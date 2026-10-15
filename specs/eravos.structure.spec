@@ -31,7 +31,7 @@
     specs/                        cross-cutting specs only (kernel, structure, maps, phases); tool specs live with tools
     tests/                        cross-cutting tests; tool tests may live in the tool's tests/
     desktop/                      the exe shell (Electron main, preload, packs builder)
-    packaging/windows/            make-exe.ps1 + .bat: Electron + the overlay (desktop/build.mjs --no-electron) → dist/
+    packaging/windows/            make-exe.ps1 (run by <repo>/Build ERAVOS.exe.bat): Electron + canvas/ + schemas/ → dist/ERAVOS
     tools/                        THE TOOLS — everything dragged onto the canvas (was domains/ until 3.37, §7)
       index.js                    the domain list the dev build loads (ERAVOS_DOMAINS)
       <domain>/
@@ -114,6 +114,8 @@
       Storage is keyed by origin only (localhost:4747, eravos://app) — moving the page under /canvas/ keeps every save.
   R10 Pack zips hold domain-relative paths (desktop/packs.mjs strips "<domain>/"), so the move changed no zip:
       all 52 Mods zips are byte-identical to 3.36. Existing ERAVOS Library folders keep working.
-  R11 Build output (the windows-x64 overlay, ERAVOS.exe, complete zips) lives in dist/ and is never committed.
+  R11 Build output (ERAVOS.exe, zips) lives in dist/ and is never committed.
+  R12 The exe IS the canvas: Build ERAVOS.exe.bat ships Electron + canvas/ + schemas/ and an empty tools/index.js —
+      no tools. Tools are everything else and arrive as packs (ERAVOS Library\\Mods or a dropped .zip).
   Verified: tests/run.mjs 809/809 · validate 127 manifests · page loads 6 domains, 54 tools, 52 packs, 0 errors
   (file://, root redirect, serve.js) · exe overlay boots bare with 0 errors.

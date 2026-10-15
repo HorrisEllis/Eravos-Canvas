@@ -14,8 +14,9 @@ A canvas of living instruments for making music — everything in key, everythin
     tests/         cross-cutting tests (node tests/run.mjs); a tool's own tests live in its folder
     specs/         cross-cutting specs (kernel, structure, phase maps); a tool's spec lives in its folder
     desktop/       the exe shell (Electron main/preload) + its builder; ships canvas/ only, tools become packs
-    packaging/     packaging/windows/make-exe.ps1 — wraps Electron around the overlay on a PC without Node
+    packaging/     packaging/windows/make-exe.ps1 — run by Build ERAVOS.exe.bat: Electron + canvas/ = ERAVOS.exe
     docs/          tool pictures (docs/tools/*.png) and release notes
+    Build ERAVOS.exe.bat   builds the exe (the canvas only) into dist/
     index.html     opens canvas/index.html · serve.js / Start ERAVOS.bat / start-eravos.sh serve this folder
 
 The canvas finds the tools through one setting: `canvas/scripts.js` sets `ERAVOS_TOOLS` (default `../tools/`) and loads
@@ -161,6 +162,6 @@ one pack per tool family (synths, drums, effects, arrange…). Remove a pack to 
 canvas to add tools (it is kept in Packs and loads every start). Put sounds, `.mid` or projects in **Drop Here** and they
 appear on the canvas; Save and Bounce write to **Projects** / **Exports**. Build the packs alone with `node desktop/packs.mjs`.
 Rebuild it from this source with `node desktop/build.mjs` (downloads the pinned Electron once).
-Without Node on the PC: `node desktop/build.mjs --no-electron --out dist/windows-x64` (on any machine) makes the overlay,
-then **packaging/windows/Make ERAVOS.exe (Windows).bat** adds Electron and writes `dist/ERAVOS` + the complete zip.
-`dist/` is build output and is not committed.
+**Build ERAVOS.exe.bat** (repo root, Windows, no Node): the exe is the canvas and nothing else — Electron + `canvas/` +
+`schemas/` → `dist/ERAVOS/ERAVOS.exe` and `dist/ERAVOS_<version>.zip`. Tools are everything else: they reach the exe as
+packs (`node desktop/packs.mjs` → drop the zips in ERAVOS Library › Mods). `dist/` is build output and is not committed.
