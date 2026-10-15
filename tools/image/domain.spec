@@ -1,4 +1,4 @@
-# spec_id: eravos.domain.image · status BUILDING (1 built: image-adjust) · folder tools/image/  (exe: ERAVOS Library/Mods/Image/)
+# spec_id: eravos.domain.image · status BUILDING (1 built: image-adjust) · folder tools/image/  (exe: tools/image/ beside ERAVOS.exe)
 domain: 🖼 Image — Photo manipulation as a chain of small tools: every tool takes an image in and gives an image out, nothing is destructive, any step can be re-wired.
 mode: Photo & Image
 units (toolbar expansion, built only when needed):

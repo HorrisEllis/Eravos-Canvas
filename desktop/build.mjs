@@ -3,11 +3,11 @@
  *   node desktop/build.mjs                         downloads the pinned Electron (desktop/package.json electronVersion)
  *   node desktop/build.mjs --electron-zip <zip>    uses an Electron win32-x64 zip you already have
  *   node desktop/build.mjs --out <folder>          default: <repo>/../ERAVOS-windows
- *   node desktop/build.mjs --no-electron           the overlay only (resources/app + ERAVOS Library + READ ME) — what
+ *   node desktop/build.mjs --no-electron           the overlay only (canvas/ tools/ schemas/ resources/app + READ ME) — what
  *                                                  packaging/windows/make-exe.ps1 wraps around Electron on a PC without Node
- * Result: <out>/ERAVOS/ERAVOS.exe + resources/app (the canvas). ERAVOS Library is created next to the exe on first run.
+ * Result: <out>/ERAVOS/ERAVOS.exe beside canvas/ tools/ schemas/ (the repo's layout); resources/app holds main.js + preload.js.
  * Same as electron-packager does, minus rcedit (icon/version info) which needs Windows or wine — declared in the spec. */
-import fs from 'fs'; import path from 'path'; import { buildPacks } from './packs.mjs'; import { execFileSync } from 'child_process'; import { fileURLToPath } from 'url';
+import fs from 'fs'; import path from 'path'; import { execFileSync } from 'child_process'; import { fileURLToPath } from 'url';
 const HERE = path.dirname(fileURLToPath(import.meta.url)), ROOT = path.resolve(HERE, '..');
 const arg = (k) => { const i = process.argv.indexOf(k); return i >= 0 ? process.argv[i + 1] : null; };
 const pkg = JSON.parse(fs.readFileSync(path.join(HERE, 'package.json'), 'utf8'));
@@ -37,12 +37,15 @@ function copyDir(src, dst, skip) {
     if (fs.statSync(s).isDirectory()) copyDir(s, d, skip); else fs.copyFileSync(s, d);
   }
 }
-// P13: the exe ships the CANVAS only (canvas/ = kernel, runtime, shell). Every tool arrives as a pack in ERAVOS Library › Mods.
-const SHIP = ['canvas', 'README.md', 'schemas'];
+// The exe folder has the project's layout: canvas/ tools/ schemas/ README.md beside ERAVOS.exe, the same folders as the
+// repo, so the exe loads every domain from tools/ exactly like the dev build. Your folders sit next to them and survive a rebuild.
+const SHIP = ['canvas', 'tools', 'schemas', 'README.md'];
+const KEEP = ['projects', 'exports', 'drop', 'packs', '.appdata', 'ERAVOS Library'];   // yours — never deleted by a rebuild
 const OVERLAY = process.argv.includes('--no-electron');
 
 say('assembling ' + APP);
-fs.rmSync(APP, { recursive: true, force: true });
+fs.mkdirSync(APP, { recursive: true });
+for (const n of fs.readdirSync(APP)) if (!KEEP.includes(n)) fs.rmSync(path.join(APP, n), { recursive: true, force: true });
 if (!OVERLAY) {
   extract(await electronZip(), APP);
   fs.renameSync(path.join(APP, 'electron.exe'), path.join(APP, 'ERAVOS.exe'));
@@ -52,22 +55,23 @@ if (!OVERLAY) {
 const res = path.join(APP, 'resources', 'app'); fs.mkdirSync(res, { recursive: true });
 ['main.js', 'preload.js'].forEach(f => fs.copyFileSync(path.join(HERE, f), path.join(res, f)));
 fs.writeFileSync(path.join(res, 'package.json'), JSON.stringify({ name: pkg.name, productName: pkg.productName, version: pkg.version, description: pkg.description, author: pkg.author, main: 'main.js', private: true }, null, 2));
-for (const s of SHIP) { const src = path.join(ROOT, s), dst = path.join(res, 'eravos', s); if (fs.statSync(src).isDirectory()) copyDir(src, dst, (rel, n) => n === 'node_modules' || n.startsWith('.')); else { fs.mkdirSync(path.dirname(dst), { recursive: true }); fs.copyFileSync(src, dst); } }
-fs.mkdirSync(path.join(res, 'eravos', 'tools'), { recursive: true });
-fs.writeFileSync(path.join(res, 'eravos', 'tools', 'index.js'), '/* ERAVOS.exe: no built-in domains — the canvas expands with packs (ERAVOS Library › Packs, or drop a .zip). */\nwindow.ERAVOS_DOMAINS = [];\n');
-const packsDir = path.join(APP, 'ERAVOS Library', 'Mods', 'Music'); // 3.30: one folder per domain
-fs.rmSync(packsDir, { recursive: true, force: true });
-const pk = buildPacks(packsDir); say(`${pk.made.length} packs → ERAVOS Library › Packs (${pk.organisms} tools)`);
+for (const s of SHIP) { const src = path.join(ROOT, s), dst = path.join(APP, s); if (fs.statSync(src).isDirectory()) copyDir(src, dst, (rel, n) => n === 'node_modules' || n.startsWith('.')); else fs.copyFileSync(src, dst); }
+say('canvas/ + tools/ (' + fs.readdirSync(path.join(ROOT, 'tools')).filter(d => fs.existsSync(path.join(ROOT, 'tools', d, 'index.js'))).join(', ') + ') + schemas/ → ' + APP);
 fs.writeFileSync(path.join(APP, 'READ ME FIRST.txt'), [
   'ERAVOS ' + pkg.version, '',
-  'Double-click ERAVOS.exe. That is the canvas - no install, no browser, nothing else needed.', '',
+  'Double-click ERAVOS.exe - no install, no browser, nothing else needed.', '',
   'First launch: Windows may say "Windows protected your PC" because this build is not code-signed yet.',
   'Click "More info" then "Run anyway". It only asks once.', '',
-  'The ERAVOS Library folder appears next to ERAVOS.exe on first run:',
-  '  Drop Here - put sounds, .mid files, packs or projects here; they appear on the canvas.',
-  '  Packs     - the tools. ERAVOS itself is only the canvas; everything you can add comes from the packs here.',
-  '              Remove a pack to remove its tools; drop a new pack on the canvas to add more (it is kept here).',
-  '  Projects / Exports - where Save and Bounce write.', '',
+  'This folder has the same layout as the ERAVOS project:',
+  '  canvas\\    the canvas (kernel, runtime)',
+  '  tools\\     every tool, one folder per domain (tools\\music, tools\\image, tools\\video, ...)',
+  '  schemas\\   the formats tools and packs follow',
+  'Your folders appear next to them on first run, and a rebuild never touches them:',
+  '  projects\\  Session > Save writes here      exports\\  bounced WAVs and other exports',
+  '  drop\\      put sounds, .mid files, packs or projects here; they appear on the canvas',
+  '  packs\\     extra tool packs (.zip) - loaded every start; packs dropped on the canvas are kept here',
+  '  .appdata\\  ERAVOS\'s own storage (autosave, presets)', '',
+  'Coming from an older build? Your old "ERAVOS Library" projects, exports and autosave move across on first start.', '',
   'MIDI pads/keys: plug in, then MIDI Map > Connect MIDI. Close other music apps first - Windows lets only one app use a MIDI device at a time.',
   'Move or back up everything: copy this whole ERAVOS folder.', ''].join('\r\n'));
 say('done → ' + (OVERLAY ? APP + ' (overlay — packaging/windows/make-exe.ps1 adds Electron)' : path.join(APP, 'ERAVOS.exe')));

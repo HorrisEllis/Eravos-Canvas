@@ -1,4 +1,4 @@
-# spec_id: eravos.domain.ui · status MAPPED · folder tools/ui/  (exe: ERAVOS Library/Mods/UI / Web/)
+# spec_id: eravos.domain.ui · status MAPPED · folder tools/ui/  (exe: tools/ui/ beside ERAVOS.exe)
 domain: 🧩 UI / Web — Design and edit web interfaces with small tools: a page is a tree of components; style comes from tokens; the result exports as real HTML/CSS.
 mode: UI Design
 units (toolbar expansion, built only when needed):
