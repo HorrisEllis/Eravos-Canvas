@@ -1,0 +1,79 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.breath",
+  "version": "1.0.0",
+  "label": "Breath",
+  "icon": "◎",
+  "accent": "#8844ff",
+  "domain": "music",
+  "category": "modulation",
+  "summary": "Breathe with the music: a breath-cycle clock that swells the sound on the inhale — and drives anything wired to it.",
+  "tags": [
+    "modulation",
+    "breath"
+  ],
+  "files": {
+    "engine": "breath.engine.js",
+    "ui": "breath.ui.js",
+    "spec": "breath.spec",
+    "preview": "preview.png",
+    "tests": "breath.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.acid-synth",
+    "eravos.bass-forge",
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.coven",
+    "eravos.dub-station",
+    "eravos.edm-lab",
+    "eravos.embodiment-lab",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.master-fx",
+    "eravos.organ",
+    "eravos.pad-forge",
+    "eravos.pads",
+    "eravos.recursive-spectra",
+    "eravos.reese-bass",
+    "eravos.retro-poly",
+    "eravos.sample-player",
+    "eravos.sidechain-compressor",
+    "eravos.sub-engine",
+    "eravos.supersaw",
+    "eravos.wobble-bass",
+    "eravos.xen-synth"
+  ],
+  "status": "built",
+  "conflicts": []
+}

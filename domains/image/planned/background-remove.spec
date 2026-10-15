@@ -1,0 +1,10 @@
+# spec_id: eravos.organism.background-remove · version 1.0.0 · phase P38 · status planned · category adjust
+identity:
+  id: eravos.image.background-remove ; label: Cut Out ; icon: ✂ ; accent: "#a0e7e5"
+  comp_intent: Remove the background from a photo — subject cut out with clean edges — for covers, thumbnails, collages.
+  novelty: Segmentation model (optional pack) + manual refine brush.
+engine: segmentation ONNX (small, open-licensed) via onnxruntime-web ; refine brush add/remove ; edge feather ; output PNG with alpha ; no model → manual mode with magic-wand + brush
+config: model ; feather ; refine strokes
+hooks: data_in image ; data_out image (alpha)
+ui: before/after ; brush tools
+tests: no model → manual mode works ; alpha edge feather width as set ±1 px

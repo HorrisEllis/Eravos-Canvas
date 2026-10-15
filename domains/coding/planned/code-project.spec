@@ -1,0 +1,10 @@
+# spec_id: eravos.organism.code-project · version 1.0.0 · phase P38 · status planned · category code
+identity:
+  id: eravos.coding.code-project ; label: Project ; icon: 🗂 ; accent: "#82aaff"
+  comp_intent: A small multi-file project in the canvas — files, folders, an editor with syntax colours, search, and run it (JS/TS in a sandbox, HTML as a live page).
+  novelty: Multi-file workspace (Code Cell = one snippet).
+engine: virtual file tree (IndexedDB, saved with the project) ; editor: CodeMirror 6 (vendored, MIT) with JS/TS/JSON/HTML/CSS/Markdown/Python highlighting, multi-cursor, find/replace, bracket match ; TS transpile via vendored sucrase ; run: module graph bundled in a Worker sandbox (same rules as Code Cell: no network unless allowed) or HTML preview in a sandboxed iframe (srcdoc, no same-origin) ; import/export zip
+config: entry file ; runtime js|html ; network bool
+hooks: data_in ; data_out result ; data_out files (json) ; trigger_in run
+ui: tree + tabs + editor + console ; preview pane for HTML
+tests: two-file import works ; TS type annotations stripped and run ; iframe preview cannot read parent (sandbox verified)

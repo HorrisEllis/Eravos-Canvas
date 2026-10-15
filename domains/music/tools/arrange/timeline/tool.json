@@ -1,0 +1,66 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.timeline",
+  "version": "2.1.0",
+  "label": "Timeline",
+  "icon": "📼",
+  "accent": "#00d4ff",
+  "domain": "music",
+  "category": "arrange",
+  "summary": "Make the song: instrument tracks with a piano roll, her vocal clips, pattern blocks, section markers.",
+  "tags": [
+    "arrange",
+    "timeline"
+  ],
+  "files": {
+    "engine": "timeline.engine.js",
+    "ui": "timeline.ui.js",
+    "css": "timeline.pianoroll.css",
+    "extra": [
+      "timeline.pianoroll.js"
+    ],
+    "spec": "timeline.spec",
+    "preview": "preview.png",
+    "tests": "timeline.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "bus_publish",
+      "bus_subscribe",
+      "filesystem_read",
+      "registry_read"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": []
+  },
+  "works_with": [
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.dub-station",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.master-fx",
+    "eravos.sidechain-compressor"
+  ],
+  "status": "built",
+  "conflicts": []
+}

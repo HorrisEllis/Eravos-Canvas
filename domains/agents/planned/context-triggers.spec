@@ -1,0 +1,10 @@
+# spec_id: eravos.organism.context-triggers · version 1.0.0 · phase P38 · status planned · category triggers
+identity:
+  id: eravos.agents.context-triggers ; label: When… ; icon: 📡 ; accent: "#34d399"
+  comp_intent: Tasker-style contexts — do something when: a time window starts, you go idle, the computer goes offline/online, a MIDI device connects, a file appears, the clipboard changes, the window is focused, battery is low (where the platform tells us).
+  novelty: Condition-based (state) triggers with enter/exit, combinable with AND/OR (Trigger Schedule = clock only).
+engine: contexts: time window, day of week, idle (Idle Detection API with permission, fallback: no input for N min), online/offline, page visible/hidden, MIDI port connect/disconnect, file watch (desktop), clipboard change (permission), battery (where available), geolocation area (permission) ; combine contexts with AND/OR/NOT ; enter & exit events ; debounce
+config: contexts[] ; logic ; debounce
+hooks: trigger_out enter ; trigger_out exit ; data_out context (json)
+ui: rule as a sentence: "When [idle 10 min] AND [after 22:00] → enter" ; live state of each condition
+tests: offline event → enter fired once (debounced) ; AND of two contexts fires only when both true ; permission denied → plain message, rule disabled not broken

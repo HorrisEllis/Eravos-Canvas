@@ -1,0 +1,45 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.midi-mapper",
+  "version": "1.1.0",
+  "label": "MIDI Map",
+  "icon": "🎛",
+  "accent": "#ff6b00",
+  "domain": "music",
+  "category": "tools",
+  "summary": "Plug in your pad controller (e.g. Donner StarryPad): learn the pads once, map knobs by wiggling them.",
+  "tags": [
+    "tools",
+    "midi",
+    "mapper"
+  ],
+  "files": {
+    "engine": "midi-mapper.engine.js",
+    "ui": "midi-mapper.ui.js",
+    "spec": "midi-mapper.spec",
+    "preview": "preview.png",
+    "tests": "midi-mapper.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "midi_in",
+      "midi_out",
+      "bus_publish",
+      "bus_subscribe",
+      "registry_read"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": []
+  },
+  "works_with": [],
+  "status": "built",
+  "conflicts": []
+}

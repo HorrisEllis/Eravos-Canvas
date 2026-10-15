@@ -1,0 +1,65 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.song-recorder",
+  "version": "1.0.0",
+  "label": "Song Recorder",
+  "icon": "⏺",
+  "accent": "#ff3355",
+  "domain": "music",
+  "category": "arrange",
+  "summary": "Pinned to the bottom: record the canvas (or one tool) into takes, edit them like a DAW, export WAV/FLAC/AIFF/MP3/Opus or stems.",
+  "tags": [
+    "arrange",
+    "song",
+    "recorder"
+  ],
+  "files": {
+    "engine": "song-recorder.engine.js",
+    "ui": "song-recorder.ui.js",
+    "spec": "song-recorder.spec",
+    "preview": "preview.png",
+    "tests": "song-recorder.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "audio_in",
+      "bus_publish",
+      "bus_subscribe",
+      "filesystem_read",
+      "filesystem_write",
+      "registry_read"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": []
+  },
+  "works_with": [
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.dub-station",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.master-fx",
+    "eravos.sidechain-compressor"
+  ],
+  "status": "built",
+  "conflicts": []
+}

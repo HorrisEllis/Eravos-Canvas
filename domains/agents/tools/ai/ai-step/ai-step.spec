@@ -1,0 +1,29 @@
+# spec_id: eravos.organism.agents.ai-step · version 1.0.0 · phase P37.1 · status BUILT · domain agents (AI Automation)
+identity:
+  id: eravos.agents.ai-step ; label: AI Step ; icon: ✦ ; category: AI
+  purpose: the one tool AI Automation stands on — one step that asks a model, wired like any tool. Automations are
+    built by wiring steps, code cells and other domains' tools (it merges the mapped "prompt" + "llm-call" tools).
+contract:
+  prompt: a template; {{input}} = what arrived (text as is, anything else as pretty JSON), {{input.a.b}} = a field,
+    {{date}} = today. Optional system instructions.
+  providers: anthropic (Messages API, browser access header) · openai-compatible (any /chat/completions endpoint,
+    OpenAI or a local server) · echo (dry run, no network: returns the filled prompt).
+  keys: per provider through ctx.secret (this computer only) — NEVER in params, presets, projects, backups or exports.
+  reliability: time limit (AbortController) · Cancel · retries (0–5) with exponential backoff on 429 / 5xx / network
+    errors (never on 4xx) · plain messages for 401/403/404/429/5xx/unreachable (CORS hint for local servers).
+  json mode: the request asks for JSON only (+ required keys); the reply is parsed (``` fences and surrounding prose
+    tolerated); missing/invalid → ONE repair request; still invalid → error out, nothing sent on json.
+  log: per call — provider, model, ms, tokens in/out, retries, repairs, errors (last 100).
+  a run replaces a run in flight (the old one is aborted and its answer discarded).
+ports (data domain):
+  in:  in (any) → {{input}} · run (trigger)
+  out: text (text) · json (json — JSON mode, or a text answer that happens to be a JSON object) · error (text)
+params: provider · model · endpoint · temperature · maxTokens · output (text|json) · requiredKeys · auto · timeout ·
+  retries. Extra (saved): prompt, system.
+acceptance (tests/p26-domains.test.js — network mocked; no real key in tests):
+  - echo returns the filled template ({{input}}, {{input.field}})
+  - anthropic request shape: URL, headers (x-api-key, anthropic-version, browser-access), body (model, max_tokens,
+    messages); the answer text goes out on text
+  - 500 then 200 → one retry, answer delivered; 401 → no retry, plain "key was refused" on error
+  - JSON mode: a fenced reply parses; missing required key → one repair request → delivered on json
+  - the key is not in the saved state (serialize) after key_set

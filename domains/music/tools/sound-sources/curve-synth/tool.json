@@ -1,0 +1,64 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.curve-synth",
+  "version": "1.0.0",
+  "label": "Curve",
+  "icon": "⤵",
+  "accent": "#c4541b",
+  "domain": "music",
+  "category": "sound-sources",
+  "summary": "Draw a pitch gesture; the sound follows it, slams the edge and ricochets back — dives, whoops, sirens, lasers.",
+  "tags": [
+    "sound-sources",
+    "curve",
+    "synth"
+  ],
+  "files": {
+    "engine": "curve-synth.engine.js",
+    "ui": "curve-synth.ui.js",
+    "spec": "curve-synth.spec",
+    "preview": "preview.png",
+    "tests": "curve-synth.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "midi_in",
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.dub-station",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.master-fx",
+    "eravos.sidechain-compressor"
+  ],
+  "status": "built",
+  "conflicts": []
+}

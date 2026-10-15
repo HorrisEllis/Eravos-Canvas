@@ -1,0 +1,131 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "sidechain-compressor.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "mix"
+ ],
+ "for": "eravos.sidechain-compressor",
+ "items": {
+  "eravos.sidechain-compressor": {
+   "presets": {
+    "Classic 1/4 Pump": {
+     "params": {
+      "mode": "duck",
+      "triggerMode": "tempo",
+      "division": "1/4",
+      "depth": 0.8,
+      "attack": 3,
+      "hold": 10,
+      "release": 220,
+      "curve": 0.6
+     },
+     "extra": {
+      "points": null
+     }
+    },
+    "Subtle Glue": {
+     "params": {
+      "mode": "duck",
+      "triggerMode": "tempo",
+      "division": "1/4",
+      "depth": 0.35,
+      "attack": 5,
+      "hold": 0,
+      "release": 160,
+      "curve": 0.5
+     },
+     "extra": {
+      "points": null
+     }
+    },
+    "Hard Gate 1/8": {
+     "params": {
+      "mode": "duck",
+      "triggerMode": "tempo",
+      "division": "1/8",
+      "depth": 1,
+      "attack": 1,
+      "hold": 40,
+      "release": 60,
+      "curve": 0.9
+     },
+     "extra": {
+      "points": null
+     }
+    },
+    "Half-time 1/2": {
+     "params": {
+      "mode": "duck",
+      "triggerMode": "tempo",
+      "division": "1/2",
+      "depth": 0.85,
+      "attack": 3,
+      "hold": 20,
+      "release": 450,
+      "curve": 0.6
+     },
+     "extra": {
+      "points": null
+     }
+    },
+    "Kick-triggered": {
+     "params": {
+      "mode": "duck",
+      "triggerMode": "event",
+      "source": "kick",
+      "depth": 0.8,
+      "attack": 2,
+      "hold": 10,
+      "release": 200,
+      "curve": 0.6
+     },
+     "extra": {
+      "points": null
+     }
+    },
+    "Trance Gate 1/16": {
+     "params": {
+      "mode": "step",
+      "smoothing": 4,
+      "steps": [
+       1,
+       0,
+       1,
+       1,
+       0,
+       1,
+       1,
+       0,
+       1,
+       0,
+       1,
+       1,
+       0,
+       1,
+       1,
+       0
+      ]
+     }
+    },
+    "Club · House Pump 1/4 (deep)": {
+     "params": {
+      "target": "insert",
+      "mode": "duck",
+      "triggerMode": "tempo",
+      "division": "1/4",
+      "depth": 0.9,
+      "attack": 2,
+      "hold": 20,
+      "release": 200,
+      "curve": 0.7
+     }
+    }
+   }
+  }
+ }
+}

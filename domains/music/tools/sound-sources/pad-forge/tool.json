@@ -1,0 +1,69 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.pad-forge",
+  "version": "1.0.0",
+  "label": "Pad Forge",
+  "icon": "☁",
+  "accent": "#8fd3ff",
+  "domain": "music",
+  "category": "sound-sources",
+  "summary": "Make pads: blend four sources on an XY square that drifts by itself, blooming filter, chord hold, shimmer halos.",
+  "tags": [
+    "sound-sources",
+    "pad",
+    "forge"
+  ],
+  "files": {
+    "engine": "pad-forge.engine.js",
+    "ui": "pad-forge.ui.js",
+    "spec": "pad-forge.spec",
+    "preview": "preview.png",
+    "tests": "pad-forge.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "midi_in",
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.breath",
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.dub-station",
+    "eravos.embodiment-lab",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.master-fx",
+    "eravos.sidechain-compressor",
+    "eravos.xy-pad"
+  ],
+  "status": "built",
+  "conflicts": []
+}

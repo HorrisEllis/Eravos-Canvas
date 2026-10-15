@@ -1,0 +1,72 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "lfo.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "modulation"
+ ],
+ "for": "eravos.lfo",
+ "items": {
+  "eravos.lfo": {
+   "presets": {
+    "Wobble 1/8": {
+     "params": {
+      "shape": "sine",
+      "sync": true,
+      "div": "1/8",
+      "depth": 1,
+      "polarity": "bipolar"
+     }
+    },
+    "Slow Filter Sweep 2 bars": {
+     "params": {
+      "shape": "triangle",
+      "sync": true,
+      "div": "2/1",
+      "depth": 0.8,
+      "polarity": "unipolar+"
+     }
+    },
+    "Stepped Random 1/16": {
+     "params": {
+      "shape": "sh",
+      "sync": true,
+      "div": "1/16",
+      "depth": 0.6
+     }
+    },
+    "Pan Swirl": {
+     "params": {
+      "shape": "sine",
+      "sync": true,
+      "div": "1/2",
+      "depth": 1,
+      "polarity": "bipolar"
+     }
+    },
+    "Pump 1/4": {
+     "params": {
+      "shape": "ramp",
+      "sync": true,
+      "div": "1/4",
+      "depth": 1,
+      "polarity": "unipolar+"
+     }
+    },
+    "80s · Slow Juno Drift": {
+     "params": {
+      "shape": "triangle",
+      "sync": false,
+      "rate": 0.12,
+      "depth": 0.25,
+      "polarity": "bipolar"
+     }
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,74 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.xy-pad",
+  "version": "2.0.0",
+  "label": "XY Pad",
+  "icon": "✛",
+  "accent": "#00d4ff",
+  "domain": "music",
+  "category": "modulation",
+  "summary": "Perform two knobs at once with your mouse — then loop the gesture in time.",
+  "tags": [
+    "modulation",
+    "pad"
+  ],
+  "files": {
+    "engine": "xy-pad.engine.js",
+    "ui": "xy-pad.ui.js",
+    "spec": "xy-pad.spec",
+    "preview": "preview.png",
+    "tests": "xy-pad.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "bus_publish",
+      "bus_subscribe",
+      "registry_read"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": []
+  },
+  "works_with": [
+    "eravos.acid-synth",
+    "eravos.bass-forge",
+    "eravos.channel",
+    "eravos.coven",
+    "eravos.dub-station",
+    "eravos.edm-lab",
+    "eravos.embodiment-lab",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.lfo",
+    "eravos.master-fx",
+    "eravos.organ",
+    "eravos.pad-forge",
+    "eravos.pads",
+    "eravos.recursive-spectra",
+    "eravos.reese-bass",
+    "eravos.retro-poly",
+    "eravos.sample-player",
+    "eravos.sub-engine",
+    "eravos.supersaw",
+    "eravos.wobble-bass",
+    "eravos.xen-synth"
+  ],
+  "status": "built",
+  "conflicts": []
+}

@@ -1,0 +1,177 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "xen-synth.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "xenharmonic"
+ ],
+ "for": "eravos.xen-synth",
+ "items": {
+  "eravos.xen-synth": {
+   "presets": {
+    "Golden Bells": {
+     "params": {
+      "tuning": "Golden generator (φ-MOS)",
+      "n": 7,
+      "spectrum": "bell",
+      "partials": 12,
+      "tilt": 0.7,
+      "attack": 0.002,
+      "decay": 3,
+      "sustain": 0,
+      "release": 3,
+      "partialDecay": 0.7,
+      "shimmer": 0.2,
+      "baseHz": 220
+     }
+    },
+    "Bohlen–Pierce Clarinet": {
+     "params": {
+      "tuning": "Bohlen–Pierce (13ED3)",
+      "spectrum": "odd",
+      "partials": 9,
+      "tilt": 1.2,
+      "attack": 0.04,
+      "decay": 0.3,
+      "sustain": 0.8,
+      "release": 0.3,
+      "baseHz": 196,
+      "shimmer": 0.05
+     }
+    },
+    "Tuning-matched 10-EDO": {
+     "params": {
+      "tuning": "EDO (any)",
+      "n": 10,
+      "spectrum": "tuning-matched",
+      "partials": 12,
+      "tilt": 1,
+      "attack": 0.01,
+      "decay": 0.8,
+      "sustain": 0.5,
+      "release": 1
+     }
+    },
+    "φ Organ (ED φ)": {
+     "params": {
+      "tuning": "Equal division of φ",
+      "n": 5,
+      "spectrum": "golden",
+      "partials": 8,
+      "tilt": 0.8,
+      "attack": 0.08,
+      "decay": 0.5,
+      "sustain": 0.9,
+      "release": 0.8,
+      "shimmer": 0.3
+     }
+    },
+    "Carlos α Glass": {
+     "params": {
+      "tuning": "Wendy Carlos α",
+      "spectrum": "harmonic",
+      "partials": 8,
+      "tilt": 1.6,
+      "attack": 0.005,
+      "decay": 1.2,
+      "sustain": 0.2,
+      "release": 1.5,
+      "partialDecay": 0.4
+     }
+    },
+    "Stretched Piano 22": {
+     "params": {
+      "tuning": "22-EDO",
+      "spectrum": "piano",
+      "shape": 0.3,
+      "partials": 16,
+      "tilt": 1.3,
+      "attack": 0.002,
+      "decay": 2.5,
+      "sustain": 0.05,
+      "release": 1,
+      "partialDecay": 0.6
+     }
+    },
+    "Prime Ghost (otonal)": {
+     "params": {
+      "tuning": "Harmonic series 8–16",
+      "spectrum": "prime",
+      "partials": 10,
+      "tilt": 0.9,
+      "attack": 0.3,
+      "decay": 1,
+      "sustain": 0.7,
+      "release": 2,
+      "shimmer": 0.4,
+      "baseHz": 130.81
+     }
+    },
+    "Slendro Metallophone": {
+     "params": {
+      "tuning": "Slendro (approx.)",
+      "spectrum": "bar",
+      "partials": 6,
+      "tilt": 0.6,
+      "attack": 0.001,
+      "decay": 1.8,
+      "sustain": 0,
+      "release": 1.8,
+      "partialDecay": 0.8
+     }
+    },
+    "π Drone": {
+     "params": {
+      "tuning": "Equal division of π",
+      "n": 16,
+      "spectrum": "root-k",
+      "shape": 0.3,
+      "partials": 14,
+      "tilt": 0.9,
+      "attack": 2.5,
+      "decay": 1,
+      "sustain": 1,
+      "release": 5,
+      "shimmer": 0.6,
+      "baseHz": 65.41
+     }
+    },
+    "Partch Diamond Strings": {
+     "params": {
+      "tuning": "Partch 11-limit diamond",
+      "spectrum": "harmonic",
+      "partials": 14,
+      "tilt": 1,
+      "attack": 0.25,
+      "decay": 0.5,
+      "sustain": 0.8,
+      "release": 1.2,
+      "spread": 6,
+      "shimmer": 0.3
+     }
+    },
+    "Silver-Mean Membrane": {
+     "params": {
+      "tuning": "Generator (any irrational)",
+      "generator": "silver mean 1+√2",
+      "n": 9,
+      "period": "2 (octave)",
+      "spectrum": "membrane",
+      "partials": 12,
+      "tilt": 0.7,
+      "attack": 0.001,
+      "decay": 0.9,
+      "sustain": 0,
+      "release": 0.9,
+      "partialDecay": 0.6,
+      "baseHz": 110
+     }
+    }
+   }
+  }
+ }
+}

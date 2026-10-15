@@ -1,0 +1,76 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "curve-synth.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "sound-sources"
+ ],
+ "for": "eravos.curve-synth",
+ "items": {
+  "eravos.curve-synth": {
+   "presets": {
+    "Songs-for-the-Dead Dive": {
+     "params": {
+      "slot": 0,
+      "duration": 0.45,
+      "lowNote": 22,
+      "highNote": 112,
+      "edge": true,
+      "bounces": 3,
+      "restitution": 0.62,
+      "decay": 0.55,
+      "wave": "sine",
+      "noise": 0.1,
+      "drive": 0.25,
+      "sustain": 0.1
+     }
+    },
+    "Ricochet": {
+     "params": {
+      "slot": 1,
+      "duration": 0.12,
+      "edge": true,
+      "bounces": 5,
+      "restitution": 0.65,
+      "decay": 0.75,
+      "wave": "triangle",
+      "noise": 0.25,
+      "drive": 0.4
+     }
+    },
+    "Siren": {
+     "params": {
+      "slot": 2,
+      "duration": 1.6,
+      "lowNote": 60,
+      "highNote": 90,
+      "edge": false,
+      "wave": "square",
+      "noise": 0,
+      "drive": 0.3,
+      "sustain": 1
+     }
+    },
+    "Drop Whoop": {
+     "params": {
+      "slot": 3,
+      "duration": 0.9,
+      "lowNote": 20,
+      "highNote": 84,
+      "edge": true,
+      "bounces": 1,
+      "restitution": 0.4,
+      "wave": "sawtooth",
+      "noise": 0.2,
+      "drive": 0.5,
+      "sustain": 0.5
+     }
+    }
+   }
+  }
+ }
+}

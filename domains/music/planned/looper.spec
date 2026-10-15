@@ -1,0 +1,17 @@
+# spec_id: eravos.organism.looper · version 1.0.0 · phase P8.2 · status canonical
+# source: v10 plugins/looper.json "INFINITE LOOP" (shell, F-19)
+identity:
+  id: eravos.looper ; label: Looper ; icon: ∞ ; accent: "#00d4ff"
+  comp_intent: Record any signal (mic, synth, Raven's voice) into a bar-locked loop and layer overdubs live.
+  novelty: Only organism recording live audio into transport-quantized loop layers with undo per layer.
+engine:
+  capture: AudioWorklet recorder on in port (or mic via getUserMedia when source = mic, permission audio_in)
+  length: 1..16 bars at current BPM, start/stop quantized to bar
+  layers: up to 8, each an AudioBuffer ; overdub adds layer ; feedback decays older layers per pass (0..1)
+  playback: layers scheduled as looping BufferSources aligned to bar start (re-aligned on transport:loop/seek)
+  transforms (non-destructive per layer): reverse (reversed copy), half-speed (rate 0.5, loop 2× bars), pitch ±12
+  bounce: flatten layers → asset:ready (to timeline/sample-player)
+config: bars 1..16 def 4 ; source enum [input, mic] ; feedback 0..1 def 1 ; monitor bool ; countIn bool ; per-layer gain/mute/reverse/half/pitch
+hooks: looper.hook.audio_in (in ; audio ; port in) ; STD.audio_out ; STD.transport_in ; asset_out (asset:ready)
+ui: hero = circular loop display, one ring per layer (waveform), playhead sweep ; REC/OVERDUB/PLAY/UNDO/CLEAR ; layer strip
+tests: 2-bar rec @120 → buffer 4.000 s ± 1 sample ; overdub aligned to layer 1 phase ± 1 sample ; undo removes last layer only ; half-speed doubles period

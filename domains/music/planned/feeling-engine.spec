@@ -1,0 +1,18 @@
+# spec_id: eravos.organism.feeling-engine · version 1.0.0 · phase P38 · status planned · category generators
+# Polyvagal framing: ventral (safe/social), sympathetic (mobilised: fight/flight), dorsal (shutdown/immobile). These
+# map to musical cues with research support (tempo, mode, loudness, roughness, prosody); "irrational frequencies" =
+# intervals from irrational ratios (φ, √2, π-derived, Bohlen-Pierce 3:1 split) via the xen-theory engine.
+# Honest limit: music cues correlate with felt emotion across many listeners; they don't guarantee one person's feeling.
+identity:
+  id: eravos.feeling-engine ; label: Feelings ; icon: 💗 ; accent: "#ff4f9a"
+  comp_intent: Start from a feeling — love, hate, longing, rage, calm, awe, dread, joy — and get music that carries it: tempo, mode, tuning, rhythm, timbre, space, and a voice-like melodic contour.
+  novelty: An emotion space (valence × arousal × state) driving tuning (incl. irrational sets), rhythm and timbre across your instruments.
+engine:
+  space: valence −1..1, arousal −1..1, polyvagal state blend {ventral, sympathetic, dorsal} ; named feelings are points (love = +v mid-a ventral; hate = −v high-a sympathetic; grief = −v low-a dorsal; awe = +v low/mid-a ventral+dorsal …) ; draw paths between feelings over time
+  mapping (each cue editable): tempo & pulse clarity · mode/tuning (major ↔ minor ↔ phrygian ↔ irrational sets: φ-scale, √2 tritone grid, Bohlen–Pierce, 7-EDO, beating clusters) · roughness (beating rate 20–70 Hz for anger/fear) · register & spread · attack sharpness · loudness & dynamics · space (reverb, closeness) · "prosody contour" (melodic shapes modelled on speech intonation: rising = question/hope, falling = finality, wide = excitement, narrow = sadness) · rhythm (sympathetic = syncopated & accelerating, ventral = steady & swung, dorsal = sparse & slowing)
+  output: drives Chord Assistant, Arp, Sequencer melodic lanes, any synth's params via mod lanes, Xen Synth tuning
+config: feeling (point or path) ; cue weights ; tuning set ; intensity ; seed
+hooks: STD.transport_in ; note_out ; theory_out (scale incl. xen) ; control_out ; data_in (feeling from a workflow/AI Step)
+ui: emotion map (drag a dot; named feelings around it) ; polyvagal triangle ; path drawing over bars ; cue table with what each cue is doing now
+packs: factory feelings — Love, Hate, Longing, Rage, Calm, Awe, Dread, Joy, Nostalgia, Defiance, Tenderness, Numb
+tests: moving valence +→− switches mode major→minor within one bar ; φ tuning set: interval ratios within 0.5 c of φ-derived values ; sympathetic state raises tempo and onset density vs ventral at same valence

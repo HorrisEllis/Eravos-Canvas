@@ -1,0 +1,43 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.session",
+  "version": "1.0.0",
+  "label": "Session",
+  "icon": "◎",
+  "accent": "#ffffff",
+  "domain": "music",
+  "category": "start-here",
+  "summary": "Song name, tempo, key (plain words), save/open, and BOUNCE to a WAV file.",
+  "tags": [
+    "start-here",
+    "session"
+  ],
+  "files": {
+    "engine": "session.engine.js",
+    "ui": "session.ui.js",
+    "spec": "session.spec",
+    "preview": "preview.png",
+    "tests": "session.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "bus_publish",
+      "bus_subscribe",
+      "filesystem_read",
+      "filesystem_write"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": []
+  },
+  "works_with": [],
+  "status": "built",
+  "conflicts": []
+}

@@ -1,0 +1,2 @@
+{ "schema": "eravos.domain/1", "id": "coding", "label": "Coding Environment", "version": "1.0.0", "icon": "⌨",
+  "core": [], "ports": ["dataflow"], "modes": ["coding"], "pages": [], "content": [] }

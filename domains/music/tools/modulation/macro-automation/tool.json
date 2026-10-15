@@ -1,0 +1,75 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.macro-automation",
+  "version": "2.0.0",
+  "label": "Automation",
+  "icon": "⤴",
+  "accent": "#ffaa00",
+  "domain": "music",
+  "category": "modulation",
+  "summary": "Draw how any knob changes across the song — filter opens over the build, reverb swells into the drop.",
+  "tags": [
+    "modulation",
+    "macro",
+    "automation"
+  ],
+  "files": {
+    "engine": "macro-automation.engine.js",
+    "ui": "macro-automation.ui.js",
+    "spec": "macro-automation.spec",
+    "preview": "preview.png",
+    "tests": "macro-automation.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "bus_publish",
+      "bus_subscribe",
+      "registry_read"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": []
+  },
+  "works_with": [
+    "eravos.acid-synth",
+    "eravos.bass-forge",
+    "eravos.channel",
+    "eravos.coven",
+    "eravos.dub-station",
+    "eravos.edm-lab",
+    "eravos.embodiment-lab",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.lfo",
+    "eravos.master-fx",
+    "eravos.organ",
+    "eravos.pad-forge",
+    "eravos.pads",
+    "eravos.recursive-spectra",
+    "eravos.reese-bass",
+    "eravos.retro-poly",
+    "eravos.sample-player",
+    "eravos.sub-engine",
+    "eravos.supersaw",
+    "eravos.wobble-bass",
+    "eravos.xen-synth"
+  ],
+  "status": "built",
+  "conflicts": []
+}

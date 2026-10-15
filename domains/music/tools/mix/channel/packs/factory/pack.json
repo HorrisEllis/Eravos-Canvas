@@ -1,0 +1,87 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "channel.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "mix"
+ ],
+ "for": "eravos.channel",
+ "items": {
+  "eravos.channel": {
+   "presets": {
+    "Vocal": {
+     "params": {
+      "hpf": 120,
+      "low": -2,
+      "mid": 2,
+      "midFreq": 3000,
+      "high": 3,
+      "sendRev": 0.35,
+      "sendDel": 0.15
+     }
+    },
+    "Bass": {
+     "params": {
+      "hpf": 25,
+      "low": 2,
+      "mid": -3,
+      "midFreq": 350,
+      "high": -2,
+      "drive": 0.15
+     }
+    },
+    "Drums": {
+     "params": {
+      "hpf": 20,
+      "low": 1.5,
+      "mid": -1.5,
+      "midFreq": 500,
+      "high": 2,
+      "drive": 0.1
+     }
+    },
+    "Pad / Lead": {
+     "params": {
+      "hpf": 150,
+      "low": -3,
+      "high": 2,
+      "sendRev": 0.3,
+      "sendDel": 0.1
+     }
+    },
+    "Flat": {
+     "params": {
+      "hpf": 0,
+      "low": 0,
+      "mid": 0,
+      "high": 0,
+      "drive": 0,
+      "sendRev": 0,
+      "sendDel": 0,
+      "trim": 0,
+      "fader": 0,
+      "pan": 0
+     }
+    },
+    "80s · 80s Snare Room": {
+     "params": {
+      "trim": 0,
+      "hpf": 120,
+      "low": -2,
+      "midFreq": 2500,
+      "midQ": 1,
+      "mid": 3,
+      "high": 4,
+      "drive": 0.15,
+      "sendRev": 0.55,
+      "sendDel": 0.1
+     }
+    }
+   }
+  }
+ }
+}

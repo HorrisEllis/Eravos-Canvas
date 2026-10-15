@@ -1,0 +1,50 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.image.image-adjust",
+  "version": "1.0.0",
+  "label": "Image Adjust",
+  "icon": "🖼",
+  "accent": "#6ee7f2",
+  "domain": "image",
+  "category": "adjust",
+  "summary": "Open a picture and shape it: exposure, colour, tone, crop, rotate — non-destructive, before/after, export PNG/JPEG/WebP.",
+  "tags": [
+    "image",
+    "photo",
+    "adjust",
+    "colour",
+    "crop",
+    "export"
+  ],
+  "files": {
+    "engine": "image-adjust.engine.js",
+    "ui": "image-adjust.ui.js",
+    "css": "image-adjust.css",
+    "spec": "image-adjust.spec",
+    "tests": "image-adjust.test.js",
+    "preview": "preview.png"
+  },
+  "needs": {
+    "units": [],
+    "tools": [],
+    "permissions": [
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.agents.ai-step",
+    "eravos.coding.code-cell",
+    "eravos.video.video-clip"
+  ],
+  "status": "built",
+  "conflicts": []
+}

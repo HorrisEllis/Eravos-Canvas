@@ -1,0 +1,100 @@
+# ============================================================
+# ERAVOS ORGANISM SPEC — SEQUENCER
+# spec_id:      eravos.organism.sequencer
+# version:      2.0.0   (supersedes 1.0.0)
+# phase:        P4
+# resolves:     F-07, F-08, F-15(seq)
+# status:       canonical
+# ============================================================
+
+identity:
+  id: eravos.sequencer ; label: Sequencer ; icon: ⬛ ; accent: "#00d4ff"
+  comp_intent: >
+    Step grid that drives any instrument on the canvas. Drum lanes
+    fire pads; melodic lanes play scale degrees so every note is in
+    key. Patterns chain into songs.
+  novelty: >
+    Only organism that addresses other organisms by target (note:trigger),
+    carries per-step articulation, and imports/exports MIDI.
+
+spec_changes_from_1.0:
+  - clock_source moved to MasterTransport; sequencer follows transport:tick (no own PrecisionClock)
+  - play button publishes ui:transport-play; seq:play/seq:stop emitted by transport only
+  - no Space binding (F-07); BPM change never restarts (F-08)
+  - dependency on eravos.pads removed; any capability.note_in organism is a valid target
+  - capability.clock_source removed from provides; capability.pattern_store kept
+
+model:
+  pattern: {name, length 1..64 steps, tracks[]}
+  slots:   8 patterns A..H ; chain: ordered slot list with repeat counts (song mode)
+  track:   {name, kind: drum|melodic, target instanceId, drumNote (drum), color, mute, solo, lengthOverride (polymeter), transpose}
+  step:    {on, vel 0..1, prob 0..1, degree 1..14 (melodic), octave −2..2, gate 0.1..4 steps, accent, slide, ratchet 1..4, wobbleDiv?}
+  swing:   0..0.75 (fraction of a 16th on odd steps)
+  scheduling: on transport:tick(t) for each track: step = tick.step16 mod length → if on && rand < prob → note:trigger {target, note, velocity, time: t + swingOffset, duration: gate·stepDur, accent, slide}
+  note resolution: melodic note = MusicTheory.degreeToMidi(degree, 4 + octave + transpose, root, scale)
+  pattern switch: cued switches apply at next bar boundary
+
+genre_starters (data/patterns.json): [four-on-floor house, dubstep half-time 140, DnB two-step 174, UKG 2-step, trap 140, lo-fi 85] — sets bpm suggestion, drum lanes, one bass lane in key
+
+config:
+  length enum [8,12,16,24,32,48,64] def 16 ; swing 0..0.75 def 0 ; slot A..H def A ; chainOn bool def false
+  recordMode enum [off, overdub, replace] def off (live-records note:trigger/pad:trigger into current step, quantized)
+
+hooks:
+  - seq.hook.note_out:     out ; event_bus ; note:trigger (STD.note_in schema) ; 2.0.0
+  - seq.hook.fire_out:     out ; seq:fire {track, step, sound, timestamp} ; 1.0.0 (lights pads)
+  - seq.hook.transport_in  STD.transport_in
+  - seq.hook.theory_in     STD.theory_in (melodic lanes re-resolve, grid shows note names)
+  - seq.hook.bank_in:      in ; pad:bank-change → drum lane names
+  - seq.hook.record_in:    in ; pad:trigger | note:trigger (recordMode)
+  - seq.hook.suggest_in:   in ; seq:pattern_suggest {target, track, steps} (acid generator, EDM Lab print)
+  - seq.hook.cue_in:       in ; seq:pattern_cue {target, slot} (timeline pattern lanes, drop builder)
+  - seq.hook.pattern_out:  out ; seq:pattern_changed {slot, bar}
+
+ui:
+  header: transport play (→ master) · BPM drag · length · swing · slots A..H (click select, shift-click cue, alt-drag copy) · chain editor · genre starter menu · import/export
+  grid: rows = tracks ; drum lane cells show velocity as fill height ; melodic lane cells show note name ; prob shown as dotted cell
+  step inspector (selected step): vel, prob, degree/octave, gate, accent, slide, ratchet
+  track header: target select (live list of capability.note_in organisms), kind, mute/solo, colour
+  drag-paint on/off ; right-drag paints velocity
+  ui_hooks: [ui:transport_play, ui:bpm_change, ui:step_edit {track, step, patch}, ui:track_edit {track, patch}, ui:track_add, ui:track_remove, ui:slot_select, ui:slot_cue, ui:slot_copy {from,to}, ui:chain_edit {chain}, ui:starter_load {name}, ui:import {arrayBuffer, name}, ui:export {format: json|mid}, standard_ui_hooks]
+  org_hooks: [org:grid_sync, org:step_cursor {step, bar} (UIKit.atTime), org:step_set]
+
+exports: [json pattern bank, mid (SMF type 1, one track per lane, ppq 96)]
+imports: [mid (auto-spawn via shell), json pattern]
+raises_faults: [MOUNT_005 (bad pattern data), RUNTIME_002, RUNTIME_003, ASSET_002 (bad MIDI)]
+
+tests:
+  - standard_tests (non-silent via a wired pads target)
+  - swing 0.5: odd steps at t + 0.5·stepDur
+  - prob 0 never fires; prob 1 always; prob 0.5 over 1000 steps within 45–55%
+  - C minor, degree 1..7 octave 0 → [60,62,63,65,67,68,70]
+  - cue slot B mid-bar → switch exactly on next bar tick
+  - MIDI export → import round trip identical
+  - two sequencers → independent patterns, same transport phase
+  - target unmounted → track shows "no target", no fault storm (single RUNTIME_003 logged)
+
+# ---- dependencies (generated by build/specs.mjs — do not edit by hand)
+dependencies:
+  mode: music   # Music Production
+  toolbar_units: [music.engine, music.transport, music.tempo, music.key]   # ui expansion when added: Audio engine · Transport · Tempo · Song key
+  services:
+    - audio: Audio engine — shares the audio clock
+    - clock: Master clock & tempo — locks to the beat
+    - key: Song key & scale — plays in key
+    - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
+    - files: Your files — drop audio / MIDI on it
+  inputs:
+    - seq.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
+    - seq.hook.theory_in (theory:key-change) — ambient broadcast
+    - seq.hook.bank_in (pad:bank-change)
+    - seq.hook.record_in (pad:trigger|note:trigger)
+    - seq.hook.suggest_in (seq:pattern_suggest)
+    - seq.hook.cue_in (seq:pattern_cue)
+  outputs:
+    - seq.hook.note_out (note:trigger)
+    - seq.hook.fire_out (seq:fire)
+    - seq.hook.pattern_out (seq:pattern_changed)
+    - seq.hook.transport_out (ui:transport-play|ui:transport-bpm|ui:transport-stop)
+  permissions: [bus_publish, bus_subscribe, filesystem_read, registry_read]
+  works_with: [eravos.pads, eravos.sample-player, eravos.wobble-bass, eravos.acid-synth, eravos.reese-bass, eravos.supersaw, eravos.timeline, eravos.edm-lab]

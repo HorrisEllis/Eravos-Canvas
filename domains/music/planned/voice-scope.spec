@@ -1,0 +1,16 @@
+# spec_id: eravos.organism.voice-scope · version 1.0.0 · phase P8.5 · status canonical
+# source: v10 CODEC V2 inline engine (PitchEngine, SlopeEngine, stability, oscillation)
+identity:
+  id: eravos.voice-scope ; label: Voice Scope ; icon: 🎙 ; accent: "#00ff88"
+  comp_intent: See a voice — pitch line, tension, breathiness — and turn it into control signals or notes (sing a melody, get notes in key).
+  novelty: Only prosody analyser; outputs voice pitch as a modulation signal and quantized notes.
+engine:
+  f0: YIN (difference function + CMND, threshold 0.1, parabolic interpolation) 60–1000 Hz on worklet frames (fixes F-26 octave errors)
+  voicing: energy + ZCR + YIN aperiodicity
+  measures (v10 kept, now on YIN periods): jitter (period perturbation), shimmer (amplitude perturbation), HNR (autocorrelation-based), spectral flux, slope/direction (v10 SlopeEngine, window 8–12)
+  prosody tag: tense | breathy | creaky | rising | falling | modal (v10 rules, thresholds configurable)
+  outputs: port 'pitch' (mod: f0 mapped over range, held when unvoiced) ; port 'level' (mod: RMS) ; note:trigger (f0 → MusicTheory.quantize to song key, debounce min note length) to target
+config: minHz/maxHz ; yinThresh 0.05..0.3 def 0.1 ; noteOut bool ; target ; minNote 50..500 ms ; range for pitch port (note lo..hi) ; tag thresholds
+hooks: vs.hook.audio_in (in ; audio ; port in ; tap) ; pitch_out, level_out (modulation) ; note_out (note:trigger) ; analysis_out (voice:analysis {f0, jitter, shimmer, hnr, tag} ≤ 20 Hz) ; STD.theory_in
+ui: hero = scrolling pitch trace over piano-roll lanes (in-key lanes lit) ; badge VOICED/SILENT ; jitter/shimmer/HNR gauges ; prosody tag
+tests: 220 Hz saw → f0 220 ± 1 (no octave error) ; silence → unvoiced ; note out for sung 440 in A minor → 69 ; tap does not reroute source

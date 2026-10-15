@@ -1,0 +1,11 @@
+# spec_id: eravos.organism.macro-rack · version 1.0.0 · phase P38 · status planned · category modulation
+identity:
+  id: eravos.macro-rack ; label: Macros ; icon: 🎛 ; accent: "#ffd23f"
+  comp_intent: 8 big knobs that each move many things at once with their own curves — build your own performance controls ("TENSION", "DROP", "AIR").
+  novelty: One-to-many mapping with per-target ranges and curves, MIDI-learnable, recordable (Macro Automation records one param; this designs the controls).
+engine: macro → targets[] {param, min, max, curve, invert} ; macro snapshots (A/B) + crossfade ; record macro moves into Timeline automation ; MIDI learn ; macros can target other macros (layers) with cycle guard
+config: macros[8] {name, color, value, targets[]} ; snapshots
+hooks: control_out ; STD.midi_in ; STD.transport_in ; data_in (set a macro from a workflow)
+ui: 8 knobs with names ; per-knob target list ; learn button ; snapshot A/B + morph slider
+packs: factory — Build-up (filter+reverb+noise+pitch), Drop Slam, Air, Grit, Lo-fi, Space Out, Tension (feeds Alchemy)
+tests: one macro to 3 targets with exp/lin/invert curves → values match formulas ±0.001 ; MIDI CC 0..127 maps full range

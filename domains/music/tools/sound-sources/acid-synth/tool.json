@@ -1,0 +1,69 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.acid-synth",
+  "version": "2.0.0",
+  "label": "Acid Synth",
+  "icon": "⚡",
+  "accent": "#00ff88",
+  "domain": "music",
+  "category": "sound-sources",
+  "summary": "The squelchy 303 line. Has a GENERATE button that writes an in-key bassline.",
+  "tags": [
+    "sound-sources",
+    "acid",
+    "synth"
+  ],
+  "files": {
+    "engine": "acid-synth.engine.js",
+    "ui": "acid-synth.ui.js",
+    "spec": "acid-synth.spec",
+    "preview": "preview.png",
+    "tests": "acid-synth.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "midi_in",
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.breath",
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.dub-station",
+    "eravos.embodiment-lab",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.master-fx",
+    "eravos.sidechain-compressor",
+    "eravos.xy-pad"
+  ],
+  "status": "built",
+  "conflicts": []
+}

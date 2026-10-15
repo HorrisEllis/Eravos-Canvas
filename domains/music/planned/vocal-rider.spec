@@ -1,0 +1,10 @@
+# spec_id: eravos.organism.vocal-rider · version 1.0.0 · phase P38 · status planned · category voice
+identity:
+  id: eravos.vocal-rider ; label: Rider ; icon: 🏇 ; accent: "#ffd166"
+  comp_intent: Rides the vocal level like an engineer on a fader — every word sits at the same loudness before compression.
+  novelty: Slow, look-ahead gain automation that writes itself (and can be written out as automation).
+engine: short-term loudness (400 ms, K-weighted) vs target ; gain range ±12 dB ; speed ; breath/noise floor guard (doesn't lift silences) ; optional music key input (rides the vocal relative to the beat) ; look-ahead 20 ms
+config: target LUFS-S def −18 ; range dB ; speed ; floor dB ; useMusicKey bool ; offset vs music dB
+hooks: STD.audio_in ; STD.audio_out ; audio_in key (music) ; data_out gain (number, for automation lanes)
+ui: moving fader + gain history ; target line ; "write to automation" button
+tests: alternating −30 / −12 dB phrases → output phrases within 2 dB ; silence below floor not raised

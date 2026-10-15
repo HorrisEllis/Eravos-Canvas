@@ -1,0 +1,115 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "fx-moddelay.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "effects"
+ ],
+ "for": "eravos.fx-moddelay",
+ "items": {
+  "eravos.fx-moddelay": {
+   "presets": {
+    "Juno Wide": {
+     "params": {
+      "mode": "chorus",
+      "rate": 0.5,
+      "sync": false,
+      "depth": 0.45,
+      "base": 11,
+      "spread": 1,
+      "feedback": 0,
+      "mix": 0.5
+     }
+    },
+    "Slow Shimmer": {
+     "params": {
+      "mode": "chorus",
+      "rate": 0.12,
+      "sync": false,
+      "depth": 0.8,
+      "base": 18,
+      "spread": 0.9,
+      "feedback": 0,
+      "mix": 0.45
+     }
+    },
+    "Jet Flange": {
+     "params": {
+      "mode": "flanger",
+      "rate": 0.15,
+      "sync": false,
+      "depth": 0.9,
+      "base": 2,
+      "feedback": 0.75,
+      "spread": 0.3,
+      "mix": 0.5
+     }
+    },
+    "Metallic Neg": {
+     "params": {
+      "mode": "flanger",
+      "rate": 0.3,
+      "sync": false,
+      "depth": 0.7,
+      "base": 1.2,
+      "feedback": -0.8,
+      "spread": 0.2,
+      "mix": 0.5
+     }
+    },
+    "Tempo Sweep 1/2": {
+     "params": {
+      "mode": "flanger",
+      "sync": true,
+      "div": "1/2",
+      "depth": 0.8,
+      "base": 3,
+      "feedback": 0.6,
+      "spread": 0.4,
+      "mix": 0.5
+     }
+    },
+    "Supersaw Widener": {
+     "params": {
+      "mode": "chorus",
+      "rate": 0.8,
+      "sync": false,
+      "depth": 0.35,
+      "base": 9,
+      "spread": 1,
+      "feedback": 0,
+      "mix": 0.35
+     }
+    },
+    "80s · Juno Chorus II": {
+     "params": {
+      "mode": "chorus",
+      "rate": 0.83,
+      "sync": false,
+      "depth": 0.55,
+      "base": 9,
+      "feedback": 0,
+      "spread": 1,
+      "mix": 0.5
+     }
+    },
+    "80s · Dimension D Wide": {
+     "params": {
+      "mode": "chorus",
+      "rate": 0.25,
+      "sync": false,
+      "depth": 0.3,
+      "base": 14,
+      "feedback": 0,
+      "spread": 0.9,
+      "mix": 0.45
+     }
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,54 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "sample-player.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "voice-and-samples"
+ ],
+ "for": "eravos.sample-player",
+ "items": {
+  "eravos.sample-player": {
+   "presets": {
+    "Whole clip": {
+     "params": {
+      "mode": "oneshot",
+      "pitch": 0,
+      "reverse": false
+     }
+    },
+    "Chop 8": {
+     "params": {
+      "mode": "slice",
+      "slices": 8
+     }
+    },
+    "Auto chop": {
+     "params": {
+      "mode": "slice",
+      "slices": "auto",
+      "sensitivity": 0.4
+     }
+    },
+    "Melodic voice": {
+     "params": {
+      "mode": "chromatic",
+      "root": 60,
+      "attack": 0.01,
+      "release": 0.2
+     }
+    },
+    "Reverse swell": {
+     "params": {
+      "mode": "oneshot",
+      "reverse": true,
+      "attack": 0.3
+     }
+    }
+   }
+  }
+ }
+}

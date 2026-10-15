@@ -1,0 +1,15 @@
+# spec_id: eravos.organism.workflow · version 1.0.0 · phase P38 · status planned · category flow
+# The engine under AI Automation: wires of tools are the pipeline; this tool makes it a durable, observable WORKFLOW.
+identity:
+  id: eravos.agents.workflow ; label: Workflow ; icon: 🧭 ; accent: "#7ce0ff"
+  comp_intent: Run a chain of tools as one job — start it from a trigger, see every step, retry what failed, resume after a reload, keep a history.
+  novelty: Run records over the dataflow graph (each value carries a run id; every step's input/output/time/error is logged).
+engine:
+  run model: run {id, trigger, started, status queued|running|waiting|done|failed|cancelled, steps[] {tool, in, out, ms, attempts, error}} ; run id travels in the value meta through K.data ; concurrency per workflow (1..n, queue overflow policy drop|queue|replace)
+  reliability: per-step retry policy (count, backoff, on which errors) ; step timeout ; idempotency key ; checkpoint after every step (IndexedDB) → RESUME after reload/crash from the last finished step ; cancel propagates to running steps (AbortSignal)
+  scheduling: owns its triggers (Trigger Schedule / Trigger Event / Webhook / Context Triggers wire into "start")
+  observability: run list, per-run timeline, replay a run with the same inputs, export run log (JSON)
+config: name ; concurrency ; overflow ; defaults {retry, timeout} ; history keep N
+hooks: trigger_in start ; data_in input ; data_out result ; data_out run (json) ; trigger_out done/failed
+ui: run list (status chips) ; run timeline with step boxes (click → see in/out) ; buttons Run, Cancel, Retry failed step, Replay
+tests: 3-step run with a step failing twice then passing (retry 3) → status done, attempts=3 ; reload mid-run → resumes at step 2 with step 1 output intact ; cancel stops a 10 s step within 100 ms

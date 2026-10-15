@@ -1,0 +1,11 @@
+# spec_id: eravos.organism.strings-ensemble · version 1.0.0 · phase P38 · status planned · category instruments
+identity:
+  id: eravos.strings-ensemble ; label: Strings ; icon: 🎻 ; accent: "#c9a26b"
+  comp_intent: Orchestral and pop strings — section sizes, articulations (sustain, staccato, spiccato, pizzicato, tremolo, trills, swells) and expression on a mod-wheel.
+  novelty: Bowed-string model with per-player detune/timing (ensemble realism) and keyswitched articulations.
+engine: bowed waveguide (bow pressure, velocity, position) per player ; section = 1..16 players, each with micro-detune, vibrato phase and onset jitter ; body IRs (violin/viola/cello/bass) ; articulations by keyswitch (C0–B0), velocity (staccato threshold) or legato detection (portamento between overlapping notes) ; expression (CC11) and dynamics (CC1) crossfade timbre, not just volume
+config: section enum violins|violas|celli|basses|full ; players ; articulation ; legato bool ; portamento ; vibrato ; expression ; room (stage position)
+hooks: STD.note_in ; STD.midi_in ; STD.audio_out
+ui: section picture with player dots ; articulation chips + keyswitch keyboard ; dynamics/expression faders
+packs: factory — Lush Pop Strings, Epic Celli Ostinato, Pizzicato Bounce, Tremolo Tension, Solo Violin, Chamber Quartet, Swells, Horror Clusters
+tests: legato overlap → glide time equals portamento ±5 ms ; 8 players → onsets spread 5–30 ms ; spiccato note length < 120 ms

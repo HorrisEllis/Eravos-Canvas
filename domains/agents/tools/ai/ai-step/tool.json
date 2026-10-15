@@ -1,0 +1,49 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.agents.ai-step",
+  "version": "1.0.0",
+  "label": "AI Step",
+  "icon": "✦",
+  "accent": "#ffb86b",
+  "domain": "agents",
+  "category": "ai",
+  "summary": "Ask an AI model as one step of an automation: a prompt filled from what arrives, any provider, text or checked JSON out.",
+  "tags": [
+    "ai",
+    "llm",
+    "prompt",
+    "automation",
+    "agent"
+  ],
+  "files": {
+    "engine": "ai-step.engine.js",
+    "ui": "ai-step.ui.js",
+    "css": "ai-step.css",
+    "spec": "ai-step.spec",
+    "tests": "ai-step.test.js",
+    "preview": "preview.png"
+  },
+  "needs": {
+    "units": [],
+    "tools": [],
+    "permissions": [
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.coding.code-cell",
+    "eravos.image.image-adjust",
+    "eravos.video.video-clip"
+  ],
+  "status": "built",
+  "conflicts": []
+}

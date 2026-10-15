@@ -1,0 +1,257 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "image-adjust.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "image"
+ ],
+ "for": "eravos.image.image-adjust",
+ "items": {
+  "eravos.image.image-adjust": {
+   "presets": {
+    "Neutral": {
+     "params": {
+      "exposure": 0,
+      "contrast": 0,
+      "highlights": 0,
+      "shadows": 0,
+      "blackPoint": 0,
+      "whitePoint": 1,
+      "gamma": 1,
+      "temperature": 0,
+      "tint": 0,
+      "saturation": 0,
+      "vibrance": 0,
+      "vignette": 0,
+      "aspect": "free"
+     }
+    },
+    "Bright & airy": {
+     "params": {
+      "exposure": 0.5,
+      "contrast": -0.1,
+      "highlights": -0.2,
+      "shadows": 0.35,
+      "blackPoint": 0,
+      "whitePoint": 1,
+      "gamma": 1,
+      "temperature": 0.08,
+      "tint": 0,
+      "saturation": 0,
+      "vibrance": 0.2,
+      "vignette": 0,
+      "aspect": "free"
+     }
+    },
+    "Moody": {
+     "params": {
+      "exposure": -0.35,
+      "contrast": 0.25,
+      "highlights": -0.4,
+      "shadows": -0.1,
+      "blackPoint": 0,
+      "whitePoint": 1,
+      "gamma": 1,
+      "temperature": -0.12,
+      "tint": 0,
+      "saturation": -0.25,
+      "vibrance": 0,
+      "vignette": 0.35,
+      "aspect": "free"
+     }
+    },
+    "Warm film": {
+     "params": {
+      "exposure": 0,
+      "contrast": 0.12,
+      "highlights": 0,
+      "shadows": 0,
+      "blackPoint": 0.04,
+      "whitePoint": 1,
+      "gamma": 1.06,
+      "temperature": 0.3,
+      "tint": 0.06,
+      "saturation": -0.1,
+      "vibrance": 0,
+      "vignette": 0.2,
+      "aspect": "free"
+     }
+    },
+    "Cold night": {
+     "params": {
+      "exposure": -0.25,
+      "contrast": 0.18,
+      "highlights": 0,
+      "shadows": 0,
+      "blackPoint": 0,
+      "whitePoint": 1,
+      "gamma": 1,
+      "temperature": -0.45,
+      "tint": -0.05,
+      "saturation": -0.15,
+      "vibrance": 0,
+      "vignette": 0.3,
+      "aspect": "free"
+     }
+    },
+    "Punchy": {
+     "params": {
+      "exposure": 0,
+      "contrast": 0.35,
+      "highlights": -0.15,
+      "shadows": 0.15,
+      "blackPoint": 0,
+      "whitePoint": 1,
+      "gamma": 1,
+      "temperature": 0,
+      "tint": 0,
+      "saturation": 0,
+      "vibrance": 0.45,
+      "vignette": 0,
+      "aspect": "free"
+     }
+    },
+    "Black & white": {
+     "params": {
+      "exposure": 0,
+      "contrast": 0.25,
+      "highlights": 0,
+      "shadows": 0.1,
+      "blackPoint": 0,
+      "whitePoint": 1,
+      "gamma": 1,
+      "temperature": 0,
+      "tint": 0,
+      "saturation": -1,
+      "vibrance": 0,
+      "vignette": 0,
+      "aspect": "free"
+     }
+    },
+    "High-key B&W": {
+     "params": {
+      "exposure": 0.7,
+      "contrast": -0.15,
+      "highlights": 0,
+      "shadows": 0.4,
+      "blackPoint": 0.06,
+      "whitePoint": 1,
+      "gamma": 1,
+      "temperature": 0,
+      "tint": 0,
+      "saturation": -1,
+      "vibrance": 0,
+      "vignette": 0,
+      "aspect": "free"
+     }
+    },
+    "Faded": {
+     "params": {
+      "exposure": 0,
+      "contrast": -0.3,
+      "highlights": 0,
+      "shadows": 0,
+      "blackPoint": 0.0,
+      "whitePoint": 0.95,
+      "gamma": 1.15,
+      "temperature": 0,
+      "tint": 0,
+      "saturation": -0.3,
+      "vibrance": 0,
+      "vignette": 0,
+      "aspect": "free"
+     }
+    },
+    "Recover highlights": {
+     "params": {
+      "exposure": -0.2,
+      "contrast": 0,
+      "highlights": -0.8,
+      "shadows": 0.2,
+      "blackPoint": 0,
+      "whitePoint": 1,
+      "gamma": 1,
+      "temperature": 0,
+      "tint": 0,
+      "saturation": 0,
+      "vibrance": 0,
+      "vignette": 0,
+      "aspect": "free"
+     }
+    },
+    "Lift shadows": {
+     "params": {
+      "exposure": 0,
+      "contrast": -0.05,
+      "highlights": 0,
+      "shadows": 0.8,
+      "blackPoint": 0,
+      "whitePoint": 1,
+      "gamma": 1,
+      "temperature": 0,
+      "tint": 0,
+      "saturation": 0,
+      "vibrance": 0,
+      "vignette": 0,
+      "aspect": "free"
+     }
+    },
+    "Square crop (1:1)": {
+     "params": {
+      "exposure": 0,
+      "contrast": 0,
+      "highlights": 0,
+      "shadows": 0,
+      "blackPoint": 0,
+      "whitePoint": 1,
+      "gamma": 1,
+      "temperature": 0,
+      "tint": 0,
+      "saturation": 0,
+      "vibrance": 0,
+      "vignette": 0,
+      "aspect": "1:1"
+     }
+    },
+    "Story (9:16)": {
+     "params": {
+      "exposure": 0,
+      "contrast": 0,
+      "highlights": 0,
+      "shadows": 0,
+      "blackPoint": 0,
+      "whitePoint": 1,
+      "gamma": 1,
+      "temperature": 0,
+      "tint": 0,
+      "saturation": 0,
+      "vibrance": 0,
+      "vignette": 0,
+      "aspect": "9:16"
+     }
+    },
+    "Cinema (16:9)": {
+     "params": {
+      "exposure": 0,
+      "contrast": 0,
+      "highlights": 0,
+      "shadows": 0,
+      "blackPoint": 0,
+      "whitePoint": 1,
+      "gamma": 1,
+      "temperature": 0,
+      "tint": 0,
+      "saturation": 0,
+      "vibrance": 0,
+      "vignette": 0.25,
+      "aspect": "16:9"
+     }
+    }
+   }
+  }
+ }
+}

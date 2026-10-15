@@ -1,0 +1,69 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.xen-synth",
+  "version": "1.0.0",
+  "label": "Xen Synth",
+  "icon": "∿",
+  "accent": "#00ffcc",
+  "domain": "music",
+  "category": "xenharmonic",
+  "summary": "Play irrational frequencies: any tuning (φ, π, e, Bohlen–Pierce, 31-EDO, Carlos α, your own ratios) with any partial spectrum.",
+  "tags": [
+    "xenharmonic",
+    "xen",
+    "synth"
+  ],
+  "files": {
+    "engine": "xen-synth.engine.js",
+    "ui": "xen-synth.ui.js",
+    "spec": "xen-synth.spec",
+    "preview": "preview.png",
+    "tests": "xen-synth.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "midi_in",
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.breath",
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.dub-station",
+    "eravos.embodiment-lab",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.master-fx",
+    "eravos.sidechain-compressor",
+    "eravos.xy-pad"
+  ],
+  "status": "built",
+  "conflicts": []
+}

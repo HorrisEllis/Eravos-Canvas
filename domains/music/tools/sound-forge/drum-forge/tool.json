@@ -1,0 +1,66 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.drum-forge",
+  "version": "1.0.0",
+  "label": "Drum Forge",
+  "icon": "⚒",
+  "accent": "#ff7b00",
+  "domain": "music",
+  "category": "sound-forge",
+  "summary": "Design your own drum-pad sounds: 16 synthesized one-shots, gated 80s room, genre kits — render a WAV or the whole kit for your pads.",
+  "tags": [
+    "sound-forge",
+    "drum",
+    "forge"
+  ],
+  "files": {
+    "engine": "drum-forge.engine.js",
+    "ui": "drum-forge.ui.js",
+    "spec": "drum-forge.spec",
+    "preview": "preview.png",
+    "tests": "drum-forge.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "midi_in",
+      "bus_publish",
+      "bus_subscribe",
+      "filesystem_write",
+      "registry_read"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.dub-station",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.master-fx",
+    "eravos.sidechain-compressor"
+  ],
+  "status": "built",
+  "conflicts": []
+}

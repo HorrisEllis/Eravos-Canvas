@@ -1,0 +1,2 @@
+{ "schema": "eravos.domain/1", "id": "image", "label": "Image Manipulation", "version": "1.0.0", "icon": "🖼",
+  "core": ["core/image-core.js"], "ports": ["dataflow"], "modes": ["image"], "pages": [], "content": [] }

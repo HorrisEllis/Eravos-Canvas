@@ -1,0 +1,69 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.sub-engine",
+  "version": "1.0.0",
+  "label": "Deep Sub",
+  "icon": "◉",
+  "accent": "#7a5cff",
+  "domain": "music",
+  "category": "sound-sources",
+  "summary": "The deepest bass: pure mono sub, 808 drops and slides, plus phantom harmonics so it is heard even on a phone.",
+  "tags": [
+    "sound-sources",
+    "sub",
+    "engine"
+  ],
+  "files": {
+    "engine": "sub-engine.engine.js",
+    "ui": "sub-engine.ui.js",
+    "spec": "sub-engine.spec",
+    "preview": "preview.png",
+    "tests": "sub-engine.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "midi_in",
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.breath",
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.dub-station",
+    "eravos.embodiment-lab",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.master-fx",
+    "eravos.sidechain-compressor",
+    "eravos.xy-pad"
+  ],
+  "status": "built",
+  "conflicts": []
+}

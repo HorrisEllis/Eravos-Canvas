@@ -1,0 +1,10 @@
+# spec_id: eravos.organism.breath-control · version 1.0.0 · phase P38 · status planned · category voice
+identity:
+  id: eravos.breath-control ; label: Breaths ; icon: 🌬 ; accent: "#b4e1ff"
+  comp_intent: Find every breath in a vocal and turn it down (or up, for intimacy) — not delete it.
+  novelty: Breath classifier + per-breath gain.
+engine: classifier: unvoiced + broadband + low level + 120–600 ms between phrases ; per-breath gain −40..+6 dB with 5 ms fades ; works live (look-ahead 30 ms) and on clips
+config: reduce dB ; sensitivity ; minLen ms ; live bool
+hooks: STD.audio_in ; STD.audio_out ; data_out breaths (json list)
+ui: waveform with breath regions marked ; one knob
+tests: synthetic phrase-breath-phrase → breath −12 dB, phrases ±0.2 dB

@@ -1,0 +1,7 @@
+/* eravos.image.image-adjust */
+.ia-stage { position: relative; min-height: 220px; max-height: 52vh; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid var(--line, #223044); background: repeating-conic-gradient(#0b1118 0% 25%, #0e1620 0% 50%) 50% / 18px 18px; overflow: hidden; margin: 6px 0; }
+.ia-canvas { max-width: 100%; max-height: 52vh; display: block; touch-action: none; }
+.ia-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; color: var(--dim, #7f93a8); font-size: 13px; pointer-events: none; }
+.ia-hist { width: 160px; height: 32px; border-radius: 4px; background: #05080c; border: 1px solid var(--line, #223044); }
+.ia-info { color: var(--dim, #7f93a8); font: 11px var(--mono, monospace); }
+.ia-orig { user-select: none; }

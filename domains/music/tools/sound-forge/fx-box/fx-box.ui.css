@@ -1,0 +1,6 @@
+.fxbox-pads { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 8px 0; }
+.fxbox-pad { height: 64px; border-radius: 9px; border: 1px solid #ff44aa66; background: #160a12; color: #ffd6ea; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; touch-action: none; }
+.fxbox-pad .g { font-size: 22px; line-height: 1; }
+.fxbox-pad .n { font: 10px var(--mono, monospace); opacity: .8; }
+.fxbox-pad.sel { border-color: #ff44aa; box-shadow: inset 0 0 0 1px #ff44aa; }
+.fxbox-pad.hit { background: #ff44aa; color: #160a12; box-shadow: 0 0 18px #ff44aa; }

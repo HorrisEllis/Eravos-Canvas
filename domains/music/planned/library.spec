@@ -1,0 +1,19 @@
+# spec_id: eravos.organism.library · version 1.0.0 · phase P8.5 · status canonical
+# source: v10 library/ (117 entries, 23 voice types, 13 categories) + LIBRARY tab (F-23: entries carry no sound params)
+identity:
+  id: eravos.library ; label: Library ; icon: 📚 ; accent: "#ff44aa"
+  comp_intent: Browse ready-made sounds by vibe (genre, key, BPM, tags), hear them instantly, drop them onto the canvas.
+  novelty: Only browser organism — resolves a library entry into (organism id + preset) and spawns or loads it.
+data:
+  data/library/library.json (v10, kept verbatim as data) + data/library/resolve.json (NEW, required by F-23):
+    maps each entry.s → {organism, preset params} e.g. acid → eravos.acid-synth {…} ; kick → eravos.pads voice kick {…} ; reese → eravos.reese-bass ; pad → eravos.supersaw 'Wide Pad' or eravos.organ ; laser/pew/zap → eravos.fx-box slot
+  every one of 117 entries MUST resolve (P8 exit) ; unresolved → listed in UI as 'needs sound' + RUNTIME_002 in tests
+engine:
+  search: text over name/tags/genre ; filters cat, genre, key, bpm range ; sort
+  audition: transient private instance of the resolved engine rendered through the library's own out port (not spawned on canvas), disposed after 4 s
+  use: 'Add' → OrganismFactory spawn resolved organism + deserialize preset ; 'Load into' → ui:preset_apply:<target> on a selected existing instance of same organism
+  favourites + user entries (IndexedDB) ; export user library JSON
+config: filters ; auditionLevel ; autoKey bool (transpose audition to song key)
+hooks: lib.hook.audio_out STD.audio_out (audition) ; apply_out (out ; ui:preset_apply {target, params}) ; STD.theory_in
+ui: category rail (v10 colours/icons per entry), search, filter chips, grid of cards (icon, name, genre, key, bpm) ; hover = audition ; click = details + Add / Load into
+tests: 117 entries parse ; 117 resolve ; audition non-silent for each resolved organism type ; Add spawns correct organism with preset params

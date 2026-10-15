@@ -1,0 +1,115 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "bass-drop-builder.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "arrange"
+ ],
+ "for": "eravos.bass-drop-builder",
+ "items": {
+  "eravos.bass-drop-builder": {
+   "presets": {
+    "Classic 4/4/¼/8": {
+     "params": {
+      "tensionBars": 4,
+      "buildBars": 4,
+      "pauseBars": 0.25,
+      "dropBars": 8
+     }
+    },
+    "Long build 8/8/1/16": {
+     "params": {
+      "tensionBars": 8,
+      "buildBars": 8,
+      "pauseBars": 1,
+      "dropBars": 16
+     }
+    },
+    "Song for her (8/7¾/¼/16)": {
+     "params": {
+      "tensionBars": 8,
+      "buildBars": 7.75,
+      "pauseBars": 0.25,
+      "dropBars": 16,
+      "stutter": 3,
+      "throw": 0.6,
+      "vocalEndOnDrop": true,
+      "riserOct": 2.5
+     }
+    },
+    "Melodic (Monstercat) 8/8/¼/16": {
+     "params": {
+      "tensionBars": 8,
+      "buildBars": 8,
+      "pauseBars": 0.25,
+      "dropBars": 16,
+      "riserOct": 2,
+      "tensionTone": "pad",
+      "padLevel": 0.4,
+      "tChords": "VI → VII",
+      "tVoicing": "add9",
+      "tOct": 4,
+      "tWave": "sawtooth",
+      "tVoices": 3,
+      "tDetune": 11,
+      "tWidth": 0.75,
+      "tAttack": 0.04,
+      "tRelease": 0.04,
+      "tCutoff": 600,
+      "tCutoffEnd": 6000,
+      "tRes": 0.8,
+      "tMotion": 0,
+      "tMotionRate": 0.2,
+      "tSwell": 0.35,
+      "tPump": 0.7,
+      "tSub": 0.35,
+      "tAir": 0.3,
+      "tSpace": 0.2
+     }
+    },
+    "Pluck build 4/4/¼/8": {
+     "params": {
+      "tensionBars": 4,
+      "buildBars": 4,
+      "pauseBars": 0.25,
+      "dropBars": 8,
+      "tensionTone": "pluck",
+      "padLevel": 0.45,
+      "tChords": "VI → VII",
+      "tVoicing": "triad",
+      "tOct": 4,
+      "tWave": "sawtooth",
+      "tVoices": 2,
+      "tDetune": 7,
+      "tWidth": 0.5,
+      "tAttack": 0.003,
+      "tRelease": 0.28,
+      "tCutoff": 1200,
+      "tCutoffEnd": 7000,
+      "tRes": 1.2,
+      "tMotion": 0,
+      "tMotionRate": 0.2,
+      "tSwell": 0.3,
+      "tPump": 0,
+      "tRate": "1/8 → 1/16",
+      "tSub": 0,
+      "tAir": 0,
+      "tSpace": 0.25
+     }
+    },
+    "Quick hit 0/2/¼/8": {
+     "params": {
+      "tensionBars": 0,
+      "buildBars": 2,
+      "pauseBars": 0.25,
+      "dropBars": 8
+     }
+    }
+   }
+  }
+ }
+}

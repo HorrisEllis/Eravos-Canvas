@@ -1,0 +1,85 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.embodiment-lab",
+  "version": "0.1.0",
+  "label": "Embodiment Lab",
+  "icon": "◉",
+  "accent": "#e0a77a",
+  "domain": "music",
+  "category": "embodiment",
+  "summary": "Sound to come back into your body: an irrational-ratio drone, a heartbeat pulse, a breath swell and gentle body cues. Pick a feeling and begin.",
+  "tags": [
+    "embodiment",
+    "breath",
+    "drone",
+    "xenharmonic",
+    "grounding"
+  ],
+  "files": {
+    "engine": "embodiment-lab.engine.js",
+    "ui": "embodiment-lab.ui.js",
+    "css": "embodiment-lab.css",
+    "preview": "preview.svg",
+    "spec": "embodiment-lab.spec",
+    "tests": "embodiment-lab.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "feelings"
+    ]
+  },
+  "works_with": [
+    "eravos.acid-synth",
+    "eravos.bass-forge",
+    "eravos.breath",
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.coven",
+    "eravos.dub-station",
+    "eravos.edm-lab",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.master-fx",
+    "eravos.organ",
+    "eravos.pad-forge",
+    "eravos.pads",
+    "eravos.recursive-spectra",
+    "eravos.reese-bass",
+    "eravos.retro-poly",
+    "eravos.sample-player",
+    "eravos.sidechain-compressor",
+    "eravos.sub-engine",
+    "eravos.supersaw",
+    "eravos.wobble-bass",
+    "eravos.xen-synth",
+    "eravos.xy-pad"
+  ],
+  "status": "built",
+  "conflicts": []
+}
