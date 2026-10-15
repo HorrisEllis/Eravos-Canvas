@@ -1,0 +1,64 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.ratio-lattice",
+  "version": "1.0.0",
+  "label": "Ratio Lattice",
+  "icon": "⋕",
+  "accent": "#00ffcc",
+  "domain": "music",
+  "category": "xenharmonic",
+  "summary": "Click a just-intonation lattice (3 × 5 × 7/11/13) to build chords from exact ratios. Hear the beats, see the harmonic series.",
+  "tags": [
+    "xenharmonic",
+    "ratio",
+    "lattice"
+  ],
+  "files": {
+    "engine": "ratio-lattice.engine.js",
+    "ui": "ratio-lattice.ui.js",
+    "spec": "ratio-lattice.spec",
+    "preview": "preview.png",
+    "tests": "ratio-lattice.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "bus_publish",
+      "bus_subscribe",
+      "registry_read"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.dub-station",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.master-fx",
+    "eravos.sidechain-compressor"
+  ],
+  "status": "built",
+  "conflicts": []
+}

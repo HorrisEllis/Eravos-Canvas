@@ -1,0 +1,162 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "sub-engine.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "sound-sources"
+ ],
+ "for": "eravos.sub-engine",
+ "items": {
+  "eravos.sub-engine": {
+   "presets": {
+    "Deep Sine": {
+     "params": {
+      "shape": 0,
+      "phantom": 0.25,
+      "drive": 0.05,
+      "click": 0.1,
+      "drop": 0,
+      "octave": -2,
+      "sustain": 0.9,
+      "release": 0.2
+     }
+    },
+    "Sound-System Sub (reggae)": {
+     "params": {
+      "shape": 0.42,
+      "phantom": 0.45,
+      "drive": 0.25,
+      "click": 0.05,
+      "drop": 0,
+      "octave": -2,
+      "attack": 0.012,
+      "sustain": 0.95,
+      "release": 0.25,
+      "tone": 600,
+      "glide": 0.04
+     }
+    },
+    "808 Boom": {
+     "params": {
+      "shape": 0.1,
+      "phantom": 0.5,
+      "drive": 0.35,
+      "click": 0.45,
+      "drop": 12,
+      "dropTime": 0.05,
+      "octave": -2,
+      "decay": 1.6,
+      "sustain": 0,
+      "release": 0.5
+     }
+    },
+    "808 Long Slide": {
+     "params": {
+      "shape": 0.12,
+      "phantom": 0.55,
+      "drive": 0.4,
+      "click": 0.3,
+      "drop": 7,
+      "dropTime": 0.04,
+      "glide": 0.18,
+      "octave": -2,
+      "decay": 3.5,
+      "sustain": 0.3,
+      "release": 0.6
+     }
+    },
+    "Earthquake Drop": {
+     "params": {
+      "shape": 0.05,
+      "phantom": 0.3,
+      "drive": 0.2,
+      "click": 0.2,
+      "drop": 30,
+      "dropTime": 1.4,
+      "octave": -2,
+      "decay": 4,
+      "sustain": 0.6,
+      "release": 1.2,
+      "floor": 18
+     }
+    },
+    "Phone-Speaker Sub": {
+     "params": {
+      "shape": 0.2,
+      "phantom": 1,
+      "drive": 0.3,
+      "click": 0.3,
+      "drop": 0,
+      "octave": -2,
+      "tone": 1400
+     }
+    },
+    "Dubstep Sub Layer": {
+     "params": {
+      "shape": 0,
+      "phantom": 0.15,
+      "drive": 0.1,
+      "click": 0,
+      "drop": 0,
+      "octave": -2,
+      "glide": 0.03,
+      "sustain": 1,
+      "release": 0.08
+     }
+    },
+    "Garage Punch": {
+     "params": {
+      "shape": 0.7,
+      "phantom": 0.4,
+      "drive": 0.45,
+      "click": 0.6,
+      "drop": 5,
+      "dropTime": 0.03,
+      "octave": -1,
+      "decay": 0.35,
+      "sustain": 0.2,
+      "release": 0.12
+     }
+    },
+    "80s · Linn Bass Drum Sub": {
+     "params": {
+      "shape": 0.1,
+      "octave": -2,
+      "drop": 7,
+      "dropTime": 0.05,
+      "glide": 0,
+      "phantom": 0.3,
+      "drive": 0.2,
+      "click": 0.45,
+      "tone": 1200,
+      "attack": 0.002,
+      "decay": 0.35,
+      "sustain": 0,
+      "release": 0.1,
+      "level": 0.8
+     }
+    },
+    "Club · Deep House Sub": {
+     "params": {
+      "shape": 0.2,
+      "octave": -2,
+      "glide": 0.04,
+      "phantom": 0.4,
+      "drive": 0.1,
+      "click": 0.15,
+      "tone": 700,
+      "attack": 0.004,
+      "decay": 0.5,
+      "sustain": 0.6,
+      "release": 0.12,
+      "level": 0.85
+     }
+    }
+   }
+  }
+ }
+}

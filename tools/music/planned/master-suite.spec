@@ -1,0 +1,10 @@
+# spec_id: eravos.organism.master-suite · version 1.0.0 · phase P38 · status planned · category mix
+identity:
+  id: eravos.master-suite ; label: Mastering ; icon: 💎 ; accent: "#e0e0ff"
+  comp_intent: Finish a song to release loudness — EQ, multiband dynamics, stereo, saturation, limiter, loudness targets per platform, dither, reference matching.
+  novelty: Platform-aware loudness targeting and reference-track tonal matching (Master FX is the live master chain).
+engine: linear-phase & minimum-phase EQ ; 4-band multiband comp (Linkwitz–Riley 24 dB) ; M/S width per band ; soft-clip ; true-peak limiter (×4 oversampled, look-ahead 1.5 ms, release program-dependent) ; loudness: integrated LUFS (BS.1770-4), LRA, true peak ; targets: streaming −14 LUFS/−1 dBTP, club −8…−6, broadcast −23 ; reference: load a track, match its average spectrum (smoothed 1/3 oct) with an amount control — learn, never copy ; dither TPDF / noise-shaped to 16/24-bit on export
+config: chain params ; target preset ; reference asset ; match amount ; dither
+hooks: STD.audio_in ; STD.audio_out ; data_out loudness (json)
+ui: loudness history ; spectrum vs reference ; GR per band ; platform target chips with "what they will turn you down by"
+tests: pink noise at −20 LUFS, target −14 → output −14 ±0.3 LUFS and TP ≤ −1.0 dBTP ; all modules bypassed = bit-transparent ; LUFS meter matches EBU test vectors ±0.1

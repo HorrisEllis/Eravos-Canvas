@@ -1,0 +1,10 @@
+# spec_id: eravos.organism.http-client · version 1.0.0 · phase P38 · status planned · category tools
+identity:
+  id: eravos.coding.http-client ; label: API Client ; icon: 🌐 ; accent: "#89ddff"
+  comp_intent: Try an API — method, URL, headers, body, auth — see the response nicely, save requests as a collection, send results down a wire.
+  novelty: Interactive request builder (HTTP Tool in AI Automation = a pipeline step without the workbench).
+engine: fetch with AbortController time limit ; auth helpers (bearer, basic, API key header — values through ctx.secret) ; environments (variables like {{base}}) ; response viewer (JSON tree, headers, timing, size) ; CORS failure explained in plain words (and that the desktop app can proxy)
+config: requests[] ; environment ; timeout
+hooks: data_in (vars) ; data_out response (json) ; trigger_in send
+ui: request editor + response viewer + collection sidebar
+tests: secret never appears in saved requests ; CORS error → plain message naming CORS

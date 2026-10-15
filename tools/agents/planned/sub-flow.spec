@@ -1,0 +1,10 @@
+# spec_id: eravos.organism.sub-flow · version 1.0.0 · phase P38 · status planned · category flow
+identity:
+  id: eravos.agents.sub-flow ; label: Sub-flow ; icon: 📦 ; accent: "#60a5fa"
+  comp_intent: Wrap a group of tools into one reusable block with inputs and outputs — use it like a single tool in other automations.
+  novelty: Composition: a saved canvas group becomes a tool (stored as a pack item, shareable).
+engine: select tools on the canvas → "make sub-flow": exposed ports chosen ; runs the group headless (ephemeral instances, like Preview) ; versioned ; parameters exposed as the block's knobs
+config: group (data) ; exposed ports ; exposed params ; version
+hooks: generated from exposed ports
+ui: block view ; "open inside" to edit
+tests: sub-flow of Code Cell → AI Step(echo) returns same result as the open group ; two instances run independently

@@ -1,0 +1,74 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "edm-lab.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "generators"
+ ],
+ "for": "eravos.edm-lab",
+ "items": {
+  "eravos.edm-lab": {
+   "presets": {
+    "UKG Shuffle": {
+     "params": {
+      "swing": 0.3,
+      "progression": "vi-IV-I-V",
+      "tension": 0.35,
+      "energy": 0.6
+     },
+     "extra": {
+      "map": "ukg"
+     }
+    },
+    "Dubstep Half-time": {
+     "params": {
+      "swing": 0,
+      "progression": "i-VI-III-VII",
+      "tension": 0.55,
+      "energy": 0.8
+     },
+     "extra": {
+      "map": "dubstep"
+     }
+    },
+    "Melodic House": {
+     "params": {
+      "swing": 0.1,
+      "progression": "vi-IV-I-V",
+      "tension": 0.3,
+      "energy": 0.65
+     },
+     "extra": {
+      "map": "house"
+     }
+    },
+    "Neuro Roller": {
+     "params": {
+      "swing": 0,
+      "progression": "i-i-VI-VII",
+      "tension": 0.7,
+      "energy": 0.85
+     },
+     "extra": {
+      "map": "neuro"
+     }
+    },
+    "Lo-fi Drift": {
+     "params": {
+      "swing": 0.35,
+      "progression": "i-iv-v-i",
+      "tension": 0.45,
+      "energy": 0.4
+     },
+     "extra": {
+      "map": "lofi"
+     }
+    }
+   }
+  }
+ }
+}

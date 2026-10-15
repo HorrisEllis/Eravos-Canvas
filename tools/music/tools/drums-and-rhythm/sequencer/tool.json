@@ -1,0 +1,45 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.sequencer",
+  "version": "2.1.0",
+  "label": "Sequencer",
+  "icon": "⬛",
+  "accent": "#00d4ff",
+  "domain": "music",
+  "category": "drums-and-rhythm",
+  "summary": "Step grid that plays any instrument. Melodic lanes use scale degrees — every note is in key.",
+  "tags": [
+    "drums-and-rhythm",
+    "sequencer"
+  ],
+  "files": {
+    "engine": "sequencer.engine.js",
+    "ui": "sequencer.ui.js",
+    "spec": "sequencer.spec",
+    "preview": "preview.png",
+    "tests": "sequencer.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "bus_publish",
+      "bus_subscribe",
+      "filesystem_read",
+      "registry_read"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [],
+  "status": "built",
+  "conflicts": []
+}

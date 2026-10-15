@@ -1,0 +1,43 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "pads.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "drums-and-rhythm"
+ ],
+ "for": "eravos.pads",
+ "items": {
+  "eravos.pads": {
+   "presets": {
+    "EDM Core": {
+     "params": {
+      "bank": 0,
+      "volume": 0.9
+     }
+    },
+    "Heavy (Dubstep/Trap)": {
+     "params": {
+      "bank": 1,
+      "volume": 0.9
+     }
+    },
+    "Breaks & World": {
+     "params": {
+      "bank": 2,
+      "volume": 0.9
+     }
+    },
+    "Future (Monstercat)": {
+     "params": {
+      "bank": 3,
+      "volume": 0.9
+     }
+    }
+   }
+  }
+ }
+}

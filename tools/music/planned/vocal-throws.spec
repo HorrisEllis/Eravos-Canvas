@@ -1,0 +1,10 @@
+# spec_id: eravos.organism.vocal-throws · version 1.0.0 · phase P38 · status planned · category voice
+identity:
+  id: eravos.vocal-throws ; label: Throws ; icon: 🪃 ; accent: "#ffa94d"
+  comp_intent: The mix-engineer trick — throw the last word of a line into a big delay or reverb, automatically or on a button.
+  novelty: Phrase-end detector that sends only the tail word to an effect.
+engine: phrase-end detection (level falls + gap ≥ threshold) ; throw = momentary send to built-in delay (dotted 1/8, 1/4, ping-pong, filtered, feedback) or reverb (plate/hall, pre-delay) ; manual THROW button/MIDI ; duck the effect under the next phrase
+config: auto bool ; effect delay|reverb|both ; time sync ; feedback ; tone ; amount ; duck
+hooks: STD.audio_in ; STD.audio_out ; STD.transport_in ; trigger_in throw
+ui: phrase timeline with throws marked ; big THROW pad
+tests: phrase + gap → only the last 300 ms reach the effect ; delay synced to 120 BPM dotted 1/8 = 375 ms ±1 ms

@@ -1,0 +1,70 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.bass-forge",
+  "version": "1.0.0",
+  "label": "Bass Forge",
+  "icon": "🜂",
+  "accent": "#ff3d00",
+  "domain": "music",
+  "category": "sound-forge",
+  "summary": "FM growls, riddim, neuro, screech — one LFO talks through FM, fold, vowel, comb, notch. MATCH learns a reference bass recursively.",
+  "tags": [
+    "sound-forge",
+    "bass",
+    "forge"
+  ],
+  "files": {
+    "engine": "bass-forge.engine.js",
+    "ui": "bass-forge.ui.js",
+    "spec": "bass-forge.spec",
+    "preview": "preview.png",
+    "tests": "bass-forge.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "midi_in",
+      "bus_publish",
+      "bus_subscribe",
+      "filesystem_read"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.breath",
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.dub-station",
+    "eravos.embodiment-lab",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.master-fx",
+    "eravos.sidechain-compressor",
+    "eravos.xy-pad"
+  ],
+  "status": "built",
+  "conflicts": []
+}

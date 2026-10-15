@@ -1,0 +1,85 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "fx-glitch.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "effects"
+ ],
+ "for": "eravos.fx-glitch",
+ "items": {
+  "eravos.fx-glitch": {
+   "presets": {
+    "Stutter 1/16": {
+     "params": {
+      "rate": "1/16",
+      "size": "1/16",
+      "repeats": 4,
+      "chaos": 0,
+      "pitchDrift": 0,
+      "mix": 1
+     }
+    },
+    "Build Roll": {
+     "params": {
+      "rate": "1/8",
+      "size": "1/32",
+      "repeats": 8,
+      "chaos": 0.15,
+      "reverseProb": 0,
+      "stopProb": 0,
+      "scatterProb": 0.1,
+      "pitchDrift": 0,
+      "mix": 1
+     }
+    },
+    "Tape Stop Drop": {
+     "params": {
+      "rate": "1/4",
+      "size": "1/4",
+      "stopBeats": 2,
+      "chaos": 0,
+      "mix": 1
+     }
+    },
+    "Reverse Tails": {
+     "params": {
+      "rate": "1/8",
+      "size": "1/8",
+      "chaos": 0.2,
+      "reverseProb": 0.8,
+      "stopProb": 0,
+      "scatterProb": 0.1,
+      "mix": 1
+     }
+    },
+    "Chaos 50": {
+     "params": {
+      "rate": "1/16",
+      "size": "1/16",
+      "repeats": 3,
+      "chaos": 0.5,
+      "reverseProb": 0.3,
+      "stopProb": 0.05,
+      "scatterProb": 0.3,
+      "pitchDrift": 0,
+      "mix": 1
+     }
+    },
+    "Pitched Stutter Up": {
+     "params": {
+      "rate": "1/16",
+      "size": "1/32",
+      "repeats": 6,
+      "chaos": 0,
+      "pitchDrift": 5,
+      "mix": 1
+     }
+    }
+   }
+  }
+ }
+}

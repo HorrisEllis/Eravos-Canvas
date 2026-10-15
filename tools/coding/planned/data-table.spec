@@ -1,0 +1,10 @@
+# spec_id: eravos.organism.data-table · version 1.0.0 · phase P38 · status planned · category data
+identity:
+  id: eravos.coding.data-table ; label: Table ; icon: 🧮 ; accent: "#addb67"
+  comp_intent: Open CSV / JSON data, filter, sort, group, compute columns, and query it with SQL — then send the result on.
+  novelty: SQL over local data (vendored sql.js / DuckDB-wasm as an optional pack).
+engine: CSV parse (RFC 4180, streaming) ; typed columns inference ; filter/sort/group UI ; computed columns (expression) ; SQL mode via sql.js (pack) ; chart quick-look (bar/line) ; export CSV/JSON
+config: source ; query ; view
+hooks: data_in ; data_out rows (json) ; data_out table (csv text)
+ui: grid with virtual scroll (100k rows) ; SQL box ; chart preview
+tests: CSV with quoted commas parsed correctly ; GROUP BY sum matches hand computation ; 100k rows scroll at 60 fps on the reference machine

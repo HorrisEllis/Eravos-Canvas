@@ -1,0 +1,15 @@
+/* eravos.timeline — piano roll (P9). Own UI area → own stylesheet. */
+.tlpr { display: none; flex-direction: column; margin-top: 4px; border: 1px solid #223044; border-radius: 6px; background: #0a0f15; min-height: 0; }
+.tlpr.open { display: flex; flex: 0 0 240px; }
+.tlpr-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 4px 6px; border-bottom: 1px solid #1a2533; }
+.tlpr-title { font: 600 12px var(--font, sans-serif); white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+.tlpr-sep { width: 1px; align-self: stretch; background: #223044; margin: 0 2px; }
+.tlpr-scroll { flex: 1; min-height: 0; overflow: auto; position: relative; display: flex; align-items: flex-start; }
+.tlpr-keys { position: sticky; left: 0; z-index: 2; flex: none; display: block; cursor: pointer; }
+.tlpr-grid { display: block; flex: none; cursor: crosshair; outline: none; }
+.tlpr-grid.move { cursor: grabbing; }
+.tlpr-grid.edge { cursor: ew-resize; }
+.tlpr-empty { font: 11px var(--font, sans-serif); color: #7f93a8; padding: 4px 6px; }
+.tl-split { display: none; flex: none; height: 7px; margin: 2px 0 -2px; cursor: row-resize; border-radius: 3px; background: linear-gradient(#0000 2px, #2d3f57 2px, #2d3f57 5px, #0000 5px); touch-action: none; }
+.tl-split:hover, .tl-split.on { background: linear-gradient(#0000 2px, var(--acc, #00d4ff) 2px, var(--acc, #00d4ff) 5px, #0000 5px); }
+.tl-split:has(+ .tlpr.open) { display: block; }

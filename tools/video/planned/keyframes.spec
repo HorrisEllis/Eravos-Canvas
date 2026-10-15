@@ -1,0 +1,10 @@
+# spec_id: eravos.organism.keyframes · version 1.0.0 · phase P38 · status planned · category motion
+identity:
+  id: eravos.video.keyframes ; label: Keyframes ; icon: 🔑 ; accent: "#bdb2ff"
+  comp_intent: Animate anything over time — position, scale, rotation, opacity of video/image/text layers, or any knob on the canvas — with easing curves.
+  novelty: Keyframe tracks targeting both visual layers and tool params (music included).
+engine: tracks {target, keys[] {time, value, ease}} ; easing (linear, ease in/out, cubic bezier, step, spring) ; time in seconds or bars (follows transport) ; sample-accurate for audio params via scheduled curves
+config: tracks[] ; time base
+hooks: STD.transport_in ; control_out ; data_out values
+ui: dope sheet + curve editor
+tests: bezier ease matches CSS cubic-bezier reference within 0.001 ; bar time base follows BPM changes

@@ -1,0 +1,4 @@
+.glitch-pads { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin: 8px 0; }
+.glitch-pad { height: 46px; border-radius: 8px; border: 1px solid var(--pc); background: color-mix(in srgb, var(--pc) 12%, #0b0d12); color: #fff; font: 700 10px var(--mono, monospace); letter-spacing: .04em; cursor: pointer; touch-action: none; }
+.glitch-pad.on, .glitch-pad:active { background: var(--pc); color: #0b0d12; box-shadow: 0 0 16px var(--pc); }
+@media (max-width: 520px) { .glitch-pads { grid-template-columns: repeat(3, 1fr); } }

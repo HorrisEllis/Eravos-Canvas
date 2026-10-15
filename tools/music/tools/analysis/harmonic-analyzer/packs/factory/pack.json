@@ -1,0 +1,55 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "harmonic-analyzer.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "analysis"
+ ],
+ "for": "eravos.harmonic-analyzer",
+ "items": {
+  "eravos.harmonic-analyzer": {
+   "presets": {
+    "Tonal (voice, synth)": {
+     "params": {
+      "fft": 16384,
+      "maxPeaks": 24,
+      "range": 55,
+      "maxDen": 32,
+      "layers": 2
+     }
+    },
+    "Bells & metal": {
+     "params": {
+      "fft": 32768,
+      "maxPeaks": 32,
+      "range": 70,
+      "maxDen": 64,
+      "layers": 3
+     }
+    },
+    "Bass (growl, 808)": {
+     "params": {
+      "fft": 32768,
+      "maxPeaks": 20,
+      "range": 50,
+      "maxDen": 16,
+      "layers": 2
+     }
+    },
+    "Chords / layers": {
+     "params": {
+      "fft": 32768,
+      "maxPeaks": 40,
+      "range": 60,
+      "maxDen": 32,
+      "layers": 4
+     }
+    }
+   }
+  }
+ }
+}

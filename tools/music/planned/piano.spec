@@ -1,0 +1,11 @@
+# spec_id: eravos.organism.piano · version 1.0.0 · phase P38 · status planned · category instruments
+identity:
+  id: eravos.piano ; label: Piano ; icon: 🎹 ; accent: "#f2e8d5"
+  comp_intent: A playable acoustic piano (grand, upright, felt, honky-tonk) and electric pianos (tine, reed) — modelled, no gigabyte sample library.
+  novelty: Modal/physical piano model: hammer–string interaction, inharmonic partials, sympathetic resonance, pedal.
+engine: per note: hammer (nonlinear felt, velocity → hardness) exciting 1–3 detuned strings modelled as banded waveguides with inharmonicity B per register ; soundboard = body IR convolution ; sustain pedal: undampened strings resonate sympathetically ; half-pedal ; una corda ; release noise and key thump ; EP models: tine (Rhodes-like) and reed (Wurli-like) bell/bark with tremolo ; polyphony 64 with voice stealing by lowest amplitude
+config: model enum grand|upright|felt|honky|tine|reed ; hardness ; brightness ; stringDetune ; resonance ; lid/mic position ; pedal ; tremolo (EP) ; drive (EP) ; velocity curve
+hooks: STD.note_in ; STD.midi_in (sustain CC64, soft CC67) ; STD.audio_out
+ui: 88-key keyboard (sticky, scrolls) ; model chips ; pedal indicator ; mic position X/Y pad
+packs: factory — Concert Grand, Pop Bright, Felt Lullaby, Upright Jazz, Honky Saloon, Tine Classic, Tine Phaser, Reed Bark, Lo-fi Keys, Gospel Organ-ish Piano Stack
+tests: A4 partials show inharmonic stretch (12th partial sharp by 10–30 c) ; sustain pedal on → undamped string energy at sympathetic partials ≥ −50 dB ; 64-voice chord renders under CPU budget

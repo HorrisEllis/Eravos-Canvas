@@ -1,0 +1,24 @@
+# spec_id: eravos.organism.video.video-clip · version 1.0.0 · phase P37.1 · status BUILT · domain video (Video Editing)
+identity:
+  id: eravos.video.video-clip ; label: Video Clip ; icon: 🎬 ; category: Video
+  purpose: the one tool Video Editing stands on — a clip you can open, trim, play (alone or locked to the song), turn
+    into pictures for image tools, and export. Merges the mapped clip-source + frame-grab + video-export; the
+    multi-clip video-timeline, transitions, grading and text stay mapped (planned/).
+contract:
+  open: Open… · a file dropped on the canvas (Intake handler video.video-file) · kept as a kernel asset (saved with the
+    project — large files make large projects; said in the Session size). Recorder WebMs without a duration header are
+    probed to the end first. Unplayable formats → a plain message naming what works (WebM, MP4/H.264).
+  trim: in/out in seconds (≥ 0.05 s apart); I / O at the playhead; drag handles on the filmstrip (10 thumbnails made
+    by a second, hidden element so playback is never disturbed).
+  play: loop (within the cut), speed 0.25–2×, volume, mute; Follow song = start at IN on transport:play, stop and go
+    back to IN on transport:stop (only when a domain publishes those — music today); Stop all pauses it.
+  frames: "frame" out = { width, height, bitmap, at } on pause, seek, Grab, and while playing at Frames-out fps.
+  export: MediaRecorder on the element's captureStream, real time, in → out, best WebM (VP9/VP8 + Opus) the browser
+    can write, 8 Mb/s; progress; cancel; named <name>-cut-<in>-<out>.webm.
+ports (dataflow): out frame (image) · info (json) — in play (trigger) · seek (number, seconds into the cut)
+params: loop · rate · volume · muted · follow · frameFps. Extra: asset hash, name, in, out.
+acceptance (tests/p26-domains.test.js — a 1.5 s WebM made in the test by MediaRecorder):
+  - opens: duration > 1 s (probed), width/height > 0; info sent
+  - trim 0.2 → 0.9; play from IN stops at OUT when loop is off
+  - a frame grabbed at 0.5 s arrives at a wired Image Adjust with the video's size
+  - export of the 0.2 → 0.9 cut produces a non-empty WebM blob

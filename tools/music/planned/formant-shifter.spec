@@ -1,0 +1,10 @@
+# spec_id: eravos.organism.formant-shifter · version 1.0.0 · phase P38 · status planned · category voice
+identity:
+  id: eravos.formant-shifter ; label: Formant ; icon: 🗣 ; accent: "#f7a8ff"
+  comp_intent: Change the size of the voice (bigger / smaller throat, character, gender cues) without changing the note — or the note without the size.
+  novelty: Independent pitch and formant control with a vowel-space view.
+engine: cepstral envelope (LPC fallback) ; formant shift ±12 st, pitch shift ±24 st independent ; growl (sub-harmonic + formant jitter) ; whisper (replace excitation with noise)
+config: formant st ; pitch st ; growl ; breath ; mix
+hooks: STD.audio_in ; STD.audio_out
+ui: F1/F2 vowel map with live dot ; two big knobs PITCH / SIZE
+tests: formant +4 st on a vowel → F1, F2 ×1.26 ±5 %, F0 unchanged ±2 c

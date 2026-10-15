@@ -1,0 +1,10 @@
+# spec_id: eravos.organism.de-esser · version 1.0.0 · phase P38 · status planned · category voice
+identity:
+  id: eravos.de-esser ; label: De-esser ; icon: 🐍 ; accent: "#7ef0c4"
+  comp_intent: Tame harsh s / sh / t sounds without dulling the voice.
+  novelty: Split-band dynamic reduction with a listen mode.
+engine: detector band 3–12 kHz (auto-find the loudest sibilant band over 4 s) ; split-band (only the band is reduced) or wideband ; look-ahead 2 ms ; attack 0.5 ms ; release 40–200 ms ; threshold relative (follows the voice level so it works at any input level)
+config: freq def auto ; width ; threshold dB ; range dB max 18 ; mode split|wide ; listen bool
+hooks: STD.audio_in ; STD.audio_out
+ui: spectrum with the band highlighted ; GR meter ; LISTEN button (hear only what is removed)
+tests: synthetic voice + 7 kHz bursts → bursts −8 dB ±1, voice band unchanged within 0.3 dB ; listen mode outputs only the band

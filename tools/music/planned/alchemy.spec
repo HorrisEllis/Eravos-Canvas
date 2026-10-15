@@ -1,0 +1,15 @@
+# spec_id: eravos.organism.alchemy · version 1.0.0 · phase P38 · status planned · category arrange
+identity:
+  id: eravos.alchemy ; label: Alchemy ; icon: ⚗ ; accent: "#ffab00"
+  comp_intent: Create with tension as the material — draw a tension curve and Alchemy turns it into harmony, rhythm, timbre and space moves across your tools; release it and the music resolves.
+  novelty: A tension field (one number per moment) mapped through "elements" onto many musical dimensions at once.
+engine:
+  tension sources: drawn curve | macro | Contrast score | live input (XY, MIDI) | another tool's value
+  elements (each maps tension → moves, each with amount): FIRE (distortion, brightness, drive) · AIR (reverb size, width, high shelf) · WATER (filter movement, LFO depth, wet) · EARTH (sub, low end weight, kick length) · HARMONY (consonance → dissonance: chord extensions, clusters, tritones, Chord Assistant tension) · RHYTHM (density, ratchets, syncopation, Contrast moves) · PITCH (risers, pitch climb) · SILENCE (space before release)
+  transmutations: rules like "at tension > 0.8 for 4 bars, next downbeat = RELEASE (all elements to their resolution values)" ; resolution = learned from the tension rise (the bigger the build, the bigger the drop)
+  safety: limits per element so tension never clips the master (works with Master FX)
+config: curve ; elements[] {on, amount, targets} ; rules[] ; resolution style
+hooks: STD.transport_in ; control_out ; data_in tension ; data_out tension
+ui: tension curve across the song ; element wheel (8 elements as a circle, amount = radius) ; "transmute" rules in sentences
+packs: factory — Classic Build & Drop, Slow Burn, Horror Rise, Euphoric Release, Collapse (tension → silence), Breathing (sine tension), Fake-out Drop
+tests: tension 0→1 over 8 bars raises chord dissonance score monotonically ; release rule fires on the first downbeat after the condition ±1 tick ; master never exceeds −0.3 dBFS with all elements at max

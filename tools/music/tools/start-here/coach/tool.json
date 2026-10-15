@@ -1,0 +1,42 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.coach",
+  "version": "1.0.0",
+  "label": "Coach",
+  "icon": "🧭",
+  "accent": "#ffffff",
+  "domain": "music",
+  "category": "start-here",
+  "summary": "Step-by-step lessons on the canvas: first beat, bassline, chop her voice, build the drop, export.",
+  "tags": [
+    "start-here",
+    "coach"
+  ],
+  "files": {
+    "engine": "coach.engine.js",
+    "ui": "coach.ui.js",
+    "spec": "coach.spec",
+    "preview": "preview.png",
+    "tests": "coach.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "bus_publish",
+      "bus_subscribe",
+      "registry_read"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": []
+  },
+  "works_with": [],
+  "status": "built",
+  "conflicts": []
+}

@@ -1,0 +1,49 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.lyric-rhythm",
+  "version": "0.1.0",
+  "label": "Lyrics → Rhythm",
+  "icon": "✎",
+  "accent": "#ff7eb6",
+  "domain": "music",
+  "category": "voice-and-words",
+  "summary": "Type the words — they become a rhythm or a melody line in key, on the beat, ready for any instrument or the Timeline.",
+  "tags": [
+    "lyrics",
+    "rhythm",
+    "words",
+    "voice"
+  ],
+  "files": {
+    "engine": "lyric-rhythm.engine.js",
+    "ui": "lyric-rhythm.ui.js",
+    "css": "lyric-rhythm.css",
+    "preview": "preview.svg",
+    "spec": "lyric-rhythm.spec",
+    "tests": "lyric-rhythm.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine",
+      "music.transport",
+      "music.key"
+    ],
+    "tools": [],
+    "permissions": [
+      "bus_publish",
+      "bus_subscribe",
+      "registry_read"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "flows"
+    ]
+  },
+  "works_with": [],
+  "status": "built",
+  "conflicts": []
+}

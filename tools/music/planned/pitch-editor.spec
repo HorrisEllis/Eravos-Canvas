@@ -1,0 +1,14 @@
+# spec_id: eravos.organism.pitch-editor · version 1.0.0 · phase P38 · status planned · category voice
+identity:
+  id: eravos.pitch-editor ; label: Pitch Editor ; icon: 🫧 ; accent: "#c58bff"
+  comp_intent: Edit a recorded vocal note by note — move pitch, straighten drift, shape vibrato, nudge timing, change formant and level — without re-singing.
+  novelty: Offline, note-object editing of a clip (Tune works live on a stream).
+engine:
+  analysis: pYIN + onset/offset detection → note blobs {start, end, centre pitch, drift curve, vibrato curve, amplitude curve, formant} ; runs in a Worker, progress reported, cached by asset hash
+  render: per-note PSOLA / phase vocoder with cepstral formant control, crossfaded 10 ms at note seams ; timing edits = time-stretch (WSOLA) of the note and its neighbour gap ; non-destructive (edit list + original asset)
+  tools: pitch (snap to scale or free), drift (0..100 % straighten), vibrato depth/rate, formant, gain, time move, length, split, join, quantize-to-grid, "correct all" macro
+  export: render to a new clip asset ; MIDI out of the corrected melody
+config: clip asset ; key/scale follow|own ; snap enum scale|chromatic|off ; correctAmount def 0 ; driftAmount def 0
+hooks: STD.audio_out ; STD.theory_in ; STD.transport_in (scrub follow) ; data_out notes (json) ; note_out (play the melody into a synth)
+ui: piano-roll with blobs over the waveform ; drift line inside each blob ; tool palette ; A/B original ; loop selection ; zoom both axes
+tests: a sung C4 with +40 c drift, drift 100 % → curve flat ±2 c ; move note +2 st → F0 +200 c, length unchanged ; render is sample-identical when no edits ; analysis of 3-min vocal < 15 s on the reference machine

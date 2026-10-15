@@ -1,0 +1,109 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "fx-filter.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "effects"
+ ],
+ "for": "eravos.fx-filter",
+ "items": {
+  "eravos.fx-filter": {
+   "presets": {
+    "Auto-Wah": {
+     "params": {
+      "type": "BP",
+      "slope": 12,
+      "cutoff": 500,
+      "res": 4,
+      "envAmt": 2,
+      "envAttack": 5,
+      "envRelease": 120,
+      "lfoAmt": 0,
+      "mix": 1
+     }
+    },
+    "Build HP 1/1": {
+     "params": {
+      "type": "HP",
+      "slope": 24,
+      "cutoff": 200,
+      "res": 1.2,
+      "lfoAmt": 2.5,
+      "lfoShape": "sawtooth",
+      "lfoSync": true,
+      "lfoDiv": "1/1",
+      "envAmt": 0,
+      "mix": 1
+     }
+    },
+    "Wobble 1/8 LP": {
+     "params": {
+      "type": "LP",
+      "slope": 24,
+      "cutoff": 400,
+      "res": 6,
+      "lfoAmt": 3,
+      "lfoShape": "sine",
+      "lfoSync": true,
+      "lfoDiv": "1/8",
+      "envAmt": 0,
+      "drive": 0.3,
+      "mix": 1
+     }
+    },
+    "Tremble 1/16": {
+     "params": {
+      "type": "LP",
+      "slope": 12,
+      "cutoff": 1500,
+      "res": 3,
+      "lfoAmt": 1.5,
+      "lfoShape": "square",
+      "lfoSync": true,
+      "lfoDiv": "1/16",
+      "envAmt": 0,
+      "mix": 1
+     }
+    },
+    "Telephone": {
+     "params": {
+      "type": "BP",
+      "slope": 24,
+      "cutoff": 1500,
+      "res": 1.5,
+      "lfoAmt": 0,
+      "envAmt": 0,
+      "drive": 0.4,
+      "mix": 1
+     }
+    },
+    "Muffled Intro": {
+     "params": {
+      "type": "LP",
+      "slope": 24,
+      "cutoff": 450,
+      "res": 0.9,
+      "lfoAmt": 0,
+      "envAmt": 0,
+      "mix": 1
+     }
+    },
+    "80s · Cassette Lo-cut": {
+     "params": {
+      "type": "BP",
+      "slope": 12,
+      "cutoff": 1500,
+      "res": 0.8,
+      "drive": 0.15,
+      "lfoAmt": 0,
+      "mix": 1
+     }
+    }
+   }
+  }
+ }
+}

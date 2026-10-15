@@ -1,0 +1,112 @@
+ERAVOS 3.36.0-alpha — one zip (everything except the unchanged Electron runtime)
+
+FASTEST: double-click "Open ERAVOS.html" (use Edge or Chrome). Nothing to install. Your StarryPad works there.
+  For the most reliable saving/microphone: install Node.js (LTS) once, then double-click source\Start ERAVOS.bat.
+  Want the stand-alone ERAVOS.exe and the complete one-file zip? Double-click "Make ERAVOS.exe (Windows).bat".
+  It downloads the official Electron runtime once (~110 MB), builds ERAVOS\ERAVOS.exe with all 47 tools, writes
+  ERAVOS_3.36.0-alpha_complete.zip next to this folder, and starts ERAVOS. No Node.js needed.
+
+ALREADY HAVE AN ERAVOS.exe FOLDER (Windows)
+  Copy the folder  windows-x64\ERAVOS  from this zip over your existing ERAVOS folder (the one with ERAVOS.exe)
+  and choose "Replace". That updates resources\app (the canvas) and ERAVOS Library\Mods\Music (all the tools).
+  ERAVOS.exe itself is unchanged: it is only the empty canvas; every tool comes from the packs.
+
+RUN WITHOUT THE EXE (any browser)
+  source\Start ERAVOS.bat (Windows) or source/start-eravos.sh — opens http://localhost:4747. Needs Node.js once.
+  Rebuild a complete ERAVOS.exe from source: node source/desktop/build.mjs
+
+New in this build (3.34) — her voice first, words into rhythm, back into the body
+- DROP BUILDER 3: a big "Her voice" panel at the top (drop her clip there; trim it, stutter it, throw it). Tabs for
+  TENSION · BUILD · PAUSE · DROP — every part of each has its own controls and a "hear this part" button.
+- LYRICS → RHYTHM (new, + Add → Voice & samples): type the words; they become a beat or a melody in key. Click a
+  syllable to make it weak / strong / ACCENT, drag it to move it, send it to the Timeline.
+- EMBODIMENT LAB (new, Lab mode): a slow drone on irrational ratios with a heartbeat pulse and a breath swell; a light
+  that breathes and a body that lights where to rest your attention. Pick a feeling: Grounded, Held, Heavy Heart,
+  Ache, Longing, Wonder, Release, Awake, Safe, Calm Fire, Hanging Tree. (A listening experience, not a treatment.)
+- PAD FORGE and DUB STATION redesigned; windows glow and shift colour with their own sound.
+- TIMELINE: clicks now land exactly where you click at any zoom (the bug behind "position is off / can't click").
+- Plan for next: Timeline + Song Recorder become one Song timeline (specs\eravos.phase33-map.spec, section H).
+
+Earlier (3.32) — the blueprint for making more
+- Every kind of thing now has a format and a starting point: source\schemas (tool, pack, mode, category, domain)
+  and source\templates (a tool, a sound-making tool, a pack, a mode, a category, a domain).
+- One command makes a new tool folder with everything in it; one checks it. See source\specs\eravos.structure.spec.
+- All preset packs and drum kit packs now live in one pack system (switch on/off, mix and match) — the base for the
+  big Pack Browser.
+- The map of where every one of the 47 tools moves in the clean folder layout: source\specs\eravos.structure.map.spec.
+- Nothing you use changed.
+
+Earlier (3.31) — your songs, your taste, goals
+- 📖 SAVE TO SONGS in the Song Recorder (bottom): keeps the song's audio AND everything on the canvas.
+  Songs → "My songs": listen, open it again, delete.
+- 🧭 EDM TOUR (Learn): 22 kinds of EDM — trance, deep house, tech house, garage, hardstyle, jungle, psytrance,
+  big room, moombahton… Each: one press writes it, you listen, you rate it 💜 / 🙂 / 🙅. Songs → "For you" then
+  shows the ones you love first. No music knowledge needed.
+- 🎯 GOALS (top of Learn): 15 achievements that unlock when you actually do the thing, and always one clear next goal.
+- Every genre now has a card in Songs, including the 13 new EDM genres.
+- The map of what ERAVOS can grow into (image, video, website UI, AI automation): source\specs\eravos.domains.map.spec,
+  one spec per tool. Mapped, not built yet.
+
+Earlier (3.30) — blank canvas, pads that just work, Sounds
+- Opens BLANK: Start · Add · Options. Everything else appears when you pick something.
+- Your StarryPad plays the Drum Machine with NO window open, and the pad you hit is the pad you see
+  (top-left on the pad = pad 1 on screen). Click MIDI only to learn pads or map knobs.
+- 🎚 SOUNDS (toolbar): every preset by pack · drum KIT PACKS (Island, 80s, Street, Dark, Mine) — switch packs on/off,
+  load a kit, mix pad by pad, save your own · CAPTURE → PAD: press Capture, play any tool, it lands on a pad.
+- 🧠 LEARN: 17 lessons, 6 tracks incl. "Make music for her" and "Express yourself". Each says the skill it gives.
+- Exe: tools now live in ERAVOS Library\Mods\Music (one folder per domain). Old Packs still load.
+
+Earlier (3.29) — off the canvas
+- 📖 SONGS (toolbar): a Songbook of finished songs by mood — Bun Dem (reggae one-drop), Yard Riddim (dancehall),
+  Under the Hanging Tree (desert goth organ), Cowbell Drift (phonk), Tape for Her (lo-fi), Breathe With Me (ambient),
+  plus every Song Engine genre. Each says what the drop does and where her voice clips go. Write it, or roll another.
+- 🧠 LEARN (toolbar): lessons on a map. Guess first, then press; each ends on a question the next one answers.
+  Runs in a small strip outside the canvas. Steps tick only when they really happen. Some unlock Songbook songs.
+- Every drop goes silent for half a beat first, then crash + kick + bass hit together.
+- New Song Engine genres on the Start screen: Reggae Dub, Dancehall, Hanging Tree, Phonk, Lo-fi, Breath Ambient.
+
+Earlier (3.28) — production grade
+- NOTHING PLAYS FOREVER. "■ Stop all" in the toolbar (or Shift+Esc) silences every tool at once, echoes and drones
+  included; each sound-making window has its own ■ in its title bar. Play or touch a tool and it comes straight back.
+  Stop on the transport now always stops: drones switch off, held chords let go, runaway echoes fade and empty.
+  Fixed hangs: Tape Echo (every preset ran away forever — its saturation tripled the feedback), Dub Station echo,
+  Destroyer (8-bit turned silence into a constant hum), Coven's Summon drone, Ratio Lattice / Recursive Spectra drones
+  (new ▶ Drone / ■ Stop drone button), Breath (new ■ Pause). Tape Echo has a ■ CLEAR button.
+- 44 NEW EDM PADS ("EDM Pad ·" in the preset menus): 20 for Pad Forge, 14 for Supersaw, 10 for Retro Poly — trance,
+  future bass, melodic dubstep, progressive, chillwave, deep house, techno, liquid DnB, hardstyle, cinematic.
+- 5 new effects: 7-band EQ, Dynamics (compressor / gate with key input), Glitch (hold pads on the grid), Pitch
+  (shift + harmonies), FX Box (12 playable sound effects: risers, impacts, lasers…).
+- Timeline: drum lanes show pad names; ⤓ MIDI and ⤓ Stems export.
+- Saving: named projects on the start screen, 5 earlier autosaves, "Back up all my saves", unsaved-changes warning.
+- Errors in plain words; every control works from the keyboard and has a name for screen readers.
+
+Earlier (3.27)
+- SONG ENGINE: Start > SONG ENGINE > pick a genre. Every press writes a new finished song (Dubstep, Riddim, DnB,
+  Neurofunk, Future Bass, Melodic Dubstep, House, Techno, Trap, Synthwave (80s), Darkwave (80s), Witch House) — tools,
+  presets, drums, bass, chords, lead and the arrangement, on the Timeline, all in key. Click any clip to edit it.
+- Two modes: Music Production (everything for making songs) and Lab (xenharmonic, analysis, breath).
+- Connect: click the ⇢ plug in any window's title bar for a list of everything it can plug into. One click connects.
+- Song Recorder: its ▶ plays your takes only — the canvas stays quiet. "Play with song" turns overdubbing on.
+- Save pieces: the ＋ next to any preset menu now keeps the whole thing — patterns, arrangements, kits with your clips.
+- Wobble Bass: free-rate LFO, retrigger, phase, volume/pitch wub, formant shift, unison, width, noise, sub octave,
+  pitch dive, level + 11 new presets. "Make a song for her" uses the Reese.
+- 80s and Club preset packs across the synths, effects and master (names start "80s ·" / "Club ·").
+- Windows open showing every control (double-click the bottom-right grip to refit). Redrawn: Supersaw, Wobble, LFO,
+  Contrast, Phaser, Mod Delay, Haunt, Automation.
+
+Earlier (3.25)
+- Canvas starts agnostic. + Add opens a full-screen menu: pick a mode, or add any tool. Each tool shows what it
+  needs and what it adds to the toolbar before you add it.
+- Donner StarryPad / DPD-16: pads play the Drum Machine / Drum Forge straight away (no learning). The toolbar
+  "MIDI" button opens the MIDI Map (it pulses "Connect pads" when a drum tool is waiting).
+- Song Recorder pinned to the bottom: record what you hear, edit takes, export WAV / FLAC / AIFF / MP3 / Opus / stems.
+- Every tool has its own volume in its title bar (drag or scroll; right-click mutes).
+- Wobble Bass no longer distorts its sub ("blown speaker"); "Make a song for her" no longer auto-fires the build.
+- Canvas fixes: drags can no longer get stuck (release outside the window, alt-tab); the browser's own drag-and-drop
+  can't hijack the mouse; no stray text selection; windows can't be dragged under the toolbar where you could never
+  grab them again; idle/off-screen windows stop redrawing (60 fps with 14 tools open); title-bar buttons keep their
+  clicks; wires need a double-click to delete; middle-mouse pans anywhere; double-click a title bar to fold it.
+- Pictures of every tool: source\docs\tools\*.png   ·   Specs + dependency map: source\specs (regenerate: node source\tools\specs.mjs)
+- What's next, phased: source\specs\eravos.phase15-roadmap.spec
+- New tools: Deep Sub, Pad Forge, Dub Station, Drum Forge, Bass Forge, Gothic Organ, Retro Poly, Coven, Haunt,
+  Curve, Breath, Xen Synth, Ratio Lattice, Recursive Spectra, Harmonic Analyzer.

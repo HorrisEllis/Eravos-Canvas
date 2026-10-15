@@ -1,0 +1,69 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.retro-poly",
+  "version": "1.0.0",
+  "label": "Retro Poly",
+  "icon": "🌆",
+  "accent": "#ff2bd6",
+  "domain": "music",
+  "category": "genre-instruments",
+  "summary": "Synthwave poly: PWM pulse + saw + sub, analog drift, 24 dB filter, BBD chorus, unison, glide, arpeggiator.",
+  "tags": [
+    "genre-instruments",
+    "retro",
+    "poly"
+  ],
+  "files": {
+    "engine": "retro-poly.engine.js",
+    "ui": "retro-poly.ui.js",
+    "spec": "retro-poly.spec",
+    "preview": "preview.png",
+    "tests": "retro-poly.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "midi_in",
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.breath",
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.dub-station",
+    "eravos.embodiment-lab",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.master-fx",
+    "eravos.sidechain-compressor",
+    "eravos.xy-pad"
+  ],
+  "status": "built",
+  "conflicts": []
+}

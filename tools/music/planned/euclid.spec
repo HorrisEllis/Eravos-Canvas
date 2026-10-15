@@ -1,0 +1,17 @@
+# spec_id: eravos.organism.euclid · version 1.0.0 · phase P8.4 · status canonical
+# source: v10 euclidean() Bjorklund + euclid page (private setTimeout clock, F-22)
+identity:
+  id: eravos.euclid ; label: Euclid ; icon: ◉ ; accent: "#ffcc00"
+  comp_intent: Great-sounding world rhythms from three numbers — hits, steps, rotation — no theory needed.
+  novelty: Only generative polymetric rhythm organism; concentric rings, each ring its own cycle length.
+engine:
+  rings: up to 8, each {hits k, steps n 1..32, rotation r, target instanceId, note (drum note or scale degree), velocity, accentEvery, prob, mute}
+  pattern: Bjorklund(k, n) rotated r (v10 algorithm re-implemented, unit-tested against known sets: E(3,8)=[x..x..x.], E(5,8), E(7,16))
+  timing: transport:tick ; ring step = tick.step16 mod n (polymeter) ; rate per ring enum [1/8, 1/16, 1/32, 1/8t]
+  output: note:trigger to ring target at tick time
+  print: seq:pattern_suggest to a sequencer (unrolled to LCM of ring lengths, max 64)
+config: per ring fields above ; swing 0..0.6 ; global rotate (shifts all rings)
+presets: Tresillo E(3,8), Cumbia E(5,8)+E(3,4), Bossa E(5,16), Afro 12/8 E(7,12), Techno Polymeter (16/12/7)
+hooks: STD.transport_in ; note_out (out ; note:trigger) ; print_out (seq:pattern_suggest) ; STD.theory_in
+ui: hero = concentric rings (v10 canvas idea), hits as dots, rotating cursor per ring ; per-ring row: k/n/r steppers, target, note ; formula readout E(k,n+r)
+tests: E(3,8)→10010010 ; E(5,8)→10110110 rotation-equivalent ; ring n=12 & n=16 phase-realign after 48 steps ; no setTimeout in engine

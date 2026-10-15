@@ -1,0 +1,49 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.video.video-clip",
+  "version": "1.0.0",
+  "label": "Video Clip",
+  "icon": "🎬",
+  "accent": "#ff8fab",
+  "domain": "video",
+  "category": "clips",
+  "summary": "Open a video, scrub and trim it, play it on the song’s beat, send frames to image tools, export the cut.",
+  "tags": [
+    "video",
+    "clip",
+    "trim",
+    "frames",
+    "export"
+  ],
+  "files": {
+    "engine": "video-clip.engine.js",
+    "ui": "video-clip.ui.js",
+    "css": "video-clip.css",
+    "spec": "video-clip.spec",
+    "tests": "video-clip.test.js",
+    "preview": "preview.png"
+  },
+  "needs": {
+    "units": [],
+    "tools": [],
+    "permissions": [
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.agents.ai-step",
+    "eravos.coding.code-cell",
+    "eravos.image.image-adjust"
+  ],
+  "status": "built",
+  "conflicts": []
+}

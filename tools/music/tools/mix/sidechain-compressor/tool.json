@@ -1,0 +1,88 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.sidechain-compressor",
+  "version": "2.1.0",
+  "label": "Sidechain",
+  "icon": "〽",
+  "accent": "#ffaa00",
+  "domain": "music",
+  "category": "mix",
+  "summary": "The EDM pump — everything ducks on the kick. Or a 16-step trance gate.",
+  "tags": [
+    "mix",
+    "sidechain",
+    "compressor"
+  ],
+  "files": {
+    "engine": "sidechain-compressor.engine.js",
+    "ui": "sidechain-compressor.ui.js",
+    "spec": "sidechain-compressor.spec",
+    "preview": "preview.png",
+    "tests": "sidechain-compressor.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "audio_in",
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.acid-synth",
+    "eravos.bass-drop-builder",
+    "eravos.bass-forge",
+    "eravos.breath",
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.coven",
+    "eravos.curve-synth",
+    "eravos.drum-forge",
+    "eravos.dub-station",
+    "eravos.edm-lab",
+    "eravos.embodiment-lab",
+    "eravos.fx-box",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.master-fx",
+    "eravos.organ",
+    "eravos.pad-forge",
+    "eravos.pads",
+    "eravos.ratio-lattice",
+    "eravos.recursive-spectra",
+    "eravos.reese-bass",
+    "eravos.retro-poly",
+    "eravos.sample-player",
+    "eravos.song-recorder",
+    "eravos.sub-engine",
+    "eravos.supersaw",
+    "eravos.timeline",
+    "eravos.wobble-bass",
+    "eravos.xen-synth"
+  ],
+  "status": "built",
+  "conflicts": []
+}

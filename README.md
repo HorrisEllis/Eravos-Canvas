@@ -1,1 +1,167 @@
-# Eravos-Canvas
+# ERAVOS
+
+A canvas of living instruments for making music — everything in key, everything on the beat.
+
+## Layout — the canvas and the tools are separate
+
+    canvas/        the empty canvas — what ERAVOS.exe is. Domain-free: kernel/, runtime/, index.html, scripts.js
+    tools/         everything you drag onto the canvas, one folder per domain (music, image, video, agents, coding,
+                   dataflow; ui is mapped, not built). tools/index.js lists the domains the dev build loads.
+                   Inside a domain: core/ (shared engine) · tools/<category>/<tool>/ (one tool each) · content/ · planned/
+    schemas/       the formats both sides agree on (tool, pack, mode, category, domain)
+    templates/     copy-to-start folders for a new tool, pack, mode, category, domain
+    build/         new-tool · index-tools · validate · structure-map · specs · shots · perf
+    tests/         cross-cutting tests (node tests/run.mjs); a tool's own tests live in its folder
+    specs/         cross-cutting specs (kernel, structure, phase maps); a tool's spec lives in its folder
+    desktop/       the exe shell (Electron main/preload) + its builder; ships canvas/ only, tools become packs
+    packaging/     packaging/windows/make-exe.ps1 — run by Build ERAVOS.exe.bat: Electron + canvas/ = ERAVOS.exe
+    docs/          tool pictures (docs/tools/*.png) and release notes
+    Build ERAVOS.exe.bat   builds the exe (the canvas only) into dist/
+    index.html     opens canvas/index.html · serve.js / Start ERAVOS.bat / start-eravos.sh serve this folder
+
+The canvas finds the tools through one setting: `canvas/scripts.js` sets `ERAVOS_TOOLS` (default `../tools/`) and loads
+`tools/index.js` last. Nothing in `canvas/` names a domain (tests/boundary.test.js enforces it).
+
+## Start
+
+- **Windows:** double-click **Start ERAVOS**.
+- **macOS / Linux:** run `./start-eravos.sh`.
+
+This opens ERAVOS at **http://localhost:4747** in your browser. Keep the small black window open while you work; close it to stop.
+It needs [Node.js](https://nodejs.org) (the LTS version) installed once.
+
+Why not just open `index.html`? Browsers only allow MIDI controllers, the microphone and dependable saving for pages served
+from an address like `localhost`. Firefox in particular refuses MIDI for pages opened straight from a file.
+
+## MIDI controller (pads, keys, knobs)
+
+1. Plug the controller in by USB **before** opening the browser (Firefox only sees devices present when it starts).
+2. Add **MIDI Map** (＋ Add), press **Connect MIDI**, choose **Allow**.
+3. Press **① Learn pads** and hit pads 1 → 16.
+
+If something goes wrong, the MIDI Map window says why and what to do. Browsers: Chrome, Edge and Firefox work. Safari has no MIDI support.
+
+## Saving
+
+Your work autosaves in the browser for this address. To keep a copy or move it to another computer: **Session → Save**
+(a `.eravos.json` file). Drop that file onto the canvas to open it.
+
+Moving from the old way (opening `index.html` directly) to Start ERAVOS? Open the old page one last time, **Session → Save**,
+then open that file in the new one — the browser keeps the two addresses' saves separate.
+
+## Undo
+
+**Ctrl+Z** undoes, **Ctrl+Shift+Z** (or Ctrl+Y) redoes — anything you do on the canvas: knob moves, notes and clips,
+tracks, adding or closing a window (it comes back with its settings and its connections), wiring. The ↶ ↷ buttons in the
+toolbar name the step they will undo. Loading a recipe or a saved song starts a fresh history.
+
+## Song Engine — a new song every press
+
+**Start → SONG ENGINE** and pick a genre (Dubstep, Riddim, Drum & Bass, Neurofunk, Future Bass, Melodic Dubstep, House,
+Techno, Trap, Synthwave (80s), Darkwave (80s), Witch House). Every press writes a different finished song — tools, presets,
+drums, bass, chords, lead and the arrangement — on the Timeline, all in key. Click any clip to edit it in the piano roll.
+The song's name ends in its number: `SongEngine.write('synthwave', 4242)` builds that exact song again.
+
+## 3.36 — the Sequencer drives every tool to the beat · "Give Your Head a Shake"
+- ＋ lane → automation lane: pick any tool and any knob, paint a value per step (⟋ = glide). Wobble rate, cutoff, DJ filter, reverb — on the beat.
+- Right-click a step: 🔒 lock a knob for that one hit · "Plays": every other pass, only in a fill, first pass only…
+- ✦ Fill (button, MIDI, Perform pad 8) · Evolve per lane (patterns grow from the 2nd pass, repeatably) · Humanize.
+- Preset "Song · Give Your Head a Shake": the whole song — intro, verse, build (her line at the end), pause, two drops, breakdown.
+- Lyrics → Rhythm → ⇢ Sequencer: paste your words; they become lanes + a "her voice" lane on every line (load her clip in a Sample Player).
+
+## 3.35.1 — ⏮ restart · your pads do more
+- ⏮ (top bar, Timeline, Home): back to the loop start, or bar 1 — keeps playing.
+- MIDI Map → What the pads do: Drums · Keys (16 notes in key) · Chords + drums · Split · Perform (⏮ ▶ ⏺ ⟲, markers, drop, tap, patterns A–H) · ✎ any pad.
+
+## 3.35 — the Timeline, easier
+- ⤢ fills the screen at true size whatever the canvas zoom (Esc back). Long songs at high zoom no longer go blank.
+- Drag the bar above the piano roll to resize it · exports are one ⤓ Export menu · wheel scrolls time · + / − zoom · F fit.
+
+## 3.34.2 — Bass Pack · 3.34.1 — Words → Song
+- Bass Pack: 8 genres (tearout, dubstep-og, riddim-war, drumstep, trapstep, bass-house, deathstep, tension-study); genre bar-writer hook `G.bar`; real builds, pause, lift.
+- Words → Song (RhythmExpand): lyrics' rhythm drives drums/bass/lead over a Song Engine genre. `SongEngine.generate(id, seed, X)` + `helpers`.
+- Merge fix: p22 golden hashes re-captured in-page (old set lacked organism sizes → layout drift; notes unchanged). Windows payload rebuilt (was 3.33).
+
+## 3.34 — nothing sticks, windows that expand, speed + settings per tool, the Mixer
+- Drags can no longer get stuck (the "open the dev console and it works again" bug): one guard ends every drag on release, a button-less move, Esc or switching windows.
+- ⤢ on every window and the bottom dock (fills the screen). Timeline: fills its window, lane height − / ＋, Ctrl+wheel zoom, Alt+wheel lane height, ⤢ Fit, ruler stays on top.
+- Speed per tool: every beat-driven tool has Speed (¼ … 4, or its own BPM) in ⚙ Settings.
+- ⚙ Settings on every tool: every parameter (searchable), presets, Reset, and Output (its mixer strip).
+- 🎛 Mixer (Mix): a strip per sound (fader, pan, M/S, meter, low cut, EQ, sends, output), ＋ Group / Reverb / Echo / Aux lines.
+- Coming next (mapped in specs/eravos.phase34-map.spec): Hard Tune, the Song editor, the UI rebuild pass, new EDM genres, import & map.
+
+## 3.33 — Drop Builder 3, Lyrics → Rhythm, Embodiment Lab, living surfaces
+
+Drop Builder: her voice panel first; every part of every section (tension, build, pause, drop) has its own editor and
+a ▶ hear button. Lyrics → Rhythm turns words into a beat or a melody line. Embodiment Lab: an irrational-ratio drone
+with a heartbeat pulse, a breath swell and body cues — feelings as presets (Lab mode). Pad Forge and Dub Station are
+redesigned; every tool's surface can follow its own sound (UI.alive). Timeline clicks land where you click at any zoom.
+
+## Making new tools, packs, modes, domains (3.32)
+
+Read `specs/eravos.structure.spec`. In short: every tool is its own folder
+(`tools/<domain>/tools/<category>/<tool>/` with tool.json, engine, window, spec, preview, packs/), modes are views
+that reference tools, packs are content only. Formats: `schemas/`. Starting points: `templates/`.
+
+    node build/new-tool.mjs --domain music --category effects --id fx-shimmer --label "Shimmer" --flavour sound
+    node build/index-tools.mjs && node build/validate.mjs
+
+Where every current tool moves: `specs/eravos.structure.map.spec` (generated by `build/structure-map.mjs`).
+
+## 3.31 — your songs, your taste, goals
+
+**📖 Save to Songs** in the Song Recorder keeps the song (audio + the whole canvas) — Songs → **My songs** to listen or
+open it again. **Learn → EDM tour**: 22 kinds of EDM, write → hear → rate each; Songs → **For you** shows what you love.
+**Goals** at the top of Learn always show the next thing to do. The map of every future domain (image, video, UI,
+automation) is in `specs/eravos.domains.map.spec`, one spec per tool.
+
+## 3.30 — blank canvas, pads that just work, Sounds
+
+ERAVOS opens blank: **Start · Add · Options**. Everything else appears when you pick a mode or add a tool.
+Your pad controller plays the Drum Machine with no window open, and the pad you hit is the pad you see.
+**🎚 Sounds** (toolbar, Music Production): every preset by pack, drum **kit packs** to switch on/off, load and mix pad by
+pad, and **Capture → pad**: play any tool and its sound lands on a Drum Machine pad.
+On the exe, tools come from **ERAVOS Library › Mods › <Domain>** — one folder per domain.
+
+## Songbook and Learn (3.29) — pages of their own, off the canvas
+
+**📖 Songs** (toolbar, Music Production): finished songs in every genre — reggae (Bun Dem), dancehall, Hanging Tree
+desert goth, phonk, lo-fi, ambient and all the Song Engine genres. Each card says what to listen for, what the drop
+does and where her voice clips go. **▶ Write this song** builds it on the canvas; **🎲 Another like it** rolls a new one.
+
+**🧠 Learn**: short lessons on a map — predict first, then press; each lesson ends on a question the next one answers.
+The lesson runs in a small strip at the bottom-left. Finishing some lessons unlocks songs in the Songbook.
+
+Every drop now goes silent for half a beat before it hits (crash + kick on beat 1).
+
+## Connecting tools
+
+Click the **⇢ plug** in a window's title bar: a list shows everything on the canvas it can plug into — click one to
+connect (✓ = connected; click again to disconnect). Or drag the plug onto a window. Double-click a wire to remove it.
+
+## Saving pieces
+
+The **＋** next to any preset menu saves your own preset — the knobs **and** what the tool holds: sequencer patterns,
+timeline arrangements, drum kits with the clips on the pads, Clip Maker / Sampler clips (their audio is kept too).
+
+## Song Recorder
+
+Its **▶** plays your takes only — the rest of the canvas stays silent. Space plays the whole canvas. Turn on
+**Play with song** when you want takes to play along with the canvas (overdubbing).
+
+## Making a track
+
+Press **Start → Future Bass song** for a finished example: click any clip to edit its notes in the piano roll,
+drag the ⇢ plug in a window's title bar onto another window to connect them, press Space to play, **Bounce WAV** to export.
+
+## ERAVOS.exe (Windows)
+
+The Windows build is a portable folder: double-click **ERAVOS.exe** — no browser, no Node, no install.
+ERAVOS.exe is only the canvas. **Every tool is a pack** in **ERAVOS Library › Packs** (next to the exe): Music Core plus
+one pack per tool family (synths, drums, effects, arrange…). Remove a pack to remove its tools; drop a new pack onto the
+canvas to add tools (it is kept in Packs and loads every start). Put sounds, `.mid` or projects in **Drop Here** and they
+appear on the canvas; Save and Bounce write to **Projects** / **Exports**. Build the packs alone with `node desktop/packs.mjs`.
+Rebuild it from this source with `node desktop/build.mjs` (downloads the pinned Electron once).
+**Build ERAVOS.exe.bat** (repo root, Windows, no Node): the exe is the canvas and nothing else — Electron + `canvas/` +
+`schemas/` → `dist/ERAVOS/ERAVOS.exe` and `dist/ERAVOS_<version>.zip`. Tools are everything else: they reach the exe as
+packs (`node desktop/packs.mjs` → drop the zips in ERAVOS Library › Mods). `dist/` is build output and is not committed.

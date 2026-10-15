@@ -1,0 +1,89 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.fx-eq",
+  "version": "1.0.0",
+  "label": "EQ",
+  "icon": "⌒",
+  "accent": "#ffdd00",
+  "domain": "music",
+  "category": "effects",
+  "summary": "Fix mud, add air: seven bands you drag right on the live spectrum. Listen to any band on its own.",
+  "tags": [
+    "effects"
+  ],
+  "files": {
+    "engine": "fx-eq.engine.js",
+    "ui": "fx-eq.ui.js",
+    "css": "fx-eq.ui.css",
+    "spec": "fx-eq.spec",
+    "preview": "preview.png",
+    "tests": "fx-eq.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "audio_in",
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.acid-synth",
+    "eravos.bass-drop-builder",
+    "eravos.bass-forge",
+    "eravos.breath",
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.coven",
+    "eravos.curve-synth",
+    "eravos.drum-forge",
+    "eravos.dub-station",
+    "eravos.edm-lab",
+    "eravos.embodiment-lab",
+    "eravos.fx-box",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.master-fx",
+    "eravos.organ",
+    "eravos.pad-forge",
+    "eravos.pads",
+    "eravos.ratio-lattice",
+    "eravos.recursive-spectra",
+    "eravos.reese-bass",
+    "eravos.retro-poly",
+    "eravos.sample-player",
+    "eravos.sidechain-compressor",
+    "eravos.song-recorder",
+    "eravos.sub-engine",
+    "eravos.supersaw",
+    "eravos.timeline",
+    "eravos.wobble-bass",
+    "eravos.xen-synth",
+    "eravos.xy-pad"
+  ],
+  "status": "built",
+  "conflicts": []
+}

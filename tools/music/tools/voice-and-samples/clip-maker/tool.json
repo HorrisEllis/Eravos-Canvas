@@ -1,0 +1,87 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.clip-maker",
+  "version": "1.0.0",
+  "label": "Clip Maker",
+  "icon": "✂",
+  "accent": "#00ff88",
+  "domain": "music",
+  "category": "voice-and-samples",
+  "summary": "Trim her recording to the exact words, clean it up, split it into clips, send them anywhere.",
+  "tags": [
+    "voice-and-samples",
+    "clip",
+    "maker"
+  ],
+  "files": {
+    "engine": "clip-maker.engine.js",
+    "ui": "clip-maker.ui.js",
+    "spec": "clip-maker.spec",
+    "preview": "preview.png",
+    "tests": "clip-maker.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "audio_in",
+      "bus_publish",
+      "bus_subscribe",
+      "filesystem_read",
+      "filesystem_write"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": []
+  },
+  "works_with": [
+    "eravos.acid-synth",
+    "eravos.bass-drop-builder",
+    "eravos.bass-forge",
+    "eravos.breath",
+    "eravos.channel",
+    "eravos.contrast-analyser",
+    "eravos.coven",
+    "eravos.curve-synth",
+    "eravos.drum-forge",
+    "eravos.dub-station",
+    "eravos.edm-lab",
+    "eravos.embodiment-lab",
+    "eravos.fx-box",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.master-fx",
+    "eravos.organ",
+    "eravos.pad-forge",
+    "eravos.pads",
+    "eravos.ratio-lattice",
+    "eravos.recursive-spectra",
+    "eravos.reese-bass",
+    "eravos.retro-poly",
+    "eravos.sample-player",
+    "eravos.sidechain-compressor",
+    "eravos.song-recorder",
+    "eravos.sub-engine",
+    "eravos.supersaw",
+    "eravos.timeline",
+    "eravos.wobble-bass",
+    "eravos.xen-synth"
+  ],
+  "status": "built",
+  "conflicts": []
+}

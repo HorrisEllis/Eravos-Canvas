@@ -1,0 +1,68 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.supersaw",
+  "version": "2.1.0",
+  "label": "Supersaw",
+  "icon": "🌊",
+  "accent": "#00d4ff",
+  "domain": "music",
+  "category": "sound-sources",
+  "summary": "Big festival lead & chords. Chord mode: press one key, get a full chord in key.",
+  "tags": [
+    "sound-sources",
+    "supersaw"
+  ],
+  "files": {
+    "engine": "supersaw.engine.js",
+    "ui": "supersaw.ui.js",
+    "spec": "supersaw.spec",
+    "preview": "preview.png",
+    "tests": "supersaw.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "midi_in",
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.breath",
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.dub-station",
+    "eravos.embodiment-lab",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.master-fx",
+    "eravos.sidechain-compressor",
+    "eravos.xy-pad"
+  ],
+  "status": "built",
+  "conflicts": []
+}

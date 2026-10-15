@@ -1,0 +1,10 @@
+{
+  "name": "eravos",
+  "productName": "ERAVOS",
+  "version": "3.36.0-alpha.1",
+  "description": "ERAVOS \u2014 a canvas of living instruments",
+  "author": "James Brooks",
+  "main": "main.js",
+  "private": true,
+  "electronVersion": "44.4.5"
+}

@@ -1,0 +1,44 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.mixer",
+  "version": "1.0.0",
+  "label": "Mixer",
+  "icon": "🎛",
+  "accent": "#7cc4ff",
+  "domain": "music",
+  "category": "mix",
+  "summary": "The whole mix in one place: a strip for every sound, add group and effect lines, send, pan, EQ, solo.",
+  "tags": [
+    "mix",
+    "mixer",
+    "console",
+    "bus",
+    "send"
+  ],
+  "files": {
+    "engine": "mixer.engine.js",
+    "ui": "mixer.ui.js",
+    "css": "mixer.css",
+    "preview": "preview.svg",
+    "spec": "mixer.spec",
+    "tests": "mixer.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "bus_publish",
+      "bus_subscribe",
+      "registry_read"
+    ]
+  },
+  "packs": {
+    "accepts": [],
+    "shipped": []
+  },
+  "works_with": [],
+  "status": "built",
+  "conflicts": []
+}

@@ -1,0 +1,4 @@
+# build output — regenerated from source, never committed (desktop/build.mjs, packaging/windows/make-exe.ps1)
+dist/
+node_modules/
+tests/out/

@@ -1,0 +1,9 @@
+/* eravos.coding.code-cell */
+.cc-editor { width: 100%; min-height: 190px; flex: 1 1 auto; resize: vertical; box-sizing: border-box; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line2, #2d3f57); background: #05080c; color: #d7ffe9; font: 12.5px/1.5 var(--mono, ui-monospace, monospace); tab-size: 2; outline: none; white-space: pre; overflow: auto; }
+.cc-editor:focus-visible { border-color: #7cffb2; box-shadow: 0 0 0 2px rgba(124,255,178,.18); }
+.cc-in { margin: 6px 0; padding: 6px 8px; border-radius: 6px; background: #0a1118; color: var(--dim, #7f93a8); font: 11px var(--mono, monospace); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cc-log { height: 120px; overflow: auto; margin-top: 6px; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--line, #223044); background: #04070a; font: 11.5px/1.45 var(--mono, monospace); }
+.cc-line { white-space: pre-wrap; word-break: break-word; color: #b8c7d6; }
+.cc-line.info { color: #7cc4ff; } .cc-line.warn { color: #ffd166; } .cc-line.error { color: #ff6b81; }
+.cc-status { font: 11px var(--mono, monospace); color: var(--dim, #7f93a8); padding: 0 4px; }
+.cc-status.running { color: #ffd166; } .cc-status.ok { color: #7cffb2; } .cc-status.error, .cc-status.timeout { color: #ff6b81; }

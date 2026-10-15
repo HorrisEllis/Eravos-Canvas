@@ -1,0 +1,18 @@
+# spec_id: eravos.organism.contrast-engine · version 1.0.0 · phase P38 · status planned · category arrange
+# Built from technique study (no melodies, lyrics or samples copied): dancehall-vocal-over-half-time-drop contrast
+# ("Make It Bun Dem" ~0:45: the drop switches density, register and rhythm grid at once), rhythm that fights the
+# grid ("Tranki": syncopated hits against a straight kick, call-and-response between bass and percussion), and
+# complextro / electro-house stop-start writing (rapid source switching every 1/8–1/16, gaps as accents).
+identity:
+  id: eravos.contrast-engine ; label: Contrast ; icon: ⚡ ; accent: "#ff1744"
+  comp_intent: Write rapid, contrasting music on purpose — switch sources every step, slam into silence, flip half/double time, stutter, make the rhythm fight the beat — with a score that tells you how much contrast you have.
+  novelty: A step "director" that controls OTHER tools (mute, pitch, filter, retrigger, rate) per step, plus a contrast meter (Contrast Analyser measures audio; this composes).
+engine:
+  lanes = moves: SWITCH (which source plays this step, from a list of tools — the complextro chop) · GAP (hard silence, tail-killed, for 1/32–1 bar) · FLIP (half-time / double-time feel for the next N steps: drum pattern re-mapped) · STUTTER (retrigger last 1/8…1/64, with pitch ramp) · FIGHT (displace a part by 1/16 or 3/16 against the kick, polyrhythm 3:4, 5:4, 7:8) · CALL/RESPONSE (alternate two sources by phrase) · DROP SWITCH (density + register + grid change in one step: the 0:45 move)
+  scheduling: all moves are sample-accurate commands on the transport ; tails killed with 2 ms fades (no clicks) ; returns restore state exactly
+  contrast score per bar: Δloudness, Δspectral centroid, Δonset density, Δregister, grid displacement → 0..100 ; target curve drawn by you ; GENERATE fills moves to hit the target curve (seeded, editable)
+config: sources[] ; lanes ; target curve ; intensity ; seed ; quantize
+hooks: STD.transport_in ; control_out (to tools) ; note_out ; data_out score
+ui: score graph over bars (target vs actual) ; move lanes like a sequencer ; source palette
+packs: factory — Complextro Chop, Half-Time Slam, Grid Fight 3:4, Stop-Start, Dancehall Drop Switch, Call & Response, Machine-Gun Stutter Fill
+tests: GAP 1/8 → output < −80 dB for exactly the gap ±1 ms, no click > −50 dB at edges ; FLIP half-time maps snare from beats 2/4 to beat 3 ; generated moves raise measured score toward target (|error| ≤ 15)

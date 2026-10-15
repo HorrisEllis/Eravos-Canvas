@@ -1,0 +1,10 @@
+# spec_id: eravos.organism.notebook · version 1.0.0 · phase P38 · status planned · category code
+identity:
+  id: eravos.coding.notebook ; label: Notebook ; icon: 📓 ; accent: "#c792ea"
+  comp_intent: Cells of code and notes that share state, run top to bottom — explore data, prototype an idea, explain it.
+  novelty: Shared-state cells (Code Cell = isolated runs).
+engine: JS cells share one sandbox realm per notebook (restartable) ; markdown cells ; outputs: text, tables, charts, images ; Python cells via Pyodide as an optional pack ; run all / run below / restart ; time limit per cell
+config: cells[] ; kernel js|python
+hooks: data_in ; data_out last ; trigger_in run all
+ui: cell list with run buttons and outputs
+tests: variable set in cell 1 visible in cell 2 ; restart clears state

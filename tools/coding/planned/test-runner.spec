@@ -1,0 +1,10 @@
+# spec_id: eravos.organism.test-runner · version 1.0.0 · phase P38 · status planned · category code
+identity:
+  id: eravos.coding.test-runner ; label: Tests ; icon: ✅ ; accent: "#c3e88d"
+  comp_intent: Write and run tests for a Project or Code Cell — describe/it/expect — and see pass/fail live as you type.
+  novelty: In-sandbox test framework with watch mode.
+engine: minimal describe/it/expect (toBe, toEqual, toThrow, toBeCloseTo, async) injected into the sandbox ; watch on file change ; per-test time limit ; coverage of lines hit (instrumented via a small transform) optional
+config: target ; watch ; timeout ; coverage
+hooks: data_in (files) ; data_out results (json)
+ui: tree of suites with ✓/✗, failure diff, re-run single test
+tests: failing expect shows expected vs received diff ; infinite loop test stopped at timeout, others still reported

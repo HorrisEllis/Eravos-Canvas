@@ -1,0 +1,68 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.coven",
+  "version": "1.0.0",
+  "label": "Coven",
+  "icon": "⛧",
+  "accent": "#c4002f",
+  "domain": "music",
+  "category": "genre-instruments",
+  "summary": "Witch-house choir that chants vowel spells on the beat: hex ring-mod, screw pitch-down, static, a drone that summons itself.",
+  "tags": [
+    "genre-instruments",
+    "coven"
+  ],
+  "files": {
+    "engine": "coven.engine.js",
+    "ui": "coven.ui.js",
+    "spec": "coven.spec",
+    "preview": "preview.png",
+    "tests": "coven.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "midi_in",
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.breath",
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.dub-station",
+    "eravos.embodiment-lab",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.master-fx",
+    "eravos.sidechain-compressor",
+    "eravos.xy-pad"
+  ],
+  "status": "built",
+  "conflicts": []
+}

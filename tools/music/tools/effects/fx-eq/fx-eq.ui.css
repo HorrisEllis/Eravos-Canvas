@@ -1,0 +1,5 @@
+.eq-table { display: grid; grid-template-columns: repeat(7, minmax(64px, 1fr)); gap: 4px; margin-top: 6px; overflow-x: auto; }
+.eq-table .eq-col { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 4px; margin: 0; }
+.eq-table .eq-col .uk-panel, .eq-table .eq-col .uk-group, .eq-table .eq-col .uk-row { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 0; border: 0; background: none; margin: 0; }
+.eq-table .eq-col .uk-group-title { white-space: nowrap; font-size: 9px; }
+.eq-table .uk-seg button { padding: 2px 4px; font-size: 9px; }

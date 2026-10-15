@@ -1,0 +1,118 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "fx-dynamics.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "effects"
+ ],
+ "for": "eravos.fx-dynamics",
+ "items": {
+  "eravos.fx-dynamics": {
+   "presets": {
+    "Punchy Drums": {
+     "params": {
+      "gateOn": false,
+      "compOn": true,
+      "thresh": -20,
+      "ratio": 4,
+      "knee": 4,
+      "attack": 12,
+      "release": 90,
+      "makeup": 5,
+      "mix": 1
+     }
+    },
+    "Vocal Level": {
+     "params": {
+      "gateOn": true,
+      "gateThresh": -55,
+      "gateRange": 18,
+      "gateRelease": 200,
+      "compOn": true,
+      "thresh": -22,
+      "ratio": 3,
+      "knee": 10,
+      "attack": 3,
+      "release": 160,
+      "makeup": 6,
+      "mix": 1
+     }
+    },
+    "Bass Glue": {
+     "params": {
+      "gateOn": false,
+      "compOn": true,
+      "thresh": -16,
+      "ratio": 3,
+      "knee": 8,
+      "attack": 20,
+      "release": 140,
+      "makeup": 3,
+      "mix": 1
+     }
+    },
+    "Tight Gate": {
+     "params": {
+      "gateOn": true,
+      "gateThresh": -32,
+      "gateRange": 60,
+      "gateAttack": 0.3,
+      "gateHold": 30,
+      "gateRelease": 60,
+      "compOn": false,
+      "mix": 1
+     }
+    },
+    "NY Parallel Smash": {
+     "params": {
+      "gateOn": false,
+      "compOn": true,
+      "thresh": -35,
+      "ratio": 12,
+      "knee": 0,
+      "attack": 1,
+      "release": 60,
+      "makeup": 14,
+      "mix": 0.4
+     }
+    },
+    "Kick Duck (Key)": {
+     "params": {
+      "gateOn": false,
+      "compOn": true,
+      "keyed": true,
+      "thresh": -30,
+      "ratio": 8,
+      "knee": 2,
+      "attack": 0.5,
+      "release": 180,
+      "makeup": 0,
+      "mix": 1
+     }
+    },
+    "80s Gated Snare": {
+     "params": {
+      "gateOn": true,
+      "gateThresh": -24,
+      "gateRange": 70,
+      "gateAttack": 0.2,
+      "gateHold": 180,
+      "gateRelease": 25,
+      "compOn": true,
+      "thresh": -18,
+      "ratio": 6,
+      "knee": 3,
+      "attack": 2,
+      "release": 80,
+      "makeup": 6,
+      "mix": 1
+     }
+    }
+   }
+  }
+ }
+}

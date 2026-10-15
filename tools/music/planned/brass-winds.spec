@@ -1,0 +1,11 @@
+# spec_id: eravos.organism.brass-winds · version 1.0.0 · phase P38 · status planned · category instruments
+identity:
+  id: eravos.brass-winds ; label: Brass & Winds ; icon: 🎺 ; accent: "#e8b923"
+  comp_intent: Trumpet, trombone, horn, sax, flute, clarinet — solos and sections (stabs, swells, falls, growls) for pop, funk, jazz, film, ska, dub.
+  novelty: Lip-reed / reed / air-jet physical models with breath control (CC2 or the Breath tool).
+engine: lip-reed model (trumpet/trombone/horn), single-reed (sax/clarinet), air-jet (flute) ; breath pressure → dynamics + brightness ; growl, flutter-tongue, fall-off, doit, shake, scoops as articulations ; section mode 2–6 players with spread ; mute types for brass (cup, harmon, plunger)
+config: instrument ; players ; breath source enum velocity|cc2|breath-wire ; articulation ; vibrato ; growl ; mute
+hooks: STD.note_in ; STD.midi_in ; data_in breath (number) ; STD.audio_out
+ui: instrument picker with pictures ; breath meter ; articulation pads
+packs: factory — Funk Section Stabs, Ska Horns, Dub Melodica-style Lead, Smooth Sax, Film Horns, Jazz Muted Trumpet, Breathy Flute
+tests: breath 0→1 increases spectral centroid monotonically ; fall-off drops ≥ 5 st in 300 ms
