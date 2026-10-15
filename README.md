@@ -10,7 +10,7 @@ A canvas of living instruments for making music — everything in key, everythin
                    Inside a domain: core/ (shared engine) · tools/<category>/<tool>/ (one tool each) · content/ · planned/
     schemas/       the formats both sides agree on (tool, pack, mode, category, domain)
     templates/     copy-to-start folders for a new tool, pack, mode, category, domain
-    build/         new-tool · index-tools · validate · structure-map · specs · shots · perf
+    build/         new-tool · index-tools · validate · structure-map · specs · planned-deps · shots · perf
     tests/         cross-cutting tests (node tests/run.mjs); a tool's own tests live in its folder
     specs/         cross-cutting specs (kernel, structure, phase maps); a tool's spec lives in its folder
     desktop/       the exe shell (Electron main/preload) + its builder; ships canvas/ only, tools become packs
