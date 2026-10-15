@@ -4,7 +4,7 @@ import { chromium } from 'playwright';
 import path from 'path'; import { fileURLToPath } from 'url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'), OUT = process.env.SHOTS_OUT || path.join(ROOT, 'docs', 'tools');
 const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] }); const p = await b.newPage({ viewport: { width: 1500, height: 1500 }, deviceScaleFactor: Number(process.env.SHOTS_SCALE || 2) });
-await p.goto('file://' + ROOT + '/index.html?noboot'); await p.waitForFunction(() => window.Shell && window.Shell.X);
+await p.goto('file://' + ROOT + '/canvas/index.html?noboot'); await p.waitForFunction(() => window.Shell && window.Shell.X);
 const ids = await p.evaluate(() => { Shell.activate(); Shell.X.enterMode('music'); return OrganismFactory.defined().map(d => d.id); });
 for (const id of ids) {
   const inst = await p.evaluate((id) => { CanvasWM.world.querySelectorAll('.wm-win').forEach(w => { if (!w.closest('#dock')) w.remove(); }); CanvasWM.view = { x: 0, y: 0, z: 1 }; CanvasWM.applyView(); return OrganismFactory.spawn(id, { x: 30, y: 20 }); }, id);

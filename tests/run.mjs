@@ -11,11 +11,11 @@ import fs from 'fs';
 const root = path.join(__dirname, '..');
 const read = (rel) => fs.readFileSync(path.join(root, rel), 'utf8');
 const list = (dir, re) => fs.readdirSync(path.join(root, dir)).filter(f => re.test(f)).map(f => dir + '/' + f);
-const skeleton = [...list('kernel', /\.js$/), ...list('runtime', /\.(js|css)$/), 'index.html', 'scripts.js'];
-// every tool's code: domains/<d>/tools/<category>/<tool>/*.js (the generated packs/index.js is data, not tool code)
-const toolDirs = fs.readdirSync(path.join(root, 'domains')).filter(d => fs.existsSync(path.join(root, 'domains', d, 'tools')))
-  .flatMap(d => fs.readdirSync(path.join(root, 'domains', d, 'tools')).filter(c => fs.statSync(path.join(root, 'domains', d, 'tools', c)).isDirectory())
-    .flatMap(c => fs.readdirSync(path.join(root, 'domains', d, 'tools', c)).filter(t => fs.existsSync(path.join(root, 'domains', d, 'tools', c, t, 'tool.json'))).map(t => `domains/${d}/tools/${c}/${t}`)));
+const skeleton = [...list('canvas/kernel', /\.js$/), ...list('canvas/runtime', /\.(js|css)$/), 'canvas/index.html', 'canvas/scripts.js'];
+// every tool's code: tools/<d>/tools/<category>/<tool>/*.js (the generated packs/index.js is data, not tool code)
+const toolDirs = fs.readdirSync(path.join(root, 'tools')).filter(d => fs.existsSync(path.join(root, 'tools', d, 'tools')))
+  .flatMap(d => fs.readdirSync(path.join(root, 'tools', d, 'tools')).filter(c => fs.statSync(path.join(root, 'tools', d, 'tools', c)).isDirectory())
+    .flatMap(c => fs.readdirSync(path.join(root, 'tools', d, 'tools', c)).filter(t => fs.existsSync(path.join(root, 'tools', d, 'tools', c, t, 'tool.json'))).map(t => `tools/${d}/tools/${c}/${t}`)));
 const organismFiles = toolDirs.flatMap(dir => list(dir, /\.js$/).filter(f => !/\.test\.js$/.test(f)));   // a tool's own tests are not tool code
 const SOURCES = { skeleton: Object.fromEntries(skeleton.map(f => [f, read(f)])), organisms: Object.fromEntries(organismFiles.map(f => [f, read(f)])) };
 const BATCH = Number(process.env.BATCH || 8);

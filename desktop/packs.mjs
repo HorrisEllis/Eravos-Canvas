@@ -2,12 +2,12 @@
 /* Build the music domain as drop-in packs (P13 · eravos.phase13-skeleton-packs). Node built-ins only.
  *   node desktop/packs.mjs --out <folder>
  * One core pack (the domain: theory, audio engine, transport, data, recipes, css) + one pack per tool family.
- * File order comes from RUNNING the dev loaders (domains/music/index.js, tools/index.js) against a stub document.write,
+ * File order comes from RUNNING the dev loaders (tools/music/index.js, tools/index.js) against a stub document.write,
  * so the source tree stays the single truth: add an organism there and it lands in the right pack by its category. */
 import fs from 'fs'; import path from 'path'; import vm from 'vm'; import zlib from 'zlib'; import { fileURLToPath } from 'url';
-const HERE = path.dirname(fileURLToPath(import.meta.url)), ROOT = path.resolve(HERE, '..'), MUSIC = path.join(ROOT, 'domains', 'music');
+const HERE = path.dirname(fileURLToPath(import.meta.url)), ROOT = path.resolve(HERE, '..'), MUSIC = path.join(ROOT, 'tools', 'music');
 const VERSION = JSON.parse(fs.readFileSync(path.join(HERE, 'package.json'), 'utf8')).version;
-const KERNEL_TARGET = (fs.readFileSync(path.join(ROOT, 'kernel', 'kernel.js'), 'utf8').match(/KERNEL_VERSION = '([^']+)'/) || [])[1] || '3.2.0';
+const KERNEL_TARGET = (fs.readFileSync(path.join(ROOT, 'canvas', 'kernel', 'kernel.js'), 'utf8').match(/KERNEL_VERSION = '([^']+)'/) || [])[1] || '3.2.0';
 
 // ---------------------------------------------------------------- zip writer (deflate, CRC-32) — readable by kernel/intake.js
 const CRC = new Uint32Array(256).map((_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
@@ -30,13 +30,13 @@ export function zip(entries) { // [{name, data:Buffer}]
 // ---------------------------------------------------------------- run a loader, capture what it would load
 function loaderOutput(file, win) {
   const tags = [];
-  const sandbox = { window: Object.assign({ ERAVOS_BASE: '' }, win || {}), document: { write: (t) => tags.push(t), currentScript: null } };
+  const sandbox = { window: Object.assign({ ERAVOS_TOOLS: '' }, win || {}), document: { write: (t) => tags.push(t), currentScript: null } };
   vm.runInNewContext(fs.readFileSync(file, 'utf8'), sandbox, { filename: file });
   const out = [];
   for (const t of tags) { let m; if ((m = t.match(/<script src="([^"]+)"/))) out.push({ kind: 'js', path: m[1] }); else if ((m = t.match(/<link rel="stylesheet" href="([^"]+)"/))) out.push({ kind: 'css', path: m[1] }); }
   return out;
 }
-const rel = (p) => p.replace(/^domains\/music\//, '');
+const rel = (p) => p.replace(/^music\//, '');
 
 // ---------------------------------------------------------------- tool families (every organism category must be covered)
 export const FAMILIES = [

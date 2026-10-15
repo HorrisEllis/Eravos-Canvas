@@ -3,6 +3,8 @@
  *   node desktop/build.mjs                         downloads the pinned Electron (desktop/package.json electronVersion)
  *   node desktop/build.mjs --electron-zip <zip>    uses an Electron win32-x64 zip you already have
  *   node desktop/build.mjs --out <folder>          default: <repo>/../ERAVOS-windows
+ *   node desktop/build.mjs --no-electron           the overlay only (resources/app + ERAVOS Library + READ ME) — what
+ *                                                  packaging/windows/make-exe.ps1 wraps around Electron on a PC without Node
  * Result: <out>/ERAVOS/ERAVOS.exe + resources/app (the canvas). ERAVOS Library is created next to the exe on first run.
  * Same as electron-packager does, minus rcedit (icon/version info) which needs Windows or wine — declared in the spec. */
 import fs from 'fs'; import path from 'path'; import { buildPacks } from './packs.mjs'; import { execFileSync } from 'child_process'; import { fileURLToPath } from 'url';
@@ -35,22 +37,24 @@ function copyDir(src, dst, skip) {
     if (fs.statSync(s).isDirectory()) copyDir(s, d, skip); else fs.copyFileSync(s, d);
   }
 }
-// P13: the exe ships the SKELETON only (kernel, runtime, shell). Every tool arrives as a pack in ERAVOS Library › Packs.
-const SHIP = ['index.html', 'scripts.js', 'README.md', 'kernel', 'runtime', 'schemas'];
+// P13: the exe ships the CANVAS only (canvas/ = kernel, runtime, shell). Every tool arrives as a pack in ERAVOS Library › Mods.
+const SHIP = ['canvas', 'README.md', 'schemas'];
+const OVERLAY = process.argv.includes('--no-electron');
 
-const zip = await electronZip();
 say('assembling ' + APP);
 fs.rmSync(APP, { recursive: true, force: true });
-extract(zip, APP);
-fs.renameSync(path.join(APP, 'electron.exe'), path.join(APP, 'ERAVOS.exe'));
-fs.rmSync(path.join(APP, 'resources', 'default_app.asar'), { force: true });
-const loc = path.join(APP, 'locales'); if (fs.existsSync(loc)) for (const f of fs.readdirSync(loc)) if (!/^en-(US|GB)\.pak$/.test(f)) fs.rmSync(path.join(loc, f));
+if (!OVERLAY) {
+  extract(await electronZip(), APP);
+  fs.renameSync(path.join(APP, 'electron.exe'), path.join(APP, 'ERAVOS.exe'));
+  fs.rmSync(path.join(APP, 'resources', 'default_app.asar'), { force: true });
+  const loc = path.join(APP, 'locales'); if (fs.existsSync(loc)) for (const f of fs.readdirSync(loc)) if (!/^en-(US|GB)\.pak$/.test(f)) fs.rmSync(path.join(loc, f));
+}
 const res = path.join(APP, 'resources', 'app'); fs.mkdirSync(res, { recursive: true });
 ['main.js', 'preload.js'].forEach(f => fs.copyFileSync(path.join(HERE, f), path.join(res, f)));
 fs.writeFileSync(path.join(res, 'package.json'), JSON.stringify({ name: pkg.name, productName: pkg.productName, version: pkg.version, description: pkg.description, author: pkg.author, main: 'main.js', private: true }, null, 2));
 for (const s of SHIP) { const src = path.join(ROOT, s), dst = path.join(res, 'eravos', s); if (fs.statSync(src).isDirectory()) copyDir(src, dst, (rel, n) => n === 'node_modules' || n.startsWith('.')); else { fs.mkdirSync(path.dirname(dst), { recursive: true }); fs.copyFileSync(src, dst); } }
-fs.mkdirSync(path.join(res, 'eravos', 'domains'), { recursive: true });
-fs.writeFileSync(path.join(res, 'eravos', 'domains', 'index.js'), '/* ERAVOS.exe: no built-in domains — the canvas expands with packs (ERAVOS Library › Packs, or drop a .zip). */\nwindow.ERAVOS_DOMAINS = [];\n');
+fs.mkdirSync(path.join(res, 'eravos', 'tools'), { recursive: true });
+fs.writeFileSync(path.join(res, 'eravos', 'tools', 'index.js'), '/* ERAVOS.exe: no built-in domains — the canvas expands with packs (ERAVOS Library › Packs, or drop a .zip). */\nwindow.ERAVOS_DOMAINS = [];\n');
 const packsDir = path.join(APP, 'ERAVOS Library', 'Mods', 'Music'); // 3.30: one folder per domain
 fs.rmSync(packsDir, { recursive: true, force: true });
 const pk = buildPacks(packsDir); say(`${pk.made.length} packs → ERAVOS Library › Packs (${pk.organisms} tools)`);
@@ -66,4 +70,4 @@ fs.writeFileSync(path.join(APP, 'READ ME FIRST.txt'), [
   '  Projects / Exports - where Save and Bounce write.', '',
   'MIDI pads/keys: plug in, then MIDI Map > Connect MIDI. Close other music apps first - Windows lets only one app use a MIDI device at a time.',
   'Move or back up everything: copy this whole ERAVOS folder.', ''].join('\r\n'));
-say('done → ' + path.join(APP, 'ERAVOS.exe'));
+say('done → ' + (OVERLAY ? APP + ' (overlay — packaging/windows/make-exe.ps1 adds Electron)' : path.join(APP, 'ERAVOS.exe')));

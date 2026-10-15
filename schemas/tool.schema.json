@@ -42,11 +42,11 @@
     },
     "domain": {
       "type": "string",
-      "description": "folder name under domains/"
+      "description": "folder name under tools/"
     },
     "category": {
       "type": "string",
-      "description": "folder name under domains/<domain>/tools/"
+      "description": "folder name under tools/<domain>/tools/"
     },
     "summary": {
       "type": "string",

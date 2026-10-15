@@ -2,6 +2,25 @@
 
 A canvas of living instruments for making music — everything in key, everything on the beat.
 
+## Layout — the canvas and the tools are separate
+
+    canvas/        the empty canvas — what ERAVOS.exe is. Domain-free: kernel/, runtime/, index.html, scripts.js
+    tools/         everything you drag onto the canvas, one folder per domain (music, image, video, agents, coding,
+                   dataflow; ui is mapped, not built). tools/index.js lists the domains the dev build loads.
+                   Inside a domain: core/ (shared engine) · tools/<category>/<tool>/ (one tool each) · content/ · planned/
+    schemas/       the formats both sides agree on (tool, pack, mode, category, domain)
+    templates/     copy-to-start folders for a new tool, pack, mode, category, domain
+    build/         new-tool · index-tools · validate · structure-map · specs · shots · perf
+    tests/         cross-cutting tests (node tests/run.mjs); a tool's own tests live in its folder
+    specs/         cross-cutting specs (kernel, structure, phase maps); a tool's spec lives in its folder
+    desktop/       the exe shell (Electron main/preload) + its builder; ships canvas/ only, tools become packs
+    packaging/     packaging/windows/make-exe.ps1 — wraps Electron around the overlay on a PC without Node
+    docs/          tool pictures (docs/tools/*.png) and release notes
+    index.html     opens canvas/index.html · serve.js / Start ERAVOS.bat / start-eravos.sh serve this folder
+
+The canvas finds the tools through one setting: `canvas/scripts.js` sets `ERAVOS_TOOLS` (default `../tools/`) and loads
+`tools/index.js` last. Nothing in `canvas/` names a domain (tests/boundary.test.js enforces it).
+
 ## Start
 
 - **Windows:** double-click **Start ERAVOS**.
@@ -80,7 +99,7 @@ redesigned; every tool's surface can follow its own sound (UI.alive). Timeline c
 ## Making new tools, packs, modes, domains (3.32)
 
 Read `specs/eravos.structure.spec`. In short: every tool is its own folder
-(`domains/<domain>/tools/<category>/<tool>/` with tool.json, engine, window, spec, preview, packs/), modes are views
+(`tools/<domain>/tools/<category>/<tool>/` with tool.json, engine, window, spec, preview, packs/), modes are views
 that reference tools, packs are content only. Formats: `schemas/`. Starting points: `templates/`.
 
     node build/new-tool.mjs --domain music --category effects --id fx-shimmer --label "Shimmer" --flavour sound
@@ -142,3 +161,6 @@ one pack per tool family (synths, drums, effects, arrange…). Remove a pack to 
 canvas to add tools (it is kept in Packs and loads every start). Put sounds, `.mid` or projects in **Drop Here** and they
 appear on the canvas; Save and Bounce write to **Projects** / **Exports**. Build the packs alone with `node desktop/packs.mjs`.
 Rebuild it from this source with `node desktop/build.mjs` (downloads the pinned Electron once).
+Without Node on the PC: `node desktop/build.mjs --no-electron --out dist/windows-x64` (on any machine) makes the overlay,
+then **packaging/windows/Make ERAVOS.exe (Windows).bat** adds Electron and writes `dist/ERAVOS` + the complete zip.
+`dist/` is build output and is not committed.

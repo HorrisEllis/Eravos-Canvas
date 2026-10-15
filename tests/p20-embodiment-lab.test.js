@@ -1,4 +1,4 @@
-/* eravos.embodiment-lab — spec domains/music/tools/embodiment/embodiment-lab/embodiment-lab.spec */
+/* eravos.embodiment-lab — spec tools/music/tools/embodiment/embodiment-lab/embodiment-lab.spec */
 window.__phase = 'P20';
 describe('eravos.embodiment-lab (Embodiment Lab)', () => {
   const ctxOf = (id) => OrganismFactory.handle(id).ctx;

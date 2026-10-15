@@ -3,13 +3,13 @@
 import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
 import { PORTS, DOMAINS } from '../specs/src/domains.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'), OUT = path.join(ROOT, 'specs');
-// P37: built tools are the folders that have a tool.json; a mapped tool's spec lives in domains/<d>/planned/ until it is built
-const builtIn = (dom) => { const t = path.join(ROOT, 'domains', dom, 'tools'); return fs.existsSync(t) ? fs.readdirSync(t).flatMap(c => fs.statSync(path.join(t, c)).isDirectory() ? fs.readdirSync(path.join(t, c)).filter(x => fs.existsSync(path.join(t, c, x, 'tool.json'))) : []) : []; };
+// P37: built tools are the folders that have a tool.json; a mapped tool's spec lives in tools/<d>/planned/ until it is built
+const builtIn = (dom) => { const t = path.join(ROOT, 'tools', dom, 'tools'); return fs.existsSync(t) ? fs.readdirSync(t).flatMap(c => fs.statSync(path.join(t, c)).isDirectory() ? fs.readdirSync(path.join(t, c)).filter(x => fs.existsSync(path.join(t, c, x, 'tool.json'))) : []) : []; };
 const music = builtIn('music');
 const list = (a) => a.length ? a.map(x => '    - ' + x).join('\n') : '    - (none)';
 let n = 0;
 for (const D of DOMAINS) {
-  const done = new Set(builtIn(D.id)), PL = path.join(ROOT, 'domains', D.id, 'planned'); fs.mkdirSync(PL, { recursive: true });
+  const done = new Set(builtIn(D.id)), PL = path.join(ROOT, 'tools', D.id, 'planned'); fs.mkdirSync(PL, { recursive: true });
   for (const [id, label, icon, purpose, ins, outs, params, behave, test, works] of D.tools) {
     if (done.has(id)) { fs.rmSync(path.join(PL, id + '.spec'), { force: true }); continue; } // built: its spec lives with its code
     fs.writeFileSync(path.join(PL, `${id}.spec`), `# spec_id: eravos.organism.${D.id}.${id} · status MAPPED (specified, not built) · domain ${D.id}
@@ -34,7 +34,7 @@ acceptance (must pass before status → built — nothing pretends to work):
     - standard: renders/produces output through its out port; unmount leaves zero subscribers, ports, wires; params clamp; presets load
 `); n++;
   }
-  fs.writeFileSync(path.join(ROOT, 'domains', D.id, 'domain.spec'), `# spec_id: eravos.domain.${D.id} · status ${done.size ? 'BUILDING (' + done.size + ' built: ' + Array.from(done).join(', ') + ')' : 'MAPPED'} · folder ${D.folder}/  (exe: ERAVOS Library/Mods/${D.label}/)
+  fs.writeFileSync(path.join(ROOT, 'tools', D.id, 'domain.spec'), `# spec_id: eravos.domain.${D.id} · status ${done.size ? 'BUILDING (' + done.size + ' built: ' + Array.from(done).join(', ') + ')' : 'MAPPED'} · folder ${D.folder}/  (exe: ERAVOS Library/Mods/${D.label}/)
 domain: ${D.icon} ${D.label} — ${D.about}
 mode: ${D.mode}
 units (toolbar expansion, built only when needed):
@@ -50,7 +50,7 @@ shell: blank, domain-free (Start · Add · Options). A domain = a folder + packs
 port types (the only way domains meet):
 ${list(Object.keys(PORTS).map(k => k + ' — ' + PORTS[k]))}
 domains:
-    - 🎛 music — BUILT · domains/music/ · ${music.length} tools: ${music.join(', ')}
+    - 🎛 music — BUILT · tools/music/ · ${music.length} tools: ${music.join(', ')}
 ${DOMAINS.map(D => { const b = builtIn(D.id); return `    - ${D.icon} ${D.id} — ${b.length ? 'BUILDING (' + b.length + ' built: ' + b.join(', ') + ')' : 'MAPPED'} · ${D.folder}/ · ${D.tools.length} tools mapped: ${D.tools.map(t => t[0]).join(', ')}`; }).join('\n')}
 cross-domain bridges (a tool in one domain that speaks another's port — never a copy of the other domain):
 ${list(DOMAINS.flatMap(D => D.tools.filter(t => (t[9] || []).length).map(t => `${D.id}.${t[0]} ↔ ${t[9].join(', ')}`)))}

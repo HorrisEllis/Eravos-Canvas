@@ -20,17 +20,20 @@
   R7  The shell knows none of this: it sees domains through units, modes, needs and packs only (boundary test).
 
 ## 2. The tree
-  source/
-    kernel/                       the kernel (domain-free)
-    runtime/                      shell runtime (domain-free): factory, canvas, wires, workspace, content-packs, add menu…
-    index.html · scripts.js       the blank shell (Start · Add · Options)
+  <repo>/
+    canvas/                       THE CANVAS — domain-free, what ERAVOS.exe ships (§7)
+      kernel/                     the kernel (domain-free)
+      runtime/                    shell runtime (domain-free): factory, canvas, wires, workspace, content-packs, add menu…
+      index.html · scripts.js     the blank shell (Start · Add · Options); scripts.js sets ERAVOS_TOOLS, loads tools/index.js last
     schemas/                      tool · pack · mode · category · domain  (.schema.json)
     templates/                    tool/ (generic) · tool-sound/ (needs music.engine) · pack/ · mode/ · category/ · domain/
     build/                        new-tool · index-tools · validate · structure-map · specs · domain-specs · shots · perf
     specs/                        cross-cutting specs only (kernel, structure, maps, phases); tool specs live with tools
     tests/                        cross-cutting tests; tool tests may live in the tool's tests/
     desktop/                      the exe shell (Electron main, preload, packs builder)
-    domains/
+    packaging/windows/            make-exe.ps1 + .bat: Electron + the overlay (desktop/build.mjs --no-electron) → dist/
+    tools/                        THE TOOLS — everything dragged onto the canvas (was domains/ until 3.37, §7)
+      index.js                    the domain list the dev build loads (ERAVOS_DOMAINS)
       <domain>/
         domain.json               schemas/domain.schema.json
         domain.js                 registers units, modes, needs with the shell
@@ -64,14 +67,14 @@
 
 ## 3. Making something new (the replicable path)
   tool      node build/new-tool.mjs --domain music --category effects --id fx-shimmer --label "Shimmer" [--flavour sound]
-            → domains/music/tools/effects/fx-shimmer/ with every file above, ids filled in, a factory pack
+            → tools/music/tools/effects/fx-shimmer/ with every file above, ids filled in, a factory pack
             → node build/index-tools.mjs   (it loads: dev page, tests, and its own zip in the exe)
             → node build/validate.mjs      (schemas + engine id + files + category folder)
             → write the engine, the window and the spec's acceptance tests; status building → built when they pass
   pack      copy templates/pack/ into a tool's packs/ (or Mods/<Domain>/packs/), fill items, index, validate
-  mode      copy templates/mode/__MODE__.mode.json into domains/<d>/modes/, list units + categories (+ include/exclude)
+  mode      copy templates/mode/__MODE__.mode.json into tools/<d>/modes/, list units + categories (+ include/exclude)
   category  copy templates/category/ (new-tool makes it for you when the folder is new)
-  domain    copy templates/domain/ → domains/<new>/ (P32.4 adds build/new-domain.mjs with a working first tool)
+  domain    copy templates/domain/ → tools/<new>/ and add <new> to tools/index.js (P32.4 adds build/new-domain.mjs with a working first tool)
   Agnostic by default: templates/tool needs nothing but the kernel. A tool that makes sound declares
   needs.units ["music.engine"]; one that records declares needs.tools ["eravos.song-recorder"]. The shell turns on
   exactly what is declared — so "what can it not be without" is written in one place and nowhere else.
@@ -102,3 +105,15 @@
   P32.4        core/ · modes/*.mode.json · pages/ · content/ folders for music; build/new-domain.mjs
   P32.5        previews: build/shots.mjs writes preview.png into each tool folder; audio previews for packs
   P32.6        first non-music domain from eravos.domains.map.spec, built only from the templates (the proof)
+
+## 7. Canvas | tools split (3.37 layout pass)
+  R8  canvas/ and tools/ are sibling folders. The canvas reaches the tools through ONE variable, ERAVOS_TOOLS
+      (canvas/scripts.js: data-tools attribute, default <data-base>../tools/). Every domain loader resolves against it.
+  R9  Same URL layout everywhere: dev (file:// and serve.js) serves <repo>/ → /canvas/index.html + /tools/;
+      the exe serves resources/app/eravos/ → /canvas/index.html + /tools/index.js (an empty stub; tools come as packs).
+      Storage is keyed by origin only (localhost:4747, eravos://app) — moving the page under /canvas/ keeps every save.
+  R10 Pack zips hold domain-relative paths (desktop/packs.mjs strips "<domain>/"), so the move changed no zip:
+      all 52 Mods zips are byte-identical to 3.36. Existing ERAVOS Library folders keep working.
+  R11 Build output (the windows-x64 overlay, ERAVOS.exe, complete zips) lives in dist/ and is never committed.
+  Verified: tests/run.mjs 809/809 · validate 127 manifests · page loads 6 domains, 54 tools, 52 packs, 0 errors
+  (file://, root redirect, serve.js) · exe overlay boots bare with 0 errors.

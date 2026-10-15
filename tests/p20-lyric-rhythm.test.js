@@ -1,4 +1,4 @@
-/* eravos.lyric-rhythm — spec domains/music/tools/voice-and-words/lyric-rhythm/lyric-rhythm.spec */
+/* eravos.lyric-rhythm — spec tools/music/tools/voice-and-words/lyric-rhythm/lyric-rhythm.spec */
 window.__phase = 'P20';
 describe('eravos.lyric-rhythm (Lyrics → Rhythm)', () => {
   it('syllable counts on a fixed word list', () => {

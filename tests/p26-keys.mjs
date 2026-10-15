@@ -6,7 +6,7 @@ import { chromium } from 'playwright'; import path from 'path'; import { fileURL
 const ROOT = process.argv[2] || path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'); let failed = 0;
 const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
 const p = await b.newPage({ viewport: { width: 1600, height: 1000 } }); p.on('dialog', d => d.accept());
-await p.goto('file://' + ROOT + '/index.html?noboot'); await p.waitForFunction(() => window.Shell && window.Shell.X);
+await p.goto('file://' + ROOT + '/canvas/index.html?noboot'); await p.waitForFunction(() => window.Shell && window.Shell.X);
 await p.evaluate(async () => { Shell.activate(); const m = Shell.X.modes()[0]; if (m) Shell.X.enterMode(m.id); document.querySelectorAll('.overlay').forEach(o => o.remove()); const ac = Kernel.audio.ctx; if (ac.state !== 'running') await ac.resume(); window.__an = ac.createAnalyser(); window.__an.fftSize = 2048; (Kernel.audio.output || Kernel.audio.chain.out).connect(window.__an); });
 const ids = await p.evaluate(() => OrganismFactory.defined().map(d => d.id));
 for (const id of ids) {

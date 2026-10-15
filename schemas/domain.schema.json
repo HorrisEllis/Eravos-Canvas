@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "eravos/domain.schema.json",
-  "title": "ERAVOS domain (domains/<domain>/domain.json)",
+  "title": "ERAVOS domain (tools/<domain>/domain.json)",
   "description": "Everything a domain is lives in its folder. The shell reads only this manifest, the units/modes/needs it registers, and its packs.",
   "type": "object",
   "required": ["schema", "id", "label", "version", "core", "ports"],

@@ -1,4 +1,4 @@
-/* 3.34.2 — Bass Pack: eight bass-music genres (domains/music/data/bass-pack.js) + the Song Engine's optional G.bar hook */
+/* 3.34.2 — Bass Pack: eight bass-music genres (tools/music/data/bass-pack.js) + the Song Engine's optional G.bar hook */
 window.__phase = 'P22';
 describe('Bass Pack (wubs, dubs, bass drops)', () => {
   const IDS = ['tearout', 'dubstep-og', 'riddim-war', 'drumstep', 'trapstep', 'bass-house', 'deathstep', 'tension-study'];

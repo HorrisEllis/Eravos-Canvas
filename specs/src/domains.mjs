@@ -19,7 +19,7 @@ export const PORTS = {
 };
 // [id, label, icon, purpose, ins[], outs[], params[], behaviour[], test, worksWith[]]
 export const DOMAINS = [
-  { id: 'image', label: 'Image', icon: '🖼', accent: '#ffb347', folder: 'domains/image', mode: 'Photo & Image',
+  { id: 'image', label: 'Image', icon: '🖼', accent: '#ffb347', folder: 'tools/image', mode: 'Photo & Image',
     units: ['image.engine — the frame pipeline + colour management', 'image.view — zoom / fit / 1:1 toolbar group', 'image.history — non-destructive steps'],
     about: 'Photo manipulation as a chain of small tools: every tool takes an image in and gives an image out, nothing is destructive, any step can be re-wired.',
     tools: [
@@ -36,7 +36,7 @@ export const DOMAINS = [
       ['histogram', 'Histogram & Scopes', '📊', 'Histogram, waveform, vectorscope — see the image as data.', ['image'], ['json'], ['scope: histogram|waveform|vectorscope'], ['reads only — never changes the image'], 'a pure red image puts every count in the red 255 bin', []],
       ['image-export', 'Export Image', '⤓', 'Save PNG / JPEG / WebP / AVIF at any size.', ['image'], ['asset'], ['format', 'quality', 'size', 'colour profile'], ['writes to Exports on the exe, downloads in a browser'], 'PNG export decodes back to identical pixels', []],
     ] },
-  { id: 'video', label: 'Video', icon: '🎬', accent: '#ff5577', folder: 'domains/video', mode: 'Video',
+  { id: 'video', label: 'Video', icon: '🎬', accent: '#ff5577', folder: 'tools/video', mode: 'Video',
     units: ['video.engine — WebCodecs decode/encode + frame clock', 'video.transport — shares the music transport when both are on', 'video.preview — the program monitor'],
     about: 'Video editing as tools on a canvas: clips, cuts and looks are separate tools; the music transport can drive the edit so cuts land on the beat.',
     tools: [
@@ -50,7 +50,7 @@ export const DOMAINS = [
       ['frame-grab', 'Frame Grab', '📸', 'Pull any frame out as an image (into the image domain).', ['video', 'trigger'], ['image', 'asset'], ['at: time|marker|trigger'], ['bridges video → image'], 'grab at 0.5 s returns frame 15 of a 30 fps clip', ['image.image-source']],
       ['video-export', 'Export Video', '⤓', 'Render MP4 / WebM with the song as the audio.', ['video', 'audio'], ['asset'], ['codec', 'bitrate', 'size', 'fps'], ['offline render — faster than real time where possible'], 'exported duration = timeline duration ±1 frame', ['music.song-recorder']],
     ] },
-  { id: 'ui', label: 'UI / Web', icon: '🧩', accent: '#33ddcc', folder: 'domains/ui', mode: 'UI Design',
+  { id: 'ui', label: 'UI / Web', icon: '🧩', accent: '#33ddcc', folder: 'tools/ui', mode: 'UI Design',
     units: ['ui.engine — the component tree + layout solver', 'ui.viewport — device sizes toolbar group', 'ui.tokens — the design token store'],
     about: 'Design and edit web interfaces with small tools: a page is a tree of components; style comes from tokens; the result exports as real HTML/CSS.',
     tools: [
@@ -66,7 +66,7 @@ export const DOMAINS = [
       ['a11y-check', 'Accessibility Check', '♿', 'Contrast, alt text, labels, focus order, headings.', ['layout', 'style'], ['json'], [], ['reads only; lists issues with a jump-to'], 'a 2:1 contrast pair is reported', []],
       ['export-web', 'Export Web', '⤓', 'Export clean HTML + CSS (or a component file).', ['layout', 'style'], ['asset'], ['format: html|css+html|component'], ['tokens become CSS custom properties'], 'export re-imports to the same tree', []],
     ] },
-  { id: 'agents', label: 'Automation', icon: '🤖', accent: '#88aaff', folder: 'domains/agents', mode: 'Automation',
+  { id: 'agents', label: 'Automation', icon: '🤖', accent: '#88aaff', folder: 'tools/agents', mode: 'Automation',
     units: ['agents.runner — runs flows as background services', 'agents.log — the run log toolbar group', 'agents.keys — credentials vault (never in projects)'],
     about: 'AI automation as wired steps: triggers start flows, steps transform data, every run is logged, nothing irreversible happens without an approve step.',
     tools: [

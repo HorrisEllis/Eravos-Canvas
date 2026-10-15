@@ -10,7 +10,7 @@
  * Order for a new tool: build/new-tool.mjs → build/index-tools.mjs (so the page loads it) → this → build/validate.mjs. */
 import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
 import { chromium } from 'playwright';
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'), DOM = path.join(ROOT, 'domains');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'), DOM = path.join(ROOT, 'tools');
 const ALL_THUMBS = process.argv.includes('--thumbs-all');
 const folders = [];
 for (const d of fs.readdirSync(DOM)) { const t = path.join(DOM, d, 'tools'); if (!fs.existsSync(t)) continue;
@@ -20,7 +20,7 @@ for (const d of fs.readdirSync(DOM)) { const t = path.join(DOM, d, 'tools'); if 
 const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
 const p = await b.newPage({ viewport: { width: 1500, height: 1200 }, deviceScaleFactor: 1 });
 const errs = []; p.on('pageerror', e => errs.push(e.message));
-await p.goto('file://' + ROOT + '/index.html?noboot'); await p.waitForFunction(() => window.OrganismFactory && window.Shell && window.Shell.X, null, { timeout: 30000 });
+await p.goto('file://' + ROOT + '/canvas/index.html?noboot'); await p.waitForFunction(() => window.OrganismFactory && window.Shell && window.Shell.X, null, { timeout: 30000 });
 const defs = await p.evaluate(() => Object.fromEntries(OrganismFactory.defined().map(d => [d.id, {
   label: d.label, config: (d.config || []).map(c => ({ key: c.key, type: c.type, min: c.min, max: c.max, options: c.options, hidden: !!c.hidden })),
   hooks: (d.hooks || []).map(h => ({ id: h.hook_id, dir: h.direction, wire: h.wire_type, type: h.data_type || h.event_type || null, accepts: h.accepts || null })),

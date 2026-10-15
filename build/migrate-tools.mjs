@@ -1,20 +1,20 @@
 #!/usr/bin/env node
 /* ONE-TIME P37.0 consolidation (eravos.structure R1–R6, eravos.phase37-map P37.0). Moves every tool still in
- * domains/<d>/organisms/<id>/ into domains/<d>/tools/<category>/<id>/ and makes each folder whole:
+ * tools/<d>/organisms/<id>/ into tools/<d>/tools/<category>/<id>/ and makes each folder whole:
  *   tool.json (from the running define()) · engine · ui · css · extra · <id>.spec (moved from specs/) · preview.png ·
  *   packs/factory/pack.json (the presets that lived INSIDE the engine code — removed from the code with acorn)
- * Bundles that span tools (PresetPacks data files) → domains/<d>/content/bundles/<id>/pack.json.
- * Specs of tools never built → domains/<d>/planned/<id>.spec. Runs the page once to read what the code defines.
+ * Bundles that span tools (PresetPacks data files) → tools/<d>/content/bundles/<id>/pack.json.
+ * Specs of tools never built → tools/<d>/planned/<id>.spec. Runs the page once to read what the code defines.
  *   node build/migrate-tools.mjs            (then: node build/index-tools.mjs && node build/validate.mjs) */
 import { chromium } from 'playwright'; import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
 import * as acorn from 'acorn';
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'), MUSIC = path.join(ROOT, 'domains', 'music');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'), MUSIC = path.join(ROOT, 'tools', 'music');
 const ORG = path.join(MUSIC, 'organisms'); if (!fs.existsSync(ORG)) { console.log('nothing to migrate'); process.exit(0); }
 const slug = (s) => String(s).toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 // ---------------------------------------------------------------- 1. read what the code defines (engine presets vs pack presets)
 const b = await chromium.launch(); const p = await b.newPage();
-await p.goto('file://' + ROOT + '/index.html?noboot'); await p.waitForFunction(() => window.Shell && window.Shell.X && window.ContentPacks);
+await p.goto('file://' + ROOT + '/canvas/index.html?noboot'); await p.waitForFunction(() => window.Shell && window.Shell.X && window.ContentPacks);
 const R = await p.evaluate(() => {
   const fromPacks = new Map(); // tool id → Set(names that came from a pack)
   ContentPacks.list().forEach(pk => pk.for.forEach(t => ContentPacks.items(t, 'presets').filter(x => x.pack === pk.id).forEach(x => { if (!fromPacks.has(t)) fromPacks.set(t, new Set()); fromPacks.get(t).add(x.name); })));
@@ -90,8 +90,8 @@ const built = new Set(R.tools.map(t => t.short));
 for (const f of fs.readdirSync(path.join(ROOT, 'specs')).filter(f => /^eravos\.organism\..+\.spec$/.test(f))) {
   const name = f.replace(/^eravos\.organism\./, '').replace(/\.spec$/, ''), m = /^(image|video|ui|agents)\.(.+)$/.exec(name);
   const dom = m ? m[1] : 'music', short = m ? m[2] : name; if (!m && built.has(short)) continue;
-  const dir = path.join(ROOT, 'domains', dom, 'planned'); fs.mkdirSync(dir, { recursive: true }); fs.renameSync(path.join(ROOT, 'specs', f), path.join(dir, short + '.spec'));
+  const dir = path.join(ROOT, 'tools', dom, 'planned'); fs.mkdirSync(dir, { recursive: true }); fs.renameSync(path.join(ROOT, 'specs', f), path.join(dir, short + '.spec'));
 }
-for (const dom of ['image', 'video', 'ui', 'agents']) { const f = path.join(ROOT, 'specs', `eravos.domain.${dom}.spec`); if (fs.existsSync(f)) { fs.mkdirSync(path.join(ROOT, 'domains', dom), { recursive: true }); fs.renameSync(f, path.join(ROOT, 'domains', dom, 'domain.spec')); } }
+for (const dom of ['image', 'video', 'ui', 'agents']) { const f = path.join(ROOT, 'specs', `eravos.domain.${dom}.spec`); if (fs.existsSync(f)) { fs.mkdirSync(path.join(ROOT, 'tools', dom), { recursive: true }); fs.renameSync(f, path.join(ROOT, 'tools', dom, 'domain.spec')); } }
 fs.rmSync(path.join(ORG, 'index.js'), { force: true }); try { fs.rmdirSync(ORG); } catch (e) { console.warn('organisms/ not empty: ' + fs.readdirSync(ORG).join(', ')); }
 console.log(`moved ${moved} tools · ${presetCount} engine presets → packs/factory · ${R.bundles.length} bundles → content/bundles · categories: ${Array.from(cats.keys()).join(', ')}`);

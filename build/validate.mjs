@@ -26,7 +26,7 @@ function check(v, s, where) {
 }
 const schemas = { tool: S('tool'), pack: S('pack'), mode: S('mode'), category: S('category'), domain: S('domain') };
 let n = 0; const load = (f) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { errs.push(`${path.relative(ROOT, f)}: not valid JSON (${e.message})`); return null; } };
-const roots = (process.argv[2] ? [path.resolve(process.argv[2])] : [path.join(ROOT, 'domains')]);
+const roots = (process.argv[2] ? [path.resolve(process.argv[2])] : [path.join(ROOT, 'tools')]);
 const isTemplate = (f) => /[\\/]templates[\\/]/.test(f) || /__[A-Z_]+__/.test(fs.readFileSync(f, 'utf8').slice(0, 400));
 (function walk(dir) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {

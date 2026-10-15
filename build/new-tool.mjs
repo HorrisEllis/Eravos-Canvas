@@ -8,7 +8,7 @@ const a = Object.fromEntries(process.argv.slice(2).join(' ').split(/\s--/).map(s
 for (const k of ['domain', 'category', 'id', 'label']) if (!a[k]) { console.error('missing --' + k); process.exit(1); }
 if (!/^[a-z][a-z0-9-]*$/.test(a.id) || !/^[a-z][a-z0-9-]*$/.test(a.category)) { console.error('--id and --category: lower-case-with-dashes'); process.exit(1); }
 const tpl = path.join(ROOT, 'templates', a.flavour === 'sound' ? 'tool-sound' : 'tool');
-const catDir = path.join(ROOT, 'domains', a.domain, 'tools', a.category), dst = path.join(catDir, a.id);
+const catDir = path.join(ROOT, 'tools', a.domain, 'tools', a.category), dst = path.join(catDir, a.id);
 if (fs.existsSync(dst)) { console.error('exists: ' + path.relative(ROOT, dst)); process.exit(1); }
 const fullId = a.domain === 'music' ? 'eravos.' + a.id : `eravos.${a.domain}.${a.id}`;
 const catLabel = a['category-label'] || a.category.replace(/-/g, ' ').replace(/^./, c => c.toUpperCase());

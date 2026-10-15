@@ -1,4 +1,4 @@
-/* 3.34.1 — RhythmExpand: the rhythm of written words grows into a whole song (domains/music/data/rhythm-expand.js) */
+/* 3.34.1 — RhythmExpand: the rhythm of written words grows into a whole song (tools/music/data/rhythm-expand.js) */
 window.__phase = 'P21';
 describe('RhythmExpand (words → song)', () => {
   const TEXT = 'Can you feel me\nevery second away from you\nstronger than the sum\nof the stars in the universe\n\nAre you holding on\nto the sounds of my love\nthe frequency of my energy\nthe light of my essence';

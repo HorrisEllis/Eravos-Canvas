@@ -7,7 +7,7 @@ const { app, BrowserWindow, protocol, net, session, shell, ipcMain, Menu, dialog
 const path = require('path'), fs = require('fs'), { pathToFileURL } = require('url');
 
 const SCHEME = 'eravos', ORIGIN = 'eravos://app';
-const APP_DIR = fs.existsSync(path.join(__dirname, 'eravos', 'index.html')) ? path.join(__dirname, 'eravos') : path.resolve(__dirname, '..');
+const APP_DIR = fs.existsSync(path.join(__dirname, 'eravos', 'canvas', 'index.html')) ? path.join(__dirname, 'eravos') : path.resolve(__dirname, '..');
 protocol.registerSchemesAsPrivileged([{ scheme: SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true, corsEnabled: true, codeCache: true } }]);
 
 // ---------------------------------------------------------------- the library folder
@@ -166,7 +166,7 @@ app.whenReady().then(() => {
       { type: 'separator' }, { role: 'reload' }, { role: 'togglefullscreen' }, { role: 'toggleDevTools' }, { type: 'separator' }, { role: 'quit' } ] },
     { role: 'editMenu' },
   ]));
-  win.loadURL(ORIGIN + '/index.html');
+  win.loadURL(ORIGIN + '/canvas/index.html');   // the canvas; its tools load from /tools/ (stub in the exe, the repo's tools/ in dev)
   win.on('closed', () => { win = null; });
 });
 app.on('window-all-closed', () => app.quit());
