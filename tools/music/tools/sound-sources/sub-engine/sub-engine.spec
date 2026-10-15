@@ -46,4 +46,4 @@ dependencies:
   outputs:
     - sub.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.sidechain-compressor, eravos.sequencer, eravos.timeline, eravos.reese-bass, eravos.midi-mapper, eravos.ratio-lattice, eravos.lyric-rhythm]
+  works_with: [eravos.sidechain-compressor, eravos.sequencer, eravos.timeline, eravos.reese-bass, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]

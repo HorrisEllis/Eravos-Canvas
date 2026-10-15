@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.agents.json-shape · status MAPPED (specified, not built) · domain agents
 identity:
   id: eravos.agents.json-shape ; label: Shape Data ; icon: 🔧 ; category: Automation
-  folder: domains/agents/tools/<category>/json-shape/   (tool.json · json-shape.engine.js · json-shape.ui.js · json-shape.spec) — its own pack, never merged into another tool
+  folder: tools/agents/tools/<category>/json-shape/   (tool.json · json-shape.engine.js · json-shape.ui.js · json-shape.spec) — its own pack, never merged into another tool
   purpose: Pick, rename, map and filter JSON.
 ports:
   in:

@@ -39,6 +39,6 @@ dependencies:
     - lat.hook.note_out (note:trigger)
     - lat.hook.tuning_out (xen:tuning)
   permissions: [audio_out, bus_publish, bus_subscribe, registry_read]
-  works_with: [eravos.xen-synth, eravos.recursive-spectra, eravos.pads, eravos.sample-player, eravos.wobble-bass, eravos.acid-synth, eravos.reese-bass, eravos.supersaw]
+  works_with: [eravos.xen-synth, eravos.recursive-spectra, eravos.pads, eravos.embodiment-lab, eravos.coven, eravos.organ, eravos.retro-poly, eravos.bass-forge]
   notes:
     - Sends exact frequencies — Xen Synth plays them exactly; 12-TET instruments get the nearest key.

@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.video.text-overlay · status MAPPED (specified, not built) · domain video
 identity:
   id: eravos.video.text-overlay ; label: Titles ; icon: 🔤 ; category: Video
-  folder: domains/video/tools/<category>/text-overlay/   (tool.json · text-overlay.engine.js · text-overlay.ui.js · text-overlay.spec) — its own pack, never merged into another tool
+  folder: tools/video/tools/<category>/text-overlay/   (tool.json · text-overlay.engine.js · text-overlay.ui.js · text-overlay.spec) — its own pack, never merged into another tool
   purpose: Titles and lyrics over video, timed to the song.
 ports:
   in:

@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.ui.button · status MAPPED (specified, not built) · domain ui
 identity:
   id: eravos.ui.button ; label: Button ; icon: 🔘 ; category: UI / Web
-  folder: domains/ui/tools/<category>/button/   (tool.json · button.engine.js · button.ui.js · button.spec) — its own pack, never merged into another tool
+  folder: tools/ui/tools/<category>/button/   (tool.json · button.engine.js · button.ui.js · button.spec) — its own pack, never merged into another tool
   purpose: A button with states (rest, hover, press, focus, disabled).
 ports:
   in:

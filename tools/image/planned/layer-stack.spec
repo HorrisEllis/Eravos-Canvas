@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.image.layer-stack · status MAPPED (specified, not built) · domain image
 identity:
   id: eravos.image.layer-stack ; label: Layers ; icon: 🗂 ; category: Image
-  folder: domains/image/tools/<category>/layer-stack/   (tool.json · layer-stack.engine.js · layer-stack.ui.js · layer-stack.spec) — its own pack, never merged into another tool
+  folder: tools/image/tools/<category>/layer-stack/   (tool.json · layer-stack.engine.js · layer-stack.ui.js · layer-stack.spec) — its own pack, never merged into another tool
   purpose: Stack images with blend modes and opacity — the composite is one image out.
 ports:
   in:

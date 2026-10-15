@@ -15,11 +15,11 @@ port types (the only way domains meet):
     - trigger — a pulse with a payload — "go now"
     - number — a single value
 domains:
-    - 🎛 music — BUILT · domains/music/ · 50 tools: harmonic-analyzer, bass-drop-builder, song-recorder, timeline, pads, sequencer, fx-destroyer, fx-dynamics, fx-echo, fx-eq, fx-filter, fx-glitch, fx-haunt, fx-moddelay, fx-phaser, fx-pitch, embodiment-lab, edm-lab, coven, dub-station, organ, retro-poly, channel, master-fx, mixer, sidechain-compressor, breath, lfo, macro-automation, xy-pad, bass-forge, drum-forge, fx-box, acid-synth, curve-synth, pad-forge, reese-bass, sub-engine, supersaw, wobble-bass, coach, session, contrast-analyser, midi-mapper, clip-maker, sample-player, lyric-rhythm, ratio-lattice, recursive-spectra, xen-synth
-    - 🖼 image — BUILDING (1 built: image-adjust) · domains/image/ · 12 tools mapped: image-source, layer-stack, crop-transform, curves, color-grade, mask-brush, selection, blur-sharpen, grain-texture, text-layer, histogram, image-export
-    - 🎬 video — BUILDING (1 built: video-clip) · domains/video/ · 9 tools mapped: clip-source, video-timeline, beat-cut, transition, video-grade, text-overlay, speed-ramp, frame-grab, video-export
-    - 🧩 ui — MAPPED · domains/ui/ · 11 tools mapped: page, box, text-block, image-block, button, style-tokens, responsive, interaction, live-preview, a11y-check, export-web
-    - 🤖 agents — BUILDING (1 built: ai-step) · domains/agents/ · 12 tools mapped: trigger-schedule, trigger-event, prompt, llm-call, http-tool, json-shape, branch, each, memory, approve, run-log, song-writer
+    - 🎛 music — BUILT · tools/music/ · 50 tools: harmonic-analyzer, bass-drop-builder, song-recorder, timeline, pads, sequencer, fx-destroyer, fx-dynamics, fx-echo, fx-eq, fx-filter, fx-glitch, fx-haunt, fx-moddelay, fx-phaser, fx-pitch, embodiment-lab, edm-lab, coven, dub-station, organ, retro-poly, channel, master-fx, mixer, sidechain-compressor, breath, lfo, macro-automation, xy-pad, bass-forge, drum-forge, fx-box, acid-synth, curve-synth, pad-forge, reese-bass, sub-engine, supersaw, wobble-bass, coach, session, contrast-analyser, midi-mapper, clip-maker, sample-player, lyric-rhythm, ratio-lattice, recursive-spectra, xen-synth
+    - 🖼 image — BUILDING (1 built: image-adjust) · tools/image/ · 12 tools mapped: image-source, layer-stack, crop-transform, curves, color-grade, mask-brush, selection, blur-sharpen, grain-texture, text-layer, histogram, image-export
+    - 🎬 video — BUILDING (1 built: video-clip) · tools/video/ · 9 tools mapped: clip-source, video-timeline, beat-cut, transition, video-grade, text-overlay, speed-ramp, frame-grab, video-export
+    - 🧩 ui — MAPPED · tools/ui/ · 11 tools mapped: page, box, text-block, image-block, button, style-tokens, responsive, interaction, live-preview, a11y-check, export-web
+    - 🤖 agents — BUILDING (1 built: ai-step) · tools/agents/ · 12 tools mapped: trigger-schedule, trigger-event, prompt, llm-call, http-tool, json-shape, branch, each, memory, approve, run-log, song-writer
 cross-domain bridges (a tool in one domain that speaks another's port — never a copy of the other domain):
     - image.image-source ↔ video.frame-grab
     - image.layer-stack ↔ image-source, mask-brush

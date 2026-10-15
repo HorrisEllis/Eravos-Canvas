@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.video.video-export · status MAPPED (specified, not built) · domain video
 identity:
   id: eravos.video.video-export ; label: Export Video ; icon: ⤓ ; category: Video
-  folder: domains/video/tools/<category>/video-export/   (tool.json · video-export.engine.js · video-export.ui.js · video-export.spec) — its own pack, never merged into another tool
+  folder: tools/video/tools/<category>/video-export/   (tool.json · video-export.engine.js · video-export.ui.js · video-export.spec) — its own pack, never merged into another tool
   purpose: Render MP4 / WebM with the song as the audio.
 ports:
   in:

@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.agents.song-writer · status MAPPED (specified, not built) · domain agents
 identity:
   id: eravos.agents.song-writer ; label: Song Writer (bridge) ; icon: 🎵 ; category: Automation
-  folder: domains/agents/tools/<category>/song-writer/   (tool.json · song-writer.engine.js · song-writer.ui.js · song-writer.spec) — its own pack, never merged into another tool
+  folder: tools/agents/tools/<category>/song-writer/   (tool.json · song-writer.engine.js · song-writer.ui.js · song-writer.spec) — its own pack, never merged into another tool
   purpose: Let a flow write music: genre + seed + mood → a song on the canvas.
 ports:
   in:

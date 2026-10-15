@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.image.blur-sharpen · status MAPPED (specified, not built) · domain image
 identity:
   id: eravos.image.blur-sharpen ; label: Blur & Sharpen ; icon: 💧 ; category: Image
-  folder: domains/image/tools/<category>/blur-sharpen/   (tool.json · blur-sharpen.engine.js · blur-sharpen.ui.js · blur-sharpen.spec) — its own pack, never merged into another tool
+  folder: tools/image/tools/<category>/blur-sharpen/   (tool.json · blur-sharpen.engine.js · blur-sharpen.ui.js · blur-sharpen.spec) — its own pack, never merged into another tool
   purpose: Gaussian, lens and motion blur; unsharp mask.
 ports:
   in:

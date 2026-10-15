@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.image.crop-transform · status MAPPED (specified, not built) · domain image
 identity:
   id: eravos.image.crop-transform ; label: Crop & Transform ; icon: ✂ ; category: Image
-  folder: domains/image/tools/<category>/crop-transform/   (tool.json · crop-transform.engine.js · crop-transform.ui.js · crop-transform.spec) — its own pack, never merged into another tool
+  folder: tools/image/tools/<category>/crop-transform/   (tool.json · crop-transform.engine.js · crop-transform.ui.js · crop-transform.spec) — its own pack, never merged into another tool
   purpose: Crop, rotate, flip, scale, perspective.
 ports:
   in:

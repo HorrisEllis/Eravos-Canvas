@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.agents.memory · status MAPPED (specified, not built) · domain agents
 identity:
   id: eravos.agents.memory ; label: Memory ; icon: 💾 ; category: Automation
-  folder: domains/agents/tools/<category>/memory/   (tool.json · memory.engine.js · memory.ui.js · memory.spec) — its own pack, never merged into another tool
+  folder: tools/agents/tools/<category>/memory/   (tool.json · memory.engine.js · memory.ui.js · memory.spec) — its own pack, never merged into another tool
   purpose: Keep values between runs (a small key/value store per flow).
 ports:
   in:

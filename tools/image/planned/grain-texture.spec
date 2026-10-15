@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.image.grain-texture · status MAPPED (specified, not built) · domain image
 identity:
   id: eravos.image.grain-texture ; label: Grain & Texture ; icon: 🌫 ; category: Image
-  folder: domains/image/tools/<category>/grain-texture/   (tool.json · grain-texture.engine.js · grain-texture.ui.js · grain-texture.spec) — its own pack, never merged into another tool
+  folder: tools/image/tools/<category>/grain-texture/   (tool.json · grain-texture.engine.js · grain-texture.ui.js · grain-texture.spec) — its own pack, never merged into another tool
   purpose: Film grain, noise, halftone, scanlines, VHS.
 ports:
   in:

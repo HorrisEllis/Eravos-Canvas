@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.ui.a11y-check · status MAPPED (specified, not built) · domain ui
 identity:
   id: eravos.ui.a11y-check ; label: Accessibility Check ; icon: ♿ ; category: UI / Web
-  folder: domains/ui/tools/<category>/a11y-check/   (tool.json · a11y-check.engine.js · a11y-check.ui.js · a11y-check.spec) — its own pack, never merged into another tool
+  folder: tools/ui/tools/<category>/a11y-check/   (tool.json · a11y-check.engine.js · a11y-check.ui.js · a11y-check.spec) — its own pack, never merged into another tool
   purpose: Contrast, alt text, labels, focus order, headings.
 ports:
   in:

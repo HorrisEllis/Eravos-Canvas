@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.ui.image-block · status MAPPED (specified, not built) · domain ui
 identity:
   id: eravos.ui.image-block ; label: Image Block ; icon: 🖼 ; category: UI / Web
-  folder: domains/ui/tools/<category>/image-block/   (tool.json · image-block.engine.js · image-block.ui.js · image-block.spec) — its own pack, never merged into another tool
+  folder: tools/ui/tools/<category>/image-block/   (tool.json · image-block.engine.js · image-block.ui.js · image-block.spec) — its own pack, never merged into another tool
   purpose: An image in the layout (from the image domain or a file).
 ports:
   in:

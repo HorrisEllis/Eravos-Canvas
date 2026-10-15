@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.agents.http-tool · status MAPPED (specified, not built) · domain agents
 identity:
   id: eravos.agents.http-tool ; label: HTTP Request ; icon: 🌐 ; category: Automation
-  folder: domains/agents/tools/<category>/http-tool/   (tool.json · http-tool.engine.js · http-tool.ui.js · http-tool.spec) — its own pack, never merged into another tool
+  folder: tools/agents/tools/<category>/http-tool/   (tool.json · http-tool.engine.js · http-tool.ui.js · http-tool.spec) — its own pack, never merged into another tool
   purpose: Call an API: method, URL, headers, body.
 ports:
   in:

@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.image.histogram · status MAPPED (specified, not built) · domain image
 identity:
   id: eravos.image.histogram ; label: Histogram & Scopes ; icon: 📊 ; category: Image
-  folder: domains/image/tools/<category>/histogram/   (tool.json · histogram.engine.js · histogram.ui.js · histogram.spec) — its own pack, never merged into another tool
+  folder: tools/image/tools/<category>/histogram/   (tool.json · histogram.engine.js · histogram.ui.js · histogram.spec) — its own pack, never merged into another tool
   purpose: Histogram, waveform, vectorscope — see the image as data.
 ports:
   in:

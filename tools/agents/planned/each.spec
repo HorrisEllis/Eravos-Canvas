@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.agents.each · status MAPPED (specified, not built) · domain agents
 identity:
   id: eravos.agents.each ; label: For Each ; icon: 🔁 ; category: Automation
-  folder: domains/agents/tools/<category>/each/   (tool.json · each.engine.js · each.ui.js · each.spec) — its own pack, never merged into another tool
+  folder: tools/agents/tools/<category>/each/   (tool.json · each.engine.js · each.ui.js · each.spec) — its own pack, never merged into another tool
   purpose: Run the next steps once per item in a list.
 ports:
   in:

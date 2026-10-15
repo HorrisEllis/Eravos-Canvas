@@ -83,4 +83,4 @@ dependencies:
   outputs:
     - wobble.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.sequencer, eravos.timeline, eravos.midi-mapper, eravos.ratio-lattice, eravos.lyric-rhythm]
+  works_with: [eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]

@@ -1,4 +1,4 @@
-# spec_id: eravos.domain.image · status BUILDING (1 built: image-adjust) · folder domains/image/  (exe: ERAVOS Library/Mods/Image/)
+# spec_id: eravos.domain.image · status BUILDING (1 built: image-adjust) · folder tools/image/  (exe: ERAVOS Library/Mods/Image/)
 domain: 🖼 Image — Photo manipulation as a chain of small tools: every tool takes an image in and gives an image out, nothing is destructive, any step can be re-wired.
 mode: Photo & Image
 units (toolbar expansion, built only when needed):
@@ -19,4 +19,4 @@ tools (each its own folder + spec; mapped ones in planned/):
     - 📊 histogram — Histogram, waveform, vectorscope — see the image as data.  [in: image → out: json]
     - ⤓ image-export — Save PNG / JPEG / WebP / AVIF at any size.  [in: image → out: asset]
 build order: source tools first (they make something to see), then transforms, then exports; one tool per step, each green before the next.
-boundary: nothing in domains/image/ is read by the shell or another domain; the shell sees only units, modes, needs, packs.
+boundary: nothing in tools/image/ is read by the shell or another domain; the shell sees only units, modes, needs, packs.

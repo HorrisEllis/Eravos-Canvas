@@ -1,7 +1,7 @@
 # ============================================================
 # ERAVOS PERFORMANCE — measured (gate P · P11.5)
 # spec_id:      eravos.performance
-# measured_at:  2026-10-10T15:00:51.836Z  ·  regenerate: node tools/perf.mjs
+# measured_at:  2026-10-10T15:00:51.836Z  ·  regenerate: node build/perf.mjs
 # machine:      Intel(R) Xeon(R) Processor @ 2.10GHz · 2 logical cores · Chromium headless
 # method:       4 s offline render per case; cost = render time ÷ audio time on ONE core (100 % = a full core in real
 #               time). Offline is a proxy for the audio thread: same graph, no deadline. Empty-universe baseline subtracted.

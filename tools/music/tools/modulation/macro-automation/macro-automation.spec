@@ -70,4 +70,4 @@ dependencies:
     - auto.hook.mod_lane6 (modulation · port lane6)
     - auto.hook.mod_lane7 (modulation · port lane7)
   permissions: [audio_out, bus_publish, bus_subscribe, registry_read]
-  works_with: [eravos.bass-drop-builder, eravos.midi-mapper]
+  works_with: [eravos.bass-drop-builder, eravos.sequencer, eravos.midi-mapper]

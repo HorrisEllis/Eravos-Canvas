@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.agents.trigger-schedule · status MAPPED (specified, not built) · domain agents
 identity:
   id: eravos.agents.trigger-schedule ; label: Schedule ; icon: ⏰ ; category: Automation
-  folder: domains/agents/tools/<category>/trigger-schedule/   (tool.json · trigger-schedule.engine.js · trigger-schedule.ui.js · trigger-schedule.spec) — its own pack, never merged into another tool
+  folder: tools/agents/tools/<category>/trigger-schedule/   (tool.json · trigger-schedule.engine.js · trigger-schedule.ui.js · trigger-schedule.spec) — its own pack, never merged into another tool
   purpose: Start a flow at times (cron-like) or every N minutes.
 ports:
   in:

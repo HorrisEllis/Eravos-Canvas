@@ -52,6 +52,6 @@ dependencies:
     - rec.hook.spectrum_out (xen:spectrum)
     - rec.hook.tuning_out (xen:tuning)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.harmonic-analyzer, eravos.xen-synth, eravos.fx-haunt, eravos.sequencer, eravos.timeline, eravos.midi-mapper, eravos.ratio-lattice, eravos.lyric-rhythm]
+  works_with: [eravos.harmonic-analyzer, eravos.xen-synth, eravos.fx-haunt, eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
   notes:
     - Generations advance per bar while the transport plays, or every N seconds on their own.

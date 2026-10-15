@@ -94,14 +94,15 @@ dependencies:
     - tl.hook.recorded_in (transport:recorded) — ambient broadcast
     - tl.hook.asset_in (asset:ready)
     - tl.hook.pads_in (pad:bank-change)
+    - tl.hook.marker_jump_in (ui:marker_jump)
   outputs:
     - tl.hook.audio_out (audio · port out)
     - tl.hook.note_out (note:trigger)
     - tl.hook.cue_out (seq:pattern_cue)
     - tl.hook.seek_out (timeline:seek)
     - tl.hook.clip_play_out (timeline:clip_play)
-    - tl.hook.loop_out (ui:transport-loop|ui:transport-seek|ui:transport-play|ui:transport-bounce)
+    - tl.hook.loop_out (ui:transport-loop|ui:transport-seek|ui:transport-play|ui:transport-bounce|ui:transport-restart)
     - tl.hook.marker_out (timeline:marker)
     - tl.hook.length_out (timeline:song_length)
   permissions: [audio_out, bus_publish, bus_subscribe, filesystem_read, registry_read]
-  works_with: [eravos.pads, eravos.sample-player, eravos.wobble-bass, eravos.acid-synth, eravos.reese-bass, eravos.supersaw, eravos.sequencer, eravos.session]
+  works_with: [eravos.song-recorder, eravos.pads, eravos.sequencer, eravos.embodiment-lab, eravos.coven, eravos.organ, eravos.retro-poly, eravos.bass-forge]

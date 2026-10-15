@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.agents.run-log · status MAPPED (specified, not built) · domain agents
 identity:
   id: eravos.agents.run-log ; label: Run Log ; icon: 📜 ; category: Automation
-  folder: domains/agents/tools/<category>/run-log/   (tool.json · run-log.engine.js · run-log.ui.js · run-log.spec) — its own pack, never merged into another tool
+  folder: tools/agents/tools/<category>/run-log/   (tool.json · run-log.engine.js · run-log.ui.js · run-log.spec) — its own pack, never merged into another tool
   purpose: Every run, every step, inputs and outputs, timing, errors.
 ports:
   in:

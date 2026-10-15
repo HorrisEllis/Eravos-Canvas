@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.video.video-timeline · status MAPPED (specified, not built) · domain video
 identity:
   id: eravos.video.video-timeline ; label: Video Timeline ; icon: 🧵 ; category: Video
-  folder: domains/video/tools/<category>/video-timeline/   (tool.json · video-timeline.engine.js · video-timeline.ui.js · video-timeline.spec) — its own pack, never merged into another tool
+  folder: tools/video/tools/<category>/video-timeline/   (tool.json · video-timeline.engine.js · video-timeline.ui.js · video-timeline.spec) — its own pack, never merged into another tool
   purpose: Arrange clips on tracks; trim, split, ripple.
 ports:
   in:

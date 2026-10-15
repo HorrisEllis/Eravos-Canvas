@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.ui.live-preview · status MAPPED (specified, not built) · domain ui
 identity:
   id: eravos.ui.live-preview ; label: Live Preview ; icon: 👁 ; category: UI / Web
-  folder: domains/ui/tools/<category>/live-preview/   (tool.json · live-preview.engine.js · live-preview.ui.js · live-preview.spec) — its own pack, never merged into another tool
+  folder: tools/ui/tools/<category>/live-preview/   (tool.json · live-preview.engine.js · live-preview.ui.js · live-preview.spec) — its own pack, never merged into another tool
   purpose: The page running for real, in a sandboxed frame.
 ports:
   in:

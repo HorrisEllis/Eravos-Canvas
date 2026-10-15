@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.image.image-export · status MAPPED (specified, not built) · domain image
 identity:
   id: eravos.image.image-export ; label: Export Image ; icon: ⤓ ; category: Image
-  folder: domains/image/tools/<category>/image-export/   (tool.json · image-export.engine.js · image-export.ui.js · image-export.spec) — its own pack, never merged into another tool
+  folder: tools/image/tools/<category>/image-export/   (tool.json · image-export.engine.js · image-export.ui.js · image-export.spec) — its own pack, never merged into another tool
   purpose: Save PNG / JPEG / WebP / AVIF at any size.
 ports:
   in:
