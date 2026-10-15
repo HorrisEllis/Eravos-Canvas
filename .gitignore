@@ -2,3 +2,9 @@
 dist/
 node_modules/
 tests/out/
+# the desktop app run from this repo (electron desktop/) keeps your folders here, as the exe does beside ERAVOS.exe
+/projects/
+/exports/
+/drop/
+/packs/
+/.appdata/
