@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.video.video-grade · status MAPPED (specified, not built) · domain video
 identity:
   id: eravos.video.video-grade ; label: Video Grade ; icon: 🎨 ; category: Video
-  folder: domains/video/tools/<category>/video-grade/   (tool.json · video-grade.engine.js · video-grade.ui.js · video-grade.spec) — its own pack, never merged into another tool
+  folder: tools/video/tools/<category>/video-grade/   (tool.json · video-grade.engine.js · video-grade.ui.js · video-grade.spec) — its own pack, never merged into another tool
   purpose: Colour grade every frame (same controls as image Colour Grade).
 ports:
   in:

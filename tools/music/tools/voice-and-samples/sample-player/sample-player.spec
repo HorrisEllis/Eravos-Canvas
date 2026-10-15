@@ -90,4 +90,4 @@ dependencies:
     - samp.hook.audio_out (audio · port out)
     - samp.hook.asset_out (asset:ready)
   permissions: [audio_out, bus_publish, bus_subscribe, filesystem_read]
-  works_with: [eravos.pads, eravos.sequencer, eravos.timeline, eravos.session, eravos.bass-drop-builder, eravos.contrast-analyser, eravos.clip-maker, eravos.midi-mapper]
+  works_with: [eravos.harmonic-analyzer, eravos.bass-drop-builder, eravos.song-recorder, eravos.timeline, eravos.pads, eravos.sequencer, eravos.bass-forge, eravos.drum-forge]

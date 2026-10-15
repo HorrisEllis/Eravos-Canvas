@@ -54,6 +54,6 @@ dependencies:
   outputs:
     - xen.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.ratio-lattice, eravos.harmonic-analyzer, eravos.recursive-spectra, eravos.sequencer, eravos.timeline, eravos.midi-mapper, eravos.lyric-rhythm]
+  works_with: [eravos.ratio-lattice, eravos.harmonic-analyzer, eravos.recursive-spectra, eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm]
   notes:
     - Ignores the song key on purpose: the tuning IS the key. Key C4 (60) = step 0 by default.

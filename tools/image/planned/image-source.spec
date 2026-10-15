@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.image.image-source · status MAPPED (specified, not built) · domain image
 identity:
   id: eravos.image.image-source ; label: Image Source ; icon: 📷 ; category: Image
-  folder: domains/image/tools/<category>/image-source/   (tool.json · image-source.engine.js · image-source.ui.js · image-source.spec) — its own pack, never merged into another tool
+  folder: tools/image/tools/<category>/image-source/   (tool.json · image-source.engine.js · image-source.ui.js · image-source.spec) — its own pack, never merged into another tool
   purpose: Bring an image in: drop a file, paste, camera, or an asset from any tool.
 ports:
   in:

@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.video.transition · status MAPPED (specified, not built) · domain video
 identity:
   id: eravos.video.transition ; label: Transition ; icon: 🔀 ; category: Video
-  folder: domains/video/tools/<category>/transition/   (tool.json · transition.engine.js · transition.ui.js · transition.spec) — its own pack, never merged into another tool
+  folder: tools/video/tools/<category>/transition/   (tool.json · transition.engine.js · transition.ui.js · transition.spec) — its own pack, never merged into another tool
   purpose: Crossfade, dip, wipe, zoom, glitch between two videos.
 ports:
   in:

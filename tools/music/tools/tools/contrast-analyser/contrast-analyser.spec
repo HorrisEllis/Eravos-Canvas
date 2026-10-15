@@ -68,4 +68,4 @@ dependencies:
   outputs:
     - ca.hook.analysis_out (contrast:analysis)
   permissions: [audio_in, bus_publish, bus_subscribe, filesystem_read]
-  works_with: [eravos.sample-player, eravos.session, eravos.clip-maker, eravos.song-recorder, eravos.drum-forge]
+  works_with: [eravos.song-recorder, eravos.drum-forge, eravos.session, eravos.clip-maker, eravos.sample-player]

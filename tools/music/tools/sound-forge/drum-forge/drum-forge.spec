@@ -39,6 +39,6 @@ dependencies:
     - df.hook.pad_trigger_out (pad:trigger)
     - df.hook.bank_out (pad:bank-change)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe, filesystem_write, registry_read]
-  works_with: [eravos.sequencer, eravos.midi-mapper, eravos.pads, eravos.dub-station, eravos.sample-player, eravos.timeline, eravos.bass-drop-builder, eravos.contrast-analyser]
+  works_with: [eravos.sequencer, eravos.midi-mapper, eravos.pads, eravos.dub-station, eravos.harmonic-analyzer, eravos.bass-drop-builder, eravos.song-recorder, eravos.timeline]
   notes:
     - Pads 1–16 = notes 36–51; the StarryPad plays it through MIDI Map.

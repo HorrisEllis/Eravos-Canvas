@@ -1,4 +1,4 @@
-# spec_id: eravos.domain.agents · status BUILDING (1 built: ai-step) · folder domains/agents/  (exe: ERAVOS Library/Mods/Automation/)
+# spec_id: eravos.domain.agents · status BUILDING (1 built: ai-step) · folder tools/agents/  (exe: ERAVOS Library/Mods/Automation/)
 domain: 🤖 Automation — AI automation as wired steps: triggers start flows, steps transform data, every run is logged, nothing irreversible happens without an approve step.
 mode: Automation
 units (toolbar expansion, built only when needed):
@@ -19,4 +19,4 @@ tools (each its own folder + spec; mapped ones in planned/):
     - 📜 run-log — Every run, every step, inputs and outputs, timing, errors.  [in: event → out: json]
     - 🎵 song-writer — Let a flow write music: genre + seed + mood → a song on the canvas.  [in: json, trigger → out: event]
 build order: source tools first (they make something to see), then transforms, then exports; one tool per step, each green before the next.
-boundary: nothing in domains/agents/ is read by the shell or another domain; the shell sees only units, modes, needs, packs.
+boundary: nothing in tools/agents/ is read by the shell or another domain; the shell sees only units, modes, needs, packs.

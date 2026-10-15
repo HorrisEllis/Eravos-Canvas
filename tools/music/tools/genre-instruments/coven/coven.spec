@@ -49,4 +49,4 @@ dependencies:
   outputs:
     - cov.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.organ, eravos.fx-haunt, eravos.drum-forge, eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.ratio-lattice, eravos.lyric-rhythm]
+  works_with: [eravos.organ, eravos.fx-haunt, eravos.drum-forge, eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]

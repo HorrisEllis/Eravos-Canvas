@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.video.speed-ramp · status MAPPED (specified, not built) · domain video
 identity:
   id: eravos.video.speed-ramp ; label: Speed Ramp ; icon: ⏩ ; category: Video
-  folder: domains/video/tools/<category>/speed-ramp/   (tool.json · speed-ramp.engine.js · speed-ramp.ui.js · speed-ramp.spec) — its own pack, never merged into another tool
+  folder: tools/video/tools/<category>/speed-ramp/   (tool.json · speed-ramp.engine.js · speed-ramp.ui.js · speed-ramp.spec) — its own pack, never merged into another tool
   purpose: Slow motion, fast forward, reverse, freeze; ramps on a curve.
 ports:
   in:

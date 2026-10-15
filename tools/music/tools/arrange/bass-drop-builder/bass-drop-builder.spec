@@ -114,4 +114,4 @@ dependencies:
     - drop.hook.fired_out (edm:drop-fired)
     - drop.hook.plan_out (edm:drop-plan)
   permissions: [audio_out, bus_publish, bus_subscribe, filesystem_read, registry_read]
-  works_with: [eravos.sample-player, eravos.sequencer, eravos.session, eravos.macro-automation, eravos.clip-maker, eravos.song-recorder, eravos.drum-forge]
+  works_with: [eravos.song-recorder, eravos.sequencer, eravos.macro-automation, eravos.drum-forge, eravos.session, eravos.clip-maker, eravos.sample-player]

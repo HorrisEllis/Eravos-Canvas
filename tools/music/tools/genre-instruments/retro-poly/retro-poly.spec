@@ -65,4 +65,4 @@ dependencies:
   outputs:
     - rp.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.drum-forge, eravos.pad-forge, eravos.fx-echo, eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.ratio-lattice, eravos.lyric-rhythm]
+  works_with: [eravos.drum-forge, eravos.pad-forge, eravos.fx-echo, eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]

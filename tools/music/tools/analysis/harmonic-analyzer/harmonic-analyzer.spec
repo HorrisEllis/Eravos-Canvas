@@ -42,6 +42,6 @@ dependencies:
     - ha.hook.tuning_out (xen:tuning)
     - ha.hook.spectrum_out (xen:spectrum)
   permissions: [audio_in, bus_publish, bus_subscribe, filesystem_read]
-  works_with: [eravos.xen-synth, eravos.recursive-spectra, eravos.sample-player, eravos.session, eravos.clip-maker, eravos.song-recorder, eravos.drum-forge]
+  works_with: [eravos.xen-synth, eravos.recursive-spectra, eravos.sample-player, eravos.song-recorder, eravos.drum-forge, eravos.session, eravos.clip-maker]
   notes:
     - Live input is a tap: the sound you wire in keeps going where it went.

@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.agents.approve · status MAPPED (specified, not built) · domain agents
 identity:
   id: eravos.agents.approve ; label: Approve ; icon: ✋ ; category: Automation
-  folder: domains/agents/tools/<category>/approve/   (tool.json · approve.engine.js · approve.ui.js · approve.spec) — its own pack, never merged into another tool
+  folder: tools/agents/tools/<category>/approve/   (tool.json · approve.engine.js · approve.ui.js · approve.spec) — its own pack, never merged into another tool
   purpose: Pause until a person says yes — required before anything irreversible.
 ports:
   in:

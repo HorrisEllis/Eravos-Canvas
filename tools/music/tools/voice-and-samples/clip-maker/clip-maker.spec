@@ -32,4 +32,4 @@ dependencies:
     - clip.hook.asset_out (asset:ready)
     - clip.hook.audio_out (audio · port out)
   permissions: [audio_out, audio_in, bus_publish, bus_subscribe, filesystem_read, filesystem_write]
-  works_with: [eravos.sample-player, eravos.timeline, eravos.bass-drop-builder, eravos.contrast-analyser, eravos.harmonic-analyzer, eravos.song-recorder, eravos.bass-forge]
+  works_with: [eravos.harmonic-analyzer, eravos.bass-drop-builder, eravos.song-recorder, eravos.timeline, eravos.bass-forge, eravos.contrast-analyser, eravos.sample-player]

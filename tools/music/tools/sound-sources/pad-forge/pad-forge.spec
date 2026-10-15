@@ -52,4 +52,4 @@ dependencies:
   outputs:
     - pad.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.timeline, eravos.sequencer, eravos.fx-moddelay, eravos.sub-engine, eravos.midi-mapper, eravos.ratio-lattice, eravos.lyric-rhythm]
+  works_with: [eravos.timeline, eravos.sequencer, eravos.fx-moddelay, eravos.sub-engine, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]

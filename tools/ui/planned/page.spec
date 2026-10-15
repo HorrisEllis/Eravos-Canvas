@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.ui.page · status MAPPED (specified, not built) · domain ui
 identity:
   id: eravos.ui.page ; label: Page ; icon: 📄 ; category: UI / Web
-  folder: domains/ui/tools/<category>/page/   (tool.json · page.engine.js · page.ui.js · page.spec) — its own pack, never merged into another tool
+  folder: tools/ui/tools/<category>/page/   (tool.json · page.engine.js · page.ui.js · page.spec) — its own pack, never merged into another tool
   purpose: A page (artboard) that holds a component tree.
 ports:
   in:

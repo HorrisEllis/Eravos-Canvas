@@ -1,4 +1,4 @@
-# spec_id: eravos.domain.ui · status MAPPED · folder domains/ui/  (exe: ERAVOS Library/Mods/UI / Web/)
+# spec_id: eravos.domain.ui · status MAPPED · folder tools/ui/  (exe: ERAVOS Library/Mods/UI / Web/)
 domain: 🧩 UI / Web — Design and edit web interfaces with small tools: a page is a tree of components; style comes from tokens; the result exports as real HTML/CSS.
 mode: UI Design
 units (toolbar expansion, built only when needed):
@@ -18,4 +18,4 @@ tools (each its own folder + spec; mapped ones in planned/):
     - ♿ a11y-check — Contrast, alt text, labels, focus order, headings.  [in: layout, style → out: json]
     - ⤓ export-web — Export clean HTML + CSS (or a component file).  [in: layout, style → out: asset]
 build order: source tools first (they make something to see), then transforms, then exports; one tool per step, each green before the next.
-boundary: nothing in domains/ui/ is read by the shell or another domain; the shell sees only units, modes, needs, packs.
+boundary: nothing in tools/ui/ is read by the shell or another domain; the shell sees only units, modes, needs, packs.

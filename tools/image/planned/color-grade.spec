@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.image.color-grade · status MAPPED (specified, not built) · domain image
 identity:
   id: eravos.image.color-grade ; label: Colour Grade ; icon: 🎨 ; category: Image
-  folder: domains/image/tools/<category>/color-grade/   (tool.json · color-grade.engine.js · color-grade.ui.js · color-grade.spec) — its own pack, never merged into another tool
+  folder: tools/image/tools/<category>/color-grade/   (tool.json · color-grade.engine.js · color-grade.ui.js · color-grade.spec) — its own pack, never merged into another tool
   purpose: Lift / gamma / gain, HSL, temperature, tint, vibrance, LUT.
 ports:
   in:

@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.image.text-layer · status MAPPED (specified, not built) · domain image
 identity:
   id: eravos.image.text-layer ; label: Text ; icon: 🔤 ; category: Image
-  folder: domains/image/tools/<category>/text-layer/   (tool.json · text-layer.engine.js · text-layer.ui.js · text-layer.spec) — its own pack, never merged into another tool
+  folder: tools/image/tools/<category>/text-layer/   (tool.json · text-layer.engine.js · text-layer.ui.js · text-layer.spec) — its own pack, never merged into another tool
   purpose: Type on images: font, size, tracking, outline, shadow.
 ports:
   in:

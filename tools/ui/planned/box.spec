@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.ui.box · status MAPPED (specified, not built) · domain ui
 identity:
   id: eravos.ui.box ; label: Box ; icon: ▭ ; category: UI / Web
-  folder: domains/ui/tools/<category>/box/   (tool.json · box.engine.js · box.ui.js · box.spec) — its own pack, never merged into another tool
+  folder: tools/ui/tools/<category>/box/   (tool.json · box.engine.js · box.ui.js · box.spec) — its own pack, never merged into another tool
   purpose: A container: flex or grid layout, padding, gap, border, radius.
 ports:
   in:

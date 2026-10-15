@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.image.curves · status MAPPED (specified, not built) · domain image
 identity:
   id: eravos.image.curves ; label: Curves ; icon: 〰 ; category: Image
-  folder: domains/image/tools/<category>/curves/   (tool.json · curves.engine.js · curves.ui.js · curves.spec) — its own pack, never merged into another tool
+  folder: tools/image/tools/<category>/curves/   (tool.json · curves.engine.js · curves.ui.js · curves.spec) — its own pack, never merged into another tool
   purpose: Tone curves per channel (RGB, R, G, B, luminance).
 ports:
   in:

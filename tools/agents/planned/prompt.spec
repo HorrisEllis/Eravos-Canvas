@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.agents.prompt · status MAPPED (specified, not built) · domain agents
 identity:
   id: eravos.agents.prompt ; label: Prompt ; icon: 📝 ; category: Automation
-  folder: domains/agents/tools/<category>/prompt/   (tool.json · prompt.engine.js · prompt.ui.js · prompt.spec) — its own pack, never merged into another tool
+  folder: tools/agents/tools/<category>/prompt/   (tool.json · prompt.engine.js · prompt.ui.js · prompt.spec) — its own pack, never merged into another tool
   purpose: A prompt template with {slots} filled from inputs.
 ports:
   in:

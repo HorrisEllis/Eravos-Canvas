@@ -26,11 +26,13 @@ dependencies:
     - audio: Audio engine — shares the audio clock
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
   inputs:
+    - mm.hook.transport_state_in (transport:state)
     - mm.hook.feedback_in (pad:trigger|seq:fire)
   outputs:
     - mm.hook.midi_out_bus (midi:note)
+    - mm.hook.actions_out (ui:transport-play|ui:transport-stop|ui:transport-record|ui:transport-loop|ui:transport-metronome|ui:transport-tap|ui:transport-restart|ui:marker_jump|ui:drop_fire|seq:pattern_cue)
     - mm.hook.status_out (midi:status)
     - mm.hook.pads_out (note:trigger)
     - mm.hook.drive_out (ui:config_change)
   permissions: [midi_in, midi_out, bus_publish, bus_subscribe, registry_read]
-  works_with: [eravos.pads, eravos.sample-player, eravos.wobble-bass, eravos.acid-synth, eravos.reese-bass, eravos.supersaw, eravos.macro-automation, eravos.xen-synth]
+  works_with: [eravos.pads, eravos.embodiment-lab, eravos.coven, eravos.organ, eravos.retro-poly, eravos.macro-automation, eravos.bass-forge, eravos.drum-forge]

@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.agents.branch · status MAPPED (specified, not built) · domain agents
 identity:
   id: eravos.agents.branch ; label: Branch ; icon: 🔀 ; category: Automation
-  folder: domains/agents/tools/<category>/branch/   (tool.json · branch.engine.js · branch.ui.js · branch.spec) — its own pack, never merged into another tool
+  folder: tools/agents/tools/<category>/branch/   (tool.json · branch.engine.js · branch.ui.js · branch.spec) — its own pack, never merged into another tool
   purpose: If / else on a condition.
 ports:
   in:

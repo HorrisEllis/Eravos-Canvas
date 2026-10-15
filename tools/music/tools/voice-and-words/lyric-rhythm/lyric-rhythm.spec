@@ -36,5 +36,6 @@ dependencies:
   outputs:
     - lyr.hook.note_out (note:trigger)
     - lyr.hook.clip_out (ui:clip_add)
+    - lyr.hook.seq_out (seq:pattern_suggest|ui:chain_edit|ui:slot_select|ui:config_change)
   permissions: [bus_publish, bus_subscribe, registry_read]
-  works_with: [eravos.pads, eravos.supersaw, eravos.retro-poly, eravos.timeline, eravos.sample-player, eravos.wobble-bass, eravos.acid-synth, eravos.reese-bass]
+  works_with: [eravos.pads, eravos.supersaw, eravos.retro-poly, eravos.timeline, eravos.embodiment-lab, eravos.coven, eravos.organ, eravos.bass-forge]

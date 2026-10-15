@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.video.frame-grab · status MAPPED (specified, not built) · domain video
 identity:
   id: eravos.video.frame-grab ; label: Frame Grab ; icon: 📸 ; category: Video
-  folder: domains/video/tools/<category>/frame-grab/   (tool.json · frame-grab.engine.js · frame-grab.ui.js · frame-grab.spec) — its own pack, never merged into another tool
+  folder: tools/video/tools/<category>/frame-grab/   (tool.json · frame-grab.engine.js · frame-grab.ui.js · frame-grab.spec) — its own pack, never merged into another tool
   purpose: Pull any frame out as an image (into the image domain).
 ports:
   in:

@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.agents.llm-call · status MAPPED (specified, not built) · domain agents
 identity:
   id: eravos.agents.llm-call ; label: LLM Call ; icon: 🧠 ; category: Automation
-  folder: domains/agents/tools/<category>/llm-call/   (tool.json · llm-call.engine.js · llm-call.ui.js · llm-call.spec) — its own pack, never merged into another tool
+  folder: tools/agents/tools/<category>/llm-call/   (tool.json · llm-call.engine.js · llm-call.ui.js · llm-call.spec) — its own pack, never merged into another tool
   purpose: Send text to a model you configure; get text or JSON back.
 ports:
   in:

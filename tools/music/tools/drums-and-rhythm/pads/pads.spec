@@ -93,4 +93,4 @@ dependencies:
     - pads.hook.pad_trigger_out (pad:trigger)
     - pads.hook.bank_change_out (pad:bank-change)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe, filesystem_read]
-  works_with: [eravos.sample-player, eravos.sequencer, eravos.timeline, eravos.midi-mapper, eravos.ratio-lattice, eravos.lyric-rhythm]
+  works_with: [eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.sample-player, eravos.lyric-rhythm, eravos.ratio-lattice]

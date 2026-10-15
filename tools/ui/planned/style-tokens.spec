@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.ui.style-tokens · status MAPPED (specified, not built) · domain ui
 identity:
   id: eravos.ui.style-tokens ; label: Design Tokens ; icon: 🎛 ; category: UI / Web
-  folder: domains/ui/tools/<category>/style-tokens/   (tool.json · style-tokens.engine.js · style-tokens.ui.js · style-tokens.spec) — its own pack, never merged into another tool
+  folder: tools/ui/tools/<category>/style-tokens/   (tool.json · style-tokens.engine.js · style-tokens.ui.js · style-tokens.spec) — its own pack, never merged into another tool
   purpose: Colours, type scale, spacing, radii, shadows — one source of style.
 ports:
   in:

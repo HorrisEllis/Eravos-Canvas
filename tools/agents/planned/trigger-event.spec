@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.agents.trigger-event · status MAPPED (specified, not built) · domain agents
 identity:
   id: eravos.agents.trigger-event ; label: On Event ; icon: ⚡ ; category: Automation
-  folder: domains/agents/tools/<category>/trigger-event/   (tool.json · trigger-event.engine.js · trigger-event.ui.js · trigger-event.spec) — its own pack, never merged into another tool
+  folder: tools/agents/tools/<category>/trigger-event/   (tool.json · trigger-event.engine.js · trigger-event.ui.js · trigger-event.spec) — its own pack, never merged into another tool
   purpose: Start a flow when something happens on the canvas (any bus topic) or a file lands.
 ports:
   in:

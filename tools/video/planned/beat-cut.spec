@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.video.beat-cut · status MAPPED (specified, not built) · domain video
 identity:
   id: eravos.video.beat-cut ; label: Beat Cut ; icon: 🥁 ; category: Video
-  folder: domains/video/tools/<category>/beat-cut/   (tool.json · beat-cut.engine.js · beat-cut.ui.js · beat-cut.spec) — its own pack, never merged into another tool
+  folder: tools/video/tools/<category>/beat-cut/   (tool.json · beat-cut.engine.js · beat-cut.ui.js · beat-cut.spec) — its own pack, never merged into another tool
   purpose: Cut between clips on every beat / bar / drop — edit to music automatically.
 ports:
   in:

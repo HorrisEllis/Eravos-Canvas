@@ -96,5 +96,6 @@ dependencies:
     - seq.hook.fire_out (seq:fire)
     - seq.hook.pattern_out (seq:pattern_changed)
     - seq.hook.transport_out (ui:transport-play|ui:transport-bpm|ui:transport-stop)
+    - seq.hook.auto_out (ui:config_change)
   permissions: [bus_publish, bus_subscribe, filesystem_read, registry_read]
-  works_with: [eravos.pads, eravos.sample-player, eravos.wobble-bass, eravos.acid-synth, eravos.reese-bass, eravos.supersaw, eravos.timeline, eravos.edm-lab]
+  works_with: [eravos.bass-drop-builder, eravos.timeline, eravos.pads, eravos.embodiment-lab, eravos.edm-lab, eravos.coven, eravos.organ, eravos.retro-poly]

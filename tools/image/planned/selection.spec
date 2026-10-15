@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.image.selection · status MAPPED (specified, not built) · domain image
 identity:
   id: eravos.image.selection ; label: Smart Select ; icon: 🪄 ; category: Image
-  folder: domains/image/tools/<category>/selection/   (tool.json · selection.engine.js · selection.ui.js · selection.spec) — its own pack, never merged into another tool
+  folder: tools/image/tools/<category>/selection/   (tool.json · selection.engine.js · selection.ui.js · selection.spec) — its own pack, never merged into another tool
   purpose: Select by colour (magic wand), range, or edges.
 ports:
   in:

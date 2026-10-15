@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.ui.responsive · status MAPPED (specified, not built) · domain ui
 identity:
   id: eravos.ui.responsive ; label: Responsive ; icon: 📱 ; category: UI / Web
-  folder: domains/ui/tools/<category>/responsive/   (tool.json · responsive.engine.js · responsive.ui.js · responsive.spec) — its own pack, never merged into another tool
+  folder: tools/ui/tools/<category>/responsive/   (tool.json · responsive.engine.js · responsive.ui.js · responsive.spec) — its own pack, never merged into another tool
   purpose: Preview and override at phone / tablet / desktop widths.
 ports:
   in:

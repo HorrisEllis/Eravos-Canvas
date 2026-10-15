@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.ui.export-web · status MAPPED (specified, not built) · domain ui
 identity:
   id: eravos.ui.export-web ; label: Export Web ; icon: ⤓ ; category: UI / Web
-  folder: domains/ui/tools/<category>/export-web/   (tool.json · export-web.engine.js · export-web.ui.js · export-web.spec) — its own pack, never merged into another tool
+  folder: tools/ui/tools/<category>/export-web/   (tool.json · export-web.engine.js · export-web.ui.js · export-web.spec) — its own pack, never merged into another tool
   purpose: Export clean HTML + CSS (or a component file).
 ports:
   in:

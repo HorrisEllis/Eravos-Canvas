@@ -46,6 +46,6 @@ dependencies:
     - embodiment-lab.hook.breath_out (modulation · port breath)
     - embodiment-lab.hook.cue_out (embody:cue)
   permissions: [audio_out, bus_publish, bus_subscribe]
-  works_with: [eravos.breath, eravos.organ, eravos.xen-synth, eravos.sequencer, eravos.timeline, eravos.midi-mapper, eravos.ratio-lattice, eravos.lyric-rhythm]
+  works_with: [eravos.breath, eravos.organ, eravos.xen-synth, eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
   notes:
     - Keep the volume comfortable and low. Stop whenever you like.

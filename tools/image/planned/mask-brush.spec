@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.image.mask-brush · status MAPPED (specified, not built) · domain image
 identity:
   id: eravos.image.mask-brush ; label: Mask Brush ; icon: 🖌 ; category: Image
-  folder: domains/image/tools/<category>/mask-brush/   (tool.json · mask-brush.engine.js · mask-brush.ui.js · mask-brush.spec) — its own pack, never merged into another tool
+  folder: tools/image/tools/<category>/mask-brush/   (tool.json · mask-brush.engine.js · mask-brush.ui.js · mask-brush.spec) — its own pack, never merged into another tool
   purpose: Paint what is selected — soft brush, eraser, feather.
 ports:
   in:

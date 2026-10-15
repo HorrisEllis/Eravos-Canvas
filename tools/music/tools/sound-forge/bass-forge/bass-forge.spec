@@ -71,6 +71,6 @@ dependencies:
   outputs:
     - bf.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe, filesystem_read]
-  works_with: [eravos.sequencer, eravos.timeline, eravos.sub-engine, eravos.harmonic-analyzer, eravos.sample-player, eravos.session, eravos.clip-maker, eravos.midi-mapper]
+  works_with: [eravos.sequencer, eravos.timeline, eravos.sub-engine, eravos.harmonic-analyzer, eravos.song-recorder, eravos.drum-forge, eravos.session, eravos.midi-mapper]
   notes:
     - MATCH analyses a clip you own (drop a bass sample on it) and steers its knobs towards it.

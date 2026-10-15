@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.ui.interaction · status MAPPED (specified, not built) · domain ui
 identity:
   id: eravos.ui.interaction ; label: Interaction ; icon: ✨ ; category: UI / Web
-  folder: domains/ui/tools/<category>/interaction/   (tool.json · interaction.engine.js · interaction.ui.js · interaction.spec) — its own pack, never merged into another tool
+  folder: tools/ui/tools/<category>/interaction/   (tool.json · interaction.engine.js · interaction.ui.js · interaction.spec) — its own pack, never merged into another tool
   purpose: Hover/press/enter animations and transitions.
 ports:
   in:

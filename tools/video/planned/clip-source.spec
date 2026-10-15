@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.video.clip-source · status MAPPED (specified, not built) · domain video
 identity:
   id: eravos.video.clip-source ; label: Clip Source ; icon: 🎞 ; category: Video
-  folder: domains/video/tools/<category>/clip-source/   (tool.json · clip-source.engine.js · clip-source.ui.js · clip-source.spec) — its own pack, never merged into another tool
+  folder: tools/video/tools/<category>/clip-source/   (tool.json · clip-source.engine.js · clip-source.ui.js · clip-source.spec) — its own pack, never merged into another tool
   purpose: Bring a video in: drop a file or record the screen/camera.
 ports:
   in:

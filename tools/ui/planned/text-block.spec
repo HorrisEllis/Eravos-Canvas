@@ -1,7 +1,7 @@
 # spec_id: eravos.organism.ui.text-block · status MAPPED (specified, not built) · domain ui
 identity:
   id: eravos.ui.text-block ; label: Text Block ; icon: 🔤 ; category: UI / Web
-  folder: domains/ui/tools/<category>/text-block/   (tool.json · text-block.engine.js · text-block.ui.js · text-block.spec) — its own pack, never merged into another tool
+  folder: tools/ui/tools/<category>/text-block/   (tool.json · text-block.engine.js · text-block.ui.js · text-block.spec) — its own pack, never merged into another tool
   purpose: Headings and paragraphs with token typography.
 ports:
   in:
