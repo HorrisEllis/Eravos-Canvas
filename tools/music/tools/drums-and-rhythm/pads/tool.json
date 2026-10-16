@@ -17,7 +17,8 @@
     "ui": "pads.ui.js",
     "spec": "pads.spec",
     "preview": "preview.png",
-    "tests": "pads.test.js"
+    "tests": "pads.test.js",
+    "css": "pads.css"
   },
   "needs": {
     "units": [

@@ -15,6 +15,7 @@
   js('tools/arrange/timeline/timeline.engine.js');
   js('tools/arrange/timeline/timeline.pianoroll.js');
   js('tools/arrange/timeline/timeline.ui.js');
+  css('tools/drums-and-rhythm/pads/pads.css');
   js('tools/drums-and-rhythm/pads/pads.engine.js');
   js('tools/drums-and-rhythm/pads/pads.ui.js');
   js('tools/drums-and-rhythm/pads/packs/index.js');

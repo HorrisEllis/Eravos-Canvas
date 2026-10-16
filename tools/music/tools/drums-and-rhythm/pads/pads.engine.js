@@ -62,7 +62,7 @@
     id: 'eravos.pads', preview: 'kit', domain: 'music', version: '3.0.0', label: 'Drum Machine', icon: '🥁', accent: '#00ff88', phase: 'P2',
     category: 'Drums & rhythm', blurb: '16 pads · every drum has several synthesis models and its own sound design · kits for every genre — or drop any sound on a pad.',
     lib: { MODELS, DRIVE_TYPES },
-    size: { w: 470, h: 470 }, minSize: { w: 360, h: 360 },
+    size: { w: 580, h: 680 }, minSize: { w: 420, h: 420 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe', 'filesystem_read'],
     provides: ['capability.pad_trigger', 'capability.audio_out', 'capability.bank_select', 'capability.note_in'],
     requires: ['capability.audio_context'],
