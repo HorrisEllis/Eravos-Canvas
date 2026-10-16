@@ -1,0 +1,350 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "pads.retro",
+ "version": "1.0.0",
+ "label": "Retro Machines",
+ "prefix": "Retro Machines",
+ "author": "James Brooks",
+ "tags": [
+  "80s",
+  "synthwave",
+  "darkwave",
+  "retro",
+  "drums-and-rhythm",
+  "kits"
+ ],
+ "for": "eravos.pads",
+ "items": {
+  "eravos.pads": {
+   "presets": {
+    "909 Classic": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "909"
+       },
+       {
+        "voice": "snare",
+        "model": "909"
+       },
+       {
+        "voice": "clap",
+        "model": "classic"
+       },
+       {
+        "voice": "hat",
+        "model": "909"
+       },
+       {
+        "voice": "openhat",
+        "model": "909"
+       },
+       {
+        "voice": "808",
+        "model": "sub"
+       },
+       {
+        "voice": "rim",
+        "model": "classic"
+       },
+       {
+        "voice": "tom",
+        "model": "classic"
+       },
+       {
+        "voice": "crash",
+        "model": "classic"
+       },
+       {
+        "voice": "perc",
+        "model": "wood"
+       },
+       {
+        "voice": "shaker",
+        "model": "classic"
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic"
+       },
+       {
+        "voice": "crash",
+        "model": "ride"
+       },
+       {
+        "voice": "tom",
+        "model": "classic",
+        "tune": 5
+       },
+       {
+        "voice": "tom",
+        "model": "classic",
+        "tune": -5
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "808 Classic": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "808"
+       },
+       {
+        "voice": "snare",
+        "model": "808"
+       },
+       {
+        "voice": "clap",
+        "model": "808"
+       },
+       {
+        "voice": "hat",
+        "model": "classic"
+       },
+       {
+        "voice": "openhat",
+        "model": "classic"
+       },
+       {
+        "voice": "808",
+        "model": "classic"
+       },
+       {
+        "voice": "rim",
+        "model": "classic"
+       },
+       {
+        "voice": "tom",
+        "model": "electro"
+       },
+       {
+        "voice": "crash",
+        "model": "classic"
+       },
+       {
+        "voice": "perc",
+        "model": "classic"
+       },
+       {
+        "voice": "shaker",
+        "model": "classic"
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic"
+       },
+       {
+        "voice": "tom",
+        "model": "electro",
+        "tune": 5
+       },
+       {
+        "voice": "tom",
+        "model": "electro",
+        "tune": -5
+       },
+       {
+        "voice": "perc",
+        "model": "wood"
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "Synthwave Gated": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "punch",
+        "tune": -1,
+        "decay": 0.35
+       },
+       {
+        "voice": "snare",
+        "model": "slam",
+        "decay": 0.5,
+        "tone": 0.2
+       },
+       {
+        "voice": "clap",
+        "model": "stacked",
+        "decay": 0.5
+       },
+       {
+        "voice": "hat",
+        "model": "909",
+        "decay": 0.05
+       },
+       {
+        "voice": "openhat",
+        "model": "909",
+        "decay": 0.3
+       },
+       {
+        "voice": "808",
+        "model": "sub"
+       },
+       {
+        "voice": "rim",
+        "model": "classic"
+       },
+       {
+        "voice": "tom",
+        "model": "electro",
+        "tune": -2,
+        "decay": 0.6
+       },
+       {
+        "voice": "crash",
+        "model": "classic",
+        "decay": 2.2
+       },
+       {
+        "voice": "perc",
+        "model": "laser"
+       },
+       {
+        "voice": "shaker",
+        "model": "classic"
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic"
+       },
+       {
+        "voice": "tom",
+        "model": "electro",
+        "tune": 5,
+        "decay": 0.5
+       },
+       {
+        "voice": "tom",
+        "model": "electro",
+        "tune": -7,
+        "decay": 0.7
+       },
+       {
+        "voice": "crash",
+        "model": "swell"
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "Darkwave Cold": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "thump",
+        "tune": -2,
+        "decay": 0.4
+       },
+       {
+        "voice": "snare",
+        "model": "electro",
+        "tune": -3,
+        "decay": 0.35
+       },
+       {
+        "voice": "clap",
+        "model": "stacked",
+        "tune": -3
+       },
+       {
+        "voice": "hat",
+        "model": "fm",
+        "tune": -3
+       },
+       {
+        "voice": "openhat",
+        "model": "fm",
+        "tune": -6
+       },
+       {
+        "voice": "808",
+        "model": "reese",
+        "tune": -3
+       },
+       {
+        "voice": "rim",
+        "model": "classic",
+        "tune": -4
+       },
+       {
+        "voice": "tom",
+        "model": "electro",
+        "tune": -6
+       },
+       {
+        "voice": "crash",
+        "model": "china",
+        "tune": -3
+       },
+       {
+        "voice": "perc",
+        "model": "clang",
+        "tune": -6
+       },
+       {
+        "voice": "shaker",
+        "model": "classic"
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic",
+        "tune": -7
+       },
+       {
+        "voice": "snare",
+        "model": "slam",
+        "tune": -5,
+        "tone": -0.4
+       },
+       {
+        "voice": "perc",
+        "model": "laser",
+        "tune": -7
+       },
+       {
+        "voice": "crash",
+        "model": "swell",
+        "tune": -3
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    }
+   }
+  }
+ }
+}

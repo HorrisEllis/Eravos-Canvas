@@ -1,7 +1,7 @@
 {
   "schema": "eravos.tool/1",
   "id": "eravos.pads",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "label": "Drum Machine",
   "icon": "🥁",
   "accent": "#00ff88",
@@ -37,7 +37,15 @@
       "presets"
     ],
     "shipped": [
-      "factory"
+      "factory",
+      "bass-music",
+      "house",
+      "techno-hard",
+      "breaks",
+      "urban",
+      "retro",
+      "cinematic-lofi",
+      "lost-love"
     ]
   },
   "works_with": [

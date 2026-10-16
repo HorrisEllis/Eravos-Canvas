@@ -96,7 +96,14 @@ dependencies:
   works_with: [eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.sample-player, eravos.lyric-rhythm, eravos.ratio-lattice]
 
 # ============================================================
-# PLANNED 3.0 — Drum Machine that sounds like many machines (P39 R1, order 2) · status MAPPED, not built
+# 3.0 — Drum Machine that sounds like many machines (P39 R1, order 2) · status BUILT 3.39 (partial — see BUILT/OPEN)
+# BUILT: 41 models over 13 voices (incl. classic) · pad keys model tone snap sweep body driveType (+ drive) · post stage
+#   (tilt EQ, 5 drive types incl. crush) · kit presets (extra.kit) · 38 kits in 8 packs (Bass Music, House, Techno & Hard,
+#   Breaks & Jungle, Trap/Phonk/Dancehall, Retro Machines, Cinematic & Lo-fi, Lost Love) · Sounds › Kits lists them from
+#   the same data · model picker auditions on pick · 7 tests (every model renders; models of a voice differ by a seeded,
+#   measured distance ≥ 0.35; classic byte-identical up to the voice's end; kit presets load & sound; kits differ).
+# OPEN: layer 2 per pad · round-robin · room send · key-tuned kick/808 · 200 single-pad sounds browser (needs the SOUND tab,
+#   specs/eravos.p39-sounds-in-settings.spec) · 40-kit target (38 shipped).
 # "with the drum machine, the presets are worthless, the pad sounds are absent beyond default."
 # ============================================================
 finding (pads.engine.js 2.0): 13 voices, ONE synthesis recipe each; a pad edits only tune/decay/level/pan/drive/choke; the

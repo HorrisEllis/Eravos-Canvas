@@ -1,0 +1,542 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "pads.house",
+ "version": "1.0.0",
+ "label": "House",
+ "prefix": "House",
+ "author": "James Brooks",
+ "tags": [
+  "house",
+  "four-on-floor",
+  "drums-and-rhythm",
+  "kits"
+ ],
+ "for": "eravos.pads",
+ "items": {
+  "eravos.pads": {
+   "presets": {
+    "Melodic House": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "808",
+        "tune": 1,
+        "decay": 0.45,
+        "sweep": 14,
+        "tone": -0.2
+       },
+       {
+        "voice": "snare",
+        "model": "909",
+        "decay": 0.18,
+        "level": 0.8
+       },
+       {
+        "voice": "clap",
+        "model": "stacked",
+        "decay": 0.55,
+        "level": 0.85
+       },
+       {
+        "voice": "hat",
+        "model": "909",
+        "decay": 0.04,
+        "level": 0.7
+       },
+       {
+        "voice": "openhat",
+        "model": "909",
+        "decay": 0.28
+       },
+       {
+        "voice": "808",
+        "model": "sub"
+       },
+       {
+        "voice": "rim",
+        "model": "classic",
+        "tune": 3,
+        "level": 0.7
+       },
+       {
+        "voice": "tom",
+        "model": "conga",
+        "tune": 2
+       },
+       {
+        "voice": "crash",
+        "model": "ride",
+        "decay": 2.4,
+        "level": 0.6
+       },
+       {
+        "voice": "perc",
+        "model": "wood",
+        "tune": 7,
+        "level": 0.7
+       },
+       {
+        "voice": "shaker",
+        "model": "classic",
+        "decay": 0.1,
+        "level": 0.75
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic",
+        "tune": 2,
+        "level": 0.6
+       },
+       {
+        "voice": "crash",
+        "model": "swell",
+        "decay": 1.8,
+        "level": 0.6
+       },
+       {
+        "voice": "snare",
+        "model": "brush"
+       },
+       {
+        "voice": "perc",
+        "model": "clang",
+        "tune": 12,
+        "decay": 1,
+        "level": 0.5
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "Progressive Drive": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "909",
+        "tune": 0,
+        "decay": 0.32
+       },
+       {
+        "voice": "snare",
+        "model": "909"
+       },
+       {
+        "voice": "clap",
+        "model": "stacked"
+       },
+       {
+        "voice": "hat",
+        "model": "909"
+       },
+       {
+        "voice": "openhat",
+        "model": "909",
+        "decay": 0.3
+       },
+       {
+        "voice": "808",
+        "model": "sub"
+       },
+       {
+        "voice": "rim",
+        "model": "classic"
+       },
+       {
+        "voice": "tom",
+        "model": "electro"
+       },
+       {
+        "voice": "crash",
+        "model": "classic",
+        "decay": 2.6
+       },
+       {
+        "voice": "perc",
+        "model": "wood"
+       },
+       {
+        "voice": "shaker",
+        "model": "classic"
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic"
+       },
+       {
+        "voice": "crash",
+        "model": "ride"
+       },
+       {
+        "voice": "crash",
+        "model": "swell",
+        "decay": 2.2
+       },
+       {
+        "voice": "snare",
+        "model": "electro",
+        "level": 0.7
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "Tech House Tops": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "punch",
+        "tune": -1,
+        "decay": 0.3
+       },
+       {
+        "voice": "snare",
+        "model": "crack",
+        "decay": 0.1
+       },
+       {
+        "voice": "clap",
+        "model": "snap",
+        "decay": 0.1
+       },
+       {
+        "voice": "hat",
+        "model": "tick"
+       },
+       {
+        "voice": "openhat",
+        "model": "909",
+        "decay": 0.2
+       },
+       {
+        "voice": "808",
+        "model": "sub",
+        "tune": -1
+       },
+       {
+        "voice": "rim",
+        "model": "classic",
+        "tune": 5
+       },
+       {
+        "voice": "tom",
+        "model": "conga",
+        "tune": 4
+       },
+       {
+        "voice": "crash",
+        "model": "ride"
+       },
+       {
+        "voice": "perc",
+        "model": "wood",
+        "tune": -3
+       },
+       {
+        "voice": "shaker",
+        "model": "classic",
+        "decay": 0.07
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic",
+        "tune": 4
+       },
+       {
+        "voice": "perc",
+        "model": "wood",
+        "tune": 9
+       },
+       {
+        "voice": "tom",
+        "model": "conga",
+        "tune": -2
+       },
+       {
+        "voice": "perc",
+        "model": "clang",
+        "tune": 3,
+        "decay": 0.3
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "Afro House": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "thump",
+        "tune": 1
+       },
+       {
+        "voice": "snare",
+        "model": "rimshot"
+       },
+       {
+        "voice": "clap",
+        "model": "snap"
+       },
+       {
+        "voice": "hat",
+        "model": "tick"
+       },
+       {
+        "voice": "openhat",
+        "model": "909",
+        "decay": 0.25
+       },
+       {
+        "voice": "808",
+        "model": "sub"
+       },
+       {
+        "voice": "rim",
+        "model": "classic",
+        "tune": 2
+       },
+       {
+        "voice": "tom",
+        "model": "conga"
+       },
+       {
+        "voice": "crash",
+        "model": "ride",
+        "decay": 2
+       },
+       {
+        "voice": "perc",
+        "model": "wood",
+        "tune": 4
+       },
+       {
+        "voice": "shaker",
+        "model": "classic",
+        "decay": 0.12
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic"
+       },
+       {
+        "voice": "tom",
+        "model": "conga",
+        "tune": 5
+       },
+       {
+        "voice": "tom",
+        "model": "conga",
+        "tune": -4
+       },
+       {
+        "voice": "tom",
+        "model": "tabla"
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "UKG Skip": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "909",
+        "tune": 2,
+        "decay": 0.25
+       },
+       {
+        "voice": "snare",
+        "model": "crack",
+        "tune": 3
+       },
+       {
+        "voice": "clap",
+        "model": "snap",
+        "tune": 2
+       },
+       {
+        "voice": "hat",
+        "model": "tick",
+        "decay": 0.03
+       },
+       {
+        "voice": "openhat",
+        "model": "909",
+        "decay": 0.18
+       },
+       {
+        "voice": "808",
+        "model": "reese",
+        "tune": 1,
+        "decay": 0.9
+       },
+       {
+        "voice": "rim",
+        "model": "classic",
+        "tune": 6
+       },
+       {
+        "voice": "tom",
+        "model": "electro",
+        "tune": 3
+       },
+       {
+        "voice": "crash",
+        "model": "classic",
+        "decay": 1.4
+       },
+       {
+        "voice": "perc",
+        "model": "wood",
+        "tune": 6
+       },
+       {
+        "voice": "shaker",
+        "model": "classic",
+        "decay": 0.06
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic",
+        "tune": 3
+       },
+       {
+        "voice": "snare",
+        "model": "rimshot",
+        "tune": 5
+       },
+       {
+        "voice": "kick",
+        "model": "punch",
+        "tune": 4,
+        "decay": 0.18
+       },
+       {
+        "voice": "perc",
+        "model": "clang",
+        "tune": 9,
+        "decay": 0.4
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "Disco Room": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "808",
+        "tune": 2,
+        "decay": 0.35,
+        "sweep": 16
+       },
+       {
+        "voice": "snare",
+        "model": "909",
+        "decay": 0.3
+       },
+       {
+        "voice": "clap",
+        "model": "808"
+       },
+       {
+        "voice": "hat",
+        "model": "classic",
+        "decay": 0.05
+       },
+       {
+        "voice": "openhat",
+        "model": "classic",
+        "decay": 0.45
+       },
+       {
+        "voice": "808",
+        "model": "sub"
+       },
+       {
+        "voice": "rim",
+        "model": "classic"
+       },
+       {
+        "voice": "tom",
+        "model": "classic"
+       },
+       {
+        "voice": "crash",
+        "model": "classic"
+       },
+       {
+        "voice": "perc",
+        "model": "wood"
+       },
+       {
+        "voice": "shaker",
+        "model": "classic"
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic"
+       },
+       {
+        "voice": "tom",
+        "model": "classic",
+        "tune": 5
+       },
+       {
+        "voice": "tom",
+        "model": "classic",
+        "tune": -5
+       },
+       {
+        "voice": "crash",
+        "model": "ride"
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    }
+   }
+  }
+ }
+}

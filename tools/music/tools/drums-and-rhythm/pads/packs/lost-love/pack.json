@@ -1,0 +1,597 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "pads.lost-love",
+ "version": "1.0.0",
+ "label": "Lost Love",
+ "prefix": "Lost Love",
+ "author": "James Brooks",
+ "tags": [
+  "lost love",
+  "melodic",
+  "her song",
+  "drums-and-rhythm",
+  "kits"
+ ],
+ "for": "eravos.pads",
+ "items": {
+  "eravos.pads": {
+   "presets": {
+    "Sunrise Under Water": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "808",
+        "tune": 0,
+        "decay": 0.5,
+        "sweep": 12,
+        "tone": -0.4
+       },
+       {
+        "voice": "snare",
+        "model": "brush",
+        "decay": 0.35
+       },
+       {
+        "voice": "clap",
+        "model": "stacked",
+        "decay": 0.7,
+        "tone": -0.2,
+        "level": 0.8
+       },
+       {
+        "voice": "hat",
+        "model": "909",
+        "decay": 0.035,
+        "tone": -0.3,
+        "level": 0.6
+       },
+       {
+        "voice": "openhat",
+        "model": "909",
+        "decay": 0.3,
+        "tone": -0.3,
+        "level": 0.7
+       },
+       {
+        "voice": "808",
+        "model": "sub",
+        "tune": -1
+       },
+       {
+        "voice": "rim",
+        "model": "classic",
+        "tune": 3,
+        "level": 0.6
+       },
+       {
+        "voice": "tom",
+        "model": "conga",
+        "tune": 1,
+        "level": 0.7
+       },
+       {
+        "voice": "crash",
+        "model": "swell",
+        "decay": 2.4,
+        "level": 0.6
+       },
+       {
+        "voice": "perc",
+        "model": "clang",
+        "tune": 12,
+        "decay": 1.6,
+        "level": 0.45
+       },
+       {
+        "voice": "shaker",
+        "model": "classic",
+        "decay": 0.12,
+        "level": 0.6
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic",
+        "tune": 5,
+        "level": 0.4
+       },
+       {
+        "voice": "crash",
+        "model": "ride",
+        "decay": 3,
+        "level": 0.5
+       },
+       {
+        "voice": "snare",
+        "model": "909",
+        "decay": 0.2,
+        "level": 0.7
+       },
+       {
+        "voice": "perc",
+        "model": "wood",
+        "tune": 7,
+        "level": 0.5
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "Heaven Takes the Long Way": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "909",
+        "tune": -1,
+        "decay": 0.32
+       },
+       {
+        "voice": "snare",
+        "model": "909",
+        "decay": 0.22
+       },
+       {
+        "voice": "clap",
+        "model": "stacked",
+        "decay": 0.6
+       },
+       {
+        "voice": "hat",
+        "model": "909"
+       },
+       {
+        "voice": "openhat",
+        "model": "909",
+        "decay": 0.32
+       },
+       {
+        "voice": "808",
+        "model": "sub",
+        "tune": -2
+       },
+       {
+        "voice": "rim",
+        "model": "classic"
+       },
+       {
+        "voice": "tom",
+        "model": "electro",
+        "tune": -3
+       },
+       {
+        "voice": "crash",
+        "model": "classic",
+        "decay": 2.8
+       },
+       {
+        "voice": "perc",
+        "model": "clang",
+        "tune": 12,
+        "decay": 1.2,
+        "level": 0.5
+       },
+       {
+        "voice": "shaker",
+        "model": "classic"
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic"
+       },
+       {
+        "voice": "crash",
+        "model": "swell",
+        "decay": 2.4
+       },
+       {
+        "voice": "crash",
+        "model": "ride",
+        "decay": 3
+       },
+       {
+        "voice": "snare",
+        "model": "slam",
+        "decay": 0.6,
+        "level": 0.7
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "Flaws (Half-Time)": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "808",
+        "tune": -2,
+        "decay": 0.55
+       },
+       {
+        "voice": "snare",
+        "model": "crack",
+        "tune": -3,
+        "decay": 0.2
+       },
+       {
+        "voice": "clap",
+        "model": "stacked",
+        "decay": 0.5
+       },
+       {
+        "voice": "hat",
+        "model": "tick",
+        "decay": 0.03
+       },
+       {
+        "voice": "openhat",
+        "model": "909",
+        "decay": 0.25
+       },
+       {
+        "voice": "808",
+        "model": "classic",
+        "tune": -3,
+        "decay": 2.2
+       },
+       {
+        "voice": "rim",
+        "model": "classic",
+        "tune": 2
+       },
+       {
+        "voice": "tom",
+        "model": "electro",
+        "tune": -5
+       },
+       {
+        "voice": "crash",
+        "model": "swell",
+        "decay": 1.6
+       },
+       {
+        "voice": "perc",
+        "model": "clang",
+        "tune": -5,
+        "decay": 1.4,
+        "level": 0.5
+       },
+       {
+        "voice": "shaker",
+        "model": "classic"
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic"
+       },
+       {
+        "voice": "808",
+        "model": "reese",
+        "tune": -3,
+        "decay": 1.8
+       },
+       {
+        "voice": "snare",
+        "model": "brush",
+        "level": 0.7
+       },
+       {
+        "voice": "perc",
+        "model": "laser",
+        "tune": -5,
+        "level": 0.6
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "Fly Back to Me (80s)": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "punch",
+        "tune": -1,
+        "decay": 0.32
+       },
+       {
+        "voice": "snare",
+        "model": "slam",
+        "decay": 0.55,
+        "tone": 0.1
+       },
+       {
+        "voice": "clap",
+        "model": "stacked",
+        "decay": 0.55
+       },
+       {
+        "voice": "hat",
+        "model": "909",
+        "decay": 0.045
+       },
+       {
+        "voice": "openhat",
+        "model": "909",
+        "decay": 0.3
+       },
+       {
+        "voice": "808",
+        "model": "sub"
+       },
+       {
+        "voice": "rim",
+        "model": "classic"
+       },
+       {
+        "voice": "tom",
+        "model": "electro",
+        "tune": -3,
+        "decay": 0.6
+       },
+       {
+        "voice": "crash",
+        "model": "classic",
+        "decay": 2.4
+       },
+       {
+        "voice": "perc",
+        "model": "laser",
+        "tune": -2
+       },
+       {
+        "voice": "shaker",
+        "model": "classic"
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic"
+       },
+       {
+        "voice": "tom",
+        "model": "electro",
+        "tune": 4,
+        "decay": 0.5
+       },
+       {
+        "voice": "tom",
+        "model": "electro",
+        "tune": -8,
+        "decay": 0.7
+       },
+       {
+        "voice": "crash",
+        "model": "swell"
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "Sweet Ruin (Dark)": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "thump",
+        "tune": -2,
+        "decay": 0.45
+       },
+       {
+        "voice": "snare",
+        "model": "electro",
+        "tune": -4,
+        "decay": 0.4
+       },
+       {
+        "voice": "clap",
+        "model": "808",
+        "tune": -3
+       },
+       {
+        "voice": "hat",
+        "model": "fm",
+        "tune": -4
+       },
+       {
+        "voice": "openhat",
+        "model": "fm",
+        "tune": -7
+       },
+       {
+        "voice": "808",
+        "model": "reese",
+        "tune": -4
+       },
+       {
+        "voice": "rim",
+        "model": "classic",
+        "tune": -5
+       },
+       {
+        "voice": "tom",
+        "model": "electro",
+        "tune": -7
+       },
+       {
+        "voice": "crash",
+        "model": "china",
+        "tune": -4,
+        "decay": 2
+       },
+       {
+        "voice": "perc",
+        "model": "clang",
+        "tune": -8,
+        "decay": 1.4
+       },
+       {
+        "voice": "shaker",
+        "model": "classic"
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic",
+        "tune": -8
+       },
+       {
+        "voice": "snare",
+        "model": "slam",
+        "tune": -6,
+        "tone": -0.5
+       },
+       {
+        "voice": "crash",
+        "model": "swell",
+        "tune": -4,
+        "decay": 2.2
+       },
+       {
+        "voice": "perc",
+        "model": "laser",
+        "tune": -9
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "Heartbeat Only": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "thump",
+        "tune": -3,
+        "decay": 0.7,
+        "level": 0.9
+       },
+       {
+        "voice": "kick",
+        "model": "thump",
+        "tune": -1,
+        "decay": 0.4,
+        "level": 0.6
+       },
+       {
+        "voice": "clap",
+        "model": "snap",
+        "level": 0.5
+       },
+       {
+        "voice": "hat",
+        "model": "tick",
+        "decay": 0.02,
+        "level": 0.4
+       },
+       {
+        "voice": "openhat",
+        "model": "fm",
+        "tune": 3,
+        "decay": 1,
+        "level": 0.4
+       },
+       {
+        "voice": "808",
+        "model": "sub",
+        "tune": -4,
+        "decay": 2.5
+       },
+       {
+        "voice": "rim",
+        "model": "classic",
+        "tune": 5,
+        "level": 0.4
+       },
+       {
+        "voice": "tom",
+        "model": "tabla",
+        "level": 0.6
+       },
+       {
+        "voice": "crash",
+        "model": "swell",
+        "decay": 3,
+        "level": 0.5
+       },
+       {
+        "voice": "perc",
+        "model": "clang",
+        "tune": 12,
+        "decay": 2.5,
+        "level": 0.4
+       },
+       {
+        "voice": "shaker",
+        "model": "classic",
+        "decay": 0.4,
+        "level": 0.4
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic",
+        "tune": 12,
+        "level": 0.3
+       },
+       {
+        "voice": "crash",
+        "model": "ride",
+        "tune": 5,
+        "decay": 4,
+        "level": 0.4
+       },
+       {
+        "voice": "snare",
+        "model": "brush",
+        "decay": 0.6,
+        "level": 0.5
+       },
+       {
+        "voice": "perc",
+        "model": "wood",
+        "tune": 12,
+        "level": 0.4
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    }
+   }
+  }
+ }
+}

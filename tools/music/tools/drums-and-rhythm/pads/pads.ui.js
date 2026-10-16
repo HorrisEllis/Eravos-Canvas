@@ -2,7 +2,7 @@
 OrganismFactory.reg('eravos.pads', function (view) {
   const UI = view.ui, h = UI.h;
   const KEYS = '1234qwerasdfzxcv';
-  let banks = null, voices = [], sel = 0;
+  let banks = null, voices = [], models = {}, driveTypes = [], sel = 0;
   const grid = h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', flex: '1', minHeight: '180px' } });
   const pads = [];
   for (let i = 0; i < 16; i++) {
@@ -41,7 +41,14 @@ OrganismFactory.reg('eravos.pads', function (view) {
     const vs = UI.Select({ label: 'Pad ' + (sel + 1) + ' voice', options: voices, value: p.voice, onChange: (v) => view.emit('pad_edit', { index: sel, key: 'voice', value: v }) });
     insp.appendChild(vs.el);
     const k = (key, label, min, max, step, unit) => UI.Knob({ label, min, max, step, unit, value: p[key], default: key === 'level' ? 1 : key === 'decay' ? p.decay : 0, size: 30, accent: p.color, onChange: (v) => view.emit('pad_edit', { index: sel, key, value: v }) }).el;
-    insp.append(k('tune', 'Tune', -24, 24, 1, 'st'), k('decay', 'Decay', 0.02, 4, 0.01, 's'), k('level', 'Level', 0, 1.5, 0.01), k('pan', 'Pan', -1, 1, 0.01), k('drive', 'Drive', 0, 1, 0.01));
+    // 3.0: the model is the instrument — picking one plays it on this pad at once
+    const ms = models[p.voice] || ['classic'];
+    if (ms.length > 1) insp.appendChild(UI.Select({ label: 'Model', options: ms, value: p.model || 'classic', onChange: (v) => { view.emit('pad_edit', { index: sel, key: 'model', value: v }); view.emit('pad_press', { index: sel, velocity: 0.9 }); } }).el);
+    insp.append(k('tune', 'Tune', -24, 24, 1, 'st'), k('decay', 'Decay', 0.02, 4, 0.01, 's'), k('level', 'Level', 0, 1.5, 0.01), k('pan', 'Pan', -1, 1, 0.01), k('drive', 'Drive', 0, 1, 0.01), k('tone', 'Tone', -1, 1, 0.01));
+    if (p.model && p.model !== 'classic') {
+      insp.append(k('snap', 'Snap', 0, 1, 0.01), k('sweep', 'Sweep', 0, 48, 0.5, 'st'), k('body', 'Body', 0, 1, 0.01));
+      insp.appendChild(UI.Select({ label: 'Drive type', options: driveTypes, value: p.driveType || 'soft', onChange: (v) => view.emit('pad_edit', { index: sel, key: 'driveType', value: v }) }).el);
+    }
     insp.appendChild(UI.Select({ label: 'Choke', options: [0, 1, 2, 3, 4].map(v => ({ value: v, label: v ? 'group ' + v : 'none' })), value: p.choke, onChange: (v) => view.emit('pad_edit', { index: sel, key: 'choke', value: +v }) }).el);
     const col = h('input', { type: 'color', value: p.color, style: { width: '28px', height: '24px', border: 0, background: 'none' } });
     col.addEventListener('change', () => view.emit('pad_edit', { index: sel, key: 'color', value: col.value }));
@@ -54,13 +61,13 @@ OrganismFactory.reg('eravos.pads', function (view) {
   function drawPads() {
     if (!banks) return;
     banks[view.state.bank].forEach((p, i) => {
-      pads[i].firstChild.textContent = p.sample ? '🎵 ' + p.sample.name.replace(/\.[a-z0-9]+$/i, '') : (p.voice === 'sample' ? '＋ drop sound' : p.voice);
+      pads[i].firstChild.textContent = p.sample ? '🎵 ' + p.sample.name.replace(/\.[a-z0-9]+$/i, '') : (p.voice === 'sample' ? '＋ drop sound' : p.voice + (p.model && p.model !== 'classic' ? ' · ' + p.model : ''));
       pads[i].style.borderColor = i === sel ? p.color : '#2a3a50';
       pads[i].style.boxShadow = i === sel ? `inset 0 0 0 1px ${p.color}` : '';
       pads[i].style.setProperty('--pc', p.color);
     });
   }
-  view.on('state_sync', (s) => { if (s.banks) { banks = s.banks; voices = s.voices; drawPads(); drawInspector(); } });
+  view.on('state_sync', (s) => { if (s.banks) { banks = s.banks; voices = s.voices; models = s.models || {}; driveTypes = s.driveTypes || []; drawPads(); drawInspector(); } });
   view.on('pad_lit', (p) => {
     const el = pads[p.index]; if (!el) return;
     UI.atTime(view.ac, p.time || 0, () => {
