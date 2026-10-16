@@ -38,8 +38,20 @@
     canvas.addEventListener('auxclick', (e) => { if (e.button === 1) e.preventDefault(); });
     // the canvas never scrolls as a box (a focused input in an off-screen window would make the browser scroll it, shifting everything)
     canvas.addEventListener('scroll', () => { if (canvas.scrollTop || canvas.scrollLeft) { canvas.scrollTop = 0; canvas.scrollLeft = 0; } });
+    function scrollsInWindow(el, dy) {
+      const win = el && el.closest && el.closest('.wm-win'); if (!win) return false;
+      for (let n = el; n && n !== win.parentElement; n = n.parentElement) {
+        if (n.scrollHeight > n.clientHeight + 1 && /(auto|scroll)/.test(getComputedStyle(n).overflowY)
+          && (dy < 0 ? n.scrollTop > 0 : n.scrollTop + n.clientHeight < n.scrollHeight - 1)) return true;
+      }
+      return false;
+    }
     canvas.addEventListener('wheel', (e) => {
       if (e.target.closest && e.target.closest('.wm-body') && !(e.ctrlKey || e.metaKey)) return;
+      // 3.39 (RCA "the tool settings are absent and i cant use them"): the ⚙ panel lives on the window frame, not in its
+      // body, so the wheel panned the canvas instead of scrolling the panel — everything under PACKS was unreachable.
+      // Any element inside a window that can scroll in the wheel's direction keeps the wheel.
+      if (!(e.ctrlKey || e.metaKey) && (e.target.closest('.ts-panel') || scrollsInWindow(e.target, e.deltaY))) return;
       e.preventDefault();
       if (e.ctrlKey || e.metaKey) {
         const r = canvas.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;

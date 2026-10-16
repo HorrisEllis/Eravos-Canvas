@@ -344,6 +344,440 @@
       "attack": 0.003,
       "release": 0.15
      }
+    },
+    "Riddim Stair": {
+     "params": {
+      "lfoShape": "square",
+      "filterMode": "lowpass",
+      "cutoff": 140,
+      "depth": 4.4,
+      "res": 10,
+      "osc2": 0.9,
+      "sub": 0.75,
+      "drive": 0.7,
+      "shaper": 0.55,
+      "octave": -1,
+      "wubOn": true,
+      "wubStep": "1/4",
+      "wubLen": 8,
+      "wubSeq": [
+       "1/2",
+       "1/4",
+       "1/4t",
+       "1/8",
+       "1/8t",
+       "1/16",
+       "1/16t",
+       "1/32",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       ""
+      ]
+     }
+    },
+    "Yoi Drawn Talker": {
+     "params": {
+      "lfoShape": "draw",
+      "shapePts": [
+       [
+        0,
+        -1,
+        0.5
+       ],
+       [
+        0.2,
+        1,
+        0
+       ],
+       [
+        0.42,
+        0.15,
+        -0.4
+       ],
+       [
+        0.55,
+        0.55,
+        0.3
+       ],
+       [
+        0.62,
+        0.1,
+        0
+       ]
+      ],
+      "filterMode": "formant",
+      "vowelA": "OO",
+      "vowelB": "AE",
+      "cutoff": 400,
+      "depth": 3,
+      "res": 10,
+      "osc2": 0.6,
+      "sub": 0.6,
+      "drive": 0.55,
+      "shaper": 0.4,
+      "div": "1/8",
+      "octave": -1
+     }
+    },
+    "Brostep Hiccup": {
+     "params": {
+      "lfoShape": "draw",
+      "shapePts": [
+       [
+        0,
+        -1,
+        0
+       ],
+       [
+        0.06,
+        1,
+        0
+       ],
+       [
+        0.25,
+        -0.4,
+        -0.6
+       ],
+       [
+        0.5,
+        -1,
+        0
+       ],
+       [
+        0.53,
+        0.8,
+        0
+       ],
+       [
+        0.62,
+        -1,
+        0
+       ]
+      ],
+      "filterMode": "lowpass",
+      "cutoff": 180,
+      "depth": 4.8,
+      "res": 12,
+      "osc2": 0.8,
+      "sub": 0.55,
+      "drive": 0.85,
+      "shaper": 0.75,
+      "spread": 18,
+      "octave": -1,
+      "wubOn": true,
+      "wubStep": "1/4",
+      "wubLen": 8,
+      "wubSeq": [
+       "1/8:yoy",
+       "1/16",
+       "x",
+       "1/8t:yoy",
+       "1/4:draw",
+       "1/32",
+       "x",
+       "1/16:square",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       ""
+      ]
+     }
+    },
+    "Tearout Gnarl Seq": {
+     "params": {
+      "lfoShape": "sawdown",
+      "filterMode": "lowpass",
+      "cutoff": 120,
+      "depth": 5.2,
+      "res": 14,
+      "osc2": 1,
+      "sub": 0.5,
+      "drive": 1,
+      "shaper": 0.95,
+      "noise": 0.15,
+      "spread": 25,
+      "octave": -1,
+      "wubOn": true,
+      "wubStep": "1/8",
+      "wubLen": 16,
+      "wubSeq": [
+       "1/32",
+       "",
+       "1/16t",
+       "x",
+       "1/8",
+       "1/32",
+       "",
+       "x",
+       "1/16",
+       "1/16t",
+       "1/32",
+       "",
+       "x",
+       "1/8t",
+       "1/32",
+       "x"
+      ]
+     }
+    },
+    "Half-time Throat": {
+     "params": {
+      "lfoShape": "yoy",
+      "filterMode": "formant",
+      "vowelA": "UH",
+      "vowelB": "ER",
+      "formantShift": -2,
+      "cutoff": 300,
+      "depth": 3,
+      "res": 11,
+      "osc2": 0.7,
+      "sub": 0.8,
+      "drive": 0.6,
+      "shaper": 0.5,
+      "octave": -1,
+      "wubOn": true,
+      "wubStep": "1/4",
+      "wubLen": 8,
+      "wubSeq": [
+       "1/2",
+       "",
+       "",
+       "",
+       "1/4t",
+       "",
+       "1/8",
+       "x",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       ""
+      ]
+     }
+    },
+    "Robot Gate 1/16": {
+     "params": {
+      "lfoShape": "draw",
+      "shapePts": [
+       [
+        0,
+        1,
+        0
+       ],
+       [
+        0.45,
+        1,
+        0
+       ],
+       [
+        0.5,
+        -1,
+        0
+       ],
+       [
+        0.95,
+        -1,
+        0
+       ]
+      ],
+      "filterMode": "lowpass",
+      "div": "1/16",
+      "cutoff": 260,
+      "depth": 3.6,
+      "res": 7,
+      "osc2": 0.9,
+      "sub": 0.6,
+      "drive": 0.5,
+      "shaper": 0.45,
+      "octave": -1
+     }
+    },
+    "Talking Neuro Roll": {
+     "params": {
+      "lfoShape": "draw",
+      "shapePts": [
+       [
+        0,
+        -1,
+        -0.5
+       ],
+       [
+        0.25,
+        0.6,
+        0.4
+       ],
+       [
+        0.4,
+        -0.2,
+        -0.3
+       ],
+       [
+        0.6,
+        0.9,
+        0.5
+       ],
+       [
+        0.8,
+        -0.6,
+        0
+       ]
+      ],
+      "filterMode": "formant",
+      "vowelA": "IH",
+      "vowelB": "OH",
+      "formantShift": 1.5,
+      "cutoff": 500,
+      "depth": 3,
+      "res": 12,
+      "osc2": 0.75,
+      "sub": 0.45,
+      "drive": 0.75,
+      "shaper": 0.65,
+      "spread": 14,
+      "width": 0.4,
+      "octave": -1,
+      "wubOn": true,
+      "wubStep": "1/8",
+      "wubLen": 8,
+      "wubSeq": [
+       "1/16t:draw",
+       "",
+       "1/16t:draw",
+       "",
+       "1/32:draw",
+       "x",
+       "1/8:yoy",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       ""
+      ]
+     }
+    },
+    "Triplet Chew": {
+     "params": {
+      "lfoShape": "yoy",
+      "filterMode": "formant",
+      "vowelA": "OO",
+      "vowelB": "AH",
+      "cutoff": 380,
+      "depth": 3,
+      "res": 9,
+      "osc2": 0.65,
+      "sub": 0.65,
+      "drive": 0.5,
+      "shaper": 0.4,
+      "octave": -1,
+      "wubOn": true,
+      "wubStep": "1/4",
+      "wubLen": 4,
+      "wubSeq": [
+       "1/8t",
+       "1/8t",
+       "1/4t",
+       "1/16t",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       ""
+      ]
+     }
+    },
+    "Deep Stair Sub": {
+     "params": {
+      "lfoShape": "sine",
+      "filterMode": "lowpass",
+      "cutoff": 90,
+      "depth": 3.2,
+      "res": 5,
+      "osc2": 0.35,
+      "sub": 1,
+      "drive": 0.3,
+      "shaper": 0.2,
+      "subOct": "-2",
+      "octave": -1,
+      "wubOn": true,
+      "wubStep": "1/2",
+      "wubLen": 4,
+      "wubSeq": [
+       "1/1",
+       "1/2",
+       "1/4",
+       "1/8",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       ""
+      ]
+     }
+    },
+    "Stop-Start Drop": {
+     "params": {
+      "lfoShape": "square",
+      "filterMode": "lowpass",
+      "cutoff": 160,
+      "depth": 4.6,
+      "res": 11,
+      "osc2": 0.85,
+      "sub": 0.7,
+      "drive": 0.8,
+      "shaper": 0.7,
+      "octave": -1,
+      "wubOn": true,
+      "wubStep": "1/8",
+      "wubLen": 16,
+      "wubSeq": [
+       "1/16",
+       "",
+       "x",
+       "",
+       "1/8",
+       "x",
+       "1/32",
+       "",
+       "x",
+       "",
+       "1/16t",
+       "",
+       "1/4",
+       "",
+       "x",
+       "1/32"
+      ]
+     }
     }
    }
   }

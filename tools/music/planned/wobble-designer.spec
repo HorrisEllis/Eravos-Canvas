@@ -1,4 +1,7 @@
 # spec_id: eravos.organism.wobble-designer · version 1.0.0 · phase P38 · status planned · category sound-sources
+# 3.38: ABSORBED into eravos.wobble-bass — one tool per tool, no second wobble synth. Wub Lab grows inside Wobble Bass in
+# stages (specs/eravos.p38-wub-lab.spec). Stage 1 BUILT (drawn shape, wub-rate sequence, 4 more vowels). This file stays the
+# target for the stages still to come: wavetable oscillators + FM/ring/sync, distortion stack + OTT, vowel pad, RESAMPLE.
 identity:
   id: eravos.wobble-designer ; label: Wub Lab ; icon: 🌊 ; accent: "#7cff4f"
   comp_intent: Design dubstep / riddim / brostep basses from the ground up — talking wubs, yoi, growls, screeches, reese wubs — and write their rhythms.

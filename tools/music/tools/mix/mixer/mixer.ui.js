@@ -89,7 +89,7 @@ OrganismFactory.reg('eravos.mixer', function (view) {
     const el = h('div', { class: 'mx-strip mx-line ' + l.kind + (l.builtin ? ' builtin' : ''), style: { '--acc': l.kind === 'group' ? '#ffc35a' : '#c08bff' } });
     const kind = h('div', { class: 'mx-kind', text: l.kind === 'group' ? 'GROUP' : 'AUX · ' + (l.fx === 'plain' ? 'plain' : l.fx) });
     const name = h('div', { class: 'mx-name mx-rename', title: l.builtin ? 'the master reverb / echo (settings in Master FX)' : 'double-click to rename', text: l.name });
-    if (!l.builtin) name.addEventListener('dblclick', () => { const n = prompt('Line name', l.name); if (n) set({ name: n.slice(0, 24) }); });
+    if (!l.builtin) name.addEventListener('dblclick', () => UI.ask('Line name', l.name).then((n) => { if (n) set({ name: n.slice(0, 24) }); }));
     const m = meterEl(); let comp;
     if (l.builtin) {
       const ret = UI.Knob({ label: 'Return', min: 0, max: 1, step: 0.01, value: l.ret, default: l.id === 'reverb' ? 0.25 : 0.2, size: 34, onChange: (v) => set({ ret: v }) });

@@ -315,3 +315,13 @@ svg.wires path.wire.hot { stroke-width: 4.5; filter: drop-shadow(0 0 4px current
 #topbar > #slot-bar::-webkit-scrollbar, #topbar > #slot-bar-right::-webkit-scrollbar { display: none; }
 #topbar > .scrolls { -webkit-mask: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%); mask: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%); }
 @media (max-width: 1180px) { #logo { display: none; } }
+
+/* ---------- 3.39 ask dialog (replaces window.prompt — the desktop app has none) ---------- */
+.uk-ask-back { position: fixed; inset: 0; z-index: 10000; background: rgba(4, 7, 11, .55); backdrop-filter: blur(3px); display: grid; place-items: center; }
+.uk-ask { width: min(420px, 92vw); padding: 18px 18px 14px; border-radius: 12px; background: linear-gradient(180deg, var(--panel2), var(--panel)); border: 1px solid var(--line2);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .55), 0 0 0 1px rgba(0, 212, 255, .06) inset; display: grid; gap: 12px; }
+.uk-ask-label { font: 600 13px var(--font); color: var(--text); letter-spacing: .01em; }
+.uk-ask-in { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line2); background: var(--bg2); color: var(--text); outline: none; }
+.uk-ask-in:focus { border-color: var(--acc); box-shadow: 0 0 0 3px rgba(0, 212, 255, .18); }
+.uk-ask-row { display: flex; justify-content: flex-end; gap: 8px; }
+.uk-ask-ok { background: var(--acc); color: #041018; border-color: var(--acc); font-weight: 700; }

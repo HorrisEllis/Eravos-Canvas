@@ -1,9 +1,12 @@
-/* eravos.wobble-bass 2.1.0 — Wobble Bass (P2) · resolves F-11(wobble)
+/* eravos.wobble-bass 3.0.0 — Wobble Bass (P2) · resolves F-11(wobble) · Wub Lab stage 1 (P38)
  * Dubstep wobble/talking bass: tempo-division LFO that retriggers per note (phase reset),
  * 24 dB lowpass OR formant (vowel) filter bank, monophonic legato with glide.
  * Sub sine is summed after the filter (low-end safety — surfaced decision, see CHANGELOG).
  * 2.1 (3.26): free-rate LFO, retrigger on/off, LFO start phase, pitch dive, vibrato, formant shift, unison spread +
- * stereo width, noise, sub octave, LFO→volume (tremolo wub), output level. */
+ * stereo width, noise, sub octave, LFO→volume (tremolo wub), output level.
+ * 3.0 (Wub Lab stage 1): DRAW — your own wobble shape (points + a bend per segment, ≤ 32 points) · WUB SEQ — a rate roll:
+ * every step of 1–16 steps picks its own rate (1/1 … 1/32), shape, HOLD (keep going) or STOP (freeze shut); while it is on
+ * the sequence owns the wobble's phase on the bar grid and notes only play pitch · 4 more vowels (UH, AE, IH, ER). */
 (function () {
   'use strict';
   const S = OrganismSDK.STD;
@@ -15,7 +18,43 @@
     AH: { f: [730, 1090, 2440], g: [0, -4, -14] },
     EH: { f: [530, 1840, 2480], g: [0, -8, -12] },
     EE: { f: [270, 2290, 3010], g: [0, -12, -10] },
+    UH: { f: [640, 1190, 2390], g: [0, -5, -18] },
+    AE: { f: [660, 1720, 2410], g: [0, -6, -14] },
+    IH: { f: [390, 1990, 2550], g: [0, -10, -12] },
+    ER: { f: [490, 1350, 1690], g: [0, -6, -10] },
   };
+  const SHAPES = ['sine', 'sawdown', 'square', 'yoy', 'draw'];
+  const STEPS = { '1/16': 1, '1/8': 2, '1/4': 4, '1/2': 8, '1/1': 16 };   // wub-seq step length in 16ths
+  const MAXPTS = 32;
+  // a drawn shape: [[x, y, bend], …] — x 0..1 rising, first x = 0; y −1..1; bend −1..1 curves the segment to the NEXT point
+  // (the last segment wraps to the first point at x = 1). Pure: same points → same curve.
+  function cleanPts(pts) {
+    if (!Array.isArray(pts)) return null;
+    const out = pts.filter(q => Array.isArray(q) && q.length >= 2 && isFinite(q[0]) && isFinite(q[1])).slice(0, MAXPTS)
+      .map(q => [Math.max(0, Math.min(1, +q[0])), Math.max(-1, Math.min(1, +q[1])), Math.max(-1, Math.min(1, +q[2] || 0))]);
+    out.sort((a, b) => a[0] - b[0]); if (out.length < 2) return null; out[0][0] = 0;
+    return out.map(q => q.map(v => Math.round(v * 1000) / 1000));
+  }
+  function drawFn(pts) {
+    return (x) => {
+      let i = pts.length - 1; while (i > 0 && pts[i][0] > x) i--;
+      const a = pts[i], b = i + 1 < pts.length ? pts[i + 1] : [1, pts[0][1]], w = Math.max(1e-6, b[0] - a[0]);
+      let u = Math.max(0, Math.min(1, (x - a[0]) / w)); const k = a[2] || 0, e = 1 + 4 * Math.abs(k);
+      if (k > 0) u = Math.pow(u, e); else if (k < 0) u = 1 - Math.pow(1 - u, e);
+      return a[1] + (b[1] - a[1]) * u;
+    };
+  }
+  // drawn shape → PeriodicWave: 64 harmonics with Lanczos σ (sharp corners without ringing past the drawn line)
+  function drawWave(ac, pts, phase) {
+    const f = drawFn(pts), M = 1024, N = 64, y = new Float32Array(M), re = new Float32Array(N), im = new Float32Array(N);
+    for (let i = 0; i < M; i++) y[i] = f(((i / M) + (phase || 0)) % 1);
+    for (let n = 1; n < N; n++) { let a = 0, b = 0; for (let i = 0; i < M; i++) { const w = 2 * Math.PI * n * i / M; a += y[i] * Math.cos(w); b += y[i] * Math.sin(w); }
+      const sg = Math.sin(Math.PI * n / N) / (Math.PI * n / N); re[n] = 2 * a / M * sg; im[n] = 2 * b / M * sg; }
+    let dc = 0; for (let i = 0; i < M; i++) dc += y[i];
+    return { wave: ac.createPeriodicWave(re, im, { disableNormalization: true }), dc: dc / M };
+  }
+  // a wub-seq cell: '1/8' · '1/8:yoy' (rate + its own shape) · 'x' (stop: wobble frozen shut) · '' (hold: keep going)
+  function parseCell(c) { c = String(c || ''); if (c === 'x') return { stop: true }; const [d, sh] = c.split(':'); return DIVS.includes(d) ? { div: d, shape: SHAPES.includes(sh) ? sh : null } : null; }
 
   function lfoWave(ac, shape, phase) {
     // all shapes built so that value at phase 0 is the shape's start point (closed filter for sine/yoy)
@@ -42,7 +81,7 @@
   }
 
   OrganismFactory.define({
-    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '2.1.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
+    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '3.0.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
     category: 'Sound sources', blurb: 'Dubstep wobble / talking "yoi" bass locked to the tempo. The drop.',
     size: { w: 560, h: 600 }, minSize: { w: 420, h: 380 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
@@ -54,7 +93,8 @@
     ],
     config: [
       { key: 'div', type: 'enum', options: DIVS, default: '1/8', label: 'Wobble rate', group: 'WOBBLE' },
-      { key: 'lfoShape', type: 'enum', options: ['sine', 'sawdown', 'square', 'yoy'], default: 'sine', label: 'Shape', group: 'WOBBLE' },
+      { key: 'lfoShape', type: 'enum', options: SHAPES, default: 'sine', label: 'Shape', group: 'WOBBLE' },
+      { key: 'shapePts', type: 'array', default: [[0, -1, 0.5], [0.2, 1, 0], [0.42, 0.15, -0.4], [0.55, 0.55, 0.3], [0.62, 0.1, 0]], label: 'Drawn shape', group: 'WOBBLE', hidden: true },
       { key: 'depth', type: 'number', default: 3, min: 0, max: 6, step: 0.01, unit: 'oct', label: 'Depth', group: 'WOBBLE' },
       { key: 'lfoSync', type: 'boolean', default: true, label: 'Sync', group: 'WOBBLE' },
       { key: 'lfoHz', type: 'number', default: 4, min: 0.1, max: 24, step: 0.01, unit: 'Hz', label: 'Free rate', group: 'WOBBLE' },
@@ -62,6 +102,10 @@
       { key: 'lfoPhase', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Phase', group: 'WOBBLE' },
       { key: 'ampMod', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Vol wub', group: 'WOBBLE' },
       { key: 'vibrato', type: 'number', default: 0, min: 0, max: 100, step: 1, unit: 'c', label: 'Pitch wub', group: 'WOBBLE' },
+      { key: 'wubOn', type: 'boolean', default: false, label: 'Wub seq', group: 'WUB SEQ' },
+      { key: 'wubLen', type: 'integer', default: 8, min: 1, max: 16, label: 'Steps', group: 'WUB SEQ' },
+      { key: 'wubStep', type: 'enum', options: Object.keys(STEPS), default: '1/4', label: 'Step', group: 'WUB SEQ' },
+      { key: 'wubSeq', type: 'array', default: ['1/8', '', '1/16', '', '1/4t', 'x', '1/32', '1/8:yoy', '', '', '', '', '', '', '', ''], label: 'Wub steps', group: 'WUB SEQ', hidden: true },
       { key: 'filterMode', type: 'enum', options: ['lowpass', 'formant'], default: 'lowpass', label: 'Filter', group: 'FILTER' },
       { key: 'vowelA', type: 'enum', options: Object.keys(VOWELS), default: 'OO', label: 'Vowel A', group: 'FILTER' },
       { key: 'vowelB', type: 'enum', options: Object.keys(VOWELS), default: 'AH', label: 'Vowel B', group: 'FILTER' },
@@ -84,6 +128,8 @@
       { key: 'pitchDive', type: 'number', default: 0, min: -24, max: 24, step: 0.1, unit: 'st', label: 'Dive', group: 'ENV' },
       { key: 'diveTime', type: 'number', default: 0.08, min: 0.005, max: 1, step: 0.001, unit: 's', label: 'Dive time', group: 'ENV' },
     ],
+    ui_hooks: ['shape_pts', 'wub_seq'],
+    lib: { drawFn, cleanPts, parseCell, DIVS, SHAPES },   // shared with the window (same folder) so the drawing IS the sound
     defaultPreset: 'Classic Wub 1/8',
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, dsp = ctx.dsp, MT = window.MusicTheory;
@@ -145,17 +191,28 @@
       const bandScale = bands.map(bd => { const f = ac.createGain(), gg = ac.createGain(); uni.connect(f); f.connect(bd.b.frequency); uni.connect(gg); gg.connect(bd.g.gain); return { f, gg }; });
       let lfo = null;
       const waves = {};
-      const wave = (s, ph) => { const k = s + '@' + (ph || 0).toFixed(2); return waves[k] || (waves[k] = lfoWave(ac, s, ph || 0)); };
-      const curWave = () => wave(P.get('lfoShape'), P.get('lfoPhase'));
-      let curDiv = P.get('div');
+      // drawn shapes carry a DC term the oscillator cannot (PeriodicWave drops n = 0) → a ConstantSource adds it back
+      const drawDc = ac.createConstantSource(); drawDc.offset.value = 0; drawDc.connect(lfoBus); drawDc.start(); ctx.track(drawDc);
+      const wave = (s, ph) => {
+        if (s === 'draw') { const pts = cleanPts(P.get('shapePts')) || [[0, -1, 0], [0.5, 1, 0]], k = 'draw@' + JSON.stringify(pts) + (ph || 0).toFixed(2); return waves[k] || (waves[k] = drawWave(ac, pts, ph || 0)); }
+        const k = s + '@' + (ph || 0).toFixed(2); return waves[k] || (waves[k] = { wave: lfoWave(ac, s, ph || 0), dc: 0 });
+      };
+      let seqShape = null;                                  // the wub-seq step's own shape (null = the tool's Shape)
+      const curWave = () => wave(seqShape || P.get('lfoShape'), P.get('lfoPhase'));
+      let curDiv = P.get('div'), frozen = false;
+      const lfoLog = [];                                    // [{t, div, shape, stop}] last 64 restarts — the tests read it
       function lfoFreq(div) { return P.get('lfoSync') ? 1 / MT.divisionSec(div, ctx.bpm) : P.get('lfoHz'); }
-      function startLfo(t, div) {
+      function setWave(w, t) { lfo.setPeriodicWave(w.wave); drawDc.offset.setValueAtTime(w.dc, t === undefined ? ac.currentTime : t); }
+      function startLfo(t, div, o) {
+        o = o || {};
         if (lfo) { try { lfo.stop(t); } catch (e) {} const old = lfo; old.onended = () => { try { old.disconnect(); } catch (e) {} ctx.untrack(old); }; }
-        lfo = ac.createOscillator(); lfo.setPeriodicWave(curWave());
-        curDiv = div || P.get('div');
-        lfo.frequency.value = lfoFreq(curDiv); lfo.frequency.setValueAtTime(lfoFreq(curDiv), t);
+        lfo = ac.createOscillator(); setWave(curWave(), t);
+        curDiv = div || P.get('div'); frozen = !!o.stop;
+        const f = frozen ? 1e-4 : lfoFreq(curDiv);          // STOP = the shape's start point, held (shut for the built-in shapes)
+        lfo.frequency.value = f; lfo.frequency.setValueAtTime(f, t);
         lfo.connect(lfoBus); lfo.start(t);
         ctx.track(lfo);
+        lfoLog.push({ t, div: curDiv, shape: seqShape || P.get('lfoShape'), stop: frozen }); if (lfoLog.length > 64) lfoLog.shift();
       }
       startLfo(ac.currentTime, P.get('div'));
 
@@ -191,12 +248,22 @@
       applyTone(); applyFilter();
       ['osc2', 'sub', 'drive', 'shaper', 'level', 'spread', 'width', 'noise', 'ampMod', 'vibrato'].forEach(k => P.onChange(k, applyTone));
       ['filterMode', 'cutoff', 'res', 'depth', 'vowelA', 'vowelB', 'formantShift'].forEach(k => P.onChange(k, applyFilter));
-      ['lfoShape', 'lfoPhase'].forEach(k => P.onChange(k, () => { if (lfo) lfo.setPeriodicWave(curWave()); }));
-      const retime = () => { if (lfo) { lfo.frequency.cancelScheduledValues(ac.currentTime); lfo.frequency.value = lfoFreq(curDiv); } };
+      ['lfoShape', 'lfoPhase', 'shapePts'].forEach(k => P.onChange(k, () => { if (lfo) setWave(curWave()); }));
+      const retime = () => { if (lfo && !frozen) { lfo.frequency.cancelScheduledValues(ac.currentTime); lfo.frequency.value = lfoFreq(curDiv); } };
       P.onChange('div', (v) => { curDiv = v; retime(); }); P.onChange('lfoSync', retime); P.onChange('lfoHz', retime);
       let pendingBpm = false;
       ctx.onBpm(() => { pendingBpm = true; });
-      ctx.onTick((t) => { if (pendingBpm && lfo) { lfo.frequency.setValueAtTime(lfoFreq(curDiv), t.time); pendingBpm = false; } });
+      ctx.onTick((t) => {
+        if (pendingBpm && lfo && !frozen) { lfo.frequency.setValueAtTime(lfoFreq(curDiv), t.time); pendingBpm = false; }
+        // WUB SEQ: on each step boundary of the bar grid the step's cell restarts the wobble (phase 0) at its own rate/shape
+        if (!P.get('wubOn')) return;
+        const len = STEPS[P.get('wubStep')] || 4; if (t.step16 % len) return;
+        const n = Math.max(1, Math.min(16, P.get('wubLen'))), cell = parseCell((P.get('wubSeq') || [])[Math.floor(t.step16 / len) % n]);
+        if (!cell) return;                                  // hold: the wobble keeps rolling
+        if (cell.stop) { seqShape = null; startLfo(t.time, curDiv, { stop: true }); return; }
+        seqShape = cell.shape; startLfo(t.time, cell.div);
+      });
+      P.onChange('wubOn', (on) => { if (!on) { seqShape = null; if (frozen) startLfo(ac.currentTime, P.get('div')); } });
 
       // --- notes (mono legato)
       let held = null; // {note, off}
@@ -222,7 +289,8 @@
           const dive = P.get('pitchDive');
           if (dive && !legato) setFreq(f, t, P.get('diveTime'), f * Math.pow(2, dive / 12)); // 2.1: pitch dive into the note
           else setFreq(f, t, legato ? Math.max(0.003, P.get('glide') * 0.5) : 0);
-          if (P.get('retrig') || !lfo) startLfo(t, o.wobbleDiv || P.get('div'));   // phase reset per non-slide note
+          if (P.get('wubOn')) { /* the wub sequence owns the wobble's phase and rate; notes play pitch only */ }
+          else if (P.get('retrig') || !lfo) startLfo(t, o.wobbleDiv || P.get('div'));   // phase reset per non-slide note
           else if (o.wobbleDiv && o.wobbleDiv !== curDiv) { curDiv = o.wobbleDiv; lfo.frequency.setValueAtTime(lfoFreq(curDiv), t); }
           const g = amp.gain; g.cancelScheduledValues(t);
           if (!legato) { g.setValueAtTime(0, t); }
@@ -252,8 +320,18 @@
       ctx.onKey(() => ctx.syncUI());
       ctx.audition = (p) => noteOn(p.note || 45, p.velocity || 0.9, ac.currentTime, { duration: p.duration || 1.2 });
       ctx.auditionOff = (p) => noteOff(p.note || 45);
-      ctx.stateExtra = () => ({ vowels: VOWELS, key: ctx.key });
-      ctx.internals = { lp1, lp2, bands, lfoBus, amp, uni, trem, vibG, noiseG, panA, panB, saw2, sub, get lfo() { return lfo; } };
+      ctx.onUI('shape_pts', { type: 'object', required: ['points'] }, (p) => {
+        const pts = cleanPts(p.points); if (!pts) return ctx.fault('RUNTIME_002', 'a drawn shape needs 2–32 points [x, y, bend]');
+        P.set('shapePts', pts); if (P.get('lfoShape') !== 'draw') P.set('lfoShape', 'draw');
+      });
+      ctx.onUI('wub_seq', { type: 'object', required: ['cells'] }, (p) => {
+        if (!Array.isArray(p.cells)) return ctx.fault('RUNTIME_002', 'wub_seq needs cells[]');
+        const cells = Array.from({ length: 16 }, (_, i) => { const c = String(p.cells[i] || ''); return c === 'x' || parseCell(c) ? c : ''; });
+        P.set('wubSeq', cells); if (p.on !== undefined) P.set('wubOn', !!p.on);
+      });
+      ctx.shapeAt = (x) => drawFn(cleanPts(P.get('shapePts')) || [[0, -1, 0], [0.5, 1, 0]])(((x % 1) + 1) % 1);
+      ctx.stateExtra = () => ({ vowels: VOWELS, key: ctx.key, divs: DIVS, shapes: SHAPES });
+      ctx.internals = { lp1, lp2, bands, lfoBus, amp, uni, trem, vibG, noiseG, panA, panB, saw2, sub, drawDc, lfoLog, get lfo() { return lfo; }, get frozen() { return frozen; } };
       return {};
     },
   });

@@ -1,7 +1,7 @@
 # ============================================================
 # ERAVOS ORGANISM SPEC — WOBBLE BASS
 # spec_id:      eravos.organism.wobble-bass
-# version:      2.0.0
+# version:      3.0.0 (Wub Lab stage 1 — P38)
 # phase:        P2
 # resolves:     F-11(wobble)
 # status:       canonical
@@ -28,6 +28,23 @@ engine:
   glide: slide notes ramp frequency over glideTime, no retrigger
   tempo: transport bpm change → LFO frequency updated with setValueAtTime at next tick
 
+wub lab stage 1 (3.0.0):
+  draw shape:  lfoShape 'draw' = shapePts [[x 0..1, y −1..1, bend −1..1] ×2..32], first x = 0, last segment wraps to the first
+               point. bend > 0 = the segment moves late (u^(1+4b)), < 0 = early. Rendered as a 64-harmonic PeriodicWave with
+               Lanczos σ; its DC term (dropped by PeriodicWave) is added back by a ConstantSource → the heard wobble = the drawing.
+               The window and the engine share ONE function (descriptor.lib.drawFn) — the picture cannot drift from the sound.
+  wub seq:     wubOn ; wubLen 1..16 ; wubStep 1/16|1/8|1/4|1/2|1/1 ; wubSeq[16] cells: '1/8' | '1/8:yoy' (rate + own shape) |
+               'x' (stop: frozen on the shape's start point, shut for built-ins) | '' (hold: keeps rolling).
+               On each step boundary of the bar grid (transport step16, sample-exact tick time) the cell restarts the wobble at
+               phase 0. While on, the sequence owns phase and rate: notes play pitch only (no per-note retrig, wobbleDiv ignored).
+               Off after a stop → the wobble un-freezes at Wobble rate.
+  vowels:      + UH, AE, IH, ER (F1/F2/F3 from the Peterson–Barney averages, rounded)
+  ui hooks:    shape_pts {points} (refused with RUNTIME_002 if < 2 valid points) ; wub_seq {cells[], on?} (unknown cells → hold)
+  window:      SHAPE editor (drag, click adds, double-click removes, shift-drag / wheel bends — "up" always pushes the curve up,
+               snap 1/32 × 1/8, starts: Yoi Talk Saw Hiccup Stair Gate) ; WUB SEQ rate roll (rows = rates fast→slow + stop,
+               bottom row cycles that step's shape, live playhead, fills: Riddim Stair Brostep Halftime, seeded Tear,
+               Faster / Slower, copy 1–8 → 9–16, Clear)
+
 config:
   div:       enum [1/1,1/2,1/4,1/4t,1/8,1/8t,1/16,1/16t,1/32] def 1/8
   filterMode: enum [lowpass, formant] def lowpass
@@ -47,7 +64,8 @@ hooks:
   - wobble.hook.mod_depth  STD.mod_in(depth)
   - wobble.hook.mod_drive  STD.mod_in(drive)
 
-presets: [Classic Wub 1/8, Half-time Growl 1/4t, Yoi Talker (formant OO→AH), Robot 1/16 square, Sub Pressure]
+presets: factory pack (packs/factory/pack.json) — 29, incl. 3.0: Riddim Stair, Yoi Drawn Talker, Brostep Hiccup, Tearout Gnarl Seq,
+         Half-time Throat, Robot Gate 1/16, Talking Neuro Roll, Triplet Chew, Deep Stair Sub, Stop-Start Drop
 
 ui:
   hero: vowel/filter display — live curve of filter response with moving LFO position (reads kernel-owned analyser, not simulated)
@@ -84,3 +102,7 @@ dependencies:
     - wobble.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
   works_with: [eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
+  - 3.0: drawn shape passes exactly through its points; bend moves a segment late/early; < 2 points → RUNTIME_002, no change
+  - 3.0: drawn gate renders open half / shut half at ±0.5 on the LFO bus (DC kept) — offline render
+  - 3.0: wub seq [1/4, 1/16:yoy, hold, stop] at 1/4 steps restarts at 0.05, 0.55, (hold), 1.55 s … exactly, twice per 2 bars
+  - 3.0: wub seq on → notes never restart the wobble; off → retrig per note as before ; off after stop → un-frozen

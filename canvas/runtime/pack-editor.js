@@ -29,7 +29,7 @@
       else { const r = CP().user.putPreset(saveTo.value, tool, n, { params: current() }); if (r && r.ok) say('Saved “' + n + '” in ' + CP().get(saveTo.value).label + '.'); else say((r && r.errors || ['could not save']).join(' · '), true); }
       saveName.value = ''; setTimeout(paint, 60);
     } });
-    const newPack = UI.Button({ label: '＋ New pack', hint: 'a pack of your own for this tool — export it to share', onClick: () => { const l = prompt('Name of the new pack', 'My ' + d.label + ' sounds'); if (!l) return; const id = CP().user.create(tool, l); openPacks.add(id); paint(); say('Made the pack “' + l + '”.'); } });
+    const newPack = UI.Button({ label: '＋ New pack', hint: 'a pack of your own for this tool — export it to share', onClick: () => UI.ask('Name of the new pack', 'My ' + d.label + ' sounds').then((l) => { if (!l) return; const id = CP().user.create(tool, l); openPacks.add(id); paint(); say('Made the pack “' + l + '”.'); }) });
     const file = h('input', { type: 'file', accept: '.json,application/json', style: { display: 'none' } });
     file.addEventListener('change', async () => {
       const f = file.files[0]; file.value = ''; if (!f) return; let obj; try { obj = JSON.parse(await f.text()); } catch (e) { say('That file is not JSON: ' + e.message, true); return; }
@@ -50,7 +50,7 @@
         tog, h('b', { class: 'pe-label', text: p.label }), h('span', { class: 'pe-badge ' + (isMine || user ? 'mine' : 'ship'), text: isMine ? 'my presets' : user ? 'yours' : 'shipped' }),
         h('span', { class: 'uk-hint', text: names.length + ' preset' + (names.length === 1 ? '' : 's') }), h('span', { class: 'wm-spacer' }),
         isMine ? null : h('button', { class: 'pe-act', text: '⤓', title: 'export this pack (.json)', onclick: () => download(p.id + '.pack.json', CP().user.export(p.id)) }),
-        user ? h('button', { class: 'pe-act', text: '✎', title: 'rename pack', onclick: () => { const l = prompt('Pack name', p.label); if (l) { CP().user.rename(p.id, l); paint(); } } }) : null,
+        user ? h('button', { class: 'pe-act', text: '✎', title: 'rename pack', onclick: () => UI.ask('Pack name', p.label).then((l) => { if (l) { CP().user.rename(p.id, l); paint(); } }) }) : null,
         user ? h('button', { class: 'pe-act bad', text: '🗑', title: 'delete this pack', onclick: () => { if (confirm('Delete the pack “' + p.label + '” and its presets?')) { CP().user.remove(p.id); paint(); } } }) : null,
       ]);
       const c = h('div', { class: 'pe-pack' + (on ? '' : ' off') }, [head]);
@@ -64,7 +64,7 @@
             h('button', { class: 'pe-name', text: n, title: on ? 'load it' : 'switch the pack on to load it', disabled: !on, onclick: () => { view.emit('preset_load', { name: key }); setTimeout(paint, 40); } }),
             h('button', { class: 'pe-act', text: editable ? '✎' : '👁', title: editable ? 'edit values' : 'see values', onclick: () => { editing = { pack: p.id, name: n, key, editable }; paintEdit(); } }),
             h('button', { class: 'pe-act', text: '⧉', title: 'copy into My presets', onclick: () => { const v = valueOf(p.id, n, key); view.emit('preset_put', { name: uniq(n), value: { params: v } }); setTimeout(paint, 60); say('Copied “' + n + '” into My presets.'); } }),
-            editable ? h('button', { class: 'pe-act', text: 'Aa', title: 'rename', onclick: () => { const t = prompt('Preset name', n); if (!t || t === n) return; if (isMine) view.emit('preset_rename', { from: n, to: t }); else CP().user.renamePreset(p.id, tool, n, t); setTimeout(paint, 60); } }) : null,
+            editable ? h('button', { class: 'pe-act', text: 'Aa', title: 'rename', onclick: () => UI.ask('Preset name', n).then((t) => { if (!t || t === n) return; if (isMine) view.emit('preset_rename', { from: n, to: t }); else CP().user.renamePreset(p.id, tool, n, t); setTimeout(paint, 60); }) }) : null,
             editable ? h('button', { class: 'pe-act bad', text: '×', title: 'delete', onclick: () => { if (!confirm('Delete “' + n + '”?')) return; if (isMine) view.emit('preset_delete', { name: n }); else CP().user.removePreset(p.id, tool, n); if (editing && editing.name === n) { editing = null; paintEdit(); } setTimeout(paint, 60); } }) : null,
           ]));
         });

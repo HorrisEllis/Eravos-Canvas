@@ -49,7 +49,7 @@ OrganismFactory.reg('eravos.song-recorder', function (view) {
     heads.innerHTML = ''; heads.appendChild(h('div', { class: 'sr-hruler', style: { height: RH + 'px' } }, [h('span', { text: `${st.lanes.length} lane${st.lanes.length === 1 ? '' : 's'} · ${st.clips.length} clip${st.clips.length === 1 ? '' : 's'}` })]));
     st.lanes.forEach(l => {
       const nm = h('span', { class: 'sr-lname', text: l.name, title: 'double-click to rename' });
-      nm.ondblclick = () => { const v = prompt('Lane name', l.name); if (v) view.emit('lane_edit', { id: l.id, patch: { name: v } }); };
+      nm.ondblclick = () => UI.ask('Lane name', l.name).then((v) => { if (v) view.emit('lane_edit', { id: l.id, patch: { name: v } }); });
       const tog = (k, t, title) => { const b = h('button', { class: 'sr-tg ' + k + (l[k] ? ' on' : ''), text: t, title }); b.onclick = () => view.emit('lane_edit', { id: l.id, patch: { [k]: !l[k] } }); return b; };
       const arm = h('button', { class: 'sr-tg arm' + (st.armed === l.id ? ' on' : ''), text: '●', title: 'arm: the next take records onto this lane' }); arm.onclick = () => view.emit('lane_arm', { id: l.id });
       const vol = UI.NumberDrag({ min: -60, max: 12, step: 0.5, value: l.vol, format: (v) => (v > 0 ? '+' : '') + (+v).toFixed(1), onChange: (v) => view.emit('lane_edit', { id: l.id, patch: { vol: v } }) });
