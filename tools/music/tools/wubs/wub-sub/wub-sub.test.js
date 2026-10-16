@@ -7,10 +7,10 @@ describe('tool · Wub Sub — the low end', () => {
     OrganismFactory.handle(sub).ctx.params.set('follow', follow !== false);
     return { U, osc, sub, sc: OrganismFactory.handle(sub).ctx };
   }
-  it('follows a note sent to a Wub Osc, two octaves down (A2 → 27.5 Hz)', async () => {
+  it('follows a note sent to a Wub Osc, at the Wub Osc’s own pitch (A2 → 55 Hz)', async () => {
     const { U, osc } = rig(1); TH.note(U, osc, 45, 0.05, { duration: 0.8 });
     const b = await TH.render(U); assert.gt(TH.rms(b, 0.3, 0.7), 0.01, 'sounds');
-    assert.near(TH.acFreq(b, 0.3, 0.75, 15, 200), 27.5, 1, 'pitch');
+    assert.near(TH.acFreq(b, 0.3, 0.75, 35, 200), 55, 1.5, 'pitch');
   });
   it('stays silent when Follow is off; a note sent to it plays', async () => {
     let r = rig(0.6, false); TH.note(r.U, r.osc, 45, 0.05, { duration: 0.4 });

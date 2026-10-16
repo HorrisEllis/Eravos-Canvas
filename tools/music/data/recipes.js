@@ -91,6 +91,25 @@
       { op: 'wire', from: ['chords', 'saw.hook.audio_out'], to: ['wide', 'fx.hook.audio_in'] },
     ],
   });
+  // ---- 3.37: the Wub rig — a dancehall-style dubstep drop built from the separate Wubs tools, already wired
+  R.register({
+    id: 'eravos.recipe.wub-drop', label: 'Wub Drop (dancehall style)', icon: '🔊', accent: '#ff2266', genome: 'eravos.genome.music',
+    tagline: 'Wub Osc → Wub Filter (talking mouth) → Destroyer, Wub Rate opening it, Wub Sub under it, a half-time beat at 140',
+    steps: [
+      { op: 'mount', organism: 'eravos.pads', as: 'pads', at: [0, 0] },
+      { op: 'mount', organism: 'eravos.wub-osc', as: 'osc', at: [0, 520], preset: 'Dancehall Growl Stack (FM 1:1)' },
+      { op: 'mount', organism: 'eravos.wub-filter', as: 'mouth', at: [540, 520], preset: 'Bun Dem Throat (OO → AE)' },
+      { op: 'mount', organism: 'eravos.fx-destroyer', as: 'grit', at: [1080, 520], preset: 'Fold Growl' },
+      { op: 'mount', organism: 'eravos.wub-rate', as: 'rate', at: [540, 1060], preset: 'Dancehall Switch-up' },
+      { op: 'mount', organism: 'eravos.wub-sub', as: 'sub', at: [0, 1060], preset: 'Clean Sine' },
+      { op: 'mount', organism: 'eravos.sequencer', as: 'seq', at: [500, 0] },
+      { op: 'event', target: 'seq', topic: 'starter_load', payload: { name: 'dubstep half-time 140' } },
+      { op: 'wire', from: ['seq', 'seq.hook.fire_out'], to: ['pads', 'pads.hook.seq_fire_in'] },
+      { op: 'wire', from: ['osc', 'wubo.hook.audio_out'], to: ['mouth', 'fx.hook.audio_in'] },
+      { op: 'wire', from: ['mouth', 'fx.hook.audio_out'], to: ['grit', 'fx.hook.audio_in'] },
+      { op: 'wire', from: ['rate', 'wubrate.hook.mod_out'], to: ['mouth', 'wubf.hook.mod_wub'] },
+    ],
+  });
   R.register({
     id: 'eravos.recipe.quick-beat', label: 'Quick Beat', icon: '🥁', accent: '#00ff88', genome: 'eravos.genome.music',
     tagline: 'Drum machine + sequencer, wired, ready to play',

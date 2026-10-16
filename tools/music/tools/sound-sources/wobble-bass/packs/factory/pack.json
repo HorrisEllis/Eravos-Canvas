@@ -778,6 +778,165 @@
        "1/32"
       ]
      }
+    },
+    "Bun Dem Growl (dancehall drop)": {
+     "params": {
+      "wubOn": true,
+      "wubStep": "1/4",
+      "wubLen": 8,
+      "wubSeq": [
+       "1/8",
+       "1/8",
+       "1/16",
+       "1/8t",
+       "1/8:yoy",
+       "1/16:yoy",
+       "1/32",
+       "x",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       ""
+      ],
+      "lfoShape": "yoy",
+      "filterMode": "formant",
+      "vowelA": "OO",
+      "vowelB": "AH",
+      "formantShift": 2,
+      "cutoff": 500,
+      "depth": 4.5,
+      "res": 12,
+      "osc2": 0.8,
+      "sub": 0.55,
+      "subOct": "0",
+      "drive": 0.9,
+      "shaper": 0.75,
+      "gritMode": "fold",
+      "octave": -1,
+      "glide": 0.05,
+      "spread": 10,
+      "width": 0.3
+     }
+    },
+    "Sound-System Screech": {
+     "params": {
+      "div": "1/16",
+      "lfoShape": "sawdown",
+      "filterMode": "lowpass",
+      "cutoff": 700,
+      "depth": 4,
+      "res": 16,
+      "osc2": 0.6,
+      "sub": 0.45,
+      "subOct": "0",
+      "drive": 0.9,
+      "shaper": 0.85,
+      "gritMode": "fold",
+      "noise": 0.08,
+      "spread": 20,
+      "width": 0.5,
+      "octave": -1
+     }
+    },
+    "Dancehall Yoi Stabs": {
+     "params": {
+      "wubOn": true,
+      "wubStep": "1/8",
+      "wubLen": 8,
+      "wubSeq": [
+       "1/16:yoy",
+       "x",
+       "1/16:yoy",
+       "x",
+       "1/8:yoy",
+       "",
+       "x",
+       "1/32",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       ""
+      ],
+      "filterMode": "formant",
+      "vowelA": "OO",
+      "vowelB": "EH",
+      "cutoff": 450,
+      "depth": 4,
+      "res": 11,
+      "osc2": 0.7,
+      "sub": 0.6,
+      "subOct": "0",
+      "drive": 0.8,
+      "shaper": 0.6,
+      "gritMode": "fold",
+      "octave": -1
+     }
+    },
+    "Half-time Talk Roll": {
+     "params": {
+      "wubOn": true,
+      "wubStep": "1/4",
+      "wubLen": 16,
+      "wubSeq": [
+       "1/4",
+       "1/8",
+       "1/8t",
+       "1/8t",
+       "1/16",
+       "1/16",
+       "1/32",
+       "x",
+       "1/4:yoy",
+       "",
+       "1/8",
+       "1/16t",
+       "1/16t",
+       "1/16t",
+       "1/32",
+       "x"
+      ],
+      "filterMode": "formant",
+      "vowelA": "OH",
+      "vowelB": "AE",
+      "cutoff": 420,
+      "depth": 4.2,
+      "res": 11,
+      "osc2": 0.75,
+      "sub": 0.6,
+      "subOct": "0",
+      "drive": 0.85,
+      "shaper": 0.7,
+      "gritMode": "asym",
+      "octave": -1,
+      "glide": 0.06
+     }
+    },
+    "Fold Growl Wub 1/8": {
+     "params": {
+      "div": "1/8",
+      "lfoShape": "sine",
+      "filterMode": "lowpass",
+      "cutoff": 320,
+      "depth": 5,
+      "res": 12,
+      "osc2": 0.8,
+      "sub": 0.5,
+      "subOct": "0",
+      "drive": 0.7,
+      "shaper": 0.8,
+      "gritMode": "fold",
+      "octave": -1,
+      "spread": 8,
+      "width": 0.25
+     }
     }
    }
   }

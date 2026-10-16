@@ -19,7 +19,7 @@
      "params": {
       "follow": true,
       "wave": "sine",
-      "octave": -2,
+      "octave": -1,
       "cut": 150,
       "glide": 0.05,
       "level": 0.8
@@ -28,7 +28,7 @@
     "Warm Phone Sub": {
      "params": {
       "wave": "warm",
-      "octave": -2,
+      "octave": -1,
       "cut": 220,
       "level": 0.8
      }
@@ -36,7 +36,7 @@
     "Triangle Punch": {
      "params": {
       "wave": "triangle",
-      "octave": -2,
+      "octave": -1,
       "cut": 180,
       "attack": 0.002,
       "release": 0.08
@@ -45,18 +45,10 @@
     "808 Slide": {
      "params": {
       "wave": "sine",
-      "octave": -2,
+      "octave": -1,
       "glide": 0.18,
       "release": 0.4,
       "cut": 160
-     }
-    },
-    "Deep (−3 oct)": {
-     "params": {
-      "wave": "sine",
-      "octave": -3,
-      "cut": 90,
-      "level": 1
      }
     },
     "Own Notes (no follow)": {
@@ -65,6 +57,14 @@
       "wave": "sine",
       "octave": -1,
       "cut": 150
+     }
+    },
+    "Deep (an octave under)": {
+     "params": {
+      "wave": "sine",
+      "octave": -2,
+      "cut": 90,
+      "level": 1
      }
     }
    }
