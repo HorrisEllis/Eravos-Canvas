@@ -27,14 +27,18 @@
       h('div', { class: 'ap-body' }, [rail, main, detail]), foot,
     ]);
     ov.appendChild(box);
-    function close() { ov.remove(); document.removeEventListener('keydown', onKey, true); unsub(); if (open && open.ov === ov) open = null; }
+    function close() { ov.remove(); document.removeEventListener('keydown', onKey, true); unsub(); unsubCat(); if (open && open.ov === ov) open = null; }
     closeBtn.onclick = close;
     ov.addEventListener('mousedown', (e) => { if (e.target === ov) close(); });
 
-    const defs = () => F.defined().filter(d => !d.hidden);
+    // P38 catalog: installed tools (defined) + tools the catalog offers but this canvas has not installed (cards say so; adding installs)
+    const Cat = global.Catalog;
+    const avail = () => Cat ? Cat.available().filter(t => !Cat.isRemoved(t.id)).map(t => ({ id: t.id, label: t.label, icon: t.icon, accent: t.accent, blurb: t.summary, category: t.category, presets: {}, _avail: t })) : [];
+    const defs = () => F.defined().filter(d => !d.hidden && !(Cat && Cat.isRemoved(d.id))).concat(avail());
+    const NODEP = { pending: [], toolbar: [], services: [], inputs: [], outputs: [], works_with: [], notes: [], mode: null, modeLabel: null };
     const depOf = new Map();
-    const dep = (d) => { if (!depOf.has(d.id)) depOf.set(d.id, X.deps(d)); return depOf.get(d.id); };
-    const unsub = X.onChange(() => { depOf.clear(); render(); });
+    const dep = (d) => { if (d._avail) return NODEP; if (!depOf.has(d.id)) depOf.set(d.id, X.deps(d)); return depOf.get(d.id); };
+    const unsub = X.onChange(() => { depOf.clear(); render(); }), unsubCat = Cat ? Cat.onChange(() => { depOf.clear(); render(); }) : () => {};
 
     // categories: those of active modes first (their order), then every other mode's, then anything else
     // 3.26: inside a mode, the menu shows that mode's tools only — other modes' tools stay one search (or the Modes page) away
@@ -62,7 +66,8 @@
 
     function chip(text, cls, title) { return h('span', { class: 'ap-chip ' + (cls || ''), text, title: title || '' }); }
 
-    function add(d) {
+    async function add(d) {
+      if (d._avail) { S.toast(`Installing ${d.icon || ''} ${d.label}…`, '', 1500); const got = await Cat.install(d.id, S.K); if (!got.includes(d.id)) { S.toast(`${d.label} could not be installed — details: the red dot, top right.`, 'bad', 6000); return; } }
       const id = F.spawn(d.id);
       if (id) S.toast(`${d.icon || ''} ${d.label} added`, 'good', 1800);
       close();
@@ -132,8 +137,12 @@
         if (dd.modeLabel && !X.isActive(dd.mode)) chips.push(chip(((X.mode_(dd.mode) || {}).icon || '') + ' ' + dd.modeLabel, 'mode', 'belongs to this mode — adding the tool does not switch the mode on'));
         if (dd.pending.length) chips.push(chip('＋' + dd.pending.length + ' toolbar', 'new', 'adds: ' + dd.pending.map(u => u.label).join(', ')));
         else if (dd.toolbar.length) chips.push(chip('ready', 'built', 'everything it needs is already on'));
-        const card = h('div', { class: 'ap-card', tabindex: '-1', style: { '--acc': d.accent || '#00d4ff' }, 'data-id': d.id }, [
-          h('span', { class: 'ap-card-ic', text: d.icon || '◻' }),
+        const meta = Cat && Cat.meta(d.id), np = d._avail ? d._avail.presets : Object.keys(d.presets || {}).length;
+        if (d._avail) chips.unshift(chip('not installed', 'new', 'adding it installs it (it stays installed until you remove it)'));
+        if (np) chips.push(chip(np + ' presets', 'dim', 'presets in its packs'));
+        const thumb = meta && meta.preview ? h('img', { class: 'ap-card-img', src: meta.preview, alt: '', loading: 'lazy', onerror: (e) => e.target.remove() }) : null;
+        const card = h('div', { class: 'ap-card' + (d._avail ? ' avail' : ''), tabindex: '-1', style: { '--acc': d.accent || '#00d4ff' }, 'data-id': d.id }, [
+          thumb || h('span', { class: 'ap-card-ic', text: d.icon || '◻' }),
           h('div', { class: 'ap-card-tx' }, [h('b', { text: d.label }), h('small', { text: d.blurb || '' }), h('div', { class: 'ap-chiprow' }, chips)]),
         ]);
         card.onclick = () => select(d.id); card.ondblclick = () => add(d);
@@ -149,7 +158,7 @@
     // ---------------------------------------------------------------- detail = the dependency list
     function renderDetail() {
       detail.innerHTML = '';
-      const d = state.sel && F.def(state.sel);
+      const d = state.sel && (F.def(state.sel) || defs().find(x => x.id === state.sel));
       if (!d || state.view === 'modes' && !state.q) {
         detail.appendChild(h('div', { class: 'ap-d-empty' }, [h('b', { text: 'Dependencies, up front' }), h('p', { text: 'Every tool says what it needs before you add it: the mode it belongs to, the services it relies on, and exactly what will appear on the toolbar.' })]));
         return;
@@ -163,7 +172,8 @@
       detail.append(
         h('div', { class: 'ap-d-head', style: { '--acc': d.accent || '#00d4ff' } }, [h('span', { class: 'ap-d-ic', text: d.icon || '◻' }), h('div', {}, [h('h3', { text: d.label }), h('small', { text: (d.category || 'General') + ' · v' + (d.version || '1.0.0') })])]),
         h('p', { class: 'ap-d-blurb', text: d.blurb || '' }),
-        h('button', { class: 'tb-btn primary ap-addbtn', text: dd.pending.length ? `Add — turns on ${dd.pending.length} toolbar item${dd.pending.length > 1 ? 's' : ''}` : 'Add to canvas', onclick: () => add(d) }),
+        h('button', { class: 'tb-btn primary ap-addbtn', text: d._avail ? 'Install + add to canvas' : dd.pending.length ? `Add — turns on ${dd.pending.length} toolbar item${dd.pending.length > 1 ? 's' : ''}` : 'Add to canvas', onclick: () => add(d) }),
+        Cat && Cat.meta(d.id) && !d._avail ? h('button', { class: 'tb-btn ap-rmbtn', text: 'Remove from this canvas', title: 'uninstall: gone from ＋ Add now; its code leaves at the next start. Windows already open keep working.', onclick: () => { Cat.remove(d.id); S.toast(`${d.label} removed — gone after the next start. Add it again any time from ＋ Add.`, '', 4000); } }) : null,
       );
       [
         sec('MODE', [row(dd.modeLabel ? ((X.mode_(dd.mode) || {}).icon || '') + ' ' + dd.modeLabel : 'none — domain-free', dd.mode ? (X.isActive(dd.mode) ? 'active' : 'stays off — only what this tool needs turns on') : '')]),

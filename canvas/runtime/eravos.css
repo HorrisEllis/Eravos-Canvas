@@ -201,6 +201,10 @@ svg.wires { position: absolute; pointer-events: none; overflow: visible; z-index
 .ap-card { display: flex; gap: 11px; padding: 12px; border-radius: 11px; border: 1px solid var(--line2); background: var(--bg2); cursor: pointer; outline: none; transition: border-color .12s, transform .12s; }
 .ap-card:hover { border-color: color-mix(in srgb, var(--acc) 60%, var(--line2)); }
 .ap-card.sel { border-color: var(--acc); box-shadow: 0 0 0 1px var(--acc), 0 8px 30px color-mix(in srgb, var(--acc) 18%, transparent); }
+.ap-card-img { width: 84px; height: 52px; flex: none; object-fit: cover; object-position: top left; border-radius: 7px; border: 1px solid var(--line2); background: var(--panel); }
+.ap-card.avail { opacity: .78; } .ap-card.avail:hover, .ap-card.avail.sel { opacity: 1; }
+.ap-rmbtn { margin-top: 6px; font-size: 11px; }
+.boot .domain-card.avail { opacity: .8; border-style: dashed; }
 .ap-card-ic { width: 34px; height: 34px; flex: none; display: grid; place-items: center; font-size: 18px; border-radius: 9px; background: color-mix(in srgb, var(--acc) 16%, var(--panel)); }
 .ap-card-tx { min-width: 0; }
 .ap-card-tx b { display: block; font-size: 13.5px; }
