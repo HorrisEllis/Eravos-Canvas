@@ -1,0 +1,367 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "pads.breaks",
+ "version": "1.0.0",
+ "label": "Breaks & Jungle",
+ "prefix": "Breaks & Jungle",
+ "author": "James Brooks",
+ "tags": [
+  "dnb",
+  "jungle",
+  "breaks",
+  "footwork",
+  "drums-and-rhythm",
+  "kits"
+ ],
+ "for": "eravos.pads",
+ "items": {
+  "eravos.pads": {
+   "presets": {
+    "Jungle Pressure": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "909",
+        "tune": 3,
+        "decay": 0.22
+       },
+       {
+        "voice": "snare",
+        "model": "rimshot",
+        "tune": 4
+       },
+       {
+        "voice": "clap",
+        "model": "snap"
+       },
+       {
+        "voice": "hat",
+        "model": "909",
+        "tune": 4,
+        "decay": 0.035
+       },
+       {
+        "voice": "openhat",
+        "model": "909",
+        "tune": 3
+       },
+       {
+        "voice": "808",
+        "model": "sub",
+        "tune": -2
+       },
+       {
+        "voice": "rim",
+        "model": "classic",
+        "tune": 7
+       },
+       {
+        "voice": "tom",
+        "model": "conga",
+        "tune": 2
+       },
+       {
+        "voice": "crash",
+        "model": "ride",
+        "tune": 3
+       },
+       {
+        "voice": "perc",
+        "model": "wood",
+        "tune": 8
+       },
+       {
+        "voice": "shaker",
+        "model": "classic",
+        "decay": 0.07
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic"
+       },
+       {
+        "voice": "snare",
+        "model": "crack",
+        "tune": 7,
+        "decay": 0.08
+       },
+       {
+        "voice": "snare",
+        "model": "rimshot",
+        "tune": -1,
+        "level": 0.6
+       },
+       {
+        "voice": "kick",
+        "model": "punch",
+        "tune": 5,
+        "decay": 0.15
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "DnB Roller": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "punch",
+        "tune": 2,
+        "decay": 0.22
+       },
+       {
+        "voice": "snare",
+        "model": "slam",
+        "tune": 4,
+        "decay": 0.3
+       },
+       {
+        "voice": "clap",
+        "model": "stacked",
+        "tune": 3
+       },
+       {
+        "voice": "hat",
+        "model": "tick"
+       },
+       {
+        "voice": "openhat",
+        "model": "909",
+        "decay": 0.2
+       },
+       {
+        "voice": "808",
+        "model": "reese"
+       },
+       {
+        "voice": "rim",
+        "model": "classic"
+       },
+       {
+        "voice": "tom",
+        "model": "electro"
+       },
+       {
+        "voice": "crash",
+        "model": "classic",
+        "decay": 1.8
+       },
+       {
+        "voice": "perc",
+        "model": "laser",
+        "tune": 7
+       },
+       {
+        "voice": "shaker",
+        "model": "classic",
+        "decay": 0.06
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic"
+       },
+       {
+        "voice": "snare",
+        "model": "crack",
+        "tune": 9
+       },
+       {
+        "voice": "crash",
+        "model": "swell"
+       },
+       {
+        "voice": "perc",
+        "model": "clang",
+        "tune": 5
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "Footwork 160": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "808",
+        "tune": 1,
+        "decay": 0.6
+       },
+       {
+        "voice": "snare",
+        "model": "crack",
+        "tune": 5
+       },
+       {
+        "voice": "clap",
+        "model": "808",
+        "tune": 3,
+        "decay": 0.25
+       },
+       {
+        "voice": "hat",
+        "model": "tick",
+        "tune": 3
+       },
+       {
+        "voice": "openhat",
+        "model": "909"
+       },
+       {
+        "voice": "808",
+        "model": "sub",
+        "decay": 1
+       },
+       {
+        "voice": "rim",
+        "model": "classic",
+        "tune": 9
+       },
+       {
+        "voice": "tom",
+        "model": "electro",
+        "tune": 5
+       },
+       {
+        "voice": "crash",
+        "model": "classic"
+       },
+       {
+        "voice": "perc",
+        "model": "wood",
+        "tune": 10
+       },
+       {
+        "voice": "shaker",
+        "model": "classic"
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic",
+        "tune": 6
+       },
+       {
+        "voice": "kick",
+        "model": "808",
+        "tune": 6,
+        "decay": 0.3
+       },
+       {
+        "voice": "snare",
+        "model": "rimshot",
+        "tune": 8
+       },
+       {
+        "voice": "perc",
+        "model": "laser",
+        "tune": 10,
+        "decay": 0.2
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "Breakbeat Funk": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "punch",
+        "tune": 2
+       },
+       {
+        "voice": "snare",
+        "model": "909",
+        "tune": 2,
+        "decay": 0.25
+       },
+       {
+        "voice": "clap",
+        "model": "stacked"
+       },
+       {
+        "voice": "hat",
+        "model": "909"
+       },
+       {
+        "voice": "openhat",
+        "model": "909"
+       },
+       {
+        "voice": "808",
+        "model": "sub"
+       },
+       {
+        "voice": "rim",
+        "model": "classic",
+        "tune": 3
+       },
+       {
+        "voice": "tom",
+        "model": "classic"
+       },
+       {
+        "voice": "crash",
+        "model": "ride"
+       },
+       {
+        "voice": "perc",
+        "model": "wood"
+       },
+       {
+        "voice": "shaker",
+        "model": "classic"
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic"
+       },
+       {
+        "voice": "snare",
+        "model": "rimshot",
+        "tune": 4
+       },
+       {
+        "voice": "tom",
+        "model": "classic",
+        "tune": 7
+       },
+       {
+        "voice": "tom",
+        "model": "classic",
+        "tune": -5
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    }
+   }
+  }
+ }
+}

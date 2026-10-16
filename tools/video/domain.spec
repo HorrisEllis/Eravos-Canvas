@@ -1,4 +1,4 @@
-# spec_id: eravos.domain.video · status BUILDING (1 built: video-clip) · folder tools/video/  (exe: ERAVOS Library/Mods/Video/)
+# spec_id: eravos.domain.video · status BUILDING (1 built: video-clip) · folder tools/video/  (exe: tools/video/ beside ERAVOS.exe)
 domain: 🎬 Video — Video editing as tools on a canvas: clips, cuts and looks are separate tools; the music transport can drive the edit so cuts land on the beat.
 mode: Video
 units (toolbar expansion, built only when needed):

@@ -78,6 +78,9 @@
     "eravos.supersaw",
     "eravos.timeline",
     "eravos.wobble-bass",
+    "eravos.wub-filter",
+    "eravos.wub-osc",
+    "eravos.wub-sub",
     "eravos.xen-synth"
   ],
   "status": "built",

@@ -121,7 +121,7 @@ ERAVOS opens blank: **Start · Add · Options**. Everything else appears when yo
 Your pad controller plays the Drum Machine with no window open, and the pad you hit is the pad you see.
 **🎚 Sounds** (toolbar, Music Production): every preset by pack, drum **kit packs** to switch on/off, load and mix pad by
 pad, and **Capture → pad**: play any tool and its sound lands on a Drum Machine pad.
-On the exe, tools come from **ERAVOS Library › Mods › <Domain>** — one folder per domain.
+On the exe, tools come from **tools/<domain>/** next to ERAVOS.exe — the same folders as this project.
 
 ## Songbook and Learn (3.29) — pages of their own, off the canvas
 
@@ -156,12 +156,11 @@ drag the ⇢ plug in a window's title bar onto another window to connect them, p
 
 ## ERAVOS.exe (Windows)
 
-The Windows build is a portable folder: double-click **ERAVOS.exe** — no browser, no Node, no install.
-ERAVOS.exe is only the canvas. **Every tool is a pack** in **ERAVOS Library › Packs** (next to the exe): Music Core plus
-one pack per tool family (synths, drums, effects, arrange…). Remove a pack to remove its tools; drop a new pack onto the
-canvas to add tools (it is kept in Packs and loads every start). Put sounds, `.mid` or projects in **Drop Here** and they
-appear on the canvas; Save and Bounce write to **Projects** / **Exports**. Build the packs alone with `node desktop/packs.mjs`.
-Rebuild it from this source with `node desktop/build.mjs` (downloads the pinned Electron once).
-**Build ERAVOS.exe.bat** (repo root, Windows, no Node): the exe is the canvas and nothing else — Electron + `canvas/` +
-`schemas/` → `dist/ERAVOS/ERAVOS.exe` and `dist/ERAVOS_<version>.zip`. Tools are everything else: they reach the exe as
-packs (`node desktop/packs.mjs` → drop the zips in ERAVOS Library › Mods). `dist/` is build output and is not committed.
+The Windows build is a portable folder with the same layout as this project: double-click **ERAVOS.exe** — no browser,
+no Node, no install. Next to it are `canvas/`, `tools/` (every domain) and `schemas/`, the same folders as here, and the
+exe loads its tools from `tools/` exactly like the dev build. Your own folders sit beside them: **projects** (Save),
+**exports** (Bounce), **drop** (sounds, `.mid`, packs or projects put there appear on the canvas), **packs** (extra tool
+packs, loaded every start; packs dropped on the canvas are kept there) and **.appdata** (autosave, presets). A rebuild
+never touches them, and an older build's **ERAVOS Library** projects, exports and autosave move across on first start.
+**Build ERAVOS.exe.bat** (repo root, Windows, no Node) → `dist/ERAVOS/ERAVOS.exe` and `dist/ERAVOS_<version>.zip`;
+`node desktop/build.mjs` does the same anywhere with Node. `dist/` is build output and is not committed.

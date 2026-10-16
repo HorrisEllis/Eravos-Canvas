@@ -1,0 +1,466 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "pads.urban",
+ "version": "1.0.0",
+ "label": "Trap, Phonk & Dancehall",
+ "prefix": "Trap, Phonk & Dancehall",
+ "author": "James Brooks",
+ "tags": [
+  "trap",
+  "phonk",
+  "drill",
+  "dancehall",
+  "reggae",
+  "drums-and-rhythm",
+  "kits"
+ ],
+ "for": "eravos.pads",
+ "items": {
+  "eravos.pads": {
+   "presets": {
+    "Trap 808 Glide": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "808",
+        "tune": 0,
+        "decay": 0.4
+       },
+       {
+        "voice": "snare",
+        "model": "crack",
+        "tune": -2,
+        "decay": 0.18
+       },
+       {
+        "voice": "clap",
+        "model": "stacked",
+        "decay": 0.4
+       },
+       {
+        "voice": "hat",
+        "model": "tick",
+        "decay": 0.03
+       },
+       {
+        "voice": "openhat",
+        "model": "909",
+        "decay": 0.3
+       },
+       {
+        "voice": "808",
+        "model": "classic",
+        "tune": -2,
+        "decay": 2
+       },
+       {
+        "voice": "rim",
+        "model": "classic",
+        "tune": 5
+       },
+       {
+        "voice": "tom",
+        "model": "electro"
+       },
+       {
+        "voice": "crash",
+        "model": "swell"
+       },
+       {
+        "voice": "perc",
+        "model": "laser"
+       },
+       {
+        "voice": "shaker",
+        "model": "classic"
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic"
+       },
+       {
+        "voice": "808",
+        "model": "dist",
+        "tune": -2,
+        "decay": 1.8
+       },
+       {
+        "voice": "snare",
+        "model": "rimshot",
+        "tune": 3
+       },
+       {
+        "voice": "clap",
+        "model": "snap"
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "Phonk Cowbell": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "punch",
+        "tune": -2,
+        "drive": 0.6
+       },
+       {
+        "voice": "snare",
+        "model": "lofi"
+       },
+       {
+        "voice": "clap",
+        "model": "808",
+        "drive": 0.4
+       },
+       {
+        "voice": "hat",
+        "model": "lofi"
+       },
+       {
+        "voice": "openhat",
+        "model": "lofi"
+       },
+       {
+        "voice": "808",
+        "model": "dist",
+        "tune": -3,
+        "drive": 0.9
+       },
+       {
+        "voice": "rim",
+        "model": "classic",
+        "drive": 0.4
+       },
+       {
+        "voice": "tom",
+        "model": "electro",
+        "tune": -4
+       },
+       {
+        "voice": "crash",
+        "model": "china"
+       },
+       {
+        "voice": "perc",
+        "model": "clang",
+        "tune": -2
+       },
+       {
+        "voice": "shaker",
+        "model": "classic"
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic",
+        "tune": 0,
+        "drive": 0.5
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic",
+        "tune": 5,
+        "drive": 0.5
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic",
+        "tune": -5,
+        "drive": 0.5
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic",
+        "tune": 7,
+        "drive": 0.5
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "Drill Slide": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "808",
+        "tune": -1,
+        "decay": 0.3
+       },
+       {
+        "voice": "snare",
+        "model": "crack",
+        "decay": 0.15
+       },
+       {
+        "voice": "clap",
+        "model": "snap"
+       },
+       {
+        "voice": "hat",
+        "model": "tick",
+        "decay": 0.025
+       },
+       {
+        "voice": "openhat",
+        "model": "909",
+        "decay": 0.18
+       },
+       {
+        "voice": "808",
+        "model": "classic",
+        "tune": -3,
+        "decay": 2.4,
+        "drive": 0.3
+       },
+       {
+        "voice": "rim",
+        "model": "classic",
+        "tune": 4
+       },
+       {
+        "voice": "tom",
+        "model": "electro"
+       },
+       {
+        "voice": "crash",
+        "model": "swell"
+       },
+       {
+        "voice": "perc",
+        "model": "laser",
+        "tune": 3
+       },
+       {
+        "voice": "shaker",
+        "model": "classic"
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic"
+       },
+       {
+        "voice": "snare",
+        "model": "rimshot",
+        "tune": 2
+       },
+       {
+        "voice": "808",
+        "model": "reese",
+        "tune": -3
+       },
+       {
+        "voice": "hat",
+        "model": "fm",
+        "tune": 2
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "Dancehall Bun": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "punch",
+        "tune": 1,
+        "decay": 0.3
+       },
+       {
+        "voice": "snare",
+        "model": "rimshot",
+        "tune": 3
+       },
+       {
+        "voice": "clap",
+        "model": "snap",
+        "tune": 2
+       },
+       {
+        "voice": "hat",
+        "model": "tick",
+        "tune": 2
+       },
+       {
+        "voice": "openhat",
+        "model": "909"
+       },
+       {
+        "voice": "808",
+        "model": "dist",
+        "decay": 1.1
+       },
+       {
+        "voice": "rim",
+        "model": "classic",
+        "tune": 4
+       },
+       {
+        "voice": "tom",
+        "model": "conga",
+        "tune": 3
+       },
+       {
+        "voice": "crash",
+        "model": "classic",
+        "decay": 1.6
+       },
+       {
+        "voice": "perc",
+        "model": "wood",
+        "tune": 6
+       },
+       {
+        "voice": "shaker",
+        "model": "classic",
+        "decay": 0.08
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic"
+       },
+       {
+        "voice": "tom",
+        "model": "tabla",
+        "tune": 4
+       },
+       {
+        "voice": "perc",
+        "model": "clang",
+        "tune": 8,
+        "decay": 0.6
+       },
+       {
+        "voice": "perc",
+        "model": "laser",
+        "tune": -2,
+        "sweep": 40
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    },
+    "Roots One Drop 3.0": {
+     "params": {
+      "volume": 0.9
+     },
+     "extra": {
+      "kit": [
+       {
+        "voice": "kick",
+        "model": "thump",
+        "tune": -3,
+        "decay": 0.55
+       },
+       {
+        "voice": "snare",
+        "model": "rimshot",
+        "tune": -3
+       },
+       {
+        "voice": "clap",
+        "model": "808",
+        "level": 0.7
+       },
+       {
+        "voice": "hat",
+        "model": "909",
+        "tune": -2,
+        "decay": 0.06
+       },
+       {
+        "voice": "openhat",
+        "model": "909",
+        "tune": -1,
+        "decay": 0.35
+       },
+       {
+        "voice": "808",
+        "model": "sub",
+        "tune": -5
+       },
+       {
+        "voice": "rim",
+        "model": "classic",
+        "tune": -2
+       },
+       {
+        "voice": "tom",
+        "model": "conga",
+        "tune": -5
+       },
+       {
+        "voice": "crash",
+        "model": "ride",
+        "tune": -2
+       },
+       {
+        "voice": "perc",
+        "model": "wood",
+        "tune": -3
+       },
+       {
+        "voice": "shaker",
+        "model": "classic"
+       },
+       {
+        "voice": "cowbell",
+        "model": "classic",
+        "tune": -5
+       },
+       {
+        "voice": "snare",
+        "model": "brush",
+        "tune": -2
+       },
+       {
+        "voice": "tom",
+        "model": "tabla",
+        "tune": -3
+       },
+       {
+        "voice": "perc",
+        "model": "clang",
+        "tune": -7,
+        "decay": 1.2,
+        "level": 0.6
+       },
+       {
+        "voice": "sample",
+        "model": "classic"
+       }
+      ]
+     }
+    }
+   }
+  }
+ }
+}

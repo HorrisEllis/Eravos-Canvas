@@ -1,0 +1,74 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.wub-sub",
+  "version": "1.0.0",
+  "label": "Wub Sub",
+  "icon": "◉",
+  "accent": "#7c4dff",
+  "domain": "music",
+  "category": "wubs",
+  "summary": "The clean low end under the wobble — follows your Wub Osc notes, never wobbles, glides with it.",
+  "tags": [
+    "wubs",
+    "sub",
+    "bass",
+    "808",
+    "dubstep"
+  ],
+  "files": {
+    "engine": "wub-sub.engine.js",
+    "ui": "wub-sub.ui.js",
+    "preview": "preview.png",
+    "spec": "wub-sub.spec",
+    "tests": "wub-sub.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "midi_in",
+      "bus_publish",
+      "bus_subscribe",
+      "registry_read"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.breath",
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.dub-station",
+    "eravos.embodiment-lab",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.master-fx",
+    "eravos.sidechain-compressor",
+    "eravos.wub-filter",
+    "eravos.wub-rate",
+    "eravos.xy-pad"
+  ],
+  "conflicts": [],
+  "status": "built"
+}

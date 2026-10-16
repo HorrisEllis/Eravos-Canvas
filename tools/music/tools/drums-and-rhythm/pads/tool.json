@@ -1,7 +1,7 @@
 {
   "schema": "eravos.tool/1",
   "id": "eravos.pads",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "label": "Drum Machine",
   "icon": "🥁",
   "accent": "#00ff88",
@@ -17,7 +17,8 @@
     "ui": "pads.ui.js",
     "spec": "pads.spec",
     "preview": "preview.png",
-    "tests": "pads.test.js"
+    "tests": "pads.test.js",
+    "css": "pads.css"
   },
   "needs": {
     "units": [
@@ -37,7 +38,15 @@
       "presets"
     ],
     "shipped": [
-      "factory"
+      "factory",
+      "bass-music",
+      "house",
+      "techno-hard",
+      "breaks",
+      "urban",
+      "retro",
+      "cinematic-lofi",
+      "lost-love"
     ]
   },
   "works_with": [
@@ -62,6 +71,8 @@
     "eravos.macro-automation",
     "eravos.master-fx",
     "eravos.sidechain-compressor",
+    "eravos.wub-filter",
+    "eravos.wub-rate",
     "eravos.xy-pad"
   ],
   "status": "built",

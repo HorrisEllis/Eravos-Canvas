@@ -34,7 +34,7 @@ acceptance (must pass before status → built — nothing pretends to work):
     - standard: renders/produces output through its out port; unmount leaves zero subscribers, ports, wires; params clamp; presets load
 `); n++;
   }
-  fs.writeFileSync(path.join(ROOT, 'tools', D.id, 'domain.spec'), `# spec_id: eravos.domain.${D.id} · status ${done.size ? 'BUILDING (' + done.size + ' built: ' + Array.from(done).join(', ') + ')' : 'MAPPED'} · folder ${D.folder}/  (exe: ERAVOS Library/Mods/${D.label}/)
+  fs.writeFileSync(path.join(ROOT, 'tools', D.id, 'domain.spec'), `# spec_id: eravos.domain.${D.id} · status ${done.size ? 'BUILDING (' + done.size + ' built: ' + Array.from(done).join(', ') + ')' : 'MAPPED'} · folder ${D.folder}/  (exe: ${D.folder}/ beside ERAVOS.exe)
 domain: ${D.icon} ${D.label} — ${D.about}
 mode: ${D.mode}
 units (toolbar expansion, built only when needed):

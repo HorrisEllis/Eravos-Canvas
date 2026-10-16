@@ -1,0 +1,75 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.wub-osc",
+  "version": "1.0.0",
+  "label": "Wub Osc",
+  "icon": "〰",
+  "accent": "#ff2266",
+  "domain": "music",
+  "category": "wubs",
+  "summary": "The raw wobble tone — saw, square, reese, FM growl — mono, glide, unison. Wire it into Wub Filter.",
+  "tags": [
+    "wubs",
+    "wobble",
+    "bass",
+    "dubstep",
+    "oscillator",
+    "fm",
+    "reese"
+  ],
+  "files": {
+    "engine": "wub-osc.engine.js",
+    "ui": "wub-osc.ui.js",
+    "preview": "preview.png",
+    "spec": "wub-osc.spec",
+    "tests": "wub-osc.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "midi_in",
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.breath",
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.dub-station",
+    "eravos.embodiment-lab",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.master-fx",
+    "eravos.sidechain-compressor",
+    "eravos.wub-filter",
+    "eravos.wub-rate",
+    "eravos.xy-pad"
+  ],
+  "conflicts": [],
+  "status": "built"
+}

@@ -1,7 +1,7 @@
 {
   "schema": "eravos.tool/1",
   "id": "eravos.wobble-bass",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "label": "Wobble Bass",
   "icon": "🔊",
   "accent": "#ff2266",
@@ -62,6 +62,8 @@
     "eravos.macro-automation",
     "eravos.master-fx",
     "eravos.sidechain-compressor",
+    "eravos.wub-filter",
+    "eravos.wub-rate",
     "eravos.xy-pad"
   ],
   "status": "built",

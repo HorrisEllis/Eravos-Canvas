@@ -1,0 +1,137 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "wub-osc.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "ERAVOS",
+ "tags": [
+  "factory",
+  "wubs",
+  "dubstep"
+ ],
+ "for": "eravos.wub-osc",
+ "enabled": true,
+ "items": {
+  "eravos.wub-osc": {
+   "presets": {
+    "Init Saw": {
+     "params": {
+      "wave": "saw",
+      "voices": 1,
+      "spread": 0,
+      "width": 0,
+      "drift": 0,
+      "octave": -1,
+      "glide": 0.05,
+      "dive": 0
+     }
+    },
+    "Classic Wub Saw": {
+     "params": {
+      "wave": "saw",
+      "voices": 3,
+      "spread": 14,
+      "width": 0.5,
+      "drift": 0.3,
+      "octave": -1
+     }
+    },
+    "Square Talker": {
+     "params": {
+      "wave": "square",
+      "voices": 2,
+      "spread": 8,
+      "width": 0.35,
+      "drift": 0.2,
+      "octave": -1
+     }
+    },
+    "Reese Roller": {
+     "params": {
+      "wave": "reese",
+      "voices": 4,
+      "spread": 22,
+      "width": 0.7,
+      "drift": 0.65,
+      "octave": -1,
+      "glide": 0.08
+     }
+    },
+    "FM Growl 1:1": {
+     "params": {
+      "wave": "fm",
+      "ratio": "1",
+      "index": 3.5,
+      "voices": 2,
+      "spread": 6,
+      "width": 0.4,
+      "octave": -1
+     }
+    },
+    "FM Riddim 2:1": {
+     "params": {
+      "wave": "fm",
+      "ratio": "2",
+      "index": 5.5,
+      "voices": 1,
+      "spread": 0,
+      "octave": -1,
+      "glide": 0.02,
+      "attack": 0.002
+     }
+    },
+    "FM Clang 3:1": {
+     "params": {
+      "wave": "fm",
+      "ratio": "3",
+      "index": 2.2,
+      "voices": 2,
+      "spread": 9,
+      "width": 0.5,
+      "octave": -1
+     }
+    },
+    "FM Low Grind 0.5:1": {
+     "params": {
+      "wave": "fm",
+      "ratio": "0.5",
+      "index": 4,
+      "voices": 1,
+      "octave": -1
+     }
+    },
+    "Hollow Yoi": {
+     "params": {
+      "wave": "hollow",
+      "voices": 3,
+      "spread": 10,
+      "width": 0.5,
+      "octave": -1
+     }
+    },
+    "Dive Bomb": {
+     "params": {
+      "wave": "saw",
+      "voices": 3,
+      "spread": 16,
+      "width": 0.6,
+      "dive": -12,
+      "diveTime": 0.18,
+      "octave": -1
+     }
+    },
+    "Slide Lead (+1 oct)": {
+     "params": {
+      "wave": "saw",
+      "voices": 5,
+      "spread": 18,
+      "width": 0.8,
+      "octave": 0,
+      "glide": 0.12
+     }
+    }
+   }
+  }
+ }
+}

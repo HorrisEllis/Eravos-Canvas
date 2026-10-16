@@ -105,7 +105,7 @@ OrganismFactory.reg('eravos.sequencer', function (view) {
     if (vk) { vk.el.title = `lane volume ${Math.round(100 * (t.vol === undefined ? 1 : t.vol))} % (drag · double-click resets)`; vk.el.setAttribute('aria-label', 'Lane volume'); const kv = vk.el.querySelector('.uk-knob-val'); if (kv) kv.style.display = 'none'; }
     const x = h('button', { class: 'uk-btn', text: '×', title: 'remove lane', style: { padding: '1px 5px' }, onclick: (e) => { e.stopPropagation(); if (confirm('Remove lane ' + t.name + '?')) view.emit('track_remove', { track: ti }); } });
     const nm = h('span', { style: { font: '600 11px var(--font)', color: t.color, width: '62px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'text' }, title: (t.kind === 'melodic' ? 'melodic lane (scale degrees)' : t.kind === 'auto' ? 'automation lane → ' + (t.paramLabel || 'pick a knob') : 'drum lane → pad ' + (t.drumNote - 35)) + ' · dbl-click to rename', text: (t.kind === 'melodic' ? '♪ ' : t.kind === 'auto' ? '∿ ' : '') + t.name });
-    nm.addEventListener('dblclick', () => { const n = prompt('Lane name', t.name); if (n) view.emit('track_edit', { track: ti, patch: { name: n } }); });
+    nm.addEventListener('dblclick', () => UI.ask('Lane name', t.name).then((n) => { if (n) view.emit('track_edit', { track: ti, patch: { name: n } }); }));
     const extra = [];
     if (t.kind === 'auto') {
       const ps = UI.Select({ options: [{ value: '', label: t.target ? '— knob —' : 'pick a tool' }].concat((t.params || []).map(p => ({ value: p.key, label: p.label }))), value: t.param || '', onChange: (v) => view.emit('track_edit', { track: ti, patch: { param: v || null, name: v ? ((t.params || []).find(p => p.key === v) || {}).label || v : 'auto' } }) });
@@ -148,7 +148,8 @@ OrganismFactory.reg('eravos.sequencer', function (view) {
       return;
     }
     const k = (key, label, min, max, step) => UI.Knob({ label, min, max, step, value: st[key], default: key === 'prob' || key === 'gate' ? 1 : 0.8, size: 28, accent: t.color, onChange: (v) => e({ [key]: key === 'ratchet' || key === 'degree' || key === 'octave' ? Math.round(v) : v }) }).el;
-    insp.append(k('vel', 'Vel', 0.05, 1, 0.01), k('prob', 'Chance', 0, 1, 0.01), k('gate', 'Length', 0.1, 4, 0.1), k('ratchet', 'Ratchet', 1, 4, 1));
+    insp.append(k('vel', 'Vel', 0.05, 1, 0.01), k('prob', 'Chance', 0, 1, 0.01), k('gate', 'Length', 0.1, 4, 0.1), k('ratchet', 'Ratchet', 1, 4, 1),
+      UI.Knob({ label: 'Nudge', min: -0.5, max: 0.5, step: 0.01, value: st.nudge || 0, default: 0, size: 28, accent: t.color, onChange: (v) => e({ nudge: v }) }).el);   // 3.39: early / late inside the step
     if (t.kind === 'melodic') insp.append(k('degree', 'Degree', 1, 14, 1), k('octave', 'Octave', -2, 2, 1));
     insp.append(UI.Toggle({ label: 'Accent', value: st.accent, onChange: (v) => e({ accent: v }) }).el, UI.Toggle({ label: 'Slide', value: st.slide, onChange: (v) => e({ slide: v }) }).el);
     if (t.kind === 'melodic') insp.append(UI.Select({ label: 'Wobble', options: DIVS.map(d => ({ value: d, label: d || '—' })), value: st.wobbleDiv || '', onChange: (v) => e({ wobbleDiv: v || null }) }).el);

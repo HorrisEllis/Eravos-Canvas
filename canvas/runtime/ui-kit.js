@@ -212,13 +212,28 @@
       if (nv !== value) { value = nv; draw(); o.onChange && o.onChange(value); }
     });
     ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => el.addEventListener(t, nEnd));
-    el.addEventListener('dblclick', () => {
-      const s = global.prompt(o.label || 'value', value);
+    el.addEventListener('dblclick', () => ask(o.label || 'value', value).then((s) => {
       if (s === null) return; const nv = Math.max(o.min, Math.min(o.max, Number(s)));
       if (Number.isFinite(nv)) { value = nv; draw(); o.onChange && o.onChange(value); }
-    });
+    }));
     draw();
     return { el, set(v) { if (typeof v === 'number') { value = v; draw(); } }, get: () => value };
+  }
+
+  // ---------------------------------------------------------------- ask (3.39)
+  // In-page text question → Promise<string|null>. Replaces window.prompt(), which the desktop app (Electron) does not
+  // support at all ("prompt() is not supported" — every rename / new-pack button threw). Enter = OK, Esc = cancel.
+  function ask(label, value) {
+    return new Promise((resolve) => {
+      const back = h('div', { class: 'uk-ask-back' }), inp = h('input', { class: 'uk-ask-in', type: 'text', value: value === undefined || value === null ? '' : String(value), 'aria-label': label });
+      const done = (v) => { back.remove(); resolve(v); };
+      const ok = h('button', { class: 'uk-btn uk-ask-ok', text: 'OK', onclick: () => done(inp.value) }), no = h('button', { class: 'uk-btn', text: 'Cancel', onclick: () => done(null) });
+      const box = h('div', { class: 'uk-ask', role: 'dialog', 'aria-modal': 'true', 'aria-label': label }, [h('div', { class: 'uk-ask-label', text: label }), inp, h('div', { class: 'uk-ask-row' }, [no, ok])]);
+      back.appendChild(box); ['pointerdown', 'wheel', 'keydown'].forEach(t => back.addEventListener(t, (e) => e.stopPropagation(), { passive: true }));
+      back.addEventListener('pointerdown', (e) => { if (e.target === back) done(null); });
+      inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); done(inp.value); } else if (e.key === 'Escape') { e.preventDefault(); done(null); } });
+      doc.body.appendChild(back); inp.focus(); inp.select();
+    });
   }
 
   // ---------------------------------------------------------------- canvases
@@ -283,7 +298,7 @@
   }
   function presetBar(view) {
     const sel = Select({ options: ['— preset —'], onChange: (v) => { if (v !== '— preset —') view.emit('preset_load', { name: v }); } });
-    const save = Button({ label: '＋', hint: 'save this as your own preset — knobs AND what it holds (patterns, notes, kit, clips)', onClick: () => { const n = global.prompt('Preset name'); if (n) view.emit('preset_save', { name: n }); } });
+    const save = Button({ label: '＋', hint: 'save this as your own preset — knobs AND what it holds (patterns, notes, kit, clips)', onClick: () => ask('Preset name').then((n) => { if (n) view.emit('preset_save', { name: n }); }) });
     view.on('state_sync', (s) => { sel.setOptions(['— preset —'].concat(s.presets || [])); if (s.preset) sel.set(s.preset); else sel.set('— preset —'); });
     return h('div', { class: 'uk-presetbar' }, [sel.el, save.el]);
   }
@@ -323,6 +338,6 @@
   function mapPoint(rect, w, h2, clientX, clientY) { const sx = rect.width > 0 && w > 0 ? w / rect.width : 1, sy = rect.height > 0 && h2 > 0 ? h2 / rect.height : 1; return { x: (clientX - rect.left) * sx, y: (clientY - rect.top) * sy }; }
   function toContent(el, clientX, clientY) { return mapPoint(el.getBoundingClientRect(), el.offsetWidth, el.offsetHeight, clientX, clientY); }
 
-  global.UIKit = { h, fmt, mapper, Knob, Fader, Toggle, Select, Segmented, Button, NumberDrag, Canvas, loop, paramControl, paramPanel, presetBar, hint, mapPoint, toContent, drag,
+  global.UIKit = { h, fmt, mapper, ask, Knob, Fader, Toggle, Select, Segmented, Button, NumberDrag, Canvas, loop, paramControl, paramPanel, presetBar, hint, mapPoint, toContent, drag,
     extend(o) { Object.keys(o || {}).forEach(k => { if (!(k in global.UIKit)) global.UIKit[k] = o[k]; }); } };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -37,9 +37,11 @@
                           "sine",
                           "sawdown",
                           "square",
-                          "yoy"
+                          "yoy",
+                          "draw"
                         ]
                       },
+                      "shapePts": {},
                       "depth": {
                         "type": "number",
                         "minimum": 0,
@@ -71,6 +73,24 @@
                         "minimum": 0,
                         "maximum": 100
                       },
+                      "wubOn": {
+                        "type": "boolean"
+                      },
+                      "wubLen": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 16
+                      },
+                      "wubStep": {
+                        "enum": [
+                          "1/16",
+                          "1/8",
+                          "1/4",
+                          "1/2",
+                          "1/1"
+                        ]
+                      },
+                      "wubSeq": {},
                       "filterMode": {
                         "enum": [
                           "lowpass",
@@ -83,7 +103,11 @@
                           "OH",
                           "AH",
                           "EH",
-                          "EE"
+                          "EE",
+                          "UH",
+                          "AE",
+                          "IH",
+                          "ER"
                         ]
                       },
                       "vowelB": {
@@ -92,7 +116,11 @@
                           "OH",
                           "AH",
                           "EH",
-                          "EE"
+                          "EE",
+                          "UH",
+                          "AE",
+                          "IH",
+                          "ER"
                         ]
                       },
                       "formantShift": {

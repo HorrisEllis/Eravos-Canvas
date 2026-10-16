@@ -1,0 +1,62 @@
+/* eravos.pads 3.0 — Drum Machine: an instrument surface. Pads are rubber with an LED strip in the pad's colour (--pc);
+ * a hit lights the pad (--hit = velocity). Everything else is quiet so the pads and the kit name carry the window. */
+.dm3 { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; overflow-x: hidden; --dm-ink: #0a0e14; --dm-rub: #161d27; --dm-rub2: #1c2531; --dm-edge: #273445; }
+
+/* kit strip */
+.dm3-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 2px 2px 8px; border-bottom: 1px solid #1a2431; }
+.dm3-kit { display: flex; flex-direction: column; min-width: 0; }
+.dm3-kitpack { font: 700 9px var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--dim); }
+.dm3-kitname { font: 700 19px/1.15 var(--font); letter-spacing: -.01em; color: #eef6ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 280px; }
+.dm3-kitctl { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dm3-kitctl .uk-presetbar .uk-select { max-width: 170px; }
+.dm3-bank { display: flex; align-items: center; gap: 6px; }
+.dm3-cap { font: 700 9px var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--dim); }
+
+/* pads */
+.dm3-body { display: flex; gap: 12px; flex: 0 0 auto; }
+.dm3-head, .dm3-editor { flex: 0 0 auto; }
+.dm3-grid { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: minmax(64px, auto); gap: 8px; min-width: 0; }
+.dm3-pad { position: relative; border-radius: 10px; cursor: pointer; user-select: none; padding: 8px 9px 12px; display: flex; flex-direction: column; min-height: 58px; overflow: hidden;
+  background: radial-gradient(120% 90% at 50% 0%, var(--dm-rub2), var(--dm-rub) 70%);
+  border: 1px solid var(--dm-edge); box-shadow: inset 0 1px 0 rgba(255,255,255,.04), inset 0 -10px 18px rgba(0,0,0,.35), 0 2px 0 #06090d;
+  transition: transform .06s ease, box-shadow .12s ease, border-color .12s ease; }
+.dm3-pad:hover { border-color: color-mix(in srgb, var(--pc) 45%, var(--dm-edge)); }
+.dm3-pad.sel { border-color: var(--pc); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pc) 55%, transparent), inset 0 -10px 18px rgba(0,0,0,.35), 0 0 18px color-mix(in srgb, var(--pc) 22%, transparent); }
+.dm3-pad.hit { transform: translateY(1px) scale(.985);
+  background: radial-gradient(110% 100% at 50% 100%, color-mix(in srgb, var(--pc) calc(var(--hit, 1) * 70%), var(--dm-rub)), var(--dm-rub2));
+  box-shadow: 0 0 calc(var(--hit, 1) * 26px) color-mix(in srgb, var(--pc) 60%, transparent), inset 0 0 0 1px var(--pc); }
+.dm3-pad.drop { outline: 2px dashed var(--green); outline-offset: -4px; }
+.dm3-pad.empty .dm3-model { color: var(--faint); font-weight: 600; font-size: 11px; }
+.dm3-voice { font: 700 8.5px var(--mono); letter-spacing: .16em; text-transform: uppercase; color: color-mix(in srgb, var(--pc) 70%, #8aa0b6); }
+.dm3-model { font: 700 14px/1.15 var(--font); color: #e9f3fd; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: capitalize; }
+.dm3-foot { margin-top: auto; display: flex; justify-content: space-between; font: 600 9px var(--mono); color: #4d5f74; }
+.dm3-led { position: absolute; left: 10px; right: 10px; bottom: 5px; height: 3px; border-radius: 3px; background: color-mix(in srgb, var(--pc) 22%, #0d131b); }
+.dm3-pad.sel .dm3-led, .dm3-pad.hit .dm3-led { background: var(--pc); box-shadow: 0 0 8px var(--pc); }
+
+/* side: meter + master knobs */
+.dm3-side { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 56px; flex: 0 0 56px; }
+.dm3-meter { width: 12px !important; border-radius: 3px; }
+
+/* voice editor */
+.dm3-editor { --pc: var(--acc); display: flex; flex-direction: column; gap: 9px; padding: 11px 12px 12px; border-radius: 12px;
+  background: linear-gradient(180deg, #0f151e, #0b1017); border: 1px solid #1c2735; box-shadow: inset 0 1px 0 rgba(255,255,255,.03); }
+.dm3-vhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.dm3-vtitle { display: flex; align-items: center; gap: 10px; }
+.dm3-vnum { font: 800 12px var(--mono); letter-spacing: .14em; color: var(--pc); text-shadow: 0 0 10px color-mix(in srgb, var(--pc) 45%, transparent); }
+.dm3-vtitle .uk-select { text-transform: capitalize; }
+.dm3-color { width: 22px; height: 22px; padding: 0; border: 1px solid #2a3a4e; border-radius: 6px; background: none; cursor: pointer; }
+.dm3-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.dm3-chip { font: 600 11px var(--font); text-transform: capitalize; color: #a9bccf; background: #121a24; border: 1px solid #243244; border-radius: 999px; padding: 4px 11px; cursor: pointer;
+  transition: border-color .1s, color .1s, background .1s; }
+.dm3-chip:hover { border-color: color-mix(in srgb, var(--pc) 60%, #243244); color: #e9f3fd; }
+.dm3-chip.on { color: #06090d; background: var(--pc); border-color: var(--pc); box-shadow: 0 0 12px color-mix(in srgb, var(--pc) 45%, transparent); }
+.dm3-chip:focus-visible { outline: 2px solid var(--pc); outline-offset: 2px; }
+.dm3-shape { border-radius: 8px; background: #080c12; border: 1px solid #172130; }
+.dm3-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px; }
+.dm3-card { background: #0d131b; border: 1px solid #1a2532; border-radius: 10px; padding: 7px 8px 6px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.dm3-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 2px; }
+.dm3-card .uk-seg button { text-transform: capitalize; padding: 2px 7px; font-size: 10.5px; }
+.dm3-sample { font: 600 11.5px var(--font); color: #cfe0f0; }
+.dm3-extra:empty { display: none; }
+.dm3-extra { display: flex; align-items: center; gap: 10px; }
+@media (prefers-reduced-motion: reduce) { .dm3-pad, .dm3-chip { transition: none; } .dm3-pad.hit { transform: none; } }

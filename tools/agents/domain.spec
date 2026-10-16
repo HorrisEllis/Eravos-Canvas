@@ -1,4 +1,4 @@
-# spec_id: eravos.domain.agents · status BUILDING (1 built: ai-step) · folder tools/agents/  (exe: ERAVOS Library/Mods/Automation/)
+# spec_id: eravos.domain.agents · status BUILDING (1 built: ai-step) · folder tools/agents/  (exe: tools/agents/ beside ERAVOS.exe)
 domain: 🤖 Automation — AI automation as wired steps: triggers start flows, steps transform data, every run is logged, nothing irreversible happens without an approve step.
 mode: Automation
 units (toolbar expansion, built only when needed):

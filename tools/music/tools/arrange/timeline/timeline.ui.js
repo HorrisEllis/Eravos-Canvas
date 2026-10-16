@@ -159,7 +159,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     heads.innerHTML = '';
     A.lanes.forEach((l) => {
       const nm = h('span', { style: { font: '600 11px var(--font)', color: l.color, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: '1', cursor: 'text', minWidth: '0' }, text: (l.kind === 'pattern' ? '▦ ' : l.kind === 'marker' ? '⚑ ' : l.kind === 'inst' ? '🎹 ' : '♫ ') + l.name, title: 'dbl-click to rename' });
-      nm.addEventListener('dblclick', () => { const n = prompt('Lane name', l.name); if (n) view.emit('lane_edit', { id: l.id, patch: { name: n } }); });
+      nm.addEventListener('dblclick', () => UI.ask('Lane name', l.name).then((n) => { if (n) view.emit('lane_edit', { id: l.id, patch: { name: n } }); }));
       const btn = (label, key, title) => h('button', { class: 'uk-toggle' + (l[key] ? ' on' : ''), title, style: { padding: '0 4px', fontSize: '10px' }, text: label, onclick: (e) => { e.stopPropagation(); view.emit('lane_edit', { id: l.id, patch: { [key]: !l[key] } }); } });
       const x = h('button', { class: 'uk-btn', style: { padding: '0 4px', fontSize: '10px' }, text: '×', onclick: () => { if (confirm('Remove lane ' + l.name + ' and its clips?')) view.emit('lane_remove', { id: l.id }); } });
       const row = h('div', { style: { height: laneH() + 'px', display: 'flex', alignItems: 'center', gap: '3px', padding: '0 4px', borderBottom: '1px solid #1a2533', boxSizing: 'border-box' } }, [nm]);
@@ -185,7 +185,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     const e = (patch) => view.emit('clip_edit', { id: c.id, patch });
     if (c.kind === 'notes') {
       insp.append(h('span', { class: 'org-label', text: '🎹 ' + (c.name || 'clip') + ' · ' + (c.notes || []).length + ' notes' }),
-        UI.Button({ label: 'Rename', onClick: () => { const n = prompt('Clip name', c.name || ''); if (n) e({ name: n }); } }).el);
+        UI.Button({ label: 'Rename', onClick: () => UI.ask('Clip name', c.name || '').then((n) => { if (n) e({ name: n }); }) }).el);
     } else if (c.kind === 'audio') {
       insp.append(h('span', { class: 'org-label', text: '♫ ' + c.name }),
         UI.Knob({ label: 'Gain', min: 0, max: 2, step: 0.01, value: c.gain, default: 1, size: 26, onChange: (v) => e({ gain: v }) }).el,
@@ -322,7 +322,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
   cv.addEventListener('dblclick', (e) => {
     if (!A) return; const { x, y } = local(e); const li = Math.floor((y - RULER) / laneH()), lane = A.lanes[li];
     if (!lane) return;
-    if (lane.kind === 'marker') { const mi = A.markers.findIndex(m => Math.abs(xOf(m.bar) - x) < 8); if (mi >= 0) { const n = prompt('Marker name (DROP fires the Drop Builder)', A.markers[mi].name); if (n) view.emit('marker_edit', { op: 'rename', index: mi, name: n }); } else view.emit('marker_edit', { op: 'add', bar: barOf(x), name: prompt('Marker name (e.g. intro, build, DROP)', 'section') || 'section' }); }
+    if (lane.kind === 'marker') { const mi = A.markers.findIndex(m => Math.abs(xOf(m.bar) - x) < 8); if (mi >= 0) UI.ask('Marker name (DROP fires the Drop Builder)', A.markers[mi].name).then((n) => { if (n) view.emit('marker_edit', { op: 'rename', index: mi, name: n }); }); else { const at = barOf(x); UI.ask('Marker name (e.g. intro, build, DROP)', 'section').then((n) => view.emit('marker_edit', { op: 'add', bar: at, name: n || 'section' })); } }
     else if (lane.kind === 'pattern' && !hit(x, y)) view.emit('clip_add', { kind: 'pattern', lane: lane.id, startBar: Math.floor(barOf(x)), bars: 4, slot: 'A' });
     else if (lane.kind === 'inst' && !hit(x, y)) { const at = Math.floor(barOf(x)); pendingSel = { lane: lane.id, startBar: at }; view.emit('clip_add', { kind: 'notes', lane: lane.id, startBar: at, bars: 4 }); }
   });

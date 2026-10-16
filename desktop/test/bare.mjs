@@ -14,7 +14,7 @@ for (const f of ['Music 0 - Core.zip', 'Music 6 - Effects.zip', 'Music 3 - Synth
 R.grown = await p.evaluate(() => ({ domains: Kernel.domains.list().map(d => d.id), organisms: OrganismFactory.defined().map(d => d.label), toolbar: document.querySelectorAll('#slot-bar > *').length, faults: Kernel.faults.list().map(f => f.code), styles: document.querySelectorAll('style[data-pack]').length,
   cards: Array.from(document.querySelectorAll('.overlay .hero-card h2, .overlay .card b')).map(e => e.textContent) }));
 await p.waitForTimeout(500);
-R.kept = fs.readdirSync(process.env.LIB + '/Packs');
+R.kept = fs.readdirSync(process.env.LIB + "/packs");
 R.errs = errs; await app.close();
 // restart: the dropped packs were kept → canvas comes back with them, no prompt
 const app2 = await electron.launch({ executablePath: process.env.ELECTRON, args: ['--no-sandbox', process.env.APP], env: Object.assign({}, process.env, { ERAVOS_LIBRARY: process.env.LIB }) });

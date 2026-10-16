@@ -15,9 +15,13 @@
   CP.kind('kits', { add() {}, remove() {} });   // kits are read on demand (items), nothing to merge
   const KitPacks = window.KitPacks = {
     add(pk) { return CP.add({ id: PID(pk.id), label: pk.label, tags: ['kits', pk.label], items: { 'eravos.pads': { kits: pk.kits } } }); },
-    list: () => CP.list({ tool: 'eravos.pads', kind: 'kits' }).map(p => ({ id: p.id.replace(/^kits\./, ''), label: p.label, kits: CP.get(p.id).items['eravos.pads'].kits })).concat([{ id: 'mine', label: 'Mine', kits: mem.mine }]),
-    enabled: (id) => id === 'mine' ? !mem.off.mine : CP.enabled(PID(id)),
-    toggle(id, on) { if (id === 'mine') { if (on) delete mem.off.mine; else mem.off.mine = 1; keep(); } else CP.setEnabled(PID(id), on); },
+    // 3.39: Drum Machine 3.0 kit packs are PRESET packs whose presets carry a kit (extra.kit) — listed here from the same
+    // data (one source, two views: the tool's preset menu and this page); their id is '@<pack id>'
+    list: () => CP.list({ tool: 'eravos.pads', kind: 'kits' }).map(p => ({ id: p.id.replace(/^kits\./, ''), label: p.label, kits: CP.get(p.id).items['eravos.pads'].kits }))
+      .concat(CP.list({ tool: 'eravos.pads', kind: 'presets' }).map(p => { const pr = (CP.get(p.id).items['eravos.pads'] || {}).presets || {}, ks = {}; Object.keys(pr).forEach(n => { if (pr[n].extra && Array.isArray(pr[n].extra.kit)) ks[n] = pr[n].extra.kit; }); return { id: '@' + p.id, label: p.label, kits: ks }; }).filter(p => Object.keys(p.kits).length))
+      .concat([{ id: 'mine', label: 'Mine', kits: mem.mine }]),
+    enabled: (id) => id === 'mine' ? !mem.off.mine : id[0] === '@' ? CP.enabled(id.slice(1)) : CP.enabled(PID(id)),
+    toggle(id, on) { if (id === 'mine') { if (on) delete mem.off.mine; else mem.off.mine = 1; keep(); } else CP.setEnabled(id[0] === '@' ? id.slice(1) : PID(id), on); },
     saveMine(name, pads) { mem.mine[name] = pads.map(p => Object.assign({}, p)); keep(); },
     removeMine(name) { delete mem.mine[name]; keep(); },
     kits() { return KitPacks.list().filter(p => KitPacks.enabled(p.id)).flatMap(p => Object.keys(p.kits).map(n => ({ pack: p.label, packId: p.id, name: n, pads: p.kits[n] }))); },

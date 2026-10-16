@@ -1,4 +1,4 @@
-/* eravos.sequencer 2.1.0 (+A-4 paint view · 3.36 automation, conditions, evolve) — Step sequencer (P4) · resolves F-07, F-08, F-15(seq)
+/* eravos.sequencer 2.2.0 (+A-4 paint view · 3.36 automation, conditions, evolve · 3.39 grooves: nudge, lane push + swing, velocity digits) — Step sequencer (P4) · resolves F-07, F-08, F-15(seq)
  * 3.36 — the Sequencer drives the whole canvas to the beat:
  *   · AUTO lanes: any knob of any tool (wobble rate, filter, FX mix …), a value per step, hold or glide to the next step
  *   · step LOCKS on note lanes: a step sets knobs of its own instrument for that hit, the knob returns after it
@@ -15,18 +15,19 @@
   const SLOTS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
   const WDIV = { '2': '1/2', '4': '1/4', '4t': '1/4t', '8': '1/8', '8t': '1/8t', '16': '1/16', '16t': '1/16t', '32': '1/32', '1': '1/1' };
   const COLORS = ['#ff2266', '#ffaa00', '#ff66aa', '#ffdd00', '#ddff44', '#aa44ff', '#ff8844', '#44ccff', '#88ffee', '#00ff88', '#ccff99', '#ffcc66', '#00d4ff', '#b066ff', '#ff4488', '#66eeff'];
-  const STEP_SCHEMA = { type: 'object', properties: { on: { type: 'boolean' }, vel: { type: 'number', minimum: 0, maximum: 1 }, prob: { type: 'number', minimum: 0, maximum: 1 }, degree: { type: 'integer', minimum: 1, maximum: 14 }, octave: { type: 'integer', minimum: -2, maximum: 2 }, gate: { type: 'number', minimum: 0.1, maximum: 4 }, accent: { type: 'boolean' }, slide: { type: 'boolean' }, ratchet: { type: 'integer', minimum: 1, maximum: 4 }, val: { type: 'number', minimum: 0, maximum: 1 }, cond: { type: 'string' }, locks: { type: ['object', 'null'] } } };
+  const STEP_SCHEMA = { type: 'object', properties: { on: { type: 'boolean' }, vel: { type: 'number', minimum: 0, maximum: 1 }, prob: { type: 'number', minimum: 0, maximum: 1 }, degree: { type: 'integer', minimum: 1, maximum: 14 }, octave: { type: 'integer', minimum: -2, maximum: 2 }, gate: { type: 'number', minimum: 0.1, maximum: 4 }, accent: { type: 'boolean' }, slide: { type: 'boolean' }, ratchet: { type: 'integer', minimum: 1, maximum: 4 }, nudge: { type: 'number', minimum: -0.5, maximum: 0.5 }, val: { type: 'number', minimum: 0, maximum: 1 }, cond: { type: 'string' }, locks: { type: ['object', 'null'] } } };
   const CONDS = ['', '1:2', '2:2', '1:3', '2:3', '3:3', '1:4', '2:4', '3:4', '4:4', 'fill', '!fill', 'first', '!first'];
   // deterministic noise for evolve / humanize: the same pass of the same step always does the same thing
   const hash = (...a) => { let h = 2166136261; a.forEach(x => { const s = String(x); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } h ^= 124; }); return ((h >>> 0) % 100000) / 100000; };
 
-  function emptyStep() { return { on: false, vel: 0.8, prob: 1, degree: 1, octave: 0, gate: 1, accent: false, slide: false, ratchet: 1, wobbleDiv: null, val: 0.5, cond: '', locks: null }; }
-  function mkTrack(o) { return Object.assign({ name: 'track', kind: 'drum', target: null, drumNote: 36, color: '#00d4ff', mute: false, solo: false, vol: 1, lengthOverride: 0, transpose: 0, role: null, param: null, mode: 'hold', evolve: 0 }, o || {}); }
+  function emptyStep() { return { on: false, vel: 0.8, prob: 1, degree: 1, octave: 0, gate: 1, accent: false, slide: false, ratchet: 1, nudge: 0, wobbleDiv: null, val: 0.5, cond: '', locks: null }; }
+  function mkTrack(o) { return Object.assign({ name: 'track', kind: 'drum', target: null, drumNote: 36, color: '#00d4ff', mute: false, solo: false, vol: 1, lengthOverride: 0, transpose: 0, role: null, param: null, mode: 'hold', evolve: 0, push: 0, swing: null }, o || {}); }
   function mkPattern(len, tracks) { return { name: '', length: len || 16, steps: tracks.map(() => Array.from({ length: 64 }, emptyStep)) }; }
 
   function parseDrum(str, len) {
     const s = String(str).replace(/[|\s]/g, ''); const out = [];
-    for (let i = 0; i < len; i++) { const c = s[i] || '.'; const st = emptyStep(); if (c !== '.' && c !== '-') { st.on = true; st.vel = c === 'X' ? 1 : c === 'o' ? 0.45 : 0.8; st.accent = c === 'X'; } out.push(st); }
+    // 3.39: a digit 1–9 is a hit at that velocity (×0.1) — grooves are written the way a drummer plays, not on/off
+    for (let i = 0; i < len; i++) { const c = s[i] || '.'; const st = emptyStep(); if (c !== '.' && c !== '-') { st.on = true; st.vel = c === 'X' ? 1 : c === 'o' ? 0.45 : /[1-9]/.test(c) ? +c / 10 : 0.8; st.accent = c === 'X'; } out.push(st); }
     return out;
   }
   function parseMelodic(str, len) {
@@ -216,7 +217,8 @@
           const rel = tk.step16 - slotStart, ls = ((rel % len) + len) % len, pass = Math.max(0, Math.floor(rel / len));
           let st = pat.steps[ti] && pat.steps[ti][ls];
           if (!st) return;
-          const swingOff = (ls % 2 === 1) ? P.get('swing') * tk.stepDur : 0;
+          // 3.39: a lane can swing on its own (null = the pattern's swing) and sit early/late by a few ms (push)
+          const swingOff = (ls % 2 === 1) ? (t.swing === null || t.swing === undefined ? P.get('swing') : t.swing) * tk.stepDur : 0;
           if (t.kind === 'auto') { if (st.on && condOK(st.cond, pass)) fireAuto(t, st, ls, pat, tk.time + swingOff, tk.stepDur); return; }
           // evolve (from the 2nd pass): melodic notes wander in key, a few rest; drum lanes grow ghost notes on empty offbeats
           const ev = t.evolve || 0, r = ev && pass > 0 ? hash(seed, slot, ti, ls, pass) : 1;
@@ -225,7 +227,7 @@
           else if (t.kind === 'melodic' && r < ev * 0.45) { const d = hash(seed, ti, ls, pass, 'd') < 0.5 ? -1 : 1, mag = hash(seed, ls, 'm') < 0.7 ? 1 : 2; st = Object.assign({}, st, { degree: Math.max(1, Math.min(14, st.degree + d * mag)) }); }
           if (!condOK(st.cond, pass)) return;
           if (st.prob < 1 && Math.random() >= st.prob) return;
-          let tt = tk.time + swingOff;
+          let tt = Math.max(ac.currentTime, tk.time + swingOff + (t.push || 0) / 1000 + (st.nudge || 0) * tk.stepDur);
           if (hum) { tt += (hash(seed, ti, ls, pass, 'h') - 0.5) * hum * 0.022; st = Object.assign({}, st, { vel: Math.max(0.05, Math.min(1, st.vel * (1 - hum * 0.25 * hash(seed, ls, pass, 'v')))) }); tt = Math.max(tk.time, tt); }
           if (t.kind === 'melodic' || t.kind === 'drum') applyLocks(ti, t, st, tt);
           fireStep(ti, t, st, ls, tt, tk.stepDur);
@@ -262,7 +264,9 @@
       });
       ctx.onUI('track_edit', { type: 'object', required: ['track', 'patch'] }, (p) => {
         const t = tracks[p.track]; if (!t) return ctx.fault('RUNTIME_002', 'track_edit: no track ' + p.track);
-        const allowed = ['name', 'kind', 'target', 'drumNote', 'color', 'mute', 'solo', 'vol', 'lengthOverride', 'transpose', 'param', 'mode', 'evolve'];
+        const allowed = ['name', 'kind', 'target', 'drumNote', 'color', 'mute', 'solo', 'vol', 'lengthOverride', 'transpose', 'param', 'mode', 'evolve', 'push', 'swing'];
+        if (p.patch.push !== undefined) { const v = Number(p.patch.push); if (!Number.isFinite(v)) return ctx.fault('RUNTIME_002', 'lane push must be ms'); p.patch.push = Math.max(-30, Math.min(30, v)); }
+        if (p.patch.swing !== undefined && p.patch.swing !== null) { const v = Number(p.patch.swing); if (!Number.isFinite(v)) return ctx.fault('RUNTIME_002', 'lane swing must be a number'); p.patch.swing = Math.max(0, Math.min(0.75, v)); }
         // 3.37: each lane has its own volume (scales its notes' velocity, 0–1) — saved with the pattern set
         if (p.patch.vol !== undefined) { const v = Number(p.patch.vol); if (!Number.isFinite(v)) return ctx.fault('RUNTIME_002', 'lane volume must be a number'); p.patch.vol = Math.max(0, Math.min(1, v)); }
         Object.keys(p.patch).forEach(k => { if (allowed.includes(k)) t[k] = p.patch[k]; else ctx.fault('RUNTIME_002', 'track_edit: key ' + k); });
@@ -301,18 +305,22 @@
         Object.values(d.slots).forEach(sl => sl.lanes.forEach(l => { if (!lanes.find(x => x.name === l.name)) lanes.push(l); }));
         const pads = K.registry.byOrganism('eravos.pads')[0];
         tracks = lanes.map((l, i) => l.pad !== undefined
-          ? mkTrack({ name: l.name, kind: 'drum', drumNote: 36 + l.pad, target: pads ? pads.instance_id : null, color: COLORS[l.pad % 16] })
+          ? mkTrack({ name: l.name, kind: 'drum', drumNote: 36 + l.pad, target: pads ? pads.instance_id : null, color: COLORS[l.pad % 16], push: l.push || 0, swing: l.swing === undefined ? null : l.swing, vol: l.vol === undefined ? 1 : l.vol })
           : mkTrack({ name: l.name, kind: 'melodic', role: l.role, target: resolveRole(l.role), color: l.role === 'bass' ? '#ff2266' : '#00d4ff', transpose: l.octave || 0 }));
         SLOTS.forEach(s => { patterns[s] = mkPattern(16, tracks); });
         Object.keys(d.slots).forEach(s => {
           const sl = d.slots[s], pat = patterns[s]; pat.length = sl.length; pat.name = sl.name || '';
-          sl.lanes.forEach(l => { const ti = tracks.findIndex(t => t.name === l.name); const row = l.pad !== undefined ? parseDrum(l.steps, sl.length) : parseMelodic(l.steps, sl.length); row.forEach((st, i) => { pat.steps[ti][i] = st; }); });
+          sl.lanes.forEach(l => { const ti = tracks.findIndex(t => t.name === l.name); const row = l.pad !== undefined ? parseDrum(l.steps, sl.length) : parseMelodic(l.steps, sl.length); row.forEach((st, i) => { pat.steps[ti][i] = st; });
+            // 3.39 groove data: conds {step: cond}, probs {step: 0..1}, nudges {step: −0.5..0.5}
+            ['cond', 'prob', 'nudge'].forEach(k => { const m = l[k + 's']; if (m && typeof m === 'object') Object.keys(m).forEach(i => { if (pat.steps[ti][+i]) pat.steps[ti][+i][k] = m[i]; }); }); });
         });
         if (d.swing !== undefined) P.set('swing', d.swing);
-        chain = d.song ? [{ slot: 'A', repeats: 2 }, { slot: 'B', repeats: 2 }, { slot: 'C', repeats: 4 }, { slot: 'D', repeats: 2 }] : [{ slot: 'A', repeats: 1 }];
+        if (d.chain) P.set('chainOn', true);   // a groove's variation / fill bar lives in its chain
+        chain = d.chain ? d.chain.map(c => ({ slot: c.slot, repeats: c.repeats || 1 })) : d.song ? [{ slot: 'A', repeats: 2 }, { slot: 'B', repeats: 2 }, { slot: 'C', repeats: 4 }, { slot: 'D', repeats: 2 }] : [{ slot: 'A', repeats: 1 }];
         P.set('slot', 'A'); P.set('length', patterns.A.length, { silent: true });
         if (d.bpm) ctx.emit('ui:transport-bpm', { bpm: d.bpm });
         if (pads && d.bank !== undefined) K.bus.publish('ui:bank_select:' + pads.instance_id, { bank: d.bank });
+        if (pads && d.kit) K.bus.publish('ui:preset_load:' + pads.instance_id, { name: d.kit });   // 3.39: a groove brings its kit (Drum Machine 3.0 kit preset)
         ctx.currentStarter = name;
         syncGrid(); ctx.syncUI();
       }
