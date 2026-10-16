@@ -59,7 +59,9 @@ describe('Bass Pack (wubs, dubs, bass drops)', () => {
     // 3.34.2 merge: all five re-captured from the 3.34-alpha engine IN this page (same values with the 3.34.2 engine).
     // The 3.34.2 set was taken with no organism defs loaded → place() used SIZE {500×460} → every mount x/y differed.
     // Notes never differed — only window coordinates. A golden must be taken in the environment that checks it.
-    const gold = { 'dubstep:7': 1597129955, 'house:5': 1939224218, 'darkwave:3': 305923139, 'neuro:11': 2802337638, 'trance:2': 2783395663 };
+    // 3.39: all five re-taken after the Drum Machine window grew 470 → 580 px (redesign): the windows placed to its right
+    // moved (3 per song, 4 in trance); every other step and every note is unchanged (compared before/after, positions only)
+    const gold = { 'dubstep:7': 3488627402, 'house:5': 3208681780, 'darkwave:3': 3685006575, 'neuro:11': 3776661450, 'trance:2': 2790197795 };
     Object.keys(gold).forEach(k => { const [id, seed] = k.split(':'); assert.equal(hash(JSON.stringify(SongEngine.generate(id, +seed))), gold[k], k); });
   });
 });
