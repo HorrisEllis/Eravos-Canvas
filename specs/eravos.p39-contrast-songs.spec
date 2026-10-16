@@ -42,6 +42,8 @@
   24 Impossible Drop       200→100 · tempo halving mid-song (metric modulation of the WHOLE song) · every tool at once
   each song ships: Song Engine recipe (seeded) + Timeline template + the presets it uses (in the genre packs) + a one-line
   "what to listen for" + "what makes it different from its nearest neighbour" (the distance, in words).
+## Focus (user 2026-10-16): NEW songs start in the "Lost Love" region first (specs/eravos.p39-her-song.spec 1.1 L4:
+  LL1–LL10); the 24 corners above follow. The farthest-point sampler runs inside that region before the whole space.
 ## Then: more sets — the same sampler run per genre family (bass music · house · techno · breaks · urban · cinematic),
   ≥ 24 songs each, every set measured against ALL earlier songs (no repeats across sets).
 ## Acceptance
