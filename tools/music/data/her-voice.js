@@ -152,5 +152,28 @@
     K.bus.publish('her-voice:placed', { count: clips.length });
   });
 
-  window.HerVoice = { load, add, remove, clear, ensure, plan, phrasesOf, roleOf, list: async () => (await load()).slice(), onChange(fn) { listeners.push(fn); } };
+  // ---------------------------------------------------------------- voice/ beside canvas/ and tools/ (never in the repo)
+  // voice/voice.js (made by build/voice-bundle.mjs from the recordings in voice/) holds her recordings; on start each one
+  // not yet in the store is added once, so a copy of ERAVOS handed to her opens with her voice already in Songs → 🎤.
+  const SELF = (document.currentScript && document.currentScript.src) || '';
+  async function seed() {
+    const B = window.ERAVOS_VOICE; if (!Array.isArray(B) || !B.length) return 0;
+    await load(); let n = 0;
+    for (const v of B) {
+      for (const f of v.files || []) {
+        const bin = atob(f.data), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+        if (recs.some(r => r.hash === hashOf(u.buffer) || r.name === v.name)) break;
+        try { await add(u.buffer, v.name); n++; break; } catch (e) { /* this format can't be decoded here — try the next */ }
+      }
+    }
+    return n;
+  }
+  if (SELF && !/\/tests\//.test(location.pathname) && typeof document !== 'undefined') {
+    const s = document.createElement('script'); s.src = new URL('../../../voice/voice.js', SELF).href;
+    s.onload = () => setTimeout(() => seed().then(n => { if (n && window.Shell && window.Shell.toast) window.Shell.toast('🎤 Her voice is in — ' + n + ' recording' + (n > 1 ? 's' : '') + ' (Songs → For her)', 'good', 4000); }), 0);
+    s.onerror = () => {};
+    document.head.appendChild(s);
+  }
+
+  window.HerVoice = { seed, load, add, remove, clear, ensure, plan, phrasesOf, roleOf, list: async () => (await load()).slice(), onChange(fn) { listeners.push(fn); } };
 })();
