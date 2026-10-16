@@ -99,3 +99,43 @@ dependencies:
     - seq.hook.auto_out (ui:config_change)
   permissions: [bus_publish, bus_subscribe, filesystem_read, registry_read]
   works_with: [eravos.bass-drop-builder, eravos.timeline, eravos.pads, eravos.embodiment-lab, eravos.edm-lab, eravos.coven, eravos.organ, eravos.retro-poly]
+
+# ============================================================
+# PLANNED 3.0 — grooves that move, lanes that reach inside tools (P39 R4 + P37.4, order 4) · status MAPPED, not built
+# "in the sequencer, four on floor is terrible." · "way more precise and adjustable sequencer"
+# ============================================================
+finding: data/patterns.js 'four-on-floor house' = kick X...x...x...x... at one velocity, clap on 2/4, 16th hats 'oxox',
+  open hats on the off-beat, one bar repeated — no velocity contour, no ghost notes, no micro-timing, no variation over
+  4/8 bars, no fill. Correct grid, no groove: it sounds like a metronome. The engine already supports what fixes it
+  (vel, prob, ratchet, cond 1:4, fill, evolve, per-lane length) — the starters do not use it.
+§G GROOVES (data — the starter set is rewritten, not the engine):
+  every starter = 4–8 bars, written like a drummer plays: velocity contour per lane (hats 0.45/0.7/0.55/0.85 …), ghost
+  notes at 0.2–0.35, micro-timing per lane (hats −6…+12 ms, snare +4 ms "lay back", kick on the grid), a variation on
+  bar 4 (cond 4:4), a fill on bar 8 (fill), open-hat chokes, crash on the 1 after a fill.
+  four-on-floor family (each its own pattern, measurably different — A4): Melodic House 122 (her song: soft kick, shaker
+  16ths, rim off-beats, clap with room) · Progressive 126 (rolling 16th bass, ride) · Tech House 125 (swung hats 58 %,
+  percussive tops, 3-3-2 perc) · Afro House 120 (shaker + conga polyrhythm 3:2) · UKG 2-step 132 (skipping kick, shuffled
+  hats) · Hard Techno 150 (rumble kick, off-beat 16th stabs) · Trance 138 (galloping bass 1/16 x-xx) · Disco 118 (open hat
+  off-beat with velocity swell) · Electro House 128 (big room claps, fills).
+  plus the rest of the set to ≥ 60 patterns: half-time dubstep · riddim · tearout · DnB 174 two-step · jungle (amen-style
+  chopped pattern on synthesized hits — no sampled break) · juke 160 · trap 140 (hat rolls 1/32→1/24) · phonk · drill
+  (sliding 808 + triplet hats) · dancehall/dembow · reggae one drop · hardstyle · breakbeat · footwork …
+§P PRECISION (engine):
+  P1 per-step NUDGE −50…+50 % of a step (micro-timing per hit), shown as a tick offset in the cell
+  P2 per-lane RATE (1/8, 1/16, 1/16t, 1/32, 1/32t, 1/64) and per-lane LENGTH (exists: lengthOverride) → polymeter 16:12:7
+  P3 per-lane SWING amount + swing grid (8ths / 16ths) — today one global swing
+  P4 step PROBABILITY (exists) + PROBABILITY GROUPS (only one step of a group fires per pass — exclusive variation)
+  P5 RATCHET shapes (exists as count) → + ramp up / ramp down velocity, + accelerate (rolls that speed up: trap, tearout)
+§L LANES THAT REACH INSIDE TOOLS (P37.4) — "＋ Lane" opens a picker of the target tool's PARTS, read from its own
+  descriptor: one key (note), one pad, a chord, a preset (the lane switches sound per step), any param (exists: auto lanes),
+  an action (throw, fill, drop, stutter — tools declare actions). LANE PLUG: drag from a lane's left dot straight onto any
+  tool/knob on the canvas to make that lane drive it (candidate answer to R9 c).
+§V READABLE GRID (candidate answer to R9 d): beat lines stronger than 16th lines, bar numbers, the playhead as a full-
+  height bar, lanes coloured by target, a velocity bar inside each cell, nudged steps drawn offset; zoom (cell width) with
+  Ctrl+wheel; up to 64 steps per lane without horizontal scroll at 1080p.
+acceptance 3.0:
+  - each four-on-floor pattern differs from every other by ≥ threshold in (swing, velocity variance, onset density, micro-
+    timing variance) — the "all the same / metronome" failure is a failing test
+  - nudge +25 % at 120 BPM 1/16 → the hit lands 31.25 ms late ± 1 sample ; polymeter 16:12 realigns every 48 steps
+  - a preset lane switches the target's sound exactly on its steps and restores it after (no stuck preset)
+  - every starter pattern plays with zero faults on a fresh canvas (tools auto-added as today)
