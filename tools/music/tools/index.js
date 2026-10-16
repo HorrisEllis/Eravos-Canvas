@@ -143,6 +143,18 @@
   js('tools/voice-and-words/lyric-rhythm/lyric-rhythm.engine.js');
   js('tools/voice-and-words/lyric-rhythm/lyric-rhythm.ui.js');
   js('tools/voice-and-words/lyric-rhythm/packs/index.js');
+  js('tools/wubs/wub-filter/wub-filter.engine.js');
+  js('tools/wubs/wub-filter/wub-filter.ui.js');
+  js('tools/wubs/wub-filter/packs/index.js');
+  js('tools/wubs/wub-osc/wub-osc.engine.js');
+  js('tools/wubs/wub-osc/wub-osc.ui.js');
+  js('tools/wubs/wub-osc/packs/index.js');
+  js('tools/wubs/wub-rate/wub-rate.engine.js');
+  js('tools/wubs/wub-rate/wub-rate.ui.js');
+  js('tools/wubs/wub-rate/packs/index.js');
+  js('tools/wubs/wub-sub/wub-sub.engine.js');
+  js('tools/wubs/wub-sub/wub-sub.ui.js');
+  js('tools/wubs/wub-sub/packs/index.js');
   js('tools/xenharmonic/ratio-lattice/ratio-lattice.engine.js');
   js('tools/xenharmonic/ratio-lattice/ratio-lattice.ui.js');
   js('tools/xenharmonic/ratio-lattice/packs/index.js');

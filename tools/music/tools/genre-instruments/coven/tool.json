@@ -61,6 +61,8 @@
     "eravos.macro-automation",
     "eravos.master-fx",
     "eravos.sidechain-compressor",
+    "eravos.wub-filter",
+    "eravos.wub-rate",
     "eravos.xy-pad"
   ],
   "status": "built",

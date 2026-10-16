@@ -168,7 +168,7 @@
   // ---------------------------------------------------------------- dependency list (spec eravos.shell-expansion)
   // Every music tool's needs are DERIVED from its declared hooks, so a new organism gets a correct list for free;
   // a descriptor may add to it with needs: { mode, units, services, works_with, notes }.
-  const CATEGORIES = ['Start here', 'Sound sources', 'Genre instruments', 'Sound Forge', 'Xenharmonic', 'Analysis', 'Voice & samples', 'Drums & rhythm', 'Arrange', 'Effects', 'Mix', 'Modulation', 'Generators', 'Tools'];
+  const CATEGORIES = ['Start here', 'Sound sources', 'Wubs', 'Genre instruments', 'Sound Forge', 'Xenharmonic', 'Analysis', 'Voice & samples', 'Drums & rhythm', 'Arrange', 'Effects', 'Mix', 'Modulation', 'Generators', 'Tools'];
   // 3.26: two modes. Music Production = everything that makes a song (Sound Design + Beat Making folded in);
   // Lab = the tools that are not for making songs (xenharmonic, analysis, breathing) — out of the studio's way
   const LAB_CATEGORIES = ['Xenharmonic', 'Analysis'];

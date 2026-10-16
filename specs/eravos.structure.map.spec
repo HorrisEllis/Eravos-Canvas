@@ -126,6 +126,15 @@ tools/music/    music
   tools/voice-and-words/   (Voice & samples)
     lyric-rhythm/   ✎ Lyrics → Rhythm · eravos.lyric-rhythm · lyric-rhythm.engine.js · lyric-rhythm.ui.js · lyric-rhythm.css · preview.svg · lyric-rhythm.spec · lyric-rhythm.test.js
         packs/ flows (7)
+  tools/wubs/   (Wubs)
+    wub-filter/   👄 Wub Filter · eravos.wub-filter · wub-filter.engine.js · wub-filter.ui.js · preview.png · wub-filter.spec · wub-filter.test.js
+        packs/ factory (11)
+    wub-osc/   〰 Wub Osc · eravos.wub-osc · wub-osc.engine.js · wub-osc.ui.js · preview.png · wub-osc.spec · wub-osc.test.js
+        packs/ factory (11)
+    wub-rate/   〽 Wub Rate · eravos.wub-rate · wub-rate.engine.js · wub-rate.ui.js · preview.png · wub-rate.spec · wub-rate.test.js
+        packs/ factory (10)
+    wub-sub/   ◉ Wub Sub · eravos.wub-sub · wub-sub.engine.js · wub-sub.ui.js · preview.png · wub-sub.spec · wub-sub.test.js
+        packs/ factory (6)
   tools/xenharmonic/   (Xenharmonic)
     ratio-lattice/   ⋕ Ratio Lattice · eravos.ratio-lattice · ratio-lattice.engine.js · ratio-lattice.ui.js · ratio-lattice.spec · preview.png · ratio-lattice.test.js
         packs/ factory (7)
@@ -145,4 +154,4 @@ tools/video/   🎬 Video Editing
         packs/ factory (5)
   planned/   beat-cut · beat-sync · captions · chroma-key · clip-source · frame-grab · keyframes · speed-ramp · text-overlay · transition · video-export · video-grade · video-timeline   (specs of tools not built yet)
 
-# totals: 54 tools · 48 packs · 387 items inside tool packs
+# totals: 58 tools · 52 packs · 425 items inside tool packs
