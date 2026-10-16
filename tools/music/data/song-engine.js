@@ -133,6 +133,7 @@
       steps.push({ op: 'mount', organism: m.organism, as: 'mod' + i, at: place(m.organism), preset: Array.isArray(m.preset) ? pick(r, m.preset) : m.preset });
       if (m.configure) steps.push({ op: 'configure', target: 'mod' + i, params: m.configure });
       if (m.to) steps.push({ op: 'modulate', from: 'mod' + i, to: m.to, key: m.key });
+      if (m.wireFrom) steps.push({ op: 'wire', from: m.wireFrom, to: ['mod' + i, m.wireTo] });   // e.g. Clip Maker's clips → this Sample
     });
     // form → markers + clips
     let bar = 1; const motif = makeMotif(r, G.leadRhythm || 'anthem');
