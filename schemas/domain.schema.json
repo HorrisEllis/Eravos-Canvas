@@ -12,7 +12,9 @@
     "ports": { "type": "array", "items": { "type": "string" }, "description": "port types it speaks: audio, modulation, event, asset, image, video, text, json, style, layout, trigger, number" },
     "modes": { "type": "array", "items": { "type": "string" } },
     "pages": { "type": "array", "items": { "type": "string" }, "description": "pages/<id>/ — off-canvas pages (browsers, learn)" },
-    "content": { "type": "array", "items": { "type": "string" }, "description": "content/<kind>/ — domain-wide data packs (genres, lessons, songs)" }
+    "content": { "type": "array", "items": { "type": "string" }, "description": "content/<kind>/ — domain-wide data packs (genres, lessons, songs)" },
+    "summary": { "type": "string", "description": "one line shown on the catalog's domain card (specs/eravos.p38-catalog.spec)" },
+    "starter": { "type": "array", "items": { "type": "string" }, "description": "tool ids the catalog installs in one click when the domain is first picked" }
   },
   "additionalProperties": false
 }

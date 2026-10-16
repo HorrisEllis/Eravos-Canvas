@@ -1,4 +1,4 @@
-# spec_id: eravos.p38.catalog · version 1.0.0 · phase P38 · status planned · canvas
+# spec_id: eravos.p38.catalog · version 1.1.0 · phase P38 · status BUILT (core; packs-under-tool = with P39 R2/R6) · canvas
 # "The catalog needs to be empty by default. None of the tools are baked in."
 identity:
   id: eravos.catalog ; label: Catalog ; icon: 📚
@@ -26,3 +26,16 @@ bundles (packs spanning tools — 80s, Club, EDM Pads, the P39 genre packs) are 
   "bundle · also feeds Supersaw, Pad Forge …".
 acceptance: every built tool's card renders its preview.png (no broken image — fallback tested by deleting one) ·
   the pack count on the card equals the tool's SOUND tab count · toggling a pack on a card flips it everywhere.
+
+## BUILT 2026-10-16 (canvas/runtime/catalog.js · tools/catalog.js generated · add-menu · first screen · workspace)
+  · Fresh profile → 0 tools; first screen lists every offered domain ("not installed — click to install N starter tools",
+    starter = domain.json "starter"). One click installs + enters the domain's mode. Verified in a fresh browser profile.
+  · ＋ Add lists installed AND offered tools (offered: "not installed" chip, "Install + add"); every card shows the tool's
+    preview.png thumbnail and its preset count; installed tools have "Remove from this canvas".
+  · Installing later loads files in order (one FIFO queue); a domain's dependencies (ports, e.g. dataflow) load first.
+  · Opening a project that names uninstalled tools installs them and names them in a toast.
+  DEVIATIONS (said, not hidden): installed set is in localStorage, not IndexedDB (boot must read it synchronously) ·
+  projects install missing tools instead of asking (refusing would leave the project broken) · removal takes effect at the
+  next start (loaded code cannot be unloaded; it leaves ＋ Add at once, open windows keep working) · a profile that used
+  ERAVOS before the catalog keeps every tool (all: true) · the exe keeps Library/Mods packs as its installed set.
+  Tests set ERAVOS_CATALOG_ALL (they test every tool); tests/p41-catalog.test.js covers the catalog itself.

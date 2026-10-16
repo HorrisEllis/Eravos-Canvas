@@ -1,2 +1,20 @@
-{ "schema": "eravos.domain/1", "id": "coding", "label": "Coding Environment", "version": "1.0.0", "icon": "⌨",
-  "core": [], "ports": ["dataflow"], "modes": ["coding"], "pages": [], "content": [] }
+{
+ "schema": "eravos.domain/1",
+ "id": "coding",
+ "label": "Coding Environment",
+ "version": "1.0.0",
+ "icon": "⌨",
+ "core": [],
+ "ports": [
+  "dataflow"
+ ],
+ "modes": [
+  "coding"
+ ],
+ "pages": [],
+ "content": [],
+ "starter": [
+  "eravos.coding.code-cell"
+ ],
+ "summary": "Write and run code on the canvas — sandboxed, with inputs and outputs as ports."
+}

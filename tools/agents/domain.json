@@ -1,2 +1,20 @@
-{ "schema": "eravos.domain/1", "id": "agents", "label": "AI Automation", "version": "1.0.0", "icon": "✦",
-  "core": [], "ports": ["dataflow"], "modes": ["agents"], "pages": [], "content": [] }
+{
+ "schema": "eravos.domain/1",
+ "id": "agents",
+ "label": "AI Automation",
+ "version": "1.0.0",
+ "icon": "✦",
+ "core": [],
+ "ports": [
+  "dataflow"
+ ],
+ "modes": [
+  "agents"
+ ],
+ "pages": [],
+ "content": [],
+ "starter": [
+  "eravos.agents.ai-step"
+ ],
+ "summary": "Chain prompts, tools and data into automations you can watch run."
+}

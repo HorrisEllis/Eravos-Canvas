@@ -43,6 +43,11 @@
     K = K || global.Kernel;
     if (!snap || typeof snap !== 'object') { K.fault('ASSET_001', { message: 'workspace: not an object' }); return false; }
     if (!snap.workspace_version || K.semver.parse(snap.workspace_version)[0] !== 1) { K.fault('MOUNT_005', { message: `workspace version ${snap.workspace_version} unsupported` }); return false; }
+    // P38 catalog: a project that names tools this canvas has not installed installs them first (named in a toast), never fails
+    if (global.Catalog && Array.isArray(snap.organisms)) {
+      const got = await global.Catalog.ensure(snap.organisms.map(o => o.id), K);
+      if (got.length && global.Shell) global.Shell.toast(`This project uses ${got.length} tool${got.length > 1 ? 's' : ''} you hadn’t installed — installed: ${got.join(', ')}`, 'good', 6000);
+    }
     restoring = true;
     K.bus.publish('workspace:restoring', {});
     try {
