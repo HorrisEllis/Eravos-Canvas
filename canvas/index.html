@@ -153,10 +153,16 @@
     const seenDomain = new Set(), primary = [], more = [];
     X.modes().forEach(m => { const d = m.domain || m.id; if (seenDomain.has(d)) more.push(m); else { seenDomain.add(d); primary.push(m); } });
     const modeCards = primary.map(m => modeCard(m, true)), moreCards = more.map(m => modeCard(m, false));
+    // P38 catalog: domains offered but not installed — one click installs that domain's starter set (named on the card), then enters it
+    const Cat = window.Catalog;
+    if (Cat) Cat.domains().filter(d => !d.loaded && !d.toolless && !seenDomain.has(d.id)).forEach(d => modeCards.push(h('div', { class: 'card mode-card domain-card avail', style: { '--acc': '#7f93a8' }, title: 'installs ' + (d.starter.length ? d.starter.length + ' starter tools' : 'this domain') + ' — add more from ＋ Add any time', onclick: async () => {
+      S.toast(`Installing ${d.label}…`, '', 2000); Cat.chooseDomain(d.id); await Cat.install(d.starter, K); S.activate();
+      const m = X.modes().find(x => x.domain === d.id); if (m) X.enterMode(m.id); bootScreen(first);
+    } }, [h('b', { text: (d.icon || '◈') + ' ' + d.label }), h('small', { text: (d.summary || '') + ' · not installed — click to install ' + (d.starter.length ? d.starter.length + ' starter tool' + (d.starter.length > 1 ? 's' : '') : 'it') })])));
     const box = h('div', { class: 'boot' }, [
       h('h1', { text: 'ERAVOS' }),
       h('p', { class: 'sub', text: X.active().length ? brand.tagline : 'A blank canvas. Pick what you are making — or start empty and add any tool from any domain; it turns on only what it needs.' }),
-      ...(X.modes().length ? [h('div', { class: 'boot-sec', text: 'WHAT ARE YOU MAKING?' }), h('div', { class: 'grid modes domains' }, modeCards)] : []),
+      ...(modeCards.length ? [h('div', { class: 'boot-sec', text: 'WHAT ARE YOU MAKING?' }), h('div', { class: 'grid modes domains' }, modeCards)] : []),
       ...(moreCards.length ? [h('div', { class: 'boot-sec', text: 'MORE MODES' }), h('div', { class: 'grid modes' }, moreCards)] : []),
       ...featured.map(r => h('div', { class: 'hero-card', onclick: () => start(r.id) }, [h('div', { class: 'big', text: r.featured.icon || r.icon || '✦' }), h('div', {}, [h('h2', { text: r.featured.title || r.label }), h('p', { text: r.featured.text || r.tagline || '' })])])),
       ...sectionEls,
