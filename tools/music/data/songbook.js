@@ -204,6 +204,30 @@
     SE.write(s.genre, seed); return true;
   }
 
+  // ---- 🎤 Her voice (3.41): the recordings songs with `voice` sing with — kept on this computer only
+  function voiceBox(h) {
+    const HV = window.HerVoice, box = h('div', { class: 'sbk-voice' }), list = h('div'), status = h('p', { class: 'sbk-note', text: '…' });
+    const file = h('input', { type: 'file', accept: 'audio/*,.m4a,.wav,.mp3,.ogg', multiple: true, style: { display: 'none' } });
+    file.onchange = async () => {
+      for (const f of Array.from(file.files || [])) {
+        status.textContent = 'Reading ' + f.name + '…';
+        try { await HV.add(await f.arrayBuffer(), f.name); } catch (e) { if (window.Shell) window.Shell.toast(e.message, 'bad', 5000); }
+      }
+      file.value = ''; paintVoice();
+    };
+    async function paintVoice() {
+      const rs = await HV.list(), n = rs.reduce((a, r) => a + r.phrases.length, 0);
+      status.textContent = rs.length ? rs.length + (rs.length === 1 ? ' recording · ' : ' recordings · ') + n + ' phrases — every song marked 🎤 uses them.' : 'No recordings yet. Add hers and this song sings with her voice.';
+      list.innerHTML = '';
+      rs.forEach(r => list.appendChild(h('div', { class: 'org-row', style: { margin: '2px 0', alignItems: 'center', gap: '6px' } }, [
+        h('span', { text: '🎤 ' + r.name.replace(/\.[a-z0-9]+$/i, '') + ' · ' + r.duration.toFixed(1) + ' s · ' + r.phrases.length + ' phrases', style: { flex: '1' } }),
+        h('button', { class: 'sbk-alt', style: { marginTop: 0 }, text: '🗑', title: 'forget this recording', onclick: async () => { if (!confirm('Forget “' + r.name + '”?')) return; await HV.remove(r.hash); paintVoice(); } })])));
+    }
+    box.append(h('h4', { text: '🎤 Her voice' }), status, list, file,
+      h('button', { class: 'sbk-alt', text: '＋ Add her recordings', title: 'WAV, MP3 or M4A — kept on this computer, never uploaded', onclick: () => file.click() }));
+    paintVoice(); return box;
+  }
+
   // ---------------------------------------------------------------- the page (overlay, off the canvas)
   let open = null;
   function show() {
@@ -227,12 +251,13 @@
       if (mood === 'mine') { paintMine(); return; }
       const T = window.Taste, list = allSongs().filter(s => mood === 'all' || (mood === 'foryou' ? T && T.get(s.genre) > 0 : s.mood.includes(mood)));
       if (mood === 'foryou') list.sort((a, b) => T.get(b.genre) - T.get(a.genre));
+      if (mood === 'her') list.sort((a, b) => (b.mood.includes('edm') ? 1 : 0) - (a.mood.includes('edm') ? 1 : 0));   // EDM is her favourite: those first
       if (!list.length) grid.appendChild(h('p', { class: 'sbk-note', text: mood === 'foryou' ? 'Nothing yet — rate genres (💜 below a song, or Learn → EDM tour) and the ones you love appear here first.' : 'Nothing here.' }));
       if (!list.includes(sel)) sel = list[0] || sel;
       list.forEach(s => {
         const G = genreOf(s), lk = locked(s);
         const card = h('button', { class: 'sbk-card' + (sel === s ? ' sel' : '') + (lk ? ' locked' : ''), style: { '--acc': (G && G.accent) || '#ff2266' } }, [
-          h('span', { class: 'sbk-ic', text: lk ? '🔒' : ((G && G.icon) || '💘') }), h('b', { text: s.title }), h('small', { text: (G ? G.label : s.genre) + ' · ' + (G ? G.bpm[0] + (G.bpm[1] !== G.bpm[0] ? '–' + G.bpm[1] : '') : s.bpm) + ' BPM' })]);
+          h('span', { class: 'sbk-ic', text: lk ? '🔒' : ((G && G.icon) || '💘') }), h('b', { text: s.title + (G && G.voice ? ' 🎤' : '') }), h('small', { text: (G ? G.label : s.genre) + ' · ' + (G ? G.bpm[0] + (G.bpm[1] !== G.bpm[0] ? '–' + G.bpm[1] : '') : s.bpm) + ' BPM' })]);
         card.onclick = () => { sel = s; paint(); }; card.ondblclick = () => { if (write(s)) close(); };
         grid.appendChild(card);
       });
@@ -242,6 +267,7 @@
         h('h4', { text: 'Listen for' }), h('p', { text: s.listen }),
         h('h4', { text: 'The drop' }), h('p', { text: s.drop }),
         h('h4', { text: 'Her voice clips' }), h('p', { text: s.voice }));
+      if (G && G.voice && window.HerVoice) detail.append(voiceBox(h));
       if (window.Taste && s.genre && !s.recipe) { const v = window.Taste.get(s.genre); detail.append(h('h4', { text: 'Is this you?' }), h('div', { class: 'sbk-actions', style: { marginTop: '4px' } }, [['💜', 2, 'love it'], ['🙂', 1, 'okay'], ['🙅', -1, 'not me']].map(([t, val, tip]) => h('button', { class: 'sbk-alt' + (v === val ? ' on' : ''), style: { marginTop: 0 }, text: t, title: tip, onclick: () => { window.Taste.rate(s.genre, val); paint(); } })))); }
       if (lk) detail.append(h('p', { class: 'sbk-lock', text: '🔒 Finish the Learn lesson “' + ((window.Learn && window.Learn.title(s.lock)) || s.lock) + '” to open this one.' }),
         h('button', { class: 'sbk-go', text: '🧠 Go to that lesson', onclick: () => { close(); window.Learn && window.Learn.open(s.lock); } }));
