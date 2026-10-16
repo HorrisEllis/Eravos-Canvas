@@ -4,5 +4,8 @@
 (function () {
   var base = window.ERAVOS_TOOLS || '';
   var D = window.ERAVOS_DOMAINS = ['dataflow', 'music', 'video', 'image', 'agents', 'coding'];
+  // the canvas Catalog (canvas/runtime/catalog.js) loads only the domains + tools you installed: catalog.js offers them all
+  // as metadata, then boot() writes the loaders that are wanted. No Catalog (an older canvas) → every domain, as before.
+  if (window.Catalog) { document.write('<script src="' + base + 'catalog.js"><\/script>'); document.write('<script>window.Catalog.boot(window.ERAVOS_DOMAINS)<\/script>'); return; }
   for (var i = 0; i < D.length; i++) document.write('<script src="' + base + D[i] + '/index.js"><\/script>');
 })();

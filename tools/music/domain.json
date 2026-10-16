@@ -1,0 +1,38 @@
+{
+ "schema": "eravos.domain/1",
+ "id": "music",
+ "label": "Music Production",
+ "version": "1.0.0",
+ "icon": "🎛",
+ "summary": "Make songs: synths, drums, sequencer, timeline, mixer — every note in key, every hit on the beat.",
+ "core": [
+  "core/music-theory.js",
+  "core/audio.js",
+  "core/master-transport.js"
+ ],
+ "ports": [],
+ "modes": [
+  "music",
+  "music.lab"
+ ],
+ "pages": [],
+ "content": [
+  "data/",
+  "content/bundles/"
+ ],
+ "starter": [
+  "eravos.session",
+  "eravos.pads",
+  "eravos.sequencer",
+  "eravos.wobble-bass",
+  "eravos.supersaw",
+  "eravos.sample-player",
+  "eravos.bass-drop-builder",
+  "eravos.timeline",
+  "eravos.song-recorder",
+  "eravos.mixer",
+  "eravos.master-fx",
+  "eravos.lyric-rhythm",
+  "eravos.coach"
+ ]
+}

@@ -3,5 +3,5 @@
 (function () {
   var base = (window.ERAVOS_TOOLS || '') + 'dataflow/';
   var F = ['core/dataflow.js'];
-  for (var i = 0; i < F.length; i++) document.write('<script src="' + base + F[i] + '"><\/script>');
+  for (var i = 0; i < F.length; i++) (window.Catalog ? window.Catalog.load(base + F[i]) : document.write('<script src="' + base + F[i] + '"><\/script>'));
 })();
