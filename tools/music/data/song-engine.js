@@ -123,8 +123,16 @@
     });
     (G.fx || []).forEach((f, i) => {
       if (i === 0) col = 4;                      // effects start their own row under the instruments
-      steps.push({ op: 'mount', organism: f.organism, as: 'fx' + i, at: place(f.organism), preset: f.preset });
+      steps.push({ op: 'mount', organism: f.organism, as: 'fx' + i, at: place(f.organism), preset: Array.isArray(f.preset) ? pick(r, f.preset) : f.preset });
       steps.push({ op: 'patch', from: f.on, to: 'fx' + i });
+    });
+    // 3.40: modulators and followers — tools with no lane of their own. A mod with `to` + `key` is wired from its first
+    // violet output into that tool's violet input (Wub Rate → Wub Filter's "wub"); without `to` it is just mounted
+    // (Wub Sub follows the Wub Osc's notes by itself). Genres without mods are untouched (same seed → same song).
+    (G.mods || []).forEach((m, i) => {
+      steps.push({ op: 'mount', organism: m.organism, as: 'mod' + i, at: place(m.organism), preset: Array.isArray(m.preset) ? pick(r, m.preset) : m.preset });
+      if (m.configure) steps.push({ op: 'configure', target: 'mod' + i, params: m.configure });
+      if (m.to) steps.push({ op: 'modulate', from: 'mod' + i, to: m.to, key: m.key });
     });
     // form → markers + clips
     let bar = 1; const motif = makeMotif(r, G.leadRhythm || 'anthem');
@@ -166,6 +174,16 @@
     const out = Array.from(ra.hooks.values()).find(h => h.wire_type === 'audio' && h.direction === 'out');
     const inn = Array.from(rb.hooks.values()).find(h => h.wire_type === 'audio' && h.direction === 'in');
     if (out && inn) K.wires.register({ src: { instanceId: a, hookId: out.hook_id }, dst: { instanceId: b, hookId: inn.hook_id } });
+  });
+
+  // ---------------------------------------------------------------- recipe op: modulate B's knob `key` from A (first violet out → B's mod.<key>)
+  R.defineOp('modulate', (st, c) => {
+    const K = c.K, a = c.alias[st.from] || st.from, b = c.alias[st.to] || st.to;
+    const ra = K.registry.get(a), rb = K.registry.get(b); if (!ra || !rb) return;
+    const out = Array.from(ra.hooks.values()).find(h => h.wire_type === 'modulation' && h.direction === 'out');
+    const inn = Array.from(rb.hooks.values()).find(h => h.wire_type === 'modulation' && h.direction === 'in' && (h.mod_key === st.key || h.port === 'mod.' + st.key));
+    if (!out || !inn) { K.fault('MOUNT_005', { message: `modulate: ${ra.organism_id} has no violet output or ${rb.organism_id} has no "${st.key}" input` }); return; }
+    K.wires.register({ src: { instanceId: a, hookId: out.hook_id }, dst: { instanceId: b, hookId: inn.hook_id } });
   });
 
   // ---------------------------------------------------------------- registration: one Start card per genre, a new seed every press
