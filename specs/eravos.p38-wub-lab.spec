@@ -39,3 +39,18 @@
 ## Gaps (ask before building the stage they block)
   G1 S6 needs a listening pass — "studio quality" is judged by ear; ERAVOS can measure loudness/spectrum but not taste.
   G2 S3 CPU budget: how many Wub Lab voices on the target PC? (mono today; poly × worklet costs).
+
+## Requests 2026-10-16 (2) — logged, in build order
+  "i want to build her a song. from my heart but im not good at this." — the goal every item below serves.
+  R1 Drum Machine: "the presets are worthless, the pad sounds are absent beyond default." FINDING (code): every voice has ONE
+     synthesis recipe; a pad can change only tune/decay/level/pan/drive; every kit in Sounds = the same 13 recipes re-tuned
+     (also P37 F3). → Drum Machine 3.0: several synthesis MODELS per voice (kick 909/808/punch/tearout/thump/zap …) + sound-
+     design knobs per pad (tone, snap, sweep, body); kits and presets rebuilt on models. NEXT BUILD.
+  R2 Presets, packs and sounds inside each tool's ⚙ Settings (browse, audition, switch packs on/off, make your own).
+  R3 A way to make sounds for every tool (sound-design surface per tool; Wobble 3.0 drawn shape = the first).
+  R4 Sequencer: "four on floor is terrible" — rewrite the starter patterns; P37.4 (lanes that reach inside a tool).
+  R5 Timeline: "hard to use, scrolling up, scrolling down, cluttered" + "when tools are wired in, should add to the timeline?"
+  R6 Catalog: each tool's thumbnail (preview.png exists per tool) + its packs listed under it.
+  R7 "Tranki" by Skrillex — how it fights the rhythm → Contrast Engine (S5), technique only.
+  R8 Fuck-ton of packs + presets per tool; the most contrasting songs possible (S6); invent something new (§I).
+  R9 "the arrows on each tool to connect them, and the lines on the sequencer" — GAP: what is wrong with them? (asked)
