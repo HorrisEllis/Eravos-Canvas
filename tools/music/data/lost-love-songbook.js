@@ -156,10 +156,10 @@
       fx: [{ organism: 'eravos.sidechain-compressor', preset: 'Classic 1/4 Pump', on: 'pad' }, { organism: 'eravos.fx-echo', preset: 'Ping-pong 1/8.', on: 'lead' }],
       mods: HER, master: { compThresh: -10, compRatio: 2.5, reverbMix: 0.22 } },
   ];
-  GENRES.forEach(SE.addGenre);
+  GENRES.forEach(g => SE.addGenre(Object.assign(g, { voice: true })));   // 3.41: they sing with her recordings (data/her-voice.js)
 
   // ---------------------------------------------------------------- what to listen for, and where her voice goes, per genre
-  const HOWTO = 'Record or drop her clip into Clip Maker, trim it, Send → the Sample player plays it.';
+  const HOWTO = 'Her recordings from Songs → 🎤 Her voice land on the timeline by themselves; for more, drop a clip into Clip Maker, trim it, Send → the Sample player.';
   const NOTES = {
     'll-deep': { listen: 'Soft four-on-the-floor; the pad starts muffled, like hearing it under water, and the peak opens it up.', drop: 'The peak: the pump, the pluck echo and the glass lead arrive together; peak 2 lifts two steps.', voice: 'Her clip in the break, alone over the pad, then once more right before peak 2. ' + HOWTO },
     'll-prog': { listen: 'Long builds, a choir pad, stabs that pump with the kick.', drop: 'One held beat, then the lead; the last peak lifts toward the light.', voice: 'Her words in the break and in the held beat before the last peak. ' + HOWTO },
