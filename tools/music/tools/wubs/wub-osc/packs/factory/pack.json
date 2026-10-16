@@ -130,6 +130,19 @@
       "octave": 0,
       "glide": 0.12
      }
+    },
+    "Dancehall Growl Stack (FM 1:1)": {
+     "params": {
+      "wave": "fm",
+      "ratio": "1",
+      "index": 7,
+      "voices": 3,
+      "spread": 12,
+      "width": 0.35,
+      "drift": 0.4,
+      "octave": -1,
+      "glide": 0.04
+     }
     }
    }
   }

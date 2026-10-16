@@ -127,7 +127,7 @@
       autoTarget();
 
       function resolveRole(role) {
-        const pref = role === 'bass' ? ['eravos.wobble-bass', 'eravos.reese-bass', 'eravos.acid-synth', 'eravos.supersaw'] : role === 'lead' ? ['eravos.supersaw', 'eravos.waveform-lab', 'eravos.acid-synth'] : ['eravos.supersaw', 'eravos.organ'];
+        const pref = role === 'bass' ? ['eravos.wobble-bass', 'eravos.reese-bass', 'eravos.wub-osc', 'eravos.acid-synth', 'eravos.supersaw'] : role === 'lead' ? ['eravos.supersaw', 'eravos.waveform-lab', 'eravos.acid-synth'] : ['eravos.supersaw', 'eravos.organ'];
         for (const id of pref) { const r = K.registry.byOrganism(id)[0]; if (r) return r.instance_id; }
         return null;
       }

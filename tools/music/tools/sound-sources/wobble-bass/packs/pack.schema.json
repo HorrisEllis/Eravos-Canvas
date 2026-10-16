@@ -45,7 +45,7 @@
                       "depth": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 6
+                        "maximum": 8
                       },
                       "lfoSync": {
                         "type": "boolean"
@@ -158,6 +158,15 @@
                         "minimum": 0,
                         "maximum": 1
                       },
+                      "gritMode": {
+                        "enum": [
+                          "auto",
+                          "soft",
+                          "asym",
+                          "fold",
+                          "hard"
+                        ]
+                      },
                       "octave": {
                         "type": "integer",
                         "minimum": -2,
@@ -178,8 +187,15 @@
                         "minimum": 0,
                         "maximum": 1
                       },
+                      "sqOct": {
+                        "enum": [
+                          "0",
+                          "-1"
+                        ]
+                      },
                       "subOct": {
                         "enum": [
+                          "0",
                           "-1",
                           "-2"
                         ]

@@ -15,7 +15,7 @@
     config: [
       { key: 'follow', type: 'boolean', default: true, label: 'Follow Wub Osc', group: 'NOTES', hint: 'play the notes sent to any Wub Osc too' },
       { key: 'wave', type: 'enum', options: ['sine', 'triangle', 'warm'], default: 'sine', label: 'Wave', group: 'TONE', hint: 'warm adds a little 2nd/3rd harmonic so the sub is heard on phones' },
-      { key: 'octave', type: 'integer', default: -2, min: -3, max: 0, label: 'Octave', group: 'TONE' },
+      { key: 'octave', type: 'integer', default: -1, min: -3, max: 0, label: 'Octave', group: 'TONE', hint: 'against the note: −1 = the same pitch as a Wub Osc at its default octave (−1)' },
       { key: 'cut', type: 'number', default: 150, min: 40, max: 400, step: 1, unit: 'Hz', label: 'Low-pass', group: 'TONE' },
       { key: 'glide', type: 'number', default: 0.05, min: 0, max: 0.6, step: 0.001, unit: 's', label: 'Glide', group: 'ENV' },
       { key: 'attack', type: 'number', default: 0.006, min: 0.001, max: 0.5, step: 0.001, unit: 's', label: 'Attack', group: 'ENV' },

@@ -58,3 +58,38 @@ describe('Wobble Bass 3.0 · Wub Lab stage 1: drawn shapes + wub sequence', () =
     c.params.set('wubOn', false); assert.equal(c.internals.frozen, false);
   });
 });
+
+// 3.1 — the sub sits at the wub's own pitch; growl grit; the mouth reaches the mids
+describe('Wobble Bass 3.1 · sub at the wub’s pitch, fold grit, mid-range growl', () => {
+  // share of energy per band, from one Hann-windowed FFT (8192 samples) starting at t
+  function bands(buf, t, edges) {
+    const x = buf.getChannelData(0), N = 8192, s = Math.floor(t * buf.sampleRate), re = new Float64Array(N), im = new Float64Array(N);
+    for (let i = 0; i < N; i++) re[i] = x[s + i] * (0.5 - 0.5 * Math.cos(2 * Math.PI * i / N));
+    for (let i = 1, j = 0; i < N; i++) { let b = N >> 1; for (; j & b; b >>= 1) j ^= b; j ^= b; if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; } }
+    for (let len = 2; len <= N; len <<= 1) { const a = -2 * Math.PI / len; for (let i = 0; i < N; i += len) for (let k = 0; k < len / 2; k++) { const c = Math.cos(a * k), sn = Math.sin(a * k), p = i + k, q = p + len / 2, vr = re[q] * c - im[q] * sn, vi = re[q] * sn + im[q] * c; re[q] = re[p] - vr; im[q] = im[p] - vi; re[p] += vr; im[p] += vi; } }
+    const hz = buf.sampleRate / N, e = edges.slice(1).map(() => 0); let tot = 0;
+    for (let i = 1; i < N / 2; i++) { const f = i * hz, m = re[i] * re[i] + im[i] * im[i]; tot += m; for (let b = 0; b < e.length; b++) if (f >= edges[b] && f < edges[b + 1]) e[b] += m; }
+    return e.map(v => v / tot);
+  }
+  const rig = (secs, preset, params) => {
+    const U = TH.universe(secs || 1, { bpm: 140 }), w = TH.spawn(U, 'eravos.wobble-bass'), c = OrganismFactory.handle(w).ctx;
+    if (preset) c.presets.load(preset); Object.keys(params || {}).forEach(k => c.params.set(k, params[k])); return { U, w, c };
+  };
+  it('by default the sub plays at the wub’s pitch (A2 at octave −1 → 55 Hz, not 27.5 Hz)', async () => {
+    const { U, w, c } = rig(0.6); assert.equal(c.params.get('subOct'), '0');
+    TH.note(U, w, 45, 0.05, { duration: 0.4 }); await TH.render(U);
+    assert.near(c.internals.sub.frequency.value, 55, 0.01);
+    c.params.set('subOct', '-1'); assert.near(c.internals.sub.frequency.value, 55, 0.01, 'the ramp target is set, not the value yet');
+  });
+  it('fold grit makes far more upper harmonics than soft grit at the same amount', async () => {
+    const hiShare = async (gritMode) => { const { U, w } = rig(0.8, null, { gritMode, shaper: 0.7, lfoSync: false, lfoHz: 0.1, depth: 0, cutoff: 900, sub: 0 });
+      TH.note(U, w, 45, 0.05, { duration: 0.7 }); const b = await TH.render(U); const [, hi] = bands(b, 0.3, [20, 800, 20000]); return hi; };
+    assert.gt(await hiShare('fold'), (await hiShare('soft')) * 1.5);
+  });
+  it('the dancehall presets reach past the low end: far more energy above 800 Hz than Classic Wub, open', async () => {
+    const mids = async (name) => { const { U, w } = rig(2.3, name, { wubOn: false, lfoSync: false, lfoHz: 0.25, retrig: true, lfoShape: 'sine' });   // opens over 2 s
+      TH.note(U, w, 45, 0.05, { duration: 2.2 }); const b = await TH.render(U); return bands(b, 1.85, [20, 800, 20000])[1]; };
+    const classic = await mids('Classic Wub 1/8');
+    for (const n of ['Bun Dem Growl (dancehall drop)', 'Sound-System Screech', 'Fold Growl Wub 1/8']) assert.gt(await mids(n), classic * 2, n);
+  }, { timeout: 60000 });
+});

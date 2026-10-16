@@ -281,6 +281,35 @@
       "smooth": 0.2,
       "noteRetrig": false
      }
+    },
+    "Dancehall Switch-up": {
+     "params": {
+      "steps": [
+       "1/8",
+       "1/8",
+       "1/16",
+       "1/8t",
+       "1/8",
+       "1/16",
+       "1/32",
+       "off",
+       "1/8",
+       "1/8",
+       "1/8",
+       "1/8",
+       "1/8",
+       "1/8",
+       "1/8",
+       "1/8"
+      ],
+      "length": 8,
+      "stepLen": "1/4",
+      "shape": "talk",
+      "polarity": "unipolar+",
+      "smooth": 0.08,
+      "retrig": "on change",
+      "depth": 1
+     }
     }
    }
   }

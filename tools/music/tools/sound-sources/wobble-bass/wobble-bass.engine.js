@@ -1,4 +1,4 @@
-/* eravos.wobble-bass 3.0.0 — Wobble Bass (P2) · resolves F-11(wobble) · Wub Lab stage 1 (P38)
+/* eravos.wobble-bass 3.1.0 — Wobble Bass (P2) · resolves F-11(wobble) · Wub Lab stage 1 (P38)
  * Dubstep wobble/talking bass: tempo-division LFO that retriggers per note (phase reset),
  * 24 dB lowpass OR formant (vowel) filter bank, monophonic legato with glide.
  * Sub sine is summed after the filter (low-end safety — surfaced decision, see CHANGELOG).
@@ -6,11 +6,15 @@
  * stereo width, noise, sub octave, LFO→volume (tremolo wub), output level.
  * 3.0 (Wub Lab stage 1): DRAW — your own wobble shape (points + a bend per segment, ≤ 32 points) · WUB SEQ — a rate roll:
  * every step of 1–16 steps picks its own rate (1/1 … 1/32), shape, HOLD (keep going) or STOP (freeze shut); while it is on
- * the sequence owns the wobble's phase on the bar grid and notes only play pitch · 4 more vowels (UH, AE, IH, ER). */
+ * the sequence owns the wobble's phase on the bar grid and notes only play pitch · 4 more vowels (UH, AE, IH, ER).
+ * 3.1: the sub plays at the wub's own pitch by default (Sub oct 0; it sat an octave under it, 27.5 Hz for an A2) · Grit
+ * type (fold = growl, hard, asym, soft) after the filter · Depth to 8 oct so the mouth opens all the way (Cutoff stays 40–8000: saved automation lanes map onto it) ·
+ * the Square layer plays at the saw's pitch by default (Square oct 0; it sat an octave under, 27.5 Hz under an A2). */
 (function () {
   'use strict';
   const S = OrganismSDK.STD;
   const DIVS = ['1/1', '1/2', '1/4', '1/4t', '1/8', '1/8t', '1/16', '1/16t', '1/32'];
+  const SUBK = { '0': 1, '-1': 0.5, '-2': 0.25 };   // 3.1: sub against the wub's pitch (0 = same; was −1 by default → 27.5 Hz under A2)
   // vowel formants F1/F2/F3 (Hz) + band gains (dB)
   const VOWELS = {
     OO: { f: [300, 870, 2240], g: [0, -10, -24] },
@@ -81,7 +85,7 @@
   }
 
   OrganismFactory.define({
-    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '3.0.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
+    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '3.1.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
     category: 'Sound sources', blurb: 'Dubstep wobble / talking "yoi" bass locked to the tempo. The drop.',
     size: { w: 560, h: 600 }, minSize: { w: 420, h: 380 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
@@ -95,7 +99,7 @@
       { key: 'div', type: 'enum', options: DIVS, default: '1/8', label: 'Wobble rate', group: 'WOBBLE' },
       { key: 'lfoShape', type: 'enum', options: SHAPES, default: 'sine', label: 'Shape', group: 'WOBBLE' },
       { key: 'shapePts', type: 'array', default: [[0, -1, 0.5], [0.2, 1, 0], [0.42, 0.15, -0.4], [0.55, 0.55, 0.3], [0.62, 0.1, 0]], label: 'Drawn shape', group: 'WOBBLE', hidden: true },
-      { key: 'depth', type: 'number', default: 3, min: 0, max: 6, step: 0.01, unit: 'oct', label: 'Depth', group: 'WOBBLE' },
+      { key: 'depth', type: 'number', default: 3, min: 0, max: 8, step: 0.01, unit: 'oct', label: 'Depth', group: 'WOBBLE' },
       { key: 'lfoSync', type: 'boolean', default: true, label: 'Sync', group: 'WOBBLE' },
       { key: 'lfoHz', type: 'number', default: 4, min: 0.1, max: 24, step: 0.01, unit: 'Hz', label: 'Free rate', group: 'WOBBLE' },
       { key: 'retrig', type: 'boolean', default: true, label: 'Retrig', group: 'WOBBLE' },
@@ -116,11 +120,13 @@
       { key: 'sub', type: 'number', default: 0.6, min: 0, max: 1, step: 0.01, label: 'Sub', group: 'TONE' },
       { key: 'drive', type: 'number', default: 0.4, min: 0, max: 1, step: 0.01, label: 'Drive', group: 'TONE' },
       { key: 'shaper', type: 'number', default: 0.3, min: 0, max: 1, step: 0.01, label: 'Grit', group: 'TONE' },
+      { key: 'gritMode', type: 'enum', options: ['auto', 'soft', 'asym', 'fold', 'hard'], default: 'auto', label: 'Grit type', group: 'TONE', hint: 'after the filter: fold = growl (harmonics that move with the wobble), hard = clipped and loud, auto = soft, asym above 0.6' },
       { key: 'octave', type: 'integer', default: -1, min: -2, max: 1, label: 'Octave', group: 'TONE' },
       { key: 'spread', type: 'number', default: 9, min: 0, max: 50, step: 0.1, unit: 'c', label: 'Unison', group: 'TONE' },
       { key: 'width', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Width', group: 'TONE' },
       { key: 'noise', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Noise', group: 'TONE' },
-      { key: 'subOct', type: 'enum', options: ['-1', '-2'], default: '-1', label: 'Sub oct', group: 'TONE' },
+      { key: 'sqOct', type: 'enum', options: ['0', '-1'], default: '0', label: 'Square oct', group: 'TONE', hint: 'the Square layer against the saw: 0 = same pitch, −1 = an octave under (thick, but 27.5 Hz under an A2 is rumble you feel more than hear)' },
+      { key: 'subOct', type: 'enum', options: ['0', '-1', '-2'], default: '0', label: 'Sub oct', group: 'TONE', hint: 'the sub against the wub: 0 = same pitch (the usual), −1 / −2 = deeper (−2 is below most speakers)' },
       { key: 'level', type: 'number', default: 1, min: 0, max: 1.5, step: 0.01, label: 'Level', group: 'TONE' },
       { key: 'glide', type: 'number', default: 0.06, min: 0, max: 0.5, step: 0.001, unit: 's', label: 'Glide', group: 'ENV' },
       { key: 'attack', type: 'number', default: 0.005, min: 0.001, max: 1, step: 0.001, unit: 's', label: 'Attack', group: 'ENV' },
@@ -220,7 +226,8 @@
         const now = ac.currentTime;
         dsp.setSmooth(sqG.gain, P.get('osc2') * 0.55, ac); dsp.setSmooth(subG.gain, P.get('sub') * 0.55, ac);
         preSh.curve = dsp.curve('tanh', 0.1 + P.get('drive') * 0.9); pre.gain.setTargetAtTime(0.8 + P.get('drive') * 1.5, now, 0.01);
-        post.curve = dsp.curve(P.get('shaper') > 0.6 ? 'asym' : 'soft', P.get('shaper') * 0.75);
+        const gm = P.get('gritMode'), kind = gm === 'auto' ? (P.get('shaper') > 0.6 ? 'asym' : 'soft') : gm;
+        post.curve = dsp.curve(kind, P.get('shaper') * (kind === 'fold' ? 1 : kind === 'hard' ? 0.5 : 0.75));
         const comp = 1 / (0.6 + dsp.curveRms(post.curve) * 0.8);
         dsp.setSmooth(level.gain, 0.45 * comp * P.get('level'), ac);
         saw2.detune.setTargetAtTime(P.get('spread'), now, 0.02);
@@ -246,7 +253,7 @@
         formMakeup.gain.setTargetAtTime(mode === 'formant' ? 2.2 + q * 0.12 : 0, ac.currentTime, 0.005);
       }
       applyTone(); applyFilter();
-      ['osc2', 'sub', 'drive', 'shaper', 'level', 'spread', 'width', 'noise', 'ampMod', 'vibrato'].forEach(k => P.onChange(k, applyTone));
+      ['osc2', 'sub', 'drive', 'shaper', 'gritMode', 'level', 'spread', 'width', 'noise', 'ampMod', 'vibrato'].forEach(k => P.onChange(k, applyTone));
       ['filterMode', 'cutoff', 'res', 'depth', 'vowelA', 'vowelB', 'formantShift'].forEach(k => P.onChange(k, applyFilter));
       ['lfoShape', 'lfoPhase', 'shapePts'].forEach(k => P.onChange(k, () => { if (lfo) setWave(curWave()); }));
       const retime = () => { if (lfo && !frozen) { lfo.frequency.cancelScheduledValues(ac.currentTime); lfo.frequency.value = lfoFreq(curDiv); } };
@@ -269,8 +276,8 @@
       let held = null; // {note, off}
       let curF = 55;
       function setFreq(f, t, glide, fromHz) {
-        const from = fromHz || curF, subK = P.get('subOct') === '-2' ? 0.25 : 0.5;
-        [[saw, 1], [sq, 0.5], [saw2, 1], [sub, subK]].forEach(([o, k]) => {
+        const from = fromHz || curF, subK = SUBK[P.get('subOct')] || 1;
+        [[saw, 1], [sq, P.get('sqOct') === '-1' ? 0.5 : 1], [saw2, 1], [sub, subK]].forEach(([o, k]) => {
           o.frequency.cancelScheduledValues(t);
           if (glide > 0) { o.frequency.setValueAtTime(from * k, t); o.frequency.exponentialRampToValueAtTime(f * k, t + glide); }
           else o.frequency.setValueAtTime(f * k, t);
@@ -310,7 +317,8 @@
         if (typeof amp.gain.cancelAndHoldAtTime === 'function') amp.gain.cancelAndHoldAtTime(t); else amp.gain.cancelScheduledValues(t);
         amp.gain.setTargetAtTime(0, t, P.get('release') / 4); held.off = t;
       }
-      P.onChange('subOct', () => { sub.frequency.setTargetAtTime(curF * (P.get('subOct') === '-2' ? 0.25 : 0.5), ac.currentTime, 0.01); });
+      P.onChange('sqOct', () => { sq.frequency.setTargetAtTime(curF * (P.get('sqOct') === '-1' ? 0.5 : 1), ac.currentTime, 0.01); });
+      P.onChange('subOct', () => { sub.frequency.setTargetAtTime(curF * (SUBK[P.get('subOct')] || 1), ac.currentTime, 0.01); });
       ctx.noteOn = noteOn;
       ctx.onNote((p) => {
         const o = { duration: p.duration, slide: p.slide, wobbleDiv: p.wobbleDiv && DIVS.includes(p.wobbleDiv) ? p.wobbleDiv : undefined };

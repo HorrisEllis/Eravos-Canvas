@@ -32,3 +32,15 @@ describe('tool · Wub Filter — the mouth', () => {
     }
   });
 });
+describe('recipe · Wub Drop (dancehall style)', () => {
+  it('builds the rig: six tools, the beat and four wires, no faults; the bass lane plays the Wub Osc', async () => {
+    const U = TH.universe(0.5, { bpm: 140 }), n0 = U.K.faults.list().length;
+    const r = await Recipes.run('eravos.recipe.wub-drop', { K: U.K, headless: true });
+    assert.ok(r, 'ran'); assert.equal(U.K.faults.list().slice(n0).map(f => f.fault_class + ' ' + f.message).join(' | '), '', 'faults');
+    ['eravos.wub-osc', 'eravos.wub-filter', 'eravos.wub-rate', 'eravos.wub-sub', 'eravos.fx-destroyer', 'eravos.sequencer', 'eravos.pads'].forEach(id => assert.equal(U.K.registry.byOrganism(id).length, 1, id));
+    assert.equal(r.wires.length, 4, 'wires');
+    const seq = OrganismFactory.handle(U.K.registry.byOrganism('eravos.sequencer')[0].instance_id).ctx, osc = U.K.registry.byOrganism('eravos.wub-osc')[0].instance_id;
+    const lanes = (seq.serialize().extra || seq.serialize()).tracks || seq.saveExtra().tracks;
+    assert.ok(lanes.some(t => t.role === 'bass' && t.target === osc), 'the bass lane targets the Wub Osc');
+  });
+});

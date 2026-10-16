@@ -121,6 +121,18 @@
       "res": 6,
       "invert": true
      }
+    },
+    "Bun Dem Throat (OO → AE)": {
+     "params": {
+      "mode": "vowel",
+      "vowelA": "OO",
+      "vowelB": "AE",
+      "res": 12,
+      "drive": 0.6,
+      "formant": 2,
+      "position": 0,
+      "invert": false
+     }
     }
    }
   }
