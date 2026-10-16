@@ -59,7 +59,8 @@
     "eravos.fx-pitch",
     "eravos.harmonic-analyzer",
     "eravos.master-fx",
-    "eravos.sidechain-compressor"
+    "eravos.sidechain-compressor",
+    "eravos.wub-filter"
   ],
   "status": "built",
   "conflicts": []

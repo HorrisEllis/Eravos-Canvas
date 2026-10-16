@@ -68,6 +68,10 @@
     "eravos.sub-engine",
     "eravos.supersaw",
     "eravos.wobble-bass",
+    "eravos.wub-filter",
+    "eravos.wub-osc",
+    "eravos.wub-rate",
+    "eravos.wub-sub",
     "eravos.xen-synth"
   ],
   "status": "built",
