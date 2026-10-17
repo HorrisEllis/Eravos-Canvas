@@ -51,7 +51,8 @@ async function measureTool(id) {
   };
   // press Stop all when the render clock REACHES t (OfflineAudioContext.suspend) — exactly what the ■ button does live
   const stopAt = (U, t) => { U.ctx.suspend(t).then(() => { U.K.silence({ hard: true, reason: 'tool-audio' }); U.ctx.resume(); }); };
-  const inPort = (U, inst) => U.K.audio.ports(inst).find(p => p.kind === 'audio' && p.direction === 'in');
+  // an effect's signal input; an instrument's FM / ring inputs (3.42 Morph Osc) and mod-slot returns are not one
+  const inPort = (U, inst) => U.K.audio.ports(inst).find(p => p.kind === 'audio' && p.direction === 'in' && !/^(fm|ring|slot\.)/.test(p.port_id));
   const mixDown = (buf) => { const m = new Float32Array(buf.length); for (let c = 0; c < buf.numberOfChannels; c++) { const dd = buf.getChannelData(c); for (let i = 0; i < dd.length; i++) m[i] += dd[i] / buf.numberOfChannels; } return m; };
   const wav = (hz, secs) => { const b = new AudioBuffer({ numberOfChannels: 1, length: Math.round(secs * SR), sampleRate: SR }), dd = b.getChannelData(0); for (let i = 0; i < dd.length; i++) { const t = i / SR; dd[i] = 0.5 * (2 * ((t * hz) % 1) - 1) * Math.min(1, t / 0.005, (secs - t) / 0.01); } return AudioRecorder.encodeWAV(b, 16); };
   { const U = TH.universe(0.1), inst = TH.spawn(U, id), hasOut = U.K.audio.ports(inst).some(p => p.kind === 'audio' && p.direction === 'out');

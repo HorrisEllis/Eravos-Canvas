@@ -79,7 +79,12 @@ registerProcessor('eravos-crush2', EravosCrush2);`;
     size: { w: 460, h: 520 }, minSize: { w: 340, h: 380 },
     permissions: ['audio_out', 'audio_in', 'bus_publish', 'bus_subscribe'],
     provides: ['capability.audio_out', 'capability.fx'],
-    curves: { shapeCurve, makeup },   // the UI draws the exact curve the engine plays
+    curves: { shapeCurve, makeup },
+    slots: [{ id: 'after', label: 'after the damage', wire_type: 'audio', hint: 'empty — put a Wub Filter, Echo or Phaser here and it is mixed by Mix' }],   // 3.42 mods: any effect can live inside (canvas/runtime/mods.js)
+    face: ['shape', 'drive', 'asym', 'lowKeep', 'bits', 'downsample'],   // what this shows on the tools it is wired to
+    links: [{ dir: 'in', category: 'Wubs', hint: 'a wub feeds this — Low keep around 100 Hz keeps its sub clean under the grit' },
+            { dir: 'in', category: 'Sound Sources', hint: 'a bass feeds this — Low keep keeps the sub clean' }],
+   // the UI draws the exact curve the engine plays
     hooks: SDK.fxHooks([S.mod_in('dst.hook.mod_drive', 'drive'), S.mod_in('dst.hook.mod_bits', 'bits'), S.mod_in('dst.hook.mod_down', 'downsample')]),
     config: [
       { key: 'shape', type: 'enum', options: SHAPES, default: 'soft', label: 'Shape', group: 'SHAPER' },
@@ -112,7 +117,7 @@ registerProcessor('eravos-crush2', EravosCrush2);`;
       tight.connect(xHP1); xHP1.connect(xHP2); xHP2.connect(pre); pre.connect(sh); sh.connect(lvl); lvl.connect(dcb); dcb.connect(aa); aa.connect(crushIn);
       img1.connect(img2); img2.connect(tame); tame.connect(dcb2); dcb2.connect(sum);   // a coarse quantiser makes DC of its own
       hi.connect(xLP1); xLP1.connect(xLP2); xLP2.connect(lowDly); lowDly.connect(lowG); lowG.connect(sum);   // lows skip TIGHT too: kept means kept
-      sum.connect(fx.wetOut);
+      ctx.slot('after', sum, { label: 'after the damage' }).connect(fx.wetOut);   // its mods, inside the wet path
       const driveMod = ctx.modBus('drive', { min: -1, max: 1 }); driveMod.connect(pre.gain);
       let crush = null, quant = null;
       crushIn.connect(img1); // until the worklet is ready (or if it never is)

@@ -62,6 +62,18 @@ Techno, Trap, Synthwave (80s), Darkwave (80s), Witch House). Every press writes 
 drums, bass, chords, lead and the arrangement — on the Timeline, all in key. Click any clip to edit it in the piano roll.
 The song's name ends in its number: `SongEngine.write('synthwave', 4242)` builds that exact song again.
 
+## 3.43 — small tools that combine · Links · Mods · Synthesis
+- **Links — tools grow when they meet.** Every window shows what it is wired to (⇠ feeds it · ⇢ it feeds). Click a chip and
+  that tool's main controls unfold inside this window; pairs that belong together (Wub Rate → Wub Filter, Morph Osc → Morph
+  Osc, Envelope → anything) unfold on their own when you wire them.
+- **Mods — any tool inside another.** Destroyer, Wub Osc, Wub Filter and Wub Sub have a 🧩 MODS rack: ＋ mod puts any effect
+  inside (Wub Filter inside the Destroyer, a Destroyer inside a Wub Osc …) — no extra window, one undo step, saved with it,
+  mods can hold mods. ⏻ bypass, ↑ ↓ reorder, ⤢ shows a mod's whole window.
+- **Synthesis** (new category): **Morph Osc** — wavetable oscillator that morphs (analog / vocal / digital / organ tables),
+  with FM and Ring INPUTS: wire one Morph Osc into another's FM in and you have FM synthesis — the modulator follows the
+  notes by itself. **Envelope** — wire it into any knob on any tool; it moves on that tool's notes. **Partials** — additive:
+  draw 24 harmonics, evolve between two spectra, stretch them into bells (kept in tune).
+
 ## 3.42 — Destroyer 2.0 · distortion that sits in a mix
 - **Same volume, new colour**: drive no longer adds up to +13 dB on quiet parts (1.x levelled itself at full scale) —
   gain is matched across −6…−24 dBFS, so switching it on changes the tone, not the loudness.

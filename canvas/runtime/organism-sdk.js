@@ -32,6 +32,21 @@
     async put(store, key, val) { try { const db = await IDB.open(); return await new Promise((res, rej) => { const tx = db.transaction(store, 'readwrite'); tx.objectStore(store).put(val, key); tx.oncomplete = () => res(true); tx.onerror = () => rej(tx.error); }); } catch (e) { return false; } },
   };
 
+  // a link = { peer, organism, label, provides, category, dir: 'in'|'out', hook, peerHook, wire_type, wire_id }.
+  // A host's own insert chain (its mods, meta.insert) is not a link: that is the tool itself.
+  function linksOf(K, id) {
+    const out = [];
+    K.wires.list().forEach(w => {
+      if (w.meta && w.meta.insert) return;
+      const mine = w.dst.instanceId === id ? 'in' : w.src.instanceId === id ? 'out' : null; if (!mine) return;
+      const peer = mine === 'in' ? w.src : w.dst, me = mine === 'in' ? w.dst : w.src, r = K.registry.get(peer.instanceId); if (!r) return;
+      const d = global.OrganismFactory && global.OrganismFactory.def(r.organism_id);
+      out.push({ peer: peer.instanceId, organism: r.organism_id, label: r.descriptor.label || r.organism_id, icon: r.descriptor.icon || '', provides: r.descriptor.provides || [], category: (d && d.category) || '',
+        dir: mine, hook: me.hookId, peerHook: peer.hookId, wire_type: w.wire_type, wire_id: w.wire_id });
+    });
+    return out;
+  }
+
   // ---------------------------------------------------------------- ctx
   function create(instanceId, K, descriptor, opts) {
     opts = opts || {};
@@ -217,6 +232,14 @@
       },
     };
 
+    // ---- links: who this tool is wired to, live (tools/<d> engines adapt to their neighbours — eravos.links spec)
+    ctx.links = () => linksOf(K, instanceId);
+    ctx.onLinks = (fn) => {
+      const fire = (w) => { if (disposed || !w) return; const src = w.src && w.src.instanceId, dst = w.dst && w.dst.instanceId; if (src === instanceId || dst === instanceId || w.instanceId) safe(() => fn(ctx.links())); };
+      ['kernel:wire-registered', 'kernel:wire-removed', 'kernel:organism-unmounted'].forEach(t => unsubs.push(bus.subscribe(t, fire, instanceId)));
+      safe(() => fn(ctx.links()));
+    };
+
     // the stop signal reaches every tool regardless of its declared hooks (a kernel signal, not a wire)
     unsubs.push(bus.subscribe('kernel:silence', (p) => { if (!disposed && (!p.instanceId || p.instanceId === instanceId)) ctx.silenceNow(p); }, instanceId));
     // a stop request from this tool's own window (its ■)
@@ -242,6 +265,7 @@
 
   const SDK = global.OrganismSDK = {
     create, STD, STD_UI_HOOKS, ASSET_SCHEMA, IDB,
+    linksOf,
     extend(x) {
       if (!x || !x.id || extensions.some(e => e.id === x.id)) return false;
       extensions.push(x);

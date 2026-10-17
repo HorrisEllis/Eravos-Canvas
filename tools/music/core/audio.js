@@ -300,7 +300,9 @@
         port.tap = !!port.tap; port._taps = [];
         // P14: every audio OUT gets a trim stage (per-tool volume + mute) — the tool keeps its own node; routing,
         // taps and wires all use port.node = the trim
-        if (port.direction === 'out' && audio.ctx) {
+        // port.internal: a tool's own insert send (its mods slot) — no trim, no strip, never on the master; the mods it
+        // feeds come back into the same tool
+        if (port.direction === 'out' && audio.ctx && !port.internal) {
           const trim = audio.ctx.createGain(); const k = key(port.instance_id, port.port_id), t = trims.get(k);
           trim.gain.value = t ? (t.mute ? 0 : Math.pow(10, t.db / 20)) : 1;
           // 3.28: a GUARD before the trim — "Stop all" / a tool's ■ closes it at once (tails included); it stays closed
@@ -315,8 +317,9 @@
           if (port.dc !== true && !processes) { const dc = audio.ctx.createBiquadFilter(); dc.type = 'highpass'; dc.frequency.value = 5; dc.Q.value = 0.5; dc.connect(guard); head = dc; port.dcBlock = dc; }
           port.node.connect(head); guard.connect(trim); port.src = port.node; port.node = trim; port.trim = trim; port.guard = guard; port.head = head;
         }
-        if (port.direction === 'out' && audio.ctx) { const st = stripState.get(key(port.instance_id, port.port_id)); if (st) port.line = st.line && lines.has(st.line) ? st.line : null; }
-        if (port.direction === 'out' && chain && port.bus === 'post') { port.node.connect(chain.post); port.onPost = true; }
+        if (port.direction === 'out' && audio.ctx && !port.internal) { const st = stripState.get(key(port.instance_id, port.port_id)); if (st) port.line = st.line && lines.has(st.line) ? st.line : null; }
+        if (port.internal) { /* wired by its tool only */ }
+        else if (port.direction === 'out' && chain && port.bus === 'post') { port.node.connect(chain.post); port.onPost = true; }
         else if (port.direction === 'out' && chain) {
           port.node.connect(homeOf(port)); port.onMaster = true;
           routes.set(key(port.instance_id, port.port_id), new Set());
@@ -356,12 +359,14 @@
       });
       return n;
     };
-    audio.unhush = function (instanceId, at) {
+    audio.unhush = function (instanceId, at, seen) {
       if (!audio.ctx) return; const t = Math.max(audio.ctx.currentTime, typeof at === 'number' ? at : 0);
       (instanceId ? K.ports.list(instanceId) : K.ports.all()).forEach(p => {
         if (!p.guard || !(p.hushedUntil > t) || (instanceId && p.instance_id !== instanceId)) return;
         const g = p.guard.gain; g.cancelScheduledValues(t); g.setValueAtTime(0, t); g.linearRampToValueAtTime(1, t + 0.01); p.hushedUntil = 0;
       });
+      // a tool's mods (insert wires) wake with it — they are part of its sound
+      if (instanceId) { seen = seen || new Set([instanceId]); K.wires.list().forEach(w => { if (w.meta && w.meta.insert && w.src.instanceId === instanceId && !seen.has(w.dst.instanceId)) { seen.add(w.dst.instanceId); audio.unhush(w.dst.instanceId, at, seen); } }); }
     };
     audio.hushed = (instanceId) => K.ports.list(instanceId).some(p => p.guard && p.hushedUntil > audio.ctx.currentTime);
     bus.subscribe('kernel:silence', (p) => { if (p && p.hard) { audio.hush(p.instanceId, p.time); if (!p.instanceId) audio.duckUnderReset(p.time); } }, 'kernel');

@@ -254,6 +254,12 @@ registerProcessor('eravos-pitch', EravosPitch);`;
   }
 
 
+  // 3.42 mods: a tool with an audio slot sends into its mods and hears them back — it needs both audio permissions
+  if (global.OrganismFactory) global.OrganismFactory.onDefine((d) => {
+    if (!(d.slots || []).some(s => s.wire_type === 'audio')) return;
+    d.permissions = d.permissions || []; ['audio_in', 'audio_out'].forEach(p => { if (!d.permissions.includes(p)) d.permissions.push(p); });
+  });
+
   SDK.extend({
     id: 'music',
     std: MUSIC_STD,
@@ -286,6 +292,25 @@ registerProcessor('eravos-pitch', EravosPitch);`;
         ctx.track(cs);
         ctx.port('mod.' + key, { kind: 'param', direction: 'in', param: cs.offset, range, label: (opts2 && opts2.label) || key });
         return cs;
+      };
+      // 3.42 mods: an insert point — from → [the mods hosted in slot <id>, in order] → the returned node. Empty, it is a
+      // straight wire (sample-exact, no latency); while mods are wired in (canvas/runtime/mods.js) the straight path closes.
+      ctx.slot = function (id, from, o) {
+        o = o || {};
+        const send = ctx.track(ac.createGain()), ret = ctx.track(ac.createGain()), thru = ctx.track(ac.createGain()), out = ctx.track(ac.createGain());
+        send.channelCount = ret.channelCount = 2; send.channelCountMode = ret.channelCountMode = 'explicit';
+        from.connect(send); from.connect(thru); thru.connect(out); ret.connect(out);
+        ctx.port('slot.' + id + '.send', { kind: 'audio', direction: 'out', node: send, internal: true, label: (o.label || id) + ' send' });
+        ctx.port('slot.' + id + '.return', { kind: 'audio', direction: 'in', node: ret, label: (o.label || id) + ' return' });
+        const hook = 'slot.' + id + '.return';
+        let live = false;
+        const sync = () => {
+          const on = K.wires.list().some(w => w.dst.instanceId === ctx.id && w.dst.hookId === hook);
+          if (on === live) return; live = on;
+          const t = ac.currentTime; thru.gain.cancelScheduledValues(t); thru.gain.setValueAtTime(thru.gain.value, t); thru.gain.linearRampToValueAtTime(on ? 0 : 1, t + 0.005);
+        };
+        ['kernel:wire-registered', 'kernel:wire-removed'].forEach(tp => { const un = K.bus.subscribe(tp, (w) => { if (w && w.dst && w.dst.instanceId === ctx.id) sync(); }, ctx.id); ctx.onDispose(un); });
+        return out;
       };
       // run fn when AUDIO time reaches t (not wall-clock) — correct in offline renders and when ticks run ahead
       // P11.5 (gate P): is anything wired into this modulation input? Per-voice connections to a modulation bus turn

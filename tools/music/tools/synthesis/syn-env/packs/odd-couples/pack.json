@@ -1,0 +1,54 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "syn-env.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.43"
+ ],
+ "for": "eravos.syn-env",
+ "items": {
+  "eravos.syn-env": {
+   "presets": {
+    "Gospel Vowel Sweep": {
+     "params": {
+      "delay": 0,
+      "attack": 0.35,
+      "curve": 0.3,
+      "hold": 0,
+      "decay": 0.9,
+      "sustain": 0.25,
+      "release": 0.4,
+      "loop": false,
+      "depth": 0.55,
+      "polarity": "+",
+      "velocity": 0.5,
+      "retrig": "every note",
+      "follow": true
+     }
+    },
+    "Trap Gate Close": {
+     "params": {
+      "delay": 0,
+      "attack": 0.001,
+      "curve": 0,
+      "hold": 0,
+      "decay": 0.35,
+      "sustain": 0,
+      "release": 0.1,
+      "loop": false,
+      "depth": 0.7,
+      "polarity": "−",
+      "velocity": 0.5,
+      "retrig": "every note",
+      "follow": true
+     }
+    }
+   }
+  }
+ }
+}

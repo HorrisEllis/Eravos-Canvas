@@ -133,7 +133,7 @@
     function row(text, wireId) { const r = h('div', { class: 'org-row', style: { margin: '1px 0', gap: '4px' } }, [h('span', { text })]); if (wireId) r.appendChild(Button({ label: '×', hint: 'disconnect', onClick: () => view.K.wires.remove(wireId, 'user') }).el); return r; }
     function paint() {
       el.innerHTML = '';
-      const ws = view.K.wires.list().filter(w => w.wire_type === 'audio');
+      const ws = view.K.wires.list().filter(w => w.wire_type === 'audio' && !(w.meta && w.meta.insert));   // its own mods are not cables
       const ins = ws.filter(w => w.dst.instanceId === view.instanceId), outs = ws.filter(w => w.src.instanceId === view.instanceId);
       if (!ins.length) el.appendChild(row(o.emptyIn || 'Nothing plugged in yet — drag the orange dot on the right edge of any sound (synth, drums, sample) and let go on this window.'));
       ins.forEach(w => el.appendChild(row('⇢ in: ' + view.label(w.src.instanceId), w.wire_id)));

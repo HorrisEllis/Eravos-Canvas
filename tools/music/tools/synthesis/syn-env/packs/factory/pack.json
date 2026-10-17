@@ -1,0 +1,139 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "syn-env.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "synthesis"
+ ],
+ "for": "eravos.syn-env",
+ "enabled": true,
+ "items": {
+  "eravos.syn-env": {
+   "presets": {
+    "Pluck Sweep": {
+     "params": {
+      "delay": 0,
+      "attack": 0.002,
+      "curve": -0.5,
+      "hold": 0,
+      "decay": 0.25,
+      "sustain": 0,
+      "release": 0.15,
+      "loop": false,
+      "depth": 1,
+      "polarity": "+",
+      "velocity": 0.5,
+      "retrig": "every note",
+      "follow": true
+     }
+    },
+    "Slow Swell": {
+     "params": {
+      "delay": 0,
+      "attack": 2.5,
+      "curve": 0.6,
+      "hold": 0,
+      "decay": 1,
+      "sustain": 1,
+      "release": 2,
+      "loop": false,
+      "depth": 1,
+      "polarity": "+",
+      "velocity": 0.5,
+      "retrig": "every note",
+      "follow": true
+     }
+    },
+    "Morph Scan": {
+     "params": {
+      "delay": 0,
+      "attack": 1.5,
+      "curve": 0,
+      "hold": 0,
+      "decay": 2,
+      "sustain": 0.6,
+      "release": 1,
+      "loop": false,
+      "depth": 1,
+      "polarity": "+",
+      "velocity": 0.5,
+      "retrig": "every note",
+      "follow": true
+     }
+    },
+    "Drop Close": {
+     "params": {
+      "delay": 0,
+      "attack": 0.001,
+      "curve": 0,
+      "hold": 0,
+      "decay": 0.6,
+      "sustain": 0,
+      "release": 0.1,
+      "loop": false,
+      "depth": 1,
+      "polarity": "−",
+      "velocity": 0.5,
+      "retrig": "every note",
+      "follow": true
+     }
+    },
+    "Note Wobble (loop)": {
+     "params": {
+      "delay": 0,
+      "attack": 0.12,
+      "curve": -0.3,
+      "hold": 0,
+      "decay": 0.12,
+      "sustain": 0,
+      "release": 0.05,
+      "loop": true,
+      "depth": 1,
+      "polarity": "+",
+      "velocity": 0.5,
+      "retrig": "every note",
+      "follow": true
+     }
+    },
+    "Bipolar Bend": {
+     "params": {
+      "delay": 0,
+      "attack": 0.05,
+      "curve": 0,
+      "hold": 0,
+      "decay": 0.35,
+      "sustain": 0.5,
+      "release": 0.2,
+      "loop": false,
+      "depth": 1,
+      "polarity": "bipolar",
+      "velocity": 0.5,
+      "retrig": "every note",
+      "follow": true
+     }
+    },
+    "Legato Filter": {
+     "params": {
+      "delay": 0,
+      "attack": 0.3,
+      "curve": 0,
+      "hold": 0,
+      "decay": 0.8,
+      "sustain": 0.4,
+      "release": 0.4,
+      "loop": false,
+      "depth": 1,
+      "polarity": "+",
+      "velocity": 0.5,
+      "retrig": "legato",
+      "follow": true
+     }
+    }
+   }
+  }
+ }
+}

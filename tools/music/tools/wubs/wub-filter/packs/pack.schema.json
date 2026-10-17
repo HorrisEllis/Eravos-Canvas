@@ -111,7 +111,8 @@
                       },
                       "bypass": {
                         "type": "boolean"
-                      }
+                      },
+                      "mods": {}
                     },
                     "additionalProperties": false
                   },

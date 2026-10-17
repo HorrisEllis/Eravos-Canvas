@@ -26,6 +26,10 @@
     size: { w: 520, h: 520 }, minSize: { w: 400, h: 360 },
     permissions: ['audio_out', 'audio_in', 'bus_publish', 'bus_subscribe'],
     provides: ['capability.audio_out', 'capability.fx', 'capability.wub_filter'],
+    slots: [{ id: 'after', label: 'after the mouth', wire_type: 'audio', hint: 'empty — a Destroyer here growls every vowel' }],
+    face: ['mode', 'cutoff', 'range', 'res', 'position', 'drive'],
+    links: [{ with: 'eravos.wub-rate', dir: 'in', face: ['stepLen', 'shape', 'smooth', 'depth', 'polarity'], hint: 'the rhythm opening this mouth' },
+            { with: 'eravos.wub-osc', dir: 'in', face: ['wave', 'octave', 'index', 'voices', 'spread'], hint: 'the tone going in' }],
     hooks: SDK.fxHooks([
       Object.assign(S.mod_in('wubf.hook.mod_wub', 'wub'), { intent: 'how far the mouth is open: 0 closed → 1 open (wire Wub Rate here)' }),
       S.mod_in('wubf.hook.mod_cutoff', 'cutoff'),
@@ -81,7 +85,7 @@
       const gLP = ac.createGain(), g12 = ac.createGain(), gV = ac.createGain(), gC = ac.createGain();
       biqOut.connect(gLP); one.connect(g12); vOut.connect(gV); cOut.connect(gC);
       const sel = ac.createGain(); [gLP, g12, gV, gC].forEach(g => g.connect(sel));
-      const dcBlock = ac.createBiquadFilter(); dcBlock.type = 'highpass'; dcBlock.frequency.value = 18; sel.connect(dcBlock); dcBlock.connect(fx.wetOut);
+      const dcBlock = ac.createBiquadFilter(); dcBlock.type = 'highpass'; dcBlock.frequency.value = 18; sel.connect(dcBlock); ctx.slot('after', dcBlock, { label: 'after the mouth' }).connect(fx.wetOut);
       [pre, sh, posK, wubPol, pos, f1, f2, cents, biqOut, one, vIn, vOut, cIn, delay, fb, damp, cOut, delayScale, gLP, g12, gV, gC, sel, dcBlock].forEach(n => ctx.track(n));
       bands.forEach(bd => [bd.b, bd.g, bd.fScale, bd.gScale].forEach(n => ctx.track(n)));
 

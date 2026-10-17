@@ -11,6 +11,10 @@
     size: { w: 500, h: 420 }, minSize: { w: 360, h: 300 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe', 'registry_read'],
     provides: ['capability.audio_out', 'capability.note_in', 'capability.sub'],
+    slots: [{ id: 'tone', label: 'its own tone', wire_type: 'audio', hint: 'empty — a Destroyer on Tape Warm makes the sub heard on phones' }],   // 3.42 mods: any effect can live inside (canvas/runtime/mods.js)
+    face: ['wave', 'octave', 'cut', 'glide', 'level'],
+    links: [{ with: 'eravos.wub-osc', face: ['wave', 'octave', 'voices', 'level'], hint: 'the wub above it' }],
+
     hooks: [S.audio_out('wubs.hook.audio_out'), S.note_in('wubs.hook.note_in'), S.midi_in('wubs.hook.midi_in'), S.mod_in('wubs.hook.mod_level', 'level')],
     config: [
       { key: 'follow', type: 'boolean', default: true, label: 'Follow Wub Osc', group: 'NOTES', hint: 'play the notes sent to any Wub Osc too' },
@@ -29,7 +33,7 @@
       const o = ac.createOscillator(); o.frequency.value = 0; hz.connect(o.frequency); o.start();
       const sh = ac.createWaveShaper(), lp = ac.createBiquadFilter(), amp = ac.createGain(), duck = ac.createGain(), level = ac.createGain();
       lp.type = 'lowpass'; lp.Q.value = 0.6; amp.gain.value = 0;
-      o.connect(sh); sh.connect(lp); lp.connect(amp); amp.connect(duck); duck.connect(level);
+      o.connect(sh); sh.connect(lp); lp.connect(amp); amp.connect(duck); ctx.slot('tone', duck, { label: 'its own tone' }).connect(level);
       [hz, o, sh, lp, amp, duck, level].forEach(n => ctx.track(n));
       ctx.port('out', { kind: 'audio', direction: 'out', node: level, label: 'sub' });
       const levelMod = ctx.modBus('level', { min: -1, max: 1 }); levelMod.connect(duck.gain);   // −1 → silent, 0 → as set

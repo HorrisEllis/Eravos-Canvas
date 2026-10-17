@@ -58,7 +58,10 @@
     "eravos.harmonic-analyzer",
     "eravos.master-fx",
     "eravos.sidechain-compressor",
-    "eravos.wub-filter"
+    "eravos.syn-osc",
+    "eravos.wub-filter",
+    "eravos.wub-osc",
+    "eravos.wub-sub"
   ],
   "status": "built",
   "conflicts": []

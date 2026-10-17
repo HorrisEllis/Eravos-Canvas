@@ -78,6 +78,8 @@
     "eravos.song-recorder",
     "eravos.sub-engine",
     "eravos.supersaw",
+    "eravos.syn-osc",
+    "eravos.syn-partials",
     "eravos.timeline",
     "eravos.wobble-bass",
     "eravos.wub-filter",

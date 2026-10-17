@@ -1,0 +1,75 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.syn-partials",
+  "version": "1.0.0",
+  "label": "Partials",
+  "icon": "✳",
+  "accent": "#ffb547",
+  "domain": "music",
+  "category": "synthesis",
+  "summary": "Additive synth: draw 24 harmonics, morph and evolve between two spectra, stretch them into bells.",
+  "tags": [
+    "synthesis",
+    "additive"
+  ],
+  "files": {
+    "engine": "syn-partials.engine.js",
+    "ui": "syn-partials.ui.js",
+    "preview": "preview.png",
+    "spec": "syn-partials.spec",
+    "tests": "syn-partials.test.js"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "midi_in",
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory",
+      "odd-couples"
+    ]
+  },
+  "works_with": [
+    "eravos.breath",
+    "eravos.channel",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.dub-station",
+    "eravos.embodiment-lab",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.master-fx",
+    "eravos.sidechain-compressor",
+    "eravos.syn-env",
+    "eravos.syn-osc",
+    "eravos.wub-filter",
+    "eravos.wub-osc",
+    "eravos.wub-rate",
+    "eravos.wub-sub",
+    "eravos.xy-pad"
+  ],
+  "conflicts": [],
+  "status": "built"
+}

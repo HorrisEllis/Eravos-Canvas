@@ -16,6 +16,7 @@
   let K, svg, world, dragging = null;
 
   function wireable(h) {
+    if (h.rail === false || h.internal) return false;   // a tool's insert slots (mods) are wired by the tool, not by hand
     if (signal(h.wire_type)) return true;
     if (h.wire_type !== 'event_bus') return false;
     return !isAmbient(h.event_type) && h.rail !== false;
@@ -109,6 +110,7 @@
     if (!svg) return;
     while (svg.firstChild) svg.removeChild(svg.firstChild);
     K.wires.list().forEach(w => {
+      if (w.meta && w.meta.insert) return;   // inside a tool (its mods): shown in its window, not as a cable
       const a = dotPos(w.src.instanceId, w.src.hookId, 'out'), b = dotPos(w.dst.instanceId, w.dst.hookId, 'in');
       if (!a || !b) return;
       const p = doc.createElementNS('http://www.w3.org/2000/svg', 'path');
