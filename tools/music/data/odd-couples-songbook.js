@@ -171,7 +171,7 @@
         stack: { role: 'chords', organism: 'eravos.supersaw', preset: O('Gospel Stack'), style: 'pulse', voicing: 'seventh', octave: 4, name: 'Gospel stack' } },
       fx: [{ organism: 'eravos.fx-glitch', preset: O('Gospel Stutter'), on: 'stack' }, { organism: 'eravos.fx-glitch', preset: O('Organ Tape Stop'), on: 'organ' }, { organism: 'eravos.fx-moddelay', preset: O('Chapel Chorus'), on: 'fx1' }],
       mods: HER(O('Cathedral Drop')).concat([{ organism: 'eravos.xy-pad', preset: O('Organ ↔ Wub') }, { organism: 'eravos.macro-automation', preset: O('16-bar latch') }]),
-      master: { compThresh: -11, compRatio: 2.5, reverbMix: 0.2 } },
+      master: { compThresh: -14, compRatio: 3, reverbMix: 0.2 } },   // measured: −11 / 2.5 drove the master soft-clipper (13–32 samples a song)
 
     // 10 — a 19-tone lead over a φ-Hz wobble on UK garage: the notes between the notes, at a rate between the beats
     { id: 'oc-xen-wobble', label: 'Odd Couples · Xen Wobble Garage', icon: '🧬', accent: '#18ffff', family: 'Odd Couples', bpm: [130, 132], roots: [9, 4], scales: ['minor', 'dorian'], progs: [[1, 6, 3, 7], [1, 4, 6, 7]],
@@ -203,13 +203,15 @@
       tagline: 'A desert-goth organ drone at a sound system: dub echoes, a wub-sub floor, a synthwave chapel answering',
       drums: { main: ONEDROP, light: { rim: '....x.......x...' } }, leadRhythm: 'sparse', bar,
       form: ODD({ intro: ['organ'], verse: ['drums', 'bass', 'organ'], build: ['organ', 'drums', 'chapel'], drop: ['drums', 'bass', 'organ', 'chapel', 'wub'], pat1: { wub: ['dubsub', 'sub'] }, brk: ['organ'], lift: 0 }),
-      parts: { drums: KIT('Breaks & World', O('Steppers Machine')), forge: FORGE(O('Golden Steppers')), bass: { role: 'bass', organism: 'eravos.reese-bass', preset: O('Chapel Reese'), style: 'onedrop', name: 'Bass' },
+      // measured in the song (tests: one render, every tool on its own channel): at 70 BPM the kit's accents land together at
+      // +2.9 dBFS and the 5 s cathedral reverb feeds the master — the master input hit +6.9 dBFS. The kit sits 5 dB lower here.
+      parts: { drums: Object.assign(KIT('Breaks & World', O('Steppers Machine')), { configure: { volume: 0.5 } }), forge: FORGE(O('Golden Steppers')), bass: { role: 'bass', organism: 'eravos.reese-bass', preset: O('Chapel Reese'), style: 'onedrop', name: 'Bass' },
         wub: { role: 'bass', organism: 'eravos.wub-osc', preset: O('Acid Saw Wub'), style: 'half', name: 'Wub' },
         organ: { role: 'chords', organism: 'eravos.organ', preset: ['Hanging Tree', O('Synthwave Chapel')], style: 'sustain', voicing: 'triad', octave: 3, name: 'Organ' },
         chapel: { role: 'lead', organism: 'eravos.retro-poly', preset: O('Wobble Pad Glow'), octave: 5, name: 'Chapel' } },
       fx: [{ organism: 'eravos.dub-station', preset: O('Cathedral Sound System'), on: 'organ' }, { organism: 'eravos.fx-echo', preset: O('Cathedral Throw'), on: 'chapel' }, { organism: 'eravos.fx-eq', preset: O('Church Low Cut'), on: 'organ' }],
       mods: HER(O('Golden Gap')).concat([{ organism: 'eravos.wub-sub', preset: O('Cathedral Sub') }, { organism: 'eravos.embodiment-lab', preset: O('Hold Her Voice') }, { organism: 'eravos.master-fx', preset: O('Cathedral Master') }]),
-      master: { compThresh: -12, compRatio: 2, reverbMix: 0.3 } },
+      master: { compThresh: -16, compRatio: 3, reverbMix: 0.22 } },   // measured: −12 / 2 / 0.3 drove the master soft-clipper (≈400 samples a song) → ≈40
   ];
   GENRES.forEach(SE.addGenre);
 
