@@ -38,6 +38,10 @@
   // ---------------------------------------------------------------- DSP helpers (shared; engines stay novel)
   const noiseCache = new WeakMap();
   const dsp = {
+    // 3.39 a WaveShaper's oversampling delays its output by a fixed number of samples (Chromium's resampler, measured:
+    // none 0 · 2x 128 · 4x 192 — at every sample rate). Parallel paths and note timing must account for it.
+    OS_SAMPLES: { none: 0, '2x': 128, '4x': 192 },
+    osLatency(ac, mode) { return (dsp.OS_SAMPLES[mode] || 0) / ac.sampleRate; },
     mulberry32(seed) {
       let a = seed >>> 0;
       return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
@@ -217,26 +221,34 @@ registerProcessor('eravos-pitch', EravosPitch);`;
     const wetIn = ac.createGain(), wetOut = ac.createGain();
     inp.channelCount = 2; inp.channelCountMode = 'explicit'; inp.channelInterpretation = 'speakers';
     inp.connect(inGain); inGain.connect(dry); dry.connect(sum); inGain.connect(wetIn); wetOut.connect(wet); wet.connect(sum); sum.connect(outGain);
+    // 3.39 latency alignment: when the wet chain is late (oversampled shaper, pitch window), a blended dry is delayed to match —
+    // otherwise dry + wet comb-filter (2.67 ms → notches at 375 Hz, 1.1 kHz …). At mix 0 / bypass the direct dry is used (exact null).
+    const dryAl = ac.createDelay(0.25), dryAlG = ac.createGain(); dryAlG.gain.value = 0; inGain.connect(dryAl); dryAl.connect(dryAlG); dryAlG.connect(sum);
     ctx.port('in', { kind: 'audio', direction: 'in', node: inp, label: 'in' });
     ctx.port('out', { kind: 'audio', direction: 'out', node: outGain, label: 'out' });
     const mixMod = ctx.modBus('mix', { min: 0, max: 1 }); const neg = ac.createGain(); neg.gain.value = -1;
     mixMod.connect(wet.gain); mixMod.connect(neg); neg.connect(dry.gain);
-    [inp, inGain, dry, wet, sum, outGain, wetIn, wetOut, neg].forEach(n => ctx.track(n));
+    [inp, inGain, dry, wet, sum, outGain, wetIn, wetOut, neg, dryAl, dryAlG].forEach(n => ctx.track(n));
+    let latency = 0, aligned = false;
+    function route(on) {   // the mix modulation follows whichever dry path is live
+      if (on === aligned) return; aligned = on;
+      try { neg.disconnect(); } catch (e) {} neg.connect(on ? dryAlG.gain : dry.gain);
+    }
     function levels(ramp) {
       const t = ac.currentTime, m = o.fixedMix !== undefined ? o.fixedMix : P.get('mix');
       const bp = P.get('bypass');
-      const d = bp ? 1 : Math.cos(m * Math.PI / 2), w = bp ? 0 : Math.sin(m * Math.PI / 2);
-      [[dry.gain, d], [wet.gain, w]].forEach(([g, v]) => { g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(v, t + (ramp === false ? 0.0005 : 0.01)); });
+      const d = bp ? 1 : Math.cos(m * Math.PI / 2), w = bp ? 0 : Math.sin(m * Math.PI / 2), al = latency > 0 && !bp && m > 0;
+      route(al);
+      [[dry.gain, al ? 0 : d], [dryAlG.gain, al ? d : 0], [wet.gain, w]].forEach(([g, v]) => { g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(v, t + (ramp === false ? 0.0005 : 0.01)); });
       inGain.gain.setTargetAtTime(dsp.dbToGain(P.get('inGain')), t, 0.01);
       outGain.gain.setTargetAtTime(dsp.dbToGain(P.get('outGain')), t, 0.01);
     }
     // exact initial values (null test at mix 0 must be exact from sample 0)
     { const m = o.fixedMix !== undefined ? o.fixedMix : P.get('mix'); dry.gain.value = Math.cos(m * Math.PI / 2); wet.gain.value = Math.sin(m * Math.PI / 2); inGain.gain.value = dsp.dbToGain(P.get('inGain')); outGain.gain.value = dsp.dbToGain(P.get('outGain')); }
     ['mix', 'bypass', 'inGain', 'outGain'].forEach(k => P.onChange(k, () => levels()));
-    let latency = 0;
     return {
       inp, wetIn, wetOut, dry, wet, outGain, levels,
-      setLatency(sec) { if (sec !== latency) { latency = sec; ctx.K.ledger.write('latency_reported', { instance_id: ctx.id, organism_id: ctx.descriptor.id, latency_sec: sec }); ctx.emitUI('latency', { sec }); } },
+      setLatency(sec) { if (sec !== latency) { latency = sec; dryAl.delayTime.setValueAtTime(Math.min(0.25, sec), ac.currentTime); levels(false); ctx.K.ledger.write('latency_reported', { instance_id: ctx.id, organism_id: ctx.descriptor.id, latency_sec: sec }); ctx.emitUI('latency', { sec }); } },
       get latency() { return latency; },
     };
   }
@@ -297,7 +309,11 @@ registerProcessor('eravos-pitch', EravosPitch);`;
         const t = typeof p.time === 'number' ? p.time : ac.currentTime, end = t + (typeof p.duration === 'number' ? p.duration : 1);
         sounding = sounding.filter(e => e > t);
         if (sounding.length >= NOTE_CEILING) { if (ctx.notesDropped++ % 64 === 0) K.fault('RUNTIME_005', { instance_id: ctx.id, message: `more than ${NOTE_CEILING} notes at once — extra notes skipped`, quiet: true }); return; }
-        sounding.push(end); fn(p);
+        sounding.push(end);
+        // 3.39 delay compensation: a tool whose whole voice runs through an oversampled shaper is late by ctx.latency
+        // seconds — its notes start that much earlier so the SOUND lands on the beat (clamped to now for live input)
+        if (ctx.latency > 0 && typeof p.time === 'number') { const t2 = Math.max(ac.currentTime, p.time - ctx.latency), d2 = typeof p.duration === 'number' ? p.duration + (p.time - t2) - ctx.latency : p.duration; p = Object.assign({}, p, { time: t2, duration: d2 }); }
+        fn(p);
       });
       ctx.onMidi = (fn) => ctx.on('midi:note', MIDI_SCHEMA, (p) => { if (midiArmed) fn(p); });
       ctx.onKey = (fn) => ctx.on('theory:key-change', THEORY_SCHEMA, fn);

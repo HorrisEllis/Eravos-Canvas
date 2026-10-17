@@ -128,13 +128,16 @@ describe('eravos.wobble-bass', () => {
     const U = TH.universe(0.3); const a = TH.spawn(U, 'eravos.wobble-bass'); const c = OrganismFactory.handle(a).ctx;
     c.params.set('div', '1/4'); assert.near(c.internals.lfo.frequency.value, 2, 1e-6);
   });
-  it('note-on at t resets LFO phase: output at t+ε equals shape(0) (sine → closed filter)', async () => {
+  // 3.39: the filter sits before the 4x post shaper (192 samples), so the LFO restarts 192 samples EARLY — the closed filter is
+  // HEARD at t. The control signal therefore reads shape(0) at t − 192 samples; the log keeps the heard time.
+  it('note-on at t resets LFO phase: the filter is heard closed at t (control restarts 192 samples early)', async () => {
     const U = TH.universe(0.6); const a = TH.spawn(U, 'eravos.wobble-bass'); const c = OrganismFactory.handle(a).ctx;
     const probe = U.ctx.createGain(); c.internals.uni.connect(probe); const m = U.ctx.createGain(); m.gain.value = 0; U.K.audio.chain.out.gain.value = 0;
     probe.connect(U.ctx.destination);
     c.params.set('lfoShape', 'sine'); c.noteOn(45, 1, 0.3, { duration: 0.2 });
     const buf = await TH.render(U); const d = buf.getChannelData(0);
-    assert.near(d[Math.round(0.3 * 48000) + 2], 0, 2e-3, 'uni LFO at note start = 0 (closed)');
+    assert.near(d[Math.round(0.3 * 48000) - 192 + 2], 0, 2e-3, 'uni LFO at (note start − shaper latency) = 0 (closed)');
+    assert.near(c.internals.lfoLog ? c.internals.lfoLog.slice(-1)[0].t : 0.3, 0.3, 1e-9, 'the log names the heard time');
   });
   it('formant OO→AH: band centres at LFO extremes equal vowel table ± 1 Hz', () => {
     const U = TH.universe(0.3); const a = TH.spawn(U, 'eravos.wobble-bass'); const c = OrganismFactory.handle(a).ctx;

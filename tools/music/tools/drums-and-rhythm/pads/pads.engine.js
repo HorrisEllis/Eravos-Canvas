@@ -229,10 +229,13 @@
       const V = {
         kick(dst, t, p, vel) {
           const r = Math.pow(2, p.tune / 12), f0 = 50 * r, dec = p.decay, end = t + dec + 0.05;
-          const o = osc('sine', f0 * 4, t, end);
+          // 3.39: the body runs through a 2x shaper (128 samples late) but the punch envelope + click sit after it — the body now
+          // starts 128 samples early so its first cycle lands inside the attack, not 2.7 ms into the decay
+          const to = Math.max(ac.currentTime, t - dsp.osLatency(ac, '2x'));
+          const o = osc('sine', f0 * 4, to, end);
           const pd = 0.03 + dec * 0.06;
-          o.frequency.exponentialRampToValueAtTime(f0, t + pd);
-          o.frequency.exponentialRampToValueAtTime(f0 * 0.85, t + dec);
+          o.frequency.exponentialRampToValueAtTime(f0, to + pd);
+          o.frequency.exponentialRampToValueAtTime(f0 * 0.85, to + dec);
           const amp = ac.createGain(); env(amp, t, vel, dec, 0.001);
           const sh = ac.createWaveShaper(); sh.curve = dsp.curve('tanh', 0.15 + p.drive * 0.8); sh.oversample = '2x';
           o.connect(sh); sh.connect(amp);
@@ -357,7 +360,9 @@
         if (p.tone) { const sh = ac.createBiquadFilter(); sh.type = 'highshelf'; sh.frequency.value = 2500; sh.gain.value = p.tone * 12; const ls = ac.createBiquadFilter(); ls.type = 'lowshelf'; ls.frequency.value = 250; ls.gain.value = -p.tone * 6; sh.connect(ls); ls.connect(into); into = sh; }
         if (fresh && p.drive > 0) { const ws = ac.createWaveShaper(); ws.curve = driveCurve(p.driveType, p.drive); ws.oversample = p.driveType === 'crush' ? 'none' : '2x'; const mk = ac.createGain(); mk.gain.value = 1 / (1 + p.drive * (p.driveType === 'hard' || p.driveType === 'fold' ? 1.4 : 0.6)); ws.connect(mk); mk.connect(into); into = ws; }
         let r;
-        try { r = fn ? fn(into, t, p, vel) : V[p.voice](into, t, p, vel); } catch (e) { ctx.fault('RUNTIME_003', `voice ${p.voice}/${p.model}: ${e.message}`); }
+        // 3.39: a driven pad's whole voice passes the 2x post shaper → it starts 128 samples early and lands on the beat
+        const tv = into !== chain && fresh && p.drive > 0 && p.driveType !== 'crush' ? Math.max(ac.currentTime, t - dsp.osLatency(ac, '2x')) : t;
+        try { r = fn ? fn(into, tv, p, vel) : V[p.voice](into, tv, p, vel); } catch (e) { ctx.fault('RUNTIME_003', `voice ${p.voice}/${p.model}: ${e.message}`); }
         ctx.emit('pad:trigger', { index, sound: p.voice, velocity: vel, bank, time: t, source: 'pads', target: ctx.id });
         ctx.emitUI('pad_lit', { index, color: p.color, time: t, velocity: vel });
         if (!r) { chain.disconnect(); pan.disconnect(); return; }

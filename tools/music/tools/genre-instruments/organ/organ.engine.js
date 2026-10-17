@@ -149,6 +149,8 @@
         g.gain.setTargetAtTime(1, t, Math.max(0.01, P.get('attack') / 2)); pedalV = { note: low, g, o };
       }
       ['dark', 'tremRate', 'tremDepth', 'breathPeriod', 'breathDepth', 'space', 'level', 'wind'].forEach(k => P.onChange(k, apply)); ['drive', 'ampTone', 'pulse', 'rotary'].forEach(k => P.onChange(k, applyAmp)); P.onChange('rotorSpeed', rotorSpeed); ['pulseRate', 'pulseShape'].forEach(k => P.onChange(k, () => pulseStart(ac.currentTime))); rotorSpeed(); P.onChange('pedal', () => updatePedal(ac.currentTime)); apply();
+      // 3.39: with Amp drive on, the whole organ passes the 2x shaper (128 samples) — notes start that much early (off: no shaper)
+      Object.defineProperty(ctx, 'latency', { get: () => P.get('drive') > 0.001 ? dsp.osLatency(ac, '2x') : 0, configurable: true });
       ctx.onNote((p) => noteOn(p.note, p.velocity, p.time, p.duration));
       ctx.onMidi((p) => { if (p.on) noteOn(p.note, p.velocity); else voices.filter(v => v.note === p.note && v.off === Infinity).forEach(v => release(v, ac.currentTime)); });
       ctx.audition = (p) => noteOn(p.note || 45, p.velocity || 0.8, ac.currentTime, p.duration || 3);

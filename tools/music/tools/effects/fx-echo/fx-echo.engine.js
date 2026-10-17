@@ -52,6 +52,9 @@
         return { d, hp, lp, sh, fb, inG };
       }
       const L = line(), R = line();
+      // 3.39: the 2x shaper in the loop adds 128 samples per pass (repeat 8 was 18.7 ms late at 48 kHz). The input enters
+      // through a matching pre-delay and the line is shortened by it, so repeat n lands exactly at n × the set time.
+      const OSL = dsp.osLatency(ac, '2x'), preL = ac.createDelay(0.1), preR = ac.createDelay(0.1); preL.delayTime.value = preR.delayTime.value = OSL; preL.connect(L.inG); preR.connect(R.inG); ctx.track(preL); ctx.track(preR);
       // wow + flutter → both delay times (seconds)
       const wow = ac.createOscillator(), flu = ac.createOscillator(), wowG = ac.createGain(), fluG = ac.createGain();
       wow.frequency.value = 0.6; flu.frequency.value = 7.3; wow.connect(wowG); flu.connect(fluG);
@@ -62,9 +65,9 @@
         const m = P.get('stereo'); if (m === mode) return; mode = m;
         [mono, L.fb, R.fb, L.d, R.d].forEach(n => { try { n.disconnect(); } catch (e) {} });
         L.d.connect(L.hp); R.d.connect(R.hp);
-        mono.connect(L.inG);
+        mono.connect(preL);
         if (m === 'pingpong') { L.fb.connect(R.inG); R.fb.connect(L.inG); L.d.connect(merge, 0, 0); R.d.connect(merge, 0, 1); }
-        else if (m === 'offset') { mono.connect(R.inG); L.fb.connect(L.inG); R.fb.connect(R.inG); L.d.connect(merge, 0, 0); R.d.connect(merge, 0, 1); }
+        else if (m === 'offset') { mono.connect(preR); L.fb.connect(L.inG); R.fb.connect(R.inG); L.d.connect(merge, 0, 0); R.d.connect(merge, 0, 1); }
         else { L.fb.connect(L.inG); L.d.connect(merge, 0, 0); L.d.connect(merge, 0, 1); }
       }
       const time = () => P.get('sync') ? MT.divisionSec(P.get('div'), ctx.bpm) : P.get('timeFree') / 1000;
@@ -72,8 +75,8 @@
       function apply(now) {
         const t = ac.currentTime, base = Math.min(3.9, time()), sat = P.get('sat'), frz = P.get('freeze');
         const set = (prm, v, tc) => now === true ? prm.setValueAtTime(v, t) : prm.setTargetAtTime(v, t, tc || 0.02);
-        set(L.d.delayTime, base);
-        set(R.d.delayTime, Math.min(3.9, P.get('stereo') === 'offset' ? base * P.get('offsetRatio') : base));
+        set(L.d.delayTime, Math.max(0, base - OSL));
+        set(R.d.delayTime, Math.max(0, Math.min(3.9, P.get('stereo') === 'offset' ? base * P.get('offsetRatio') : base) - OSL));
         // saturation bounds the loop: without it feedback is capped below 1
         const fbv = frz ? 1 : (sat > 0.01 ? P.get('feedback') : Math.min(0.98, P.get('feedback')));
         [L, R].forEach(l => {

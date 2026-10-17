@@ -22,6 +22,12 @@
     const alias = Object.assign({}, o.alias || {});
     const origin = o.origin || { x: 40, y: 40 };
     const report = { recipe: id, mounted: [], wires: [], faults: [] };
+    // P41 catalog: a recipe that mounts tools this canvas has not installed installs them first and names them — before,
+    // it opened with those parts silently missing (one tool was in 183 of 186 generated recipes)
+    if (global.Catalog) {
+      const got = await global.Catalog.ensure(needs(r), K);
+      if (got.length && global.Shell && !o.headless) global.Shell.toast(`This uses ${got.length} tool${got.length > 1 ? 's' : ''} you hadn’t installed — installed: ${got.join(', ')}`, 'good', 6000);
+    }
     beforeRun.forEach(fn => { try { fn(r, { K }); } catch (e) { K.fault('RUNTIME_003', { message: `recipe ${id}: before-run: ${e.message}` }); } });
     K.bus.publish('recipe:start', { recipe_id: id });
     const f0 = K.faults.list().length;
@@ -77,7 +83,9 @@
 
   // P13 — the canvas expands with packs: a recipe is offered only when every organism it mounts is installed
   function needs(r) { return Array.from(new Set((r.steps || []).filter(s => s && s.op === 'mount' && s.organism).map(s => s.organism))); }
-  function available(r) { return !!global.OrganismFactory && needs(r).every(id => !!global.OrganismFactory.def(id)); }
+  // …or the catalog offers it: running the recipe installs it (P41) — recipes no longer vanish from Start on a fresh profile
+  const offered = (id) => !!(global.Catalog && global.Catalog.meta(id) && !global.Catalog.isRemoved(id));
+  function available(r) { return !!global.OrganismFactory && needs(r).every(id => !!global.OrganismFactory.def(id) || offered(id)); }
   global.Recipes = {
     needs, available,
     all: () => Array.from(recipes.values()),

@@ -42,6 +42,9 @@
       c.djHpf = ctx.createBiquadFilter(); c.djHpf.type = 'highpass'; c.djHpf.frequency.value = 10; c.djHpf.Q.value = 0.707;
       c.djLpf = ctx.createBiquadFilter(); c.djLpf.type = 'lowpass'; c.djLpf.frequency.value = 22000; c.djLpf.Q.value = 0.707;
       c.duck = ctx.createGain();
+      // 3.39 priority: vduck dips everything EXCEPT the priority input (her voice) while it speaks; priority joins after it,
+      // so the voice is never ducked by itself or by the kick sidechain, and still goes through the master comp + limiter
+      c.vduck = ctx.createGain(); c.priority = ctx.createGain();
       c.comp = ctx.createDynamicsCompressor();
       c.makeup = ctx.createGain();
       c.limiter = ctx.createDynamicsCompressor();
@@ -55,7 +58,7 @@
       }
       c.clip.curve = curve;
       c.out = ctx.createGain();
-      c.masterIn.connect(c.djHpf); c.djHpf.connect(c.djLpf); c.djLpf.connect(c.duck); c.duck.connect(c.comp);
+      c.masterIn.connect(c.djHpf); c.djHpf.connect(c.djLpf); c.djLpf.connect(c.duck); c.duck.connect(c.vduck); c.vduck.connect(c.comp); c.priority.connect(c.comp);
       c.comp.connect(c.makeup); c.makeup.connect(c.limiter); c.limiter.connect(c.clipIn); c.clipIn.connect(c.clip); c.clip.connect(c.out);
       c.out.connect(ctx.destination);
       // P14: post bus — joins AFTER the master output tap (song recorder playback: heard + metered, never re-recorded)
@@ -249,6 +252,33 @@
       chain._shimNode = node || null;
       if (node) { chain.revFbIn.connect(node); node.connect(chain.revShimmerSlot); } else chain.revFbIn.connect(chain.revShimmerSlot);
     };
+    // 3.39 her voice on top: duck the rest of the mix under a clip's own loudness envelope, word by word.
+    //   duckUnder(buffer, segments, { depthDb, attack, release, lookahead }) — segments: [{ t, offset, duration }] (audio
+    //   times; where the clip plays). Envelope: 10 ms RMS of the clip, gated 36 dB under its loudest frame; attack/release
+    //   smoothing in time; the dip leads the word by `lookahead`. One curve over the whole window, scheduled on vduck.
+    audio.duckUnder = function (buffer, segments, o) {
+      if (!chain || !buffer || !segments || !segments.length) return null;
+      o = o || {};
+      const depthDb = Math.min(0, o.depthDb === undefined ? -9 : o.depthDb), atk = o.attack || 0.012, rel = o.release || 0.22, look = o.lookahead === undefined ? 0.02 : o.lookahead;
+      if (depthDb === 0) return null;
+      const FR = 200, sr = buffer.sampleRate, n = buffer.length, chs = buffer.numberOfChannels, hop = Math.max(1, Math.round(sr / FR));
+      const env = buffer._eravosEnv || (buffer._eravosEnv = (() => { const e = new Float32Array(Math.ceil(n / hop)); for (let f = 0; f < e.length; f++) { let q = 0, k = 0; for (let i = f * hop; i < Math.min(n, (f + 1) * hop); i++) for (let c = 0; c < chs; c++) { const v = buffer.getChannelData(c)[i]; q += v * v; k++; } e[f] = Math.sqrt(q / Math.max(1, k)); } return e; })());
+      let pk = 0; for (let i = 0; i < env.length; i++) pk = Math.max(pk, env[i]); if (!pk) return null;
+      const t0 = Math.min(...segments.map(x => x.t)) - look - atk, t1 = Math.max(...segments.map(x => x.t + x.duration)) + rel * 4;
+      const len = Math.max(2, Math.ceil((t1 - t0) * FR)), want = new Float32Array(len);   // 0…1: how much to duck at each frame
+      segments.forEach(sg => { for (let i = 0; i < len; i++) { const tt = t0 + i / FR + look - sg.t; if (tt < 0 || tt > sg.duration) continue;
+        const f = Math.floor((sg.offset + tt) * FR); if (f < 0 || f >= env.length) continue; const lvl = 20 * Math.log10(Math.max(1e-9, env[f] / pk));
+        want[i] = Math.max(want[i], Math.min(1, Math.max(0, (lvl + 36) / 24))); } });   // −36 dB → 0, −12 dB and up → full
+      const ka = 1 - Math.exp(-1 / (atk * FR)), kr = 1 - Math.exp(-1 / (rel * FR)), curve = new Float32Array(len); let y = 0;
+      for (let i = 0; i < len; i++) { y += (want[i] - y) * (want[i] > y ? ka : kr); curve[i] = Math.pow(10, depthDb * y / 20); }
+      curve[len - 1] = 1;
+      const g = chain.vduck.gain, t = Math.max(audio.ctx.currentTime, t0);
+      if (typeof g.cancelAndHoldAtTime === 'function') g.cancelAndHoldAtTime(t); else g.cancelScheduledValues(t);
+      g.setValueAtTime(1, t);
+      try { g.setValueCurveAtTime(curve, t + 1e-6, (len - 1) / FR); } catch (e) { fault('RUNTIME_003', { message: 'voice duck: ' + e.message }); return null; }
+      return { from: t, to: t + (len - 1) / FR, minDb: 20 * Math.log10(Math.min(...curve)) };
+    };
+    audio.duckUnderReset = function (time) { if (!chain) return; const g = chain.vduck.gain, t = Math.max(audio.ctx.currentTime, time || 0); g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.setTargetAtTime(1, t, 0.02); };
     audio.duckTarget = function (v, t, tau) { if (!chain) return; chain.duck.gain.setTargetAtTime(v, t, Math.max(0.0005, tau || 0.005)); };
     audio.duckReset = function () { if (!chain) return; const g = chain.duck.gain, t = audio.ctx.currentTime; g.cancelScheduledValues(t); g.setTargetAtTime(1, t, 0.01); chain.duckEnd = undefined; };
     audio.meters = function () {
@@ -334,7 +364,7 @@
       });
     };
     audio.hushed = (instanceId) => K.ports.list(instanceId).some(p => p.guard && p.hushedUntil > audio.ctx.currentTime);
-    bus.subscribe('kernel:silence', (p) => { if (p && p.hard) audio.hush(p.instanceId, p.time); }, 'kernel');
+    bus.subscribe('kernel:silence', (p) => { if (p && p.hard) { audio.hush(p.instanceId, p.time); if (!p.instanceId) audio.duckUnderReset(p.time); } }, 'kernel');
     // playing again reopens at once: a note for that tool, or the transport starting
     bus.subscribe('note:trigger', (p) => { if (p && p.target && p.target !== '*') audio.unhush(p.target, p.time); else if (p && p.target === '*') audio.unhush(null, p.time); }, 'kernel');
     bus.subscribe('transport:play', (p) => audio.unhush(null, p && p.time), 'kernel');
@@ -350,7 +380,7 @@
     // low / high → pan → fader → mute → master. The built-in Reverb and Echo returns are the first two AUX lines.
     const STRIP0 = { pan: 0, lowCut: 0, low: 0, mid: 0, midFreq: 1000, high: 0, solo: false, line: null, sends: {} };
     const stripState = new Map(), lines = new Map(); let lineSeq = 1;
-    function homeOf(port) { const l = port && port.line && lines.get(port.line); return l && l.input ? l.input : chain.masterIn; }
+    function homeOf(port) { const l = port && port.line && lines.get(port.line); return l && l.input ? l.input : port && port.bus === 'priority' ? chain.priority : chain.masterIn; }
     // balance pan: unity at centre (adding a strip never changes a level), mono is spread to both sides first
     function makePan(ac) {
       const up = ac.createGain(), sp = ac.createChannelSplitter(2), gL = ac.createGain(), gR = ac.createGain(), mg = ac.createChannelMerger(2);

@@ -141,7 +141,9 @@
         const s = slots[i]; if (!s) return;
         t = Math.max(t || ac.currentTime, ac.currentTime);
         if (s.choke) { (choking.get(s.choke) || []).forEach(g => { try { g.gain.cancelScheduledValues(t); g.gain.setTargetAtTime(0, t, 0.006); } catch (e) {} }); choking.set(s.choke, []); }
-        const v = voice(ac, Object.assign({}, s, { gate: s.gate * P.get('room') }), t, vel, mix, noiseBuf, gate.inG);
+        // 3.39: a driven slot's voice passes a 2x shaper (128 samples late) → it starts that much early and lands on the beat
+        const tv = s.drive > 0 ? Math.max(ac.currentTime, t - ctx.dsp.osLatency(ac, '2x')) : t;
+        const v = voice(ac, Object.assign({}, s, { gate: s.gate * P.get('room') }), tv, vel, mix, noiseBuf, gate.inG);
         if (s.gate > 0 && P.get('room') > 0) gate.open(t, s.gate * P.get('room'));
         if (s.choke) choking.get(s.choke).push(v.gain);
         // open hats are choked by closed hats in the same group (hat → group of the next open hat)

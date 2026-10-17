@@ -19,7 +19,7 @@
     'Silent (canvas tool)': { tensionTone: 'off' },
   };
   OrganismFactory.define({
-    id: 'eravos.bass-drop-builder', tempo: false, domain: 'music', version: '3.0.0', label: 'Drop Builder', icon: '🔻', accent: '#ff2266', phase: 'P6',
+    id: 'eravos.bass-drop-builder', tempo: false, domain: 'music', version: '3.1.0', label: 'Drop Builder', icon: '🔻', accent: '#ff2266', phase: 'P6',
     category: 'Arrange', blurb: 'Build the moment: tension → build → silence → DROP, with her voice landing right before the bass hits.',
     size: { w: 780, h: 680 }, minSize: { w: 600, h: 420 },
     permissions: ['audio_out', 'bus_publish', 'bus_subscribe', 'filesystem_read', 'registry_read'],
@@ -96,6 +96,7 @@
       { key: 'stutter', type: 'integer', default: 0, min: 0, max: 8, label: 'Stutter ×', group: 'VOCAL', hint: 'repeat the first 1/8 of the word before it plays: “gi-gi-give…”' },
       { key: 'vocalGain', type: 'number', default: 1, min: 0, max: 2, step: 0.01, label: 'Vocal gain', group: 'VOCAL' },
       { key: 'vocalHpf', type: 'number', default: 120, min: 20, max: 1000, step: 1, unit: 'Hz', label: 'Vocal low cut', group: 'VOCAL' },
+      { key: 'vocalPriority', type: 'number', default: 9, min: 0, max: 18, step: 0.5, unit: 'dB', label: 'Her voice on top', group: 'VOCAL', hint: 'everything else dips this much under each word she says (0 = off); her voice is never ducked' },
       { key: 'throw', type: 'number', default: 0.5, min: 0, max: 1, step: 0.01, label: 'Reverb throw', group: 'VOCAL' },
     ],
     ui_hooks: ['section_edit', 'cue_edit', 'vocal_load', 'vocal_place', 'fire', 'abort', 'vocal_audition', 'tension_audition', 'tension_sound', 'section_audition'],
@@ -103,7 +104,7 @@
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, K = ctx.K, dsp = ctx.dsp, MT = window.MusicTheory;
       const fx = ac.createGain(), fxOut = fx; fx.gain.value = 0.8; ctx.port('fx', { kind: 'audio', direction: 'out', node: fx, label: 'build FX' });
-      const vocal = ac.createGain(); ctx.port('vocal', { kind: 'audio', direction: 'out', node: vocal, label: 'vocal' });
+      const vocal = ac.createGain(); ctx.port('vocal', { kind: 'audio', direction: 'out', node: vocal, label: 'vocal', bus: 'priority' });   // 3.39: joins the master after the ducks
       const vHp = ac.createBiquadFilter(); vHp.type = 'highpass'; vHp.connect(vocal);
       const throwG = ac.createGain(); throwG.gain.value = 0; vHp.connect(throwG); throwG.connect(K.audio.reverbSend);
       [fx, vocal, vHp, throwG].forEach(n => ctx.track(n));
@@ -283,16 +284,19 @@
         src.start(start + skip, off0 + skip, dur - skip);
         run.sources.push(src); src.onended = () => { try { g.disconnect(); } catch (e) {} };
         // stutter: repeat the first 1/8 of the word N times right before it plays
-        const N = P.get('stutter');
+        const N = P.get('stutter'), segs = [{ t: start + skip, offset: off0 + skip, duration: dur - skip }];
         for (let i = N; i >= 1; i--) {
           const ts = start - i * eighth; if (ts < now) continue;
           const s = ac.createBufferSource(); s.buffer = buf; const sg = ac.createGain(); sg.gain.setValueAtTime(0, ts); sg.gain.linearRampToValueAtTime(P.get('vocalGain') * (0.6 + 0.4 * (N - i + 1) / N), ts + 0.003); sg.gain.setValueAtTime(P.get('vocalGain') * (0.6 + 0.4 * (N - i + 1) / N), ts + eighth * 0.85); sg.gain.linearRampToValueAtTime(0, ts + eighth * 0.95);
           s.connect(sg); sg.connect(vHp); s.start(ts, off0, eighth); run.sources.push(s); s.onended = () => { try { sg.disconnect(); } catch (e) {} };
+          segs.push({ t: ts, offset: off0, duration: eighth * 0.95 });
         }
+        // 3.39 her voice on top: the rest of the mix dips under each word (her clip's own envelope), never her
+        const duck = P.get('vocalPriority') > 0 && K.audio.duckUnder ? K.audio.duckUnder(buf, segs, { depthDb: -P.get('vocalPriority') }) : null;
         // reverb throw at the tail
         const th = P.get('throw');
         if (th > 0) { const te = start + dur; throwG.gain.cancelScheduledValues(now); throwG.gain.setValueAtTime(0, Math.max(now, te - dur * 0.35)); throwG.gain.linearRampToValueAtTime(th * 1.2, te); throwG.gain.setTargetAtTime(0, te + 0.05, 0.4); }
-        return { start, end: start + dur };
+        return { start, end: start + dur, duck };
       }
       ctx.scheduleVocal = scheduleVocal;
       async function loadVocalHash(hash, name) {
@@ -354,7 +358,7 @@
       function finishRun(reason) {
         if (!run) return;
         const t = ac.currentTime;
-        if (reason === 'abort') { run.sources.forEach(s => { try { s.stop(t + 0.01); } catch (e) {} }); K.audio.setDJFilter({ value: run.restoredDJ }); }
+        if (reason === 'abort') { run.sources.forEach(s => { try { s.stop(t + 0.01); } catch (e) {} }); K.audio.setDJFilter({ value: run.restoredDJ }); if (run.vocal && run.vocal.duck && K.audio.duckUnderReset) K.audio.duckUnderReset(t); }
         else K.audio.setDJFilter(run.restoredDJ, Math.max(t, run.b.AFTER.ts)); // scheduled restore (exact even when ticks run ahead)
         // unmute everything this run muted
         new Set(SECTIONS.flatMap(s => (cues[s] && cues[s].mutes) || [])).forEach(ch => { if (K.registry.has(ch)) ctx.emit('ui:config_change:' + ch, { key: 'mute', value: false }); });

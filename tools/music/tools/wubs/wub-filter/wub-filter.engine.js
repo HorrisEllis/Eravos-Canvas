@@ -49,6 +49,7 @@
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, dsp = ctx.dsp;
       const fx = SDK.fxShell(ctx);
+      fx.setLatency(dsp.osLatency(ac, '4x'));   // 3.39: the blended dry waits for the 4x shaper
       // ---- drive
       const pre = ac.createGain(), sh = ac.createWaveShaper(); sh.oversample = '4x';
       fx.wetIn.connect(pre); pre.connect(sh);
