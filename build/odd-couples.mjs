@@ -4,7 +4,8 @@
  *   node build/odd-couples.mjs            → tools/music/tools/<category>/<tool>/packs/odd-couples/pack.json for every tool
  * Each preset = an existing preset of the same tool (base) + the knobs that make it its Odd Couples self. Every value is checked
  * against the tool's real config (read from the running engines): unknown key, out of range or bad option → nothing is written.
- * Then: node build/index-tools.mjs && node build/validate.mjs && node tests/tool-audio.mjs (every new preset measured). */
+ * Then: node build/index-tools.mjs && node build/validate.mjs && node tests/tool-audio.mjs --json s.json && node build/gain-stage.mjs s.json
+ *   (ORDER MATTERS: this script rewrites the Odd Couples packs; gain-stage.mjs must run after it, or the levels it set are lost) */
 import { chromium } from 'playwright'; import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

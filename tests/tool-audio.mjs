@@ -42,7 +42,7 @@ async function measureTool(id) {
   const xen = /xen|ratio|spectra|embodiment/i.test(id);   // not 12-tone by design: the pitch check does not apply
   const bass = /bass|sub|wub|reese|808|wobble/i.test(id + ' ' + (d.category || ''));
   const NOTE = bass ? 45 : 57;   // A2 / A3 — in the default key (A minor) and in C major, so key-snapping cannot move it
-  const out = { id, label: d.label, category: d.category, kind: null, presets: [] };
+  const out = { id, label: d.label, category: d.category, kind: null, presets: [], defaults: Object.fromEntries((d.config || []).map(c => [c.key, c.default])) };   // build/gain-stage.mjs reads the defaults
   if (CONTAINERS[id]) { out.kind = 'container'; out.skip = CONTAINERS[id]; return out; }
   const tap = (U, inst) => {   // the tool's own audio-out ports, summed, straight to the destination (master taken off)
     try { U.K.audio.chain.out.disconnect(U.ctx.destination); } catch (e) {}
@@ -146,7 +146,7 @@ function verdict(tool, r) {
   if (r.error) f.push('error: ' + r.error);
   if (r.nan) f.push(`${r.nan} NaN/Inf samples`);
   if (r.clip) f.push(`over full scale (${r.clip} samples ≥ 0 dBFS at the tool's own output)`);
-  if (r.rmsDb !== undefined && r.rmsDb < -60) f.push(`silent (${r.rmsDb} dBFS)`);
+  if (r.peakDb !== undefined && r.peakDb < -60) f.push(`silent (peak ${r.peakDb} dBFS)`);   // by PEAK: a pluck or stab is over before the 0.3–1.2 s level window
   if (r.afterStopDb !== undefined && r.afterStopDb > -60) f.push(`still sounding 0.45 s after Stop all (${r.afterStopDb} dBFS)`);
   if (r.maxGridMs !== null && r.maxGridMs !== undefined && r.maxGridMs > 1) f.push(`off time by up to ${r.maxGridMs} ms (${(r.worst || []).join('; ')})`);
   if (r.hits && r.hits.split('/')[0] !== r.hits.split('/')[1]) f.push(`only ${r.hits} hits heard`);

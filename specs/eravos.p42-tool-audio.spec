@@ -53,14 +53,35 @@ measured in Chromium (= the exe's Electron 44): WaveShaper oversample 2x = 128 s
 master chain: … duck → vduck → comp ; priority → comp. K.audio.duckUnder(buffer, segments, {depthDb}) / duckUnderReset.
 tests/p42-voice-priority.test.js: 9 ± 0.6 dB under each word, back between words and after, never ducks her.
 
+## Gain staging (3.41) — build/gain-stage.mjs
+the survey measures each preset's OWN output (one note; a triad for chord tools — Pad Forge, Supersaw, Retro Poly, Organ,
+  Coven, Xen Synth — the way songs play them). 93 presets peaked over 0 dBFS (worst: Wub Filter Screech Reso +10.4, Inverted
+  Mouth +7.1, Classic LP Wub +5.5 — resonance gain on a −6 dBFS saw; Supersaw Chord Stab +5.3, Wide Pad +4.9; Pad Forge
+  Celestial Glass +4.2; Pads Riddim Steel +4.3; Drop Builder impact +1.6). Each was turned DOWN on its own output knob
+  (level / volume / outGain / trim; EDM Lab: its three levels; Drop Builder: impact + crash) to peak at −1.5 dBFS — never up,
+  only presets measured over full scale; −1.5 leaves 0.5 dB for velocity 1.0 over the measured 0.9. The full list with old →
+  new values is the script's output (run it with --dry). Effect on mixes: chords and drum kits come down 1.5–7 dB, basses
+  mostly unchanged — older songs lean more on the bass. One commit: revert it to get the old levels back.
+order: build/odd-couples.mjs rewrites the Odd Couples packs — run gain-stage.mjs after it.
+
+## Knobs and the wheel (3.41, canvas/runtime/ui-kit.js)
+found by tests/p39-settings-wheel.mjs after the new packs moved the layout: while scrolling a ⚙ Settings panel, a knob that
+  slid under the cursor took the wheel — scrolling stopped and the knob turned (FX Dynamics gate release, FX EQ low shelf,
+  Retro Poly decay, Supersaw sustain changed on their own). A wheel gesture (events < 300 ms apart) now belongs to where it
+  STARTED: scrolling keeps scrolling; a gesture that starts on a knob still turns it. The test now also fails if scrolling
+  changes any setting, and checks that a knob still turns.
+
+## The catalog and the build scripts (3.41)
+since the catalog merge a fresh profile installs no tools; 11 build/test scripts opened the canvas as a fresh profile and got
+  none (tool-kit wrote 0 pack schemas; p39-no-prompt crashed). They set ERAVOS_CATALOG_ALL like tests/run.html.
+tests/p16-ui.mjs had failed since 3.34 (it looked for Song Engine cards on the start screen): it now checks every genre is in
+  📖 Songs, writes the song through the Songs page, and that every control in a tool window is reachable with the wheel.
+
 ## Open (measured, not yet changed) — the user decides
   · Wobble sub alignment: aligning the clean sub to the mid layer evens the low end across notes (Classic Wub spread
     5.7 → 2.4 dB, Half-time 5.6 → 1.9) but moves average low end per preset (Classic/Half-time/Monstercat −3…−4 dB,
     Screech/Fold +4 dB). The mid layer is high-passed 85 Hz (2nd order) against a 140 Hz low-passed sub: an overlapping
     2nd-order pair is ~180° apart in the overlap. A Linkwitz–Riley 4 crossover was tried at 90 / 110 Hz: no clear win
     (Fold Growl spread 9.3 / 5.4 dB). Not changed.
-  · levels: tools whose RAW output passes full scale (Sub Engine 808s, Wub Filter Classic LP, FX Haunt Witch Fog, Pad Forge
-    Celestial Glass, EDM Lab, Reese Melodic Growl, Drop Builder impact …) — the master limiter catches it, but it is why 114
-    of 189 song previews touch 0 dBFS. Plan: a per-tool output ceiling of −1 dBFS measured by the survey; presets re-levelled.
   · vibrato on Wobble lands 192 samples behind its filter wobble (oscillator detune passes both shapers).
   · effect latency on a track (2.7–4 ms) is not compensated across the mixer (no plugin delay compensation between tracks).

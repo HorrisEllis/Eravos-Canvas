@@ -62,6 +62,19 @@ Techno, Trap, Synthwave (80s), Darkwave (80s), Witch House). Every press writes 
 drums, bass, chords, lead and the arrangement — on the Timeline, all in key. Click any clip to edit it in the piano roll.
 The song's name ends in its number: `SongEngine.write('synthwave', 4242)` builds that exact song again.
 
+## 3.41 — Odd Couples · every tool measured · her voice on top
+- **Songs → 🧪 Odd Couples**: 72 songs in 12 genres made from tools that never meet — a cathedral organ over the riddim wub
+  rig, a 303 at a séance, golden-ratio bells on a dub sound system, a music box over tearout, a breathing drone under 174 drum &
+  bass … Every tool has a new **Odd Couples** pack (prefix "Odd ·"). Every song opens her voice rig: record her once in Clip
+  Maker — she plays in the break AND lands on the drop with the rest of the mix ducked under her.
+- **Drop Builder · Her voice on top** (VOCAL, default 9 dB): everything else dips under each word of her clip; she never does.
+- **Measured, not guessed** (specs/eravos.p42-tool-audio.spec): every tool × every preset rendered and measured — timing to the
+  sample, pitch to the cent, level, Stop all. Fixed: notes that played 2.7–18 ms late (Sub Engine, Organ with drive, Reese,
+  Embodiment, driven drum voices), echo repeats drifting off the beat, dry/wet comb filtering in Destroyer / Filter / Wub Filter,
+  presets peaking over full scale. `node tests/tool-audio.mjs [tool]` runs the survey.
+- **Songs page**: every card answers a click (39 didn't in the exe) and Write writes the card you picked. A song installs any
+  tool it needs and says which. **Settings panels**: scrolling no longer turns the knob that slides under the cursor.
+
 ## 3.36 — the Sequencer drives every tool to the beat · "Give Your Head a Shake"
 - ＋ lane → automation lane: pick any tool and any knob, paint a value per step (⟋ = glide). Wobble rate, cutoff, DJ filter, reverb — on the beat.
 - Right-click a step: 🔒 lock a knob for that one hit · "Plays": every other pass, only in a fill, first pass only…
