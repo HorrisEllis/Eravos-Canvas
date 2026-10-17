@@ -29,7 +29,7 @@
       "aD": 0.2,
       "aS": 0.3,
       "aR": 0.25,
-      "chordMode": "seventh",
+      "chordMode": "off",
       "level": 0.45
      }
     },
@@ -48,7 +48,7 @@
       "aD": 1,
       "aS": 0.9,
       "aR": 2.5,
-      "chordMode": "sus4",
+      "chordMode": "off",
       "level": 0.339
      }
     },

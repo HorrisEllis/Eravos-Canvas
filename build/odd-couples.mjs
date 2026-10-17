@@ -58,8 +58,8 @@ const DESIGN = {
     'Golden Orbit': P('Her Essence', { orbit: 'circle', orbitRate: 0.0618, orbitSize: 0.382, x: 0.618, y: 0.382, shimmer: 0.4, level: 0.6 }, 'her essence pad orbiting on golden numbers'),
   },
   'eravos.supersaw': {
-    'Gospel Stack': P('Chord Stab (triad)', { chordMode: 'seventh', unison: 5, detune: 0.25, cutoff: 4200, aR: 0.25, level: 0.6 }, 'gospel sevenths stacked as saws, for the glitch gospel'),
-    'Acid Church Pad': P('Airy Sus Pad', { chordMode: 'sus4', cutoff: 2600, res: 1.5, level: 0.55 }, 'a sus4 cloud between the 303 and the choir'),
+    'Gospel Stack': P('Chord Stab (triad)', { chordMode: 'off', unison: 5, detune: 0.25, cutoff: 4200, aR: 0.25, level: 0.6 }, 'gospel sevenths stacked as saws, for the glitch gospel (chordMode off: the song sends the seventh chords — on, every note became a chord: 16 notes × 5 saws)'),
+    'Acid Church Pad': P('Airy Sus Pad', { chordMode: 'off', cutoff: 2600, res: 1.5, level: 0.55 }, 'a sus4 cloud between the 303 and the choir'),
     'Steppers Pluck': P('Monstercat Pluck', { aD: 0.18, aS: 0, aR: 0.12, cutoff: 5200, level: 0.6 }, 'a pluck on the steppers off-beat'),
     'Wobble Halo Saws': P('EDM Pad · Melodic Dubstep Saws', { cutoff: 3200, aA: 0.4, level: 0.5 }, 'saws behind a wobble — lower, slower, never in the way'),
   },
