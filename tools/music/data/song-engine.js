@@ -164,6 +164,14 @@
       });
       bar += sec.bars;
     });
+    // 3.41: a genre with `voice` sings with her recordings (data/her-voice.js): the timeline's audio goes through a vocal
+    // chain (EQ → level), then her phrases are laid on the timeline by section. Genres without it are untouched.
+    if (G.voice) {
+      steps.push({ op: 'mount', organism: 'eravos.fx-eq', as: 'voxEq', at: place('eravos.fx-eq'), preset: 'Vocal Clarity' }, { op: 'patch', from: 'tl', to: 'voxEq' });
+      steps.push({ op: 'mount', organism: 'eravos.fx-dynamics', as: 'voxLvl', at: place('eravos.fx-dynamics'), preset: 'Vocal Level' }, { op: 'patch', from: 'voxEq', to: 'voxLvl' });
+      let b = 1; const sections = form.map(sec => { const s = { name: sec.name, kind: sec.kind || sec.name.replace(/\s*\d+$/, ''), bar: b, bars: sec.bars }; b += sec.bars; return s; });
+      steps.push({ op: 'her_voice', target: 'tl', out: 'voxLvl', sections, bpm, seed });
+    }
     if (G.master) { steps.push({ op: 'mount', organism: 'eravos.master-fx', as: 'master', at: [1620, 0], size: [640, 440], reuse: true }); steps.push({ op: 'configure', target: 'master', params: G.master }); }
     return steps;
   }

@@ -7,7 +7,7 @@
   var F = [
     'core/music-theory.js', 'core/xen-theory.js', 'core/vendor/lame.min.js', 'core/codecs.js', 'core/audio-recorder.js', 'core/audio.js', 'core/sdk-music.js', 'core/precision-clock.js', 'core/master-transport.js', 'core/ui-music.js',
     'domain.js', 'core/plain-errors-music.js', 'core/preview-music.js',
-    'data/data.js', 'data/patterns.js', 'data/lessons.js', 'data/recipes.js', 'data/song-engine.js', 'data/genres-edm.js', 'data/rhythm-expand.js', 'data/songbook.js', 'data/bass-pack.js', 'data/wub-songbook.js', 'data/lost-love-songbook.js', 'data/odd-couples-songbook.js', 'data/learn.js', 'data/kits.js', 'data/sounds.js', 'data/goals.js', 'data/plugins.js', 'data/library.js',
+    'data/data.js', 'data/patterns.js', 'data/lessons.js', 'data/recipes.js', 'data/song-engine.js', 'data/her-voice.js', 'data/genres-edm.js', 'data/rhythm-expand.js', 'data/songbook.js', 'data/bass-pack.js', 'data/wub-songbook.js', 'data/lost-love-songbook.js', 'data/her-edm-songbook.js', 'data/odd-couples-songbook.js', 'data/learn.js', 'data/kits.js', 'data/sounds.js', 'data/goals.js', 'data/plugins.js', 'data/library.js',
     'tools/index.js'
   ];
   for (var i = 0; i < F.length; i++) (window.Catalog ? window.Catalog.load(base + F[i]) : document.write('<script src="' + base + F[i] + '"><\/script>'));

@@ -13,11 +13,12 @@ describe('Songs page — every card selects, and Write writes the card you picke
       const all = Songbook.all().filter(s => !Songbook.locked(s));
       for (const s of all) {
         Songbook.open(); const ov = document.querySelector('.overlay.sbk');
-        const card = [...ov.querySelectorAll('.sbk-card')].find(c => c.querySelector('b').textContent === s.title);
+        const name = (c) => c.querySelector('b').textContent.replace(/ 🎤$/, '');   // songs that sing with her carry a 🎤
+        const card = [...ov.querySelectorAll('.sbk-card')].find(c => name(c) === s.title);
         if (!card) { bad.push(s.id + ': no card'); ov.remove(); continue; }
         card.click();
         const selCard = ov.querySelector('.sbk-card.sel'), shown = ov.querySelector('.sbk-detail h3').textContent;
-        if (!selCard || selCard.querySelector('b').textContent !== s.title || shown !== s.title) bad.push(`${s.id}: selected "${selCard && selCard.querySelector('b').textContent}", shown "${shown}"`);
+        if (!selCard || name(selCard) !== s.title || shown !== s.title) bad.push(`${s.id}: selected "${selCard && name(selCard)}", shown "${shown}"`);
         wrote = null; ov.querySelector('.sbk-go').click();
         const ok = s.recipe ? wrote && wrote.recipe === s.recipe : wrote && wrote.genre === s.genre && wrote.seed === s.seed;
         if (!ok) bad.push(`${s.id}: Write wrote ${JSON.stringify(wrote)}`);

@@ -1,8 +1,12 @@
-/* eravos.pad-forge 1.0.0 — Pad Forge · spec eravos.organism.pad-forge
+/* eravos.pad-forge 1.1.0 — Pad Forge · spec eravos.organism.pad-forge
  * Make pad sounds. Vector synthesis: four different sources sit on the corners of a square (swarm, glass, air, choir,
  * organ, strings, halo); a point inside the square mixes them, and that point ORBITS (circle, figure-8, drift) so the pad
  * keeps changing while you hold the chord. Bloom opens the filter over seconds; Hold latches chords; the shimmer space
- * is a long generated reverb whose tail is pitched up an octave and fed back — halos that build on themselves. */
+ * is a long generated reverb whose tail is pitched up an octave and fed back — halos that build on themselves.
+ * 1.1 (sound fix, measured): a 4-note chord drove the Warmth shaper to 0.5–3.4× full scale, so 17 of 30 presets hard-clipped
+ * (buzz); the sources now mix in with headroom (−10 dB) and Warmth is the 'tape' curve (unity on quiet signal, rounds
+ * only the peaks; 0 = clean). Width was L/R ± (11 ms − 17 ms delays) — a comb filter that made every pad hollow and
+ * phasey; now each corner source has its own place in the stereo field (the pad moves as it orbits) plus a gentle stereo chorus. */
 (function () {
   'use strict';
   const IR_CACHE = new WeakMap(); // AudioContext → Map(size → AudioBuffer)
@@ -10,7 +14,7 @@
   const SOURCES = ['swarm', 'glass', 'air', 'choir', 'organ', 'strings', 'halo'];
   const ORBITS = ['still', 'circle', 'figure-8', 'drift'];
   OrganismFactory.define({
-    id: 'eravos.pad-forge', preview: 'chord', domain: 'music', version: '1.0.0', label: 'Pad Forge', icon: '☁', accent: '#8fd3ff', phase: 'P14',
+    id: 'eravos.pad-forge', preview: 'chord', domain: 'music', version: '1.1.0', label: 'Pad Forge', icon: '☁', accent: '#8fd3ff', phase: 'P14',
     category: 'Sound sources', blurb: 'Make pads: blend four sources on an XY square that drifts by itself, blooming filter, chord hold, shimmer halos.',
     size: { w: 560, h: 640 }, minSize: { w: 440, h: 480 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
@@ -43,17 +47,24 @@
     defaultPreset: 'Her Essence',
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, dsp = ctx.dsp, MT = window.MusicTheory;
+      // each corner has its own place in the stereo field (A left · B right · C left-centre · D right-centre)
+      const PAN = [-0.7, 0.7, -0.3, 0.3];
       const corners = [0, 1, 2, 3].map(() => { const g = ac.createGain(); g.gain.value = 0.25; ctx.track(g); return g; });
-      const pre = ac.createGain(), lp = ac.createBiquadFilter(), lp2 = ac.createBiquadFilter(), warm = ac.createWaveShaper(); lp.type = lp2.type = 'lowpass'; lp.Q.value = 0.6; lp2.Q.value = 0.5;
-      corners.forEach(g => g.connect(pre)); pre.connect(warm); warm.connect(lp); lp.connect(lp2);
+      const pans = corners.map((g) => { const p = ac.createStereoPanner(); g.connect(p); ctx.track(p); return p; });
+      const pre = ac.createGain(), lp = ac.createBiquadFilter(), lp2 = ac.createBiquadFilter(), warm = ac.createWaveShaper(), body = ac.createGain(); lp.type = lp2.type = 'lowpass'; lp.Q.value = 0.6; lp2.Q.value = 0.5;
+      pre.gain.value = 0.32; body.gain.value = 2.85; warm.oversample = '2x';   // headroom into the shaper, made up after it
+      pans.forEach(p => p.connect(pre)); pre.connect(warm); warm.connect(lp); lp.connect(lp2); lp2.connect(body);
       const cutMod = ctx.modBus('cutoff', { min: -4800, max: 4800 }); cutMod.connect(lp.detune); cutMod.connect(lp2.detune);
-      // width: Haas-free mid/side-ish — a short modulated delay on one side
+      // width: the corners' stereo places (above) + a gentle stereo chorus — one slow-moving delay per side, ADDED to
+      // the dry signal (never subtracted: L − R of two short delays is a comb filter, the 1.0 hollow sound)
       const split = ac.createChannelSplitter(2), merge = ac.createChannelMerger(2), dl = ac.createDelay(0.05), dlR = ac.createDelay(0.05), wob = ac.createOscillator(), wobG = ac.createGain();
-      dl.delayTime.value = 0.011; dlR.delayTime.value = 0.017; wob.frequency.value = 0.31; wobG.gain.value = 0.002; wob.connect(wobG); wobG.connect(dl.delayTime); wob.start();
-      const dryMono = ac.createGain(), sideG = ac.createGain();
-      lp2.connect(dryMono); dryMono.connect(merge, 0, 0); dryMono.connect(merge, 0, 1);
-      lp2.connect(dl); lp2.connect(dlR); dl.connect(sideG); const inv = ac.createGain(); inv.gain.value = -1; dlR.connect(inv); inv.connect(sideG);
-      const sideL = ac.createGain(), sideR = ac.createGain(); sideR.gain.value = -1; sideG.connect(sideL); sideG.connect(sideR); sideL.connect(merge, 0, 0); sideR.connect(merge, 0, 1);
+      dl.delayTime.value = 0.013; dlR.delayTime.value = 0.019; wob.frequency.value = 0.23; wobG.gain.value = 0.0025; wob.connect(wobG); wobG.connect(dl.delayTime);
+      const wobInv = ac.createGain(); wobInv.gain.value = -1; wobG.connect(wobInv); wobInv.connect(dlR.delayTime); wob.start();
+      const dryMono = ac.createGain(), sideG = ac.createGain(), sideL = ac.createGain(), sideR = ac.createGain(), inv = ac.createGain();
+      body.connect(dryMono); dryMono.connect(split); split.connect(merge, 0, 0); split.connect(merge, 1, 1);
+      body.connect(dl); body.connect(dlR); dl.connect(sideL); dlR.connect(sideR);
+      const chL = ac.createChannelSplitter(2), chR = ac.createChannelSplitter(2); sideL.connect(chL); sideR.connect(chR); chL.connect(merge, 0, 0); chR.connect(merge, 1, 1);
+      [wobInv, chL, chR, body].concat(pans).forEach(n => ctx.track(n));
       // shimmer space: convolver (generated) + octave-up pitch feedback
       const verbIn = ac.createGain(), conv = ac.createConvolver(), verbOut = ac.createGain(), fb = ac.createGain(), out = ac.createGain();
       merge.connect(out); merge.connect(verbIn); verbIn.connect(conv); conv.connect(verbOut); verbOut.connect(out);
@@ -62,6 +73,7 @@
       const level = ac.createGain(); out.connect(level);
       [pre, lp, lp2, warm, split, merge, dl, dlR, wob, wobG, dryMono, sideG, inv, sideL, sideR, verbIn, conv, verbOut, fb, out, level].forEach(n => ctx.track(n));
       ctx.port('out', { kind: 'audio', direction: 'out', node: level, label: 'pad', tail: 14 }); // tail: Stop all keeps it quiet until the longest space has emptied
+      const LINEAR = new Float32Array([-1, 1]);
       let irSize = 0;
       function ir() {
         // 3.37 (QA: each preset change blocked the page 100–460 ms): the space's IR is cached per size (¼ s steps) and context
@@ -74,10 +86,11 @@
       }
       function apply() {
         const t = ac.currentTime; ir();
-        warm.curve = dsp.curve('tube', P.get('warmth') * 0.6);
+        const wa = P.get('warmth'); warm.curve = wa < 0.01 ? LINEAR : dsp.curve('tape', wa * 0.9);   // unity on quiet signal, rounds the peaks
+        const w = P.get('width'); pans.forEach((p, i) => p.pan.setTargetAtTime(PAN[i] * w, t, 0.05));
         lp2.frequency.setTargetAtTime(Math.min(18000, P.get('cutoff') * 2.2), t, 0.05);
         dsp.setSmooth(verbIn.gain, P.get('space'), ac); dsp.setSmooth(verbOut.gain, 0.6, ac); dsp.setSmooth(fb.gain, P.get('shimmer') * 0.55, ac);
-        dsp.setSmooth(sideG.gain, P.get('width') * 0.5, ac); dsp.setSmooth(level.gain, P.get('level') * 0.8, ac);
+        dsp.setSmooth(sideL.gain, w * 0.35, ac); dsp.setSmooth(sideR.gain, w * 0.35, ac); dsp.setSmooth(level.gain, P.get('level') * 0.8, ac);
         if (!bloomActive) lp.frequency.setTargetAtTime(P.get('cutoff'), t, 0.05);
       }
       let bloomActive = false;
@@ -106,7 +119,10 @@
       ctx.vector = () => vp;
       // ---- sources (each a different way of making a sustained tone)
       const noise = dsp.noise(ac, 2, 'pink');
-      function source(kind, f, dst, t, nodes) {
+      // 1.1: each source calibrated to the same loudness (a 4-note chord measured alone, −16 dB RMS) — they spanned 16 dB
+      const SRC_DB = { swarm: 4.9, glass: -8.1, air: 7.5, choir: 7.9, organ: -7.5, strings: 0.5, halo: -1.3 };
+      function source(kind, f, dst0, t, nodes) {
+        const cal = ac.createGain(); cal.gain.value = Math.pow(10, (SRC_DB[kind] || 0) / 20); cal.connect(dst0); nodes.push(cal); const dst = cal;
         const osc = (type, fr, det, gain, to) => { const o = ac.createOscillator(); o.type = type; o.frequency.value = fr; o.detune.value = det || 0; const g = ac.createGain(); g.gain.value = gain; o.connect(g); g.connect(to || dst); o.start(t); nodes.push(o, g); return o; };
         switch (kind) {
           case 'swarm': [-18, -9, 0, 9, 18].forEach((d, i) => osc('sawtooth', f, d + (rnd() - 0.5) * 3, 0.07, null)); break;
@@ -148,7 +164,7 @@
       ctx.audition = (p) => noteOn(p.note || 57, p.velocity || 0.8, ac.currentTime, p.duration || 3);
       ctx.auditionOff = (p) => { if (!P.get('hold')) voices.filter(v => v.note === (p.note || 57)).forEach(v => release(v, ac.currentTime)); };
       ctx.onUI('release_all', null, () => voices.slice().forEach(v => release(v, ac.currentTime)));
-      ctx.internals = { voices, corners };
+      ctx.internals = { voices, corners, pre, warm, body, level, pans };
       ctx.onDispose(() => voices.slice().forEach(v => kill(v, ac.currentTime)));
       return {};
     },
