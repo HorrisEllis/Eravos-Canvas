@@ -22,7 +22,8 @@
     "ui": "wub-osc.ui.js",
     "preview": "preview.png",
     "spec": "wub-osc.spec",
-    "tests": "wub-osc.test.js"
+    "tests": "wub-osc.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

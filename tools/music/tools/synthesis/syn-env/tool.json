@@ -18,7 +18,8 @@
     "ui": "syn-env.ui.js",
     "preview": "preview.png",
     "spec": "syn-env.spec",
-    "tests": "syn-env.test.js"
+    "tests": "syn-env.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

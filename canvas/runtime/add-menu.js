@@ -140,10 +140,13 @@
         const meta = Cat && Cat.meta(d.id), np = d._avail ? d._avail.presets : Object.keys(d.presets || {}).length;
         if (d._avail) chips.unshift(chip('not installed', 'new', 'adding it installs it (it stays installed until you remove it)'));
         if (np) chips.push(chip(np + ' presets', 'dim', 'presets in its packs'));
-        const thumb = meta && meta.preview ? h('img', { class: 'ap-card-img', src: meta.preview, alt: '', loading: 'lazy', onerror: (e) => e.target.remove() }) : null;
+        // 3.44: the card leads with the tool's own display (thumb.png, 16:10) — the old 84×52 corner of the whole window showed
+        // only a title bar. No picture → the icon on the tool's colour, same frame, so the grid stays even.
+        const pic = meta && (meta.thumb || meta.preview), frame = h('div', { class: 'ap-card-pic' + (meta && meta.thumb ? '' : ' fit') }, [h('span', { class: 'ap-card-ic', text: d.icon || '◻' })]);
+        if (pic) frame.appendChild(h('img', { class: 'ap-card-img', src: pic, alt: '', loading: 'lazy', onerror: (e) => e.target.remove() }));
         const card = h('div', { class: 'ap-card' + (d._avail ? ' avail' : ''), tabindex: '-1', style: { '--acc': d.accent || '#00d4ff' }, 'data-id': d.id }, [
-          thumb || h('span', { class: 'ap-card-ic', text: d.icon || '◻' }),
-          h('div', { class: 'ap-card-tx' }, [h('b', { text: d.label }), h('small', { text: d.blurb || '' }), h('div', { class: 'ap-chiprow' }, chips)]),
+          frame,
+          h('div', { class: 'ap-card-tx' }, [h('b', {}, [h('span', { class: 'ap-card-glyph', text: d.icon || '' }), d.label]), h('small', { text: d.blurb || '' }), h('div', { class: 'ap-chiprow' }, chips)]),
         ]);
         card.onclick = () => select(d.id); card.ondblclick = () => add(d);
         grid.appendChild(card); cards.push({ el: card, d });
@@ -171,9 +174,10 @@
       const portName = (x) => (x.port ? x.port + ' · ' : '') + x.kind;
       detail.append(
         h('div', { class: 'ap-d-head', style: { '--acc': d.accent || '#00d4ff' } }, [h('span', { class: 'ap-d-ic', text: d.icon || '◻' }), h('div', {}, [h('h3', { text: d.label }), h('small', { text: (d.category || 'General') + ' · v' + (d.version || '1.0.0') })])]),
+        (Cat && Cat.meta(d.id) && Cat.meta(d.id).preview) ? h('div', { class: 'ap-d-shot' }, [h('img', { src: Cat.meta(d.id).preview, alt: d.label + ' — the whole window', onerror: (e) => e.target.parentNode.remove() })]) : '',
         h('p', { class: 'ap-d-blurb', text: d.blurb || '' }),
         h('button', { class: 'tb-btn primary ap-addbtn', text: d._avail ? 'Install + add to canvas' : dd.pending.length ? `Add — turns on ${dd.pending.length} toolbar item${dd.pending.length > 1 ? 's' : ''}` : 'Add to canvas', onclick: () => add(d) }),
-        Cat && Cat.meta(d.id) && !d._avail ? h('button', { class: 'tb-btn ap-rmbtn', text: 'Remove from this canvas', title: 'uninstall: gone from ＋ Add now; its code leaves at the next start. Windows already open keep working.', onclick: () => { Cat.remove(d.id); S.toast(`${d.label} removed — gone after the next start. Add it again any time from ＋ Add.`, '', 4000); } }) : null,
+        Cat && Cat.meta(d.id) && !d._avail ? h('button', { class: 'tb-btn ap-rmbtn', text: 'Remove from this canvas', title: 'uninstall: gone from ＋ Add now; its code leaves at the next start. Windows already open keep working.', onclick: () => { Cat.remove(d.id); S.toast(`${d.label} removed — gone after the next start. Add it again any time from ＋ Add.`, '', 4000); } }) : '',   // never null: append() prints it as "null"
       );
       [
         sec('MODE', [row(dd.modeLabel ? ((X.mode_(dd.mode) || {}).icon || '') + ' ' + dd.modeLabel : 'none — domain-free', dd.mode ? (X.isActive(dd.mode) ? 'active' : 'stays off — only what this tool needs turns on') : '')]),
@@ -199,7 +203,7 @@
       if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); return; }
       if (!cards.length || state.view === 'modes' && !state.q) return;
       const i = Math.max(0, cards.findIndex(c => c.d.id === state.sel));
-      const cols = Math.max(1, Math.round(main.querySelector('.ap-grid') ? main.querySelector('.ap-grid').clientWidth / 260 : 1));
+      const cols = Math.max(1, Math.round(main.querySelector('.ap-grid') ? main.querySelector('.ap-grid').clientWidth / 280 : 1));
       const go = (n) => { e.preventDefault(); select(cards[Math.max(0, Math.min(cards.length - 1, n))].d.id); };
       if (e.key === 'ArrowDown') go(i + cols); else if (e.key === 'ArrowUp') go(i - cols);
       else if (e.key === 'ArrowRight' && e.target !== q) go(i + 1); else if (e.key === 'ArrowLeft' && e.target !== q) go(i - 1);

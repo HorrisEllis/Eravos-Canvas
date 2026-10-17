@@ -18,7 +18,8 @@
     "ui": "clip-maker.ui.js",
     "spec": "clip-maker.spec",
     "preview": "preview.png",
-    "tests": "clip-maker.test.js"
+    "tests": "clip-maker.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

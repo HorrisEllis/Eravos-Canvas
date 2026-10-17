@@ -18,7 +18,8 @@
     "ui": "bass-forge.ui.js",
     "spec": "bass-forge.spec",
     "preview": "preview.png",
-    "tests": "bass-forge.test.js"
+    "tests": "bass-forge.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

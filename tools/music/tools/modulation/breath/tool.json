@@ -17,7 +17,8 @@
     "ui": "breath.ui.js",
     "spec": "breath.spec",
     "preview": "preview.png",
-    "tests": "breath.test.js"
+    "tests": "breath.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

@@ -22,7 +22,8 @@
     "ui": "wub-rate.ui.js",
     "preview": "preview.png",
     "spec": "wub-rate.spec",
-    "tests": "wub-rate.test.js"
+    "tests": "wub-rate.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

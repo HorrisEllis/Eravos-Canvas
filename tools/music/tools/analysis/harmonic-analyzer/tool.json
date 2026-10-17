@@ -18,7 +18,8 @@
     "ui": "harmonic-analyzer.ui.js",
     "spec": "harmonic-analyzer.spec",
     "preview": "preview.png",
-    "tests": "harmonic-analyzer.test.js"
+    "tests": "harmonic-analyzer.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

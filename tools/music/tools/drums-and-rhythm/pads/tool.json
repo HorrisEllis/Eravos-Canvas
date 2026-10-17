@@ -18,7 +18,8 @@
     "spec": "pads.spec",
     "preview": "preview.png",
     "tests": "pads.test.js",
-    "css": "pads.css"
+    "css": "pads.css",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

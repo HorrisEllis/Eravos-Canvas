@@ -18,7 +18,8 @@
     "ui": "sample-player.ui.js",
     "spec": "sample-player.spec",
     "preview": "preview.png",
-    "tests": "sample-player.test.js"
+    "tests": "sample-player.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

@@ -17,7 +17,8 @@
     "ui": "supersaw.ui.js",
     "spec": "supersaw.spec",
     "preview": "preview.png",
-    "tests": "supersaw.test.js"
+    "tests": "supersaw.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

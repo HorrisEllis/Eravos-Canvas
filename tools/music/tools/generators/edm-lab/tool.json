@@ -18,7 +18,8 @@
     "ui": "edm-lab.ui.js",
     "spec": "edm-lab.spec",
     "preview": "preview.png",
-    "tests": "edm-lab.test.js"
+    "tests": "edm-lab.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

@@ -20,7 +20,8 @@
     "ui": "wub-sub.ui.js",
     "preview": "preview.png",
     "spec": "wub-sub.spec",
-    "tests": "wub-sub.test.js"
+    "tests": "wub-sub.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

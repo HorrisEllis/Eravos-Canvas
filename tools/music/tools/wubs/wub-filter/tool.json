@@ -22,7 +22,8 @@
     "ui": "wub-filter.ui.js",
     "preview": "preview.png",
     "spec": "wub-filter.spec",
-    "tests": "wub-filter.test.js"
+    "tests": "wub-filter.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

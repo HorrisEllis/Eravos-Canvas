@@ -18,7 +18,8 @@
     "ui": "ratio-lattice.ui.js",
     "spec": "ratio-lattice.spec",
     "preview": "preview.png",
-    "tests": "ratio-lattice.test.js"
+    "tests": "ratio-lattice.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

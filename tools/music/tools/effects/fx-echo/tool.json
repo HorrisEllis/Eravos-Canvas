@@ -17,7 +17,8 @@
     "ui": "fx-echo.ui.js",
     "spec": "fx-echo.spec",
     "preview": "preview.png",
-    "tests": "fx-echo.test.js"
+    "tests": "fx-echo.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

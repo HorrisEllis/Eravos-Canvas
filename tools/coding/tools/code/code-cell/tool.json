@@ -21,7 +21,8 @@
     "css": "code-cell.css",
     "spec": "code-cell.spec",
     "tests": "code-cell.test.js",
-    "preview": "preview.png"
+    "preview": "preview.png",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [],

@@ -17,7 +17,8 @@
     "ui": "organ.ui.js",
     "spec": "organ.spec",
     "preview": "preview.png",
-    "tests": "organ.test.js"
+    "tests": "organ.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

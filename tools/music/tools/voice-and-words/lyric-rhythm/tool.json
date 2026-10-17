@@ -18,9 +18,10 @@
     "engine": "lyric-rhythm.engine.js",
     "ui": "lyric-rhythm.ui.js",
     "css": "lyric-rhythm.css",
-    "preview": "preview.svg",
+    "preview": "preview.png",
     "spec": "lyric-rhythm.spec",
-    "tests": "lyric-rhythm.test.js"
+    "tests": "lyric-rhythm.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

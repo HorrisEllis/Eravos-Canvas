@@ -17,7 +17,8 @@
     "ui": "fx-phaser.ui.js",
     "spec": "fx-phaser.spec",
     "preview": "preview.png",
-    "tests": "fx-phaser.test.js"
+    "tests": "fx-phaser.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

@@ -18,7 +18,8 @@
     "ui": "contrast-analyser.ui.js",
     "spec": "contrast-analyser.spec",
     "preview": "preview.png",
-    "tests": "contrast-analyser.test.js"
+    "tests": "contrast-analyser.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

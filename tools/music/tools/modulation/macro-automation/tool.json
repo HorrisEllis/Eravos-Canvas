@@ -18,7 +18,8 @@
     "ui": "macro-automation.ui.js",
     "spec": "macro-automation.spec",
     "preview": "preview.png",
-    "tests": "macro-automation.test.js"
+    "tests": "macro-automation.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

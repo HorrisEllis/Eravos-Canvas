@@ -17,7 +17,8 @@
     "ui": "coven.ui.js",
     "spec": "coven.spec",
     "preview": "preview.png",
-    "tests": "coven.test.js"
+    "tests": "coven.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

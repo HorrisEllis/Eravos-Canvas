@@ -17,7 +17,8 @@
     "ui": "lfo.ui.js",
     "spec": "lfo.spec",
     "preview": "preview.png",
-    "tests": "lfo.test.js"
+    "tests": "lfo.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

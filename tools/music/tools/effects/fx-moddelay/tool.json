@@ -17,7 +17,8 @@
     "ui": "fx-moddelay.ui.js",
     "spec": "fx-moddelay.spec",
     "preview": "preview.png",
-    "tests": "fx-moddelay.test.js"
+    "tests": "fx-moddelay.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

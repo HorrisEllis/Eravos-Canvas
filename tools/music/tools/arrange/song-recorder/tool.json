@@ -18,7 +18,8 @@
     "ui": "song-recorder.ui.js",
     "spec": "song-recorder.spec",
     "preview": "preview.png",
-    "tests": "song-recorder.test.js"
+    "tests": "song-recorder.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

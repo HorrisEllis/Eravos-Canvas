@@ -197,11 +197,12 @@
   async function removeSong(name) { await IDB().put('library', 'song:' + name, null); await IDB().put('library', 'mysongs', (await mySongs()).filter(x => x.name !== name)); }
   function genreOf(s) { return s.recipe ? null : SE.genres().find(g => g.id === s.genre); }
   function locked(s) { return !!(s.lock && !(window.Learn && window.Learn.done(s.lock))); }
-  function write(s, fresh) {
+  // sh = { semis, tempo } (Make it yours): the same song higher / lower, faster / slower — SongEngine.reshape
+  function write(s, fresh, sh) {
     if (locked(s)) return false;
     if (s.recipe) { const r = R.get(s.recipe); if (!r) return false; R.run(s.recipe, { clear: true, origin: { x: 30, y: 20 } }); return true; }
-    const seed = fresh ? 1 + Math.floor(Math.random() * 99999) : s.seed;
-    SE.write(s.genre, seed); return true;
+    const seed = fresh ? 1 + Math.floor(Math.random() * 99999) : s.seed, shifted = sh && (sh.semis || sh.tempo !== 1);
+    if (shifted) SE.write(s.genre, seed, { shift: { semis: sh.semis, tempo: sh.tempo } }); else SE.write(s.genre, seed); return true;
   }
 
   // ---- 🎤 Her voice (3.41): the recordings songs with `voice` sing with — kept on this computer only
@@ -228,8 +229,42 @@
     paintVoice(); return box;
   }
 
+  // ---------------------------------------------------------------- categories (3.44: "sort and organize the songs by category")
+  // A genre can name its own shelf (G.category); otherwise its id or family decides. Unknown genres land in "More", so a new
+  // genre pack still shows up. Order here = order on the page.
+  const CATS = [
+    { id: 'her', label: 'For her', icon: '💘' },
+    { id: 'synthesis', label: 'Synthesis showcase', icon: '🧬' },
+    { id: 'dubstep', label: 'Dubstep & wubs', icon: '🔊', genres: ['dubstep', 'riddim', 'melodic', 'tearout', 'dubstep-og', 'riddim-war', 'deathstep', 'trapstep', 'tension-study', 'wub-rig', 'dancehall-dubstep', 'brostep-wub', 'talker', 'melodic-wub'] },
+    { id: 'dnb', label: 'Drum & bass', icon: '⚡', genres: ['dnb', 'neuro', 'jungle', 'drumstep', 'reese-roller', 'halftime-reese', 'wub-neuro', 'reese-vs-wub'] },
+    { id: 'house', label: 'House & techno', icon: '🏠', genres: ['house', 'techno', 'deep-house', 'tech-house', 'progressive', 'bass-house', 'electro', 'big-room'] },
+    { id: 'trance', label: 'Trance & hard', icon: '🌀', genres: ['trance', 'psytrance', 'hardstyle'] },
+    { id: 'garage', label: 'Garage & breaks', icon: '🎚', genres: ['ukg', 'future-garage', 'breakbeat'] },
+    { id: 'trap', label: 'Trap, phonk & future', icon: '💎', genres: ['trap', 'phonk', 'future-bass', 'moombahton'] },
+    { id: '80s', label: '80s & synth', icon: '🌆', genres: ['synthwave', 'darkwave'] },
+    { id: 'dark', label: 'Dark & goth', icon: '🦇', genres: ['hanging-tree', 'witch-house'] },
+    { id: 'island', label: 'Island & dub', icon: '🌴', genres: ['reggae', 'dancehall'] },
+    { id: 'chill', label: 'Chill & ambient', icon: '🌙', genres: ['lofi', 'ambient'] },
+    { id: 'lostlove', label: 'Lost Love (album)', icon: '🥀' },
+    { id: 'odd', label: 'Odd Couples', icon: '🧪' },
+    { id: 'more', label: 'More', icon: '✦' },
+  ];
+  function categoryOf(s) {
+    const G = genreOf(s), g = String(s.genre || '').toLowerCase();
+    if (G && G.category && CATS.some(c => c.id === G.category)) return G.category;
+    if (s.recipe || /^her-/.test(g)) return 'her';
+    if (/^syn-/.test(g)) return 'synthesis';
+    if (/^ll-/.test(g) || (G && G.family === 'Lost Love')) return 'lostlove';
+    if (/^oc-/.test(g) || (G && G.family === 'Odd Couples')) return 'odd';
+    const c = CATS.find(x => x.genres && x.genres.includes(g));
+    return c ? c.id : 'more';
+  }
+  const bpmOf = (s) => { const G = genreOf(s); return G ? (G.bpm[0] + G.bpm[1]) / 2 : (s.bpm || 0); };
+  const SORTS = [['cat', 'By category'], ['az', 'A → Z'], ['bpm', 'Slow → fast'], ['bpm-', 'Fast → slow'], ['genre', 'By genre']];
+
   // ---------------------------------------------------------------- the page (overlay, off the canvas)
   let open = null;
+  const shift = { semis: 0, tempo: 1 };   // "Make it yours" — kept while the page stays open between songs
   function show() {
     if (open) { open.close(); return; }
     const UI = window.UIKit, h = UI.h, S = window.Shell;
@@ -237,47 +272,99 @@
     // 3.39 (exe: 39 of 189 cards ignored clicks): allSongs() builds NEW objects for genre cards and EDM-tagged songs on every
     // call, so a selection held as an object was never found in the next paint and snapped back to the first song — and
     // "Write this song" then wrote that first song. The selection is an id now.
-    let mood = 'all', selId = SONGS[0].id;
+    let mood = 'all', cat = 'all', sort = 'cat', q = '', selId = SONGS[0].id;
     const ov = h('div', { class: 'overlay sbk', role: 'dialog', 'aria-label': 'Songs' });
-    const chips = h('div', { class: 'sbk-chips' }), grid = h('div', { class: 'sbk-grid' }), detail = h('aside', { class: 'sbk-detail' });
+    const chips = h('div', { class: 'sbk-chips' }), rail = h('nav', { class: 'sbk-rail' }), grid = h('div', { class: 'sbk-grid' }), detail = h('aside', { class: 'sbk-detail' });
+    const search = h('input', { class: 'sbk-search', placeholder: 'Search songs, genres, tools…', 'aria-label': 'Search songs' });
+    const sorter = h('select', { class: 'sbk-sort', 'aria-label': 'Sort songs' }, SORTS.map(([v, l]) => h('option', { value: v, text: l })));
+    search.addEventListener('input', () => { q = search.value.trim().toLowerCase(); paint(); });
+    sorter.addEventListener('change', () => { sort = sorter.value; paint(); });
     const close = () => { ov.remove(); document.removeEventListener('keydown', key, true); open = null; };
     const key = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
     ov.append(h('div', { class: 'sbk-box' }, [
-      h('header', { class: 'sbk-head' }, [h('div', {}, [h('b', { text: '📖 Songs' }), h('span', { class: 'sbk-sub', text: ' every song in one place — write one in any genre (a new one every press), the song for her, and My songs you saved' })]), h('button', { class: 'sbk-x', title: 'Close (Esc)', text: '×', onclick: close })]),
-      chips, h('div', { class: 'sbk-body' }, [grid, detail]),
+      h('header', { class: 'sbk-head' }, [h('div', { class: 'sbk-titles' }, [h('b', { text: '📖 Songs' }), h('span', { class: 'sbk-sub', text: ' every song in one place, shelved by category' })]), search, sorter, h('button', { class: 'sbk-x', title: 'Close (Esc)', text: '×', onclick: close })]),
+      chips, h('div', { class: 'sbk-body' }, [rail, grid, detail]),
     ]));
     ov.addEventListener('mousedown', (e) => { if (e.target === ov) close(); });
     document.addEventListener('keydown', key, true);
+    const hay = (s) => { const G = genreOf(s); return [s.title, s.genre, G && G.label, G && G.tagline, s.listen, (CATS.find(c => c.id === categoryOf(s)) || {}).label, (s.mood || []).join(' ')].join(' ').toLowerCase(); };
+    function filtered() {
+      const T = window.Taste;
+      let list = allSongs().filter(s => mood === 'all' || (mood === 'foryou' ? T && T.get(s.genre) > 0 : s.mood.includes(mood)));
+      if (q) list = list.filter(s => q.split(/\s+/).every(w => hay(s).includes(w)));
+      return list;
+    }
+    function ordered(list) {
+      const T = window.Taste, ci = (s) => CATS.findIndex(c => c.id === categoryOf(s)), t = (s) => s.title.toLowerCase();
+      const by = { az: (a, b) => t(a) < t(b) ? -1 : t(a) > t(b) ? 1 : 0, bpm: (a, b) => bpmOf(a) - bpmOf(b), 'bpm-': (a, b) => bpmOf(b) - bpmOf(a),
+        genre: (a, b) => String(a.genre).localeCompare(String(b.genre)) || by.az(a, b), cat: (a, b) => ci(a) - ci(b) };
+      list = list.slice().sort(by[sort] || by.cat);   // stable: songs keep their written order inside a category
+      if (mood === 'foryou') list.sort((a, b) => T.get(b.genre) - T.get(a.genre));
+      if (mood === 'her') list.sort((a, b) => (b.mood.includes('edm') ? 1 : 0) - (a.mood.includes('edm') ? 1 : 0));   // EDM is her favourite: those first
+      return list;
+    }
+    function paintRail(base) {
+      rail.innerHTML = '';
+      const item = (id, label, n) => { const b = h('button', { class: 'sbk-rail-item' + (cat === id ? ' on' : ''), title: label }, [h('span', { text: label }), h('small', { text: String(n) })]); b.onclick = () => { cat = id; paint(); }; rail.appendChild(b); };
+      item('all', '▦ All songs', base.length);
+      rail.appendChild(h('div', { class: 'sbk-rail-sec', text: 'CATEGORIES' }));
+      CATS.forEach(c => { const n = base.filter(s => categoryOf(s) === c.id).length; if (n) item(c.id, c.icon + ' ' + c.label, n); });
+    }
+    function card(s) {
+      const G = genreOf(s), lk = locked(s);
+      const el = h('button', { class: 'sbk-card' + (s.id === selId ? ' sel' : '') + (lk ? ' locked' : ''), style: { '--acc': (G && G.accent) || '#ff2266' } }, [
+        h('span', { class: 'sbk-ic', text: lk ? '🔒' : ((G && G.icon) || '💘') }), h('b', { text: s.title + (G && G.voice ? ' 🎤' : '') }), h('small', { text: (G ? G.label : s.genre) + ' · ' + (G ? G.bpm[0] + (G.bpm[1] !== G.bpm[0] ? '–' + G.bpm[1] : '') : s.bpm) + ' BPM' })]);
+      el.onclick = () => { selId = s.id; paint(); }; el.ondblclick = () => { if (write(s, false, shift)) close(); };
+      return el;
+    }
     function paint() {
       chips.innerHTML = ''; MOODS.forEach(([id, label]) => { const c = h('button', { class: 'sbk-chip' + (mood === id ? ' on' : ''), text: label }); c.onclick = () => { mood = id; paint(); }; chips.appendChild(c); });
       grid.innerHTML = '';
-      if (mood === 'mine') { paintMine(); return; }
-      const T = window.Taste, list = allSongs().filter(s => mood === 'all' || (mood === 'foryou' ? T && T.get(s.genre) > 0 : s.mood.includes(mood)));
-      if (mood === 'foryou') list.sort((a, b) => T.get(b.genre) - T.get(a.genre));
-      if (mood === 'her') list.sort((a, b) => (b.mood.includes('edm') ? 1 : 0) - (a.mood.includes('edm') ? 1 : 0));   // EDM is her favourite: those first
-      if (!list.length) grid.appendChild(h('p', { class: 'sbk-note', text: mood === 'foryou' ? 'Nothing yet — rate genres (💜 below a song, or Learn → EDM tour) and the ones you love appear here first.' : 'Nothing here.' }));
+      if (mood === 'mine') { rail.innerHTML = ''; paintMine(); return; }
+      const base = filtered(); paintRail(base);
+      if (cat !== 'all' && !base.some(s => categoryOf(s) === cat)) cat = 'all';
+      const list = ordered(cat === 'all' ? base : base.filter(s => categoryOf(s) === cat));
+      if (!list.length) grid.appendChild(h('p', { class: 'sbk-note', text: mood === 'foryou' ? 'Nothing yet — rate genres (💜 below a song, or Learn → EDM tour) and the ones you love appear here first.' : q ? 'No song matches “' + q + '”.' : 'Nothing here.' }));
       if (list.length && !list.some(x => x.id === selId)) selId = list[0].id;
       const sel = list.find(x => x.id === selId) || allSongs().find(x => x.id === selId) || SONGS[0];
+      // grouped shelves when sorted by category (a heading per category, its count beside it); a flat list otherwise
+      let last = null;
       list.forEach(s => {
-        const G = genreOf(s), lk = locked(s);
-        const card = h('button', { class: 'sbk-card' + (s.id === selId ? ' sel' : '') + (lk ? ' locked' : ''), style: { '--acc': (G && G.accent) || '#ff2266' } }, [
-          h('span', { class: 'sbk-ic', text: lk ? '🔒' : ((G && G.icon) || '💘') }), h('b', { text: s.title + (G && G.voice ? ' 🎤' : '') }), h('small', { text: (G ? G.label : s.genre) + ' · ' + (G ? G.bpm[0] + (G.bpm[1] !== G.bpm[0] ? '–' + G.bpm[1] : '') : s.bpm) + ' BPM' })]);
-        card.onclick = () => { selId = s.id; paint(); }; card.ondblclick = () => { if (write(s)) close(); };
-        grid.appendChild(card);
+        if (sort === 'cat' && mood !== 'foryou') { const c = categoryOf(s); if (c !== last) { const C = CATS.find(x => x.id === c); grid.appendChild(h('div', { class: 'sbk-sec' }, [h('span', { text: C.icon + ' ' + C.label }), h('small', { text: String(list.filter(x => categoryOf(x) === c).length) })])); last = c; } }
+        grid.appendChild(card(s));
       });
-      const s = sel, G = genreOf(s), lk = locked(s);
+      paintDetail(sel);
+    }
+    function shiftBox(s) {
+      const G = genreOf(s), box = h('div', { class: 'sbk-shift' });
+      if (s.recipe || !G) { box.append(h('h4', { text: 'Make it yours' }), h('p', { class: 'sbk-meta', text: 'This one is a hand-built set — change its key and tempo on the canvas (Session window) after writing it.' })); return box; }
+      const base = (G.bpm[0] + G.bpm[1]) / 2, read = h('span', { class: 'sbk-shift-read' });
+      const say = () => { read.textContent = (shift.semis ? (shift.semis > 0 ? '+' : '') + shift.semis + ' st · ' : 'original key · ') + '≈' + Math.round(base * shift.tempo) + ' BPM (' + Math.round(shift.tempo * 100) + '%)'; };
+      const slider = (label, min, max, step, val, fmt, set) => { const v = h('b', { text: fmt(val) }), r = h('input', { type: 'range', min, max, step, value: val, 'aria-label': label }); r.oninput = () => { set(+r.value); v.textContent = fmt(+r.value); say(); }; return h('label', { class: 'sbk-slider' }, [h('span', { text: label }), r, v]); };
+      say();
+      box.append(h('h4', { text: 'Make it yours — key & tempo' }),
+        slider('Key', -12, 12, 1, shift.semis, (x) => (x > 0 ? '+' : '') + x + ' st', (x) => { shift.semis = x; }),
+        slider('Tempo', 0.5, 1.5, 0.01, shift.tempo, (x) => Math.round(x * 100) + '%', (x) => { shift.tempo = x; }),
+        h('div', { class: 'sbk-shift-row' }, [read,
+          h('button', { class: 'sbk-alt sm', text: 'Higher + slower', title: '+5 semitones, 85% speed', onclick: () => { shift.semis = 5; shift.tempo = 0.85; paint(); } }),
+          h('button', { class: 'sbk-alt sm', text: 'Reset', onclick: () => { shift.semis = 0; shift.tempo = 1; paint(); } })]));
+      return box;
+    }
+    function paintDetail(s) {
+      const G = genreOf(s), lk = locked(s), C = CATS.find(x => x.id === categoryOf(s));
       detail.innerHTML = '';
-      detail.append(h('h3', { text: s.title }), h('div', { class: 'sbk-meta', text: (G ? G.label + ' · ' + G.tagline : s.genre) }),
+      detail.append(h('h3', { text: s.title }), h('div', { class: 'sbk-meta', text: (C ? C.icon + ' ' + C.label + ' · ' : '') + (G ? G.label + ' · ' + G.tagline : s.genre) }),
         h('h4', { text: 'Listen for' }), h('p', { text: s.listen }),
         h('h4', { text: 'The drop' }), h('p', { text: s.drop }),
         h('h4', { text: 'Her voice clips' }), h('p', { text: s.voice }));
+      if (s.tools) detail.append(h('h4', { text: 'Tools it shows off' }), h('p', { text: s.tools }));
       if (G && G.voice && window.HerVoice) detail.append(voiceBox(h));
       if (window.Taste && s.genre && !s.recipe) { const v = window.Taste.get(s.genre); detail.append(h('h4', { text: 'Is this you?' }), h('div', { class: 'sbk-actions', style: { marginTop: '4px' } }, [['💜', 2, 'love it'], ['🙂', 1, 'okay'], ['🙅', -1, 'not me']].map(([t, val, tip]) => h('button', { class: 'sbk-alt' + (v === val ? ' on' : ''), style: { marginTop: 0 }, text: t, title: tip, onclick: () => { window.Taste.rate(s.genre, val); paint(); } })))); }
       if (lk) detail.append(h('p', { class: 'sbk-lock', text: '🔒 Finish the Learn lesson “' + ((window.Learn && window.Learn.title(s.lock)) || s.lock) + '” to open this one.' }),
         h('button', { class: 'sbk-go', text: '🧠 Go to that lesson', onclick: () => { close(); window.Learn && window.Learn.open(s.lock); } }));
-      else detail.append(h('div', { class: 'sbk-actions' }, [
-        h('button', { class: 'sbk-go', text: '▶ Write this song', title: 'replaces what is on the canvas (Ctrl+Z brings it back)', onclick: () => { if (write(s)) close(); } }),
-        s.recipe ? h('span') : h('button', { class: 'sbk-alt', text: '🎲 Another like it', onclick: () => { if (write(s, true)) close(); } })]),
+      else detail.append(shiftBox(s), h('div', { class: 'sbk-actions' }, [
+        h('button', { class: 'sbk-go', text: '▶ Write this song', title: 'replaces what is on the canvas (Ctrl+Z brings it back)', onclick: () => { if (write(s, false, shift)) close(); } }),
+        s.recipe ? h('span') : h('button', { class: 'sbk-alt', text: '🎲 Another like it', onclick: () => { if (write(s, true, shift)) close(); } })]),
         h('p', { class: 'sbk-note', text: 'It replaces the canvas. Press Space to play. Every clip opens in the piano roll.' }));
     }
     async function paintMine() {
@@ -289,7 +376,7 @@
           h('button', { class: 'sbk-alt', style: { marginTop: 0 }, text: '🗑', title: 'delete', onclick: async () => { if (!confirm('Delete “' + x.name + '” from My songs?')) return; await removeSong(x.name); paint(); } })])])));
       detail.innerHTML = ''; detail.append(h('h3', { text: 'My songs' }), h('p', { text: 'Every song you save from the Song Recorder: listen here, or open it back onto the canvas exactly as it was.' }));
     }
-    paint(); document.body.appendChild(ov); open = { close, ov };
+    paint(); document.body.appendChild(ov); open = { close, ov }; search.focus();
   }
-  window.Songbook = { open: show, songs: () => SONGS.slice(), all: allSongs, mySongs, keepSong, write, locked, add(s) { if (s && s.id && !SONGS.some(x => x.id === s.id)) SONGS.push(s); } };
+  window.Songbook = { open: show, songs: () => SONGS.slice(), all: allSongs, mySongs, keepSong, write, locked, categoryOf, categories: () => CATS.map(c => ({ id: c.id, label: c.label, icon: c.icon })), add(s) { if (s && s.id && !SONGS.some(x => x.id === s.id)) SONGS.push(s); } };
 })();

@@ -17,7 +17,8 @@
     "ui": "fx-destroyer.ui.js",
     "spec": "fx-destroyer.spec",
     "preview": "preview.png",
-    "tests": "fx-destroyer.test.js"
+    "tests": "fx-destroyer.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

@@ -17,7 +17,8 @@
     "ui": "channel.ui.js",
     "spec": "channel.spec",
     "preview": "preview.png",
-    "tests": "channel.test.js"
+    "tests": "channel.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [
