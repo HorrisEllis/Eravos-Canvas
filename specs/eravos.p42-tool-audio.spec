@@ -31,6 +31,10 @@ measured in Chromium (= the exe's Electron 44): WaveShaper oversample 2x = 128 s
   · Embodiment Lab: 419 samples late (2x ceiling + compressor look-ahead) → ctx.latency.
   · Reese: the shaped stack reached the gate 192 samples after it opened (the old note for the first 4 ms) and sat 192
     behind the clean sub → pre-shaper events scheduled 192 early, the sub delayed 192, the gate on time.
+  · Reese (older than 3.39): each stacked voice got its "start phase" by DELAYING its start by that fraction of a period —
+    up to 18 ms at A1: right voices always 10.6 ms late, the left one up to 17.6 ms when the ±3 % jitter wrapped below 0.
+    In 8 renders of one note the old engine was silent past 10 ms in 6. Voices now start EARLY by the rest of the period
+    (behind the closed gate): exact phase at t, sound from the first millisecond, 8 of 8 (p42-timing).
   · Wobble Bass 3.2: mid-layer pitch 384 samples late at the gate, filter wobble 192 behind the grid → pitch scheduled 384
     early, LFO restarted 192 early (volume-wub path delayed 192), gate on time; the LFO log keeps the HEARD time. The clean
     sub is untouched: low end within ±1.3 dB of 3.1 at 53 of 54 preset×note points (one 3.7 dB, Screech at A2+2).

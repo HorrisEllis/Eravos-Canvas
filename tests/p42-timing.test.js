@@ -49,6 +49,17 @@ describe('3.39 timing — oversampling and look-ahead are compensated', () => {
     const lat = await noteLatency('eravos.reese-bass', null, Object.assign({ sub: 0 }, open)), latSub = await noteLatency('eravos.reese-bass', null, Object.assign({ sub: 1 }, open));
     assert.lt(lat, 64, `stack ${lat} (old engine: 210)`); assert.lt(latSub, 64, `sub ${latSub}`);   // < 64: a linear attack on a saw at phase 0 reads ~23 samples; the old 192-sample delay read 210
   });
+  it('Reese: every note sounds in its first millisecond — 8 of 8 (the phase trick delayed voices up to 18 ms at A1)', async () => {
+    const late = [];
+    for (let r = 0; r < 8; r++) {
+      const U = TH.universe(0.4), inst = TH.spawn(U, 'eravos.reese-bass'), c = OrganismFactory.handle(inst).ctx;
+      Object.entries({ sub: 0, attack: 0.001, cutoff: 6000, envAmt: 0, combMix: 0, res: 0.7, voices: 2 }).forEach(([k, v]) => c.params.set(k, v));
+      U.K.audio.chain.out.disconnect(U.ctx.destination); U.K.audio.port(inst, 'out').node.connect(U.ctx.destination);
+      U.K.bus.publish('note:trigger', { target: inst, note: 45, velocity: 0.9, time: 0.2, duration: 0.15 });
+      const db = TH.db(TH.rms(await TH.render(U), 0.2, 0.201)); if (db < -40) late.push(db.toFixed(0));
+    }
+    assert.equal(late.length, 0, 'renders silent in their first ms: ' + late.join(' '));
+  });
   it('driven drum voices land on the beat (Pads 3.0 drive, Drum Forge drive): every hit within 0.05 ms', async () => {
     for (const [id, preset] of [['eravos.pads', 'Bass Music · Brostep Metal'], ['eravos.drum-forge', 'Dubstep · Heavy']]) {
       const U = TH.universe(2.2), inst = TH.spawn(U, id), c = OrganismFactory.handle(inst).ctx; c.presets.load(preset);

@@ -82,7 +82,7 @@
         const n = P.get('voices'), det = P.get('detune'), w = P.get('width');
         for (let i = 0; i < n; i++) {
           const x = n === 1 ? 0 : (i / (n - 1)) * 2 - 1; // −1..1 symmetric
-          const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(hz, t); o.detune.value = x * det;
+          const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = hz; o.frequency.setValueAtTime(hz, t); o.detune.value = x * det;
           const g = ac.createGain(); g.gain.value = 0.7 / Math.sqrt(n);
           const pan = ac.createStereoPanner(); const side = (i % 2 === 0 ? -1 : 1);
           pan.pan.value = side * w;
@@ -91,7 +91,11 @@
           // start phase: golden-ratio spread, right side 0.2 period apart from left, ±3 % jitter for analog life.
           // (was fully random: width 1 swung from −0.71 (mono-cancelling) to +0.66 correlation note to note — P10 audit)
           const ph = (((i * 0.381966) + (side > 0 ? 0.2 : 0) + (Math.random() - 0.5) * 0.06) % 1 + 1) % 1;
-          o.start(t + ph / hz * 0.999);
+          // 3.39: the phase was made by DELAYING the voice by ph of a period — up to 18 ms at A1, so every note started late
+          // (right voices always 10.6 ms, the left one up to 17.6 ms when the jitter wrapped). Now the voice starts EARLY by the
+          // rest of the period: at t it is exactly at phase ph, and the run-in is behind the closed gate. Live input (t = now)
+          // cannot run in early — those voices start at once, phase unspread.
+          o.start(Math.max(ac.currentTime, t - (1 - ph) / hz));
           ctx.track(o);
           stack.push({ o, pan, g, side, wm });
         }
