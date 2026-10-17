@@ -1,0 +1,101 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "wub-rate.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.wub-rate",
+ "items": {
+  "eravos.wub-rate": {
+   "presets": {
+    "Riddim Requiem Rate": {
+     "params": {
+      "steps": [
+       "1/16",
+       "off",
+       "1/16",
+       "off",
+       "1/8",
+       "off",
+       "1/16t",
+       "off",
+       "1/8",
+       "1/8",
+       "1/8",
+       "1/8",
+       "1/8",
+       "1/8",
+       "1/8",
+       "1/8"
+      ],
+      "length": 8,
+      "stepLen": "1/8",
+      "shape": "square",
+      "smooth": 0.1
+     }
+    },
+    "Steppers Switch": {
+     "params": {
+      "steps": [
+       "1/8",
+       "1/8",
+       "1/16",
+       "1/8t",
+       "1/8",
+       "1/16",
+       "1/32",
+       "off",
+       "1/8",
+       "1/8",
+       "1/8",
+       "1/8",
+       "1/8",
+       "1/8",
+       "1/8",
+       "1/8"
+      ],
+      "length": 8,
+      "stepLen": "1/4",
+      "shape": "talk",
+      "polarity": "unipolar+",
+      "smooth": 0.2,
+      "retrig": "on change",
+      "depth": 1
+     }
+    },
+    "Golden Rate": {
+     "params": {
+      "steps": [
+       "1/8t",
+       "1/8t",
+       "1/16",
+       "1/8",
+       "1/16t",
+       "1/8t",
+       "1/32",
+       "off",
+       "1/8t",
+       "1/16",
+       "1/8",
+       "1/16t",
+       "1/8t",
+       "1/16",
+       "1/32",
+       "off"
+      ],
+      "length": 13,
+      "stepLen": "1/8",
+      "shape": "sine",
+      "polarity": "unipolar+"
+     }
+    }
+   }
+  }
+ }
+}

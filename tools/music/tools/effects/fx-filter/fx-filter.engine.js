@@ -46,6 +46,7 @@ registerProcessor('eravos-env', EravosEnv);`;
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, dsp = ctx.dsp, MT = window.MusicTheory;
       const fx = SDK.fxShell(ctx);
+      fx.setLatency(dsp.osLatency(ac, '2x'));   // 3.39: the blended dry waits for the 2x drive shaper
       const pre = ac.createGain(), sh = ac.createWaveShaper(), post = ac.createGain(), f1 = ac.createBiquadFilter(), f2 = ac.createBiquadFilter();
       sh.oversample = '2x';
       fx.wetIn.connect(pre); pre.connect(sh); sh.connect(post);

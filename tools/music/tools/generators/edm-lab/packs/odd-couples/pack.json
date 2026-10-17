@@ -1,0 +1,47 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "edm-lab.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.edm-lab",
+ "items": {
+  "eravos.edm-lab": {
+   "presets": {
+    "Machine Choir Roller": {
+     "params": {
+      "swing": 0,
+      "progression": "i-i-VI-VII",
+      "tension": 0.6,
+      "energy": 0.7,
+      "harmonyLevel": 0.3,
+      "bassLevel": 0.6,
+      "rhythmLevel": 0.7
+     },
+     "extra": {
+      "map": "neuro"
+     }
+    },
+    "Steppers Lab": {
+     "params": {
+      "swing": 0.25,
+      "progression": "vi-IV-I-V",
+      "tension": 0.35,
+      "energy": 0.6,
+      "bassLevel": 0.55,
+      "rhythmLevel": 0.7
+     },
+     "extra": {
+      "map": "ukg"
+     }
+    }
+   }
+  }
+ }
+}

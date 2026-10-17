@@ -1,0 +1,38 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "wub-sub.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.wub-sub",
+ "items": {
+  "eravos.wub-sub": {
+   "presets": {
+    "Cathedral Sub": {
+     "params": {
+      "follow": true,
+      "wave": "sine",
+      "octave": -1,
+      "cut": 120,
+      "glide": 0.05,
+      "level": 0.75
+     }
+    },
+    "Steppers Sub (wub)": {
+     "params": {
+      "wave": "warm",
+      "octave": -1,
+      "cut": 220,
+      "level": 0.75
+     }
+    }
+   }
+  }
+ }
+}

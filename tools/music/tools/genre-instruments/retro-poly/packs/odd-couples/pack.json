@@ -1,0 +1,104 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "retro-poly.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.retro-poly",
+ "items": {
+  "eravos.retro-poly": {
+   "presets": {
+    "Steppers Brass": {
+     "params": {
+      "saw": 1,
+      "pulse": 0.2,
+      "sub": 0.15,
+      "cutoff": 3600,
+      "res": 1.2,
+      "envAmt": 0.6,
+      "fA": 0.04,
+      "fD": 0.3,
+      "fS": 0.35,
+      "attack": 0.03,
+      "decay": 0.4,
+      "sustain": 0.6,
+      "release": 0.15,
+      "chorus": "I+II",
+      "level": 0.55
+     }
+    },
+    "Acid Arp Chapel": {
+     "params": {
+      "saw": 0.7,
+      "pulse": 0.6,
+      "width": 0.25,
+      "cutoff": 1800,
+      "res": 6,
+      "envAmt": 0.7,
+      "fD": 0.2,
+      "fS": 0,
+      "decay": 0.2,
+      "sustain": 0,
+      "release": 0.2,
+      "chorus": "I",
+      "arp": "up-down",
+      "arpDiv": "1/16",
+      "arpOct": 2,
+      "arpGate": 0.4,
+      "level": 0.5
+     }
+    },
+    "Dub Juno Bubble": {
+     "params": {
+      "saw": 0.3,
+      "pulse": 0.8,
+      "width": 0.5,
+      "pwm": 0.15,
+      "sub": 0.1,
+      "cutoff": 2200,
+      "res": 2,
+      "envAmt": 0.45,
+      "fD": 0.6,
+      "fS": 0.2,
+      "attack": 0.002,
+      "decay": 0.15,
+      "sustain": 0,
+      "release": 0.08,
+      "chorus": "II",
+      "level": 0.55
+     }
+    },
+    "Wobble Pad Glow": {
+     "params": {
+      "saw": 0.6,
+      "pulse": 0.7,
+      "width": 0.45,
+      "pwm": 0.6,
+      "pwmRate": 0.6,
+      "drift": 0.45,
+      "cutoff": 1400,
+      "res": 2,
+      "envAmt": 0.2,
+      "fA": 0.6,
+      "fD": 1.2,
+      "fS": 0.8,
+      "attack": 0.6,
+      "decay": 1,
+      "sustain": 0.9,
+      "release": 1.2,
+      "chorus": "I+II",
+      "unison": 3,
+      "arp": "off",
+      "level": 0.45
+     }
+    }
+   }
+  }
+ }
+}

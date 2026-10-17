@@ -1,0 +1,102 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "sequencer.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.sequencer",
+ "items": {
+  "eravos.sequencer": {
+   "presets": {
+    "Steppers Grid": {
+     "params": {
+      "chainOn": false,
+      "swing": 0.12,
+      "slot": "A",
+      "humanize": 0.1
+     },
+     "extra": {
+      "lanes": [
+       {
+        "name": "kick",
+        "kind": "drum",
+        "drumNote": 36,
+        "color": "#ff2266"
+       },
+       {
+        "name": "snare",
+        "kind": "drum",
+        "drumNote": 37,
+        "color": "#ffaa00"
+       },
+       {
+        "name": "hat",
+        "kind": "drum",
+        "drumNote": 39,
+        "color": "#ffdd00",
+        "evolve": 0.4
+       },
+       {
+        "name": "riddim",
+        "kind": "melodic",
+        "organism": "eravos.wobble-bass",
+        "role": "bass",
+        "transpose": -1,
+        "color": "#b066ff"
+       },
+       {
+        "name": "wobble rate",
+        "kind": "auto",
+        "organism": "eravos.wobble-bass",
+        "param": "div",
+        "mode": "hold",
+        "color": "#ffd166"
+       },
+       {
+        "name": "grit",
+        "kind": "auto",
+        "organism": "eravos.wobble-bass",
+        "param": "shaper",
+        "mode": "glide",
+        "color": "#ff8844"
+       }
+      ],
+      "slots": {
+       "A": {
+        "name": "riddim talk",
+        "length": 32,
+        "steps": {
+         "kick": "X.........X.....X.........X.....",
+         "snare": "........X...............X.......",
+         "hat": "..x...x...x...x...x...x...x...x.",
+         "riddim": "1g3 . . 1g3 . . 1g2 . . . 1g3 . . 1g2 . . 1g3 . . 1g3 . . 1g2 . . . 1+g3 . . 7-g2 . .",
+         "wobble rate": "7..5..4...7..4..9..7..4...7..2..",
+         "grit": "2.....6.........3.....9.....2..."
+        },
+        "locks": {
+         "riddim": {
+          "26": {
+           "lfoShape": "yoy"
+          }
+         }
+        }
+       }
+      },
+      "chain": [
+       {
+        "slot": "A",
+        "repeats": 1
+       }
+      ]
+     }
+    }
+   }
+  }
+ }
+}

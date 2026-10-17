@@ -47,13 +47,17 @@
       { const n = 2048, c = new Float32Array(n); for (let i = 0; i < n; i++) { const x = i / (n - 1) * 2 - 1; c[i] = 0.6 * Math.abs(x) + 0.4 * Math.tanh(3 * x * x * x); } ph.curve = c; } // f(0) = 0: silence in → silence out
       const phHP = ac.createBiquadFilter(), phLP = ac.createBiquadFilter(), phG = ac.createGain(); phHP.type = 'highpass'; phHP.frequency.value = 90; phLP.type = 'lowpass'; phLP.frequency.value = 600; phHP.Q.value = phLP.Q.value = 0.7;
       const phMod = ctx.modBus('phantom', { min: -1, max: 1 }); phMod.connect(phG.gain);
-      amp.connect(warm); warm.connect(pureLP);
+      // 3.39 alignment: pure (2x = 128 samples), phantom (4x = 192) and click (0) were summed out of time — the pure band and
+      // its own harmonics 64 samples apart, the click 4 ms ahead of the body. All three now land at 192; notes start 192 early.
+      const OS2 = dsp.osLatency(ac, '2x'), OS4 = dsp.osLatency(ac, '4x'), warmAl = ac.createDelay(0.05), clickAl = ac.createDelay(0.05);
+      warmAl.delayTime.value = OS4 - OS2; clickAl.delayTime.value = OS4; ctx.track(warmAl); ctx.track(clickAl); ctx.latency = OS4;
+      amp.connect(warm); warm.connect(warmAl); warmAl.connect(pureLP);
       amp.connect(ph); ph.connect(phHP); phHP.connect(phLP); phLP.connect(phG);
       // click
       const clickG = ac.createGain(); clickG.gain.value = 0;
       const out = ac.createGain(), floor = ac.createBiquadFilter(), toneLP = ac.createBiquadFilter(), level = ac.createGain();
       floor.type = 'highpass'; floor.Q.value = 0.707; toneLP.type = 'lowpass'; toneLP.Q.value = 0.5;
-      pureLP.connect(out); phG.connect(out); clickG.connect(out); out.connect(floor); floor.connect(toneLP); toneLP.connect(level);
+      pureLP.connect(out); phG.connect(out); clickG.connect(clickAl); clickAl.connect(out); out.connect(floor); floor.connect(toneLP); toneLP.connect(level);
       const levMod = ctx.modBus('level', { min: 0, max: 1.5 }); levMod.connect(level.gain);
       [gS, gT, gQ, sqLP, sum, amp, pureLP, warm, ph, phHP, phLP, phG, clickG, out, floor, toneLP, level].forEach(n => ctx.track(n));
       ctx.port('out', { kind: 'audio', direction: 'out', node: level, label: 'sub' });

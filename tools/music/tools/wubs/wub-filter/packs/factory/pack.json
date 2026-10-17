@@ -24,7 +24,8 @@
       "res": 6,
       "drive": 0.25,
       "invert": false,
-      "position": 0
+      "position": 0,
+      "outGain": -7
      }
     },
     "Yoi Vowel (OO → AH)": {
@@ -62,7 +63,8 @@
       "cutoff": 300,
       "range": 3,
       "res": 4,
-      "drive": 0.5
+      "drive": 0.5,
+      "outGain": -4.8
      }
     },
     "Robot Comb": {
@@ -109,7 +111,8 @@
       "cutoff": 400,
       "range": 4,
       "res": 16,
-      "drive": 0.6
+      "drive": 0.6,
+      "outGain": -11.9
      }
     },
     "Inverted Mouth": {
@@ -119,7 +122,8 @@
       "cutoff": 160,
       "range": 4.5,
       "res": 6,
-      "invert": true
+      "invert": true,
+      "outGain": -8.6
      }
     },
     "Bun Dem Throat (OO → AE)": {
@@ -131,7 +135,8 @@
       "drive": 0.6,
       "formant": 2,
       "position": 0,
-      "invert": false
+      "invert": false,
+      "outGain": -2.5
      }
     }
    }

@@ -1,0 +1,67 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "curve-synth.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.curve-synth",
+ "items": {
+  "eravos.curve-synth": {
+   "presets": {
+    "Music Box Bounce": {
+     "params": {
+      "slot": 1,
+      "duration": 0.12,
+      "edge": true,
+      "bounces": 5,
+      "restitution": 0.72,
+      "decay": 0.45,
+      "wave": "triangle",
+      "noise": 0.02,
+      "drive": 0,
+      "lowNote": 60,
+      "highNote": 96,
+      "level": 0.55
+     }
+    },
+    "Siren Into Drop": {
+     "params": {
+      "slot": 2,
+      "duration": 1.6,
+      "lowNote": 60,
+      "highNote": 90,
+      "edge": false,
+      "wave": "sawtooth",
+      "noise": 0,
+      "drive": 0.35,
+      "sustain": 0.6,
+      "level": 0.5
+     }
+    },
+    "Falling Coin": {
+     "params": {
+      "slot": 3,
+      "duration": 0.3,
+      "lowNote": 20,
+      "highNote": 84,
+      "edge": true,
+      "bounces": 7,
+      "restitution": 0.55,
+      "wave": "sine",
+      "noise": 0.2,
+      "drive": 0.5,
+      "sustain": 0.5,
+      "decay": 0.3,
+      "level": 0.5
+     }
+    }
+   }
+  }
+ }
+}

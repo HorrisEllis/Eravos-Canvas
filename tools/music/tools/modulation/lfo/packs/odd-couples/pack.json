@@ -1,0 +1,39 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "lfo.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.lfo",
+ "items": {
+  "eravos.lfo": {
+   "presets": {
+    "Golden LFO": {
+     "params": {
+      "shape": "triangle",
+      "sync": false,
+      "div": "2/1",
+      "depth": 0.8,
+      "polarity": "unipolar+",
+      "rate": 0.618
+     }
+    },
+    "Breath LFO (bar)": {
+     "params": {
+      "shape": "smooth",
+      "sync": true,
+      "div": "1/1",
+      "depth": 1,
+      "polarity": "unipolar+"
+     }
+    }
+   }
+  }
+ }
+}

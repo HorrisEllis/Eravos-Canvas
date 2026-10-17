@@ -1,0 +1,36 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "lyric-rhythm.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.lyric-rhythm",
+ "items": {
+  "eravos.lyric-rhythm": {
+   "presets": {
+    "Chant": {
+     "params": {
+      "flow": "on-beat chant",
+      "mode": "drums",
+      "vary": 0,
+      "text": "Organ in the dance\nChoir in the bass\nGold in the dub\nYou in every place"
+     }
+    },
+    "Dancehall Chat": {
+     "params": {
+      "flow": "dancehall",
+      "mode": "drums",
+      "vary": 0,
+      "text": "Pull up the organ\nWobble on the floor\nSiren in the chapel\nGive me one more"
+     }
+    }
+   }
+  }
+ }
+}

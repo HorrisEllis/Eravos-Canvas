@@ -1,0 +1,26 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "coach.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.coach",
+ "items": {
+  "eravos.coach": {
+   "presets": {
+    "Build and drop": {
+     "params": {
+      "lesson": "build-and-drop",
+      "showHints": true
+     }
+    }
+   }
+  }
+ }
+}

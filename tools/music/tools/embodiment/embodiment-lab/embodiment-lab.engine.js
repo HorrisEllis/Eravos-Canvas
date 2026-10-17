@@ -271,6 +271,8 @@
         P.set('rootNote', fold(note)); glideRoot(t);
         if (!running) { begin(t, { byNote: true }); const tok = endTok; ctx.atAudioTime(t + Math.max(dur || 0, P.get('fade') + 1), () => { if (tok === endTok && heldByNote && running) end(); }); }
       }
+      // 3.39: the drone passes the 2x ceiling shaper (128 samples) and a DynamicsCompressor (6 ms look-ahead) — notes start early
+      ctx.latency = dsp.osLatency(ac, '2x') + 0.006;
       ctx.onNote((p) => noteIn(p.note, typeof p.time === 'number' ? p.time : ac.currentTime, p.duration));
       ctx.audition = (p) => noteIn(p.note || P.get('rootNote'), ac.currentTime, p.duration || 8);
       ctx.auditionOff = () => { if (heldByNote) end(); };

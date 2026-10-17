@@ -1,0 +1,45 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "fx-haunt.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.fx-haunt",
+ "items": {
+  "eravos.fx-haunt": {
+   "presets": {
+    "Chapel Tape": {
+     "params": {
+      "screw": 2,
+      "warble": 0.75,
+      "wowRate": 0.4,
+      "tone": "open",
+      "crush": 0.15,
+      "vinyl": 0.35,
+      "ghost": 0.4,
+      "mix": 0.5,
+      "outGain": -4
+     }
+    },
+    "Séance Phone": {
+     "params": {
+      "screw": 0,
+      "warble": 0.3,
+      "tone": "telephone",
+      "crush": 0.15,
+      "vinyl": 0.6,
+      "ghost": 0.3,
+      "mix": 0.6,
+      "outGain": -3
+     }
+    }
+   }
+  }
+ }
+}

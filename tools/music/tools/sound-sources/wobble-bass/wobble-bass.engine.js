@@ -85,7 +85,7 @@
   }
 
   OrganismFactory.define({
-    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '3.1.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
+    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '3.3.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
     category: 'Sound sources', blurb: 'Dubstep wobble / talking "yoi" bass locked to the tempo. The drop.',
     size: { w: 560, h: 600 }, minSize: { w: 420, h: 380 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
@@ -127,6 +127,7 @@
       { key: 'noise', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Noise', group: 'TONE' },
       { key: 'sqOct', type: 'enum', options: ['0', '-1'], default: '0', label: 'Square oct', group: 'TONE', hint: 'the Square layer against the saw: 0 = same pitch, −1 = an octave under (thick, but 27.5 Hz under an A2 is rumble you feel more than hear)' },
       { key: 'subOct', type: 'enum', options: ['0', '-1', '-2'], default: '0', label: 'Sub oct', group: 'TONE', hint: 'the sub against the wub: 0 = same pitch (the usual), −1 / −2 = deeper (−2 is below most speakers)' },
+      { key: 'subAlign', type: 'boolean', default: false, label: 'Sub in phase', group: 'TONE', hint: 'line the clean sub up with the wub layer (it reaches the output 8 ms later through the grit): a more even low end from note to note; off = the original sound' },
       { key: 'level', type: 'number', default: 1, min: 0, max: 1.5, step: 0.01, label: 'Level', group: 'TONE' },
       { key: 'glide', type: 'number', default: 0.06, min: 0, max: 0.5, step: 0.001, unit: 's', label: 'Glide', group: 'ENV' },
       { key: 'attack', type: 'number', default: 0.005, min: 0.001, max: 1, step: 0.001, unit: 's', label: 'Attack', group: 'ENV' },
@@ -180,7 +181,17 @@
       const trem = ac.createGain(); trem.gain.value = 1;   // 2.1: LFO → volume ("Vol wub")
       const level = ac.createGain(); level.gain.value = 0.3;
       const subLP = ac.createBiquadFilter(); subLP.type = 'lowpass'; subLP.frequency.value = 140; subG.connect(subLP);
-      post.connect(dcBlock); dcBlock.connect(fizz); fizz.connect(amp); subLP.connect(amp); amp.connect(trem); trem.connect(level);
+      // 3.39 timing (Chromium: a 4x shaper delays 192 samples). The mid layer's oscillators reach amp through BOTH shapers (384
+      // samples); the filter / formant wobble through the post shaper only (192). So: mid-layer pitch is scheduled 384 early (no
+      // 8 ms of the old note when the gate opens), the LFO restarts 192 early (its volume-wub path delayed 192 to match) so the
+      // wobble is heard ON the grid, and the amp gate stays exactly on the note. The clean sub is untouched — its phase against
+      // the mid layer (and so every preset's low end) is exactly as before; aligning it is a separate, measured choice
+      // (specs: wobble-bass.spec § 3.2 timing). Vibrato (oscillator detune) still lands 192 behind the filter.
+      const OS4 = dsp.osLatency(ac, '4x'), OSC_LAT = 2 * OS4, FILT_LAT = OS4;
+      // Sub in phase (3.41, off by default): the clean sub waits OSC_LAT and its pitch leaves OSC_LAT early, like the wub layer
+      const subAl = ac.createDelay(0.05); subAl.delayTime.value = P.get('subAlign') ? OSC_LAT : 0; ctx.track(subAl);
+      P.onChange('subAlign', (v) => subAl.delayTime.setValueAtTime(v ? OSC_LAT : 0, ac.currentTime));
+      post.connect(dcBlock); dcBlock.connect(fizz); fizz.connect(amp); subLP.connect(subAl); subAl.connect(amp); amp.connect(trem); trem.connect(level);
       [dcBlock, fizz, subLP].forEach(n => ctx.track(n));
       ctx.port('out', { kind: 'audio', direction: 'out', node: level, label: 'wobble' });
 
@@ -192,7 +203,7 @@
       const depthMod = ctx.modBus('depth', { min: 0, max: 7200 }); depthMod.connect(depthG.gain);
       const cutMod = ctx.modBus('cutoff', { min: -4800, max: 4800 }); cutMod.connect(lp1.detune); cutMod.connect(lp2.detune);
       // 2.1: tremolo + vibrato ride the same LFO
-      const tremDepth = ac.createGain(); tremDepth.gain.value = 0; uni.connect(tremDepth); tremDepth.connect(trem.gain);
+      const tremDepth = ac.createGain(), tremAl = ac.createDelay(0.05); tremDepth.gain.value = 0; tremAl.delayTime.value = FILT_LAT; uni.connect(tremDepth); tremDepth.connect(tremAl); tremAl.connect(trem.gain); ctx.track(tremAl);
       const vibG = ac.createGain(); vibG.gain.value = 0; lfoBus.connect(vibG); [saw, saw2, sq].forEach(o => vibG.connect(o.detune));
       const bandScale = bands.map(bd => { const f = ac.createGain(), gg = ac.createGain(); uni.connect(f); f.connect(bd.b.frequency); uni.connect(gg); gg.connect(bd.g.gain); return { f, gg }; });
       let lfo = null;
@@ -211,6 +222,7 @@
       function setWave(w, t) { lfo.setPeriodicWave(w.wave); drawDc.offset.setValueAtTime(w.dc, t === undefined ? ac.currentTime : t); }
       function startLfo(t, div, o) {
         o = o || {};
+        const heard = t; t = Math.max(ac.currentTime, t - FILT_LAT);   // 3.39: restart early so the wobble is HEARD at `heard`
         if (lfo) { try { lfo.stop(t); } catch (e) {} const old = lfo; old.onended = () => { try { old.disconnect(); } catch (e) {} ctx.untrack(old); }; }
         lfo = ac.createOscillator(); setWave(curWave(), t);
         curDiv = div || P.get('div'); frozen = !!o.stop;
@@ -218,7 +230,7 @@
         lfo.frequency.value = f; lfo.frequency.setValueAtTime(f, t);
         lfo.connect(lfoBus); lfo.start(t);
         ctx.track(lfo);
-        lfoLog.push({ t, div: curDiv, shape: seqShape || P.get('lfoShape'), stop: frozen }); if (lfoLog.length > 64) lfoLog.shift();
+        lfoLog.push({ t: heard, at: t, div: curDiv, shape: seqShape || P.get('lfoShape'), stop: frozen }); if (lfoLog.length > 64) lfoLog.shift();
       }
       startLfo(ac.currentTime, P.get('div'));
 
@@ -275,9 +287,10 @@
       // --- notes (mono legato)
       let held = null; // {note, off}
       let curF = 55;
-      function setFreq(f, t, glide, fromHz) {
+      function setFreq(f, t0, glide, fromHz) {
         const from = fromHz || curF, subK = SUBK[P.get('subOct')] || 1;
-        [[saw, 1], [sq, P.get('sqOct') === '-1' ? 0.5 : 1], [saw2, 1], [sub, subK]].forEach(([o, k]) => {
+        [[saw, 1, true], [sq, P.get('sqOct') === '-1' ? 0.5 : 1, true], [saw2, 1, true], [sub, subK, false]].forEach(([o, k, shaped]) => {
+          const t = (shaped || P.get('subAlign')) ? Math.max(ac.currentTime, t0 - OSC_LAT) : t0;   // 3.39: the shaped layer's pitch leaves early; the sub's too when it is in phase
           o.frequency.cancelScheduledValues(t);
           if (glide > 0) { o.frequency.setValueAtTime(from * k, t); o.frequency.exponentialRampToValueAtTime(f * k, t + glide); }
           else o.frequency.setValueAtTime(f * k, t);

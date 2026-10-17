@@ -1,0 +1,46 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "fx-filter.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.fx-filter",
+ "items": {
+  "eravos.fx-filter": {
+   "presets": {
+    "Choir Behind Glass": {
+     "params": {
+      "type": "LP",
+      "slope": 24,
+      "cutoff": 900,
+      "res": 1.5,
+      "lfoAmt": 0,
+      "envAmt": 0,
+      "mix": 1
+     }
+    },
+    "Acid Auto-Wah": {
+     "params": {
+      "type": "BP",
+      "slope": 12,
+      "cutoff": 500,
+      "res": 8,
+      "envAmt": 2,
+      "envAttack": 5,
+      "envRelease": 120,
+      "lfoAmt": 2,
+      "mix": 1,
+      "lfoDiv": "1/16",
+      "outGain": -3
+     }
+    }
+   }
+  }
+ }
+}

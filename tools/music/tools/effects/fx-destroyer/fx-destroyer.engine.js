@@ -39,6 +39,7 @@ registerProcessor('eravos-crush', EravosCrush);`;
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, dsp = ctx.dsp;
       const fx = SDK.fxShell(ctx);
+      fx.setLatency(dsp.osLatency(ac, '4x'));   // 3.39: the blended dry waits for the 4x shaper (no comb filter at partial mix)
       const lo = ac.createBiquadFilter(), hi = ac.createBiquadFilter(), sh = ac.createWaveShaper(), lvl = ac.createGain(), lp = ac.createBiquadFilter(), crushIn = ac.createGain();
       lo.type = 'lowshelf'; hi.type = 'highshelf'; lo.frequency.value = hi.frequency.value = 800; sh.oversample = '4x'; lp.type = 'lowpass'; lp.Q.value = 0;
       const dcb = ac.createBiquadFilter(); dcb.type = 'highpass'; dcb.frequency.value = 5; dcb.Q.value = 0.5; ctx.track(dcb); // 3.37: tube/fold are asymmetric → DC; removed in the wet chain only

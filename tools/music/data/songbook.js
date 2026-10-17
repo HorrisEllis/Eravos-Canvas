@@ -167,7 +167,7 @@
     { id: 'bonus-island', title: 'Steppers at Dawn', genre: 'reggae', seed: 33, mood: ['island'], lock: 'beats-3',
       listen: 'Roots to steppers.', drop: 'Steppers kick after the dub break.', voice: 'Siren and her voice trade phrases.' },
   ];
-  const MOODS = [['mine', '📖 My songs'], ['foryou', '💜 For you'], ['all', 'All'], ['edm', 'EDM'], ['her', 'For her'], ['heavy', 'Heavy'], ['dark', 'Dark'], ['goth', 'Goth'], ['80s', '80s'], ['island', 'Island'], ['warm', 'Warm'], ['party', 'Party'], ['calm', 'Calm'], ['fast', 'Fast']];
+  const MOODS = [['mine', '📖 My songs'], ['foryou', '💜 For you'], ['all', 'All'], ['odd', '🧪 Odd Couples'], ['edm', 'EDM'], ['her', 'For her'], ['heavy', 'Heavy'], ['dark', 'Dark'], ['goth', 'Goth'], ['80s', '80s'], ['island', 'Island'], ['warm', 'Warm'], ['party', 'Party'], ['calm', 'Calm'], ['fast', 'Fast']];
 
   // every genre the Song Engine knows gets a card, even without a hand-written one (a new genre pack shows up by itself)
   function allSongs() {
@@ -234,7 +234,10 @@
     if (open) { open.close(); return; }
     const UI = window.UIKit, h = UI.h, S = window.Shell;
     if (S && S.X) S.X.enterMode('music');
-    let mood = 'all', sel = SONGS[0];
+    // 3.39 (exe: 39 of 189 cards ignored clicks): allSongs() builds NEW objects for genre cards and EDM-tagged songs on every
+    // call, so a selection held as an object was never found in the next paint and snapped back to the first song — and
+    // "Write this song" then wrote that first song. The selection is an id now.
+    let mood = 'all', selId = SONGS[0].id;
     const ov = h('div', { class: 'overlay sbk', role: 'dialog', 'aria-label': 'Songs' });
     const chips = h('div', { class: 'sbk-chips' }), grid = h('div', { class: 'sbk-grid' }), detail = h('aside', { class: 'sbk-detail' });
     const close = () => { ov.remove(); document.removeEventListener('keydown', key, true); open = null; };
@@ -253,12 +256,13 @@
       if (mood === 'foryou') list.sort((a, b) => T.get(b.genre) - T.get(a.genre));
       if (mood === 'her') list.sort((a, b) => (b.mood.includes('edm') ? 1 : 0) - (a.mood.includes('edm') ? 1 : 0));   // EDM is her favourite: those first
       if (!list.length) grid.appendChild(h('p', { class: 'sbk-note', text: mood === 'foryou' ? 'Nothing yet — rate genres (💜 below a song, or Learn → EDM tour) and the ones you love appear here first.' : 'Nothing here.' }));
-      if (!list.includes(sel)) sel = list[0] || sel;
+      if (list.length && !list.some(x => x.id === selId)) selId = list[0].id;
+      const sel = list.find(x => x.id === selId) || allSongs().find(x => x.id === selId) || SONGS[0];
       list.forEach(s => {
         const G = genreOf(s), lk = locked(s);
-        const card = h('button', { class: 'sbk-card' + (sel === s ? ' sel' : '') + (lk ? ' locked' : ''), style: { '--acc': (G && G.accent) || '#ff2266' } }, [
+        const card = h('button', { class: 'sbk-card' + (s.id === selId ? ' sel' : '') + (lk ? ' locked' : ''), style: { '--acc': (G && G.accent) || '#ff2266' } }, [
           h('span', { class: 'sbk-ic', text: lk ? '🔒' : ((G && G.icon) || '💘') }), h('b', { text: s.title + (G && G.voice ? ' 🎤' : '') }), h('small', { text: (G ? G.label : s.genre) + ' · ' + (G ? G.bpm[0] + (G.bpm[1] !== G.bpm[0] ? '–' + G.bpm[1] : '') : s.bpm) + ' BPM' })]);
-        card.onclick = () => { sel = s; paint(); }; card.ondblclick = () => { if (write(s)) close(); };
+        card.onclick = () => { selId = s.id; paint(); }; card.ondblclick = () => { if (write(s)) close(); };
         grid.appendChild(card);
       });
       const s = sel, G = genreOf(s), lk = locked(s);

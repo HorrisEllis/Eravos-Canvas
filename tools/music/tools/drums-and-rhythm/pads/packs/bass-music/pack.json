@@ -19,7 +19,7 @@
    "presets": {
     "Riddim Steel": {
      "params": {
-      "volume": 0.9
+      "volume": 0.462
      },
      "extra": {
       "kit": [
@@ -103,7 +103,7 @@
     },
     "Tearout Concrete": {
      "params": {
-      "volume": 0.9
+      "volume": 0.683
      },
      "extra": {
       "kit": [
@@ -358,7 +358,7 @@
     },
     "Colour Bass": {
      "params": {
-      "volume": 0.9
+      "volume": 0.495
      },
      "extra": {
       "kit": [

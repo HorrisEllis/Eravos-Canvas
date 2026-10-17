@@ -1,0 +1,29 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "harmonic-analyzer.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.harmonic-analyzer",
+ "items": {
+  "eravos.harmonic-analyzer": {
+   "presets": {
+    "Organ + Wub (layers)": {
+     "params": {
+      "fft": 32768,
+      "maxPeaks": 32,
+      "range": 60,
+      "maxDen": 32,
+      "layers": 4
+     }
+    }
+   }
+  }
+ }
+}

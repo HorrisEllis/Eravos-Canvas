@@ -14,6 +14,7 @@ const slug = (s) => String(s).toLowerCase().replace(/&/g, 'and').replace(/[^a-z0
 
 // ---------------------------------------------------------------- 1. read what the code defines (engine presets vs pack presets)
 const b = await chromium.launch(); const p = await b.newPage();
+await p.addInitScript(() => { window.ERAVOS_CATALOG_ALL = true; });   // P41 catalog: a fresh profile installs no tools — this script needs every one
 await p.goto('file://' + ROOT + '/canvas/index.html?noboot'); await p.waitForFunction(() => window.Shell && window.Shell.X && window.ContentPacks);
 const R = await p.evaluate(() => {
   const fromPacks = new Map(); // tool id → Set(names that came from a pack)

@@ -20,7 +20,7 @@
    "presets": {
     "Trap 808 Glide": {
      "params": {
-      "volume": 0.9
+      "volume": 0.495
      },
      "extra": {
       "kit": [
@@ -195,7 +195,7 @@
     },
     "Drill Slide": {
      "params": {
-      "volume": 0.9
+      "volume": 0.518
      },
      "extra": {
       "kit": [
@@ -281,7 +281,7 @@
     },
     "Dancehall Bun": {
      "params": {
-      "volume": 0.9
+      "volume": 0.691
      },
      "extra": {
       "kit": [

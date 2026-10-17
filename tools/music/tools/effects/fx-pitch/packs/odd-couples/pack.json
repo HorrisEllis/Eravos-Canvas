@@ -1,0 +1,43 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "fx-pitch.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.fx-pitch",
+ "items": {
+  "eravos.fx-pitch": {
+   "presets": {
+    "Octave Under the Choir": {
+     "params": {
+      "semitones": -12,
+      "cents": 0,
+      "window": 60,
+      "glide": 0,
+      "harm1": "off",
+      "harm2": "off",
+      "mix": 0.5,
+      "harmLevel": 0.4
+     }
+    },
+    "Golden Fifth": {
+     "params": {
+      "semitones": 0,
+      "cents": 2,
+      "window": 50,
+      "harm1": "5th",
+      "harm2": "off",
+      "harmLevel": 0.6,
+      "mix": 0.45
+     }
+    }
+   }
+  }
+ }
+}

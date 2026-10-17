@@ -346,6 +346,11 @@
                         "minimum": 20,
                         "maximum": 1000
                       },
+                      "vocalPriority": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 18
+                      },
                       "throw": {
                         "type": "number",
                         "minimum": 0,

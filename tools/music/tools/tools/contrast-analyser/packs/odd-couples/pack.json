@@ -1,0 +1,27 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "contrast-analyser.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.contrast-analyser",
+ "items": {
+  "eravos.contrast-analyser": {
+   "presets": {
+    "Two worlds": {
+     "params": {
+      "fft": 8192,
+      "smoothing": 0.6,
+      "sensitivity": 0.55
+     }
+    }
+   }
+  }
+ }
+}

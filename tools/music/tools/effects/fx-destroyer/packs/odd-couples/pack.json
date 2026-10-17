@@ -1,0 +1,42 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "fx-destroyer.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.fx-destroyer",
+ "items": {
+  "eravos.fx-destroyer": {
+   "presets": {
+    "Organ Crush": {
+     "params": {
+      "shape": "soft",
+      "drive": 0.15,
+      "bits": 12,
+      "downsample": 2,
+      "tilt": -0.1,
+      "postLP": 10000,
+      "mix": 0.5
+     }
+    },
+    "Golden Fold": {
+     "params": {
+      "shape": "fold",
+      "drive": 0.382,
+      "bits": 16,
+      "downsample": 1,
+      "tilt": 0,
+      "postLP": 9000,
+      "mix": 0.618
+     }
+    }
+   }
+  }
+ }
+}

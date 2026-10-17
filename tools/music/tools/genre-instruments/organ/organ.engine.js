@@ -123,14 +123,18 @@
         const sc = P.get('scrape'); if (sc > 0) [1, 1.003, 0.997].forEach((k, j) => { const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f * 2 * k; const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = f * 2 * k; bp.Q.value = 8; const g = ac.createGain(); g.gain.value = sc * 0.07; const tr = ac.createOscillator(), trg = ac.createGain(); tr.frequency.value = 0.6 + j * 0.15; trg.gain.value = sc * 0.03; tr.connect(trg); trg.connect(g.gain); o.connect(bp); bp.connect(g); g.connect(dst); o.start(t); tr.start(t); nodes.push(o, bp, g, tr, trg); });
         return parts;
       }
+      // 3.41: perc and chiff end on their own (0.7 s / 0.1 s). They used to sit in the voice's node list, where release() pushed their
+      // stop out to the note's end — the 2 s chiff buffer then ran out at (2 − random offset) s, its onended was the voice's
+      // cleanup, and a held note went silent mid-note. Now they disconnect themselves and the voice ends on its own oscillators.
+      function oneShot(src, ...rest) { src.onended = () => { [src, ...rest].forEach(n => { try { n.disconnect(); } catch (e) {} }); }; }
       function noteOn(note, vel, t, dur) {
         t = Math.max(t || ac.currentTime, ac.currentTime);
         while (voices.length >= 6) kill(voices[0], t);
         const f = MT.hz(note), nodes = [], env = ac.createGain(); env.gain.value = 0; env.connect(bus); nodes.push(env);
         const freqs = P.get('chord') ? [[1, 0], [1.189, -12], [1.189, 12], [1.498, 0], [1.498, -12], [1, 12]].map(([k, c]) => f * k * Math.pow(2, c / 1200)) : [f];
         freqs.forEach((ff, i) => rank(ff, nodes, env, t));
-        const pc = P.get('perc'); if (pc > 0 && !voices.some(v => v.off === Infinity && v.t < t)) { const po = ac.createOscillator(), pg = ac.createGain(); po.frequency.value = f * (P.get('percHarm') === '2nd' ? 2 : 3); pg.gain.setValueAtTime(0, t); pg.gain.linearRampToValueAtTime(pc * 0.22 * vel, t + 0.002); pg.gain.setTargetAtTime(0, t + 0.002, 0.09); po.connect(pg); pg.connect(bus); po.start(t); po.stop(t + 0.7); nodes.push(po, pg); }
-        const ch = P.get('chiff'); if (ch > 0) { const n = ac.createBufferSource(); n.buffer = dsp.noise(ac, 2, 'white'); const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = Math.min(9000, f * 4); bp.Q.value = 3; const g = ac.createGain(); g.gain.setValueAtTime(ch * 0.25 * vel, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.07); n.connect(bp); bp.connect(g); g.connect(bus); n.start(t, Math.random()); n.stop(t + 0.1); nodes.push(n, bp, g); }
+        const pc = P.get('perc'); if (pc > 0 && !voices.some(v => v.off === Infinity && v.t < t)) { const po = ac.createOscillator(), pg = ac.createGain(); po.frequency.value = f * (P.get('percHarm') === '2nd' ? 2 : 3); pg.gain.setValueAtTime(0, t); pg.gain.linearRampToValueAtTime(pc * 0.22 * vel, t + 0.002); pg.gain.setTargetAtTime(0, t + 0.002, 0.09); po.connect(pg); pg.connect(bus); po.start(t); po.stop(t + 0.7); oneShot(po, pg); }
+        const ch = P.get('chiff'); if (ch > 0) { const n = ac.createBufferSource(); n.buffer = dsp.noise(ac, 2, 'white'); const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = Math.min(9000, f * 4); bp.Q.value = 3; const g = ac.createGain(); g.gain.setValueAtTime(ch * 0.25 * vel, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.07); n.connect(bp); bp.connect(g); g.connect(bus); n.start(t, Math.random()); n.stop(t + 0.1); oneShot(n, bp, g); }
         const peak = (0.4 + 0.6 * vel) / Math.sqrt(freqs.length);
         env.gain.setValueAtTime(0, t); env.gain.setTargetAtTime(peak, t, Math.max(0.002, P.get('attack') / 3));
         const v = { note, env, nodes, off: Infinity, t }; voices.push(v);
@@ -138,7 +142,7 @@
         updatePedal(t); updateWind();
         return v;
       }
-      function release(v, t) { if (v.off !== Infinity) return; v.off = t; const R = P.get('release'); dsp.release(v.env.gain, t, R); v.nodes.forEach(n => { if (n.stop) try { n.stop(t + R * 1.7 + 0.1); } catch (e) {} }); const last = v.nodes.filter(n => n.stop).pop(); const done = () => { v.nodes.forEach(n => { try { n.disconnect(); } catch (e) {} }); const i = voices.indexOf(v); if (i >= 0) voices.splice(i, 1); updatePedal(ac.currentTime); updateWind(); }; if (last) last.onended = done; else done(); setTimeout(() => { updatePedal(ac.currentTime); updateWind(); }, Math.max(0, (t - ac.currentTime) * 1000) + 5); }
+      function release(v, t) { if (v.off !== Infinity) return; v.off = t; const R = P.get('release'); dsp.release(v.env.gain, t, R); v.nodes.forEach(n => { if (n.stop) try { n.stop(t + R * 1.7 + 0.1); } catch (e) {} }); const last = v.nodes.filter(n => n.stop).pop(); /* a sustaining source: perc and chiff clean up after themselves (oneShot) */ const done = () => { v.nodes.forEach(n => { try { n.disconnect(); } catch (e) {} }); const i = voices.indexOf(v); if (i >= 0) voices.splice(i, 1); updatePedal(ac.currentTime); updateWind(); }; if (last) last.onended = done; else done(); setTimeout(() => { updatePedal(ac.currentTime); updateWind(); }, Math.max(0, (t - ac.currentTime) * 1000) + 5); }
       function kill(v, t) { const i = voices.indexOf(v); if (i >= 0) voices.splice(i, 1); v.env.gain.cancelScheduledValues(t); v.env.gain.setTargetAtTime(0, t, 0.01); v.nodes.forEach(n => { if (n.stop) try { n.stop(t + 0.08); } catch (e) {} }); }
       function updatePedal(t) {
         const held = voices.filter(v => v.off === Infinity || v.off > ac.currentTime + 0.01), low = held.length && P.get('pedal') ? Math.min(...held.map(v => v.note)) : null;
@@ -149,6 +153,8 @@
         g.gain.setTargetAtTime(1, t, Math.max(0.01, P.get('attack') / 2)); pedalV = { note: low, g, o };
       }
       ['dark', 'tremRate', 'tremDepth', 'breathPeriod', 'breathDepth', 'space', 'level', 'wind'].forEach(k => P.onChange(k, apply)); ['drive', 'ampTone', 'pulse', 'rotary'].forEach(k => P.onChange(k, applyAmp)); P.onChange('rotorSpeed', rotorSpeed); ['pulseRate', 'pulseShape'].forEach(k => P.onChange(k, () => pulseStart(ac.currentTime))); rotorSpeed(); P.onChange('pedal', () => updatePedal(ac.currentTime)); apply();
+      // 3.39: with Amp drive on, the whole organ passes the 2x shaper (128 samples) — notes start that much early (off: no shaper)
+      Object.defineProperty(ctx, 'latency', { get: () => P.get('drive') > 0.001 ? dsp.osLatency(ac, '2x') : 0, configurable: true });
       ctx.onNote((p) => noteOn(p.note, p.velocity, p.time, p.duration));
       ctx.onMidi((p) => { if (p.on) noteOn(p.note, p.velocity); else voices.filter(v => v.note === p.note && v.off === Infinity).forEach(v => release(v, ac.currentTime)); });
       ctx.audition = (p) => noteOn(p.note || 45, p.velocity || 0.8, ac.currentTime, p.duration || 3);

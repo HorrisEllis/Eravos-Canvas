@@ -1,7 +1,7 @@
 {
   "schema": "eravos.tool/1",
   "id": "eravos.bass-drop-builder",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "label": "Drop Builder",
   "icon": "🔻",
   "accent": "#ff2266",

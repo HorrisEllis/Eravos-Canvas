@@ -1,0 +1,48 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "fx-dynamics.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.fx-dynamics",
+ "items": {
+  "eravos.fx-dynamics": {
+   "presets": {
+    "Choir Leveller": {
+     "params": {
+      "gateOn": true,
+      "gateThresh": -55,
+      "gateRange": 18,
+      "gateRelease": 200,
+      "compOn": true,
+      "thresh": -22,
+      "ratio": 3,
+      "knee": 10,
+      "attack": 3,
+      "release": 160,
+      "makeup": 6,
+      "mix": 1
+     }
+    },
+    "Breath Gate": {
+     "params": {
+      "gateOn": true,
+      "gateThresh": -42,
+      "gateRange": 60,
+      "gateAttack": 0.3,
+      "gateHold": 30,
+      "gateRelease": 300,
+      "compOn": false,
+      "mix": 1
+     }
+    }
+   }
+  }
+ }
+}

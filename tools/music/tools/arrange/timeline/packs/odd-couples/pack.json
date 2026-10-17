@@ -1,0 +1,36 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "timeline.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.timeline",
+ "items": {
+  "eravos.timeline": {
+   "presets": {
+    "Whole song (zoomed out)": {
+     "params": {
+      "pxPerBar": 24,
+      "snap": "bar",
+      "follow": true
+     }
+    },
+    "Drop loop (8 bars)": {
+     "params": {
+      "loopOn": true,
+      "loopStartBar": 41,
+      "loopEndBar": 49,
+      "pxPerBar": 96,
+      "snap": "1/16"
+     }
+    }
+   }
+  }
+ }
+}

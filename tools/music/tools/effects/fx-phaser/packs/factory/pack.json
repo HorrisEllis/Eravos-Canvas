@@ -23,7 +23,8 @@
       "feedback": 0.4,
       "stereo": 90,
       "Q": 0.7,
-      "mix": 0.5
+      "mix": 0.5,
+      "outGain": -2.8
      }
     },
     "Deep 12-stage": {
@@ -49,7 +50,8 @@
       "feedback": 0.75,
       "stereo": 0,
       "Q": 1.2,
-      "mix": 0.5
+      "mix": 0.5,
+      "outGain": -1.6
      }
     },
     "Vocal Air": {
@@ -75,7 +77,8 @@
       "feedback": 0.55,
       "stereo": 180,
       "Q": 0.7,
-      "mix": 0.5
+      "mix": 0.5,
+      "outGain": -2.9
      }
     },
     "80s · Small Stone Swirl": {

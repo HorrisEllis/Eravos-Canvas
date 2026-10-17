@@ -1,0 +1,30 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "clip-maker.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.clip-maker",
+ "items": {
+  "eravos.clip-maker": {
+   "presets": {
+    "Her words (tight)": {
+     "params": {
+      "snapZero": true,
+      "normalizeTarget": -3,
+      "normalizeMode": "loudness",
+      "silenceThresh": -40,
+      "minGap": 120,
+      "fadeShape": "S"
+     }
+    }
+   }
+  }
+ }
+}

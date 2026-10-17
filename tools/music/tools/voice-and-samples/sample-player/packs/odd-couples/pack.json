@@ -1,0 +1,37 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "sample-player.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.sample-player",
+ "items": {
+  "eravos.sample-player": {
+   "presets": {
+    "Her Voice · Up Front": {
+     "params": {
+      "mode": "oneshot",
+      "pitch": 0,
+      "reverse": false,
+      "gain": 0.9,
+      "attack": 0.005,
+      "release": 0.12
+     }
+    },
+    "Her Voice · Chopped Triplets": {
+     "params": {
+      "mode": "slice",
+      "slices": 8,
+      "gain": 0.85
+     }
+    }
+   }
+  }
+ }
+}

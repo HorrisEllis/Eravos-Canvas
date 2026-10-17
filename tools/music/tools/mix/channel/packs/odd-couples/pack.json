@@ -1,0 +1,42 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "channel.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.channel",
+ "items": {
+  "eravos.channel": {
+   "presets": {
+    "Her Voice (on top)": {
+     "params": {
+      "hpf": 110,
+      "low": -2,
+      "mid": 2,
+      "midFreq": 3000,
+      "high": 3,
+      "sendRev": 0.15,
+      "sendDel": 0.15,
+      "trim": -3
+     }
+    },
+    "Organ Under": {
+     "params": {
+      "hpf": 150,
+      "low": -3,
+      "high": -2,
+      "sendRev": 0.3,
+      "sendDel": 0.1,
+      "fader": -4
+     }
+    }
+   }
+  }
+ }
+}

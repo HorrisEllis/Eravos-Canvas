@@ -20,6 +20,7 @@ for (const d of fs.readdirSync(DOM)) { const t = path.join(DOM, d, 'tools'); if 
 const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
 const p = await b.newPage({ viewport: { width: 1500, height: 1200 }, deviceScaleFactor: 1 });
 const errs = []; p.on('pageerror', e => errs.push(e.message));
+await p.addInitScript(() => { window.ERAVOS_CATALOG_ALL = true; });   // P41 catalog: a fresh profile installs no tools — this script needs every one
 await p.goto('file://' + ROOT + '/canvas/index.html?noboot'); await p.waitForFunction(() => window.OrganismFactory && window.Shell && window.Shell.X, null, { timeout: 30000 });
 const defs = await p.evaluate(() => Object.fromEntries(OrganismFactory.defined().map(d => [d.id, {
   label: d.label, config: (d.config || []).map(c => ({ key: c.key, type: c.type, min: c.min, max: c.max, options: c.options, hidden: !!c.hidden })),

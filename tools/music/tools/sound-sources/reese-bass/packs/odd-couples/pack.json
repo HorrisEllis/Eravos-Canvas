@@ -1,0 +1,67 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "reese-bass.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.reese-bass",
+ "items": {
+  "eravos.reese-bass": {
+   "presets": {
+    "Chapel Reese": {
+     "params": {
+      "voices": 6,
+      "detune": 18,
+      "width": 1,
+      "cutoff": 380,
+      "envAmt": 0.8,
+      "drift": 0.6,
+      "combMix": 0.25,
+      "dist": 0.25,
+      "sub": 0.6,
+      "level": 0.9
+     }
+    },
+    "Breathing Reese": {
+     "params": {
+      "voices": 6,
+      "detune": 22,
+      "width": 0.8,
+      "cutoff": 900,
+      "res": 3,
+      "envAmt": 2,
+      "combTime": 3,
+      "combFb": 0.7,
+      "combMix": 0.5,
+      "combRate": "1/1",
+      "dist": 0.7,
+      "sub": 0.6,
+      "combSync": true,
+      "driftRate": 0.1,
+      "level": 0.85
+     }
+    },
+    "Golden Reese": {
+     "params": {
+      "voices": 4,
+      "detune": 16.18,
+      "width": 0.618,
+      "cutoff": 500,
+      "envAmt": 1.5,
+      "combMix": 0.382,
+      "dist": 0.3,
+      "sub": 0.5,
+      "combTime": 6.18,
+      "level": 0.9
+     }
+    }
+   }
+  }
+ }
+}

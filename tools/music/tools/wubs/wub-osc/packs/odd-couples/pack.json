@@ -1,0 +1,57 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "wub-osc.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.wub-osc",
+ "items": {
+  "eravos.wub-osc": {
+   "presets": {
+    "Cathedral FM": {
+     "params": {
+      "wave": "fm",
+      "ratio": "3",
+      "index": 4,
+      "voices": 3,
+      "spread": 18,
+      "width": 0.5,
+      "octave": -1,
+      "level": 0.75
+     }
+    },
+    "Steppers Growl": {
+     "params": {
+      "wave": "fm",
+      "ratio": "1",
+      "index": 3,
+      "voices": 3,
+      "spread": 12,
+      "width": 0.35,
+      "drift": 0.4,
+      "octave": -1,
+      "glide": 0.04,
+      "level": 0.75
+     }
+    },
+    "Acid Saw Wub": {
+     "params": {
+      "wave": "saw",
+      "voices": 1,
+      "spread": 0,
+      "width": 0.5,
+      "drift": 0.1,
+      "octave": -1,
+      "level": 0.8
+     }
+    }
+   }
+  }
+ }
+}

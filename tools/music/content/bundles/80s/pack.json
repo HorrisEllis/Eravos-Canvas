@@ -195,7 +195,7 @@
       "aR": 0.25,
       "chordMode": "triad",
       "octave": 0,
-      "level": 0.65
+      "level": 0.361
      }
     },
     "Hyperspace Pad": {
@@ -217,7 +217,7 @@
       "aR": 2.5,
       "chordMode": "seventh",
       "octave": 0,
-      "level": 0.55
+      "level": 0.398
      }
     }
    }
@@ -304,7 +304,7 @@
       "space": 0.7,
       "shimmer": 0.3,
       "size": 9,
-      "level": 0.65
+      "level": 0.445
      }
     },
     "Cassette Choir": {
@@ -327,7 +327,7 @@
       "space": 0.5,
       "shimmer": 0.1,
       "size": 6,
-      "level": 0.7
+      "level": 0.543
      }
     }
    }

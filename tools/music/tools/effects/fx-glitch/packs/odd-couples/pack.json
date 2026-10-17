@@ -1,0 +1,40 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "fx-glitch.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.fx-glitch",
+ "items": {
+  "eravos.fx-glitch": {
+   "presets": {
+    "Gospel Stutter": {
+     "params": {
+      "rate": "1/16",
+      "size": "1/16",
+      "repeats": 6,
+      "chaos": 0,
+      "pitchDrift": 0,
+      "mix": 0.7,
+      "reverseProb": 0.1
+     }
+    },
+    "Organ Tape Stop": {
+     "params": {
+      "rate": "1/4",
+      "size": "1/4",
+      "stopBeats": 1,
+      "chaos": 0,
+      "mix": 0.9
+     }
+    }
+   }
+  }
+ }
+}

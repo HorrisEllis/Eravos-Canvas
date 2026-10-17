@@ -63,7 +63,10 @@
       const sh = ac.createWaveShaper(); sh.oversample = '4x'; dsum.connect(sh);
       const sub = ac.createOscillator(); sub.type = 'sine'; sub.start(); ctx.track(sub);
       const subG = ac.createGain(); sub.connect(subG);
-      const amp = ac.createGain(); amp.gain.value = 0; sh.connect(amp); subG.connect(amp);
+      // 3.39 alignment: the stack reaches amp through the 4x shaper (192 samples late); the clean sub is delayed to match, and
+      // everything BEFORE the shaper (stack, glides, filter env, sub pitch) is scheduled LAT early so the gate at t opens on the new note
+      const LAT = dsp.osLatency(ac, '4x'), subAl = ac.createDelay(0.05); subAl.delayTime.value = LAT; ctx.track(subAl);
+      const amp = ac.createGain(); amp.gain.value = 0; sh.connect(amp); subG.connect(subAl); subAl.connect(amp);
       const out = ac.createGain(); out.gain.value = 0.5; amp.connect(out);
       const dcb = ac.createBiquadFilter(); dcb.type = 'highpass'; dcb.frequency.value = 18; dcb.Q.value = 0.5; out.connect(dcb); ctx.track(dcb); // P14: DC blocker (asym drive left offset)
       const lvlOut = ac.createGain(); lvlOut.gain.value = P.get('level'); dcb.connect(lvlOut); ctx.track(lvlOut); P.onChange('level', (v) => dsp.setSmooth(lvlOut.gain, v, ac));
@@ -79,7 +82,7 @@
         const n = P.get('voices'), det = P.get('detune'), w = P.get('width');
         for (let i = 0; i < n; i++) {
           const x = n === 1 ? 0 : (i / (n - 1)) * 2 - 1; // −1..1 symmetric
-          const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(hz, t); o.detune.value = x * det;
+          const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = hz; o.frequency.setValueAtTime(hz, t); o.detune.value = x * det;
           const g = ac.createGain(); g.gain.value = 0.7 / Math.sqrt(n);
           const pan = ac.createStereoPanner(); const side = (i % 2 === 0 ? -1 : 1);
           pan.pan.value = side * w;
@@ -88,7 +91,11 @@
           // start phase: golden-ratio spread, right side 0.2 period apart from left, ±3 % jitter for analog life.
           // (was fully random: width 1 swung from −0.71 (mono-cancelling) to +0.66 correlation note to note — P10 audit)
           const ph = (((i * 0.381966) + (side > 0 ? 0.2 : 0) + (Math.random() - 0.5) * 0.06) % 1 + 1) % 1;
-          o.start(t + ph / hz * 0.999);
+          // 3.39: the phase was made by DELAYING the voice by ph of a period — up to 18 ms at A1, so every note started late
+          // (right voices always 10.6 ms, the left one up to 17.6 ms when the jitter wrapped). Now the voice starts EARLY by the
+          // rest of the period: at t it is exactly at phase ph, and the run-in is behind the closed gate. Live input (t = now)
+          // cannot run in early — those voices start at once, phase unspread.
+          o.start(Math.max(ac.currentTime, t - (1 - ph) / hz));
           ctx.track(o);
           stack.push({ o, pan, g, side, wm });
         }
@@ -120,22 +127,23 @@
       function noteOn(note, vel, t, o) {
         o = o || {};
         t = Math.max(t, ac.currentTime);
+        const tp = Math.max(ac.currentTime, t - LAT);   // pre-shaper time
         const hz = MT.hz(note - 12);
         const legato = held && held.off > t - 1e-4;
         if (legato) {
           const gl = Math.max(0.005, P.get('glide'));
-          stack.forEach(v => { v.o.frequency.cancelScheduledValues(t); v.o.frequency.setValueAtTime(curHz, t); v.o.frequency.exponentialRampToValueAtTime(hz, t + gl); });
-          sub.frequency.cancelScheduledValues(t); sub.frequency.setValueAtTime(curHz / 2, t); sub.frequency.exponentialRampToValueAtTime(hz / 2, t + gl);
+          stack.forEach(v => { v.o.frequency.cancelScheduledValues(tp); v.o.frequency.setValueAtTime(curHz, tp); v.o.frequency.exponentialRampToValueAtTime(hz, tp + gl); });
+          sub.frequency.cancelScheduledValues(tp); sub.frequency.setValueAtTime(curHz / 2, tp); sub.frequency.exponentialRampToValueAtTime(hz / 2, tp + gl);
           const g = amp.gain, v = envAt(t); g.cancelScheduledValues(t); g.setValueAtTime(v, t);
           if (t < env.t0 + env.att) g.linearRampToValueAtTime(env.peak, env.t0 + env.att); else g.setValueAtTime(env.peak, t + 0.002);
         } else {
-          buildStack(t, hz);
-          sub.frequency.cancelScheduledValues(t); sub.frequency.setValueAtTime(hz / 2, t);
+          buildStack(tp, hz);
+          sub.frequency.cancelScheduledValues(tp); sub.frequency.setValueAtTime(hz / 2, tp);
           env = { t0: t, att: Math.max(0.001, P.get('attack')), peak: 0.5 + 0.5 * vel };
           amp.gain.cancelScheduledValues(t); amp.gain.setValueAtTime(0, t); amp.gain.linearRampToValueAtTime(env.peak, t + env.att);
           // filter env
           const c = P.get('cutoff'), pk = Math.min(18000, c * Math.pow(2, P.get('envAmt')));
-          [lp1, lp2].forEach(b => { b.frequency.cancelScheduledValues(t); b.frequency.setValueAtTime(pk, t); b.frequency.setTargetAtTime(c, t + 0.005, P.get('envDecay') / 3); });
+          [lp1, lp2].forEach(b => { b.frequency.cancelScheduledValues(tp); b.frequency.setValueAtTime(pk, tp); b.frequency.setTargetAtTime(c, tp + 0.005, P.get('envDecay') / 3); });
         }
         curHz = hz;
         const off = o.duration !== undefined ? t + o.duration : Infinity;

@@ -1,0 +1,65 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "xen-synth.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.xen-synth",
+ "items": {
+  "eravos.xen-synth": {
+   "presets": {
+    "Golden Dub Bells": {
+     "params": {
+      "tuning": "Golden generator (φ-MOS)",
+      "n": 7,
+      "spectrum": "bell",
+      "partials": 12,
+      "tilt": 0.7,
+      "attack": 0.002,
+      "decay": 1.2,
+      "sustain": 0,
+      "release": 1.5,
+      "partialDecay": 0.7,
+      "shimmer": 0.25,
+      "baseHz": 220,
+      "level": 0.55
+     }
+    },
+    "19-EDO Wobble Lead": {
+     "params": {
+      "tuning": "19-EDO",
+      "spectrum": "tuning-matched",
+      "partials": 8,
+      "tilt": 1.6,
+      "attack": 0.005,
+      "decay": 0.4,
+      "sustain": 0.5,
+      "release": 1.5,
+      "partialDecay": 0.4,
+      "level": 0.5
+     }
+    },
+    "Slendro Riddim Bells": {
+     "params": {
+      "tuning": "Slendro (approx.)",
+      "spectrum": "bar",
+      "partials": 6,
+      "tilt": 0.6,
+      "attack": 0.001,
+      "decay": 0.5,
+      "sustain": 0,
+      "release": 0.4,
+      "partialDecay": 0.8,
+      "level": 0.55
+     }
+    }
+   }
+  }
+ }
+}

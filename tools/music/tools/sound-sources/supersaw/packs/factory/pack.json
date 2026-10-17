@@ -60,7 +60,7 @@
       "aS": 0.8,
       "aR": 2.2,
       "chordMode": "triad",
-      "level": 0.55
+      "level": 0.263
      }
     },
     "Chord Stab (triad)": {
@@ -78,7 +78,8 @@
       "aD": 0.2,
       "aS": 0.3,
       "aR": 0.15,
-      "chordMode": "triad"
+      "chordMode": "triad",
+      "level": 0.32
      }
     },
     "Future Bass Chords (7th)": {
@@ -99,7 +100,7 @@
       "aR": 0.25,
       "chordMode": "seventh",
       "octave": 0,
-      "level": 0.5
+      "level": 0.346
      }
     },
     "Future Bass Chords (add9)": {
@@ -120,7 +121,7 @@
       "aR": 0.2,
       "chordMode": "add9",
       "octave": 0,
-      "level": 0.5
+      "level": 0.327
      }
     },
     "Monstercat Pluck": {
@@ -184,7 +185,7 @@
       "aR": 3,
       "chordMode": "add9",
       "octave": 0,
-      "level": 0.45
+      "level": 0.37
      }
     },
     "Airy Sus Pad": {
@@ -220,7 +221,7 @@
       "aS": 0.9,
       "aR": 0.15,
       "chordMode": "triad",
-      "level": 0.45
+      "level": 0.297
      }
     },
     "Melodic Saw Bass": {

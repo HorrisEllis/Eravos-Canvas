@@ -6,6 +6,7 @@ const vocal = fs.readFileSync(OUT + '/give_your_head_a_shake.wav').toString('bas
 const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
 const p = await b.newPage({ viewport: { width: 1900, height: 1150 } });
 const errs = []; p.on('pageerror', e => errs.push('PAGEERR ' + e.message)); p.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') errs.push(m.text()); });
+await p.addInitScript(() => { window.ERAVOS_CATALOG_ALL = true; });   // P41 catalog: a fresh profile installs no tools — this script needs every one
 await p.goto('file:///home/claude/eravos/canvas/index.html?noboot');
 await p.waitForTimeout(400);
 const rep = await p.evaluate(async () => {

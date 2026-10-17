@@ -213,7 +213,7 @@
     },
     "Flaws (Half-Time)": {
      "params": {
-      "volume": 0.9
+      "volume": 0.512
      },
      "extra": {
       "kit": [

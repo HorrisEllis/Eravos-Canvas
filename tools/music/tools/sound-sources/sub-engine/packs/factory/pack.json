@@ -37,7 +37,8 @@
       "sustain": 0.95,
       "release": 0.25,
       "tone": 600,
-      "glide": 0.04
+      "glide": 0.04,
+      "level": 0.65
      }
     },
     "808 Boom": {
@@ -51,7 +52,8 @@
       "octave": -2,
       "decay": 1.6,
       "sustain": 0,
-      "release": 0.5
+      "release": 0.5,
+      "level": 0.58
      }
     },
     "808 Long Slide": {
@@ -66,7 +68,8 @@
       "octave": -2,
       "decay": 3.5,
       "sustain": 0.3,
-      "release": 0.6
+      "release": 0.6,
+      "level": 0.529
      }
     },
     "Earthquake Drop": {
@@ -92,7 +95,8 @@
       "click": 0.3,
       "drop": 0,
       "octave": -2,
-      "tone": 1400
+      "tone": 1400,
+      "level": 0.573
      }
     },
     "Dubstep Sub Layer": {
@@ -119,7 +123,8 @@
       "octave": -1,
       "decay": 0.35,
       "sustain": 0.2,
-      "release": 0.12
+      "release": 0.12,
+      "level": 0.573
      }
     },
     "80s · Linn Bass Drum Sub": {

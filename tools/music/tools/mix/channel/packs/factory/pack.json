@@ -21,7 +21,8 @@
       "midFreq": 3000,
       "high": 3,
       "sendRev": 0.35,
-      "sendDel": 0.15
+      "sendDel": 0.15,
+      "trim": -2.1
      }
     },
     "Bass": {
