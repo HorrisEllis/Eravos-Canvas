@@ -53,8 +53,8 @@
                       },
                       "octave": {
                         "type": "integer",
-                        "minimum": -3,
-                        "maximum": 3
+                        "minimum": -4,
+                        "maximum": 4
                       },
                       "attack": {
                         "type": "number",

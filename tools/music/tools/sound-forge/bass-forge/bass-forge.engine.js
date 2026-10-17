@@ -86,7 +86,7 @@
   const CFG = [
     { key: 'wave', type: 'enum', options: ['sawtooth', 'square', 'triangle', 'sine'], default: 'sawtooth', label: 'Carrier', group: 'FM' },
     { key: 'ratio', type: 'enum', options: Object.keys(RATIOS), default: '1', label: 'Ratio', group: 'FM' },
-    { key: 'fm', type: 'number', default: 1.2, min: 0, max: 10, step: 0.01, label: 'FM index', group: 'FM' },
+    { key: 'fm', type: 'number', default: 1.2, min: 0, max: 20, step: 0.01, label: 'FM index', group: 'FM' },
     { key: 'spread', type: 'number', default: 12, min: 0, max: 60, step: 0.1, unit: '¢', label: 'Unison', group: 'FM' },
     { key: 'fold', type: 'number', default: 0.3, min: 0, max: 1, step: 0.01, label: 'Fold', group: 'SHAPE' },
     { key: 'formant', type: 'number', default: 0.4, min: 0, max: 1, step: 0.01, label: 'Formant', group: 'SHAPE' },
@@ -108,13 +108,13 @@
     { key: 'lfoComb', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: '→ Comb', group: 'LFO' },
     { key: 'lfoNotch', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: '→ Notch', group: 'LFO' },
     { key: 'lfoCut', type: 'number', default: 0.3, min: 0, max: 1, step: 0.01, label: '→ Cutoff', group: 'LFO' },
-    { key: 'pitchEnv', type: 'number', default: 0, min: 0, max: 48, step: 0.5, unit: 'st', label: 'Pitch env', group: 'PITCH' },
+    { key: 'pitchEnv', type: 'number', default: 0, min: -48, max: 48, step: 0.5, unit: 'st', label: 'Pitch env', group: 'PITCH' },
     { key: 'pitchTime', type: 'number', default: 0.08, min: 0.005, max: 1.5, step: 0.001, unit: 's', label: 'Pitch time', group: 'PITCH' },
-    { key: 'glide', type: 'number', default: 0.04, min: 0, max: 0.6, step: 0.001, unit: 's', label: 'Glide', group: 'PITCH' },
-    { key: 'octave', type: 'integer', default: -1, min: -2, max: 1, label: 'Octave', group: 'PITCH' },
+    { key: 'glide', type: 'number', default: 0.04, min: 0, max: 2, step: 0.001, unit: 's', label: 'Glide', group: 'PITCH' },
+    { key: 'octave', type: 'integer', default: -1, min: -3, max: 3, label: 'Octave', group: 'PITCH' },
     { key: 'sub', type: 'number', default: 0.6, min: 0, max: 1, step: 0.01, label: 'Sub', group: 'OUT' },
-    { key: 'attack', type: 'number', default: 0.004, min: 0.001, max: 1, step: 0.001, unit: 's', label: 'Attack', group: 'OUT' },
-    { key: 'release', type: 'number', default: 0.1, min: 0.01, max: 2, step: 0.001, unit: 's', label: 'Release', group: 'OUT' },
+    { key: 'attack', type: 'number', default: 0.004, min: 0.001, max: 4, step: 0.001, unit: 's', label: 'Attack', group: 'OUT' },
+    { key: 'release', type: 'number', default: 0.1, min: 0.01, max: 8, step: 0.001, unit: 's', label: 'Release', group: 'OUT' },
     { key: 'level', type: 'number', default: 0.8, min: 0, max: 1.5, step: 0.01, label: 'Level', group: 'OUT' },
   ];
   // ---- features for MATCH

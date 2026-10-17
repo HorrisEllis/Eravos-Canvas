@@ -50,8 +50,8 @@
                       },
                       "lfoAmt": {
                         "type": "number",
-                        "minimum": -4,
-                        "maximum": 4
+                        "minimum": -8,
+                        "maximum": 8
                       },
                       "lfoShape": {
                         "enum": [
@@ -77,23 +77,23 @@
                       },
                       "lfoRate": {
                         "type": "number",
-                        "minimum": 0.05,
-                        "maximum": 20
+                        "minimum": 0.01,
+                        "maximum": 40
                       },
                       "envAmt": {
                         "type": "number",
-                        "minimum": -4,
-                        "maximum": 4
+                        "minimum": -8,
+                        "maximum": 8
                       },
                       "envAttack": {
                         "type": "number",
-                        "minimum": 1,
-                        "maximum": 200
+                        "minimum": 0.5,
+                        "maximum": 2000
                       },
                       "envRelease": {
                         "type": "number",
-                        "minimum": 10,
-                        "maximum": 1000
+                        "minimum": 5,
+                        "maximum": 5000
                       },
                       "mix": {
                         "type": "number",

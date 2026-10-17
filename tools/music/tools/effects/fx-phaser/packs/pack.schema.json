@@ -30,8 +30,8 @@
                       },
                       "rate": {
                         "type": "number",
-                        "minimum": 0.01,
-                        "maximum": 8
+                        "minimum": 0.005,
+                        "maximum": 20
                       },
                       "sync": {
                         "type": "boolean"
@@ -47,18 +47,18 @@
                       },
                       "minHz": {
                         "type": "number",
-                        "minimum": 100,
-                        "maximum": 2000
+                        "minimum": 20,
+                        "maximum": 4000
                       },
                       "maxHz": {
                         "type": "number",
-                        "minimum": 500,
-                        "maximum": 12000
+                        "minimum": 200,
+                        "maximum": 18000
                       },
                       "feedback": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 0.9
+                        "maximum": 0.97
                       },
                       "stereo": {
                         "type": "number",
@@ -68,7 +68,7 @@
                       "Q": {
                         "type": "number",
                         "minimum": 0.3,
-                        "maximum": 4
+                        "maximum": 12
                       },
                       "mix": {
                         "type": "number",

@@ -80,24 +80,3 @@ dependencies:
     - reese.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
   works_with: [eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
-
-# ============================================================
-# PLANNED 2.0 — Reese editor (P38 S2 / P39 R13) · status MAPPED, not built
-# "same with reese bass editor" — the Reese grows the way Wobble did (one tool per tool)
-# ============================================================
-finding (1.x): voices 2–6 with ONE detune amount spread evenly, comb on a sine/rate LFO, drift = random wander; nothing
-  can be drawn or sequenced, so every Reese moves the same way.
-engine 2.0:
-  VOICE SPREAD editor: per-voice detune (cents), pan, level, octave and wave (saw · square · drawn) — the Reese's "beating"
-    is designed voice by voice, not one knob; presets of spreads (Classic 2, Wide 4, Neuro 6, Octave Stack)
-  MOVEMENT (drawn, the S1 shape editor reused — one widget, not a copy): detune amount, comb time, filter cutoff and
-    phase-warp each follow a drawn curve over 1–8 bars (sync) or seconds (free)
-  RATE ROLL (the S1 wub-seq widget reused): a per-step rate for the movement — neuro "rolls" and stops on the grid
-  PHASE: voices reset phase per note (tight, punchy) or free-run (wide, drifting) ; "phase-lock at drop" action
-  FILTER: 24 dB LP + band "throat" (formant pair) in series/parallel ; NEURO stack: comb → BP → asym drive → OTT-lite
-  SUB: clean sine sub, phase-aligned to voice 1, crossover 80–200 Hz (mono under the crossover — club-safe)
-packs 2.0: ≥ 60 — Neuro Roll · Classic DnB Reese · Darkstep · Jungle Pressure · Halftime Growl · Liquid Warm · Techno
-  Rumble Reese · Dubstep Reese Wub (rate roll on comb) · Synthwave Reese · Witch Reese · Hoover-ish (detuned stack + pitch
-  dive, technique only) …
-acceptance 2.0: per-voice detune audible as beat frequency f·(2^(c/1200)−1) ± 2 % ; mono below crossover (L−R < −60 dB
-  under 100 Hz) ; drawn movement reproduces the curve on the param ± 1 % ; 1.x presets load and render identically.

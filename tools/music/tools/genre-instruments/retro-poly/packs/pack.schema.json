@@ -61,8 +61,8 @@
                       },
                       "octave": {
                         "type": "integer",
-                        "minimum": -2,
-                        "maximum": 2
+                        "minimum": -4,
+                        "maximum": 4
                       },
                       "cutoff": {
                         "type": "number",
@@ -143,7 +143,7 @@
                       "glide": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 1
+                        "maximum": 3
                       },
                       "arp": {
                         "enum": [

@@ -115,14 +115,3 @@ dependencies:
     - drop.hook.plan_out (edm:drop-plan)
   permissions: [audio_out, bus_publish, bus_subscribe, filesystem_read, registry_read]
   works_with: [eravos.song-recorder, eravos.sequencer, eravos.macro-automation, eravos.drum-forge, eravos.session, eravos.clip-maker, eravos.sample-player]
-
-## 3.1 (3.39) — her voice on top · "the bass drop tool must make her voice or clip a priority over the other sounds"
-vocal port: bus 'priority' — joins the master AFTER the ducks (chain: … duck → vduck → comp; priority → comp), so her
-  voice is never ducked (not by itself, not by the kick sidechain) and still goes through the master comp + limiter.
-vocalPriority (dB, 0–18, default 9, VOCAL group, "Her voice on top"): while her clip plays (main + every stutter), the rest
-  of the mix dips under the clip's OWN loudness envelope — K.audio.duckUnder(buffer, segments, {depthDb}) in core/audio.js:
-  10 ms RMS of the clip, gated 36 dB under its loudest frame, full dip from −12 dB, attack 12 ms, release 220 ms,
-  look-ahead 20 ms. Between words the mix comes back. 0 = off. Abort and Stop all release the dip at once.
-measured (tests/p42-voice-priority.test.js): dip under each word 9 ± 0.6 dB · between words < 4.5 dB · after the clip the
-  mix is back within 0.1 dB · already ≥ 6 dB down 10 ms into the first word · her vocal level identical at 0 and 18 dB ·
-  priority 0 changes nothing (< 0.05 dB) · Stop all: back to full within 0.2 s.

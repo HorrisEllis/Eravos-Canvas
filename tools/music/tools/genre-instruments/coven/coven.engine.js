@@ -27,7 +27,7 @@
       { key: 'vibrato', type: 'number', default: 0.25, min: 0, max: 1, step: 0.01, label: 'Vibrato', group: 'CHOIR' },
       { key: 'hex', type: 'enum', options: Object.keys(HEX), default: 'off', label: 'Hex ratio', group: 'HEX' },
       { key: 'hexMix', type: 'number', default: 0.4, min: 0, max: 1, step: 0.01, label: 'Hex', group: 'HEX' },
-      { key: 'screw', type: 'number', default: 0, min: 0, max: 12, step: 0.1, unit: 'st', label: 'Screw', group: 'DARK', hint: 'drags the whole coven down' },
+      { key: 'screw', type: 'number', default: 0, min: 0, max: 24, step: 0.1, unit: 'st', label: 'Screw', group: 'DARK', hint: 'drags the whole coven down' },
       { key: 'static', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Static', group: 'DARK' },
       { key: 'summon', type: 'number', default: 0.4, min: 0, max: 1, step: 0.01, label: 'Summon', group: 'DARK', hint: 'drone grows under long-held chords' },
       { key: 'dark', type: 'number', default: 3200, min: 300, max: 12000, step: 1, unit: 'Hz', label: 'Darkness', group: 'DARK' },

@@ -34,7 +34,7 @@ tools:
     - eravos.pads (Drum Machine) mode=music units=[engine,meter,midi] needs=[audio,midi,mod,notes,files] in=3 out=3
     - eravos.sequencer (Sequencer) mode=music units=[engine,transport,tempo,key] needs=[audio,clock,key,notes,files] in=4 out=5
   Effects:
-    - eravos.fx-destroyer (Destroyer) mode=music units=[engine,meter] needs=[audio,mod] in=5 out=1
+    - eravos.fx-destroyer (Destroyer) mode=music units=[engine,meter] needs=[audio,mod] in=6 out=2
     - eravos.fx-dynamics (Dynamics) mode=music units=[engine,meter] needs=[audio,mod] in=3 out=2
     - eravos.fx-echo (Tape Echo) mode=music units=[engine,meter] needs=[audio,mod] in=5 out=1
     - eravos.fx-eq (EQ) mode=music units=[engine,meter] needs=[audio,mod] in=5 out=1
@@ -45,7 +45,7 @@ tools:
     - eravos.fx-phaser (Phaser) mode=music units=[engine,meter] needs=[audio,mod] in=4 out=1
     - eravos.fx-pitch (Pitch) mode=music units=[engine,key,meter] needs=[audio,key,mod] in=3 out=1
   Generators:
-    - eravos.edm-lab (EDM Lab) mode=music units=[engine,transport,tempo,key,meter] needs=[audio,clock,key,mod] in=2 out=5
+    - eravos.edm-lab (EDM Lab) mode=music units=[engine,transport,tempo,key,meter] needs=[audio,clock,key,mod] in=4 out=6
   Genre instruments:
     - eravos.coven (Coven) mode=music units=[engine,transport,tempo,key,meter,midi] needs=[audio,clock,key,midi,mod,notes] in=2 out=1
     - eravos.dub-station (Dub Station) mode=music units=[engine,transport,tempo,key,meter] needs=[audio,clock,key,mod] in=3 out=2
@@ -78,6 +78,11 @@ tools:
   Start here:
     - eravos.coach (Coach) mode=music units=[engine,transport,tempo] needs=[audio,clock,notes] in=1 out=1
     - eravos.session (Session) mode=music units=[engine,tempo,key] needs=[audio,clock,key,files,assets] in=1 out=3
+  Synthesis:
+    - eravos.granular (Granular) mode=music units=[engine,key,meter] needs=[audio,key,mod,notes,files] in=7 out=1
+    - eravos.syn-env (Envelope) mode=music units=[engine,midi] needs=[audio,midi,mod,notes] in=2 out=1
+    - eravos.syn-osc (Morph Osc) mode=music units=[engine,meter,midi] needs=[audio,midi,mod,notes] in=6 out=1
+    - eravos.syn-partials (Partials) mode=music units=[engine,meter,midi] needs=[audio,midi,mod,notes] in=2 out=1
   Tools:
     - eravos.contrast-analyser (Contrast) mode=music units=[engine] needs=[audio,files] in=3 out=1
     - eravos.midi-mapper (MIDI Map) mode=music units=[engine,midi] needs=[audio,midi] in=2 out=5
@@ -88,10 +93,10 @@ tools:
     - eravos.sample-player (Sample) mode=music units=[engine,meter,midi] needs=[audio,midi,mod,notes,files,assets] in=5 out=2
     - eravos.lyric-rhythm (Lyrics → Rhythm) mode=music units=[engine,transport,tempo,key] needs=[audio,clock,key] in=0 out=3
   Wubs:
-    - eravos.wub-filter (Wub Filter) mode=music units=[engine,meter] needs=[audio,mod] in=5 out=1
-    - eravos.wub-osc (Wub Osc) mode=music units=[engine,meter,midi] needs=[audio,midi,mod,notes] in=4 out=1
+    - eravos.wub-filter (Wub Filter) mode=music units=[engine,meter] needs=[audio,mod] in=6 out=2
+    - eravos.wub-osc (Wub Osc) mode=music units=[engine,meter,midi] needs=[audio,midi,mod,notes] in=5 out=2
     - eravos.wub-rate (Wub Rate) mode=music units=[engine,transport,tempo] needs=[audio,clock,mod] in=1 out=1
-    - eravos.wub-sub (Wub Sub) mode=music units=[engine,meter,midi] needs=[audio,midi,mod,notes] in=2 out=1
+    - eravos.wub-sub (Wub Sub) mode=music units=[engine,meter,midi] needs=[audio,midi,mod,notes] in=3 out=2
   Xenharmonic:
     - eravos.embodiment-lab (Embodiment Lab) mode=music.lab units=[engine,transport,tempo,meter] needs=[audio,clock,mod,notes] in=2 out=3
     - eravos.ratio-lattice (Ratio Lattice) mode=music.lab units=[engine,transport,tempo,meter] needs=[audio,clock] in=0 out=3

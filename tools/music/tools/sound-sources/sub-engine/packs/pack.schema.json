@@ -27,7 +27,7 @@
                       "octave": {
                         "type": "integer",
                         "minimum": -4,
-                        "maximum": 0
+                        "maximum": 1
                       },
                       "floor": {
                         "type": "number",

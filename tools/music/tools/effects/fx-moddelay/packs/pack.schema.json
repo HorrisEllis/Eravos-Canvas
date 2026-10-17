@@ -27,8 +27,8 @@
                       },
                       "rate": {
                         "type": "number",
-                        "minimum": 0.02,
-                        "maximum": 10
+                        "minimum": 0.005,
+                        "maximum": 20
                       },
                       "sync": {
                         "type": "boolean"
@@ -49,8 +49,8 @@
                       },
                       "base": {
                         "type": "number",
-                        "minimum": 0.2,
-                        "maximum": 25
+                        "minimum": 0.1,
+                        "maximum": 50
                       },
                       "feedback": {
                         "type": "number",

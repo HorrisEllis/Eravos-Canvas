@@ -31,8 +31,8 @@
                       },
                       "octave": {
                         "type": "integer",
-                        "minimum": -3,
-                        "maximum": 0
+                        "minimum": -4,
+                        "maximum": 1
                       },
                       "cut": {
                         "type": "number",
@@ -42,17 +42,17 @@
                       "glide": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 0.6
+                        "maximum": 2
                       },
                       "attack": {
                         "type": "number",
                         "minimum": 0.001,
-                        "maximum": 0.5
+                        "maximum": 4
                       },
                       "release": {
                         "type": "number",
                         "minimum": 0.01,
-                        "maximum": 2
+                        "maximum": 8
                       },
                       "level": {
                         "type": "number",

@@ -36,13 +36,13 @@
                       },
                       "cutoff": {
                         "type": "number",
-                        "minimum": 40,
-                        "maximum": 6000
+                        "minimum": 30,
+                        "maximum": 16000
                       },
                       "res": {
                         "type": "number",
                         "minimum": 0.5,
-                        "maximum": 12
+                        "maximum": 20
                       },
                       "envAmt": {
                         "type": "number",
@@ -116,17 +116,17 @@
                       "glide": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 0.5
+                        "maximum": 2
                       },
                       "attack": {
                         "type": "number",
                         "minimum": 0.001,
-                        "maximum": 2
+                        "maximum": 6
                       },
                       "release": {
                         "type": "number",
                         "minimum": 0.01,
-                        "maximum": 4
+                        "maximum": 10
                       },
                       "tempoX": {
                         "enum": [

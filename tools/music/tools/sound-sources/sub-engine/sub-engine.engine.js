@@ -16,7 +16,7 @@
     hooks: [S.audio_out('sub.hook.audio_out'), S.note_in('sub.hook.note_in'), S.midi_in('sub.hook.midi_in'), S.theory_in('sub.hook.theory_in'), S.mod_in('sub.hook.mod_phantom', 'phantom'), S.mod_in('sub.hook.mod_level', 'level')],
     config: [
       { key: 'shape', type: 'number', default: 0.15, min: 0, max: 1, step: 0.01, label: 'Shape', group: 'SUB', hint: '0 sine · 0.5 triangle · 1 rounded square' },
-      { key: 'octave', type: 'integer', default: -2, min: -4, max: 0, label: 'Octave', group: 'SUB' },
+      { key: 'octave', type: 'integer', default: -2, min: -4, max: 1, label: 'Octave', group: 'SUB' },
       { key: 'floor', type: 'number', default: 24, min: 12, max: 45, step: 1, unit: 'Hz', label: 'Floor', group: 'SUB', hint: 'infrasonic cut — protects speakers' },
       { key: 'drop', type: 'number', default: 0, min: 0, max: 36, step: 0.5, unit: 'st', label: 'Drop', group: 'PITCH', hint: '808 punch: start this far above and fall' },
       { key: 'dropTime', type: 'number', default: 0.06, min: 0.005, max: 2, step: 0.001, unit: 's', label: 'Drop time', group: 'PITCH' },

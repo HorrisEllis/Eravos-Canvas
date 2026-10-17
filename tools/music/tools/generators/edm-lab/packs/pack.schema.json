@@ -29,44 +29,279 @@
                         "minimum": 0,
                         "maximum": 1
                       },
-                      "progression": {
-                        "enum": [
-                          "i-VI-III-VII",
-                          "i-iv-v-i",
-                          "vi-IV-I-V",
-                          "i-i-VI-VII"
-                        ]
-                      },
-                      "chordBars": {
-                        "enum": [
-                          1,
-                          2
-                        ]
-                      },
                       "swing": {
                         "type": "number",
                         "minimum": 0,
                         "maximum": 0.6
+                      },
+                      "humanize": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "density": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 2
                       },
                       "seed": {
                         "type": "integer",
                         "minimum": 1,
                         "maximum": 99999
                       },
-                      "rhythmLevel": {
+                      "pattern": {
+                        "enum": [
+                          "A",
+                          "B",
+                          "C",
+                          "D"
+                        ]
+                      },
+                      "chain": {
+                        "enum": [
+                          "off",
+                          "A·B",
+                          "A·B·C·D",
+                          "A·A·B·C",
+                          "A·B·A·C",
+                          "A·A·A·B"
+                        ]
+                      },
+                      "kit": {
+                        "enum": [
+                          "808",
+                          "909",
+                          "Lab",
+                          "Breaks",
+                          "Garage",
+                          "Techno",
+                          "Lo-fi",
+                          "Trap"
+                        ]
+                      },
+                      "kitDrive": {
                         "type": "number",
                         "minimum": 0,
                         "maximum": 1
+                      },
+                      "bassStyle": {
+                        "enum": [
+                          "follow kick",
+                          "offbeat",
+                          "rolling",
+                          "octave pump",
+                          "half-time",
+                          "wobble",
+                          "acid"
+                        ]
+                      },
+                      "bassWave": {
+                        "enum": [
+                          "saw",
+                          "square",
+                          "sine",
+                          "fm"
+                        ]
+                      },
+                      "bassOctave": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 3
+                      },
+                      "bassCutoff": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "bassRes": {
+                        "type": "number",
+                        "minimum": 0.5,
+                        "maximum": 24
+                      },
+                      "bassEnv": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "bassDrive": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "bassGlide": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 0.5
+                      },
+                      "bassSub": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "wobble": {
+                        "enum": [
+                          "1/2",
+                          "1/4",
+                          "1/8",
+                          "1/8T",
+                          "1/16"
+                        ]
+                      },
+                      "progression": {
+                        "enum": [
+                          "i-VI-III-VII",
+                          "i-iv-v-i",
+                          "vi-IV-I-V",
+                          "i-i-VI-VII",
+                          "I-V-vi-IV",
+                          "i-VII-VI-VII",
+                          "i-iv-VI-v",
+                          "ii-V-I-vi",
+                          "i-III-VII-VI",
+                          "IV-I-V-vi",
+                          "i-v-VI-iv",
+                          "i (drone)"
+                        ]
+                      },
+                      "chordBars": {
+                        "enum": [
+                          1,
+                          2,
+                          4
+                        ]
+                      },
+                      "chordStyle": {
+                        "enum": [
+                          "pad",
+                          "stabs",
+                          "offbeat",
+                          "pluck",
+                          "arp"
+                        ]
+                      },
+                      "chordOctave": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 6
+                      },
+                      "chordBright": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "chordWidth": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 40
+                      },
+                      "chordAttack": {
+                        "type": "number",
+                        "minimum": 0.002,
+                        "maximum": 4
+                      },
+                      "chordRelease": {
+                        "type": "number",
+                        "minimum": 0.02,
+                        "maximum": 6
+                      },
+                      "leadStyle": {
+                        "enum": [
+                          "arp up",
+                          "arp down",
+                          "arp up-down",
+                          "random",
+                          "hook",
+                          "chord tones"
+                        ]
+                      },
+                      "leadRate": {
+                        "enum": [
+                          "1/4",
+                          "1/8",
+                          "1/16"
+                        ]
+                      },
+                      "leadOctave": {
+                        "type": "integer",
+                        "minimum": 2,
+                        "maximum": 7
+                      },
+                      "leadWave": {
+                        "enum": [
+                          "square",
+                          "saw",
+                          "triangle",
+                          "sine"
+                        ]
+                      },
+                      "leadCutoff": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "leadGate": {
+                        "type": "number",
+                        "minimum": 0.05,
+                        "maximum": 1
+                      },
+                      "leadGlide": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 0.4
+                      },
+                      "leadEcho": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 0.9
+                      },
+                      "pump": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "pumpRelease": {
+                        "type": "number",
+                        "minimum": 0.03,
+                        "maximum": 0.6
+                      },
+                      "arrange": {
+                        "enum": [
+                          "loop",
+                          "song"
+                        ]
+                      },
+                      "buildBars": {
+                        "enum": [
+                          1,
+                          2,
+                          4,
+                          8
+                        ]
+                      },
+                      "riser": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "rhythmLevel": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1.5
                       },
                       "bassLevel": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 1
+                        "maximum": 1.5
                       },
                       "harmonyLevel": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 1
+                        "maximum": 1.5
+                      },
+                      "leadLevel": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1.5
                       },
                       "rhythmOn": {
                         "type": "boolean"
@@ -75,6 +310,9 @@
                         "type": "boolean"
                       },
                       "harmonyOn": {
+                        "type": "boolean"
+                      },
+                      "leadOn": {
                         "type": "boolean"
                       },
                       "tempoX": {

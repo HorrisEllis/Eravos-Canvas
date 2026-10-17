@@ -30,7 +30,7 @@
       { key: 'x', type: 'number', default: 0.4, min: 0, max: 1, step: 0.001, label: 'X', group: 'VECTOR' },
       { key: 'y', type: 'number', default: 0.4, min: 0, max: 1, step: 0.001, label: 'Y', group: 'VECTOR' },
       { key: 'orbit', type: 'enum', options: ORBITS, default: 'circle', label: 'Orbit', group: 'VECTOR' },
-      { key: 'orbitRate', type: 'number', default: 0.06, min: 0.005, max: 2, step: 0.001, unit: 'Hz', label: 'Orbit rate', group: 'VECTOR' },
+      { key: 'orbitRate', type: 'number', default: 0.06, min: 0.002, max: 8, step: 0.001, unit: 'Hz', label: 'Orbit rate', group: 'VECTOR' },
       { key: 'orbitSize', type: 'number', default: 0.3, min: 0, max: 0.5, step: 0.001, label: 'Orbit size', group: 'VECTOR' },
       { key: 'cutoff', type: 'number', default: 3200, min: 120, max: 16000, step: 1, unit: 'Hz', label: 'Cutoff', group: 'TONE' },
       { key: 'bloom', type: 'number', default: 0.5, min: 0, max: 1, step: 0.01, label: 'Bloom', group: 'TONE', hint: 'filter opens over a few seconds after each chord' },

@@ -83,8 +83,8 @@
                       },
                       "orbitRate": {
                         "type": "number",
-                        "minimum": 0.005,
-                        "maximum": 2
+                        "minimum": 0.002,
+                        "maximum": 8
                       },
                       "orbitSize": {
                         "type": "number",

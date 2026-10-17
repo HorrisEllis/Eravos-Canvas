@@ -132,7 +132,7 @@
       { key: 'mode', type: 'enum', options: ['drums', 'melody'], default: 'drums', label: 'Plays as', group: 'RHYTHM' },
       { key: 'bars', type: 'integer', default: 0, min: 0, max: 32, label: 'Bars (0 = fit)', group: 'RHYTHM' },
       { key: 'vary', type: 'integer', default: 0, min: 0, max: 999, label: 'Vary', group: 'RHYTHM', hint: '0 = exact · any other number = a different but repeatable feel' },
-      { key: 'octave', type: 'integer', default: 4, min: 2, max: 6, label: 'Octave', group: 'MELODY' },
+      { key: 'octave', type: 'integer', default: 4, min: 1, max: 7, label: 'Octave', group: 'MELODY' },
       { key: 'range', type: 'integer', default: 5, min: 2, max: 10, label: 'Range (degrees)', group: 'MELODY' },
       { key: 'gate', type: 'number', default: 0.85, min: 0.2, max: 1, step: 0.01, label: 'Note length', group: 'MELODY' },
       { key: 'target', type: 'string', default: 'auto', label: 'Plays', group: 'OUT', hidden: true },

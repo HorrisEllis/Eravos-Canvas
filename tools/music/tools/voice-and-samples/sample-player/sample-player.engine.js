@@ -25,7 +25,7 @@
     config: [
       { key: 'mode', type: 'enum', options: MODES, default: 'oneshot', label: 'Mode', group: 'PLAY', hint: 'oneshot = whole clip · gate = while held · loop · chromatic = play it as notes · slice = chop' },
       { key: 'gain', type: 'number', default: 1, min: 0, max: 2, step: 0.01, label: 'Gain', group: 'PLAY' },
-      { key: 'pitch', type: 'number', default: 0, min: -24, max: 24, step: 0.01, unit: 'st', label: 'Pitch', group: 'PLAY' },
+      { key: 'pitch', type: 'number', default: 0, min: -36, max: 36, step: 0.01, unit: 'st', label: 'Pitch', group: 'PLAY' },
       { key: 'root', type: 'integer', default: 60, min: 0, max: 127, label: 'Root', group: 'PLAY' },
       { key: 'reverse', type: 'boolean', default: false, label: 'Reverse', group: 'PLAY' },
       { key: 'start', type: 'number', default: 0, min: 0, max: 1, step: 0.0001, label: 'Start', group: 'REGION', hidden: true },

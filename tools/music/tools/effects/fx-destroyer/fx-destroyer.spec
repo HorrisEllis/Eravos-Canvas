@@ -33,7 +33,9 @@ dependencies:
     - dst.hook.mod_drive (modulation · port mod.drive)
     - dst.hook.mod_bits (modulation · port mod.bits)
     - dst.hook.mod_down (modulation · port mod.downsample)
+    - slot.after.return (audio · port slot.after.return)
   outputs:
     - fx.hook.audio_out (audio · port out)
+    - slot.after.send (audio · port slot.after.send)
   permissions: [audio_out, audio_in, bus_publish, bus_subscribe]
   works_with: []

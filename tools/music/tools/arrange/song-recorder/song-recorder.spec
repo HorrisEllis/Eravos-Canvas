@@ -41,7 +41,7 @@ dependencies:
     - songrec.hook.song_out (song:saved)
     - songrec.hook.transport_out (ui:transport-play|ui:transport-stop|ui:transport-seek)
   permissions: [audio_out, audio_in, bus_publish, bus_subscribe, filesystem_read, filesystem_write, registry_read]
-  works_with: [eravos.timeline, eravos.session, eravos.clip-maker, eravos.harmonic-analyzer, eravos.bass-drop-builder, eravos.bass-forge, eravos.drum-forge, eravos.contrast-analyser]
+  works_with: [eravos.timeline, eravos.session, eravos.clip-maker, eravos.harmonic-analyzer, eravos.bass-drop-builder, eravos.bass-forge, eravos.drum-forge, eravos.granular]
   notes:
     - Always docked at the bottom; drag its top edge to resize, double-click to fold.
     - Records the master you hear; its own playback is never re-recorded.

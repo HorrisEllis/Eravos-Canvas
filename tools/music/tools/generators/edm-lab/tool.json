@@ -1,25 +1,32 @@
 {
   "schema": "eravos.tool/1",
   "id": "eravos.edm-lab",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "label": "EDM Lab",
   "icon": "⚗",
   "accent": "#ff2266",
   "domain": "music",
   "category": "generators",
-  "summary": "Paint where the rhythm is busy, turn TENSION: drums, bass and chords follow — always in key.",
+  "summary": "A groove workstation: paint the drums, turn TENSION and ENERGY — kit, bass, chords and a lead follow in key. Patterns, chains, a 32-bar song, PRINT and MIDI.",
   "tags": [
     "generators",
     "edm",
-    "lab"
+    "lab",
+    "groove",
+    "drums",
+    "bass",
+    "chords",
+    "arp",
+    "midi"
   ],
   "files": {
     "engine": "edm-lab.engine.js",
     "ui": "edm-lab.ui.js",
+    "css": "edm-lab.css",
     "spec": "edm-lab.spec",
     "preview": "preview.png",
-    "tests": "edm-lab.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "tests": "edm-lab.test.js"
   },
   "needs": {
     "units": [

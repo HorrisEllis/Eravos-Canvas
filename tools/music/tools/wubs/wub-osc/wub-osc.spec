@@ -29,7 +29,7 @@ dependencies:
   mode: music   # Music Production
   toolbar_units: [music.engine, music.meter, music.midi]   # ui expansion when added: Audio engine · Master meter · MIDI button
   services:
-    - audio: Audio engine — makes sound
+    - audio: Audio engine — processes sound
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
     - mod: 3 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
@@ -39,7 +39,9 @@ dependencies:
     - wubo.hook.mod_pitch (modulation · port mod.pitch)
     - wubo.hook.mod_fm (modulation · port mod.fm)
     - wubo.hook.mod_spread (modulation · port mod.spread)
+    - slot.tone.return (audio · port slot.tone.return)
   outputs:
     - wubo.hook.audio_out (audio · port out)
-  permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
+    - slot.tone.send (audio · port slot.tone.send)
+  permissions: [audio_out, midi_in, bus_publish, bus_subscribe, audio_in]
   works_with: [eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]

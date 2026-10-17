@@ -14,14 +14,14 @@
     hooks: SDK.fxHooks([S.mod_in('ph.hook.mod_rate', 'rate'), S.mod_in('ph.hook.mod_feedback', 'feedback')]),
     config: [
       { key: 'stages', type: 'enum', options: [2, 4, 6, 8, 12], default: 6, label: 'Stages', group: 'PHASER' },
-      { key: 'rate', type: 'number', default: 0.3, min: 0.01, max: 8, step: 0.01, unit: 'Hz', label: 'Rate', group: 'LFO' },
+      { key: 'rate', type: 'number', default: 0.3, min: 0.005, max: 20, step: 0.01, unit: 'Hz', label: 'Rate', group: 'LFO' },
       { key: 'sync', type: 'boolean', default: false, label: 'Sync', group: 'LFO' },
       { key: 'div', type: 'enum', options: DIVS, default: '1/4', label: 'Every', group: 'LFO' },
-      { key: 'minHz', type: 'number', default: 300, min: 100, max: 2000, step: 1, unit: 'Hz', label: 'From', group: 'SWEEP' },
-      { key: 'maxHz', type: 'number', default: 3000, min: 500, max: 12000, step: 1, unit: 'Hz', label: 'To', group: 'SWEEP' },
-      { key: 'feedback', type: 'number', default: 0.5, min: 0, max: 0.9, step: 0.01, label: 'Feedback', group: 'SWEEP' },
+      { key: 'minHz', type: 'number', default: 300, min: 20, max: 4000, step: 1, unit: 'Hz', label: 'From', group: 'SWEEP' },
+      { key: 'maxHz', type: 'number', default: 3000, min: 200, max: 18000, step: 1, unit: 'Hz', label: 'To', group: 'SWEEP' },
+      { key: 'feedback', type: 'number', default: 0.5, min: 0, max: 0.97, step: 0.01, label: 'Feedback', group: 'SWEEP' },
       { key: 'stereo', type: 'number', default: 90, min: 0, max: 180, step: 1, unit: '°', label: 'Stereo', group: 'SWEEP' },
-      { key: 'Q', type: 'number', default: 0.7, min: 0.3, max: 4, step: 0.01, label: 'Q', group: 'SWEEP' },
+      { key: 'Q', type: 'number', default: 0.7, min: 0.3, max: 12, step: 0.01, label: 'Q', group: 'SWEEP' },
     ].concat(SDK.STD_FX_CONFIG.map(c => c.key === 'mix' ? Object.assign({}, c, { default: 0.5 }) : c)),
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, MT = window.MusicTheory;

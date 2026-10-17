@@ -22,7 +22,7 @@
                       "screw": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 12
+                        "maximum": 24
                       },
                       "warble": {
                         "type": "number",
@@ -31,8 +31,8 @@
                       },
                       "wowRate": {
                         "type": "number",
-                        "minimum": 0.1,
-                        "maximum": 3
+                        "minimum": 0.02,
+                        "maximum": 12
                       },
                       "tone": {
                         "enum": [
@@ -60,8 +60,8 @@
                       },
                       "ghostLen": {
                         "type": "number",
-                        "minimum": 0.4,
-                        "maximum": 6
+                        "minimum": 0.1,
+                        "maximum": 12
                       },
                       "mix": {
                         "type": "number",

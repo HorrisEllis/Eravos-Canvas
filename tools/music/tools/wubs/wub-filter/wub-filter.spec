@@ -36,7 +36,9 @@ dependencies:
     - wubf.hook.mod_wub (modulation · port mod.wub)
     - wubf.hook.mod_cutoff (modulation · port mod.cutoff)
     - wubf.hook.mod_res (modulation · port mod.res)
+    - slot.after.return (audio · port slot.after.return)
   outputs:
     - fx.hook.audio_out (audio · port out)
+    - slot.after.send (audio · port slot.after.send)
   permissions: [audio_out, audio_in, bus_publish, bus_subscribe]
   works_with: []

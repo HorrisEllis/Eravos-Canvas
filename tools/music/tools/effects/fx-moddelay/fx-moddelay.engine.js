@@ -14,11 +14,11 @@
     hooks: SDK.fxHooks([S.mod_in('md.hook.mod_rate', 'rate'), S.mod_in('md.hook.mod_depth', 'depth')]),
     config: [
       { key: 'mode', type: 'enum', options: ['chorus', 'flanger'], default: 'chorus', label: 'Mode', group: 'MODE' },
-      { key: 'rate', type: 'number', default: 0.6, min: 0.02, max: 10, step: 0.01, unit: 'Hz', label: 'Rate', group: 'LFO' },
+      { key: 'rate', type: 'number', default: 0.6, min: 0.005, max: 20, step: 0.01, unit: 'Hz', label: 'Rate', group: 'LFO' },
       { key: 'sync', type: 'boolean', default: false, label: 'Sync', group: 'LFO' },
       { key: 'div', type: 'enum', options: DIVS, default: '1/2', label: 'Every', group: 'LFO' },
       { key: 'depth', type: 'number', default: 0.5, min: 0, max: 1, step: 0.01, label: 'Depth', group: 'LFO' },
-      { key: 'base', type: 'number', default: 12, min: 0.2, max: 25, step: 0.1, unit: 'ms', label: 'Base', group: 'DELAY', hint: 'chorus 7–25 ms · flanger 0.2–8 ms' },
+      { key: 'base', type: 'number', default: 12, min: 0.1, max: 50, step: 0.1, unit: 'ms', label: 'Base', group: 'DELAY', hint: 'chorus 7–25 ms · flanger 0.2–8 ms' },
       { key: 'feedback', type: 'number', default: 0, min: -0.95, max: 0.95, step: 0.01, label: 'Feedback', group: 'DELAY', hint: 'flanger only; negative = hollow' },
       { key: 'spread', type: 'number', default: 0.8, min: 0, max: 1, step: 0.01, label: 'Width', group: 'DELAY' },
     ].concat(SDK.STD_FX_CONFIG.map(c => c.key === 'mix' ? Object.assign({}, c, { default: 0.5 }) : c)),

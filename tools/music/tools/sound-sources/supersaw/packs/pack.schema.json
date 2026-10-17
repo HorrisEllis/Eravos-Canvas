@@ -47,7 +47,7 @@
                       "res": {
                         "type": "number",
                         "minimum": 0.5,
-                        "maximum": 10
+                        "maximum": 20
                       },
                       "fEnv": {
                         "type": "number",
@@ -72,12 +72,12 @@
                       "fR": {
                         "type": "number",
                         "minimum": 0.01,
-                        "maximum": 6
+                        "maximum": 12
                       },
                       "aA": {
                         "type": "number",
                         "minimum": 0.001,
-                        "maximum": 4
+                        "maximum": 10
                       },
                       "aD": {
                         "type": "number",
@@ -92,7 +92,7 @@
                       "aR": {
                         "type": "number",
                         "minimum": 0.01,
-                        "maximum": 6
+                        "maximum": 12
                       },
                       "chordMode": {
                         "enum": [
@@ -107,8 +107,8 @@
                       },
                       "octave": {
                         "type": "integer",
-                        "minimum": -2,
-                        "maximum": 2
+                        "minimum": -4,
+                        "maximum": 4
                       },
                       "level": {
                         "type": "number",
