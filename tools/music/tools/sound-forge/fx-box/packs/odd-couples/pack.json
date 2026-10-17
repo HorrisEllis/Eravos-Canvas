@@ -1,0 +1,161 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "fx-box.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.fx-box",
+ "items": {
+  "eravos.fx-box": {
+   "presets": {
+    "Chapel Hits": {
+     "params": {
+      "sel": 0
+     },
+     "extra": {
+      "slots": [
+       {
+        "alg": "bounce",
+        "A": 0.4,
+        "B": 0.5,
+        "C": 0.3,
+        "length": 1.2,
+        "unit": "s",
+        "pitch": 12,
+        "level": 0.8,
+        "pan": 0
+       },
+       {
+        "alg": "ricochet",
+        "A": 0.5,
+        "B": 0.5,
+        "C": 0.3,
+        "length": 0.8,
+        "unit": "s",
+        "pitch": 7,
+        "level": 0.8,
+        "pan": 0
+       },
+       {
+        "alg": "pew",
+        "A": 0.5,
+        "B": 0.5,
+        "C": 0.3,
+        "length": 0.15,
+        "unit": "s",
+        "pitch": 12,
+        "level": 0.6,
+        "pan": 0
+       },
+       {
+        "alg": "glitch",
+        "A": 0.4,
+        "B": 0.5,
+        "C": 0.3,
+        "length": 0.3,
+        "unit": "s",
+        "pitch": 0,
+        "level": 0.6,
+        "pan": 0
+       },
+       {
+        "alg": "vinyl",
+        "A": 0.3,
+        "B": 0.2,
+        "C": 0.3,
+        "length": 2,
+        "unit": "s",
+        "pitch": 0,
+        "level": 0.8,
+        "pan": 0
+       },
+       {
+        "alg": "laser",
+        "A": 0.5,
+        "B": 0.5,
+        "C": 0.3,
+        "length": 0.2,
+        "unit": "s",
+        "pitch": 12,
+        "level": 0.5,
+        "pan": 0
+       },
+       {
+        "alg": "zap",
+        "A": 0.5,
+        "B": 0.5,
+        "C": 0.3,
+        "length": 0.15,
+        "unit": "s",
+        "pitch": 0,
+        "level": 0.5,
+        "pan": 0
+       },
+       {
+        "alg": "scrape",
+        "A": 0.7,
+        "B": 0.5,
+        "C": 0.3,
+        "length": 0.6,
+        "unit": "s",
+        "pitch": 0,
+        "level": 0.5,
+        "pan": 0
+       },
+       {
+        "alg": "scream",
+        "A": 0.5,
+        "B": 0.5,
+        "C": 0.3,
+        "length": 0.6,
+        "unit": "s",
+        "pitch": 0,
+        "level": 0.5,
+        "pan": 0
+       },
+       {
+        "alg": "riser",
+        "A": 0.5,
+        "B": 0.5,
+        "C": 0.3,
+        "length": 0.5,
+        "unit": "bars",
+        "pitch": 0,
+        "level": 0.6,
+        "pan": 0
+       },
+       {
+        "alg": "downer",
+        "A": 0.5,
+        "B": 0.5,
+        "C": 0.3,
+        "length": 0.5,
+        "unit": "bars",
+        "pitch": 0,
+        "level": 0.6,
+        "pan": 0
+       },
+       {
+        "alg": "impact",
+        "A": 0.4,
+        "B": 0.5,
+        "C": 0.3,
+        "length": 1.2,
+        "unit": "s",
+        "pitch": 0,
+        "level": 0.6,
+        "pan": 0
+       }
+      ]
+     }
+    }
+   }
+  }
+ }
+}

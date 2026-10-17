@@ -1,0 +1,101 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "supersaw.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.supersaw",
+ "items": {
+  "eravos.supersaw": {
+   "presets": {
+    "Gospel Stack": {
+     "params": {
+      "unison": 5,
+      "detune": 0.25,
+      "mix": 0.6,
+      "spread": 0.8,
+      "cutoff": 4200,
+      "fEnv": 2,
+      "fA": 0.001,
+      "fD": 0.15,
+      "fS": 0.2,
+      "aA": 0.002,
+      "aD": 0.2,
+      "aS": 0.3,
+      "aR": 0.25,
+      "chordMode": "seventh",
+      "level": 0.6
+     }
+    },
+    "Acid Church Pad": {
+     "params": {
+      "unison": 8,
+      "detune": 0.5,
+      "mix": 0.8,
+      "spread": 1,
+      "cutoff": 2600,
+      "res": 1.5,
+      "fEnv": 0.5,
+      "fA": 0.9,
+      "fS": 0.8,
+      "aA": 0.8,
+      "aD": 1,
+      "aS": 0.9,
+      "aR": 2.5,
+      "chordMode": "sus4",
+      "level": 0.55
+     }
+    },
+    "Steppers Pluck": {
+     "params": {
+      "unison": 7,
+      "detune": 0.28,
+      "mix": 0.6,
+      "spread": 0.9,
+      "cutoff": 5200,
+      "res": 1.2,
+      "fEnv": 2.6,
+      "fA": 0.001,
+      "fD": 0.2,
+      "fS": 0,
+      "fR": 0.2,
+      "aA": 0.002,
+      "aD": 0.18,
+      "aS": 0,
+      "aR": 0.12,
+      "chordMode": "off",
+      "level": 0.6
+     }
+    },
+    "Wobble Halo Saws": {
+     "params": {
+      "unison": 9,
+      "detune": 0.32,
+      "mix": 0.7,
+      "spread": 1,
+      "cutoff": 3200,
+      "res": 1.5,
+      "fEnv": 0.6,
+      "fA": 1,
+      "fD": 1.5,
+      "fS": 0.75,
+      "fR": 1.5,
+      "aA": 0.4,
+      "aD": 1.2,
+      "aS": 0.9,
+      "aR": 2.5,
+      "chordMode": "seventh",
+      "octave": 0,
+      "level": 0.5
+     }
+    }
+   }
+  }
+ }
+}

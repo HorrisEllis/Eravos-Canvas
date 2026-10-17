@@ -1,0 +1,60 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "bass-drop-builder.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.bass-drop-builder",
+ "items": {
+  "eravos.bass-drop-builder": {
+   "presets": {
+    "Cathedral Drop": {
+     "params": {
+      "tensionBars": 8,
+      "buildBars": 7.75,
+      "pauseBars": 0.25,
+      "dropBars": 16,
+      "stutter": 3,
+      "throw": 0.6,
+      "vocalEndOnDrop": true,
+      "riserOct": 2.5,
+      "tensionTone": "pad",
+      "tChords": "i → VI",
+      "tWave": "sawtooth",
+      "tCutoff": 600,
+      "tCutoffEnd": 4000,
+      "gapSound": "vocal tail",
+      "vocalPriority": 10
+     }
+    },
+    "Steppers Pull-up": {
+     "params": {
+      "tensionBars": 4,
+      "buildBars": 4,
+      "pauseBars": 0.25,
+      "dropBars": 8,
+      "gapSound": "sub swell",
+      "impactPitch": 50,
+      "vocalPriority": 9
+     }
+    },
+    "Golden Gap": {
+     "params": {
+      "tensionBars": 0,
+      "buildBars": 2,
+      "pauseBars": 0.5,
+      "dropBars": 8,
+      "gapSound": "silence",
+      "vocalPriority": 12
+     }
+    }
+   }
+  }
+ }
+}

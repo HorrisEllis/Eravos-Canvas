@@ -1,0 +1,48 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "session.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.session",
+ "items": {
+  "eravos.session": {
+   "presets": {
+    "Cathedral Riddim · 140 E phrygian": {
+     "params": {
+      "bpm": 140,
+      "root": 4,
+      "scale": "phrygian"
+     }
+    },
+    "Golden Dub · 75 A minor": {
+     "params": {
+      "bpm": 75,
+      "root": 9,
+      "scale": "minor"
+     }
+    },
+    "Acid Séance · 128 C# minor": {
+     "params": {
+      "bpm": 128,
+      "root": 1,
+      "scale": "minor"
+     }
+    },
+    "Breathing DnB · 174 D minor": {
+     "params": {
+      "bpm": 174,
+      "root": 2,
+      "scale": "minor"
+     }
+    }
+   }
+  }
+ }
+}

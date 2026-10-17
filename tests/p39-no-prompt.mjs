@@ -7,6 +7,7 @@ const ROOT = process.argv[2] || path.resolve(path.dirname(fileURLToPath(import.m
 const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1400, height: 900 } }); const errs = [];
 p.on('pageerror', e => errs.push(e.message));
 await p.addInitScript(() => { window.prompt = () => { throw new Error('prompt() is not supported.'); }; });
+await p.addInitScript(() => { window.ERAVOS_CATALOG_ALL = true; });   // P41 catalog: a fresh profile installs no tools — this script needs every one
 await p.goto('file://' + ROOT + '/canvas/index.html?noboot'); await p.waitForFunction(() => window.Shell && window.Shell.X && window.ToolSettings);
 const id = await p.evaluate(() => { const i = OrganismFactory.spawn('eravos.pads', { x: 80, y: 80 }); ToolSettings.open(i); return i; }); await p.waitForTimeout(300);
 const btn = p.locator('.ts-panel button', { hasText: 'New pack' }).first(); await btn.click();

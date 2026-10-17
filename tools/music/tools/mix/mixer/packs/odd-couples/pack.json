@@ -1,0 +1,27 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "mixer.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.mixer",
+ "items": {
+  "eravos.mixer": {
+   "presets": {
+    "Wide with meters": {
+     "params": {
+      "wide": true,
+      "meters": true,
+      "showLines": true
+     }
+    }
+   }
+  }
+ }
+}

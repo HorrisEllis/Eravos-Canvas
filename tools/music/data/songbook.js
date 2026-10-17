@@ -167,7 +167,7 @@
     { id: 'bonus-island', title: 'Steppers at Dawn', genre: 'reggae', seed: 33, mood: ['island'], lock: 'beats-3',
       listen: 'Roots to steppers.', drop: 'Steppers kick after the dub break.', voice: 'Siren and her voice trade phrases.' },
   ];
-  const MOODS = [['mine', '📖 My songs'], ['foryou', '💜 For you'], ['all', 'All'], ['edm', 'EDM'], ['her', 'For her'], ['heavy', 'Heavy'], ['dark', 'Dark'], ['goth', 'Goth'], ['80s', '80s'], ['island', 'Island'], ['warm', 'Warm'], ['party', 'Party'], ['calm', 'Calm'], ['fast', 'Fast']];
+  const MOODS = [['mine', '📖 My songs'], ['foryou', '💜 For you'], ['all', 'All'], ['odd', '🧪 Odd Couples'], ['edm', 'EDM'], ['her', 'For her'], ['heavy', 'Heavy'], ['dark', 'Dark'], ['goth', 'Goth'], ['80s', '80s'], ['island', 'Island'], ['warm', 'Warm'], ['party', 'Party'], ['calm', 'Calm'], ['fast', 'Fast']];
 
   // every genre the Song Engine knows gets a card, even without a hand-written one (a new genre pack shows up by itself)
   function allSongs() {

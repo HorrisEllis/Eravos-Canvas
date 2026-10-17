@@ -1,0 +1,85 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "bass-forge.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.bass-forge",
+ "items": {
+  "eravos.bass-forge": {
+   "presets": {
+    "Tearout Lullaby": {
+     "params": {
+      "wave": "sawtooth",
+      "ratio": "√2 1.414",
+      "fm": 3.5,
+      "fold": 0.7,
+      "comb": 0.3,
+      "combPitch": 3,
+      "lfoComb": 0.5,
+      "lfoDiv": "1/8t",
+      "lfoShape": "square",
+      "lfoFM": 0.6,
+      "lfoFold": 0.6,
+      "drive": 0.85,
+      "crush": 0.15,
+      "ott": 0.35,
+      "cutoff": 6000,
+      "formant": 0.55,
+      "level": 0.75
+     }
+    },
+    "Golden Dub Growl": {
+     "params": {
+      "wave": "sawtooth",
+      "ratio": "φ 1.618",
+      "fm": 2.8,
+      "fold": 0.35,
+      "formant": 0.5,
+      "comb": 0.25,
+      "combPitch": 1.618,
+      "lfoDiv": "1/4",
+      "lfoShape": "talk",
+      "lfoFM": 0.8,
+      "lfoFormant": 0.7,
+      "drive": 0.2,
+      "ott": 0.25,
+      "cutoff": 1800,
+      "level": 0.75
+     }
+    },
+    "Organ Grinder": {
+     "params": {
+      "wave": "square",
+      "ratio": "0.5",
+      "fm": 0.6,
+      "fold": 0.15,
+      "formant": 0.6,
+      "comb": 0,
+      "notch": 0.45,
+      "cutoff": 1800,
+      "res": 4,
+      "drive": 0.6,
+      "crush": 0.25,
+      "ott": 0.7,
+      "lfoDiv": "1/16t",
+      "lfoShape": "stair",
+      "lfoFM": 0.3,
+      "lfoNotch": 0.9,
+      "lfoCut": 0.5,
+      "lfoFormant": 0,
+      "vowelA": "OH",
+      "vowelB": "EE",
+      "level": 0.75
+     }
+    }
+   }
+  }
+ }
+}

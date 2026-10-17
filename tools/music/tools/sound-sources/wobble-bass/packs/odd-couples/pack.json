@@ -1,0 +1,110 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "wobble-bass.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.wobble-bass",
+ "items": {
+  "eravos.wobble-bass": {
+   "presets": {
+    "Cathedral Wub": {
+     "params": {
+      "div": "1/4t",
+      "lfoShape": "sawdown",
+      "filterMode": "formant",
+      "cutoff": 160,
+      "depth": 4.2,
+      "res": 11,
+      "osc2": 0.8,
+      "sub": 0.6,
+      "drive": 0.5,
+      "shaper": 0.7,
+      "octave": -1,
+      "vowelA": "OO",
+      "vowelB": "OH",
+      "formantShift": -3,
+      "level": 0.85
+     }
+    },
+    "Steppers Wobble": {
+     "params": {
+      "div": "1/8t",
+      "lfoShape": "sine",
+      "filterMode": "lowpass",
+      "cutoff": 220,
+      "depth": 3.4,
+      "res": 8,
+      "osc2": 0.6,
+      "sub": 0.55,
+      "drive": 0.35,
+      "shaper": 0.35,
+      "octave": -1,
+      "level": 0.85
+     }
+    },
+    "Acid Wobble": {
+     "params": {
+      "div": "1/16",
+      "lfoShape": "sawdown",
+      "filterMode": "lowpass",
+      "cutoff": 420,
+      "depth": 4,
+      "res": 14,
+      "osc2": 0.4,
+      "sub": 0.6,
+      "drive": 0.55,
+      "shaper": 0.5,
+      "octave": -1,
+      "level": 0.8
+     }
+    },
+    "Golden Wobble": {
+     "params": {
+      "lfoSync": false,
+      "lfoHz": 6.18,
+      "retrig": false,
+      "lfoShape": "yoy",
+      "filterMode": "formant",
+      "vowelA": "OH",
+      "vowelB": "EE",
+      "cutoff": 380,
+      "depth": 3.82,
+      "res": 11,
+      "osc2": 0.8,
+      "sub": 0.7,
+      "drive": 0.85,
+      "shaper": 0.7,
+      "noise": 0.08,
+      "level": 0.85
+     }
+    },
+    "Lullaby Wub": {
+     "params": {
+      "div": "1/4",
+      "lfoShape": "sine",
+      "filterMode": "lowpass",
+      "cutoff": 900,
+      "depth": 2.4,
+      "res": 4,
+      "osc2": 0.4,
+      "sub": 0.85,
+      "drive": 0.15,
+      "shaper": 0.1,
+      "spread": 26,
+      "width": 0.6,
+      "glide": 0.07,
+      "release": 0.3,
+      "level": 0.8
+     }
+    }
+   }
+  }
+ }
+}

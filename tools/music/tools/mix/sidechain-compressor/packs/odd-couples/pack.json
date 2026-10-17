@@ -1,0 +1,50 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "sidechain-compressor.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.sidechain-compressor",
+ "items": {
+  "eravos.sidechain-compressor": {
+   "presets": {
+    "Wobble Breathes With Kick": {
+     "params": {
+      "mode": "duck",
+      "triggerMode": "event",
+      "source": "kick",
+      "depth": 0.6,
+      "attack": 2,
+      "hold": 10,
+      "release": 160,
+      "curve": 0.6
+     },
+     "extra": {
+      "points": null
+     }
+    },
+    "Steppers Pump 1/4": {
+     "params": {
+      "mode": "duck",
+      "triggerMode": "tempo",
+      "division": "1/4",
+      "depth": 0.5,
+      "attack": 3,
+      "hold": 10,
+      "release": 220,
+      "curve": 0.5
+     },
+     "extra": {
+      "points": null
+     }
+    }
+   }
+  }
+ }
+}

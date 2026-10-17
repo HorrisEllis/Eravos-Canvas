@@ -34,6 +34,11 @@ check(Math.abs(M.foldCents(220, 110)) < 1e-9 && Math.abs(M.foldCents(M.midiHz(45
   const d2 = gen(1, () => 0), s = Math.round((t0 + step * 4) * SR + 0.003 * SR); for (let i = 0; i < 400; i++) d2[s + i] = Math.exp(-i / 80) * 0.8 + (i === 0 ? 0.2 : 0);
   const e2 = M.gridError(M.onsets(d2, SR), bpm, t0); check(e2.length === 1 && Math.abs(e2[0].errMs - 3) < 0.05, 'sees a 3 ms late hit: ' + JSON.stringify(e2)); }
 
+// a quieter hit (−6 dB under the first) on top of a loud decaying tail is still found to within 0.1 ms (was read up to one 2 ms frame early)
+{ const d = gen(1.2, (t) => t > 0.1 ? 0.8 * Math.exp(-(t - 0.1) / 0.6) * Math.sin(2 * Math.PI * 55 * t) : 0), s = Math.round(0.6 * SR);
+  for (let i = 0; i < 300; i++) d[s + i] += 0.4 * Math.exp(-i / 60) * Math.sin(i * 1.1);
+  const o = M.onsets(d, SR, { floorDb: -40, ratio: 1.5, diff: true }), hit = o.find(t => Math.abs(t - 0.6) < 0.01);
+  check(hit !== undefined && Math.abs(hit - s / SR) < 0.0001, 'quiet hit over a tail: ' + (hit === undefined ? 'missed' : ((hit - s / SR) * 1000).toFixed(3) + ' ms')); }
 // modRate: a 110 Hz saw gated by an LFO at 140 BPM 1/8 triplet... use plain divisions: 1/4 at 140 = 2.333 Hz, 1/16 = 9.333 Hz
 for (const [div, hz] of [['1/4', 140 / 60], ['1/8', 140 / 60 * 2], ['1/16', 140 / 60 * 4], ['1/8T', 140 / 60 * 3]]) {
   const d = gen(4, (t) => saw(55)(t) * (0.55 + 0.45 * Math.cos(2 * Math.PI * hz * t)));

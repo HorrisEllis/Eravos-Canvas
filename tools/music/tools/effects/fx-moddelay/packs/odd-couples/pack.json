@@ -1,0 +1,45 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "fx-moddelay.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.fx-moddelay",
+ "items": {
+  "eravos.fx-moddelay": {
+   "presets": {
+    "Chapel Chorus": {
+     "params": {
+      "mode": "chorus",
+      "rate": 0.12,
+      "sync": false,
+      "depth": 0.4,
+      "base": 18,
+      "spread": 0.9,
+      "feedback": 0,
+      "mix": 0.4
+     }
+    },
+    "Steppers Flange": {
+     "params": {
+      "mode": "flanger",
+      "rate": 0.15,
+      "sync": true,
+      "depth": 0.9,
+      "base": 2,
+      "feedback": 0.75,
+      "spread": 0.3,
+      "mix": 0.4,
+      "div": "1/2"
+     }
+    }
+   }
+  }
+ }
+}

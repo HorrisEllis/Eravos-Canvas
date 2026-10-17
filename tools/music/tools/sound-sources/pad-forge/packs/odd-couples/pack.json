@@ -1,0 +1,99 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "pad-forge.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.pad-forge",
+ "items": {
+  "eravos.pad-forge": {
+   "presets": {
+    "Chapel Haze": {
+     "params": {
+      "cornerA": "choir",
+      "cornerB": "organ",
+      "cornerC": "air",
+      "cornerD": "organ",
+      "x": 0.3,
+      "y": 0.7,
+      "orbit": "drift",
+      "orbitRate": 0.04,
+      "cutoff": 2400,
+      "bloom": 0.3,
+      "warmth": 0.5,
+      "attack": 2.5,
+      "release": 5,
+      "space": 0.6,
+      "shimmer": 0.25,
+      "size": 9,
+      "level": 0.6
+     }
+    },
+    "Dub Fog Bed": {
+     "params": {
+      "cornerA": "air",
+      "cornerB": "organ",
+      "cornerC": "air",
+      "cornerD": "organ",
+      "orbit": "still",
+      "cutoff": 1600,
+      "bloom": 0.7,
+      "warmth": 0.45,
+      "attack": 0.08,
+      "release": 1.4,
+      "space": 0.55,
+      "shimmer": 0.1,
+      "size": 3.5,
+      "level": 0.55
+     }
+    },
+    "Lullaby Glass": {
+     "params": {
+      "cornerA": "glass",
+      "cornerB": "halo",
+      "cornerC": "glass",
+      "cornerD": "glass",
+      "orbit": "figure-8",
+      "orbitRate": 0.12,
+      "cutoff": 9000,
+      "bloom": 0.2,
+      "attack": 0.6,
+      "release": 6,
+      "space": 0.7,
+      "shimmer": 0.3,
+      "size": 5,
+      "level": 0.55
+     }
+    },
+    "Golden Orbit": {
+     "params": {
+      "cornerA": "glass",
+      "cornerB": "choir",
+      "cornerC": "strings",
+      "cornerD": "halo",
+      "x": 0.618,
+      "y": 0.382,
+      "orbit": "circle",
+      "orbitRate": 0.0618,
+      "orbitSize": 0.382,
+      "cutoff": 3800,
+      "bloom": 0.6,
+      "warmth": 0.3,
+      "attack": 1.6,
+      "release": 4.5,
+      "space": 0.55,
+      "shimmer": 0.4,
+      "size": 7,
+      "level": 0.6
+     }
+    }
+   }
+  }
+ }
+}

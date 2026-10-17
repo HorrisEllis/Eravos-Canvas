@@ -1,0 +1,47 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "fx-phaser.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.fx-phaser",
+ "items": {
+  "eravos.fx-phaser": {
+   "presets": {
+    "Lullaby Phase": {
+     "params": {
+      "stages": 6,
+      "rate": 0.12,
+      "sync": false,
+      "minHz": 300,
+      "maxHz": 4000,
+      "feedback": 0.55,
+      "stereo": 180,
+      "Q": 0.7,
+      "mix": 0.4
+     }
+    },
+    "Wobble Phase": {
+     "params": {
+      "stages": 8,
+      "sync": true,
+      "div": "1/8",
+      "minHz": 200,
+      "maxHz": 3500,
+      "feedback": 0.75,
+      "stereo": 0,
+      "Q": 1.2,
+      "mix": 0.35,
+      "outGain": -3
+     }
+    }
+   }
+  }
+ }
+}

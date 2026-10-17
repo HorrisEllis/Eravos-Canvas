@@ -1,0 +1,52 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "wub-filter.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.wub-filter",
+ "items": {
+  "eravos.wub-filter": {
+   "presets": {
+    "Choir Mouth": {
+     "params": {
+      "mode": "vowel",
+      "vowelA": "OO",
+      "vowelB": "OH",
+      "res": 8,
+      "drive": 0.15,
+      "formant": -4,
+      "outGain": -3
+     }
+    },
+    "Acid Mouth": {
+     "params": {
+      "mode": "lowpass",
+      "slope": 24,
+      "cutoff": 220,
+      "range": 5,
+      "res": 12,
+      "drive": 0.15,
+      "outGain": -6
+     }
+    },
+    "Chapel Comb": {
+     "params": {
+      "mode": "comb",
+      "cutoff": 300,
+      "range": 3,
+      "comb": 0.7,
+      "drive": 0.3,
+      "outGain": -3
+     }
+    }
+   }
+  }
+ }
+}

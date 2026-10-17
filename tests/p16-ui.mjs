@@ -7,6 +7,7 @@ fs.mkdirSync(OUT, { recursive: true });
 const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
 const p = await b.newPage({ viewport: { width: 1500, height: 1000 } }); const errs = []; p.on('pageerror', e => errs.push(e.message));
 const results = []; const check = (name, ok, info) => { results.push({ name, ok: !!ok, info }); console.log(`  ${ok ? '✓' : '✗'} ${name}${info ? '  — ' + info : ''}`); };
+await p.addInitScript(() => { window.ERAVOS_CATALOG_ALL = true; });   // P41 catalog: a fresh profile installs no tools — this script needs every one
 await p.goto('file://' + ROOT + '/canvas/index.html'); await p.waitForSelector('.overlay .boot', { timeout: 15000 });
 // enter Music Production from the start screen
 await p.evaluate(() => { const m = Array.from(document.querySelectorAll('.mode-card')).find(c => /Music Production/.test(c.textContent)); m && m.click(); });

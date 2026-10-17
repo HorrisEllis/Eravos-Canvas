@@ -1,0 +1,70 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "acid-synth.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.acid-synth",
+ "items": {
+  "eravos.acid-synth": {
+   "presets": {
+    "Séance Squelch": {
+     "params": {
+      "cutoff": 420,
+      "res": 0.82,
+      "envMod": 0.7,
+      "decay": 0.22,
+      "accent": 0.8,
+      "drive": 0.4,
+      "wave": "saw",
+      "level": 0.85
+     }
+    },
+    "Golden Acid": {
+     "params": {
+      "cutoff": 618,
+      "res": 0.618,
+      "envMod": 0.382,
+      "decay": 0.618,
+      "accent": 0.4,
+      "drive": 0.1,
+      "wave": "square",
+      "octave": -1,
+      "level": 0.85
+     }
+    },
+    "Acid Under Organ": {
+     "params": {
+      "cutoff": 280,
+      "res": 0.55,
+      "envMod": 0.45,
+      "decay": 0.18,
+      "accent": 0.5,
+      "drive": 0.25,
+      "wave": "saw",
+      "octave": -1,
+      "level": 0.9
+     }
+    },
+    "Dancehall Acid Stab": {
+     "params": {
+      "cutoff": 500,
+      "res": 0.6,
+      "envMod": 0.8,
+      "decay": 0.12,
+      "accent": 0.9,
+      "drive": 0.25,
+      "wave": "square",
+      "level": 0.8
+     }
+    }
+   }
+  }
+ }
+}

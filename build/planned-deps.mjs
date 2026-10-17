@@ -88,6 +88,7 @@ const todo = files.map(({ domain, file }) => {
 }).filter(Boolean);
 
 const b = await chromium.launch(); const p = await b.newPage();
+await p.addInitScript(() => { window.ERAVOS_CATALOG_ALL = true; });   // P41 catalog: a fresh profile installs no tools — this script needs every one
 await p.goto('file://' + ROOT + '/canvas/index.html?noboot'); await p.waitForFunction(() => window.Shell && window.Shell.X);
 const res = await p.evaluate((descs) => descs.map(d => { const r = Shell.X.deps(d); return { mode: r.mode, modeLabel: r.modeLabel, units: r.units, services: r.services, inputs: r.inputs, outputs: r.outputs, works_with: r.works_with }; }), todo.map(t => t.desc));
 const unitL = await p.evaluate(() => Object.fromEntries(Shell.X.units().map(u => [u.id, u.label])));

@@ -1,0 +1,80 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "ratio-lattice.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.ratio-lattice",
+ "items": {
+  "eravos.ratio-lattice": {
+   "presets": {
+    "Dub Lattice Drone": {
+     "params": {
+      "primeZ": 7,
+      "timbre": "organ",
+      "baseHz": 110,
+      "fade": 1.5,
+      "level": 0.35
+     },
+     "extra": {
+      "nodes": [
+       [
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        1,
+        0
+       ],
+       [
+        1,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        1
+       ]
+      ]
+     }
+    },
+    "Séance Lattice": {
+     "params": {
+      "primeZ": 7,
+      "timbre": "glass",
+      "baseHz": 98,
+      "level": 0.3
+     },
+     "extra": {
+      "nodes": [
+       [
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        -1,
+        0
+       ],
+       [
+        -1,
+        0,
+        0
+       ]
+      ]
+     }
+    }
+   }
+  }
+ }
+}

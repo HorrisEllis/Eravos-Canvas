@@ -8,6 +8,7 @@
  *   pitch(d, sr, from, to)       → { hz, clarity } — YIN (de Cheveigné & Kawahara 2002) with parabolic refinement
  *   cents(hz, ref)               → signed cents ; foldCents(hz, ref) → cents to the NEAREST OCTAVE of ref (-600…600)
  *   onsets(d, sr, o)             → [seconds] — energy-flux onsets, each refined to the first sample over a local threshold
+ *                                  (o.diff: on the first difference — hits over a low tail)
  *   gridError(onsets, bpm, t0)   → [{ t, step, errMs }] against the 16th grid
  *   modRate(d, sr, from, to, o)  → { hz, depthDb } — the strongest periodic movement of the loudness envelope (wobble rate)
  *   correlation(buf, from, to)   → L/R Pearson correlation (1 mono, 0 wide, −1 phase-inverted)
@@ -72,6 +73,9 @@
   // clears `floorDb` under the buffer peak; then refined to the first sample (in that region) exceeding 10 % of the local peak.
   function onsets(d, sr, o) {
     o = o || {};
+    // o.diff: work on the first difference (x[n] − x[n−1]) — a high-pass that leaves drum transients and removes a low tail
+    // (a 55 Hz tail drops below 1 %), so a hat on an 808 is still seen and timed
+    if (o.diff) { const e = new Float32Array(d.length); for (let i = 1; i < d.length; i++) e[i] = d[i] - d[i - 1]; d = e; }
     const hop = Math.max(1, Math.round(sr * 0.002)), ratio = o.ratio || 4, look = o.look || 10, gap = o.minGap || 0.05;
     let pk = 0; for (let i = 0; i < d.length; i++) pk = Math.max(pk, Math.abs(d[i]));
     const floor = pk * Math.pow(10, (o.floorDb || -30) / 20), frames = [];
@@ -82,7 +86,10 @@
       if (frames[f] > floor && frames[f] > prev * ratio) {
         const s0 = Math.max(0, (f - 1) * hop), s1 = Math.min(d.length, (f + 3) * hop);
         let lp = 0; for (let i = s0; i < s1; i++) lp = Math.max(lp, Math.abs(d[i]));
-        let at = s0; for (let i = s0; i < s1; i++) if (Math.abs(d[i]) >= lp * (o.edge || 0.1)) { at = i; break; }   // 10 %: a 2 ms attack ramp reads at 0.2 ms
+        // the edge is measured from the level JUST BEFORE the hit (a quiet hit over a loud tail would otherwise read a frame early)
+        let floor0 = 0; for (let i = Math.max(0, s0 - hop); i < s0; i++) floor0 = Math.max(floor0, Math.abs(d[i]));
+        const edge = floor0 + (lp - floor0) * (o.edge || 0.1);   // 10 %: a 2 ms attack ramp reads at 0.2 ms
+        let at = s0; for (let i = s0; i < s1; i++) if (Math.abs(d[i]) > edge) { at = i; break; }
         const t = at / sr; if (t - last >= gap) { out.push(t); last = t; }
       }
     }

@@ -4,6 +4,7 @@ import { chromium } from 'playwright';
 import path from 'path'; import { fileURLToPath } from 'url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'), OUT = process.env.SHOTS_OUT || path.join(ROOT, 'docs', 'tools');
 const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] }); const p = await b.newPage({ viewport: { width: 1500, height: 1500 }, deviceScaleFactor: Number(process.env.SHOTS_SCALE || 2) });
+await p.addInitScript(() => { window.ERAVOS_CATALOG_ALL = true; });   // P41 catalog: a fresh profile installs no tools — this script needs every one
 await p.goto('file://' + ROOT + '/canvas/index.html?noboot'); await p.waitForFunction(() => window.Shell && window.Shell.X);
 const ids = await p.evaluate(() => { Shell.activate(); Shell.X.enterMode('music'); return OrganismFactory.defined().map(d => d.id); });
 for (const id of ids) {

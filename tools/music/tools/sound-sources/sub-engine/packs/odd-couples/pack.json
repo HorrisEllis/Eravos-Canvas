@@ -1,0 +1,82 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "sub-engine.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.sub-engine",
+ "items": {
+  "eravos.sub-engine": {
+   "presets": {
+    "Cathedral Floor": {
+     "params": {
+      "shape": 0,
+      "phantom": 0.5,
+      "drive": 0.1,
+      "click": 0.1,
+      "drop": 0,
+      "octave": -2,
+      "sustain": 0.9,
+      "release": 0.3,
+      "tone": 600,
+      "level": 0.75
+     }
+    },
+    "Séance 808": {
+     "params": {
+      "shape": 0.12,
+      "phantom": 0.55,
+      "drive": 0.25,
+      "click": 0.3,
+      "drop": 7,
+      "dropTime": 0.25,
+      "glide": 0.18,
+      "octave": -2,
+      "decay": 3.5,
+      "sustain": 0.3,
+      "release": 0.6,
+      "level": 0.7
+     }
+    },
+    "Steppers Sub": {
+     "params": {
+      "shape": 0.05,
+      "phantom": 0.25,
+      "drive": 0.25,
+      "click": 0.1,
+      "drop": 0,
+      "octave": -2,
+      "attack": 0.012,
+      "sustain": 0.95,
+      "release": 0.25,
+      "tone": 600,
+      "glide": 0.04,
+      "level": 0.75
+     }
+    },
+    "Breath Sub": {
+     "params": {
+      "shape": 0.7,
+      "phantom": 0.4,
+      "drive": 0.45,
+      "click": 0.6,
+      "drop": 5,
+      "dropTime": 0.03,
+      "octave": -1,
+      "decay": 1.2,
+      "sustain": 0.6,
+      "release": 0.6,
+      "attack": 0.02,
+      "level": 0.7
+     }
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,28 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "song-recorder.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.song-recorder",
+ "items": {
+  "eravos.song-recorder": {
+   "presets": {
+    "Master (−1 dBFS, 24-bit)": {
+     "params": {
+      "format": "wav24",
+      "range": "song",
+      "tail": 4,
+      "level": 0.9
+     }
+    }
+   }
+  }
+ }
+}

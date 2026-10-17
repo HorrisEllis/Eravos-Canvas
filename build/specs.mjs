@@ -8,6 +8,7 @@ import { chromium } from 'playwright';
 import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'), SPECS = path.join(ROOT, 'specs');
 const b = await chromium.launch(); const p = await b.newPage();
+await p.addInitScript(() => { window.ERAVOS_CATALOG_ALL = true; });   // P41 catalog: a fresh profile installs no tools — this script needs every one
 await p.goto('file://' + ROOT + '/canvas/index.html?noboot'); await p.waitForFunction(() => window.Shell && window.Shell.X);
 const data = await p.evaluate(() => OrganismFactory.defined().map(d => ({ d: { id: d.id, label: d.label, icon: d.icon, accent: d.accent, version: d.version, phase: d.phase, category: d.category, blurb: d.blurb, dock: d.dock || null,
   config: d.config.map(c => ({ key: c.key, type: c.type, default: c.default, min: c.min, max: c.max, unit: c.unit, options: c.options, label: c.label, group: c.group })), presets: Object.keys(d.presets || {}), ui_hooks: d.ui_hooks },

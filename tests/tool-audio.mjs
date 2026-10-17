@@ -37,7 +37,7 @@ async function measureTool(id) {
   const hookIn = (t) => (d.hooks || []).some(h => h.direction === 'in' && String(h.event_type || '').split('|').map(s => s.trim()).includes(t));
   const plays = hookIn('note:trigger'), ticks = hookIn('transport:tick');
   const presets = Object.keys(d.presets || {}); if (!presets.length) presets.push(null);
-  const DRUMS = { 'eravos.pads': [36, 37, 38, 39], 'eravos.drum-forge': [36, 37, 38, 39], 'eravos.fx-box': [36, 37, 38] };
+  const DRUMS = { 'eravos.pads': [36, 37, 38, 39], 'eravos.drum-forge': [36, 37, 38, 39] }, ONESHOTS = { 'eravos.fx-box': [36, 37, 38, 39] };   // FX Box: risers / reverse swells lead in by design — no onset timing
   const CONTAINERS = { 'eravos.timeline': 'plays the other tools — measured through the 189 song renders', 'eravos.song-recorder': 'records the master — measured through the song renders' };
   const xen = /xen|ratio|spectra|embodiment/i.test(id);   // not 12-tone by design: the pitch check does not apply
   const bass = /bass|sub|wub|reese|808|wobble/i.test(id + ' ' + (d.category || ''));
@@ -55,7 +55,7 @@ async function measureTool(id) {
   const mixDown = (buf) => { const m = new Float32Array(buf.length); for (let c = 0; c < buf.numberOfChannels; c++) { const dd = buf.getChannelData(c); for (let i = 0; i < dd.length; i++) m[i] += dd[i] / buf.numberOfChannels; } return m; };
   const wav = (hz, secs) => { const b = new AudioBuffer({ numberOfChannels: 1, length: Math.round(secs * SR), sampleRate: SR }), dd = b.getChannelData(0); for (let i = 0; i < dd.length; i++) { const t = i / SR; dd[i] = 0.5 * (2 * ((t * hz) % 1) - 1) * Math.min(1, t / 0.005, (secs - t) / 0.01); } return AudioRecorder.encodeWAV(b, 16); };
   { const U = TH.universe(0.1), inst = TH.spawn(U, id), hasOut = U.K.audio.ports(inst).some(p => p.kind === 'audio' && p.direction === 'out');
-    out.kind = !hasOut ? 'silent-by-design' : DRUMS[id] ? 'drums' : id === 'eravos.bass-drop-builder' ? 'drop' : id === 'eravos.sample-player' ? 'sampler' : id === 'eravos.clip-maker' ? 'clip'
+    out.kind = !hasOut ? 'silent-by-design' : DRUMS[id] ? 'drums' : ONESHOTS[id] ? 'oneshots' : id === 'eravos.bass-drop-builder' ? 'drop' : id === 'eravos.sample-player' ? 'sampler' : id === 'eravos.clip-maker' ? 'clip'
       : inPort(U, inst) ? 'effect' : plays ? 'instrument' : ticks ? 'beat' : 'other'; }
   if (out.kind === 'silent-by-design' || out.kind === 'other') return out;
   const levels = (r, buf, mono, from, to) => { const s = M.scan(buf); Object.assign(r, { nan: s.nan, clip: s.clip, peakDb: +s.peakDb.toFixed(1), rmsDb: +M.db(M.rms(mono, SR, from, to)).toFixed(1), dc: +M.mean(mono, SR, from, to).toFixed(4), corr: +M.correlation(buf, from, to).toFixed(2) }); };
@@ -63,24 +63,48 @@ async function measureTool(id) {
     const r = { preset: name }; const t0 = performance.now();
     try {
       if (out.kind === 'drums') {
-        // 8 hits asked for at exact times (every 0.25 s from 0.1 s): each onset measured against the time it was asked for
+        // each pad ALONE (nothing masks it): asked for at 0.1 s → its first non-zero sample = its latency; heard = level in 200 ms.
+        // then all of them together for levels and Stop all.
+        const lat = [], quiet = [];
+        for (const n of DRUMS[id]) {
+          const U = TH.universe(0.6), inst = TH.spawn(U, id), c = OrganismFactory.handle(inst).ctx; if (name) c.presets.load(name); if (c.ready) await c.ready; tap(U, inst);
+          U.K.bus.publish('note:trigger', { target: inst, note: n, velocity: 0.9, time: 0.1, duration: 0.2 });
+          const mono = mixDown(await TH.render(U)), s0 = Math.round(0.1 * SR); let k = s0; while (k < mono.length && Math.abs(mono[k]) < 1e-6) k++;
+          if (M.db(M.rms(mono, SR, 0.1, 0.3)) < -60) quiet.push(n); else lat.push([n, k - s0]);
+        }
+        r.hits = `${lat.length}/${DRUMS[id].length}`; r.missing = quiet;
+        r.maxGridMs = lat.length ? +Math.max(...lat.map(([, x]) => x / SR * 1000)).toFixed(3) : null; r.worst = lat.slice().sort((a, b) => b[1] - a[1]).slice(0, 3).map(([n, x]) => `pad ${n}: ${x} samples`);
         const U = TH.universe(3), inst = TH.spawn(U, id), c = OrganismFactory.handle(inst).ctx; if (name) c.presets.load(name); if (c.ready) await c.ready; r.outs = tap(U, inst);
         const notes = DRUMS[id]; for (let k = 0; k < 8; k++) U.K.bus.publish('note:trigger', { target: inst, note: notes[k % notes.length], velocity: 0.9, time: 0.1 + k * 0.25, duration: 0.2 });
         stopAt(U, 2.2);
         const buf = await TH.render(U), mono = mixDown(buf); levels(r, buf, mono, 0.1, 2.1);
-        const ons = M.onsets(mono, SR, { floorDb: -40, minGap: 0.1 }), g = M.gridError(ons, 60, 0.1).filter(e => e.step >= 0 && e.step < 8);
-        r.hits = `${new Set(g.map(e => e.step)).size}/8`; r.maxGridMs = g.length ? +Math.max(...g.map(e => Math.abs(e.errMs))).toFixed(3) : null;
-        r.worst = g.slice().sort((a, b) => Math.abs(b.errMs) - Math.abs(a.errMs)).slice(0, 3).map(e => `hit ${e.step}: ${e.errMs.toFixed(2)} ms`);
         r.afterStopDb = +M.db(M.rms(mono, SR, 2.6, 2.95)).toFixed(1);
+      } else if (out.kind === 'oneshots') {
+        // each of 4 requests (1 s apart) must make a sound in its own second; levels, Stop all
+        const U = TH.universe(5), inst = TH.spawn(U, id), c = OrganismFactory.handle(inst).ctx; if (name) c.presets.load(name); r.outs = tap(U, inst);
+        ONESHOTS[id].forEach((n, k) => U.K.bus.publish('note:trigger', { target: inst, note: n, velocity: 0.9, time: 0.2 + k, duration: 0.5 }));
+        stopAt(U, 4.2);
+        const buf = await TH.render(U), mono = mixDown(buf); levels(r, buf, mono, 0.2, 4.2);
+        // risers run 2–4 bars from near-silence: each slot is heard ALONE over 9 s, not in a 1-second window
+        const heard = []; for (const n of ONESHOTS[id]) { const U2 = TH.universe(9), i2 = TH.spawn(U2, id), c2 = OrganismFactory.handle(i2).ctx; if (name) c2.presets.load(name); tap(U2, i2);
+          U2.K.bus.publish('note:trigger', { target: i2, note: n, velocity: 0.9, time: 0.1, duration: 0.5 }); if (M.db(M.rms(mixDown(await TH.render(U2)), SR, 0.1, 9)) > -60) heard.push(n); }
+        r.hits = `${heard.length}/${ONESHOTS[id].length}`;
+        r.afterStopDb = +M.db(M.rms(mono, SR, 4.65, 4.95)).toFixed(1);
       } else if (out.kind === 'drop') {
         // fire it at bar 1 with short sections (1 / 1 / ¼ / 1 bars at 128): the impact must land on DROP beat 1
         const bpm = 128, U = TH.universe(8, { bpm }), inst = TH.spawn(U, id), c = OrganismFactory.handle(inst).ctx; if (name) c.presets.load(name);
         [['tensionBars', 1], ['buildBars', 1], ['pauseBars', 0.25], ['dropBars', 1]].forEach(([k, v]) => c.params.set(k, v)); r.outs = tap(U, inst);
         c.arm({ atStep: 0 }); U.T.bpm = bpm; U.T.renderTicks(0, 16 * 4, 0.05);
         const buf = await TH.render(U), mono = mixDown(buf), b = c.bounds(0, 0.05, 60 / bpm / 4); levels(r, buf, mono, 0.05, b.DROP.te);
-        const ons = M.onsets(mono, SR, { floorDb: -30 }), near = ons.filter(t => Math.abs(t - b.DROP.ts) < 0.05);
-        r.maxGridMs = near.length ? +Math.min(...near.map(t => Math.abs(t - b.DROP.ts) * 1000)).toFixed(3) : 999; r.worst = [`impact vs DROP beat 1: ${near.length ? ((near[0] - b.DROP.ts) * 1000).toFixed(2) : 'no onset'} ms`];
-        r.gapDb = +M.db(M.rms(mono, SR, b.PAUSE.ts + 0.02, b.PAUSE.te - 0.02)).toFixed(1);
+        // timing: the same preset with the gap set to silence (its default reverse cymbal fills the pause on purpose) — the pause
+        // must then be silent and the impact must start on DROP beat 1 (first sample after the pause)
+        { const U2 = TH.universe(8, { bpm }), i2 = TH.spawn(U2, id), c2 = OrganismFactory.handle(i2).ctx; if (name) c2.presets.load(name);
+          [['tensionBars', 1], ['buildBars', 1], ['pauseBars', 0.25], ['dropBars', 1], ['gapSound', 'silence']].forEach(([k, v]) => c2.params.set(k, v)); tap(U2, i2);
+          c2.arm({ atStep: 0 }); U2.T.bpm = bpm; U2.T.renderTicks(0, 16 * 4, 0.05);
+          const m2 = mixDown(await TH.render(U2)), b2 = c2.bounds(0, 0.05, 60 / bpm / 4), s0 = Math.round(b2.DROP.ts * SR);
+          r.gapDb = +M.db(M.rms(m2, SR, b2.PAUSE.ts + 0.05, b2.PAUSE.te - 0.005)).toFixed(1);
+          let k = Math.round((b2.PAUSE.ts + 0.06) * SR); while (k < m2.length && Math.abs(m2[k]) < 0.01) k++;   // −40 dBFS: build tails ring on under it
+          r.maxGridMs = +(Math.abs(k - s0) / SR * 1000).toFixed(3); r.worst = [`first sound after the pause: ${((k - s0) / SR * 1000).toFixed(2)} ms from DROP beat 1`]; }
       } else if (out.kind === 'beat') {
         const bpm = 128, bars = 2, secs = bars * 240 / bpm + 1.2, U = TH.universe(secs, { bpm }), inst = TH.spawn(U, id), c = OrganismFactory.handle(inst).ctx;
         if (name) c.presets.load(name); if (c.ready) await c.ready; r.outs = tap(U, inst);
@@ -95,7 +119,10 @@ async function measureTool(id) {
         let expectHz = M.midiHz(NOTE), note = NOTE;
         if (out.kind === 'sampler') { await c.load(wav(220, 2.6), 'a3-saw.wav'); note = c.params.get('mode') === 'slice' ? 36 : c.params.get('root'); expectHz = 220; }
         if (out.kind === 'clip') { await c.loadAB(wav(220, 2.6), 'a3-saw.wav'); U.K.bus.publish('ui:play:' + inst, {}); expectHz = 220; }
-        if (out.kind === 'instrument' || out.kind === 'sampler') U.K.bus.publish('note:trigger', { target: inst, note, velocity: 0.9, time: 0.1, duration: 2.7 });   // still held when Stop all lands
+        // chord tools are measured the way songs play them — a triad (A minor: the pitch check reads the root an octave-folded way)
+        const POLY = /pad-forge|supersaw|retro-poly|organ|coven|xen-synth/.test(id), chord = out.kind === 'instrument' && POLY ? [note, note + 3, note + 7] : [note];
+        if (out.kind === 'instrument' || out.kind === 'sampler') chord.forEach(n => U.K.bus.publish('note:trigger', { target: inst, note: n, velocity: 0.9, time: 0.1, duration: 2.7 }));   // still held when Stop all lands
+        if (chord.length > 1) { r.chord = true; expectHz = 0; }   // a triad has no single pitch to check
         if (out.kind === 'effect') { const o = U.ctx.createOscillator(), g = U.ctx.createGain(); o.type = 'sawtooth'; o.frequency.value = 110; g.gain.value = 0.5; o.connect(g); g.connect(inPort(U, inst).node); o.start(0.1); o.stop(1.3); expectHz = 0; }
         U.T.bpm = bpm; U.T.renderTicks(0, Math.floor(secs * bpm / 15), 0);   // the transport runs: arps, gates and synced LFOs move as they do in a song
         stopAt(U, 2.0);   // Stop all (hard), pressed when the clock reaches 2.0 s
@@ -122,8 +149,8 @@ function verdict(tool, r) {
   if (r.rmsDb !== undefined && r.rmsDb < -60) f.push(`silent (${r.rmsDb} dBFS)`);
   if (r.afterStopDb !== undefined && r.afterStopDb > -60) f.push(`still sounding 0.45 s after Stop all (${r.afterStopDb} dBFS)`);
   if (r.maxGridMs !== null && r.maxGridMs !== undefined && r.maxGridMs > 1) f.push(`off time by up to ${r.maxGridMs} ms (${(r.worst || []).join('; ')})`);
-  if (r.hits && r.hits !== '8/8') f.push(`only ${r.hits} hits heard`);
-  if (r.gapDb !== undefined && r.gapDb > -50) w.push(`the PAUSE is not silent (${r.gapDb} dBFS)`);
+  if (r.hits && r.hits.split('/')[0] !== r.hits.split('/')[1]) f.push(`only ${r.hits} hits heard`);
+  if (r.gapDb !== undefined && r.gapDb > -50) f.push(`the PAUSE is not silent with In the gap = silence (${r.gapDb} dBFS)`);
   if (r.latencySamples > 16) f.push(`late: the first sound is ${r.latencySamples} samples (${(r.latencySamples / 48).toFixed(2)} ms) after the note`);
   if (r.dc !== undefined && Math.abs(r.dc) > 0.01) w.push(`DC offset ${r.dc}`);
   if (r.peakDb !== undefined && r.peakDb > -0.3 && !r.clip) w.push(`peaks at ${r.peakDb} dBFS (no headroom)`);

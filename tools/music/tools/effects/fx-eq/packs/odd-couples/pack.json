@@ -1,0 +1,61 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "fx-eq.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.fx-eq",
+ "items": {
+  "eravos.fx-eq": {
+   "presets": {
+    "Make Room for Her": {
+     "params": {
+      "hpOn": true,
+      "hpFreq": 90,
+      "hpSlope": 24,
+      "lsGain": -2,
+      "lsFreq": 180,
+      "p1Freq": 300,
+      "p1Gain": -3,
+      "p1Q": 1.2,
+      "p2Freq": 2500,
+      "p2Gain": -4,
+      "p2Q": 1.2,
+      "p3Freq": 6500,
+      "p3Gain": -2,
+      "p3Q": 4,
+      "hsFreq": 10000,
+      "hsGain": -2,
+      "lpOn": false,
+      "outGain": -3
+     }
+    },
+    "Church Low Cut": {
+     "params": {
+      "hpOn": true,
+      "hpFreq": 140,
+      "hpSlope": 24,
+      "lsGain": 0,
+      "p1Freq": 250,
+      "p1Gain": -4,
+      "p1Q": 1.4,
+      "p2Freq": 800,
+      "p2Gain": 1.5,
+      "p2Q": 1,
+      "p3Gain": 0,
+      "hsGain": -2,
+      "lpOn": true,
+      "lpFreq": 9000,
+      "lpSlope": 12
+     }
+    }
+   }
+  }
+ }
+}

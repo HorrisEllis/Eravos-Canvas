@@ -1,0 +1,33 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "breath.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.breath",
+ "items": {
+  "eravos.breath": {
+   "presets": {
+    "Drum & Bass Breath": {
+     "params": {
+      "pattern": "COHERENCE",
+      "tempoLink": true,
+      "rise": 3
+     }
+    },
+    "Séance Breath": {
+     "params": {
+      "pattern": "HANGING TREE",
+      "level": 0.4
+     }
+    }
+   }
+  }
+ }
+}

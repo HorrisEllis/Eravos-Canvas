@@ -3,6 +3,14 @@
  * Domains add their own widgets with UIKit.extend({...}). No business logic: controls only emit ui:config_change {key, value}. */
 (function (global) {
   'use strict';
+  // 3.39 wheel gestures (found by tests/p39-settings-wheel.mjs: scrolling a ⚙ Settings panel stopped dead when a knob slid under
+  // the cursor, and the wheel silently turned that knob — FX Dynamics' gate release 120 → 113). A stream of wheel events with
+  // gaps under 300 ms is ONE gesture; a control takes the wheel only if the gesture STARTED on it. Scrolling keeps scrolling
+  // whatever passes under the cursor; rest on a knob and roll the wheel, and it turns.
+  let wheelT = 0, wheelAt = null;
+  if (global.document) global.document.addEventListener('wheel', (e) => { const now = Date.now(); if (now - wheelT > 300) wheelAt = e.target; wheelT = now; }, { capture: true, passive: true });
+  const wheelStartedOn = (el) => !!(wheelAt && el.contains(wheelAt));
+
   const doc = global.document;
 
   function h(tag, attrs, children) {
@@ -114,7 +122,7 @@
     });
     const end = () => { dragging = false; el.classList.remove('active'); if (kDone) { kDone(); kDone = null; } };
     svg.addEventListener('pointerup', end); svg.addEventListener('pointercancel', end); svg.addEventListener('lostpointercapture', end);
-    svg.addEventListener('wheel', (e) => { e.preventDefault(); e.stopPropagation(); const nv = m.fromN(m.toN(value) - Math.sign(e.deltaY) * (e.shiftKey ? 0.002 : 0.01)); if (nv !== value) { value = nv; draw(); o.onChange && o.onChange(value); } }, { passive: false });
+    svg.addEventListener('wheel', (e) => { if (!wheelStartedOn(svg)) return; e.preventDefault(); e.stopPropagation(); const nv = m.fromN(m.toN(value) - Math.sign(e.deltaY) * (e.shiftKey ? 0.002 : 0.01)); if (nv !== value) { value = nv; draw(); o.onChange && o.onChange(value); } }, { passive: false });
     svg.addEventListener('dblclick', () => { value = o.default !== undefined ? o.default : o.min; draw(); o.onChange && o.onChange(value); });
     draw();
     return { el, set(v) { if (typeof v === 'number') { value = v; draw(); } }, get: () => value };
@@ -338,6 +346,6 @@
   function mapPoint(rect, w, h2, clientX, clientY) { const sx = rect.width > 0 && w > 0 ? w / rect.width : 1, sy = rect.height > 0 && h2 > 0 ? h2 / rect.height : 1; return { x: (clientX - rect.left) * sx, y: (clientY - rect.top) * sy }; }
   function toContent(el, clientX, clientY) { return mapPoint(el.getBoundingClientRect(), el.offsetWidth, el.offsetHeight, clientX, clientY); }
 
-  global.UIKit = { h, fmt, mapper, ask, Knob, Fader, Toggle, Select, Segmented, Button, NumberDrag, Canvas, loop, paramControl, paramPanel, presetBar, hint, mapPoint, toContent, drag,
+  global.UIKit = { wheelStartedOn, h, fmt, mapper, ask, Knob, Fader, Toggle, Select, Segmented, Button, NumberDrag, Canvas, loop, paramControl, paramPanel, presetBar, hint, mapPoint, toContent, drag,
     extend(o) { Object.keys(o || {}).forEach(k => { if (!(k in global.UIKit)) global.UIKit[k] = o[k]; }); } };
 })(typeof window !== 'undefined' ? window : globalThis);
