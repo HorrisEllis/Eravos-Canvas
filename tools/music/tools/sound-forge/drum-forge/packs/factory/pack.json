@@ -1500,7 +1500,8 @@
     },
     "Witch House": {
      "params": {
-      "kit": "Witch House"
+      "kit": "Witch House",
+      "volume": 0.675
      },
      "extra": {
       "slots": [
@@ -1797,7 +1798,8 @@
     },
     "Industrial Goth": {
      "params": {
-      "kit": "Industrial Goth"
+      "kit": "Industrial Goth",
+      "volume": 0.667
      },
      "extra": {
       "slots": [

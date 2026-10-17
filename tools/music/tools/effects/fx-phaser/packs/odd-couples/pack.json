@@ -24,7 +24,8 @@
       "feedback": 0.55,
       "stereo": 180,
       "Q": 0.7,
-      "mix": 0.4
+      "mix": 0.4,
+      "outGain": -1.5
      }
     },
     "Wobble Phase": {

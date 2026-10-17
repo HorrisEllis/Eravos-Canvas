@@ -37,7 +37,8 @@
       "lfoSync": true,
       "lfoDiv": "1/1",
       "envAmt": 0,
-      "mix": 1
+      "mix": 1,
+      "outGain": -1.7
      }
     },
     "Wobble 1/8 LP": {

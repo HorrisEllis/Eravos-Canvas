@@ -30,7 +30,9 @@
       "tCutoff": 600,
       "tCutoffEnd": 4000,
       "gapSound": "vocal tail",
-      "vocalPriority": 10
+      "vocalPriority": 10,
+      "impactLevel": 0.56,
+      "crashLevel": 0.315
      }
     },
     "Steppers Pull-up": {
@@ -41,7 +43,9 @@
       "dropBars": 8,
       "gapSound": "sub swell",
       "impactPitch": 50,
-      "vocalPriority": 9
+      "vocalPriority": 9,
+      "impactLevel": 0.56,
+      "crashLevel": 0.315
      }
     },
     "Golden Gap": {
@@ -51,7 +55,9 @@
       "pauseBars": 0.5,
       "dropBars": 8,
       "gapSound": "silence",
-      "vocalPriority": 12
+      "vocalPriority": 12,
+      "impactLevel": 0.56,
+      "crashLevel": 0.315
      }
     }
    }

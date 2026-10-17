@@ -42,7 +42,8 @@
       "p3Q": 4,
       "hsFreq": 10000,
       "hsGain": 3,
-      "lpOn": false
+      "lpOn": false,
+      "outGain": -2.2
      }
     },
     "Kick Tighten": {
@@ -129,7 +130,8 @@
       "p3Gain": 4,
       "p3Q": 1,
       "hsGain": 2,
-      "lpOn": false
+      "lpOn": false,
+      "outGain": -2.2
      }
     }
    }

@@ -31,7 +31,8 @@
       "release": 4.5,
       "space": 0.55,
       "shimmer": 0.4,
-      "size": 7
+      "size": 7,
+      "level": 0.496
      }
     },
     "Celestial Glass": {
@@ -48,7 +49,8 @@
       "release": 6,
       "space": 0.7,
       "shimmer": 0.6,
-      "size": 10
+      "size": 10,
+      "level": 0.363
      }
     },
     "Golden Hour Strings": {
@@ -120,7 +122,8 @@
       "release": 1.4,
       "space": 0.5,
       "shimmer": 0,
-      "size": 3.5
+      "size": 3.5,
+      "level": 0.422
      }
     },
     "Frozen Halo (hold)": {
@@ -137,7 +140,8 @@
       "hold": true,
       "space": 0.85,
       "shimmer": 0.75,
-      "size": 14
+      "size": 14,
+      "level": 0.484
      }
     },
     "Underwater": {

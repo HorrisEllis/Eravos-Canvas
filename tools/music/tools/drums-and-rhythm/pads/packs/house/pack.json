@@ -196,7 +196,7 @@
     },
     "Tech House Tops": {
      "params": {
-      "volume": 0.9
+      "volume": 0.555
      },
      "extra": {
       "kit": [
@@ -284,7 +284,7 @@
     },
     "Afro House": {
      "params": {
-      "volume": 0.9
+      "volume": 0.581
      },
      "extra": {
       "kit": [
@@ -365,7 +365,7 @@
     },
     "UKG Skip": {
      "params": {
-      "volume": 0.9
+      "volume": 0.524
      },
      "extra": {
       "kit": [

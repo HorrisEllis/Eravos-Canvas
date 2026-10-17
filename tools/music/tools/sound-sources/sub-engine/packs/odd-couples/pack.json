@@ -57,7 +57,7 @@
       "release": 0.25,
       "tone": 600,
       "glide": 0.04,
-      "level": 0.75
+      "level": 0.589
      }
     },
     "Breath Sub": {
@@ -73,7 +73,7 @@
       "sustain": 0.6,
       "release": 0.6,
       "attack": 0.02,
-      "level": 0.7
+      "level": 0.556
      }
     }
    }
