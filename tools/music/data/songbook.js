@@ -210,7 +210,10 @@
     if (open) { open.close(); return; }
     const UI = window.UIKit, h = UI.h, S = window.Shell;
     if (S && S.X) S.X.enterMode('music');
-    let mood = 'all', sel = SONGS[0];
+    // 3.39 (exe: 39 of 189 cards ignored clicks): allSongs() builds NEW objects for genre cards and EDM-tagged songs on every
+    // call, so a selection held as an object was never found in the next paint and snapped back to the first song — and
+    // "Write this song" then wrote that first song. The selection is an id now.
+    let mood = 'all', selId = SONGS[0].id;
     const ov = h('div', { class: 'overlay sbk', role: 'dialog', 'aria-label': 'Songs' });
     const chips = h('div', { class: 'sbk-chips' }), grid = h('div', { class: 'sbk-grid' }), detail = h('aside', { class: 'sbk-detail' });
     const close = () => { ov.remove(); document.removeEventListener('keydown', key, true); open = null; };
@@ -228,12 +231,13 @@
       const T = window.Taste, list = allSongs().filter(s => mood === 'all' || (mood === 'foryou' ? T && T.get(s.genre) > 0 : s.mood.includes(mood)));
       if (mood === 'foryou') list.sort((a, b) => T.get(b.genre) - T.get(a.genre));
       if (!list.length) grid.appendChild(h('p', { class: 'sbk-note', text: mood === 'foryou' ? 'Nothing yet — rate genres (💜 below a song, or Learn → EDM tour) and the ones you love appear here first.' : 'Nothing here.' }));
-      if (!list.includes(sel)) sel = list[0] || sel;
+      if (list.length && !list.some(x => x.id === selId)) selId = list[0].id;
+      const sel = list.find(x => x.id === selId) || allSongs().find(x => x.id === selId) || SONGS[0];
       list.forEach(s => {
         const G = genreOf(s), lk = locked(s);
-        const card = h('button', { class: 'sbk-card' + (sel === s ? ' sel' : '') + (lk ? ' locked' : ''), style: { '--acc': (G && G.accent) || '#ff2266' } }, [
+        const card = h('button', { class: 'sbk-card' + (s.id === selId ? ' sel' : '') + (lk ? ' locked' : ''), style: { '--acc': (G && G.accent) || '#ff2266' } }, [
           h('span', { class: 'sbk-ic', text: lk ? '🔒' : ((G && G.icon) || '💘') }), h('b', { text: s.title }), h('small', { text: (G ? G.label : s.genre) + ' · ' + (G ? G.bpm[0] + (G.bpm[1] !== G.bpm[0] ? '–' + G.bpm[1] : '') : s.bpm) + ' BPM' })]);
-        card.onclick = () => { sel = s; paint(); }; card.ondblclick = () => { if (write(s)) close(); };
+        card.onclick = () => { selId = s.id; paint(); }; card.ondblclick = () => { if (write(s)) close(); };
         grid.appendChild(card);
       });
       const s = sel, G = genreOf(s), lk = locked(s);
