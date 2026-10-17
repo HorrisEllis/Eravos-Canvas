@@ -51,7 +51,8 @@ async function measureTool(id) {
   };
   // press Stop all when the render clock REACHES t (OfflineAudioContext.suspend) — exactly what the ■ button does live
   const stopAt = (U, t) => { U.ctx.suspend(t).then(() => { U.K.silence({ hard: true, reason: 'tool-audio' }); U.ctx.resume(); }); };
-  const inPort = (U, inst) => U.K.audio.ports(inst).find(p => p.kind === 'audio' && p.direction === 'in');
+  // an effect's signal input; an instrument's FM / ring inputs (3.42 Morph Osc) and mod-slot returns are not one
+  const inPort = (U, inst) => U.K.audio.ports(inst).find(p => p.kind === 'audio' && p.direction === 'in' && !/^(fm|ring|slot\.)/.test(p.port_id));
   const mixDown = (buf) => { const m = new Float32Array(buf.length); for (let c = 0; c < buf.numberOfChannels; c++) { const dd = buf.getChannelData(c); for (let i = 0; i < dd.length; i++) m[i] += dd[i] / buf.numberOfChannels; } return m; };
   const wav = (hz, secs) => { const b = new AudioBuffer({ numberOfChannels: 1, length: Math.round(secs * SR), sampleRate: SR }), dd = b.getChannelData(0); for (let i = 0; i < dd.length; i++) { const t = i / SR; dd[i] = 0.5 * (2 * ((t * hz) % 1) - 1) * Math.min(1, t / 0.005, (secs - t) / 0.01); } return AudioRecorder.encodeWAV(b, 16); };
   { const U = TH.universe(0.1), inst = TH.spawn(U, id), hasOut = U.K.audio.ports(inst).some(p => p.kind === 'audio' && p.direction === 'out');
@@ -123,7 +124,7 @@ async function measureTool(id) {
         const POLY = /pad-forge|supersaw|retro-poly|organ|coven|xen-synth/.test(id), chord = out.kind === 'instrument' && POLY ? [note, note + 3, note + 7] : [note];
         if (out.kind === 'instrument' || out.kind === 'sampler') chord.forEach(n => U.K.bus.publish('note:trigger', { target: inst, note: n, velocity: 0.9, time: 0.1, duration: 2.7 }));   // still held when Stop all lands
         if (chord.length > 1) { r.chord = true; expectHz = 0; }   // a triad has no single pitch to check
-        if (out.kind === 'effect') { const o = U.ctx.createOscillator(), g = U.ctx.createGain(); o.type = 'sawtooth'; o.frequency.value = 110; g.gain.value = 0.5; o.connect(g); g.connect(inPort(U, inst).node); o.start(0.1); o.stop(1.3); expectHz = 0; }
+        if (out.kind === 'effect') { const o = U.ctx.createOscillator(), g = U.ctx.createGain(); o.type = 'sawtooth'; o.frequency.value = 110; g.gain.value = 0.5; o.connect(g); g.connect(inPort(U, inst).node); o.start(0.1); o.stop(1.3); expectHz = 0; if (plays) U.K.bus.publish('note:trigger', { target: inst, note: 60, velocity: 0.9, time: 0.1, duration: 1.2 }); }   // an effect that takes notes (Granular keys) is measured with one held
         U.T.bpm = bpm; U.T.renderTicks(0, Math.floor(secs * bpm / 15), 0);   // the transport runs: arps, gates and synced LFOs move as they do in a song
         stopAt(U, 2.0);   // Stop all (hard), pressed when the clock reaches 2.0 s
         const buf = await TH.render(U), mono = mixDown(buf); levels(r, buf, mono, 0.3, 1.2);

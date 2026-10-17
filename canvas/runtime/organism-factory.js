@@ -107,7 +107,7 @@
     const allowed = new Set(global.OrganismSDK.STD_UI_HOOKS.concat(d.ui_hooks.map(u => String(u).replace(/^ui:/, '').split(/\s/)[0])));
     const state = {};
     const binds = new Map();
-    const unsubs = [];
+    const unsubs = [], own = [];
     const view = {
       root, instanceId: id, descriptor: d, ui: global.UIKit, state, K,
       emit(type, payload) {
@@ -121,7 +121,7 @@
         const un = K.bus.subscribe(topic, fn, 'ui:' + id); unsubs.push(un); return un;
       },
       bind(key, fn) { if (!binds.has(key)) binds.set(key, []); binds.get(key).push(fn); if (state[key] !== undefined) fn(state[key]); },
-      onDispose(fn) { rec.uiDisposers.push(fn); },
+      onDispose(fn) { own.push(fn); },
       targets(capability) { // live list of organisms (for target selects) — registry_read
         return K.registry.list().filter(r => !r.descriptor.system && (!capability || (r.descriptor.provides || []).includes(capability)) && r.instance_id !== id)
           .map(r => ({ value: r.instance_id, label: (r.descriptor.icon || '') + ' ' + (r.descriptor.label || r.organism_id) + ' · ' + r.instance_id.split('-').slice(-2).join('') }));
@@ -132,7 +132,10 @@
     viewExts.forEach(fn => { try { fn(view, rec); } catch (e) { K.fault('RUNTIME_003', { organism_id: d.id, message: 'view extension: ' + e.message }); } });
     view.on('state_sync', (s) => { if (s && s.params) { Object.assign(state, s.params); Object.keys(s.params).forEach(k => (binds.get(k) || []).forEach(fn => fn(s.params[k]))); } });
     view.on('param', (p) => { if (p) { state[p.key] = p.value; (binds.get(p.key) || []).forEach(fn => fn(p.value)); } });
-    rec.uiDisposers.push(() => unsubs.forEach(u => u()));
+    const drop = () => { unsubs.forEach(u => u()); unsubs.length = 0; own.splice(0).forEach(fn => { try { fn(); } catch (e) {} }); };
+    rec.uiDisposers.push(drop);
+    // a view mounted somewhere else (a linked tool's face, a mod card) ends before its tool does
+    view.dispose = () => { drop(); const i = rec.uiDisposers.indexOf(drop); if (i >= 0) rec.uiDisposers.splice(i, 1); };
     // preload current state synchronously
     Object.assign(state, rec.ctx.params.all());
     return view;

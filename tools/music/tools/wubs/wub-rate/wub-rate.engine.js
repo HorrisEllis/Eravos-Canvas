@@ -46,6 +46,8 @@
     size: { w: 520, h: 470 }, minSize: { w: 400, h: 340 },
     permissions: ['audio_out', 'bus_publish', 'bus_subscribe', 'registry_read'],
     provides: ['capability.lfo', 'capability.wub_rhythm'],
+    face: ['stepLen', 'shape', 'smooth', 'depth', 'polarity'],
+    links: [{ with: 'eravos.wub-filter', dir: 'out', face: ['mode', 'cutoff', 'range', 'res', 'drive'], hint: 'the mouth this rhythm opens' }],
     hooks: [
       S.mod_out('wubrate.hook.mod_out', 'out'),
       S.transport_in('wubrate.hook.transport_in'),

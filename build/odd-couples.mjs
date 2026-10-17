@@ -57,6 +57,23 @@ const DESIGN = {
     'Lullaby Glass': P('Celestial Glass', { cornerB: 'halo', cornerC: 'glass', orbit: 'figure-8', orbitRate: 0.12, shimmer: 0.3, size: 5, level: 0.55 }, 'a music-box shimmer over a tearout floor'),
     'Golden Orbit': P('Her Essence', { orbit: 'circle', orbitRate: 0.0618, orbitSize: 0.382, x: 0.618, y: 0.382, shimmer: 0.4, level: 0.6 }, 'her essence pad orbiting on golden numbers'),
   },
+  // ── synthesis (3.43) ──
+  'eravos.syn-osc': {
+    'Gospel Morph Stack': P('Morph Lead', { bank: 'vocal', morph: 0.25, unison: 3, detune: 10, width: 0.8, attack: 0.02, decay: 0.6, sustain: 0.75, release: 0.5, level: 0.45 }, 'vowel tables stacked in sevenths for the glitch gospel; its Envelope opens the vowels on every chord'),
+    'Morph Choir Pad': P('Glass Pad', { bank: 'vocal', morph: 0.5, level: 0.5 }, 'a vowel pad that morphs u → i under anything'),
+  },
+  'eravos.syn-env': {
+    'Gospel Vowel Sweep': P('Morph Scan', { attack: 0.35, curve: 0.3, decay: 0.9, sustain: 0.25, release: 0.4, depth: 0.55 }, 'sweeps the gospel stack u → a → e on every chord, then settles'),
+    'Trap Gate Close': P('Drop Close', { decay: 0.35, depth: 0.7 }, 'closes whatever it is wired into after each hit'),
+  },
+  'eravos.syn-partials': {
+    'Spectral Glass Pad': P('Glass Keys', { attack: 0.25, decay: 1.5, sustain: 0.6, release: 1.4, evolve: 2.5, tilt: -0.15, level: 0.5 }, 'glass partials that evolve to a pure tone under trap 808s'),
+    'Bell Choir': P('Evolving Choir', { stretch: 0.03, damp: 0.3, level: 0.5 }, 'a choir that rings like bells'),
+  },
+  'eravos.granular': {
+    'Choir Grain Halo': P('Shimmer Pad', { pitch: 0, pitchSpray: 12, quantize: true, feedback: 0.35, size: 0.3, density: 18, mix: 0.35 }, 'the machine choir scattered into a halo an octave around itself'),
+    'Riddim Grain Stutter': P('Stutter 1/8', { sync: '1/16', size: 0.06, mix: 0.6 }, 'a 1/16 grain stutter for wub drops'),
+  },
   'eravos.supersaw': {
     'Gospel Stack': P('Chord Stab (triad)', { chordMode: 'off', unison: 5, detune: 0.25, cutoff: 4200, aR: 0.25, level: 0.6 }, 'gospel sevenths stacked as saws, for the glitch gospel (chordMode off: the song sends the seventh chords — on, every note became a chord: 16 notes × 5 saws)'),
     'Acid Church Pad': P('Airy Sus Pad', { chordMode: 'off', cutoff: 2600, res: 1.5, level: 0.55 }, 'a sus4 cloud between the 303 and the choir'),

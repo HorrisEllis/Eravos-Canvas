@@ -42,6 +42,8 @@
   OrganismFactory.boot(K);
   CanvasWM.init(document.getElementById('canvas'), K);
   WireSystem.init(K);
+  Links.init(K);
+  Mods.init(K);
   Workspace.boot(K);
   Recipes.attach(K);
   const intake = window.ShellIntake = Intake.create(K);

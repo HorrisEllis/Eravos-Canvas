@@ -21,7 +21,14 @@
       "downsample": 1,
       "tilt": -0.2,
       "postLP": 14000,
-      "mix": 1
+      "mix": 1,
+      "asym": 0.3,
+      "autoGain": true,
+      "tight": 30,
+      "lowKeep": 0,
+      "alias": 0.35,
+      "dither": false,
+      "autoTame": 0.4
      }
     },
     "Grit": {
@@ -32,7 +39,14 @@
       "downsample": 1,
       "tilt": 0.2,
       "postLP": 12000,
-      "mix": 0.8
+      "mix": 0.8,
+      "asym": 0,
+      "autoGain": true,
+      "tight": 80,
+      "lowKeep": 0,
+      "alias": 0.35,
+      "dither": false,
+      "autoTame": 0.6
      }
     },
     "Fold Growl": {
@@ -43,7 +57,14 @@
       "downsample": 1,
       "tilt": 0,
       "postLP": 9000,
-      "mix": 1
+      "mix": 1,
+      "asym": 0,
+      "autoGain": true,
+      "tight": 60,
+      "lowKeep": 80,
+      "alias": 0.35,
+      "dither": false,
+      "autoTame": 0.4
      }
     },
     "NES 8-bit": {
@@ -54,7 +75,14 @@
       "downsample": 4,
       "tilt": 0,
       "postLP": 16000,
-      "mix": 1
+      "mix": 1,
+      "asym": 0,
+      "autoGain": true,
+      "tight": 25,
+      "lowKeep": 0,
+      "alias": 0.8,
+      "dither": false,
+      "autoTame": 0.5
      }
     },
     "Lo-fi 12-bit 22k": {
@@ -65,7 +93,14 @@
       "downsample": 2,
       "tilt": -0.1,
       "postLP": 10000,
-      "mix": 1
+      "mix": 1,
+      "asym": 0,
+      "autoGain": true,
+      "tight": 25,
+      "lowKeep": 0,
+      "alias": 0.15,
+      "dither": true,
+      "autoTame": 0.5
      }
     },
     "Total Destruction": {
@@ -76,7 +111,14 @@
       "downsample": 12,
       "tilt": 0.4,
       "postLP": 7000,
-      "mix": 1
+      "mix": 1,
+      "asym": 0,
+      "autoGain": true,
+      "tight": 40,
+      "lowKeep": 0,
+      "alias": 0.7,
+      "dither": false,
+      "autoTame": 0.3
      }
     },
     "Bass Grit (parallel)": {
@@ -87,7 +129,14 @@
       "downsample": 1,
       "tilt": 0.3,
       "postLP": 8000,
-      "mix": 0.45
+      "mix": 0.45,
+      "asym": 0.25,
+      "autoGain": true,
+      "tight": 60,
+      "lowKeep": 120,
+      "alias": 0.35,
+      "dither": false,
+      "autoTame": 0.6
      }
     },
     "80s · SP-1200 Grit (12-bit)": {
@@ -98,7 +147,140 @@
       "downsample": 2,
       "tilt": 0.1,
       "postLP": 12000,
-      "mix": 1
+      "mix": 1,
+      "asym": 0,
+      "autoGain": true,
+      "tight": 30,
+      "lowKeep": 0,
+      "alias": 0.6,
+      "dither": false,
+      "autoTame": 0.5
+     }
+    },
+    "Tape Saturation": {
+     "params": {
+      "shape": "tape",
+      "drive": 0.35,
+      "asym": 0.2,
+      "bits": 16,
+      "downsample": 1,
+      "tilt": -0.1,
+      "postLP": 18000,
+      "mix": 1,
+      "tight": 20,
+      "autoTame": 0.3,
+      "autoGain": true,
+      "lowKeep": 0,
+      "alias": 0.35,
+      "dither": false
+     }
+    },
+    "Fuzz Box": {
+     "params": {
+      "shape": "fuzz",
+      "drive": 0.6,
+      "asym": 0.2,
+      "bits": 16,
+      "downsample": 1,
+      "tilt": 0.15,
+      "postLP": 9000,
+      "mix": 1,
+      "tight": 90,
+      "autoTame": 0.6,
+      "autoGain": true,
+      "lowKeep": 0,
+      "alias": 0.35,
+      "dither": false
+     }
+    },
+    "Octave Rectifier": {
+     "params": {
+      "shape": "rectify",
+      "drive": 0.5,
+      "bits": 16,
+      "downsample": 1,
+      "tilt": 0,
+      "postLP": 10000,
+      "mix": 0.7,
+      "tight": 100,
+      "autoTame": 0.5,
+      "asym": 0,
+      "autoGain": true,
+      "lowKeep": 0,
+      "alias": 0.35,
+      "dither": false
+     }
+    },
+    "Wub Grit · sub stays clean": {
+     "params": {
+      "shape": "hard",
+      "drive": 0.55,
+      "asym": 0.2,
+      "bits": 16,
+      "downsample": 1,
+      "tilt": 0.2,
+      "postLP": 11000,
+      "mix": 1,
+      "tight": 40,
+      "lowKeep": 110,
+      "autoTame": 0.6,
+      "autoGain": true,
+      "alias": 0.35,
+      "dither": false
+     }
+    },
+    "Growl Fold · sub stays clean": {
+     "params": {
+      "shape": "fold",
+      "drive": 0.55,
+      "asym": 0.1,
+      "bits": 16,
+      "downsample": 1,
+      "tilt": 0.1,
+      "postLP": 10000,
+      "mix": 1,
+      "tight": 50,
+      "lowKeep": 100,
+      "autoTame": 0.5,
+      "autoGain": true,
+      "alias": 0.35,
+      "dither": false
+     }
+    },
+    "Drum Bus Crunch": {
+     "params": {
+      "shape": "tube",
+      "drive": 0.3,
+      "asym": 0.35,
+      "bits": 16,
+      "downsample": 1,
+      "tilt": 0.1,
+      "postLP": 16000,
+      "mix": 0.5,
+      "tight": 30,
+      "autoTame": 0.4,
+      "autoGain": true,
+      "lowKeep": 0,
+      "alias": 0.35,
+      "dither": false
+     }
+    },
+    "Cassette 8-bit (smooth)": {
+     "params": {
+      "shape": "soft",
+      "drive": 0.2,
+      "bits": 8,
+      "downsample": 3,
+      "tilt": -0.2,
+      "postLP": 9000,
+      "mix": 1,
+      "alias": 0.1,
+      "dither": true,
+      "autoTame": 0.3,
+      "asym": 0,
+      "autoGain": true,
+      "tight": 25,
+      "lowKeep": 0
      }
     }
    }

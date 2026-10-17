@@ -31,7 +31,9 @@
       if (quiet() || topic.charCodeAt(0) !== 117 || !topic.startsWith('ui:')) return;
       if (payload && payload._auto) return; // 3.36: a change marked _auto is automation playing back, not an edit — no undo step
       const i = topic.indexOf(':', 3); if (i < 0) return;
-      const hook = topic.slice(3, i), id = topic.slice(i + 1);
+      const hook = topic.slice(3, i); let id = topic.slice(i + 1);
+      // a tool hosted inside another (a mod, runtime/mods.js) is part of its host: its edits are the host's steps
+      for (let r = F.handle(id), n = 0; r && r.hostId && n < 8; r = F.handle(id), n++) id = r.hostId;
       if (!mine(id)) return;
       let o = open.get(id);
       if (!o) { const before = snap(id); if (before == null) return; o = { before, hook, t0: performance.now() }; open.set(id, o); }

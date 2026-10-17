@@ -229,7 +229,13 @@ registerProcessor('eravos-pitch', EravosPitch);`;
     const mixMod = ctx.modBus('mix', { min: 0, max: 1 }); const neg = ac.createGain(); neg.gain.value = -1;
     mixMod.connect(wet.gain); mixMod.connect(neg); neg.connect(dry.gain);
     [inp, inGain, dry, wet, sum, outGain, wetIn, wetOut, neg, dryAl, dryAlG].forEach(n => ctx.track(n));
-    let latency = 0, aligned = false;
+    let latency = 0, aligned = false, own = 0, extra = 0;
+    function apply() {
+      const sec = own + extra; if (sec === latency) return; latency = sec;
+      dryAl.delayTime.setValueAtTime(Math.min(0.25, sec), ac.currentTime); levels(false);
+      ctx.K.ledger.write('latency_reported', { instance_id: ctx.id, organism_id: ctx.descriptor.id, latency_sec: sec }); ctx.emitUI('latency', { sec });
+      if (ctx.K.audio && ctx.K.audio.setLatency) ctx.K.audio.setLatency(ctx.id, sec);
+    }
     function route(on) {   // the mix modulation follows whichever dry path is live
       if (on === aligned) return; aligned = on;
       try { neg.disconnect(); } catch (e) {} neg.connect(on ? dryAlG.gain : dry.gain);
@@ -248,11 +254,19 @@ registerProcessor('eravos-pitch', EravosPitch);`;
     ['mix', 'bypass', 'inGain', 'outGain'].forEach(k => P.onChange(k, () => levels()));
     return {
       inp, wetIn, wetOut, dry, wet, outGain, levels,
-      setLatency(sec) { if (sec !== latency) { latency = sec; dryAl.delayTime.setValueAtTime(Math.min(0.25, sec), ac.currentTime); levels(false); ctx.K.ledger.write('latency_reported', { instance_id: ctx.id, organism_id: ctx.descriptor.id, latency_sec: sec }); ctx.emitUI('latency', { sec }); } },
+      // own: this tool's wet chain · extra: the mods inside its wet path (3.43) — the blended dry waits for both
+      setLatency(sec) { own = sec; apply(); },
+      addLatency(sec) { extra = sec; apply(); },
       get latency() { return latency; },
     };
   }
 
+
+  // 3.42 mods: a tool with an audio slot sends into its mods and hears them back — it needs both audio permissions
+  if (global.OrganismFactory) global.OrganismFactory.onDefine((d) => {
+    if (!(d.slots || []).some(s => s.wire_type === 'audio')) return;
+    d.permissions = d.permissions || []; ['audio_in', 'audio_out'].forEach(p => { if (!d.permissions.includes(p)) d.permissions.push(p); });
+  });
 
   SDK.extend({
     id: 'music',
@@ -286,6 +300,32 @@ registerProcessor('eravos-pitch', EravosPitch);`;
         ctx.track(cs);
         ctx.port('mod.' + key, { kind: 'param', direction: 'in', param: cs.offset, range, label: (opts2 && opts2.label) || key });
         return cs;
+      };
+      // 3.42 mods: an insert point — from → [the mods hosted in slot <id>, in order] → the returned node. Empty, it is a
+      // straight wire (sample-exact, no latency); while mods are wired in (canvas/runtime/mods.js) the straight path closes.
+      ctx.slot = function (id, from, o) {
+        o = o || {};
+        const send = ctx.track(ac.createGain()), ret = ctx.track(ac.createGain()), thru = ctx.track(ac.createGain()), out = ctx.track(ac.createGain());
+        send.channelCount = ret.channelCount = 2; send.channelCountMode = ret.channelCountMode = 'explicit';
+        from.connect(send); from.connect(thru); thru.connect(out); ret.connect(out);
+        ctx.port('slot.' + id + '.send', { kind: 'audio', direction: 'out', node: send, internal: true, label: (o.label || id) + ' send' });
+        ctx.port('slot.' + id + '.return', { kind: 'audio', direction: 'in', node: ret, label: (o.label || id) + ' return' });
+        const hook = 'slot.' + id + '.return';
+        let live = false;
+        const sync = () => {
+          const on = K.wires.list().some(w => w.dst.instanceId === ctx.id && w.dst.hookId === hook);
+          if (on === live) return; live = on;
+          const t = ac.currentTime; thru.gain.cancelScheduledValues(t); thru.gain.setValueAtTime(thru.gain.value, t); thru.gain.linearRampToValueAtTime(on ? 0 : 1, t + 0.005);
+        };
+        ['kernel:wire-registered', 'kernel:wire-removed'].forEach(tp => { const un = K.bus.subscribe(tp, (w) => { if (w && w.dst && w.dst.instanceId === ctx.id) sync(); }, ctx.id); ctx.onDispose(un); });
+        // the delay of the mods in this slot (the sum along its chain) → o.onLatency (an fx host: its dry alignment)
+        if (o.onLatency) {
+          let last = -1;
+          const chain = () => K.wires.list().filter(w => w.meta && w.meta.insert && w.meta.host === ctx.id && w.meta.slot === id).map(w => w.dst.instanceId).filter(x => x !== ctx.id);
+          const relat = () => { const sec = chain().reduce((a, c) => a + (K.audio.latencyOf ? K.audio.latencyOf(c) : 0), 0); if (sec !== last) { last = sec; o.onLatency(sec); } };
+          ['kernel:wire-registered', 'kernel:wire-removed', 'audio:latency'].forEach(tp => { const un = K.bus.subscribe(tp, () => relat(), ctx.id); ctx.onDispose(un); });
+        }
+        return out;
       };
       // run fn when AUDIO time reaches t (not wall-clock) — correct in offline renders and when ticks run ahead
       // P11.5 (gate P): is anything wired into this modulation input? Per-voice connections to a modulation bus turn

@@ -141,7 +141,7 @@
       drums: { main: TRAP, light: { hat: 'x...x...x...x.x.', kick: 'X...............' } }, leadRhythm: 'sparse', bar,
       form: ODD({ intro: ['pad', 'drums'], verse: ['drums', 'sub', 'pad'], build: ['pad', 'drums', 'lead'], drop: ['drums', 'sub', 'pad', 'lead'], pat1: { sub: 'sub' }, brk: ['pad'] }),
       parts: { drums: KIT('Trap, Phonk & Dancehall · Trap 808 Glide', O('Séance Trap')), sub: { role: 'bass', organism: 'eravos.sub-engine', preset: O('Séance 808'), style: '808', name: '808' },
-        pad: { role: 'chords', organism: 'eravos.supersaw', preset: O('Acid Church Pad'), style: 'sustain', voicing: 'triad', octave: 4, name: 'Saws' },
+        pad: { role: 'chords', organism: 'eravos.syn-partials', preset: O('Spectral Glass Pad'), style: 'sustain', voicing: 'triad', octave: 4, name: 'Partials' },   // 3.43: drawn spectra evolving under the trap
         lead: { role: 'lead', organism: 'eravos.xen-synth', preset: O('Slendro Riddim Bells'), octave: 5, name: 'Slendro' } },
       fx: [{ organism: 'eravos.fx-pitch', preset: O('Octave Under the Choir'), on: 'pad' }, { organism: 'eravos.fx-glitch', preset: O('Gospel Stutter'), on: 'lead' }],
       mods: HER(O('Steppers Pull-up')).concat([{ organism: 'eravos.recursive-spectra', preset: O('Trap Spectrum Drone') }, { organism: 'eravos.harmonic-analyzer', preset: O('Organ + Wub (layers)') }]),
@@ -168,9 +168,9 @@
       form: ODD({ intro: ['organ', 'drums'], verse: ['drums', 'bass', 'organ'], build: ['stack', 'drums', 'organ'], drop: ['drums', 'bass', 'stack', 'organ'], pat1: { bass: 'bhA' }, brk: ['organ'], lift: 1 }),
       parts: { drums: KIT('House · Disco Room', 'House · Melodic House'), bass: { role: 'bass', organism: 'eravos.sub-engine', preset: 'Club · Deep House Sub', style: 'offbeat', name: 'Bass' },
         organ: { role: 'chords', organism: 'eravos.organ', preset: O('Dub Bubble Hammond'), style: 'stab', voicing: 'seventh', octave: 4, name: 'Hammond' },
-        stack: { role: 'chords', organism: 'eravos.supersaw', preset: O('Gospel Stack'), style: 'pulse', voicing: 'seventh', octave: 4, name: 'Gospel stack' } },
+        stack: { role: 'chords', organism: 'eravos.syn-osc', preset: O('Gospel Morph Stack'), style: 'pulse', voicing: 'seventh', octave: 4, name: 'Gospel stack' } },   // 3.43: vowel tables, swept by its Envelope
       fx: [{ organism: 'eravos.fx-glitch', preset: O('Gospel Stutter'), on: 'stack' }, { organism: 'eravos.fx-glitch', preset: O('Organ Tape Stop'), on: 'organ' }, { organism: 'eravos.fx-moddelay', preset: O('Chapel Chorus'), on: 'fx1' }],
-      mods: HER(O('Cathedral Drop')).concat([{ organism: 'eravos.xy-pad', preset: O('Organ ↔ Wub') }, { organism: 'eravos.macro-automation', preset: O('16-bar latch') }]),
+      mods: HER(O('Cathedral Drop')).concat([{ organism: 'eravos.xy-pad', preset: O('Organ ↔ Wub') }, { organism: 'eravos.macro-automation', preset: O('16-bar latch') }, { organism: 'eravos.syn-env', preset: O('Gospel Vowel Sweep'), to: 'stack', key: 'morph' }]),   // the Envelope follows the stack's chords by itself
       master: { compThresh: -14, compRatio: 3, reverbMix: 0.2 } },   // measured: −11 / 2.5 drove the master soft-clipper (13–32 samples a song)
 
     // 10 — a 19-tone lead over a φ-Hz wobble on UK garage: the notes between the notes, at a rate between the beats
@@ -194,7 +194,7 @@
       parts: { drums: KIT(O('Cathedral Riddim'), 'Heavy (Dubstep/Trap)'), wobble: { role: 'bass', organism: 'eravos.wobble-bass', preset: O('Acid Wobble'), style: 'half', name: 'Acid wobble' },
         choir: { role: 'chords', organism: 'eravos.coven', preset: [O('Golden Ghost Choir'), O('Riddim Requiem')], style: 'sustain', voicing: 'triad', octave: 4, name: 'Choir' },
         organ: { role: 'chords', organism: 'eravos.organ', preset: O('Organ Into Wobble'), style: 'sustain', voicing: 'triad', octave: 3, name: 'Organ' } },
-      fx: [{ organism: 'eravos.fx-filter', preset: O('Choir Behind Glass'), on: 'choir' }, { organism: 'eravos.wub-filter', preset: O('Acid Mouth'), on: 'wobble' }, { organism: 'eravos.fx-destroyer', preset: O('Organ Crush'), on: 'organ' }],
+      fx: [{ organism: 'eravos.fx-filter', preset: O('Choir Behind Glass'), on: 'choir' }, { organism: 'eravos.wub-filter', preset: O('Acid Mouth'), on: 'wobble' }, { organism: 'eravos.fx-destroyer', preset: O('Organ Crush'), on: 'organ' }, { organism: 'eravos.granular', preset: O('Choir Grain Halo'), on: 'choir' }],   // 3.43: the choir scattered into a halo behind itself
       mods: HER(O('Cathedral Drop')).concat([{ organism: 'eravos.edm-lab', preset: O('Machine Choir Roller') }, { organism: 'eravos.wub-rate', preset: O('Golden Rate'), to: 'fx1', key: 'wub' }]),
       master: { compThresh: -10, compRatio: 3, reverbMix: 0.2 } },
 

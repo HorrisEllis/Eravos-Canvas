@@ -15,6 +15,11 @@
     size: { w: 520, h: 520 }, minSize: { w: 400, h: 360 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
     provides: ['capability.audio_out', 'capability.note_in', 'capability.wub_source'],
+    slots: [{ id: 'tone', label: 'its own tone', wire_type: 'audio', hint: 'empty — a Destroyer or a Wub Filter here makes this one window a whole wub' }],   // 3.42 mods: any effect can live inside (canvas/runtime/mods.js)
+    face: ['wave', 'octave', 'index', 'voices', 'spread', 'level'],
+    links: [{ with: 'eravos.wub-filter', dir: 'out', face: ['mode', 'cutoff', 'range', 'res', 'position', 'drive'], hint: 'the mouth it speaks through' },
+            { with: 'eravos.wub-sub', face: ['wave', 'octave', 'cut', 'level'], hint: 'the sub under it' }],
+
     hooks: [
       S.audio_out('wubo.hook.audio_out'), S.note_in('wubo.hook.note_in'), S.midi_in('wubo.hook.midi_in'),
       S.mod_in('wubo.hook.mod_pitch', 'pitch'), S.mod_in('wubo.hook.mod_fm', 'fm'), S.mod_in('wubo.hook.mod_spread', 'spread'),
@@ -41,7 +46,7 @@
       const ac = ctx.ac, P = ctx.params, MT = window.MusicTheory;
       const hz = ac.createConstantSource(); hz.offset.value = 55; hz.start();                    // the pitch every oscillator follows
       const mix = ac.createGain(), amp = ac.createGain(), level = ac.createGain(); amp.gain.value = 0;
-      mix.connect(amp); amp.connect(level);
+      mix.connect(amp); ctx.slot('tone', amp, { label: 'its own tone' }).connect(level);
       ctx.port('out', { kind: 'audio', direction: 'out', node: level, label: 'wub tone' });
       const pitchMod = ctx.modBus('pitch', { min: -1200, max: 1200 });
       const fmMod = ctx.modBus('fm', { min: -6, max: 6 });

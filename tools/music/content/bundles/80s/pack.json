@@ -466,7 +466,14 @@
       "downsample": 2,
       "tilt": 0.1,
       "postLP": 12000,
-      "mix": 1
+      "mix": 1,
+      "asym": 0,
+      "autoGain": true,
+      "tight": 30,
+      "lowKeep": 0,
+      "alias": 0.6,
+      "dither": false,
+      "autoTame": 0.5
      }
     }
    }

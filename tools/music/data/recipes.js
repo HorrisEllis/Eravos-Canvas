@@ -174,13 +174,13 @@
     id: 'eravos.recipe.emerge', label: 'Emerge', icon: '∞', accent: '#aaff44', genome: 'eravos.genome.emerge', tagline: 'GRANULAR CLOUD · EMERGENCE — her voice as a shimmering cloud',
     steps: [
       { op: 'mount', organism: 'eravos.sample-player', as: 'samp', at: [40, 40] },
-      { op: 'mount', organism: 'eravos.granular', as: 'gran', at: [540, 40] },
+      { op: 'mount', organism: 'eravos.granular', as: 'gran', at: [540, 40], preset: 'Voice Cloud' },   // built in 3.43
       { op: 'mount', organism: 'eravos.lfo', as: 'lfo', at: [540, 520] },
       { op: 'mount', organism: 'eravos.fx-moddelay', as: 'md', at: [1100, 40] },
-      { op: 'wire', from: ['samp', 'samp.hook.asset_out'], to: ['gran', 'gran.hook.asset_in'] },
+      { op: 'wire', from: ['samp', 'samp.hook.asset_out'], to: ['gran', 'gra.hook.asset_in'] },
       { op: 'configure', target: 'lfo', params: { div: '4/1', depth: 0.3, polarity: 'bipolar' } },
-      { op: 'wire', from: ['lfo', 'lfo.hook.mod_out'], to: ['gran', 'gran.hook.mod_position'] },
-      { op: 'wire', from: ['gran', 'gran.hook.audio_out'], to: ['md', 'fx.hook.audio_in'] },
+      { op: 'wire', from: ['lfo', 'lfo.hook.mod_out'], to: ['gran', 'gra.hook.mod_position'] },
+      { op: 'wire', from: ['gran', 'fx.hook.audio_out'], to: ['md', 'fx.hook.audio_in'] },
     ],
   });
   R.register({

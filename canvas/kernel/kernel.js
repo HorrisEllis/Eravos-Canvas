@@ -386,7 +386,7 @@
       // edge graph of one wire type at instance level; organism in→out implied
       const adj = new Map();
       wires.forEach(w => {
-        if (w.wire_type !== type) return;
+        if (w.wire_type !== type || (w.meta && w.meta.insert)) return;   // a tool's own insert chain (its mods) is not a path between tools
         if (!adj.has(w.src.instanceId)) adj.set(w.src.instanceId, new Set());
         adj.get(w.src.instanceId).add(w.dst.instanceId);
       });
@@ -439,7 +439,8 @@
             return { ok: false, fault: fault('WIRE_004', { hook_id: src.hookId, message: 'duplicate wire' }) };
           }
         }
-        if (handler.acyclic) {
+        // insert wires (meta.insert): a host routing through a tool it hosts — host → mod → host is the point, not a loop
+        if (handler.acyclic && !(spec.meta && spec.meta.insert)) {
           if (src.instanceId === dst.instanceId || instGraphHasPath(dst.instanceId, src.instanceId, wt)) {
             return { ok: false, fault: fault('WIRE_006', { hook_id: src.hookId, message: `${wt} cycle ${src.instanceId} → ${dst.instanceId}` }) };
           }

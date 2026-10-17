@@ -1,0 +1,64 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "syn-osc.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.43"
+ ],
+ "for": "eravos.syn-osc",
+ "items": {
+  "eravos.syn-osc": {
+   "presets": {
+    "Gospel Morph Stack": {
+     "params": {
+      "bank": "vocal",
+      "morph": 0.25,
+      "octave": 0,
+      "ratio": "1",
+      "fine": 0,
+      "glide": 0,
+      "unison": 3,
+      "detune": 10,
+      "width": 0.8,
+      "fmIndex": 1,
+      "ring": 1,
+      "follow": true,
+      "attack": 0.02,
+      "decay": 0.6,
+      "sustain": 0.75,
+      "release": 0.5,
+      "velocity": 0.6,
+      "level": 0.45
+     }
+    },
+    "Morph Choir Pad": {
+     "params": {
+      "bank": "vocal",
+      "morph": 0.5,
+      "octave": 0,
+      "ratio": "1",
+      "fine": 0,
+      "glide": 0,
+      "unison": 4,
+      "detune": 9,
+      "width": 0.9,
+      "fmIndex": 1,
+      "ring": 1,
+      "follow": true,
+      "attack": 0.9,
+      "decay": 1.5,
+      "sustain": 0.85,
+      "release": 2.5,
+      "velocity": 0.6,
+      "level": 0.5
+     }
+    }
+   }
+  }
+ }
+}
