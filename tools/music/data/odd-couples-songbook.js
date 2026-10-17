@@ -207,7 +207,7 @@
       // +2.9 dBFS and the 5 s cathedral reverb feeds the master — the master input hit +6.9 dBFS. The kit sits 5 dB lower here.
       parts: { drums: Object.assign(KIT('Breaks & World', O('Steppers Machine')), { configure: { volume: 0.5 } }), forge: FORGE(O('Golden Steppers')), bass: { role: 'bass', organism: 'eravos.reese-bass', preset: O('Chapel Reese'), style: 'onedrop', name: 'Bass' },
         wub: { role: 'bass', organism: 'eravos.wub-osc', preset: O('Acid Saw Wub'), style: 'half', name: 'Wub' },
-        organ: { role: 'chords', organism: 'eravos.organ', preset: ['Hanging Tree', O('Synthwave Chapel')], style: 'sustain', voicing: 'triad', octave: 3, name: 'Organ' },
+        organ: { role: 'chords', organism: 'eravos.organ', preset: ['Hanging Tree', O('Synthwave Chapel')], configure: { level: 0.45 }, style: 'sustain', voicing: 'triad', octave: 3, name: 'Organ' },   // held notes sustain since the organ fix: ≈4 dB down keeps the master clear
         chapel: { role: 'lead', organism: 'eravos.retro-poly', preset: O('Wobble Pad Glow'), octave: 5, name: 'Chapel' } },
       fx: [{ organism: 'eravos.dub-station', preset: O('Cathedral Sound System'), on: 'organ' }, { organism: 'eravos.fx-echo', preset: O('Cathedral Throw'), on: 'chapel' }, { organism: 'eravos.fx-eq', preset: O('Church Low Cut'), on: 'organ' }],
       mods: HER(O('Golden Gap')).concat([{ organism: 'eravos.wub-sub', preset: O('Cathedral Sub') }, { organism: 'eravos.embodiment-lab', preset: O('Hold Her Voice') }, { organism: 'eravos.master-fx', preset: O('Cathedral Master') }]),
