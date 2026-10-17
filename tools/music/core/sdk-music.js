@@ -229,7 +229,13 @@ registerProcessor('eravos-pitch', EravosPitch);`;
     const mixMod = ctx.modBus('mix', { min: 0, max: 1 }); const neg = ac.createGain(); neg.gain.value = -1;
     mixMod.connect(wet.gain); mixMod.connect(neg); neg.connect(dry.gain);
     [inp, inGain, dry, wet, sum, outGain, wetIn, wetOut, neg, dryAl, dryAlG].forEach(n => ctx.track(n));
-    let latency = 0, aligned = false;
+    let latency = 0, aligned = false, own = 0, extra = 0;
+    function apply() {
+      const sec = own + extra; if (sec === latency) return; latency = sec;
+      dryAl.delayTime.setValueAtTime(Math.min(0.25, sec), ac.currentTime); levels(false);
+      ctx.K.ledger.write('latency_reported', { instance_id: ctx.id, organism_id: ctx.descriptor.id, latency_sec: sec }); ctx.emitUI('latency', { sec });
+      if (ctx.K.audio && ctx.K.audio.setLatency) ctx.K.audio.setLatency(ctx.id, sec);
+    }
     function route(on) {   // the mix modulation follows whichever dry path is live
       if (on === aligned) return; aligned = on;
       try { neg.disconnect(); } catch (e) {} neg.connect(on ? dryAlG.gain : dry.gain);
@@ -248,7 +254,9 @@ registerProcessor('eravos-pitch', EravosPitch);`;
     ['mix', 'bypass', 'inGain', 'outGain'].forEach(k => P.onChange(k, () => levels()));
     return {
       inp, wetIn, wetOut, dry, wet, outGain, levels,
-      setLatency(sec) { if (sec !== latency) { latency = sec; dryAl.delayTime.setValueAtTime(Math.min(0.25, sec), ac.currentTime); levels(false); ctx.K.ledger.write('latency_reported', { instance_id: ctx.id, organism_id: ctx.descriptor.id, latency_sec: sec }); ctx.emitUI('latency', { sec }); } },
+      // own: this tool's wet chain · extra: the mods inside its wet path (3.43) — the blended dry waits for both
+      setLatency(sec) { own = sec; apply(); },
+      addLatency(sec) { extra = sec; apply(); },
       get latency() { return latency; },
     };
   }
@@ -310,6 +318,13 @@ registerProcessor('eravos-pitch', EravosPitch);`;
           const t = ac.currentTime; thru.gain.cancelScheduledValues(t); thru.gain.setValueAtTime(thru.gain.value, t); thru.gain.linearRampToValueAtTime(on ? 0 : 1, t + 0.005);
         };
         ['kernel:wire-registered', 'kernel:wire-removed'].forEach(tp => { const un = K.bus.subscribe(tp, (w) => { if (w && w.dst && w.dst.instanceId === ctx.id) sync(); }, ctx.id); ctx.onDispose(un); });
+        // the delay of the mods in this slot (the sum along its chain) → o.onLatency (an fx host: its dry alignment)
+        if (o.onLatency) {
+          let last = -1;
+          const chain = () => K.wires.list().filter(w => w.meta && w.meta.insert && w.meta.host === ctx.id && w.meta.slot === id).map(w => w.dst.instanceId).filter(x => x !== ctx.id);
+          const relat = () => { const sec = chain().reduce((a, c) => a + (K.audio.latencyOf ? K.audio.latencyOf(c) : 0), 0); if (sec !== last) { last = sec; o.onLatency(sec); } };
+          ['kernel:wire-registered', 'kernel:wire-removed', 'audio:latency'].forEach(tp => { const un = K.bus.subscribe(tp, () => relat(), ctx.id); ctx.onDispose(un); });
+        }
         return out;
       };
       // run fn when AUDIO time reaches t (not wall-clock) — correct in offline renders and when ticks run ahead

@@ -61,6 +61,38 @@ describe('P44 · mods — any tool inside another', () => {
     U.ctx.suspend(0.8).then(() => { TH.note(U, o, 45, 0.82, { duration: 0.6 }); U.ctx.resume(); });   // played again AFTER the stop
     const b = await TH.render(U); assert.lt(TH.db(TH.rms(b, 0.5, 0.75)), -60, 'stopped'); assert.gt(TH.db(TH.rms(b, 1.0, 1.35)), -40, 'heard again after the stop, through its mod');
   });
+  it('⇲ a window on the canvas moves inside: its settings come along, and what fed it now feeds what it fed', () => {
+    const U = TH.universe(0.2), o = TH.spawn(U, 'eravos.wub-osc'), e = TH.spawn(U, 'eravos.fx-echo'), d = TH.spawn(U, 'eravos.fx-destroyer');
+    const W = (a, ah, b, bh) => assert.ok(U.K.wires.register({ src: { instanceId: a, hookId: ah }, dst: { instanceId: b, hookId: bh } }).ok);
+    W(o, 'wubo.hook.audio_out', e, 'fx.hook.audio_in'); W(e, 'fx.hook.audio_out', d, 'fx.hook.audio_in'); ctxOf(e).params.set('feedback', 0.61);
+    assert.ok(Mods.movable(d, 'after').some(t => t.instanceId === e), 'offered');
+    const u = Mods.absorb(d, 'after', e); assert.ok(u, 'moved');
+    assert.ok(!U.K.registry.has(e), 'its window is gone'); assert.equal(ctxOf(Mods.childOf(d, u)).params.get('feedback'), 0.61, 'settings came along');
+    assert.ok(U.K.wires.list().some(w => w.src.instanceId === o && w.dst.instanceId === d && !(w.meta && w.meta.insert)), 'Wub Osc now feeds the Destroyer directly');
+  });
+  it('⇱ a mod pops out to its own window, wired straight after its host (before what the host fed)', () => {
+    const U = TH.universe(0.2), d = TH.spawn(U, 'eravos.fx-destroyer'), e = TH.spawn(U, 'eravos.fx-echo');
+    U.K.wires.register({ src: { instanceId: d, hookId: 'fx.hook.audio_out' }, dst: { instanceId: e, hookId: 'fx.hook.audio_in' } });
+    const u = Mods.add(d, 'after', 'eravos.wub-filter'); ctxOf(Mods.childOf(d, u)).params.set('cutoff', 444);
+    const f = Mods.popOut(d, u); assert.ok(f && U.K.registry.has(f), 'a tool of its own'); assert.equal(Mods.list(d).length, 0, 'gone from the rack');
+    assert.equal(ctxOf(f).params.get('cutoff'), 444, 'same settings');
+    const plainW = U.K.wires.list().filter(w => !(w.meta && w.meta.insert));
+    assert.ok(plainW.some(w => w.src.instanceId === d && w.dst.instanceId === f), 'host → it'); assert.ok(plainW.some(w => w.src.instanceId === f && w.dst.instanceId === e), 'it → what the host fed');
+    assert.ok(!plainW.some(w => w.src.instanceId === d && w.dst.instanceId === e), 'no bypass left behind');
+  });
+  it('a mod that delays its sound (a Destroyer inside a Wub Filter) is waited for: at mix 0.5 the dry no longer arrives early', async () => {
+    const U = TH.universe(0.5), f = TH.spawn(U, 'eravos.wub-filter'), c = ctxOf(f); c.params.setMany({ mix: 0.5, mode: 'lowpass', cutoff: 8000, range: 0, position: 1 }); if (c.ready) await c.ready;
+    const kid = Mods.childOf(f, Mods.add(f, 'after', 'eravos.fx-destroyer')); const kc = ctxOf(kid); kc.params.setMany({ mix: 1, drive: 0 }); await kc.ready;
+    const own = OrganismSDK.dsp.osLatency(U.ctx, '4x'), mod = U.K.audio.latencyOf(kid); assert.gt(mod, 0, 'the mod delays');
+    assert.near(U.K.audio.latencyOf(f), own + mod, 1e-6, 'the host reports its own delay plus its mod’s');
+    U.K.audio.chain.out.disconnect(U.ctx.destination); U.K.audio.port(f, 'out').node.connect(U.ctx.destination);
+    // a tone burst (a lone 1-sample impulse does not survive these offline graphs, before this change too): the first sound out
+    // must come after the host's AND the mod's delay — before 3.43 the blended dry came through after the host's alone
+    const o = U.ctx.createOscillator(), g = U.ctx.createGain(); o.frequency.value = 440; g.gain.value = 0.3; o.connect(g); g.connect(U.K.audio.port(f, 'in').node); o.start(0.1); o.stop(0.2);
+    const x = (await TH.render(U)).getChannelData(0), s0 = Math.round(0.1 * SR), want = Math.round((own + mod) * SR);
+    let first = -1; for (let i = s0; i < s0 + 4000; i++) if (Math.abs(x[i]) > 1e-3) { first = i - s0; break; }
+    assert.gt(first, want - 8, `first sound ${first} samples after the input; host + mod delay = ${want}`); assert.gt(TH.db(TH.rms({ getChannelData: () => x, sampleRate: SR, duration: 0.5 }, 0.12, 0.2)), -40, 'and it is heard');
+  });
   it('adding a mod is one undo step on the host; undo takes the mod out again', async () => {
     const U = TH.universe(0.2), Hs = History.create(U.K), h = TH.spawn(U, 'eravos.wub-filter');
     await TH.sleep(30); Mods.add(h, 'after', 'eravos.fx-destroyer'); await TH.sleep(520);

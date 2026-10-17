@@ -85,7 +85,7 @@
       const gLP = ac.createGain(), g12 = ac.createGain(), gV = ac.createGain(), gC = ac.createGain();
       biqOut.connect(gLP); one.connect(g12); vOut.connect(gV); cOut.connect(gC);
       const sel = ac.createGain(); [gLP, g12, gV, gC].forEach(g => g.connect(sel));
-      const dcBlock = ac.createBiquadFilter(); dcBlock.type = 'highpass'; dcBlock.frequency.value = 18; sel.connect(dcBlock); ctx.slot('after', dcBlock, { label: 'after the mouth' }).connect(fx.wetOut);
+      const dcBlock = ac.createBiquadFilter(); dcBlock.type = 'highpass'; dcBlock.frequency.value = 18; sel.connect(dcBlock); ctx.slot('after', dcBlock, { label: 'after the mouth', onLatency: fx.addLatency }).connect(fx.wetOut);
       [pre, sh, posK, wubPol, pos, f1, f2, cents, biqOut, one, vIn, vOut, cIn, delay, fb, damp, cOut, delayScale, gLP, g12, gV, gC, sel, dcBlock].forEach(n => ctx.track(n));
       bands.forEach(bd => [bd.b, bd.g, bd.fScale, bd.gScale].forEach(n => ctx.track(n)));
 

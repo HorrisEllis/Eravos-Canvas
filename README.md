@@ -69,6 +69,11 @@ The song's name ends in its number: `SongEngine.write('synthwave', 4242)` builds
 - **Mods — any tool inside another.** Destroyer, Wub Osc, Wub Filter and Wub Sub have a 🧩 MODS rack: ＋ mod puts any effect
   inside (Wub Filter inside the Destroyer, a Destroyer inside a Wub Osc …) — no extra window, one undo step, saved with it,
   mods can hold mods. ⏻ bypass, ↑ ↓ reorder, ⤢ shows a mod's whole window.
+- **In and out freely**: ＋ mod also lists the windows already on your canvas — ⇲ moves one inside and joins its cables up
+  behind it; ⇱ on a mod pops it back out into its own window, wired straight after its host. A mod that delays its sound
+  (a Destroyer's oversampling) is waited for, so its host's Mix never comb-filters.
+- **Granular**: any sound into a cloud of grains — live from whatever is wired in (or the tool it sits inside as a mod), or from
+  a clip. Freeze, feedback shimmer, tempo-synced stutters, pitch spray in key, play it from notes; click the field to burst.
 - **Synthesis** (new category): **Morph Osc** — wavetable oscillator that morphs (analog / vocal / digital / organ tables),
   with FM and Ring INPUTS: wire one Morph Osc into another's FM in and you have FM synthesis — the modulator follows the
   notes by itself. **Envelope** — wire it into any knob on any tool; it moves on that tool's notes. **Partials** — additive:

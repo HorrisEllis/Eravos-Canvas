@@ -70,6 +70,10 @@ const DESIGN = {
     'Spectral Glass Pad': P('Glass Keys', { attack: 0.25, decay: 1.5, sustain: 0.6, release: 1.4, evolve: 2.5, tilt: -0.15, level: 0.5 }, 'glass partials that evolve to a pure tone under trap 808s'),
     'Bell Choir': P('Evolving Choir', { stretch: 0.03, damp: 0.3, level: 0.5 }, 'a choir that rings like bells'),
   },
+  'eravos.granular': {
+    'Choir Grain Halo': P('Shimmer Pad', { pitch: 0, pitchSpray: 12, quantize: true, feedback: 0.35, size: 0.3, density: 18, mix: 0.35 }, 'the machine choir scattered into a halo an octave around itself'),
+    'Riddim Grain Stutter': P('Stutter 1/8', { sync: '1/16', size: 0.06, mix: 0.6 }, 'a 1/16 grain stutter for wub drops'),
+  },
   'eravos.supersaw': {
     'Gospel Stack': P('Chord Stab (triad)', { chordMode: 'off', unison: 5, detune: 0.25, cutoff: 4200, aR: 0.25, level: 0.6 }, 'gospel sevenths stacked as saws, for the glitch gospel (chordMode off: the song sends the seventh chords — on, every note became a chord: 16 notes × 5 saws)'),
     'Acid Church Pad': P('Airy Sus Pad', { chordMode: 'off', cutoff: 2600, res: 1.5, level: 0.55 }, 'a sus4 cloud between the 303 and the choir'),

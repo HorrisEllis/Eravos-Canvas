@@ -46,5 +46,14 @@ first users:
 tests: tests/p44-links-mods.test.js (hooks + param ; picker ; sound through a mod, bypass = plain ; order ; save → load ;
        nested ; Stop all wakes mods ; one undo step ; links both sides + onLinks ; default face) and each synthesis tool's own
 
-next (mapped, not built): drag a window onto a rack to make it a mod · ⇱ pop a mod out to its own window, wired in place ·
-       latency of a mod reported to its host's dry path · modulation slots (an LFO / Envelope living inside a tool)
+in and out (3.43.1):
+  ⇲ Mods.absorb(host, slot, instance) — a window already on the canvas moves inside (＋ mod lists them first): its state comes
+       along, its window closes, and every tool that fed it is wired to every tool it fed (the chain closes behind it)
+  ⇱ Mods.popOut(host, uid) — a mod becomes its own window beside its host with the same state, wired host → it → whatever the
+       host fed (those wires move behind it)
+  both are a handful of steps inside 150 ms → one undo step
+latency (3.43.1):
+  K.audio.setLatency / latencyOf / 'audio:latency' — how late a tool's processed sound is (the STD.fx shell reports own + extra)
+  ctx.slot(id, node, { onLatency }) sums the delays of the mods in that slot's chain; an fx host passes fx.addLatency, so its
+       blended dry waits for its own wet chain AND its mods (Destroyer, Wub Filter). Nested hosts report their totals upward.
+next (mapped, not built): drag a window by its title onto a rack · modulation slots (an LFO / Envelope living inside a tool)

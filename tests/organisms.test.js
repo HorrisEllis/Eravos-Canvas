@@ -1180,8 +1180,13 @@ describe('P13 skeleton + packs — the canvas expands', () => {
     Recipes.register({ id: 'test.p13-ghost', label: 'Ghost', steps: [{ op: 'mount', organism: 'eravos.does-not-exist', as: 'g' }] });
     assert.ok(!Recipes.list().some(r => r.id === 'test.p13-ghost')); assert.ok(Recipes.all().some(r => r.id === 'test.p13-ghost'));
   });
-  it('recipes referencing never-built organisms are hidden (spatial, visual, emerge)', () => {
-    ['eravos.recipe.spatial', 'eravos.recipe.visual', 'eravos.recipe.emerge'].forEach(id => { const r = Recipes.get(id); if (r) assert.ok(!Recipes.available(r), id); });
+  it('recipes referencing never-built organisms are hidden (spatial, visual)', () => {
+    ['eravos.recipe.spatial', 'eravos.recipe.visual'].forEach(id => { const r = Recipes.get(id); if (r) assert.ok(!Recipes.available(r), id); });
+  });
+  it('Emerge is offered once Granular exists (3.43), and every wire it asks for names a real hook', () => {
+    const r = Recipes.get('eravos.recipe.emerge'); assert.ok(r && Recipes.available(r));
+    const as = {}; r.steps.filter(s => s.op === 'mount').forEach(s => { as[s.as] = OrganismFactory.def(s.organism); });
+    r.steps.filter(s => s.op === 'wire').forEach(s => [s.from, s.to].forEach(([who, hook]) => assert.ok(as[who].hooks.some(h => h.hook_id === hook), `${who}.${hook}`)));
   });
   it('Vagal is offered once its tools exist (Breath + Gothic Organ were built in P14)', () => {
     const r = Recipes.get('eravos.recipe.vagal'); assert.ok(r && Recipes.available(r));

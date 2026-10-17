@@ -368,6 +368,12 @@
       // a tool's mods (insert wires) wake with it — they are part of its sound
       if (instanceId) { seen = seen || new Set([instanceId]); K.wires.list().forEach(w => { if (w.meta && w.meta.insert && w.src.instanceId === instanceId && !seen.has(w.dst.instanceId)) { seen.add(w.dst.instanceId); audio.unhush(w.dst.instanceId, at, seen); } }); }
     };
+    // 3.43 how late a tool's processed sound is (oversampled shapers, pitch windows) — a host adds its mods' delays to its
+    // own dry alignment. Set by the STD.fx shell; read by the mods slot helper (sdk-music ctx.slot).
+    const latencies = new Map();
+    audio.setLatency = (instanceId, sec) => { const v = Math.max(0, +sec || 0); if ((latencies.get(instanceId) || 0) === v) return; if (v) latencies.set(instanceId, v); else latencies.delete(instanceId); bus.publish('audio:latency', { instanceId, sec: v }); };
+    audio.latencyOf = (instanceId) => latencies.get(instanceId) || 0;
+    bus.subscribe('kernel:organism-unmounted', (p) => { if (p && latencies.delete(p.instanceId)) bus.publish('audio:latency', { instanceId: p.instanceId, sec: 0 }); }, 'kernel');
     audio.hushed = (instanceId) => K.ports.list(instanceId).some(p => p.guard && p.hushedUntil > audio.ctx.currentTime);
     bus.subscribe('kernel:silence', (p) => { if (p && p.hard) { audio.hush(p.instanceId, p.time); if (!p.instanceId) audio.duckUnderReset(p.time); } }, 'kernel');
     // playing again reopens at once: a note for that tool, or the transport starting

@@ -1,6 +1,7 @@
 /* ERAVOS runtime — mods-rack.js → window.ModsRack (spec eravos.links-and-mods). Domain-free.
  * The MODS rack at the foot of every window whose tool has slots: ＋ adds any tool that fits; each mod is a card with
- * its own controls (its face, or its whole window with ⤢), ⏻ bypass, ↑ ↓ order, × remove. Every edit is undoable. */
+ * its own controls (its face, or its whole window with ⤢), ⏻ bypass, ↑ ↓ order, ⇱ pop out to a window, × remove;
+ * ＋ also moves a window already on the canvas inside (⇲). Every edit is undoable. */
 (function (global) {
   'use strict';
   const doc = global.document;
@@ -42,6 +43,7 @@
         btn('↑', 'earlier in the chain', () => M.move(hostId, e.uid, -1)), btn('↓', 'later in the chain', () => M.move(hostId, e.uid, 1)),
         btn(mode === 'full' ? '▣' : '⤢', mode === 'full' ? 'show just its main controls' : 'show all of it', () => { folded.set(cid, mode === 'full' ? 'face' : 'full'); render(hostId); WM.fitToContent(hostId); }),
         btn(mode === 'shut' ? '▸' : '▾', mode === 'shut' ? 'unfold' : 'fold', () => { folded.set(cid, mode === 'shut' ? 'face' : 'shut'); render(hostId); WM.fitToContent(hostId, { shrink: true }); }),
+        btn('⇱', 'pop it out to its own window, wired straight after this one', () => M.popOut(hostId, e.uid)),
         btn('×', 'remove this mod (Ctrl+Z brings it back)', () => M.remove(hostId, e.uid)),
       ]));
       if (!c || mode === 'shut') return el;
@@ -60,6 +62,12 @@
       const pop = h('div', { class: 'md-pick' }, [q, listEl]);
       const paint = () => {
         const s = q.value.trim().toLowerCase(); listEl.innerHTML = ''; let cat = null;
+        // tools already on the canvas: move one inside (its cables are joined up behind it)
+        const here = M.movable(hostId, sl.id).filter(t => !s || t.label.toLowerCase().includes(s));
+        if (here.length) {
+          listEl.appendChild(h('div', { class: 'md-cat', text: 'on the canvas — move it inside' }));
+          here.forEach(t => { const b = h('button', { class: 'md-item', title: 'moves this window inside; what fed it now feeds what it fed', text: `⇲ ${t.icon} ${t.label} · ${t.instanceId.split('-').slice(-2).join('')}` }); b.addEventListener('click', (ev) => { ev.stopPropagation(); pop.remove(); M.absorb(hostId, sl.id, t.instanceId); }); listEl.appendChild(b); });
+        }
         tools.filter(t => !s || (t.label + ' ' + t.category + ' ' + t.blurb).toLowerCase().includes(s)).forEach(t => {
           if (t.category !== cat) { cat = t.category; listEl.appendChild(h('div', { class: 'md-cat', text: cat || 'other' })); }
           const b = h('button', { class: 'md-item', title: t.blurb, text: `${t.icon} ${t.label}` });

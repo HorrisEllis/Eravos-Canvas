@@ -55,6 +55,7 @@
     "eravos.fx-moddelay",
     "eravos.fx-phaser",
     "eravos.fx-pitch",
+    "eravos.granular",
     "eravos.harmonic-analyzer",
     "eravos.master-fx",
     "eravos.sidechain-compressor",

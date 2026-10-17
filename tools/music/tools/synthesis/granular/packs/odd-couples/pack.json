@@ -1,0 +1,70 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "granular.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.43"
+ ],
+ "for": "eravos.granular",
+ "items": {
+  "eravos.granular": {
+   "presets": {
+    "Choir Grain Halo": {
+     "params": {
+      "position": 0.6,
+      "spray": 0.25,
+      "memory": 3,
+      "scan": 0,
+      "freeze": false,
+      "size": 0.3,
+      "shape": 1,
+      "density": 18,
+      "sync": "off",
+      "reverse": 0,
+      "pitch": 0,
+      "pitchSpray": 12,
+      "quantize": true,
+      "keys": false,
+      "width": 0.9,
+      "feedback": 0.35,
+      "level": 1,
+      "mix": 0.35,
+      "inGain": 0,
+      "outGain": 0,
+      "bypass": false
+     }
+    },
+    "Riddim Grain Stutter": {
+     "params": {
+      "position": 0.97,
+      "spray": 0.0,
+      "memory": 3,
+      "scan": 0,
+      "freeze": false,
+      "size": 0.06,
+      "shape": 0.3,
+      "density": 0,
+      "sync": "1/16",
+      "reverse": 0,
+      "pitch": 0,
+      "pitchSpray": 0,
+      "quantize": false,
+      "keys": false,
+      "width": 0.6,
+      "feedback": 0,
+      "level": 1,
+      "mix": 0.6,
+      "inGain": 0,
+      "outGain": 0,
+      "bypass": false
+     }
+    }
+   }
+  }
+ }
+}

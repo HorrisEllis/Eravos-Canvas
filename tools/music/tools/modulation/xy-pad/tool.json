@@ -55,6 +55,7 @@
     "eravos.fx-moddelay",
     "eravos.fx-phaser",
     "eravos.fx-pitch",
+    "eravos.granular",
     "eravos.lfo",
     "eravos.master-fx",
     "eravos.organ",

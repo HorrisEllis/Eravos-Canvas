@@ -124,7 +124,7 @@ async function measureTool(id) {
         const POLY = /pad-forge|supersaw|retro-poly|organ|coven|xen-synth/.test(id), chord = out.kind === 'instrument' && POLY ? [note, note + 3, note + 7] : [note];
         if (out.kind === 'instrument' || out.kind === 'sampler') chord.forEach(n => U.K.bus.publish('note:trigger', { target: inst, note: n, velocity: 0.9, time: 0.1, duration: 2.7 }));   // still held when Stop all lands
         if (chord.length > 1) { r.chord = true; expectHz = 0; }   // a triad has no single pitch to check
-        if (out.kind === 'effect') { const o = U.ctx.createOscillator(), g = U.ctx.createGain(); o.type = 'sawtooth'; o.frequency.value = 110; g.gain.value = 0.5; o.connect(g); g.connect(inPort(U, inst).node); o.start(0.1); o.stop(1.3); expectHz = 0; }
+        if (out.kind === 'effect') { const o = U.ctx.createOscillator(), g = U.ctx.createGain(); o.type = 'sawtooth'; o.frequency.value = 110; g.gain.value = 0.5; o.connect(g); g.connect(inPort(U, inst).node); o.start(0.1); o.stop(1.3); expectHz = 0; if (plays) U.K.bus.publish('note:trigger', { target: inst, note: 60, velocity: 0.9, time: 0.1, duration: 1.2 }); }   // an effect that takes notes (Granular keys) is measured with one held
         U.T.bpm = bpm; U.T.renderTicks(0, Math.floor(secs * bpm / 15), 0);   // the transport runs: arps, gates and synced LFOs move as they do in a song
         stopAt(U, 2.0);   // Stop all (hard), pressed when the clock reaches 2.0 s
         const buf = await TH.render(U), mono = mixDown(buf); levels(r, buf, mono, 0.3, 1.2);

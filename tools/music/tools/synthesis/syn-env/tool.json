@@ -61,6 +61,7 @@
     "eravos.fx-moddelay",
     "eravos.fx-phaser",
     "eravos.fx-pitch",
+    "eravos.granular",
     "eravos.lfo",
     "eravos.macro-automation",
     "eravos.master-fx",

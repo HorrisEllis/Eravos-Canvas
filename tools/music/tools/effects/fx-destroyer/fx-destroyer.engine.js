@@ -117,7 +117,7 @@ registerProcessor('eravos-crush2', EravosCrush2);`;
       tight.connect(xHP1); xHP1.connect(xHP2); xHP2.connect(pre); pre.connect(sh); sh.connect(lvl); lvl.connect(dcb); dcb.connect(aa); aa.connect(crushIn);
       img1.connect(img2); img2.connect(tame); tame.connect(dcb2); dcb2.connect(sum);   // a coarse quantiser makes DC of its own
       hi.connect(xLP1); xLP1.connect(xLP2); xLP2.connect(lowDly); lowDly.connect(lowG); lowG.connect(sum);   // lows skip TIGHT too: kept means kept
-      ctx.slot('after', sum, { label: 'after the damage' }).connect(fx.wetOut);   // its mods, inside the wet path
+      ctx.slot('after', sum, { label: 'after the damage', onLatency: fx.addLatency }).connect(fx.wetOut);   // its mods, inside the wet path
       const driveMod = ctx.modBus('drive', { min: -1, max: 1 }); driveMod.connect(pre.gain);
       let crush = null, quant = null;
       crushIn.connect(img1); // until the worklet is ready (or if it never is)
