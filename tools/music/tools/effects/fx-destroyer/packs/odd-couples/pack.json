@@ -22,7 +22,14 @@
       "downsample": 2,
       "tilt": -0.1,
       "postLP": 10000,
-      "mix": 0.5
+      "mix": 0.5,
+      "asym": 0,
+      "autoGain": true,
+      "tight": 40,
+      "lowKeep": 0,
+      "alias": 0.3,
+      "dither": true,
+      "autoTame": 0.5
      }
     },
     "Golden Fold": {
@@ -33,7 +40,14 @@
       "downsample": 1,
       "tilt": 0,
       "postLP": 9000,
-      "mix": 0.618
+      "mix": 0.618,
+      "asym": 0.15,
+      "autoGain": true,
+      "tight": 40,
+      "lowKeep": 0,
+      "alias": 0.35,
+      "dither": false,
+      "autoTame": 0.5
      }
     }
    }

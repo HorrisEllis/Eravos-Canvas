@@ -62,6 +62,15 @@ Techno, Trap, Synthwave (80s), Darkwave (80s), Witch House). Every press writes 
 drums, bass, chords, lead and the arrangement — on the Timeline, all in key. Click any clip to edit it in the piano roll.
 The song's name ends in its number: `SongEngine.write('synthwave', 4242)` builds that exact song again.
 
+## 3.42 — Destroyer 2.0 · distortion that sits in a mix
+- **Same volume, new colour**: drive no longer adds up to +13 dB on quiet parts (1.x levelled itself at full scale) —
+  gain is matched across −6…−24 dBFS, so switching it on changes the tone, not the loudness.
+- **No more fizz**: its own curves with a smooth knee (hard, fold were brick walls) + **Auto tame** rolls off the top as
+  the drive goes up. New shapes **tape · fuzz · rectify**, and **Asym** for warm even harmonics.
+- **Bass that stays bass**: **Tight** cuts the mud before the shaper; **Low keep** leaves the sub clean under the grit.
+- **Crush that crunches instead of hissing**: **Alias** (0 clean lo-fi … 1 raw 8-bit fold-over), **Dither**, smooth
+  fractional downsample under modulation. 7 new presets (Fuzz Box, Wub Grit · sub stays clean, Drum Bus Crunch …).
+
 ## 3.41 — Odd Couples · every tool measured · her voice on top
 - **Songs → 🧪 Odd Couples**: 72 songs in 12 genres made from tools that never meet — a cathedral organ over the riddim wub
   rig, a 303 at a séance, golden-ratio bells on a dub sound system, a music box over tearout, a breathing drone under 174 drum &

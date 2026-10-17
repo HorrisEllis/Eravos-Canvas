@@ -24,13 +24,34 @@
                           "soft",
                           "hard",
                           "tube",
-                          "fold"
+                          "fold",
+                          "tape",
+                          "fuzz",
+                          "rectify"
                         ]
                       },
                       "drive": {
                         "type": "number",
                         "minimum": 0,
                         "maximum": 1
+                      },
+                      "asym": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "autoGain": {
+                        "type": "boolean"
+                      },
+                      "tight": {
+                        "type": "number",
+                        "minimum": 10,
+                        "maximum": 600
+                      },
+                      "lowKeep": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 400
                       },
                       "bits": {
                         "type": "integer",
@@ -42,6 +63,14 @@
                         "minimum": 1,
                         "maximum": 64
                       },
+                      "alias": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "dither": {
+                        "type": "boolean"
+                      },
                       "tilt": {
                         "type": "number",
                         "minimum": -1,
@@ -51,6 +80,11 @@
                         "type": "number",
                         "minimum": 1000,
                         "maximum": 20000
+                      },
+                      "autoTame": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
                       },
                       "mix": {
                         "type": "number",
