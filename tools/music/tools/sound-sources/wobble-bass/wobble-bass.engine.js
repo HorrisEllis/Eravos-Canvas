@@ -85,7 +85,7 @@
   }
 
   OrganismFactory.define({
-    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '3.2.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
+    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '3.3.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
     category: 'Sound sources', blurb: 'Dubstep wobble / talking "yoi" bass locked to the tempo. The drop.',
     size: { w: 560, h: 600 }, minSize: { w: 420, h: 380 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
@@ -127,6 +127,7 @@
       { key: 'noise', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Noise', group: 'TONE' },
       { key: 'sqOct', type: 'enum', options: ['0', '-1'], default: '0', label: 'Square oct', group: 'TONE', hint: 'the Square layer against the saw: 0 = same pitch, −1 = an octave under (thick, but 27.5 Hz under an A2 is rumble you feel more than hear)' },
       { key: 'subOct', type: 'enum', options: ['0', '-1', '-2'], default: '0', label: 'Sub oct', group: 'TONE', hint: 'the sub against the wub: 0 = same pitch (the usual), −1 / −2 = deeper (−2 is below most speakers)' },
+      { key: 'subAlign', type: 'boolean', default: false, label: 'Sub in phase', group: 'TONE', hint: 'line the clean sub up with the wub layer (it reaches the output 8 ms later through the grit): a more even low end from note to note; off = the original sound' },
       { key: 'level', type: 'number', default: 1, min: 0, max: 1.5, step: 0.01, label: 'Level', group: 'TONE' },
       { key: 'glide', type: 'number', default: 0.06, min: 0, max: 0.5, step: 0.001, unit: 's', label: 'Glide', group: 'ENV' },
       { key: 'attack', type: 'number', default: 0.005, min: 0.001, max: 1, step: 0.001, unit: 's', label: 'Attack', group: 'ENV' },
@@ -187,7 +188,10 @@
       // the mid layer (and so every preset's low end) is exactly as before; aligning it is a separate, measured choice
       // (specs: wobble-bass.spec § 3.2 timing). Vibrato (oscillator detune) still lands 192 behind the filter.
       const OS4 = dsp.osLatency(ac, '4x'), OSC_LAT = 2 * OS4, FILT_LAT = OS4;
-      post.connect(dcBlock); dcBlock.connect(fizz); fizz.connect(amp); subLP.connect(amp); amp.connect(trem); trem.connect(level);
+      // Sub in phase (3.41, off by default): the clean sub waits OSC_LAT and its pitch leaves OSC_LAT early, like the wub layer
+      const subAl = ac.createDelay(0.05); subAl.delayTime.value = P.get('subAlign') ? OSC_LAT : 0; ctx.track(subAl);
+      P.onChange('subAlign', (v) => subAl.delayTime.setValueAtTime(v ? OSC_LAT : 0, ac.currentTime));
+      post.connect(dcBlock); dcBlock.connect(fizz); fizz.connect(amp); subLP.connect(subAl); subAl.connect(amp); amp.connect(trem); trem.connect(level);
       [dcBlock, fizz, subLP].forEach(n => ctx.track(n));
       ctx.port('out', { kind: 'audio', direction: 'out', node: level, label: 'wobble' });
 
@@ -286,7 +290,7 @@
       function setFreq(f, t0, glide, fromHz) {
         const from = fromHz || curF, subK = SUBK[P.get('subOct')] || 1;
         [[saw, 1, true], [sq, P.get('sqOct') === '-1' ? 0.5 : 1, true], [saw2, 1, true], [sub, subK, false]].forEach(([o, k, shaped]) => {
-          const t = shaped ? Math.max(ac.currentTime, t0 - OSC_LAT) : t0;   // 3.39: the shaped layer's pitch leaves early; the sub's on time
+          const t = (shaped || P.get('subAlign')) ? Math.max(ac.currentTime, t0 - OSC_LAT) : t0;   // 3.39: the shaped layer's pitch leaves early; the sub's too when it is in phase
           o.frequency.cancelScheduledValues(t);
           if (glide > 0) { o.frequency.setValueAtTime(from * k, t); o.frequency.exponentialRampToValueAtTime(f * k, t + glide); }
           else o.frequency.setValueAtTime(f * k, t);

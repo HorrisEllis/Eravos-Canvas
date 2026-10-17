@@ -1,7 +1,7 @@
 {
   "schema": "eravos.tool/1",
   "id": "eravos.wobble-bass",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "label": "Wobble Bass",
   "icon": "🔊",
   "accent": "#ff2266",

@@ -78,7 +78,7 @@ tests/p16-ui.mjs had failed since 3.34 (it looked for Song Engine cards on the s
   📖 Songs, writes the song through the Songs page, and that every control in a tool window is reachable with the wheel.
 
 ## Open (measured, not yet changed) — the user decides
-  · Wobble sub alignment: aligning the clean sub to the mid layer evens the low end across notes (Classic Wub spread
+  · Wobble sub alignment → Wobble Bass 3.3 "Sub in phase" (TONE, OFF by default): the user A/Bs it. Measured: aligning the clean sub to the mid layer evens the low end across notes (Classic Wub spread
     5.7 → 2.4 dB, Half-time 5.6 → 1.9) but moves average low end per preset (Classic/Half-time/Monstercat −3…−4 dB,
     Screech/Fold +4 dB). The mid layer is high-passed 85 Hz (2nd order) against a 140 Hz low-passed sub: an overlapping
     2nd-order pair is ~180° apart in the overlap. A Linkwitz–Riley 4 crossover was tried at 90 / 110 Hz: no clear win

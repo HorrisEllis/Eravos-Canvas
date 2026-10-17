@@ -200,6 +200,9 @@
                           "-2"
                         ]
                       },
+                      "subAlign": {
+                        "type": "boolean"
+                      },
                       "level": {
                         "type": "number",
                         "minimum": 0,

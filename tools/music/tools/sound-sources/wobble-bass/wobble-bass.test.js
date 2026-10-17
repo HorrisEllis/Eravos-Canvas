@@ -93,3 +93,21 @@ describe('Wobble Bass 3.1 · sub at the wub’s pitch, fold grit, mid-range grow
     for (const n of ['Bun Dem Growl (dancehall drop)', 'Sound-System Screech', 'Fold Growl Wub 1/8']) assert.gt(await mids(n), classic * 2, n);
   }, { timeout: 60000 });
 });
+
+// 3.3 — Sub in phase (off by default): the clean sub lined up with the wub layer (which reaches the output 384 samples later
+// through the two 4x shapers). Measured over a bass octave: the low end (20–140 Hz) is more even from note to note.
+describe('Wobble Bass 3.3 · Sub in phase', () => {
+  const low = async (preset, align, note) => {
+    const U = TH.universe(1.6, { bpm: 140 }), w = TH.spawn(U, 'eravos.wobble-bass'), c = OrganismFactory.handle(w).ctx; c.presets.load(preset); c.params.set('subAlign', align);
+    const port = U.K.audio.port(w, 'out'); U.K.audio.chain.out.disconnect(U.ctx.destination);
+    let n = port.node; for (const [type, f] of [['highpass', 20], ['highpass', 20], ['lowpass', 140], ['lowpass', 140]]) { const b = U.ctx.createBiquadFilter(); b.type = type; b.frequency.value = f; n.connect(b); n = b; } n.connect(U.ctx.destination);
+    TH.note(U, w, note, 0.05, { duration: 1.5 }); return TH.db(TH.rms(await TH.render(U), 0.4, 1.5));
+  };
+  const spread = async (preset, align) => { const v = []; for (const n of [28, 31, 33, 36, 38, 40, 43, 45, 47]) v.push(await low(preset, align, n)); return Math.max(...v) - Math.min(...v); };
+  it('is off by default (every preset sounds as it did)', () => {
+    const U = TH.universe(0.1), w = TH.spawn(U, 'eravos.wobble-bass'); assert.equal(OrganismFactory.handle(w).ctx.params.get('subAlign'), false);
+  });
+  it('on: the low end is more even across a bass octave (Classic Wub, Half-time Growl)', async () => {
+    for (const p of ['Classic Wub 1/8', 'Half-time Growl 1/4t']) { const off = await spread(p, false), on = await spread(p, true); assert.lt(on, off - 1, `${p}: spread ${off.toFixed(1)} dB off → ${on.toFixed(1)} dB on`); }
+  }, { timeout: 120000 });
+});
