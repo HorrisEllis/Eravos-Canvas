@@ -114,6 +114,14 @@
 .sbk-head b { font-size: 17px; } .sbk-sub { color: var(--dim); font-size: 12px; }
 .sbk-x { background: none; border: 1px solid var(--line2); color: var(--dim); border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-size: 18px; }
 .sbk-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 18px; border-bottom: 1px solid var(--line); }
+.sbk-filter { border-bottom: 1px solid var(--line); }
+.sbk-filter .sbk-chips { border-bottom: 0; padding: 8px 18px 4px; }
+.sbk-cats .sbk-chip { font-weight: 600; }
+.sbk-row2 { display: flex; align-items: center; gap: 6px; padding: 0 0 6px 18px; flex-wrap: wrap; }
+.sbk-row2 .sbk-chips { padding: 4px 18px 4px 0; flex: 1; }
+.sbk-q { background: var(--bg); border: 1px solid var(--line2); border-radius: 99px; color: var(--text); padding: 4px 12px; min-width: 200px; font-size: 12px; }
+.sbk-sec { grid-column: 1 / -1; font: 700 11px var(--mono); letter-spacing: 1.5px; text-transform: uppercase; color: var(--dim); padding: 10px 2px 2px; border-bottom: 1px solid var(--line); margin-bottom: 2px; }
+.sbk-sec:first-child { padding-top: 0; }
 .sbk-chip { background: var(--panel2); border: 1px solid var(--line2); color: var(--text); border-radius: 99px; padding: 4px 12px; cursor: pointer; font-size: 12px; }
 .sbk-chip.on { background: #ff2266; border-color: #ff2266; color: #fff; }
 .sbk-body { display: grid; grid-template-columns: 1fr 360px; min-height: 0; flex: 1; }

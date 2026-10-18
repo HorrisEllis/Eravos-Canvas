@@ -111,3 +111,36 @@ describe('Wobble Bass 3.3 · Sub in phase', () => {
     for (const p of ['Classic Wub 1/8', 'Half-time Growl 1/4t']) { const off = await spread(p, false), on = await spread(p, true); assert.lt(on, off - 1, `${p}: spread ${off.toFixed(1)} dB off → ${on.toFixed(1)} dB on`); }
   }, { timeout: 120000 });
 });
+describe('tool · Wobble Bass 3.4 — toward the Bun Dem growl', () => {
+  const SR = 48000;
+  async function play(params, sec) {
+    const U = TH.universe(sec || 2.4, { bpm: 140 }), w = TH.spawn(U, 'eravos.wobble-bass'), c = OrganismFactory.handle(w).ctx; c.presets.load('Bun Dem Growl (dancehall drop)'); c.params.setMany(params || {});
+    U.K.audio.chain.out.disconnect(U.ctx.destination); U.K.audio.port(w, 'out').node.connect(U.ctx.destination);
+    U.T.bpm = 140; U.T.renderTicks(0, 36, 0.05); U.K.bus.publish('note:trigger', { target: w, note: 41, velocity: 1, time: 0.05, duration: (sec || 2.4) - 0.2 });
+    return { d: (await TH.render(U)).getChannelData(0), c };
+  }
+  // the share of energy in the growl band (800 Hz – 5 kHz) and how far the brightness moves (10th → 90th percentile, octaves)
+  function growl(d) {
+    const N = 2048, re = new Float32Array(N), im = new Float32Array(N), win = OrganismSDK.dsp.hann(N), cents = []; let mid = 0, tot = 0;
+    for (let o = Math.round(0.3 * SR); o + N < d.length - SR * 0.25; o += 960) { for (let i = 0; i < N; i++) { re[i] = d[o + i] * win[i]; im[i] = 0; } OrganismSDK.dsp.fft(re, im); let num = 0, den = 0;
+      for (let k = 1; k < N / 2; k++) { const m = Math.hypot(re[k], im[k]), f = k * SR / N; num += m * f; den += m; if (f > 800 && f < 5000) mid += m * m; tot += m * m; } cents.push(num / Math.max(1e-9, den)); }
+    cents.sort((a, b) => a - b); return { band: mid / tot, range: Math.log2(cents[Math.floor(cents.length * 0.9)] / cents[Math.floor(cents.length * 0.1)]) };
+  }
+  it('FM that moves with the wobble puts more of the sound in the growl band and makes it talk wider than the old preset', async () => {
+    const old = growl((await play({ fmIndex: 0, fmWub: 0, squash: 0 })).d), now = growl((await play({ fmIndex: 3.2, fmWub: 0.7, squash: 0 })).d);
+    assert.gt(now.band, old.band * 1.15, `growl band ${(100 * old.band).toFixed(1)} % → ${(100 * now.band).toFixed(1)} %`);
+    assert.gt(now.range, old.range * 1.2, `talking range ${old.range.toFixed(2)} → ${now.range.toFixed(2)} oct`);
+  });
+  it('FM stays in tune: the growl’s pitch is the note’s', async () => {
+    const { d } = await play({ fmIndex: 3.2, fmWub: 0.7, fmRatio: '1', squash: 0, wubOn: false, filterMode: 'lowpass', cutoff: 2000, depth: 0 });
+    const hz = TH.acFreq({ getChannelData: () => d, sampleRate: SR }, 0.4, 1.2, 30, 400); assert.lt(Math.abs(1200 * Math.log2(hz / MusicTheory.hz(41 - 12))), 30, hz.toFixed(1) + ' Hz');
+  });
+  it('Squash adds no delay and leaves the sub as it was', async () => {
+    const a = await play({ squash: 0 }), b = await play({ squash: 0.8 });
+    assert.equal(b.c.latency || 0, 0, 'no latency reported');
+    const sub = (d) => { let re = 0, im = 0; const f = MusicTheory.hz(41 - 12), s0 = Math.round(0.4 * SR), n = Math.round(1.2 * SR); for (let i = s0; i < s0 + n; i++) { re += d[i] * Math.cos(2 * Math.PI * f * i / SR); im += d[i] * Math.sin(2 * Math.PI * f * i / SR); } return Math.hypot(re, im) / n; };
+    assert.lt(Math.abs(20 * Math.log10(sub(b.d) / sub(a.d))), 2, 'sub level within 2 dB');
+    const first = (d) => { for (let i = Math.round(0.05 * SR); i < d.length; i++) if (Math.abs(d[i]) > 1e-3) return i; return -1; };
+    assert.lt(Math.abs(first(b.d) - first(a.d)), 8, 'the note starts at the same sample');
+  });
+});

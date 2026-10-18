@@ -9,7 +9,13 @@
  * the sequence owns the wobble's phase on the bar grid and notes only play pitch · 4 more vowels (UH, AE, IH, ER).
  * 3.1: the sub plays at the wub's own pitch by default (Sub oct 0; it sat an octave under it, 27.5 Hz for an A2) · Grit
  * type (fold = growl, hard, asym, soft) after the filter · Depth to 8 oct so the mouth opens all the way (Cutoff stays 40–8000: saved automation lanes map onto it) ·
- * the Square layer plays at the saw's pitch by default (Square oct 0; it sat an octave under, 27.5 Hz under an A2). */
+ * the Square layer plays at the saw's pitch by default (Square oct 0; it sat an octave under, 27.5 Hz under an A2).
+ * 3.4 (toward the Make It Bun Dem growl): what a lowpass/vowel wobble can't do —
+ *   FM: a sine modulator (Ratio × the note) bends the saws/square, FM index × the note's frequency so it stays in tune;
+ *       FM WUB lets the wobble itself open the FM — the talking growl moves its harmonics, not just a filter over them
+ *   SQUASH: 3-band OTT-style squash on the whole output — each band driven into a soft limiter (the growl's mids most):
+ *       quiet detail comes up, peaks flatten, the growl comes forward. No look-ahead, so no latency
+ *   All default to off: every older preset sounds exactly as before. */
 (function () {
   'use strict';
   const S = OrganismSDK.STD;
@@ -85,7 +91,7 @@
   }
 
   OrganismFactory.define({
-    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '3.3.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
+    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '3.4.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
     category: 'Sound sources', blurb: 'Dubstep wobble / talking "yoi" bass locked to the tempo. The drop.',
     size: { w: 560, h: 600 }, minSize: { w: 420, h: 380 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
@@ -116,6 +122,10 @@
       { key: 'formantShift', type: 'number', default: 0, min: -12, max: 12, step: 0.1, unit: 'st', label: 'Formant', group: 'FILTER' },
       { key: 'cutoff', type: 'number', default: 300, min: 40, max: 8000, step: 1, unit: 'Hz', label: 'Cutoff', group: 'FILTER' },
       { key: 'res', type: 'number', default: 6, min: 0.5, max: 20, step: 0.1, label: 'Reso', group: 'FILTER' },
+      { key: 'fmIndex', type: 'number', default: 0, min: 0, max: 12, step: 0.01, label: 'FM', group: 'GROWL', hint: 'a sine bends the saws: 2–5 growls, more screams (0 = off)' },
+      { key: 'fmRatio', type: 'enum', options: ['0.5', '1', '1.5', '2', '3'], default: '1', label: 'FM ratio', group: 'GROWL', hint: '1 and 2 growl in tune, 0.5 is a thick sub-growl, 1.5 / 3 go metallic' },
+      { key: 'fmWub', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'FM wub', group: 'GROWL', hint: 'how much the wobble opens the FM too — the talking growl' },
+      { key: 'squash', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Squash', group: 'GROWL', hint: '3-band OTT-style squash: fizz up front, everything loud (0 = off)' },
       { key: 'osc2', type: 'number', default: 0.5, min: 0, max: 1, step: 0.01, label: 'Square', group: 'TONE' },
       { key: 'sub', type: 'number', default: 0.6, min: 0, max: 1, step: 0.01, label: 'Sub', group: 'TONE' },
       { key: 'drive', type: 'number', default: 0.4, min: 0, max: 1, step: 0.01, label: 'Drive', group: 'TONE' },
@@ -170,6 +180,15 @@
       const bands = [0, 1, 2].map(() => { const b = ac.createBiquadFilter(); b.type = 'bandpass'; const g = ac.createGain(); formIn.connect(b); b.connect(g); g.connect(formOut); return { b, g }; });
       const formMakeup = ac.createGain(); formOut.connect(formMakeup);
       const filtSel = ac.createGain(); lpOut.connect(filtSel); formMakeup.connect(filtSel);
+      // 3.4 FM: sine at Ratio × note → depth = note Hz × (index·(1 − wub) + index·wub·wobble) → the saws' and square's frequency
+      const fmOsc = ac.createOscillator(); fmOsc.type = 'sine'; fmOsc.frequency.value = 55; fmOsc.start();
+      const fHz = ac.createConstantSource(); fHz.offset.value = 55; fHz.start();
+      const fmVca = ac.createGain(); fmVca.gain.value = 0; fmOsc.connect(fmVca);
+      const fmStatic = ac.createGain(); fmStatic.gain.value = 0; fHz.connect(fmStatic); fmStatic.connect(fmVca.gain);
+      const fmWubVca = ac.createGain(); fmWubVca.gain.value = 0; fHz.connect(fmWubVca); fmWubVca.connect(fmVca.gain);
+      const fmWubDepth = ac.createGain(); fmWubDepth.gain.value = 0; fmWubDepth.connect(fmWubVca.gain);
+      [saw, saw2, sq].forEach(o => fmVca.connect(o.frequency));
+      [fmOsc, fHz, fmVca, fmStatic, fmWubVca, fmWubDepth].forEach(n => ctx.track(n));
       // post shaper → amp
       // P14 fix ("blown speaker"): only the filtered mid layer is distorted. The sub joins AFTER the shaper, clean;
       // the distorted layer is DC-blocked + high-passed so it never fights the sub, and its fizz is rolled off.
@@ -191,7 +210,31 @@
       // Sub in phase (3.41, off by default): the clean sub waits OSC_LAT and its pitch leaves OSC_LAT early, like the wub layer
       const subAl = ac.createDelay(0.05); subAl.delayTime.value = P.get('subAlign') ? OSC_LAT : 0; ctx.track(subAl);
       P.onChange('subAlign', (v) => subAl.delayTime.setValueAtTime(v ? OSC_LAT : 0, ac.currentTime));
-      post.connect(dcBlock); dcBlock.connect(fizz); fizz.connect(amp); subLP.connect(subAl); subAl.connect(amp); amp.connect(trem); trem.connect(level);
+      post.connect(dcBlock); dcBlock.connect(fizz); fizz.connect(amp); subLP.connect(subAl); subAl.connect(amp); amp.connect(trem);
+      // 3.4 SQUASH (OTT-style): trem → [straight] or [3 bands, each driven into a soft limiter and brought back up] → level.
+      // Each band is pushed into tanh by its own amount (highs most), so quiet detail comes up and peaks flatten — the dense,
+      // loud, fizzy growl — with no look-ahead (zero latency) and no compressor pumping. Switched, never blended.
+      const sqDry = ac.createGain(), sqWet = ac.createGain(), sqTop = ac.createBiquadFilter(); sqDry.gain.value = 1; sqWet.gain.value = 0;
+      sqTop.type = 'lowpass'; sqTop.frequency.value = 12000; sqTop.Q.value = 0.5;   // anything the limiters fold up high goes
+      trem.connect(sqDry); sqDry.connect(level); sqWet.connect(sqTop); sqTop.connect(level);
+      const tanh = new Float32Array(2049); for (let i = 0; i < 2049; i++) { const x = (i / 2048) * 2 - 1; tanh[i] = Math.tanh(1.5 * x) / Math.tanh(1.5); } tanh[1024] = 0;
+      const bandDefs = [['lowpass', 180, null], ['bandpass', 180, 2400], ['highpass', 2400, null]];
+      const sqBands = bandDefs.map(([type, f1, f2]) => {
+        const a = ac.createBiquadFilter(); a.type = type === 'bandpass' ? 'highpass' : type; a.frequency.value = f1; a.Q.value = 0.5;
+        let tail = a; if (f2) { const b = ac.createBiquadFilter(); b.type = 'lowpass'; b.frequency.value = f2; b.Q.value = 0.5; a.connect(b); tail = b; ctx.track(b); }
+        const drv = ac.createGain(), sh = ac.createWaveShaper(), mk = ac.createGain(); sh.curve = tanh;
+        trem.connect(a); tail.connect(drv); drv.connect(sh); sh.connect(mk); mk.connect(sqWet); [a, drv, sh, mk].forEach(n => ctx.track(n)); return { drv, mk };
+      });
+      [sqDry, sqWet, sqTop].forEach(n => ctx.track(n));
+      const postLat = 0;   // (kept for the wobble timing below: squash adds no delay)
+      function applySquash() {
+        const x = P.get('squash'), on = x > 0.001, t = ac.currentTime;
+        sqDry.gain.setTargetAtTime(on ? 0 : 1, t, 0.004); sqWet.gain.setTargetAtTime(on ? 1 : 0, t, 0.004);
+        // drive into the limiter: lows gently, the growl's mids most, highs a little, each made up to sit level
+        // the lows (the sub) pass clean at unity (driven so low the curve is straight, made back up exactly) — only the growl
+        // above 180 Hz is squashed: mids most, highs a little
+        sqBands.forEach((b, i) => { if (i === 0) { b.drv.gain.setTargetAtTime(0.25, t, 0.01); b.mk.gain.setTargetAtTime(Math.tanh(1.5) / 1.5 / 0.25, t, 0.01); return; } const d = 1 + x * [0, 5, 3][i]; b.drv.gain.setTargetAtTime(d, t, 0.01); b.mk.gain.setTargetAtTime([0, 0.75, 0.5][i] / (0.6 + 0.4 * Math.sqrt(d)), t, 0.01); });
+      }
       [dcBlock, fizz, subLP].forEach(n => ctx.track(n));
       ctx.port('out', { kind: 'audio', direction: 'out', node: level, label: 'wobble' });
 
@@ -264,7 +307,16 @@
         lpOut.gain.setTargetAtTime(mode === 'lowpass' ? 1 : 0, ac.currentTime, 0.005);
         formMakeup.gain.setTargetAtTime(mode === 'formant' ? 2.2 + q * 0.12 : 0, ac.currentTime, 0.005);
       }
-      applyTone(); applyFilter();
+      function applyFm(t) {
+        t = t === undefined ? ac.currentTime : t;
+        const idx = P.get('fmIndex'), w = P.get('fmWub');
+        fmStatic.gain.setTargetAtTime(idx * (1 - w), t, 0.01); fmWubDepth.gain.setTargetAtTime(idx * w, t, 0.01);
+      }
+      uni.connect(fmWubDepth);   // the wobble (0..1) opens the FM
+      applyTone(); applyFilter(); applyFm(); applySquash();
+      ['fmIndex', 'fmWub'].forEach(k => P.onChange(k, () => applyFm()));
+      P.onChange('fmRatio', () => fmOsc.frequency.setTargetAtTime(curF * (+P.get('fmRatio') || 1), ac.currentTime, 0.01));
+      P.onChange('squash', applySquash);
       ['osc2', 'sub', 'drive', 'shaper', 'gritMode', 'level', 'spread', 'width', 'noise', 'ampMod', 'vibrato'].forEach(k => P.onChange(k, applyTone));
       ['filterMode', 'cutoff', 'res', 'depth', 'vowelA', 'vowelB', 'formantShift'].forEach(k => P.onChange(k, applyFilter));
       ['lfoShape', 'lfoPhase', 'shapePts'].forEach(k => P.onChange(k, () => { if (lfo) setWave(curWave()); }));
@@ -289,7 +341,7 @@
       let curF = 55;
       function setFreq(f, t0, glide, fromHz) {
         const from = fromHz || curF, subK = SUBK[P.get('subOct')] || 1;
-        [[saw, 1, true], [sq, P.get('sqOct') === '-1' ? 0.5 : 1, true], [saw2, 1, true], [sub, subK, false]].forEach(([o, k, shaped]) => {
+        [[saw, 1, true], [sq, P.get('sqOct') === '-1' ? 0.5 : 1, true], [saw2, 1, true], [sub, subK, false], [fmOsc, +P.get('fmRatio') || 1, true], [{ frequency: fHz.offset }, 1, true]].forEach(([o, k, shaped]) => {
           const t = (shaped || P.get('subAlign')) ? Math.max(ac.currentTime, t0 - OSC_LAT) : t0;   // 3.39: the shaped layer's pitch leaves early; the sub's too when it is in phase
           o.frequency.cancelScheduledValues(t);
           if (glide > 0) { o.frequency.setValueAtTime(from * k, t); o.frequency.exponentialRampToValueAtTime(f * k, t + glide); }
@@ -310,7 +362,7 @@
           if (dive && !legato) setFreq(f, t, P.get('diveTime'), f * Math.pow(2, dive / 12)); // 2.1: pitch dive into the note
           else setFreq(f, t, legato ? Math.max(0.003, P.get('glide') * 0.5) : 0);
           if (P.get('wubOn')) { /* the wub sequence owns the wobble's phase and rate; notes play pitch only */ }
-          else if (P.get('retrig') || !lfo) startLfo(t, o.wobbleDiv || P.get('div'));   // phase reset per non-slide note
+          else if (P.get('retrig') || !lfo) startLfo(t, o.wobbleDiv || P.get('div'), { fromNote: true });   // phase reset per non-slide note
           else if (o.wobbleDiv && o.wobbleDiv !== curDiv) { curDiv = o.wobbleDiv; lfo.frequency.setValueAtTime(lfoFreq(curDiv), t); }
           const g = amp.gain; g.cancelScheduledValues(t);
           if (!legato) { g.setValueAtTime(0, t); }

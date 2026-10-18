@@ -25,7 +25,11 @@
       "sub": 0.7,
       "drive": 0.5,
       "shaper": 0.35,
-      "octave": -1
+      "octave": -1,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Half-time Growl 1/4t": {
@@ -40,7 +44,11 @@
       "sub": 0.6,
       "drive": 0.8,
       "shaper": 0.7,
-      "octave": -1
+      "octave": -1,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Yoi Talker": {
@@ -57,7 +65,11 @@
       "sub": 0.7,
       "drive": 0.75,
       "shaper": 0.55,
-      "octave": -1
+      "octave": -1,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Robot 1/16 square": {
@@ -72,7 +84,11 @@
       "sub": 0.6,
       "drive": 0.6,
       "shaper": 0.5,
-      "octave": -1
+      "octave": -1,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Sub Pressure": {
@@ -87,7 +103,11 @@
       "sub": 1,
       "drive": 0.2,
       "shaper": 0.1,
-      "octave": -1
+      "octave": -1,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Monstercat Wub 1/4": {
@@ -103,7 +123,11 @@
       "drive": 0.45,
       "shaper": 0.3,
       "octave": -1,
-      "glide": 0.05
+      "glide": 0.05,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Talking Chord Bass 1/8t": {
@@ -120,7 +144,11 @@
       "sub": 0.7,
       "drive": 0.6,
       "shaper": 0.45,
-      "octave": -1
+      "octave": -1,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Head Shaker": {
@@ -138,7 +166,11 @@
       "drive": 0.95,
       "shaper": 0.8,
       "octave": -1,
-      "glide": 0.04
+      "glide": 0.04,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Riddim Square 1/16t": {
@@ -156,7 +188,11 @@
       "octave": -1,
       "spread": 4,
       "width": 0,
-      "ampMod": 0.35
+      "ampMod": 0.35,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Tearout Screech": {
@@ -178,7 +214,11 @@
       "spread": 22,
       "width": 0.6,
       "pitchDive": 7,
-      "diveTime": 0.05
+      "diveTime": 0.05,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Laser Dive Wub": {
@@ -196,7 +236,11 @@
       "pitchDive": 12,
       "diveTime": 0.12,
       "spread": 12,
-      "width": 0.4
+      "width": 0.4,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Wide Melodic Wub": {
@@ -214,7 +258,11 @@
       "spread": 26,
       "width": 0.9,
       "glide": 0.07,
-      "release": 0.3
+      "release": 0.3,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Free-run Growl 5.3 Hz": {
@@ -233,7 +281,11 @@
       "sub": 0.7,
       "drive": 0.85,
       "shaper": 0.7,
-      "noise": 0.08
+      "noise": 0.08,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Off-beat Yoi (phase ½)": {
@@ -250,7 +302,11 @@
       "osc2": 0.7,
       "sub": 0.75,
       "drive": 0.7,
-      "shaper": 0.5
+      "shaper": 0.5,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Wobble Vibrato Lead": {
@@ -270,7 +326,11 @@
       "spread": 18,
       "width": 0.8,
       "glide": 0.09,
-      "release": 0.35
+      "release": 0.35,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Trap Wub 808": {
@@ -290,7 +350,11 @@
       "pitchDive": 5,
       "diveTime": 0.09,
       "glide": 0.12,
-      "release": 0.5
+      "release": 0.5,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Sub Quake (-2 oct)": {
@@ -306,7 +370,11 @@
       "subOct": "-2",
       "drive": 0.4,
       "shaper": 0.3,
-      "ampMod": 0.5
+      "ampMod": 0.5,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Vowel Morph (shifted down)": {
@@ -323,7 +391,11 @@
       "osc2": 0.8,
       "sub": 0.7,
       "drive": 0.8,
-      "shaper": 0.6
+      "shaper": 0.6,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "80s Synth Wub": {
@@ -342,7 +414,11 @@
       "spread": 14,
       "width": 0.5,
       "attack": 0.003,
-      "release": 0.15
+      "release": 0.15,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Riddim Stair": {
@@ -377,7 +453,11 @@
        "",
        "",
        ""
-      ]
+      ],
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Yoi Drawn Talker": {
@@ -421,7 +501,11 @@
       "drive": 0.55,
       "shaper": 0.4,
       "div": "1/8",
-      "octave": -1
+      "octave": -1,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Brostep Hiccup": {
@@ -489,7 +573,11 @@
        "",
        "",
        ""
-      ]
+      ],
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Tearout Gnarl Seq": {
@@ -526,7 +614,11 @@
        "1/8t",
        "1/32",
        "x"
-      ]
+      ],
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Half-time Throat": {
@@ -564,7 +656,11 @@
        "",
        "",
        ""
-      ]
+      ],
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Robot Gate 1/16": {
@@ -601,7 +697,11 @@
       "sub": 0.6,
       "drive": 0.5,
       "shaper": 0.45,
-      "octave": -1
+      "octave": -1,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Talking Neuro Roll": {
@@ -668,7 +768,11 @@
        "",
        "",
        ""
-      ]
+      ],
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Triplet Chew": {
@@ -705,7 +809,11 @@
        "",
        "",
        ""
-      ]
+      ],
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Deep Stair Sub": {
@@ -741,7 +849,11 @@
        "",
        "",
        ""
-      ]
+      ],
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Stop-Start Drop": {
@@ -776,14 +888,54 @@
        "",
        "x",
        "1/32"
-      ]
+      ],
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Bun Dem Growl (dancehall drop)": {
      "params": {
+      "div": "1/8",
+      "lfoShape": "yoy",
+      "shapePts": [
+       [
+        0,
+        -1,
+        0.5
+       ],
+       [
+        0.2,
+        1,
+        0
+       ],
+       [
+        0.42,
+        0.15,
+        -0.4
+       ],
+       [
+        0.55,
+        0.55,
+        0.3
+       ],
+       [
+        0.62,
+        0.1,
+        0
+       ]
+      ],
+      "depth": 4.5,
+      "lfoSync": true,
+      "lfoHz": 4,
+      "retrig": true,
+      "lfoPhase": 0,
+      "ampMod": 0,
+      "vibrato": 0,
       "wubOn": true,
-      "wubStep": "1/4",
       "wubLen": 8,
+      "wubStep": "1/4",
       "wubSeq": [
        "1/8",
        "1/8",
@@ -802,24 +954,34 @@
        "",
        ""
       ],
-      "lfoShape": "yoy",
       "filterMode": "formant",
       "vowelA": "OO",
       "vowelB": "AH",
       "formantShift": 2,
       "cutoff": 500,
-      "depth": 4.5,
       "res": 12,
+      "fmIndex": 3.2,
+      "fmRatio": "1",
+      "fmWub": 0.7,
+      "squash": 0,
       "osc2": 0.8,
       "sub": 0.55,
-      "subOct": "0",
       "drive": 0.9,
       "shaper": 0.75,
       "gritMode": "fold",
       "octave": -1,
-      "glide": 0.05,
       "spread": 10,
-      "width": 0.3
+      "width": 0.3,
+      "noise": 0,
+      "sqOct": "0",
+      "subOct": "0",
+      "subAlign": false,
+      "level": 1,
+      "glide": 0.05,
+      "attack": 0.005,
+      "release": 0.12,
+      "pitchDive": 0,
+      "diveTime": 0.08
      }
     },
     "Sound-System Screech": {
@@ -839,7 +1001,11 @@
       "noise": 0.08,
       "spread": 20,
       "width": 0.5,
-      "octave": -1
+      "octave": -1,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Dancehall Yoi Stabs": {
@@ -877,7 +1043,11 @@
       "drive": 0.8,
       "shaper": 0.6,
       "gritMode": "fold",
-      "octave": -1
+      "octave": -1,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Half-time Talk Roll": {
@@ -916,7 +1086,11 @@
       "shaper": 0.7,
       "gritMode": "asym",
       "octave": -1,
-      "glide": 0.06
+      "glide": 0.06,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
      }
     },
     "Fold Growl Wub 1/8": {
@@ -935,7 +1109,278 @@
       "gritMode": "fold",
       "octave": -1,
       "spread": 8,
-      "width": 0.25
+      "width": 0.25,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0
+     }
+    },
+    "Bun Dem · FM Talker": {
+     "params": {
+      "div": "1/8",
+      "lfoShape": "yoy",
+      "shapePts": [
+       [
+        0,
+        -1,
+        0.5
+       ],
+       [
+        0.2,
+        1,
+        0
+       ],
+       [
+        0.42,
+        0.15,
+        -0.4
+       ],
+       [
+        0.55,
+        0.55,
+        0.3
+       ],
+       [
+        0.62,
+        0.1,
+        0
+       ]
+      ],
+      "depth": 4,
+      "lfoSync": true,
+      "lfoHz": 4,
+      "retrig": true,
+      "lfoPhase": 0,
+      "ampMod": 0,
+      "vibrato": 0,
+      "wubOn": true,
+      "wubLen": 8,
+      "wubStep": "1/4",
+      "wubSeq": [
+       "1/8",
+       "1/8",
+       "1/16t",
+       "1/8:yoy",
+       "1/4t",
+       "1/16",
+       "x",
+       "1/8:yoy",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       ""
+      ],
+      "filterMode": "formant",
+      "vowelA": "OO",
+      "vowelB": "AH",
+      "formantShift": 1,
+      "cutoff": 500,
+      "res": 11,
+      "fmIndex": 4,
+      "fmRatio": "2",
+      "fmWub": 1,
+      "squash": 0,
+      "osc2": 0.8,
+      "sub": 0.55,
+      "drive": 0.8,
+      "shaper": 0.55,
+      "gritMode": "fold",
+      "octave": -1,
+      "spread": 12,
+      "width": 0.35,
+      "noise": 0,
+      "sqOct": "0",
+      "subOct": "0",
+      "subAlign": false,
+      "level": 1,
+      "glide": 0.06,
+      "attack": 0.005,
+      "release": 0.12,
+      "pitchDive": 0,
+      "diveTime": 0.08
+     }
+    },
+    "Bun Dem · Half-time Yoi 1/4t": {
+     "params": {
+      "div": "1/4t",
+      "lfoShape": "yoy",
+      "shapePts": [
+       [
+        0,
+        -1,
+        0.5
+       ],
+       [
+        0.2,
+        1,
+        0
+       ],
+       [
+        0.42,
+        0.15,
+        -0.4
+       ],
+       [
+        0.55,
+        0.55,
+        0.3
+       ],
+       [
+        0.62,
+        0.1,
+        0
+       ]
+      ],
+      "depth": 4,
+      "lfoSync": true,
+      "lfoHz": 4,
+      "retrig": true,
+      "lfoPhase": 0,
+      "ampMod": 0,
+      "vibrato": 0,
+      "wubOn": false,
+      "wubLen": 8,
+      "wubStep": "1/4",
+      "wubSeq": [
+       "1/8",
+       "1/8",
+       "1/16",
+       "1/8t",
+       "1/8:yoy",
+       "1/16:yoy",
+       "1/32",
+       "x",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       ""
+      ],
+      "filterMode": "formant",
+      "vowelA": "EE",
+      "vowelB": "OO",
+      "formantShift": 2,
+      "cutoff": 500,
+      "res": 10,
+      "fmIndex": 3,
+      "fmRatio": "1",
+      "fmWub": 1,
+      "squash": 0,
+      "osc2": 0.8,
+      "sub": 0.55,
+      "drive": 0.9,
+      "shaper": 0.75,
+      "gritMode": "fold",
+      "octave": -1,
+      "spread": 10,
+      "width": 0.3,
+      "noise": 0,
+      "sqOct": "0",
+      "subOct": "0",
+      "subAlign": false,
+      "level": 1,
+      "glide": 0.08,
+      "attack": 0.005,
+      "release": 0.12,
+      "pitchDive": -5,
+      "diveTime": 0.06
+     }
+    },
+    "Bun Dem · Sub Growl (ratio ½)": {
+     "params": {
+      "div": "1/8",
+      "lfoShape": "sine",
+      "shapePts": [
+       [
+        0,
+        -1,
+        0.5
+       ],
+       [
+        0.2,
+        1,
+        0
+       ],
+       [
+        0.42,
+        0.15,
+        -0.4
+       ],
+       [
+        0.55,
+        0.55,
+        0.3
+       ],
+       [
+        0.62,
+        0.1,
+        0
+       ]
+      ],
+      "depth": 3.5,
+      "lfoSync": true,
+      "lfoHz": 4,
+      "retrig": true,
+      "lfoPhase": 0,
+      "ampMod": 0,
+      "vibrato": 0,
+      "wubOn": false,
+      "wubLen": 8,
+      "wubStep": "1/4",
+      "wubSeq": [
+       "1/8",
+       "1/8",
+       "1/16",
+       "1/8t",
+       "1/8:yoy",
+       "1/16:yoy",
+       "1/32",
+       "x",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       ""
+      ],
+      "filterMode": "lowpass",
+      "vowelA": "OO",
+      "vowelB": "AH",
+      "formantShift": 2,
+      "cutoff": 250,
+      "res": 8,
+      "fmIndex": 2,
+      "fmRatio": "0.5",
+      "fmWub": 0.6,
+      "squash": 0,
+      "osc2": 0.8,
+      "sub": 0.7,
+      "drive": 0.7,
+      "shaper": 0.45,
+      "gritMode": "fold",
+      "octave": -1,
+      "spread": 10,
+      "width": 0.3,
+      "noise": 0,
+      "sqOct": "0",
+      "subOct": "0",
+      "subAlign": false,
+      "level": 1,
+      "glide": 0.05,
+      "attack": 0.005,
+      "release": 0.12,
+      "pitchDive": 0,
+      "diveTime": 0.08
      }
     }
    }

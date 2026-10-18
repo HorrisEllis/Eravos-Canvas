@@ -167,7 +167,29 @@
     { id: 'bonus-island', title: 'Steppers at Dawn', genre: 'reggae', seed: 33, mood: ['island'], lock: 'beats-3',
       listen: 'Roots to steppers.', drop: 'Steppers kick after the dub break.', voice: 'Siren and her voice trade phrases.' },
   ];
-  const MOODS = [['mine', '📖 My songs'], ['foryou', '💜 For you'], ['all', 'All'], ['odd', '🧪 Odd Couples'], ['edm', 'EDM'], ['her', 'For her'], ['heavy', 'Heavy'], ['dark', 'Dark'], ['goth', 'Goth'], ['80s', '80s'], ['island', 'Island'], ['warm', 'Warm'], ['party', 'Party'], ['calm', 'Calm'], ['fast', 'Fast']];
+  // 3.44 categories: every song sits in one — styles first, then the three collections. Picked by genre id, so a new genre
+  // lands in its style by name (dub / wub / reese / house …) and anything unknown shows under "More".
+  const CATS = [
+    { id: 'dubstep', label: '🔊 Dubstep & Wubs', ids: ['dubstep', 'dubstep-og', 'riddim', 'riddim-war', 'tearout', 'deathstep', 'brostep-wub', 'talker', 'wub-rig', 'melodic', 'melodic-wub', 'tension-study', 'trapstep', 'reese-vs-wub', 'dancehall-dubstep'], re: /step|wub|riddim|tearout|talker/ },
+    { id: 'dnb', label: '⚡ Drum & Bass · Breaks', ids: ['dnb', 'neuro', 'jungle', 'breakbeat', 'drumstep', 'reese-roller', 'halftime-reese', 'wub-neuro'], re: /dnb|neuro|jungle|break|reese/ },
+    { id: 'house', label: '🏠 House · Garage', ids: ['house', 'deep-house', 'tech-house', 'bass-house', 'ukg', 'future-garage', 'electro', 'big-room'], re: /house|garage|ukg|electro/ },
+    { id: 'techno', label: '🌀 Techno · Trance · Hard', ids: ['techno', 'trance', 'progressive', 'psytrance', 'hardstyle'], re: /techno|trance|hard|prog/ },
+    { id: 'trap', label: '🎛 Trap · Phonk · Future', ids: ['trap', 'phonk', 'future-bass', 'moombahton'], re: /trap|phonk|future|moomba/ },
+    { id: 'reggae', label: '🔥 Reggae · Dub · Dancehall', ids: ['reggae', 'dancehall'], re: /reggae|dub|dancehall/ },
+    { id: '80s', label: '🌆 80s · Synth', ids: ['synthwave', 'darkwave'], re: /synth|wave/ },
+    { id: 'goth', label: '🖤 Dark · Goth', ids: ['witch-house', 'hanging-tree'], re: /witch|goth|tree/ },
+    { id: 'chill', label: '🌙 Chill · Ambient', ids: ['lofi', 'ambient'], re: /lofi|ambient|chill/ },
+    { id: 'her', label: '💜 For Her', re: /^her-/ },
+    { id: 'lostlove', label: '🥀 Lost Love', re: /^ll-/ },
+    { id: 'odd', label: '🧪 Odd Couples', re: /^oc-/ },
+    { id: 'more', label: '✦ More', re: /$^/ },
+  ];
+  function categoryOf(s) {
+    const g = String((s && s.genre) || '');
+    return (CATS.find(c => (c.id === 'her' || c.id === 'lostlove' || c.id === 'odd') && c.re.test(g))
+      || CATS.find(c => (c.ids || []).includes(g)) || CATS.find(c => c.re.test(g)) || CATS[CATS.length - 1]).id;
+  }
+  const MOODS = [['mine', '📖 My songs'], ['foryou', '💜 For you'], ['all', 'Any mood'], ['edm', 'EDM'], ['her', 'For her'], ['heavy', 'Heavy'], ['dark', 'Dark'], ['goth', 'Goth'], ['80s', '80s'], ['island', 'Island'], ['warm', 'Warm'], ['party', 'Party'], ['calm', 'Calm'], ['fast', 'Fast']];
 
   // every genre the Song Engine knows gets a card, even without a hand-written one (a new genre pack shows up by itself)
   function allSongs() {
@@ -237,28 +259,42 @@
     // 3.39 (exe: 39 of 189 cards ignored clicks): allSongs() builds NEW objects for genre cards and EDM-tagged songs on every
     // call, so a selection held as an object was never found in the next paint and snapped back to the first song — and
     // "Write this song" then wrote that first song. The selection is an id now.
-    let mood = 'all', selId = SONGS[0].id;
+    let mood = 'all', cat = 'all', q = '', selId = SONGS[0].id;
     const ov = h('div', { class: 'overlay sbk', role: 'dialog', 'aria-label': 'Songs' });
     const chips = h('div', { class: 'sbk-chips' }), grid = h('div', { class: 'sbk-grid' }), detail = h('aside', { class: 'sbk-detail' });
+    const cats = h('div', { class: 'sbk-chips sbk-cats' }), search = h('input', { class: 'sbk-q', placeholder: 'find a song, genre or tool…', type: 'search' });
+    search.addEventListener('input', () => { q = search.value.trim().toLowerCase(); paint(); });
+    search.addEventListener('keydown', (e) => e.stopPropagation());
     const close = () => { ov.remove(); document.removeEventListener('keydown', key, true); open = null; };
     const key = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
     ov.append(h('div', { class: 'sbk-box' }, [
       h('header', { class: 'sbk-head' }, [h('div', {}, [h('b', { text: '📖 Songs' }), h('span', { class: 'sbk-sub', text: ' every song in one place — write one in any genre (a new one every press), the song for her, and My songs you saved' })]), h('button', { class: 'sbk-x', title: 'Close (Esc)', text: '×', onclick: close })]),
-      chips, h('div', { class: 'sbk-body' }, [grid, detail]),
+      h('div', { class: 'sbk-filter' }, [cats, h('div', { class: 'sbk-row2' }, [search, chips])]), h('div', { class: 'sbk-body' }, [grid, detail]),
     ]));
     ov.addEventListener('mousedown', (e) => { if (e.target === ov) close(); });
     document.addEventListener('keydown', key, true);
     function paint() {
       chips.innerHTML = ''; MOODS.forEach(([id, label]) => { const c = h('button', { class: 'sbk-chip' + (mood === id ? ' on' : ''), text: label }); c.onclick = () => { mood = id; paint(); }; chips.appendChild(c); });
+      const every = allSongs(), count = (id) => every.filter(x => categoryOf(x) === id).length;
+      cats.innerHTML = ''; [{ id: 'all', label: 'All songs' }].concat(CATS).forEach(c => { const n = c.id === 'all' ? every.length : count(c.id); if (!n) return;
+        const b = h('button', { class: 'sbk-chip sbk-cat' + (cat === c.id ? ' on' : ''), text: `${c.label} ${n}` }); b.onclick = () => { cat = c.id; if (mood === 'mine') mood = 'all'; paint(); }; cats.appendChild(b); });
       grid.innerHTML = '';
       if (mood === 'mine') { paintMine(); return; }
-      const T = window.Taste, list = allSongs().filter(s => mood === 'all' || (mood === 'foryou' ? T && T.get(s.genre) > 0 : s.mood.includes(mood)));
+      const T = window.Taste, G0 = (s) => genreOf(s), hay = (s) => (s.title + ' ' + s.genre + ' ' + ((G0(s) && (G0(s).label + ' ' + G0(s).tagline + ' ' + Object.values(G0(s).parts || {}).map(p => p.organism).join(' '))) || '') + ' ' + (s.listen || '')).toLowerCase();
+      const list = every.filter(s => (cat === 'all' || categoryOf(s) === cat) && (!q || hay(s).includes(q)) && (mood === 'all' || (mood === 'foryou' ? T && T.get(s.genre) > 0 : s.mood.includes(mood))));
       if (mood === 'foryou') list.sort((a, b) => T.get(b.genre) - T.get(a.genre));
       if (mood === 'her') list.sort((a, b) => (b.mood.includes('edm') ? 1 : 0) - (a.mood.includes('edm') ? 1 : 0));   // EDM is her favourite: those first
       if (!list.length) grid.appendChild(h('p', { class: 'sbk-note', text: mood === 'foryou' ? 'Nothing yet — rate genres (💜 below a song, or Learn → EDM tour) and the ones you love appear here first.' : 'Nothing here.' }));
       if (list.length && !list.some(x => x.id === selId)) selId = list[0].id;
       const sel = list.find(x => x.id === selId) || allSongs().find(x => x.id === selId) || SONGS[0];
+      // grouped: a heading per category (in category order), the songs under it — every card is still in the grid
+      const order = (s) => CATS.findIndex(c => c.id === categoryOf(s));
+      const gl = (s) => (G0(s) ? G0(s).label : String(s.genre || ''));   // inside a category, songs of one genre sit together
+      if (mood !== 'foryou' && mood !== 'her') list.sort((a, b) => order(a) - order(b) || gl(a).localeCompare(gl(b)));
+      let lastCat = null;
       list.forEach(s => {
+        const ci = categoryOf(s);
+        if (ci !== lastCat && mood !== 'foryou') { lastCat = ci; const C = CATS.find(c => c.id === ci); grid.appendChild(h('div', { class: 'sbk-sec', text: `${C.label} · ${list.filter(x => categoryOf(x) === ci).length}` })); }
         const G = genreOf(s), lk = locked(s);
         const card = h('button', { class: 'sbk-card' + (s.id === selId ? ' sel' : '') + (lk ? ' locked' : ''), style: { '--acc': (G && G.accent) || '#ff2266' } }, [
           h('span', { class: 'sbk-ic', text: lk ? '🔒' : ((G && G.icon) || '💘') }), h('b', { text: s.title + (G && G.voice ? ' 🎤' : '') }), h('small', { text: (G ? G.label : s.genre) + ' · ' + (G ? G.bpm[0] + (G.bpm[1] !== G.bpm[0] ? '–' + G.bpm[1] : '') : s.bpm) + ' BPM' })]);
@@ -291,5 +327,5 @@
     }
     paint(); document.body.appendChild(ov); open = { close, ov };
   }
-  window.Songbook = { open: show, songs: () => SONGS.slice(), all: allSongs, mySongs, keepSong, write, locked, add(s) { if (s && s.id && !SONGS.some(x => x.id === s.id)) SONGS.push(s); } };
+  window.Songbook = { open: show, songs: () => SONGS.slice(), all: allSongs, categoryOf, categories: () => CATS.map(c => ({ id: c.id, label: c.label })), mySongs, keepSong, write, locked, add(s) { if (s && s.id && !SONGS.some(x => x.id === s.id)) SONGS.push(s); } };
 })();
