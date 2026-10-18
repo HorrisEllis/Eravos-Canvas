@@ -34,7 +34,9 @@
       "fmIndex": 0,
       "fmRatio": "1",
       "fmWub": 0,
-      "squash": 0
+      "squash": 0,
+      "rateBend": 1,
+      "rateGlide": 0
      }
     },
     "Steppers Wobble": {
@@ -54,7 +56,9 @@
       "fmIndex": 0,
       "fmRatio": "1",
       "fmWub": 0,
-      "squash": 0
+      "squash": 0,
+      "rateBend": 1,
+      "rateGlide": 0
      }
     },
     "Acid Wobble": {
@@ -74,7 +78,9 @@
       "fmIndex": 0,
       "fmRatio": "1",
       "fmWub": 0,
-      "squash": 0
+      "squash": 0,
+      "rateBend": 1,
+      "rateGlide": 0
      }
     },
     "Golden Wobble": {
@@ -98,7 +104,9 @@
       "fmIndex": 0,
       "fmRatio": "1",
       "fmWub": 0,
-      "squash": 0
+      "squash": 0,
+      "rateBend": 1,
+      "rateGlide": 0
      }
     },
     "Lullaby Wub": {
@@ -121,7 +129,9 @@
       "fmIndex": 0,
       "fmRatio": "1",
       "fmWub": 0,
-      "squash": 0
+      "squash": 0,
+      "rateBend": 1,
+      "rateGlide": 0
      }
     }
    }

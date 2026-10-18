@@ -71,7 +71,17 @@
                       "vibrato": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 100
+                        "maximum": 2400
+                      },
+                      "rateBend": {
+                        "type": "number",
+                        "minimum": 0.25,
+                        "maximum": 4
+                      },
+                      "rateGlide": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 2
                       },
                       "wubOn": {
                         "type": "boolean"
@@ -194,7 +204,7 @@
                       "octave": {
                         "type": "integer",
                         "minimum": -2,
-                        "maximum": 1
+                        "maximum": 2
                       },
                       "spread": {
                         "type": "number",
