@@ -1,26 +1,25 @@
 /* ERAVOS host — cos.js · ERAVOS COS, the Compartment OS made for this canvas (spec eravos.host). Node built-ins only.
- * From Nexus COS: every part lives in a sealed COMPARTMENT that is born in a sandbox and earns its place by passing
- * BIRTH GATES; its state is kept on disk; SNAPSHOTS freeze it and bring it back. Made specifically ERAVOS:
- *   compartments  the canvas skeleton (canvas/) + one per tool folder (tools/<domain>/tools/<category>/<tool>/)
- *   states        sandbox → integrated (every gate passed) | recycled (a gate failed — the failures are kept)
- *   gates (tool)  manifest · shape · sealed · packs · spec   + deep: tests (its own tests in Chromium) · sound (survey)
- *   gates (canvas) boundary (no domain words in the skeleton) · scripts (every runtime file it lists exists)
- *   snapshots     .eravos/cos/snapshots/<compartment>/<stamp>.json.gz — every file's path, size, sha256 AND contents
- *                 (Nexus COS keeps the manifest only; a tool folder is small, so ERAVOS keeps all of it → restore works)
- *   archetype     the COS `eravos-canvas` archetype, generated from this repo (never a stale copy) */
+ * From Nexus COS: every part lives in a sealed COMPARTMENT that earns its place by passing BIRTH GATES; its state is kept
+ * on disk. Made specifically ERAVOS — compartments NEST the way the project does:
+ *   eravos.canvas                      the empty canvas (canvas/)            gates: boundary · scripts
+ *     eravos.domain.<id>               each domain (tools/<id>/)             gates: charter · loader · listed · walls
+ *       eravos.<tool>                  each tool (tools/<id>/tools/<cat>/<tool>/)   gates: manifest · shape · sealed · packs ·
+ *                                                                             spec  (+ --deep: tests · sound)
+ *   states  sandbox → integrated | recycled. A parent is integrated only when its own gates pass AND every compartment
+ *           inside it is integrated; gating a parent gates everything inside it.
+ *   archetype  the COS `eravos-canvas` archetype, generated from this repo (never a stale copy) */
 'use strict';
-const fs = require('fs'), path = require('path'), zlib = require('zlib'), crypto = require('crypto'), vm = require('vm'), { spawnSync } = require('child_process');
+const fs = require('fs'), path = require('path'), vm = require('vm'), { spawnSync } = require('child_process');
 
 const STATE = { SANDBOX: 'sandbox', INTEGRATED: 'integrated', RECYCLED: 'recycled' };
 const TOOL_GATES = ['manifest', 'shape', 'sealed', 'packs', 'spec'], DEEP_GATES = ['tests', 'sound'];
-const CANVAS_GATES = ['boundary', 'scripts'];
+const CANVAS_GATES = ['boundary', 'scripts'], DOMAIN_GATES = ['charter', 'loader', 'listed', 'walls'];
 // the words the empty canvas must never say (the boundary test derives more from what domains register; this is its fixed list)
 const DOMAIN_WORDS = ['audio', 'music', 'midi', 'bpm', 'tempo', 'reverb', 'sidechain', 'synth', 'chord', 'melody', 'drum', 'song', 'vocal', 'transport', 'AudioContext', 'Analyser', 'decodeAudioData'];
 const SKIP = /(^|[\\/])(node_modules|\.git|\.eravos)([\\/]|$)/;
 
 const rel = (root, f) => path.relative(root, f).split(path.sep).join('/');
 const readJSON = (f) => JSON.parse(fs.readFileSync(f, 'utf8'));
-const sha = (buf) => crypto.createHash('sha256').update(buf).digest('hex');
 function walk(dir, out) { out = out || []; if (!fs.existsSync(dir)) return out; for (const n of fs.readdirSync(dir).sort()) { const f = path.join(dir, n); if (SKIP.test(f)) continue; const st = fs.statSync(f); if (st.isDirectory()) walk(f, out); else out.push(f); } return out; }
 
 class Cos {
@@ -29,23 +28,28 @@ class Cos {
 
   // ---------------------------------------------------------------- compartments
   list() {
-    const out = [{ id: 'eravos.canvas', kind: 'canvas', label: 'The canvas (skeleton)', dir: 'canvas', domain: null, category: null, version: this.canvasVersion() }];
+    const out = [{ id: 'eravos.canvas', kind: 'canvas', label: 'The canvas (skeleton)', dir: 'canvas', parent: null, domain: null, category: null, version: this.canvasVersion() }];
     const td = path.join(this.root, 'tools');
     if (fs.existsSync(td)) for (const dom of fs.readdirSync(td).sort()) {
-      const tools = path.join(td, dom, 'tools'); if (!fs.existsSync(tools) || !fs.statSync(tools).isDirectory()) continue;
+      const dd = path.join(td, dom), dj = path.join(dd, 'domain.json'); if (!fs.existsSync(dj)) continue;   // a folder of plans is not a domain yet
+      let dm = {}; try { dm = readJSON(dj); } catch (e) { dm = {}; }
+      const did = 'eravos.domain.' + dom;
+      out.push({ id: did, kind: 'domain', label: dm.label || dom, dir: rel(this.root, dd), parent: 'eravos.canvas', domain: dom, category: null, version: dm.version || '0.0.0' });
+      const tools = path.join(dd, 'tools'); if (!fs.existsSync(tools) || !fs.statSync(tools).isDirectory()) continue;
       for (const cat of fs.readdirSync(tools).sort()) {
         const cd = path.join(tools, cat); if (!fs.statSync(cd).isDirectory()) continue;
         for (const t of fs.readdirSync(cd).sort()) {
           const dir = path.join(cd, t), mf = path.join(dir, 'tool.json'); if (!fs.existsSync(mf)) continue;
           let m = {}; try { m = readJSON(mf); } catch (e) { m = { id: 'eravos.' + t, label: t, broken: e.message }; }
-          out.push({ id: m.id || 'eravos.' + t, kind: 'tool', label: m.label || t, dir: rel(this.root, dir), domain: dom, category: cat, version: m.version || '0.0.0' });
+          out.push({ id: m.id || 'eravos.' + t, kind: 'tool', label: m.label || t, dir: rel(this.root, dir), parent: did, domain: dom, category: cat, version: m.version || '0.0.0' });
         }
       }
     }
     const st = this.state();
     return out.map(c => Object.assign(c, { state: (st[c.id] && st[c.id].state) || STATE.SANDBOX, gated: st[c.id] ? st[c.id].at : null }));
   }
-  get(id) { return this.list().find(c => c.id === id || c.id === 'eravos.' + id || c.dir.endsWith('/' + id)) || null; }
+  children(id) { return this.list().filter(c => c.parent === id); }
+  get(id) { const l = this.list(); return l.find(c => c.id === id) || l.find(c => c.id === 'eravos.' + id) || l.find(c => c.id === 'eravos.domain.' + id) || l.find(c => c.kind === 'tool' && c.dir.endsWith('/' + id)) || null; }
   canvasVersion() { try { return (fs.readFileSync(path.join(this.root, 'canvas/kernel/kernel.js'), 'utf8').match(/KERNEL_VERSION = '([^']+)'/) || [])[1] || '?'; } catch (e) { return '?'; } }
   state() { try { return readJSON(path.join(this.home, 'state.json')); } catch (e) { return {}; } }
   saveState(st) { fs.mkdirSync(this.home, { recursive: true }); fs.writeFileSync(path.join(this.home, 'state.json'), JSON.stringify(st, null, 1)); }
@@ -53,16 +57,59 @@ class Cos {
   // ---------------------------------------------------------------- birth gates
   gate(id, o) {
     o = o || {}; const c = this.get(id); if (!c) throw new Error(`no compartment “${id}”`);
-    const names = c.kind === 'canvas' ? CANVAS_GATES : TOOL_GATES.concat(o.deep ? DEEP_GATES : []);
+    const names = c.kind === 'canvas' ? CANVAS_GATES : c.kind === 'domain' ? DOMAIN_GATES : TOOL_GATES.concat(o.deep ? DEEP_GATES : []);
     this.say('cos:gate:start', { id: c.id, gates: names });
     const results = names.map(g => { let r; try { r = this['g_' + g](c); } catch (e) { r = { ok: false, why: [e.message] }; } r = Object.assign({ gate: g }, r); this.say('cos:gate:result', { id: c.id, gate: g, ok: r.ok, why: r.why || [] }); return r; });
-    const ok = results.every(r => r.ok), st = this.state();
-    st[c.id] = { state: ok ? STATE.INTEGRATED : STATE.RECYCLED, at: new Date().toISOString(), deep: !!o.deep, version: c.version, failed: results.filter(r => !r.ok).map(r => ({ gate: r.gate, why: r.why })) };
-    this.saveState(st); this.say('cos:gate:done', { id: c.id, state: st[c.id].state, failed: st[c.id].failed.map(f => f.gate) });
-    return { id: c.id, state: st[c.id].state, results };
+    // nested: everything inside is gated too, and the parent is only as good as what it holds
+    // (nested: false gates this one alone and judges what is inside by its last recorded state)
+    const inside = o.nested === false ? this.children(c.id).map(k => ({ id: k.id, state: k.state })) : this.children(c.id).map(k => { const r = this.gate(k.id, o); return { id: r.id, state: r.state, failed: r.failed, holding: r.holding, inside: r.inside }; });
+    const holding = inside.filter(k => k.state !== STATE.INTEGRATED).map(k => k.id);
+    const ok = results.every(r => r.ok) && !holding.length, st = this.state();
+    st[c.id] = { state: ok ? STATE.INTEGRATED : STATE.RECYCLED, at: new Date().toISOString(), deep: !!o.deep, version: c.version, failed: results.filter(r => !r.ok).map(r => ({ gate: r.gate, why: r.why })), holding };
+    this.saveState(st); this.say('cos:gate:done', { id: c.id, state: st[c.id].state, failed: st[c.id].failed.map(f => f.gate), holding });
+    return { id: c.id, kind: c.kind, state: st[c.id].state, results, failed: st[c.id].failed.map(f => f.gate), holding, inside };
   }
-  gateAll(o) { return this.list().map(c => { const r = this.gate(c.id, o); return { id: r.id, state: r.state, failed: r.results.filter(x => !x.ok).map(x => x.gate) }; }); }
 
+  // ---- domain gates
+  domainJSON(c) { return readJSON(path.join(this.root, c.dir, 'domain.json')); }
+  // charter: domain.json is whole — its id is its folder, its core files exist, its starter tools are its own
+  g_charter(c) {
+    const why = [], d = this.domainJSON(c), dir = path.join(this.root, c.dir);
+    if (d.schema !== 'eravos.domain/1') why.push(`domain.json schema is ${d.schema}, not eravos.domain/1`);
+    ['id', 'label', 'version'].forEach(k => { if (!d[k]) why.push(`domain.json has no ${k}`); });
+    if (d.id && d.id !== c.domain) why.push(`id ${d.id} ≠ folder ${c.domain}`);
+    (d.core || []).forEach(f => { if (!fs.existsSync(path.join(dir, f))) why.push(`core file ${f} is missing`); });
+    const mine = new Set(this.children(c.id).map(k => k.id)); (d.starter || []).forEach(t => { if (!mine.has(t)) why.push(`starter ${t} is not a tool of this domain`); });
+    return { ok: !why.length, why };
+  }
+  // loader: its index.js loads files that exist, and its generated tool list names exactly the tools in its folder
+  g_loader(c) {
+    const why = [], dir = path.join(this.root, c.dir), idx = path.join(dir, 'index.js');
+    if (!fs.existsSync(idx)) return { ok: false, why: ['no index.js'] };
+    Array.from(fs.readFileSync(idx, 'utf8').matchAll(/'([\w./-]+\.js)'/g)).map(x => x[1]).forEach(f => { if (!fs.existsSync(path.join(dir, f))) why.push(`index.js loads ${f}, which is missing`); });
+    const kids = this.children(c.id);
+    if (kids.length) {
+      const tl = path.join(dir, 'tools', 'index.js'); if (!fs.existsSync(tl)) why.push('no tools/index.js (node build/index-tools.mjs)');
+      else { const src = fs.readFileSync(tl, 'utf8'), listed = new Set(Array.from(src.matchAll(/\["(eravos\.[\w.-]+)",\[/g)).map(x => x[1]));
+        kids.forEach(k => { if (!listed.has(k.id)) why.push(`tools/index.js does not load ${k.id} (node build/index-tools.mjs)`); });
+        listed.forEach(id => { if (!kids.some(k => k.id === id)) why.push(`tools/index.js loads ${id}, which has no folder`); }); }
+    }
+    return { ok: !why.length, why };
+  }
+  // listed: the build ships it (tools/index.js names it)
+  g_listed(c) { const src = fs.readFileSync(path.join(this.root, 'tools', 'index.js'), 'utf8'), list = (src.match(/ERAVOS_DOMAINS = \[([^\]]*)\]/) || [])[1] || ''; return list.includes(`'${c.domain}'`) ? { ok: true } : { ok: false, why: [`tools/index.js does not ship ${c.domain}`] }; }
+  // walls: the domain's own code (core/, domain.js, index.js) never reaches into another domain's folder
+  g_walls(c) {
+    const why = [], dir = path.join(this.root, c.dir), others = this.list().filter(x => x.kind === 'domain' && x.id !== c.id).map(x => x.domain);
+    walk(path.join(dir, 'core')).concat(['domain.js', 'index.js'].map(f => path.join(dir, f))).filter(f => /\.js$/.test(f) && fs.existsSync(f)).forEach(f => {
+      const src = fs.readFileSync(f, 'utf8'), r = rel(this.root, f);
+      if (/['"`]\.\.\//.test(src)) why.push(`${r}: a path out of its folder (../)`);
+      others.forEach(o => { if (new RegExp(`['"\`/]${o}/(core|tools|data|domain)`).test(src)) why.push(`${r}: reaches into the ${o} domain`); });
+    });
+    return { ok: !why.length, why };
+  }
+
+  // ---- tool gates
   files(c) { const dir = path.join(this.root, c.dir); return walk(dir); }
   manifest(c) { return readJSON(path.join(this.root, c.dir, 'tool.json')); }
   // tool.json is valid and names files that exist; its id matches its folder
@@ -153,40 +200,6 @@ class Cos {
     return { ok: names.length > 0 && !why.length, why };
   }
 
-  // ---------------------------------------------------------------- snapshots
-  snapDir(c) { return path.join(this.home, 'snapshots', c.id); }
-  snapshot(id, o) {
-    o = o || {}; const c = this.get(id); if (!c) throw new Error(`no compartment “${id}”`);
-    const files = this.files(c).map(f => { const b = fs.readFileSync(f); return { path: rel(this.root, f), size: b.length, sha256: sha(b), data: b.toString('base64') }; });
-    const stamp = new Date().toISOString().replace(/[:.]/g, '-'), snap = { schema: 'eravos.cos.snapshot/1', id: stamp, compartment: c.id, dir: c.dir, version: c.version, state: c.state, note: o.note || '', createdAt: new Date().toISOString(), files };
-    fs.mkdirSync(this.snapDir(c), { recursive: true });
-    const file = path.join(this.snapDir(c), stamp + '.json.gz'); fs.writeFileSync(file, zlib.gzipSync(JSON.stringify(snap)));
-    this.say('cos:snapshot:taken', { id: c.id, snapshot: stamp, files: files.length });
-    return { id: c.id, snapshot: stamp, files: files.length, bytes: fs.statSync(file).size };
-  }
-  snapshots(id) { const c = this.get(id); if (!c || !fs.existsSync(this.snapDir(c))) return []; return fs.readdirSync(this.snapDir(c)).filter(f => f.endsWith('.json.gz')).sort().map(f => f.replace(/\.json\.gz$/, '')); }
-  readSnap(c, snapId) {
-    const all = this.snapshots(c.id), s = snapId || all[all.length - 1]; if (!s || !all.includes(s)) throw new Error(`no snapshot ${snapId || ''} for ${c.id}`);
-    return JSON.parse(zlib.gunzipSync(fs.readFileSync(path.join(this.snapDir(c), s + '.json.gz'))).toString('utf8'));
-  }
-  // what changed since a snapshot (the newest, if none named)
-  diff(id, snapId) {
-    const c = this.get(id); if (!c) throw new Error(`no compartment “${id}”`);
-    const snap = this.readSnap(c, snapId), now = new Map(this.files(c).map(f => [rel(this.root, f), sha(fs.readFileSync(f))])), then = new Map(snap.files.map(f => [f.path, f.sha256]));
-    return { id: c.id, snapshot: snap.id, changed: [...now.keys()].filter(p => then.has(p) && then.get(p) !== now.get(p)), added: [...now.keys()].filter(p => !then.has(p)), removed: [...then.keys()].filter(p => !now.has(p)) };
-  }
-  // put the snapshot's files back (and, with o.prune, remove files added since) — a snapshot of now is taken first
-  restore(id, snapId, o) {
-    o = o || {}; const c = this.get(id); if (!c) throw new Error(`no compartment “${id}”`);
-    const snap = this.readSnap(c, snapId), base = path.join(this.root, c.dir) + path.sep;
-    const before = this.snapshot(c.id, { note: 'before restoring ' + snap.id });
-    snap.files.forEach(f => { const dst = path.resolve(this.root, f.path); if (!dst.startsWith(base)) throw new Error('snapshot path escapes its compartment: ' + f.path); fs.mkdirSync(path.dirname(dst), { recursive: true }); fs.writeFileSync(dst, Buffer.from(f.data, 'base64')); });
-    let pruned = [];
-    if (o.prune) { const keep = new Set(snap.files.map(f => f.path)); pruned = this.files(c).map(f => rel(this.root, f)).filter(p => !keep.has(p)); pruned.forEach(p => fs.unlinkSync(path.join(this.root, p))); }
-    this.say('cos:snapshot:restored', { id: c.id, snapshot: snap.id, files: snap.files.length, pruned: pruned.length, safety: before.snapshot });
-    return { id: c.id, restored: snap.id, files: snap.files.length, pruned, safety: before.snapshot };
-  }
-
   // ---------------------------------------------------------------- the COS archetype, generated from this repo
   archetype(outDir) {
     const out = path.resolve(outDir), take = ['canvas', 'schemas', 'templates', 'build/new-tool.mjs', 'build/index-tools.mjs', 'build/validate.mjs', 'tests/harness.js', 'tests/run.html', 'serve.js', 'host'];
@@ -194,11 +207,12 @@ class Cos {
     take.forEach(t => { const src = path.join(this.root, t); if (!fs.existsSync(src)) return; (fs.statSync(src).isDirectory() ? walk(src) : [src]).forEach(f => { const d = path.join(out, rel(this.root, f)); fs.mkdirSync(path.dirname(d), { recursive: true }); fs.copyFileSync(f, d); n++; }); });
     const arch = { schema: 'nexus.cos.archetype/1', name: 'eravos-canvas', label: 'ERAVOS canvas', generatedFrom: 'Eravos-Canvas', kernel: this.canvasVersion(), generatedAt: new Date().toISOString(),
       detect: { files: ['canvas/kernel/kernel.js', 'canvas/scripts.js', 'canvas/index.html'], dirs: ['tools/*/tools'] },
-      compartments: { canvas: 'canvas/', tool: 'tools/<domain>/tools/<category>/<tool>/' }, gates: { canvas: CANVAS_GATES, tool: TOOL_GATES, deep: DEEP_GATES },
+      compartments: { canvas: 'canvas/', domain: 'tools/<domain>/', tool: 'tools/<domain>/tools/<category>/<tool>/' },
+      domains: this.list().filter(c => c.kind === 'domain').map(c => ({ id: c.id, dir: c.dir, version: c.version })), gates: { canvas: CANVAS_GATES, domain: DOMAIN_GATES, tool: TOOL_GATES, deep: DEEP_GATES },
       tools: this.list().filter(c => c.kind === 'tool').map(c => ({ id: c.id, dir: c.dir, version: c.version })) };
     fs.writeFileSync(path.join(out, 'archetype.json'), JSON.stringify(arch, null, 1));
     return { out, files: n + 1, tools: arch.tools.length };
   }
 }
 
-module.exports = { Cos, STATE, TOOL_GATES, DEEP_GATES, CANVAS_GATES, DOMAIN_WORDS };
+module.exports = { Cos, STATE, TOOL_GATES, DEEP_GATES, CANVAS_GATES, DOMAIN_GATES, DOMAIN_WORDS };

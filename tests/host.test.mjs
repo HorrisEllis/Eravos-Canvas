@@ -1,4 +1,4 @@
-// ERAVOS host — node tests/host.test.mjs : SISO, ERAVOS COS (gates, snapshots, archetype) and ERAVOS Glass end to end
+// ERAVOS host — node tests/host.test.mjs : SISO, ERAVOS COS (nested compartments, gates, archetype) and ERAVOS Glass end to end
 // (a real canvas in Chromium driven through the command door). Spec eravos.host.
 import { createRequire } from 'module'; import fs from 'fs'; import os from 'os'; import path from 'path'; import { fileURLToPath } from 'url';
 import { chromium } from 'playwright';
@@ -8,10 +8,14 @@ let pass = 0, fail = 0;
 const ok = (c, m) => { if (!c) throw new Error(m || 'assertion failed'); };
 async function it(name, fn) { try { await fn(); pass++; console.log('  ✓ ' + name); } catch (e) { fail++; console.log('  ✗ ' + name + ' — ' + e.message); } }
 const tmp = (p) => fs.mkdtempSync(path.join(os.tmpdir(), p));
-// a throwaway repo: the real canvas/ + one real tool, so gates and snapshots never touch this checkout
+// a throwaway repo: the real canvas/ + the music domain holding one real tool, so gates never touch this checkout
 function sandboxRepo() {
   const r = tmp('eravos-host-'), cp = (a) => fs.cpSync(path.join(ROOT, a), path.join(r, a), { recursive: true });
-  ['canvas', 'tools/music/core', 'tools/music/tools/wubs/wub-sub'].forEach(cp); return r;
+  ['canvas', 'tools/index.js', 'tools/music/core', 'tools/music/data', 'tools/music/content', 'tools/music/domain.js', 'tools/music/index.js', 'tools/music/tools/wubs/wub-sub'].forEach(cp);
+  const dj = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools/music/domain.json'), 'utf8')); dj.starter = ['eravos.wub-sub'];
+  fs.writeFileSync(path.join(r, 'tools/music/domain.json'), JSON.stringify(dj));
+  fs.writeFileSync(path.join(r, 'tools/music/tools/index.js'), '[["eravos.wub-sub",[["js","tools/wubs/wub-sub/wub-sub.engine.js"]]]]');
+  return r;
 }
 
 console.log('\n[host] siso');
@@ -27,10 +31,15 @@ await it('schemas refuse bad commands before the gate runs', () => {
 });
 
 console.log('\n[host] cos');
-await it('every tool folder and the canvas are compartments; all pass their quick birth gates', () => {
+await it('compartments nest: canvas › every domain › its tools; the whole tree passes its birth gates', () => {
   const c = new Cos({ root: ROOT }); c.home = tmp('eravos-cos-');
-  const list = c.list(); ok(list[0].id === 'eravos.canvas' && list.filter(x => x.kind === 'tool').length >= 60, `${list.length} compartments`);
-  const bad = c.gateAll().filter(r => r.state !== 'integrated'); ok(!bad.length, JSON.stringify(bad));
+  const list = c.list(), doms = list.filter(x => x.kind === 'domain');
+  ok(list[0].id === 'eravos.canvas' && !list[0].parent, 'the canvas is the root');
+  ok(doms.length >= 6 && doms.every(d => d.parent === 'eravos.canvas'), doms.map(d => d.id).join(','));
+  ok(list.filter(x => x.kind === 'tool').every(t => t.parent === 'eravos.domain.' + t.domain), 'every tool sits in its domain');
+  ok(!list.some(x => x.id === 'eravos.domain.ui'), 'a folder of plans (no domain.json) is not a compartment');
+  const r = c.gate('eravos.canvas'); ok(r.state === 'integrated', JSON.stringify({ failed: r.failed, holding: r.holding }));
+  ok(r.inside.length === doms.length && c.list().every(x => x.state === 'integrated'), 'gating the root gated everything');
 });
 await it('a broken tool is recycled, and says why (a preset setting the tool lacks, a path out of its folder, a missing spec)', () => {
   const r = sandboxRepo(), c = new Cos({ root: r }), dir = path.join(r, 'tools/music/tools/wubs/wub-sub');
@@ -42,32 +51,41 @@ await it('a broken tool is recycled, and says why (a preset setting the tool lac
   ok(g.state === 'recycled', 'recycled'); ok(/packs: .*notAKnob/.test(why) && /sealed: .*\.\.\//.test(why) && /shape: no spec/.test(why), why);
   ok(c.list().find(x => x.id === 'eravos.wub-sub').state === 'recycled', 'the state is kept');
 });
+await it('a broken tool holds back its domain and the canvas above it; fixing it frees them', () => {
+  const r = sandboxRepo(), c = new Cos({ root: r }), spec = path.join(r, 'tools/music/tools/wubs/wub-sub/wub-sub.spec'), keep = fs.readFileSync(spec);
+  ok(c.gate('eravos.canvas').state === 'integrated', 'healthy first');
+  fs.unlinkSync(spec); const g = c.gate('eravos.canvas');
+  ok(g.state === 'recycled' && g.failed.length === 0 && g.holding.includes('eravos.domain.music'), 'canvas held back, its own gates fine: ' + JSON.stringify(g.failed));
+  const m = g.inside.find(x => x.id === 'eravos.domain.music'); ok(m.state === 'recycled' && m.holding.includes('eravos.wub-sub'), 'the domain is held back by the tool');
+  fs.writeFileSync(spec, keep); ok(c.gate('wub-sub').state === 'integrated' && c.gate('music').state === 'integrated', 'fixed → free');
+});
+await it('domain gates: a stale tool list, a domain reaching into another, a starter that is not its own', () => {
+  const r = sandboxRepo(), c = new Cos({ root: r }), d = path.join(r, 'tools/music');
+  fs.writeFileSync(path.join(d, 'tools/index.js'), '[["eravos.wub-sub",[]],["eravos.ghost",[]]]');
+  fs.appendFileSync(path.join(d, 'domain.js'), "\nconst x = 'image/core/image-core.js';\n");
+  const dj = JSON.parse(fs.readFileSync(path.join(d, 'domain.json'), 'utf8')); dj.starter.push('eravos.not-here'); fs.writeFileSync(path.join(d, 'domain.json'), JSON.stringify(dj));
+  fs.mkdirSync(path.join(r, 'tools/image'), { recursive: true }); fs.writeFileSync(path.join(r, 'tools/image/domain.json'), JSON.stringify({ schema: 'eravos.domain/1', id: 'image', label: 'Image', version: '1.0.0' }));
+  const g = c.gate('music', { nested: false }), why = g.results.filter(x => !x.ok).flatMap(x => x.why.map(w => x.gate + ': ' + w)).join('\n');
+  ok(/loader: .*eravos\.ghost.*no folder/.test(why) && /walls: .*image domain/.test(why) && /charter: starter eravos\.not-here/.test(why), why);
+});
 await it('the canvas gate catches a domain word in the skeleton', () => {
   const r = sandboxRepo(), c = new Cos({ root: r }); ok(c.gate('eravos.canvas').state === 'integrated');
-  fs.appendFileSync(path.join(r, 'canvas/runtime/history.js'), '\n// the tempo\n'); const g = c.gate('eravos.canvas');
+  fs.appendFileSync(path.join(r, 'canvas/runtime/history.js'), '\n// the tempo\n'); const g = c.gate('eravos.canvas', { nested: false });
   ok(g.state === 'recycled' && g.results[0].why.some(w => /tempo/.test(w)), JSON.stringify(g.results[0].why));
-});
-await it('snapshot → change → diff names it → restore brings it back (a safety snapshot first; --prune removes additions)', () => {
-  const r = sandboxRepo(), c = new Cos({ root: r }), f = path.join(r, 'tools/music/tools/wubs/wub-sub/wub-sub.spec'), orig = fs.readFileSync(f, 'utf8');
-  const s = c.snapshot('wub-sub', { note: 'before' }); ok(s.files >= 6, 'files kept');
-  fs.writeFileSync(f, 'changed'); const extra = path.join(path.dirname(f), 'scratch.txt'); fs.writeFileSync(extra, 'x');
-  const d = c.diff('wub-sub', s.snapshot); ok(d.changed.some(p => p.endsWith('wub-sub.spec')) && d.added.some(p => p.endsWith('scratch.txt')), JSON.stringify(d));
-  const back = c.restore('wub-sub', s.snapshot, { prune: true }); ok(fs.readFileSync(f, 'utf8') === orig, 'contents back'); ok(!fs.existsSync(extra), 'pruned');
-  ok(c.snapshots('wub-sub').includes(back.safety), 'safety snapshot kept'); ok(c.diff('wub-sub', s.snapshot).changed.length === 0);
 });
 await it('the eravos-canvas archetype is generated from this repo (never a stale copy)', () => {
   const r = sandboxRepo(), c = new Cos({ root: r }), o = tmp('eravos-arch-'); const a = c.archetype(o), j = JSON.parse(fs.readFileSync(path.join(o, 'archetype.json'), 'utf8'));
-  ok(j.name === 'eravos-canvas' && j.tools.some(t => t.id === 'eravos.wub-sub'), 'archetype.json'); ok(fs.readFileSync(path.join(o, 'canvas/kernel/kernel.js'), 'utf8') === fs.readFileSync(path.join(r, 'canvas/kernel/kernel.js'), 'utf8'), 'the current kernel');
+  ok(j.name === 'eravos-canvas' && j.tools.some(t => t.id === 'eravos.wub-sub') && j.domains.some(d => d.id === 'eravos.domain.music'), 'archetype.json'); ok(fs.readFileSync(path.join(o, 'canvas/kernel/kernel.js'), 'utf8') === fs.readFileSync(path.join(r, 'canvas/kernel/kernel.js'), 'utf8'), 'the current kernel');
   ok(a.files > 20);
 });
 
 console.log('\n[host] glass');
-const g = await glass.start({ root: ROOT, port: 0, ledger: false, timeoutMs: 6000 });
+const g = await glass.start({ root: ROOT, port: 0, data: tmp('eravos-glass-'), timeoutMs: 6000 });
 const cmd = async (type, data, headers) => { const r = await fetch(g.url + 'glass/cmd', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json', 'X-Eravos-Glass': '1' }, headers || {}), body: JSON.stringify({ type, data }) }); return Object.assign(await r.json(), { status: r.status }); };
 await it('the door: health, signatures, cos commands; no header → refused; unknown command → 404; bad data → 400', async () => {
   const h = await (await fetch(g.url + 'glass/health')).json(); ok(h.app === 'eravos-glass' && h.page === false);
   const sig = await (await fetch(g.url + 'glass/signatures')).json(); ok(sig.some(s => s.type === 'canvas.set') && sig.some(s => s.type === 'cos.gate'));
-  const l = await cmd('cos.list'); ok(l.ok && l.result.length >= 60);
+  const l = await cmd('cos.list'); ok(l.ok && l.result.length >= 60 && l.result.some(x => x.kind === 'domain'));
   ok((await cmd('cos.list', {}, { 'X-Eravos-Glass': '0' })).status === 403, 'header'); ok((await cmd('nope')).status === 404); ok((await cmd('cos.gate', {})).status === 400, 'schema');
   ok((await cmd('canvas.state')).status === 409, 'no canvas open yet');
 });

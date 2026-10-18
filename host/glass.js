@@ -12,14 +12,13 @@
  *   canvas.tools · canvas.state · canvas.spawn {tool, preset?} · canvas.set {instanceId, key, value | params} ·
  *   canvas.preset {instanceId, name} · canvas.wire {from:[id,hook], to:[id,hook]} · canvas.unwire {wireId} ·
  *   canvas.close {instanceId} · canvas.suite {tool, instanceId?}
- *   cos.list · cos.gate {id, deep?} · cos.gateAll {deep?} · cos.snapshot {id, note?} · cos.snapshots {id} ·
- *   cos.diff {id, snapshot?} · cos.restore {id, snapshot?, prune?}
- * start({ root, port, data? }) — data: where the ledger and COS state live (default <root>/.eravos).
+ *   cos.list · cos.gate {id, deep?}   (gating a parent gates everything nested in it; eravos.canvas = the whole tree)
+ * start({ root, port, data? }) — data: where COS keeps its state (default <root>/.eravos).
  * Loopback only. Commands need the X-Eravos-Glass header, which a web page on another site cannot send without asking
  * (and Glass never says yes), so nothing but you can drive your canvas. */
 'use strict';
 const http = require('http'), fs = require('fs'), path = require('path');
-const { Stream, Ledger } = require('./siso.js');
+const { Stream } = require('./siso.js');
 const { Cos } = require('./cos.js');
 
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8',
@@ -42,24 +41,16 @@ const CANVAS_CMDS = {
 function start(o) {
   o = o || {};
   const root = path.resolve(o.root || path.join(__dirname, '..')), port = o.port === undefined ? 4747 : o.port, host = o.host || '127.0.0.1';
-  const data = o.data || path.join(root, '.eravos');   // the ledger + COS state/snapshots (the desktop app keeps them in its own storage)
-  let ledger = null; if (o.ledger !== false) { try { ledger = new Ledger(path.join(data, 'glass', 'ledger.jsonl')); } catch (e) { ledger = null; } }
-  const stream = new Stream({ cap: 1000, ledger });
-  const cos = new Cos({ root, stream, home: path.join(data, 'cos') });
+  const stream = new Stream({ cap: 1000 });
+  const cos = new Cos({ root, stream, home: path.join(o.data || path.join(root, '.eravos'), 'cos') });   // COS state (the desktop app keeps it in .appdata)
   const clients = new Set(), pages = new Set(), waiting = new Map();
   let nextId = 0;
   const timeoutMs = o.timeoutMs || 8000;
 
   // ---------------------------------------------------------------- the gates
   Object.entries(CANVAS_CMDS).forEach(([type, [schema, describe]]) => stream.gate(type, (ev) => relay(type, ev.data), { schema, describe }));
-  stream.gate('cos.list', () => cos.list(), { describe: 'every compartment: the canvas and each tool, with its state' });
-  stream.gate('cos.gate', (ev) => cos.gate(ev.data.id, { deep: !!ev.data.deep }), { schema: { id: 'string', 'deep?': 'boolean' }, describe: 'run a compartment’s birth gates' });
-  stream.gate('cos.gateAll', (ev) => cos.gateAll({ deep: !!ev.data.deep }), { schema: { 'deep?': 'boolean' }, describe: 'gate every compartment' });
-  stream.gate('cos.snapshot', (ev) => cos.snapshot(ev.data.id, { note: ev.data.note }), { schema: { id: 'string', 'note?': 'string' }, describe: 'freeze a compartment (every file, with contents)' });
-  stream.gate('cos.snapshots', (ev) => cos.snapshots(ev.data.id), { schema: { id: 'string' }, describe: 'a compartment’s snapshots, oldest first' });
-  stream.gate('cos.diff', (ev) => cos.diff(ev.data.id, ev.data.snapshot), { schema: { id: 'string', 'snapshot?': 'string' }, describe: 'what changed since a snapshot' });
-  stream.gate('cos.restore', (ev) => cos.restore(ev.data.id, ev.data.snapshot, { prune: !!ev.data.prune }), { schema: { id: 'string', 'snapshot?': 'string', 'prune?': 'boolean' }, describe: 'bring a snapshot back (a safety snapshot is taken first)' });
-  stream.gate('glass.signatures', () => stream.signatures(), { describe: 'every command Glass answers' });
+  stream.gate('cos.list', () => cos.list(), { describe: 'the compartment tree — canvas › domains › tools — each with its parent and state' });
+  stream.gate('cos.gate', (ev) => cos.gate(ev.data.id, { deep: !!ev.data.deep }), { schema: { id: 'string', 'deep?': 'boolean' }, describe: 'run a compartment’s birth gates — and everything nested inside it (eravos.canvas = all)' });
 
   // a canvas command travels to the open page and waits for its answer
   function relay(type, data) {

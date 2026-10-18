@@ -4,10 +4,8 @@
  *   Gate    one event type → one gate. A second gate for the same type is a hard error (two handlers can't fight
  *           over a command). A gate's transform(event, stream) may return a value (the command's answer) or a promise.
  *   Stream  emit(type, data) → the gate's answer (or undefined if no gate claims it — the event still lands in the ring).
- *           A ring of the last N events (late SSE clients, `since(seq)`), onAny observers (they watch, never answer).
- *   Ledger  append-only JSON lines on disk — what happened, in order. */
+ *           A ring of the last N events (late SSE clients, `since(seq)`), onAny observers (they watch, never answer). */
 'use strict';
-const fs = require('fs'), path = require('path');
 
 class Event { constructor(type, data, seq) { this.type = type; this.data = data === undefined ? {} : data; this.seq = seq; this.ts = Date.now(); } }
 
@@ -21,7 +19,7 @@ class Gate {
 }
 
 class Stream {
-  constructor(o) { o = o || {}; this.gates = new Map(); this.ring = []; this.cap = o.cap || 1000; this.seq = 0; this.observers = new Set(); this.ledger = o.ledger || null; }
+  constructor(o) { o = o || {}; this.gates = new Map(); this.ring = []; this.cap = o.cap || 1000; this.seq = 0; this.observers = new Set(); }
   register(gate) {
     if (!(gate instanceof Gate)) throw new Error('Stream.register: not a Gate');
     if (this.gates.has(gate.signature)) throw new Error(`Stream.register: “${gate.signature}” already has a gate — one signature, one gate`);
@@ -32,7 +30,6 @@ class Stream {
   emit(type, data) {
     const ev = new Event(type, data, ++this.seq);
     this.ring.push(ev); if (this.ring.length > this.cap) this.ring.shift();
-    if (this.ledger) this.ledger.write(ev);
     this.observers.forEach(fn => { try { fn(ev); } catch (e) {} });
     const g = this.gates.get(type);
     if (!g) return undefined;
@@ -56,10 +53,4 @@ function check(schema, data) {
   return null;
 }
 
-class Ledger {
-  constructor(file) { this.file = file; fs.mkdirSync(path.dirname(file), { recursive: true }); }
-  write(ev) { try { fs.appendFileSync(this.file, JSON.stringify({ seq: ev.seq, ts: ev.ts, type: ev.type, data: ev.data }) + '\n'); } catch (e) {} }
-  read(n) { try { const l = fs.readFileSync(this.file, 'utf8').trim().split('\n').filter(Boolean); return l.slice(-(n || l.length)).map(x => JSON.parse(x)); } catch (e) { return []; } }
-}
-
-module.exports = { Event, Gate, Stream, Ledger, check };
+module.exports = { Event, Gate, Stream, check };
