@@ -15,7 +15,10 @@
  *       FM WUB lets the wobble itself open the FM — the talking growl moves its harmonics, not just a filter over them
  *   SQUASH: 3-band OTT-style squash on the whole output — each band driven into a soft limiter (the growl's mids most):
  *       quiet detail comes up, peaks flatten, the growl comes forward. No look-ahead, so no latency
- *   All default to off: every older preset sounds exactly as before. */
+ *   All default to off: every older preset sounds exactly as before.
+ * 3.5 (more power, control, fluidity): RATE BEND (×¼…×4, smooth, between the grid rates) and RATE GLIDE (rate changes swoop;
+ *   wub-seq steps glide on instead of restarting) · PITCH WUB to 2400 c (an octave-scream screech; was 100 c) · Octave +2 ·
+ *   three new inputs — rate, FM, pitch — so an Envelope / LFO / Wub Rate can move the speed, the growl and the pitch. */
 (function () {
   'use strict';
   const S = OrganismSDK.STD;
@@ -91,7 +94,7 @@
   }
 
   OrganismFactory.define({
-    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '3.4.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
+    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '3.5.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
     category: 'Sound sources', blurb: 'Dubstep wobble / talking "yoi" bass locked to the tempo. The drop.',
     size: { w: 560, h: 600 }, minSize: { w: 420, h: 380 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
@@ -100,6 +103,8 @@
       S.audio_out('wobble.hook.audio_out'), S.note_in('wobble.hook.note_in'), S.midi_in('wobble.hook.midi_in'),
       S.theory_in('wobble.hook.theory_in'), S.transport_in('wobble.hook.transport_in'),
       S.mod_in('wobble.hook.mod_cutoff', 'cutoff'), S.mod_in('wobble.hook.mod_depth', 'depth'), S.mod_in('wobble.hook.mod_drive', 'drive'),
+      // 3.5: the wobble's speed, the growl's FM and the pitch — any LFO / Envelope / Wub Rate can drive them
+      S.mod_in('wobble.hook.mod_rate', 'rate'), S.mod_in('wobble.hook.mod_fm', 'fm'), S.mod_in('wobble.hook.mod_pitch', 'pitch'),
     ],
     config: [
       { key: 'div', type: 'enum', options: DIVS, default: '1/8', label: 'Wobble rate', group: 'WOBBLE' },
@@ -111,7 +116,9 @@
       { key: 'retrig', type: 'boolean', default: true, label: 'Retrig', group: 'WOBBLE' },
       { key: 'lfoPhase', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Phase', group: 'WOBBLE' },
       { key: 'ampMod', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Vol wub', group: 'WOBBLE' },
-      { key: 'vibrato', type: 'number', default: 0, min: 0, max: 100, step: 1, unit: 'c', label: 'Pitch wub', group: 'WOBBLE' },
+      { key: 'vibrato', type: 'number', default: 0, min: 0, max: 2400, step: 1, unit: 'c', label: 'Pitch wub', group: 'WOBBLE', hint: 'the wobble bends the pitch too: up to 100 c a wobble, 1200 c an octave scream (the screech)' },
+      { key: 'rateBend', type: 'number', default: 1, min: 0.25, max: 4, step: 0.001, unit: '×', label: 'Rate bend', group: 'WOBBLE', hint: 'speeds the wobble up or slows it down smoothly, between the grid rates (×2 = one rate faster)' },
+      { key: 'rateGlide', type: 'number', default: 0, min: 0, max: 2, step: 0.001, unit: 's', label: 'Rate glide', group: 'WOBBLE', hint: 'rate changes swoop instead of jumping — Rate bend, the rate ladder and the wub-seq steps (which then glide on without restarting)' },
       { key: 'wubOn', type: 'boolean', default: false, label: 'Wub seq', group: 'WUB SEQ' },
       { key: 'wubLen', type: 'integer', default: 8, min: 1, max: 16, label: 'Steps', group: 'WUB SEQ' },
       { key: 'wubStep', type: 'enum', options: Object.keys(STEPS), default: '1/4', label: 'Step', group: 'WUB SEQ' },
@@ -131,7 +138,7 @@
       { key: 'drive', type: 'number', default: 0.4, min: 0, max: 1, step: 0.01, label: 'Drive', group: 'TONE' },
       { key: 'shaper', type: 'number', default: 0.3, min: 0, max: 1, step: 0.01, label: 'Grit', group: 'TONE' },
       { key: 'gritMode', type: 'enum', options: ['auto', 'soft', 'asym', 'fold', 'hard'], default: 'auto', label: 'Grit type', group: 'TONE', hint: 'after the filter: fold = growl (harmonics that move with the wobble), hard = clipped and loud, auto = soft, asym above 0.6' },
-      { key: 'octave', type: 'integer', default: -1, min: -2, max: 1, label: 'Octave', group: 'TONE' },
+      { key: 'octave', type: 'integer', default: -1, min: -2, max: 2, label: 'Octave', group: 'TONE', hint: '+1 / +2 = the screech register' },
       { key: 'spread', type: 'number', default: 9, min: 0, max: 50, step: 0.1, unit: 'c', label: 'Unison', group: 'TONE' },
       { key: 'width', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Width', group: 'TONE' },
       { key: 'noise', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Noise', group: 'TONE' },
@@ -188,6 +195,10 @@
       const fmWubVca = ac.createGain(); fmWubVca.gain.value = 0; fHz.connect(fmWubVca); fmWubVca.connect(fmVca.gain);
       const fmWubDepth = ac.createGain(); fmWubDepth.gain.value = 0; fmWubDepth.connect(fmWubVca.gain);
       [saw, saw2, sq].forEach(o => fmVca.connect(o.frequency));
+      // 3.5 FM input: (index added by what is wired) × note Hz → the FM depth
+      const fmMod = ctx.modBus('fm', { min: -6, max: 6 }); const fmModVca = ac.createGain(); fmModVca.gain.value = 0; fHz.connect(fmModVca); fmMod.connect(fmModVca.gain); fmModVca.connect(fmVca.gain); ctx.track(fmModVca);
+      // 3.5 pitch input (cents): the wub layer bends (Envelope = dives, LFO = screams); the clean sub stays on the note
+      const pitchMod = ctx.modBus('pitch', { min: -2400, max: 2400 }); [saw, saw2, sq].forEach(o => pitchMod.connect(o.detune));
       [fmOsc, fHz, fmVca, fmStatic, fmWubVca, fmWubDepth].forEach(n => ctx.track(n));
       // post shaper → amp
       // P14 fix ("blown speaker"): only the filtered mid layer is distorted. The sub joins AFTER the shaper, clean;
@@ -263,15 +274,19 @@
       const lfoLog = [];                                    // [{t, div, shape, stop}] last 64 restarts — the tests read it
       function lfoFreq(div) { return P.get('lfoSync') ? 1 / MT.divisionSec(div, ctx.bpm) : P.get('lfoHz'); }
       function setWave(w, t) { lfo.setPeriodicWave(w.wave); drawDc.offset.setValueAtTime(w.dc, t === undefined ? ac.currentTime : t); }
+      // 3.5 the wobble's speed beyond the grid: Rate bend (glided) + the rate input, both in cents on every LFO's detune
+      const rateBus = ac.createConstantSource(); rateBus.offset.value = 1200 * Math.log2(P.get('rateBend') || 1); rateBus.start(); ctx.track(rateBus);
+      const rateMod = ctx.modBus('rate', { min: -2400, max: 2400 });
+      const glideTau = () => Math.max(0.004, P.get('rateGlide') / 3);
       function startLfo(t, div, o) {
         o = o || {};
         const heard = t; t = Math.max(ac.currentTime, t - FILT_LAT);   // 3.39: restart early so the wobble is HEARD at `heard`
-        if (lfo) { try { lfo.stop(t); } catch (e) {} const old = lfo; old.onended = () => { try { old.disconnect(); } catch (e) {} ctx.untrack(old); }; }
+        if (lfo) { try { lfo.stop(t); } catch (e) {} const old = lfo; old.onended = () => { try { old.disconnect(); rateBus.disconnect(old.detune); rateMod.disconnect(old.detune); } catch (e) {} ctx.untrack(old); }; }
         lfo = ac.createOscillator(); setWave(curWave(), t);
         curDiv = div || P.get('div'); frozen = !!o.stop;
         const f = frozen ? 1e-4 : lfoFreq(curDiv);          // STOP = the shape's start point, held (shut for the built-in shapes)
         lfo.frequency.value = f; lfo.frequency.setValueAtTime(f, t);
-        lfo.connect(lfoBus); lfo.start(t);
+        lfo.connect(lfoBus); rateBus.connect(lfo.detune); rateMod.connect(lfo.detune); lfo.start(t);
         ctx.track(lfo);
         lfoLog.push({ t: heard, at: t, div: curDiv, shape: seqShape || P.get('lfoShape'), stop: frozen }); if (lfoLog.length > 64) lfoLog.shift();
       }
@@ -320,7 +335,11 @@
       ['osc2', 'sub', 'drive', 'shaper', 'gritMode', 'level', 'spread', 'width', 'noise', 'ampMod', 'vibrato'].forEach(k => P.onChange(k, applyTone));
       ['filterMode', 'cutoff', 'res', 'depth', 'vowelA', 'vowelB', 'formantShift'].forEach(k => P.onChange(k, applyFilter));
       ['lfoShape', 'lfoPhase', 'shapePts'].forEach(k => P.onChange(k, () => { if (lfo) setWave(curWave()); }));
-      const retime = () => { if (lfo && !frozen) { lfo.frequency.cancelScheduledValues(ac.currentTime); lfo.frequency.value = lfoFreq(curDiv); } };
+      const retime = () => {
+        if (!lfo || frozen) return; const t = ac.currentTime, f = lfoFreq(curDiv), g = P.get('rateGlide');
+        lfo.frequency.cancelScheduledValues(t); if (g > 0) { lfo.frequency.setValueAtTime(lfo.frequency.value, t); lfo.frequency.exponentialRampToValueAtTime(f, t + g); } else lfo.frequency.value = f;
+      };
+      P.onChange('rateBend', (v) => rateBus.offset.setTargetAtTime(1200 * Math.log2(v || 1), ac.currentTime, glideTau()));
       P.onChange('div', (v) => { curDiv = v; retime(); }); P.onChange('lfoSync', retime); P.onChange('lfoHz', retime);
       let pendingBpm = false;
       ctx.onBpm(() => { pendingBpm = true; });
@@ -332,6 +351,14 @@
         const n = Math.max(1, Math.min(16, P.get('wubLen'))), cell = parseCell((P.get('wubSeq') || [])[Math.floor(t.step16 / len) % n]);
         if (!cell) return;                                  // hold: the wobble keeps rolling
         if (cell.stop) { seqShape = null; startLfo(t.time, curDiv, { stop: true }); return; }
+        // 3.5 Rate glide on: the step glides the running wobble to its rate (no restart) — a rate ramp, not a jump
+        if (P.get('rateGlide') > 0 && lfo && !frozen) {
+          const at = Math.max(ac.currentTime, t.time - FILT_LAT), f = lfoFreq(cell.div); curDiv = cell.div;
+          lfo.frequency.cancelScheduledValues(at); lfo.frequency.setValueAtTime(lfo.frequency.value, at); lfo.frequency.exponentialRampToValueAtTime(f, at + P.get('rateGlide'));
+          if (cell.shape !== seqShape) { seqShape = cell.shape; setWave(curWave(), at); }
+          lfoLog.push({ t: t.time, at, div: curDiv, shape: seqShape || P.get('lfoShape'), stop: false, glide: true }); if (lfoLog.length > 64) lfoLog.shift();
+          return;
+        }
         seqShape = cell.shape; startLfo(t.time, cell.div);
       });
       P.onChange('wubOn', (on) => { if (!on) { seqShape = null; if (frozen) startLfo(ac.currentTime, P.get('div')); } });

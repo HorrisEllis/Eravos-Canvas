@@ -142,20 +142,77 @@ OrganismFactory.reg('eravos.wobble-bass', function (view) {
     UI.Button({ label: 'Clear', hint: 'every step holds (the wobble keeps rolling)', onClick: () => view.emit('wub_seq', { cells: Array(16).fill('') }) }).el,
   ]));
   const wubOn = ctl('wubOn'), wubLen = ctl('wubLen', { size: 28 }), wubStep = ctl('wubStep');
+  // ---- 3.5 every control on screen, grouped by what it does; a control that waits on a switch is dimmed and says why
+  const placed = new Set(['lfoShape', 'filterMode', 'vowelA', 'vowelB', 'lfoSync', 'retrig', 'subOct', 'div', 'wubOn', 'wubLen', 'wubStep']);
+  const knob = (k) => { placed.add(k); const c = ctl(k, { size: 30 }); c.el.dataset.key = k; return c; };
+  const group = (title, keys, extra) => h('div', { class: 'uk-group wb-group' }, [h('div', { class: 'uk-group-title', text: title }), h('div', { class: 'uk-row' }, (extra || []).concat(keys.map(k => knob(k).el)))]);
+  [shape, mode, va, vb, sync, retrig, subOct, wubOn, wubLen, wubStep].forEach((c, i) => { c.el.dataset.key = ['lfoShape', 'filterMode', 'vowelA', 'vowelB', 'lfoSync', 'retrig', 'subOct', 'wubOn', 'wubLen', 'wubStep'][i]; });
+  const RULES = [   // [control key, the switch it waits on, when it works, what to say when it does not]
+    ['lfoHz', 'lfoSync', (v) => !v, 'Free rate works with Sync off'],
+    ['vowelA', 'filterMode', (v) => v === 'formant', 'vowels work in the formant filter'], ['vowelB', 'filterMode', (v) => v === 'formant', 'vowels work in the formant filter'],
+    ['formantShift', 'filterMode', (v) => v === 'formant', 'Formant works in the formant filter'],
+    ['fmRatio', 'fmIndex', (v) => v > 0, 'turn FM up first'], ['fmWub', 'fmIndex', (v) => v > 0, 'turn FM up first'],
+    ['diveTime', 'pitchDive', (v) => v !== 0, 'set a Dive first'],
+    ['wubLen', 'wubOn', (v) => !!v, 'turn Wub seq on'], ['wubStep', 'wubOn', (v) => !!v, 'turn Wub seq on'],
+  ];
+  // ---- PERFORM: one hand on the wobble — sideways bends its speed (×¼ … ×4, glided), up/down opens the mouth
+  const pad = UI.Canvas(480, 120); pad.style.cursor = 'crosshair'; pad.setAttribute('aria-label', 'perform pad: rate bend and mouth');
+  const LOG = (v, a, b) => Math.log(v / a) / Math.log(b / a), EXP = (u, a, b) => a * Math.pow(b / a, u);
+  const mouthKey = () => view.state.filterMode === 'formant' ? 'formantShift' : 'cutoff';
+  const mouthU = () => mouthKey() === 'cutoff' ? LOG(view.state.cutoff || 300, 40, 8000) : ((view.state.formantShift || 0) + 12) / 24;
+  let padDrag = false, springBack = true, home = null;
+  UI.loop(pad, () => {
+    const g = pad.g; pad.fit(); const W = pad.W, H = 120, s = view.state, x = LOG(s.rateBend || 1, 0.25, 4) * W, y = (1 - mouthU()) * H;
+    g.fillStyle = '#0b0710'; g.fillRect(0, 0, W, H);
+    [0.25, 0.5, 1, 2, 4].forEach(r => { const px = LOG(r, 0.25, 4) * W; g.strokeStyle = r === 1 ? '#3a2a44' : '#1d1626'; g.beginPath(); g.moveTo(px, 0); g.lineTo(px, H); g.stroke(); g.fillStyle = '#6b5a7a'; g.font = '9px monospace'; g.fillText('×' + r, Math.min(W - 22, px + 2), H - 4); });
+    g.fillStyle = 'rgba(255,34,102,.18)'; g.beginPath(); g.arc(x, y, 16, 0, 7); g.fill(); g.fillStyle = padDrag ? '#fff' : '#ff2266'; g.beginPath(); g.arc(x, y, 6, 0, 7); g.fill();
+    g.fillStyle = '#9fb3c8'; g.font = '10px monospace'; g.fillText(`rate ×${(s.rateBend || 1).toFixed(2)}${s.rateGlide > 0 ? ' · glide ' + s.rateGlide.toFixed(2) + 's' : ''}  ·  ${mouthKey() === 'cutoff' ? 'mouth ' + Math.round(s.cutoff) + ' Hz' : 'formant ' + (s.formantShift || 0).toFixed(1) + ' st'}`, 6, 12);
+    g.fillStyle = '#5b6f84'; g.fillText('slower', 6, H / 2); g.fillText('faster', W - 40, H / 2); g.fillText('open ↑', W / 2 - 18, 24);
+  }, 30);
+  const padSet = (e) => {
+    const r = pad.getBoundingClientRect(), u = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), v = Math.max(0, Math.min(1, 1 - (e.clientY - r.top) / r.height));
+    view.set('rateBend', +EXP(u, 0.25, 4).toFixed(3));
+    if (mouthKey() === 'cutoff') view.set('cutoff', Math.round(EXP(v, 40, 8000))); else view.set('formantShift', +(v * 24 - 12).toFixed(1));
+  };
+  pad.addEventListener('pointerdown', (e) => { stopEv(e); padDrag = true; home = { rateBend: view.state.rateBend, [mouthKey()]: view.state[mouthKey()] }; try { pad.setPointerCapture(e.pointerId); } catch (_) {} padSet(e); });
+  pad.addEventListener('pointermove', (e) => { if (padDrag) padSet(e); });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => pad.addEventListener(t, () => { if (!padDrag) return; padDrag = false; if (springBack && home) Object.keys(home).forEach(k => view.set(k, home[k])); home = null; }));
+  pad.addEventListener('dblclick', (e) => { stopEv(e); view.set('rateBend', 1); });
+  const springB = UI.Button({ label: 'Spring back ✓', hint: 'on: letting go returns to where you started (a performance move) · off: it stays where you leave it', onClick: () => { springBack = !springBack; springB.set(springBack ? 'Spring back ✓' : 'Spring back'); } });
+
+  const groups = [
+    group('RATE — beyond the grid', ['rateBend', 'rateGlide', 'lfoHz', 'lfoPhase', 'depth']),
+    group('MOUTH — the filter', ['cutoff', 'res', 'formantShift']),
+    group('GROWL — FM, grit, squash', ['fmIndex', 'fmRatio', 'fmWub', 'gritMode', 'shaper', 'drive', 'squash']),
+    group('PITCH — bends and dives', ['octave', 'glide', 'pitchDive', 'diveTime', 'vibrato']),
+    group('TONE — layers and level', ['osc2', 'sqOct', 'sub', 'subAlign', 'spread', 'width', 'noise', 'ampMod', 'attack', 'release', 'level']),
+  ];
+  const ctlOf = (k) => view.root.querySelector(`[data-key="${k}"]`);
+  function dim() {
+    RULES.forEach(([k, sw, ok, why]) => { const el = ctlOf(k); if (!el) return; const on = ok(view.state[sw]); el.style.opacity = on ? '' : '0.35'; el.title = on ? (el.dataset.hint0 || '') : '⏸ ' + why; if (!el.dataset.hint0) el.dataset.hint0 = el.title && el.title.startsWith('⏸') ? '' : (el.title || ''); });
+  }
+  [...new Set(RULES.map(r => r[1]))].forEach(sw => view.bind(sw, () => setTimeout(dim, 0)));
   view.root.append(
     h('div', { class: 'org-row', style: { justifyContent: 'space-between' } }, [UI.presetBar(view), shape.el]),
     spec,
     sec('WOBBLE RATE'),
     h('div', { class: 'org-row', style: { flexWrap: 'wrap', gap: '6px', margin: 0 } }, [ladderBox, sync.el, retrig.el]),
+    sec('PERFORM — drag: sideways bends the wobble speed, up opens the mouth · double-click resets the speed'),
+    pad, h('div', { class: 'org-row', style: { gap: '4px', margin: '4px 0 0' } }, [springB.el]),
     sec('SHAPE — drag points · click to add · double-click removes · shift-drag or wheel bends a segment'),
     ed, shapeRow,
-    sec('WUB SEQ — a rate per step (fast at the top) · bottom row: that step\'s shape · on = notes play pitch only'),
+    sec('WUB SEQ — a rate per step (fast at the top) · bottom row: that step\'s shape · on = notes play pitch only · Rate glide on = steps glide'),
     h('div', { class: 'org-row', style: { flexWrap: 'wrap', gap: '6px', margin: 0, alignItems: 'center' } }, [wubOn.el, wubLen.el, wubStep.el]),
     roll, seqBtns,
     sec('FILTER + VOWELS'),
     h('div', { class: 'org-row', style: { flexWrap: 'wrap', gap: '8px', margin: 0 } }, [mode.el, va.el, vb.el, subOct.el]),
-    UI.paramPanel(view, ['depth', 'lfoHz', 'lfoPhase', 'ampMod', 'vibrato', 'cutoff', 'res', 'formantShift', 'osc2', 'sub', 'drive', 'shaper', 'spread', 'width', 'noise', 'octave', 'level', 'glide', 'attack', 'release', 'pitchDive', 'diveTime'], { size: 32 }),
+    h('div', { class: 'uk-panel' }, groups),
     h('div', { style: { height: '6px' } }), kb.el,
-    UI.hint('Sync off + Free rate = a growl that ignores the grid. Retrig off keeps the wobble rolling across notes. Dive drops into each note; Pitch wub and Vol wub ride the same LFO. Wub seq: each step restarts the wobble on the bar grid at its own rate — stop freezes it shut, an empty step holds.'),
+    UI.hint('The screech: Octave +1, FM 3–6, Pitch wub 600–1200 c, a fast rate. The growl: Octave −1, FM 2–4 with FM wub, formant OO → AH. Rate glide makes the wub seq swoop between rates. Every knob with a violet dot (rate, FM, pitch, cutoff, depth, drive) can be moved by an Envelope, LFO or Wub Rate.'),
   );
+  dim();
+  // nothing the engine has may be left off the window (3.5: FM, Squash, Grit type … were missing)
+  const orphans = view.descriptor.config.filter(c => !c.hidden && !c.settingsOnly && !placed.has(c.key)).map(c => c.key);
+  if (orphans.length) console.warn('wobble-bass UI: controls not on the window:', orphans.join(', '));
+  view.orphans = orphans;
 });

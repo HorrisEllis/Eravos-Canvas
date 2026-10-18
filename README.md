@@ -62,6 +62,14 @@ Techno, Trap, Synthwave (80s), Darkwave (80s), Witch House). Every press writes 
 drums, bass, chords, lead and the arrangement — on the Timeline, all in key. Click any clip to edit it in the piano roll.
 The song's name ends in its number: `SongEngine.write('synthwave', 4242)` builds that exact song again.
 
+## 3.45 — Wobble Bass: everything on screen, fluid rates, the Bun Dem screech
+- **Fixed**: seven controls (FM, FM ratio, FM wub, Squash, Grit type, Square oct, Sub in phase) were missing from the window.
+  Now every control is there, grouped (Rate · Mouth · Growl · Pitch · Tone); a control that waits on a switch is dimmed and says why.
+- **Perform pad**: drag sideways to bend the wobble speed smoothly (×¼ … ×4), up and down to open the mouth; springs back on release.
+- **Rate glide**: rate changes swoop instead of jumping — wub-seq steps glide into each other. **Pitch wub** to 2400 c (an octave
+  scream; it stopped at 1 semitone). **Octave +2**. New inputs: **rate · FM · pitch** — wire an Envelope or LFO into them.
+- **Bun Dem presets**: Screech (the drop lead, octave up, FM, octave-wide bends), Talking Growl, Rate Ramp (glide).
+
 ## 3.44 — Songs by category · the Bun Dem growl
 - **Songs page by category**: 🔊 Dubstep & Wubs · ⚡ Drum & Bass · 🏠 House · 🌀 Techno & Trance · 🎛 Trap & Phonk · 🔥 Reggae &
   Dub · 🌆 80s · 🖤 Dark · 🌙 Chill, then the collections 💜 For Her · 🥀 Lost Love · 🧪 Odd Couples. Counts on every chip,
