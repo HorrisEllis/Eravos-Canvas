@@ -1,24 +1,28 @@
 {
   "schema": "eravos.tool/1",
   "id": "eravos.breath",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "label": "Breath",
   "icon": "◎",
   "accent": "#8844ff",
   "domain": "music",
   "category": "modulation",
-  "summary": "Breathe with the music: a breath-cycle clock that swells the sound on the inhale — and drives anything wired to it.",
+  "summary": "Breathe with the music: a breath-cycle clock with 12 patterns and timed sessions — its sound swells with you, and three outputs drive anything wired to it.",
   "tags": [
     "modulation",
-    "breath"
+    "breath",
+    "calm",
+    "session",
+    "meditation"
   ],
   "files": {
     "engine": "breath.engine.js",
     "ui": "breath.ui.js",
+    "css": "breath.css",
     "spec": "breath.spec",
     "preview": "preview.png",
-    "tests": "breath.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "tests": "breath.test.js"
   },
   "needs": {
     "units": [

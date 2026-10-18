@@ -59,7 +59,7 @@ tools:
     - eravos.mixer (Mixer) mode=music units=[engine] needs=[audio] in=0 out=0
     - eravos.sidechain-compressor (Sidechain) mode=music units=[engine,transport,tempo,meter] needs=[audio,clock,notes] in=2 out=2
   Modulation:
-    - eravos.breath (Breath) mode=music.lab units=[engine,key,meter] needs=[audio,key] in=0 out=3
+    - eravos.breath (Breath) mode=music.lab units=[engine,key,meter] needs=[audio,key] in=0 out=6
     - eravos.lfo (LFO) mode=music units=[engine,transport,tempo] needs=[audio,clock,mod] in=1 out=1
     - eravos.macro-automation (Automation) mode=music units=[engine,transport,tempo] needs=[audio,clock] in=1 out=9
     - eravos.xy-pad (XY Pad) mode=music units=[engine,transport,tempo] needs=[audio,clock] in=0 out=2

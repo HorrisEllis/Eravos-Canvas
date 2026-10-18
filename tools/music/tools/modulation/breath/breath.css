@@ -1,0 +1,6 @@
+/* eravos.breath 2.0 */
+.breath .br-about { color: #c8b8f0; font-size: 12px; margin: 2px 0 4px; min-height: 16px; }
+.breath .br-sub { font: 700 9.5px var(--mono, monospace); letter-spacing: 1.4px; color: var(--dim, #7f93a8); margin-top: 8px; }
+.breath .br-log { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border-radius: 9px; background: rgba(136,68,255,.07); border: 1px solid rgba(136,68,255,.25); font-size: 12px; align-items: flex-start; }
+.breath .br-log-list { display: flex; flex-direction: column; gap: 1px; color: var(--dim, #7f93a8); font: 11px var(--mono, monospace); }
+.breath .br-dim { color: var(--dim, #7f93a8); }

@@ -252,11 +252,13 @@
 
       // ---------------------------------------------------------------- voices
       // drums: 8 lane strips (level · pan) → kit drive → rhythm
-      const kitBus = node(ac.createGain()), kitSh = node(ac.createWaveShaper()); kitBus.connect(kitSh); kitSh.connect(outs.rhythm);
-      const shapeKit = () => { const d = clamp(P.get('kitDrive') + KITS[P.get('kit')].drive * 0.5, 0, 1); kitSh.curve = d > 0.01 ? dsp.curve('tanh', d) : null; kitBus.gain.value = 1 / (1 + d * 0.6); };
+      // the drive stage is only in the path while it drives: an idle WaveShaper still costs the kick its first samples
+      const kitBus = node(ac.createGain()), kitSh = node(ac.createWaveShaper()); kitSh.connect(outs.rhythm);
+      const shapeKit = () => { const d = clamp(P.get('kitDrive') + KITS[P.get('kit')].drive * 0.5, 0, 1); try { kitBus.disconnect(); } catch (e) {} if (d > 0.01) { kitSh.curve = dsp.curve('tanh', d); kitBus.connect(kitSh); } else kitBus.connect(outs.rhythm); kitBus.gain.value = 1 / (1 + d * 0.6); };
       shapeKit(); ['kit', 'kitDrive'].forEach(k => P.onChange(k, shapeKit));
-      const strips = ROWS.map(() => { const g = node(ac.createGain()), p = node(ac.createStereoPanner()); g.connect(p); p.connect(kitBus); return { g, p }; });
-      const applyLanes = () => lanes.forEach((l, i) => { strips[i].g.gain.setTargetAtTime(audible(i) ? l.level : 0, ac.currentTime, 0.01); strips[i].p.pan.setTargetAtTime(l.pan, ac.currentTime, 0.01); });
+      const strips = ROWS.map(() => { const g = node(ac.createGain()), p = node(ac.createStereoPanner()); g.gain.value = Math.SQRT2; g.connect(p); p.connect(kitBus); return { g, p }; });
+      // ×√2: an equal-power panner puts a centred mono hit at −3 dB a side — centred lanes stay as loud as the 3.0 lab
+      const applyLanes = () => lanes.forEach((l, i) => { strips[i].g.gain.setTargetAtTime(audible(i) ? l.level * Math.SQRT2 : 0, ac.currentTime, 0.01); strips[i].p.pan.setTargetAtTime(l.pan, ac.currentTime, 0.01); });
       applyLanes();
       const noiseBuf = dsp.noise(ac, 1);
       const nz = (t, d) => { const n = ac.createBufferSource(); n.buffer = noiseBuf; n.start(t, Math.random() * 0.5); n.stop(t + d); return n; };
@@ -281,14 +283,16 @@
       const bLp = node(ac.createBiquadFilter()); bLp.type = 'lowpass'; const bSh = node(ac.createWaveShaper());
       const bAmp = node(ac.createGain()); bAmp.gain.value = 0; const bSubG = node(ac.createGain());
       const wob = node(ac.createOscillator()), wobG = node(ac.createGain()); wob.type = 'sine'; wobG.gain.value = 0; wob.connect(wobG); wobG.connect(bLp.frequency);
-      bOsc.connect(bLp); bSub.connect(bSubG); bLp.connect(bSh); bSubG.connect(bAmp); bSh.connect(bAmp); bAmp.connect(duck.bass);
+      bOsc.connect(bLp); bSub.connect(bSubG); bLp.connect(bSh); bSubG.connect(bSh); bSh.connect(bAmp); bAmp.connect(duck.bass);   // the sub shares the soft clip (3.0's level)
       [bOsc, bSub, bFmOsc].forEach(o => { o.frequency.value = 55; o.start(); }); wob.start();
-      const bassCut = () => 80 * Math.pow(2, 7.5 * clamp(P.get('bassCutoff') + modC(), 0, 1));   // 80 Hz … 14.5 kHz
+      // Cutoff 0.5 = the 3.0 lab's tone; each 0.1 is ±0.6 octave (1/8× … 8×) — cutK scales every filter frequency below
+      let tickBpm = null; const bpmNow = () => tickBpm || ctx.bpm;   // the tempo the ticks really run at (a sixteenth = 15 / bpm s)
+      const cutK = () => Math.pow(2, 6 * (clamp(P.get('bassCutoff') + modC(), 0, 1) - 0.5)), bassCut = () => 300 * cutK();
       function voiceBass() {
-        const w = P.get('bassWave'); bOsc.type = w === 'fm' ? 'sine' : w;
+        const w = P.get('bassWave'); bOsc.type = w === 'fm' ? 'sine' : w === 'saw' ? 'sawtooth' : w;
         bFmG.gain.setTargetAtTime(0, ac.currentTime, 0.01);
         bLp.Q.value = P.get('bassRes'); bSh.curve = dsp.curve('tanh', 0.05 + 0.95 * P.get('bassDrive')); bSubG.gain.value = P.get('bassSub');
-        const wr = WOB[P.get('wobble')] * ctx.bpm / 60; wob.frequency.setTargetAtTime(wr, ac.currentTime, 0.01);
+        const wr = WOB[P.get('wobble')] * bpmNow() / 60; wob.frequency.setTargetAtTime(wr, ac.currentTime, 0.01);
         wobG.gain.setTargetAtTime(P.get('bassStyle') === 'wobble' ? bassCut() * 0.9 : 0, ac.currentTime, 0.02);
         if (P.get('bassStyle') !== 'wobble') bLp.frequency.setTargetAtTime(bassCut(), ac.currentTime, 0.05);
       }
@@ -298,10 +302,10 @@
         const f = MT.hz(n.midi), gl = P.get('bassGlide');
         if (n.glide && gl > 0) { bOsc.frequency.setTargetAtTime(f, t, gl / 3); bSub.frequency.setTargetAtTime(f / 2, t, gl / 3); bFmOsc.frequency.setTargetAtTime(f * 2, t, gl / 3); }
         else { bOsc.frequency.setValueAtTime(f, t); bSub.frequency.setValueAtTime(f / 2, t); bFmOsc.frequency.setValueAtTime(f * 2, t); }
-        const e = energy(), c = bassCut(), envAmt = P.get('bassEnv') * (n.accent ? 1.4 : 1);
+        const e = energy(), envAmt = P.get('bassEnv') * (n.accent ? 1.4 : 1);
         if (P.get('bassWave') === 'fm') { bFmG.gain.cancelScheduledValues(t); bFmG.gain.setValueAtTime(f * (1 + 3 * envAmt * e), t); bFmG.gain.setTargetAtTime(f * 0.4, t + 0.01, 0.1); }
-        if (P.get('bassStyle') !== 'wobble') { bLp.frequency.cancelScheduledValues(t); bLp.frequency.setValueAtTime(Math.min(18000, c * (1 + envAmt * (2 + 6 * e))), t); bLp.frequency.setTargetAtTime(c * (0.5 + 0.5 * e), t + 0.01, 0.06 + 0.1 * (1 - e)); }
-        else wob.frequency.setValueAtTime(WOB[P.get('wobble')] * ctx.bpm / 60, t);
+        if (P.get('bassStyle') !== 'wobble') { const k = cutK(); bLp.frequency.cancelScheduledValues(t); bLp.frequency.setValueAtTime(Math.min(18000, (200 + 2200 * e) * k * (0.4 + envAmt)), t); bLp.frequency.setTargetAtTime((120 + 300 * e) * k, t + 0.01, 0.08); }
+        else wob.frequency.setValueAtTime(WOB[P.get('wobble')] * bpmNow() / 60, t);
         bAmp.gain.cancelScheduledValues(t); bAmp.gain.setValueAtTime(bAmp.gain.value, t); bAmp.gain.linearRampToValueAtTime(n.accent ? 0.7 : 0.55, t + 0.005); bAmp.gain.setTargetAtTime(0, t + dur, 0.03);
         bassLog.push({ t, midi: n.midi, name: MT.noteName(n.midi) }); if (bassLog.length > 32) bassLog.shift();
         ctx.emitUI('bass_note', { time: t, midi: n.midi, name: MT.noteName(n.midi) });
@@ -333,10 +337,11 @@
       const lOsc = node(ac.createOscillator()), lLp = node(ac.createBiquadFilter()), lAmp = node(ac.createGain()), lDel = node(ac.createDelay(2)), lFb = node(ac.createGain()), lWet = node(ac.createGain());
       lLp.type = 'lowpass'; lLp.Q.value = 2; lAmp.gain.value = 0; lOsc.connect(lLp); lLp.connect(lAmp); lAmp.connect(duck.lead); lAmp.connect(lDel); lDel.connect(lFb); lFb.connect(lDel); lDel.connect(lWet); lWet.connect(duck.lead);
       lOsc.frequency.value = 440; lOsc.start();
-      const voiceLead = () => { lOsc.type = P.get('leadWave'); lLp.frequency.setTargetAtTime(200 * Math.pow(2, 6.5 * P.get('leadCutoff')), ac.currentTime, 0.02); lDel.delayTime.setTargetAtTime(0.75 * 60 / ctx.bpm, ac.currentTime, 0.05); lFb.gain.value = P.get('leadEcho') * 0.75; lWet.gain.value = P.get('leadEcho') * 0.8; };
+      const voiceLead = () => { lOsc.type = P.get('leadWave') === 'saw' ? 'sawtooth' : P.get('leadWave'); lLp.frequency.setTargetAtTime(200 * Math.pow(2, 6.5 * P.get('leadCutoff')), ac.currentTime, 0.02); lDel.delayTime.setTargetAtTime(0.75 * 60 / bpmNow(), ac.currentTime, 0.05); lFb.gain.value = P.get('leadEcho') * 0.75; lWet.gain.value = P.get('leadEcho') * 0.8; };
       voiceLead(); ['leadWave', 'leadCutoff', 'leadEcho'].forEach(k => P.onChange(k, voiceLead)); ctx.onBpm(voiceLead);
       function leadNote(t, n, dur) {
         const f = MT.hz(n.midi), gl = P.get('leadGlide');
+        lDel.delayTime.setValueAtTime(0.75 * 60 / bpmNow(), t);   // the echo follows the tempo as it is now, event or not
         if (gl > 0) lOsc.frequency.setTargetAtTime(f, t, gl / 3); else lOsc.frequency.setValueAtTime(f, t);
         lAmp.gain.cancelScheduledValues(t); lAmp.gain.setValueAtTime(lAmp.gain.value, t); lAmp.gain.linearRampToValueAtTime(0.32, t + 0.004); lAmp.gain.setTargetAtTime(0, t + dur, 0.025);
         ctx.emitUI('lead_note', { time: t, midi: n.midi, name: MT.noteName(n.midi) });
@@ -364,7 +369,7 @@
       const human = (bar, step, i) => { const h = P.get('humanize'); if (!h) return [0, 1]; const r = dsp.mulberry32((P.get('seed') * 31337 + bar * 977 + step * 53 + i * 7) >>> 0); return [(r() * 2 - 1) * 0.008 * h, 1 + (r() * 2 - 1) * 0.25 * h]; };
 
       ctx.onTick((tk) => {
-        const bar = Math.floor(tk.step16 / 16), step = tk.step16 % 16;
+        const bar = Math.floor(tk.step16 / 16), step = tk.step16 % 16; tickBpm = 15 / tk.stepDur;
         // song arrangement
         const sec = sectionOf(bar);
         if (step === 0) {

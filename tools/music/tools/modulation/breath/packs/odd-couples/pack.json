@@ -17,13 +17,56 @@
     "Drum & Bass Breath": {
      "params": {
       "pattern": "COHERENCE",
+      "cIn": 5,
+      "cHold": 0,
+      "cOut": 5,
+      "cRest": 0,
+      "pace": 1,
+      "curve": "sine",
       "tempoLink": true,
-      "rise": 3
+      "session": "open",
+      "program": "steady",
+      "guide": false,
+      "depth": 1,
+      "floor": 0,
+      "voiceOn": true,
+      "voice": "pad",
+      "chord": "fifth",
+      "octave": 3,
+      "rise": 3,
+      "bright": 0.4,
+      "air": 0.25,
+      "bell": true,
+      "bellTone": "bell",
+      "bellLevel": 0.5,
+      "level": 0.5
      }
     },
     "Séance Breath": {
      "params": {
       "pattern": "HANGING TREE",
+      "cIn": 5,
+      "cHold": 0,
+      "cOut": 5,
+      "cRest": 0,
+      "pace": 1,
+      "curve": "sine",
+      "tempoLink": false,
+      "session": "open",
+      "program": "steady",
+      "guide": false,
+      "depth": 1,
+      "floor": 0,
+      "voiceOn": true,
+      "voice": "pad",
+      "chord": "fifth",
+      "octave": 3,
+      "rise": 2,
+      "bright": 0.4,
+      "air": 0.25,
+      "bell": true,
+      "bellTone": "bell",
+      "bellLevel": 0.5,
       "level": 0.4
      }
     }

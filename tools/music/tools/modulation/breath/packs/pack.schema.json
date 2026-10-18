@@ -22,9 +22,15 @@
                       "pattern": {
                         "enum": [
                           "COHERENCE",
+                          "RESONANCE",
                           "4-7-8",
                           "BOX",
+                          "TRIANGLE",
                           "EXTENDED",
+                          "2-TO-1",
+                          "PHYSIOLOGICAL SIGH",
+                          "UJJAYI",
+                          "SLEEP",
                           "ENERGIZE",
                           "HANGING TREE",
                           "CUSTOM"
@@ -33,36 +39,126 @@
                       "cIn": {
                         "type": "number",
                         "minimum": 0.5,
-                        "maximum": 12
+                        "maximum": 20
                       },
                       "cHold": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 12
+                        "maximum": 20
                       },
                       "cOut": {
                         "type": "number",
                         "minimum": 0.5,
-                        "maximum": 12
+                        "maximum": 30
                       },
                       "cRest": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 12
+                        "maximum": 20
+                      },
+                      "pace": {
+                        "type": "number",
+                        "minimum": 0.5,
+                        "maximum": 2
+                      },
+                      "curve": {
+                        "enum": [
+                          "sine",
+                          "linear",
+                          "natural",
+                          "late"
+                        ]
                       },
                       "tempoLink": {
                         "type": "boolean"
                       },
+                      "session": {
+                        "enum": [
+                          "open",
+                          "1 min",
+                          "3 min",
+                          "5 min",
+                          "10 min",
+                          "15 min",
+                          "20 min"
+                        ]
+                      },
+                      "program": {
+                        "enum": [
+                          "steady",
+                          "slow down",
+                          "longer exhale"
+                        ]
+                      },
+                      "guide": {
+                        "type": "boolean"
+                      },
+                      "depth": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "floor": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
                       "voiceOn": {
                         "type": "boolean"
                       },
+                      "voice": {
+                        "enum": [
+                          "pad",
+                          "choir",
+                          "drone",
+                          "air only"
+                        ]
+                      },
+                      "chord": {
+                        "enum": [
+                          "fifth",
+                          "minor",
+                          "major",
+                          "sus2",
+                          "octaves",
+                          "minor 9"
+                        ]
+                      },
+                      "octave": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 6
+                      },
                       "rise": {
                         "type": "number",
+                        "minimum": -12,
+                        "maximum": 12
+                      },
+                      "bright": {
+                        "type": "number",
                         "minimum": 0,
-                        "maximum": 7
+                        "maximum": 1
+                      },
+                      "air": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
                       },
                       "bell": {
                         "type": "boolean"
+                      },
+                      "bellTone": {
+                        "enum": [
+                          "bell",
+                          "bowl",
+                          "chime",
+                          "click"
+                        ]
+                      },
+                      "bellLevel": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
                       },
                       "level": {
                         "type": "number",
