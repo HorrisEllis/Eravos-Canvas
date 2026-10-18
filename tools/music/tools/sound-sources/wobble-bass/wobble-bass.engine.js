@@ -18,7 +18,9 @@
  *   All default to off: every older preset sounds exactly as before.
  * 3.5 (more power, control, fluidity): RATE BEND (×¼…×4, smooth, between the grid rates) and RATE GLIDE (rate changes swoop;
  *   wub-seq steps glide on instead of restarting) · PITCH WUB to 2400 c (an octave-scream screech; was 100 c) · Octave +2 ·
- *   three new inputs — rate, FM, pitch — so an Envelope / LFO / Wub Rate can move the speed, the growl and the pitch. */
+ *   three new inputs — rate, FM, pitch — so an Envelope / LFO / Wub Rate can move the speed, the growl and the pitch.
+ * 3.6: a GROWL mod slot (the wub layer only — the sub stays clean, delayed to stay in time with the mods) and a SUITE
+ *   (the tool page loads it all at once or one by one: canvas/runtime/tool-page.js). */
 (function () {
   'use strict';
   const S = OrganismSDK.STD;
@@ -94,9 +96,19 @@
   }
 
   OrganismFactory.define({
-    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '3.5.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
+    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '3.6.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
     category: 'Sound sources', blurb: 'Dubstep wobble / talking "yoi" bass locked to the tempo. The drop.',
     size: { w: 560, h: 600 }, minSize: { w: 420, h: 380 },
+    slots: [{ id: 'growl', label: 'the growl (the sub stays clean)', wire_type: 'audio', hint: 'empty — a Destroyer, Phaser or Echo here works on the wub only; the sub underneath stays clean and in time' }],
+    // 3.6 its suite (canvas/runtime/tool-page.js): one click loads it all, or ＋ one by one
+    suite: { label: 'The drop rig', blurb: 'A grit and a sweep inside the growl (the sub stays clean), an envelope that opens the FM growl on every note, Wub Rate switching the depth, and a slow LFO bending the speed.',
+      members: [
+        { tool: 'eravos.fx-destroyer', as: 'mod', slot: 'growl', preset: 'Wub Grit · sub stays clean', why: 'grit inside the growl — the sub underneath stays clean' },
+        { tool: 'eravos.fx-phaser', as: 'mod', slot: 'growl', preset: 'Dubstep Sweep 1/8', why: 'a sweep after the grit, still only on the wub' },
+        { tool: 'eravos.syn-env', as: 'linked', preset: 'Pluck Sweep', wire: { from: ['self', 'env.hook.mod_out'], to: ['host', 'wobble.hook.mod_fm'] }, why: 'every note opens the FM growl, then it settles' },
+        { tool: 'eravos.wub-rate', as: 'linked', preset: 'Brostep Switch-up', wire: { from: ['self', 'wubrate.hook.mod_out'], to: ['host', 'wobble.hook.mod_depth'] }, why: 'a rhythm switching how far the mouth opens' },
+        { tool: 'eravos.lfo', as: 'linked', preset: 'Slow Filter Sweep 2 bars', wire: { from: ['self', 'lfo.hook.mod_out'], to: ['host', 'wobble.hook.mod_rate'] }, why: 'the wobble speeds up and slows down over two bars' },
+      ] },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
     provides: ['capability.audio_out', 'capability.note_in', 'capability.lead_voice'],
     hooks: [
@@ -221,7 +233,11 @@
       // Sub in phase (3.41, off by default): the clean sub waits OSC_LAT and its pitch leaves OSC_LAT early, like the wub layer
       const subAl = ac.createDelay(0.05); subAl.delayTime.value = P.get('subAlign') ? OSC_LAT : 0; ctx.track(subAl);
       P.onChange('subAlign', (v) => subAl.delayTime.setValueAtTime(v ? OSC_LAT : 0, ac.currentTime));
-      post.connect(dcBlock); dcBlock.connect(fizz); fizz.connect(amp); subLP.connect(subAl); subAl.connect(amp); amp.connect(trem);
+      // 3.6 GROWL slot: mods run on the wub layer only (the sub never goes through them); the sub waits for whatever delay they add
+      const subMod = ac.createDelay(0.2); ctx.track(subMod);
+      post.connect(dcBlock); dcBlock.connect(fizz);
+      ctx.slot('growl', fizz, { label: 'the growl', onLatency: (sec) => subMod.delayTime.setValueAtTime(Math.min(0.2, sec), ac.currentTime) }).connect(amp);
+      subLP.connect(subAl); subAl.connect(subMod); subMod.connect(amp); amp.connect(trem);
       // 3.4 SQUASH (OTT-style): trem → [straight] or [3 bands, each driven into a soft limiter and brought back up] → level.
       // Each band is pushed into tanh by its own amount (highs most), so quiet detail comes up and peaks flatten — the dense,
       // loud, fizzy growl — with no look-ahead (zero latency) and no compressor pumping. Switched, never blended.

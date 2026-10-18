@@ -154,5 +154,9 @@ dependencies:
     - wobble.hook.mod_drive (modulation · port mod.drive)
   outputs:
     - wobble.hook.audio_out (audio · port out)
+  mod slots (3.6):
+    - growl — after the post shaper, wub layer only; the sub joins after it, delayed by the mods' reported latency
+  suite (3.6): The drop rig — Destroyer + Phaser in growl · Envelope → mod_fm · Wub Rate → mod_depth · LFO → mod_rate
+    (canvas/runtime/tool-page.js · specs/eravos.tool-pages.spec)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
   works_with: [eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]

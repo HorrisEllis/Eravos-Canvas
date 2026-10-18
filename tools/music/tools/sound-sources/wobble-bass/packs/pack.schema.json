@@ -267,6 +267,7 @@
                         "minimum": 0.005,
                         "maximum": 1
                       },
+                      "mods": {},
                       "tempoX": {
                         "enum": [
                           "¼",
