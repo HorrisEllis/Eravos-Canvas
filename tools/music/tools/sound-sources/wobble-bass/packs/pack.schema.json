@@ -138,6 +138,30 @@
                         "minimum": 0.5,
                         "maximum": 20
                       },
+                      "fmIndex": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 12
+                      },
+                      "fmRatio": {
+                        "enum": [
+                          "0.5",
+                          "1",
+                          "1.5",
+                          "2",
+                          "3"
+                        ]
+                      },
+                      "fmWub": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "squash": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
                       "osc2": {
                         "type": "number",
                         "minimum": 0,

@@ -62,6 +62,14 @@ Techno, Trap, Synthwave (80s), Darkwave (80s), Witch House). Every press writes 
 drums, bass, chords, lead and the arrangement — on the Timeline, all in key. Click any clip to edit it in the piano roll.
 The song's name ends in its number: `SongEngine.write('synthwave', 4242)` builds that exact song again.
 
+## 3.44 — Songs by category · the Bun Dem growl
+- **Songs page by category**: 🔊 Dubstep & Wubs · ⚡ Drum & Bass · 🏠 House · 🌀 Techno & Trance · 🎛 Trap & Phonk · 🔥 Reggae &
+  Dub · 🌆 80s · 🖤 Dark · 🌙 Chill, then the collections 💜 For Her · 🥀 Lost Love · 🧪 Odd Couples. Counts on every chip,
+  headings in the grid, a search box (title, genre or tool), and the mood chips still narrow it down.
+- **Wobble Bass 3.4 — the growl**: **FM** (a sine bending the saws, in tune) and **FM wub** (the wobble opens the FM too, so
+  the growl talks with its harmonics, not just a filter) and **Squash** (3-band OTT-style; the sub stays clean). The
+  "Bun Dem Growl" preset now uses FM; new Bun Dem presets: FM Talker, Half-time Yoi 1/4t, Sub Growl (ratio ½).
+
 ## 3.43 — small tools that combine · Links · Mods · Synthesis
 - **Links — tools grow when they meet.** Every window shows what it is wired to (⇠ feeds it · ⇢ it feeds). Click a chip and
   that tool's main controls unfold inside this window; pairs that belong together (Wub Rate → Wub Filter, Morph Osc → Morph
