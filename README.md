@@ -62,6 +62,13 @@ Techno, Trap, Synthwave (80s), Darkwave (80s), Witch House). Every press writes 
 drums, bass, chords, lead and the arrangement — on the Timeline, all in key. Click any clip to edit it in the piano roll.
 The song's name ends in its number: `SongEngine.write('synthwave', 4242)` builds that exact song again.
 
+## 3.46 — a whole page for every tool
+- **📘 on every window** (and "📘 Its page" in ＋ Add): its **suite**: load the lot in one click, or ＋ one by one. Also: every **mod**
+  that fits each slot, the tools it **plays with**, every **sound pack** (▶ hear, Load, pack on/off), **every control** (range, default,
+  ∿ = an input can move it) and its inputs and outputs.
+- Suites: Wobble Bass (The drop rig), Wub Osc (A whole wub), Morph Osc (Morph voice), Destroyer (Talking grit).
+- **Wobble Bass 3.6**: a **growl** mod slot. Its mods run on the wub only; the sub stays clean and in time.
+
 ## 3.45 — Wobble Bass: everything on screen, fluid rates, the Bun Dem screech
 - **Fixed**: seven controls (FM, FM ratio, FM wub, Squash, Grit type, Square oct, Sub in phase) were missing from the window.
   Now every control is there, grouped (Rate · Mouth · Growl · Pitch · Tone); a control that waits on a switch is dimmed and says why.
@@ -69,6 +76,8 @@ The song's name ends in its number: `SongEngine.write('synthwave', 4242)` builds
 - **Rate glide**: rate changes swoop instead of jumping — wub-seq steps glide into each other. **Pitch wub** to 2400 c (an octave
   scream; it stopped at 1 semitone). **Octave +2**. New inputs: **rate · FM · pitch** — wire an Envelope or LFO into them.
 - **Bun Dem presets**: Screech (the drop lead, octave up, FM, octave-wide bends), Talking Growl, Rate Ramp (glide).
+- **Matched to the track**: the drop measured (1/8-triplet movement at ~141 BPM, mono F#1 sub, scooped low-mids, a flat bright
+  top) and the Wobble Bass tuned against it by an offline search — "Bun Dem · Matched to the track (1/8t)" and "… + drop rhythm".
 
 ## 3.44 — Songs by category · the Bun Dem growl
 - **Songs page by category**: 🔊 Dubstep & Wubs · ⚡ Drum & Bass · 🏠 House · 🌀 Techno & Trance · 🎛 Trap & Phonk · 🔥 Reggae &

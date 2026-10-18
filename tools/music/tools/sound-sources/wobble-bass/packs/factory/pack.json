@@ -1729,6 +1729,188 @@
       "rateBend": 1,
       "rateGlide": 0.3
      }
+    },
+    "Bun Dem · Matched to the track (1/8t)": {
+     "params": {
+      "div": "1/8t",
+      "lfoShape": "sawdown",
+      "shapePts": [
+       [
+        0,
+        -1,
+        0.5
+       ],
+       [
+        0.2,
+        1,
+        0
+       ],
+       [
+        0.42,
+        0.15,
+        -0.4
+       ],
+       [
+        0.55,
+        0.55,
+        0.3
+       ],
+       [
+        0.62,
+        0.1,
+        0
+       ]
+      ],
+      "depth": 3.81,
+      "lfoSync": true,
+      "lfoHz": 4,
+      "retrig": true,
+      "lfoPhase": 0.49,
+      "ampMod": 0,
+      "vibrato": 45,
+      "wubOn": false,
+      "wubLen": 8,
+      "wubStep": "1/4",
+      "wubSeq": [
+       "1/8",
+       "",
+       "1/16",
+       "",
+       "1/4t",
+       "x",
+       "1/32",
+       "1/8:yoy",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       ""
+      ],
+      "filterMode": "formant",
+      "vowelA": "ER",
+      "vowelB": "UH",
+      "formantShift": 7.95,
+      "cutoff": 286,
+      "res": 18,
+      "fmIndex": 0,
+      "fmRatio": "1.5",
+      "fmWub": 1,
+      "squash": 1,
+      "osc2": 0.36,
+      "sub": 0.56,
+      "drive": 0.24,
+      "shaper": 0.52,
+      "gritMode": "hard",
+      "octave": -1,
+      "spread": 31.9,
+      "width": 0.56,
+      "noise": 0.27,
+      "sqOct": "0",
+      "subOct": "0",
+      "subAlign": false,
+      "level": 1,
+      "glide": 0.03,
+      "attack": 0.005,
+      "release": 0.12,
+      "pitchDive": 0,
+      "diveTime": 0.08,
+      "rateBend": 1,
+      "rateGlide": 0
+     }
+    },
+    "Bun Dem · Matched + drop rhythm": {
+     "params": {
+      "div": "1/8t",
+      "lfoShape": "sawdown",
+      "shapePts": [
+       [
+        0,
+        -1,
+        0.5
+       ],
+       [
+        0.2,
+        1,
+        0
+       ],
+       [
+        0.42,
+        0.15,
+        -0.4
+       ],
+       [
+        0.55,
+        0.55,
+        0.3
+       ],
+       [
+        0.62,
+        0.1,
+        0
+       ]
+      ],
+      "depth": 3.81,
+      "lfoSync": true,
+      "lfoHz": 4,
+      "retrig": true,
+      "lfoPhase": 0.49,
+      "ampMod": 0,
+      "vibrato": 45,
+      "wubOn": true,
+      "wubLen": 8,
+      "wubStep": "1/4",
+      "wubSeq": [
+       "1/8t",
+       "",
+       "1/8t",
+       "",
+       "1/4t",
+       "1/8t",
+       "x",
+       "1/8t",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       ""
+      ],
+      "filterMode": "formant",
+      "vowelA": "ER",
+      "vowelB": "UH",
+      "formantShift": 7.95,
+      "cutoff": 286,
+      "res": 18,
+      "fmIndex": 0,
+      "fmRatio": "1.5",
+      "fmWub": 1,
+      "squash": 1,
+      "osc2": 0.36,
+      "sub": 0.56,
+      "drive": 0.24,
+      "shaper": 0.52,
+      "gritMode": "hard",
+      "octave": -1,
+      "spread": 31.9,
+      "width": 0.56,
+      "noise": 0.27,
+      "sqOct": "0",
+      "subOct": "0",
+      "subAlign": false,
+      "level": 1,
+      "glide": 0.03,
+      "attack": 0.005,
+      "release": 0.12,
+      "pitchDive": 0,
+      "diveTime": 0.08,
+      "rateBend": 1,
+      "rateGlide": 0
+     }
     }
    }
   }

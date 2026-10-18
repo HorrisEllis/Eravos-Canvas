@@ -47,6 +47,13 @@
     id: 'eravos.syn-osc', domain: 'music', version: '1.0.0', label: 'Morph Osc', icon: '🌀', accent: '#3ad6c4', phase: 'P44',
     category: 'Synthesis', blurb: 'Wavetable oscillator that morphs. Wire sounds into its FM / Ring inputs, or wire it into another Morph Osc to make FM.',
     size: { w: 560, h: 560 }, minSize: { w: 420, h: 380 },
+    // its suite (canvas/runtime/tool-page.js)
+    suite: { label: 'Morph voice', blurb: 'A second Morph Osc into its FM input, an Envelope scanning the morph on every note, and an Echo after it.',
+      members: [
+        { tool: 'eravos.syn-osc', as: 'linked', preset: 'FM Modulator ×2 (wire into FM in)', wire: { from: ['self', 'mosc.hook.audio_out'], to: ['host', 'mosc.hook.fm_in'] }, why: 'its FM modulator — follows its notes ×2' },
+        { tool: 'eravos.syn-env', as: 'linked', preset: 'Morph Scan', wire: { from: ['self', 'env.hook.mod_out'], to: ['host', 'mosc.hook.mod_morph'] }, why: 'every note scans the wavetable' },
+        { tool: 'eravos.fx-echo', as: 'linked', preset: 'Ping-pong 1/8.', wire: { from: ['host', 'mosc.hook.audio_out'], to: ['self', 'fx.hook.audio_in'] }, why: 'space after it' },
+      ] },
     permissions: ['audio_out', 'audio_in', 'midi_in', 'bus_publish', 'bus_subscribe', 'registry_read'],
     provides: ['capability.audio_out', 'capability.note_in', 'capability.oscillator'],
     noMod: true,   // it makes sound from notes; as a mod inside an effect it would just go quiet

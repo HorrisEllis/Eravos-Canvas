@@ -8,7 +8,7 @@
   var S = window.ERAVOS_SCRIPTS = [
     'kernel/kernel.js', 'kernel/intake.js', 'runtime/catalog.js', 'runtime/plain-errors.js',
     'runtime/organism-sdk.js', 'runtime/ui-kit.js', 'runtime/organism-factory.js', 'runtime/content-packs.js', 'runtime/canvas-wm.js',
-    'runtime/wire-system.js', 'runtime/links.js', 'runtime/mods.js', 'runtime/mods-rack.js', 'runtime/tool-settings.js', 'runtime/pack-editor.js', 'runtime/workspace.js', 'runtime/recipes.js', 'runtime/preview.js', 'runtime/history.js', 'runtime/expansion.js', 'runtime/add-menu.js', 'runtime/desktop-bridge.js'
+    'runtime/wire-system.js', 'runtime/links.js', 'runtime/mods.js', 'runtime/mods-rack.js', 'runtime/tool-page.js', 'runtime/tool-settings.js', 'runtime/pack-editor.js', 'runtime/workspace.js', 'runtime/recipes.js', 'runtime/preview.js', 'runtime/history.js', 'runtime/expansion.js', 'runtime/add-menu.js', 'runtime/desktop-bridge.js'
   ];
   for (var i = 0; i < S.length; i++) document.write('<script src="' + base + S[i] + '"><\/script>');
   document.write('<script src="' + window.ERAVOS_TOOLS + 'index.js"><\/script>');

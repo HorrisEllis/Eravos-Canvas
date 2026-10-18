@@ -173,6 +173,7 @@
         h('div', { class: 'ap-d-head', style: { '--acc': d.accent || '#00d4ff' } }, [h('span', { class: 'ap-d-ic', text: d.icon || '◻' }), h('div', {}, [h('h3', { text: d.label }), h('small', { text: (d.category || 'General') + ' · v' + (d.version || '1.0.0') })])]),
         h('p', { class: 'ap-d-blurb', text: d.blurb || '' }),
         h('button', { class: 'tb-btn primary ap-addbtn', text: d._avail ? 'Install + add to canvas' : dd.pending.length ? `Add — turns on ${dd.pending.length} toolbar item${dd.pending.length > 1 ? 's' : ''}` : 'Add to canvas', onclick: () => add(d) }),
+        !d._avail && global.ToolPage ? h('button', { class: 'tb-btn ap-pagebtn', text: '📘 Its page — mods, packs, suite', title: 'everything this tool can do: load its whole suite or its mods one by one, hear every preset', onclick: () => { close(); global.ToolPage.open(d.id, { K: S.K }); } }) : null,
         Cat && Cat.meta(d.id) && !d._avail ? h('button', { class: 'tb-btn ap-rmbtn', text: 'Remove from this canvas', title: 'uninstall: gone from ＋ Add now; its code leaves at the next start. Windows already open keep working.', onclick: () => { Cat.remove(d.id); S.toast(`${d.label} removed — gone after the next start. Add it again any time from ＋ Add.`, '', 4000); } }) : null,
       );
       [

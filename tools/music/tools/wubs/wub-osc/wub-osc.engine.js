@@ -13,6 +13,14 @@
     id: 'eravos.wub-osc', domain: 'music', version: '1.0.0', label: 'Wub Osc', icon: '〰', accent: '#ff2266',
     category: 'Wubs', blurb: 'The raw wobble tone — saw, square, reese, FM growl — mono, glide, unison. Wire it into Wub Filter.',
     size: { w: 520, h: 520 }, minSize: { w: 400, h: 360 },
+    // its suite (canvas/runtime/tool-page.js): the whole wub from small tools — one click, or ＋ one by one
+    suite: { label: 'A whole wub', blurb: 'Wub Osc speaks through a Wub Filter (its mouth), Wub Rate opens the mouth in time, Wub Sub holds the clean low end under it, and a Destroyer inside the osc gives it teeth.',
+      members: [
+        { tool: 'eravos.wub-filter', as: 'linked', preset: 'Yoi Vowel (OO → AH)', wire: { from: ['host', 'wubo.hook.audio_out'], to: ['self', 'fx.hook.audio_in'] }, why: 'the mouth it speaks through' },
+        { tool: 'eravos.wub-rate', as: 'linked', preset: 'Classic 1/8', wire: { from: ['self', 'wubrate.hook.mod_out'], to: ['eravos.wub-filter', 'wubf.hook.mod_wub'] }, why: 'opens the mouth on the beat' },
+        { tool: 'eravos.wub-sub', as: 'linked', preset: 'Clean Sine', wire: false, why: 'follows its notes — the clean low end under the wobble' },
+        { tool: 'eravos.fx-destroyer', as: 'mod', slot: 'tone', preset: 'Fold Growl', why: 'teeth inside the osc, before the mouth' },
+      ] },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
     provides: ['capability.audio_out', 'capability.note_in', 'capability.wub_source'],
     slots: [{ id: 'tone', label: 'its own tone', wire_type: 'audio', hint: 'empty — a Destroyer or a Wub Filter here makes this one window a whole wub' }],   // 3.42 mods: any effect can live inside (canvas/runtime/mods.js)
