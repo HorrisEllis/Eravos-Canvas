@@ -69,6 +69,8 @@ The song's name ends in its number: `SongEngine.write('synthwave', 4242)` builds
 - **Rate glide**: rate changes swoop instead of jumping — wub-seq steps glide into each other. **Pitch wub** to 2400 c (an octave
   scream; it stopped at 1 semitone). **Octave +2**. New inputs: **rate · FM · pitch** — wire an Envelope or LFO into them.
 - **Bun Dem presets**: Screech (the drop lead, octave up, FM, octave-wide bends), Talking Growl, Rate Ramp (glide).
+- **Matched to the track**: the drop measured (1/8-triplet movement at ~141 BPM, mono F#1 sub, scooped low-mids, a flat bright
+  top) and the Wobble Bass tuned against it by an offline search — "Bun Dem · Matched to the track (1/8t)" and "… + drop rhythm".
 
 ## 3.44 — Songs by category · the Bun Dem growl
 - **Songs page by category**: 🔊 Dubstep & Wubs · ⚡ Drum & Bass · 🏠 House · 🌀 Techno & Trance · 🎛 Trap & Phonk · 🔥 Reggae &
