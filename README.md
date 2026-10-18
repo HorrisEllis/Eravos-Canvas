@@ -62,6 +62,17 @@ Techno, Trap, Synthwave (80s), Darkwave (80s), Witch House). Every press writes 
 drums, bass, chords, lead and the arrangement — on the Timeline, all in key. Click any clip to edit it in the piano roll.
 The song's name ends in its number: `SongEngine.write('synthwave', 4242)` builds that exact song again.
 
+## 3.47 — ERAVOS Glass + ERAVOS COS (from Nexus Clear Glass and COS, made for ERAVOS)
+- **ERAVOS COS** (`host/cos.js`): the canvas and every tool folder are **compartments** that earn their place through **birth
+  gates**: manifest, shape, sealed (reaches nothing outside its folder), packs (every preset checked against the tool's real
+  settings), spec, plus `--deep` for its own tests and the sound survey. **Snapshots** keep every file, so `diff` and `restore`
+  work. `cos archetype` generates the COS `eravos-canvas` archetype from this repo. All 63 compartments pass.
+- **ERAVOS Glass** (`host/glass.js`): the canvas served with a live **event stream** and one **command door**. Anything on your
+  machine can drive the open canvas, a script today and the Ollama DJ next: open tools, turn knobs, load presets, wire, load
+  suites, read the whole state back. All of it is undoable, like a person doing it.
+  `node host/eravos.mjs glass --open`, then e.g. `node host/eravos.mjs send canvas.spawn '{"tool":"eravos.wobble-bass"}'`.
+- **ERAVOS.exe** runs Glass inside the app (`eravos://app/glass/`, and `127.0.0.1:4748` for outside callers).
+
 ## 3.46 — a whole page for every tool
 - **📘 on every window** (and "📘 Its page" in ＋ Add): its **suite**: load the lot in one click, or ＋ one by one. Also: every **mod**
   that fits each slot, the tools it **plays with**, every **sound pack** (▶ hear, Load, pack on/off), **every control** (range, default,

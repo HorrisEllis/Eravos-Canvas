@@ -103,16 +103,35 @@ ipcMain.handle('eravos:keep-pack', (e, { name, data }) => {
 });
 ipcMain.on('eravos:open-library', (e, sub) => shell.openPath(sub && DIRS[sub] ? DIRS[sub] : HOME));
 
+// ---------------------------------------------------------------- ERAVOS Glass inside the app (host/glass.js, spec eravos.host)
+// The event stream + command door run on loopback; the page reaches them as eravos://app/glass/* (same origin), and an
+// outside caller (a script, the co-pilot) as http://127.0.0.1:4748/glass/. Its ledger and COS state live in .appdata.
+let GLASS = null;
+const GLASS_PORT = parseInt(process.env.ERAVOS_GLASS_PORT || '4748', 10);
+async function startGlass() {
+  const file = path.join(APP_DIR, 'host', 'glass.js'); if (!fs.existsSync(file) || process.env.ERAVOS_GLASS === '0') return;
+  try { GLASS = await require(file).start({ root: APP_DIR, port: GLASS_PORT, data: path.join(DIRS.appdata, 'eravos') }); }
+  catch (e) { GLASS = null; console.error('ERAVOS Glass did not start (the canvas runs without it):', e.message); }
+}
+ipcMain.on('eravos:glass', (e) => { e.returnValue = GLASS ? { events: '/glass/events', version: 1, port: GLASS.port } : null; });
+
 // ---------------------------------------------------------------- app
 const ALLOWED = new Set(['midi', 'midiSysex', 'media', 'fullscreen', 'clipboard-sanitized-write']);
 // Node's URL doesn't know eravos: is a standard scheme (its .origin is "null") — compare scheme + host explicitly
 const ours = (u) => { try { const x = new URL(String(u)); return x.protocol === SCHEME + ':' && x.host === 'app'; } catch (e) { return false; } };
 function uniquePath(dir, name) { let p = path.join(dir, name); const ext = path.extname(name), base = path.basename(name, ext); for (let i = 2; fs.existsSync(p); i++) p = path.join(dir, `${base} (${i})${ext}`); return p; }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   if (!PRIMARY) return;
+  await startGlass();
   protocol.handle(SCHEME, async (req) => {
     const u = new URL(req.url); if (u.host !== 'app') return new Response('not found', { status: 404 });
+    if (u.pathname.startsWith('/glass/')) {   // the Glass door, same origin for the page
+      if (!GLASS) return new Response('ERAVOS Glass is off', { status: 404 });
+      const init = { method: req.method, headers: req.headers };
+      if (req.method !== 'GET' && req.method !== 'HEAD') { init.body = await req.arrayBuffer(); }
+      return net.fetch(`http://127.0.0.1:${GLASS.port}${u.pathname}${u.search}`, init);
+    }
     let rel = decodeURIComponent(u.pathname); if (rel.endsWith('/')) rel += 'index.html';
     const file = path.resolve(APP_DIR, '.' + rel);
     if (!file.startsWith(APP_DIR + path.sep)) return new Response('forbidden', { status: 403 });
@@ -168,4 +187,4 @@ app.whenReady().then(() => {
   win.loadURL(ORIGIN + '/canvas/index.html');   // the canvas; its tools load from /tools/ — the tools/ folder beside it
   win.on('closed', () => { win = null; });
 });
-app.on('window-all-closed', () => app.quit());
+app.on('window-all-closed', () => { if (GLASS) GLASS.close(); app.quit(); });

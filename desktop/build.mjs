@@ -39,7 +39,7 @@ function copyDir(src, dst, skip) {
 }
 // The exe folder has the project's layout: canvas/ tools/ schemas/ README.md beside ERAVOS.exe, the same folders as the
 // repo, so the exe loads every domain from tools/ exactly like the dev build. Your folders sit next to them and survive a rebuild.
-const SHIP = ['canvas', 'tools', 'schemas', 'README.md'];
+const SHIP = ['canvas', 'tools', 'schemas', 'host', 'README.md'];   // host/: ERAVOS Glass + COS (run by main.js, never served to the page)
 const KEEP = ['projects', 'exports', 'drop', 'packs', 'voice', '.appdata', 'ERAVOS Library'];   // yours — never deleted by a rebuild
 const OVERLAY = process.argv.includes('--no-electron');
 
