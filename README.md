@@ -63,6 +63,12 @@ drums, bass, chords, lead and the arrangement — on the Timeline, all in key. C
 The song's name ends in its number: `SongEngine.write('synthwave', 4242)` builds that exact song again.
 
 ## 3.48.1 — the MIDI button on a fresh install · the web build and ERAVOS.exe are the same
+- **Mods fixed**: Clip Maker was offered as a mod, and inside any tool it silenced the sound (it records clips; it doesn't
+  pass sound through). It is no longer offered. Every other mod in every slot was checked: 83 host × mod pairs, all
+  pass sound, and a test now checks every tool the ＋ mod picker offers.
+- **A tool's page opens when you click its name** (or icon) in the window title; dragging still moves the window. The
+  page button is a clean drawn icon (the 📘 emoji looked fragmented).
+- **Spectrum at rest**: the display under every instrument shows its frequency grid and "play a note" instead of an empty box.
 - **Fixed** "That needs a pack that isn't installed" when clicking **MIDI / Connect pads** on a fresh install, as on
   ERAVOS.exe's first start. Any tool opened by name now installs itself first and then opens; this also covers Learn,
   Sounds and the Song dock. Check it with `node tests/fresh-profile.mjs`.
