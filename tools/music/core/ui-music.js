@@ -54,20 +54,28 @@
     const c = Canvas(o.width || 260, o.height || 80, 'uk-spectrum');
     let bins = new Float32Array(an ? an.frequencyBinCount : 1024);
     c.stop = loop(c, () => {
+      if (c.fit) c.fit();   // draw at the size it is shown (stretched pixels blur the labels)
       const g = c.g, W = c.W, H = c.H;
       g.clearRect(0, 0, W, H); g.fillStyle = '#080b10'; g.fillRect(0, 0, W, H);
+      // 3.48.1 the display at rest is still a display: a frequency grid (100 · 1k · 10k) and dB lines, never a blank box
+      const xf = (f) => Math.log(f / 20) / Math.log(1000) * W;
+      g.fillStyle = '#121a25'; [50, 200, 500, 2000, 5000].forEach(f => g.fillRect(Math.round(xf(f)), 0, 1, H));
+      g.fillStyle = '#1c2838'; [100, 1000, 10000].forEach(f => g.fillRect(Math.round(xf(f)), 0, 1, H)); [0.25, 0.5, 0.75].forEach(t => g.fillRect(0, Math.round(H * t), W, 1));
+      if (H >= 40) { g.fillStyle = '#4d6178'; g.font = '9px monospace'; [[100, '100'], [1000, '1k'], [10000, '10k']].forEach(([f, t]) => g.fillText(t, xf(f) + 3, H - 4)); }
       if (!an) return;
       if (bins.length !== an.frequencyBinCount) bins = new Float32Array(an.frequencyBinCount);
       an.getFloatFrequencyData(bins);
       const sr = an.context.sampleRate, ny = sr / 2;
+      let loud = 0;
       g.beginPath(); g.moveTo(0, H);
       for (let x = 0; x < W; x++) {
         const f = 20 * Math.pow(1000, x / W); const b = Math.min(bins.length - 1, Math.round(f / ny * bins.length));
-        const db = bins[b]; const y = H - Math.max(0, Math.min(1, (db + 100) / 90)) * H;
+        const db = bins[b]; const v = Math.max(0, Math.min(1, (db + 100) / 90)), y = H - v * H; if (v > loud) loud = v;
         g.lineTo(x, y);
       }
       g.lineTo(W, H); g.closePath();
       g.fillStyle = (o.color || '#00d4ff') + '55'; g.fill(); g.strokeStyle = o.color || '#00d4ff'; g.stroke();
+      if (loud < 0.02) { g.fillStyle = (o.color || '#00d4ff') + '55'; g.fillRect(0, H - 1.5, W, 1.5); if (H >= 40) { g.fillStyle = '#4d6178'; g.font = '10px sans-serif'; g.textAlign = 'right'; g.fillText('play a note to see its spectrum', W - 8, 14); g.textAlign = 'left'; } }
       if (o.overlay) o.overlay(g, W, H);
     }, 30);
     return c;
