@@ -143,7 +143,7 @@ acceptance 3.0:
   - an old 2.x project opens with its lanes (no auto-delete of user-made empty lanes in loaded projects)
 
 # ============================================================
-# 3.48 — PIANO ROLL PRECISION (phase P48.1 · P1 + P2 BUILT 2026-10-19 · P3 + P4 mapped) — "the timeline adding notes isn't precise. make adding
+# 3.48 — PIANO ROLL PRECISION (phase P48.1 · BUILT 2026-10-19: P1 P2 P3 P4) — "the timeline adding notes isn't precise. make adding
 #   the notes more precise. Like paint, expand notes, anything else."
 # ============================================================
 findings (timeline.pianoroll.js, read 2026-10-19):
@@ -174,7 +174,14 @@ built (P1 + P2): ghost + readout (bar.beat.tick · note) · 4 px dead zone · mo
   pointer) · fit clip · ruler (song bars, beats; click/drag = seek) · tools Draw/Paint/Split/Erase (keys 1–4) · both-edge
   resize, edge zone max(4 px, 25 %) · Length "last" · engine keeps notes at 1/192 step (was 1/64: triplets drifted),
   minimum length 1/128 note (was 1/64)
-moved to P3 (needs multi-select): the velocity lane, Shift-drag an edge to resize every selected note
+built (P3 + P4): ⬚ Select tool (5) and Shift-drag box · Shift-click add/remove · Ctrl+A · Esc clears · dragging a selected
+  note moves them all, Ctrl+drag copies (Alt stays "no snap") · an edge stretches every selected note by the same amount ·
+  Ctrl+C / X / V (paste at the pointer, else the playhead; shared between clips) · Ctrl+D duplicates after the selection ·
+  ← → nudge a grid step (Shift: a bar) · ↑ ↓ semitone/octave for the whole selection · Quantize (Q, 25–100 %) · Humanize
+  (H, ±10 ticks, ±8 % velocity) · Legato (L) · velocity lane (drag draws, Ctrl-drag ramps; only the selection when there
+  is one) · double-click = exact fields (right-click deletes; double-click no longer deletes) · step input ⏎ (Z…M and
+  Q…U an octave up; Space rest, Backspace back, ← → cursor; the ruler sets the cursor) · every edit = one undo step
+not built: MIDI-keyboard step input (computer keys and the on-screen keys only), reverse / glue / transpose-to-scale
 §P2 DRAW TOOLS (fixes R4)
   - tools (toolbar + keys): ✎ Draw (1) · 🖌 Paint (2): drag across = one note per grid cell along the path, the pitch
     following the pointer (scale-locked when lock is on) · ⬚ Select (3): box select · ✂ Split (4): click splits a note at
@@ -185,7 +192,7 @@ moved to P3 (needs multi-select): the velocity lane, Shift-drag an edge to resiz
   - velocity: a velocity lane under the grid (bars per note; drag to draw velocities across notes; Ctrl-drag = a ramp)
 §P3 EDIT MANY (fixes R5)
   - selection: box select, Shift-click add/remove, Ctrl+A all, click empty = none
-  - move/copy: drag moves the selection; Alt+drag copies; Ctrl+C / Ctrl+V pastes at the playhead or the hover cell;
+  - move/copy: drag moves the selection; Ctrl+drag copies (Alt is "no snap"); Ctrl+C / Ctrl+V pastes at the playhead or the hover cell;
     Ctrl+D duplicates the selection right after itself
   - nudge: ← → by one grid step (Shift: one bar), ↑ ↓ by a semitone (Shift: octave; in-scale step with scale lock)
   - quantize (Q): start to the grid, 0–100 % strength, optional end quantize; humanize (H): ± ticks and ± velocity

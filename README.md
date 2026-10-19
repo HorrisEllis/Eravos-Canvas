@@ -62,7 +62,7 @@ Techno, Trap, Synthwave (80s), Darkwave (80s), Witch House). Every press writes 
 drums, bass, chords, lead and the arrangement — on the Timeline, all in key. Click any clip to edit it in the piano roll.
 The song's name ends in its number: `SongEngine.write('synthwave', 4242)` builds that exact song again.
 
-## 3.48 (P48.1, first half) — a precise piano roll
+## 3.48 (P48.1) — a precise piano roll
 - **Notes land where you aim**: a ghost shows exactly where a click will land, and the toolbar reads the position
   (bar.beat.tick) and the note. A click never slides: notes follow the cell and row under the pointer, so a small slide
   inside the cell you clicked no longer moves the note a step or a semitone. Before, it did.
@@ -73,6 +73,13 @@ The song's name ends in its number: `SongEngine.write('synthwave', 4242)` builds
   across notes), on keys 1–4.
 - **Stretch notes from either edge**; the edge is easier to grab on short notes. New notes take the length you last drew.
 - Notes now keep exact triplet timing in the song (1/192 step).
+- **Edit many**: ⬚ Select (5) or Shift-drag a box, Shift-click to add. Drag moves the lot, Ctrl+drag copies, and an edge
+  stretches them all. Ctrl+C/X/V (paste at the pointer), Ctrl+D duplicate, ← → nudge, ↑ ↓ transpose.
+  **Q** quantize (25–100 %), **H** humanize, **L** legato. Each edit is one undo step.
+- **Velocity lane** under the notes: drag to draw velocities, Ctrl-drag for a ramp.
+- **Exact values**: double-click a note to type its start (bar.beat.tick), length (ticks), pitch (C#4) and velocity.
+  Right-click deletes.
+- **Step input** ⏎: type notes on Z S X D C V G B H N J M (Q 2 W 3 E R 5 T 6 Y 7 U an octave up). Space rests, Backspace steps back.
 
 ## 3.47 — ERAVOS Glass + ERAVOS COS (from Nexus Clear Glass and COS, made for ERAVOS)
 - **ERAVOS COS** (`host/cos.js`): compartments **nest** like the project: the canvas › each **domain** (music, image, video,

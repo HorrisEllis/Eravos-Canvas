@@ -21,7 +21,8 @@ describe('tool · Timeline — piano roll precision (3.48)', () => {
     const click = (s, n, extra, wobble) => { fire('pointerdown', pt(s, n), extra); if (wobble) fire('pointermove', pt(s, n, wobble), extra); fire('pointerup', pt(s, n, wobble || 0), extra); };
     const dragTo = (a, b, extra) => { fire('pointerdown', pt(a[0], a[1], a[2]), extra); for (let i = 1; i <= 6; i++) fire('pointermove', pt(a[0] + (b[0] - a[0]) * i / 6, a[1], (a[2] || 0) + ((b[2] || 0) - (a[2] || 0)) * i / 6), extra); fire('pointerup', pt(b[0], b[1], b[2]), extra); };
     const done = () => host.remove();
-    return { pr, log, pt, fire, click, dragTo, done, notes: () => pr.state.notes, edits: () => log.filter(x => x[0] === 'clip_edit').length };
+    const key = (k, o2) => cv.dispatchEvent(new KeyboardEvent('keydown', Object.assign({ key: k, bubbles: true, cancelable: true }, o2 || {})));
+    return { pr, log, pt, fire, click, dragTo, key, done, notes: () => pr.state.notes, edits: () => log.filter(x => x[0] === 'clip_edit').length };
   }
 
   [1, 0.6].forEach(z => it(`a click with a 3 px wobble lands exactly on the ghost's cell (canvas zoom ${z})`, () => {
@@ -81,6 +82,70 @@ describe('tool · Timeline — piano roll precision (3.48)', () => {
       const rr = r.pr.ruler.getBoundingClientRect(), k = rr.width / r.pr.ruler.offsetWidth;
       r.pr.ruler.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerId: 2, clientX: rr.left + 16 * r.pr.state.pps * k + 1, clientY: rr.top + 5, buttons: 1 }));
       const seek = r.log.filter(x => x[0] === 'seek').pop(); assert.ok(seek, 'seek sent'); assert.equal(seek[1].bar, 4, 'step 16 of a clip at bar 3 = bar 4');
+    } finally { r.done(); }
+  });
+
+  // P3 + P4
+  const four = () => [0, 2, 4, 6].map((s, i) => ({ s, l: 1, n: [60, 63, 67, 70][i], v: 0.8 }));
+  it('box select, then ← nudges every selected note one grid step — one undo step', () => {
+    const r = roll({ notes: four() });
+    try {
+      r.pr.setTool('select'); r.fire('pointerdown', r.pt(1.5, 72)); r.fire('pointermove', r.pt(5.5, 62)); r.fire('pointerup', r.pt(5.5, 62));
+      assert.deepEqual(r.pr.selected, [1, 2], 'the box touched D#4 at 2 and G4 at 4');
+      const before = r.edits(); r.key('ArrowLeft'); assert.equal(r.edits(), before + 1, 'one commit');
+      assert.deepEqual(r.notes().map(n => n.s), [0, 1, 3, 6]);
+    } finally { r.done(); }
+  });
+  it('Shift-click builds a selection; dragging one moves them all; Ctrl+drag copies; an edge stretches them all', () => {
+    const r = roll({ notes: four() });
+    try {
+      r.click(0.5, 60); r.click(4.5, 67, { shiftKey: true }); assert.deepEqual(r.pr.selected, [0, 2]);
+      r.dragTo([0.5, 60], [2.5, 60]); assert.deepEqual(r.notes().map(n => n.s), [2, 2, 6, 6], 'both moved two steps');
+      r.dragTo([2.5, 60], [8.5, 60], { ctrlKey: true }); assert.equal(r.notes().length, 6, 'copies made'); assert.deepEqual(r.notes().slice(4).map(n => n.s), [8, 12]);
+      const pps = r.pr.state.pps; r.dragTo([8, 60, pps - 2], [10, 60, 0]); assert.deepEqual(r.notes().slice(4).map(n => n.l), [2, 2], 'both stretched to 2');
+    } finally { r.done(); }
+  });
+  it('copy → paste at the pointer; Ctrl+D duplicates right after itself', () => {
+    const r = roll({ notes: four().slice(0, 2) });
+    try {
+      r.key('a', { ctrlKey: true }); r.key('c', { ctrlKey: true });
+      r.fire('pointermove', r.pt(16.2, 60), { buttons: 0 }); r.key('v', { ctrlKey: true });
+      assert.deepEqual(r.notes().map(n => n.s), [0, 2, 16, 18], 'pasted at step 16, spacing kept');
+      r.key('d', { ctrlKey: true }); assert.deepEqual(r.notes().slice(4).map(n => n.s), [19, 21], 'duplicate starts where the selection ends (3 steps long)');
+    } finally { r.done(); }
+  });
+  it('quantize pulls starts by the chosen strength; legato fills the gaps', () => {
+    const r = roll({ notes: [{ s: 1.25, l: 0.5, n: 60, v: 0.8 }, { s: 4.75, l: 0.5, n: 63, v: 0.8 }] });
+    try {
+      r.pr.el.querySelector('select[aria-label="Quantize"]').value = '0.5'; r.pr.el.querySelector('select[aria-label="Quantize"]').dispatchEvent(new Event('change'));
+      r.key('q'); assert.deepEqual(r.notes().map(n => n.s), [1.125, 4.875], 'half way to 1 and 5');
+      r.key('l'); assert.equal(r.notes()[0].l, 3.75, 'the first lasts until the second');
+    } finally { r.done(); }
+  });
+  it('velocity lane: drag sets the velocity of the note under the pointer; Ctrl-drag ramps across notes', () => {
+    const r = roll({ notes: four() });
+    try {
+      const v = r.pr.vel, b = v.getBoundingClientRect(), k = b.width / v.offsetWidth, pps = r.pr.state.pps, P = (s, frac) => ({ clientX: b.left + s * pps * k + 2, clientY: b.top + (4 + (1 - frac) * 40) * k });
+      const ev = (t, p, o2) => v.dispatchEvent(new PointerEvent(t, Object.assign({ bubbles: true, pointerId: 3, buttons: t === 'pointerup' ? 0 : 1 }, p, o2 || {})));
+      ev('pointerdown', P(0.1, 0.25)); ev('pointerup', P(0.1, 0.25)); assert.lt(Math.abs(r.notes()[0].v - 0.25), 0.03, 'note 1 at a quarter');
+      ev('pointerdown', P(1.8, 0.2), { ctrlKey: true }); ev('pointermove', P(6, 1)); ev('pointerup', P(6, 1));
+      const vs = r.notes().slice(1).map(n => n.v); assert.ok(vs[0] < vs[1] && vs[1] < vs[2] && vs[2] > 0.95, 'a rising ramp: ' + vs.join(','));
+    } finally { r.done(); }
+  });
+  it('typed values are exact: start 4.2.120 · 240 ticks · D#4 · velocity 100', () => {
+    const r = roll({ notes: [{ s: 0, l: 1, n: 60, v: 0.8 }] });
+    try {
+      const f = r.pr.openEditor(0); f.fs.value = '4.2.120'; f.fl.value = '240'; f.fp.value = 'D#4'; f.fv.value = '100'; f.apply();
+      const n = r.notes()[0]; assert.deepEqual([n.s, n.l, n.n], [21, 2, 63], 'bar 4 of a clip at bar 3 = step 16, beat 2 = +4, 120 ticks = +1');
+      assert.equal(n.v, Math.round(100 / 127 * 100) / 100);
+    } finally { r.done(); }
+  });
+  it('step input: keys land at the cursor and advance it; Space rests; Backspace steps back and removes', () => {
+    const r = roll();
+    try {
+      r.pr.setStep(true); ['z', 'x', ' ', 'c', 'q'].forEach(k => r.key(k));
+      assert.deepEqual(r.notes().map(n => [n.s, n.n]), [[0, 60], [1, 62], [3, 63], [4, 72]], 'C D (rest) Eb (scale) C5');
+      r.key('Backspace'); assert.equal(r.notes().length, 3); assert.equal(r.pr.state.cursor, 4);
     } finally { r.done(); }
   });
 });
