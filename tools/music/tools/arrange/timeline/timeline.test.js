@@ -132,12 +132,14 @@ describe('tool · Timeline — piano roll precision (3.48)', () => {
       const vs = r.notes().slice(1).map(n => n.v); assert.ok(vs[0] < vs[1] && vs[1] < vs[2] && vs[2] > 0.95, 'a rising ramp: ' + vs.join(','));
     } finally { r.done(); }
   });
-  it('typed values are exact: start 4.2.120 · 240 ticks · D#4 · velocity 100', () => {
+  it('the note\'s knobs: start on the grid, length, pitch, velocity — live, then one undo step', () => {
     const r = roll({ notes: [{ s: 0, l: 1, n: 60, v: 0.8 }] });
     try {
-      const f = r.pr.openEditor(0); f.fs.value = '4.2.120'; f.fl.value = '240'; f.fp.value = 'D#4'; f.fv.value = '100'; f.apply();
-      const n = r.notes()[0]; assert.deepEqual([n.s, n.l, n.n], [21, 2, 63], 'bar 4 of a clip at bar 3 = step 16, beat 2 = +4, 120 ticks = +1');
-      assert.equal(n.v, Math.round(100 / 127 * 100) / 100);
+      const k = r.pr.openEditor(0); assert.ok(r.pr.el.querySelectorAll('.tlpr-edit .uk-knob, .tlpr-edit svg').length >= 4, 'four knobs, no text boxes');
+      assert.equal(r.pr.el.querySelectorAll('.tlpr-edit input').length, 0, 'nothing to type');
+      const before = r.edits(); k.start(21.4); k.length(2.2); k.pitch(63); k.velocity(100); k.finish();
+      const n = r.notes()[0]; assert.deepEqual([n.s, n.l, n.n], [21, 2, 63], 'start snapped to the 1/16 grid');
+      assert.equal(n.v, Math.round(100 / 127 * 100) / 100); assert.equal(r.edits(), before + 1, 'one commit');
     } finally { r.done(); }
   });
   it('step input: keys land at the cursor and advance it; Space rests; Backspace steps back and removes', () => {

@@ -15,7 +15,7 @@
  *      edges stretch every selected note · Ctrl+C/X/V (paste at the pointer, else the playhead) · Ctrl+D duplicates ·
  *      ← → nudge one grid step (Shift: a bar) · ↑ ↓ semitone (Shift: octave) · Quantize (strength) · Humanize · Legato ·
  *      a VELOCITY lane under the notes (drag to draw, Ctrl-drag a ramp) · every edit is one undo step
- *   P4 double-click a note → exact fields (start bar.beat.tick, length in ticks, pitch, velocity 0–127) · ⏎ STEP input:
+ *   P4 double-click a note → its own KNOBS (start on the grid, length, pitch, velocity — live, one undo step) · ⏎ STEP input:
  *      computer keys Z S X D C V G B H N J M (+ Q 2 W 3 E R 5 T 6 Y 7 U an octave up) land at the step cursor, which
  *      advances by the grid; Space = rest, Backspace = back, ← → move the cursor */
 (function (global) {
@@ -87,7 +87,7 @@
     const bar = h('div', { class: 'tlpr-bar' }, [title, bars.el, h('span', { class: 'tlpr-sep' }), toolBox, gridSel.el, lenSel.el, stampSel.el, lockT.el, zoomSel.el, rowSel.el, edBox, readout, h('span', { class: 'tlpr-sep' }), progSel.el, styleSel.el, voiceSel.el, fillBtn.el, clearBtn.el, closeBtn.el]);
     const keys = document.createElement('canvas'); keys.className = 'tlpr-keys';
     const ruler = document.createElement('canvas'); ruler.className = 'tlpr-ruler';
-    const cv = document.createElement('canvas'); cv.className = 'tlpr-grid'; cv.tabIndex = 0; cv.setAttribute('role', 'application'); cv.setAttribute('aria-label', 'Note grid — 1 draw, 2 paint, 3 split, 4 erase, 5 select; click to add, drag to move, drag an edge to stretch, Shift-click or drag a box to select, Ctrl+C / V / D, arrow keys nudge, Q quantize, double-click for exact values; hold Alt for no snap');
+    const cv = document.createElement('canvas'); cv.className = 'tlpr-grid'; cv.tabIndex = 0; cv.setAttribute('role', 'application'); cv.setAttribute('aria-label', 'Note grid — 1 draw, 2 paint, 3 split, 4 erase, 5 select; click to add, drag to move, drag an edge to stretch, Shift-click or drag a box to select, Ctrl+C / V / D, arrow keys nudge, Q quantize, double-click for the note knobs; hold Alt for no snap');
     const vel = document.createElement('canvas'); vel.className = 'tlpr-vel'; vel.setAttribute('aria-label', 'velocity lane — drag to draw velocities, Ctrl-drag for a ramp');
     const corner = h('div', { class: 'tlpr-corner' }), vcorner = h('div', { class: 'tlpr-vcorner', text: 'vel' });
     const keyCol = h('div', { class: 'tlpr-keycol' }, [corner, keys, vcorner]);
@@ -414,30 +414,32 @@
       if (d.changed) commit(notes.slice());
     };
     vel.addEventListener('pointerup', velEnd); vel.addEventListener('pointercancel', velEnd); vel.addEventListener('lostpointercapture', velEnd);
-    // ---- P4 exact fields
-    const tickStr = (s) => where(s);
-    function parseWhere(t) { const m = String(t).trim().match(/^(\d+)(?:\.(\d+))?(?:\.(\d+))?$/); if (!m) return null; return (+m[1] - clip.startBar) * 16 + ((+(m[2] || 1)) - 1) * 4 + (+(m[3] || 0)) / 120; }
-    function parsePitch(t) { t = String(t).trim(); if (/^\d+$/.test(t)) return +t; const m = t.match(/^([A-Ga-g])([#b]?)(-?\d)$/); if (!m) return null; const pc = { c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11 }[m[1].toLowerCase()] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0); return (+m[3] + 1) * 12 + pc; }
+    // ---- P4 the note's own knobs (no typing): start snaps to the grid, length, pitch, velocity — live, one undo step
+    const lenName = (l) => { const m = { 0.25: '1/64', 0.5: '1/32', 1: '1/16', 2: '1/8', 3: '1/8.', 4: '1/4', 6: '1/4.', 8: '1/2', 12: '1/2.', 16: '1 bar' }; return m[Math.round(l * 192) / 192] || (+(l / 4).toFixed(3) + ' beat'); };
     function openEditor(i) {
-      const a = notes[i]; if (!a) return; selOnly(i); draw(); editor.innerHTML = '';
-      const field = (label, value, hint) => { const inp = h('input', { class: 'uk-input tlpr-f', value: String(value), title: hint, 'aria-label': label }); editor.appendChild(h('label', { class: 'tlpr-fl' }, [h('span', { text: label }), inp])); return inp; };
-      const fs = field('Start', tickStr(a.s), 'bar.beat.tick — 480 ticks a beat'), fl = field('Length', Math.round(a.l * 120), 'ticks — 480 = a beat, 120 = a 1/16'),
-        fp = field('Pitch', drums ? a.n : nameOf(a.n), 'a name (C#4) or a MIDI number'), fv = field('Velocity', Math.round(a.v * 127), '1–127');
-      const err = h('div', { class: 'tlpr-ferr' });
-      const ok = h('button', { class: 'uk-btn', text: 'Set' }), no = h('button', { class: 'uk-btn', text: 'Cancel' });
-      editor.append(err, h('div', { class: 'tlpr-fb' }, [ok, no]));
-      const apply = () => {
-        const s1 = parseWhere(fs.value), l1 = +fl.value / 120, n1 = parsePitch(fp.value), v1 = +fv.value / 127, st = steps();
-        const bad = s1 === null || s1 < 0 || s1 >= st ? 'start is outside this clip' : !(l1 > 0) ? 'length must be more than 0' : n1 === null || n1 < 0 || n1 > 127 ? 'pitch: a name like C#4 or 0–127' : !(v1 > 0 && v1 <= 1) ? 'velocity: 1–127' : '';
-        if (bad) { err.textContent = bad; return; }
-        const next = notes.slice(); next[i] = Object.assign({}, a, { s: Math.round(s1 * 192) / 192, l: Math.round(Math.min(l1, st - s1) * 192) / 192, n: Math.round(n1), v: Math.round(v1 * 100) / 100 });
-        closeEditor(); commit(next); cv.focus({ preventScroll: true });
+      const a0 = notes[i]; if (!a0) return; selOnly(i); draw(); editor.innerHTML = '';
+      let cur = Object.assign({}, a0), timer = null;
+      const st = steps(), gs = grid || FREE;
+      const apply = (patch) => {
+        cur = Object.assign({}, cur, patch); cur.s = q(clampN(cur.s, 0, st - FREE)); cur.l = q(clampN(cur.l, FREE, st - cur.s)); cur.n = Math.round(clampN(cur.n, drums ? 0 : LO, drums ? 127 : HI)); cur.v = clampN(Math.round(cur.v * 100) / 100, 0.05, 1);
+        notes[i] = Object.assign({}, cur); draw(); say(cur.s, cur.n, lenName(cur.l) + ' · vel ' + Math.round(cur.v * 127));
+        clearTimeout(timer); timer = setTimeout(() => commit(notes.slice()), 250);   // one commit after the knob settles
       };
-      ok.addEventListener('click', (e) => { e.stopPropagation(); apply(); }); no.addEventListener('click', (e) => { e.stopPropagation(); closeEditor(); cv.focus({ preventScroll: true }); });
-      editor.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') apply(); if (e.key === 'Escape') { closeEditor(); cv.focus({ preventScroll: true }); } });
-      editor.addEventListener('pointerdown', (e) => e.stopPropagation());
-      editor.classList.add('open'); fs.focus(); fs.select();
-      return { fs, fl, fp, fv, apply };
+      const knob = (label, o, set) => { const k = UI.Knob(Object.assign({ label, size: 44, onChange: (v) => set(v) }, o)); return k; };
+      const kS = knob('Start', { min: 0, max: st - gs, value: cur.s, format: (v) => where(Math.round(v / gs) * gs) }, (v) => apply({ s: Math.round(v / gs) * gs }));
+      const kL = knob('Length', { min: FREE, max: Math.min(16, st), value: cur.l, format: (v) => lenName(Math.max(FREE, Math.round(v / gs) * gs || gs)) }, (v) => apply({ l: Math.max(gs, Math.round(v / gs) * gs) }));
+      const kP = drums ? knob('Pad', { min: 0, max: rowNotes.length - 1, value: Math.max(0, rowNotes.indexOf(cur.n)), format: (v) => nameOf(rowNotes[Math.round(v)]) }, (v) => apply({ n: rowNotes[Math.round(v)] }))
+        : knob('Pitch', { min: LO, max: HI, value: cur.n, format: (v) => nameOf(Math.round(lock ? pitchFor(Math.round(v)) : v)) }, (v) => { const n = lock ? pitchFor(Math.round(v)) : Math.round(v); if (n !== cur.n) audition([n]); apply({ n }); });
+      const kV = knob('Velocity', { min: 1, max: 127, value: Math.round(cur.v * 127), format: (v) => String(Math.round(v)) }, (v) => apply({ v: Math.round(v) / 127 }));
+      const done = h('button', { class: 'tlpr-tool', title: 'done (Esc)', text: '✓' });
+      editor.append(h('div', { class: 'tlpr-eh' }, [h('b', { text: 'Note' }), h('span', { class: 'wm-spacer' }), done]), h('div', { class: 'tlpr-knobs' }, [kS.el, kL.el, kP.el, kV.el]));
+      const finish = () => { if (timer) { clearTimeout(timer); timer = null; commit(notes.slice()); } closeEditor(); cv.focus({ preventScroll: true }); };
+      done.addEventListener('click', (e) => { e.stopPropagation(); finish(); });
+      editor.onkeydown = (e) => { e.stopPropagation(); if (e.key === 'Escape' || e.key === 'Enter') finish(); };
+      editor.onpointerdown = (e) => e.stopPropagation();
+      editor.classList.add('open');
+      // for tests and scripts: the same path a knob takes
+      return { start: (v) => apply({ s: Math.round(v / gs) * gs }), length: (v) => apply({ l: Math.max(gs, Math.round(v / gs) * gs) }), pitch: (n) => apply({ n }), velocity: (v) => apply({ v: v / 127 }), finish };
     }
     function closeEditor() { editor.classList.remove('open'); editor.innerHTML = ''; }
     // ---- P4 step input

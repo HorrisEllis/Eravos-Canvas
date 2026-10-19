@@ -30,9 +30,7 @@
 .tlpr-vcorner { position: sticky; bottom: 0; z-index: 4; flex: none; background: #0b1119; border-top: 1px solid #223044; font: 10px var(--mono, monospace); color: #7f93a8; padding: 4px 6px; box-sizing: border-box; }
 .tlpr-ed { font-weight: 700; }
 .tlpr-tool.tlpr-ed.on { border-color: #00e5ff; color: #00e5ff; background: #0a2a30; }
-.tlpr-edit { display: none; position: absolute; right: 10px; top: 46px; z-index: 10; background: #0d1520; border: 1px solid #ffd24a; border-radius: 8px; padding: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.5); flex-direction: column; gap: 6px; width: 220px; }
+.tlpr-edit { display: none; position: absolute; right: 10px; top: 46px; z-index: 10; background: #0d1520; border: 1px solid #ffd24a; border-radius: 8px; padding: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.5); flex-direction: column; gap: 6px; }
 .tlpr-edit.open { display: flex; }
-.tlpr-fl { display: flex; align-items: center; justify-content: space-between; gap: 8px; font: 12px var(--font, sans-serif); color: #c9d6e3; }
-.tlpr-f { width: 110px; background: #070b11; color: #ffd24a; border: 1px solid #26364a; border-radius: 5px; padding: 3px 6px; font: 12px var(--mono, monospace); }
-.tlpr-ferr { font: 11px var(--font, sans-serif); color: #ff6b6b; min-height: 13px; }
-.tlpr-fb { display: flex; gap: 6px; justify-content: flex-end; }
+.tlpr-eh { display: flex; align-items: center; gap: 6px; font: 12px var(--font, sans-serif); color: #ffd24a; }
+.tlpr-knobs { display: flex; gap: 10px; }

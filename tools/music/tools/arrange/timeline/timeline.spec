@@ -179,7 +179,7 @@ built (P3 + P4): ⬚ Select tool (5) and Shift-drag box · Shift-click add/remov
   Ctrl+C / X / V (paste at the pointer, else the playhead; shared between clips) · Ctrl+D duplicates after the selection ·
   ← → nudge a grid step (Shift: a bar) · ↑ ↓ semitone/octave for the whole selection · Quantize (Q, 25–100 %) · Humanize
   (H, ±10 ticks, ±8 % velocity) · Legato (L) · velocity lane (drag draws, Ctrl-drag ramps; only the selection when there
-  is one) · double-click = exact fields (right-click deletes; double-click no longer deletes) · step input ⏎ (Z…M and
+  is one) · double-click = the note's KNOBS: Start (snaps to the grid, reads bar.beat.tick), Length, Pitch (reads the name; scale-locked), Velocity — live, one undo step, nothing to type (right-click deletes) · step input ⏎ (Z…M and
   Q…U an octave up; Space rest, Backspace back, ← → cursor; the ruler sets the cursor) · every edit = one undo step
 not built: MIDI-keyboard step input (computer keys and the on-screen keys only), reverse / glue / transpose-to-scale
 §P2 DRAW TOOLS (fixes R4)

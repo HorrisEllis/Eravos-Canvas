@@ -77,8 +77,8 @@ The song's name ends in its number: `SongEngine.write('synthwave', 4242)` builds
   stretches them all. Ctrl+C/X/V (paste at the pointer), Ctrl+D duplicate, ← → nudge, ↑ ↓ transpose.
   **Q** quantize (25–100 %), **H** humanize, **L** legato. Each edit is one undo step.
 - **Velocity lane** under the notes: drag to draw velocities, Ctrl-drag for a ramp.
-- **Exact values**: double-click a note to type its start (bar.beat.tick), length (ticks), pitch (C#4) and velocity.
-  Right-click deletes.
+- **The note's knobs**: double-click a note for Start (snaps to the grid), Length, Pitch and Velocity knobs.
+  It's live and nothing to type. Right-click deletes.
 - **Step input** ⏎: type notes on Z S X D C V G B H N J M (Q 2 W 3 E R 5 T 6 Y 7 U an octave up). Space rests, Backspace steps back.
 
 ## 3.47 — ERAVOS Glass + ERAVOS COS (from Nexus Clear Glass and COS, made for ERAVOS)
