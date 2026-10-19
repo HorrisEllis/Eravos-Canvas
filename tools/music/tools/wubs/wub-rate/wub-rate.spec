@@ -42,3 +42,5 @@ dependencies:
     - wubrate.hook.mod_out (modulation · port out)
   permissions: [audio_out, bus_publish, bus_subscribe, registry_read]
   works_with: []
+
+# 3.48 SUITES (specs/eravos.suites.spec): part of music.wub-lab — usable alone as always; its 📘 page shows "Part of" and links the suite page

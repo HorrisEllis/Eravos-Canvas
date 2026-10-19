@@ -3,12 +3,22 @@
 Where things stand, so work can be picked up in any session. Newest first.
 
 ## Done (merged to main)
+- **ERAVOS Glass + ERAVOS COS** (3.47): `host/` brings in Nexus Clear Glass and COS, rebuilt for ERAVOS with no Nexus
+  dependency. Nested compartments (canvas › domain › tool) with birth gates; the canvas driven through an event stream and command door;
+  ERAVOS.exe runs Glass inside the app. Spec `specs/eravos.host.spec`, tests `node tests/host.test.mjs`.
+  The desktop wiring is not yet run in Electron.
 - **Tool pages** (3.46): 📘 on every window and in ＋ Add. Each page has the tool's suite (load all of it, or one tool at a time),
   the mods per slot, the tools it plays with, its sound packs, every control and its inputs/outputs.
   Files: `canvas/runtime/tool-page.js`, `specs/eravos.tool-pages.spec`, `tests/p45-tool-page.test.js`.
 - **Wobble Bass 3.6**: a `growl` mod slot (wub layer only; the sub stays clean). 3.5 added rate bend/glide, FM, squash,
   a rebuilt UI and the Bun Dem matched presets.
 - Destroyer 2.0 · Links & Mods · synthesis tools (Morph Osc, Envelope, Partials, Granular) · Songs by category.
+
+## In progress — 3.48 (specs/eravos.phase48-map.spec)
+P48.1 piano roll precision: BUILT (exact placement, paint/split/erase, both-edge stretch, grids, zoom, ruler,
+multi-select, copy/paste, nudge, quantize/humanize/legato, velocity lane, per-note knobs, step input). Next: P48.2 → P48.2 motion core (any knob can move) → P48.3 macros + perform pad + Destroyer 2.1 →
+P48.4 Retro Poly · Gothic Organ · Dub Station → P48.5 suites as systems (own page, six tabs, scenes) → P48.6 polish.
+Specs: eravos.suites.spec, eravos.motion.spec, timeline.spec § 3.48, and § 3.48 in each static tool's spec.
 
 ## In progress — Skrillex "Quest For Fire" (basement set clip, about 2:08)
 The section was analysed from the user's clip. The audio stays out of the repo. The Wobble Bass was then matched against it by an
@@ -32,5 +42,5 @@ Match cost 10.17 (default preset 28.0).
 other key at its default plus rateBend 1 and rateGlide 0. Run `node tests/tool-audio.mjs wobble`, then the full `node tests/run.mjs`.
 
 ## Ideas parked
-- Ollama as a DJ turning knobs live (the user pinned this).
+- Ollama as a DJ turning knobs live (the user pinned this). The door is ready: POST /glass/cmd canvas.state / canvas.set.
 - A Sound Match tool (the offline matcher as a tool) · LFO/Envelope able to reach any knob · more suites (Granular, Partials, Wub Filter).

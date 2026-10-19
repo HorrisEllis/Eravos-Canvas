@@ -27,3 +27,7 @@ Wobble Bass 3.6: slot `growl` — after the post shaper on the wub layer only; t
   latency the mods report (onLatency), so the low end stays clean and in time.
 
 tests: tests/p45-tool-page.test.js
+
+3.48 (specs/eravos.suites.spec): suites become their own systems with their own page (canvas/runtime/suite-page.js);
+  a tool page gains "Part of: <suite> 🧰" (opens the suite page). descriptor.suite stays as the tool's starter rig.
+  Shared parts (preset lists, mod pickers, control tables) move into one module both pages use — no copy of the code.

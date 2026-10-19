@@ -12,3 +12,5 @@ contextBridge.exposeInMainWorld('eravosDesktop', {
   keepPack: (name, data) => ipcRenderer.invoke('eravos:keep-pack', { name, data }),
   openLibrary: (sub) => ipcRenderer.send('eravos:open-library', sub || ''),
 });
+// ERAVOS Glass (host/glass.js) runs inside the app: tell the page before its scripts run (canvas/runtime/glass-link.js)
+{ const g = ipcRenderer.sendSync('eravos:glass'); if (g) contextBridge.exposeInMainWorld('ERAVOS_GLASS', g); }

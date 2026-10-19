@@ -5,7 +5,18 @@
 .tlpr-title { font: 600 12px var(--font, sans-serif); white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
 .tlpr-sep { width: 1px; align-self: stretch; background: #223044; margin: 0 2px; }
 .tlpr-scroll { flex: 1; min-height: 0; overflow: auto; position: relative; display: flex; align-items: flex-start; }
-.tlpr-keys { position: sticky; left: 0; z-index: 2; flex: none; display: block; cursor: pointer; }
+.tlpr-keycol { position: sticky; left: 0; z-index: 3; flex: none; display: flex; flex-direction: column; background: #0a0f15; }
+.tlpr-corner { position: sticky; top: 0; z-index: 4; flex: none; background: #0d1520; border-bottom: 1px solid #223044; }
+.tlpr-keys { flex: none; display: block; cursor: pointer; }
+.tlpr-gridcol { flex: none; display: flex; flex-direction: column; }
+.tlpr-ruler { position: sticky; top: 0; z-index: 2; display: block; cursor: pointer; }
+.tlpr-tools { display: inline-flex; gap: 2px; }
+.tlpr-tool { min-width: 26px; height: 24px; border: 1px solid #223044; border-radius: 5px; background: #111a26; color: #c9d6e3; cursor: pointer; font-size: 13px; padding: 0 4px; }
+.tlpr-tool.on { border-color: #ffd24a; color: #ffd24a; background: #2a2410; }
+.tlpr-pos { font: 11px var(--mono, monospace); color: #ffd24a; min-width: 132px; white-space: nowrap; }
+.tlpr-grid[data-tool="paint"] { cursor: cell; }
+.tlpr-grid[data-tool="erase"] { cursor: not-allowed; }
+.tlpr-grid[data-tool="split"] { cursor: col-resize; }
 .tlpr-grid { display: block; flex: none; cursor: crosshair; outline: none; }
 .tlpr-grid.move { cursor: grabbing; }
 .tlpr-grid.edge { cursor: ew-resize; }
@@ -13,3 +24,13 @@
 .tl-split { display: none; flex: none; height: 7px; margin: 2px 0 -2px; cursor: row-resize; border-radius: 3px; background: linear-gradient(#0000 2px, #2d3f57 2px, #2d3f57 5px, #0000 5px); touch-action: none; }
 .tl-split:hover, .tl-split.on { background: linear-gradient(#0000 2px, var(--acc, #00d4ff) 2px, var(--acc, #00d4ff) 5px, #0000 5px); }
 .tl-split:has(+ .tlpr.open) { display: block; }
+/* 3.48 P3/P4: velocity lane pinned under the notes, exact-values panel */
+.tlpr { position: relative; }
+.tlpr-vel { position: sticky; bottom: 0; z-index: 2; display: block; cursor: ns-resize; }
+.tlpr-vcorner { position: sticky; bottom: 0; z-index: 4; flex: none; background: #0b1119; border-top: 1px solid #223044; font: 10px var(--mono, monospace); color: #7f93a8; padding: 4px 6px; box-sizing: border-box; }
+.tlpr-ed { font-weight: 700; }
+.tlpr-tool.tlpr-ed.on { border-color: #00e5ff; color: #00e5ff; background: #0a2a30; }
+.tlpr-edit { display: none; position: absolute; right: 10px; top: 46px; z-index: 10; background: #0d1520; border: 1px solid #ffd24a; border-radius: 8px; padding: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.5); flex-direction: column; gap: 6px; }
+.tlpr-edit.open { display: flex; }
+.tlpr-eh { display: flex; align-items: center; gap: 6px; font: 12px var(--font, sans-serif); color: #ffd24a; }
+.tlpr-knobs { display: flex; gap: 10px; }

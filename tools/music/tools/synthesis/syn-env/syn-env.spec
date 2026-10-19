@@ -14,3 +14,5 @@ hooks: mod_out ; note_in ; midi_in ; mod_in depth
 presets: Pluck Sweep, Slow Swell, Morph Scan, Drop Close, Note Wobble (loop), Bipolar Bend, Legato Filter
 tests: contract ; wired into a tool's knob it follows that tool's notes ; the shape reaches peak at attack and sustain after decay ; loop repeats
 
+
+# 3.48 SUITES (specs/eravos.suites.spec): part of music.wub-lab (shape) · music.synthesis-lab — usable alone as always; its 📘 page shows "Part of" and links the suite page

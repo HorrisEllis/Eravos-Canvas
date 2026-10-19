@@ -66,3 +66,16 @@ dependencies:
     - rp.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
   works_with: [eravos.drum-forge, eravos.pad-forge, eravos.fx-echo, eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
+
+# 3.48 MOTION (phase P48.4 · status mapped · specs/eravos.motion.spec) — "the retro synthwave tool … more dynamic"
+findings: 31 settings, 2 mod inputs (cutoff, pwm); no velocity routing; filter env is the only internal movement.
+adds:
+  macros: Brightness = cutoff 300→9000 + envAmt 0.2→0.8 · Motion = pwm 0→0.8 + pwmRate 0.2→6 Hz + drift 0→0.6 ·
+    Space = chorus off→II + unison 1→4 · Pluck = fD 1.2 s→0.12 s + decay 1.5 s→0.2 s
+  perform pad: X = Brightness, Y = Motion, spring-back on
+  new audio-rate buses: res, envAmt, drift, chorus depth; per-voice VELOCITY → cutoff (0–100 %) and → PWM (0–100 %)
+  a built-in LFO 2 (sync or free, 6 shapes) with 2 destinations (any of cutoff / pwm / pitch / pan / level), so the
+    classic synthwave sweep needs no extra window
+  POLY AFTERTOUCH / MPE when the controller sends it → cutoff and vibrato per voice
+  every setting can carry motion (M1); arp settings step at control rate
+acceptance: velocity 30 vs 120 opens the filter by ≥ 1 octave at 100 %; LFO 2 → cutoff audibly sweeps on held chords

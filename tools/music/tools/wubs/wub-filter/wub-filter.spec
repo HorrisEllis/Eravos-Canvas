@@ -40,3 +40,5 @@ dependencies:
     - fx.hook.audio_out (audio · port out)
   permissions: [audio_out, audio_in, bus_publish, bus_subscribe]
   works_with: []
+
+# 3.48 SUITES (specs/eravos.suites.spec): part of music.wub-lab — usable alone as always; its 📘 page shows "Part of" and links the suite page
