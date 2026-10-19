@@ -275,14 +275,27 @@
       .sort((a, b) => (a.category + a.label).localeCompare(b.category + b.label));
   }
 
+  // a crisp drawn icon (an emoji book renders fragmented at title-bar size on some systems)
+  const BOOK = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M2.5 3.2c1.9-.7 3.8-.6 5.5.6v9.1c-1.7-1.1-3.6-1.2-5.5-.5zM13.5 3.2c-1.9-.7-3.8-.6-5.5.6v9.1c1.7-1.1 3.6-1.2 5.5-.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
   if (global.CanvasWM) global.CanvasWM.addTitleAction({
     when: (d) => !d.system,
     make(rec) {
-      const b = global.UIKit.h('button', { class: 'wm-min tp-open', title: 'its page — mods, sound packs, suite, every control', 'aria-label': rec.def.label + ' page', text: '📘' });
+      const b = global.UIKit.h('button', { class: 'wm-min tp-open', title: 'its page — mods, sound packs, suite, every control', 'aria-label': rec.def.label + ' page' });
+      b.innerHTML = BOOK;
       b.addEventListener('pointerdown', (e) => e.stopPropagation());
       b.addEventListener('click', (e) => { e.stopPropagation(); open(rec.id, { instanceId: rec.instanceId, K: rec.K }); });
       return b;
     },
   });
+  // clicking a window's icon or name opens its page (a drag of the title bar still moves the window)
+  if (doc) {
+    let down = null;
+    doc.addEventListener('pointerdown', (e) => { const t = e.target.closest && e.target.closest('.wm-head .wm-icon, .wm-head .wm-title'); down = t ? { x: e.clientX, y: e.clientY, t } : null; }, true);
+    doc.addEventListener('pointerup', (e) => {
+      const d = down; down = null; if (!d || e.button !== 0 || Math.hypot(e.clientX - d.x, e.clientY - d.y) > 4) return;
+      const win = d.t.closest('.wm-win'), id = win && win.getAttribute('data-instance'), rec = id && F().handle(id);
+      if (rec && !rec.def.system) open(rec.id, { instanceId: id, K: rec.K });
+    }, true);
+  }
   global.ToolPage = TP;
 })(typeof window !== 'undefined' ? window : globalThis);

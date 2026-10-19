@@ -188,7 +188,7 @@
     const actions = titleActions.filter(a => a.when(d)).map(a => a.make(rec, K)).filter(Boolean);
     const tag = h('span', { class: 'wm-tag', text: rec.instanceId.split('-').slice(-2).join('') });
     const header = h('div', { class: 'wm-head' }, [
-      h('span', { class: 'wm-icon', text: d.icon || '◻' }), h('span', { class: 'wm-title', text: d.label }), tag,
+      h('span', { class: 'wm-icon', text: d.icon || '◻', title: 'open its page' }), h('span', { class: 'wm-title', text: d.label, title: 'open its page — mods, packs, every control' }), tag,
       rec.ctx.readOnly ? h('span', { class: 'wm-ro', text: 'READ-ONLY' }) : null,
       h('span', { class: 'wm-spacer' }), ...actions, maxBtn, minBtn, closeBtn,
     ]);

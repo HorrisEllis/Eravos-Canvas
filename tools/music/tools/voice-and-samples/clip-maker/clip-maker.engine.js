@@ -7,7 +7,8 @@
   const S = OrganismSDK.STD;
   OrganismFactory.define({
     id: 'eravos.clip-maker', tempo: false, domain: 'music', version: '1.0.0', label: 'Clip Maker', icon: '✂', accent: '#00ff88', phase: 'P8.5',
-    category: 'Voice & samples', blurb: 'Trim her recording to the exact words, clean it up, split it into clips, send them anywhere.',
+    category: 'Voice & samples', noMod: true,   // 3.48.1: it records and plays clips — it never passes the sound through, so inside another tool it silenced it
+    blurb: 'Trim her recording to the exact words, clean it up, split it into clips, send them anywhere.',
     size: { w: 760, h: 470 }, minSize: { w: 560, h: 360 },
     permissions: ['audio_out', 'audio_in', 'bus_publish', 'bus_subscribe', 'filesystem_read', 'filesystem_write'],
     provides: ['capability.sample_source', 'capability.audio_out'],

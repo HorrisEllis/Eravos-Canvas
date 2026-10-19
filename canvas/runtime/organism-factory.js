@@ -38,11 +38,27 @@
       ui_hooks: d.ui_hooks, constraints: d.constraints || [], presets: d.presets || {} };
   }
 
+  const installable = (id) => !!(global.Catalog && global.Catalog.meta && global.Catalog.meta(id));
+  // spawn that installs first when it has to → Promise<instanceId | null>
+  async function spawnAsync(id, o) {
+    o = o || {}; const K = o.K || global.Kernel;
+    if (!defs.has(id) && installable(id)) {
+      const meta = global.Catalog.meta(id), S = global.Shell;
+      if (S && S.toast && !o.headless) S.toast(`Installing ${meta.icon || ''} ${meta.label || id}…`, '', 1500);
+      await global.Catalog.install([id], K);
+    }
+    return spawn(id, Object.assign({}, o, { _installing: true }));
+  }
   function spawn(id, o) {
     o = o || {};
     const K = o.K || global.Kernel;
     const d = defs.get(id);
-    if (!d) { K.fault('MOUNT_001', { organism_id: id, message: `organism ${id} not defined (engine file missing?)` }); return null; }
+    if (!d) {
+      // 3.48: a tool the catalog knows but this profile has not installed yet (a fresh profile — the desktop app's first
+      // start) installs itself and then opens, instead of failing with "needs a pack". The window arrives a moment later.
+      if (!o._installing && installable(id)) { spawnAsync(id, o); return null; }
+      K.fault('MOUNT_001', { organism_id: id, message: `organism ${id} not defined (engine file missing?)` }); return null;
+    }
     if (!K._factoryBooted) boot(K);
     // the shell expands what a tool needs (its UI units) BEFORE the engine mounts — tools never wait on chrome
     beforeSpawnHooks.forEach(fn => { try { fn(d, o, K); } catch (e) { K.fault('RUNTIME_003', { organism_id: id, message: 'before-spawn: ' + e.message }); } });
@@ -159,7 +175,7 @@
   }
 
   global.OrganismFactory = {
-    define, reg, spawn, boot, mountUI, makeView,
+    define, reg, spawn, spawnAsync, boot, mountUI, makeView,
     onDefine(fn) { defineHooks.push(fn); defs.forEach(d => fn(d)); },
     extendView(fn) { viewExts.push(fn); },
     onBeforeSpawn(fn) { beforeSpawnHooks.push(fn); return () => { const i = beforeSpawnHooks.indexOf(fn); if (i >= 0) beforeSpawnHooks.splice(i, 1); }; },

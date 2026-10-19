@@ -404,3 +404,7 @@ svg.wires path.wire.hot { stroke-width: 4.5; filter: drop-shadow(0 0 4px current
 .tp-tab { width: 100%; border-collapse: collapse; } .tp-tab td { padding: 3px 6px; border-bottom: 1px solid var(--line, #1a2533); vertical-align: top; }
 .tp-cl { white-space: nowrap; font-weight: 600; } .tp-cr, .tp-cd { color: var(--dim, #8fa1b6); font-size: 12px; } .tp-ch { font-size: 12px; } .tp-mv { color: var(--acc, #00d4ff); }
 @media (max-width: 600px) { .tp-head { flex-wrap: wrap; } .tp-tab .tp-ch { display: none; } }
+.wm-head .wm-icon, .wm-head .wm-title { cursor: pointer; border-radius: 4px; }
+.wm-head .wm-title:hover { color: var(--acc, #00d4ff); text-decoration: underline; text-underline-offset: 3px; }
+.tp-open { display: inline-flex; align-items: center; justify-content: center; }
+.tp-open svg { display: block; }

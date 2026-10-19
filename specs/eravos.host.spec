@@ -87,3 +87,9 @@ tests: tests/host.test.mjs (node; Chromium for Glass end to end)
 3.48 (specs/eravos.suites.spec, mapped): suites join the tree as grouping compartments under their domain —
   eravos.domain.<d> › eravos.suite.<d>.<name> — gates: members · wiring · scenes; integrated when its gates pass and every
   part tool is integrated. Tools stay children of their domain; a suite only lists them.
+
+3.48.1 parity: serve.js IS Glass (host/glass.js start({ root, port: 4747, also: ['::1'] })) — the web build and ERAVOS.exe
+  run the same server, so both have the stream, the command door and glass-link; the exe serves voice/ like the web build.
+  Desktop-only by nature: desktop-bridge (drop/ packs/ projects/ exports/ folders). OrganismFactory.spawn of a tool the
+  catalog knows but the profile has not installed installs it and opens it (spawnAsync) — no MOUNT_001 on a fresh profile.
+  tests/fresh-profile.mjs.

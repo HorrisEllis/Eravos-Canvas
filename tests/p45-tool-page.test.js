@@ -88,4 +88,15 @@ describe('P45 · tool pages — suites, mods one by one, sound packs', () => {
       assert.ok(!ToolPage.isOpen() && !document.querySelector('.tp-overlay'), 'closed');
     } finally { ToolPage.close(); F().close(id); }
   });
+  it('clicking a window\'s name opens its page; dragging the title bar does not', async () => {
+    if (!CanvasWM.world) { CanvasWM.init(document.getElementById('wmhost'), Kernel); WireSystem.init(Kernel); OrganismFactory.boot(Kernel); }
+    const K = Kernel, id = F().spawn('eravos.wub-osc', { K, x: 40, y: 40 }); await TH.sleep(20);
+    try {
+      const t = CanvasWM.windowOf(id).querySelector('.wm-title'), r = t.getBoundingClientRect(), x = r.left + 5, y = r.top + r.height / 2;
+      const ev = (type, dx) => t.dispatchEvent(new PointerEvent(type, { bubbles: true, cancelable: true, pointerId: 7, button: 0, clientX: x + (dx || 0), clientY: y }));
+      ev('pointerdown'); ev('pointermove', 30); ev('pointerup', 30); assert.ok(!ToolPage.isOpen(), 'a drag moves the window, no page');
+      ev('pointerdown'); ev('pointerup'); assert.ok(ToolPage.isOpen() && ToolPage.current().target === id, 'a click opens its page on that window');
+      assert.ok(CanvasWM.windowOf(id).querySelector('.tp-open svg'), 'the page button is a drawn icon, not an emoji');
+    } finally { ToolPage.close(); F().close(id); }
+  });
 });
