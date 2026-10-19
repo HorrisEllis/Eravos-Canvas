@@ -27,7 +27,7 @@
            syn-partials / granular (§ 3.48 suite membership) · eravos.tool-pages.spec · eravos.host.spec (suite compartments)
 
 ## Phases — one at a time, each tested and pushed before the next                                   status
-  P48.1 PIANO ROLL PRECISION (timeline.spec § P1–P4)                                                    mapped
+  P48.1 PIANO ROLL PRECISION (timeline.spec § P1–P4)                          P1+P2 built (2026-10-19) · P3+P4 mapped
         P1 place exactly (hover ghost, 4 px dead zone, one snap rule, 1/32 · 1/64 · triplets · off, Alt = free,
            vertical + continuous zoom, ruler) → P2 draw tools (draw · paint · select · split · erase, both-edge resize,
            last length, velocity lane) → P3 edit many (box/shift select, copy/paste/duplicate, nudge, quantize,

@@ -62,6 +62,18 @@ Techno, Trap, Synthwave (80s), Darkwave (80s), Witch House). Every press writes 
 drums, bass, chords, lead and the arrangement — on the Timeline, all in key. Click any clip to edit it in the piano roll.
 The song's name ends in its number: `SongEngine.write('synthwave', 4242)` builds that exact song again.
 
+## 3.48 (P48.1, first half) — a precise piano roll
+- **Notes land where you aim**: a ghost shows exactly where a click will land, and the toolbar reads the position
+  (bar.beat.tick) and the note. A click never slides: notes follow the cell and row under the pointer, so a small slide
+  inside the cell you clicked no longer moves the note a step or a semitone. Before, it did.
+- **Finer grids**: 1/32, 1/64, 1/8 · 1/16 · 1/32 triplets, and off. Hold **Alt** to place freely.
+- **Zoom**: taller rows (Rows, or Ctrl+Shift+wheel), smooth zoom (Ctrl+wheel keeps your spot), and fit clip.
+- **Ruler**: song bars and beats above the notes; click or drag it to move the playhead.
+- **Tools**: ✎ Draw · 🖌 **Paint** (drag = one note per grid cell, following the pointer) · ✂ Split · ⌫ Erase (drag
+  across notes), on keys 1–4.
+- **Stretch notes from either edge**; the edge is easier to grab on short notes. New notes take the length you last drew.
+- Notes now keep exact triplet timing in the song (1/192 step).
+
 ## 3.47 — ERAVOS Glass + ERAVOS COS (from Nexus Clear Glass and COS, made for ERAVOS)
 - **ERAVOS COS** (`host/cos.js`): compartments **nest** like the project: the canvas › each **domain** (music, image, video,
   agents, coding, dataflow) › each **tool**. Each earns its place through **birth gates**:

@@ -143,7 +143,7 @@ acceptance 3.0:
   - an old 2.x project opens with its lanes (no auto-delete of user-made empty lanes in loaded projects)
 
 # ============================================================
-# 3.48 — PIANO ROLL PRECISION (phase P48.1 · status mapped) — "the timeline adding notes isn't precise. make adding
+# 3.48 — PIANO ROLL PRECISION (phase P48.1 · P1 + P2 BUILT 2026-10-19 · P3 + P4 mapped) — "the timeline adding notes isn't precise. make adding
 #   the notes more precise. Like paint, expand notes, anything else."
 # ============================================================
 findings (timeline.pianoroll.js, read 2026-10-19):
@@ -168,6 +168,13 @@ findings (timeline.pianoroll.js, read 2026-10-19):
     point under the pointer fixed; "fit clip" button
   - ruler across the top: bar numbers, beats, the grid's subdivisions; click the ruler = move the playhead; the key row
     under the pointer and the time under the pointer read out in the toolbar
+built (P1 + P2): ghost + readout (bar.beat.tick · note) · 4 px dead zone · moves follow the CELL and ROW under the pointer
+  (a slide inside the clicked cell/row never moves the note — the root of "not precise") · grids 1/4–1/64, 1/8t 1/16t 1/32t,
+  off · Alt = free · rows 6–28 px (Rows menu, Ctrl+Shift+wheel) · continuous zoom (Ctrl+wheel keeps the time under the
+  pointer) · fit clip · ruler (song bars, beats; click/drag = seek) · tools Draw/Paint/Split/Erase (keys 1–4) · both-edge
+  resize, edge zone max(4 px, 25 %) · Length "last" · engine keeps notes at 1/192 step (was 1/64: triplets drifted),
+  minimum length 1/128 note (was 1/64)
+moved to P3 (needs multi-select): the velocity lane, Shift-drag an edge to resize every selected note
 §P2 DRAW TOOLS (fixes R4)
   - tools (toolbar + keys): ✎ Draw (1) · 🖌 Paint (2): drag across = one note per grid cell along the path, the pitch
     following the pointer (scale-locked when lock is on) · ⬚ Select (3): box select · ✂ Split (4): click splits a note at

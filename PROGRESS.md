@@ -14,8 +14,9 @@ Where things stand, so work can be picked up in any session. Newest first.
   a rebuilt UI and the Bun Dem matched presets.
 - Destroyer 2.0 · Links & Mods · synthesis tools (Morph Osc, Envelope, Partials, Granular) · Songs by category.
 
-## Mapped next — 3.48 (specs/eravos.phase48-map.spec)
-P48.1 piano roll precision → P48.2 motion core (any knob can move) → P48.3 macros + perform pad + Destroyer 2.1 →
+## In progress — 3.48 (specs/eravos.phase48-map.spec)
+P48.1 piano roll precision: P1 + P2 BUILT (exact placement, paint/split/erase, both-edge stretch, grids, zoom, ruler);
+P3 + P4 next (multi-select, copy/paste, nudge, quantize, velocity lane, typed values, step input) → P48.2 motion core (any knob can move) → P48.3 macros + perform pad + Destroyer 2.1 →
 P48.4 Retro Poly · Gothic Organ · Dub Station → P48.5 suites as systems (own page, six tabs, scenes) → P48.6 polish.
 Specs: eravos.suites.spec, eravos.motion.spec, timeline.spec § 3.48, and § 3.48 in each static tool's spec.
 
