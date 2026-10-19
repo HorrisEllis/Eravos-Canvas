@@ -296,7 +296,7 @@
           const ex = K.registry.byOrganism('eravos.midi-mapper')[0];
           if (ex && global.OrganismFactory.show(ex.instance_id)) return; // the background pad service gets its window
           if (ex) { K.bus.publish('canvas:collapse', { instanceId: ex.instance_id, on: false }); K.bus.publish('canvas:focus-request', { instanceId: ex.instance_id }); }
-          else { const id = global.OrganismFactory.spawn('eravos.midi-mapper'); if (id) K.bus.publish('ui:connect:' + id, {}); }
+          else global.OrganismFactory.spawnAsync('eravos.midi-mapper').then((id) => { if (id) K.bus.publish('ui:connect:' + id, {}); });   // installs it on a fresh profile (the exe's first start)
         };
         S.slot('bar').appendChild(h('div', { class: 'tb-group', 'data-unit': UNITS.midi.id }, [b]));
         K.bus.subscribe('midi:status', (st) => {
@@ -316,9 +316,12 @@
               const ins = Array.from(acc.inputs.values()).filter(i => i.state !== 'disconnected'); if (!ins.length) return;
               // 3.30: pads work with NO window open — the MIDI Map runs as a background service (not saved, survives
               // clearing the canvas); the MIDI button gives it its window when you want to learn or map knobs
-              const id = global.OrganismFactory.spawn('eravos.midi-mapper', { service: true }); if (!id) return;
-              K.bus.publish('ui:connect:' + id, {});
-              S.toast('🎛 ' + ins[0].name + ' connected — hit a pad. (Click MIDI to open its map.)', 'good', 5000);
+              if (check.busy) return; check.busy = true;
+              global.OrganismFactory.spawnAsync('eravos.midi-mapper', { service: true, headless: false }).then((id) => {
+                check.busy = false; if (!id) return;
+                K.bus.publish('ui:connect:' + id, {});
+                S.toast('🎛 ' + ins[0].name + ' connected — hit a pad. (Click MIDI to open its map.)', 'good', 5000);
+              });
             };
             check(); acc.addEventListener('statechange', () => setTimeout(check, 300));
             K.bus.subscribe('kernel:organism-unmounted', (p) => { if (p && p.organismId === 'eravos.midi-mapper') setTimeout(check, 300); }, 'shell'); // closed its window → back to the background

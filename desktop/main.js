@@ -12,7 +12,7 @@ const SCHEME = 'eravos', ORIGIN = 'eravos://app';
 // the project tree: next to ERAVOS.exe (a build), or the repo root (electron desktop/ in dev)
 const hasCanvas = (d) => fs.existsSync(path.join(d, 'canvas', 'index.html'));
 const APP_DIR = [path.dirname(process.execPath), path.resolve(__dirname, '..', '..'), path.resolve(__dirname, '..')].find(hasCanvas) || path.resolve(__dirname, '..');
-const SERVED = new Set(['canvas', 'tools', 'schemas', 'README.md']);   // the only top-level names the app serves
+const SERVED = new Set(['canvas', 'tools', 'schemas', 'voice', 'README.md']);   // the only top-level names the app serves (voice/: her recordings — the web build serves it too)
 protocol.registerSchemesAsPrivileged([{ scheme: SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true, corsEnabled: true, codeCache: true } }]);
 
 // ---------------------------------------------------------------- your folders (beside canvas/ and tools/)

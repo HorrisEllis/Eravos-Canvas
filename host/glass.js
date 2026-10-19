@@ -124,16 +124,20 @@ function start(o) {
       fs.createReadStream(file).on('error', () => res.destroy()).pipe(res);
     });
   }
-  const server = http.createServer((req, res) => {
+  const handler = (req, res) => {
     let p; try { p = decodeURIComponent(new URL(req.url, 'http://x').pathname); } catch (e) { return json(res, 400, { ok: false, error: 'bad request' }); }
     if (p.startsWith('/glass/')) return api(req, res, p).catch(e => json(res, 500, { ok: false, error: e.message }));
     serveFile(req, res, p);
-  });
+  };
+  // the first host must listen (its error rejects); the others (o.also, e.g. ::1 — "localhost" is IPv6 on some machines)
+  // join on the same port when they can and are skipped quietly when they can't
+  const server = http.createServer(handler), extra = [];
   let url = '';
-  const ready = new Promise((resolve, reject) => { server.once('error', reject); server.listen(port, host, () => { url = `http://${host === '127.0.0.1' ? 'localhost' : host}:${server.address().port}/`; resolve(); }); });
+  const ready = new Promise((resolve, reject) => { server.once('error', reject); server.listen(port, host, () => { url = `http://${host === '127.0.0.1' ? 'localhost' : host}:${server.address().port}/`; resolve(); }); })
+    .then(() => Promise.all((o.also || []).map(h2 => new Promise((res) => { const s2 = http.createServer(handler); s2.once('error', () => res()); s2.listen(server.address().port, h2, () => { extra.push(s2); res(); }); }))));
   return ready.then(() => ({
-    url, port: server.address().port, stream, cos, server,
-    close: () => new Promise(r => { clients.forEach(c => { try { c.end(); } catch (e) {} }); waiting.forEach(w => { clearTimeout(w.t); w.reject(new Error('Glass closed')); }); server.close(() => r()); }),
+    url, port: server.address().port, stream, cos, server, also: extra.length,
+    close: () => new Promise(r => { clients.forEach(c => { try { c.end(); } catch (e) {} }); waiting.forEach(w => { clearTimeout(w.t); w.reject(new Error('Glass closed')); }); extra.forEach(x => x.close()); server.close(() => r()); }),
   }));
 }
 
