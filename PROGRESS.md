@@ -14,6 +14,11 @@ Where things stand, so work can be picked up in any session. Newest first.
   a rebuilt UI and the Bun Dem matched presets.
 - Destroyer 2.0 · Links & Mods · synthesis tools (Morph Osc, Envelope, Partials, Granular) · Songs by category.
 
+## Mapped next — 3.48 (specs/eravos.phase48-map.spec)
+P48.1 piano roll precision → P48.2 motion core (any knob can move) → P48.3 macros + perform pad + Destroyer 2.1 →
+P48.4 Retro Poly · Gothic Organ · Dub Station → P48.5 suites as systems (own page, six tabs, scenes) → P48.6 polish.
+Specs: eravos.suites.spec, eravos.motion.spec, timeline.spec § 3.48, and § 3.48 in each static tool's spec.
+
 ## In progress — Skrillex "Quest For Fire" (basement set clip, about 2:08)
 The section was analysed from the user's clip. The audio stays out of the repo. The Wobble Bass was then matched against it by an
 offline search. Lower cost = closer.

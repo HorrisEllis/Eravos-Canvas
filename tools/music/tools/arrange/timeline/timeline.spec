@@ -141,3 +141,58 @@ acceptance 3.0:
   - 12 tools, 4 with clips: every lane visible with no vertical scroll in a 1040×620 window
   - moving a section moves all clips inside it by exactly the same bars; undo restores positions exactly
   - an old 2.x project opens with its lanes (no auto-delete of user-made empty lanes in loaded projects)
+
+# ============================================================
+# 3.48 — PIANO ROLL PRECISION (phase P48.1 · status mapped) — "the timeline adding notes isn't precise. make adding
+#   the notes more precise. Like paint, expand notes, anything else."
+# ============================================================
+findings (timeline.pianoroll.js, read 2026-10-19):
+  R1 rows are 11 px (PROW) with no vertical zoom — one pixel off is a different note; zoom (S/M/L = 8/14/22 px per 1/16)
+     is horizontal only
+  R2 grid is 1/16 · 1/8 · 1/4 only: no 1/32, no triplets, no "off" (free), no snap override key
+  R3 a click ADDS and immediately starts a MOVE drag: the add snaps with floor() but the drag delta with round() — a hand
+     that moves half a cell while clicking shifts the new note by a step or a semitone. The main "not precise" bug.
+  R4 resize only from the right edge, 6 px wide — at S zoom a 1/16 note is 8 px, so the edge is most of the note;
+     a new note's length is the Length menu, not the last note you drew
+  R5 one note selected at a time: no box select, no shift-click, no copy/paste/duplicate, no left/right nudge
+     (↑↓ moves pitch only), no quantize, no velocity lane (wheel per note only), no hover ghost showing where a click lands
+  R6 the time ruler has no bar numbers; the playhead is the only time reference inside the roll
+
+§P1 PLACE EXACTLY (fixes R1–R3, R6)
+  - hover GHOST: a translucent note shows exactly where a click will land (cell, pitch name, bar.beat.tick in the bar)
+  - a click adds; a drag only starts after the pointer moves > 4 px (dead zone), and add + drag use the same snap (round
+    to the nearest grid line from where the note started, never floor-then-round)
+  - grid: 1/4 · 1/8 · 1/16 · 1/32 · 1/64 · triplets (1/8t 1/16t 1/32t) · off (free, 1/128 resolution); Alt held = no
+    snap while held; the grid also sets nudge size
+  - vertical zoom: rows 8–28 px (Ctrl+Shift+wheel, or the ↕ slider); horizontal zoom continuous (Ctrl+wheel), keeps the
+    point under the pointer fixed; "fit clip" button
+  - ruler across the top: bar numbers, beats, the grid's subdivisions; click the ruler = move the playhead; the key row
+    under the pointer and the time under the pointer read out in the toolbar
+§P2 DRAW TOOLS (fixes R4)
+  - tools (toolbar + keys): ✎ Draw (1) · 🖌 Paint (2): drag across = one note per grid cell along the path, the pitch
+    following the pointer (scale-locked when lock is on) · ⬚ Select (3): box select · ✂ Split (4): click splits a note at
+    the grid line · ⌫ Erase (5): drag across deletes
+  - length: new notes take the length of the last note you drew or resized ("last length"), or the Length menu
+  - resize from BOTH edges; the edge zone is max(4 px, 25 % of the note) so short notes stay movable; Shift-drag an edge
+    = resize every selected note by the same amount; Alt-drag = no snap
+  - velocity: a velocity lane under the grid (bars per note; drag to draw velocities across notes; Ctrl-drag = a ramp)
+§P3 EDIT MANY (fixes R5)
+  - selection: box select, Shift-click add/remove, Ctrl+A all, click empty = none
+  - move/copy: drag moves the selection; Alt+drag copies; Ctrl+C / Ctrl+V pastes at the playhead or the hover cell;
+    Ctrl+D duplicates the selection right after itself
+  - nudge: ← → by one grid step (Shift: one bar), ↑ ↓ by a semitone (Shift: octave; in-scale step with scale lock)
+  - quantize (Q): start to the grid, 0–100 % strength, optional end quantize; humanize (H): ± ticks and ± velocity
+  - legato (L) · glue overlapping notes · reverse · transpose to scale
+  - every edit is ONE undo step (a drag, a paste, a quantize), through clip_edit as today
+§P4 PRECISE ENTRY
+  - double-click a note opens its fields: start (bar.beat.tick), length (ticks or a division), pitch (name or MIDI),
+    velocity (0–127) — typed values are exact
+  - step input: with the roll focused, play notes on a MIDI keyboard / the computer keys → each lands at the step cursor,
+    which advances by the grid (Space = rest)
+acceptance 3.48:
+  - a click with a 3 px wobble adds the note exactly at the ghost's cell (test: synthetic pointer down/move/up)
+  - paint across 8 cells at 1/16 adds 8 notes, one per cell; erase drag removes exactly the notes crossed
+  - 1/16t grid places notes at multiples of 2/3 of a 1/16 step; Alt-drag places off-grid
+  - resize from the left edge keeps the end fixed; box-select + ← moves every selected note one grid step; one undo
+    restores all of them
+  - typed start 3.2.120 lands at bar 3, beat 2, tick 120 (480 ticks/beat), exactly

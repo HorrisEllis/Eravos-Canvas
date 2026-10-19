@@ -22,3 +22,5 @@ ui: the grain field (x where each grain reads, y its pitch, fading over its life
 tests: contract ; makes a cloud of what is wired in ; freeze keeps sounding after the input stops ; pitch +12 = an octave up ;
   clip mode plays a loaded clip with nothing wired in ; works as a mod inside the Destroyer
 
+
+# 3.48 SUITES (specs/eravos.suites.spec): part of music.synthesis-lab — usable alone as always; its 📘 page shows "Part of" and links the suite page

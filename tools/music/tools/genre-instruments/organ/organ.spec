@@ -36,3 +36,20 @@ dependencies:
     - organ.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
   works_with: [eravos.breath, eravos.coven, eravos.fx-haunt, eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
+
+# 3.48 MOTION (phase P48.4 · status mapped · specs/eravos.motion.spec) — "the gothic organ … more dynamic"
+findings: 27 settings, 1 mod input (breath); drawbars set one by one and jump; rotary fast/slow switches without inertia;
+  no expression pedal.
+adds:
+  EXPRESSION (swell pedal): a 0–1 control on level + darkness (the box closing), audio-rate bus `expression`, mapped to
+    MIDI CC11 / CC7 by default
+  REGISTRATIONS: two drawbar sets A and B (9 bars each) and a 0–1 morph between them — drawbars glide, the morph is mod-able;
+    the Swell + Registration macros make a sustained chord evolve by hand
+  ROTARY with inertia: slow ↔ fast ramps the horn (≈0.8 s) and the drum (≈3 s) like a real cabinet; `rotorSpeed` becomes
+    a continuous 0–1 (brake at 0)
+  macros: Swell = expression · Registration = A↔B morph · Spin = rotor slow↔fast · Cathedral = space 0.2→1 + release 0.3→4 s
+  perform pad: X = Swell, Y = Registration, spring-back off
+  key velocity → chiff and percussion level (on/off as an option, organs are traditionally not velocity-sensitive)
+  every setting can carry motion (M1)
+acceptance: rotor slow→fast reaches full speed in 0.6–1.0 s (horn) and 2.5–3.5 s (drum), measured from the AM rate;
+  registration morph 0→1 changes the spectrum continuously (no step > 1 dB in any partial over 10 ms)

@@ -16,3 +16,5 @@ links: an incoming Morph Osc shows its bank / morph / ratio face; an incoming En
 presets: Morph Lead, Glass Pad, Vowel Bass, Drawbar Organ, Pluck, Sub Sine, FM Modulator ×2, Bell Modulator ×7, Growl Modulator ×1
 tests: contract ; plays in pitch ; morph changes the spectrum ; a second Morph Osc wired into FM in follows the notes and adds sidebands ; ring in multiplies
 
+
+# 3.48 SUITES (specs/eravos.suites.spec): part of music.wub-lab (second voice) · music.synthesis-lab — usable alone as always; its 📘 page shows "Part of" and links the suite page

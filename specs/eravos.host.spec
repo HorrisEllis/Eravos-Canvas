@@ -83,3 +83,7 @@ cli: node host/eravos.mjs glass [--port] [--open] · send <command> [json] · co
 next: the Ollama DJ (pinned) drives the canvas through POST /glass/cmd — canvas.state to listen, canvas.set to turn knobs.
 
 tests: tests/host.test.mjs (node; Chromium for Glass end to end)
+
+3.48 (specs/eravos.suites.spec, mapped): suites join the tree as grouping compartments under their domain —
+  eravos.domain.<d> › eravos.suite.<d>.<name> — gates: members · wiring · scenes; integrated when its gates pass and every
+  part tool is integrated. Tools stay children of their domain; a suite only lists them.

@@ -11,3 +11,5 @@ hooks: audio_out ; note_in ; midi_in ; mod_in pitch ; ui partial_set {set, k, v}
 presets: Glass Keys, Tubular Bell, Hollow Reed, Drawbars, Evolving Choir, Mallet, Saw to Sine Pad, Octave Air
 tests: contract ; plays in pitch ; odd-only spectrum has no 2nd harmonic ; stretch moves the 2nd partial up ; evolve changes the tone over the note
 
+
+# 3.48 SUITES (specs/eravos.suites.spec): part of music.synthesis-lab — usable alone as always; its 📘 page shows "Part of" and links the suite page

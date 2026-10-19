@@ -160,3 +160,5 @@ dependencies:
     (canvas/runtime/tool-page.js · specs/eravos.tool-pages.spec)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
   works_with: [eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
+
+# 3.48 SUITES (specs/eravos.suites.spec): part of music.drop-rig — usable alone as always; its 📘 page shows "Part of" and links the suite page

@@ -37,3 +37,18 @@ dependencies:
     - fx.hook.audio_out (audio · port out)
   permissions: [audio_out, audio_in, bus_publish, bus_subscribe]
   works_with: []
+
+# 3.48 MOTION (phase P48.3 · status mapped · specs/eravos.motion.spec) — "more dynamic, control and fluidity"
+findings: 13 settings, 3 mod inputs (drive, bits, downsample); shape/curve changes jump; nothing moves by itself.
+adds:
+  macros (default, editable): Heat = drive 0→0.9 + asym 0→0.4 (autoGain keeps level) · Crunch = bits 16→4 + downsample 1→12 ·
+    Bite = tight 20→400 Hz + tilt 0→+6 dB · Tame = postLP 18k→3k + autoTame on
+  perform pad: X = Heat, Y = Crunch, spring-back off by default (an effect holds where you leave it)
+  new audio-rate buses: tilt, postLP, asym (mod hooks dst.hook.mod_tilt / mod_postlp / mod_asym)
+  FOLLOW: drive can follow the input level (built-in envelope follower: attack 5 ms, release 120 ms, depth ±) — grit
+    that opens on hits
+  CURVE MORPH: shape A → shape B with a 0–1 morph (the two curves cross-faded in the shaper table, rebuilt ≤ 30×/s) —
+    replaces the hard jump between curves; `shapeB` + `morph` settings, morph is mod-able
+  every setting can carry motion (M1); bits/downsample step at control rate, drive/tilt/postLP glide at audio rate
+acceptance: a sine LFO on Heat audibly sweeps; curve morph 0→1 shows no level jump > 1 dB; follow mode drives harder on
+  a kick than in the gap after it (offline render)
