@@ -1,6 +1,6 @@
 // P16 UI checks against the real shell (node tests/p16-ui.mjs [outDir]) — start screen, every genre in 📖 Songs, Connect menu,
 // windows open un-clipped, recorder ▶ leaves the canvas silent. Screenshots land in outDir (default: tests/out).
-import { chromium } from 'playwright';
+import { chromium } from '../host/driver/glass.js';   // Clear Glass's driver, not Playwright (his call, 2026-10-21)
 import path from 'path'; import fs from 'fs'; import { fileURLToPath } from 'url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'), OUT = process.argv[2] || path.join(ROOT, 'tests', 'out');
 fs.mkdirSync(OUT, { recursive: true });

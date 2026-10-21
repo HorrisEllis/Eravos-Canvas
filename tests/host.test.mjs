@@ -1,7 +1,7 @@
 // ERAVOS host — node tests/host.test.mjs : SISO, ERAVOS COS (nested compartments, gates, archetype) and ERAVOS Glass end to end
 // (a real canvas in Chromium driven through the command door). Spec eravos.host.
 import { createRequire } from 'module'; import fs from 'fs'; import os from 'os'; import path from 'path'; import { fileURLToPath } from 'url';
-import { chromium } from 'playwright';
+import { chromium } from '../host/driver/glass.js';   // Clear Glass's driver, not Playwright (his call, 2026-10-21)
 const require = createRequire(import.meta.url), ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const { Stream, Gate, check } = require('../host/siso.js'), { Cos } = require('../host/cos.js'), glass = require('../host/glass.js');
 let pass = 0, fail = 0;
@@ -114,6 +114,14 @@ await it('driven from outside: spawn on a preset, turn knobs, wire, read the sta
 await it('canvas.suite loads a tool’s whole suite through its 📘 page (two mods inside, three tools wired)', async () => {
   const s = await cmd('canvas.suite', { tool: 'eravos.wobble-bass' }); ok(s.ok && s.result.loaded === 5, JSON.stringify(s));
   const mods = await p.evaluate((i) => Mods.entries(i).length, s.result.instanceId); ok(mods === 2, 'two mods inside');
+});
+await it('suites through the door: list, open and build Wub Lab, mix in a part of another suite, load a scene, read it back', async () => {
+  const l = await cmd('canvas.suites'); ok(l.ok && l.result.some(s => s.id === 'music.wub-lab') && l.result.some(s => s.id === 'music.synthesis-lab'), JSON.stringify(l).slice(0, 200));
+  const o = await cmd('canvas.suite.open', { suite: 'music.wub-lab', build: true }); ok(o.ok && o.result.parts.filter(x => x.instanceId).length === 4, JSON.stringify(o).slice(0, 300));
+  const a = await cmd('canvas.suite.add', { instanceId: o.result.instanceId, tool: 'eravos.syn-partials' }); ok(a.ok && a.result.parts.some(x => x.mixed && x.tool === 'eravos.syn-partials'), 'mixed in');
+  const sc = await cmd('canvas.suite.scene', { instanceId: o.result.instanceId, name: 'Riddim' }); ok(sc.ok && sc.result.scene === 'Riddim', JSON.stringify(sc).slice(0, 200));
+  ok((await cmd('canvas.suite.scene', { instanceId: o.result.instanceId, name: 'Nope' })).error.includes('no scene'), 'unknown scene refused');
+  ok((await cmd('canvas.suite.state', { instanceId: o.result.instanceId })).result.wiring.every(w => w.on || !w.possible), 'every wire whose two ends are here is on');
 });
 await it('SSE: an outside listener sees commands and page events', async () => {
   const ctl = new AbortController(), r = await fetch(g.url + 'glass/events?replay=5', { signal: ctl.signal }), rd = r.body.getReader(); let txt = '';

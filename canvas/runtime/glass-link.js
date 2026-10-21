@@ -43,7 +43,22 @@
       const st = { d: def, K: K(), target: live(d.instanceId) ? d.instanceId : null, made: new Map() };
       const out = global.ToolPage.loadSuite(st); await settle(); return { instanceId: st.target, loaded: out.filter(Boolean).length, of: ((def.suite && def.suite.members) || []).length };
     },
+    // 3.48 suites as systems (eravos.suites ADDENDUM 2026-10-21): the suite window and its parts, the same steps a person takes
+    'canvas.suites': () => (global.Suites ? global.Suites.list() : []).map(s => ({ id: s.id, label: s.label, blurb: s.blurb || '', parts: s.parts.map(p => ({ tool: p.tool, role: p.role || '', required: !!p.required })), scenes: Object.keys(s.scenes), starter: s.starter || null })),
+    'canvas.suite.open': async (d) => { const S = needSuites(); if (!S.get(d.suite)) throw new Error(`no suite ${d.suite} — canvas.suites lists them`); const hub = S.open(d.suite, { K: K() }); if (!hub) throw new Error(d.suite + ': its window could not open'); if (d.build) S.build(K(), hub); await settle(); return suiteState(hub); },
+    'canvas.suite.build': async (d) => { const S = needSuites(); needHub(d.instanceId); S.build(K(), d.instanceId); await settle(); return suiteState(d.instanceId); },
+    'canvas.suite.add': async (d) => { const S = needSuites(); needHub(d.instanceId); if (!F().def(d.tool)) throw new Error('no tool ' + d.tool); const id = S.addPart(K(), d.instanceId, d.tool, { preset: d.preset }); if (!id) throw new Error(d.tool + ' could not join'); await settle(); return Object.assign({ added: id }, suiteState(d.instanceId)); },
+    'canvas.suite.scene': async (d) => { const S = needSuites(), r = needHub(d.instanceId), s = S.get(r.ctx.params.get('suite')); if (!s.scenes[d.name]) throw new Error(`${s.label} has no scene “${d.name}”`); S.scene(K(), d.instanceId, d.name); await settle(); return suiteState(d.instanceId); },
+    'canvas.suite.state': (d) => { needHub(d.instanceId); return suiteState(d.instanceId); },
   };
+  function needSuites() { if (!global.Suites) throw new Error('suites are not loaded'); return global.Suites; }
+  function needHub(id) { const r = need(live(id), id), s = global.Suites && global.Suites.get(r.ctx.params.get('suite')); if (!s) throw new Error(`${id} is not a suite window`); return r; }
+  function suiteState(hub) {
+    const S = global.Suites, r = live(hub);
+    return { instanceId: hub, suite: r.ctx.params.get('suite'), scene: r.ctx.params.get('scene') || null,
+      parts: S.status(K(), hub).map(x => ({ tool: x.part.tool, role: x.part.role || '', instanceId: x.instanceId || null, mixed: !!x.mixed })),
+      wiring: S.wiring(K(), hub).map(w => ({ from: w.wire.from, to: w.wire.to, on: w.on, possible: w.possible })) };
+  }
 
   let es = null, handled = 0;
   function connect() {

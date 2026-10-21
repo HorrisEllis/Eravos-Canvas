@@ -2,7 +2,7 @@
 // (the server both the web build and ERAVOS.exe use). A tool opened by name installs itself instead of failing with
 // "needs a pack" (MOUNT_001): the MIDI button opens the MIDI Map. Also: the web build serves what the exe serves (voice/).
 import { createRequire } from 'module'; import path from 'path'; import os from 'os'; import fs from 'fs'; import { fileURLToPath } from 'url';
-import { chromium } from 'playwright';
+import { chromium } from '../host/driver/glass.js';   // Clear Glass's driver, not Playwright (his call, 2026-10-21)
 const require = createRequire(import.meta.url), ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const g = await require('../host/glass.js').start({ root: ROOT, port: 0, data: fs.mkdtempSync(path.join(os.tmpdir(), 'eravos-fresh-')) });
 const b = await chromium.launch(), p = await (await b.newContext()).newPage(), errs = [];   // a new context = empty storage

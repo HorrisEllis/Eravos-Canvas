@@ -346,6 +346,24 @@
   function mapPoint(rect, w, h2, clientX, clientY) { const sx = rect.width > 0 && w > 0 ? w / rect.width : 1, sy = rect.height > 0 && h2 > 0 ? h2 / rect.height : 1; return { x: (clientX - rect.left) * sx, y: (clientY - rect.top) * sy }; }
   function toContent(el, clientX, clientY) { return mapPoint(el.getBoundingClientRect(), el.offsetWidth, el.offsetHeight, clientX, clientY); }
 
-  global.UIKit = { wheelStartedOn, h, fmt, mapper, ask, Knob, Fader, Toggle, Select, Segmented, Button, NumberDrag, Canvas, loop, paramControl, paramPanel, presetBar, hint, mapPoint, toContent, drag,
+  // 3.48.7 UIKit.fit(el, fn) — what is inside a window grows with it (eravos.phase48-map P48.7). fn({ w, h }) runs when el's
+  // laid-out size changes (the resize grip, ⤢, the dock), at most once a frame, and never for a size it already saw. It stops
+  // by itself once el has been on the page and leaves it. Sizes are the window's own pixels (canvas zoom does not change them).
+  function fit(el, fn) {
+    let last = '', raf = 0, seen = false, ro = null;
+    const run = () => {
+      raf = 0;
+      if (!el.isConnected) { if (seen && ro) { ro.disconnect(); ro = null; } return; }
+      seen = true; const w = el.clientWidth, h2 = el.clientHeight, k = w + 'x' + h2;
+      if (!w || k === last) return; last = k;
+      try { fn({ w, h: h2 }); } catch (e) { console.warn('UIKit.fit', e); }
+    };
+    const soon = () => { if (!raf) raf = global.requestAnimationFrame ? global.requestAnimationFrame(run) : global.setTimeout(run, 16); };
+    if (global.ResizeObserver) { ro = new global.ResizeObserver(soon); ro.observe(el); }
+    soon();
+    return { stop() { if (ro) ro.disconnect(); ro = null; }, now: run };
+  }
+
+  global.UIKit = { wheelStartedOn, h, fit, fmt, mapper, ask, Knob, Fader, Toggle, Select, Segmented, Button, NumberDrag, Canvas, loop, paramControl, paramPanel, presetBar, hint, mapPoint, toContent, drag,
     extend(o) { Object.keys(o || {}).forEach(k => { if (!(k in global.UIKit)) global.UIKit[k] = o[k]; }); } };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -1,0 +1,28 @@
+{
+  "schema": "eravos.suite/1",
+  "id": "music.synthesis-lab",
+  "label": "Synthesis Lab",
+  "icon": "🧪",
+  "accent": "#7c4dff",
+  "version": "1.0.0",
+  "blurb": "Sound from scratch, one job per tool. Morph Osc is the voice, an Envelope scans its morph on every note, an LFO moves its FM, and Partials layers a drawn spectrum under it. Each part is its own tool, and they all end in this suite.",
+  "hub": "eravos.suite",
+  "parts": [
+    { "tool": "eravos.syn-osc", "role": "voice", "required": true, "preset": "Morph Lead", "why": "the voice: a wave that morphs, with FM and ring inputs" },
+    { "tool": "eravos.syn-env", "role": "shape", "required": true, "preset": "Morph Scan", "why": "every note scans the morph, then it settles" },
+    { "tool": "eravos.lfo", "role": "motion", "preset": "Wobble 1/8", "why": "moves the FM in time" },
+    { "tool": "eravos.syn-partials", "role": "layer", "preset": "Glass Keys", "why": "a drawn spectrum under the voice" }
+  ],
+  "wiring": [
+    { "from": ["eravos.syn-env", "env.hook.mod_out"], "to": ["eravos.syn-osc", "mosc.hook.mod_morph"] },
+    { "from": ["eravos.lfo", "lfo.hook.mod_out"], "to": ["eravos.syn-osc", "mosc.hook.mod_fm"] }
+  ],
+  "output": ["eravos.syn-osc", "eravos.syn-partials"],
+  "starter": "Morph Lead",
+  "scenes": {
+    "Morph Lead": { "eravos.syn-osc": { "preset": "Morph Lead" }, "eravos.syn-env": { "preset": "Morph Scan" } },
+    "Glass Pad": { "eravos.syn-osc": { "preset": "Glass Pad" }, "eravos.syn-env": { "preset": "Slow Swell" }, "eravos.syn-partials": { "preset": "Glass Keys" } },
+    "Vowel Bass": { "eravos.syn-osc": { "preset": "Vowel Bass" }, "eravos.syn-env": { "preset": "Pluck Sweep" } },
+    "Pluck": { "eravos.syn-osc": { "preset": "Pluck" }, "eravos.syn-env": { "preset": "Pluck Sweep" }, "eravos.syn-partials": { "preset": "Mallet" } }
+  }
+}

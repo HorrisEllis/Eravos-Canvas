@@ -1,0 +1,24 @@
+/* eravos.suite — the suite window */
+.su { display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
+.su-head { display: flex; gap: 10px; align-items: flex-start; padding-bottom: 6px; border-bottom: 1px solid var(--line, #1a2533); }
+.su-big { font-size: 28px; line-height: 1; }
+.su-title { font-size: 15px; color: var(--acc, #ff2266); }
+.su-grow { flex: 1; min-width: 0; }
+.su-dim { color: var(--dim, #8fa1b6); font-size: 11px; line-height: 1.35; }
+.su-count { margin-top: 3px; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--dim, #8fa1b6); }
+.su-tabs { display: flex; gap: 4px; }
+.su-bar { display: flex; justify-content: flex-end; }
+.su-btn { background: #111a26; color: inherit; border: 1px solid var(--line2, #26364a); border-radius: 6px; padding: 3px 9px; cursor: pointer; font: inherit; white-space: nowrap; }
+.su-btn:hover { border-color: var(--acc, #ff2266); }
+.su-btn.on { color: var(--acc, #ff2266); border-color: var(--acc, #ff2266); }
+.su-btn.pri { background: color-mix(in srgb, var(--acc, #ff2266) 22%, #0b1119); border-color: var(--acc, #ff2266); font-weight: 700; }
+.su-row { display: flex; gap: 8px; align-items: center; padding: 5px 6px; border: 1px solid var(--line, #1a2533); border-radius: 6px; background: #0a0f16; }
+.su-row.on { border-color: color-mix(in srgb, var(--acc, #ff2266) 55%, #1a2533); background: color-mix(in srgb, var(--acc, #ff2266) 7%, #0a0f16); }
+.su-row.mixed { border-style: dashed; }
+.su-role { min-width: 56px; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: var(--acc, #ff2266); }
+.su-state { font-size: 10px; color: var(--dim, #8fa1b6); white-space: nowrap; }
+.su-row.on .su-state { color: #6fe3a1; }
+.su-h { margin: 8px 0 2px; font-size: 12px; color: var(--dim, #8fa1b6); }
+.su-ic { font-size: 20px; }
+.su-p { margin: 0; }
+.su-kb { margin-top: 4px; }

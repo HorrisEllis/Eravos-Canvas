@@ -1,5 +1,5 @@
 // Offline render of a recipe song (fast): node offline-song.mjs out.wav [stems]
-import { chromium } from 'playwright';
+import { chromium } from '../host/driver/glass.js';   // Clear Glass's driver, not Playwright (his call, 2026-10-21)
 import fs from 'fs';
 const OUT = '/tmp/claude-0/e2e';
 const vocal = fs.readFileSync(OUT + '/give_your_head_a_shake.wav').toString('base64');

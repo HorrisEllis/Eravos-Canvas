@@ -80,18 +80,41 @@
     }, 30);
     return c;
   }
-  // playable keyboard, scale-highlighted
+  // playable keyboard, scale-highlighted.
+  // 3.48.7 it grows with its window (eravos.phase48-map P48.7, D-48.7). The tool's own range [low, high] is the least it shows.
+  // A wider window adds whole white keys below and above in turn, so the register stays in the middle, up to a piano's 88 keys
+  // (A0 = 21 … C8 = 108). A narrower one gives them back. o.grow === false keeps the fixed range. o.keyWidth sets the px per white key.
+  // James, 2026-10-21: "make it so the tools expand when resized, like that way it can expand to capture the full range of piano keys"
+  const PIANO_LO = 21, PIANO_HI = 108, WHITE = [0, 2, 4, 5, 7, 9, 11];
+  const isWhite = (n) => WHITE.includes(((n % 12) + 12) % 12);
+  function keyRange(lo0, hi0, width, keyW) {
+    let a = Math.max(PIANO_LO, lo0), b = Math.min(PIANO_HI, hi0), whites = 0;
+    for (let n = a; n <= b; n++) if (isWhite(n)) whites++;
+    const want = Math.floor(width / (keyW || 24)); let below = true;
+    while (whites < want && (a > PIANO_LO || b < PIANO_HI)) {
+      if (below && a > PIANO_LO) { do { a--; } while (a > PIANO_LO && !isWhite(a)); whites++; }
+      else if (b < PIANO_HI) { do { b++; } while (b < PIANO_HI && !isWhite(b)); whites++; }
+      else { do { a--; } while (a > PIANO_LO && !isWhite(a)); whites++; }
+      below = !below;
+    }
+    return [a, b];
+  }
   function Keyboard(o) {
     const el = h('div', { class: 'uk-keys' });
-    const lo = o.low || 48, hi = o.high || 72;
+    const lo0 = o.low || 48, hi0 = o.high || 72;
+    let lo = lo0, hi = hi0;
     let root = (o.key && o.key.root) || 9, scale = (o.key && o.key.scale) || 'minor', lock = o.lock !== false;
-    const keys = [];
-    const white = [0, 2, 4, 5, 7, 9, 11];
-    for (let n = lo; n <= hi; n++) {
-      const isW = white.includes(n % 12);
-      const k = h('div', { class: 'uk-key ' + (isW ? 'w' : 'b'), 'data-n': n });
-      k.appendChild(h('span', { text: n % 12 === root % 12 ? global.MusicTheory.noteName(n).replace(/\d+$/, '') : '' }));
-      keys.push([n, k]); el.appendChild(k);
+    let keys = [];
+    function build() {
+      el.innerHTML = ''; keys = [];
+      for (let n = lo; n <= hi; n++) {
+        const k = h('div', { class: 'uk-key ' + (isWhite(n) ? 'w' : 'b'), 'data-n': n });
+        k.appendChild(h('span', { text: '' }));
+        k.addEventListener('pointerdown', (e) => down(e, n));
+        keys.push([n, k]); el.appendChild(k);
+      }
+      el.classList.toggle('grown', lo < lo0 || hi > hi0);
+      el.dataset.range = lo + '-' + hi;
     }
     const held = new Map();
     const down = (e, n) => {
@@ -101,14 +124,14 @@
       held.set(e.pointerId, play); o.onDown && o.onDown(play, 0.8); mark(play, true);
     };
     const up = (e) => { const n = held.get(e.pointerId); if (n !== undefined) { held.delete(e.pointerId); o.onUp && o.onUp(n); mark(n, false); } };
-    keys.forEach(([n, k]) => { k.addEventListener('pointerdown', (e) => down(e, n)); });
     el.addEventListener('pointerup', up); el.addEventListener('pointerleave', up); el.addEventListener('pointercancel', up);
     function mark(n, on) { keys.forEach(([m, k]) => { if (m === n) k.classList.toggle('down', on); }); }
     // P11.4 (gate A): playable from the keyboard — Tab to it, ←/→ pick a note (in key), Space or Enter plays it
     el.setAttribute('tabindex', '0'); el.setAttribute('role', 'group');
     const MTn = (n) => global.MusicTheory.noteName(n);
-    let cur = keys.find(([n]) => (n - root) % 12 === 0) ? keys.find(([n]) => (n - root) % 12 === 0)[0] : lo, kHeld = null;
-    const label = () => el.setAttribute('aria-label', `Keyboard — ${MTn(cur)} selected. Left and right arrows choose a note, Space plays it.`);
+    let cur = lo, kHeld = null;
+    for (let n = lo; n <= hi; n++) if ((n - root) % 12 === 0) { cur = n; break; }
+    const label = () => el.setAttribute('aria-label', `Keyboard ${MTn(lo)}–${MTn(hi)} — ${MTn(cur)} selected. Left and right arrows choose a note, Space plays it.`);
     const showCur = () => { keys.forEach(([n, k]) => k.classList.toggle('kcur', n === cur && el === doc.activeElement)); label(); };
     el.addEventListener('focus', showCur); el.addEventListener('blur', () => { keys.forEach(([, k]) => k.classList.remove('kcur')); if (kHeld !== null) { o.onUp && o.onUp(kHeld); mark(kHeld, false); kHeld = null; } });
     el.addEventListener('keydown', (e) => {
@@ -117,16 +140,25 @@
       if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); e.stopPropagation(); kHeld = cur; o.onDown && o.onDown(cur, 0.8); mark(cur, true); }
     });
     el.addEventListener('keyup', (e) => { if ((e.key === ' ' || e.key === 'Enter') && kHeld !== null) { e.preventDefault(); o.onUp && o.onUp(kHeld); mark(kHeld, false); kHeld = null; } });
-    label();
     function paint() {
+      const grown = lo < lo0 || hi > hi0;
       keys.forEach(([n, k]) => {
-        const inS = global.MusicTheory.inScale(n, root, scale);
-        k.classList.toggle('in', inS); k.classList.toggle('out', !inS && lock); k.classList.toggle('root', (n - root) % 12 === 0);
-        k.firstChild.textContent = (n - root) % 12 === 0 ? global.MusicTheory.noteName(n) : '';
+        const inS = global.MusicTheory.inScale(n, root, scale), isRoot = (n - root) % 12 === 0;
+        k.classList.toggle('in', inS); k.classList.toggle('out', !inS && lock); k.classList.toggle('root', isRoot);
+        // grown past its own range: every C carries its octave, so you can tell where you are
+        k.firstChild.textContent = isRoot || (grown && n % 12 === 0) ? global.MusicTheory.noteName(n) : '';
       });
+      // a note still held keeps its lit key across a rebuild
+      held.forEach(n => mark(n, true)); if (kHeld !== null) mark(kHeld, true);
     }
-    paint();
-    return { el, setKey(k) { root = k.root; scale = k.scale; paint(); }, setLock(v) { lock = v; paint(); }, mark };
+    function setRange(a, b) {
+      if (a === lo && b === hi && keys.length) return false;
+      lo = a; hi = b; if (cur < lo || cur > hi) cur = Math.max(lo, Math.min(hi, cur));
+      build(); paint(); label(); return true;
+    }
+    build(); paint(); label();
+    if (o.grow !== false && global.UIKit && global.UIKit.fit) global.UIKit.fit(el, ({ w }) => { const r = keyRange(lo0, hi0, w, o.keyWidth); setRange(r[0], r[1]); });
+    return { el, setKey(k) { root = k.root; scale = k.scale; paint(); }, setLock(v) { lock = v; paint(); }, mark, range: () => [lo, hi], own: [lo0, hi0], setWidth: (w) => { const r = keyRange(lo0, hi0, w, o.keyWidth); return setRange(r[0], r[1]); } };
   }
 
   function divisionLadder(view, key, options) {
@@ -201,5 +233,5 @@
     return { hit };
   }
   const presetBar = (view) => global.UIKit.presetBar(view), paramPanel = (v, k, op) => global.UIKit.paramPanel(v, k, op), hint = (t) => global.UIKit.hint(t);
-  UI.extend({ atTime, Meter, readLevel, Scope, Spectrum, Keyboard, divisionLadder, audioRouting, instrumentPanel, alive });
+  UI.extend({ atTime, Meter, readLevel, Scope, Spectrum, Keyboard, keyRange, divisionLadder, audioRouting, instrumentPanel, alive });
 })(typeof window !== 'undefined' ? window : globalThis);

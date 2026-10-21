@@ -58,3 +58,32 @@
   a suite page opens for each shipped suite with all six tabs · Load the whole system opens every required part, wired,
   on the starter scene · each part adds alone and wires into what is open · a scene sets every part · scenes and wiring
   pass the COS gates · tests: tests/p48-suites.test.js
+
+## ADDENDUM 2026-10-21 — the suite is the primary system; parts are tools; mixed and matched
+  James, 2026-10-21: "then need the tool suites to connect each tool with the mods. like how there is 4 wub tools, but no primay
+  system. like i want each tool to have its components as tools, then they all connect to the suite, but can be mixed and matched."
+  Context: the four wub tools existed, joined only by wub-osc's starter rig on its 📘 page (3.46 descriptor.suite). Map:
+  eravos.phase48-map.spec ADDENDUM 2026-10-21 (P48.5a/b built, P48.5c mapped). Decision D-48.5 there is the coder's reading,
+  marked to confirm.
+
+  The suite file gains (all optional, schema eravos.suite/1 unchanged in shape):
+    parts[].as: 'linked' (default, its own window) | 'mod' (lives in another part's slot: { slot, in: <part tool> })
+    parts[].preset: the preset it opens on
+    output: [<part tool>, ...]   the parts whose sound ends in the suite (default: every linked part with an audio out and no
+                                 audio wire to another part in `wiring`)
+  THE SUITE WINDOW — tool eravos.suite (music domain, tools/music/tools/suites/suite/). Its config `suite` names the suite id.
+    engine: audio in (every part's last sound) → level → audio out (Master by default). No sound of its own.
+    tabs:
+      Parts    each part: role, label, state (here and wired / here, not wired / not here), ＋ add / ↗ go / ⤓ wire it in;
+               "＋ Build the whole system" (every required part, wired, starter scene); "Mix in" lists the parts of every
+               other suite and any tool, ＋ adds it wired into what is here
+      Scenes   ▶ Load a scene: sets every part that is here (opens missing required parts first)
+      Wiring   the suite's wires, each ✓ when it is on the canvas, ＋ when it is not
+    membership: a part is any window wired into the suite window, or opened by it (kept in its state `members`, saved).
+    every action is the normal undoable action (spawn, ui:preset_load, kernel wires, Mods.add).
+  The 3.46 descriptor.suite stays (a tool's starter rig). wub-osc's rig and music.wub-lab name the same tools, and both are kept.
+  Built 2026-10-21: canvas/runtime/suites.js · tools/music/tools/suites/suite/ · tools/music/suites/{wub-lab,synthesis-lab}/suite.json ·
+  schemas/suite.schema.json (adds parts[].notes and hub, which the 1.0.0 file format above did not have) · ＋ Add cards · Glass
+  canvas.suite.* commands. Rule found while building: a part that joined the suite directly because the part it feeds was missing
+  (Wub Osc before Wub Filter) is unwired from the suite when that part arrives. Without it the voice is heard twice
+  (tests/p48-suites.test.js, "one part at a time").

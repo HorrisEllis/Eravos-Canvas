@@ -4,7 +4,7 @@
  * them), time the render, report cost = render-time / audio-time (1.00 = one full CPU core in real time).
  * Then the 20-tool scene from tests/p17 and a Song Engine song. Offline rendering is a proxy for the audio thread:
  * it runs the same graph on one core, without the real-time deadline — the numbers rank tools and catch regressions. */
-import { chromium } from 'playwright';
+import { chromium } from '../host/driver/glass.js';   // Clear Glass's driver, not Playwright (his call, 2026-10-21)
 import fs from 'fs'; import path from 'path'; import os from 'os'; import { fileURLToPath } from 'url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });

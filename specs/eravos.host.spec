@@ -93,3 +93,15 @@ tests: tests/host.test.mjs (node; Chromium for Glass end to end)
   Desktop-only by nature: desktop-bridge (drop/ packs/ projects/ exports/ folders). OrganismFactory.spawn of a tool the
   catalog knows but the profile has not installed installs it and opens it (spawnAsync) — no MOUNT_001 on a fresh profile.
   tests/fresh-profile.mjs.
+
+
+## ADDENDUM 2026-10-21 — Clear Glass's driver; suite commands
+  James, 2026-10-21: "not playright. isn't clearglass in this project". Context: the coder had started the test run on Playwright.
+  ERAVOS Glass had come from Nexus without the page driver that replaced Playwright there (Nexus §0.39.263).
+  - host/driver/glass.js + glass-host/ is Nexus's clear-glass/src/driver, copied so ERAVOS needs no Nexus checkout. It uses Clear
+    Glass's Electron if installed (node_modules or desktop/node_modules), else any Chromium over DevTools. Added for ERAVOS:
+    launch({ args }), 'crash', element screenshot/boundingBox, and screenshot({ clip }). Every tests/*.mjs and build/*.mjs uses it.
+    tests/no-playwright.mjs is the guard. Known exceptions, listed by the guard: desktop/test/{bare,skel}.mjs, which launch the
+    packaged app (Playwright's _electron), a mode the driver does not have.
+  - commands: canvas.suites · canvas.suite.open {suite, build?} · canvas.suite.build {instanceId} · canvas.suite.add {instanceId,
+    tool, preset?} · canvas.suite.scene {instanceId, name} · canvas.suite.state {instanceId} (eravos.suites ADDENDUM 2026-10-21)
