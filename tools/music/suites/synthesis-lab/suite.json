@@ -6,7 +6,7 @@
   "accent": "#7c4dff",
   "version": "1.0.0",
   "blurb": "Sound from scratch, one job per tool. Morph Osc is the voice, an Envelope scans its morph on every note, an LFO moves its FM, and Partials layers a drawn spectrum under it. Each part is its own tool, and they all end in this suite.",
-  "hub": "eravos.suite",
+  "hub": "eravos.suite-hub",
   "parts": [
     { "tool": "eravos.syn-osc", "role": "voice", "required": true, "preset": "Morph Lead", "why": "the voice: a wave that morphs, with FM and ring inputs" },
     { "tool": "eravos.syn-env", "role": "shape", "required": true, "preset": "Morph Scan", "why": "every note scans the morph, then it settles" },

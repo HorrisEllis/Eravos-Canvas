@@ -11,7 +11,9 @@ describe('Odd Couples — a pack for every tool, songs from tools that never mee
     const all = Songbook.all(); OC().songs.forEach(id => { const s = all.find(x => x.id === id); assert.ok(s, id); assert.ok(s.mood.includes('odd'), id + ' tagged odd'); });
   });
   it('every music tool has an Odd Couples pack', () => {
-    const missing = []; OrganismFactory.defined().filter(d => d.domain === 'music').forEach(d => { if (!ContentPacks.list({ tool: d.id }).some(p => p.id === d.id.replace('eravos.', '') + '.odd-couples')) missing.push(d.id); });
+    // a tool with no sound of its own declares noPacks (3.48 the suite window: nothing to preset) — listed, not hidden
+    const skipped = OrganismFactory.defined().filter(d => d.domain === 'music' && d.noPacks).map(d => d.id); assert.deepEqual(skipped, ['eravos.suite-hub'], 'tools without packs');
+    const missing = []; OrganismFactory.defined().filter(d => d.domain === 'music' && !d.noPacks).forEach(d => { if (!ContentPacks.list({ tool: d.id }).some(p => p.id === d.id.replace('eravos.', '') + '.odd-couples')) missing.push(d.id); });
     assert.equal(missing.join(', '), '');
   });
   it('every preset a song names exists in that tool (none falls back silently)', () => {
@@ -24,7 +26,8 @@ describe('Odd Couples — a pack for every tool, songs from tools that never mee
     genres().forEach(G => used(G).forEach(([org]) => inSet.add(org)));
     const notUsed = OrganismFactory.defined().filter(d => d.domain === 'music' && !inSet.has(d.id)).map(d => d.id);
     // not song material: the recorder, the mixer view, the coach, MIDI mapping, the contrast analyser, the sequencer (songs use the Timeline)
-    const ALLOWED = ['eravos.song-recorder', 'eravos.mixer', 'eravos.coach', 'eravos.midi-mapper', 'eravos.contrast-analyser', 'eravos.sequencer'];
+    // 3.48 the suite window (eravos.suite-hub): the system its parts end in, no sound of its own
+    const ALLOWED = ['eravos.suite-hub', 'eravos.song-recorder', 'eravos.mixer', 'eravos.coach', 'eravos.midi-mapper', 'eravos.contrast-analyser', 'eravos.sequencer'];
     assert.equal(notUsed.filter(id => !ALLOWED.includes(id)).join(', '), '');
   });
   it('pairs that never meet: no genre shares its organ / choir / 303 / xen / dub pairing with another family', () => {

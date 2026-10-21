@@ -2,7 +2,7 @@
  * Tabs: Parts (each part here / not here / wired, ＋ add it, ↗ go to it, Mix in parts of other suites) · Scenes · Wiring.
  * A keyboard plays every part that takes notes (a part with notes: false follows another part on its own).
  * Every button is the user's own action through window.Suites (spawn, preset, wire, Mods.add), so Ctrl+Z takes it back. */
-OrganismFactory.reg('eravos.suite', function (view) {
+OrganismFactory.reg('eravos.suite-hub', function (view) {
   const UI = view.ui, h = UI.h, K = view.K, me = view.instanceId, Su = window.Suites;
   const win = view.root.closest ? view.root.closest('.wm-win') : null;
   const el = h('div', { class: 'su' }); view.root.appendChild(el);

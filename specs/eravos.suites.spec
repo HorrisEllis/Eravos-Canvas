@@ -71,7 +71,7 @@
     parts[].preset: the preset it opens on
     output: [<part tool>, ...]   the parts whose sound ends in the suite (default: every linked part with an audio out and no
                                  audio wire to another part in `wiring`)
-  THE SUITE WINDOW — tool eravos.suite (music domain, tools/music/tools/suites/suite/). Its config `suite` names the suite id.
+  THE SUITE WINDOW — tool eravos.suite-hub (music domain, tools/music/tools/suites/suite-hub/). Its config `suite` names the suite id.
     engine: audio in (every part's last sound) → level → audio out (Master by default). No sound of its own.
     tabs:
       Parts    each part: role, label, state (here and wired / here, not wired / not here), ＋ add / ↗ go / ⤓ wire it in;
@@ -82,7 +82,7 @@
     membership: a part is any window wired into the suite window, or opened by it (kept in its state `members`, saved).
     every action is the normal undoable action (spawn, ui:preset_load, kernel wires, Mods.add).
   The 3.46 descriptor.suite stays (a tool's starter rig). wub-osc's rig and music.wub-lab name the same tools, and both are kept.
-  Built 2026-10-21: canvas/runtime/suites.js · tools/music/tools/suites/suite/ · tools/music/suites/{wub-lab,synthesis-lab}/suite.json ·
+  Built 2026-10-21: canvas/runtime/suites.js · tools/music/tools/suites/suite-hub/ · tools/music/suites/{wub-lab,synthesis-lab}/suite.json ·
   schemas/suite.schema.json (adds parts[].notes and hub, which the 1.0.0 file format above did not have) · ＋ Add cards · Glass
   canvas.suite.* commands. Rule found while building: a part that joined the suite directly because the part it feeds was missing
   (Wub Osc before Wub Filter) is unwired from the suite when that part arrives. Without it the voice is heard twice

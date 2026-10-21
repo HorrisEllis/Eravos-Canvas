@@ -1,6 +1,6 @@
 {
   "schema": "eravos.tool/1",
-  "id": "eravos.suite",
+  "id": "eravos.suite-hub",
   "version": "1.0.0",
   "label": "Suite",
   "icon": "🧰",
@@ -14,11 +14,11 @@
     "wubs"
   ],
   "files": {
-    "engine": "suite.engine.js",
-    "ui": "suite.ui.js",
-    "spec": "suite.spec",
-    "tests": "suite.test.js",
-    "css": "suite.css",
+    "engine": "suite-hub.engine.js",
+    "ui": "suite-hub.ui.js",
+    "spec": "suite-hub.spec",
+    "tests": "suite-hub.test.js",
+    "css": "suite-hub.css",
     "preview": "preview.png"
   },
   "needs": {

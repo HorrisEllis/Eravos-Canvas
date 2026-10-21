@@ -111,7 +111,7 @@
         Amended by his words above; see eravos.suites.spec ADDENDUM 2026-10-21. Built in three parts:
         P48.5a  suite data: schemas/suite.schema.json · canvas/runtime/suites.js (window.Suites, domain-free) · the indexer
                 writes every tools/<d>/suites/<id>/suite.json into tools/catalog.js · first suite: music.wub-lab.  built
-        P48.5b  THE SUITE WINDOW — the primary system: tool eravos.suite (tools/music/tools/suites/suite/). One window per
+        P48.5b  THE SUITE WINDOW — the primary system: tool eravos.suite-hub (tools/music/tools/suites/suite-hub/; first named eravos.suite, renamed the same day because a tool named "suite" made the domain-free canvas unable to say the word — tests/boundary.test.js). One window per
                 suite, which any number of parts connect to. The parts' sound ends in it. Tabs: Parts · Scenes · Wiring. built
                 Also built: each suite is a card in ＋ Add (canvas/runtime/add-menu.js, category Suites); ERAVOS Glass gained
                 canvas.suites · canvas.suite.open {suite, build?} · .build · .add · .scene · .state (glass-link.js, host/glass.js,
@@ -132,10 +132,17 @@
           more than one key. The tool's own range is the floor, so no tool shows fewer keys than it does today (§0.3,
           nothing lost).
   D-48.5  "no primay system" read as: the suite is a thing on the canvas that its parts connect to. The coder's reading
-          (to confirm): a SUITE WINDOW (eravos.suite) with an audio input that every part's last sound goes into, a level,
+          (to confirm): a SUITE WINDOW (eravos.suite-hub) with an audio input that every part's last sound goes into, a level,
           and an output to Master. Every part stays a tool of its own (its own window, presets, mods). "Connect" is then a
           real wire you can see and pull. "Mixed and matched" means three things: ＋ any part of any suite into this one
           (it joins by the first ports that fit), any tool dropped on the suite window joins it, and closing a part never
           breaks the others.
           Why a window and not only a page: the page (P48.5c) never owns state (suites spec). A system you play needs one
           place that holds it and stays on the canvas. The window maximised (⤢) is that system full-screen.
+  Run 2026-10-21, after commit 1f584d0: the full suite was 1021/1024. Two causes, both the coder's:
+    (1) The tool was named eravos.suite, which made "suite" a tool name. tests/boundary.test.js then refused the word in canvas/,
+        where it is a canvas idea (tool-page had it since 3.46). Fix: the tool is eravos.suite-hub.
+    (2) tests/p43-odd-couples.test.js wants an Odd Couples pack and a song part for every music tool. The suite window has no
+        sound and no presets, so it declares noPacks. The test lists what it skips, and it joins the "not song material" list with
+        the mixer and the recorder.
+  After the fix: 1024/1024 on Clear Glass's driver · host 15/15 · tests/no-playwright.mjs ✓ · build/validate.mjs 214 manifests ✓.

@@ -6,7 +6,7 @@
   "accent": "#ff2266",
   "version": "1.0.0",
   "blurb": "The wub, built from parts. Wub Osc is the voice, Wub Filter the mouth it speaks through, Wub Rate the rhythm that opens the mouth, Wub Sub the clean low end. An Envelope opens the growl on every note; a Destroyer inside the osc gives it teeth. Every part is its own tool, and they all end in this suite.",
-  "hub": "eravos.suite",
+  "hub": "eravos.suite-hub",
   "parts": [
     { "tool": "eravos.wub-osc", "role": "voice", "required": true, "preset": "Classic Wub Saw", "why": "the raw tone — saw, square, reese, FM growl" },
     { "tool": "eravos.wub-filter", "role": "mouth", "required": true, "preset": "Yoi Vowel (OO → AH)", "why": "the vowel filter the voice speaks through" },

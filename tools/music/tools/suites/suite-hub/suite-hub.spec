@@ -1,8 +1,8 @@
-# spec_id: eravos.suite · version 1.0.0 · status built · template eravos.tool/1 (sound flavour) · map eravos.phase48-map P48.5b
+# spec_id: eravos.suite-hub · version 1.0.0 · status built · template eravos.tool/1 (sound flavour) · map eravos.phase48-map P48.5b
 # James, 2026-10-21: "like how there is 4 wub tools, but no primay system. like i want each tool to have its components as tools,
 #  then they all connect to the suite, but can be mixed and matched."
 identity:
-  id: eravos.suite ; label: Suite (the window shows the suite's own name) ; domain: music ; category: suites (Suites)
+  id: eravos.suite-hub ; label: Suite (the window shows the suite's own name) ; domain: music ; category: suites (Suites)
   purpose: a suite's own window, the primary system. Every part stays its own tool, and every part ends here.
 ports:
   in:  in (audio, every output part's last sound) · mod.level

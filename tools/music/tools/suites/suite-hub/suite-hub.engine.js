@@ -8,7 +8,7 @@
   'use strict';
   const S = OrganismSDK.STD;
   OrganismFactory.define({
-    id: 'eravos.suite', domain: 'music', version: '1.0.0', label: 'Suite', icon: '🧰', accent: '#ff2266',
+    id: 'eravos.suite-hub', domain: 'music', version: '1.0.0', label: 'Suite', icon: '🧰', accent: '#ff2266',
     category: 'Suites', blurb: 'A suite’s own window: every part is still its own tool, and they all end here. Build the whole system, add parts one by one, load a scene, mix in parts from other suites.',
     size: { w: 460, h: 560 }, minSize: { w: 340, h: 300 },
     permissions: ['audio_in', 'audio_out', 'bus_publish', 'bus_subscribe', 'registry_read'],
@@ -25,6 +25,8 @@
     ],
     ui_hooks: [],
     presets: {},
+    // no sound of its own, so nothing to preset: no Odd Couples pack, no part in a song (tests/p43-odd-couples.test.js skips it, saying so)
+    noPacks: true,
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params;
       const inp = ac.createGain(), level = ac.createGain(); level.gain.value = P.get('level');

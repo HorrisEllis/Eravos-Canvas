@@ -9,7 +9,7 @@
  * (directly or through each other), plus the mods living inside them. Wire any tool in and it belongs; pull the wire and it
  * doesn't. Nothing to drift.
  * Every action is the user's own (spawn, ui:preset_load, ui:config_change, kernel wires, Mods.add), so all of it is undoable
- * and saved with the session.
+ * and saved with the canvas.
  *   add(suite) · get(id) · list() · forTool(toolId) · outputs(suite)
  *   open(id, {K,x,y}) → the suite window · members(K, hubId) → Map(instanceId → toolId) · status(K, hubId)
  *   addPart(K, hubId, toolId, {preset?}) · build(K, hubId) · scene(K, hubId, name) · wiring(K, hubId) · mixable(id) */
