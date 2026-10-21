@@ -123,6 +123,11 @@ await it('suites through the door: list, open and build Wub Lab, mix in a part o
   ok((await cmd('canvas.suite.scene', { instanceId: o.result.instanceId, name: 'Nope' })).error.includes('no scene'), 'unknown scene refused');
   ok((await cmd('canvas.suite.state', { instanceId: o.result.instanceId })).result.wiring.every(w => w.on || !w.possible), 'every wire whose two ends are here is on');
 });
+await it('the EDM Lab suite through the door: open built, turn ENERGY, fold the part windows', async () => {
+  const o = await cmd('canvas.suite.open', { suite: 'music.edm-lab', build: true }); ok(o.ok && o.result.parts.filter(x => x.instanceId).length === 6, JSON.stringify(o).slice(0, 300));
+  const m = await cmd('canvas.suite.macro', { instanceId: o.result.instanceId, index: 0, value: 0.9 }); ok(m.ok && m.result.macro === 'ENERGY' && m.result.parts === 3, JSON.stringify(m));
+  const f = await cmd('canvas.suite.fold', { instanceId: o.result.instanceId }); ok(f.ok && f.result.windows === 6, JSON.stringify(f));
+});
 await it('SSE: an outside listener sees commands and page events', async () => {
   const ctl = new AbortController(), r = await fetch(g.url + 'glass/events?replay=5', { signal: ctl.signal }), rd = r.body.getReader(); let txt = '';
   const t0 = Date.now(); while (Date.now() - t0 < 3000 && !txt.includes('"type"')) { const { value } = await rd.read(); txt += new TextDecoder().decode(value); }

@@ -50,12 +50,17 @@
     'canvas.suite.add': async (d) => { const S = needSuites(); needHub(d.instanceId); if (!F().def(d.tool)) throw new Error('no tool ' + d.tool); const id = S.addPart(K(), d.instanceId, d.tool, { preset: d.preset }); if (!id) throw new Error(d.tool + ' could not join'); await settle(); return Object.assign({ added: id }, suiteState(d.instanceId)); },
     'canvas.suite.scene': async (d) => { const S = needSuites(), r = needHub(d.instanceId), s = S.get(r.ctx.params.get('suite')); if (!s.scenes[d.name]) throw new Error(`${s.label} has no scene “${d.name}”`); S.scene(K(), d.instanceId, d.name); await settle(); return suiteState(d.instanceId); },
     'canvas.suite.state': (d) => { needHub(d.instanceId); return suiteState(d.instanceId); },
+    // P48.8 the suite as a control panel
+    'canvas.suite.macro': async (d) => { const S = needSuites(), r = needHub(d.instanceId), s = S.get(r.ctx.params.get('suite')), i = d.index | 0; if (!(s.macros || [])[i]) throw new Error(`${s.label} has no macro ${i}`); const n = S.macro(K(), d.instanceId, i, d.value); await settle(); return { macro: s.macros[i].label, value: r.ctx.params.get('m' + (i + 1)), parts: n }; },
+    'canvas.suite.fold': async (d) => { const S = needSuites(); needHub(d.instanceId); const n = S.fold(K(), d.instanceId, d.on !== false); await settle(); return { folded: d.on !== false, windows: n }; },
   };
   function needSuites() { if (!global.Suites) throw new Error('suites are not loaded'); return global.Suites; }
   function needHub(id) { const r = need(live(id), id), s = global.Suites && global.Suites.get(r.ctx.params.get('suite')); if (!s) throw new Error(`${id} is not a suite window`); return r; }
   function suiteState(hub) {
     const S = global.Suites, r = live(hub);
+    const su = S.get(r.ctx.params.get('suite'));
     return { instanceId: hub, suite: r.ctx.params.get('suite'), scene: r.ctx.params.get('scene') || null,
+      macros: ((su && su.macros) || []).map((m, i) => ({ index: i, label: m.label, value: r.ctx.params.get('m' + (i + 1)) })),
       parts: S.status(K(), hub).map(x => ({ tool: x.part.tool, role: x.part.role || '', instanceId: x.instanceId || null, mixed: !!x.mixed })),
       wiring: S.wiring(K(), hub).map(w => ({ from: w.wire.from, to: w.wire.to, on: w.on, possible: w.possible })) };
   }

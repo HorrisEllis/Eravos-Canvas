@@ -85,6 +85,7 @@ describe('P48.5 · suites as systems — the suite window and its parts', () => 
     try {
       const win = CanvasWM.windowOf(hub);
       assert.equal(win.querySelector('.wm-title').textContent, 'Wub Lab');
+      Array.from(win.querySelectorAll('.su-tabs button')).find(b => b.dataset.tab === 'parts').click(); await TH.sleep(10);   // P48.8: it opens on Panel
       assert.equal(win.querySelectorAll('.su-part').length, 6, 'six parts listed');
       win.querySelector('.su-build').click(); await TH.sleep(60);
       assert.equal(win.querySelectorAll('.su-part.on').length, 4, 'the four required parts are here (the optional ones wait for ＋)');

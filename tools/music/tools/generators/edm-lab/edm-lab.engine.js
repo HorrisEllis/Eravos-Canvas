@@ -20,8 +20,8 @@
     return m;
   }
   OrganismFactory.define({
-    id: 'eravos.edm-lab', domain: 'music', version: '3.0.0', label: 'EDM Lab', icon: '⚗', accent: '#ff2266', phase: 'P6',
-    category: 'Generators', blurb: 'Paint where the rhythm is busy, turn TENSION: drums, bass and chords follow — always in key.',
+    id: 'eravos.edm-lab', domain: 'music', version: '3.0.0', label: 'EDM Lab (all-in-one)', icon: '⚗', accent: '#ff2266', phase: 'P6',
+    category: 'Generators', blurb: 'The original all-in-one: paint the rhythm, turn TENSION — drums, bass and chords inside one window. The EDM Lab suite (＋ Add › Suites) is the same idea built from parts you can swap.',
     size: { w: 760, h: 500 }, minSize: { w: 560, h: 380 },
     permissions: ['audio_out', 'bus_publish', 'bus_subscribe', 'registry_read'],
     provides: ['capability.audio_out', 'capability.generation'],

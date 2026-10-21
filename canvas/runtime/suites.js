@@ -5,14 +5,16 @@
  * James, 2026-10-21: "like how there is 4 wub tools, but no primay system. like i want each tool to have its components as
  * tools, then they all connect to the suite, but can be mixed and matched."
  *
- * Membership is read from the wires and never stored: the members of a suite window are every window joined to it by wires
- * (directly or through each other), plus the mods living inside them. Wire any tool in and it belongs; pull the wire and it
- * doesn't. Nothing to drift.
+ * Membership is read from the wires: the members of a suite window are every window joined to it by wires (directly or through
+ * each other), plus the mods living inside them — wire any tool in and it belongs; pull the wire and it doesn't. Also members:
+ * the parts the suite window opened itself (config `opened`, live ones only), since a generator has no wire to the suite until
+ * its instrument is here (P48.10 finding).
  * Every action is the user's own (spawn, ui:preset_load, ui:config_change, kernel wires, Mods.add), so all of it is undoable
  * and saved with the canvas.
  *   add(suite) · get(id) · list() · forTool(toolId) · outputs(suite)
  *   open(id, {K,x,y}) → the suite window · members(K, hubId) → Map(instanceId → toolId) · status(K, hubId)
- *   addPart(K, hubId, toolId, {preset?}) · build(K, hubId) · scene(K, hubId, name) · wiring(K, hubId) · mixable(id) */
+ *   addPart(K, hubId, toolId, {preset?}) · build(K, hubId) · scene(K, hubId, name) · wiring(K, hubId) · mixable(id) ·
+ *   macro(K, hubId, i, 0…1) · fold(K, hubId, on) — P48.8, the suite as a control panel */
 (function (global) {
   'use strict';
   const suites = new Map();
@@ -67,9 +69,13 @@
 
   // ---------------------------------------------------------------- the suite window and who belongs to it
   const suiteOf = (K, hubId) => { const r = live(hubId); return r ? get(r.ctx.params.get('suite')) : null; };
+  // the parts this suite window opened (its config `opened`) belong until they close — a generator has no wire to the suite until
+  // its instrument is here (found 2026-10-21: EDM Lab's Groove opened, joined nothing, and the starter scene opened a second one)
+  const opened = (hubId) => { const r = live(hubId), v = r && r.ctx.params.get('opened'); return Array.isArray(v) ? v.filter(id => live(id)) : []; };
+  function remember(K, hubId, id) { const v = opened(hubId); if (!v.includes(id)) K.bus.publish('ui:config_change:' + hubId, { key: 'opened', value: v.concat([id]) }); }
   function members(K, hubId) {
     const out = new Map(); if (!live(hubId)) return out;
-    const seen = new Set([hubId]), todo = [hubId], ws = K.wires.list();
+    const seen = new Set([hubId].concat(opened(hubId))), todo = Array.from(seen), ws = K.wires.list();
     while (todo.length) {
       const id = todo.pop();
       ws.forEach(w => {
@@ -124,7 +130,15 @@
     if (!s.hub || !F().def(s.hub)) { K.fault('MOUNT_001', { organism_id: s.hub || '?', message: `suite ${id}: its suite window (${s.hub}) is not installed` }); return null; }
     const hub = F().spawn(s.hub, Object.assign({ K }, o.x !== undefined ? { x: o.x, y: o.y } : {})); if (!hub) return null;
     K.bus.publish('ui:config_change:' + hub, { key: 'suite', value: id });
+    (s.macros || []).forEach((m, i) => { if (typeof m.default === 'number') K.bus.publish('ui:config_change:' + hub, { key: 'm' + (i + 1), value: m.default }); });   // the knobs show the suite's own start
     return hub;
+  }
+  // a fresh profile has not installed the suite window or its parts yet: install them all, then open (→ Promise<hubId | null>)
+  async function openAsync(id, o) {
+    o = o || {}; const K = o.K || global.Kernel, s = get(id); if (!s) return null;
+    const C = global.Catalog, want = [s.hub].concat(s.parts.map(p => p.tool)).filter(t => !F().def(t) && C && C.meta && C.meta(t));
+    if (want.length) await C.install(want, K);
+    return open(id, o);
   }
   // join a part to what is here: the suite's own wires first, then (an output part) into the suite window, then (mixed in)
   // the first ports that fit any member, then the suite window
@@ -163,6 +177,7 @@
       return global.Mods.childOf(host, u) || u;
     }
     const id = F().spawn(toolId, Object.assign({ K }, placeNear(hubId, members(K, hubId).size))); if (!id) return null;
+    remember(K, hubId, id);
     presetLoad(K, id, o.preset || p.preset);
     join(K, hubId, id, toolId);
     return id;
@@ -193,5 +208,30 @@
     return n;
   }
 
-  global.Suites = { add, get, list, forTool, outputs, mixable, open, members, status, wiring, addPart, build, scene, instanceOf: (K, hubId, t) => instanceOf(K, hubId, t) };
+  // P48.8 macros: suite.json macros[i] = { label, default?, targets: [{ tool, key, min?, max? }] }. One value 0…1 turns each target
+  // part's key across its range (its own min…max unless the suite narrows it). The suite window keeps the value as m1…m4.
+  function macro(K, hubId, i, v) {
+    const s = suiteOf(K, hubId), m = s && (s.macros || [])[i]; if (!m) return 0;
+    v = Math.max(0, Math.min(1, +v || 0)); const ms = members(K, hubId); let n = 0;
+    K.bus.publish('ui:config_change:' + hubId, { key: 'm' + (i + 1), value: v });
+    (m.targets || []).forEach(t => {
+      for (const [id, tool] of ms) {
+        if (tool !== t.tool) continue;
+        const c = (live(id).def.config || []).find(x => x.key === t.key); if (!c) continue;
+        const lo = t.min !== undefined ? t.min : c.min, hi = t.max !== undefined ? t.max : c.max; if (typeof lo !== 'number' || typeof hi !== 'number') continue;
+        let x = lo + v * (hi - lo); if (c.type === 'integer') x = Math.round(x); else if (c.step) x = Math.round(x / c.step) * c.step;
+        K.bus.publish('ui:config_change:' + id, { key: t.key, value: +x.toFixed(6) }); n++;
+      }
+    });
+    return n;
+  }
+  // P48.8 the panel is where you play: fold every part window to its title bar (or open them again)
+  function fold(K, hubId, on) {
+    const WM = global.CanvasWM; if (!WM || !WM.windowOf) return 0; let n = 0;
+    members(K, hubId).forEach((tool, id) => { const w = WM.windowOf(id); if (!w) return; w.classList.toggle('collapsed', !!on); n++; });
+    K.bus.publish('canvas:layout', {});
+    return n;
+  }
+
+  global.Suites = { add, get, list, forTool, outputs, mixable, open, openAsync, members, status, wiring, addPart, build, scene, macro, fold, instanceOf: (K, hubId, t) => instanceOf(K, hubId, t) };
 })(typeof window !== 'undefined' ? window : globalThis);

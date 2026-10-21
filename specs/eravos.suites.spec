@@ -87,3 +87,15 @@
   canvas.suite.* commands. Rule found while building: a part that joined the suite directly because the part it feeds was missing
   (Wub Osc before Wub Filter) is unwired from the suite when that part arrives. Without it the voice is heard twice
   (tests/p48-suites.test.js, "one part at a time").
+
+## ADDENDUM 2026-10-21 (later) — the suite as a control panel; EDM Lab as a suite
+  James, 2026-10-21: "the suite should be like a synthesis tool of the respective tools. Like the edm lab needs rebuilt. like a control
+  panel of the respective tools. basically to group them, like anything form a tool that other tools can use need to be decomposed,
+  and grouped by the tool suite". The coder's reading, R1 and R2 in eravos.phase48-map, is marked to confirm.
+  - The suite window opens on PANEL: the suite's macros (suite.json macros[], up to 4, kept as m1…m4 on the window), then one card
+    per part with its main controls, ⤢ its whole face, ▾ fold, ↗ its window. A part's mods show on its card. "Fold the part
+    windows" leaves only their title bars.
+  - Membership = everything wired to the suite window, plus the parts it opened (config `opened`, live ones only).
+  - Suite music.edm-lab (4.0.0): Groove → Pads · Chords → Pad Forge · Bassline → Reese Bass · Chords → Bassline (chord) ·
+    Groove → Bassline (kick) · optional Bass Drop Builder. Macros ENERGY, TENSION, SWING. Scenes Dubstep, UKG, House, Neuro.
+  - Glass: canvas.suite.macro {instanceId, index, value} · canvas.suite.fold {instanceId, on?}

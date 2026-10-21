@@ -29,6 +29,26 @@
                         "type": "number",
                         "minimum": 0,
                         "maximum": 1.5
+                      },
+                      "m1": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "m2": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "m3": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "m4": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
                       }
                     },
                     "additionalProperties": false

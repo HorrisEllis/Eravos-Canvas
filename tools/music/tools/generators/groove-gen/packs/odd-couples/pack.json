@@ -1,0 +1,35 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "groove-gen.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "ERAVOS",
+ "tags": [
+  "odd-couples"
+ ],
+ "for": "eravos.groove-gen",
+ "enabled": true,
+ "items": {
+  "eravos.groove-gen": {
+   "presets": {
+    "Gospel Shuffle": {
+     "params": {
+      "style": "ukg",
+      "energy": 0.5,
+      "swing": 0.45,
+      "seed": 41
+     }
+    },
+    "Organ Hall Stomp": {
+     "params": {
+      "style": "house",
+      "energy": 0.9,
+      "swing": 0,
+      "seed": 303
+     }
+    }
+   }
+  }
+ }
+}

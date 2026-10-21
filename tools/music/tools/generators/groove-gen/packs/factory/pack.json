@@ -1,0 +1,55 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "groove-gen.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "ERAVOS",
+ "tags": [
+  "factory",
+  "edm"
+ ],
+ "for": "eravos.groove-gen",
+ "enabled": true,
+ "items": {
+  "eravos.groove-gen": {
+   "presets": {
+    "Dubstep Half-time": {
+     "params": {
+      "style": "dubstep",
+      "energy": 0.7,
+      "swing": 0.05
+     }
+    },
+    "UKG Shuffle": {
+     "params": {
+      "style": "ukg",
+      "energy": 0.65,
+      "swing": 0.3
+     }
+    },
+    "House Four": {
+     "params": {
+      "style": "house",
+      "energy": 0.7,
+      "swing": 0.08
+     }
+    },
+    "Neuro Roll": {
+     "params": {
+      "style": "neuro",
+      "energy": 0.85,
+      "swing": 0.02
+     }
+    },
+    "Breaks": {
+     "params": {
+      "style": "breaks",
+      "energy": 0.6,
+      "swing": 0.15
+     }
+    }
+   }
+  }
+ }
+}

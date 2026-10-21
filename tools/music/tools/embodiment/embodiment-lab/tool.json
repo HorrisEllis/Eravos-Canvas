@@ -45,8 +45,10 @@
   "works_with": [
     "eravos.acid-synth",
     "eravos.bass-forge",
+    "eravos.bass-gen",
     "eravos.breath",
     "eravos.channel",
+    "eravos.chord-gen",
     "eravos.clip-maker",
     "eravos.contrast-analyser",
     "eravos.coven",
@@ -63,6 +65,7 @@
     "eravos.fx-phaser",
     "eravos.fx-pitch",
     "eravos.granular",
+    "eravos.groove-gen",
     "eravos.harmonic-analyzer",
     "eravos.lfo",
     "eravos.macro-automation",

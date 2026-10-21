@@ -35,12 +35,14 @@
     const Cat = global.Catalog;
     const avail = () => Cat ? Cat.available().filter(t => !Cat.isRemoved(t.id)).map(t => ({ id: t.id, label: t.label, icon: t.icon, accent: t.accent, blurb: t.summary, category: t.category, presets: {}, _avail: t })) : [];
     // 3.48 suites (eravos.suites ADDENDUM 2026-10-21): each suite is a card of its own; adding it opens its suite window
-    const suiteCards = () => global.Suites ? global.Suites.list().filter(s => F.def(s.hub)).map(s => ({ id: 'suite:' + s.id, label: s.label, icon: s.icon, accent: s.accent, blurb: s.blurb,
-      category: F.def(s.hub).category, presets: {}, _suite: s })) : [];
+    // (a fresh profile has not installed the suite window yet: the card still shows, from the catalog, and adding installs it)
+    const hubMeta = (s) => F.def(s.hub) || (Cat && Cat.meta && Cat.meta(s.hub)) || null;
+    const suiteCards = () => global.Suites ? global.Suites.list().filter(s => hubMeta(s)).map(s => ({ id: 'suite:' + s.id, label: s.label, icon: s.icon, accent: s.accent, blurb: s.blurb,
+      category: hubMeta(s).category, presets: {}, _suite: s })) : [];
     const defs = () => F.defined().filter(d => !d.hidden && !(Cat && Cat.isRemoved(d.id))).concat(avail(), suiteCards());
     const NODEP = { pending: [], toolbar: [], services: [], inputs: [], outputs: [], works_with: [], notes: [], mode: null, modeLabel: null };
     const depOf = new Map();
-    const dep = (d) => { if (d._avail) return NODEP; if (d._suite) return depOf.get(d.id) || (depOf.set(d.id, Object.assign({}, X.deps(F.def(d._suite.hub)), { works_with: d._suite.parts.map(p => p.tool).filter(t => F.def(t)) })), depOf.get(d.id)); if (!depOf.has(d.id)) depOf.set(d.id, X.deps(d)); return depOf.get(d.id); };
+    const dep = (d) => { if (d._avail) return NODEP; if (d._suite) return depOf.get(d.id) || (depOf.set(d.id, Object.assign({}, F.def(d._suite.hub) ? X.deps(F.def(d._suite.hub)) : NODEP, { works_with: d._suite.parts.map(p => p.tool).filter(t => F.def(t)) })), depOf.get(d.id)); if (!depOf.has(d.id)) depOf.set(d.id, X.deps(d)); return depOf.get(d.id); };
     const unsub = X.onChange(() => { depOf.clear(); render(); }), unsubCat = Cat ? Cat.onChange(() => { depOf.clear(); render(); }) : () => {};
 
     // categories: those of active modes first (their order), then every other mode's, then anything else
@@ -70,7 +72,7 @@
     function chip(text, cls, title) { return h('span', { class: 'ap-chip ' + (cls || ''), text, title: title || '' }); }
 
     async function add(d) {
-      if (d._suite) { const id = global.Suites.open(d._suite.id, { K: S.K }); if (id) S.toast(`${d.icon || ''} ${d.label} — its window is on the canvas: ＋ Build the whole system, or add parts one by one`, 'good', 3200); close(); return; }
+      if (d._suite) { const id = await global.Suites.openAsync(d._suite.id, { K: S.K }); if (id) S.toast(`${d.icon || ''} ${d.label} — its window is on the canvas: ＋ Build the whole system, or add parts one by one`, 'good', 3200); close(); return; }
       if (d._avail) { S.toast(`Installing ${d.icon || ''} ${d.label}…`, '', 1500); const got = await Cat.install(d.id, S.K); if (!got.includes(d.id)) { S.toast(`${d.label} could not be installed — details: the red dot, top right.`, 'bad', 6000); return; } }
       const id = F.spawn(d.id);
       if (id) S.toast(`${d.icon || ''} ${d.label} added`, 'good', 1800);
@@ -173,15 +175,16 @@
       const presets = Object.keys(d.presets || {});
       const ins = dd.inputs.filter(x => !x.ambient), outs = dd.outputs.filter(x => !x.ambient), follows = dd.inputs.filter(x => x.ambient);
       const portName = (x) => (x.port ? x.port + ' · ' : '') + x.kind;
-      detail.append(
+      // 3.48 fix (his screenshot, 2026-10-21): a tool not installed yet has no page or remove button; append(null) printed "nullnull"
+      detail.append(...[
         h('div', { class: 'ap-d-head', style: { '--acc': d.accent || '#00d4ff' } }, [h('span', { class: 'ap-d-ic', text: d.icon || '◻' }), h('div', {}, [h('h3', { text: d.label }), h('small', { text: (d.category || 'General') + ' · v' + (d.version || '1.0.0') })])]),
         h('p', { class: 'ap-d-blurb', text: d.blurb || '' }),
         h('button', { class: 'tb-btn primary ap-addbtn', text: d._suite ? 'Open the suite' : d._avail ? 'Install + add to canvas' : dd.pending.length ? `Add — turns on ${dd.pending.length} toolbar item${dd.pending.length > 1 ? 's' : ''}` : 'Add to canvas', onclick: () => add(d) }),
         !d._avail && !d._suite && global.ToolPage ? h('button', { class: 'tb-btn ap-pagebtn', text: '📘 Its page — mods, packs, suite', title: 'everything this tool can do: load its whole suite or its mods one by one, hear every preset', onclick: () => { close(); global.ToolPage.open(d.id, { K: S.K }); } }) : null,
         Cat && Cat.meta(d.id) && !d._avail ? h('button', { class: 'tb-btn ap-rmbtn', text: 'Remove from this canvas', title: 'uninstall: gone from ＋ Add now; its code leaves at the next start. Windows already open keep working.', onclick: () => { Cat.remove(d.id); S.toast(`${d.label} removed — gone after the next start. Add it again any time from ＋ Add.`, '', 4000); } }) : null,
-      );
+      ].filter(Boolean));
       [
-        sec('MODE', [row(dd.modeLabel ? ((X.mode_(dd.mode) || {}).icon || '') + ' ' + dd.modeLabel : 'none — domain-free', dd.mode ? (X.isActive(dd.mode) ? 'active' : 'stays off — only what this tool needs turns on') : '')]),
+        sec('MODE', [row(d._avail ? 'not installed yet — adding it installs it' + (d._avail.domain ? ' (' + d._avail.domain + ')' : '') : dd.modeLabel ? ((X.mode_(dd.mode) || {}).icon || '') + ' ' + dd.modeLabel : 'none — domain-free', dd.mode ? (X.isActive(dd.mode) ? 'active' : 'stays off — only what this tool needs turns on') : '')]),
         sec('NEEDS', dd.services.map(s => row('• ' + s.label, s.why || ''))),
         sec('ADDS TO THE TOOLBAR', dd.toolbar.map(u => row((u.built ? '✓ ' : '✚ ') + (u.icon ? u.icon + ' ' : '') + u.label, u.built ? 'already on' : u.describes, u.built ? 'built' : 'new'))),
         sec('INPUTS', ins.map(x => row('← ' + portName(x), x.intent))),

@@ -41,7 +41,9 @@
   "works_with": [
     "eravos.acid-synth",
     "eravos.bass-forge",
+    "eravos.bass-gen",
     "eravos.channel",
+    "eravos.chord-gen",
     "eravos.coven",
     "eravos.dub-station",
     "eravos.edm-lab",
@@ -57,6 +59,7 @@
     "eravos.fx-phaser",
     "eravos.fx-pitch",
     "eravos.granular",
+    "eravos.groove-gen",
     "eravos.lfo",
     "eravos.master-fx",
     "eravos.organ",

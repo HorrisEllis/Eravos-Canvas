@@ -150,6 +150,55 @@
     },
     "starter": {
       "type": "string"
+    },
+    "macros": {
+      "type": "array",
+      "maxItems": 4,
+      "description": "P48.8: up to four knobs on the suite window; each turns its targets' keys across their range (the part's own min…max unless narrowed)",
+      "items": {
+        "type": "object",
+        "required": [
+          "label",
+          "targets"
+        ],
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "default": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "hint": {
+            "type": "string"
+          },
+          "targets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "tool",
+                "key"
+              ],
+              "properties": {
+                "tool": {
+                  "type": "string"
+                },
+                "key": {
+                  "type": "string"
+                },
+                "min": {
+                  "type": "number"
+                },
+                "max": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

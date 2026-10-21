@@ -1,0 +1,44 @@
+{
+  "schema": "eravos.suite/1",
+  "id": "music.edm-lab",
+  "label": "EDM Lab",
+  "icon": "⚗",
+  "accent": "#ff2266",
+  "version": "4.0.0",
+  "blurb": "EDM Lab, rebuilt as a system. Groove paints the rhythm and plays Pads; Chords voices the progression by TENSION and plays Pad Forge; Bassline puts the root on the kick and plays Reese Bass. ENERGY and TENSION here turn all of them. Swap any instrument for another and it still plays.",
+  "hub": "eravos.suite-hub",
+  "parts": [
+    { "tool": "eravos.groove-gen", "role": "rhythm", "required": true, "preset": "Dubstep Half-time", "notes": false, "why": "where the drums are busy × ENERGY → hits" },
+    { "tool": "eravos.pads", "role": "drums", "required": true, "preset": "Heavy (Dubstep/Trap)", "notes": false, "why": "the drum sounds the Groove plays" },
+    { "tool": "eravos.chord-gen", "role": "harmony", "required": true, "preset": "Dark Minor", "notes": false, "why": "the progression, voiced by TENSION" },
+    { "tool": "eravos.pad-forge", "role": "chords", "required": true, "preset": "EDM Pad · Melodic Dubstep Halo", "why": "the chord sound" },
+    { "tool": "eravos.bass-gen", "role": "bassline", "required": true, "preset": "On the Kick", "notes": false, "why": "the chord’s root on the kick" },
+    { "tool": "eravos.reese-bass", "role": "bass", "required": true, "preset": "Her Drop (dubstep reese)", "why": "the bass sound" },
+    { "tool": "eravos.bass-drop-builder", "role": "drop", "preset": "Classic 4/4/¼/8", "why": "the build, the pause and the drop" }
+  ],
+  "wiring": [
+    { "from": ["eravos.groove-gen", "groove.hook.note_out"], "to": ["eravos.pads", "pads.hook.note_in"] },
+    { "from": ["eravos.chord-gen", "chordg.hook.note_out"], "to": ["eravos.pad-forge", "pad.hook.note_in"] },
+    { "from": ["eravos.bass-gen", "bassg.hook.note_out"], "to": ["eravos.reese-bass", "reese.hook.note_in"] },
+    { "from": ["eravos.chord-gen", "chordg.hook.chord_out"], "to": ["eravos.bass-gen", "bassg.hook.chord_in"] },
+    { "from": ["eravos.groove-gen", "groove.hook.step_out"], "to": ["eravos.bass-gen", "bassg.hook.groove_in"] }
+  ],
+  "output": ["eravos.pads", "eravos.pad-forge", "eravos.reese-bass", "eravos.bass-drop-builder"],
+  "macros": [
+    { "label": "ENERGY", "default": 0.6, "hint": "how busy and how hard: the Groove's hits, the chords' attack, the bassline's drive", "targets": [
+      { "tool": "eravos.groove-gen", "key": "energy" }, { "tool": "eravos.chord-gen", "key": "energy" }, { "tool": "eravos.bass-gen", "key": "energy" } ] },
+    { "label": "TENSION", "default": 0.3, "hint": "triad → add9 → 7sus4 → cluster", "targets": [ { "tool": "eravos.chord-gen", "key": "tension" } ] },
+    { "label": "SWING", "default": 0.15, "hint": "the Groove's swing", "targets": [ { "tool": "eravos.groove-gen", "key": "swing", "min": 0, "max": 0.6 } ] }
+  ],
+  "starter": "Dubstep",
+  "scenes": {
+    "Dubstep": { "eravos.groove-gen": { "preset": "Dubstep Half-time" }, "eravos.pads": { "preset": "Heavy (Dubstep/Trap)" }, "eravos.chord-gen": { "preset": "Dark Minor" },
+      "eravos.pad-forge": { "preset": "EDM Pad · Melodic Dubstep Halo" }, "eravos.bass-gen": { "preset": "On the Kick" }, "eravos.reese-bass": { "preset": "Her Drop (dubstep reese)" } },
+    "UKG": { "eravos.groove-gen": { "preset": "UKG Shuffle" }, "eravos.pads": { "preset": "EDM Core" }, "eravos.chord-gen": { "preset": "Lifted add9" },
+      "eravos.pad-forge": { "preset": "EDM Pad · Deep House Organ Pad" }, "eravos.bass-gen": { "preset": "On the Kick" }, "eravos.reese-bass": { "preset": "Warm Future Sub" } },
+    "House": { "eravos.groove-gen": { "preset": "House Four" }, "eravos.pads": { "preset": "EDM Core" }, "eravos.chord-gen": { "preset": "Lifted add9" },
+      "eravos.pad-forge": { "preset": "EDM Pad · Warm Sidechain Bed" }, "eravos.bass-gen": { "preset": "Offbeat House" }, "eravos.reese-bass": { "preset": "Classic Reese" } },
+    "Neuro": { "eravos.groove-gen": { "preset": "Neuro Roll" }, "eravos.pads": { "preset": "Heavy (Dubstep/Trap)" }, "eravos.chord-gen": { "preset": "Cluster Drop" },
+      "eravos.pad-forge": { "preset": "EDM Pad · Neuro Dark Pad" }, "eravos.bass-gen": { "preset": "Rolling Eighths" }, "eravos.reese-bass": { "preset": "Neuro Flange" } }
+  }
+}

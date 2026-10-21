@@ -294,6 +294,10 @@ registerProcessor('eravos-pitch', EravosPitch);`;
       });
       ctx.dsp = dsp;
       ctx.now = () => ac.currentTime;
+      // 3.48 (P48.10): who this instance's hook is wired to — a generator sends its notes to exactly the tools wired from its
+      // note out (any drum, bass or poly tool: mixed and matched), and listens only to the parts wired into its event ins
+      ctx.wiredOut = (hookId) => ctx.K.wires.list().filter(w => w.src.instanceId === ctx.id && w.src.hookId === hookId).map(w => w.dst.instanceId);
+      ctx.wiredIn = (hookId) => ctx.K.wires.list().filter(w => w.dst.instanceId === ctx.id && w.dst.hookId === hookId).map(w => w.src.instanceId);
       ctx.modBus = function (key, range, opts2) {
         // shared ConstantSource summing bus → port 'mod.<key>' (kind param) — connect output to any number of AudioParams
         const cs = ac.createConstantSource(); cs.offset.value = 0; cs.start();

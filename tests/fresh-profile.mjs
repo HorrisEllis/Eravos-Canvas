@@ -25,6 +25,25 @@ try {
   ok(!r.faults.includes('MOUNT_001'), 'no "needs a pack" fault (MOUNT_001)');
   ok(await p.evaluate(() => !!(window.ERAVOS_GLASS && window.GlassLink && GlassLink.active)), 'the web build runs Glass, like the exe');
   const v = await (await fetch(g.url + 'voice/voice.js')).status; ok(v === 200 || v === 404, 'voice/ is served from the project root (' + v + ' — 404 only means no recordings here)');
+  // 3.48 (his screenshot, 2026-10-21): ＋ Add on a tool not installed yet printed "nullnull" and "MODE none — domain-free"
+  const det = await p.evaluate(async () => {
+    AddMenu.show(Shell, Shell.X, { view: 'all' }); await new Promise(r => setTimeout(r, 50));
+    const card = document.querySelector('.ap-card.avail'); if (!card) return { none: true };
+    card.click(); await new Promise(r => setTimeout(r, 50));
+    const t = document.querySelector('.ap-detail').innerText; document.querySelector('.ap-x').click(); return { t };
+  });
+  ok(!det.none && !/null/.test(det.t) && !/domain-free/.test(det.t) && /not installed yet/.test(det.t), 'a not-installed tool’s detail: no "null", says it installs when added — ' + JSON.stringify((det.t || '').slice(0, 140)));
+  // the suites are offered on a fresh profile too
+  ok(await p.evaluate(() => window.Suites && Suites.list().length >= 3), 'Wub Lab, Synthesis Lab and EDM Lab are offered');
+  const su = await p.evaluate(async () => {
+    AddMenu.show(Shell, Shell.X, { view: 'all' }); await new Promise(r => setTimeout(r, 50));
+    const card = document.querySelector('.ap-card[data-id="suite:music.edm-lab"]'); if (!card) return { card: false };
+    card.click(); await new Promise(r => setTimeout(r, 30)); document.querySelector('.ap-addbtn').click();
+    for (let i = 0; i < 100 && !Kernel.registry.byOrganism('eravos.suite-hub').length; i++) await new Promise(r => setTimeout(r, 100));
+    const hub = (Kernel.registry.byOrganism('eravos.suite-hub')[0] || {}).instance_id; if (!hub) return { card: true, hub: null };
+    Suites.build(Kernel, hub); return { card: true, hub, parts: Suites.members(Kernel, hub).size };
+  });
+  ok(su.card && su.hub && su.parts === 6, 'fresh profile: the EDM Lab card installs its suite window and parts, and builds whole — ' + JSON.stringify(su));
   ok(!errs.length, 'no page errors ' + errs.join(' | '));
 } finally { await b.close(); await g.close(); }
 console.log(`\n${pass}/${pass + fail} passed, ${fail} failed`); process.exitCode = fail ? 1 : 0;

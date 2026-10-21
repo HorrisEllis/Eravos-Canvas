@@ -21,7 +21,14 @@
     config: [
       { key: 'suite', type: 'string', default: '', label: 'Suite', group: 'SUITE', hidden: true },
       { key: 'scene', type: 'string', default: '', label: 'Scene', group: 'SUITE', hidden: true },
+      // the parts this window opened (instance ids) — members even before a wire reaches them (canvas/runtime/suites.js)
+      { key: 'opened', type: 'array', default: [], label: 'Opened parts', group: 'SUITE', hidden: true },
       { key: 'level', type: 'number', default: 1, min: 0, max: 1.5, step: 0.01, label: 'System level', group: 'OUT' },
+      // P48.8 the suite's macros (suite.json macros[0…3]); each one turns several parts' knobs at once — named by the suite
+      { key: 'm1', type: 'number', default: 0.5, min: 0, max: 1, step: 0.001, label: 'Macro 1', group: 'MACRO', hidden: true },
+      { key: 'm2', type: 'number', default: 0.5, min: 0, max: 1, step: 0.001, label: 'Macro 2', group: 'MACRO', hidden: true },
+      { key: 'm3', type: 'number', default: 0.5, min: 0, max: 1, step: 0.001, label: 'Macro 3', group: 'MACRO', hidden: true },
+      { key: 'm4', type: 'number', default: 0.5, min: 0, max: 1, step: 0.001, label: 'Macro 4', group: 'MACRO', hidden: true },
     ],
     ui_hooks: [],
     presets: {},
