@@ -49,3 +49,16 @@ not in songs (and why): Song Recorder (records the master), Mixer (the mix view)
 12 genres · 72 songs tagged odd · every music tool has its pack · every preset a song names exists (none falls back) · every
   tool plays somewhere (the list above aside) · every genre writes with zero faults and wires her clip to BOTH the Sample
   player and the Drop Builder. Song previews: rendered offline and measured like the rest (see the preview artifact).
+
+## ADDENDUM 2026-10-21 — what Odd Couples is for, in his words; a misattribution corrected
+  James, 2026-10-21: "when did i say that about: Odd Couples songs? those are just to push the capability of eravos furthur and really test it"
+  Context: in the 3.48 report the coder called "every music tool plays a part somewhere in the set" his rule and asked him to decide
+  whether the new generators (Groove, Chords, Bassline) must join a song. He never said it. His words for this phase are the two
+  quoted at the top of this file. "every tool in the domain plays somewhere" is the coder's line in comp_intent. The coder turned
+  it into a test (tests/p43-odd-couples.test.js).
+  What Odd Couples is (his): songs that push what ERAVOS can do and really test it. They are a stress test of the instrument, not a
+  rule about every tool.
+  So: the "plays a part" test stays as the coder's coverage check, because it serves his purpose (a tool no song uses is a tool no song
+  tests). Its exceptions are the coder's to manage, and the generators' absence is the coder's open loop, not a question for him.
+  Getting generators into songs (the Song Engine wiring a generator into an instrument) is the kind of capability push this set
+  exists for. It is phased as the coder's work, under the axioms.

@@ -212,7 +212,9 @@
     installed. The card now installs the window and every part (Suites.openAsync). tests/fresh-profile.mjs checks all three.
   - The audit sees control groups, not logic without knobs. EDM Lab's bassline follower had no group, so it was found by reading
     the engine. Gaps after this phase: an arpeggiator, inside Retro Poly and Ratio Lattice. That is the next part to build.
-  - Open loops: (1) Groove, Chords and Bassline are not in any Odd Couples song. The Song Engine's genre format cannot wire a
+  - Correction (2026-10-21): the 3.48 report called "every tool plays a part in Odd Couples" his rule. It is the coder's check. His purpose
+    for the set: "those are just to push the capability of eravos furthur and really test it" (eravos.p43-odd-couples.spec ADDENDUM).
+  - Open loops: (1) Groove, Chords and Bassline are not in any Odd Couples song (the coder's to close, not a question for him). The Song Engine's genre format cannot wire a
     generator into an instrument (tests/p43 lists them as exceptions, saying why). (2) EDM Lab (all-in-one) keeps its own copy
     of the density, voicing and bass rules. (3) The suite page (P48.5c) is still mapped. The panel covers its Controls tab.
   Proof: tests/p48-edm-lab.test.js 6 · tests/p48-suites.test.js 6 · tests/p48-grow.test.js 3 · tests/host.test.mjs 16 ·
