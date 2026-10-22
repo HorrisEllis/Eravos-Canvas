@@ -210,3 +210,12 @@ acceptance 3.48:
   - resize from the left edge keeps the end fixed; box-select + ← moves every selected note one grid step; one undo
     restores all of them
   - typed start 3.2.120 lands at bar 3, beat 2, tick 120 (480 ticks/beat), exactly
+
+## ADDENDUM 2026-10-22 — note curves (map eravos.phase52-map P52.6a)
+  James: "What about curvature? like bending notes, drawing." · "needs to have the timeline curves"
+  - note field `b`: array of [x, st]. x is 0..1 across the note, st is semitones −24..24. Up to 64 points, x strictly rising.
+    Absent means a straight note.
+  - engine: note:trigger carries `bend` = b. cleanNotes keeps a cleaned b.
+  - piano roll: tool 'bend' (key 6). A freehand drag over a note writes b. Shift snaps to semitones. Double-click clears it.
+    One drag is one clip_edit.
+  - acceptance: tests/p52-curves.test.js.

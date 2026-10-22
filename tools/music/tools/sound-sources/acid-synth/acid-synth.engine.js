@@ -99,6 +99,7 @@
         chargeTimer = ctx.interval(() => { const c = chargeAt(ac.currentTime); ctx.emitUI('charge', { value: c }); if (c < 0.005) { clearInterval(chargeTimer); chargeTimer = null; } }, 33);
       }
       ctx.noteOn = noteOn;
+      ctx.bendTargets([osc.detune]);   // 3.52 curves
       ctx.onNote((p) => noteOn(p.note, p.velocity, p.time, { accent: p.accent, slide: p.slide, duration: p.duration }));
       ctx.onMidi((p) => { if (p.on) noteOn(p.note, p.velocity, ac.currentTime, { accent: p.velocity > 0.8, duration: 0.25 }); });
       ctx.onKey(() => ctx.syncUI());

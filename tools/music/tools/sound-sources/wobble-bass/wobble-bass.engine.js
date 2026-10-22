@@ -432,6 +432,7 @@
       P.onChange('subOct', () => { sub.frequency.setTargetAtTime(curF * (SUBK[P.get('subOct')] || 1), ac.currentTime, 0.01); });
       ['octave', 'transpose'].forEach(k => P.onChange(k, () => { if (held && held.off > ac.currentTime) setFreq(noteHz(held.note), ac.currentTime, 0.03); }));   // retune a held note live
       ctx.noteOn = noteOn;
+      ctx.bendTargets([saw.detune, sq.detune, sub.detune, saw2.detune, fmOsc.detune]);   // 3.52 curves: drawn bends move every oscillator of the voice
       ctx.onNote((p) => {
         const o = { duration: p.duration, slide: p.slide, wobbleDiv: p.wobbleDiv && DIVS.includes(p.wobbleDiv) ? p.wobbleDiv : undefined };
         noteOn(p.note, p.velocity * (p.accent ? 1 : 0.9), p.time, o);

@@ -162,6 +162,7 @@
       }
       ['octave', 'transpose'].forEach(k => P.onChange(k, () => { if (held && held.off > ac.currentTime) setHz(noteHz(held.note), ac.currentTime, 0.03); }));   // retune a held note live
       ctx.noteOn = noteOn;
+      ctx.bendTargets([pitchMod.offset]);   // 3.52 curves: drawn bends ride the pitch bus every oscillator follows
       ctx.onNote((p) => noteOn(p.note, p.velocity * (p.accent ? 1 : 0.9), p.time, { duration: p.duration, slide: p.slide }));
       ctx.onMidi((p) => { if (p.on) noteOn(p.note, p.velocity, ac.currentTime); else noteOff(p.note, ac.currentTime); });
       ctx.allNotesOff = (p) => { const t = (p && typeof p.time === 'number') ? Math.max(p.time, ac.currentTime) : ac.currentTime; amp.gain.cancelScheduledValues(t); amp.gain.setTargetAtTime(0, t, p && p.hard ? 0.005 : P.get('release') / 4); if (held) held.off = t; };

@@ -95,6 +95,7 @@
         ctx.lastNote = { f, t };
       }
       function noteOff(note, t) { if (!held || held.note !== note) return; t = Math.max(t || ac.currentTime, ac.currentTime); held.off = t; dsp.release(amp.gain, t, P.get('release')); }
+      ctx.bendTargets([sine.detune, tri.detune, sq.detune]);   // 3.52 curves
       ctx.onNote((p) => noteOn(p.note, p.velocity, p.time, p.duration));
       ctx.onMidi((p) => p.on ? noteOn(p.note, p.velocity) : noteOff(p.note));
       ctx.audition = (p) => noteOn(p.note || 45, p.velocity || 0.9, ac.currentTime, p.duration || 1.2);

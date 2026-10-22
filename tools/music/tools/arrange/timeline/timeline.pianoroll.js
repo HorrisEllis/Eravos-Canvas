@@ -60,7 +60,9 @@
     const bars = UI.NumberDrag({ label: 'bars', min: 1, max: 128, step: 1, value: 4, suffix: ' bars', onChange: (v) => clip && view.emit('clip_edit', { id: clip.id, patch: { bars: v } }) });
     const tools = [['draw', '✎', 'Draw (1) — click adds, drag moves, drag an edge to stretch'], ['paint', '🖌', 'Paint (2) — drag across the grid: one note per grid cell, following the pointer'],
       ['split', '✂', 'Split (3) — click a note to cut it at the grid line'], ['erase', '⌫', 'Erase (4) — click or drag across notes to delete them'],
-      ['select', '⬚', 'Select (5) — drag a box; Shift adds; drag a selected note to move them all (Ctrl+drag copies)']];
+      ['select', '⬚', 'Select (5) — drag a box; Shift adds; drag a selected note to move them all (Ctrl+drag copies)'],
+      // 3.52 CURVES — James, 2026-10-22: "What about curvature? like bending notes, drawing." · "needs to have the timeline curves"
+      ['bend', '〰', 'Bend (6) — drag along a note to draw its pitch curve: up/down = semitones (Shift snaps to whole ones); double-click a note clears it']];
     const toolBtns = tools.map(([id, icon, hint]) => { const b = h('button', { class: 'tlpr-tool', title: hint, 'aria-label': hint, 'data-tool': id, text: icon }); b.addEventListener('click', (e) => { e.stopPropagation(); setTool(id); }); return b; });
     const toolBox = h('span', { class: 'tlpr-tools', role: 'group', 'aria-label': 'note tools' }, toolBtns);
     function setTool(t) { tool = t; toolBtns.forEach(b => b.classList.toggle('on', b.dataset.tool === t)); cv.dataset.tool = t; ghost = null; draw(); }
@@ -156,6 +158,12 @@
         const c2 = drums ? ((drums[rowNotes.indexOf(nt.n)] || {}).color || col) : col;
         g.globalAlpha = 0.35 + 0.65 * nt.v; g.fillStyle = c2; g.fillRect(x + 1, y + 1, w - 1, ROW - 2); g.globalAlpha = 1;
         g.strokeStyle = S.has(i) ? '#fff' : '#000'; g.lineWidth = 1; g.strokeRect(x + 1.5, y + 1.5, w - 2, ROW - 3);
+        if (!drums && Array.isArray(nt.b) && nt.b.length) {   // 3.52: the note's bend, drawn over it (one row = one semitone)
+          const pts = nt.b[0][0] > 0 ? [[0, 0]].concat(nt.b) : nt.b, mid = y + ROW / 2;
+          g.strokeStyle = '#fff'; g.lineWidth = 2; g.beginPath();
+          pts.forEach(([px, st], k) => { const cx = (nt.s + px * nt.l) * pps, cy = mid - st * ROW; if (k) g.lineTo(cx, cy); else g.moveTo(cx, cy); });
+          g.stroke(); g.lineWidth = 1;
+        }
       });
       if (ghost && !drag) {   // where a click lands
         const x = ghost.s * pps, y = yOf(ghost.n), w = Math.max(3, ghost.l * pps - 1);
@@ -188,6 +196,19 @@
     const where = (s) => { const b = (clip ? clip.startBar : 1) + Math.floor(s / 16 + 1e-9), beat = Math.floor(mod(s, 16) / 4 + 1e-9) + 1, tick = Math.round(mod(s, 4) * 120) % 480; return `${b}.${beat}.${String(tick).padStart(3, '0')}`; };
     function say(s, n, extra) { readout.textContent = s === null ? '' : `${where(s)} · ${nameOf(n)}${extra ? ' · ' + extra : ''}`; }
     const local = (e) => toContent(cv, e.clientX, e.clientY);
+    // 3.52 curves: the pointer's place along note i (0…1) and its height against the note's own row (semitones, ±24) — freehand;
+    // Shift snaps to whole semitones. Points only move forward in time: dragging back rubs out what is past the pointer.
+    function bendAt(i, x, y, e) {
+      const a = notes[i], d = drag; if (!a || !d) return;
+      const px = Math.max(0, Math.min(1, (x / pps - a.s) / a.l)), raw = (yOf(a.n) + ROW / 2 - y) / ROW;
+      const st = Math.max(-24, Math.min(24, e && e.shiftKey ? Math.round(raw) : Math.round(raw * 10) / 10));
+      while (d.pts.length && d.pts[d.pts.length - 1][0] >= px) d.pts.pop();
+      d.pts.push([Math.round(px * 1000) / 1000, st]);
+      let pts = d.pts; if (pts.length > 64) { const step = pts.length / 63; pts = Array.from({ length: 63 }, (_, k) => d.pts[Math.floor(k * step)]).concat([d.pts[d.pts.length - 1]]); }
+      const nn = Object.assign({}, a); if (pts.some(q => q[1] !== 0)) nn.b = pts.map(q => q.slice()); else delete nn.b;
+      notes = notes.slice(); notes[i] = nn; d.changed = true;
+      say(a.s + px * a.l, a.n, (st > 0 ? '+' : '') + st + ' st');
+    }
     function hit(x, y) { const n = nOf(y), st = x / pps; for (let i = notes.length - 1; i >= 0; i--) { const a = notes[i]; if (a.n === n && st >= a.s && st <= a.s + a.l) return i; } return -1; }
     // which part of a note the pointer is on: 'L' / 'R' edge (max 4 px, 25 % of the note) or the body
     function zone(i, x) { const a = notes[i], x0 = a.s * pps, x1 = (a.s + a.l) * pps, z = Math.max(4, (x1 - x0) * 0.25); return x1 - x < z ? 'R' : x - x0 < z && a.l > (grid || FREE) ? 'L' : 'B'; }
@@ -199,6 +220,11 @@
       closeEditor();
       try { cv.setPointerCapture(e.pointerId); } catch (_) {}
       ghost = null;
+      if (tool === 'bend') {
+        if (i < 0 || drums) return;
+        drag = { mode: 'bend', i, pts: [], armed: true, changed: false, x0: x, y0: y };
+        bendAt(i, x, y, e); draw(); return;
+      }
       if (tool === 'erase') { drag = { mode: 'erase', orig: notes.slice(), x0: x, y0: y, armed: true, changed: false }; eraseAt(x, y); draw(); return; }
       if (tool === 'split') {
         if (i >= 0) { const a = notes[i], at = q(snapTo(x / pps, g)); if (at > a.s + 1e-6 && at < a.s + a.l - 1e-6) { const next = notes.slice(); next.splice(i, 1, Object.assign({}, a, { l: q(at - a.s) }), Object.assign({}, a, { s: at, l: q(a.s + a.l - at) })); selOnly(i + 1); commit(next); } }
@@ -247,6 +273,7 @@
       cv.classList.add('move');
       const st = steps(), g = g0(e);
       if (drag.mode === 'erase') { eraseAt(x, y); draw(); return; }
+      if (drag.mode === 'bend') { bendAt(drag.i, x, y, e); draw(); return; }
       if (drag.mode === 'box') {
         drag.x1 = x; drag.y1 = y; const s0 = Math.min(drag.x0, x) / pps, s1 = Math.max(drag.x0, x) / pps, r0 = Math.floor(Math.min(drag.y0, y) / ROW), r1 = Math.floor(Math.max(drag.y0, y) / ROW);
         S = new Set(drag.base); notes.forEach((a, i) => { const r = Math.floor(yOf(a.n) / ROW); if (r >= r0 && r <= r1 && a.s < s1 && a.s + a.l > s0) S.add(i); });
@@ -285,7 +312,8 @@
     function hover(x, y, e) {
       const st = steps(), i = hit(x, y), g = g0(e), n = drums ? nOf(y) : pitchFor(nOf(y));
       let gh = null;
-      if (tool === 'erase') gh = i >= 0 ? Object.assign({}, notes[i]) : null;
+      if (tool === 'bend') gh = null;   // 3.52: bending draws on notes, it never places one
+      else if (tool === 'erase') gh = i >= 0 ? Object.assign({}, notes[i]) : null;
       else if (tool === 'split') gh = i >= 0 ? { s: notes[i].s, l: notes[i].l, n: notes[i].n, split: q(snapTo(x / pps, g)) } : null;
       else if (i < 0) { const s = q(clampN(cellOf(x / pps, g), 0, st - (g || FREE))); gh = { s, l: q(Math.min(tool === 'paint' ? (g || FREE) : newLen(), st - s)), n }; }
       const z = i >= 0 && tool === 'draw' ? zone(i, x) : null;
@@ -305,7 +333,9 @@
     cv.addEventListener('pointerup', endDrag);
     // a lost capture / cancelled pointer (alt-tab, touch cancel, window torn down mid-drag) must never leave a drag armed
     cv.addEventListener('pointercancel', endDrag); cv.addEventListener('lostpointercapture', endDrag);
-    cv.addEventListener('dblclick', (e) => { const { x, y } = local(e); const i = hit(x, y); if (i >= 0) openEditor(i); });   // 3.48: exact fields (right-click deletes)
+    cv.addEventListener('dblclick', (e) => { const { x, y } = local(e); const i = hit(x, y); if (i < 0) return;
+      if (tool === 'bend') { if (notes[i].b) { const next = notes.slice(); next[i] = Object.assign({}, notes[i]); delete next[i].b; commit(next); } return; }   // 3.52: clear the curve
+      openEditor(i); });   // 3.48: exact fields (right-click deletes)
     cv.addEventListener('contextmenu', (e) => e.preventDefault());
     // zoom that keeps the time (x) or the note (y) under the pointer where it is
     function zoomTo(p, atX) {
@@ -333,7 +363,7 @@
       const k = e.key, lower = k.length === 1 ? k.toLowerCase() : k, mod = e.ctrlKey || e.metaKey, eat = () => { e.preventDefault(); e.stopPropagation(); };
       if (!clip) return;
       if (stepOn && !mod && stepKey(e)) return eat();
-      if (!mod && !e.altKey && ['1', '2', '3', '4', '5'].includes(k)) { eat(); setTool(tools[+k - 1][0]); return; }
+      if (!mod && !e.altKey && ['1', '2', '3', '4', '5', '6'].includes(k)) { eat(); setTool(tools[+k - 1][0]); return; }
       if (mod && lower === 'a') { eat(); selOnly(notes.map((_, i) => i)); draw(); readout.textContent = `${S.size} selected`; return; }
       if (mod && (lower === 'c' || lower === 'x')) { eat(); copySel(); if (lower === 'x') removeSel(); return; }
       if (mod && lower === 'v') { eat(); paste(); return; }

@@ -97,11 +97,14 @@
           .map(r => ({ value: r.instance_id, label: (r.descriptor.icon ? r.descriptor.icon + ' ' : '') + (r.descriptor.label || r.organism_id) + ' ·' + r.instance_id.split('-').slice(-1)[0], organism: r.organism_id }));
       }
       const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+      // 3.52 curves: a note's bend [[x 0…1, semitones −24…+24], …] (at most 64 points, x ascending) is kept; anything else is dropped
+      const cleanBend = (b) => { if (!Array.isArray(b)) return null; const pts = b.filter(q => Array.isArray(q) && isFinite(q[0]) && isFinite(q[1])).slice(0, 64)
+        .map(q => [Math.round(clamp(+q[0], 0, 1) * 1000) / 1000, Math.round(clamp(+q[1], -24, 24) * 100) / 100]).sort((x, y) => x[0] - y[0]); return pts.length && pts.some(q => q[1] !== 0) ? pts : null; };
       function cleanNotes(arr, bars) {
         const max = bars * 16;
-        return (Array.isArray(arr) ? arr : []).map(n => ({ s: +n.s, l: +n.l, n: Math.round(+n.n), v: n.v === undefined ? 0.85 : +n.v }))
+        return (Array.isArray(arr) ? arr : []).map(n => ({ s: +n.s, l: +n.l, n: Math.round(+n.n), v: n.v === undefined ? 0.85 : +n.v, b: n.b }))
           .filter(n => isFinite(n.s) && isFinite(n.l) && isFinite(n.n) && isFinite(n.v) && n.s >= 0 && n.s < max)
-          .map(n => ({ s: Math.round(n.s * 192) / 192, l: clamp(Math.round(n.l * 192) / 192, 0.125, max - n.s), n: clamp(n.n, 0, 127), v: clamp(n.v, 0.05, 1) }))   // 3.48: 1/192 step — exact for 1/64 and every triplet; 1/128-note minimum
+          .map(n => { const o = { s: Math.round(n.s * 192) / 192, l: clamp(Math.round(n.l * 192) / 192, 0.125, max - n.s), n: clamp(n.n, 0, 127), v: clamp(n.v, 0.05, 1) }; const b = cleanBend(n.b); if (b) o.b = b; return o; })   // 3.48: 1/192 step — exact for 1/64 and every triplet; 1/128-note minimum
           .sort((a, b) => a.s - b.s || a.n - b.n);
       }
       const snap16 = (b) => Math.max(1, 1 + Math.round((b - 1) * 16) / 16);
@@ -150,7 +153,9 @@
           c.notes.forEach(n => {
             if (Math.floor(n.s + 1e-9) !== local) return;
             const len = Math.min(n.l, c.bars * 16 - n.s);
-            ctx.emit('note:trigger', { target: lane.target, note: n.n, velocity: n.v, time: tk.time + (n.s - local) * sd, duration: len * sd * 0.98 });
+            const msg = { target: lane.target, note: n.n, velocity: n.v, time: tk.time + (n.s - local) * sd, duration: len * sd * 0.98 };
+            if (Array.isArray(n.b) && n.b.length) msg.bend = n.b;   // 3.52 curves: the note's drawn bend
+            ctx.emit('note:trigger', msg);
           });
         });
       }

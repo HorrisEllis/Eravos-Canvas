@@ -75,6 +75,7 @@
       }
       const play = (p) => noteOn(p.note, p.velocity, typeof p.time === 'number' ? p.time : ac.currentTime, { duration: p.duration, slide: p.slide });
       ['octave', 'transpose'].forEach(k => P.onChange(k, () => { if (held && held.off > ac.currentTime) { hz.offset.cancelScheduledValues(ac.currentTime); hz.offset.setValueAtTime(curF, ac.currentTime); curF = noteHz(held.note); hz.offset.exponentialRampToValueAtTime(curF, ac.currentTime + 0.03); } }));   // retune a held note live
+      ctx.bendTargets([o.detune]);   // 3.52 curves
       ctx.onNote(play);
       // follow: notes addressed to any Wub Osc (not to this sub — those already arrive through onNote)
       ctx.on('note:trigger', null, (p) => {

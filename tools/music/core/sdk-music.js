@@ -12,6 +12,7 @@
       velocity: { type: 'number', minimum: 0, maximum: 1 }, time: { type: 'number' },
       duration: { type: 'number', minimum: 0 }, accent: { type: 'boolean' }, slide: { type: 'boolean' },
       freq: { type: 'number', minimum: 0 }, // xen: an exact (often irrational) frequency; `note` stays the nearest 12-TET key
+      bend: { type: 'array' },   // 3.52 curves: [[x 0…1 of the note's length, semitones −24…+24], …] — drawn in the piano roll
     },
   };
   const MIDI_SCHEMA = { type: 'object', required: ['note', 'velocity', 'on'], properties: { note: { type: 'integer', minimum: 0, maximum: 127 }, velocity: { type: 'number', minimum: 0, maximum: 1 }, on: { type: 'boolean' } } };
@@ -408,6 +409,28 @@ registerProcessor('eravos-pitch', EravosPitch);`;
       // P11.5 (gate P): a hard ceiling on simultaneous notes per tool — a runaway pattern can't swamp the audio thread.
       // Each tool still steals its own voices below this; this only stops pathological floods (counted, never silent).
       const NOTE_CEILING = 32; let sounding = []; ctx.notesDropped = 0;
+      // 3.52 CURVES (eravos.phase52-map P52.6a). James, 2026-10-22: "What about curvature? like bending notes, drawing." · "needs to have
+      // the timeline curves". A note may carry bend [[x, st], …]: its pitch follows that curve over the note, sample-accurate. The
+      // curve is ADDED to the oscillators' detune through a control source of its own (cents), so whatever detune a tool already uses
+      // (unison spread, drift, the knob inputs) is kept. Poly tools: the oscillators a note creates are found while the tool makes
+      // the note (no tool code needed). Mono tools that reuse their oscillators name them once: ctx.bendTargets([audioParams]).
+      const cleanBend = (b) => {
+        if (!Array.isArray(b)) return null;
+        const pts = b.filter(q => Array.isArray(q) && isFinite(q[0]) && isFinite(q[1])).map(q => [Math.max(0, Math.min(1, +q[0])), Math.max(-24, Math.min(24, +q[1]))]).sort((x, y) => x[0] - y[0]);
+        if (!pts.length || pts.every(q => q[1] === 0)) return null;
+        if (pts[0][0] > 0) pts.unshift([0, 0]);
+        return pts;
+      };
+      function bendCurve(off, pts, t, dur) {
+        off.cancelScheduledValues(t); off.setValueAtTime(pts[0][1] * 100, t);
+        for (let i = 1; i < pts.length; i++) off.linearRampToValueAtTime(pts[i][1] * 100, t + Math.max(pts[i][0] * dur, 0.001 * i));
+      }
+      let sharedBend = null;
+      ctx.bendTargets = (params) => {
+        if (!sharedBend) { sharedBend = ac.createConstantSource(); sharedBend.offset.value = 0; sharedBend.start(); ctx.track(sharedBend); }
+        (params || []).forEach(pr => { try { sharedBend.connect(pr); } catch (e) {} });
+      };
+      ctx.cleanBend = cleanBend;
       ctx.onNote = (fn) => ctx.on('note:trigger', NOTE_SCHEMA, (p) => {
         if (!ctx.isTarget(p)) return;
         const t = typeof p.time === 'number' ? p.time : ac.currentTime, end = t + (typeof p.duration === 'number' ? p.duration : 1);
@@ -417,7 +440,21 @@ registerProcessor('eravos-pitch', EravosPitch);`;
         // 3.39 delay compensation: a tool whose whole voice runs through an oversampled shaper is late by ctx.latency
         // seconds — its notes start that much earlier so the SOUND lands on the beat (clamped to now for live input)
         if (ctx.latency > 0 && typeof p.time === 'number') { const t2 = Math.max(ac.currentTime, p.time - ctx.latency), d2 = typeof p.duration === 'number' ? p.duration + (p.time - t2) - ctx.latency : p.duration; p = Object.assign({}, p, { time: t2, duration: d2 }); }
-        fn(p);
+        const pts = cleanBend(p.bend), t0 = typeof p.time === 'number' ? Math.max(p.time, ac.currentTime) : ac.currentTime, dur = typeof p.duration === 'number' ? p.duration : 1;
+        if (sharedBend) {   // a mono tool: its own oscillators bend; a note without a curve plays straight
+          if (pts) { bendCurve(sharedBend.offset, pts, t0, dur); sharedBend.offset.setValueAtTime(0, t0 + dur); }
+          else { sharedBend.offset.cancelScheduledValues(t0); sharedBend.offset.setValueAtTime(0, t0); }
+          if (!ctx.bendCapture || !pts) { fn(p); return; }   // bendCapture: a tool with shared AND per-note oscillators (Reese)
+        }
+        if (!pts) { fn(p); return; }
+        // a poly tool: find the oscillators this note makes, and bend them alone (the other notes of a chord keep their own curve)
+        const made = [], orig = ac.createOscillator;
+        ac.createOscillator = function () { const o = orig.apply(ac, arguments); made.push(o); return o; };
+        try { fn(p); } finally { ac.createOscillator = orig; }
+        if (!made.length) return;
+        const cs = ac.createConstantSource(); bendCurve(cs.offset, pts, t0, dur);
+        made.forEach(o => { try { cs.connect(o.detune); } catch (e) {} });
+        cs.start(t0); cs.stop(t0 + dur + 12); cs.onended = () => { try { cs.disconnect(); } catch (e) {} };   // holds the last bend through the release
       });
       ctx.onMidi = (fn) => ctx.on('midi:note', MIDI_SCHEMA, (p) => { if (midiArmed) fn(p); });
       ctx.onKey = (fn) => ctx.on('theory:key-change', THEORY_SCHEMA, fn);

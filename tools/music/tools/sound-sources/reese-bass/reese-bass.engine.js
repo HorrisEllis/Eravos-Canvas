@@ -170,6 +170,7 @@
       }));
       P.onChange('subOct', () => { if (held && held.off > ac.currentTime) sub.frequency.setTargetAtTime(subHz(curHz), ac.currentTime, 0.02); });
       ctx.noteOn = noteOn;
+      ctx.bendTargets([sub.detune]); ctx.bendCapture = true;   // 3.52 curves: the shared sub, and each note's own saws
       ctx.onNote((p) => noteOn(p.note, p.velocity, p.time, { duration: p.duration }));
       ctx.onMidi((p) => { if (p.on) noteOn(p.note, p.velocity, ac.currentTime); else noteOff(p.note); });
       ctx.audition = (p) => noteOn(p.note || 45, 0.9, ac.currentTime, { duration: p.duration || 1.5 });
