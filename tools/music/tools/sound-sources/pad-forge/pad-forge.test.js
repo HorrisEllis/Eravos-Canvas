@@ -30,3 +30,21 @@ describe('Pad Forge 1.1 · headroom, even sources, real stereo', () => {
     assert.lt(diff(await chord('Her Essence', Object.assign({ width: 0 }, base))), 0.01, 'mono at width 0');
   });
 });
+
+// 3.52 — Octave and Pitch (his song: "the pad (yellow) is to high pitched though, and I need more control")
+describe('Pad Forge 3.52 · Octave and Pitch move the whole pad', () => {
+  const zc = async (params) => {
+    const U = TH.universe(1.6), id = TH.spawn(U, 'eravos.pad-forge'), c = OrganismFactory.handle(id).ctx;
+    c.params.setMany(Object.assign({ shimmer: 0, space: 0, bloom: 0, cutoff: 16000, attack: 0.01 }, params));
+    TH.note(U, id, 69, 0.05, { duration: 1.4, velocity: 1 }); const b = await TH.render(U), d = b.getChannelData(0);
+    let n = 0; for (let i = Math.floor(0.4 * TH.SR) + 1; i < Math.floor(1.4 * TH.SR); i++) if ((d[i - 1] < 0) !== (d[i] < 0)) n++; return n;
+  };
+  it('defaults are 0: nothing changes for old songs and presets', () => {
+    const d = OrganismFactory.def('eravos.pad-forge'); ['octave', 'transpose'].forEach(k => assert.equal(d.config.find(c => c.key === k).default, 0, k));
+  });
+  it('Octave −1 sounds an octave lower; Pitch −12 does the same', async () => {
+    const base = await zc({}), down = await zc({ octave: -1 }), pitch = await zc({ transpose: -12 });
+    assert.ok(down / base > 0.35 && down / base < 0.7, `octave −1: ${down} vs ${base} crossings (≈ half)`);
+    assert.ok(Math.abs(pitch - down) / down < 0.15, `pitch −12 ≈ octave −1: ${pitch} vs ${down}`);
+  });
+});
