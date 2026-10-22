@@ -206,6 +206,11 @@
                         "minimum": -2,
                         "maximum": 2
                       },
+                      "transpose": {
+                        "type": "number",
+                        "minimum": -36,
+                        "maximum": 24
+                      },
                       "spread": {
                         "type": "number",
                         "minimum": 0,

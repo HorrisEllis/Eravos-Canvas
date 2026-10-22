@@ -171,6 +171,38 @@
       "glide": 0.02,
       "release": 0.1
      }
+    },
+    "Deep Reese": {
+     "params": {
+      "voices": 4,
+      "detune": 10,
+      "width": 0.5,
+      "octave": -1,
+      "cutoff": 260,
+      "res": 1.5,
+      "envAmt": 1.2,
+      "combMix": 0.15,
+      "dist": 0.3,
+      "sub": 0.8,
+      "subOct": "-1",
+      "subWarm": 0.45
+     }
+    },
+    "Sub Floor Reese": {
+     "params": {
+      "voices": 3,
+      "detune": 7,
+      "width": 0.3,
+      "octave": -2,
+      "cutoff": 180,
+      "res": 1,
+      "envAmt": 0.8,
+      "combMix": 0.05,
+      "dist": 0.2,
+      "sub": 0.9,
+      "subOct": "-1",
+      "subWarm": 0.7
+     }
     }
    }
   }

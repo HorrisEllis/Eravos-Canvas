@@ -53,3 +53,8 @@ dependencies:
     - pad.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
   works_with: [eravos.timeline, eravos.sequencer, eravos.fx-moddelay, eravos.sub-engine, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
+
+## ADDENDUM 2026-10-22 (3.52) — Octave and Pitch
+  James, 2026-10-22, on his song: "the pad (yellow) is to high pitched though, and I need more control".
+  octave −3…+2 (default 0) · transpose (Pitch) −24…+24 st, 0.1 steps (default 0). The whole pad moves; a change applies from the next
+  chord. Defaults unchanged: every preset loads and sounds as before. Test: pad-forge.test.js "Octave −1 sounds an octave lower".

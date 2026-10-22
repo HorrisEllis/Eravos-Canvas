@@ -6,7 +6,7 @@ OrganismFactory.reg('eravos.wub-osc', function (view) {
   view.bind('wave', (w) => { fmBox.style.display = w === 'fm' ? '' : 'none'; });
   UI.instrumentPanel(view, {
     header: [wave], middle: [fmBox], low: 24, high: 48, color: '#ff2266',
-    keys: ['octave', 'fine', 'index', 'voices', 'spread', 'width', 'drift', 'glide', 'attack', 'release', 'dive', 'diveTime', 'level'],
+    keys: ['octave', 'transpose', 'fine', 'index', 'voices', 'spread', 'width', 'drift', 'glide', 'attack', 'release', 'dive', 'diveTime', 'level'],
     hint: 'Raw tone only — wire its output into Wub Filter, and Wub Rate into the filter’s “wub”. Reese breathes with Drift; FM growls with Index.',
   });
   if (UI.alive) UI.alive(view);

@@ -101,3 +101,7 @@ packs 2.0: ≥ 60 — Neuro Roll · Classic DnB Reese · Darkstep · Jungle Pres
   dive, technique only) …
 acceptance 2.0: per-voice detune audible as beat frequency f·(2^(c/1200)−1) ± 2 % ; mono below crossover (L−R < −60 dB
   under 100 Hz) ; drawn movement reproduces the curve on the param ± 1 % ; 1.x presets load and render identically.
+
+# 3.50: Pitch (transpose) −24..+24 st, default 0 — tunes the whole tool up/down; retunes a held note live
+
+# 3.51: Pitch to −36 st; Octave −4..+2; Sub oct (0/−1/−2, default −1); Sub harmonics 0..1 (default 0) — overtones on the clean sub so a deep note is heard on small speakers

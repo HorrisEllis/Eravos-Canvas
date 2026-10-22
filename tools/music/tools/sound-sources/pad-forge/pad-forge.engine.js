@@ -43,6 +43,10 @@
       { key: 'shimmer', type: 'number', default: 0.35, min: 0, max: 0.85, step: 0.01, label: 'Shimmer', group: 'SHIMMER', hint: 'octave-up feedback in the tail' },
       { key: 'size', type: 'number', default: 6, min: 1, max: 14, step: 0.1, unit: 's', label: 'Size', group: 'SHIMMER' },
       { key: 'level', type: 'number', default: 0.7, min: 0, max: 1.5, step: 0.01, label: 'Level', group: 'OUT' },
+      // 3.52 (his song, 2026-10-22: "the pad (yellow) is to high pitched though, and I need more control") — the whole pad up or down.
+      // Default 0 = as before: every preset and song sounds the same. A change applies from the next chord.
+      { key: 'octave', type: 'integer', default: 0, min: -3, max: 2, label: 'Octave', group: 'PITCH' },
+      { key: 'transpose', type: 'number', default: 0, min: -24, max: 24, step: 0.1, unit: 'st', label: 'Pitch', group: 'PITCH', hint: 'tune the whole pad in semitones' },
     ],
     defaultPreset: 'Her Essence',
     engine(ctx) {
@@ -140,7 +144,7 @@
         if (P.get('hold') && t - lastChordAt > 0.12) voices.filter(v => v.off === Infinity).forEach(v => release(v, t)); // a new chord replaces the held one
         lastChordAt = t;
         while (voices.length >= 8) kill(voices[0], t);
-        const f = MT.hz(note), nodes = [], envs = corners.map(c => { const e = ac.createGain(); e.gain.value = 0; e.connect(c); nodes.push(e); return e; });
+        const f = MT.hz(note + 12 * P.get('octave')) * Math.pow(2, P.get('transpose') / 12), nodes = [], envs = corners.map(c => { const e = ac.createGain(); e.gain.value = 0; e.connect(c); nodes.push(e); return e; });
         const kinds = ['cornerA', 'cornerB', 'cornerC', 'cornerD'].map(k => P.get(k));
         kinds.forEach((k, i) => source(k, f, envs[i], t, nodes));
         const pk = 0.35 + 0.65 * vel;

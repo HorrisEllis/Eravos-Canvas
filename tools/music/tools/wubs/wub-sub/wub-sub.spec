@@ -35,3 +35,7 @@ dependencies:
   works_with: [eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
 
 # 3.48 SUITES (specs/eravos.suites.spec): part of music.wub-lab — usable alone as always; its 📘 page shows "Part of" and links the suite page
+
+# 3.50: Pitch (transpose) −24..+24 st, default 0 — tunes the whole tool up/down; retunes a held note live
+
+# 3.51: Pitch to −36 st; Octave to −4; Harmonics 0..1 (default 0) — overtones so a deep sub is heard on small speakers

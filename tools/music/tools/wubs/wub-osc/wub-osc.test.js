@@ -42,3 +42,14 @@ describe('tool · Wub Osc — the raw tone', () => {
     TH.note(U, id, 45, 0.05, { duration: 0.4 }); assert.gt(TH.rms(await TH.render(U), 0.1, 0.4), 0.01);
   });
 });
+
+describe('tool · Wub Osc — Pitch (3.50)', () => {
+  it('Pitch −12 st drops a note an octave; +7 st goes up a fifth; 0 is unchanged', async () => {
+    for (const [tr, hz] of [[0, 110], [-12, 55], [7, 110 * Math.pow(2, 7 / 12)]]) {
+      const U = TH.universe(1), id = TH.spawn(U, 'eravos.wub-osc'), c = OrganismFactory.handle(id).ctx;
+      Object.entries({ wave: 'saw', voices: 1, octave: 0, dive: 0, transpose: tr }).forEach(([k, v]) => c.params.set(k, v));
+      TH.note(U, id, 45, 0.05, { duration: 0.8 });
+      assert.near(TH.acFreq(await TH.render(U), 0.3, 0.7, hz * 0.75, hz * 1.33), hz, hz * 0.03, `Pitch ${tr} st`);
+    }
+  });
+});

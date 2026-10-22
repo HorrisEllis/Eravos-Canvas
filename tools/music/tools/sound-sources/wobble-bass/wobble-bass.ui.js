@@ -184,7 +184,7 @@ OrganismFactory.reg('eravos.wobble-bass', function (view) {
     group('RATE — beyond the grid', ['rateBend', 'rateGlide', 'lfoHz', 'lfoPhase', 'depth']),
     group('MOUTH — the filter', ['cutoff', 'res', 'formantShift']),
     group('GROWL — FM, grit, squash', ['fmIndex', 'fmRatio', 'fmWub', 'gritMode', 'shaper', 'drive', 'squash']),
-    group('PITCH — bends and dives', ['octave', 'glide', 'pitchDive', 'diveTime', 'vibrato']),
+    group('PITCH — bends and dives', ['octave', 'transpose', 'glide', 'pitchDive', 'diveTime', 'vibrato']),
     group('TONE — layers and level', ['osc2', 'sqOct', 'sub', 'subAlign', 'spread', 'width', 'noise', 'ampMod', 'attack', 'release', 'level']),
   ];
   const ctlOf = (k) => view.root.querySelector(`[data-key="${k}"]`);

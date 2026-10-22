@@ -187,3 +187,17 @@ describe('tool · Wobble Bass 3.5 — power, control, fluidity', () => {
     const b = await TH.render(U), hz = TH.acFreq(b, 0.3, 0.6, 30, 2000); assert.gt(1200 * Math.log2(hz / MusicTheory.hz(57 - 12)), 1000, hz.toFixed(1) + ' Hz: an octave up (depth 0.5 = +12 st)');
   });
 });
+
+describe('Wobble Bass 3.50 · Pitch', () => {
+  it('Pitch −12 st lowers the note an octave (the sub rides with it); 0 is unchanged', async () => {
+    const freqAt = async (tr) => {
+      const U = TH.universe(0.6, { bpm: 140 }), w = TH.spawn(U, 'eravos.wobble-bass'), c = OrganismFactory.handle(w).ctx;
+      c.params.set('transpose', tr);
+      TH.note(U, w, 45, 0.05, { duration: 0.4 }); await TH.render(U);
+      return c.internals.sub.frequency.value;
+    };
+    assert.near(await freqAt(0), 55, 0.01, 'default');
+    assert.near(await freqAt(-12), 27.5, 0.05, '−12 st');
+    assert.near(await freqAt(7), 55 * Math.pow(2, 7 / 12), 0.05, '+7 st');
+  });
+});
