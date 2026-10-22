@@ -68,7 +68,7 @@
   P49.2 GLIDE AND MORPH (eravos.motion.spec M4)                                                          mapped
         depends_on: [P49.1]
         every knob change ramps; a preset can morph over 0–8 bars; A/B on a crossfader
-  P49.3 EVERY TOOL GROWS (R2)                                                                            mapped
+  P49.3 EVERY TOOL GROWS (R2)                                                       audit built · per tool next
         depends_on: [P48.7]
         files: build/grow-audit.mjs → specs/eravos.growth.spec (generated), then one phase per tool it names
         Measured, not guessed. Clear Glass's driver opens each tool at 520 and 1400 px wide and counts what it shows (keys,
@@ -77,6 +77,12 @@
         grow in whole units around its centre).
         Candidates seen while reading (to be measured): sequencer and wub-rate steps · Pads banks (4 × 16 shown at once) ·
         mixer channels · Groove's bars · drop-builder lanes · harmonic analyzer range · xen and lattice keyboards.
+        AUDIT BUILT (2026-10-22): 62 tools measured. 15 grow (every keyboard tool, P48.7), 47 stretch (specs/eravos.growth.spec).
+        Among the stretchers, the ones with a range to show more of (the coder's read of each one's face; each is checked against
+        its code in its own phase): Sequencer (steps, lanes) · Drum Machine (banks) · Mixer (channels) · Wub Rate (steps) ·
+        Groove (bars) · Timeline and Song Recorder (bars) · Drop Builder (lanes) · Ratio Lattice (lattice extent) · Harmonic
+        Analyzer (partials) · Drum Forge (voices) · MIDI Map (pads). The effects draw their whole frequency range already: there is
+        nothing more to show, so they stay as they are, said here, not skipped.
   P49.4 LARGE TOOLS AS PARTS (R3), one tool per phase, each in the order: read its engine → its own map entry (each inner piece:
         an existing tool, a new part, or stays) → the new parts → its suite → the old tool kept as "all-in-one"
         depends_on: [P48.10, P49.1]   (motion first: once every knob is an input, the parts need no extra mod buses)
