@@ -1,0 +1,137 @@
+diff --git a/canvas/runtime/desktop-bridge.js b/canvas/runtime/desktop-bridge.js
+index 1886672..8765adc 100644
+--- a/canvas/runtime/desktop-bridge.js
++++ b/canvas/runtime/desktop-bridge.js
+@@ -5,6 +5,21 @@
+   'use strict';
+   const D = global.eravosDesktop; if (!D) return;
+   global.ERAVOS_DESKTOP = true;
++  // borderless window (2026-10-22, his call): the top bar is the title bar; − ▢ ✕ at its right end
++  if (D.window && global.document) {
++    const doc = global.document;
++    const mount = () => {
++      const bar = doc.getElementById('topbar'); if (!bar || doc.querySelector('.win-ctl')) return;
++      doc.body.classList.add('frameless');
++      const b = (cls, title, text, fn) => { const x = doc.createElement('button'); x.className = 'win-btn ' + cls; x.title = title; x.setAttribute('aria-label', title); x.textContent = text; x.addEventListener('click', (e) => { e.stopPropagation(); fn(); }); return x; };
++      const max = b('max', 'Maximize', '▢', D.window.max);
++      const box = doc.createElement('div'); box.className = 'win-ctl';
++      box.append(b('min', 'Minimize', '−', D.window.min), max, b('close', 'Close ERAVOS', '✕', D.window.close));
++      doc.body.appendChild(box);   // not inside #topbar: its stacking context sits under every overlay, and the window must always close
++      D.window.onState((s) => { const on = s && (s.maximized || s.fullscreen); max.textContent = on ? '❐' : '▢'; max.title = on ? 'Restore' : 'Maximize'; max.setAttribute('aria-label', max.title); doc.body.classList.toggle('win-max', !!on); });
++    };
++    if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', mount); else mount();
++  }
+   // the shell shows its start screen when the packs folder has loaded (tools + recipes exist by then); 20 s safety net
+   let packsReady; global.ERAVOS_PACKS_READY = new Promise((res) => { packsReady = res; setTimeout(res, 20000); });
+   async function manifestOf(ab) {
+diff --git a/canvas/runtime/eravos.css b/canvas/runtime/eravos.css
+index 924aca1..3ac0168 100644
+--- a/canvas/runtime/eravos.css
++++ b/canvas/runtime/eravos.css
+@@ -412,3 +412,15 @@ svg.wires path.wire.hot { stroke-width: 4.5; filter: drop-shadow(0 0 4px current
+ .wm-head .wm-title:hover { color: var(--acc, #00d4ff); text-decoration: underline; text-underline-offset: 3px; }
+ .tp-open { display: inline-flex; align-items: center; justify-content: center; }
+ .tp-open svg { display: block; }
++/* borderless window (ERAVOS.exe, 2026-10-22): the top bar is the title bar — drag it; its controls stay clickable */
++body.frameless #topbar { -webkit-app-region: drag; user-select: none; }
++body.frameless #topbar button, body.frameless #topbar input, body.frameless #topbar select, body.frameless #topbar a, body.frameless #topbar .tb-slot,
++body.frameless #topbar #faultLed, body.frameless #topbar #optMenu, body.frameless #topbar [role=menu], body.frameless .win-ctl { -webkit-app-region: no-drag; }
++body.frameless:not(.win-max) { box-shadow: inset 0 0 0 1px var(--line, #1a2533); }
++.win-ctl { display: flex; }
++.win-btn { width: 46px; border: 0; background: transparent; color: var(--dim, #8fa1b6); font: 15px var(--mono, monospace); cursor: pointer; }
++.win-btn:hover { background: #1a2533; color: var(--text, #d8e2ee); }
++.win-btn.close:hover { background: #c42b4a; color: #fff; }
++/* the window controls sit above every overlay (start screen, ＋ Add, tool pages): the window can always be closed or moved */
++body.frameless .win-ctl { position: fixed; top: 0; right: 0; height: 52px; margin: 0; z-index: 2147483000; background: linear-gradient(#0e141d, #0a0e14); }
++body.frameless #topbar { padding-right: 150px; }
+diff --git a/desktop/main.js b/desktop/main.js
+index 7790244..c10f426 100644
+--- a/desktop/main.js
++++ b/desktop/main.js
+@@ -113,6 +113,13 @@ async function startGlass() {
+   try { GLASS = await require(file).start({ root: APP_DIR, port: GLASS_PORT, data: path.join(DIRS.appdata, 'eravos') }); }
+   catch (e) { GLASS = null; console.error('ERAVOS Glass did not start (the canvas runs without it):', e.message); }
+ }
++ipcMain.on('eravos:win', (e, op) => {
++  if (!win || win.isDestroyed() || e.sender !== win.webContents) return;
++  if (op === 'min') win.minimize();
++  else if (op === 'max') { if (win.isFullScreen()) win.setFullScreen(false); else if (win.isMaximized()) win.unmaximize(); else win.maximize(); }
++  else if (op === 'close') win.close();
++  else if (op === 'state') e.sender.send('eravos:win-state', { maximized: win.isMaximized(), fullscreen: win.isFullScreen() });
++});
+ ipcMain.on('eravos:glass', (e) => { e.returnValue = GLASS ? { events: '/glass/events', version: 1, port: GLASS.port } : null; });
+ 
+ // ---------------------------------------------------------------- app
+@@ -157,11 +164,16 @@ app.whenReady().then(async () => {
+   const st = loadState();
+   win = new BrowserWindow({
+     width: st.width || 1600, height: st.height || 1000, x: st.x, y: st.y, minWidth: 900, minHeight: 600,
+-    backgroundColor: '#07090d', title: 'ERAVOS', autoHideMenuBar: true, show: false,
++    // 2026-10-22, his call: "can you make it borderless windowed?" — no OS frame; ERAVOS's top bar is the title bar (drag it, double-click
++    // to maximize), its own − ▢ ✕ are the window controls (canvas/runtime/desktop-bridge.js), the edges still resize. F11 = full screen.
++    frame: false, backgroundColor: '#07090d', title: 'ERAVOS', autoHideMenuBar: true, show: false,
+     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, nodeIntegration: false, sandbox: true, backgroundThrottling: false, autoplayPolicy: 'no-user-gesture-required' },
+   });
+   if (st.maximized) win.maximize();
+   win.once('ready-to-show', () => win.show());
++  // the window controls on the page (borderless): one message each way, nothing else
++  const sayWin = () => { if (win && !win.isDestroyed()) win.webContents.send('eravos:win-state', { maximized: win.isMaximized(), fullscreen: win.isFullScreen() }); };
++  ['maximize', 'unmaximize', 'enter-full-screen', 'leave-full-screen'].forEach(ev => win.on(ev, sayWin));
+   ['resize', 'move', 'close'].forEach(ev => win.on(ev, saveState));
+   const wc = win.webContents;
+   // P11.3 (gate S): the page says "unsaved changes" → ask, instead of silently refusing to close
+diff --git a/desktop/preload.js b/desktop/preload.js
+index c4d04ab..a5d9ada 100644
+--- a/desktop/preload.js
++++ b/desktop/preload.js
+@@ -11,6 +11,9 @@ contextBridge.exposeInMainWorld('eravosDesktop', {
+   onSaved: (cb) => ipcRenderer.on('eravos:saved', (e, s) => cb(s)),
+   keepPack: (name, data) => ipcRenderer.invoke('eravos:keep-pack', { name, data }),
+   openLibrary: (sub) => ipcRenderer.send('eravos:open-library', sub || ''),
++  // borderless window (2026-10-22): the page draws − ▢ ✕ and asks; it learns when the window is maximized or full screen
++  window: { min: () => ipcRenderer.send('eravos:win', 'min'), max: () => ipcRenderer.send('eravos:win', 'max'), close: () => ipcRenderer.send('eravos:win', 'close'),
++    onState: (cb) => { ipcRenderer.on('eravos:win-state', (e, s) => cb(s)); ipcRenderer.send('eravos:win', 'state'); } },
+ });
+ // ERAVOS Glass (host/glass.js) runs inside the app: tell the page before its scripts run (canvas/runtime/glass-link.js)
+ { const g = ipcRenderer.sendSync('eravos:glass'); if (g) contextBridge.exposeInMainWorld('ERAVOS_GLASS', g); }
+diff --git a/tests/frameless.mjs b/tests/frameless.mjs
+new file mode 100644
+index 0000000..2a890d8
+--- /dev/null
++++ b/tests/frameless.mjs
+@@ -0,0 +1,35 @@
++// node tests/frameless.mjs — the borderless ERAVOS.exe window, page side (2026-10-22, his call: "can you make it borderless windowed?").
++// The canvas runs with a stand-in for the app's preload (window.eravosDesktop) that records what the page asks for. It checks: the
++// top bar is the drag region, its buttons are not, − ▢ ✕ are there and send min / max / close, and ▢ becomes ❐ when maximized.
++// What it cannot check here: Electron itself (frame:false, the IPC in desktop/main.js). Run ERAVOS.exe for that.
++import path from 'path'; import { fileURLToPath } from 'url';
++import { chromium } from '../host/driver/glass.js';
++const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'), OUT = process.argv[2];
++const b = await chromium.launch(), p = await b.newPage({ viewport: { width: 1500, height: 800 } }), errs = [];
++p.on('pageerror', e => errs.push(e.message));
++await p.addInitScript(() => {
++  window.__win = []; let st = null;
++  window.eravosDesktop = { info: async () => ({ desktop: true }), ready() {}, onFile() {}, onPacks(cb) { setTimeout(() => cb([]), 10); }, packsDone() {}, fileDone() {}, onSaved() {}, keepPack: async () => ({}), openLibrary() {},
++    window: { min: () => window.__win.push('min'), max: () => { window.__win.push('max'); st && st({ maximized: true }); }, close: () => window.__win.push('close'), onState: (cb) => { st = cb; cb({ maximized: false }); } } };
++});
++let pass = 0, fail = 0; const ok = (c, m) => { if (c) { pass++; console.log('  ✓ ' + m); } else { fail++; console.log('  ✗ ' + m); } };
++await p.goto('file://' + ROOT + '/canvas/index.html');
++await p.waitForFunction(() => document.querySelector('#topbar .win-ctl'), null, { timeout: 20000 });
++const r = await p.evaluate(() => {
++  const css = (el) => getComputedStyle(el).webkitAppRegion || getComputedStyle(el).getPropertyValue('-webkit-app-region');
++  const bar = document.getElementById('topbar'), ctl = document.querySelector('.win-ctl'), btns = Array.from(ctl.querySelectorAll('.win-btn'));
++  const out = { frameless: document.body.classList.contains('frameless'), bar: css(bar), add: css(document.getElementById('addBtn')), ctl: css(ctl), labels: btns.map(x => x.textContent), right: Math.round(window.innerWidth - ctl.getBoundingClientRect().right), top: Math.round(ctl.getBoundingClientRect().top) };
++  const r1 = btns[2].getBoundingClientRect(), top = document.elementFromPoint(r1.left + r1.width / 2, r1.top + r1.height / 2);
++  out.onTop = top === btns[2] || btns[2].contains(top);
++  btns[1].click(); out.afterMax = btns[1].textContent; btns[0].click(); btns[2].click(); out.calls = window.__win.slice(); return out;
++});
++ok(r.frameless, 'the page knows it is borderless');
++ok(r.bar === 'drag', 'the top bar is the title bar (drag region): ' + r.bar);
++ok(r.add === 'no-drag' && r.ctl === 'no-drag', 'its buttons and the window controls stay clickable');
++ok(JSON.stringify(r.labels) === JSON.stringify(['−', '▢', '✕']) && r.right === 0 && r.top === 0, '− ▢ ✕ at the top right, on the bar');
++ok(JSON.stringify(r.calls) === JSON.stringify(['max', 'min', 'close']), 'they send max, min, close: ' + r.calls.join(','));
++ok(r.onTop, '✕ is on top even under the start screen (the window can always be closed)');
++ok(r.afterMax === '❐', 'maximized: ▢ becomes ❐ (restore)');
++ok(!errs.length, 'no page errors ' + errs.join(' | '));
++if (OUT) await p.screenshot({ path: OUT });
++await b.close(); console.log(`\n${pass}/${pass + fail} passed, ${fail} failed`); process.exitCode = fail ? 1 : 0;
