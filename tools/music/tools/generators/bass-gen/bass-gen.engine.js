@@ -37,11 +37,20 @@
       const energy = () => { an.getFloatTimeDomainData(mb); return Math.max(0, Math.min(1, P.get('energy') + (mb[mb.length - 1] || 0))); };
       let heard = null;   // the last chord from a wired Chords
       const from = (hook, p) => p && p._from && ctx.wiredIn(hook).includes(p._from);
-      ctx.on('harmony:chord', { type: 'object' }, (p) => { if (from('bassg.hook.chord_in', p)) heard = p; });
+      // a kick at a chord change can arrive before that chord does (whichever part ticks first — found 2026-10-22): it waits for it
+      let pending = [];
+      const chordWired = () => ctx.wiredIn('bassg.hook.chord_in').length > 0;
+      const heardEnd = () => heard ? heard.time + (heard.bars || 1) * 16 * (heard.stepDur || 0.125) : -Infinity;
+      ctx.on('harmony:chord', { type: 'object' }, (p) => {
+        if (!from('bassg.hook.chord_in', p)) return;
+        const old = pending.filter(x => x.t < p.time - 1e-6); old.forEach(x => play(x.t, x.bar, x.step, x.stepDur, true));
+        heard = p; const now = pending.filter(x => x.t >= p.time - 1e-6); pending = []; now.forEach(x => play(x.t, x.bar, x.step, x.stepDur, true));
+      });
       const ownDegree = (bar) => { const pr = PROG[P.get('progression')]; return pr[Math.floor(bar / +P.get('chordBars')) % pr.length]; };
       const degree = (bar) => (heard && ctx.wiredIn('bassg.hook.chord_in').length ? heard.degree : ownDegree(bar));
       let lastNote = null;
-      function play(t, bar, step, stepDur) {
+      function play(t, bar, step, stepDur, now) {
+        if (!now && chordWired() && t >= heardEnd() - 1e-6) { pending.push({ t, bar, step, stepDur }); return; }
         const e = energy(), k = ctx.key, up = step % 8 === 4 && e > 0.7 ? 1 : 0;
         const note = MT.degreeToMidi(degree(bar), P.get('octave') + up, k.root, k.scale), dur = stepDur * P.get('length') * (e > 0.6 ? 0.65 : 1);
         ctx.wiredOut('bassg.hook.note_out').forEach(target => ctx.emit('note:trigger', { target, note, velocity: 0.7 + 0.3 * e, time: t, duration: dur, slide: step % 4 !== 0 }));
@@ -51,6 +60,8 @@
       const following = () => P.get('rhythm') === 'groove kick' && ctx.wiredIn('bassg.hook.groove_in').length > 0;
       ctx.on('groove:step', { type: 'object' }, (p) => { if (following() && from('bassg.hook.groove_in', p) && p.kick) play(p.time, p.bar, p.step % 16, p.stepDur); });
       ctx.onTick((tk) => {
+        // a kick still waiting from an earlier tick: no chord came for it, so it plays on the last one
+        const stale = pending.filter(x => x.t < tk.time - 1e-6); if (stale.length) { pending = pending.filter(x => !stale.includes(x)); stale.forEach(x => play(x.t, x.bar, x.step, x.stepDur, true)); }
         if (following()) return;
         const bar = Math.floor(tk.step16 / 16), step = tk.step16 % 16;
         if (PATTERNS[P.get('rhythm')].includes(step)) play(tk.time, bar, step, tk.stepDur);

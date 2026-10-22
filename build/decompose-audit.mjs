@@ -29,10 +29,12 @@ const JOBS = [
   [/RHYTHM|GROOVE|SEQ|STEP|EUCLID/i, 'rhythm generator', ['eravos.sequencer', 'eravos.groove-gen']],
   [/HARMONY|CHORD|PROGRESS/i, 'chord generator', ['eravos.chord-gen']],
   [/BASSLINE|BASS\b/i, 'bassline', ['eravos.bass-gen']],
-  [/ARP/i, 'arpeggiator', []],
+  [/ARP/i, 'arpeggiator', ['eravos.arp']],
   [/MACRO|PERFORM/i, 'macros', ['eravos.macro-automation']],
   [/OUT\b|LEVEL|MIX\b|LEVELS|PAN|STEREO|WIDTH/i, 'output (stays in the tool)', null],
 ];
+// groups whose name says a shared job but which do another one (read in the engine, said here with the reason)
+const OWN = { 'eravos.ratio-lattice:ARP': 'steps its own drone’s just ratios (xen frequencies), not notes — not the Arp’s job' };
 const job = (g) => { for (const [re, name, tools] of JOBS) if (re.test(g)) return { name, tools }; return { name: 'its own (no shared job)', tools: null }; };
 
 const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
@@ -56,6 +58,7 @@ const lines = [], gaps = [];
 for (const t of data.tools.sort((a, b) => (a.category + a.label).localeCompare(b.category + b.label))) {
   const gs = Object.entries(t.groups); if (!gs.length) continue;
   const rows = gs.map(([g, keys]) => {
+    if (OWN[t.id + ':' + g]) return `      ${g.padEnd(12)} ${keys.length} knob(s) · its own: ${OWN[t.id + ':' + g]}`;
     const j = job(g); if (j.tools === null) return `      ${g.padEnd(12)} ${keys.length} knob(s) · ${j.name}`;
     if (j.tools.includes(t.id)) return `      ${g.padEnd(12)} ${keys.length} knob(s) · ${j.name} — this tool is that part`;
     const have = j.tools.filter(x => installed.has(x));

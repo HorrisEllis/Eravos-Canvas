@@ -45,7 +45,9 @@ describe('P48.10 · EDM Lab as a suite — Groove, Chords, Bassline as parts; th
     U.T.renderTicks(0, 32, 0.05);
     assert.gt(bass.length, 0, 'it played'); assert.deepEqual(bass.map(p => +p.time.toFixed(6)), kicks, 'one note on each kick, at its time');
     assert.ok(bass.every(p => p.target === r), 'to the wired Reese Bass');
-    const roots = chords.map(x => x.notes[0] % 12); assert.ok(bass.every(p => roots.includes(p.note % 12)), 'each note is a chord root');
+    // strict (2026-10-22): each note is the root of the chord playing AT ITS TIME — a kick at a chord change waits for that chord
+    const at = (t) => chords.filter(x => x.time <= t + 1e-6).pop();
+    bass.forEach(p => assert.equal(p.note % 12, at(p.time).notes[0] % 12, `bass at ${p.time.toFixed(3)} s is the root of the chord then (${at(p.time).name})`));
     // alone: its own steps (groove kick with no Groove = steps 0 and 10)
     const U2 = TH.universe(0.2), b2 = TH.spawn(U2, 'eravos.bass-gen'), r2 = TH.spawn(U2, 'eravos.reese-bass'); wire(U2, b2, 'bassg.hook.note_out', r2, 'reese.hook.note_in');
     const own = notesFrom(U2, b2); U2.T.renderTicks(0, 16, 0.05); assert.equal(own.length, 2, 'two notes in a bar on its own');

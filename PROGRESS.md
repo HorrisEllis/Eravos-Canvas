@@ -19,7 +19,10 @@ Where things stand, so work can be picked up in any session. Newest first.
 each ;arge tool rebuilt as parts if it can be used by another suite or tool"
 - P49.1 BUILT: every knob of every sound tool can be moved. Right-click → Move with LFO / Envelope / Wub Rate / XY Pad / Macro (or one already
   on the canvas). The knob shows where it is now; its saved value stays yours. tests/p49-motion.test.js.
-- Next: P49.3 growth audit (the driver measures every tool at two widths) → P49.4a Arpeggiator → P49.4b Wobble Bass → P49.2 glide/morph.
+- P49.3 audit BUILT: 62 tools measured at 520 and 1400 px (specs/eravos.growth.spec): 15 grow (the keyboards), 47 stretch.
+- P49.4a BUILT: Arp (a part: notes or a Chords in → any instrument). P49.4b BUILT: Wobble Bass → "As parts: Wub Lab" on its page.
+- Fixed: the Bassline could play the old root on a chord change (a tick-order race, shipped in 3.48).
+- Next: P49.2 glide/morph → growth per tool (Sequencer, Drum Machine, Mixer, Wub Rate, Groove…) → P49.4c Gothic Organ as parts.
 
 ## In progress — 3.48 (specs/eravos.phase48-map.spec)
 2026-10-21, his words: "make it so the tools expand when resized ... the full range of piano keys" · "like how there is 4 wub tools, but no

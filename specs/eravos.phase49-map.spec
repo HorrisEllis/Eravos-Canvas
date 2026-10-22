@@ -87,9 +87,20 @@
         an existing tool, a new part, or stays) → the new parts → its suite → the old tool kept as "all-in-one"
         depends_on: [P48.10, P49.1]   (motion first: once every knob is an input, the parts need no extra mod buses)
         P49.4a ARPEGGIATOR: the one gap with no tool, inside Retro Poly and Ratio Lattice. An Arp part (notes in → notes out,
-               as Chords and Bassline are)                                                                  mapped
+               as Chords and Bassline are)                                                       built (2026-10-22)
+               Read first: Ratio Lattice's arp steps its own drone's just ratios, not notes. That is a different job, so it stays
+               there (build/decompose-audit.mjs OWN, with the reason). The Arp does Retro Poly's: 5 orders, 1–3 octaves, triplets,
+               gate, latch, plus notes in, MIDI, a wired Chords, and its own keyboard. tests/p49-arp.test.js.
+               Found: notes or a chord sent on the tick the Arp has just played arrived after it (whichever part ticks first), so
+               the first step of a chord was lost. The Arp now plays that tick again if it played nothing. The same race was in
+               the Bassline (shipped in 95e5ea6): on a chord change it could play the old root. Measured with the old engine: A
+               under F add9 at 2.05 s. A kick at a chord change now waits for that chord. The test is now strict (each note is the
+               root of the chord at its time), and it fails on the old engine and passes on the new.
         P49.4b WOBBLE BASS → Wub Lab: its parts already exist (wub-osc, wub-filter, wub-rate, wub-sub). Only the link is
-               missing: Wobble Bass is named "all-in-one" and pointed at the suite. No new code.                mapped
+               missing: Wobble Bass is named "all-in-one" and pointed at the suite. No new code.     built (2026-10-22)
+               Changed while building: the name stays "Wobble Bass" (the one he uses). Instead, suite.json allInOne names it, and
+               its 📘 page offers "As parts: Wub Lab". Every part's page offers "Part of: <suite>" (a P48.5c item, done here).
+               EDM Lab (all-in-one) gets the same.
         P49.4c GOTHIC ORGAN: drawbars (an organ voice part), Rotary (a new effect any tool can use), its space (FX Haunt
                if it does the job), its breath motion (an LFO)                                               mapped
         P49.4d BASS FORGE: FM voice, shape, filter, LFO, pitch, most of them existing parts                    mapped
@@ -104,6 +115,8 @@
   P49.6 THE STATIC TOOLS' motion (was P48.4). Now mostly done by P49.1: their "new buses" are knob inputs. What stays is
         each tool's own macros and pad (motion M5).                                                    mapped
         depends_on: [P49.5]
+  After P49.4a/b the audit shows 0 gaps: every job a tool shares now has a standalone part. That is not the end of R3. The large tools
+  still hold their own copies inside, and P49.4c–h rebuild each one as a suite of parts.
   Order: P49.1 → P49.3 audit → P49.4a → P49.4b → P49.2 → the rest of P49.3 and P49.4 one tool at a time → P49.5 → P49.6.
   Why: motion first, because every later part leans on it. The growth audit is cheap (the driver does the work) and tells the rest
   of P49.3 what to build. The arpeggiator is the only gap that blocks two tools. Wobble Bass costs nothing.

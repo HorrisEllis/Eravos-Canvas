@@ -1,0 +1,36 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "arp.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "ERAVOS",
+ "tags": [
+  "odd-couples"
+ ],
+ "for": "eravos.arp",
+ "enabled": true,
+ "items": {
+  "eravos.arp": {
+   "presets": {
+    "Gothic Bell Ladder": {
+     "params": {
+      "order": "up-down",
+      "div": "1/8t",
+      "octaves": 3,
+      "gate": 0.9
+     }
+    },
+    "Dub Random Drops": {
+     "params": {
+      "order": "random",
+      "div": "1/16",
+      "octaves": 2,
+      "gate": 0.3,
+      "latch": true
+     }
+    }
+   }
+  }
+ }
+}

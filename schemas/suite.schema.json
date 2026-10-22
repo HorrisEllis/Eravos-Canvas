@@ -199,6 +199,10 @@
           }
         }
       }
+    },
+    "allInOne": {
+      "type": "string",
+      "description": "P49.4: the all-in-one tool these parts rebuild (its 📘 page offers 'As parts: <suite>')"
     }
   }
 }

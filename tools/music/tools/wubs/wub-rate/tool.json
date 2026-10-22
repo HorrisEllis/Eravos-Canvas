@@ -46,6 +46,7 @@
   },
   "works_with": [
     "eravos.acid-synth",
+    "eravos.arp",
     "eravos.bass-drop-builder",
     "eravos.bass-forge",
     "eravos.bass-gen",
