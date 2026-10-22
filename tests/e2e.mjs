@@ -1,5 +1,5 @@
 // E2E: build the raven-drop song with a (synthetic) vocal, bounce it, save the WAV + screenshots
-import { chromium } from 'playwright';
+import { chromium } from '../host/driver/glass.js';   // Clear Glass's driver, not Playwright (his call, 2026-10-21)
 import fs from 'fs';
 const OUT = process.argv[2] || '/tmp/claude-0/e2e';
 const vocal = fs.readFileSync(OUT + '/give_your_head_a_shake.wav').toString('base64');

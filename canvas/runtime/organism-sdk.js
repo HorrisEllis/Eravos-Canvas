@@ -86,8 +86,22 @@
       }
     }
 
+    // 3.49 (eravos.phase49-map P49.1, D-49.2): a LIVE value — what a mover (a tool wired to the knob) moves it to right now. The engine hears it
+    // (get() returns it, onChange runs) but it is never saved, never undoable, never echoed as a setting: all() and serialize()
+    // keep the knob's own value. live(k, null) hands the knob back. The window hears 'param_live' (at most every 40 ms per knob).
+    const liveVals = new Map(), liveSaid = new Map();
+    const fire = (k, v, prev) => { (paramHandlers.get(k) || []).forEach(fn => safe(() => fn(v, prev, k))); (paramHandlers.get('*') || []).forEach(fn => safe(() => fn(v, prev, k))); };
+    const sayLive = (k, v) => { const now = Date.now(); if (v !== null && now - (liveSaid.get(k) || 0) < 40) return; liveSaid.set(k, now); ctx.emitUI('param_live', { key: k, value: v }); };
     const params = {
-      get: (k) => values[k],
+      get: (k) => (liveVals.has(k) ? liveVals.get(k) : values[k]),
+      base: (k) => values[k],
+      isLive: (k) => liveVals.has(k),
+      live(k, v) {
+        if (v === null || v === undefined) { if (!liveVals.has(k)) return false; const prev = liveVals.get(k); liveVals.delete(k); fire(k, values[k], prev); sayLive(k, null); return true; }
+        const r = coerce(k, v); if (r.err) return false;
+        const prev = params.get(k); if (liveVals.has(k) && JSON.stringify(prev) === JSON.stringify(r.v)) return false;
+        liveVals.set(k, r.v); fire(k, r.v, prev); sayLive(k, r.v); return true;
+      },
       all: () => clone(values),
       schema: () => descriptor.config || [],
       set(k, v, o) {
@@ -96,10 +110,7 @@
         if (r.err) { fault('RUNTIME_002', r.err); return false; }
         const prev = values[k];
         values[k] = r.v;
-        if (!o.silent) {
-          (paramHandlers.get(k) || []).forEach(fn => safe(() => fn(r.v, prev, k)));
-          (paramHandlers.get('*') || []).forEach(fn => safe(() => fn(r.v, prev, k)));
-        }
+        if (!o.silent && !liveVals.has(k)) fire(k, r.v, prev);   // a knob being moved live: the next sample carries the new own value
         if (!o.noEcho) ctx.emitUI('param', { key: k, value: clone(r.v) });
         return true;
       },

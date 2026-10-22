@@ -1,0 +1,58 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.chord-gen",
+  "version": "1.0.0",
+  "label": "Chords",
+  "icon": "🎹",
+  "accent": "#b066ff",
+  "domain": "music",
+  "category": "generators",
+  "summary": "A chord progression in key, voiced by TENSION: plays any poly tool wired to it and tells a Bassline the chord.",
+  "tags": [
+    "generators",
+    "chords",
+    "harmony",
+    "edm"
+  ],
+  "files": {
+    "engine": "chord-gen.engine.js",
+    "ui": "chord-gen.ui.js",
+    "spec": "chord-gen.spec",
+    "tests": "chord-gen.test.js",
+    "preview": "preview.png"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "bus_publish",
+      "bus_subscribe",
+      "registry_read"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory",
+      "odd-couples"
+    ]
+  },
+  "works_with": [
+    "eravos.breath",
+    "eravos.embodiment-lab",
+    "eravos.fx-dynamics",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.sidechain-compressor",
+    "eravos.syn-env",
+    "eravos.wub-rate",
+    "eravos.xy-pad"
+  ],
+  "conflicts": [],
+  "status": "built"
+}

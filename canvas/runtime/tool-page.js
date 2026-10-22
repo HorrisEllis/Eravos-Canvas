@@ -158,6 +158,11 @@
       ]),
     ]));
     page.appendChild(h('div', { class: 'tp-on' }, [h('span', { text: 'Works on: ' }), pick]));
+    // 3.49 (P49.4): this tool as parts — a suite whose allInOne names it (and the suites it is a part of)
+    const SU = global.Suites, asParts = SU ? SU.list().filter(x => x.allInOne === d.id) : [], partOf = SU ? SU.forTool(d.id) : [];
+    if (asParts.length || partOf.length) page.appendChild(h('div', { class: 'tp-on tp-parts' }, [].concat(
+      asParts.map(x => btn('🧰 As parts: ' + x.label, 'the same tool rebuilt from parts you can swap and use elsewhere — opens its suite window', () => { close(); SU.openAsync(x.id, { K }); }, 'pri tp-asparts')),
+      partOf.map(x => btn('🧰 Part of: ' + x.label, 'open that suite', () => { close(); SU.openAsync(x.id, { K }); }, 'tp-partof')))));
 
     const nav = h('nav', { class: 'tp-nav' }); page.appendChild(nav);
     const navTo = (id, label) => nav.appendChild(btn(label, 'jump to ' + label, () => { const s = page.querySelector(`[data-sec="${id}"]`); if (s) s.scrollIntoView({ block: 'start' }); }));

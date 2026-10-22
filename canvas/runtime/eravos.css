@@ -95,6 +95,10 @@ svg.wires { position: absolute; pointer-events: none; overflow: visible; z-index
 .uk-knob-track { fill: none; stroke: #243244; stroke-width: 4; stroke-linecap: round; }
 .uk-knob-arc { fill: none; stroke: var(--acc); stroke-width: 4; stroke-linecap: round; filter: drop-shadow(0 0 3px var(--acc)); }
 .uk-knob-dot { fill: #e8f4ff; }
+/* 3.49 P49.1: a knob a mover is moving (a tool wired to it) — where it is now (its own value stays the arc) */
+.uk-knob-live { fill: #c58bff; filter: drop-shadow(0 0 3px #c58bff); }
+.uk-knob.moving .uk-knob-label::after, .uk-toggle.moving::after { content: " ∿"; color: #c58bff; }
+.uk-seg.moving, .uk-select.moving { box-shadow: 0 0 0 1px #c58bff; }
 .uk-knob.active .uk-knob-arc { stroke-width: 5; }
 .uk-knob-val { font: 10.5px var(--mono); color: var(--text); margin-top: -2px; }
 .uk-knob-label { font: 600 9.5px var(--font); color: var(--dim); text-align: center; line-height: 1.1; max-width: 100%; overflow: hidden; white-space: normal; overflow-wrap: break-word; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; min-height: 2.2em; max-width: calc(100% + 16px); margin: 0 -8px; } /* 3.37: two lines, never an ellipsis; a long single word may overhang the knob a little instead of breaking */

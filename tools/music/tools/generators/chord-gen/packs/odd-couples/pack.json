@@ -1,0 +1,36 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "chord-gen.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "ERAVOS",
+ "tags": [
+  "odd-couples"
+ ],
+ "for": "eravos.chord-gen",
+ "enabled": true,
+ "items": {
+  "eravos.chord-gen": {
+   "presets": {
+    "Choir Sus Swell": {
+     "params": {
+      "progression": "i-v-VI-iv",
+      "tension": 0.65,
+      "chordBars": 2,
+      "octave": 4,
+      "gate": 1
+     }
+    },
+    "Dub Siren Cluster": {
+     "params": {
+      "progression": "i-i-VI-VII",
+      "tension": 0.95,
+      "chordBars": 4,
+      "octave": 2
+     }
+    }
+   }
+  }
+ }
+}

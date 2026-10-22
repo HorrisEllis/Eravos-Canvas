@@ -1,0 +1,48 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "chord-gen.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "ERAVOS",
+ "tags": [
+  "factory",
+  "edm"
+ ],
+ "for": "eravos.chord-gen",
+ "enabled": true,
+ "items": {
+  "eravos.chord-gen": {
+   "presets": {
+    "Dark Minor": {
+     "params": {
+      "progression": "i-VI-III-VII",
+      "tension": 0.2,
+      "chordBars": 1
+     }
+    },
+    "Lifted add9": {
+     "params": {
+      "progression": "vi-IV-I-V",
+      "tension": 0.4,
+      "chordBars": 1
+     }
+    },
+    "Sus Tension": {
+     "params": {
+      "progression": "i-iv-v-i",
+      "tension": 0.6,
+      "chordBars": 1
+     }
+    },
+    "Cluster Drop": {
+     "params": {
+      "progression": "i-i-VI-VII",
+      "tension": 0.9,
+      "chordBars": 2
+     }
+    }
+   }
+  }
+ }
+}

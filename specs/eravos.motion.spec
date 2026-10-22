@@ -59,3 +59,13 @@
   the saved value is unchanged by motion; undo history does not fill with motion steps
   the four static tools ship 4 macros + a perform pad each; preset morph glides (no step > 1 dB / 50 cents per 10 ms)
   tests: tests/p48-motion.test.js + each tool's own test file
+
+## ADDENDUM 2026-10-22 — M1 built differently: the movers are the part tools (eravos.phase49-map P49.1, D-49.1)
+  James, 2026-10-22: "Motion core: any knob can be moved by an LFO or envelope."
+  M1 above designed motion inside each knob, with a motion engine of its own. It is superseded, and kept (§0.3). Built instead:
+  every knob of every sound tool has an input (knob.<key>). The LFO, Envelope, Wub Rate, XY Pad and Macro tools wire to it, from
+  the knob's right-click menu "Move with". The moving value is live (params.live): heard, never saved, never undoable. Reasons:
+  those tools exist (§8.6), and his rule of 10-21 makes what other tools can use a part. To confirm: if he meant motion inside the
+  knob with no window, M1 can still be built on params.live, which already exists.
+  M2–M5 are unchanged and re-phased: M4 → P49.2, M2/M3 → P49.5, M5 → P49.6. M5's "new buses" for the static tools are no longer
+  needed: every knob is an input now.

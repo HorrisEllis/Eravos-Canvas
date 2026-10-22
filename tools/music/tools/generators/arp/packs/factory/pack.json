@@ -1,0 +1,60 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "arp.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "ERAVOS",
+ "tags": [
+  "factory"
+ ],
+ "for": "eravos.arp",
+ "enabled": true,
+ "items": {
+  "eravos.arp": {
+   "presets": {
+    "Synthwave 1/16 Up": {
+     "params": {
+      "order": "up",
+      "div": "1/16",
+      "octaves": 2,
+      "gate": 0.5
+     }
+    },
+    "Trance Up-Down": {
+     "params": {
+      "order": "up-down",
+      "div": "1/16",
+      "octaves": 2,
+      "gate": 0.4
+     }
+    },
+    "Dreamy 1/8 Down": {
+     "params": {
+      "order": "down",
+      "div": "1/8",
+      "octaves": 1,
+      "gate": 0.8
+     }
+    },
+    "Triplet Roll": {
+     "params": {
+      "order": "up",
+      "div": "1/16t",
+      "octaves": 1,
+      "gate": 0.45
+     }
+    },
+    "As Played, Latched": {
+     "params": {
+      "order": "played",
+      "div": "1/8",
+      "octaves": 1,
+      "gate": 0.6,
+      "latch": true
+     }
+    }
+   }
+  }
+ }
+}

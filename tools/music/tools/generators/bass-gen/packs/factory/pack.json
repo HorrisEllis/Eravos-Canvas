@@ -1,0 +1,49 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "bass-gen.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "ERAVOS",
+ "tags": [
+  "factory",
+  "edm"
+ ],
+ "for": "eravos.bass-gen",
+ "enabled": true,
+ "items": {
+  "eravos.bass-gen": {
+   "presets": {
+    "On the Kick": {
+     "params": {
+      "rhythm": "groove kick",
+      "energy": 0.6,
+      "length": 2.5
+     }
+    },
+    "Rolling Eighths": {
+     "params": {
+      "rhythm": "eighths",
+      "energy": 0.7,
+      "length": 1.2
+     }
+    },
+    "Offbeat House": {
+     "params": {
+      "rhythm": "offbeats",
+      "energy": 0.6,
+      "length": 1.5
+     }
+    },
+    "Half-time Sub": {
+     "params": {
+      "rhythm": "half-time",
+      "energy": 0.4,
+      "length": 8,
+      "octave": 1
+     }
+    }
+   }
+  }
+ }
+}

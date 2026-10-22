@@ -162,3 +162,10 @@ dependencies:
   works_with: [eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
 
 # 3.48 SUITES (specs/eravos.suites.spec): part of music.drop-rig — usable alone as always; its 📘 page shows "Part of" and links the suite page
+
+## ADDENDUM 2026-10-22 — its parts are Wub Lab (eravos.phase49-map P49.4b)
+  James, 2026-10-22: "each ;arge tool rebuilt as parts if it can be used by another suite or tool"
+  Wobble Bass's jobs already exist as parts: Wub Osc (voice, FM), Wub Filter (mouth, vowels), Wub Rate (the wobble's rhythm), Wub Sub
+  (the clean low end). Its envelope is the Envelope, and its grit is the Destroyer. The suite music.wub-lab names Wobble Bass as its
+  all-in-one (allInOne), and its 📘 page offers "As parts: Wub Lab". No code moved. Its name stays "Wobble Bass", the one he uses.
+  Not covered by a part yet: the drawn wobble shape, the perform pad (P49.5 makes that generic), the growl slot. They stay here.

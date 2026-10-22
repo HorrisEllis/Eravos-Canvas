@@ -6,7 +6,7 @@
  * Bundles that span tools (PresetPacks data files) → tools/<d>/content/bundles/<id>/pack.json.
  * Specs of tools never built → tools/<d>/planned/<id>.spec. Runs the page once to read what the code defines.
  *   node build/migrate-tools.mjs            (then: node build/index-tools.mjs && node build/validate.mjs) */
-import { chromium } from 'playwright'; import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
+import { chromium } from '../host/driver/glass.js';   // Clear Glass's driver, not Playwright (his call, 2026-10-21) import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
 import * as acorn from 'acorn';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'), MUSIC = path.join(ROOT, 'tools', 'music');
 const ORG = path.join(MUSIC, 'organisms'); if (!fs.existsSync(ORG)) { console.log('nothing to migrate'); process.exit(0); }

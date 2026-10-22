@@ -1,0 +1,180 @@
+{
+  "schema": "eravos.suite/1",
+  "id": "music.wub-lab",
+  "label": "Wub Lab",
+  "icon": "🧰",
+  "accent": "#ff2266",
+  "version": "1.0.0",
+  "blurb": "The wub, built from parts. Wub Osc is the voice, Wub Filter the mouth it speaks through, Wub Rate the rhythm that opens the mouth, Wub Sub the clean low end. An Envelope opens the growl on every note; a Destroyer inside the osc gives it teeth. Every part is its own tool, and they all end in this suite.",
+  "hub": "eravos.suite-hub",
+  "allInOne": "eravos.wobble-bass",
+  "parts": [
+    {
+      "tool": "eravos.wub-osc",
+      "role": "voice",
+      "required": true,
+      "preset": "Classic Wub Saw",
+      "why": "the raw tone — saw, square, reese, FM growl"
+    },
+    {
+      "tool": "eravos.wub-filter",
+      "role": "mouth",
+      "required": true,
+      "preset": "Yoi Vowel (OO → AH)",
+      "why": "the vowel filter the voice speaks through"
+    },
+    {
+      "tool": "eravos.wub-rate",
+      "role": "rhythm",
+      "required": true,
+      "preset": "Classic 1/8",
+      "why": "opens and closes the mouth on the beat"
+    },
+    {
+      "tool": "eravos.wub-sub",
+      "role": "low end",
+      "required": true,
+      "preset": "Clean Sine",
+      "notes": false,
+      "why": "follows the voice's notes on its own: the clean sub under the wobble"
+    },
+    {
+      "tool": "eravos.syn-env",
+      "role": "shape",
+      "preset": "Pluck Sweep",
+      "why": "every note opens the FM growl, then it settles"
+    },
+    {
+      "tool": "eravos.fx-destroyer",
+      "role": "grit",
+      "as": "mod",
+      "slot": "tone",
+      "in": "eravos.wub-osc",
+      "preset": "Fold Growl",
+      "why": "teeth inside the osc, before the mouth"
+    }
+  ],
+  "wiring": [
+    {
+      "from": [
+        "eravos.wub-osc",
+        "wubo.hook.audio_out"
+      ],
+      "to": [
+        "eravos.wub-filter",
+        "fx.hook.audio_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.wub-rate",
+        "wubrate.hook.mod_out"
+      ],
+      "to": [
+        "eravos.wub-filter",
+        "wubf.hook.mod_wub"
+      ]
+    },
+    {
+      "from": [
+        "eravos.syn-env",
+        "env.hook.mod_out"
+      ],
+      "to": [
+        "eravos.wub-osc",
+        "wubo.hook.mod_fm"
+      ]
+    }
+  ],
+  "output": [
+    "eravos.wub-filter",
+    "eravos.wub-sub"
+  ],
+  "starter": "Classic Wub",
+  "scenes": {
+    "Classic Wub": {
+      "eravos.wub-osc": {
+        "preset": "Classic Wub Saw"
+      },
+      "eravos.wub-filter": {
+        "preset": "Classic LP Wub"
+      },
+      "eravos.wub-rate": {
+        "preset": "Classic 1/8"
+      },
+      "eravos.wub-sub": {
+        "preset": "Clean Sine"
+      }
+    },
+    "Yoi Talker": {
+      "eravos.wub-osc": {
+        "preset": "Square Talker"
+      },
+      "eravos.wub-filter": {
+        "preset": "Talking Yoi (OH → EE)"
+      },
+      "eravos.wub-rate": {
+        "preset": "Half-time Talk"
+      },
+      "eravos.wub-sub": {
+        "preset": "Clean Sine"
+      }
+    },
+    "Riddim": {
+      "eravos.wub-osc": {
+        "preset": "FM Riddim 2:1"
+      },
+      "eravos.wub-filter": {
+        "preset": "Riddim Notch"
+      },
+      "eravos.wub-rate": {
+        "preset": "Riddim Stabs"
+      },
+      "eravos.wub-sub": {
+        "preset": "Triangle Punch"
+      }
+    },
+    "Bun Dem Growl": {
+      "eravos.wub-osc": {
+        "preset": "Dancehall Growl Stack (FM 1:1)"
+      },
+      "eravos.wub-filter": {
+        "preset": "Bun Dem Throat (OO → AE)"
+      },
+      "eravos.wub-rate": {
+        "preset": "Dancehall Switch-up"
+      },
+      "eravos.wub-sub": {
+        "preset": "Warm Phone Sub"
+      }
+    },
+    "Screech": {
+      "eravos.wub-osc": {
+        "preset": "Slide Lead (+1 oct)"
+      },
+      "eravos.wub-filter": {
+        "preset": "Screech Reso"
+      },
+      "eravos.wub-rate": {
+        "preset": "Triplet Roll"
+      },
+      "eravos.wub-sub": {
+        "preset": "Clean Sine"
+      }
+    },
+    "Half-time Roll": {
+      "eravos.wub-osc": {
+        "preset": "Reese Roller"
+      },
+      "eravos.wub-filter": {
+        "preset": "Gentle 12 dB"
+      },
+      "eravos.wub-rate": {
+        "preset": "Slow Yoi 1/2"
+      },
+      "eravos.wub-sub": {
+        "preset": "808 Slide"
+      }
+    }
+  }
+}

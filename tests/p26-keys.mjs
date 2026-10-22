@@ -2,7 +2,7 @@
 /* P37.3 shell test (real page, real pointer clicks): every on-screen key of every tool makes sound, lights ITSELF, and is
  * not covered by anything (the bug: tall windows put their keyboard under the docked Song Recorder).
  *   node tests/p26-keys.mjs   → exit 1 on any failure */
-import { chromium } from 'playwright'; import path from 'path'; import { fileURLToPath } from 'url';
+import { chromium } from '../host/driver/glass.js';   // Clear Glass's driver, not Playwright (his call, 2026-10-21) import path from 'path'; import { fileURLToPath } from 'url';
 const ROOT = process.argv[2] || path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'); let failed = 0;
 const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
 const p = await b.newPage({ viewport: { width: 1600, height: 1000 } }); p.on('dialog', d => d.accept());

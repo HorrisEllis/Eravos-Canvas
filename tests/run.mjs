@@ -1,5 +1,5 @@
 // Playwright runner: node tests/run.mjs [filter]  → runs tests/run.html in Chromium, prints results
-import { chromium } from 'playwright';
+import { chromium } from '../host/driver/glass.js';   // Clear Glass's driver, not Playwright (his call, 2026-10-21)
 import path from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
