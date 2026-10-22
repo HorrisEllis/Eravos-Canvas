@@ -71,6 +71,7 @@
     "eravos.groove-gen",
     "eravos.harmonic-analyzer",
     "eravos.lfo",
+    "eravos.macro-automation",
     "eravos.master-fx",
     "eravos.organ",
     "eravos.pad-forge",
@@ -93,7 +94,8 @@
     "eravos.wub-osc",
     "eravos.wub-rate",
     "eravos.wub-sub",
-    "eravos.xen-synth"
+    "eravos.xen-synth",
+    "eravos.xy-pad"
   ],
   "status": "built",
   "conflicts": []

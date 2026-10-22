@@ -84,7 +84,9 @@
     const svg = doc.createElementNS(svgNS, 'svg'); svg.setAttribute('width', size); svg.setAttribute('height', size); svg.setAttribute('viewBox', '0 0 40 40');
     const track = doc.createElementNS(svgNS, 'path'), arc = doc.createElementNS(svgNS, 'path'), dot = doc.createElementNS(svgNS, 'circle');
     track.setAttribute('class', 'uk-knob-track'); arc.setAttribute('class', 'uk-knob-arc'); dot.setAttribute('class', 'uk-knob-dot'); dot.setAttribute('r', '2.6');
-    svg.append(track, arc, dot);
+    // 3.49 (P49.1): where a moving knob is right now (a mover is wired to it) — a second dot; its own value stays the arc
+    const liveDot = doc.createElementNS(svgNS, 'circle'); liveDot.setAttribute('class', 'uk-knob-live'); liveDot.setAttribute('r', '2.2'); liveDot.style.display = 'none';
+    svg.append(track, arc, dot, liveDot);
     const lbl = h('div', { class: 'uk-knob-label', text: o.label || o.key || '' });
     const val = h('div', { class: 'uk-knob-val' });
     const el = h('div', { class: 'uk-knob' + (o.big ? ' big' : ''), title: (o.label || '') + (o.hint ? ' — ' + o.hint : '') + '\n(drag or arrow keys · shift fine · dbl-click / Delete resets)',
@@ -125,7 +127,12 @@
     svg.addEventListener('wheel', (e) => { if (!wheelStartedOn(svg)) return; e.preventDefault(); e.stopPropagation(); const nv = m.fromN(m.toN(value) - Math.sign(e.deltaY) * (e.shiftKey ? 0.002 : 0.01)); if (nv !== value) { value = nv; draw(); o.onChange && o.onChange(value); } }, { passive: false });
     svg.addEventListener('dblclick', () => { value = o.default !== undefined ? o.default : o.min; draw(); o.onChange && o.onChange(value); });
     draw();
-    return { el, set(v) { if (typeof v === 'number') { value = v; draw(); } }, get: () => value };
+    function live(v) {
+      if (v === null || v === undefined || typeof v !== 'number') { liveDot.style.display = 'none'; el.classList.remove('moving'); return; }
+      const [x, y] = pol(A0 + (A1 - A0) * Math.max(0, Math.min(1, m.toN(v))), 16.5); liveDot.setAttribute('cx', x); liveDot.setAttribute('cy', y);
+      liveDot.style.display = ''; el.classList.add('moving');
+    }
+    return { el, set(v) { if (typeof v === 'number') { value = v; draw(); } }, get: () => value, live };
   }
 
   // ---------------------------------------------------------------- Fader (vertical)
@@ -286,6 +293,9 @@
     else if (c.type === 'string') { const inp = h('input', { class: 'uk-text', value: view.state[c.key] || '' }); inp.addEventListener('change', () => send(inp.value)); inp.addEventListener('pointerdown', e => e.stopPropagation()); ctl = { el: h('label', { class: 'uk-field' }, [h('span', { text: c.label || c.key }), inp]), set: (v) => { inp.value = v; } }; }
     else return null;
     view.bind(c.key, (v) => ctl.set(v));
+    // 3.49 (P49.1): a knob being moved shows where it is now; right-click offers what can move it (UIKit.knobMenu, from a domain)
+    if (view.on) view.on('param_live', (p) => { if (!p || p.key !== c.key) return; if (ctl.live) ctl.live(p.value); else ctl.el.classList.toggle('moving', p.value !== null); });
+    ctl.el.addEventListener('contextmenu', (e) => { if (!global.UIKit.knobMenu) return; e.preventDefault(); e.stopPropagation(); global.UIKit.knobMenu(e, view, c, ctl); });
     return ctl;
   }
   function paramPanel(view, keys, o) {

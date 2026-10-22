@@ -43,10 +43,12 @@
     "shipped": []
   },
   "works_with": [
+    "eravos.breath",
     "eravos.channel",
     "eravos.clip-maker",
     "eravos.contrast-analyser",
     "eravos.dub-station",
+    "eravos.embodiment-lab",
     "eravos.fx-destroyer",
     "eravos.fx-dynamics",
     "eravos.fx-echo",
@@ -59,14 +61,19 @@
     "eravos.fx-pitch",
     "eravos.granular",
     "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.macro-automation",
     "eravos.master-fx",
     "eravos.sidechain-compressor",
     "eravos.suite-hub",
+    "eravos.syn-env",
     "eravos.syn-osc",
     "eravos.wobble-bass",
     "eravos.wub-filter",
     "eravos.wub-osc",
-    "eravos.wub-sub"
+    "eravos.wub-rate",
+    "eravos.wub-sub",
+    "eravos.xy-pad"
   ],
   "status": "built",
   "conflicts": []

@@ -233,5 +233,46 @@
     return { hit };
   }
   const presetBar = (view) => global.UIKit.presetBar(view), paramPanel = (v, k, op) => global.UIKit.paramPanel(v, k, op), hint = (t) => global.UIKit.hint(t);
-  UI.extend({ atTime, Meter, readLevel, Scope, Spectrum, Keyboard, keyRange, divisionLadder, audioRouting, instrumentPanel, alive });
+  // 3.49 MOTION CORE (eravos.phase49-map P49.1): right-click any knob → what can move it. James, 2026-10-22: "Motion core: any knob can
+  // be moved by an LFO or envelope". The movers are the part tools themselves (D-49.1): adding one opens it beside the window, wired
+  // to this knob. A mover already on the canvas can be wired instead. Stop removes the wire (the knob is its own value again).
+  // Every step is the user's own (spawn, kernel wire, remove), so Ctrl+Z takes it back.
+  const MOVERS = [['eravos.lfo', 'LFO', 'a steady movement in time'], ['eravos.syn-env', 'Envelope', 'a shape on every note this tool plays'],
+    ['eravos.wub-rate', 'Wub Rate', 'a rhythm of rates (the wobble)'], ['eravos.xy-pad', 'XY Pad', 'your hand, on a pad'], ['eravos.macro-automation', 'Macro', 'drawn over the song']];
+  const modOut = (d) => (d && d.hooks || []).find(hk => hk.wire_type === 'modulation' && (hk.direction === 'out' || hk.direction === 'inout'));
+  // the input that moves this knob: its own audio-rate input if it has one, else its knob input
+  function knobHook(d, key) { const own = (d.hooks || []).find(hk => hk.wire_type === 'modulation' && hk.direction === 'in' && hk.mod_key === key); return own ? own.hook_id : ((d.hooks || []).some(hk => hk.hook_id === 'knob.' + key) ? 'knob.' + key : null); }
+  let menuEl = null;
+  function closeKnobMenu() { if (menuEl) { menuEl.remove(); menuEl = null; } }
+  function moveWith(K, id, key, srcId) {
+    const F = global.OrganismFactory, r = F.handle(id), src = F.handle(srcId); if (!r || !src) return null;
+    const hk = knobHook(r.def, key), o = modOut(src.def); if (!hk || !o) return null;
+    const w = K.wires.register({ src: { instanceId: srcId, hookId: o.hook_id }, dst: { instanceId: id, hookId: hk } });
+    return w && w.ok ? w.wire_id : null;
+  }
+  function addMover(K, id, key, tool) {
+    const F = global.OrganismFactory, WM = global.CanvasWM, win = WM && WM.windowOf && WM.windowOf(id);
+    const at = win ? { x: Math.round(parseFloat(win.style.left) + win.offsetWidth + 24), y: Math.round(parseFloat(win.style.top)) } : {};
+    const m = F.spawn(tool, Object.assign({ K }, at)); if (!m) return null;
+    return moveWith(K, id, key, m) ? m : null;
+  }
+  function knobMenu(e, view, c) {
+    closeKnobMenu();
+    const K = view.K, F = global.OrganismFactory, id = view.instanceId, hk = knobHook(view.descriptor, c.key);
+    if (!hk) return;   // a setting nothing can move (texts, files, or a tool without sound)
+    const into = K.wires.list().filter(w => w.dst.instanceId === id && w.dst.hookId === hk);
+    const here = K.registry.list().map(x => F.handle(x.instance_id)).filter(x => x && !x.unmounted && x.instanceId !== id && modOut(x.def) && !into.some(w => w.src.instanceId === x.instanceId));
+    const item = (text, hint, fn, cls) => { const b = h('button', { class: 'km-item' + (cls ? ' ' + cls : ''), text, title: hint || '' }); b.addEventListener('click', (ev) => { ev.stopPropagation(); closeKnobMenu(); fn(); }); return b; };
+    menuEl = h('div', { class: 'km', role: 'menu', 'aria-label': 'move ' + (c.label || c.key) }, [h('div', { class: 'km-h', text: 'Move “' + (c.label || c.key) + '” with' })]
+      .concat(MOVERS.filter(([t]) => F.def(t)).map(([t, l, why]) => item('＋ ' + (F.def(t).icon || '') + ' ' + l, why + ' — opens beside this window, wired to this knob', () => addMover(K, id, c.key, t))))
+      .concat(here.length ? [h('div', { class: 'km-s', text: 'on the canvas' })].concat(here.map(x => item('⇠ ' + (x.def.icon || '') + ' ' + x.def.label, 'wire it to this knob', () => moveWith(K, id, c.key, x.instanceId)))) : [])
+      .concat(into.length ? [h('div', { class: 'km-s', text: 'moving it now' })].concat(into.map(w => { const sr = F.handle(w.src.instanceId); return item('× stop ' + (sr ? sr.def.label : 'it'), 'unwire it: the knob is its own value again', () => K.wires.remove(w.wire_id, 'user'), 'stop'); })) : []));
+    doc.body.appendChild(menuEl);
+    const W = global.innerWidth || 1200, H = global.innerHeight || 800;
+    menuEl.style.left = Math.min(e.clientX, W - 240) + 'px'; menuEl.style.top = Math.min(e.clientY, H - menuEl.offsetHeight - 8) + 'px';
+    setTimeout(() => { const off = (ev) => { if (menuEl && !menuEl.contains(ev.target)) { closeKnobMenu(); doc.removeEventListener('pointerdown', off, true); } }; doc.addEventListener('pointerdown', off, true); }, 0);
+  }
+  if (doc) doc.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeKnobMenu(); }, true);
+
+  UI.extend({ knobMenu, motion: { MOVERS, knobHook, moveWith, addMover, close: closeKnobMenu }, atTime, Meter, readLevel, Scope, Spectrum, Keyboard, keyRange, divisionLadder, audioRouting, instrumentPanel, alive });
 })(typeof window !== 'undefined' ? window : globalThis);

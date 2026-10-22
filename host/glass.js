@@ -12,6 +12,7 @@
  *   canvas.tools · canvas.state · canvas.spawn {tool, preset?} · canvas.set {instanceId, key, value | params} ·
  *   canvas.preset {instanceId, name} · canvas.wire {from:[id,hook], to:[id,hook]} · canvas.unwire {wireId} ·
  *   canvas.close {instanceId} · canvas.suite {tool, instanceId?} ·
+ *   canvas.move {instanceId, key, with} · canvas.unmove {instanceId, key} ·
  *   canvas.suites · canvas.suite.open {suite, build?} · canvas.suite.build|state {instanceId} · canvas.suite.add {instanceId, tool, preset?} ·
  *   canvas.suite.scene {instanceId, name} · canvas.suite.macro {instanceId, index, value} · canvas.suite.fold {instanceId, on?}
  *   cos.list · cos.gate {id, deep?}   (gating a parent gates everything nested in it; eravos.canvas = the whole tree)
@@ -46,6 +47,8 @@ const CANVAS_CMDS = {
   'canvas.suite.scene': [{ instanceId: 'string', name: 'string' }, 'load a scene: sets every part of the system'],
   'canvas.suite.state': [{ instanceId: 'string' }, 'a suite window: its parts (here or not), the scene, every wire on or off'],
   'canvas.suite.macro': [{ instanceId: 'string', index: 'number', value: 'number' }, 'turn one of the suite’s macros (0…1): it moves every part it names'],
+  'canvas.move': [{ instanceId: 'string', key: 'string', with: 'string' }, 'move any knob with a mover: a tool id (LFO, Envelope… opens beside it) or one already on the canvas (its instanceId)'],
+  'canvas.unmove': [{ instanceId: 'string', key: 'string' }, 'stop whatever moves that knob (it is its own value again)'],
   'canvas.suite.fold': [{ instanceId: 'string', 'on?': 'boolean' }, 'fold every part window to its title bar (on: false opens them again)'],
 };
 

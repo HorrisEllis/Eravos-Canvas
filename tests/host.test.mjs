@@ -128,6 +128,12 @@ await it('the EDM Lab suite through the door: open built, turn ENERGY, fold the 
   const m = await cmd('canvas.suite.macro', { instanceId: o.result.instanceId, index: 0, value: 0.9 }); ok(m.ok && m.result.macro === 'ENERGY' && m.result.parts === 3, JSON.stringify(m));
   const f = await cmd('canvas.suite.fold', { instanceId: o.result.instanceId }); ok(f.ok && f.result.windows === 6, JSON.stringify(f));
 });
+await it('motion through the door: any knob moved by an LFO, then stopped', async () => {
+  const s = await cmd('canvas.spawn', { tool: 'eravos.wub-sub' });
+  const m = await cmd('canvas.move', { instanceId: s.result.instanceId, key: 'cut', with: 'eravos.lfo' }); ok(m.ok && m.result.by, JSON.stringify(m));
+  ok((await cmd('canvas.move', { instanceId: s.result.instanceId, key: 'nope', with: 'eravos.lfo' })).error.includes('no setting'), 'unknown knob refused');
+  const u = await cmd('canvas.unmove', { instanceId: s.result.instanceId, key: 'cut' }); ok(u.ok && u.result.removed === 1, JSON.stringify(u));
+});
 await it('SSE: an outside listener sees commands and page events', async () => {
   const ctl = new AbortController(), r = await fetch(g.url + 'glass/events?replay=5', { signal: ctl.signal }), rd = r.body.getReader(); let txt = '';
   const t0 = Date.now(); while (Date.now() - t0 < 3000 && !txt.includes('"type"')) { const { value } = await rd.read(); txt += new TextDecoder().decode(value); }

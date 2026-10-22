@@ -14,6 +14,13 @@ Where things stand, so work can be picked up in any session. Newest first.
   a rebuilt UI and the Bun Dem matched presets.
 - Destroyer 2.0 · Links & Mods · synthesis tools (Morph Osc, Envelope, Partials, Granular) · Songs by category.
 
+## In progress — 3.49 (specs/eravos.phase49-map.spec)
+2026-10-22, his words: "Motion core: any knob can be moved by an LFO or envelope. Windows that grow (keyboards up to 88 keys) not just paino.
+each ;arge tool rebuilt as parts if it can be used by another suite or tool"
+- P49.1 BUILT: every knob of every sound tool can be moved. Right-click → Move with LFO / Envelope / Wub Rate / XY Pad / Macro (or one already
+  on the canvas). The knob shows where it is now; its saved value stays yours. tests/p49-motion.test.js.
+- Next: P49.3 growth audit (the driver measures every tool at two widths) → P49.4a Arpeggiator → P49.4b Wobble Bass → P49.2 glide/morph.
+
 ## In progress — 3.48 (specs/eravos.phase48-map.spec)
 2026-10-21, his words: "make it so the tools expand when resized ... the full range of piano keys" · "like how there is 4 wub tools, but no
 primay system ... they all connect to the suite, but can be mixed and matched" · "not playright. isn't clearglass in this project".

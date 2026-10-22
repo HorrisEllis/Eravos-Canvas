@@ -25,6 +25,7 @@
                       "scene": {
                         "type": "string"
                       },
+                      "opened": {},
                       "level": {
                         "type": "number",
                         "minimum": 0,
