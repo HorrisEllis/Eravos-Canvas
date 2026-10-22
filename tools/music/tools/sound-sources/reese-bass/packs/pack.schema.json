@@ -34,6 +34,16 @@
                         "minimum": 0,
                         "maximum": 1
                       },
+                      "octave": {
+                        "type": "integer",
+                        "minimum": -4,
+                        "maximum": 2
+                      },
+                      "transpose": {
+                        "type": "number",
+                        "minimum": -36,
+                        "maximum": 24
+                      },
                       "cutoff": {
                         "type": "number",
                         "minimum": 40,
@@ -109,6 +119,18 @@
                         "maximum": 1.5
                       },
                       "sub": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "subOct": {
+                        "enum": [
+                          "0",
+                          "-1",
+                          "-2"
+                        ]
+                      },
+                      "subWarm": {
                         "type": "number",
                         "minimum": 0,
                         "maximum": 1

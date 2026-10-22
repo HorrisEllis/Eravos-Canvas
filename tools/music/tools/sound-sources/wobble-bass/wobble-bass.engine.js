@@ -151,6 +151,7 @@
       { key: 'shaper', type: 'number', default: 0.3, min: 0, max: 1, step: 0.01, label: 'Grit', group: 'TONE' },
       { key: 'gritMode', type: 'enum', options: ['auto', 'soft', 'asym', 'fold', 'hard'], default: 'auto', label: 'Grit type', group: 'TONE', hint: 'after the filter: fold = growl (harmonics that move with the wobble), hard = clipped and loud, auto = soft, asym above 0.6' },
       { key: 'octave', type: 'integer', default: -1, min: -2, max: 2, label: 'Octave', group: 'TONE', hint: '+1 / +2 = the screech register' },
+      { key: 'transpose', type: 'number', default: 0, min: -36, max: 24, step: 0.1, unit: 'st', label: 'Pitch', group: 'TONE', hint: 'tune the whole instrument up or down in semitones (−36 … +24, three octaves down) — turn it down when everything sounds too high; decimals detune between notes' },
       { key: 'spread', type: 'number', default: 9, min: 0, max: 50, step: 0.1, unit: 'c', label: 'Unison', group: 'TONE' },
       { key: 'width', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Width', group: 'TONE' },
       { key: 'noise', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Noise', group: 'TONE' },
@@ -392,11 +393,13 @@
         });
         curF = f;
       }
+      // 3.50: Pitch (semitones, decimals ok) tunes the whole bass; the sub and the FM modulator follow it (they ride on curF)
+      const noteHz = (note) => Math.max(8, MT.hz(Math.max(12, note + 12 * P.get('octave'))) * Math.pow(2, P.get('transpose') / 12));
       function noteOn(note, vel, t, o) {
         o = o || {};
         t = Math.max(t, ac.currentTime);
         const n = note + 12 * P.get('octave');
-        const f = MT.hz(Math.max(12, n));
+        const f = noteHz(note);
         const legato = held && held.off > t - 1e-4;
         const slide = !!o.slide && legato;
         if (slide) { setFreq(f, t, Math.max(0.005, P.get('glide'))); }
@@ -427,6 +430,7 @@
       }
       P.onChange('sqOct', () => { sq.frequency.setTargetAtTime(curF * (P.get('sqOct') === '-1' ? 0.5 : 1), ac.currentTime, 0.01); });
       P.onChange('subOct', () => { sub.frequency.setTargetAtTime(curF * (SUBK[P.get('subOct')] || 1), ac.currentTime, 0.01); });
+      ['octave', 'transpose'].forEach(k => P.onChange(k, () => { if (held && held.off > ac.currentTime) setFreq(noteHz(held.note), ac.currentTime, 0.03); }));   // retune a held note live
       ctx.noteOn = noteOn;
       ctx.onNote((p) => {
         const o = { duration: p.duration, slide: p.slide, wobbleDiv: p.wobbleDiv && DIVS.includes(p.wobbleDiv) ? p.wobbleDiv : undefined };

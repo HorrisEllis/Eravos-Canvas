@@ -169,3 +169,5 @@ dependencies:
   (the clean low end). Its envelope is the Envelope, and its grit is the Destroyer. The suite music.wub-lab names Wobble Bass as its
   all-in-one (allInOne), and its 📘 page offers "As parts: Wub Lab". No code moved. Its name stays "Wobble Bass", the one he uses.
   Not covered by a part yet: the drawn wobble shape, the perform pad (P49.5 makes that generic), the growl slot. They stay here.
+
+# 3.50: Pitch (transpose) −24..+24 st, default 0 — tunes the whole tool up/down; retunes a held note live

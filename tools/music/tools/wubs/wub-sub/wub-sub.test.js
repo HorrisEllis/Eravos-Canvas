@@ -27,3 +27,30 @@ describe('tool · Wub Sub — the low end', () => {
     assert.lt(TH.rms(b, 0.5, 0.58), TH.rms(b, 0.86, 0.98) * 0.6, 'quiet on the beat, back by its end');
   });
 });
+
+describe('tool · Wub Sub — Pitch (3.50)', () => {
+  it('Pitch −12 st takes the sub an octave lower (A2 at octave 0 → 110 Hz, −12 st → 55 Hz)', async () => {
+    const U = TH.universe(1.2), sub = TH.spawn(U, 'eravos.wub-sub'), c = OrganismFactory.handle(sub).ctx;
+    c.params.set('octave', 0); c.params.set('transpose', -12);
+    TH.note(U, sub, 45, 0.05, { duration: 1 });
+    assert.near(TH.acFreq(await TH.render(U), 0.3, 0.95, 40, 75), 55, 2, 'A2 at octave 0 = 110 Hz, down 12 st = 55 Hz');
+  });
+});
+
+describe('tool · Wub Sub — Harmonics (3.51)', () => {
+  it('Harmonics adds overtones (3rd harmonic of a 55 Hz sub at 165 Hz) that a plain sine does not have', async () => {
+    const third = async (hm) => {
+      const U = TH.universe(1.2), sub = TH.spawn(U, 'eravos.wub-sub'), c = OrganismFactory.handle(sub).ctx;
+      c.params.set('octave', -1); c.params.set('cut', 400); c.params.set('harmonics', hm); TH.note(U, sub, 45, 0.05, { duration: 1 });
+      const b = await TH.render(U), d = b.getChannelData(0), sr = b.sampleRate, a = Math.floor(0.3 * sr), n = Math.floor(0.6 * sr);
+      let re = 0, im = 0; for (let i = 0; i < n; i++) { const ph = 2 * Math.PI * 165 * (a + i) / sr; re += d[a + i] * Math.cos(ph); im += d[a + i] * Math.sin(ph); }
+      return Math.hypot(re, im) / n;
+    };
+    const plain = await third(0), rich = await third(1);
+    assert.gt(rich, plain * 8 + 1e-4, `3rd harmonic ${plain.toExponential(2)} → ${rich.toExponential(2)}`);
+  });
+  it('Deep Sub (heard on small speakers) loads and sounds', async () => {
+    const U = TH.universe(1), sub = TH.spawn(U, 'eravos.wub-sub'), c = OrganismFactory.handle(sub).ctx; c.presets.load('Deep Sub (heard on small speakers)');
+    TH.note(U, sub, 45, 0.05, { duration: 0.8 }); assert.gt(TH.rms(await TH.render(U), 0.3, 0.8), 0.005);
+  });
+});

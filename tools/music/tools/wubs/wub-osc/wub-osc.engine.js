@@ -34,7 +34,8 @@
     ],
     config: [
       { key: 'wave', type: 'enum', options: WAVES, default: 'saw', label: 'Wave', group: 'TONE' },
-      { key: 'octave', type: 'integer', default: -1, min: -3, max: 1, label: 'Octave', group: 'TONE' },
+      { key: 'octave', type: 'integer', default: -1, min: -4, max: 1, label: 'Octave', group: 'TONE' },
+      { key: 'transpose', type: 'number', default: 0, min: -36, max: 24, step: 0.1, unit: 'st', label: 'Pitch', group: 'TONE', hint: 'tune the whole instrument up or down in semitones (−36 … +24, three octaves down) — turn it down when everything sounds too high; decimals detune between notes' },
       { key: 'fine', type: 'number', default: 0, min: -100, max: 100, step: 1, unit: 'c', label: 'Fine', group: 'TONE' },
       { key: 'ratio', type: 'enum', options: RATIOS, default: '1', label: 'FM ratio', group: 'FM', hint: 'modulator pitch ÷ carrier pitch: 1 and 2 growl, 1.5 and 3 clang' },
       { key: 'index', type: 'number', default: 2.5, min: 0, max: 12, step: 0.01, label: 'FM index', group: 'FM', hint: 'how hard the modulator bends the carrier: more = brighter, dirtier' },
@@ -134,9 +135,10 @@
         curF = f;
       }
       const peak = (vel) => 0.08 + 0.92 * Math.pow(Math.max(0, Math.min(1, vel)), 1.5);
+      const noteHz = (note) => Math.max(8, MT.hz(Math.max(0, Math.min(127, note + 12 * P.get('octave')))) * Math.pow(2, P.get('transpose') / 12));   // 3.50 Pitch
       function noteOn(note, vel, t, o) {
         o = o || {}; t = Math.max(t, ac.currentTime);
-        const f = MT.hz(Math.max(0, Math.min(127, note + 12 * P.get('octave'))));
+        const f = noteHz(note);
         const legato = held && held.off > t - 1e-4;
         if (o.slide && legato) setHz(f, t, Math.max(0.005, P.get('glide')));
         else {
@@ -158,6 +160,7 @@
         if (typeof amp.gain.cancelAndHoldAtTime === 'function') amp.gain.cancelAndHoldAtTime(t); else amp.gain.cancelScheduledValues(t);
         amp.gain.setTargetAtTime(0, t, P.get('release') / 4); held.off = t;
       }
+      ['octave', 'transpose'].forEach(k => P.onChange(k, () => { if (held && held.off > ac.currentTime) setHz(noteHz(held.note), ac.currentTime, 0.03); }));   // retune a held note live
       ctx.noteOn = noteOn;
       ctx.onNote((p) => noteOn(p.note, p.velocity * (p.accent ? 1 : 0.9), p.time, { duration: p.duration, slide: p.slide }));
       ctx.onMidi((p) => { if (p.on) noteOn(p.note, p.velocity, ac.currentTime); else noteOff(p.note, ac.currentTime); });

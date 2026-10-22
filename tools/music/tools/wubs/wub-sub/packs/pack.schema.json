@@ -31,8 +31,18 @@
                       },
                       "octave": {
                         "type": "integer",
-                        "minimum": -3,
+                        "minimum": -4,
                         "maximum": 0
+                      },
+                      "transpose": {
+                        "type": "number",
+                        "minimum": -36,
+                        "maximum": 24
+                      },
+                      "harmonics": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
                       },
                       "cut": {
                         "type": "number",
