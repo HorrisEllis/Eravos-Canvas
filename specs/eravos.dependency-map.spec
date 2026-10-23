@@ -45,7 +45,7 @@ tools:
     - eravos.fx-phaser (Phaser) mode=music units=[engine,meter] needs=[audio,mod] in=14 out=1
     - eravos.fx-pitch (Pitch) mode=music units=[engine,key,meter] needs=[audio,key,mod] in=12 out=1
   Generators:
-    - eravos.arp (Arp) mode=music units=[engine,transport,tempo,midi] needs=[audio,clock,midi,mod,notes] in=10 out=2
+    - eravos.arp (Arp) mode=music units=[engine,transport,tempo,midi] needs=[audio,clock,midi,mod,notes] in=24 out=2
     - eravos.bass-gen (Bassline) mode=music units=[engine,transport,tempo,key] needs=[audio,clock,key,mod] in=8 out=1
     - eravos.chord-gen (Chords) mode=music units=[engine,transport,tempo,key] needs=[audio,clock,key,mod] in=6 out=2
     - eravos.edm-lab (EDM Lab (all-in-one)) mode=music units=[engine,transport,tempo,key,meter] needs=[audio,clock,key,mod] in=12 out=5

@@ -25,7 +25,7 @@ dependencies:
     - audio: Audio engine — shares the audio clock
     - clock: Master clock & tempo — locks to the beat
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 8 modulation inputs — LFO / XY / Macro can move them
+    - mod: 22 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - arp.hook.note_in (note:trigger)
@@ -35,10 +35,24 @@ dependencies:
     - knob.order (modulation · port mod.knob.order)
     - knob.div (modulation · port mod.knob.div)
     - knob.octaves (modulation · port mod.knob.octaves)
+    - knob.octDir (modulation · port mod.knob.octDir)
+    - knob.repeat (modulation · port mod.knob.repeat)
+    - knob.length (modulation · port mod.knob.length)
+    - knob.restart (modulation · port mod.knob.restart)
+    - knob.steps (modulation · port mod.knob.steps)
+    - knob.swing (modulation · port mod.knob.swing)
+    - knob.chance (modulation · port mod.knob.chance)
     - knob.gate (modulation · port mod.knob.gate)
+    - knob.gateRand (modulation · port mod.knob.gateRand)
+    - knob.humanize (modulation · port mod.knob.humanize)
+    - knob.slide (modulation · port mod.knob.slide)
     - knob.latch (modulation · port mod.knob.latch)
     - knob.velocity (modulation · port mod.knob.velocity)
+    - knob.velRand (modulation · port mod.knob.velRand)
+    - knob.velRamp (modulation · port mod.knob.velRamp)
     - knob.transpose (modulation · port mod.knob.transpose)
+    - knob.stack (modulation · port mod.knob.stack)
+    - knob.seed (modulation · port mod.knob.seed)
     - bend.in (modulation · port mod.bendin)
   outputs:
     - arp.hook.note_out (note:trigger)
