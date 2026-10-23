@@ -4,7 +4,8 @@
  *   main     — the modes page (agnostic canvas) or a grid of tool cards; search filters everything
  *   detail   — the selected tool's dependency list: mode, services, what it adds to the toolbar (✚ new / ✓ already
  *              there), inputs, outputs, works-with, presets — read from Expansion.deps(), the same list the specs print
- * Keyboard: type to search · ↑↓←→ move · Enter adds · Esc closes. Domain-free: every word on screen comes from
+ * 3.63 a click on a card opens that tool's page (a suite's: its suite page) — ← Back on the page returns here, as you left it.
+ * Keyboard: type to search · ↑↓←→ move · Enter adds · Space opens the page · Esc closes. Domain-free: every word on screen comes from
  * descriptors, modes and units the packs registered. */
 (function (global) {
   'use strict';
@@ -15,13 +16,13 @@
     if (open) { open.close(); return null; }
     const UI = global.UIKit, h = UI.h, F = global.OrganismFactory;
     S.activate();
-    const state = { view: o.view || (X.agnostic() && X.modes().length ? 'modes' : 'all'), cat: null, sel: null, q: '' };
+    const state = { view: o.view || (X.agnostic() && X.modes().length ? 'modes' : 'all'), cat: o.cat || null, sel: o.sel || null, q: o.q || '' };
     const ov = h('div', { class: 'overlay addpop', role: 'dialog', 'aria-label': 'Add to canvas' });
     const q = h('input', { class: 'ap-search', placeholder: 'Search tools, modes, what they do…', 'aria-label': 'Search' });
     const closeBtn = h('button', { class: 'ap-x', title: 'Close (Esc)', text: '×' });
     const modeChips = h('div', { class: 'ap-chips' });
     const rail = h('nav', { class: 'ap-rail' }), main = h('section', { class: 'ap-main' }), detail = h('aside', { class: 'ap-detail' });
-    const foot = h('div', { class: 'ap-foot', text: 'Type to search · ↑↓ move · Enter adds · Esc closes' });
+    const foot = h('div', { class: 'ap-foot', text: 'Click a tool for its page · type to search · ↑↓ move · Enter adds · Space: its page · Esc closes' });
     const box = h('div', { class: 'ap-box' }, [
       h('header', { class: 'ap-head' }, [h('div', { class: 'ap-title' }, [h('b', { text: '＋ Add to canvas' }), modeChips]), q, closeBtn]),
       h('div', { class: 'ap-body' }, [rail, main, detail]), foot,
@@ -77,6 +78,14 @@
       const id = F.spawn(d.id);
       if (id) S.toast(`${d.icon || ''} ${d.label} added`, 'good', 1800);
       close();
+    }
+
+    // 3.63 a tool's page (a suite's page) instead of the menu; ← Back on it opens the menu again where you were
+    function page(d) {
+      const TP = global.ToolPage; if (!TP || d._avail) { select(d.id); return false; }
+      const back = () => show(S, X, { view: state.view, cat: state.cat, sel: d.id, q: state.q }), K = S.K;
+      close(); if (d._suite) TP.openSuite(d._suite.id, { K, back }); else TP.open(d.id, { K, back });
+      return true;
     }
 
     // ---------------------------------------------------------------- rail
@@ -154,7 +163,7 @@
           frame,
           h('div', { class: 'ap-card-tx' }, [h('b', {}, [h('span', { class: 'ap-card-glyph', text: d.icon || '' }), d.label]), h('small', { text: d.blurb || '' }), h('div', { class: 'ap-chiprow' }, chips)]),
         ]);
-        card.onclick = () => select(d.id); card.ondblclick = () => add(d);
+        card.onclick = () => page(d);
         grid.appendChild(card); cards.push({ el: card, d });
       });
       main.appendChild(grid);
@@ -184,7 +193,7 @@
         (Cat && Cat.meta(d.id) && Cat.meta(d.id).preview) ? h('div', { class: 'ap-d-shot' }, [h('img', { src: Cat.meta(d.id).preview, alt: d.label + ' — the whole window', onerror: (e) => e.target.parentNode.remove() })]) : '',
         h('p', { class: 'ap-d-blurb', text: d.blurb || '' }),
         h('button', { class: 'tb-btn primary ap-addbtn', text: d._suite ? 'Open the suite' : d._avail ? 'Install + add to canvas' : dd.pending.length ? `Add — turns on ${dd.pending.length} toolbar item${dd.pending.length > 1 ? 's' : ''}` : 'Add to canvas', onclick: () => add(d) }),
-        !d._avail && !d._suite && global.ToolPage ? h('button', { class: 'tb-btn ap-pagebtn', text: '📘 Its page — mods, packs, suite', title: 'everything this tool can do: load its whole suite or its mods one by one, hear every preset', onclick: () => { close(); global.ToolPage.open(d.id, { K: S.K }); } }) : null,
+        !d._avail && global.ToolPage ? h('button', { class: 'tb-btn ap-pagebtn', text: d._suite ? '📘 Its page — parts, scenes, wiring' : '📘 Its page — mods, packs, suite', title: d._suite ? 'every part, its scenes and macros, how it is wired: build it whole or a part at a time' : 'everything this tool can do: load its whole suite or its mods one by one, hear every preset', onclick: () => page(d) }) : null,
         Cat && Cat.meta(d.id) && !d._avail ? h('button', { class: 'tb-btn ap-rmbtn', text: 'Remove from this canvas', title: 'uninstall: gone from ＋ Add now; its code leaves at the next start. Windows already open keep working.', onclick: () => { Cat.remove(d.id); S.toast(`${d.label} removed — gone after the next start. Add it again any time from ＋ Add.`, '', 4000); } }) : null,
       ].filter(Boolean));
       [
@@ -216,10 +225,11 @@
       if (e.key === 'ArrowDown') go(i + cols); else if (e.key === 'ArrowUp') go(i - cols);
       else if (e.key === 'ArrowRight' && e.target !== q) go(i + 1); else if (e.key === 'ArrowLeft' && e.target !== q) go(i - 1);
       else if (e.key === 'Enter') { e.preventDefault(); const c = cards[i]; if (c) add(c.d); }
+      else if (e.key === ' ' && e.target !== q) { e.preventDefault(); const c = cards[i]; if (c) page(c.d); }
     }
     document.addEventListener('keydown', onKey, true);
     document.body.appendChild(ov);
-    render(); q.focus();
+    q.value = state.q; render(); if (o.sel && cards.some(c => c.d.id === o.sel)) select(o.sel); q.focus();
     open = { ov, close };
     return open;
   }

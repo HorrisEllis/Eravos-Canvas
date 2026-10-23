@@ -38,7 +38,7 @@ try {
   const su = await p.evaluate(async () => {
     AddMenu.show(Shell, Shell.X, { view: 'all' }); await new Promise(r => setTimeout(r, 50));
     const card = document.querySelector('.ap-card[data-id="suite:music.edm-lab"]'); if (!card) return { card: false };
-    card.click(); await new Promise(r => setTimeout(r, 30)); document.querySelector('.ap-addbtn').click();
+    card.click(); await new Promise(r => setTimeout(r, 30)); const just = [...document.querySelectorAll('.tp-overlay .tp-btn')].find(x => /Just the suite window/.test(x.textContent)); if (!just) return { card: true, page: false }; just.click();   // 3.63: the card opens the suite's page
     for (let i = 0; i < 100 && !Kernel.registry.byOrganism('eravos.suite-hub').length; i++) await new Promise(r => setTimeout(r, 100));
     const hub = (Kernel.registry.byOrganism('eravos.suite-hub')[0] || {}).instance_id; if (!hub) return { card: true, hub: null };
     Suites.build(Kernel, hub); return { card: true, hub, parts: Suites.members(Kernel, hub).size };

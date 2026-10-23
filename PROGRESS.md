@@ -2,6 +2,17 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.63 Heavy Drops suite · a page for every suite · a click in ＋ Add opens the page (2026-10-23)
+His words: "i like the drops, the wobble and sub. especially between 26 - 41" · "Make a page for the suite like the rest. Have it open the page
+by default" · "It opens the tool page but for a suite. I'm saying all tools. Like open the tool page when you click on them."
+- **Heavy Drops suite** (tools/music/suites/heavy-drops): the Floor Falls Out sound as a system. Groove → Pads; Chords → Bassline → Wobble
+  Bass AND Sub Engine; a Destroyer in the wobble's growl slot; the Drop Builder. Extras: Wub Osc screech, Pad Forge. Macros WOBBLE · WEIGHT ·
+  GRIT · SPACE. Scenes: Floor Falls Out (starter), Half-time Growl, Head Shaker, Tearout, Sub Quake.
+- **A page for every suite** (ToolPage.openSuite): every part (▶ its preset, ＋ just that one, 📘 its own page, ✓ when it is on), scenes,
+  macros, how it is wired (live on/off once a suite window is open), ＋ Build the whole suite. A suite window's 📘 or name opens it.
+- **＋ Add: a click opens the page** of the tool (or of the suite). ← Back returns to the menu where you were. Enter still adds; Space opens
+  the page from the keyboard. Tests: tests/p63-suite-page.test.js; tests/fresh-profile.mjs follows the new click.
+
 ## Done — 3.62 The adjustment works · sleep · repeat · split lanes · the whole timeline full screen · Arp & Motion songs (2026-10-23)
 His words: "can you optimize performance? also what do you think? especially about the timeline additions?" · "also the adjustment doesn't
 work. also adding a way to split the lanes. make it easier to repeat patterns, control a in full screen, add songs that use the automation,

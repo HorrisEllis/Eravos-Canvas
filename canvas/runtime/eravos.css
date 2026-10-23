@@ -407,6 +407,7 @@ svg.wires path.wire.hot { stroke-width: 4.5; filter: drop-shadow(0 0 4px current
 .tp-list { display: flex; flex-direction: column; gap: 4px; }
 .tp-row, .tp-mod { display: flex; gap: 8px; align-items: center; padding: 6px 8px; background: #0e1520; border: 1px solid var(--line, #1a2533); border-radius: 6px; }
 .tp-row.off { opacity: .55; }
+.tp-row.on { border-color: color-mix(in srgb, var(--acc, #00d4ff) 55%, transparent); } .tp-onmark { color: var(--acc, #00d4ff); font-size: 12px; white-space: nowrap; }
 .tp-rt { flex: 1; min-width: 0; display: flex; flex-direction: column; } .tp-rt small { color: var(--dim, #8fa1b6); }
 .tp-tag { font-size: 11px; padding: 1px 6px; border-radius: 4px; white-space: nowrap; } .tp-tag.mod { background: #1d2a1a; color: #9be37a; } .tp-tag.lnk { background: #14243a; color: #7fc4ff; }
 .tp-slot, .tp-pack, .tp-cg { margin-bottom: 12px; }
