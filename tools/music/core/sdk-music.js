@@ -13,6 +13,7 @@
       duration: { type: 'number', minimum: 0 }, accent: { type: 'boolean' }, slide: { type: 'boolean' },
       freq: { type: 'number', minimum: 0 }, // xen: an exact (often irrational) frequency; `note` stays the nearest 12-TET key
       params: { type: 'object' },   // 3.53 per-note settings: { knob: value } for this note only (see ctx.onNote)
+      bend: { type: 'object' },     // 3.56 the note's pitch curve: { from, to (semitones), shape, at (0…0.95 of the note) } (see PITCH WHEEL)
     },
   };
   const MIDI_SCHEMA = { type: 'object', required: ['note', 'velocity', 'on'], properties: { note: { type: 'integer', minimum: 0, maximum: 127 }, velocity: { type: 'number', minimum: 0, maximum: 1 }, on: { type: 'boolean' } } };
@@ -290,6 +291,24 @@ registerProcessor('eravos-pitch', EravosPitch);`;
     d._knobInputs.forEach(k => { const c = d.config.find(x => x.key === k); d.hooks.push(Object.assign(MUSIC_STD.mod_in('knob.' + k, 'knob.' + k), { rail: false, knob: k, intent: 'move ' + (c.label || k) })); });
   });
 
+  // 3.56 PITCH WHEEL — "curve the notes: the pitch, smoother transitions, bigger and deeper drops". Every music tool gets a
+  // wheel (a ConstantSource in cents) that every oscillator and sample it plays follows (→ detune). A note with a bend
+  // moves the wheel over its length; the next note without one sets it back to 0 at its start (so a dive rings down
+  // through the release). Like a hardware pitch wheel it bends the whole tool — a bass line, a lead, a drop.
+  // No tool is rewritten for it: the sources a tool creates while ITS code runs (engine setup, its note / tick / ui /
+  // param / timer handlers) are hooked at start() and join the wheel on the tool's first bend. Slow oscillators
+  // (0 < f < 20 Hz: LFOs) are left alone.
+  let CUR = null;
+  const withTool = (c, fn) => { const prev = CUR; CUR = c; try { return fn(); } finally { CUR = prev; } };
+  (function hookSources() {
+    const B = global.BaseAudioContext || global.AudioContext; if (!B || !B.prototype || B.prototype.__eravosWheel) return;
+    Object.defineProperty(B.prototype, '__eravosWheel', { value: true });
+    ['createOscillator', 'createBufferSource'].forEach(m => { const orig = B.prototype[m]; if (typeof orig !== 'function') return;
+      B.prototype[m] = function () { const n = orig.apply(this, arguments), c = CUR; if (c && c.ac === this && c._wheelHook) c._wheelHook(n); return n; }; });
+  })();
+  const BEND_SHAPES = { smooth: (x) => x * x * (3 - 2 * x), linear: (x) => x, early: (x) => 1 - Math.pow(1 - x, 3), late: (x) => x * x * x };
+  const BEND_MAX = 48;
+
   SDK.extend({
     id: 'music',
     std: MUSIC_STD,
@@ -402,13 +421,46 @@ registerProcessor('eravos-pitch', EravosPitch);`;
       ctx.atAudioTime = function (t, fn) {
         const k = ac.createConstantSource(); k.offset.value = 0; const sink = ac.createGain(); sink.gain.value = 0;
         k.connect(sink); sink.connect(ac.destination);
-        k.onended = () => { try { k.disconnect(); sink.disconnect(); } catch (e) {} if (!ctx.disposed) api.safe(fn); };
+        k.onended = () => { try { k.disconnect(); sink.disconnect(); } catch (e) {} if (!ctx.disposed) api.safe(() => withTool(ctx, fn)); };
         k.start(Math.max(ac.currentTime, t - 0.001)); k.stop(Math.max(ac.currentTime + 0.001, t));
         return k;
       };
       // P11.5 (gate P): a hard ceiling on simultaneous notes per tool — a runaway pattern can't swamp the audio thread.
       // Each tool still steals its own voices below this; this only stops pathological floods (counted, never silent).
       const NOTE_CEILING = 32; let sounding = []; ctx.notesDropped = 0;
+      // ---- 3.56 the pitch wheel (see PITCH WHEEL above)
+      let wheel = null, bent = false, lastBendT = -1, everBent = false;
+      const wheelNode = () => { if (!wheel) { wheel = ac.createConstantSource(); wheel.offset.value = 0; wheel.start(); ctx.track(wheel); } return wheel; };
+      if (ctx.descriptor.domain === 'music') {
+        // started sources are only REMEMBERED; they join the wheel on the tool's first bend (then every rate is set — an LFO
+        // made at 440 Hz and slowed later is seen as the LFO it is), and later sources at start. No bends: nothing connected.
+        const srcs = new Set();
+        const join = (n) => { if (n._wheel) return; const fv = n.frequency ? n.frequency.value : 440;   // 0 = pitch driven by a signal (Wub Osc): a voice
+          if (fv > 0 && fv < 20) return; try { wheelNode().connect(n.detune); n._wheel = true; } catch (e) {} };
+        ctx._wheelHook = (n) => {
+          if (!n.detune) return; const start = n.start;
+          n.start = function () { srcs.add(n); n.addEventListener('ended', () => { srcs.delete(n); if (n._wheel && wheel) { try { wheel.disconnect(n.detune); } catch (e) {} } }); if (everBent) join(n); return start.apply(n, arguments); };
+        };
+        ctx._wheelJoinAll = () => srcs.forEach(join);
+        CUR = ctx; Promise.resolve().then(() => { if (CUR === ctx) CUR = null; });   // the engine is built right after this, in the same task
+        const wrap = (name) => { const f0 = ctx[name]; if (typeof f0 !== 'function') return; ctx[name] = function () { const a = Array.from(arguments).map(x => typeof x === 'function' ? function () { const args = arguments; return withTool(ctx, () => x.apply(this, args)); } : x); return f0.apply(ctx, a); }; };
+        ['on', 'onUI', 'interval', 'timeout'].forEach(wrap);
+        if (ctx.params && typeof ctx.params.onChange === 'function') { const oc = ctx.params.onChange; ctx.params.onChange = function (k, fn) { return oc.call(ctx.params, k, typeof fn === 'function' ? function () { const args = arguments; return withTool(ctx, () => fn.apply(this, args)); } : fn); }; }
+      }
+      /** schedule the wheel for a note from t to end: its bend, or back to 0 if an earlier note left it bent */
+      function bendNote(t, end, b) {
+        const from = b ? Math.max(-BEND_MAX, Math.min(BEND_MAX, +b.from || 0)) : 0, to = b ? Math.max(-BEND_MAX, Math.min(BEND_MAX, +b.to || 0)) : 0, has = !!(from || to);
+        if (!has && (!bent || Math.abs(t - lastBendT) < 0.002)) return;   // a chord note without a bend never cancels its neighbour's
+        const o = wheelNode().offset;
+        try { if (o.cancelAndHoldAtTime) o.cancelAndHoldAtTime(t); else o.cancelScheduledValues(t); } catch (e) {}
+        if (!has) { o.setValueAtTime(0, t); bent = false; return; }
+        if (!everBent) { everBent = true; if (ctx._wheelJoinAll) ctx._wheelJoinAll(); }
+        const f = BEND_SHAPES[b.shape] || BEND_SHAPES.smooth, at = Math.max(0, Math.min(0.95, +b.at || 0)), t1 = t + (end - t) * at, dur = Math.max(0.01, end - t1), N = 24;
+        o.setValueAtTime(from * 100, t); if (t1 > t) o.setValueAtTime(from * 100, t1);
+        for (let i = 1; i <= N; i++) o.linearRampToValueAtTime((from + (to - from) * f(i / N)) * 100, t1 + dur * i / N);
+        bent = true; lastBendT = t;
+      }
+      ctx.bendNote = bendNote; Object.defineProperty(ctx, 'wheel', { get: () => wheel });
       // 3.53 PER-NOTE SETTINGS — a note may carry params { knob: value } (a Timeline note's own wobble, depth, cutoff …): the
       // knob takes that value for the note as a LIVE value (params.live: never saved, never undoable, the window's knob shows
       // it), then hands back to the knob's own setting when the note ends — unless a later note has taken the knob since.
@@ -433,7 +485,8 @@ registerProcessor('eravos-pitch', EravosPitch);`;
         const set = () => { if (v === null) autoLive.delete(p.key); else autoLive.set(p.key, v); if (!noteOwner.has(p.key)) P.live(p.key, v); };
         if (v === null || typeof p.time !== 'number' || p.time <= ac.currentTime + 0.003) set(); else ctx.atAudioTime(p.time, set);
       });
-      ctx.onSilence(() => { if (ctx.params) { noteOwner.forEach((_, k) => ctx.params.live(k, autoLive.has(k) ? autoLive.get(k) : null)); } noteOwner.clear(); noteTok++; });
+      ctx.onSilence(() => { if (ctx.params) { noteOwner.forEach((_, k) => ctx.params.live(k, autoLive.has(k) ? autoLive.get(k) : null)); } noteOwner.clear(); noteTok++;
+        if (wheel && bent) { const o = wheel.offset; o.cancelScheduledValues(0); o.setValueAtTime(0, ac.currentTime); bent = false; } });
       ctx.onNote = (fn) => ctx.on('note:trigger', NOTE_SCHEMA, (p) => {
         if (!ctx.isTarget(p)) return;
         const t = typeof p.time === 'number' ? p.time : ac.currentTime, end = t + (typeof p.duration === 'number' ? p.duration : 1);
@@ -444,9 +497,10 @@ registerProcessor('eravos-pitch', EravosPitch);`;
         // 3.39 delay compensation: a tool whose whole voice runs through an oversampled shaper is late by ctx.latency
         // seconds — its notes start that much earlier so the SOUND lands on the beat (clamped to now for live input)
         if (ctx.latency > 0 && typeof p.time === 'number') { const t2 = Math.max(ac.currentTime, p.time - ctx.latency), d2 = typeof p.duration === 'number' ? p.duration + (p.time - t2) - ctx.latency : p.duration; p = Object.assign({}, p, { time: t2, duration: d2 }); }
-        fn(p);
+        if (ctx._wheelHook) { const t3 = typeof p.time === 'number' ? p.time : ac.currentTime; bendNote(t3, t3 + (typeof p.duration === 'number' ? p.duration : 1), p.bend); }
+        withTool(ctx, () => fn(p));
       });
-      ctx.onMidi = (fn) => ctx.on('midi:note', MIDI_SCHEMA, (p) => { if (midiArmed) fn(p); });
+      ctx.onMidi = (fn) => ctx.on('midi:note', MIDI_SCHEMA, (p) => { if (midiArmed) withTool(ctx, () => fn(p)); });
       ctx.onKey = (fn) => ctx.on('theory:key-change', THEORY_SCHEMA, fn);
       // 3.34 speed per tool: the master's 16ths resampled to this tool's rate — sample-accurate (tick times are audio
       // times), phase-locked to the song position (tool step = master step × rate), resynced on any jump (play, loop, seek)

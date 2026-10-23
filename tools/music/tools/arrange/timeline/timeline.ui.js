@@ -160,6 +160,11 @@ OrganismFactory.reg('eravos.timeline', function (view) {
           const span = Math.max(12, hi - lo + 1), ih = r.h - 16, per = r.w / (c.bars * 16);
           g.fillStyle = lane.color;
           ns.forEach(n => { const y = r.y + 13 + (hi - n.n) / span * ih; g.fillRect(r.x + n.s * per, y, Math.max(1.5, n.l * per - 1), Math.max(1.5, ih / span)); });
+          // 3.56 a bent note shows its curve here too (a straight sketch: from its start pitch to its end pitch, clipped to the clip)
+          g.save(); g.beginPath(); g.rect(r.x, r.y, r.w, r.h); g.clip(); g.strokeStyle = '#ffe08a'; g.lineWidth = 1.5;
+          ns.forEach(n => { if (!n.b) return; const y0 = r.y + 13 + (hi - n.n - n.b.from) / span * ih + 1, y1 = r.y + 13 + (hi - n.n - n.b.to) / span * ih + 1, x0 = r.x + n.s * per, x1 = x0 + n.l * per, xa = x0 + (x1 - x0) * (n.b.at || 0);
+            g.beginPath(); g.moveTo(x0, y0); g.lineTo(xa, y0); g.quadraticCurveTo(xa + (x1 - xa) * 0.6, y0, x1, y1); g.stroke(); });
+          g.restore();
         }
         for (let b = 1; b < c.bars; b++) { g.fillStyle = lane.color + '55'; g.fillRect(r.x + b * pb, r.y + 2, 1, r.h - 4); }
         g.fillStyle = '#fff'; g.font = '10px sans-serif'; g.fillText((ns.length ? '' : '＋ ') + (c.name || 'clip').slice(0, Math.max(3, Math.floor(r.w / 6))), r.x + 4, r.y + 11);

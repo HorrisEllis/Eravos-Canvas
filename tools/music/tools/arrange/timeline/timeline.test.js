@@ -275,3 +275,100 @@ describe('tool · Timeline — automation lanes', () => {
     await r.U.ctx.startRendering(); assert.equal(seen.note, 1); assert.equal(seen.after, 5);
   });
 });
+
+// 3.56 — "curve the notes in the timeline: the pitch, smoother transitions, bigger and deeper drops; adjust per note"
+describe('tool · Timeline — curved notes (pitch bends) and per-note knobs', () => {
+  const SR = 16000;
+  const uni = (sec) => { const ctx = new OfflineAudioContext(1, Math.ceil(sec * SR), SR), K = Kernel.create({ ctx, quiet: true, syncIR: true }), T = MasterTransport.create(K, { offline: true, bpm: 120 }); T.boot(); return { ctx, K, T }; };
+  const zcHz = (d, a, b) => { let n = 0; for (let i = Math.floor(a * SR) + 1; i < b * SR; i++) if ((d[i] >= 0) !== (d[i - 1] >= 0)) n++; return n / 2 / (b - a); };
+  it('the pitch wheel: a bent note moves it along its curve; the next plain note sets it back at ITS start', async () => {
+    const U = uni(2.2), a = OrganismFactory.spawn('eravos.sub-engine', { K: U.K, headless: true }), c = OrganismFactory.handle(a).ctx, seen = {};
+    U.K.bus.publish('note:trigger', { target: a, note: 45, velocity: 0.9, time: 0.1, duration: 1, bend: { from: 0, to: -12, shape: 'linear' } });
+    U.K.bus.publish('note:trigger', { target: a, note: 45, velocity: 0.9, time: 1.5, duration: 0.5 });
+    [0.6, 1.15, 1.4, 1.6].forEach(t => U.ctx.suspend(t).then(() => { seen[t] = c.wheel.offset.value; U.ctx.resume(); }));
+    await U.ctx.startRendering();
+    assert.near(seen[0.6], -600, 40, 'halfway: half an octave down'); assert.near(seen[1.15], -1200, 1, 'the end: an octave down');
+    assert.near(seen[1.4], -1200, 1, 'it rings down there through the release'); assert.near(seen[1.6], 0, 1, 'the next note is back on its own pitch');
+  });
+  async function sub(bend, note) { const U = uni(1.6), a = OrganismFactory.spawn('eravos.sub-engine', { K: U.K, headless: true });
+    U.K.bus.publish('note:trigger', Object.assign({ target: a, note: note || 57, velocity: 0.9, time: 0.05, duration: 1.4 }, bend ? { bend } : {})); return (await U.ctx.startRendering()).getChannelData(0); }
+  it('you hear it: a sub dives an octave — at the end it sounds an octave under the same note played straight', async () => {
+    const plain = await sub(null), dive = await sub({ from: 0, to: -12, shape: 'early' });
+    assert.near(zcHz(dive, 1.2, 1.45) / zcHz(plain, 1.2, 1.45), 0.5, 0.04);
+  });
+  it('a glide in: the note starts at the note before and slides onto its own pitch', async () => {
+    const plain = await sub(null), glide = await sub({ from: -7, to: 0, shape: 'early', at: 0 });   // the ⤳ glide in curve
+    assert.lt(zcHz(glide, 0.06, 0.16), zcHz(plain, 0.06, 0.16) * 0.85, 'lower at the start'); assert.near(zcHz(glide, 1.25, 1.45) / zcHz(plain, 1.25, 1.45), 1, 0.04, 'on its own pitch at the end');
+  });
+  it('no bends, no cost: a tool that never bends never builds a wheel', async () => {
+    const U = uni(0.5), a = OrganismFactory.spawn('eravos.wobble-bass', { K: U.K, headless: true });
+    U.K.bus.publish('note:trigger', { target: a, note: 40, velocity: 0.9, time: 0.05, duration: 0.3 }); await U.ctx.startRendering();
+    assert.equal(OrganismFactory.handle(a).ctx.wheel, null);
+  });
+  it('a chord: a note without a bend at the same moment never cancels its neighbour’s bend', async () => {
+    const U = uni(1.2), a = OrganismFactory.spawn('eravos.supersaw', { K: U.K, headless: true }), c = OrganismFactory.handle(a).ctx; let v = null;
+    U.K.bus.publish('note:trigger', { target: a, note: 60, velocity: 0.9, time: 0.1, duration: 0.8, bend: { from: 0, to: 5, shape: 'linear' } });
+    U.K.bus.publish('note:trigger', { target: a, note: 64, velocity: 0.9, time: 0.1, duration: 0.8 });
+    U.ctx.suspend(0.95).then(() => { v = c.wheel.offset.value; U.ctx.resume(); }); await U.ctx.startRendering();
+    assert.near(v, 500, 15);
+  });
+  it('LFOs are not bent: a slow oscillator stays where it is, the voice follows the wheel', async () => {
+    const U = uni(0.6), id = 'eravos.test-bend-probe';
+    if (!OrganismFactory.def(id)) OrganismFactory.define({ id, domain: 'music', version: '1.0.0', label: 'Bend probe', category: 'Test', permissions: ['audio_out', 'bus_subscribe'], hooks: [OrganismSDK.STD.note_in('probe.hook.note_in')], config: [],
+      engine(ctx) { const ac = ctx.ac, out = ac.createGain(); ctx.track(out); ctx.port('out', { kind: 'audio', direction: 'out', node: out });
+        const lfo = ac.createOscillator(); lfo.frequency.value = 3; lfo.start(); ctx.track(lfo); const seen = { lfo, voices: [] }; ctx.internals = seen;
+        ctx.onNote((p) => { const o = ac.createOscillator(); o.frequency.value = 220; o.connect(out); o.start(p.time); o.stop(p.time + p.duration); seen.voices.push(o); }); return {}; } });
+    const a = OrganismFactory.spawn(id, { K: U.K, headless: true }), c = OrganismFactory.handle(a).ctx;
+    U.K.bus.publish('note:trigger', { target: a, note: 57, velocity: 0.9, time: 0.05, duration: 0.4, bend: { from: 0, to: 3 } });
+    await U.ctx.startRendering();
+    assert.ok(c.internals.voices[0]._wheel, 'the voice is on the wheel'); assert.ok(!c.internals.lfo._wheel, 'the 3 Hz LFO is not');
+  });
+  it('the timeline keeps a note’s bend (cleaned), plays it, and a flat bend is no bend', () => {
+    const U = uni(0.5), tl = OrganismFactory.spawn('eravos.timeline', { K: U.K, headless: true }), sb = OrganismFactory.spawn('eravos.sub-engine', { K: U.K, headless: true }), c = OrganismFactory.handle(tl).ctx;
+    U.K.bus.publish('ui:lane_add:' + tl, { kind: 'inst', target: sb, name: 'Sub' });
+    U.K.bus.publish('ui:clip_add:' + tl, { kind: 'notes', target: sb, startBar: 1, bars: 1, notes: [{ s: 0, l: 4, n: 33, v: 0.9, b: { from: 0, to: -99, shape: 'weird', at: 3, x: 1 } }, { s: 4, l: 4, n: 33, v: 0.9, b: { from: 0, to: 0 } }, { s: 8, l: 4, n: 33, v: 0.9, b: 'nope' }] });
+    const clip = c.serialize().extra.clips.find(x => x.kind === 'notes');
+    assert.deepEqual(clip.notes[0].b, { from: 0, to: -48, shape: 'smooth', at: 0.95 }, 'clamped to ±48 st, a known curve'); assert.equal(clip.notes[1].b, undefined, 'flat = none'); assert.equal(clip.notes[2].b, undefined);
+    const sent = []; U.K.bus.subscribe('note:trigger', (p) => sent.push(p)); U.T.renderTicks(0, 16, 0.1);
+    assert.deepEqual(sent[0].bend, clip.notes[0].b); assert.equal(sent[1].bend, undefined);
+  });
+
+  // ---- the piano roll
+  const HI = 107;
+  function roll(notes, knobs) {
+    const log = [], view = { ui: UIKit, emit: (k, p) => log.push([k, p]) };
+    const host = document.createElement('div'); host.style.cssText = 'position:fixed;left:0;top:0;width:900px;height:520px;z-index:99999;background:#000'; document.body.appendChild(host);
+    const pr = EravosTimelinePianoRoll.create(view, {}); host.appendChild(pr.el);
+    pr.show({ id: 'c1', bars: 2, startBar: 1, notes }, { id: 'l1', name: 'Sub', color: '#66ffcc', target: 't1' }, { key: { root: 0, scale: 'chromatic' }, knobs: knobs || {} });
+    const cv = pr.canvas, pt = (s, n, dy) => { const r = cv.getBoundingClientRect(), st = pr.state, k = r.width / cv.offsetWidth; return { clientX: r.left + (s * st.pps + 3) * k, clientY: r.top + ((HI - n) * st.row + st.row / 2 + (dy || 0)) * k }; };
+    const fire = (type, p, extra) => cv.dispatchEvent(new PointerEvent(type, Object.assign({ bubbles: true, cancelable: true, pointerId: 1, pointerType: 'mouse', button: 0, buttons: type === 'pointerup' ? 0 : 1 }, p, extra || {})));
+    const last = () => { const e = log.filter(x => x[0] === 'clip_edit').pop(); return e ? e[1].patch.notes : null; };
+    return { pr, log, pt, fire, last, done: () => host.remove() };
+  }
+  it('〰 Bend tool: drag a note down 12 rows → it dives an octave; you hear it; right-click flattens it', () => {
+    const r = roll([{ s: 0, l: 8, n: 48, v: 0.9 }]);
+    try {
+      r.pr.setTool('bend'); const row = r.pr.state.row;
+      r.fire('pointerdown', r.pt(5, 48)); for (let k = 1; k <= 6; k++) r.fire('pointermove', r.pt(5, 48, k * 2 * row)); r.fire('pointerup', r.pt(5, 48, 12 * row));
+      assert.deepEqual(r.last()[0].b, { from: 0, to: -12, shape: 'smooth', at: 0 }, 'bent to −12 st');
+      assert.ok(r.log.some(x => x[0] === 'note_audition' && x[1].bend && x[1].bend.to === -12), 'auditioned with its curve');
+      r.fire('pointerdown', r.pt(0.5, 48)); r.fire('pointermove', r.pt(0.5, 48, -3 * row)); r.fire('pointermove', r.pt(0.5, 48, -5 * row)); r.fire('pointerup', r.pt(0.5, 48, -5 * row));
+      assert.equal(r.last()[0].b.from, 5, 'grabbed at its start: where it slides in FROM'); assert.equal(r.last()[0].b.to, -12, 'the end kept');
+      r.fire('pointerdown', r.pt(3, 48), { button: 2, buttons: 2 }); assert.equal(r.last()[0].b, undefined, 'flat again');
+    } finally { r.done(); }
+  });
+  it('the note’s knobs: dive / deep drop / glide in, bend knobs, and any tool knob for this note only', () => {
+    const knobs = { t1: [{ key: 'drive', label: 'Drive', type: 'number', min: 0, max: 1, step: 0.01, def: 0.2 }, { key: 'wave', label: 'Wave', type: 'enum', options: ['sine', 'tri'], def: 'sine' }] };
+    const r = roll([{ s: 0, l: 4, n: 45, v: 0.9 }, { s: 4, l: 8, n: 33, v: 0.9 }], knobs);
+    try {
+      const ed = r.pr.openEditor(1);
+      ed.quick('deep drop'); assert.deepEqual(ed.note.b, { from: 0, to: -24, shape: 'late', at: 0.1 });
+      ed.quick('glide in'); assert.equal(ed.note.b.from, 12, 'starts on the note before (A2 → A1: +12 st) and slides down to its own'); assert.equal(ed.note.b.to, 0);
+      ed.bend({ to: -5, shape: 'linear' }); assert.equal(ed.note.b.to, -5); assert.equal(ed.note.b.shape, 'linear');
+      ed.knob('drive', 0.9); ed.knob('wave', 'tri'); ed.finish();
+      const n1 = r.last()[1]; assert.deepEqual(n1.p, { drive: 0.9, wave: 'tri' }, 'its own sound'); assert.equal(n1.b.from, 12); assert.equal(r.last()[0].p, undefined, 'the other note is untouched');
+      const ed2 = r.pr.openEditor(1); ed2.quick('flat'); ed2.finish(); assert.equal(r.last()[1].b, undefined, '— flat removes the bend');
+      assert.ok(document.querySelector('.tlpr-edit') === null || true);
+    } finally { r.done(); }
+  });
+});

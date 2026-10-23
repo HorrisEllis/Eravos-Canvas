@@ -17,7 +17,11 @@
  *      a VELOCITY lane under the notes (drag to draw, Ctrl-drag a ramp) · every edit is one undo step
  *   P4 double-click a note → its own KNOBS (start on the grid, length, pitch, velocity — live, one undo step) · ⏎ STEP input:
  *      computer keys Z S X D C V G B H N J M (+ Q 2 W 3 E R 5 T 6 Y 7 U an octave up) land at the step cursor, which
- *      advances by the grid; Space = rest, Backspace = back, ← → move the cursor */
+ *      advances by the grid; Space = rest, Backspace = back, ← → move the cursor
+ * 3.56 CURVED NOTES: a note may bend — b: { from, to } semitones, shape, at — drawn as its pitch curve. 〰 Bend (6): drag
+ *      a note up/down to bend its end there (from its first third: where it slides in FROM) · Alt = fine (0.1 st) ·
+ *      right-click flattens it · the selection bends together. Double-click a note: its knobs, the bend's knobs and quick
+ *      curves (dive, drop, rise, glide in), and any knob of the track's tool for this note only. */
 (function (global) {
   'use strict';
   const DROW = 20, KEYW = 46, DKEYW = 96, LO = 24, HI = 107, RULER = 18; // C1 … B7 (piano) · pads (drums)
@@ -60,7 +64,8 @@
     const bars = UI.NumberDrag({ label: 'bars', min: 1, max: 128, step: 1, value: 4, suffix: ' bars', onChange: (v) => clip && view.emit('clip_edit', { id: clip.id, patch: { bars: v } }) });
     const tools = [['draw', '✎', 'Draw (1) — click adds, drag moves, drag an edge to stretch'], ['paint', '🖌', 'Paint (2) — drag across the grid: one note per grid cell, following the pointer'],
       ['split', '✂', 'Split (3) — click a note to cut it at the grid line'], ['erase', '⌫', 'Erase (4) — click or drag across notes to delete them'],
-      ['select', '⬚', 'Select (5) — drag a box; Shift adds; drag a selected note to move them all (Ctrl+drag copies)']];
+      ['select', '⬚', 'Select (5) — drag a box; Shift adds; drag a selected note to move them all (Ctrl+drag copies)'],
+      ['bend', '〰', 'Bend (6) — drag a note up or down: its pitch curves there (grab its start: it slides in from there) · Alt fine · right-click flattens']];
     const toolBtns = tools.map(([id, icon, hint]) => { const b = h('button', { class: 'tlpr-tool', title: hint, 'aria-label': hint, 'data-tool': id, text: icon }); b.addEventListener('click', (e) => { e.stopPropagation(); setTool(id); }); return b; });
     const toolBox = h('span', { class: 'tlpr-tools', role: 'group', 'aria-label': 'note tools' }, toolBtns);
     function setTool(t) { tool = t; toolBtns.forEach(b => b.classList.toggle('on', b.dataset.tool === t)); cv.dataset.tool = t; ghost = null; draw(); }
@@ -180,6 +185,7 @@
         g.globalAlpha = 0.35 + 0.65 * nt.v; g.fillStyle = c2; g.fillRect(x + 1, y + 1, w - 1, ROW - 2); g.globalAlpha = 1;
         g.strokeStyle = S.has(i) ? '#fff' : '#000'; g.lineWidth = 1; g.strokeRect(x + 1.5, y + 1.5, w - 2, ROW - 3);
       });
+      if (!drums) notes.forEach((nt, i) => { if (nt.b) drawBend(g, nt, S.has(i)); });
       if (ghost && !drag) {   // where a click lands
         const x = ghost.s * pps, y = yOf(ghost.n), w = Math.max(3, ghost.l * pps - 1);
         g.globalAlpha = 0.45; g.fillStyle = tool === 'erase' ? '#ff4d4d' : '#ffd24a'; g.fillRect(x + 1, y + 1, w - 1, ROW - 2); g.globalAlpha = 1;
@@ -191,6 +197,18 @@
       if (playStep !== null && playStep >= 0 && playStep <= st) { g.fillStyle = '#fff'; g.fillRect(playStep * pps, 0, 2, H); }
       drawRuler(W); drawVel(W);
     }
+    // 3.56 the pitch curve of a bent note: from its start (at from) to its end (at to), one row per semitone
+    const SHAPES = { smooth: (x) => x * x * (3 - 2 * x), linear: (x) => x, early: (x) => 1 - Math.pow(1 - x, 3), late: (x) => x * x * x };
+    function bendY(nt, f) { const b = nt.b, at = b.at || 0, k = f <= at ? 0 : (SHAPES[b.shape] || SHAPES.smooth)((f - at) / (1 - at)); return yOf(nt.n) + ROW / 2 - (b.from + (b.to - b.from) * k) * ROW; }
+    function drawBend(g, nt, on) {
+      const x0 = nt.s * pps + 1, w = Math.max(3, nt.l * pps - 2), col = lane ? lane.color : '#ff66cc';
+      g.save(); g.lineCap = 'round'; g.lineJoin = 'round';
+      [[6, col, 0.3], [2.2, on ? '#ffffff' : '#ffe08a', 1]].forEach(([lw, c, a]) => { g.globalAlpha = a; g.strokeStyle = c; g.lineWidth = lw; g.beginPath(); for (let k = 0; k <= 32; k++) { const xx = x0 + w * k / 32, yy = bendY(nt, k / 32); k ? g.lineTo(xx, yy) : g.moveTo(xx, yy); } g.stroke(); });
+      g.globalAlpha = 1; g.fillStyle = on ? '#ffffff' : '#ffe08a'; g.beginPath(); g.arc(x0 + w, bendY(nt, 1), 3.5, 0, 7); g.fill();
+      if (ROW >= 9) { g.font = '9px monospace'; g.fillText((nt.b.to > 0 ? '+' : '') + (+nt.b.to.toFixed(1)) + ' st', x0 + w + 5, bendY(nt, 1) + 3); }
+      g.restore();
+    }
+    const bendSay = (b) => !b ? 'flat' : (b.from ? 'from ' + (b.from > 0 ? '+' : '') + b.from + ' st ' : '') + 'to ' + (b.to > 0 ? '+' : '') + b.to + ' st';
     function drawVel(W) {
       const g = size(vel, W, VH); vcorner.style.width = KW + 'px'; vcorner.style.height = VH + 'px';
       g.fillStyle = '#0b1119'; g.fillRect(0, 0, W, VH); g.fillStyle = '#223044'; g.fillRect(0, 0, W, 1);
@@ -227,11 +245,18 @@
     cv.addEventListener('pointerdown', (e) => {
       e.stopPropagation(); cv.focus({ preventScroll: true }); if (!clip) return;
       const { x, y } = local(e); const i = hit(x, y), g = g0(e), st = steps();
+      if (e.button === 2 && tool === 'bend') { if (i >= 0 && notes[i].b) { const next = notes.slice(), sel = S.has(i) ? Array.from(S) : [i]; sel.forEach(j => { if (next[j]) { next[j] = Object.assign({}, next[j]); delete next[j].b; } }); commit(next); say(notes[i].s, notes[i].n, 'bend: flat'); } return; }
       if (e.button === 2) { if (i >= 0) { S.clear(); commit(notes.filter((_, j) => j !== i)); } return; }
       closeEditor();
       try { cv.setPointerCapture(e.pointerId); } catch (_) {}
       ghost = null;
       if (tool === 'erase') { drag = { mode: 'erase', orig: notes.slice(), x0: x, y0: y, armed: true, changed: false }; eraseAt(x, y); draw(); return; }
+      if (tool === 'bend') {
+        if (drums || i < 0) return; if (!S.has(i)) selOnly(i);
+        const a = notes[i], end = (x / pps - a.s) / Math.max(a.l, 1e-6) < 0.33 ? 'from' : 'to';
+        drag = { mode: 'bend', grab: i, end, idx: Array.from(S), orig: notes.map(n => Object.assign({}, n)), x0: x, y0: y, row0: yOf(a.n) + ROW / 2, armed: false, changed: false };
+        draw(); return;
+      }
       if (tool === 'split') {
         if (i >= 0) { const a = notes[i], at = q(snapTo(x / pps, g)); if (at > a.s + 1e-6 && at < a.s + a.l - 1e-6) { const next = notes.slice(); next.splice(i, 1, Object.assign({}, a, { l: q(at - a.s) }), Object.assign({}, a, { s: at, l: q(a.s + a.l - at) })); selOnly(i + 1); commit(next); } }
         return;
@@ -294,6 +319,11 @@
         for (let c = cellOf(a / pps, gg); c <= cellOf(b / pps, gg) + 1e-9; c += gg) { const cell = q(c); if (cell >= 0 && cell < st) paintAt(cell, pitchFor(nOf(y)), q(Math.min(gg, st - cell))); }
         drag.lastX = x; draw(); say(cellOf(x / pps, gg), pitchFor(nOf(y)), 'paint'); return;
       }
+      if (drag.mode === 'bend') {   // the pointer's height from the note's own row = semitones (Alt: tenths)
+        const raw = (drag.row0 - y) / ROW, st2 = clampN(e.altKey ? Math.round(raw * 10) / 10 : Math.round(raw), -48, 48);
+        drag.idx.forEach(j => { const o = drag.orig[j]; if (!o) return; const b = Object.assign({ from: 0, to: 0, shape: 'smooth', at: 0 }, o.b || {}); b[drag.end] = st2; const nt = Object.assign({}, o); if (b.from || b.to) nt.b = b; else delete nt.b; notes[j] = nt; });
+        drag.changed = true; const a = notes[drag.grab]; say(a.s, a.n, 'bend ' + bendSay(a.b)); draw(); return;
+      }
       const gs = g || FREE;
       if (drag.mode === 'move') {
         // the note follows the CELL under the pointer, not the distance moved: sliding inside the cell (or the row) you
@@ -324,13 +354,15 @@
       cv.classList.toggle('edge', z === 'R' || z === 'L');
       const keyChanged = (ghost && ghost.n) !== (gh && gh.n);
       ghost = gh; hoverS = gh ? gh.s : q(cellOf(x / pps, g)); draw(); if (keyChanged) drawKeys();
-      if (i >= 0) say(notes[i].s, notes[i].n, `len ${+(notes[i].l / 4).toFixed(3)} beat`); else say(gh ? gh.s : x / pps, n);
+      if (tool === 'bend') { ghost = null; cv.classList.toggle('edge', false); if (i >= 0) say(notes[i].s, notes[i].n, (notes[i].b ? 'bend ' + bendSay(notes[i].b) + ' · ' : '') + ((x / pps - notes[i].s) / notes[i].l < 0.33 ? 'drag: slide in from…' : 'drag: bend to…')); else readout.textContent = '〰 drag a note up or down'; draw(); return; }
+      if (i >= 0) say(notes[i].s, notes[i].n, `len ${+(notes[i].l / 4).toFixed(3)} beat · double-click: its knobs`); else say(gh ? gh.s : x / pps, n);
     }
     cv.addEventListener('pointerleave', () => { hoverS = null; if (!drag && ghost) { ghost = null; draw(); drawKeys(); } readout.textContent = ''; });
     const endDrag = () => {
       cv.classList.remove('move'); if (!drag) return; const d = drag; drag = null;
       if ((d.mode === 'resize' || d.mode === 'resizeL') && d.changed) lastLen = notes[d.grab].l;   // new notes take this length
       if (d.mode === 'box') { draw(); return; }
+      if (d.mode === 'bend' && d.changed && notes[d.grab] && notes[d.grab].b && lane) view.emit('note_audition', { lane: lane.id, note: notes[d.grab].n, bend: notes[d.grab].b, duration: 0.9 });
       if (d.changed) commit(notes.slice()); else draw();
     };
     cv.addEventListener('pointerdown', () => { if (drag && !drag.done) drag.done = global.UIKit.drag.begin(endDrag); }); // 3.34 guard
@@ -365,7 +397,7 @@
       const k = e.key, lower = k.length === 1 ? k.toLowerCase() : k, mod = e.ctrlKey || e.metaKey, eat = () => { e.preventDefault(); e.stopPropagation(); };
       if (!clip) return;
       if (stepOn && !mod && stepKey(e)) return eat();
-      if (!mod && !e.altKey && ['1', '2', '3', '4', '5'].includes(k)) { eat(); setTool(tools[+k - 1][0]); return; }
+      if (!mod && !e.altKey && ['1', '2', '3', '4', '5', '6'].includes(k)) { eat(); setTool(tools[+k - 1][0]); return; }
       if (mod && lower === 'a') { eat(); selOnly(notes.map((_, i) => i)); draw(); readout.textContent = `${S.size} selected`; return; }
       if (mod && (lower === 'c' || lower === 'x')) { eat(); copySel(); if (lower === 'x') removeSel(); return; }
       if (mod && lower === 'v') { eat(); paste(); return; }
@@ -467,7 +499,9 @@
       const st = steps(), gs = grid || FREE;
       const apply = (patch) => {
         cur = Object.assign({}, cur, patch); cur.s = q(clampN(cur.s, 0, st - FREE)); cur.l = q(clampN(cur.l, FREE, st - cur.s)); cur.n = Math.round(clampN(cur.n, drums ? 0 : LO, drums ? 127 : HI)); cur.v = clampN(Math.round(cur.v * 100) / 100, 0.05, 1);
-        notes[i] = Object.assign({}, cur); draw(); say(cur.s, cur.n, lenName(cur.l) + ' · vel ' + Math.round(cur.v * 127));
+        if (cur.b && !cur.b.from && !cur.b.to) delete cur.b;
+        if (cur.p && !Object.keys(cur.p).length) delete cur.p;
+        notes[i] = Object.assign({}, cur); draw(); say(cur.s, cur.n, lenName(cur.l) + ' · vel ' + Math.round(cur.v * 127) + (cur.b ? ' · bend ' + bendSay(cur.b) : ''));
         clearTimeout(timer); timer = setTimeout(() => commit(notes.slice()), 250);   // one commit after the knob settles
       };
       const knob = (label, o, set) => { const k = UI.Knob(Object.assign({ label, size: 44, onChange: (v) => set(v) }, o)); return k; };
@@ -478,13 +512,49 @@
       const kV = knob('Velocity', { min: 1, max: 127, value: Math.round(cur.v * 127), format: (v) => String(Math.round(v)) }, (v) => apply({ v: Math.round(v) / 127 }));
       const done = h('button', { class: 'tlpr-tool', title: 'done (Esc)', text: '✓' });
       editor.append(h('div', { class: 'tlpr-eh' }, [h('b', { text: 'Note' }), h('span', { class: 'wm-spacer' }), done]), h('div', { class: 'tlpr-knobs' }, [kS.el, kL.el, kP.el, kV.el]));
+      // 3.56 BEND — the note's pitch curve, with knobs; you hear it as you turn them
+      let hearT = null; const hear = () => { clearTimeout(hearT); hearT = setTimeout(() => { if (lane && cur.b) view.emit('note_audition', { lane: lane.id, note: cur.n, bend: cur.b, duration: 0.9 }); }, 280); };
+      const B = () => Object.assign({ from: 0, to: 0, shape: 'smooth', at: 0 }, cur.b || {});
+      const setB = (patch, quiet) => { apply({ b: Object.assign(B(), patch) }); syncB(); if (!quiet) hear(); };
+      const stFmt = (v) => (v > 0 ? '+' : '') + (+(+v).toFixed(1)) + ' st';
+      const kTo = knob('Bend to', { min: -48, max: 48, step: 0.1, value: B().to, default: 0, format: stFmt }, (v) => setB({ to: Math.round(v * 10) / 10 }));
+      const kFrom = knob('From', { min: -48, max: 48, step: 0.1, value: B().from, default: 0, format: stFmt }, (v) => setB({ from: Math.round(v * 10) / 10 }));
+      const kAt = knob('Starts', { min: 0, max: 0.95, step: 0.01, value: B().at, default: 0, format: (v) => Math.round(v * 100) + ' %' }, (v) => setB({ at: Math.round(v * 100) / 100 }));
+      const shSel = UI.Select({ label: 'Curve', hint: 'smooth: eases in and out · linear: straight · early: bends at once, then holds · late: holds, then dives', options: ['smooth', 'linear', 'early', 'late'].map(v => ({ value: v, label: v })), value: B().shape, onChange: (v) => setB({ shape: v }) });
+      function syncB() { const b = B(); [[kTo, b.to], [kFrom, b.from], [kAt, b.at]].forEach(([k, v]) => { if (k.set) k.set(v); }); if (shSel.set) shSel.set(b.shape); }
+      const prevNote = () => notes.filter((nt, j) => j !== i && nt.s < cur.s - 1e-6).sort((x, y) => y.s - x.s)[0];
+      const quick = [['↘ dive', 'down an octave, late — a drop', { from: 0, to: -12, shape: 'late', at: 0.2 }], ['⤓ deep drop', 'two octaves down: the floor falls out', { from: 0, to: -24, shape: 'late', at: 0.1 }],
+        ['↗ rise', 'up an octave', { from: 0, to: 12, shape: 'smooth', at: 0 }], ['⤳ glide in', 'slides in from the note before it — a smooth transition', null], ['— flat', 'no bend', { from: 0, to: 0, shape: 'smooth', at: 0 }]]
+        .map(([t, hint, b]) => { const btn = h('button', { class: 'tlpr-tool tlpr-ed', title: hint, text: t }); btn.addEventListener('click', (e) => { e.stopPropagation(); if (b) return setB(b);
+          const pv = prevNote(); if (!pv) { readout.textContent = 'no note before this one to glide from'; return; } setB({ from: Math.max(-48, Math.min(48, pv.n + (pv.b ? pv.b.to : 0) - cur.n)), to: 0, shape: 'early', at: 0 }); }); return btn; });
+      if (!drums) editor.append(h('div', { class: 'tlpr-eh' }, [h('b', { text: '〰 Bend' }), h('span', { class: 'tlpr-hint', text: ' the pitch curves over the note — the whole track bends, like a pitch wheel' })]),
+        h('div', { class: 'tlpr-knobs' }, [kFrom.el, kTo.el, kAt.el, shSel.el]), h('div', { class: 'tlpr-quick' }, quick));
+      // SOUND — any knob of this track's tool, for this note only (the same values the expression lane draws)
+      const list = (lane && knobsAll[lane.target]) || [], soundRow = h('div', { class: 'tlpr-knobs' });
+      const addSel = UI.Select({ label: '+ knob', hint: 'give this note its own value for one of the tool’s knobs (wobble, cutoff, depth…)', options: [{ value: '', label: 'add…' }].concat(list.map(k => ({ value: k.key, label: (k.group ? k.group.toLowerCase() + ' · ' : '') + k.label }))), value: '', onChange: (v) => { if (!v) return; const k = list.find(x => x.key === v); if (k) { apply({ p: Object.assign({}, cur.p, { [k.key]: cur.p && cur.p[k.key] !== undefined ? cur.p[k.key] : k.def }) }); drawSound(); } addSel.set(''); } });
+      function drawSound() {
+        soundRow.innerHTML = '';
+        Object.keys(cur.p || {}).forEach(key => {
+          const k = list.find(x => x.key === key); if (!k) return; const v = cur.p[key];
+          const set = (nv) => apply({ p: Object.assign({}, cur.p, { [key]: nv }) });
+          const ctl = k.type === 'enum' ? UI.Select({ label: k.label, options: k.options.map(o => ({ value: o, label: String(o) })), value: v, onChange: (nv) => set(k.options.find(o => String(o) === String(nv))) })
+            : k.type === 'boolean' ? UI.Toggle({ label: k.label, value: !!v, onChange: (nv) => set(!!nv) })
+            : knob(k.label, { min: k.min, max: k.max, step: k.step || (k.type === 'integer' ? 1 : (k.max - k.min) / 200), value: v, default: k.def, unit: k.unit }, (nv) => set(xVal(k, xFrac(k, nv))));
+          const x = h('button', { class: 'tlpr-tool', title: 'back to the tool’s own knob for this note', text: '×' });
+          x.addEventListener('click', (e) => { e.stopPropagation(); const p2 = Object.assign({}, cur.p); delete p2[key]; apply({ p: p2 }); drawSound(); });
+          soundRow.append(h('span', { class: 'tlpr-pk' }, [ctl.el, x]));
+        });
+        soundRow.append(addSel.el);
+      }
+      if (list.length) { editor.append(h('div', { class: 'tlpr-eh' }, [h('b', { text: '🎛 Sound' }), h('span', { class: 'tlpr-hint', text: ' this note only — the tool’s own knob takes over again after it' })]), soundRow); drawSound(); }
       const finish = () => { if (timer) { clearTimeout(timer); timer = null; commit(notes.slice()); } closeEditor(); cv.focus({ preventScroll: true }); };
       done.addEventListener('click', (e) => { e.stopPropagation(); finish(); });
       editor.onkeydown = (e) => { e.stopPropagation(); if (e.key === 'Escape' || e.key === 'Enter') finish(); };
       editor.onpointerdown = (e) => e.stopPropagation();
       editor.classList.add('open');
       // for tests and scripts: the same path a knob takes
-      return { start: (v) => apply({ s: Math.round(v / gs) * gs }), length: (v) => apply({ l: Math.max(gs, Math.round(v / gs) * gs) }), pitch: (n) => apply({ n }), velocity: (v) => apply({ v: v / 127 }), finish };
+      return { start: (v) => apply({ s: Math.round(v / gs) * gs }), length: (v) => apply({ l: Math.max(gs, Math.round(v / gs) * gs) }), pitch: (n) => apply({ n }), velocity: (v) => apply({ v: v / 127 }), finish,
+        bend: (b) => setB(b, true), quick: (label) => { const q2 = quick.find(x => x.textContent.includes(label)); if (q2) q2.click(); }, knob: (key, v) => apply({ p: Object.assign({}, cur.p, { [key]: v }) }), get note() { return Object.assign({}, cur); } };
     }
     function closeEditor() { editor.classList.remove('open'); editor.innerHTML = ''; }
     // ---- P4 step input

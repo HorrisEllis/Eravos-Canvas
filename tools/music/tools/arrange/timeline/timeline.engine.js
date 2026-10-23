@@ -117,11 +117,18 @@
         Object.keys(p).slice(0, 16).forEach(k => { const v = p[k]; if (/^[A-Za-z][\w.]{0,40}$/.test(k) && ((typeof v === 'number' && isFinite(v)) || (typeof v === 'string' && v.length <= 40) || typeof v === 'boolean')) o[k] = v; });
         return Object.keys(o).length ? o : null;
       }
+      // 3.56 a note's pitch curve: { from, to } semitones (±48), shape, at (where in the note the bend starts) — null if flat
+      const BEND_SHAPES = ['smooth', 'linear', 'early', 'late'];
+      function cleanB(b) {
+        if (!b || typeof b !== 'object') return null; const r2 = (v) => Math.round(clamp(+v || 0, -48, 48) * 100) / 100;
+        const o = { from: r2(b.from), to: r2(b.to), shape: BEND_SHAPES.includes(b.shape) ? b.shape : 'smooth', at: Math.round(clamp(+b.at || 0, 0, 0.95) * 100) / 100 };
+        return o.from || o.to ? o : null;
+      }
       function cleanNotes(arr, bars) {
         const max = bars * 16;
-        return (Array.isArray(arr) ? arr : []).map(n => ({ s: +n.s, l: +n.l, n: Math.round(+n.n), v: n.v === undefined ? 0.85 : +n.v, p: cleanP(n.p) }))
+        return (Array.isArray(arr) ? arr : []).map(n => ({ s: +n.s, l: +n.l, n: Math.round(+n.n), v: n.v === undefined ? 0.85 : +n.v, p: cleanP(n.p), b: cleanB(n.b) }))
           .filter(n => isFinite(n.s) && isFinite(n.l) && isFinite(n.n) && isFinite(n.v) && n.s >= 0 && n.s < max)
-          .map(n => Object.assign({ s: Math.round(n.s * 192) / 192, l: clamp(Math.round(n.l * 192) / 192, 0.125, max - n.s), n: clamp(n.n, 0, 127), v: clamp(n.v, 0.05, 1) }, n.p ? { p: n.p } : {}))   // 3.48: 1/192 step — exact for 1/64 and every triplet; 1/128-note minimum
+          .map(n => Object.assign({ s: Math.round(n.s * 192) / 192, l: clamp(Math.round(n.l * 192) / 192, 0.125, max - n.s), n: clamp(n.n, 0, 127), v: clamp(n.v, 0.05, 1) }, n.p ? { p: n.p } : {}, n.b ? { b: n.b } : {}))   // 3.48: 1/192 step — exact for 1/64 and every triplet; 1/128-note minimum
           .sort((a, b) => a.s - b.s || a.n - b.n);
       }
       const snap16 = (b) => Math.max(1, 1 + Math.round((b - 1) * 16) / 16);
@@ -170,7 +177,7 @@
           c.notes.forEach(n => {
             if (Math.floor(n.s + 1e-9) !== local) return;
             const len = Math.min(n.l, c.bars * 16 - n.s);
-            ctx.emit('note:trigger', Object.assign({ target: lane.target, note: n.n, velocity: n.v, time: tk.time + (n.s - local) * sd, duration: len * sd * 0.98 }, n.p ? { params: n.p } : {}));
+            ctx.emit('note:trigger', Object.assign({ target: lane.target, note: n.n, velocity: n.v, time: tk.time + (n.s - local) * sd, duration: len * sd * 0.98 }, n.p ? { params: n.p } : {}, n.b ? { bend: n.b } : {}));
           });
         });
       }
@@ -452,7 +459,8 @@
       ctx.onUI('note_audition', { type: 'object', required: ['note'] }, (p) => {
         const lane = lanes.find(l => l.id === p.lane); const target = (lane && lane.target) || p.target;
         if (!target || !K.registry.has(target)) return;
-        (Array.isArray(p.notes) ? p.notes : [p.note]).forEach(n => ctx.emit('note:trigger', { target, note: clamp(Math.round(n), 0, 127), velocity: 0.8, time: ac.currentTime + 0.01, duration: 0.3 }));
+        const b = cleanB(p.bend), dur = b ? clamp(+p.duration || 0.9, 0.1, 4) : 0.3;   // 3.56: hear the curve while you shape it
+        (Array.isArray(p.notes) ? p.notes : [p.note]).forEach(n => ctx.emit('note:trigger', Object.assign({ target, note: clamp(Math.round(n), 0, 127), velocity: 0.8, time: ac.currentTime + 0.01, duration: dur }, b ? { bend: b } : {})));
       });
       ctx.onUI('marker_edit', { type: 'object', required: ['op'] }, (p) => {
         if (p.op === 'add') markers.push({ bar: snapBar(p.bar || 1), name: p.name || 'marker' });
