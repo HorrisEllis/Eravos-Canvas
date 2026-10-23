@@ -5,16 +5,21 @@
  * sent on as text, or as checked JSON. Keys stay on this computer (ctx.secret, per provider) and are never part of a
  * saved project, preset, backup or export. Every call is logged: provider, model, time, tokens, status.
  * Reliability: time limit (AbortController) · retries with backoff on 429 / 5xx / network errors · Cancel · JSON mode
- * parses the reply (fences tolerated), checks the required keys and makes ONE repair request if they are missing. */
+ * parses the reply (fences tolerated), checks the required keys and makes ONE repair request if they are missing.
+ * Session trace (opt-in, off by default): {{session}} is what happened in this session, read from the kernel's ledger —
+ * tools added and closed, wires, faults, modes, files, songs written — one plain line per event, newest last, at most
+ * Trace size events and 4000 characters. Ids and names only: no parameter values, no file contents, never a key.
+ * (After the CFR kernel's context synthesizer: the model sees the session's flight path instead of starting blind.) */
 (function () {
   'use strict';
   const S = OrganismSDK.STD;
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-  function render(tpl, input) {
+  function render(tpl, input, session) {
     const asText = (v) => v === undefined || v === null ? '' : typeof v === 'string' ? v : JSON.stringify(v, null, 2);
     return String(tpl).replace(/\{\{\s*([a-zA-Z_][\w.]*)\s*\}\}/g, (m, path) => {
       if (path === 'date') return new Date().toISOString().slice(0, 10);
+      if (path === 'session') return session || '';   // empty unless Session trace is on
       if (path === 'input') return asText(input);
       if (path.startsWith('input.')) { let v = input; for (const k of path.slice(6).split('.')) { if (v == null) break; v = v[k]; } return asText(v); }
       return m;
@@ -30,11 +35,45 @@
   }
   const missingKeys = (v, keys) => keys.filter(k => !(v && typeof v === 'object' && !Array.isArray(v) && k in v));
 
+  // ---- the session trace: ledger entries → short plain lines. Plumbing (ports, type definitions, install steps) is left out.
+  const TRACE_MAX_CHARS = 4000;
+  const short = (v) => { const t = String(v == null ? '' : v).replace(/\s+/g, ' '); return /^(sk-|key-|Bearer )|[A-Za-z0-9+/_-]{40,}/.test(t) ? '[hidden]' : t.length > 60 ? t.slice(0, 57) + '…' : t; };
+  function traceLines(entries, name) {
+    const who = (inst, org) => { const d = org && window.OrganismFactory && OrganismFactory.def ? OrganismFactory.def(org) : null; return (d ? d.label : short(org || 'tool')) + (inst ? ' (' + short(inst) + ')' : ''); };
+    const say = {
+      organism_mounted: (e) => 'added ' + who(e.instance_id, e.organism_id),
+      organism_unmounted: (e) => 'closed ' + who(e.instance_id, e.organism_id) + (e.reason && e.reason !== 'unmount' ? ' — ' + short(e.reason) : ''),
+      wire_registered: (e) => 'wired ' + name(e.source, true) + ' → ' + name(e.target, true),
+      wire_removed: (e) => 'unwired ' + short(e.wire_id),
+      fault_raised: (e) => 'problem ' + short(e.fault_class) + ' in ' + who(e.instance_id, e.organism_id) + ': ' + short(e.message),
+      permission_denied: (e) => 'refused: ' + who(null, e.organism_id) + ' may not ' + short(e.permission),
+      mode_changed: (e) => 'mode → ' + short(e.mode_id), shell_mode: (e) => 'mode → ' + short(e.mode),
+      asset_imported: (e) => 'file in: ' + short(e.source) + (e.asset_type ? ' (' + short(e.asset_type) + ')' : ''),
+      recipe_started: (e) => 'started ' + short(e.recipe_id), recipe_finished: (e) => 'finished ' + short(e.recipe_id) + ': ' + (e.mounted | 0) + ' tools, ' + (e.wires | 0) + ' wires, ' + (e.faults | 0) + ' problems',
+      pack_installed: (e) => 'installed pack ' + short(e.pack_id), mutation_applied: (e) => 'changed ' + short(e.target) + ' (' + short(e.operation) + ')',
+      route_changed: (e) => 'routed ' + name(short(e.instance_id)) + ' → ' + short(e.to),
+    };
+    const t0 = entries.length ? entries[0].t : 0, out = [];
+    entries.forEach(e => { const f = say[e.type]; if (!f) return; const line = f(e), prev = out[out.length - 1];
+      if (prev && prev.line === line) { prev.n++; return; } out.push({ at: (e.t - t0) / 1000, line, n: 1 }); });
+    return out.map(x => `+${x.at.toFixed(1)}s ${x.line}${x.n > 1 ? ' ×' + x.n : ''}`);
+  }
+  /** the last `max` meaningful events of this kernel's session, at most 4000 characters (oldest dropped first) */
+  function sessionTrace(K, max) {
+    const names = new Map(); (K.ledger.entries() || []).forEach(e => { if (e.type === 'organism_mounted') names.set(e.instance_id, e.organism_id); });
+    // a wire end is '<instance id>.<hook id>' and both can hold dots: match the known instance it starts with
+    const name = (s, end) => { s = String(s || ''); const inst = end ? [...names.keys()].filter(k => s.startsWith(k + '.')).sort((x, y) => y.length - x.length)[0] || s : s;
+      const org = names.get(inst), d = org && OrganismFactory.def ? OrganismFactory.def(org) : null; return d ? d.label : short(inst); };
+    let lines = traceLines(K.ledger.entries(), name).slice(-Math.max(1, max));
+    while (lines.length > 1 && lines.join('\n').length > TRACE_MAX_CHARS) lines.shift();
+    return lines.length ? lines.join('\n') : '(nothing has happened in this session yet)';
+  }
+
   OrganismFactory.define({
     id: 'eravos.agents.ai-step', domain: 'agents', version: '1.0.0', label: 'AI Step', icon: '✦', accent: '#ffb86b', phase: 'P37',
     category: 'AI', blurb: 'Ask an AI model as one step of an automation: a prompt filled from what arrives, any provider, text or checked JSON out.',
     size: { w: 600, h: 620 }, minSize: { w: 400, h: 420 },
-    permissions: ['bus_publish', 'bus_subscribe'],
+    permissions: ['bus_publish', 'bus_subscribe', 'ledger_read'],
     provides: ['capability.ai'],
     hooks: [
       S.data_in('ai.hook.in', 'in', ['*'], 'fills {{input}} in the prompt'),
@@ -54,11 +93,13 @@
       { key: 'auto', type: 'boolean', default: false, label: 'Auto', group: 'RUN', hint: 'run every time a new input arrives' },
       { key: 'timeout', type: 'number', default: 60, min: 5, max: 600, step: 1, unit: 's', label: 'Time limit', group: 'RUN' },
       { key: 'retries', type: 'integer', default: 2, min: 0, max: 5, step: 1, label: 'Retries', group: 'RUN', hint: 'on rate limits, server errors and lost connections' },
+      { key: 'trace', type: 'enum', options: ['off', 'where-written', 'append'], default: 'off', label: 'Session trace', group: 'CONTEXT', hint: 'off: nothing about your session is sent · where-written: {{session}} fills where you put it · append: added to the end of every prompt' },
+      { key: 'traceSize', type: 'integer', default: 30, min: 5, max: 200, step: 1, label: 'Trace size', group: 'CONTEXT', hint: 'how many recent events (tools added, wires, problems…) — at most 4000 characters' },
     ],
     ui_hooks: ['run', 'cancel', 'prompt_edit', 'key_set', 'key_clear', 'clear_log'],
     engine(ctx) {
       const memKeys = {}, getKey = (prov) => ctx.secret('key.' + prov).get() || memKeys[prov] || '';   // memKeys: only if the browser blocks storage
-      const P = ctx.params;
+      const P = ctx.params, K = ctx.K;
       let prompt = 'Summarise this in one sentence:\n\n{{input}}', system = '', input = undefined, busy = null, lastAnswer = null;
       const log = []; const LOG_MAX = 100;
       const out = { text: ctx.dataOut('text', { type: 'text', label: 'answer' }), json: ctx.dataOut('json', { type: 'json', label: 'answer JSON' }), error: ctx.dataOut('error', { type: 'text', label: 'error' }) };
@@ -108,7 +149,8 @@
         const limit = setTimeout(() => { me.timedOut = true; ctl.abort(); }, P.get('timeout') * 1000);
         ctx.emitUI('status', { status: 'running', why }); ctx.syncUI();
         const jsonMode = P.get('output') === 'json', req = String(P.get('requiredKeys') || '').split(',').map(s => s.trim()).filter(Boolean);
-        let text = render(prompt, input);
+        let text = render(prompt, input, traceFor());
+        if (P.get('trace') === 'append' && !/\{\{\s*session\s*\}\}/.test(prompt)) text += '\n\n### What happened in this session (oldest first)\n' + traceFor();
         if (jsonMode && P.get('provider') !== 'echo') text += `\n\nReply with JSON only — no prose, no code fences.${req.length ? ' It must have these keys: ' + req.join(', ') + '.' : ''}`;
         try {
           let r = await withRetries(text, ctl), usage = { in: r.usage.in, out: r.usage.out }, value;
@@ -135,6 +177,8 @@
           ctx.emitUI('status', { status: 'error', message: msg });
         } finally { clearTimeout(limit); if (busy === me) busy = null; ctx.syncUI(); }
       }
+      // the trace is read only when it is switched on, and only through the kernel's permission check
+      function traceFor() { const m = P.get('trace'); if (m === 'off') return ''; if (!K.permissions.enforce(ctx.id, 'ledger_read', 'session trace')) return ''; return sessionTrace(K, P.get('traceSize')); }
       ctx.run = run;
       ctx.dataIn('in', { accepts: ['*'], label: 'input' }, (v) => { input = v; ctx.emitUI('input', { preview: render('{{input}}', v).slice(0, 400) }); if (P.get('auto')) run('input'); });
       ctx.dataIn('run', { accepts: ['trigger'], label: 'run' }, () => run('trigger'));
@@ -145,11 +189,12 @@
       ctx.onUI('key_clear', null, () => { const prov = P.get('provider'); delete memKeys[prov]; ctx.secret('key.' + prov).clear(); ctx.syncUI(); });
       ctx.onUI('clear_log', null, () => { log.length = 0; ctx.syncUI(); });
       P.onChange('provider', () => ctx.syncUI());
+      ['trace', 'traceSize'].forEach(k => P.onChange(k, () => ctx.syncUI()));   // the UI shows exactly what would be sent
       ctx.onSilence && ctx.onSilence((p) => { if (p.hard && busy) busy.ctl.abort(); });
       ctx.saveExtra = () => ({ prompt, system }); // never the key
       ctx.loadExtra = (x) => { if (!x || typeof x.prompt !== 'string') return ctx.fault('MOUNT_005', 'ai step: saved prompt missing'); prompt = x.prompt; system = typeof x.system === 'string' ? x.system : ''; ctx.syncUI(); };
-      ctx.stateExtra = () => ({ prompt, system, hasKey: !!getKey(P.get('provider')), busy: !!busy, log: log.slice(-40), answer: lastAnswer, input: input === undefined ? null : render('{{input}}', input).slice(0, 400) });
-      ctx.internals = { render, parseJSON, get log() { return log; }, get answer() { return lastAnswer; } };
+      ctx.stateExtra = () => ({ prompt, system, hasKey: !!getKey(P.get('provider')), busy: !!busy, log: log.slice(-40), answer: lastAnswer, input: input === undefined ? null : render('{{input}}', input).slice(0, 400), trace: P.get('trace') === 'off' ? null : traceFor() });
+      ctx.internals = { render, parseJSON, traceFor, get log() { return log; }, get answer() { return lastAnswer; } };
       return { unmount() { if (busy) busy.ctl.abort(); } };
     },
   });
