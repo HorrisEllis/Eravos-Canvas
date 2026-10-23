@@ -2,7 +2,7 @@
  * instrument tracks (＋ Track spawns an instrument + lane + first clip) and the piano roll (timeline.pianoroll.js) */
 OrganismFactory.reg('eravos.timeline', function (view) {
   const UI = view.ui, h = UI.h;
-  const RULER = 26, HEAD_W = 176;
+  const RULER = 26, HEAD_W = 232;   // room for the name, M · S, the instrument and the 〰 curve picker
   const laneH = () => Math.max(28, Math.min(160, view.state.laneH || 48));
   let A = null, sel = null, playBar = null, drag = null, hover = null, pendingSel = null, headSig = '';
   const laneKindFor = (c) => c.kind === 'audio' ? 'audio' : c.kind === 'notes' ? 'inst' : 'pattern';
@@ -160,6 +160,11 @@ OrganismFactory.reg('eravos.timeline', function (view) {
           const span = Math.max(12, hi - lo + 1), ih = r.h - 16, per = r.w / (c.bars * 16);
           g.fillStyle = lane.color;
           ns.forEach(n => { const y = r.y + 13 + (hi - n.n) / span * ih; g.fillRect(r.x + n.s * per, y, Math.max(1.5, n.l * per - 1), Math.max(1.5, ih / span)); });
+          // 3.56 a bent note shows its curve here too (a straight sketch: from its start pitch to its end pitch, clipped to the clip)
+          g.save(); g.beginPath(); g.rect(r.x, r.y, r.w, r.h); g.clip(); g.strokeStyle = '#ffe08a'; g.lineWidth = 1.5;
+          ns.forEach(n => { if (!n.b) return; const y0 = r.y + 13 + (hi - n.n - n.b.from) / span * ih + 1, y1 = r.y + 13 + (hi - n.n - n.b.to) / span * ih + 1, x0 = r.x + n.s * per, x1 = x0 + n.l * per, xa = x0 + (x1 - x0) * (n.b.at || 0);
+            g.beginPath(); g.moveTo(x0, y0); g.lineTo(xa, y0); g.quadraticCurveTo(xa + (x1 - xa) * 0.6, y0, x1, y1); g.stroke(); });
+          g.restore();
         }
         for (let b = 1; b < c.bars; b++) { g.fillStyle = lane.color + '55'; g.fillRect(r.x + b * pb, r.y + 2, 1, r.h - 4); }
         g.fillStyle = '#fff'; g.font = '10px sans-serif'; g.fillText((ns.length ? '' : '＋ ') + (c.name || 'clip').slice(0, Math.max(3, Math.floor(r.w / 6))), r.x + 4, r.y + 11);
@@ -198,7 +203,8 @@ OrganismFactory.reg('eravos.timeline', function (view) {
         // 3.53 ⤴ automate one of this tool's knobs: a lane under the track
         const ks = (A.knobs && A.knobs[l.target]) || [];
         if (live && ks.length) {
-          const au = h('select', { class: 'uk-select', title: 'automate a knob of this tool — its own lane under the track', style: { width: '26px', fontSize: '10px', padding: '0 2px' } }, [h('option', { value: '', text: '⤴' })].concat(ks.map(k => h('option', { value: k.key, text: (k.group ? k.group.toLowerCase() + ' · ' : '') + k.label }))));
+          // visible on purpose: a bare ⤴ arrow went unnoticed ("how do I curve the notes? I don't see anything")
+          const au = h('select', { class: 'uk-select', 'aria-label': 'Add a curve for a knob', title: 'draw a curve for one of this tool’s knobs (wobble, cutoff, depth…) — it gets its own lane under the track', style: { width: '68px', fontSize: '10px', padding: '0 2px', color: '#ffd166', borderColor: '#ffd16688' } }, [h('option', { value: '', text: '〰 curve' })].concat(ks.map(k => h('option', { value: k.key, text: (k.group ? k.group.toLowerCase() + ' · ' : '') + k.label }))));
           au.addEventListener('change', () => { if (au.value) view.emit('lane_add', { kind: 'auto', target: l.target, key: au.value }); au.value = ''; });
           au.addEventListener('pointerdown', (e) => e.stopPropagation()); row.append(au);
         }
