@@ -1,0 +1,299 @@
+{
+  "schema": "eravos.suite/1",
+  "id": "music.heavy-drops",
+  "label": "Heavy Drops",
+  "icon": "💥",
+  "accent": "#ff2266",
+  "version": "1.0.0",
+  "blurb": "The Floor Falls Out sound as a system. A half-time Groove plays the Pads; Chords set the key and the Bassline puts the root on the kick, played twice: by the Wobble Bass (with a Destroyer inside its growl, so the sub underneath stays clean) and by the Sub Engine that dives on every drop. The Drop Builder makes the build, the pause where the floor falls out, and the room that opens on the drop. WOBBLE, WEIGHT, GRIT and SPACE turn all of it.",
+  "hub": "eravos.suite-hub",
+  "parts": [
+    {
+      "tool": "eravos.groove-gen",
+      "role": "rhythm",
+      "required": true,
+      "preset": "Dubstep Half-time",
+      "notes": false,
+      "why": "the half-time groove: plays the drums and tells the Bassline where the kick is"
+    },
+    {
+      "tool": "eravos.pads",
+      "role": "drums",
+      "required": true,
+      "preset": "Heavy (Dubstep/Trap)",
+      "notes": false,
+      "why": "the drum sounds the Groove plays"
+    },
+    {
+      "tool": "eravos.chord-gen",
+      "role": "key",
+      "required": true,
+      "preset": "Dark Minor",
+      "notes": false,
+      "why": "the progression the bass follows (wire a pad to it for chords)"
+    },
+    {
+      "tool": "eravos.bass-gen",
+      "role": "bassline",
+      "required": true,
+      "preset": "On the Kick",
+      "notes": false,
+      "why": "the chord’s root on the kick, sent to the wobble and the sub at once"
+    },
+    {
+      "tool": "eravos.wobble-bass",
+      "role": "wobble",
+      "required": true,
+      "preset": "Classic Wub 1/8",
+      "why": "the wobble: its rate, its vowel, its growl"
+    },
+    {
+      "tool": "eravos.fx-destroyer",
+      "role": "grit",
+      "required": true,
+      "as": "mod",
+      "slot": "growl",
+      "in": "eravos.wobble-bass",
+      "preset": "Fold Growl",
+      "why": "teeth on the wub only — the sub under it stays clean"
+    },
+    {
+      "tool": "eravos.sub-engine",
+      "role": "sub",
+      "required": true,
+      "preset": "Earthquake Drop",
+      "why": "the floor: a clean sub that dives on the drop"
+    },
+    {
+      "tool": "eravos.bass-drop-builder",
+      "role": "drop",
+      "required": true,
+      "preset": "Long build 8/8/1/16",
+      "why": "the build, the one-bar pause where the floor falls out, the impact and the room that opens"
+    },
+    {
+      "tool": "eravos.wub-osc",
+      "role": "screech",
+      "preset": "Slide Lead (+1 oct)",
+      "why": "a screech to answer the wobble — play it, or wire a part to it"
+    },
+    {
+      "tool": "eravos.pad-forge",
+      "role": "pad",
+      "preset": "EDM Pad · Melodic Dubstep Halo",
+      "why": "the pad for the intro and the break"
+    }
+  ],
+  "wiring": [
+    {
+      "from": [
+        "eravos.groove-gen",
+        "groove.hook.note_out"
+      ],
+      "to": [
+        "eravos.pads",
+        "pads.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.groove-gen",
+        "groove.hook.step_out"
+      ],
+      "to": [
+        "eravos.bass-gen",
+        "bassg.hook.groove_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.chord-gen",
+        "chordg.hook.chord_out"
+      ],
+      "to": [
+        "eravos.bass-gen",
+        "bassg.hook.chord_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.bass-gen",
+        "bassg.hook.note_out"
+      ],
+      "to": [
+        "eravos.wobble-bass",
+        "wobble.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.bass-gen",
+        "bassg.hook.note_out"
+      ],
+      "to": [
+        "eravos.sub-engine",
+        "sub.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.chord-gen",
+        "chordg.hook.note_out"
+      ],
+      "to": [
+        "eravos.pad-forge",
+        "pad.hook.note_in"
+      ]
+    }
+  ],
+  "output": [
+    "eravos.pads",
+    "eravos.wobble-bass",
+    "eravos.sub-engine",
+    "eravos.bass-drop-builder",
+    "eravos.wub-osc",
+    "eravos.pad-forge"
+  ],
+  "macros": [
+    {
+      "label": "WOBBLE",
+      "default": 0.5,
+      "hint": "how far the wobble opens",
+      "targets": [
+        {
+          "tool": "eravos.wobble-bass",
+          "key": "depth",
+          "min": 1,
+          "max": 7
+        }
+      ]
+    },
+    {
+      "label": "WEIGHT",
+      "default": 0.6,
+      "hint": "how deep the sub dives and how hard the drop pulls it down",
+      "targets": [
+        {
+          "tool": "eravos.sub-engine",
+          "key": "drop",
+          "min": 0,
+          "max": 24
+        },
+        {
+          "tool": "eravos.bass-drop-builder",
+          "key": "subDive"
+        }
+      ]
+    },
+    {
+      "label": "GRIT",
+      "default": 0.45,
+      "hint": "the Destroyer in the growl and the wobble's own drive",
+      "targets": [
+        {
+          "tool": "eravos.fx-destroyer",
+          "key": "drive"
+        },
+        {
+          "tool": "eravos.wobble-bass",
+          "key": "drive",
+          "min": 0,
+          "max": 0.8
+        }
+      ]
+    },
+    {
+      "label": "SPACE",
+      "default": 0.6,
+      "hint": "the room that opens on the drop: its tail and how far it circles you",
+      "targets": [
+        {
+          "tool": "eravos.bass-drop-builder",
+          "key": "spaceTail"
+        },
+        {
+          "tool": "eravos.bass-drop-builder",
+          "key": "orbit",
+          "min": 0,
+          "max": 0.8
+        }
+      ]
+    }
+  ],
+  "starter": "Floor Falls Out",
+  "scenes": {
+    "Floor Falls Out": {
+      "eravos.wobble-bass": {
+        "preset": "Classic Wub 1/8"
+      },
+      "eravos.sub-engine": {
+        "preset": "Earthquake Drop"
+      },
+      "eravos.fx-destroyer": {
+        "preset": "Fold Growl"
+      },
+      "eravos.bass-drop-builder": {
+        "preset": "Long build 8/8/1/16"
+      },
+      "eravos.pads": {
+        "preset": "Heavy (Dubstep/Trap)"
+      }
+    },
+    "Half-time Growl": {
+      "eravos.wobble-bass": {
+        "preset": "Half-time Growl 1/4t"
+      },
+      "eravos.sub-engine": {
+        "preset": "Dubstep Sub Layer"
+      },
+      "eravos.fx-destroyer": {
+        "preset": "Growl Fold · sub stays clean"
+      },
+      "eravos.pads": {
+        "preset": "Bass Music · 140 Half-Time Dub"
+      }
+    },
+    "Head Shaker": {
+      "eravos.wobble-bass": {
+        "preset": "Head Shaker"
+      },
+      "eravos.sub-engine": {
+        "preset": "Deep Sine"
+      },
+      "eravos.fx-destroyer": {
+        "preset": "Bass Grit (parallel)"
+      },
+      "eravos.pads": {
+        "preset": "Bass Music · Brostep Metal"
+      }
+    },
+    "Tearout": {
+      "eravos.wobble-bass": {
+        "preset": "Tearout Screech"
+      },
+      "eravos.sub-engine": {
+        "preset": "Dubstep Sub Layer"
+      },
+      "eravos.fx-destroyer": {
+        "preset": "Total Destruction"
+      },
+      "eravos.pads": {
+        "preset": "Bass Music · Tearout Concrete"
+      }
+    },
+    "Sub Quake": {
+      "eravos.wobble-bass": {
+        "preset": "Sub Quake (-2 oct)"
+      },
+      "eravos.sub-engine": {
+        "preset": "Earthquake Drop"
+      },
+      "eravos.fx-destroyer": {
+        "preset": "Wub Grit · sub stays clean"
+      },
+      "eravos.pads": {
+        "preset": "Bass Music · Riddim Steel"
+      }
+    }
+  }
+}

@@ -8,11 +8,14 @@
  *              wire?: { from: [ref, hookId], to: [ref, hookId] } }   ref = 'host' | 'self' | another member's tool id
  *     A linked member with no wire is joined to the host by the first pair of ports that fit (its link rule's way first);
  *     wire: false leaves it unwired (a tool that follows its partner without a cable).
- * Every step acts like the user: spawn, ui:* events, kernel wires, Mods.add — so all of it is undoable and saved. */
+ * Every step acts like the user: spawn, ui:* events, kernel wires, Mods.add — so all of it is undoable and saved.
+ * 3.63 A SUITE has a page too (openSuite): what it is, every part (▶ hear its preset, ＋ add just that one, 📘 its own page),
+ * its scenes, its macros and how it is wired — and ＋ Build the whole suite. A suite window's 📘 (or its name) opens it.
+ * o.back (both pages): a ← button that takes you back where you came from (＋ Add opens pages this way). */
 (function (global) {
   'use strict';
   const doc = global.document;
-  const TP = { open, close, isOpen: () => !!cur, load, loadSuite, addMod, addLinked, presetGroups, partners, current: () => cur && { defId: cur.d.id, target: cur.target } };
+  const TP = { open, openSuite, close, isOpen: () => !!cur, load, loadSuite, addMod, addLinked, presetGroups, partners, current: () => cur && (cur.suite ? { suiteId: cur.suite.id, target: cur.target } : { defId: cur.d.id, target: cur.target }) };
   let cur = null;   // { d, target, el, K, made: Map(tool → instanceId) }
 
   const F = () => global.OrganismFactory;
@@ -111,16 +114,23 @@
   // ---------------------------------------------------------------- the page
   function open(defId, o) {
     o = o || {}; const K = kern(o), d = F().def(defId); if (!d) return null;
+    // a suite window → the page of the suite it is
+    const SU = global.Suites, hubOf = live(o.instanceId) && SU && SU.list().some(x => x.hub === defId) ? live(o.instanceId).ctx.params.get('suite') : null;
+    if (hubOf && SU.get(hubOf)) return openSuite(hubOf, o);
     close();
     const target = live(o.instanceId) ? o.instanceId : windowsOf(K, defId)[0] || null;
-    cur = { d, K, target, made: new Map(), el: null, q: '' };
+    cur = { d, K, target, made: new Map(), el: null, q: '', back: o.back || null };
+    return mount(d.label, d.accent);
+  }
+  function mount(label, accent) {
+    const K = cur.K;
     const UI = global.UIKit, h = UI.h;
-    const el = cur.el = h('div', { class: 'tp-overlay', role: 'dialog', 'aria-label': d.label + ' — its page', style: { '--acc': d.accent || '#00d4ff' } });
+    const el = cur.el = h('div', { class: 'tp-overlay', role: 'dialog', 'aria-label': label + ' — its page', style: { '--acc': accent || '#00d4ff' } });
     el.addEventListener('pointerdown', (e) => { if (e.target === el) close(); });
     el.addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } });
     el.appendChild(h('div', { class: 'tp-page', tabindex: '-1' }));
     doc.body.appendChild(el);
-    cur.unsubs = ['kernel:organism-mounted', 'kernel:organism-unmounted', 'canvas:mods', 'contentpacks:changed'].map(tp => K.bus.subscribe(tp, () => soon(), 'tool-page'));
+    cur.unsubs = ['kernel:organism-mounted', 'kernel:organism-unmounted', 'canvas:mods', 'contentpacks:changed'].concat(cur.suite ? ['kernel:wire-registered', 'kernel:wire-removed'] : []).map(tp => K.bus.subscribe(tp, () => soon(), 'tool-page'));
     if (global.ContentPacks) cur.unsubs.push(global.ContentPacks.onChange(() => soon()));
     repaint(); el.querySelector('.tp-page').focus();
     return el;
@@ -129,12 +139,12 @@
   function soon() { if (pend) return; pend = global.setTimeout(() => { pend = null; repaint(); }, 30); }
   function close() {
     if (!cur) return; (cur.unsubs || []).forEach(u => { try { u(); } catch (e) {} });
-    if (global.Preview && global.Preview.current && global.Preview.current.defId === cur.d.id) global.Preview.stop();
+    if (global.Preview && global.Preview.current && (cur.suite ? cur.suite.parts.some(p => p.tool === global.Preview.current.defId) : global.Preview.current.defId === cur.d.id)) global.Preview.stop();
     cur.el.remove(); cur = null;
   }
 
   function repaint() {
-    if (!cur) return;
+    if (!cur) return; if (cur.suite) return repaintSuite();
     const st = cur, d = st.d, K = st.K, UI = global.UIKit, h = UI.h, M = global.Mods;
     const page = st.el.querySelector('.tp-page'), keepY = page.scrollTop; page.innerHTML = '';
     if (!live(st.target)) st.target = null;
@@ -154,7 +164,7 @@
       h('div', { class: 'tp-act' }, [
         btn(st.target ? '↗ Go to it' : '＋ Add to canvas', st.target ? 'show its window' : 'open one on the canvas', () => { if (st.target) { K.bus.publish('canvas:focus-request', { instanceId: st.target }); close(); } else ensureHost(st); }, 'pri'),
         suite ? btn('＋ Load the whole suite', 'the tool and every tool in its suite, wired up and set — one click (Ctrl+Z takes it back)', () => loadSuite(st), 'pri tp-suite-all') : null,
-        btn('✕', 'close (Esc)', close, 'tp-x'),
+        backBtn(btn), btn('✕', 'close (Esc)', close, 'tp-x'),
       ]),
     ]));
     page.appendChild(h('div', { class: 'tp-on' }, [h('span', { text: 'Works on: ' }), pick]));
@@ -270,6 +280,104 @@
     }
     page.scrollTop = keepY;
   }
+  const backBtn = (btn) => cur && cur.back ? btn('← Back', 'back to where you were', () => { const b = cur.back; close(); b(); }, 'tp-back') : null;
+
+  // ---------------------------------------------------------------- 3.63 the page of a SUITE
+  function openSuite(suiteId, o) {
+    o = o || {}; const SU = global.Suites, s = SU && SU.get(suiteId); if (!s) return null;
+    close();
+    const K = kern(o), hubs = suiteWindows(K, s), target = live(o.instanceId) && hubs.includes(o.instanceId) ? o.instanceId : hubs[0] || null;
+    cur = { suite: s, d: { id: 'suite:' + s.id, label: s.label, icon: s.icon, accent: s.accent }, K, target, made: new Map(), el: null, q: '', back: o.back || null };
+    return mount(s.label, s.accent);
+  }
+  // the suite windows on the canvas that are this suite
+  function suiteWindows(K, s) { return F().def(s.hub) ? windowsOf(K, s.hub).filter(id => live(id).ctx.params.get('suite') === s.id) : []; }
+  async function ensureSuite(st) {
+    if (live(st.target)) return st.target;
+    const id = await global.Suites.openAsync(st.suite.id, { K: st.K }); if (!id) return null;
+    st.target = id; if (cur === st) repaint(); return id;
+  }
+  async function buildSuite(st) { st = st || cur; const hub = await ensureSuite(st); if (!hub) return []; const out = global.Suites.build(st.K, hub); soon(); return out; }
+  async function addSuitePart(st, tool, preset) { const hub = await ensureSuite(st); if (!hub) return null; const id = global.Suites.addPart(st.K, hub, tool, preset ? { preset } : {}); soon(); return id; }
+  async function suiteScene(st, name) { const hub = await ensureSuite(st); if (!hub) return 0; const n = global.Suites.scene(st.K, hub, name); toast(`${st.suite.icon || ''} ${st.suite.label}: ${name}`, 'good', 1600); soon(); return n; }
+  TP.buildSuite = buildSuite; TP.addSuitePart = addSuitePart; TP.suiteScene = suiteScene;
+
+  function repaintSuite() {
+    const st = cur, s = st.suite, K = st.K, SU = global.Suites, UI = global.UIKit, h = UI.h;
+    const page = st.el.querySelector('.tp-page'), keepY = page.scrollTop; page.innerHTML = '';
+    if (!live(st.target)) st.target = null;
+    const btn = (text, title, fn, cls) => { const b = h('button', { class: 'tp-btn ' + (cls || ''), title, text }); b.addEventListener('click', (e) => { e.stopPropagation(); fn(); }); return b; };
+    const name = (id) => { const x = F().def(id); return x ? `${x.icon || '◻'} ${x.label}` : id; };
+    const sec = (title, sub, kids, id) => h('section', { class: 'tp-sec', 'data-sec': id }, [h('h3', { class: 'tp-h' }, [title, sub ? h('small', { text: ' ' + sub }) : null])].concat(kids));
+    const hub = st.target, stat = hub ? SU.status(K, hub) : [], here = (tool) => stat.find(x => x.part.tool === tool && x.instanceId);
+
+    const hubs = suiteWindows(K, s);
+    const pick = h('select', { class: 'tp-target', 'aria-label': 'which suite window this page works on' },
+      [h('option', { value: '', text: '— a new suite window (opened when you add something)' })].concat(hubs.map(id => h('option', { value: id, text: `${s.label} · ${id.split('-').slice(-2).join('')}` }))));
+    pick.value = st.target || ''; pick.addEventListener('change', () => { st.target = pick.value || null; repaint(); });
+    const nParts = s.parts.length, nOn = stat.filter(x => x.instanceId && !x.mixed).length;
+    page.appendChild(h('header', { class: 'tp-head' }, [
+      h('span', { class: 'tp-ic', text: s.icon || '🧰' }),
+      h('div', { class: 'tp-ht' }, [h('h2', { text: s.label }), h('div', { class: 'tp-meta', text: ['Suite', nParts + ' parts', s.version ? 'v' + s.version : ''].filter(Boolean).join(' · ') + (hub ? ` · ${nOn} of ${nParts} on the canvas` : '') }), h('p', { text: s.blurb || '' })]),
+      h('div', { class: 'tp-act' }, [
+        btn('＋ Build the whole suite', 'every part it needs, wired up, on its starter scene' + (s.starter ? ' (' + s.starter + ')' : '') + ' — one click (Ctrl+Z takes it back)', () => buildSuite(st), 'pri tp-suite-all'),
+        btn(hub ? '↗ Go to it' : '🧰 Just the suite window', hub ? 'show the suite window' : 'open the suite window and add the parts yourself', () => { if (hub) { K.bus.publish('canvas:focus-request', { instanceId: hub }); close(); } else ensureSuite(st); }),
+        backBtn(btn), btn('✕', 'close (Esc)', close, 'tp-x'),
+      ]),
+    ]));
+    page.appendChild(h('div', { class: 'tp-on' }, [h('span', { text: 'Works on: ' }), pick]));
+    if (s.allInOne && F().def(s.allInOne)) page.appendChild(h('div', { class: 'tp-on tp-parts' }, [btn('◻ All in one: ' + name(s.allInOne), 'the same thing in one window — its page', () => open(s.allInOne, { K, back: () => openSuite(s.id, { K, back: st.back }) }), 'tp-allinone')]));
+
+    const nav = h('nav', { class: 'tp-nav' }); page.appendChild(nav);
+    const navTo = (id, label) => nav.appendChild(btn(label, 'jump to ' + label, () => { const x = page.querySelector(`[data-sec="${id}"]`); if (x) x.scrollIntoView({ block: 'start' }); }));
+
+    // the parts
+    navTo('parts', '🧩 Parts');
+    page.appendChild(sec('🧩 Parts', `· ${nParts} tools — each one still a tool of its own`, [h('div', { class: 'tp-list' }, s.parts.map(p => {
+      const ok = !!F().def(p.tool), on = here(p.tool), inn = p.as === 'mod' && p.in ? ' · inside ' + name(p.in) + (p.slot ? ' (' + p.slot + ')' : '') : '';
+      return h('div', { class: 'tp-row tp-part' + (ok ? '' : ' off') + (on ? ' on' : ''), 'data-tool': p.tool }, [
+        h('span', { class: 'tp-tag ' + (p.as === 'mod' ? 'mod' : 'lnk'), text: (p.role || (p.as === 'mod' ? 'mod' : 'part')) + (p.required ? '' : ' · extra') }),
+        h('div', { class: 'tp-rt' }, [h('b', { text: name(p.tool) + (p.preset ? ' — ' + p.preset : '') }), h('small', { text: (p.why || '') + inn })]),
+        ok && p.preset && global.Preview ? global.Preview.button(p.tool, p.preset) : null,
+        on ? h('span', { class: 'tp-dim tp-onmark', text: '✓ on' }) : ok ? btn('＋', 'add just this one to the suite', () => addSuitePart(st, p.tool)) : h('small', { class: 'tp-dim', text: 'installs with the suite' }),
+        ok ? btn('📘', 'its own page', () => open(p.tool, { K, instanceId: on ? on.instanceId : undefined, back: () => openSuite(s.id, { K, instanceId: st.target, back: st.back }) }), 'tp-partpage') : null,
+      ]);
+    }))], 'parts'));
+
+    // scenes
+    const scenes = Object.keys(s.scenes || {});
+    if (scenes.length) {
+      navTo('scenes', '🎬 Scenes');
+      const curScene = hub ? live(hub).ctx.params.get('scene') : null;
+      page.appendChild(sec('🎬 Scenes', '· one click sets every part', [h('div', { class: 'tp-list' }, scenes.map(n => h('div', { class: 'tp-row tp-scene' + (n === curScene ? ' on' : '') }, [
+        h('span', { class: 'tp-tag lnk', text: n === s.starter ? '★ starter' : 'scene' }),
+        h('div', { class: 'tp-rt' }, [h('b', { text: n }), h('small', { text: Object.keys(s.scenes[n]).map(t => (F().def(t) ? F().def(t).label : t) + ': ' + (s.scenes[n][t].preset || '…')).join(' · ') })]),
+        btn(n === curScene ? '✓ on' : 'Load', hub ? 'set every part to this scene' : 'open the suite and set it to this scene', () => suiteScene(st, n)),
+      ])))], 'scenes'));
+    }
+
+    // macros
+    if ((s.macros || []).length) {
+      navTo('macros', '🎛 Macros');
+      page.appendChild(sec('🎛 Macros', '· one knob turns several parts — on the suite window', [h('div', { class: 'tp-list' }, s.macros.map(m => h('div', { class: 'tp-row' }, [
+        h('span', { class: 'tp-tag mod', text: m.label }),
+        h('div', { class: 'tp-rt' }, [h('b', { text: (m.targets || []).map(t => name(t.tool) + ' · ' + t.key).join('  +  ') }), h('small', { text: m.hint || '' })]),
+      ])))], 'macros'));
+    }
+
+    // wiring
+    const wires = hub ? SU.wiring(K, hub) : (s.wiring || []).map(w => ({ wire: w })).concat(SU.outputs(s).map(t => ({ wire: { from: [t], to: ['suite'] }, toSuite: true })));
+    if (wires.length) {
+      navTo('wiring', '🔌 Wiring');
+      const short = (hk) => hk ? ' · ' + String(hk).split('.').pop().replace(/_/g, ' ') : '';
+      page.appendChild(sec('🔌 How it is wired', '· the suite makes these wires for you', [h('div', { class: 'tp-list' }, wires.map(w => h('div', { class: 'tp-row' + (hub && !w.on ? ' off' : '') }, [
+        h('span', { class: 'tp-tag ' + (w.toSuite ? 'mod' : 'lnk'), text: hub ? (w.on ? '● on' : w.possible ? '○ off' : '○ —') : w.toSuite ? 'out' : 'wire' }),
+        h('div', { class: 'tp-rt' }, [h('b', { text: name(w.wire.from[0]) + short(w.wire.from[1]) + '  →  ' + (w.toSuite ? (s.icon || '🧰') + ' ' + s.label : name(w.wire.to[0]) + short(w.wire.to[1])) })]),
+      ])))], 'wiring'));
+    }
+    page.scrollTop = keepY;
+  }
+
   // no window yet: which tools would fit a slot (the same rule Mods.compatible uses, read from the descriptors)
   function compatibleFor(d, sl) {
     const io = (x, dir) => (x.hooks || []).some(h => h.wire_type === sl.wire_type && h.direction === dir && !h.internal);
