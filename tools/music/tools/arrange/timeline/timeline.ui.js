@@ -169,12 +169,15 @@ OrganismFactory.reg('eravos.timeline', function (view) {
           let lo = 127, hi = 0; ns.forEach(n => { lo = Math.min(lo, n.n); hi = Math.max(hi, n.n); });
           const span = Math.max(12, hi - lo + 1), ih = r.h - 16, per = r.w / (c.bars * 16);
           g.fillStyle = lane.color;
-          ns.forEach(n => { const y = r.y + 13 + (hi - n.n) / span * ih; g.fillRect(r.x + n.s * per, y, Math.max(1.5, n.l * per - 1), Math.max(1.5, ih / span)); });
-          // 3.56 a bent note shows its curve here too (a straight sketch: from its start pitch to its end pitch, clipped to the clip)
-          g.save(); g.beginPath(); g.rect(r.x, r.y, r.w, r.h); g.clip(); g.strokeStyle = '#ffe08a'; g.lineWidth = 1.5;
-          ns.forEach(n => { if (!n.b) return; const y0 = r.y + 13 + (hi - n.n - n.b.from) / span * ih + 1, y1 = r.y + 13 + (hi - n.n - n.b.to) / span * ih + 1, x0 = r.x + n.s * per, x1 = x0 + n.l * per, xa = x0 + (x1 - x0) * (n.b.at || 0);
-            g.beginPath(); g.moveTo(x0, y0); g.lineTo(xa, y0); g.quadraticCurveTo(xa + (x1 - xa) * 0.6, y0, x1, y1); g.stroke(); });
-          g.restore();
+          // 3.58 a bent note is drawn bent: a strip along its pitch curve (smooth shape, from → to, starting where its bend starts)
+          const th = Math.max(1.5, ih / span), sm = (x) => x * x * (3 - 2 * x), yAt = (n, st) => r.y + 13 + (hi - n.n - st) / span * ih + th / 2;
+          ns.forEach(n => {
+            const x0 = r.x + n.s * per, w = Math.max(1.5, n.l * per - 1);
+            if (!n.b) { g.fillRect(x0, r.y + 13 + (hi - n.n) / span * ih, w, th); return; }
+            g.save(); g.beginPath(); g.rect(r.x, r.y, r.w, r.h); g.clip(); g.strokeStyle = lane.color; g.lineWidth = th; g.lineCap = 'butt'; g.beginPath();
+            const at = n.b.at || 0; for (let k = 0; k <= 16; k++) { const f = k / 16, kk = f <= at ? 0 : (n.b.shape === 'linear' ? (f - at) / (1 - at) : sm((f - at) / (1 - at))), yy = yAt(n, n.b.from + (n.b.to - n.b.from) * kk); k ? g.lineTo(x0 + w * f, yy) : g.moveTo(x0, yy); }
+            g.stroke(); g.restore();
+          });
         }
         for (let b = 1; b < c.bars; b++) { g.fillStyle = lane.color + '55'; g.fillRect(r.x + b * pb, r.y + 2, 1, r.h - 4); }
         g.fillStyle = '#fff'; g.font = '10px sans-serif'; g.fillText((ns.length ? '' : '＋ ') + (c.name || 'clip').slice(0, Math.max(3, Math.floor(r.w / 6))), r.x + 4, r.y + 11);
