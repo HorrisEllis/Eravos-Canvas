@@ -17,7 +17,8 @@
     "ui": "session.ui.js",
     "spec": "session.spec",
     "preview": "preview.png",
-    "tests": "session.test.js"
+    "tests": "session.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

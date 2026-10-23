@@ -17,7 +17,8 @@
     "ui": "xy-pad.ui.js",
     "spec": "xy-pad.spec",
     "preview": "preview.png",
-    "tests": "xy-pad.test.js"
+    "tests": "xy-pad.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

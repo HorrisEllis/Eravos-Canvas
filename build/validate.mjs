@@ -39,7 +39,7 @@ const isTemplate = (f) => /[\\/]templates[\\/]/.test(f) || /__[A-Z_]+__/.test(fs
       const eng = path.join(dir, v.files && v.files.engine || ''); if (!fs.existsSync(eng)) { errs.push(`${r}: engine file ${v.files && v.files.engine} missing`); continue; }
       const src = fs.readFileSync(eng, 'utf8'), at = src.indexOf('OrganismFactory.define('), id = (src.slice(at < 0 ? 0 : at).match(/id: '([^']+)'/) || [])[1]; if (id !== v.id) errs.push(`${r}: tool.json id ${v.id} ≠ engine id ${id}`);
       if (!v.files.spec || !fs.existsSync(path.join(path.dirname(path.join(ROOT, r)), v.files.spec))) errs.push(`${r}: every tool has a spec beside its code (P37.2) — run build/specs.mjs`);
-      ['ui', 'css', 'spec', 'preview'].forEach(k => { if (v.files[k] && !fs.existsSync(path.join(dir, v.files[k]))) errs.push(`${r}: ${k} file ${v.files[k]} missing`); });
+      ['ui', 'css', 'spec', 'preview', 'thumb'].forEach(k => { if (v.files[k] && !fs.existsSync(path.join(dir, v.files[k]))) errs.push(`${r}: ${k} file ${v.files[k]} missing`); });
       (v.packs && v.packs.shipped || []).forEach(p => { if (!fs.existsSync(path.join(dir, 'packs', p, 'pack.json'))) errs.push(`${r}: shipped pack ${p} missing`); });
       // the tool's own pack schema (build/tool-kit.mjs) — every pack in its packs/ folder must fit it
       const ps = path.join(dir, 'packs', 'pack.schema.json');

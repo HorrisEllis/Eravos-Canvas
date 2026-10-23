@@ -18,7 +18,8 @@
     "ui": "curve-synth.ui.js",
     "spec": "curve-synth.spec",
     "preview": "preview.png",
-    "tests": "curve-synth.test.js"
+    "tests": "curve-synth.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

@@ -17,7 +17,8 @@
     "ui": "fx-pitch.ui.js",
     "spec": "fx-pitch.spec",
     "preview": "preview.png",
-    "tests": "fx-pitch.test.js"
+    "tests": "fx-pitch.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

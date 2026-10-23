@@ -18,7 +18,8 @@
     "ui": "recursive-spectra.ui.js",
     "spec": "recursive-spectra.spec",
     "preview": "preview.png",
-    "tests": "recursive-spectra.test.js"
+    "tests": "recursive-spectra.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

@@ -26,7 +26,7 @@
       { key: 'oddEven', type: 'number', default: 0, min: -1, max: 1, step: 0.01, label: 'Odd ↔ Even', group: 'SHAPE', hint: '− only odd partials (hollow, clarinet) · + only even (octave-up, airy)' },
       { key: 'stretch', type: 'number', default: 0, min: -1, max: 1, step: 0.01, label: 'Stretch', group: 'SHAPE', hint: '0 = harmonic · + spreads the partials apart (bells, metal, piano strings)' },
       { key: 'damp', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Damp', group: 'SHAPE', hint: 'high partials fade first (plucks, mallets)' },
-      { key: 'octave', type: 'integer', default: 0, min: -3, max: 3, label: 'Octave', group: 'PITCH' },
+      { key: 'octave', type: 'integer', default: 0, min: -4, max: 4, label: 'Octave', group: 'PITCH' },
       { key: 'attack', type: 'number', default: 0.01, min: 0.001, max: 6, step: 0.001, unit: 's', label: 'Attack', group: 'AMP' },
       { key: 'decay', type: 'number', default: 0.6, min: 0.01, max: 10, step: 0.01, unit: 's', label: 'Decay', group: 'AMP' },
       { key: 'sustain', type: 'number', default: 0.7, min: 0, max: 1, step: 0.01, label: 'Sustain', group: 'AMP' },

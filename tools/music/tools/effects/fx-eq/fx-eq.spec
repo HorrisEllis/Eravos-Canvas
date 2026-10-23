@@ -21,13 +21,39 @@ dependencies:
   toolbar_units: [music.engine, music.meter]   # ui expansion when added: Audio engine · Master meter
   services:
     - audio: Audio engine — processes sound
-    - mod: 4 modulation inputs — LFO / XY / Macro can move them
+    - mod: 30 modulation inputs — LFO / XY / Macro can move them
   inputs:
     - fx.hook.audio_in (audio · port in)
     - fx.hook.mod_mix (modulation · port mod.mix)
     - eq.hook.mod_band1_freq (modulation · port mod.p1Freq)
     - eq.hook.mod_band2_freq (modulation · port mod.p2Freq)
     - eq.hook.mod_band3_freq (modulation · port mod.p3Freq)
+    - knob.hpOn (modulation · port mod.knob.hpOn)
+    - knob.hpFreq (modulation · port mod.knob.hpFreq)
+    - knob.hpSlope (modulation · port mod.knob.hpSlope)
+    - knob.lsOn (modulation · port mod.knob.lsOn)
+    - knob.lsFreq (modulation · port mod.knob.lsFreq)
+    - knob.lsGain (modulation · port mod.knob.lsGain)
+    - knob.p1On (modulation · port mod.knob.p1On)
+    - knob.p1Gain (modulation · port mod.knob.p1Gain)
+    - knob.p1Q (modulation · port mod.knob.p1Q)
+    - knob.p2On (modulation · port mod.knob.p2On)
+    - knob.p2Gain (modulation · port mod.knob.p2Gain)
+    - knob.p2Q (modulation · port mod.knob.p2Q)
+    - knob.p3On (modulation · port mod.knob.p3On)
+    - knob.p3Gain (modulation · port mod.knob.p3Gain)
+    - knob.p3Q (modulation · port mod.knob.p3Q)
+    - knob.hsOn (modulation · port mod.knob.hsOn)
+    - knob.hsFreq (modulation · port mod.knob.hsFreq)
+    - knob.hsGain (modulation · port mod.knob.hsGain)
+    - knob.lpOn (modulation · port mod.knob.lpOn)
+    - knob.lpFreq (modulation · port mod.knob.lpFreq)
+    - knob.lpSlope (modulation · port mod.knob.lpSlope)
+    - knob.listen (modulation · port mod.knob.listen)
+    - knob.autoGain (modulation · port mod.knob.autoGain)
+    - knob.inGain (modulation · port mod.knob.inGain)
+    - knob.outGain (modulation · port mod.knob.outGain)
+    - knob.bypass (modulation · port mod.knob.bypass)
   outputs:
     - fx.hook.audio_out (audio · port out)
   permissions: [audio_out, audio_in, bus_publish, bus_subscribe]

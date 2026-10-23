@@ -29,9 +29,9 @@ dependencies:
   mode: music   # Music Production
   toolbar_units: [music.engine, music.meter, music.midi]   # ui expansion when added: Audio engine · Master meter · MIDI button
   services:
-    - audio: Audio engine — makes sound
+    - audio: Audio engine — processes sound
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 3 modulation inputs — LFO / XY / Macro can move them
+    - mod: 18 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - wubo.hook.note_in (note:trigger)
@@ -39,11 +39,24 @@ dependencies:
     - wubo.hook.mod_pitch (modulation · port mod.pitch)
     - wubo.hook.mod_fm (modulation · port mod.fm)
     - wubo.hook.mod_spread (modulation · port mod.spread)
+    - slot.tone.return (audio · port slot.tone.return)
+    - knob.wave (modulation · port mod.knob.wave)
+    - knob.octave (modulation · port mod.knob.octave)
+    - knob.transpose (modulation · port mod.knob.transpose)
+    - knob.fine (modulation · port mod.knob.fine)
+    - knob.ratio (modulation · port mod.knob.ratio)
+    - knob.index (modulation · port mod.knob.index)
+    - knob.voices (modulation · port mod.knob.voices)
+    - knob.width (modulation · port mod.knob.width)
+    - knob.drift (modulation · port mod.knob.drift)
+    - knob.glide (modulation · port mod.knob.glide)
+    - knob.attack (modulation · port mod.knob.attack)
+    - knob.release (modulation · port mod.knob.release)
+    - knob.dive (modulation · port mod.knob.dive)
+    - knob.diveTime (modulation · port mod.knob.diveTime)
+    - knob.level (modulation · port mod.knob.level)
   outputs:
     - wubo.hook.audio_out (audio · port out)
-  permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
-
-# 3.48 SUITES (specs/eravos.suites.spec): part of music.wub-lab — usable alone as always; its 📘 page shows "Part of" and links the suite page
-
-# 3.50: Pitch (transpose) −24..+24 st, default 0 — tunes the whole tool up/down; retunes a held note live
+    - slot.tone.send (audio · port slot.tone.send)
+  permissions: [audio_out, midi_in, bus_publish, bus_subscribe, audio_in]
+  works_with: [eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen, eravos.midi-mapper, eravos.lyric-rhythm]

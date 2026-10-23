@@ -17,7 +17,8 @@
     "ui": "master-fx.ui.js",
     "spec": "master-fx.spec",
     "preview": "preview.png",
-    "tests": "master-fx.test.js"
+    "tests": "master-fx.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

@@ -134,6 +134,6 @@ describe('3.44 · Songs by category', () => {
   it('the page groups the cards under category headings and still shows every song in All', () => {
     Songbook.open(); const ov = document.querySelector('.overlay.sbk');
     try { assert.equal(ov.querySelectorAll('.sbk-card').length, Songbook.all().length); assert.gt(ov.querySelectorAll('.sbk-sec').length, 8); }
-    finally { ov.remove(); }
+    finally { ov.querySelector('.sbk-x').click(); }   // close it the way a person does — remove() left the page "open" for the next test
   });
 });

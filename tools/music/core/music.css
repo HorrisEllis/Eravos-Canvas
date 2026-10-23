@@ -125,6 +125,14 @@
 .sbk-chip { background: var(--panel2); border: 1px solid var(--line2); color: var(--text); border-radius: 99px; padding: 4px 12px; cursor: pointer; font-size: 12px; }
 .sbk-chip.on { background: #ff2266; border-color: #ff2266; color: #fff; }
 .sbk-body { display: grid; grid-template-columns: 1fr 360px; min-height: 0; flex: 1; }
+/* 3.53 Make it yours: key & tempo on any song (SongEngine.reshape) */
+.sbk-shift { margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,.03); border: 1px solid var(--line2); }
+.sbk-shift h4 { margin-top: 0 !important; }
+.sbk-slider { display: grid; grid-template-columns: 52px 1fr 50px; align-items: center; gap: 8px; margin-top: 6px; font-size: 12px; color: var(--dim); }
+.sbk-slider input { accent-color: #ff2266; width: 100%; } .sbk-slider b { color: var(--text); font: 600 11px var(--mono); text-align: right; }
+.sbk-shift-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+.sbk-shift-read { flex: 1 1 100%; color: var(--text); font: 600 11px var(--mono); }
+.sbk-alt.sm { padding: 5px 10px; margin-top: 0; font-size: 11.5px; }
 .sbk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; padding: 14px 18px; overflow: auto; align-content: start; }
 .sbk-card { text-align: left; background: var(--bg2); border: 1px solid var(--line2); border-left: 3px solid var(--acc); border-radius: 10px; padding: 10px 12px; cursor: pointer; color: var(--text); display: flex; flex-direction: column; gap: 3px; transition: transform .08s, box-shadow .12s; }
 .sbk-card:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px var(--acc), 0 6px 24px rgba(0,0,0,.4); }

@@ -50,8 +50,8 @@
                       },
                       "octave": {
                         "type": "integer",
-                        "minimum": 2,
-                        "maximum": 6
+                        "minimum": 1,
+                        "maximum": 7
                       },
                       "range": {
                         "type": "integer",

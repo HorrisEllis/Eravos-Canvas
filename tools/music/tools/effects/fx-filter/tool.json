@@ -17,7 +17,8 @@
     "ui": "fx-filter.ui.js",
     "spec": "fx-filter.spec",
     "preview": "preview.png",
-    "tests": "fx-filter.test.js"
+    "tests": "fx-filter.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

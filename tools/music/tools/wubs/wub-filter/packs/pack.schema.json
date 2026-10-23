@@ -36,8 +36,8 @@
                       },
                       "cutoff": {
                         "type": "number",
-                        "minimum": 30,
-                        "maximum": 4000
+                        "minimum": 20,
+                        "maximum": 12000
                       },
                       "range": {
                         "type": "number",
@@ -86,8 +86,8 @@
                       },
                       "formant": {
                         "type": "number",
-                        "minimum": -12,
-                        "maximum": 12
+                        "minimum": -24,
+                        "maximum": 24
                       },
                       "comb": {
                         "type": "number",

@@ -56,9 +56,13 @@ dependencies:
   services:
     - audio: Audio engine — shares the audio clock
     - clock: Master clock & tempo — locks to the beat
+    - mod: 3 modulation inputs — LFO / XY / Macro can move them
   inputs:
     - auto.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
     - auto.hook.target_in (ui:config_change)
+    - knob.lengthBars (modulation · port mod.knob.lengthBars)
+    - knob.quantize (modulation · port mod.knob.quantize)
+    - knob.mode (modulation · port mod.knob.mode)
   outputs:
     - auto.hook.drive_out (ui:config_change)
     - auto.hook.mod_lane0 (modulation · port lane0)

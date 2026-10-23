@@ -18,7 +18,8 @@
     "ui": "xen-synth.ui.js",
     "spec": "xen-synth.spec",
     "preview": "preview.png",
-    "tests": "xen-synth.test.js"
+    "tests": "xen-synth.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

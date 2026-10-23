@@ -18,7 +18,8 @@
     "css": "fx-box.ui.css",
     "spec": "fx-box.spec",
     "preview": "preview.png",
-    "tests": "fx-box.test.js"
+    "tests": "fx-box.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

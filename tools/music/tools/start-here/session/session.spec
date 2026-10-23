@@ -76,4 +76,4 @@ dependencies:
     - session.hook.transport_out (ui:transport-bpm|ui:transport-record|ui:transport-bounce|ui:transport-metronome|ui:transport-stop)
     - session.hook.asset_out (asset:ready)
   permissions: [bus_publish, bus_subscribe, filesystem_read, filesystem_write]
-  works_with: [eravos.harmonic-analyzer, eravos.bass-drop-builder, eravos.song-recorder, eravos.timeline, eravos.bass-forge, eravos.contrast-analyser, eravos.sample-player]
+  works_with: [eravos.harmonic-analyzer, eravos.bass-drop-builder, eravos.song-recorder, eravos.timeline, eravos.bass-forge, eravos.granular, eravos.contrast-analyser, eravos.sample-player]

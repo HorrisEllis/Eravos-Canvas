@@ -19,9 +19,10 @@
     "engine": "mixer.engine.js",
     "ui": "mixer.ui.js",
     "css": "mixer.css",
-    "preview": "preview.svg",
+    "preview": "preview.png",
     "spec": "mixer.spec",
-    "tests": "mixer.test.js"
+    "tests": "mixer.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

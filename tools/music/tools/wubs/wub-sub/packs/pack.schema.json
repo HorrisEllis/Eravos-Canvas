@@ -32,7 +32,7 @@
                       "octave": {
                         "type": "integer",
                         "minimum": -4,
-                        "maximum": 0
+                        "maximum": 1
                       },
                       "transpose": {
                         "type": "number",
@@ -52,17 +52,17 @@
                       "glide": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 0.6
+                        "maximum": 2
                       },
                       "attack": {
                         "type": "number",
                         "minimum": 0.001,
-                        "maximum": 0.5
+                        "maximum": 4
                       },
                       "release": {
                         "type": "number",
                         "minimum": 0.01,
-                        "maximum": 2
+                        "maximum": 8
                       },
                       "level": {
                         "type": "number",

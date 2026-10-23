@@ -138,11 +138,11 @@ dependencies:
   mode: music   # Music Production
   toolbar_units: [music.engine, music.transport, music.tempo, music.key, music.meter, music.midi]   # ui expansion when added: Audio engine · Transport · Tempo · Song key · Master meter · MIDI button
   services:
-    - audio: Audio engine — makes sound
+    - audio: Audio engine — processes sound
     - clock: Master clock & tempo — locks to the beat
     - key: Song key & scale — plays in key
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 3 modulation inputs — LFO / XY / Macro can move them
+    - mod: 46 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - wobble.hook.note_in (note:trigger)
@@ -152,22 +152,52 @@ dependencies:
     - wobble.hook.mod_cutoff (modulation · port mod.cutoff)
     - wobble.hook.mod_depth (modulation · port mod.depth)
     - wobble.hook.mod_drive (modulation · port mod.drive)
+    - wobble.hook.mod_rate (modulation · port mod.rate)
+    - wobble.hook.mod_fm (modulation · port mod.fm)
+    - wobble.hook.mod_pitch (modulation · port mod.pitch)
+    - slot.growl.return (audio · port slot.growl.return)
+    - knob.div (modulation · port mod.knob.div)
+    - knob.lfoShape (modulation · port mod.knob.lfoShape)
+    - knob.lfoSync (modulation · port mod.knob.lfoSync)
+    - knob.lfoHz (modulation · port mod.knob.lfoHz)
+    - knob.retrig (modulation · port mod.knob.retrig)
+    - knob.lfoPhase (modulation · port mod.knob.lfoPhase)
+    - knob.ampMod (modulation · port mod.knob.ampMod)
+    - knob.vibrato (modulation · port mod.knob.vibrato)
+    - knob.rateBend (modulation · port mod.knob.rateBend)
+    - knob.rateGlide (modulation · port mod.knob.rateGlide)
+    - knob.wubOn (modulation · port mod.knob.wubOn)
+    - knob.wubLen (modulation · port mod.knob.wubLen)
+    - knob.wubStep (modulation · port mod.knob.wubStep)
+    - knob.filterMode (modulation · port mod.knob.filterMode)
+    - knob.vowelA (modulation · port mod.knob.vowelA)
+    - knob.vowelB (modulation · port mod.knob.vowelB)
+    - knob.formantShift (modulation · port mod.knob.formantShift)
+    - knob.res (modulation · port mod.knob.res)
+    - knob.fmIndex (modulation · port mod.knob.fmIndex)
+    - knob.fmRatio (modulation · port mod.knob.fmRatio)
+    - knob.fmWub (modulation · port mod.knob.fmWub)
+    - knob.squash (modulation · port mod.knob.squash)
+    - knob.osc2 (modulation · port mod.knob.osc2)
+    - knob.sub (modulation · port mod.knob.sub)
+    - knob.shaper (modulation · port mod.knob.shaper)
+    - knob.gritMode (modulation · port mod.knob.gritMode)
+    - knob.octave (modulation · port mod.knob.octave)
+    - knob.transpose (modulation · port mod.knob.transpose)
+    - knob.spread (modulation · port mod.knob.spread)
+    - knob.width (modulation · port mod.knob.width)
+    - knob.noise (modulation · port mod.knob.noise)
+    - knob.sqOct (modulation · port mod.knob.sqOct)
+    - knob.subOct (modulation · port mod.knob.subOct)
+    - knob.subAlign (modulation · port mod.knob.subAlign)
+    - knob.level (modulation · port mod.knob.level)
+    - knob.glide (modulation · port mod.knob.glide)
+    - knob.attack (modulation · port mod.knob.attack)
+    - knob.release (modulation · port mod.knob.release)
+    - knob.pitchDive (modulation · port mod.knob.pitchDive)
+    - knob.diveTime (modulation · port mod.knob.diveTime)
   outputs:
     - wobble.hook.audio_out (audio · port out)
-  mod slots (3.6):
-    - growl — after the post shaper, wub layer only; the sub joins after it, delayed by the mods' reported latency
-  suite (3.6): The drop rig — Destroyer + Phaser in growl · Envelope → mod_fm · Wub Rate → mod_depth · LFO → mod_rate
-    (canvas/runtime/tool-page.js · specs/eravos.tool-pages.spec)
-  permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
-
-# 3.48 SUITES (specs/eravos.suites.spec): part of music.drop-rig — usable alone as always; its 📘 page shows "Part of" and links the suite page
-
-## ADDENDUM 2026-10-22 — its parts are Wub Lab (eravos.phase49-map P49.4b)
-  James, 2026-10-22: "each ;arge tool rebuilt as parts if it can be used by another suite or tool"
-  Wobble Bass's jobs already exist as parts: Wub Osc (voice, FM), Wub Filter (mouth, vowels), Wub Rate (the wobble's rhythm), Wub Sub
-  (the clean low end). Its envelope is the Envelope, and its grit is the Destroyer. The suite music.wub-lab names Wobble Bass as its
-  all-in-one (allInOne), and its 📘 page offers "As parts: Wub Lab". No code moved. Its name stays "Wobble Bass", the one he uses.
-  Not covered by a part yet: the drawn wobble shape, the perform pad (P49.5 makes that generic), the growl slot. They stay here.
-
-# 3.50: Pitch (transpose) −24..+24 st, default 0 — tunes the whole tool up/down; retunes a held note live
+    - slot.growl.send (audio · port slot.growl.send)
+  permissions: [audio_out, midi_in, bus_publish, bus_subscribe, audio_in]
+  works_with: [eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen, eravos.midi-mapper, eravos.lyric-rhythm]

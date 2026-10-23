@@ -51,13 +51,13 @@
                       },
                       "sirenPitch": {
                         "type": "number",
-                        "minimum": 120,
-                        "maximum": 2000
+                        "minimum": 40,
+                        "maximum": 4000
                       },
                       "sirenRate": {
                         "type": "number",
-                        "minimum": 0.1,
-                        "maximum": 16
+                        "minimum": 0.02,
+                        "maximum": 30
                       },
                       "sirenDepth": {
                         "type": "number",

@@ -19,7 +19,8 @@
     "ui": "groove-gen.ui.js",
     "spec": "groove-gen.spec",
     "tests": "groove-gen.test.js",
-    "preview": "preview.png"
+    "preview": "preview.png",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

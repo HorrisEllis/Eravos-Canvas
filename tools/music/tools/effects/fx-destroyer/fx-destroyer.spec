@@ -26,29 +26,29 @@ dependencies:
   toolbar_units: [music.engine, music.meter]   # ui expansion when added: Audio engine · Master meter
   services:
     - audio: Audio engine — processes sound
-    - mod: 4 modulation inputs — LFO / XY / Macro can move them
+    - mod: 17 modulation inputs — LFO / XY / Macro can move them
   inputs:
     - fx.hook.audio_in (audio · port in)
     - fx.hook.mod_mix (modulation · port mod.mix)
     - dst.hook.mod_drive (modulation · port mod.drive)
     - dst.hook.mod_bits (modulation · port mod.bits)
     - dst.hook.mod_down (modulation · port mod.downsample)
+    - slot.after.return (audio · port slot.after.return)
+    - knob.shape (modulation · port mod.knob.shape)
+    - knob.asym (modulation · port mod.knob.asym)
+    - knob.autoGain (modulation · port mod.knob.autoGain)
+    - knob.tight (modulation · port mod.knob.tight)
+    - knob.lowKeep (modulation · port mod.knob.lowKeep)
+    - knob.alias (modulation · port mod.knob.alias)
+    - knob.dither (modulation · port mod.knob.dither)
+    - knob.tilt (modulation · port mod.knob.tilt)
+    - knob.postLP (modulation · port mod.knob.postLP)
+    - knob.autoTame (modulation · port mod.knob.autoTame)
+    - knob.inGain (modulation · port mod.knob.inGain)
+    - knob.outGain (modulation · port mod.knob.outGain)
+    - knob.bypass (modulation · port mod.knob.bypass)
   outputs:
     - fx.hook.audio_out (audio · port out)
+    - slot.after.send (audio · port slot.after.send)
   permissions: [audio_out, audio_in, bus_publish, bus_subscribe]
   works_with: []
-
-# 3.48 MOTION (phase P48.3 · status mapped · specs/eravos.motion.spec) — "more dynamic, control and fluidity"
-findings: 13 settings, 3 mod inputs (drive, bits, downsample); shape/curve changes jump; nothing moves by itself.
-adds:
-  macros (default, editable): Heat = drive 0→0.9 + asym 0→0.4 (autoGain keeps level) · Crunch = bits 16→4 + downsample 1→12 ·
-    Bite = tight 20→400 Hz + tilt 0→+6 dB · Tame = postLP 18k→3k + autoTame on
-  perform pad: X = Heat, Y = Crunch, spring-back off by default (an effect holds where you leave it)
-  new audio-rate buses: tilt, postLP, asym (mod hooks dst.hook.mod_tilt / mod_postlp / mod_asym)
-  FOLLOW: drive can follow the input level (built-in envelope follower: attack 5 ms, release 120 ms, depth ±) — grit
-    that opens on hits
-  CURVE MORPH: shape A → shape B with a 0–1 morph (the two curves cross-faded in the shaper table, rebuilt ≤ 30×/s) —
-    replaces the hard jump between curves; `shapeB` + `morph` settings, morph is mod-able
-  every setting can carry motion (M1); bits/downsample step at control rate, drive/tilt/postLP glide at audio rate
-acceptance: a sine LFO on Heat audibly sweeps; curve morph 0→1 shows no level jump > 1 dB; follow mode drives harder on
-  a kick than in the gap after it (offline render)

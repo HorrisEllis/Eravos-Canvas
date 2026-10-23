@@ -18,7 +18,8 @@
     "ui": "sub-engine.ui.js",
     "spec": "sub-engine.spec",
     "preview": "preview.png",
-    "tests": "sub-engine.test.js"
+    "tests": "sub-engine.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

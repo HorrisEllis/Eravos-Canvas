@@ -52,8 +52,8 @@
                       },
                       "lfoHz": {
                         "type": "number",
-                        "minimum": 0.1,
-                        "maximum": 24
+                        "minimum": 0.02,
+                        "maximum": 40
                       },
                       "retrig": {
                         "type": "boolean"
@@ -135,8 +135,8 @@
                       },
                       "formantShift": {
                         "type": "number",
-                        "minimum": -12,
-                        "maximum": 12
+                        "minimum": -24,
+                        "maximum": 24
                       },
                       "cutoff": {
                         "type": "number",
@@ -203,8 +203,8 @@
                       },
                       "octave": {
                         "type": "integer",
-                        "minimum": -2,
-                        "maximum": 2
+                        "minimum": -3,
+                        "maximum": 3
                       },
                       "transpose": {
                         "type": "number",
@@ -250,22 +250,22 @@
                       "glide": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 0.5
+                        "maximum": 2
                       },
                       "attack": {
                         "type": "number",
                         "minimum": 0.001,
-                        "maximum": 1
+                        "maximum": 4
                       },
                       "release": {
                         "type": "number",
                         "minimum": 0.01,
-                        "maximum": 2
+                        "maximum": 8
                       },
                       "pitchDive": {
                         "type": "number",
-                        "minimum": -24,
-                        "maximum": 24
+                        "minimum": -48,
+                        "maximum": 48
                       },
                       "diveTime": {
                         "type": "number",

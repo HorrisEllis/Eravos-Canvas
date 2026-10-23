@@ -35,4 +35,4 @@ dependencies:
     - mm.hook.pads_out (note:trigger)
     - mm.hook.drive_out (ui:config_change)
   permissions: [midi_in, midi_out, bus_publish, bus_subscribe, registry_read]
-  works_with: [eravos.pads, eravos.embodiment-lab, eravos.coven, eravos.organ, eravos.retro-poly, eravos.macro-automation, eravos.bass-forge, eravos.drum-forge]
+  works_with: [eravos.pads, eravos.embodiment-lab, eravos.arp, eravos.coven, eravos.organ, eravos.retro-poly, eravos.macro-automation, eravos.bass-forge]

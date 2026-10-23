@@ -19,7 +19,8 @@
     "spec": "suite-hub.spec",
     "tests": "suite-hub.test.js",
     "css": "suite-hub.css",
-    "preview": "preview.png"
+    "preview": "preview.png",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

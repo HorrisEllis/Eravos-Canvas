@@ -79,12 +79,22 @@ dependencies:
     - audio: Audio engine — makes sound
     - clock: Master clock & tempo — locks to the beat
     - key: Song key & scale — plays in key
-    - mod: 2 modulation inputs — LFO / XY / Macro can move them
+    - mod: 12 modulation inputs — LFO / XY / Macro can move them
   inputs:
     - lab.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
     - lab.hook.theory_in (theory:key-change) — ambient broadcast
     - lab.hook.mod_energy (modulation · port mod.energy)
     - lab.hook.mod_tension (modulation · port mod.tension)
+    - knob.progression (modulation · port mod.knob.progression)
+    - knob.chordBars (modulation · port mod.knob.chordBars)
+    - knob.swing (modulation · port mod.knob.swing)
+    - knob.seed (modulation · port mod.knob.seed)
+    - knob.rhythmLevel (modulation · port mod.knob.rhythmLevel)
+    - knob.bassLevel (modulation · port mod.knob.bassLevel)
+    - knob.harmonyLevel (modulation · port mod.knob.harmonyLevel)
+    - knob.rhythmOn (modulation · port mod.knob.rhythmOn)
+    - knob.bassOn (modulation · port mod.knob.bassOn)
+    - knob.harmonyOn (modulation · port mod.knob.harmonyOn)
   outputs:
     - lab.hook.out_rhythm (audio · port rhythm)
     - lab.hook.out_bass (audio · port bass)
@@ -93,12 +103,3 @@ dependencies:
     - lab.hook.drop_out (edm:drop-fired)
   permissions: [audio_out, bus_publish, bus_subscribe, registry_read]
   works_with: [eravos.sequencer]
-
-## ADDENDUM 2026-10-21 — superseded by the EDM Lab suite, kept
-  James, 2026-10-21: "the suite should be like a synthesis tool of the respective tools. Like the edm lab needs rebuilt."
-  The rebuilt EDM Lab is the suite music.edm-lab (eravos.phase48-map P48.10). Its rhythm, chord and bassline brains are now the part
-  tools Groove (eravos.groove-gen), Chords (eravos.chord-gen) and Bassline (eravos.bass-gen), and they play Pads, Pad Forge and
-  Reese Bass. This tool keeps its id and code: songs, recipes and saved sessions name eravos.edm-lab (§0.3 nothing lost). Its label
-  is now "EDM Lab (all-in-one)" so ＋ Add shows the two apart.
-  Open: the density map and hit rule, and the voicing rule, now exist twice (here and in the parts). Rebuild this tool on the parts'
-  code only if he wants the all-in-one kept long-term.

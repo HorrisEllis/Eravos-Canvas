@@ -19,7 +19,8 @@
     "ui": "bass-drop-builder.ui.js",
     "spec": "bass-drop-builder.spec",
     "preview": "preview.png",
-    "tests": "bass-drop-builder.test.js"
+    "tests": "bass-drop-builder.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

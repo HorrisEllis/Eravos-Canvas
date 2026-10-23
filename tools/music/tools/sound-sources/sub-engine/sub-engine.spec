@@ -35,7 +35,7 @@ dependencies:
     - audio: Audio engine — makes sound
     - key: Song key & scale — plays in key
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 2 modulation inputs — LFO / XY / Macro can move them
+    - mod: 15 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - sub.hook.note_in (note:trigger)
@@ -43,7 +43,20 @@ dependencies:
     - sub.hook.theory_in (theory:key-change) — ambient broadcast
     - sub.hook.mod_phantom (modulation · port mod.phantom)
     - sub.hook.mod_level (modulation · port mod.level)
+    - knob.shape (modulation · port mod.knob.shape)
+    - knob.octave (modulation · port mod.knob.octave)
+    - knob.floor (modulation · port mod.knob.floor)
+    - knob.drop (modulation · port mod.knob.drop)
+    - knob.dropTime (modulation · port mod.knob.dropTime)
+    - knob.glide (modulation · port mod.knob.glide)
+    - knob.drive (modulation · port mod.knob.drive)
+    - knob.click (modulation · port mod.knob.click)
+    - knob.tone (modulation · port mod.knob.tone)
+    - knob.attack (modulation · port mod.knob.attack)
+    - knob.decay (modulation · port mod.knob.decay)
+    - knob.sustain (modulation · port mod.knob.sustain)
+    - knob.release (modulation · port mod.knob.release)
   outputs:
     - sub.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.sidechain-compressor, eravos.sequencer, eravos.timeline, eravos.reese-bass, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
+  works_with: [eravos.sidechain-compressor, eravos.sequencer, eravos.timeline, eravos.reese-bass, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen]

@@ -60,11 +60,16 @@ dependencies:
   toolbar_units: [music.engine]   # ui expansion when added: Audio engine
   services:
     - audio: Audio engine — listens to sound
+    - mod: 4 modulation inputs — LFO / XY / Macro can move them
     - files: Your files — drop audio / MIDI on it
   inputs:
     - ca.hook.in_a (audio · port inA)
     - ca.hook.in_b (audio · port inB)
     - ca.hook.asset_in (asset:ready)
+    - knob.fft (modulation · port mod.knob.fft)
+    - knob.smoothing (modulation · port mod.knob.smoothing)
+    - knob.sensitivity (modulation · port mod.knob.sensitivity)
+    - knob.bpmSource (modulation · port mod.knob.bpmSource)
   outputs:
     - ca.hook.analysis_out (contrast:analysis)
   permissions: [audio_in, bus_publish, bus_subscribe, filesystem_read]

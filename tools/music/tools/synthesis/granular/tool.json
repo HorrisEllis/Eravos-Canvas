@@ -18,7 +18,8 @@
     "ui": "granular.ui.js",
     "preview": "preview.png",
     "spec": "granular.spec",
-    "tests": "granular.test.js"
+    "tests": "granular.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

@@ -58,12 +58,32 @@ dependencies:
   services:
     - audio: Audio engine — listens to sound
     - clock: Master clock & tempo — locks to the beat
-    - mod: 2 modulation inputs — LFO / XY / Macro can move them
+    - mod: 22 modulation inputs — LFO / XY / Macro can move them
   inputs:
     - mfx.hook.audio_in (audio · port in)
     - mfx.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
     - mfx.hook.mod_dj (modulation · port mod.djFilter)
     - mfx.hook.mod_revmix (modulation · port mod.reverbMix)
+    - knob.size (modulation · port mod.knob.size)
+    - knob.decay (modulation · port mod.knob.decay)
+    - knob.predelay (modulation · port mod.knob.predelay)
+    - knob.damping (modulation · port mod.knob.damping)
+    - knob.freeze (modulation · port mod.knob.freeze)
+    - knob.shimmer (modulation · port mod.knob.shimmer)
+    - knob.delayMix (modulation · port mod.knob.delayMix)
+    - knob.delayDiv (modulation · port mod.knob.delayDiv)
+    - knob.feedback (modulation · port mod.knob.feedback)
+    - knob.tone (modulation · port mod.knob.tone)
+    - knob.width (modulation · port mod.knob.width)
+    - knob.compThresh (modulation · port mod.knob.compThresh)
+    - knob.compRatio (modulation · port mod.knob.compRatio)
+    - knob.compAttack (modulation · port mod.knob.compAttack)
+    - knob.compRelease (modulation · port mod.knob.compRelease)
+    - knob.makeup (modulation · port mod.knob.makeup)
+    - knob.ceiling (modulation · port mod.knob.ceiling)
+    - knob.outGain (modulation · port mod.knob.outGain)
+    - knob.target (modulation · port mod.knob.target)
+    - knob.customTarget (modulation · port mod.knob.customTarget)
   outputs:
     - mfx.hook.loudness_out (master:loudness)
   permissions: [audio_out, audio_in, bus_publish, bus_subscribe]

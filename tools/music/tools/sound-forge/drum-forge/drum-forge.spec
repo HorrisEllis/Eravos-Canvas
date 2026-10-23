@@ -28,11 +28,16 @@ dependencies:
   services:
     - audio: Audio engine — makes sound
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
+    - mod: 4 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
     - assets: Clip output — renders sounds other tools can load
   inputs:
     - df.hook.note_in (note:trigger)
     - df.hook.midi_in (midi:note) — ambient broadcast
+    - knob.kit (modulation · port mod.knob.kit)
+    - knob.sel (modulation · port mod.knob.sel)
+    - knob.room (modulation · port mod.knob.room)
+    - knob.volume (modulation · port mod.knob.volume)
   outputs:
     - df.hook.audio_out (audio · port out)
     - df.hook.asset_out (asset:ready)

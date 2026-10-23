@@ -17,7 +17,8 @@
     "css": "fx-eq.ui.css",
     "spec": "fx-eq.spec",
     "preview": "preview.png",
-    "tests": "fx-eq.test.js"
+    "tests": "fx-eq.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

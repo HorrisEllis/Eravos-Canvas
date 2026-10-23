@@ -16,7 +16,7 @@
     hooks: [S.audio_out('sub.hook.audio_out'), S.note_in('sub.hook.note_in'), S.midi_in('sub.hook.midi_in'), S.theory_in('sub.hook.theory_in'), S.mod_in('sub.hook.mod_phantom', 'phantom'), S.mod_in('sub.hook.mod_level', 'level')],
     config: [
       { key: 'shape', type: 'number', default: 0.15, min: 0, max: 1, step: 0.01, label: 'Shape', group: 'SUB', hint: '0 sine · 0.5 triangle · 1 rounded square' },
-      { key: 'octave', type: 'integer', default: -2, min: -4, max: 0, label: 'Octave', group: 'SUB' },
+      { key: 'octave', type: 'integer', default: -2, min: -4, max: 1, label: 'Octave', group: 'SUB' },
       { key: 'floor', type: 'number', default: 24, min: 12, max: 45, step: 1, unit: 'Hz', label: 'Floor', group: 'SUB', hint: 'infrasonic cut — protects speakers' },
       { key: 'drop', type: 'number', default: 0, min: 0, max: 36, step: 0.5, unit: 'st', label: 'Drop', group: 'PITCH', hint: '808 punch: start this far above and fall' },
       { key: 'dropTime', type: 'number', default: 0.06, min: 0.005, max: 2, step: 0.001, unit: 's', label: 'Drop time', group: 'PITCH' },
@@ -86,11 +86,15 @@
         const f = MT.hz(Math.max(0, note + 12 * P.get('octave')));
         const legato = held && held.off > t - 1e-4;
         setF(f, t, legato ? P.get('glide') : 0, legato ? 0 : P.get('drop'));
+        // 3.53 legato: the note this one glides out of booked its release for ITS end, inside this note — unbook it (hold here,
+        // settle back to sustain); this note books its own below. Before, overlapping notes went silent from the first old end.
+        if (legato) { const a = amp.gain; if (typeof a.cancelAndHoldAtTime === 'function') a.cancelAndHoldAtTime(t); else a.cancelScheduledValues(t); a.setTargetAtTime(held.sus, t, 0.008); }
+        const sus = legato ? held.sus : (0.25 + 0.75 * vel) * P.get('sustain');
         if (!legato) {
           dsp.adsr(amp.gain, t, { a: P.get('attack'), d: P.get('decay'), s: P.get('sustain'), peak: 0.25 + 0.75 * vel });
           const ck = P.get('click'); if (ck > 0) { const o = ac.createOscillator(), g = ac.createGain(); o.frequency.setValueAtTime(f * 16, t); o.frequency.exponentialRampToValueAtTime(f * 2, t + 0.012); g.gain.setValueAtTime(ck * 0.35 * vel, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.018); o.connect(g); g.connect(clickG); clickG.gain.setValueAtTime(1, t); o.start(t); o.stop(t + 0.03); o.onended = () => { try { o.disconnect(); g.disconnect(); } catch (e) {} }; }
         }
-        held = { note, off: dur !== undefined ? t + dur : Infinity };
+        held = { note, sus, off: dur !== undefined ? t + dur : Infinity };
         if (dur !== undefined) dsp.release(amp.gain, t + dur, P.get('release'));
         ctx.lastNote = { f, t };
       }

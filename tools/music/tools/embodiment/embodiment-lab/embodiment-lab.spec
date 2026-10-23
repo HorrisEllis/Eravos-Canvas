@@ -35,17 +35,43 @@ dependencies:
   services:
     - audio: Audio engine — makes sound
     - clock: Master clock & tempo — locks to the beat
-    - mod: 1 modulation input — LFO / XY / Macro can move them
+    - mod: 27 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - embodiment-lab.hook.note_in (note:trigger)
     - embodiment-lab.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
     - embodiment-lab.hook.breath_in (modulation · port mod.breath)
+    - knob.rootNote (modulation · port mod.knob.rootNote)
+    - knob.ratioSet (modulation · port mod.knob.ratioSet)
+    - knob.tone (modulation · port mod.knob.tone)
+    - knob.brightness (modulation · port mod.knob.brightness)
+    - knob.drift (modulation · port mod.knob.drift)
+    - knob.grit (modulation · port mod.knob.grit)
+    - knob.sub (modulation · port mod.knob.sub)
+    - knob.pulse (modulation · port mod.knob.pulse)
+    - knob.pulseShape (modulation · port mod.knob.pulseShape)
+    - knob.pulseLock (modulation · port mod.knob.pulseLock)
+    - knob.pulseRate (modulation · port mod.knob.pulseRate)
+    - knob.clock (modulation · port mod.knob.clock)
+    - knob.inhale (modulation · port mod.knob.inhale)
+    - knob.hold (modulation · port mod.knob.hold)
+    - knob.exhale (modulation · port mod.knob.exhale)
+    - knob.rest (modulation · port mod.knob.rest)
+    - knob.breathDepth (modulation · port mod.knob.breathDepth)
+    - knob.breathFilter (modulation · port mod.knob.breathFilter)
+    - knob.cues (modulation · port mod.knob.cues)
+    - knob.cueEvery (modulation · port mod.knob.cueEvery)
+    - knob.space (modulation · port mod.knob.space)
+    - knob.stereo (modulation · port mod.knob.stereo)
+    - knob.beat (modulation · port mod.knob.beat)
+    - knob.fade (modulation · port mod.knob.fade)
+    - knob.level (modulation · port mod.knob.level)
+    - knob.glow (modulation · port mod.knob.glow)
   outputs:
     - embodiment-lab.hook.audio_out (audio · port out)
     - embodiment-lab.hook.breath_out (modulation · port breath)
     - embodiment-lab.hook.cue_out (embody:cue)
   permissions: [audio_out, bus_publish, bus_subscribe]
-  works_with: [eravos.breath, eravos.organ, eravos.xen-synth, eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
+  works_with: [eravos.breath, eravos.organ, eravos.xen-synth, eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen]
   notes:
     - Keep the volume comfortable and low. Stop whenever you like.

@@ -18,7 +18,8 @@
     "ui": "reese-bass.ui.js",
     "spec": "reese-bass.spec",
     "preview": "preview.png",
-    "tests": "reese-bass.test.js"
+    "tests": "reese-bass.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

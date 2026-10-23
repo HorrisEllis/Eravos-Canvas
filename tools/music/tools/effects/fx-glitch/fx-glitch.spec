@@ -23,12 +23,24 @@ dependencies:
   services:
     - audio: Audio engine — processes sound
     - clock: Master clock & tempo — locks to the beat
-    - mod: 1 modulation input — LFO / XY / Macro can move them
+    - mod: 13 modulation inputs — LFO / XY / Macro can move them
   inputs:
     - fx.hook.audio_in (audio · port in)
     - fx.hook.mod_mix (modulation · port mod.mix)
     - glitch.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
     - glitch.hook.event_in (fx:glitch)
+    - knob.rate (modulation · port mod.knob.rate)
+    - knob.size (modulation · port mod.knob.size)
+    - knob.repeats (modulation · port mod.knob.repeats)
+    - knob.chaos (modulation · port mod.knob.chaos)
+    - knob.reverseProb (modulation · port mod.knob.reverseProb)
+    - knob.stopProb (modulation · port mod.knob.stopProb)
+    - knob.scatterProb (modulation · port mod.knob.scatterProb)
+    - knob.pitchDrift (modulation · port mod.knob.pitchDrift)
+    - knob.stopBeats (modulation · port mod.knob.stopBeats)
+    - knob.inGain (modulation · port mod.knob.inGain)
+    - knob.outGain (modulation · port mod.knob.outGain)
+    - knob.bypass (modulation · port mod.knob.bypass)
   outputs:
     - fx.hook.audio_out (audio · port out)
   permissions: [audio_out, audio_in, bus_publish, bus_subscribe]

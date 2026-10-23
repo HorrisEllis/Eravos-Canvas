@@ -67,7 +67,7 @@ dependencies:
     - audio: Audio engine — makes sound
     - clock: Master clock & tempo — locks to the beat
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 3 modulation inputs — LFO / XY / Macro can move them
+    - mod: 25 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - reese.hook.note_in (note:trigger)
@@ -76,32 +76,29 @@ dependencies:
     - reese.hook.mod_cutoff (modulation · port mod.cutoff)
     - reese.hook.mod_comb (modulation · port mod.combTime)
     - reese.hook.mod_width (modulation · port mod.width)
+    - knob.voices (modulation · port mod.knob.voices)
+    - knob.detune (modulation · port mod.knob.detune)
+    - knob.octave (modulation · port mod.knob.octave)
+    - knob.transpose (modulation · port mod.knob.transpose)
+    - knob.res (modulation · port mod.knob.res)
+    - knob.envAmt (modulation · port mod.knob.envAmt)
+    - knob.envDecay (modulation · port mod.knob.envDecay)
+    - knob.drift (modulation · port mod.knob.drift)
+    - knob.driftRate (modulation · port mod.knob.driftRate)
+    - knob.combFb (modulation · port mod.knob.combFb)
+    - knob.combSync (modulation · port mod.knob.combSync)
+    - knob.combRate (modulation · port mod.knob.combRate)
+    - knob.combHz (modulation · port mod.knob.combHz)
+    - knob.combMix (modulation · port mod.knob.combMix)
+    - knob.dist (modulation · port mod.knob.dist)
+    - knob.level (modulation · port mod.knob.level)
+    - knob.sub (modulation · port mod.knob.sub)
+    - knob.subOct (modulation · port mod.knob.subOct)
+    - knob.subWarm (modulation · port mod.knob.subWarm)
+    - knob.glide (modulation · port mod.knob.glide)
+    - knob.attack (modulation · port mod.knob.attack)
+    - knob.release (modulation · port mod.knob.release)
   outputs:
     - reese.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
-
-# ============================================================
-# PLANNED 2.0 — Reese editor (P38 S2 / P39 R13) · status MAPPED, not built
-# "same with reese bass editor" — the Reese grows the way Wobble did (one tool per tool)
-# ============================================================
-finding (1.x): voices 2–6 with ONE detune amount spread evenly, comb on a sine/rate LFO, drift = random wander; nothing
-  can be drawn or sequenced, so every Reese moves the same way.
-engine 2.0:
-  VOICE SPREAD editor: per-voice detune (cents), pan, level, octave and wave (saw · square · drawn) — the Reese's "beating"
-    is designed voice by voice, not one knob; presets of spreads (Classic 2, Wide 4, Neuro 6, Octave Stack)
-  MOVEMENT (drawn, the S1 shape editor reused — one widget, not a copy): detune amount, comb time, filter cutoff and
-    phase-warp each follow a drawn curve over 1–8 bars (sync) or seconds (free)
-  RATE ROLL (the S1 wub-seq widget reused): a per-step rate for the movement — neuro "rolls" and stops on the grid
-  PHASE: voices reset phase per note (tight, punchy) or free-run (wide, drifting) ; "phase-lock at drop" action
-  FILTER: 24 dB LP + band "throat" (formant pair) in series/parallel ; NEURO stack: comb → BP → asym drive → OTT-lite
-  SUB: clean sine sub, phase-aligned to voice 1, crossover 80–200 Hz (mono under the crossover — club-safe)
-packs 2.0: ≥ 60 — Neuro Roll · Classic DnB Reese · Darkstep · Jungle Pressure · Halftime Growl · Liquid Warm · Techno
-  Rumble Reese · Dubstep Reese Wub (rate roll on comb) · Synthwave Reese · Witch Reese · Hoover-ish (detuned stack + pitch
-  dive, technique only) …
-acceptance 2.0: per-voice detune audible as beat frequency f·(2^(c/1200)−1) ± 2 % ; mono below crossover (L−R < −60 dB
-  under 100 Hz) ; drawn movement reproduces the curve on the param ± 1 % ; 1.x presets load and render identically.
-
-# 3.50: Pitch (transpose) −24..+24 st, default 0 — tunes the whole tool up/down; retunes a held note live
-
-# 3.51: Pitch to −36 st; Octave −4..+2; Sub oct (0/−1/−2, default −1); Sub harmonics 0..1 (default 0) — overtones on the clean sub so a deep note is heard on small speakers
+  works_with: [eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen, eravos.midi-mapper, eravos.lyric-rhythm]

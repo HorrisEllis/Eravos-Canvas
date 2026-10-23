@@ -44,7 +44,7 @@
                       "fm": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 10
+                        "maximum": 20
                       },
                       "spread": {
                         "type": "number",
@@ -173,7 +173,7 @@
                       },
                       "pitchEnv": {
                         "type": "number",
-                        "minimum": 0,
+                        "minimum": -48,
                         "maximum": 48
                       },
                       "pitchTime": {
@@ -184,12 +184,12 @@
                       "glide": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 0.6
+                        "maximum": 2
                       },
                       "octave": {
                         "type": "integer",
-                        "minimum": -2,
-                        "maximum": 1
+                        "minimum": -3,
+                        "maximum": 3
                       },
                       "sub": {
                         "type": "number",
@@ -199,12 +199,12 @@
                       "attack": {
                         "type": "number",
                         "minimum": 0.001,
-                        "maximum": 1
+                        "maximum": 4
                       },
                       "release": {
                         "type": "number",
                         "minimum": 0.01,
-                        "maximum": 2
+                        "maximum": 8
                       },
                       "level": {
                         "type": "number",

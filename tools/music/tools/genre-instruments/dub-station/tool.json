@@ -18,7 +18,8 @@
     "ui": "dub-station.ui.js",
     "spec": "dub-station.spec",
     "preview": "preview.png",
-    "tests": "dub-station.test.js"
+    "tests": "dub-station.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

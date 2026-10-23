@@ -30,18 +30,28 @@ dependencies:
   services:
     - audio: Audio engine — makes sound
     - clock: Master clock & tempo — locks to the beat
+    - mod: 9 modulation inputs — LFO / XY / Macro can move them
     - files: Your files — drop audio / MIDI on it
     - assets: Clip output — renders sounds other tools can load
   inputs:
     - songrec.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
     - songrec.hook.asset_in (asset:ready)
+    - knob.snap (modulation · port mod.knob.snap)
+    - knob.zoom (modulation · port mod.knob.zoom)
+    - knob.follow (modulation · port mod.knob.follow)
+    - knob.format (modulation · port mod.knob.format)
+    - knob.range (modulation · port mod.knob.range)
+    - knob.stems (modulation · port mod.knob.stems)
+    - knob.tail (modulation · port mod.knob.tail)
+    - knob.level (modulation · port mod.knob.level)
+    - knob.withSong (modulation · port mod.knob.withSong)
   outputs:
     - songrec.hook.audio_out (audio · port out)
     - songrec.hook.asset_out (asset:ready)
     - songrec.hook.song_out (song:saved)
     - songrec.hook.transport_out (ui:transport-play|ui:transport-stop|ui:transport-seek)
   permissions: [audio_out, audio_in, bus_publish, bus_subscribe, filesystem_read, filesystem_write, registry_read]
-  works_with: [eravos.timeline, eravos.session, eravos.clip-maker, eravos.harmonic-analyzer, eravos.bass-drop-builder, eravos.bass-forge, eravos.drum-forge, eravos.contrast-analyser]
+  works_with: [eravos.timeline, eravos.session, eravos.clip-maker, eravos.harmonic-analyzer, eravos.bass-drop-builder, eravos.bass-forge, eravos.drum-forge, eravos.granular]
   notes:
     - Always docked at the bottom; drag its top edge to resize, double-click to fold.
     - Records the master you hear; its own playback is never re-recorded.

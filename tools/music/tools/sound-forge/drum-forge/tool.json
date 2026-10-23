@@ -18,7 +18,8 @@
     "ui": "drum-forge.ui.js",
     "spec": "drum-forge.spec",
     "preview": "preview.png",
-    "tests": "drum-forge.test.js"
+    "tests": "drum-forge.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

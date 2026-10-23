@@ -75,7 +75,7 @@
                       "screw": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 12
+                        "maximum": 24
                       },
                       "static": {
                         "type": "number",

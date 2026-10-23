@@ -58,7 +58,7 @@ dependencies:
     - clock: Master clock & tempo — locks to the beat
     - key: Song key & scale — plays in key
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 1 modulation input — LFO / XY / Macro can move them
+    - mod: 32 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
     - files: Your files — drop audio / MIDI on it
   inputs:
@@ -68,9 +68,40 @@ dependencies:
     - bf.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
     - bf.hook.asset_in (asset:ready)
     - bf.hook.mod_level (modulation · port mod.level)
+    - knob.wave (modulation · port mod.knob.wave)
+    - knob.ratio (modulation · port mod.knob.ratio)
+    - knob.fm (modulation · port mod.knob.fm)
+    - knob.spread (modulation · port mod.knob.spread)
+    - knob.fold (modulation · port mod.knob.fold)
+    - knob.formant (modulation · port mod.knob.formant)
+    - knob.vowelA (modulation · port mod.knob.vowelA)
+    - knob.vowelB (modulation · port mod.knob.vowelB)
+    - knob.comb (modulation · port mod.knob.comb)
+    - knob.combPitch (modulation · port mod.knob.combPitch)
+    - knob.notch (modulation · port mod.knob.notch)
+    - knob.cutoff (modulation · port mod.knob.cutoff)
+    - knob.res (modulation · port mod.knob.res)
+    - knob.drive (modulation · port mod.knob.drive)
+    - knob.crush (modulation · port mod.knob.crush)
+    - knob.ott (modulation · port mod.knob.ott)
+    - knob.lfoDiv (modulation · port mod.knob.lfoDiv)
+    - knob.lfoShape (modulation · port mod.knob.lfoShape)
+    - knob.lfoFM (modulation · port mod.knob.lfoFM)
+    - knob.lfoFold (modulation · port mod.knob.lfoFold)
+    - knob.lfoFormant (modulation · port mod.knob.lfoFormant)
+    - knob.lfoComb (modulation · port mod.knob.lfoComb)
+    - knob.lfoNotch (modulation · port mod.knob.lfoNotch)
+    - knob.lfoCut (modulation · port mod.knob.lfoCut)
+    - knob.pitchEnv (modulation · port mod.knob.pitchEnv)
+    - knob.pitchTime (modulation · port mod.knob.pitchTime)
+    - knob.glide (modulation · port mod.knob.glide)
+    - knob.octave (modulation · port mod.knob.octave)
+    - knob.sub (modulation · port mod.knob.sub)
+    - knob.attack (modulation · port mod.knob.attack)
+    - knob.release (modulation · port mod.knob.release)
   outputs:
     - bf.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe, filesystem_read]
-  works_with: [eravos.sequencer, eravos.timeline, eravos.sub-engine, eravos.harmonic-analyzer, eravos.song-recorder, eravos.drum-forge, eravos.session, eravos.midi-mapper]
+  works_with: [eravos.sequencer, eravos.timeline, eravos.sub-engine, eravos.harmonic-analyzer, eravos.song-recorder, eravos.arp, eravos.bass-gen, eravos.chord-gen]
   notes:
     - MATCH analyses a clip you own (drop a bass sample on it) and steers its knobs towards it.

@@ -43,7 +43,7 @@ dependencies:
   services:
     - audio: Audio engine — makes sound
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 1 modulation input — LFO / XY / Macro can move them
+    - mod: 20 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - xen.hook.note_in (note:trigger)
@@ -51,9 +51,28 @@ dependencies:
     - xen.hook.tuning_in (xen:tuning)
     - xen.hook.spectrum_in (xen:spectrum)
     - xen.hook.mod_level (modulation · port mod.level)
+    - knob.tuning (modulation · port mod.knob.tuning)
+    - knob.n (modulation · port mod.knob.n)
+    - knob.generator (modulation · port mod.knob.generator)
+    - knob.period (modulation · port mod.knob.period)
+    - knob.baseHz (modulation · port mod.knob.baseHz)
+    - knob.baseNote (modulation · port mod.knob.baseNote)
+    - knob.spectrum (modulation · port mod.knob.spectrum)
+    - knob.partials (modulation · port mod.knob.partials)
+    - knob.shape (modulation · port mod.knob.shape)
+    - knob.tilt (modulation · port mod.knob.tilt)
+    - knob.even (modulation · port mod.knob.even)
+    - knob.bright (modulation · port mod.knob.bright)
+    - knob.shimmer (modulation · port mod.knob.shimmer)
+    - knob.spread (modulation · port mod.knob.spread)
+    - knob.attack (modulation · port mod.knob.attack)
+    - knob.decay (modulation · port mod.knob.decay)
+    - knob.sustain (modulation · port mod.knob.sustain)
+    - knob.release (modulation · port mod.knob.release)
+    - knob.partialDecay (modulation · port mod.knob.partialDecay)
   outputs:
     - xen.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.ratio-lattice, eravos.harmonic-analyzer, eravos.recursive-spectra, eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm]
+  works_with: [eravos.ratio-lattice, eravos.harmonic-analyzer, eravos.recursive-spectra, eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen]
   notes:
     - Ignores the song key on purpose: the tuning IS the key. Key C4 (60) = step 0 by default.

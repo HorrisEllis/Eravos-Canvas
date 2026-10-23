@@ -17,7 +17,8 @@
     "ui": "sequencer.ui.js",
     "spec": "sequencer.spec",
     "preview": "preview.png",
-    "tests": "sequencer.test.js"
+    "tests": "sequencer.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

@@ -17,7 +17,8 @@
     "ui": "syn-partials.ui.js",
     "preview": "preview.png",
     "spec": "syn-partials.spec",
-    "tests": "syn-partials.test.js"
+    "tests": "syn-partials.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

@@ -134,6 +134,7 @@
       if (m.configure) steps.push({ op: 'configure', target: 'mod' + i, params: m.configure });
       if (m.to) steps.push({ op: 'modulate', from: 'mod' + i, to: m.to, key: m.key });
       if (m.wireFrom) steps.push({ op: 'wire', from: m.wireFrom, to: ['mod' + i, m.wireTo] });   // e.g. Clip Maker's clips → this Sample
+      if (m.into) steps.push({ op: 'wire', from: ['mod' + i, m.out], to: m.into });                // 3.44: this tool → a part's input (Morph Osc → Morph Osc's FM in)
     });
     // form → markers + clips
     let bar = 1; const motif = makeMotif(r, G.leadRhythm || 'anthem');
@@ -202,12 +203,34 @@
       id: 'eravos.recipe.engine.' + G.id, label: G.label, icon: G.icon || '✦', accent: G.accent || '#00d4ff', genome: 'eravos.genome.music',
       section: 'SONG ENGINE — every press writes a new song', tagline: G.tagline || '',
       hidden: true, // 3.34: every song lives behind ONE button — 📖 Songs (the Songbook writes these); not on the Start screen
-      _seed: G.seed || 1,
-      get steps() { return generate(G, this._seed); },
+      _seed: G.seed || 1, _shift: null,
+      get steps() { return reshape(generate(G, this._seed), this._shift); },
     };
     R.register(rec);
   }
-  R.onBeforeRun((r) => { if (r && /^eravos\.recipe\.engine\./.test(r.id)) { if (r._pinned) { r._seed = r._pinned; r._pinned = 0; } else r._seed = 1 + Math.floor(Math.random() * 99999); } });
+  R.onBeforeRun((r) => { if (r && /^eravos\.recipe\.engine\./.test(r.id)) { if (r._pinned) { r._seed = r._pinned; r._pinned = 0; } else { r._seed = 1 + Math.floor(Math.random() * 99999); r._shift = null; } } });
+
+  // 3.44 — the same song, higher / lower and faster / slower: shift = { semis: −12…+12, tempo: 0.5…1.5 (× the BPM) }.
+  // Every pitched note moves by exactly `semis` (so +5 really sounds higher, it never wraps down), the song key moves with
+  // it (tools that follow the key stay in it), drums keep their pads. No shift → the steps are untouched (same seed → same song).
+  function reshape(steps, sh) {
+    const semis = sh ? Math.max(-24, Math.min(24, Math.round(sh.semis || 0))) : 0, tempo = sh ? Math.max(0.25, Math.min(2, +sh.tempo || 1)) : 1;
+    if (!semis && tempo === 1) return steps;
+    const bpm = (b) => Math.max(30, Math.min(300, Math.round(b * tempo))), drums = new Set();
+    steps.forEach(st => { if (st.op === 'mount' && /^eravos\.(pads|drum-forge|sequencer)$/.test(st.organism)) drums.add('@' + st.as); });
+    return steps.map(st => {
+      if (st.op === 'bpm') return Object.assign({}, st, { bpm: bpm(st.bpm) });
+      if (st.op === 'her_voice') return Object.assign({}, st, { bpm: bpm(st.bpm) });
+      if (st.op === 'configure' && st.target === 'session') {
+        const p = Object.assign({}, st.params); if (p.bpm) p.bpm = bpm(p.bpm); if (typeof p.root === 'number') p.root = ((p.root + semis) % 12 + 12) % 12;
+        if (p.songName) p.songName += ' (' + [semis ? (semis > 0 ? '+' : '') + semis + ' st' : '', tempo !== 1 ? Math.round(tempo * 100) + '% speed' : ''].filter(Boolean).join(' · ') + ')';
+        return Object.assign({}, st, { params: p });
+      }
+      if (semis && st.op === 'event' && st.topic === 'clip_add' && st.payload && st.payload.kind === 'notes' && !drums.has(st.payload.target))
+        return Object.assign({}, st, { payload: Object.assign({}, st.payload, { notes: st.payload.notes.map(n => Object.assign({}, n, { n: Math.max(0, Math.min(127, n.n + semis)) })) }) });
+      return st;
+    });
+  }
 
   // ---------------------------------------------------------------- the genres (data)
   const half = { kick: 'X.........X.....', snare: '........X.......', clap: '........x.......', hat: '..x...x...x...x.' };
@@ -333,6 +356,8 @@
     addGenre, genres: () => Array.from(genres.values()), generate: (id, seed, X) => genres.has(id) ? generate(genres.get(id), seed, X) : null,
     helpers: { rng, pick, drumBar, bassBar, chordBar, leadBar, PAD },   // 3.34.1: what RhythmExpand builds on
     // same song again: SongEngine.write('synthwave', 4242)
-    write(id, seed, o) { const rec = R.get('eravos.recipe.engine.' + id); if (!rec) return null; rec._pinned = seed || 1; return R.run(rec.id, Object.assign({ clear: true, origin: { x: 30, y: 20 } }, o || {})); },
+    // o.shift = { semis, tempo } writes the same song higher / lower, faster / slower (Songs → Key · Tempo)
+    write(id, seed, o) { const rec = R.get('eravos.recipe.engine.' + id); if (!rec) return null; o = Object.assign({}, o); rec._pinned = seed || 1; rec._shift = o.shift || null; delete o.shift; return R.run(rec.id, Object.assign({ clear: true, origin: { x: 30, y: 20 } }, o)); },
+    reshape,
   };
 })();

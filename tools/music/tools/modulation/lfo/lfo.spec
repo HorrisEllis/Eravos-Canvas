@@ -58,10 +58,19 @@ dependencies:
   services:
     - audio: Audio engine — shares the audio clock
     - clock: Master clock & tempo — locks to the beat
-    - mod: 1 modulation input — LFO / XY / Macro can move them
+    - mod: 10 modulation inputs — LFO / XY / Macro can move them
   inputs:
     - lfo.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
     - lfo.hook.mod_depth (modulation · port mod.depth)
+    - knob.shape (modulation · port mod.knob.shape)
+    - knob.sync (modulation · port mod.knob.sync)
+    - knob.div (modulation · port mod.knob.div)
+    - knob.rate (modulation · port mod.knob.rate)
+    - knob.offset (modulation · port mod.knob.offset)
+    - knob.phase (modulation · port mod.knob.phase)
+    - knob.polarity (modulation · port mod.knob.polarity)
+    - knob.retrigger (modulation · port mod.knob.retrigger)
+    - knob.fade (modulation · port mod.knob.fade)
   outputs:
     - lfo.hook.mod_out (modulation · port out)
   permissions: [audio_out, bus_publish, bus_subscribe, registry_read]

@@ -105,13 +105,13 @@
                       },
                       "tremRate": {
                         "type": "number",
-                        "minimum": 0.5,
-                        "maximum": 9
+                        "minimum": 0.1,
+                        "maximum": 16
                       },
                       "tremDepth": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 0.6
+                        "maximum": 1
                       },
                       "breathPeriod": {
                         "type": "number",
@@ -188,13 +188,13 @@
                       },
                       "attack": {
                         "type": "number",
-                        "minimum": 0.005,
-                        "maximum": 3
+                        "minimum": 0.001,
+                        "maximum": 6
                       },
                       "release": {
                         "type": "number",
-                        "minimum": 0.02,
-                        "maximum": 6
+                        "minimum": 0.01,
+                        "maximum": 12
                       },
                       "level": {
                         "type": "number",

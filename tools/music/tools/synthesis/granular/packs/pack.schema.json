@@ -75,13 +75,13 @@
                       },
                       "pitch": {
                         "type": "number",
-                        "minimum": -24,
-                        "maximum": 24
+                        "minimum": -36,
+                        "maximum": 36
                       },
                       "pitchSpray": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 24
+                        "maximum": 36
                       },
                       "quantize": {
                         "type": "boolean"

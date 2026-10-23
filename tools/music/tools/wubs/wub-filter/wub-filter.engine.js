@@ -38,7 +38,7 @@
     config: [
       { key: 'mode', type: 'enum', options: MODES, default: 'lowpass', label: 'Mouth', group: 'FILTER' },
       { key: 'slope', type: 'enum', options: [12, 24], default: 24, label: 'dB/oct', group: 'FILTER' },
-      { key: 'cutoff', type: 'number', default: 160, min: 30, max: 4000, step: 1, unit: 'Hz', label: 'Closed at', group: 'FILTER', hint: 'where the mouth sits when the wub is 0' },
+      { key: 'cutoff', type: 'number', default: 160, min: 20, max: 12000, step: 1, unit: 'Hz', label: 'Closed at', group: 'FILTER', hint: 'where the mouth sits when the wub is 0' },
       { key: 'range', type: 'number', default: 4.5, min: 0, max: 8, step: 0.01, unit: 'oct', label: 'Range', group: 'FILTER', hint: 'how far it opens when the wub is 1' },
       { key: 'res', type: 'number', default: 6, min: 0.5, max: 20, step: 0.1, label: 'Reso', group: 'FILTER' },
       { key: 'position', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Position', group: 'WUB', hint: 'a fixed opening, added to what is wired in — automate it or move it by hand' },
@@ -46,7 +46,7 @@
       { key: 'drive', type: 'number', default: 0.25, min: 0, max: 1, step: 0.01, label: 'Drive', group: 'TONE' },
       { key: 'vowelA', type: 'enum', options: Object.keys(VOWELS), default: 'OO', label: 'Vowel closed', group: 'VOWEL' },
       { key: 'vowelB', type: 'enum', options: Object.keys(VOWELS), default: 'AH', label: 'Vowel open', group: 'VOWEL' },
-      { key: 'formant', type: 'number', default: 0, min: -12, max: 12, step: 0.1, unit: 'st', label: 'Formant', group: 'VOWEL' },
+      { key: 'formant', type: 'number', default: 0, min: -24, max: 24, step: 0.1, unit: 'st', label: 'Formant', group: 'VOWEL' },
       { key: 'comb', type: 'number', default: 0.85, min: -1, max: 1, step: 0.01, label: 'Comb', group: 'COMB', hint: '+ = peaks at the tuned note and its harmonics, − = hollow notches' },
     ].concat(SDK.STD_FX_CONFIG),
     defaultPreset: 'Classic LP Wub',

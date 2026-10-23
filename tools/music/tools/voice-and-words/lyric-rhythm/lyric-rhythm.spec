@@ -38,4 +38,4 @@ dependencies:
     - lyr.hook.clip_out (ui:clip_add)
     - lyr.hook.seq_out (seq:pattern_suggest|ui:chain_edit|ui:slot_select|ui:config_change)
   permissions: [bus_publish, bus_subscribe, registry_read]
-  works_with: [eravos.pads, eravos.supersaw, eravos.retro-poly, eravos.timeline, eravos.embodiment-lab, eravos.coven, eravos.organ, eravos.bass-forge]
+  works_with: [eravos.pads, eravos.supersaw, eravos.retro-poly, eravos.timeline, eravos.embodiment-lab, eravos.arp, eravos.coven, eravos.organ]

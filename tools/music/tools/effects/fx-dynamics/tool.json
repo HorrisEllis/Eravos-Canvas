@@ -17,7 +17,8 @@
     "ui": "fx-dynamics.ui.js",
     "spec": "fx-dynamics.spec",
     "preview": "preview.png",
-    "tests": "fx-dynamics.test.js"
+    "tests": "fx-dynamics.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

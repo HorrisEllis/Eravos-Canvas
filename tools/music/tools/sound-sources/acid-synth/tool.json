@@ -18,7 +18,8 @@
     "ui": "acid-synth.ui.js",
     "spec": "acid-synth.spec",
     "preview": "preview.png",
-    "tests": "acid-synth.test.js"
+    "tests": "acid-synth.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

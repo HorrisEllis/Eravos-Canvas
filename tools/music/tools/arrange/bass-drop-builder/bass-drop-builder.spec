@@ -100,12 +100,74 @@ dependencies:
     - audio: Audio engine — makes sound
     - clock: Master clock & tempo — locks to the beat
     - key: Song key & scale — plays in key
+    - mod: 61 modulation inputs — LFO / XY / Macro can move them
     - files: Your files — drop audio / MIDI on it
   inputs:
     - drop.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
     - drop.hook.theory_in (theory:key-change) — ambient broadcast
     - drop.hook.asset_in (asset:ready)
     - drop.hook.fire_in (ui:drop_fire|timeline:marker)
+    - knob.tensionBars (modulation · port mod.knob.tensionBars)
+    - knob.buildBars (modulation · port mod.knob.buildBars)
+    - knob.pauseBars (modulation · port mod.knob.pauseBars)
+    - knob.dropBars (modulation · port mod.knob.dropBars)
+    - knob.outroBars (modulation · port mod.knob.outroBars)
+    - knob.startMode (modulation · port mod.knob.startMode)
+    - knob.autoFire (modulation · port mod.knob.autoFire)
+    - knob.riserLevel (modulation · port mod.knob.riserLevel)
+    - knob.riserWave (modulation · port mod.knob.riserWave)
+    - knob.riserOct (modulation · port mod.knob.riserOct)
+    - knob.riserNoise (modulation · port mod.knob.riserNoise)
+    - knob.riserCurve (modulation · port mod.knob.riserCurve)
+    - knob.riserFrom (modulation · port mod.knob.riserFrom)
+    - knob.rollLevel (modulation · port mod.knob.rollLevel)
+    - knob.rollVoice (modulation · port mod.knob.rollVoice)
+    - knob.rollStart (modulation · port mod.knob.rollStart)
+    - knob.rollEnd (modulation · port mod.knob.rollEnd)
+    - knob.rollCurve (modulation · port mod.knob.rollCurve)
+    - knob.rollPitch (modulation · port mod.knob.rollPitch)
+    - knob.rollFrom (modulation · port mod.knob.rollFrom)
+    - knob.gapSound (modulation · port mod.knob.gapSound)
+    - knob.gapLevel (modulation · port mod.knob.gapLevel)
+    - knob.gapLen (modulation · port mod.knob.gapLen)
+    - knob.impactLevel (modulation · port mod.knob.impactLevel)
+    - knob.impactPitch (modulation · port mod.knob.impactPitch)
+    - knob.impactLen (modulation · port mod.knob.impactLen)
+    - knob.crashLevel (modulation · port mod.knob.crashLevel)
+    - knob.padLevel (modulation · port mod.knob.padLevel)
+    - knob.tensionTone (modulation · port mod.knob.tensionTone)
+    - knob.tChords (modulation · port mod.knob.tChords)
+    - knob.tVoicing (modulation · port mod.knob.tVoicing)
+    - knob.tOct (modulation · port mod.knob.tOct)
+    - knob.tWave (modulation · port mod.knob.tWave)
+    - knob.tVoices (modulation · port mod.knob.tVoices)
+    - knob.tDetune (modulation · port mod.knob.tDetune)
+    - knob.tWidth (modulation · port mod.knob.tWidth)
+    - knob.tAttack (modulation · port mod.knob.tAttack)
+    - knob.tRelease (modulation · port mod.knob.tRelease)
+    - knob.tCutoff (modulation · port mod.knob.tCutoff)
+    - knob.tCutoffEnd (modulation · port mod.knob.tCutoffEnd)
+    - knob.tRes (modulation · port mod.knob.tRes)
+    - knob.tMotion (modulation · port mod.knob.tMotion)
+    - knob.tMotionRate (modulation · port mod.knob.tMotionRate)
+    - knob.tSwell (modulation · port mod.knob.tSwell)
+    - knob.tPump (modulation · port mod.knob.tPump)
+    - knob.tRate (modulation · port mod.knob.tRate)
+    - knob.tSub (modulation · port mod.knob.tSub)
+    - knob.tAir (modulation · port mod.knob.tAir)
+    - knob.tSpace (modulation · port mod.knob.tSpace)
+    - knob.downLevel (modulation · port mod.knob.downLevel)
+    - knob.downLen (modulation · port mod.knob.downLen)
+    - knob.vocalTrimStart (modulation · port mod.knob.vocalTrimStart)
+    - knob.vocalTrimEnd (modulation · port mod.knob.vocalTrimEnd)
+    - knob.vocalSection (modulation · port mod.knob.vocalSection)
+    - knob.vocalBeat (modulation · port mod.knob.vocalBeat)
+    - knob.vocalEndOnDrop (modulation · port mod.knob.vocalEndOnDrop)
+    - knob.stutter (modulation · port mod.knob.stutter)
+    - knob.vocalGain (modulation · port mod.knob.vocalGain)
+    - knob.vocalHpf (modulation · port mod.knob.vocalHpf)
+    - knob.vocalPriority (modulation · port mod.knob.vocalPriority)
+    - knob.throw (modulation · port mod.knob.throw)
   outputs:
     - drop.hook.fx_out (audio · port fx)
     - drop.hook.vocal_out (audio · port vocal)
@@ -115,14 +177,3 @@ dependencies:
     - drop.hook.plan_out (edm:drop-plan)
   permissions: [audio_out, bus_publish, bus_subscribe, filesystem_read, registry_read]
   works_with: [eravos.song-recorder, eravos.sequencer, eravos.macro-automation, eravos.drum-forge, eravos.session, eravos.clip-maker, eravos.sample-player]
-
-## 3.1 (3.39) — her voice on top · "the bass drop tool must make her voice or clip a priority over the other sounds"
-vocal port: bus 'priority' — joins the master AFTER the ducks (chain: … duck → vduck → comp; priority → comp), so her
-  voice is never ducked (not by itself, not by the kick sidechain) and still goes through the master comp + limiter.
-vocalPriority (dB, 0–18, default 9, VOCAL group, "Her voice on top"): while her clip plays (main + every stutter), the rest
-  of the mix dips under the clip's OWN loudness envelope — K.audio.duckUnder(buffer, segments, {depthDb}) in core/audio.js:
-  10 ms RMS of the clip, gated 36 dB under its loudest frame, full dip from −12 dB, attack 12 ms, release 220 ms,
-  look-ahead 20 ms. Between words the mix comes back. 0 = off. Abort and Stop all release the dip at once.
-measured (tests/p42-voice-priority.test.js): dip under each word 9 ± 0.6 dB · between words < 4.5 dB · after the clip the
-  mix is back within 0.1 dB · already ≥ 6 dB down 10 ms into the first word · her vocal level identical at 0 and 18 dB ·
-  priority 0 changes nothing (< 0.05 dB) · Stop all: back to full within 0.2 s.

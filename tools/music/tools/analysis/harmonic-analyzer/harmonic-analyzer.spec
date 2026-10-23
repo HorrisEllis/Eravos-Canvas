@@ -34,10 +34,22 @@ dependencies:
   toolbar_units: [music.engine]   # ui expansion when added: Audio engine
   services:
     - audio: Audio engine — listens to sound
+    - mod: 11 modulation inputs — LFO / XY / Macro can move them
     - files: Your files — drop audio / MIDI on it
   inputs:
     - ha.hook.audio_in (audio · port in)
     - ha.hook.asset_in (asset:ready)
+    - knob.fft (modulation · port mod.knob.fft)
+    - knob.floor (modulation · port mod.knob.floor)
+    - knob.range (modulation · port mod.knob.range)
+    - knob.maxPeaks (modulation · port mod.knob.maxPeaks)
+    - knob.maxDen (modulation · port mod.knob.maxDen)
+    - knob.smoothing (modulation · port mod.knob.smoothing)
+    - knob.layers (modulation · port mod.knob.layers)
+    - knob.f0Mode (modulation · port mod.knob.f0Mode)
+    - knob.f0Manual (modulation · port mod.knob.f0Manual)
+    - knob.hold (modulation · port mod.knob.hold)
+    - knob.source (modulation · port mod.knob.source)
   outputs:
     - ha.hook.tuning_out (xen:tuning)
     - ha.hook.spectrum_out (xen:spectrum)

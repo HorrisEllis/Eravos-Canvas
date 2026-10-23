@@ -17,7 +17,8 @@
     "ui": "coach.ui.js",
     "spec": "coach.spec",
     "preview": "preview.png",
-    "tests": "coach.test.js"
+    "tests": "coach.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

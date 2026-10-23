@@ -175,10 +175,11 @@
     { id: 'house', label: '🏠 House · Garage', ids: ['house', 'deep-house', 'tech-house', 'bass-house', 'ukg', 'future-garage', 'electro', 'big-room'], re: /house|garage|ukg|electro/ },
     { id: 'techno', label: '🌀 Techno · Trance · Hard', ids: ['techno', 'trance', 'progressive', 'psytrance', 'hardstyle'], re: /techno|trance|hard|prog/ },
     { id: 'trap', label: '🎛 Trap · Phonk · Future', ids: ['trap', 'phonk', 'future-bass', 'moombahton'], re: /trap|phonk|future|moomba/ },
-    { id: 'reggae', label: '🔥 Reggae · Dub · Dancehall', ids: ['reggae', 'dancehall'], re: /reggae|dub|dancehall/ },
+    { id: 'reggae', label: '🔥 Reggae · Dub · Dancehall', ids: ['reggae', 'dancehall', 'bun-dem-fire'], re: /reggae|dub|dancehall/ },
     { id: '80s', label: '🌆 80s · Synth', ids: ['synthwave', 'darkwave'], re: /synth|wave/ },
     { id: 'goth', label: '🖤 Dark · Goth', ids: ['witch-house', 'hanging-tree'], re: /witch|goth|tree/ },
     { id: 'chill', label: '🌙 Chill · Ambient', ids: ['lofi', 'ambient'], re: /lofi|ambient|chill/ },
+    { id: 'synthesis', label: '🧬 Synthesis showcase', re: /^syn-/ },
     { id: 'her', label: '💜 For Her', re: /^her-/ },
     { id: 'lostlove', label: '🥀 Lost Love', re: /^ll-/ },
     { id: 'odd', label: '🧪 Odd Couples', re: /^oc-/ },
@@ -186,7 +187,7 @@
   ];
   function categoryOf(s) {
     const g = String((s && s.genre) || '');
-    return (CATS.find(c => (c.id === 'her' || c.id === 'lostlove' || c.id === 'odd') && c.re.test(g))
+    return (CATS.find(c => (c.id === 'her' || c.id === 'lostlove' || c.id === 'odd' || c.id === 'synthesis') && c.re.test(g))
       || CATS.find(c => (c.ids || []).includes(g)) || CATS.find(c => c.re.test(g)) || CATS[CATS.length - 1]).id;
   }
   const MOODS = [['mine', '📖 My songs'], ['foryou', '💜 For you'], ['all', 'Any mood'], ['edm', 'EDM'], ['her', 'For her'], ['heavy', 'Heavy'], ['dark', 'Dark'], ['goth', 'Goth'], ['80s', '80s'], ['island', 'Island'], ['warm', 'Warm'], ['party', 'Party'], ['calm', 'Calm'], ['fast', 'Fast']];
@@ -219,11 +220,28 @@
   async function removeSong(name) { await IDB().put('library', 'song:' + name, null); await IDB().put('library', 'mysongs', (await mySongs()).filter(x => x.name !== name)); }
   function genreOf(s) { return s.recipe ? null : SE.genres().find(g => g.id === s.genre); }
   function locked(s) { return !!(s.lock && !(window.Learn && window.Learn.done(s.lock))); }
-  function write(s, fresh) {
+  // sh = { semis, tempo } (Make it yours): the same song higher / lower, faster / slower — SongEngine.reshape
+  function write(s, fresh, sh) {
     if (locked(s)) return false;
     if (s.recipe) { const r = R.get(s.recipe); if (!r) return false; R.run(s.recipe, { clear: true, origin: { x: 30, y: 20 } }); return true; }
-    const seed = fresh ? 1 + Math.floor(Math.random() * 99999) : s.seed;
-    SE.write(s.genre, seed); return true;
+    const seed = fresh ? 1 + Math.floor(Math.random() * 99999) : s.seed, shifted = sh && (sh.semis || sh.tempo !== 1);
+    if (shifted) SE.write(s.genre, seed, { shift: { semis: sh.semis, tempo: sh.tempo } }); else SE.write(s.genre, seed); return true;
+  }
+  const shift = { semis: 0, tempo: 1 };   // Make it yours — kept while ERAVOS is open, from song to song
+  function shiftBox(h, s, repaint) {
+    const G = genreOf(s), box = h('div', { class: 'sbk-shift' });
+    if (s.recipe || !G) { box.append(h('h4', { text: 'Make it yours' }), h('p', { class: 'sbk-meta', text: 'A hand-built set — change its key and tempo in the Session window after writing it.' })); return box; }
+    const base = (G.bpm[0] + G.bpm[1]) / 2, read = h('span', { class: 'sbk-shift-read' });
+    const say = () => { read.textContent = (shift.semis ? (shift.semis > 0 ? '+' : '') + shift.semis + ' st · ' : 'original key · ') + '≈' + Math.round(base * shift.tempo) + ' BPM (' + Math.round(shift.tempo * 100) + '%)'; };
+    const slider = (label, min, max, step, val, fmt, set) => { const v = h('b', { text: fmt(val) }), r = h('input', { type: 'range', min, max, step, value: val, 'aria-label': label }); r.oninput = () => { set(+r.value); v.textContent = fmt(+r.value); say(); }; r.addEventListener('keydown', (e) => e.stopPropagation()); return h('label', { class: 'sbk-slider' }, [h('span', { text: label }), r, v]); };
+    say();
+    box.append(h('h4', { text: 'Make it yours — key & tempo' }),
+      slider('Key', -12, 12, 1, shift.semis, (x) => (x > 0 ? '+' : '') + x + ' st', (x) => { shift.semis = x; }),
+      slider('Tempo', 0.5, 1.5, 0.01, shift.tempo, (x) => Math.round(x * 100) + '%', (x) => { shift.tempo = x; }),
+      h('div', { class: 'sbk-shift-row' }, [read,
+        h('button', { class: 'sbk-alt sm', text: 'Higher + slower', title: '+5 semitones, 85% speed', onclick: () => { shift.semis = 5; shift.tempo = 0.85; repaint(); } }),
+        h('button', { class: 'sbk-alt sm', text: 'Reset', onclick: () => { shift.semis = 0; shift.tempo = 1; repaint(); } })]));
+    return box;
   }
 
   // ---- 🎤 Her voice (3.41): the recordings songs with `voice` sing with — kept on this computer only
@@ -298,7 +316,7 @@
         const G = genreOf(s), lk = locked(s);
         const card = h('button', { class: 'sbk-card' + (s.id === selId ? ' sel' : '') + (lk ? ' locked' : ''), style: { '--acc': (G && G.accent) || '#ff2266' } }, [
           h('span', { class: 'sbk-ic', text: lk ? '🔒' : ((G && G.icon) || '💘') }), h('b', { text: s.title + (G && G.voice ? ' 🎤' : '') }), h('small', { text: (G ? G.label : s.genre) + ' · ' + (G ? G.bpm[0] + (G.bpm[1] !== G.bpm[0] ? '–' + G.bpm[1] : '') : s.bpm) + ' BPM' })]);
-        card.onclick = () => { selId = s.id; paint(); }; card.ondblclick = () => { if (write(s)) close(); };
+        card.onclick = () => { selId = s.id; paint(); }; card.ondblclick = () => { if (write(s, false, shift)) close(); };
         grid.appendChild(card);
       });
       const s = sel, G = genreOf(s), lk = locked(s);
@@ -307,13 +325,14 @@
         h('h4', { text: 'Listen for' }), h('p', { text: s.listen }),
         h('h4', { text: 'The drop' }), h('p', { text: s.drop }),
         h('h4', { text: 'Her voice clips' }), h('p', { text: s.voice }));
+      if (s.tools) detail.append(h('h4', { text: 'Tools it shows off' }), h('p', { text: s.tools }));
       if (G && G.voice && window.HerVoice) detail.append(voiceBox(h));
       if (window.Taste && s.genre && !s.recipe) { const v = window.Taste.get(s.genre); detail.append(h('h4', { text: 'Is this you?' }), h('div', { class: 'sbk-actions', style: { marginTop: '4px' } }, [['💜', 2, 'love it'], ['🙂', 1, 'okay'], ['🙅', -1, 'not me']].map(([t, val, tip]) => h('button', { class: 'sbk-alt' + (v === val ? ' on' : ''), style: { marginTop: 0 }, text: t, title: tip, onclick: () => { window.Taste.rate(s.genre, val); paint(); } })))); }
       if (lk) detail.append(h('p', { class: 'sbk-lock', text: '🔒 Finish the Learn lesson “' + ((window.Learn && window.Learn.title(s.lock)) || s.lock) + '” to open this one.' }),
         h('button', { class: 'sbk-go', text: '🧠 Go to that lesson', onclick: () => { close(); window.Learn && window.Learn.open(s.lock); } }));
-      else detail.append(h('div', { class: 'sbk-actions' }, [
-        h('button', { class: 'sbk-go', text: '▶ Write this song', title: 'replaces what is on the canvas (Ctrl+Z brings it back)', onclick: () => { if (write(s)) close(); } }),
-        s.recipe ? h('span') : h('button', { class: 'sbk-alt', text: '🎲 Another like it', onclick: () => { if (write(s, true)) close(); } })]),
+      else detail.append(shiftBox(h, s, paint), h('div', { class: 'sbk-actions' }, [
+        h('button', { class: 'sbk-go', text: '▶ Write this song', title: 'replaces what is on the canvas (Ctrl+Z brings it back)', onclick: () => { if (write(s, false, shift)) close(); } }),
+        s.recipe ? h('span') : h('button', { class: 'sbk-alt', text: '🎲 Another like it', onclick: () => { if (write(s, true, shift)) close(); } })]),
         h('p', { class: 'sbk-note', text: 'It replaces the canvas. Press Space to play. Every clip opens in the piano roll.' }));
     }
     async function paintMine() {

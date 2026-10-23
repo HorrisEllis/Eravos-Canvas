@@ -46,13 +46,32 @@ dependencies:
     - audio: Audio engine — processes sound
     - clock: Master clock & tempo — locks to the beat
     - key: Song key & scale — plays in key
-    - mod: 2 modulation inputs — LFO / XY / Macro can move them
+    - mod: 21 modulation inputs — LFO / XY / Macro can move them
   inputs:
     - dub.hook.audio_in (audio · port in)
     - dub.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
     - dub.hook.theory_in (theory:key-change) — ambient broadcast
     - dub.hook.mod_knob (modulation · port mod.bigKnob)
     - dub.hook.mod_sweep (modulation · port mod.echoSweep)
+    - knob.skankOn (modulation · port mod.knob.skankOn)
+    - knob.skankStyle (modulation · port mod.knob.skankStyle)
+    - knob.prog (modulation · port mod.knob.prog)
+    - knob.skankTone (modulation · port mod.knob.skankTone)
+    - knob.skankLevel (modulation · port mod.knob.skankLevel)
+    - knob.sirenPitch (modulation · port mod.knob.sirenPitch)
+    - knob.sirenRate (modulation · port mod.knob.sirenRate)
+    - knob.sirenDepth (modulation · port mod.knob.sirenDepth)
+    - knob.sirenShape (modulation · port mod.knob.sirenShape)
+    - knob.sirenRise (modulation · port mod.knob.sirenRise)
+    - knob.sirenLevel (modulation · port mod.knob.sirenLevel)
+    - knob.hornLevel (modulation · port mod.knob.hornLevel)
+    - knob.spring (modulation · port mod.knob.spring)
+    - knob.echo (modulation · port mod.knob.echo)
+    - knob.echoDiv (modulation · port mod.knob.echoDiv)
+    - knob.echoFeedback (modulation · port mod.knob.echoFeedback)
+    - knob.rewindLen (modulation · port mod.knob.rewindLen)
+    - knob.rewindRestart (modulation · port mod.knob.rewindRestart)
+    - knob.level (modulation · port mod.knob.level)
   outputs:
     - dub.hook.audio_out (audio · port out)
     - dub.hook.transport_out (ui:transport-stop|ui:transport-play|ui:transport-seek)
@@ -61,20 +80,3 @@ dependencies:
   notes:
     - Wire your riddim (drums, bass) into its input for the big knob, spring and echo.
     - Pull Up grabs the last seconds of everything you hear.
-
-# 3.48 MOTION (phase P48.4 · status mapped · specs/eravos.motion.spec) — "dub station … more dynamic"
-findings: 21 settings, 2 mod inputs (bigKnob, echoSweep); the classic dub moves — throws, feedback rides, siren bends —
-  are separate knob turns; no momentary controls.
-adds:
-  THROW: a momentary button + key (T) that sends the input to the echo at full while held and lets the tail ring — the
-    dub throw; `throw` is also an input (a sequencer/pad can fire it on a beat)
-  FEEDBACK RIDE: echoFeedback becomes an audio-rate bus with a safe ceiling (soft limiter in the loop, so riding past 1.0
-    swells into self-oscillation without blowing up)
-  macros: Big Knob = bigKnob sweep · Throw = echo send 0→1 + feedback 0.4→0.85 · Spring = spring 0→1 + its tone ·
-    Siren = sirenPitch + sirenRate
-  perform pad: X = Big Knob, Y = Throw, spring-back ON (let go = the knob returns, the tail rings) — the sound-system move
-  siren: pitch bend by the pad or a wheel, rise/fall shapes; the skank and siren take note velocity
-  new audio-rate buses: echoFeedback, spring, sirenPitch
-  every setting can carry motion (M1)
-acceptance: throw held 1 beat leaves an echo tail ≥ 3 repeats; feedback ridden to 1.2 for 2 s stays under −1 dBFS;
-  pad spring-back returns bigKnob to its base within 150 ms

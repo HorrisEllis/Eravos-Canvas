@@ -21,7 +21,8 @@
     ],
     "spec": "timeline.spec",
     "preview": "preview.png",
-    "tests": "timeline.test.js"
+    "tests": "timeline.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

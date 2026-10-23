@@ -18,7 +18,8 @@
     "css": "fx-glitch.ui.css",
     "spec": "fx-glitch.spec",
     "preview": "preview.png",
-    "tests": "fx-glitch.test.js"
+    "tests": "fx-glitch.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

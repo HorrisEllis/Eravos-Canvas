@@ -19,7 +19,8 @@
     "ui": "syn-osc.ui.js",
     "preview": "preview.png",
     "spec": "syn-osc.spec",
-    "tests": "syn-osc.test.js"
+    "tests": "syn-osc.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [

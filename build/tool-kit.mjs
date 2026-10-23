@@ -18,7 +18,7 @@ for (const d of fs.readdirSync(DOM)) { const t = path.join(DOM, d, 'tools'); if 
     for (const n of fs.readdirSync(cd)) { const td = path.join(cd, n), mj = path.join(td, 'tool.json'); if (fs.existsSync(mj)) folders.push({ dir: td, name: n, m: JSON.parse(fs.readFileSync(mj, 'utf8')) }); } } }
 
 const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
-const p = await b.newPage({ viewport: { width: 1500, height: 1200 }, deviceScaleFactor: 1 });
+const p = await b.newPage({ viewport: { width: 1500, height: 1200 }, deviceScaleFactor: 2 });   // 2×: card pictures stay sharp on hi-dpi screens
 const errs = []; p.on('pageerror', e => errs.push(e.message));
 await p.addInitScript(() => { window.ERAVOS_CATALOG_ALL = true; });   // P41 catalog: a fresh profile installs no tools — this script needs every one
 await p.goto('file://' + ROOT + '/canvas/index.html?noboot'); await p.waitForFunction(() => window.OrganismFactory && window.Shell && window.Shell.X, null, { timeout: 30000 });
@@ -73,12 +73,33 @@ TH.toolContract('${f.m.id}');
 `); nTests++;
   }
   f.m.files.tests = tf;
-  // 4. thumbnail
-  if (ALL_THUMBS || !f.m.files.preview || !fs.existsSync(path.join(f.dir, f.m.files.preview))) {
-    const inst = await p.evaluate((id) => { Shell.activate(); const dm = (OrganismFactory.def(id).domain); try { Shell.X.enterMode(Shell.X.modes().find(m => m.domain === dm).id); } catch (e) {} OrganismFactory.clearAll(Kernel); CanvasWM.view = { x: 0, y: 0, z: 1 }; CanvasWM.applyView(); return OrganismFactory.spawn(id, { x: 30, y: 20 }); }, f.m.id);
-    await p.waitForTimeout(600);
+  // 4. pictures: preview.png = the whole window (detail pane) · thumb.png = its main display cropped 16:10 (the ＋ Add card)
+  const needPreview = ALL_THUMBS || !f.m.files.preview || !/\.png$/.test(f.m.files.preview) || !fs.existsSync(path.join(f.dir, f.m.files.preview));
+  const needThumb = ALL_THUMBS || !f.m.files.thumb || !fs.existsSync(path.join(f.dir, f.m.files.thumb));
+  if (needPreview || needThumb) {
+    const inst = await p.evaluate((id) => { Shell.activate(); const dm = (OrganismFactory.def(id).domain); try { Shell.X.enterMode(Shell.X.modes().find(m => m.domain === dm).id); } catch (e) {} OrganismFactory.clearAll(Kernel); CanvasWM.view = { x: 0, y: 0, z: 1 }; CanvasWM.applyView(); const i = OrganismFactory.spawn(id, { x: 30, y: 20 }); try { Kernel.bus.publish('ui:audition:' + i, { note: 57, velocity: 0.9, duration: 1.5 }); } catch (e) {} return i; }, f.m.id);
+    await p.waitForTimeout(900);
     const el = inst && await p.$(`.wm-win[data-instance="${inst}"]`);
-    if (el) { await el.screenshot({ path: path.join(f.dir, 'preview.png') }); f.m.files.preview = 'preview.png'; nThumbs++; } else console.error('✗ no window to photograph: ' + f.m.id);
+    if (!el) console.error('✗ no window to photograph: ' + f.m.id);
+    else {
+      if (needPreview) { const old = f.m.files.preview; await el.screenshot({ path: path.join(f.dir, 'preview.png') }); if (old && old !== 'preview.png') fs.rmSync(path.join(f.dir, old), { force: true }); f.m.files.preview = 'preview.png'; nThumbs++; }
+      if (needThumb) {
+        // the hero: the biggest canvas in the window (orb, lattice, spectrum, grid…); none → the window body under its title bar
+        const box = await p.evaluate((i) => {
+          const w = document.querySelector(`.wm-win[data-instance="${i}"]`), wr = w.getBoundingClientRect();
+          let best = null; w.querySelectorAll('canvas').forEach(c => { const r = c.getBoundingClientRect(); if (r.width * r.height > (best ? best.width * best.height : 6000)) best = r; });
+          const head = w.querySelector('.wm-head, header'), top = head ? head.getBoundingClientRect().bottom : wr.top;
+          const r = best || { left: wr.left, top, width: wr.width, height: wr.bottom - top };
+          // grow to 16:10 around the hero, kept inside the window
+          let W = r.width, H = r.height; if (W / H > 1.6) H = W / 1.6; else W = H * 1.6;
+          W = Math.min(W, wr.width); H = Math.min(H, W / 1.6, wr.bottom - top); W = Math.min(W, H * 1.6);
+          const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+          const x = Math.max(wr.left, Math.min(wr.right - W, cx - W / 2)), y = Math.max(top, Math.min(wr.bottom - H, cy - H / 2));
+          return { x, y, width: W, height: H };
+        }, inst);
+        await p.screenshot({ path: path.join(f.dir, 'thumb.png'), clip: box }); f.m.files.thumb = 'thumb.png';
+      }
+    }
     await p.evaluate((i) => i && OrganismFactory.close(i), inst);
   }
   fs.writeFileSync(path.join(f.dir, 'tool.json'), JSON.stringify(f.m, null, 2) + '\n');

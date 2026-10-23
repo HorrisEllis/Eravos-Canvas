@@ -22,7 +22,8 @@
     "css": "image-adjust.css",
     "spec": "image-adjust.spec",
     "tests": "image-adjust.test.js",
-    "preview": "preview.png"
+    "preview": "preview.png",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [],

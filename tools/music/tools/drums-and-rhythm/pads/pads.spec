@@ -80,7 +80,7 @@ dependencies:
   services:
     - audio: Audio engine — makes sound
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 1 modulation input — LFO / XY / Macro can move them
+    - mod: 5 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
     - files: Your files — drop audio / MIDI on it
   inputs:
@@ -88,64 +88,13 @@ dependencies:
     - pads.hook.midi_in (midi:note) — ambient broadcast
     - pads.hook.seq_fire_in (seq:fire)
     - pads.hook.mod_level (modulation · port mod.level)
+    - knob.bank (modulation · port mod.knob.bank)
+    - knob.volume (modulation · port mod.knob.volume)
+    - knob.swingVel (modulation · port mod.knob.swingVel)
+    - knob.keymap (modulation · port mod.knob.keymap)
   outputs:
     - pads.hook.audio_out (audio · port out)
     - pads.hook.pad_trigger_out (pad:trigger)
     - pads.hook.bank_change_out (pad:bank-change)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe, filesystem_read]
-  works_with: [eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.sample-player, eravos.lyric-rhythm, eravos.ratio-lattice]
-
-# ============================================================
-# 3.0 — Drum Machine that sounds like many machines (P39 R1, order 2) · status BUILT 3.39 (partial — see BUILT/OPEN)
-# BUILT: 41 models over 13 voices (incl. classic) · pad keys model tone snap sweep body driveType (+ drive) · post stage
-#   (tilt EQ, 5 drive types incl. crush) · kit presets (extra.kit) · 38 kits in 8 packs (Bass Music, House, Techno & Hard,
-#   Breaks & Jungle, Trap/Phonk/Dancehall, Retro Machines, Cinematic & Lo-fi, Lost Love) · Sounds › Kits lists them from
-#   the same data · model picker auditions on pick · 7 tests (every model renders; models of a voice differ by a seeded,
-#   measured distance ≥ 0.35; classic byte-identical up to the voice's end; kit presets load & sound; kits differ).
-# OPEN: layer 2 per pad · round-robin · room send · key-tuned kick/808 · 200 single-pad sounds browser (needs the SOUND tab,
-#   specs/eravos.p39-sounds-in-settings.spec) · 40-kit target (38 shipped).
-# "with the drum machine, the presets are worthless, the pad sounds are absent beyond default."
-# ============================================================
-finding (pads.engine.js 2.0): 13 voices, ONE synthesis recipe each; a pad edits only tune/decay/level/pan/drive/choke; the
-  4 banks, the 4 bank presets and every kit in Sounds (Island, 80s, Street, Dark) are those same 13 recipes re-tuned → kits
-  cannot sound different, so presets feel worthless. The ceiling is the voice engine, not the data (P37 F3).
-engine 3.0:
-  MODELS per voice (each a different synthesis graph or partial set, not a re-tune):
-    kick   909 (sine + pitch env + clicky noise) · 808 boom (long sine, soft knee) · punch (tri body, short env, transient
-           click osc) · tearout (body → asym drive → bandpass "knock", tail gated) · thump (sub sine, no click, lo-fi) ·
-           hardstyle (pitch-env'd sine into hard clip + tonal tail at the song key) · techno rumble (kick + filtered reverb
-           tail, sidechained) · zap (fast exponential sweep 2 kHz → 40 Hz)
-    snare  909 (2 tri + noise) · 808 (tuned tri pair + bright noise) · trap crack (short noise, HP 2 kHz, tight) · dubstep
-           slam (layered body + white noise + room tail) · rim-shot (rim + body) · brush (filtered noise swells) ·
-           electro (noise through a resonant BP sweep) · lo-fi (bit-crushed, rolled-off)
-    clap   909 (4 bursts + tail) · 808 · stacked (2 claps detuned + room) · snap (single fast burst, finger-snap BP)
-    hat/oh 808 metal (6 squares, exists) · 909 (noise + metal ring) · trap tick (very short, HP 9 kHz) · shaker-hat ·
-           FM metal (inharmonic FM pair) · lo-fi
-    808    clean · distorted (asym + harmonics) · reese 808 (2 detuned saws LP'd under the sine) · slide (portamento across
-           notes, exists) · sub only
-    tom    floor · rack · electro (sine sweep) · conga · tabla-like (FM pitch bend)
-    crash/ride  crash · ride (bell partials) · china (detuned, gritty) · reverse swell (envelope reversed, ends on the beat)
-    perc   FM bell · wood (BP noise + short sine) · metal clang (inharmonic partials) · laser (sweep) · vocal chop slot (sample)
-    shaker · cowbell (808 / acoustic) · rim (808 / 909) · sample (exists)
-  per-pad SOUND DESIGN (new pad keys, all ranged, all savable): model · tone (brightness) · snap (transient level) ·
-    sweep (pitch-env amount, st) · sweepTime · body (fundamental vs noise balance) · drive + driveType (soft · hard · asym ·
-    fold · crush) · room (short ambience send) · layer2 {voice, model, level, tune} (one stacked layer per pad: clap on
-    snare, sub on kick) · round-robin (2–4 micro-variations of tone/tune so repeats breathe) · velocity → tone/decay.
-  KEY-TUNED: kick and 808 can follow the song key (root or chosen degree) — hardstyle and dubstep kicks sit in key.
-  compatibility: pads without `model` load as today's recipe (= model "classic"); every 2.0 save opens unchanged.
-packs 3.0:
-  KITS ≥ 40 (each kit = 16 pads that differ by MODEL, not tune), grouped: Bass music (Riddim, Brostep, Tearout, Colour Bass,
-  Melodic Dubstep) · House (Melodic — her song —, Progressive, Tech, Afro, UKG) · Techno (Hard, Rumble, Minimal) · Hard
-  (Hardstyle, Hardcore) · Breaks (Jungle, DnB, Breakbeat, Juke) · Urban (Trap, Phonk, Drill, Dancehall, Reggae One Drop) ·
-  Retro (808 Classic, 909 Classic, LinnDrum-style, 80s Gated, Synthwave) · Cinematic (Trailer hits, Ambient) · Lo-fi.
-  PAD SOUNDS ≥ 200 single-pad presets (browse by voice/model/genre in the SOUND tab, drag one onto any pad).
-  The 4 bank presets become 4 of the 40 kits; "— preset —" lists kits, never 2.0 re-tunes only.
-ui 3.0: pad panel gains a SOUND row: model picker (▶ each model on this pad) · tone · snap · sweep · body · drive type ·
-  room · layer 2 ; the 16-pad grid shows each pad's model as a small tag ; Keys/MIDI unchanged.
-acceptance 3.0:
-  - every model of every voice renders non-silent, peak ≤ −1 dBFS at vel 1, no NaN, unmount clean
-  - DIFFERENCE: for each voice, every pair of models differs by ≥ a threshold in rendered feature distance (spectral
-    centroid, decay time, crest factor, pitch track) — measured, so "kits sound the same" cannot come back
-  - kits: the median pairwise distance between 2 kits' kick+snare+hat renders ≥ threshold for ≥ 90 % of kit pairs
-  - a 2.0 project loads and sounds identical (byte-equal render) ; key-tuned kick lands on the key root ± 3 cents
-  - layer 2 + round-robin cost: 16 pads × 2 layers at 1/32 rolls stays under the P21 speed budget
+  works_with: [eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen, eravos.midi-mapper, eravos.sample-player]

@@ -32,13 +32,25 @@ dependencies:
   services:
     - audio: Audio engine — makes sound
     - clock: Master clock & tempo — locks to the beat
+    - mod: 11 modulation inputs — LFO / XY / Macro can move them
   inputs:
     - lat.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
+    - knob.baseHz (modulation · port mod.knob.baseHz)
+    - knob.primeZ (modulation · port mod.knob.primeZ)
+    - knob.layer (modulation · port mod.knob.layer)
+    - knob.timbre (modulation · port mod.knob.timbre)
+    - knob.fade (modulation · port mod.knob.fade)
+    - knob.level (modulation · port mod.knob.level)
+    - knob.drone (modulation · port mod.knob.drone)
+    - knob.arp (modulation · port mod.knob.arp)
+    - knob.arpDiv (modulation · port mod.knob.arpDiv)
+    - knob.arpOrder (modulation · port mod.knob.arpOrder)
+    - knob.noteDur (modulation · port mod.knob.noteDur)
   outputs:
     - lat.hook.audio_out (audio · port out)
     - lat.hook.note_out (note:trigger)
     - lat.hook.tuning_out (xen:tuning)
   permissions: [audio_out, bus_publish, bus_subscribe, registry_read]
-  works_with: [eravos.xen-synth, eravos.recursive-spectra, eravos.pads, eravos.embodiment-lab, eravos.coven, eravos.organ, eravos.retro-poly, eravos.bass-forge]
+  works_with: [eravos.xen-synth, eravos.recursive-spectra, eravos.pads, eravos.embodiment-lab, eravos.arp, eravos.coven, eravos.organ, eravos.retro-poly]
   notes:
     - Sends exact frequencies — Xen Synth plays them exactly; 12-TET instruments get the nearest key.

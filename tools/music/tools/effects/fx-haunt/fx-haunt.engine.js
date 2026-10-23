@@ -15,14 +15,14 @@
     needs: { works_with: ['eravos.coven', 'eravos.organ', 'eravos.sample-player', 'eravos.pad-forge'] },
     hooks: SDK.fxHooks([S.mod_in('haunt.hook.mod_warble', 'warble'), S.mod_in('haunt.hook.mod_ghost', 'ghost')]),
     config: [
-      { key: 'screw', type: 'number', default: 0, min: 0, max: 12, step: 0.1, unit: 'st', label: 'Screw', group: 'TIME' },
+      { key: 'screw', type: 'number', default: 0, min: 0, max: 24, step: 0.1, unit: 'st', label: 'Screw', group: 'TIME' },
       { key: 'warble', type: 'number', default: 0.3, min: 0, max: 1, step: 0.01, label: 'Warble', group: 'TIME' },
-      { key: 'wowRate', type: 'number', default: 0.55, min: 0.1, max: 3, step: 0.01, unit: 'Hz', label: 'Wow', group: 'TIME' },
+      { key: 'wowRate', type: 'number', default: 0.55, min: 0.02, max: 12, step: 0.01, unit: 'Hz', label: 'Wow', group: 'TIME' },
       { key: 'tone', type: 'enum', options: ['open', 'underwater', 'radio', 'telephone', 'séance'], default: 'open', label: 'Tone', group: 'COLOUR' },
       { key: 'crush', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Crush', group: 'COLOUR' },
       { key: 'vinyl', type: 'number', default: 0.2, min: 0, max: 1, step: 0.01, label: 'Vinyl', group: 'COLOUR' },
       { key: 'ghost', type: 'number', default: 0.3, min: 0, max: 1, step: 0.01, label: 'Ghost', group: 'GHOST', hint: 'reverse-swell reverb' },
-      { key: 'ghostLen', type: 'number', default: 2.2, min: 0.4, max: 6, step: 0.01, unit: 's', label: 'Ghost length', group: 'GHOST' },
+      { key: 'ghostLen', type: 'number', default: 2.2, min: 0.1, max: 12, step: 0.01, unit: 's', label: 'Ghost length', group: 'GHOST' },
     ].concat(SDK.STD_FX_CONFIG.map(c => c.key === 'mix' ? Object.assign({}, c, { default: 0.8 }) : c)),
     defaultPreset: 'Haunted Cassette',
     engine(ctx) {

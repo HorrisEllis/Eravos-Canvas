@@ -22,8 +22,8 @@
       { key: 'width', type: 'number', default: 0.7, min: 0, max: 1, step: 0.01, label: 'Width', group: 'STACK' },
       { key: 'octave', type: 'integer', default: 0, min: -4, max: 2, label: 'Octave', group: 'PITCH', hint: '0 = as before (a bass octave under the key you play); −1 / −2 = deeper, +1 / +2 = higher' },
       { key: 'transpose', type: 'number', default: 0, min: -36, max: 24, step: 0.1, unit: 'st', label: 'Pitch', group: 'PITCH', hint: 'tune the whole instrument up or down in semitones (−36 … +24, three octaves down) — turn it down when everything sounds too high; decimals detune between notes' },
-      { key: 'cutoff', type: 'number', default: 500, min: 40, max: 6000, step: 1, unit: 'Hz', label: 'Cutoff', group: 'FILTER' },
-      { key: 'res', type: 'number', default: 1.5, min: 0.5, max: 12, step: 0.1, label: 'Reso', group: 'FILTER' },
+      { key: 'cutoff', type: 'number', default: 500, min: 30, max: 16000, step: 1, unit: 'Hz', label: 'Cutoff', group: 'FILTER' },
+      { key: 'res', type: 'number', default: 1.5, min: 0.5, max: 20, step: 0.1, label: 'Reso', group: 'FILTER' },
       { key: 'envAmt', type: 'number', default: 1.5, min: 0, max: 4, step: 0.01, unit: 'oct', label: 'Env', group: 'FILTER' },
       { key: 'envDecay', type: 'number', default: 0.8, min: 0.05, max: 3, step: 0.01, unit: 's', label: 'Env decay', group: 'FILTER' },
       { key: 'drift', type: 'number', default: 0.3, min: 0, max: 1, step: 0.01, label: 'Drift', group: 'FILTER' },
@@ -39,9 +39,9 @@
       { key: 'sub', type: 'number', default: 0.5, min: 0, max: 1, step: 0.01, label: 'Sub', group: 'DRIVE+SUB' },
       { key: 'subOct', type: 'enum', options: ['0', '-1', '-2'], default: '-1', label: 'Sub oct', group: 'DRIVE+SUB', hint: 'the sub against the stack: −1 = an octave under (as before), −2 = two octaves (very deep), 0 = the same pitch' },
       { key: 'subWarm', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Sub harmonics', group: 'DRIVE+SUB', hint: 'adds overtones above the sub so a very deep note is still heard on laptop speakers, phones and headphones (needs Sub above 0)' },
-      { key: 'glide', type: 'number', default: 0.08, min: 0, max: 0.5, step: 0.001, unit: 's', label: 'Glide', group: 'DRIVE+SUB' },
-      { key: 'attack', type: 'number', default: 0.01, min: 0.001, max: 2, step: 0.001, unit: 's', label: 'Attack', group: 'DRIVE+SUB' },
-      { key: 'release', type: 'number', default: 0.3, min: 0.01, max: 4, step: 0.01, unit: 's', label: 'Release', group: 'DRIVE+SUB' },
+      { key: 'glide', type: 'number', default: 0.08, min: 0, max: 2, step: 0.001, unit: 's', label: 'Glide', group: 'DRIVE+SUB' },
+      { key: 'attack', type: 'number', default: 0.01, min: 0.001, max: 6, step: 0.001, unit: 's', label: 'Attack', group: 'DRIVE+SUB' },
+      { key: 'release', type: 'number', default: 0.3, min: 0.01, max: 10, step: 0.01, unit: 's', label: 'Release', group: 'DRIVE+SUB' },
     ],
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, dsp = ctx.dsp, MT = window.MusicTheory;

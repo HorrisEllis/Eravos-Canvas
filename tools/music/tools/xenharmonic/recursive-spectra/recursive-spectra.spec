@@ -39,7 +39,7 @@ dependencies:
     - audio: Audio engine — makes sound
     - clock: Master clock & tempo — locks to the beat
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 1 modulation input — LFO / XY / Macro can move them
+    - mod: 16 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - rec.hook.note_in (note:trigger)
@@ -47,11 +47,26 @@ dependencies:
     - rec.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
     - rec.hook.spectrum_in (xen:spectrum)
     - rec.hook.mod_level (modulation · port mod.level)
+    - knob.seed (modulation · port mod.knob.seed)
+    - knob.transform (modulation · port mod.knob.transform)
+    - knob.amount (modulation · port mod.knob.amount)
+    - knob.depth (modulation · port mod.knob.depth)
+    - knob.loop (modulation · port mod.knob.loop)
+    - knob.partials (modulation · port mod.knob.partials)
+    - knob.ceiling (modulation · port mod.knob.ceiling)
+    - knob.rate (modulation · port mod.knob.rate)
+    - knob.seconds (modulation · port mod.knob.seconds)
+    - knob.morph (modulation · port mod.knob.morph)
+    - knob.baseHz (modulation · port mod.knob.baseHz)
+    - knob.drone (modulation · port mod.knob.drone)
+    - knob.attack (modulation · port mod.knob.attack)
+    - knob.release (modulation · port mod.knob.release)
+    - knob.autoSend (modulation · port mod.knob.autoSend)
   outputs:
     - rec.hook.audio_out (audio · port out)
     - rec.hook.spectrum_out (xen:spectrum)
     - rec.hook.tuning_out (xen:tuning)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.harmonic-analyzer, eravos.xen-synth, eravos.fx-haunt, eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
+  works_with: [eravos.harmonic-analyzer, eravos.xen-synth, eravos.fx-haunt, eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen]
   notes:
     - Generations advance per bar while the transport plays, or every N seconds on their own.
