@@ -12,6 +12,7 @@
       velocity: { type: 'number', minimum: 0, maximum: 1 }, time: { type: 'number' },
       duration: { type: 'number', minimum: 0 }, accent: { type: 'boolean' }, slide: { type: 'boolean' },
       freq: { type: 'number', minimum: 0 }, // xen: an exact (often irrational) frequency; `note` stays the nearest 12-TET key
+      params: { type: 'object' },   // 3.53 per-note settings: { knob: value } for this note only (see ctx.onNote)
     },
   };
   const MIDI_SCHEMA = { type: 'object', required: ['note', 'velocity', 'on'], properties: { note: { type: 'integer', minimum: 0, maximum: 127 }, velocity: { type: 'number', minimum: 0, maximum: 1 }, on: { type: 'boolean' } } };
@@ -408,11 +409,27 @@ registerProcessor('eravos-pitch', EravosPitch);`;
       // P11.5 (gate P): a hard ceiling on simultaneous notes per tool — a runaway pattern can't swamp the audio thread.
       // Each tool still steals its own voices below this; this only stops pathological floods (counted, never silent).
       const NOTE_CEILING = 32; let sounding = []; ctx.notesDropped = 0;
+      // 3.53 PER-NOTE SETTINGS — a note may carry params { knob: value } (a Timeline note's own wobble, depth, cutoff …): the
+      // knob takes that value for the note as a LIVE value (params.live: never saved, never undoable, the window's knob shows
+      // it), then hands back to the knob's own setting when the note ends — unless a later note has taken the knob since.
+      // WHEN it switches: if nothing of this tool is sounding, at once (the note is scheduled up to 0.1 s ahead, into silence),
+      // so the voice is built with it; while an earlier note still sounds (legato, overlaps), at the note's start on the audio
+      // clock, so the earlier note is not changed early. A knob wired to a mover (LFO …) keeps following its mover.
+      const noteOwner = new Map(); let noteTok = 0;
+      function noteParams(p, t, end, quiet) {
+        const P = ctx.params; if (!P || !p.params || typeof p.params !== 'object') return;
+        const has = new Set(P.schema().map(c => c.key)), keys = Object.keys(p.params).filter(k => has.has(k)); if (!keys.length) return;
+        const tok = ++noteTok, take = () => keys.forEach(k => { P.live(k, p.params[k]); noteOwner.set(k, tok); });
+        if (quiet || t <= ac.currentTime + 0.002) take(); else ctx.atAudioTime(t, take);
+        ctx.atAudioTime(end, () => keys.forEach(k => { if (noteOwner.get(k) === tok) { noteOwner.delete(k); P.live(k, null); } }));
+      }
+      ctx.onSilence(() => { if (ctx.params) noteOwner.forEach((_, k) => ctx.params.live(k, null)); noteOwner.clear(); noteTok++; });
       ctx.onNote = (fn) => ctx.on('note:trigger', NOTE_SCHEMA, (p) => {
         if (!ctx.isTarget(p)) return;
         const t = typeof p.time === 'number' ? p.time : ac.currentTime, end = t + (typeof p.duration === 'number' ? p.duration : 1);
         sounding = sounding.filter(e => e > t);
         if (sounding.length >= NOTE_CEILING) { if (ctx.notesDropped++ % 64 === 0) K.fault('RUNTIME_005', { instance_id: ctx.id, message: `more than ${NOTE_CEILING} notes at once — extra notes skipped`, quiet: true }); return; }
+        if (p.params) noteParams(p, t, end, !sounding.length);
         sounding.push(end);
         // 3.39 delay compensation: a tool whose whole voice runs through an oversampled shaper is late by ctx.latency
         // seconds — its notes start that much earlier so the SOUND lands on the beat (clamped to now for live input)

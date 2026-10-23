@@ -92,16 +92,31 @@
       addLane('marker'); addLane('pattern'); addLane('audio'); addLane('audio');
 
       // ---- instruments + note clips (2.1)
+      // 3.53: each instrument lane's knobs (what a note can set for itself — the piano roll's expression lanes)
+      function knobsOf() {
+        const o = {};
+        lanes.forEach(l => { if (l.kind !== 'inst' || !l.target || o[l.target]) return; const r = K.registry.get(l.target); if (!r) return;
+          o[l.target] = (r.descriptor.config || []).filter(c => !c.hidden && !c.settingsOnly && (((c.type === 'number' || c.type === 'integer') && isFinite(c.min) && isFinite(c.max)) || (c.type === 'enum' && (c.options || []).length > 1)))
+            .map(c => ({ key: c.key, label: c.label || c.key, group: c.group || '', type: c.type, min: c.min, max: c.max, step: c.step, unit: c.unit || '', options: c.options, def: c.default })); });
+        return o;
+      }
       function instruments() {
         return K.registry.list().filter(r => r.instance_id !== ctx.id && isInstrument(r))
           .map(r => ({ value: r.instance_id, label: (r.descriptor.icon ? r.descriptor.icon + ' ' : '') + (r.descriptor.label || r.organism_id) + ' ·' + r.instance_id.split('-').slice(-1)[0], organism: r.organism_id }));
       }
       const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+      // 3.53 per-note settings: a note may carry p = { knob: value } — that tool's knob for this note only (numbers / strings,
+      // at most 16 keys); the tool checks the values against its own ranges when the note plays
+      function cleanP(p) {
+        if (!p || typeof p !== 'object') return null; const o = {};
+        Object.keys(p).slice(0, 16).forEach(k => { const v = p[k]; if (/^[A-Za-z][\w.]{0,40}$/.test(k) && ((typeof v === 'number' && isFinite(v)) || (typeof v === 'string' && v.length <= 40) || typeof v === 'boolean')) o[k] = v; });
+        return Object.keys(o).length ? o : null;
+      }
       function cleanNotes(arr, bars) {
         const max = bars * 16;
-        return (Array.isArray(arr) ? arr : []).map(n => ({ s: +n.s, l: +n.l, n: Math.round(+n.n), v: n.v === undefined ? 0.85 : +n.v }))
+        return (Array.isArray(arr) ? arr : []).map(n => ({ s: +n.s, l: +n.l, n: Math.round(+n.n), v: n.v === undefined ? 0.85 : +n.v, p: cleanP(n.p) }))
           .filter(n => isFinite(n.s) && isFinite(n.l) && isFinite(n.n) && isFinite(n.v) && n.s >= 0 && n.s < max)
-          .map(n => ({ s: Math.round(n.s * 192) / 192, l: clamp(Math.round(n.l * 192) / 192, 0.125, max - n.s), n: clamp(n.n, 0, 127), v: clamp(n.v, 0.05, 1) }))   // 3.48: 1/192 step — exact for 1/64 and every triplet; 1/128-note minimum
+          .map(n => Object.assign({ s: Math.round(n.s * 192) / 192, l: clamp(Math.round(n.l * 192) / 192, 0.125, max - n.s), n: clamp(n.n, 0, 127), v: clamp(n.v, 0.05, 1) }, n.p ? { p: n.p } : {}))   // 3.48: 1/192 step — exact for 1/64 and every triplet; 1/128-note minimum
           .sort((a, b) => a.s - b.s || a.n - b.n);
       }
       const snap16 = (b) => Math.max(1, 1 + Math.round((b - 1) * 16) / 16);
@@ -150,7 +165,7 @@
           c.notes.forEach(n => {
             if (Math.floor(n.s + 1e-9) !== local) return;
             const len = Math.min(n.l, c.bars * 16 - n.s);
-            ctx.emit('note:trigger', { target: lane.target, note: n.n, velocity: n.v, time: tk.time + (n.s - local) * sd, duration: len * sd * 0.98 });
+            ctx.emit('note:trigger', Object.assign({ target: lane.target, note: n.n, velocity: n.v, time: tk.time + (n.s - local) * sd, duration: len * sd * 0.98 }, n.p ? { params: n.p } : {}));
           });
         });
       }
@@ -252,7 +267,7 @@
         applyLanes();
         const peaks = {}; clips.forEach(c => { if (c.kind === 'audio' && peaksCache.has(c.assetHash)) peaks[c.assetHash] = peaksCache.get(c.assetHash); });
         const end = songEnd();
-        ctx.emitUI('arrangement_sync', { lanes, clips, markers, peaks, barSec: barSec(), songEnd: end, key: ctx.key, instruments: instruments(), drumNames: drumNamesLive(),
+        ctx.emitUI('arrangement_sync', { lanes, clips, markers, peaks, barSec: barSec(), songEnd: end, key: ctx.key, instruments: instruments(), drumNames: drumNamesLive(), knobs: knobsOf(),
           progressions: Object.keys(PROGRESSIONS).map(k => ({ value: k, label: PROGRESSIONS[k].label })), fillStyles: Object.keys(FILL_STYLES).map(k => ({ value: k, label: FILL_STYLES[k].label })), sequencers: K.registry.byOrganism('eravos.sequencer').map(r => ({ value: r.instance_id, label: '⬛ ' + r.instance_id.split('-').slice(-2).join('') })) });
         ctx.emit('timeline:song_length', { bars: Math.max(end, 1) });
       }
