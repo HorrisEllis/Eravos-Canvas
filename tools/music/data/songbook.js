@@ -180,6 +180,7 @@
     { id: 'goth', label: '🖤 Dark · Goth', ids: ['witch-house', 'hanging-tree'], re: /witch|goth|tree/ },
     { id: 'chill', label: '🌙 Chill · Ambient', ids: ['lofi', 'ambient'], re: /lofi|ambient|chill/ },
     { id: 'heavy', label: '💥 Heavy Drops', re: /^hd-/ },
+    { id: 'motion', label: '🪜 Arp & Motion', re: /^am-/ },   // 3.62: songs built from the Arp, curve lanes and repeating clips
     { id: 'synthesis', label: '🧬 Synthesis showcase', re: /^syn-/ },
     { id: 'her', label: '💜 For Her', re: /^her-/ },
     { id: 'lostlove', label: '🥀 Lost Love', re: /^ll-/ },
@@ -188,7 +189,7 @@
   ];
   function categoryOf(s) {
     const g = String((s && s.genre) || '');
-    return (CATS.find(c => (c.id === 'her' || c.id === 'lostlove' || c.id === 'odd' || c.id === 'synthesis' || c.id === 'heavy') && c.re.test(g))
+    return (CATS.find(c => (c.id === 'her' || c.id === 'lostlove' || c.id === 'odd' || c.id === 'synthesis' || c.id === 'heavy' || c.id === 'motion') && c.re.test(g))
       || CATS.find(c => (c.ids || []).includes(g)) || CATS.find(c => c.re.test(g)) || CATS[CATS.length - 1]).id;
   }
   const MOODS = [['mine', '📖 My songs'], ['foryou', '💜 For you'], ['all', 'Any mood'], ['edm', 'EDM'], ['her', 'For her'], ['heavy', 'Heavy'], ['dark', 'Dark'], ['goth', 'Goth'], ['80s', '80s'], ['island', 'Island'], ['warm', 'Warm'], ['party', 'Party'], ['calm', 'Calm'], ['fast', 'Fast']];

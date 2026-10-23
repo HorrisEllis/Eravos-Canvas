@@ -57,3 +57,62 @@ describe('Timeline usability (3.35)', () => {
     } finally { OrganismFactory.close(tl); }
   });
 });
+
+// 3.62 — "also the adjustment doesn't work" (2026-10-23): every edit came back as arrangement_sync and rebuilt the clip inspector,
+// so the knob or bars field under the pointer was thrown away after its first step (the browser drops the pointer capture of a
+// removed element: the drag ends). The inspector now keeps its controls while the same clip is selected.
+describe('Timeline inspector keeps its controls while you drag them (3.62)', () => {
+  function host() { const host = document.getElementById('wmhost'); if (!CanvasWM.world) { CanvasWM.init(host, Kernel); WireSystem.init(Kernel); OrganismFactory.boot(Kernel); } Kernel.audio.boot(); }
+  it('a pattern block’s bars: dragged 4 → 8 in two steps, the same field the whole way', async () => {
+    host(); const tl = OrganismFactory.spawn('eravos.timeline', { x: 10, y: 10 });
+    try {
+      await TH.sleep(30); const pub = (t, p) => Kernel.bus.publish('ui:' + t + ':' + tl, p), I = OrganismFactory.handle(tl).ctx.internals;
+      pub('lane_add', { kind: 'pattern' }); const lane = I.lanes.find(l => l.kind === 'pattern');
+      pub('clip_add', { kind: 'pattern', lane: lane.id, startBar: 2, bars: 4, slot: 'A' }); await TH.sleep(40);
+      const cv = CanvasWM.windowOf(tl).querySelector('canvas[aria-label^="arrangement"]'), li = I.lanes.indexOf(lane), cx = 64 + 40, ly = 26 + li * 48 + 24;
+      const r = cv.getBoundingClientRect(), s = r.width / cv.offsetWidth;
+      cv.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: r.left + cx * s, clientY: r.top + ly * s, pointerId: 12, button: 0, buttons: 1, pointerType: 'mouse' }));
+      cv.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX: r.left + cx * s, clientY: r.top + ly * s, pointerId: 12, button: 0, buttons: 0, pointerType: 'mouse' }));
+      const num = [...CanvasWM.windowOf(tl).querySelectorAll('.uk-num')].find(x => /bars/.test(x.textContent) && x.offsetParent);   // (the closed piano roll has a bars field too) assert.ok(num, 'the bars field is in the inspector');
+      const y0 = 300, ev = (t, y) => num.dispatchEvent(new PointerEvent(t, { bubbles: true, clientX: 10, clientY: y, pointerId: 13, button: 0, buttons: t === 'pointerup' ? 0 : 1, pointerType: 'mouse' }));
+      ev('pointerdown', y0); ev('pointermove', y0 - 8); await TH.sleep(20);
+      assert.equal(I.clips.find(c => c.lane === lane.id).bars, 6, 'first step'); assert.ok(num.isConnected, 'the field under the pointer is still the one on screen');
+      ev('pointermove', y0 - 16); ev('pointerup', y0 - 16); await TH.sleep(20);
+      assert.equal(I.clips.find(c => c.lane === lane.id).bars, 8, 'second step');
+    } finally { OrganismFactory.close(tl); }
+  });
+  it('⛶ the whole timeline over the page: tracks, toolbar and clicks still land; Esc puts it back in its window', async () => {
+    host(); const z0 = Object.assign({}, CanvasWM.view); const tl = OrganismFactory.spawn('eravos.timeline', { x: 10, y: 10 });
+    try {
+      await TH.sleep(30); CanvasWM.view = { x: 0, y: 0, z: 0.6 }; CanvasWM.applyView();
+      const root = OrganismFactory.handle(tl).view.root, home = root.parentNode;
+      const btn = [...root.querySelectorAll('button')].find(b => b.textContent === '⛶'); assert.ok(btn, 'a ⛶ in the timeline toolbar'); btn.click(); await TH.sleep(40);
+      assert.equal(root.parentNode, document.body, 'moved out of the zoomed canvas'); const rc = root.getBoundingClientRect(); assert.near(rc.width, innerWidth, 2); assert.near(rc.height, innerHeight, 2);
+      const pub = (t, p) => Kernel.bus.publish('ui:' + t + ':' + tl, p), I = OrganismFactory.handle(tl).ctx.internals;
+      pub('lane_add', { kind: 'pattern' }); const lane = I.lanes.find(l => l.kind === 'pattern'); pub('clip_add', { kind: 'pattern', lane: lane.id, startBar: 2, bars: 2, slot: 'A' }); await TH.sleep(40);
+      const cv = root.querySelector('canvas[aria-label^="arrangement"]'), li = I.lanes.indexOf(lane), r = cv.getBoundingClientRect(), s = r.width / cv.offsetWidth, ppb = OrganismFactory.handle(tl).ctx.params.get('pxPerBar');
+      const X = r.left + (ppb + 20) * s, Y = r.top + (26 + li * 48 + 24) * s;
+      cv.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: X, clientY: Y, pointerId: 14, button: 0, buttons: 1, pointerType: 'mouse' }));
+      assert.equal(cv._state().sel, I.clips[0].id, 'a click in full screen lands on the clip'); cv.dispatchEvent(new PointerEvent('lostpointercapture', { bubbles: true, pointerId: 14 }));
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await TH.sleep(20);
+      assert.equal(root.parentNode, home, 'Esc: back in its window'); assert.ok(!root.classList.contains('tl-full'));
+    } finally { const v = OrganismFactory.handle(tl) && OrganismFactory.handle(tl).view; if (v && v.full) v.setFull(false); CanvasWM.view = z0; CanvasWM.applyView(); OrganismFactory.close(tl); }
+  });
+  it('✂ in an instrument lane’s header and ⟳ Repeat every in a note clip’s inspector do what they say', async () => {
+    host(); const tl = OrganismFactory.spawn('eravos.timeline', { x: 10, y: 10 }), syn = OrganismFactory.spawn('eravos.supersaw', { x: 900, y: 10 });
+    try {
+      await TH.sleep(30); const pub = (t, p) => Kernel.bus.publish('ui:' + t + ':' + tl, p), I = OrganismFactory.handle(tl).ctx.internals, root = OrganismFactory.handle(tl).view.root;
+      pub('lane_add', { kind: 'inst', target: syn, name: 'Keys' }); pub('clip_add', { kind: 'notes', target: syn, startBar: 1, bars: 2, notes: [{ s: 0, l: 4, n: 36, v: 1 }, { s: 0, l: 8, n: 64, v: 0.8 }] }); await TH.sleep(40);
+      const sp = root.querySelector('select[aria-label="Split this lane"]'); assert.ok(sp, 'a ✂ on the lane');
+      sp.value = 'pitch'; sp.dispatchEvent(new Event('change')); await TH.sleep(20);
+      assert.deepEqual(I.lanes.filter(l => l.kind === 'inst').map(l => l.name), ['Keys', 'Keys · from E4']);
+      const cv = root.querySelector('canvas[aria-label^="arrangement"]'), c = I.clips.find(x => x.lane === I.lanes.find(l => l.name === 'Keys').id), li = I.lanes.findIndex(l => l.id === c.lane);
+      const r = cv.getBoundingClientRect(), s = r.width / cv.offsetWidth;
+      cv.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: r.left + 20 * s, clientY: r.top + (26 + li * 48 + 24) * s, pointerId: 15, button: 0, buttons: 1, pointerType: 'mouse' }));
+      cv.dispatchEvent(new PointerEvent('lostpointercapture', { bubbles: true, pointerId: 15 })); await TH.sleep(20);
+      const rep = [...root.querySelectorAll('select')].find(x => x.offsetParent && [...x.options].some(o => o.text === '½ bar')); assert.ok(rep, 'a Repeat every choice in the inspector');
+      rep.value = '16'; rep.dispatchEvent(new Event('change')); await TH.sleep(20);
+      assert.equal(I.clips.find(x => x.id === c.id).loop, 16, 'repeats every bar');
+    } finally { OrganismFactory.close(tl); OrganismFactory.close(syn); }
+  });
+});

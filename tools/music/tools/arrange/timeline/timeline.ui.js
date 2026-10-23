@@ -2,7 +2,7 @@
  * instrument tracks (＋ Track spawns an instrument + lane + first clip) and the piano roll (timeline.pianoroll.js) */
 OrganismFactory.reg('eravos.timeline', function (view) {
   const UI = view.ui, h = UI.h;
-  const RULER = 26, HEAD_W = 232;   // room for the name, M · S, the instrument and the 〰 curve picker
+  const RULER = 26, HEAD_W = 268;   // room for the name, M · S, the instrument, the 〰 curve picker and ✂ (3.62)
   const laneH = () => Math.max(28, Math.min(160, view.state.laneH || 48));
   let A = null, sel = null, playBar = null, drag = null, hover = null, pendingSel = null, headSig = '';
   const laneKindFor = (c) => c.kind === 'audio' ? 'audio' : c.kind === 'notes' ? 'inst' : 'pattern';
@@ -63,10 +63,26 @@ OrganismFactory.reg('eravos.timeline', function (view) {
   });
   split.addEventListener('dblclick', () => setRollH(((view.root.clientHeight || 600) - 80) / 2));
   view.root.style.display = 'flex'; view.root.style.flexDirection = 'column';
+  // 3.62 ⛶ THE WHOLE TIMELINE FULL SCREEN — tracks, curve lanes, transport, the clip inspector and the piano roll over the page (the roll's
+  // own ⛶ shows only the notes). Same move as the roll's (3.53): the timeline lives inside the CSS-transformed canvas, so it is MOVED onto
+  // the page and back to the same spot; every hit test maps through the live rect. ⛶ again or Esc.
+  let tlFull = null;
+  const fullT = UI.Button({ label: '⛶', hint: 'the whole timeline full screen — tracks, curves, piano roll (⛶ again or Esc)', onClick: () => setTlFull(!tlFull) });
+  function tlKey(e) { if (e.key !== 'Escape' || !tlFull || roll.full || oscP || document.querySelector('.uk-ask-back')) return; e.preventDefault(); e.stopPropagation(); setTlFull(false); }
+  function setTlFull(on) {
+    if (!!on === !!tlFull) return;
+    const el = view.root;
+    if (on) { tlFull = { parent: el.parentNode, next: el.nextSibling }; document.body.appendChild(el); el.classList.add('tl-full'); document.addEventListener('keydown', tlKey, true); }
+    else { const f = tlFull; tlFull = null; el.classList.remove('tl-full'); document.removeEventListener('keydown', tlKey, true); if (f.parent) f.parent.insertBefore(el, f.next && f.next.parentNode === f.parent ? f.next : null); }
+    fullT.el.classList.toggle('on', !!tlFull); fullT.el.title = tlFull ? 'back to the canvas (Esc)' : 'the whole timeline full screen — tracks, curves, piano roll (⛶ again or Esc)';
+    requestAnimationFrame(() => { headSig = ''; if (A) { drawHeads(); draw(); } cv.focus({ preventScroll: true }); });
+  }
+  view.setFull = setTlFull; Object.defineProperty(view, 'full', { get: () => !!tlFull, configurable: true });
+  view.onDispose && view.onDispose(() => { if (tlFull) setTlFull(false); });
   // 3.53 record what you play: while this is on and the song plays, any knob you turn on a track's tool is written into its
   // own automation lane (a lane is made for it the first time)
   const recK = UI.Toggle({ label: '⏺ knobs', hint: 'record what you play — while the song plays, every knob you turn on a track’s tool is written into an automation lane', onChange: (v) => view.emit('rec_knobs', { on: v }) });
-  view.root.append(h('div', { class: 'org-row', style: { flexWrap: 'wrap' } }, [UI.presetBar(view), restart.el, play.el, pos, addT.el, recK.el, snap.el, zoom.el, h('span', { class: 'org-label', text: 'lanes' }), laneDn.el, laneUp.el, fitB.el, loop.el, addL.el, expM.el, expSt]), body, split, roll.el, insp,
+  view.root.append(h('div', { class: 'org-row', style: { flexWrap: 'wrap' } }, [UI.presetBar(view), restart.el, play.el, pos, addT.el, recK.el, snap.el, zoom.el, h('span', { class: 'org-label', text: 'lanes' }), laneDn.el, laneUp.el, fitB.el, fullT.el, loop.el, addL.el, expM.el, expSt]), body, split, roll.el, insp,
     UI.hint('＋ Track adds an instrument with a clip · dbl-click an instrument lane for a new clip, click a clip to open its piano roll · drop audio onto a lane · drag clips (alt = copy) · drag edges to trim · dbl-click a pattern lane for a pattern block · click the ruler to jump, drag it to loop · ⏮ / Home restart · S split · Del delete · wheel / Shift+wheel scroll, Ctrl+wheel zooms · + / − zoom · F fit · ⤢ fills the screen (Esc back)'));
   const ppb = () => view.state.pxPerBar || 64;
   const xOf = (bar) => (bar - 1) * ppb();
@@ -171,13 +187,19 @@ OrganismFactory.reg('eravos.timeline', function (view) {
           g.fillStyle = lane.color;
           // 3.58 a bent note is drawn bent: a strip along its pitch curve (smooth shape, from → to, starting where its bend starts)
           const th = Math.max(1.5, ih / span), sm = (x) => x * x * (3 - 2 * x), yAt = (n, st) => r.y + 13 + (hi - n.n - st) / span * ih + th / 2;
-          ns.forEach(n => {
+          // 3.62 a repeating clip draws its pattern in every repeat — the first one solid, the repeats faded (they follow the first)
+          const L = c.loop || 0, reps = L ? Math.ceil(c.bars * 16 / L) : 1, max = c.bars * 16;
+          for (let k = 0; k < reps; k++) { g.globalAlpha = k ? 0.45 : 1; ns.forEach(n0 => {
+            if (L && (n0.s >= L || k * L + n0.s >= max)) return;
+            const n = L ? Object.assign({}, n0, { s: k * L + n0.s, l: Math.min(n0.l, L - n0.s, max - k * L - n0.s) }) : n0;
             const x0 = r.x + n.s * per, w = Math.max(1.5, n.l * per - 1);
             if (!n.b) { g.fillRect(x0, r.y + 13 + (hi - n.n) / span * ih, w, th); return; }
             g.save(); g.beginPath(); g.rect(r.x, r.y, r.w, r.h); g.clip(); g.strokeStyle = lane.color; g.lineWidth = th; g.lineCap = 'butt'; g.beginPath();
             const at = n.b.at || 0; for (let k = 0; k <= 16; k++) { const f = k / 16, kk = f <= at ? 0 : (n.b.shape === 'linear' ? (f - at) / (1 - at) : sm((f - at) / (1 - at))), yy = yAt(n, n.b.from + (n.b.to - n.b.from) * kk); k ? g.lineTo(x0 + w * f, yy) : g.moveTo(x0, yy); }
             g.stroke(); g.restore();
-          });
+          }); }
+          g.globalAlpha = 1;
+          if (L) { g.fillStyle = '#fff'; for (let k = 1; k * L < max; k++) { const lx = r.x + k * L * per; g.fillRect(lx, r.y + 2, 2, r.h - 4); g.beginPath(); g.moveTo(lx + 2, r.y + 2); g.lineTo(lx + 8, r.y + 2); g.lineTo(lx + 2, r.y + 8); g.fill(); } }
         }
         for (let b = 1; b < c.bars; b++) { g.fillStyle = lane.color + '55'; g.fillRect(r.x + b * pb, r.y + 2, 1, r.h - 4); }
         g.fillStyle = '#fff'; g.font = '10px sans-serif'; g.fillText((ns.length ? '' : '＋ ') + (c.name || 'clip').slice(0, Math.max(3, Math.floor(r.w / 6))), r.x + 4, r.y + 11);
@@ -207,11 +229,18 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     const ss = UI.Select({ label: 'Shape', options: ['sine', 'triangle', 'saw', 'square', 'random'].map(v => ({ value: v, label: v })), value: o.shape, onChange: (v) => send({ shape: v }) });
     const off = UI.Button({ label: 'Off', onClick: () => { view.emit('lane_edit', { id: l.id, patch: { osc: null } }); oscP.remove(); oscP = null; } });
     const close = UI.Button({ label: '✓', onClick: () => { oscP.remove(); oscP = null; } });
-    oscP = h('div', { class: 'tl-oscp', style: { position: 'fixed', left: Math.round(r.right + 6) + 'px', top: Math.round(r.top - 8) + 'px', zIndex: 100000, background: '#0d1520', border: '1px solid #7cf7ff', borderRadius: '8px', padding: '8px', display: 'flex', gap: '8px', alignItems: 'flex-end', boxShadow: '0 8px 24px rgba(0,0,0,.5)' } },
+    oscP = h('div', { class: 'tl-oscp', style: { position: 'fixed', left: Math.round(r.right + 6) + 'px', top: Math.round(r.top - 8) + 'px', zIndex: 160000, background: '#0d1520', border: '1px solid #7cf7ff', borderRadius: '8px', padding: '8px', display: 'flex', gap: '8px', alignItems: 'flex-end', boxShadow: '0 8px 24px rgba(0,0,0,.5)' } },
       [h('b', { text: '∿ ' + k.label, style: { color: '#7cf7ff', font: '600 11px var(--font)', alignSelf: 'center' } }), rs.el, dk.el, ss.el, off.el, close.el]);
     ['pointerdown', 'keydown', 'wheel'].forEach(t => oscP.addEventListener(t, (e) => e.stopPropagation()));
     document.body.appendChild(oscP); if (!l.osc) send({});
   }
+  // "C3", "f#4", "Bb2" or a MIDI number → MIDI (C4 = 60), else null
+  function noteNum(t) {
+    t = String(t || '').trim(); if (/^\d+$/.test(t)) return Math.max(0, Math.min(127, +t));
+    const m = /^([a-g])([#b]?)(-?\d)$/i.exec(t); if (!m) return null;
+    return Math.max(0, Math.min(127, { c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11 }[m[1].toLowerCase()] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0) + 12 * (+m[3] + 1)));
+  }
+  view.noteNum = noteNum;
   function drawHeads() {
     heads.innerHTML = '';
     A.lanes.forEach((l) => {
@@ -238,6 +267,14 @@ OrganismFactory.reg('eravos.timeline', function (view) {
           au.addEventListener('change', () => { if (au.value) view.emit('lane_add', { kind: 'auto', target: l.target, key: au.value }); au.value = ''; });
           au.addEventListener('pointerdown', (e) => e.stopPropagation()); row.append(au);
         }
+        // 3.62 ✂ split the lane ("adding a way to split the lanes"): drums one lane per pad, or low / high notes on lanes of their own
+        const drumsHere = !!(A.drumNames && A.drumNames[l.target] && A.drumNames[l.target].length);
+        const sp = h('select', { class: 'uk-select', 'aria-label': 'Split this lane', title: 'split this lane into several — each can then play its own tool, be muted, soloed or given its own curves', style: { width: '38px', fontSize: '10px', padding: '0 2px' } },
+          [h('option', { value: '', text: '✂' })].concat(drumsHere ? [h('option', { value: 'pad', text: '✂ one lane per drum pad' })] : [], [h('option', { value: 'pitch', text: '✂ low / high notes (where they part)' }), h('option', { value: 'at', text: '✂ at a note… (e.g. C3)' })]));
+        sp.addEventListener('change', () => { const v = sp.value; sp.value = ''; if (!v) return;
+          if (v !== 'at') return view.emit('lane_split', { id: l.id, by: v });
+          UI.ask('Split at which note? Notes from here up get their own lane (e.g. C3, F#4 or 48)', 'C3').then((t) => { const n = noteNum(t); if (n !== null) view.emit('lane_split', { id: l.id, by: 'pitch', at: n }); }); });
+        sp.addEventListener('pointerdown', (e) => e.stopPropagation()); row.append(sp);
       }
       if (l.kind === 'auto') {
         const k = knobOf(l); nm.title = (k ? k.label : l.key) + ' of ' + l.target + ' — click the lane to add points, drag them, right-click removes';
@@ -246,29 +283,44 @@ OrganismFactory.reg('eravos.timeline', function (view) {
           ob.addEventListener('click', (e) => { e.stopPropagation(); oscPanel(l, k, ob); }); row.append(ob); }
       }
       row.append(x);
+      // 3.62: an instrument lane carries M · S · tool · curve · ✂ — with room (lanes ≥ 40 px) its name gets a line of its own above them
+      if (l.kind === 'inst' && laneH() >= 40) { row.style.flexWrap = 'wrap'; row.style.alignContent = 'center'; row.style.rowGap = '2px'; nm.style.flex = '1 0 100%'; }
       heads.appendChild(row);
     });
   }
+  // 3.62 ("the adjustment doesn't work"): every edit comes back as arrangement_sync — rebuilding here threw away the knob / bars field
+  // under the pointer after its first step. Same clip, same kind of controls: the controls stay and only take the new values.
+  let inspSig = '', inspSet = [];
   function drawInsp() {
-    insp.innerHTML = '';
     const c = A && A.clips.find(x => x.id === sel);
+    const sig = c ? [c.id, c.kind, c.name, c.kind === 'notes' ? (c.notes || []).length : '', c.kind === 'audio' ? c.lengthSec : '', c.kind === 'pattern' ? (A.sequencers || []).map(s => s.value).join() : ''].join('|') : '';
+    if (c && sig === inspSig) { inspSet.forEach(f => f(c)); return; }
+    inspSig = sig; inspSet = []; insp.innerHTML = '';
     if (!c) return;
+    const live = (ctl, get) => { inspSet.push((cc) => { if (ctl.set && !ctl.el.matches(':active') && !ctl.el.contains(document.activeElement)) ctl.set(get(cc)); }); return ctl.el; };
     const e = (patch) => view.emit('clip_edit', { id: c.id, patch });
     if (c.kind === 'notes') {
+      // 3.62 Repeat every: the clip plays its first N bars again and again across its length — stretch it and the pattern keeps going
+      const LOOPS = [{ value: '0', label: 'off' }, { value: '4', label: '1 beat' }, { value: '8', label: '½ bar' }, { value: '16', label: '1 bar' }, { value: '32', label: '2 bars' }, { value: '64', label: '4 bars' }, { value: '128', label: '8 bars' }];
       insp.append(h('span', { class: 'org-label', text: '🎹 ' + (c.name || 'clip') + ' · ' + (c.notes || []).length + ' notes' }),
-        UI.Button({ label: 'Rename', onClick: () => UI.ask('Clip name', c.name || '').then((n) => { if (n) e({ name: n }); }) }).el);
+        UI.Button({ label: 'Rename', onClick: () => UI.ask('Clip name', c.name || '').then((n) => { if (n) e({ name: n }); }) }).el,
+        live(UI.Select({ label: '⟳ Repeat every', hint: 'the clip plays its first bars again and again across its length — stretch the clip (drag its right edge) and the pattern keeps going; edit the first bars and every repeat follows', options: LOOPS, value: String(c.loop || 0), onChange: (v) => e(+v && c.bars * 16 <= +v ? { loop: +v, bars: Math.max(c.bars, (+v / 16) * 4) } : { loop: +v }) }), cc => String(cc.loop || 0)));
     } else if (c.kind === 'audio') {
       insp.append(h('span', { class: 'org-label', text: '♫ ' + c.name }),
-        UI.Knob({ label: 'Gain', min: 0, max: 2, step: 0.01, value: c.gain, default: 1, size: 26, onChange: (v) => e({ gain: v }) }).el,
-        UI.Knob({ label: 'Fade in', min: 0, max: Math.min(8, c.lengthSec), step: 0.01, unit: 's', value: c.fadeIn, default: 0, size: 26, onChange: (v) => e({ fadeIn: v }) }).el,
-        UI.Knob({ label: 'Fade out', min: 0, max: Math.min(8, c.lengthSec), step: 0.01, unit: 's', value: c.fadeOut, default: 0, size: 26, onChange: (v) => e({ fadeOut: v }) }).el,
-        UI.Toggle({ label: 'Loop', value: c.loop, onChange: (v) => e({ loop: v }) }).el);
+        live(UI.Knob({ label: 'Gain', min: 0, max: 2, step: 0.01, value: c.gain, default: 1, size: 26, onChange: (v) => e({ gain: v }) }), cc => cc.gain),
+        live(UI.Knob({ label: 'Fade in', min: 0, max: Math.min(8, c.lengthSec), step: 0.01, unit: 's', value: c.fadeIn, default: 0, size: 26, onChange: (v) => e({ fadeIn: v }) }), cc => cc.fadeIn),
+        live(UI.Knob({ label: 'Fade out', min: 0, max: Math.min(8, c.lengthSec), step: 0.01, unit: 's', value: c.fadeOut, default: 0, size: 26, onChange: (v) => e({ fadeOut: v }) }), cc => cc.fadeOut),
+        live(UI.Toggle({ label: 'Loop', value: c.loop, onChange: (v) => e({ loop: v }) }), cc => !!cc.loop));
     } else {
       insp.append(h('span', { class: 'org-label', text: '▦ pattern block' }),
-        UI.Select({ label: 'Slot', options: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'], value: c.slot, onChange: (v) => e({ slot: v }) }).el,
-        UI.Select({ label: 'Sequencer', options: [{ value: '', label: '—' }].concat(A.sequencers), value: c.target || '', onChange: (v) => e({ target: v || null }) }).el,
-        UI.NumberDrag({ label: 'bars', min: 1, max: 128, step: 1, value: c.bars, suffix: ' bars', onChange: (v) => e({ bars: v }) }).el);
+        live(UI.Select({ label: 'Slot', options: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'], value: c.slot, onChange: (v) => e({ slot: v }) }), cc => cc.slot),
+        live(UI.Select({ label: 'Sequencer', options: [{ value: '', label: '—' }].concat(A.sequencers), value: c.target || '', onChange: (v) => e({ target: v || null }) }), cc => cc.target || ''),
+        live(UI.NumberDrag({ label: 'bars', min: 1, max: 128, step: 1, value: c.bars, suffix: ' bars', onChange: (v) => e({ bars: v }) }), cc => cc.bars));
     }
+    const repSel = UI.Select({ options: [{ value: '', label: '⧉ Repeat ×…' }, { value: '1', label: '×1 (duplicate)' }, { value: '3', label: '×3 (to 4 in a row)' }, { value: '7', label: '×7 (to 8 in a row)' }, { value: '15', label: '×15 (to 16 in a row)' }],
+      onChange: (v) => { setTimeout(() => repSel.set(''), 50); if (+v) view.emit('clip_repeat', { id: c.id, times: +v }); } });
+    repSel.el.title = 'copies laid end to end after this clip — each its own clip (to keep them in step, use ⟳ Repeat every instead)';
+    insp.append(repSel.el);
     insp.append(UI.Button({ label: 'Split at playhead', onClick: () => playBar && view.emit('clip_split', { id: c.id, bar: playBar }) }).el, UI.Button({ label: 'Duplicate', onClick: () => view.emit('clip_duplicate', { id: c.id }) }).el, UI.Button({ label: 'Delete', kind: 'danger', onClick: () => { view.emit('clip_remove', { id: c.id }); sel = null; } }).el);
   }
   view.on('auto_live', (p) => { const l = A && A.lanes.find(x => x.id === p.id); if (l) { l.points = p.points; draw(); } });
@@ -280,7 +332,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     if (pendingSel) { const ln = a.lanes.find(l => l.target === pendingSel.target || l.id === pendingSel.lane); const c = ln && a.clips.find(x => x.lane === ln.id && x.kind === 'notes' && Math.abs(x.startBar - pendingSel.startBar) < 1e-6); if (c) { sel = c.id; pendingSel = null; } }
     if (sel && !a.clips.some(c => c.id === sel)) sel = null;
     // 3.34: lane heads are rebuilt only when what they show changes — a gain knob is not destroyed by its own drag
-    const sig = JSON.stringify([a.lanes.map(l => [l.id, l.kind, l.name, l.color, l.mute, l.solo, l.armed, l.target, l.rec, l.key]), (a.instruments || []).map(o => o.value + o.label), Object.keys(a.knobs || {}).map(t => t + (a.knobs[t] || []).length), laneH()]);
+    const sig = JSON.stringify([a.lanes.map(l => [l.id, l.kind, l.name, l.color, l.mute, l.solo, l.armed, l.target, l.rec, l.key]), (a.instruments || []).map(o => o.value + o.label), Object.keys(a.knobs || {}).map(t => t + (a.knobs[t] || []).length), Object.keys(a.drumNames || {}), laneH()]);
     if (recK.set) recK.set(!!a.recKnobs);
     if (sig !== headSig) { headSig = sig; drawHeads(); }
     drawInsp(); syncRoll(); draw();

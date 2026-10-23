@@ -2,6 +2,50 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.62 The adjustment works · sleep · repeat · split lanes · the whole timeline full screen · Arp & Motion songs (2026-10-23)
+His words: "can you optimize performance? also what do you think? especially about the timeline additions?" · "also the adjustment doesn't
+work. also adding a way to split the lanes. make it easier to repeat patterns, control a in full screen, add songs that use the automation,
+arp, etc" · "make sure your on the mian branch". Map: specs/eravos.phase62-map.spec (readings R1–R5, the ones to confirm marked).
+- **The adjustment** (two bugs, each reproduced by a test before the fix):
+  - Note knobs edited the wrong note. Turn a note's Start or Pitch past its neighbour, then any knob: the neighbour was overwritten (one note
+    doubled, one lost). The roll held the note by its position, and the engine re-sorts notes on every save.
+  - The clip inspector's knobs and bars field were rebuilt after their first step, so the drag stopped.
+  - Also: the rename / "split at" dialog and the knob menu opened BEHIND the piano roll's full screen. They are on top now.
+- **Performance, measured** (specs/eravos.performance.spec addendum; `node build/perf-idle.mjs`):
+  - A silent tool kept costing: Gothic Organ 18.8 % of a core while playing nothing, Pad Forge 15.3 %, Wobble Bass 5.8 %; all 24
+    instruments 61.7 %. Unplugged: ≈ 0.
+  - Now those three **sleep** after their whole tail, and any note wakes them before it sounds (tests/p62-sleep.test.js: the note after
+    sleep is within 3 dB of the first). A whole song: 6–14 % less.
+  - My first guess (stolen voices left connected) was measured and was WRONG. Nothing was shipped for it.
+- **Repeat patterns**: ⟳ Repeat every (1 beat … 8 bars) on a note clip. Stretch the clip and the pattern keeps going; edit the first bars
+  and every repeat follows. ⧉ Repeat ×… lays copies end to end. MIDI export and Split write the repeats out.
+- **Split lanes**: ✂ in an instrument lane's header: one lane per drum pad, low / high notes (where they part), or at a note you name.
+  The new lanes play the same tool until you pick another.
+- **⛶ the whole timeline full screen**: tracks, curve lanes, transport, inspector and piano roll. Esc to leave. (The roll's own ⛶ shows
+  only the notes.)
+- **🪜 Arp & Motion songbook** (6 songs, Songs → 🪜 Arp & Motion):
+  - The Arp plays a pluck. Its chords repeat (one turn written).
+  - Curve lanes climb through every build: Arp octaves 1 → 3, gate staccato → legato, rate 1/8 → 1/16, the pluck's filter opens, the
+    pad bends up an octave into the drop.
+  - The lead glides in and blooms a vibrato.
+- Tests: full suite 1129/1132 → the 3 failures fixed (2 were mine: a CSS comment naming a domain word, and a preset check that did not
+  allow a part with no preset), plus the gate suites run separately 37/37. The remaining crash is "stop contract" (renderer crash in this
+  sandbox, on main too: see 3.50).
+- Open: R1/R2/R4 are readings to confirm. Arp curves land up to one look-ahead late (O3). Sleep is next for Embodiment Lab and the effects
+  (O4). The timeline is "a challenge to use": still yours to name what gets in the way (P52.6).
+
+## Catch-up — 3.53 … 3.61 were built without a PROGRESS entry (found 2026-10-23, drift §12.5)
+His words as the code carries them (file of each quote in brackets). Nothing here is reconstructed beyond what those comments say.
+- 3.53 "a way to full screen the notes screen, its cramped" · "what if we can do different configurations per note, wobble, depth,
+  oscillation, giving full range and depth to the timeline" → per-note knobs, automation lanes, ⏺ record knobs (timeline.test.js)
+- 3.56 "curve the notes in the timeline: the pitch, smoother transitions, bigger and deeper drops; adjust per note" → curved notes, 〰 Bend
+- 3.57 "use the curve for modularity and oscillations … interconnected when connected" + "draw on the piano roll and have it turn to
+  notes" → oscillation, Pitch lane, curve out → bend in, ✍ Sketch (timeline.test.js)
+- 3.58 "click a note and edit it completely" · "this is all supposed to be dynamic … I want the UI to stay clean and organized" → the note
+  inspector beside the notes, edges connect, ⊞ Tidy up (timeline.pianoroll.js, tests/p58-dynamic.test.js)
+- 3.59 "Can you make songs with a heavy bass drop" → 💥 Heavy Drops; the roll is the tool's editor (heavy-drops-songbook.js, pianoroll)
+- 3.61 "make arp more adjustable. i love it" → Arp 2.0 (arp.engine.js, PR #34)
+
 ## Done — 3.51 Deep bass (2026-10-22)
 His words: "can you do more for deep bass?"
 - Pitch now reaches −36 st (three octaves down) on Wobble Bass, Reese Bass, Wub Osc and Wub Sub; Octave goes to −4 on Reese, Wub Osc, Wub Sub.

@@ -56,8 +56,8 @@
       { key: 'laneH', type: 'integer', default: 48, min: 28, max: 160, label: 'Lane height', group: 'VIEW', hint: 'taller lanes = bigger clips (Alt + wheel over the lanes)' },
       { key: 'songBars', type: 'integer', default: 64, min: 1, max: 512, label: 'Song bars', group: 'VIEW' },
     ],
-    ui_hooks: ['transport_play', 'restart', 'seek', 'loop_set', 'lane_add', 'lane_edit', 'lane_remove', 'auto_points', 'rec_knobs', 'clip_add', 'clip_edit', 'clip_remove', 'clip_split', 'clip_duplicate', 'marker_edit', 'bounce', 'drop_file', 'export', 'note_audition', 'clip_fill', 'export_midi', 'export_stems', 'tool_set', 'tool_preset'],
-    ui_hook_labels: { clip_add: 'new clip', clip_edit: 'edit clip / notes', clip_remove: 'delete clip', clip_split: 'split clip', clip_duplicate: 'duplicate clip',
+    ui_hooks: ['transport_play', 'restart', 'seek', 'loop_set', 'lane_add', 'lane_edit', 'lane_remove', 'auto_points', 'rec_knobs', 'clip_add', 'clip_edit', 'clip_remove', 'clip_split', 'clip_duplicate', 'clip_repeat', 'lane_split', 'marker_edit', 'bounce', 'drop_file', 'export', 'note_audition', 'clip_fill', 'export_midi', 'export_stems', 'tool_set', 'tool_preset'],
+    ui_hook_labels: { clip_add: 'new clip', clip_edit: 'edit clip / notes', clip_remove: 'delete clip', clip_split: 'split clip', clip_duplicate: 'duplicate clip', clip_repeat: 'repeat clip', lane_split: 'split lane',
       clip_fill: 'fill chords', lane_add: 'new track', lane_edit: 'track settings', lane_remove: 'remove track', marker_edit: 'marker', drop_file: 'drop audio', loop_set: 'loop' },
     restoreTwice: true,
     engine(ctx) {
@@ -153,6 +153,15 @@
           .sort((a, b) => a.s - b.s || a.n - b.n);
       }
       const snap16 = (b) => Math.max(1, 1 + Math.round((b - 1) * 16) / 16);
+      // 3.62 REPEAT ("make it easier to repeat patterns"): a note clip may repeat its first `loop` steps (1/16) across its whole length —
+      // stretch the clip and the pattern keeps going; edit the first bars and every repeat follows. 0 / absent = plays once (as before).
+      const cleanLoop = (v, bars) => { const L = Math.round(clamp(+v || 0, 0, 128 * 16) * 4) / 4; return L >= 1 && L < bars * 16 ? L : 0; };
+      function notesOf(c) {   // what the clip plays, repeats written out (MIDI export, split)
+        const L = c.loop || 0; if (!L) return c.notes.slice(); const out = [], max = c.bars * 16;
+        for (let o = 0; o < max; o += L) c.notes.forEach(n => { if (n.s >= L || o + n.s >= max) return; out.push(Object.assign({}, n, { s: o + n.s, l: Math.min(n.l, L - n.s, max - o - n.s) })); });
+        return out;
+      }
+      ctx.notesOf = notesOf;
       function instLane(id, target) {
         let lane = lanes.find(l => l.id === id && l.kind === 'inst');
         if (!lane && target) lane = lanes.find(l => l.kind === 'inst' && l.target === target);
@@ -162,6 +171,7 @@
         const lane = instLane(o.lane, o.target);
         const bars = clamp(Math.round(o.bars || 4), 1, 128);
         const c = { id: uid('C'), kind: 'notes', lane: lane.id, name: o.name || lane.name, startBar: snap16(o.startBar || 1), bars, notes: cleanNotes(o.notes, bars) };
+        const L = cleanLoop(o.loop, bars); if (L) c.loop = L;
         if (o.fill && typeof o.fill === 'object') fillNotes(c, o.fill.progression, o.fill.style, o.fill.voicing);
         clips.push(c); sync(); return c;
       }
@@ -194,11 +204,11 @@
             if (!missingTargets.has(lane.target)) { missingTargets.add(lane.target); ctx.fault('RUNTIME_003', `track ${lane.name}: instrument ${lane.target} not mounted — pick one in the lane header`); }
             return;
           }
-          const sd = tk.stepDur || (60 / ctx.bpm / 4);
+          const sd = tk.stepDur || (60 / ctx.bpm / 4), L = c.loop || 0, lp = L ? local % L : local, room = L ? Math.min(L, c.bars * 16 - (local - lp)) : c.bars * 16;
           c.notes.forEach(n => {
-            if (Math.floor(n.s + 1e-9) !== local) return;
-            const len = Math.min(n.l, c.bars * 16 - n.s);
-            ctx.emit('note:trigger', Object.assign({ target: lane.target, note: n.n, velocity: n.v, time: tk.time + (n.s - local) * sd, duration: len * sd * 0.98 }, n.p ? { params: n.p } : {}, n.b ? { bend: n.b } : {}));
+            if (Math.floor(n.s + 1e-9) !== lp || n.s >= room) return;
+            const len = Math.min(n.l, room - n.s);
+            ctx.emit('note:trigger', Object.assign({ target: lane.target, note: n.n, velocity: n.v, time: tk.time + (n.s - lp) * sd, duration: len * sd * 0.98 }, n.p ? { params: n.p } : {}, n.b ? { bend: n.b } : {}));
           });
         });
       }
@@ -460,11 +470,11 @@
       });
       ctx.onUI('clip_edit', { type: 'object', required: ['id', 'patch'] }, (p) => {
         const c = clips.find(x => x.id === p.id); if (!c) return ctx.fault('RUNTIME_002', 'clip ' + p.id);
-        const ok = c.kind === 'audio' ? ['startBar', 'offsetSec', 'lengthSec', 'gain', 'fadeIn', 'fadeOut', 'loop', 'lane', 'name'] : c.kind === 'notes' ? ['startBar', 'bars', 'lane', 'name', 'notes'] : ['startBar', 'bars', 'slot', 'target', 'lane'];
+        const ok = c.kind === 'audio' ? ['startBar', 'offsetSec', 'lengthSec', 'gain', 'fadeIn', 'fadeOut', 'loop', 'lane', 'name'] : c.kind === 'notes' ? ['startBar', 'bars', 'lane', 'name', 'notes', 'loop'] : ['startBar', 'bars', 'slot', 'target', 'lane'];
         if (p.patch.lane !== undefined) { const nl = lanes.find(l => l.id === p.patch.lane); const want = c.kind === 'audio' ? 'audio' : c.kind === 'notes' ? 'inst' : 'pattern'; if (!nl || nl.kind !== want) return ctx.fault('RUNTIME_002', `clip ${c.id} cannot move to lane ${p.patch.lane}`); }
         Object.keys(p.patch).forEach(k => { if (ok.includes(k)) c[k] = p.patch[k]; });
         if (c.kind === 'audio') { const b = buffers.get(c.assetHash); c.startBar = Math.max(1, c.startBar); c.offsetSec = Math.max(0, Math.min(b ? b.duration - 0.01 : 1e9, c.offsetSec)); if (!c.loop && b) c.lengthSec = Math.max(0.01, Math.min(b.duration - c.offsetSec, c.lengthSec)); c.fadeIn = Math.max(0, Math.min(c.lengthSec, c.fadeIn)); c.fadeOut = Math.max(0, Math.min(c.lengthSec - c.fadeIn, c.fadeOut)); }
-        else if (c.kind === 'notes') { c.startBar = snap16(+c.startBar || 1); c.bars = clamp(Math.round(+c.bars || 1), 1, 128); c.notes = cleanNotes(c.notes, c.bars); }
+        else if (c.kind === 'notes') { c.startBar = snap16(+c.startBar || 1); c.bars = clamp(Math.round(+c.bars || 1), 1, 128); c.notes = cleanNotes(c.notes, c.bars); const L = cleanLoop(c.loop, c.bars); if (L) c.loop = L; else delete c.loop; }
         else { c.startBar = Math.max(1, Math.round(c.startBar)); c.bars = Math.max(1, Math.round(c.bars)); }
         sync();
       });
@@ -479,6 +489,7 @@
         const nb = Math.round(bar - c.startBar); if (nb <= 0 || nb >= c.bars) return null;
         if (c.kind === 'notes') {
           const cut = nb * 16, left = [], right = [];
+          if (c.loop) { c.notes = notesOf(c); delete c.loop; }   // 3.62: a repeating clip is written out, then cut
           c.notes.forEach(n => { if (n.s < cut) left.push(Object.assign({}, n, { l: Math.min(n.l, cut - n.s) })); else right.push(Object.assign({}, n, { s: n.s - cut })); });
           const d = { id: uid('C'), kind: 'notes', lane: c.lane, name: c.name, startBar: c.startBar + nb, bars: c.bars - nb, notes: right };
           c.bars = nb; c.notes = left; clips.push(d); sync(); return [c, d];
@@ -493,6 +504,43 @@
         const d = JSON.parse(JSON.stringify(c)); d.id = uid('C');
         d.startBar = p.startBar !== undefined ? snapBar(p.startBar) : (c.kind === 'notes' ? snap16(c.startBar + len) : snapBar(c.startBar + len));
         clips.push(d); sync(); return d;
+      });
+      // 3.62 SPLIT A LANE ("adding a way to split the lanes"): one instrument lane taken apart into several, each able to play its own tool.
+      //   by 'pad'   — drums: every pad that is played gets its own lane (the lowest stays) · by 'pitch' — notes at or above `at` move to a
+      //   new lane (no `at`: the widest gap between the pitches used — where the bass ends and the chords begin). The new lanes play the
+      //   same tool until you pick another; their clips keep the start, length and repeat of the clip they came from.
+      function splitLane(id, by, at) {
+        const l = lanes.find(x => x.id === id && x.kind === 'inst'); if (!l) return ctx.fault('RUNTIME_002', 'lane_split: no instrument lane ' + id);
+        const mine = clips.filter(c => c.kind === 'notes' && c.lane === l.id), used = Array.from(new Set(mine.flatMap(c => c.notes.map(n => n.n)))).sort((a, b) => a - b);
+        if (used.length < 2) { ctx.emitUI('export_state', { error: 'Split: this lane plays fewer than two different notes — nothing to split.' }); return []; }
+        let groups;
+        if (by === 'pad') {
+          const pads = (l.target && drumNamesLive()[l.target]) || [], nm = (n) => { const x = pads.find(q => q.note === n); return x ? x.name : MT.noteName(n); };
+          groups = used.slice(1).map(n => ({ name: l.name + ' · ' + nm(n), test: (x) => x.n === n }));
+        } else {
+          let cut = Math.round(+at);
+          if (!isFinite(cut)) { let gap = -1; for (let i = 1; i < used.length; i++) if (used[i] - used[i - 1] > gap) { gap = used[i] - used[i - 1]; cut = used[i]; } }
+          if (!used.some(n => n >= cut) || !used.some(n => n < cut)) { ctx.emitUI('export_state', { error: 'Split: every note is on one side of ' + MT.noteName(cut) + '.' }); return []; }
+          groups = [{ name: l.name + ' · from ' + MT.noteName(cut), test: (x) => x.n >= cut }];
+        }
+        let after = lanes.indexOf(l); while (lanes[after + 1] && lanes[after + 1].kind === 'auto' && lanes[after + 1].target === l.target) after++;
+        const made = groups.map((gp) => {
+          const nl = addLane('inst', { target: l.target, name: gp.name }); lanes.splice(lanes.indexOf(nl), 1); lanes.splice(++after, 0, nl);
+          mine.forEach(c => { const take = c.notes.filter(gp.test); if (!take.length) return; c.notes = c.notes.filter(x => !gp.test(x));
+            clips.push(Object.assign({ id: uid('C'), kind: 'notes', lane: nl.id, name: c.name, startBar: c.startBar, bars: c.bars, notes: take }, c.loop ? { loop: c.loop } : {})); });
+          return nl;
+        });
+        clips = clips.filter(c => !(mine.includes(c) && !c.notes.length));   // a clip whose every note moved lives on in its new lane
+        applyLanes(); sync(); return made;
+      }
+      ctx.splitLane = splitLane;
+      ctx.onUI('lane_split', { type: 'object', required: ['id'] }, (p) => splitLane(p.id, p.by, p.at));
+      // 3.62 Repeat ×N: copies laid end to end after the clip (a clip that should keep in step with its copies repeats instead: clip.loop)
+      ctx.onUI('clip_repeat', { type: 'object', required: ['id', 'times'] }, (p) => {
+        const c = clips.find(x => x.id === p.id); if (!c) return ctx.fault('RUNTIME_002', 'clip ' + p.id);
+        const n = clamp(Math.round(+p.times || 1), 1, 64), len = c.kind === 'audio' ? c.lengthSec / barSec() : c.bars, out = [];
+        for (let k = 1; k <= n; k++) { const d = JSON.parse(JSON.stringify(c)); d.id = uid('C'); d.startBar = c.kind === 'audio' ? c.startBar + len * k : snap16(c.startBar + len * k); clips.push(d); out.push(d); }
+        sync(); return out;
       });
       ctx.onUI('clip_fill', { type: 'object', required: ['id'] }, (p) => {
         const c = clips.find(x => x.id === p.id); if (!c || c.kind !== 'notes') return ctx.fault('RUNTIME_002', 'clip_fill needs a note clip');
@@ -523,7 +571,7 @@
         lanes.filter(l => l.kind === 'inst').forEach(l => {
           const rec = l.target && K.registry.get(l.target), isDrums = !!(rec && /pad|drum/i.test(rec.organism_id || ''));
           const events = [];
-          clips.filter(c => c.kind === 'notes' && c.lane === l.id).forEach(c => { const o16 = Math.round((c.startBar - 1) * 16); c.notes.forEach(n => events.push({ tick: Math.round((o16 + n.s) * tick16), dur: Math.max(1, Math.round(n.l * tick16)), note: n.n, vel: n.v })); });
+          clips.filter(c => c.kind === 'notes' && c.lane === l.id).forEach(c => { const o16 = Math.round((c.startBar - 1) * 16); notesOf(c).forEach(n => events.push({ tick: Math.round((o16 + n.s) * tick16), dur: Math.max(1, Math.round(n.l * tick16)), note: n.n, vel: n.v })); });
           if (events.length) tracks.push({ name: l.name + (rec ? ' — ' + rec.descriptor.label : ''), events, drums: isDrums });
         });
         return { ppq, tempo: ctx.bpm, tracks };

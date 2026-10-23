@@ -103,7 +103,7 @@ describe('Song Engine (3.27)', () => {
   it('every genre generates a full song: sections, tracks, notes; every preset it can pick exists', () => {
     const G = SongEngine.genres(); assert.gt(G.length, 10);
     G.forEach(g => {
-      Object.values(g.parts).concat(g.fx || []).forEach(P => { const d = OrganismFactory.def(P.organism); assert.ok(d, g.id + ' ' + P.organism); [].concat(P.preset).forEach(pr => assert.ok(d.presets[pr], `${g.id}: ${P.organism} has no preset “${pr}”`)); });
+      Object.values(g.parts).concat(g.fx || []).forEach(P => { const d = OrganismFactory.def(P.organism); assert.ok(d, g.id + ' ' + P.organism); [].concat(P.preset || []).forEach(pr => assert.ok(d.presets[pr], `${g.id}: ${P.organism} has no preset “${pr}”`)); });
       const st = SongEngine.generate(g.id, 4242);
       assert.gt(st.filter(s => s.topic === 'marker_edit').length, 4, g.id + ' sections');
       assert.gt(st.filter(s => s.topic === 'clip_add').length, 10, g.id + ' clips');

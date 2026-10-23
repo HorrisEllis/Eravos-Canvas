@@ -53,3 +53,26 @@ per_tool (heaviest first):
 budget:
   per tool:  ≤ 10 % of a core while playing (tests/p17 guards the 20-tool scene; this file records the rest)
   over budget here: Pad Forge 36.0 %, Gothic Organ 28.2 %, Xen Synth 22.3 %, Supersaw 17.0 %, Coven 16.5 %, Curve 12.2 %
+
+## ADDENDUM 2026-10-23 (3.62, map specs/eravos.phase62-map.spec P62.2) — a silent tool sleeps
+His words: "can you optimize performance?"
+Measured on this machine (Xeon 2.1 GHz, 2 cores, Chromium headless; offline, cost = render time ÷ audio time on one core). Reproduce:
+node build/perf-idle.mjs.
+1. REJECTED (nothing shipped for it): Pad Forge, Gothic Organ and Coven stop a stolen voice without disconnecting it. With chords sent
+   while rendering (the way the transport sends them), cost per second is flat from 8 s to 32 s: Pad Forge 49.8 → 45.7 %, Organ
+   33.5 → 33.7 %, Coven 22.0 → 20.8 %, Xen Synth 27.4 → 25.8 %. Chrome drops finished nodes itself. (A first probe that scheduled every
+   chord up front showed ×4 growth; that was the probe, not the tools.)
+2. FOUND: a tool playing NOTHING keeps rendering its reverb, chorus LFOs and worklets. Silent, awake → with its audio out unplugged:
+     Gothic Organ 18.8 % → −0.5 %   Pad Forge 15.3 % → −0.5 %   Embodiment Lab 8.2 % → 0.1 %   Bass Forge 6.1 % → −0.1 %
+     Wobble Bass 5.8 % → −0.9 %     Retro Poly 2.0 % → −0.1 %   all 24 instruments 61.7 % → 1.6 %   (negative = within noise)
+   Pad Forge playing, by part (8 s of 4-note chords every 0.3 s): default 51.2 % · reverb Size 1 s instead of 6 s 31.3 % · Shimmer 0
+   45.3 % · Space 0 45.1 % (the convolver keeps running with nothing in it). Its reverb is its biggest cost while it plays.
+3. SHIPPED — sleep (tools/music/core/sdk-music.js): a tool that says when it is silent (ctx.sleepWhen) is unplugged at its output after
+   its whole tail (port.tail + 0.5 s; Pad Forge 14 s, Organ 7.5 s) and plugged back in by any note, MIDI note or audition before it
+   sounds. On: Pad Forge (no voices, held chords count), Gothic Organ (no voices, no pedal), Wobble Bass (no note, release over).
+   tests/p62-sleep.test.js: each sleeps only after its tail and the note after sleep sounds within 3 dB of the first; Hold never sleeps.
+   A whole song (Heavy Drops "For Her, Heavy", seed 5908, first 40 s): 42.1 → 36.4 % in one run, 40.6 → 38.0 % in another: a 6–14 %
+   cut (Wobble Bass and Pad Forge asleep while silent). The big saving is a canvas of tools that are not all playing.
+   Real-time contexts sleep on their own (checked every 250 ms); offline renders stay awake unless K.audio.sleepOffline is set.
+Open: Embodiment Lab is a drone (needs its own "stopped" state); effects need a "no input" test; Pad Forge's reverb while playing
+(a cheaper IR at the same sound) is the next cost by this table.

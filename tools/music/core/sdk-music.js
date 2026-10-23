@@ -562,9 +562,10 @@ registerProcessor('eravos-pitch', EravosPitch);`;
         // seconds — its notes start that much earlier so the SOUND lands on the beat (clamped to now for live input)
         if (ctx.latency > 0 && typeof p.time === 'number') { const t2 = Math.max(ac.currentTime, p.time - ctx.latency), d2 = typeof p.duration === 'number' ? p.duration + (p.time - t2) - ctx.latency : p.duration; p = Object.assign({}, p, { time: t2, duration: d2 }); }
         if (ctx._wheelHook) { const t3 = typeof p.time === 'number' ? p.time : ac.currentTime; bendNote(t3, t3 + (typeof p.duration === 'number' ? p.duration : 1), p.bend); }
+        if (ctx.wake) ctx.wake();   // 3.62: plugged back in before the note sounds
         withTool(ctx, () => fn(p));
       });
-      ctx.onMidi = (fn) => ctx.on('midi:note', MIDI_SCHEMA, (p) => { if (midiArmed) withTool(ctx, () => fn(p)); });
+      ctx.onMidi = (fn) => ctx.on('midi:note', MIDI_SCHEMA, (p) => { if (midiArmed) { if (ctx.wake) ctx.wake(); withTool(ctx, () => fn(p)); } });
       ctx.onKey = (fn) => ctx.on('theory:key-change', THEORY_SCHEMA, fn);
       // 3.34 speed per tool: the master's 16ths resampled to this tool's rate — sample-accurate (tick times are audio
       // times), phase-locked to the song position (tool step = master step × rate), resynced on any jump (play, loop, seek)
@@ -594,6 +595,31 @@ registerProcessor('eravos-pitch', EravosPitch);`;
       ctx.onBpm = (fn) => { bpmFns.push(fn); return ctx.on('transport:bpm', { type: 'object', required: ['bpm'] }, (p) => fn(p.bpm * tempoRate())); };
       if (hasTempo()) ['tempoX', 'tempoBpm'].forEach(k => ctx.params.onChange(k, () => bpmFns.forEach(fn => api.safe(() => fn(ctx.bpm)))));
       ctx.loadWorklet = (name, src) => loadWorklet(ac, name, src);
+      // 3.62 SLEEP — "can you optimize performance?" Measured (specs/eravos.performance.spec, addendum 3.62): a SILENT Gothic Organ costs
+      // 17.8 % of a core, Pad Forge 13.7 %, Embodiment Lab 10.4 %, Wobble Bass 7.3 % — their reverbs, chorus LFOs and worklets never stop.
+      // Unplugged from the output they cost ≈ 0 (Chrome only renders what reaches the speakers). A tool that can say when it is silent
+      // (ctx.sleepWhen(() => no voices sounding)) is unplugged once it has been silent for its whole tail (port.tail, its longest
+      // reverb) — so nothing audible is cut — and plugged back in by any note, MIDI note or audition before that sound starts
+      // (ctx.wake(): the SDK calls it on every note; a tool calls it where it makes a voice, so previews and auditions wake it too).
+      // Offline renders (tests, measurements) keep every tool awake unless K.audio.sleepOffline is set.
+      let asleep = false, quietSince = null, silentFn = null;
+      const outs = () => (K.ports ? K.ports.list(ctx.id) : []).filter(p => p.kind === 'audio' && p.direction === 'out' && p.src && p.head);
+      ctx.wake = () => { quietSince = null; if (!asleep) return; asleep = false; outs().forEach(p => { try { p.src.connect(p.head); } catch (e) {} }); };
+      ctx.sleepCheck = () => {
+        if (!silentFn || asleep || ctx.disposed) return asleep;
+        if (!silentFn()) { quietSince = null; return false; }
+        const now = ac.currentTime; if (quietSince === null) quietSince = now;
+        const ps = outs(), tail = Math.max(1, ...ps.map(p => +p.tail || 0)) + 0.5;
+        if (ps.length && now - quietSince >= tail) { asleep = true; ps.forEach(p => { try { p.src.disconnect(p.head); } catch (e) {} }); }
+        return asleep;
+      };
+      Object.defineProperty(ctx, 'asleep', { get: () => asleep, configurable: true });
+      ctx.sleepWhen = (silent) => {
+        silentFn = silent;
+        const offline = typeof OfflineAudioContext !== 'undefined' && ac instanceof OfflineAudioContext;
+        if (!offline || (K.audio && K.audio.sleepOffline)) ctx.interval(ctx.sleepCheck, 250);
+      };
+      ctx.onDispose(() => { silentFn = null; });
       ctx.onUI('midi_arm', { type: 'object', required: ['on'] }, (p) => { midiArmed = !!p.on; ctx.syncUI(); });
       ctx.onUI('audition', null, (p) => { if (ctx.audition) ctx.audition(p || {}); });
       ctx.onUI('audition_off', null, (p) => { if (ctx.auditionOff) ctx.auditionOff(p || {}); });

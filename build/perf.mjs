@@ -68,5 +68,7 @@ const lines = [
   `  over budget here: ${R.rows.filter(r => r.cost > 0.10).map(r => r.label + ' ' + pct(r.cost).trim()).join(', ') || 'none'}`,
   '',
 ];
-fs.writeFileSync(path.join(ROOT, 'specs', 'eravos.performance.spec'), lines.join('\n'));
+// 3.62: the measured table is regenerated; every dated ## ADDENDUM below it is kept as it was (a living spec loses nothing, §0.3)
+const SPEC = path.join(ROOT, 'specs', 'eravos.performance.spec'), old = fs.existsSync(SPEC) ? fs.readFileSync(SPEC, 'utf8') : '', at = old.indexOf('\n## ADDENDUM');
+fs.writeFileSync(SPEC, lines.join('\n') + (at >= 0 ? '\n' + old.slice(at) : ''));
 console.log(lines.join('\n'));

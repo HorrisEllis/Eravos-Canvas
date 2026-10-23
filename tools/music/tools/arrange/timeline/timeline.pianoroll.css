@@ -59,3 +59,5 @@
 .tlpr-edit .tlpr-eh b { color: var(--tool-acc, #ffd24a); }
 /* 3.59 the roll's corner: which tool this track plays */
 select.tlpr-toolsel, .tlpr-toolsel select { font-weight: 600; color: var(--tool-acc, #ffd24a); border-color: var(--tool-acc, #ffd24a); max-width: 200px; }
+/* 3.62 the whole timeline full screen — tracks, curve lanes, transport, inspector and the piano roll ("control a in full screen") */
+.tl-full { position: fixed !important; inset: 0; z-index: 150000; margin: 0; padding: 10px 12px; box-sizing: border-box; width: 100vw !important; height: 100vh !important; background: #0a0f15; display: flex; flex-direction: column; }

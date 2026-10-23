@@ -460,3 +460,99 @@ describe('tool · Timeline — oscillating curves, the Pitch lane, curve out →
     } finally { r.done(); }
   });
 });
+
+// 3.62 — "also the adjustment doesn't work" (2026-10-23). The engine saves a clip's notes sorted (start, then pitch); the open
+// note's knobs and the selection held ARRAY POSITIONS, so after a Start or Pitch change moved the note past a neighbour, the
+// next turn of a knob wrote over the neighbour (one note doubled, one lost). Here the round trip is the engine's: every
+// clip_edit comes back through show() sorted the way timeline.engine cleanNotes sorts.
+describe('tool · Timeline — the note’s knobs keep hold of their note (3.62)', () => {
+  function rig(notes) {
+    const view = { ui: UIKit, emit: (k, p) => { if (k !== 'clip_edit' || !p.patch.notes) return; clip = Object.assign({}, clip, { notes: p.patch.notes.map(n => Object.assign({}, n)).sort((a, b) => a.s - b.s || a.n - b.n) }); pr.show(clip, ln, A); } };
+    const host = document.createElement('div'); host.style.cssText = 'position:fixed;left:0;top:0;width:1000px;height:520px;z-index:99999'; document.body.appendChild(host);
+    const pr = EravosTimelinePianoRoll.create(view, {}); host.appendChild(pr.el);
+    const ln = { id: 'l1', name: 'Lead', color: '#ff66cc' }, A = { key: { root: 0, scale: 'chromatic' } };
+    let clip = { id: 'c1', bars: 2, startBar: 1, notes };
+    pr.show(clip, ln, A);
+    return { pr, notes: () => clip.notes, done: () => { pr.hide(); host.remove(); } };
+  }
+  it('move a note past its neighbour with Start, then turn Velocity: the same note changes, nothing doubled or lost', async () => {
+    const r = rig([{ s: 0, l: 2, n: 60, v: 0.5 }, { s: 8, l: 2, n: 64, v: 0.5 }]);
+    try {
+      const ed = r.pr.openEditor(0); ed.start(12); await TH.sleep(320);   // the knob settles → saved → back sorted
+      assert.deepEqual(r.notes().map(n => [n.s, n.n]), [[8, 64], [12, 60]], 'the note moved after its neighbour');
+      ed.velocity(127); await TH.sleep(320);
+      assert.deepEqual(r.notes().map(n => [n.s, n.n, n.v]), [[8, 64, 0.5], [12, 60, 1]], 'velocity landed on the note being edited, the neighbour untouched');
+      ed.pitch(67); await TH.sleep(320); assert.deepEqual(r.notes().map(n => n.n).sort(), [64, 67], 'still two notes');
+      assert.deepEqual(r.pr.selected.map(i => r.notes()[i].n), [67], 'the selection follows the note too');
+      ed.finish();
+    } finally { r.done(); }
+  });
+  it('a selection survives the re-sort: Shift+↓ an octave moves the notes you picked, again and again', async () => {
+    const r = rig([{ s: 0, l: 2, n: 72, v: 0.8 }, { s: 0, l: 2, n: 65, v: 0.8 }, { s: 4, l: 2, n: 50, v: 0.8 }]);
+    try {
+      const key = (k, o) => r.pr.canvas.dispatchEvent(new KeyboardEvent('keydown', Object.assign({ key: k, bubbles: true, cancelable: true }, o || {})));
+      const at = r.notes().findIndex(n => n.n === 72); r.pr.openEditor(at).finish();   // select the top note
+      key('ArrowDown', { shiftKey: true }); await TH.sleep(20); key('ArrowDown', { shiftKey: true }); await TH.sleep(20);
+      assert.deepEqual(r.notes().map(n => n.n).sort((a, b) => a - b), [48, 50, 65], 'the picked note went down two octaves; the others stayed');
+    } finally { r.done(); }
+  });
+});
+
+// 3.62 — "make it easier to repeat patterns" · "adding a way to split the lanes"
+describe('tool · Timeline — repeating clips, Repeat ×N, split lanes (3.62)', () => {
+  const uni = (sec) => { const ctx = new OfflineAudioContext(1, Math.ceil(sec * 8000), 8000), K = Kernel.create({ ctx, quiet: true, syncIR: true }), T = MasterTransport.create(K, { offline: true, bpm: 120 }); T.boot(); return { ctx, K, T }; };
+  function rig(inst) {
+    const U = uni(0.5), tl = OrganismFactory.spawn('eravos.timeline', { K: U.K, headless: true }), t = OrganismFactory.spawn(inst || 'eravos.supersaw', { K: U.K, headless: true }), c = OrganismFactory.handle(tl).ctx;
+    const pub = (k, p) => U.K.bus.publish('ui:' + k + ':' + tl, p); pub('lane_add', { kind: 'inst', target: t, name: 'Keys' });
+    const sent = []; U.K.bus.subscribe('note:trigger', (p) => { if (p.target === t) sent.push(p); });
+    return { U, tl, t, c, pub, sent, clips: () => c.internals.clips, lanes: () => c.internals.lanes };
+  }
+  it('a clip that repeats its first bar plays it in every bar of its length; edit bar 1 and every repeat follows', () => {
+    const r = rig();
+    r.pub('clip_add', { kind: 'notes', target: r.t, startBar: 1, bars: 4, loop: 16, notes: [{ s: 0, l: 2, n: 60, v: 0.8 }, { s: 8, l: 2, n: 67, v: 0.8 }, { s: 20, l: 2, n: 99, v: 0.8 }] });
+    const c = r.clips()[0]; assert.equal(c.loop, 16);
+    r.U.T.renderTicks(0, 64, 0.05);
+    assert.deepEqual(r.sent.map(p => p.note), [60, 67, 60, 67, 60, 67, 60, 67], 'bar 1, four times — the note past the repeat point is not played');
+    assert.near(r.sent[2].time - r.sent[0].time, 16 * 0.125, 1e-6, 'one bar apart at 120 BPM');
+    r.pub('clip_edit', { id: c.id, patch: { notes: [{ s: 4, l: 2, n: 62, v: 0.8 }] } }); r.sent.length = 0; r.U.T.renderTicks(64, 128, 8.05);
+    assert.deepEqual(r.sent.map(p => p.note), [], 'the clip ended at bar 4');
+    r.pub('clip_edit', { id: c.id, patch: { bars: 8 } }); r.sent.length = 0; r.U.T.renderTicks(0, 128, 16.05);
+    assert.deepEqual(r.sent.map(p => p.note), new Array(8).fill(62), 'stretched to 8 bars: the edited pattern, eight times');
+    assert.equal(r.c.midiSong().tracks[0].events.length, 8, 'MIDI export writes the repeats out');
+    r.pub('clip_edit', { id: c.id, patch: { loop: 0 } }); assert.equal(r.clips()[0].loop, undefined, 'off: plays once');
+  });
+  it('a note that runs past the repeat point is cut there; the last repeat stops at the clip’s end; split writes the repeats out', () => {
+    const r = rig();
+    r.pub('clip_add', { kind: 'notes', target: r.t, startBar: 1, bars: 3, loop: 32, notes: [{ s: 24, l: 16, n: 50, v: 0.8 }] });
+    r.U.T.renderTicks(0, 48, 0.05);
+    assert.deepEqual(r.sent.map(p => +(p.duration / 0.125 / 0.98).toFixed(3)), [8], 'cut at the repeat point (step 32); the second repeat starts at 32 and has no note before 48+24');
+    const [a, b] = r.c.split(r.clips()[0].id, 2);
+    assert.equal(a.loop, undefined); assert.deepEqual(a.notes.map(n => [n.s, n.l]), [], 'bar 1 had no note');
+    assert.deepEqual(b.notes.map(n => [n.s, n.l]), [[8, 8]], 'the repeat written out, then cut');
+  });
+  it('Repeat ×4: four copies end to end, each its own clip', () => {
+    const r = rig(); r.pub('clip_add', { kind: 'notes', target: r.t, startBar: 3, bars: 2, notes: [{ s: 0, l: 4, n: 60, v: 0.8 }] });
+    r.pub('clip_repeat', { id: r.clips()[0].id, times: 4 });
+    assert.deepEqual(r.clips().map(c => c.startBar), [3, 5, 7, 9, 11]); assert.equal(new Set(r.clips().map(c => c.id)).size, 5);
+  });
+  it('split a pitched lane: the bass stays, the chords above the widest gap get a lane of their own, same tool, under it', () => {
+    const r = rig();
+    r.pub('lane_add', { kind: 'inst', name: 'Other' });
+    r.pub('clip_add', { kind: 'notes', target: r.t, startBar: 1, bars: 2, loop: 16, notes: [{ s: 0, l: 4, n: 36, v: 1 }, { s: 0, l: 16, n: 60, v: 0.7 }, { s: 0, l: 16, n: 64, v: 0.7 }, { s: 8, l: 4, n: 43, v: 1 }] });
+    const keys = r.lanes().find(l => l.name === 'Keys'); r.pub('lane_split', { id: keys.id, by: 'pitch' });
+    const ls = r.lanes().filter(l => l.kind === 'inst'), i = ls.indexOf(keys), hi = ls[i + 1];
+    assert.equal(hi.name, 'Keys · from C4'); assert.equal(hi.target, r.t, 'the same tool until you pick another'); assert.equal(ls[i + 2].name, 'Other', 'right under the lane it came from');
+    const lo = r.clips().find(c => c.lane === keys.id), up = r.clips().find(c => c.lane === hi.id);
+    assert.deepEqual(lo.notes.map(n => n.n), [36, 43]); assert.deepEqual(up.notes.map(n => n.n), [60, 64]); assert.equal(up.loop, 16, 'the repeat comes along');
+    r.pub('lane_split', { id: hi.id, by: 'pitch', at: 62 }); assert.equal(r.lanes().filter(l => l.kind === 'inst').length, 4, 'at a note you choose');
+  });
+  it('split a drum lane: one lane per pad that plays, named after the pad', () => {
+    const r = rig('eravos.pads');
+    r.pub('clip_add', { kind: 'notes', target: r.t, startBar: 1, bars: 1, notes: [{ s: 0, l: 1, n: 36, v: 1 }, { s: 4, l: 1, n: 38, v: 1 }, { s: 2, l: 1, n: 42, v: 1 }, { s: 6, l: 1, n: 42, v: 1 }] });
+    const keys = r.lanes().find(l => l.name === 'Keys'); r.pub('lane_split', { id: keys.id, by: 'pad' });
+    const made = r.lanes().filter(l => l.kind === 'inst' && l !== keys);
+    assert.equal(made.length, 2, 'snare and hat get lanes; the kick stays');
+    assert.deepEqual(made.map(l => r.clips().find(c => c.lane === l.id).notes.length), [1, 2]);
+    assert.ok(made.every(l => / · /.test(l.name)), made.map(l => l.name).join());
+  });
+});

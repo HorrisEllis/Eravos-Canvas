@@ -128,7 +128,7 @@
       // cleanup, and a held note went silent mid-note. Now they disconnect themselves and the voice ends on its own oscillators.
       function oneShot(src, ...rest) { src.onended = () => { [src, ...rest].forEach(n => { try { n.disconnect(); } catch (e) {} }); }; }
       function noteOn(note, vel, t, dur) {
-        t = Math.max(t || ac.currentTime, ac.currentTime);
+        ctx.wake(); t = Math.max(t || ac.currentTime, ac.currentTime);
         while (voices.length >= 6) kill(voices[0], t);
         const f = MT.hz(note), nodes = [], env = ac.createGain(); env.gain.value = 0; env.connect(bus); nodes.push(env);
         const freqs = P.get('chord') ? [[1, 0], [1.189, -12], [1.189, 12], [1.498, 0], [1.498, -12], [1, 12]].map(([k, c]) => f * k * Math.pow(2, c / 1200)) : [f];
@@ -156,6 +156,7 @@
       // 3.39: with Amp drive on, the whole organ passes the 2x shaper (128 samples) — notes start that much early (off: no shaper)
       Object.defineProperty(ctx, 'latency', { get: () => P.get('drive') > 0.001 ? dsp.osLatency(ac, '2x') : 0, configurable: true });
       ctx.onNote((p) => noteOn(p.note, p.velocity, p.time, p.duration));
+      ctx.sleepWhen(() => !voices.length && !pedalV);   // 3.62: silent → unplugged after its 7.5 s tail
       ctx.onMidi((p) => { if (p.on) noteOn(p.note, p.velocity); else voices.filter(v => v.note === p.note && v.off === Infinity).forEach(v => release(v, ac.currentTime)); });
       ctx.audition = (p) => noteOn(p.note || 45, p.velocity || 0.8, ac.currentTime, p.duration || 3);
       ctx.auditionOff = (p) => voices.filter(v => v.note === (p.note || 45) && v.off === Infinity).forEach(v => release(v, ac.currentTime));

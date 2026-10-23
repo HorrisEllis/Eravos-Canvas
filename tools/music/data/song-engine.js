@@ -136,6 +136,9 @@
       if (m.wireFrom) steps.push({ op: 'wire', from: m.wireFrom, to: ['mod' + i, m.wireTo] });   // e.g. Clip Maker's clips → this Sample
       if (m.into) steps.push({ op: 'wire', from: ['mod' + i, m.out], to: m.into });                // 3.44: this tool → a part's input (Morph Osc → Morph Osc's FM in)
     });
+    // 3.62: a genre can wire one part into another (G.wires: [[from, hook], [to, hook]] — the Arp's notes out → the synth it plays).
+    // Both ends are parts, so both have a lane: the synth's lane carries its curves (filter …). Genres without it are untouched.
+    (G.wires || []).forEach(([from, to]) => { if (G.parts[from[0]] && G.parts[to[0]]) steps.push({ op: 'wire', from, to }); });
     // form → markers + clips
     let bar = 1; const motif = makeMotif(r, G.leadRhythm || 'anthem');
     form.forEach(sec => {
@@ -161,7 +164,15 @@
         }
         // the gap: everything stops half a beat before the drop, so the drop hits out of silence (the head-shake)
         if (nextIsDrop) { const cut = (sec.bars - 1) * 16 + 14; for (let i = notes.length - 1; i >= 0; i--) { const x = notes[i]; if (x.s >= cut) notes.splice(i, 1); else if (x.s + x.l > cut) x.l = cut - x.s; } }
-        if (notes.length) steps.push({ op: 'event', target: 'tl', topic: 'clip_add', payload: { kind: 'notes', target: '@' + p, startBar: bar, bars: sec.bars, name: `${P.name || p} · ${sec.name}`, notes } });
+        // 3.62: a part with `repeat` writes one turn of the progression and lets the clip repeat it (⟳ Repeat every) — only when every
+        // turn is the same notes; a section whose last bar differs (the gap before a drop, a fill) is written out in full, as before
+        let loop = 0;
+        if (P.repeat && notes.length) {
+          const L = prog.length * 16, total = sec.bars * 16, key = (n) => [n.s % L, n.l, n.n, n.v, JSON.stringify(n.b || null), JSON.stringify(n.p || null)].join('|');
+          if (total > L && total % L === 0) { const first = notes.filter(n => n.s < L), sig = first.map(key).sort().join(';'), same = Array.from({ length: total / L }, (_, k) => notes.filter(n => n.s >= k * L && n.s < (k + 1) * L && n.s + n.l <= (k + 1) * L + 1e-9).map(key).sort().join(';')).every(x => x === sig) && notes.every(n => Math.floor(n.s / L) === Math.floor((n.s + n.l - 1e-9) / L));
+            if (same) { loop = L; notes.splice(0, notes.length, ...first); } }
+        }
+        if (notes.length) steps.push({ op: 'event', target: 'tl', topic: 'clip_add', payload: Object.assign({ kind: 'notes', target: '@' + p, startBar: bar, bars: sec.bars, name: `${P.name || p} · ${sec.name}`, notes }, loop ? { loop } : {}) });
       });
       bar += sec.bars;
     });

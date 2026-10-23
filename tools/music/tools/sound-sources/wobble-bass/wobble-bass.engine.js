@@ -396,7 +396,7 @@
       // 3.50: Pitch (semitones, decimals ok) tunes the whole bass; the sub and the FM modulator follow it (they ride on curF)
       const noteHz = (note) => Math.max(8, MT.hz(Math.max(12, note + 12 * P.get('octave'))) * Math.pow(2, P.get('transpose') / 12));
       function noteOn(note, vel, t, o) {
-        o = o || {};
+        o = o || {}; ctx.wake();
         t = Math.max(t, ac.currentTime);
         const n = note + 12 * P.get('octave');
         const f = noteHz(note);
@@ -437,6 +437,7 @@
         noteOn(p.note, p.velocity * (p.accent ? 1 : 0.9), p.time, o);
       });
       ctx.onMidi((p) => { if (p.on) noteOn(p.note, p.velocity, ac.currentTime); else noteOff(p.note, ac.currentTime); });
+      ctx.sleepWhen(() => !held || (held.off !== Infinity && ac.currentTime > held.off + P.get('release') * 2 + 0.1));   // 3.62: no note, its release over
       ctx.onKey(() => ctx.syncUI());
       ctx.audition = (p) => noteOn(p.note || 45, p.velocity || 0.9, ac.currentTime, { duration: p.duration || 1.2 });
       ctx.auditionOff = (p) => noteOff(p.note || 45);

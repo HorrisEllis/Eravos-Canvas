@@ -205,6 +205,14 @@
         g.globalAlpha = 0.35 + 0.65 * nt.v; g.fillStyle = c2; g.fillRect(x + 1, y + 1, w - 1, ROW - 2); g.globalAlpha = 1;
         g.strokeStyle = S.has(i) ? '#fff' : '#000'; g.lineWidth = 1; g.strokeRect(x + 1.5, y + 1.5, w - 2, ROW - 3);
       });
+      // 3.62 a repeating clip: past its repeat point the notes are the first bars again — shaded, drawn faint, not editable there
+      const L = clip.loop || 0;
+      if (L && L < st) {
+        g.fillStyle = 'rgba(0,0,0,.45)'; g.fillRect(L * pps, 0, W - L * pps, H);
+        g.globalAlpha = 0.3; for (let o = L; o < st; o += L) notes.forEach(nt => { if (nt.s >= L || (drums && rowNotes.indexOf(nt.n) < 0)) return; const x = (o + nt.s) * pps; if (x >= st * pps) return; g.fillStyle = col; g.fillRect(x + 1, yOf(nt.n) + 1, Math.max(3, Math.min(nt.l, L - nt.s, st - o - nt.s) * pps - 1) - 1, ROW - 2); });
+        g.globalAlpha = 1; g.fillStyle = '#fff'; g.fillRect(L * pps - 1, 0, 2, H);
+        g.font = '10px sans-serif'; g.fillText('⟳ repeats from here', L * pps + 6, Math.max(12, (scroll.scrollTop || 0) + 12));
+      }
       if (ghost && !drag) {   // where a click lands
         const x = ghost.s * pps, y = yOf(ghost.n), w = Math.max(3, ghost.l * pps - 1);
         g.globalAlpha = 0.45; g.fillStyle = tool === 'erase' ? '#ff4d4d' : '#ffd24a'; g.fillRect(x + 1, y + 1, w - 1, ROW - 2); g.globalAlpha = 1;
@@ -602,18 +610,19 @@
     vel.addEventListener('pointerup', velEnd); vel.addEventListener('pointercancel', velEnd); vel.addEventListener('lostpointercapture', velEnd);
     // ---- P4 the note's own knobs (no typing): start snaps to the grid, length, pitch, velocity — live, one undo step
     const lenName = (l) => { const m = { 0.25: '1/64', 0.5: '1/32', 1: '1/16', 2: '1/8', 3: '1/8.', 4: '1/4', 6: '1/4.', 8: '1/2', 12: '1/2.', 16: '1 bar' }; return m[Math.round(l * 192) / 192] || (+(l / 4).toFixed(3) + ' beat'); };
-    let insts = [];
+    let insts = [], edNote = null;
     const toolName = () => { const r = lane && insts.find(x => x.value === lane.target); return r ? r.label.replace(/\s*·[^·]*$/, '') : (lane ? lane.name : 'this tool'); };
     function openEditor(i) {
       const a0 = notes[i]; if (!a0) return; if (!S.has(i)) selOnly(i); draw(); editor.innerHTML = ''; edMode = 'note'; toolCtl = new Map(); toolSig = '';   // a note inside a selection keeps the selection
       let cur = Object.assign({}, a0), timer = null;
+      const ed = edNote = { i, get pending() { return !!timer; } };   // 3.62: show() moves ed.i when the engine hands the notes back re-sorted
       const st = steps(), gs = grid || FREE;
       const apply = (patch) => {
         cur = Object.assign({}, cur, patch); cur.s = q(clampN(cur.s, 0, st - FREE)); cur.l = q(clampN(cur.l, FREE, st - cur.s)); cur.n = Math.round(clampN(cur.n, drums ? 0 : LO, drums ? 127 : HI)); cur.v = clampN(Math.round(cur.v * 100) / 100, 0.05, 1);
         if (cur.b && !cur.b.from && !cur.b.to && !(cur.b.osc && cur.b.osc.depth > 0)) delete cur.b;
         if (cur.p && !Object.keys(cur.p).length) delete cur.p;
-        notes[i] = Object.assign({}, cur); draw(); say(cur.s, cur.n, lenName(cur.l) + ' · vel ' + Math.round(cur.v * 127) + (cur.b ? ' · bend ' + bendSay(cur.b) : ''));
-        clearTimeout(timer); timer = setTimeout(() => commit(notes.slice()), 250);   // one commit after the knob settles
+        notes[ed.i] = Object.assign({}, cur); draw(); say(cur.s, cur.n, lenName(cur.l) + ' · vel ' + Math.round(cur.v * 127) + (cur.b ? ' · bend ' + bendSay(cur.b) : ''));
+        clearTimeout(timer); timer = setTimeout(() => { timer = null; commit(notes.slice()); }, 250);   // one commit after the knob settles
       };
       const knob = (label, o, set) => { const k = UI.Knob(Object.assign({ label, size: 44, onChange: (v) => set(v) }, o)); return k; };
       const kS = knob('Start', { min: 0, max: st - gs, value: cur.s, format: (v) => where(Math.round(v / gs) * gs) }, (v) => apply({ s: Math.round(v / gs) * gs }));
@@ -633,7 +642,7 @@
       const kAt = knob('Starts', { min: 0, max: 0.95, step: 0.01, value: B().at, default: 0, format: (v) => Math.round(v * 100) + ' %' }, (v) => setB({ at: Math.round(v * 100) / 100 }));
       const shSel = UI.Select({ label: 'Curve', hint: 'smooth: eases in and out · linear: straight · early: bends at once, then holds · late: holds, then dives', options: ['smooth', 'linear', 'early', 'late'].map(v => ({ value: v, label: v })), value: B().shape, onChange: (v) => setB({ shape: v }) });
       function syncB() { const b = B(); [[kTo, b.to], [kFrom, b.from], [kAt, b.at]].forEach(([k, v]) => { if (k.set) k.set(v); }); if (shSel.set) shSel.set(b.shape); }
-      const prevNote = () => notes.filter((nt, j) => j !== i && nt.s < cur.s - 1e-6).sort((x, y) => y.s - x.s)[0];
+      const prevNote = () => notes.filter((nt, j) => j !== ed.i && nt.s < cur.s - 1e-6).sort((x, y) => y.s - x.s)[0];
       const quick = [['↘ dive', 'down an octave, late — a drop', { from: 0, to: -12, shape: 'late', at: 0.2 }], ['⤓ deep drop', 'two octaves down: the floor falls out', { from: 0, to: -24, shape: 'late', at: 0.1 }],
         ['↗ rise', 'up an octave', { from: 0, to: 12, shape: 'smooth', at: 0 }], ['⤳ glide in', 'slides in from the note before it — a smooth transition', null], ['— flat', 'no bend', { from: 0, to: 0, shape: 'smooth', at: 0 }]]
         .map(([t, hint, b]) => { const btn = h('button', { class: 'tlpr-tool tlpr-ed', title: hint, text: t }); btn.addEventListener('click', (e) => { e.stopPropagation(); if (b) return setB(b);
@@ -692,7 +701,7 @@
       return { start: (v) => apply({ s: Math.round(v / gs) * gs }), length: (v) => apply({ l: Math.max(gs, Math.round(v / gs) * gs) }), pitch: (n) => apply({ n }), velocity: (v) => apply({ v: v / 127 }), finish,
         bend: (b) => setB(b, true), osc: (o) => setO(o, true), quick: (label) => { const q2 = quick.concat(oquick).find(x => x.textContent.includes(label)); if (q2) q2.click(); }, knob: (key, v) => apply({ p: Object.assign({}, cur.p, { [key]: v }) }), get note() { return Object.assign({}, cur); } };
     }
-    function closeEditor() { edMode = null; editor.classList.remove('open'); editor.innerHTML = ''; toolCtl = new Map(); toolSig = ''; if (toolOn && clip && lane && lane.target && toolsAll[lane.target]) openTool(); }
+    function closeEditor() { edNote = null; edMode = null; editor.classList.remove('open'); editor.innerHTML = ''; toolCtl = new Map(); toolSig = ''; if (toolOn && clip && lane && lane.target && toolsAll[lane.target]) openTool(); }
     // ---- the tool panel
     function openTool() {
       const t = toolsAll[lane.target], list = (knobsAll[lane.target] || []), sig = lane.target + '|' + list.map(k => k.key).join() + '|' + (t.presets || []).length;
@@ -747,6 +756,18 @@
       ruler.addEventListener('pointermove', mv); ruler.addEventListener('pointerup', up);
     });
 
+    // 3.62 ("the adjustment doesn't work"): the engine hands a clip's notes back SORTED (start, then pitch). The selection and the
+    // open note's knobs hold positions in this array, so they are carried over by the note itself, not its old index — else a
+    // knob turned after a Start/Pitch change wrote over the neighbour the note had just passed.
+    const nKey = (n) => n.s + '|' + n.n + '|' + n.l;
+    function adopt(next) {
+      if (next.length && notes.length && (S.size || edNote)) {
+        const used = new Set(), find = (old) => { if (!old) return -1; const k = nKey(old); const j = next.findIndex((m, x) => !used.has(x) && nKey(m) === k); if (j >= 0) used.add(j); return j; };
+        const e = edNote ? find(notes[edNote.i]) : -1, s2 = new Set(); S.forEach(i => { const j = i === (edNote && edNote.i) ? e : find(notes[i]); if (j >= 0) s2.add(j); }); S = s2;
+        if (edNote) { if (e >= 0) edNote.i = e; else { notes = next; closeEditor(); return next; } }
+      }
+      return next;
+    }
     function setOptions(sel2, list) { if (sel2.setOptions && list && list.length) sel2.setOptions(list); }
     function show(c, ln, A) {
       const first = openedId !== c.id;
@@ -755,7 +776,7 @@
       const pads = ln && ln.target && A && A.drumNames ? A.drumNames[ln.target] : null;
       if (first || !!pads !== !!drums || (pads && drums && pads.map(p => p.name).join() !== drums.map(p => p.name).join())) setMode(pads);
       if (first) { S.clear(); closeEditor(); }
-      if (!drag) notes = (c.notes || []).map(n => Object.assign({}, n));
+      if (!drag && !(edNote && edNote.pending)) notes = adopt((c.notes || []).map(n => Object.assign({}, n)));
       // (the track-wide Pitch lane is not a per-note knob)
       if (A && A.knobs) { knobsAll = {}; Object.keys(A.knobs).forEach(t => { knobsAll[t] = A.knobs[t].filter(k => !k.lane); }); const list = (ln && knobsAll[ln.target]) || []; const ks = list.map(k => k.key).join();
         knobsRaw = A.knobs; lanesAll = (A.lanes || []).filter(l => l.kind === 'auto' && ln && l.target === ln.target);
