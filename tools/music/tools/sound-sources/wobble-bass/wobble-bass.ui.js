@@ -192,23 +192,23 @@ OrganismFactory.reg('eravos.wobble-bass', function (view) {
     RULES.forEach(([k, sw, ok, why]) => { const el = ctlOf(k); if (!el) return; const on = ok(view.state[sw]); el.style.opacity = on ? '' : '0.35'; el.title = on ? (el.dataset.hint0 || '') : '⏸ ' + why; if (!el.dataset.hint0) el.dataset.hint0 = el.title && el.title.startsWith('⏸') ? '' : (el.title || ''); });
   }
   [...new Set(RULES.map(r => r[1]))].forEach(sw => view.bind(sw, () => setTimeout(dim, 0)));
+  // 3.58 WIDE, NOT TALL: the window is cards in columns (each card drops into the shortest column) — as many columns as it is wide (resize it: wide → side
+  // by side, narrow → stacked). Every control is still on the window; the how-to lines are each card's title (hover: the rest).
+  const card = (title, how, kids, o) => h('div', { class: 'wb-card', style: Object.assign({ background: '#0c0910', border: '1px solid #2a1d33', borderRadius: '8px', padding: '8px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '4px', breakInside: 'avoid', marginBottom: '8px' }, (o && o.style) || {}) },
+    [h('div', { class: 'uk-group-title', style: { margin: '0 0 2px' }, text: title, title: how || '' })].concat(kids));
+  const grid = h('div', { class: 'wb-grid', style: { columnWidth: '320px', columnGap: '8px', marginTop: '6px' } }, [
+    card('WOBBLE RATE', 'the wobble speed, locked to the beat (or free with Sync off)', [spec, h('div', { class: 'org-row', style: { flexWrap: 'wrap', gap: '6px', margin: 0 } }, [ladderBox, sync.el, retrig.el])]),
+    card('PERFORM', 'drag: sideways bends the wobble speed, up opens the mouth · double-click resets the speed', [pad, h('div', { class: 'org-row', style: { gap: '4px', margin: 0 } }, [springB.el])]),
+    card('SHAPE', 'drag points · click to add · double-click removes · shift-drag or wheel bends a segment', [ed, shapeRow]),
+    card('WUB SEQ', 'a rate per step (fast at the top) · bottom row: that step’s shape · on = notes play pitch only · Rate glide on = steps glide',
+      [h('div', { class: 'org-row', style: { flexWrap: 'wrap', gap: '6px', margin: 0, alignItems: 'center' } }, [wubOn.el, wubLen.el, wubStep.el]), roll, seqBtns]),
+    card('FILTER + VOWELS', 'the mouth: low-pass or a formant filter that talks between two vowels', [h('div', { class: 'org-row', style: { flexWrap: 'wrap', gap: '8px', margin: 0 } }, [mode.el, va.el, vb.el, subOct.el])]),
+  ].concat(groups.map(gEl => { Object.assign(gEl.style, { margin: '0 0 8px', breakInside: 'avoid' }); return gEl; })));
   view.root.append(
     h('div', { class: 'org-row', style: { justifyContent: 'space-between' } }, [UI.presetBar(view), shape.el]),
-    spec,
-    sec('WOBBLE RATE'),
-    h('div', { class: 'org-row', style: { flexWrap: 'wrap', gap: '6px', margin: 0 } }, [ladderBox, sync.el, retrig.el]),
-    sec('PERFORM — drag: sideways bends the wobble speed, up opens the mouth · double-click resets the speed'),
-    pad, h('div', { class: 'org-row', style: { gap: '4px', margin: '4px 0 0' } }, [springB.el]),
-    sec('SHAPE — drag points · click to add · double-click removes · shift-drag or wheel bends a segment'),
-    ed, shapeRow,
-    sec('WUB SEQ — a rate per step (fast at the top) · bottom row: that step\'s shape · on = notes play pitch only · Rate glide on = steps glide'),
-    h('div', { class: 'org-row', style: { flexWrap: 'wrap', gap: '6px', margin: 0, alignItems: 'center' } }, [wubOn.el, wubLen.el, wubStep.el]),
-    roll, seqBtns,
-    sec('FILTER + VOWELS'),
-    h('div', { class: 'org-row', style: { flexWrap: 'wrap', gap: '8px', margin: 0 } }, [mode.el, va.el, vb.el, subOct.el]),
-    h('div', { class: 'uk-panel' }, groups),
+    grid,
     h('div', { style: { height: '6px' } }), kb.el,
-    UI.hint('The screech: Octave +1, FM 3–6, Pitch wub 600–1200 c, a fast rate. The growl: Octave −1, FM 2–4 with FM wub, formant OO → AH. Rate glide makes the wub seq swoop between rates. Every knob with a violet dot (rate, FM, pitch, cutoff, depth, drive) can be moved by an Envelope, LFO or Wub Rate.'),
+    UI.hint('The screech: Octave +1, FM 3–6, Pitch wub 600–1200 c, a fast rate. The growl: Octave −1, FM 2–4 with FM wub, formant OO → AH. Card titles: hover for how to use them.'),
   );
   dim();
   // nothing the engine has may be left off the window (3.5: FM, Squash, Grit type … were missing)

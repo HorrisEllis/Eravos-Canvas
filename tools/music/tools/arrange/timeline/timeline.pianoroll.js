@@ -189,10 +189,10 @@
         if (drums && rowNotes.indexOf(nt.n) < 0) return; // a note no pad answers to: kept in the clip, not drawn as a hit
         const x = nt.s * pps, y = yOf(nt.n), w = Math.max(3, nt.l * pps - 1);
         const c2 = drums ? ((drums[rowNotes.indexOf(nt.n)] || {}).color || col) : col;
+        if (!drums && nt.b) { drawBend(g, nt, S.has(i)); return; }   // 3.58 a bent note IS its curve: the block bends
         g.globalAlpha = 0.35 + 0.65 * nt.v; g.fillStyle = c2; g.fillRect(x + 1, y + 1, w - 1, ROW - 2); g.globalAlpha = 1;
         g.strokeStyle = S.has(i) ? '#fff' : '#000'; g.lineWidth = 1; g.strokeRect(x + 1.5, y + 1.5, w - 2, ROW - 3);
       });
-      if (!drums) notes.forEach((nt, i) => { if (nt.b) drawBend(g, nt, S.has(i)); });
       if (ghost && !drag) {   // where a click lands
         const x = ghost.s * pps, y = yOf(ghost.n), w = Math.max(3, ghost.l * pps - 1);
         g.globalAlpha = 0.45; g.fillStyle = tool === 'erase' ? '#ff4d4d' : '#ffd24a'; g.fillRect(x + 1, y + 1, w - 1, ROW - 2); g.globalAlpha = 1;
@@ -217,10 +217,16 @@
     }
     function drawBend(g, nt, on) {
       const x0 = nt.s * pps + 1, w = Math.max(3, nt.l * pps - 2), col = lane ? lane.color : '#ff66cc';
-      g.save(); g.lineCap = 'round'; g.lineJoin = 'round';
+      g.save(); g.lineJoin = 'round';
       const o = nt.b.osc, NS = o && o.depth > 0 ? Math.min(600, Math.max(48, Math.ceil(Math.max(cyc(o.rate, nt.l / 4), o.rateTo ? cyc(o.rateTo, nt.l / 4) : 0) * 16))) : 32;
-      [[6, col, 0.3], [2.2, on ? '#ffffff' : (o && o.depth > 0 ? '#7cf7ff' : '#ffe08a'), 1]].forEach(([lw, c, a]) => { g.globalAlpha = a; g.strokeStyle = c; g.lineWidth = lw; g.beginPath(); for (let k = 0; k <= NS; k++) { const xx = x0 + w * k / NS, yy = bendY(nt, k / NS); k ? g.lineTo(xx, yy) : g.moveTo(xx, yy); } g.stroke(); });
-      g.globalAlpha = 1; g.fillStyle = on ? '#ffffff' : '#ffe08a'; g.beginPath(); g.arc(x0 + w, bendY(nt, 1), 3.5, 0, 7); g.fill();
+      // where the note is written: a faint outline on its own row (drag it there to move it)
+      g.globalAlpha = 0.22; g.strokeStyle = col; g.setLineDash([3, 3]); g.strokeRect(x0 + 0.5, yOf(nt.n) + 1.5, w - 1, ROW - 3); g.setLineDash([]);
+      // the block itself, bent along the pitch it plays: a ribbon one row thick (edge, then body)
+      const path = () => { g.beginPath(); for (let k = 0; k <= NS; k++) { const xx = x0 + w * k / NS, yy = bendY(nt, k / NS); k ? g.lineTo(xx, yy) : g.moveTo(xx, yy); } };
+      g.lineCap = 'butt'; g.globalAlpha = 1; g.strokeStyle = on ? '#ffffff' : '#000000'; g.lineWidth = Math.max(3, ROW - 1); path(); g.stroke();
+      g.globalAlpha = 0.35 + 0.65 * nt.v; g.strokeStyle = col; g.lineWidth = Math.max(2, ROW - 3); path(); g.stroke();
+      if (o && o.depth > 0) { g.globalAlpha = 0.9; g.strokeStyle = '#7cf7ff'; g.lineWidth = 1; path(); g.stroke(); }   // ∿ a thin cyan spine on an oscillating note
+      g.globalAlpha = 1; g.fillStyle = on ? '#ffffff' : '#ffe08a'; g.beginPath(); g.arc(x0 + w, bendY(nt, 1), 3, 0, 7); g.fill();
       if (ROW >= 9 && w >= 36) { g.font = '9px monospace'; g.fillText((nt.b.from || nt.b.to ? (nt.b.to > 0 ? '+' : '') + (+nt.b.to.toFixed(1)) + ' st' : '') + (o && o.depth > 0 ? ' ∿' : ''), x0 + w + 5, bendY(nt, 1) + 3); }
       g.restore();
     }
@@ -291,7 +297,8 @@
     const where = (s) => { const b = (clip ? clip.startBar : 1) + Math.floor(s / 16 + 1e-9), beat = Math.floor(mod(s, 16) / 4 + 1e-9) + 1, tick = Math.round(mod(s, 4) * 120) % 480; return `${b}.${beat}.${String(tick).padStart(3, '0')}`; };
     function say(s, n, extra) { readout.textContent = s === null ? '' : `${where(s)} · ${nameOf(n)}${extra ? ' · ' + extra : ''}`; }
     const local = (e) => toContent(cv, e.clientX, e.clientY);
-    function hit(x, y) { const n = nOf(y), st = x / pps; for (let i = notes.length - 1; i >= 0; i--) { const a = notes[i]; if (a.n === n && st >= a.s && st <= a.s + a.l) return i; } return -1; }
+    function hit(x, y) { const n = nOf(y), st = x / pps; for (let i = notes.length - 1; i >= 0; i--) { const a = notes[i]; if (st < a.s || st > a.s + a.l) continue; if (a.n === n) return i;
+      if (a.b && !drums && Math.abs(y - bendY(a, (st - a.s) / Math.max(a.l, 1e-6))) <= ROW / 2 + 1) return i; } return -1; }   // a bent note is grabbed on its curve too
     // which part of a note the pointer is on: 'L' / 'R' edge (max 4 px, 25 % of the note) or the body
     function zone(i, x) { const a = notes[i], x0 = a.s * pps, x1 = (a.s + a.l) * pps, z = Math.max(4, (x1 - x0) * 0.25); return x1 - x < z ? 'R' : x - x0 < z && a.l > (grid || FREE) ? 'L' : 'B'; }
 
