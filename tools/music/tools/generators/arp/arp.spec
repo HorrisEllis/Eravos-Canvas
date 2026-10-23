@@ -25,7 +25,7 @@ dependencies:
     - audio: Audio engine — shares the audio clock
     - clock: Master clock & tempo — locks to the beat
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 7 modulation inputs — LFO / XY / Macro can move them
+    - mod: 8 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - arp.hook.note_in (note:trigger)
@@ -39,7 +39,9 @@ dependencies:
     - knob.latch (modulation · port mod.knob.latch)
     - knob.velocity (modulation · port mod.knob.velocity)
     - knob.transpose (modulation · port mod.knob.transpose)
+    - bend.in (modulation · port mod.bendin)
   outputs:
     - arp.hook.note_out (note:trigger)
+    - curve.out (modulation · port curve)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe, registry_read]
   works_with: [eravos.timeline, eravos.pads, eravos.sequencer, eravos.embodiment-lab, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen, eravos.coven]

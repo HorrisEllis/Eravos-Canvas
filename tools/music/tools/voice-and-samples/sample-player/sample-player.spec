@@ -75,7 +75,7 @@ dependencies:
   services:
     - audio: Audio engine — makes sound
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 11 modulation inputs — LFO / XY / Macro can move them
+    - mod: 12 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
     - files: Your files — drop audio / MIDI on it
     - assets: Clip output — renders sounds other tools can load
@@ -96,8 +96,10 @@ dependencies:
     - knob.release (modulation · port mod.knob.release)
     - knob.xfade (modulation · port mod.knob.xfade)
     - knob.padLink (modulation · port mod.knob.padLink)
+    - bend.in (modulation · port mod.bendin)
   outputs:
     - samp.hook.audio_out (audio · port out)
     - samp.hook.asset_out (asset:ready)
+    - curve.out (modulation · port curve)
   permissions: [audio_out, bus_publish, bus_subscribe, filesystem_read]
   works_with: [eravos.harmonic-analyzer, eravos.bass-drop-builder, eravos.song-recorder, eravos.timeline, eravos.pads, eravos.sequencer, eravos.arp, eravos.bass-gen]

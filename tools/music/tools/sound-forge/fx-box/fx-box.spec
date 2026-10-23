@@ -25,7 +25,7 @@ dependencies:
     - audio: Audio engine — makes sound
     - clock: Master clock & tempo — locks to the beat
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 2 modulation inputs — LFO / XY / Macro can move them
+    - mod: 3 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - box.hook.note_in (note:trigger)
@@ -33,8 +33,10 @@ dependencies:
     - box.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
     - knob.sel (modulation · port mod.knob.sel)
     - knob.volume (modulation · port mod.knob.volume)
+    - bend.in (modulation · port mod.bendin)
   outputs:
     - box.hook.audio_out (audio · port out)
     - box.hook.bank_out (pad:bank-change)
+    - curve.out (modulation · port curve)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
   works_with: [eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen, eravos.midi-mapper, eravos.lyric-rhythm]

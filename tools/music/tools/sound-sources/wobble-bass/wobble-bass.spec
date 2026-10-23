@@ -142,7 +142,7 @@ dependencies:
     - clock: Master clock & tempo — locks to the beat
     - key: Song key & scale — plays in key
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 46 modulation inputs — LFO / XY / Macro can move them
+    - mod: 47 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - wobble.hook.note_in (note:trigger)
@@ -196,8 +196,10 @@ dependencies:
     - knob.release (modulation · port mod.knob.release)
     - knob.pitchDive (modulation · port mod.knob.pitchDive)
     - knob.diveTime (modulation · port mod.knob.diveTime)
+    - bend.in (modulation · port mod.bendin)
   outputs:
     - wobble.hook.audio_out (audio · port out)
     - slot.growl.send (audio · port slot.growl.send)
+    - curve.out (modulation · port curve)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe, audio_in]
   works_with: [eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen, eravos.midi-mapper, eravos.lyric-rhythm]

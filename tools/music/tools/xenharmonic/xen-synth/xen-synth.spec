@@ -43,7 +43,7 @@ dependencies:
   services:
     - audio: Audio engine — makes sound
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 20 modulation inputs — LFO / XY / Macro can move them
+    - mod: 21 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - xen.hook.note_in (note:trigger)
@@ -70,8 +70,10 @@ dependencies:
     - knob.sustain (modulation · port mod.knob.sustain)
     - knob.release (modulation · port mod.knob.release)
     - knob.partialDecay (modulation · port mod.knob.partialDecay)
+    - bend.in (modulation · port mod.bendin)
   outputs:
     - xen.hook.audio_out (audio · port out)
+    - curve.out (modulation · port curve)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
   works_with: [eravos.ratio-lattice, eravos.harmonic-analyzer, eravos.recursive-spectra, eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen]
   notes:

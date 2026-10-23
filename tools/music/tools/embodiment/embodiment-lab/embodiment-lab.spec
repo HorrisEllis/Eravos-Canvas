@@ -35,7 +35,7 @@ dependencies:
   services:
     - audio: Audio engine — makes sound
     - clock: Master clock & tempo — locks to the beat
-    - mod: 27 modulation inputs — LFO / XY / Macro can move them
+    - mod: 28 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - embodiment-lab.hook.note_in (note:trigger)
@@ -67,10 +67,12 @@ dependencies:
     - knob.fade (modulation · port mod.knob.fade)
     - knob.level (modulation · port mod.knob.level)
     - knob.glow (modulation · port mod.knob.glow)
+    - bend.in (modulation · port mod.bendin)
   outputs:
     - embodiment-lab.hook.audio_out (audio · port out)
     - embodiment-lab.hook.breath_out (modulation · port breath)
     - embodiment-lab.hook.cue_out (embody:cue)
+    - curve.out (modulation · port curve)
   permissions: [audio_out, bus_publish, bus_subscribe]
   works_with: [eravos.breath, eravos.organ, eravos.xen-synth, eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen]
   notes:

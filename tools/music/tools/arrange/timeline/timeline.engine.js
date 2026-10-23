@@ -102,7 +102,8 @@
         const o = {};
         lanes.forEach(l => { if ((l.kind !== 'inst' && l.kind !== 'auto') || !l.target || o[l.target]) return; const r = K.registry.get(l.target); if (!r) return;
           o[l.target] = (r.descriptor.config || []).filter(c => !c.hidden && !c.settingsOnly && (((c.type === 'number' || c.type === 'integer') && isFinite(c.min) && isFinite(c.max)) || (c.type === 'enum' && (c.options || []).length > 1)))
-            .map(c => ({ key: c.key, label: c.label || c.key, group: c.group || '', type: c.type, min: c.min, max: c.max, step: c.step, unit: c.unit || '', options: c.options, def: c.default })); });
+            .map(c => ({ key: c.key, label: c.label || c.key, group: c.group || '', type: c.type, min: c.min, max: c.max, step: c.step, unit: c.unit || '', options: c.options, def: c.default }));
+          if (isInstrument(r)) o[l.target].unshift({ key: PITCH.key, label: '〰 Pitch (bend the track)', group: '', type: 'number', min: PITCH.min, max: PITCH.max, step: PITCH.step, unit: 'st', def: 0, lane: true }); });
         return o;
       }
       function instruments() {
@@ -122,7 +123,15 @@
       function cleanB(b) {
         if (!b || typeof b !== 'object') return null; const r2 = (v) => Math.round(clamp(+v || 0, -48, 48) * 100) / 100;
         const o = { from: r2(b.from), to: r2(b.to), shape: BEND_SHAPES.includes(b.shape) ? b.shape : 'smooth', at: Math.round(clamp(+b.at || 0, 0, 0.95) * 100) / 100 };
-        return o.from || o.to ? o : null;
+        const os = cleanNoteOsc(b.osc); if (os) o.osc = os;
+        return o.from || o.to || o.osc ? o : null;
+      }
+      // 3.57 a note's oscillation (vibrato, trill, siren, a wobble that speeds up): rate = a division or Hz, rateTo = where the rate ends
+      const NOTE_DIVS = ['4/1', '2/1', '1/1', '1/2', '1/2t', '1/4', '1/4t', '1/8', '1/8t', '1/16', '1/16t', '1/32'], NOTE_OSC = ['sine', 'triangle', 'saw', 'square', 'random'];
+      const okRate = (r) => typeof r === 'number' && isFinite(r) ? Math.round(clamp(r, 0.05, 50) * 100) / 100 : NOTE_DIVS.includes(r) ? r : null;
+      function cleanNoteOsc(o) {
+        if (!o || typeof o !== 'object') return null; const rate = okRate(o.rate), depth = Math.round(clamp(+o.depth || 0, 0, 24) * 100) / 100; if (!rate || !depth) return null;
+        const out = { rate, depth, shape: NOTE_OSC.includes(o.shape) ? o.shape : 'sine', fade: Math.round(clamp(+o.fade || 0, 0, 1) * 100) / 100 }, rt = okRate(o.rateTo); if (rt && rt !== rate) out.rateTo = rt; return out;
       }
       function cleanNotes(arr, bars) {
         const max = bars * 16;
@@ -318,7 +327,9 @@
       // lane (●) writes the knob as you turn it while the song plays — over what was there in that stretch — thinned when
       // you stop; '⏺ knobs' arms everything: any knob you turn on a track's tool gets its own lane.
       let lastTk = null, recAll = false;
-      const knobCfg = (target, key) => { const r = K.registry.get(target); return r && (r.descriptor.config || []).find(c => c.key === key); };
+      // 3.57 PITCH — a virtual knob every instrument has: a lane on it bends the whole track over the song (sdk-music lanePitch)
+      const PITCH = { key: '@pitch', label: 'Pitch', group: 'PITCH', type: 'number', min: -24, max: 24, step: 0.1, unit: 'st', default: 0 };
+      const knobCfg = (target, key) => { const r = K.registry.get(target); if (!r) return null; if (key === '@pitch') return isInstrument(r) ? PITCH : null; return (r.descriptor.config || []).find(c => c.key === key); };
       function cleanPoints(pts, c) {
         const out = []; (Array.isArray(pts) ? pts : []).forEach(q => { if (!Array.isArray(q)) return; const b = +q[0]; let v = q[1]; if (!isFinite(b) || b < 1 || b > 2049) return;
           if (c && c.type === 'enum') { if (!(c.options || []).map(String).includes(String(v))) return; v = c.options.find(o => String(o) === String(v)); }
@@ -333,21 +344,39 @@
         const v = a[1] + (b[1] - a[1]) * (bar - a[0]) / (b[0] - a[0]); return c && c.type === 'integer' ? Math.round(v) : +v.toFixed(6);
       }
       ctx.valueAt = valueAt;
+      // 3.57 OSCILLATE — a lane can swing around its curve: rate (a note division, locked to the song) or Hz, depth in the knob's
+      // own units (semitones on Pitch), a shape. The phase is the song position, so every pass through the bar sounds the same.
+      const RATE_DIV = { '4/1': 1 / 16, '2/1': 1 / 8, '1/1': 0.25, '1/2': 0.5, '1/2t': 0.75, '1/4': 1, '1/4t': 1.5, '1/8': 2, '1/8t': 3, '1/16': 4, '1/16t': 6, '1/32': 8 };
+      const OSC_SHAPES = ['sine', 'triangle', 'saw', 'square', 'random'];
+      function cleanOsc(o, c) {
+        if (!o || typeof o !== 'object' || !c || c.type === 'enum') return null;
+        const rate = typeof o.rate === 'number' ? clamp(o.rate, 0.05, 20) : RATE_DIV[o.rate] ? o.rate : null, half = (c.max - c.min) / 2, depth = clamp(+o.depth || 0, 0, half);
+        if (!rate || !depth) return null; return { rate, depth: +depth.toFixed(4), shape: OSC_SHAPES.includes(o.shape) ? o.shape : 'sine' };
+      }
+      const wave = (shape, ph) => { const f = ph - Math.floor(ph); if (shape === 'triangle') return 1 - 4 * Math.abs(f - 0.5); if (shape === 'saw') return 2 * f - 1; if (shape === 'square') return f < 0.5 ? 1 : -1;
+        if (shape === 'random') { const x = Math.sin(Math.floor(ph) * 12.9898 + 78.233) * 43758.5453; return 2 * (x - Math.floor(x)) - 1; } return Math.sin(2 * Math.PI * f); };
+      function oscAt(o, bar, beatSec, v, c) {
+        const beats = (bar - 1) * 4, ph = typeof o.rate === 'number' ? beats * beatSec * o.rate : beats * RATE_DIV[o.rate];
+        let x = v + o.depth * wave(o.shape, ph); x = clamp(x, c.min, c.max); return c.type === 'integer' ? Math.round(x) : +x.toFixed(4);
+      }
+      ctx.oscAt = oscAt; ctx.cleanOsc = cleanOsc;
       const sentAuto = new Map();   // lane id → last value sent
       function playAuto(tk) {
         const solo = lanes.some(l => l.solo);
         lanes.forEach(l => {
-          if (l.kind !== 'auto' || l.mute || (solo && !l.solo) || !l.target || !l.key || !l.points.length || !K.registry.has(l.target)) return;
+          if (l.kind !== 'auto' || l.mute || (solo && !l.solo) || !l.target || !l.key || (!l.points.length && !l.osc) || !K.registry.has(l.target)) return;
           if (l.rec && takes.has(l.id)) return;   // writing: your hand has the knob
-          const c = knobCfg(l.target, l.key);
-          for (let k = 0; k < 4; k++) {
-            const bar = (tk.step16 + k / 4) / 16 + 1, v = valueAt(l.points, bar, c);
+          const c = knobCfg(l.target, l.key), os = l.osc && c && c.type !== 'enum' ? l.osc : null, N = os ? 8 : 4;
+          if (os && !l.points.length && l._base === undefined) l._base = l.key === '@pitch' ? 0 : +K.registry.readParam(ctx.id, l.target, l.key) || 0;
+          for (let k = 0; k < N; k++) {
+            const bar = (tk.step16 + k / N) / 16 + 1; let v = l.points.length ? valueAt(l.points, bar, c) : l._base;
+            if (os && v !== undefined) { v = oscAt(os, bar, tk.stepDur * 4, v, c); }
             if (v === undefined || sentAuto.get(l.id) === v) continue; sentAuto.set(l.id, v);
-            ctx.emit('knob:live', { target: l.target, key: l.key, value: v, time: tk.time + k * tk.stepDur / 4 });
+            ctx.emit('knob:live', { target: l.target, key: l.key, value: v, time: tk.time + k * tk.stepDur / N });
           }
         });
       }
-      function releaseAuto() { lanes.forEach(l => { if (l.kind === 'auto' && l.target && l.key && sentAuto.has(l.id)) ctx.emit('knob:live', { target: l.target, key: l.key, value: null }); }); sentAuto.clear(); }
+      function releaseAuto() { lanes.forEach(l => { delete l._base; if (l.kind === 'auto' && l.target && l.key && sentAuto.has(l.id)) ctx.emit('knob:live', { target: l.target, key: l.key, value: null }); }); sentAuto.clear(); }
       ctx.playAuto = playAuto;
       // -- recording: a take per lane — points written while the song plays, thinned when it stops
       const takes = new Map(), watched = new Map();   // lane id → { from, pts } · target → unsubscribe
@@ -407,6 +436,7 @@
         }
         ['name', 'color', 'gain', 'pan', 'mute', 'solo', 'armed'].forEach(k => { if (p.patch[k] !== undefined) l[k] = p.patch[k]; });
         if (l.kind === 'auto' && p.patch.rec !== undefined) { l.rec = !!p.patch.rec; watch(); }
+        if (l.kind === 'auto' && p.patch.osc !== undefined) { const o = cleanOsc(p.patch.osc, knobCfg(l.target, l.key)); if (o) l.osc = o; else delete l.osc; delete l._base; sentAuto.delete(l.id); }
         if (l.kind === 'auto' && p.patch.mute && sentAuto.has(l.id)) { ctx.emit('knob:live', { target: l.target, key: l.key, value: null }); sentAuto.delete(l.id); }
         if (p.patch.armed) lanes.forEach(o => { if (o !== l) o.armed = false; }); sync();
       });
@@ -526,7 +556,7 @@
         lanes = x.lanes || lanes; clips = x.clips || []; markers = x.markers || [];
         // 3.26: a saved arrangement (user preset) — tracks whose instrument is gone wait for you to pick one in the lane header
         if (o && o.preset) lanes.forEach(l => { if (l.target && !K.registry.has(l.target)) l.target = null; });
-        lanes.forEach(l => { if (l.kind === 'audio') laneNode(l); if (l.kind === 'auto') { l.points = cleanPoints(l.points, l.target && knobCfg(l.target, l.key)); l.rec = !!l.rec; } });
+        lanes.forEach(l => { if (l.kind === 'audio') laneNode(l); if (l.kind === 'auto') { l.points = cleanPoints(l.points, l.target && knobCfg(l.target, l.key)); l.rec = !!l.rec; const o = cleanOsc(l.osc, l.target && knobCfg(l.target, l.key)); if (o) l.osc = o; else delete l.osc; } });
         watch();
         for (const c of clips) if (c.kind === 'audio') await bufferOf(c.assetHash);
         sync();

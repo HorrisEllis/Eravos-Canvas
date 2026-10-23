@@ -289,6 +289,13 @@ registerProcessor('eravos-pitch', EravosPitch);`;
     const keys = knobKeys(d), have = new Set((d.hooks || []).map(h => h.hook_id));
     d._knobInputs = keys.filter(k => !have.has('knob.' + k));
     d._knobInputs.forEach(k => { const c = d.config.find(x => x.key === k); d.hooks.push(Object.assign(MUSIC_STD.mod_in('knob.' + k, 'knob.' + k), { rail: false, knob: k, intent: 'move ' + (c.label || k) })); });
+    // 3.57 every instrument (plays notes, makes sound): CURVE OUT — its pitch curve (bends, Pitch lane, oscillation) as a control
+    // signal for any knob — and BEND IN — another instrument's curve bends this one. Interconnected only when wired.
+    const plays = (d.hooks || []).some(h => h.direction === 'in' && h.event_type === 'note:trigger');
+    if (plays && perms.includes('audio_out') && !have.has('curve.out')) {
+      d.hooks.push(Object.assign(MUSIC_STD.mod_out('curve.out', 'curve'), { intent: 'this track’s pitch curve — bends, Pitch lane, oscillation — to move any knob' }));
+      d.hooks.push(Object.assign(MUSIC_STD.mod_in('bend.in', 'bendin'), { intent: 'bend with another instrument’s curve (wire its curve out here)' }));
+    }
   });
 
   // 3.56 PITCH WHEEL — "curve the notes: the pitch, smoother transitions, bigger and deeper drops". Every music tool gets a
@@ -428,39 +435,94 @@ registerProcessor('eravos-pitch', EravosPitch);`;
       // P11.5 (gate P): a hard ceiling on simultaneous notes per tool — a runaway pattern can't swamp the audio thread.
       // Each tool still steals its own voices below this; this only stops pathological floods (counted, never silent).
       const NOTE_CEILING = 32; let sounding = []; ctx.notesDropped = 0;
-      // ---- 3.56 the pitch wheel (see PITCH WHEEL above)
-      let wheel = null, bent = false, lastBendT = -1, everBent = false;
-      const wheelNode = () => { if (!wheel) { wheel = ac.createConstantSource(); wheel.offset.value = 0; wheel.start(); ctx.track(wheel); } return wheel; };
-      if (ctx.descriptor.domain === 'music') {
-        // started sources are only REMEMBERED; they join the wheel on the tool's first bend (then every rate is set — an LFO
+      // ---- 3.56 the pitch wheel (see PITCH WHEEL above). A small bus, in cents, that every voice's detune follows:
+      //   wheel (the notes' bends) + lane (a Timeline Pitch lane) + per-note oscillators + bend in (another tool's curve)
+      // → bus → every voice · and → curve out (±1 = ± an octave) for anything wired to it.
+      let bus = null, wheel = null, lane = null, bent = false, lastBendT = -1, everBent = false, curveIn = null;
+      const isMusic = ctx.descriptor.domain === 'music', hasHook = (id) => (ctx.descriptor.hooks || []).some(h => h.hook_id === id);
+      const busNode = () => { if (!bus) { bus = ac.createGain(); bus.gain.value = 1; ctx.track(bus); if (curveIn) bus.connect(curveIn); } return bus; };
+      const csInto = () => { const c = ac.createConstantSource(); c.offset.value = 0; c.start(); ctx.track(c); c.connect(busNode()); return c; };
+      const wheelNode = () => wheel || (wheel = csInto());
+      const laneNode = () => lane || (lane = csInto());
+      let wake = () => {};
+      if (isMusic) {
+        // started sources are only REMEMBERED; they join the bus on the tool's first bend (then every rate is set — an LFO
         // made at 440 Hz and slowed later is seen as the LFO it is), and later sources at start. No bends: nothing connected.
         const srcs = new Set();
         const join = (n) => { if (n._wheel) return; const fv = n.frequency ? n.frequency.value : 440;   // 0 = pitch driven by a signal (Wub Osc): a voice
-          if (fv > 0 && fv < 20) return; try { wheelNode().connect(n.detune); n._wheel = true; } catch (e) {} };
+          if (fv > 0 && fv < 20) return; try { busNode().connect(n.detune); n._wheel = true; } catch (e) {} };
         ctx._wheelHook = (n) => {
           if (!n.detune) return; const start = n.start;
-          n.start = function () { srcs.add(n); n.addEventListener('ended', () => { srcs.delete(n); if (n._wheel && wheel) { try { wheel.disconnect(n.detune); } catch (e) {} } }); if (everBent) join(n); return start.apply(n, arguments); };
+          n.start = function () { srcs.add(n); n.addEventListener('ended', () => { srcs.delete(n); if (n._wheel && bus) { try { bus.disconnect(n.detune); } catch (e) {} } }); if (everBent) join(n); return start.apply(n, arguments); };
         };
-        ctx._wheelJoinAll = () => srcs.forEach(join);
+        wake = () => { if (everBent) return; everBent = true; srcs.forEach(join); };
         CUR = ctx; Promise.resolve().then(() => { if (CUR === ctx) CUR = null; });   // the engine is built right after this, in the same task
         const wrap = (name) => { const f0 = ctx[name]; if (typeof f0 !== 'function') return; ctx[name] = function () { const a = Array.from(arguments).map(x => typeof x === 'function' ? function () { const args = arguments; return withTool(ctx, () => x.apply(this, args)); } : x); return f0.apply(ctx, a); }; };
         ['on', 'onUI', 'interval', 'timeout'].forEach(wrap);
         if (ctx.params && typeof ctx.params.onChange === 'function') { const oc = ctx.params.onChange; ctx.params.onChange = function (k, fn) { return oc.call(ctx.params, k, typeof fn === 'function' ? function () { const args = arguments; return withTool(ctx, () => fn.apply(this, args)); } : fn); }; }
+        // 3.57 CURVE OUT — the tool's pitch curve as a control signal (±1 = ± an octave, held at ±1 beyond): wire it to any knob
+        if (hasHook('curve.out')) {
+          const sc = ac.createGain(), clip = ac.createWaveShaper(), out = ac.createGain(); sc.gain.value = 1 / 1200; clip.curve = new Float32Array([-1, 1]); sc.connect(clip); clip.connect(out);
+          [sc, clip, out].forEach(n => ctx.track(n)); curveIn = sc; if (bus) bus.connect(sc);
+          try { ctx.port('curve', { kind: 'mod', direction: 'out', node: out, label: 'curve' }); } catch (e) { K.fault('RUNTIME_003', { instance_id: ctx.id, organism_id: ctx.descriptor.id, message: 'curve out could not open: ' + e.message }); }
+        }
+        // 3.57 BEND IN — another tool's curve out bends this one (±1 → ± an octave): two synths that move as one
+        if (hasHook('bend.in')) {
+          const cs = ac.createConstantSource(), g = ac.createGain(); cs.offset.value = 0; g.gain.value = 1200; cs.connect(g); [cs, g].forEach(n => ctx.track(n)); let on = false;
+          try { ctx.port('mod.bendin', { kind: 'param', direction: 'in', param: cs.offset, range: { min: -1, max: 1 }, label: 'bend in' }); } catch (e) { K.fault('RUNTIME_003', { instance_id: ctx.id, organism_id: ctx.descriptor.id, message: 'bend in could not open: ' + e.message }); }
+          const check = () => { if (on || !ctx.wiredIn('bend.in').length) return; on = true; cs.start(); g.connect(busNode()); wake(); };
+          const un = K.bus.subscribe('kernel:wire-registered', (w) => { if (w && w.dst && w.dst.instanceId === ctx.id) check(); }, ctx.id); ctx.onDispose(un); check();
+        }
       }
-      /** schedule the wheel for a note from t to end: its bend, or back to 0 if an earlier note left it bent */
+      // per-note oscillation: { rate: '1/8' | Hz, rateTo, depth (st), shape, fade (0…1 of the note) } — an LFO on the bus for the note
+      const RATE_DIV = { '4/1': 1 / 16, '2/1': 1 / 8, '1/1': 0.25, '1/2': 0.5, '1/2t': 0.75, '1/4': 1, '1/4t': 1.5, '1/8': 2, '1/8t': 3, '1/16': 4, '1/16t': 6, '1/32': 8 };
+      const rateHz = (r) => typeof r === 'number' ? Math.max(0.05, Math.min(50, r)) : RATE_DIV[r] ? RATE_DIV[r] * ctx.bpm / 60 : 0;
+      const cycles = {};
+      function lfoCycle(shape) {   // 1 s = one cycle, so playbackRate is the rate in Hz
+        if (cycles[shape]) return cycles[shape]; const n = ac.sampleRate, b = ac.createBuffer(1, n, ac.sampleRate), d = b.getChannelData(0);
+        for (let i = 0; i < n; i++) { const f = i / n; d[i] = shape === 'triangle' ? 1 - 4 * Math.abs(f - 0.5) : shape === 'saw' ? 2 * f - 1 : shape === 'square' ? (f < 0.5 ? 1 : -1) : Math.sin(2 * Math.PI * f); }
+        return (cycles[shape] = b);
+      }
+      function oscNote(t, end, o) {
+        const depth = Math.max(0, Math.min(24, +o.depth || 0)), hz = rateHz(o.rate); if (!depth || !hz) return;
+        withTool(null, () => {   // its own LFO: never hooked onto the wheel it drives
+          const g = ac.createGain(), fade = Math.max(0, Math.min(1, +o.fade || 0)) * (end - t), hz2 = o.rateTo !== undefined && o.rateTo !== null ? rateHz(o.rateTo) : hz;
+          g.gain.setValueAtTime(fade > 0.005 ? 0 : depth * 100, t); if (fade > 0.005) g.gain.linearRampToValueAtTime(depth * 100, t + fade);
+          let src;
+          if (o.shape === 'random') {   // sample & hold: a new random step every cycle
+            const steps = Math.max(1, Math.ceil((end - t) * Math.max(hz, hz2)) + 1), b = ac.createBuffer(1, Math.max(2, Math.ceil((end - t) * ac.sampleRate) + 2), ac.sampleRate), d = b.getChannelData(0), r = dsp.mulberry32((t * 1e4) | 0);
+            let v = r() * 2 - 1, next = 0, k = 0; for (let i = 0; i < d.length; i++) { const tt = i / ac.sampleRate, hh = hz + (hz2 - hz) * Math.min(1, tt / Math.max(1e-3, end - t)); if (tt >= next) { v = r() * 2 - 1; next = tt + 1 / hh; k++; } d[i] = v; }
+            src = ac.createBufferSource(); src.buffer = b; void steps;
+          } else {   // one exact cycle (not band-limited: a slow LFO needs none, and a ±12 st square must reach ±12 st), looped at the rate
+            src = ac.createBufferSource(); src.buffer = lfoCycle(o.shape); src.loop = true;
+            src.playbackRate.setValueAtTime(hz, t); if (hz2 !== hz) src.playbackRate.linearRampToValueAtTime(hz2, end);
+          }
+          src.connect(g); g.connect(busNode()); src.start(t); src.stop(end + 0.02);
+          src.onended = () => { try { src.disconnect(); g.disconnect(); } catch (e) {} };
+        });
+      }
+      /** schedule the bus for a note from t to end: its bend (and oscillation), or back to 0 if an earlier note left it bent */
       function bendNote(t, end, b) {
-        const from = b ? Math.max(-BEND_MAX, Math.min(BEND_MAX, +b.from || 0)) : 0, to = b ? Math.max(-BEND_MAX, Math.min(BEND_MAX, +b.to || 0)) : 0, has = !!(from || to);
+        const from = b ? Math.max(-BEND_MAX, Math.min(BEND_MAX, +b.from || 0)) : 0, to = b ? Math.max(-BEND_MAX, Math.min(BEND_MAX, +b.to || 0)) : 0, osc = b && b.osc && +b.osc.depth > 0 ? b.osc : null, has = !!(from || to);
+        if (osc) { wake(); oscNote(t, end, osc); }
         if (!has && (!bent || Math.abs(t - lastBendT) < 0.002)) return;   // a chord note without a bend never cancels its neighbour's
         const o = wheelNode().offset;
         try { if (o.cancelAndHoldAtTime) o.cancelAndHoldAtTime(t); else o.cancelScheduledValues(t); } catch (e) {}
         if (!has) { o.setValueAtTime(0, t); bent = false; return; }
-        if (!everBent) { everBent = true; if (ctx._wheelJoinAll) ctx._wheelJoinAll(); }
+        wake();
         const f = BEND_SHAPES[b.shape] || BEND_SHAPES.smooth, at = Math.max(0, Math.min(0.95, +b.at || 0)), t1 = t + (end - t) * at, dur = Math.max(0.01, end - t1), N = 24;
         o.setValueAtTime(from * 100, t); if (t1 > t) o.setValueAtTime(from * 100, t1);
         for (let i = 1; i <= N; i++) o.linearRampToValueAtTime((from + (to - from) * f(i / N)) * 100, t1 + dur * i / N);
         bent = true; lastBendT = t;
       }
-      ctx.bendNote = bendNote; Object.defineProperty(ctx, 'wheel', { get: () => wheel });
+      /** a Timeline Pitch lane: semitones at an audio time, glided (never stepped), null = back to 0 */
+      function lanePitch(v, time) {
+        const o = laneNode().offset, t = Math.max(ac.currentTime, typeof time === 'number' ? time : ac.currentTime);
+        if (v === null) { o.cancelScheduledValues(ac.currentTime); o.setTargetAtTime(0, ac.currentTime, 0.02); return; }
+        wake(); o.linearRampToValueAtTime(Math.max(-BEND_MAX, Math.min(BEND_MAX, +v || 0)) * 100, t);
+      }
+      ctx.bendNote = bendNote; ctx.lanePitch = lanePitch;
+      Object.defineProperty(ctx, 'wheel', { get: () => wheel }); Object.defineProperty(ctx, 'wheelBus', { get: () => bus }); Object.defineProperty(ctx, 'laneWheel', { get: () => lane });
       // 3.53 PER-NOTE SETTINGS — a note may carry params { knob: value } (a Timeline note's own wobble, depth, cutoff …): the
       // knob takes that value for the note as a LIVE value (params.live: never saved, never undoable, the window's knob shows
       // it), then hands back to the knob's own setting when the note ends — unless a later note has taken the knob since.
@@ -480,13 +542,15 @@ registerProcessor('eravos-pitch', EravosPitch);`;
       // plays, then the knob returns to where the automation has it.
       const autoLive = new Map();
       ctx.on('knob:live', { type: 'object', required: ['target', 'key'] }, (p) => {
+        if (p.target === ctx.id && p.key === '@pitch') { if (isMusic) lanePitch(p.value === undefined ? null : p.value, p.time); return; }   // 3.57 a Pitch lane
         const P = ctx.params; if (p.target !== ctx.id || !P || !P.schema().some(c => c.key === p.key)) return;
         const v = p.value === undefined ? null : p.value;
         const set = () => { if (v === null) autoLive.delete(p.key); else autoLive.set(p.key, v); if (!noteOwner.has(p.key)) P.live(p.key, v); };
         if (v === null || typeof p.time !== 'number' || p.time <= ac.currentTime + 0.003) set(); else ctx.atAudioTime(p.time, set);
       });
       ctx.onSilence(() => { if (ctx.params) { noteOwner.forEach((_, k) => ctx.params.live(k, autoLive.has(k) ? autoLive.get(k) : null)); } noteOwner.clear(); noteTok++;
-        if (wheel && bent) { const o = wheel.offset; o.cancelScheduledValues(0); o.setValueAtTime(0, ac.currentTime); bent = false; } });
+        if (wheel && bent) { const o = wheel.offset; o.cancelScheduledValues(0); o.setValueAtTime(0, ac.currentTime); bent = false; }
+        if (lane) { lane.offset.cancelScheduledValues(0); lane.offset.setValueAtTime(0, ac.currentTime); } });
       ctx.onNote = (fn) => ctx.on('note:trigger', NOTE_SCHEMA, (p) => {
         if (!ctx.isTarget(p)) return;
         const t = typeof p.time === 'number' ? p.time : ac.currentTime, end = t + (typeof p.duration === 'number' ? p.duration : 1);
