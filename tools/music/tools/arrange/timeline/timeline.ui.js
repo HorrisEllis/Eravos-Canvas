@@ -2,7 +2,7 @@
  * instrument tracks (＋ Track spawns an instrument + lane + first clip) and the piano roll (timeline.pianoroll.js) */
 OrganismFactory.reg('eravos.timeline', function (view) {
   const UI = view.ui, h = UI.h;
-  const RULER = 26, HEAD_W = 176;
+  const RULER = 26, HEAD_W = 232;   // room for the name, M · S, the instrument and the 〰 curve picker
   const laneH = () => Math.max(28, Math.min(160, view.state.laneH || 48));
   let A = null, sel = null, playBar = null, drag = null, hover = null, pendingSel = null, headSig = '';
   const laneKindFor = (c) => c.kind === 'audio' ? 'audio' : c.kind === 'notes' ? 'inst' : 'pattern';
@@ -198,7 +198,8 @@ OrganismFactory.reg('eravos.timeline', function (view) {
         // 3.53 ⤴ automate one of this tool's knobs: a lane under the track
         const ks = (A.knobs && A.knobs[l.target]) || [];
         if (live && ks.length) {
-          const au = h('select', { class: 'uk-select', title: 'automate a knob of this tool — its own lane under the track', style: { width: '26px', fontSize: '10px', padding: '0 2px' } }, [h('option', { value: '', text: '⤴' })].concat(ks.map(k => h('option', { value: k.key, text: (k.group ? k.group.toLowerCase() + ' · ' : '') + k.label }))));
+          // visible on purpose: a bare ⤴ arrow went unnoticed ("how do I curve the notes? I don't see anything")
+          const au = h('select', { class: 'uk-select', 'aria-label': 'Add a curve for a knob', title: 'draw a curve for one of this tool’s knobs (wobble, cutoff, depth…) — it gets its own lane under the track', style: { width: '68px', fontSize: '10px', padding: '0 2px', color: '#ffd166', borderColor: '#ffd16688' } }, [h('option', { value: '', text: '〰 curve' })].concat(ks.map(k => h('option', { value: k.key, text: (k.group ? k.group.toLowerCase() + ' · ' : '') + k.label }))));
           au.addEventListener('change', () => { if (au.value) view.emit('lane_add', { kind: 'auto', target: l.target, key: au.value }); au.value = ''; });
           au.addEventListener('pointerdown', (e) => e.stopPropagation()); row.append(au);
         }
