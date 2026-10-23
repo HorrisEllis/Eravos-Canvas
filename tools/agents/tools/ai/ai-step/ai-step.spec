@@ -40,5 +40,5 @@ dependencies:
     - ai.hook.text (dataflow · port text)
     - ai.hook.json (dataflow · port json)
     - ai.hook.error (dataflow · port error)
-  permissions: [bus_publish, bus_subscribe]
+  permissions: [bus_publish, bus_subscribe, ledger_read]
   works_with: []

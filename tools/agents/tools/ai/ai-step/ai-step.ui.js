@@ -18,6 +18,8 @@ OrganismFactory.reg('eravos.agents.ai-step', function (view) {
   const inBox = h('div', { class: 'ai-in', text: '{{input}} is empty — wire something in, or write the whole prompt yourself' });
   const ans = h('div', { class: 'ai-answer', role: 'region', 'aria-label': 'Answer', text: '' });
   const log = h('div', { class: 'ai-log', role: 'log', 'aria-label': 'Call log' });
+  const traceTxt = h('pre', { class: 'ai-in', style: { whiteSpace: 'pre-wrap', maxHeight: '160px', overflow: 'auto', margin: '4px 0 0' } });
+  const traceSum = h('summary', { text: 'Session trace is off — nothing about your session is sent' }), traceBox = h('details', { class: 'ai-sysbox' }, [traceSum, traceTxt]);
   const row = (x) => h('div', { class: 'ai-row ' + x.status, text: x.status === 'ok' ? `✓ ${x.model || ''} · ${x.ms} ms · ${x.tokensIn}→${x.tokensOut} tokens` : x.status === 'retry' ? `↻ retry ${x.attempt}: ${x.message}` : x.status === 'repair' ? `⟲ asked again: ${x.message}` : `✗ ${x.message}` });
   view.on('log', (x) => { log.prepend(row(x)); while (log.children.length > 60) log.lastChild.remove(); });
   view.on('input', (x) => { inBox.textContent = 'input: ' + x.preview; });
@@ -29,6 +31,8 @@ OrganismFactory.reg('eravos.agents.ai-step', function (view) {
     endpointBox.style.display = prov === 'openai-compatible' ? '' : 'none';
     if (s.answer) ans.textContent = s.answer.json !== undefined ? JSON.stringify(s.answer.json, null, 2) : s.answer.text;
     if (s.input) inBox.textContent = 'input: ' + s.input;
+    const tm = s.params && s.params.trace; traceTxt.textContent = s.trace || '';
+    traceSum.textContent = !tm || tm === 'off' ? 'Session trace is off — nothing about your session is sent' : `Session trace ${tm === 'append' ? 'is added to every prompt' : 'fills {{session}}'} — what the model will see (${(s.trace || '').split('\n').length} lines)`;
     if (Array.isArray(s.log)) { log.innerHTML = ''; s.log.slice().reverse().forEach(x => log.appendChild(row(x))); }
   });
   view.root.append(
@@ -36,11 +40,12 @@ OrganismFactory.reg('eravos.agents.ai-step', function (view) {
     h('div', { class: 'org-row', style: { gap: '8px', flexWrap: 'wrap', alignItems: 'flex-end' } }, [pc('provider'), pc('model'), pc('output'), pc('requiredKeys')]),
     endpointBox,
     h('div', { class: 'org-row ai-keyrow', style: { gap: '6px', alignItems: 'center', flexWrap: 'wrap' } }, [keyIn, keySave.el, keyClear.el, keyState]),
-    h('label', { class: 'ai-lbl', text: 'Prompt  ({{input}} · {{input.field}} · {{date}})' }), ed,
+    h('label', { class: 'ai-lbl', text: 'Prompt  ({{input}} · {{input.field}} · {{date}} · {{session}})' }), ed,
     h('details', { class: 'ai-sysbox' }, [h('summary', { text: 'System instructions' }), sys]),
     inBox,
+    h('div', { class: 'org-row', style: { gap: '8px', flexWrap: 'wrap', alignItems: 'flex-end' } }, [pc('trace'), pc('traceSize')]), traceBox,
     h('div', { class: 'org-row', style: { gap: '8px', flexWrap: 'wrap', alignItems: 'center' } }, [pc('auto'), pc('temperature'), pc('maxTokens'), pc('timeout'), pc('retries')]),
     h('label', { class: 'ai-lbl', text: 'Answer' }), ans, log,
-    UI.hint('Keys stay in this browser on this computer — never in projects, presets, backups or exports. Echo is a free dry run: it returns the filled prompt.'),
+    UI.hint('Keys stay in this browser on this computer — never in projects, presets, backups or exports. Echo is a free dry run: it returns the filled prompt. Session trace is off until you turn it on: then tool names, wires and problems from this session go with the prompt — never settings, file contents or keys.'),
   );
 });

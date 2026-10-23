@@ -84,7 +84,8 @@ OrganismFactory.reg('eravos.bass-drop-builder', function (view) {
       grp('SHAPE', ['tAttack', 'tRelease', 'tSwell', 'tPump', 'tRate']), grp('FILTER · SPACE', ['tCutoff', 'tCutoffEnd', 'tRes', 'tMotion', 'tMotionRate', 'tSpace'])]),
     BUILD: h('div', {}, [grp('RISER', ['riserLevel', 'riserWave', 'riserOct', 'riserNoise', 'riserCurve', 'riserFrom']), grp('ROLL', ['rollLevel', 'rollVoice', 'rollStart', 'rollEnd', 'rollCurve', 'rollPitch', 'rollFrom'])]),
     PAUSE: h('div', {}, [grp('THE GAP — the breath before the hit', ['gapSound', 'gapLevel', 'gapLen'])]),
-    DROP: h('div', {}, [grp('IMPACT', ['impactLevel', 'impactPitch', 'impactLen', 'crashLevel']), grp('DOWNLIFTER', ['downLevel', 'downLen'])]),
+    DROP: h('div', {}, [grp('IMPACT', ['impactLevel', 'impactPitch', 'impactLen', 'crashLevel']), grp('DOWNLIFTER', ['downLevel', 'downLen']),
+      grp('SPACE — deep and wide: the sub stays mono and centred, the room above it opens', ['subDive', 'subFrom', 'subTo', 'subLen', 'crossover', 'spaceTail', 'spaceSize', 'spacePre', 'spaceDuck', 'spaceWidth', 'swell', 'swellBeats', 'orbit', 'orbitBars'])]),
   };
   const tabs = h('div', { class: 'db-tabs' }), secTitle = h('div', { class: 'db-sec-title' }), cueBox = h('div', { class: 'db-cue' }), panelBox = h('div', {});
   const hear = UI.Button({ label: '▶ hear this part', hint: 'play this section’s sound on its own (up to 4 bars) — again to stop', onClick: () => view.emit('section_audition', { section: sel }) });

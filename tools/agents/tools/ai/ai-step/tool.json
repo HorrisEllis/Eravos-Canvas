@@ -29,7 +29,8 @@
     "tools": [],
     "permissions": [
       "bus_publish",
-      "bus_subscribe"
+      "bus_subscribe",
+      "ledger_read"
     ]
   },
   "packs": {

@@ -295,6 +295,76 @@
                         "minimum": 0,
                         "maximum": 1
                       },
+                      "subDive": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "subFrom": {
+                        "type": "number",
+                        "minimum": 30,
+                        "maximum": 120
+                      },
+                      "subTo": {
+                        "type": "number",
+                        "minimum": 18,
+                        "maximum": 60
+                      },
+                      "subLen": {
+                        "type": "number",
+                        "minimum": 0.3,
+                        "maximum": 8
+                      },
+                      "spaceTail": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "spaceSize": {
+                        "type": "number",
+                        "minimum": 1,
+                        "maximum": 14
+                      },
+                      "spacePre": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 0.3
+                      },
+                      "spaceDuck": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "crossover": {
+                        "type": "number",
+                        "minimum": 60,
+                        "maximum": 400
+                      },
+                      "spaceWidth": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "swell": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "swellBeats": {
+                        "type": "number",
+                        "minimum": 0.5,
+                        "maximum": 8
+                      },
+                      "orbit": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "orbitBars": {
+                        "type": "number",
+                        "minimum": 0.25,
+                        "maximum": 16
+                      },
                       "downLevel": {
                         "type": "number",
                         "minimum": 0,

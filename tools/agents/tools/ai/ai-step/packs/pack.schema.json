@@ -63,6 +63,18 @@
                         "type": "integer",
                         "minimum": 0,
                         "maximum": 5
+                      },
+                      "trace": {
+                        "enum": [
+                          "off",
+                          "where-written",
+                          "append"
+                        ]
+                      },
+                      "traceSize": {
+                        "type": "integer",
+                        "minimum": 5,
+                        "maximum": 200
                       }
                     },
                     "additionalProperties": false

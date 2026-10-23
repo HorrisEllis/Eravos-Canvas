@@ -86,6 +86,23 @@
       { key: 'tSub', type: 'number', default: 0.25, min: 0, max: 1, step: 0.01, label: 'Sub', group: 'TENSION' },
       { key: 'tAir', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Air', group: 'TENSION', hint: 'filtered noise riding over the section' },
       { key: 'tSpace', type: 'number', default: 0.35, min: 0, max: 1, step: 0.01, label: 'Space', group: 'TENSION', hint: 'send to the canvas reverb' },
+      // 3.53 SPACE — "a way to make deep bass drops, like spatially". The sub stays MONO and centred (below Crossover nothing is
+      // widened or moved: clubs sum it, and no one can hear where 40 Hz comes from); what makes the drop huge happens above it.
+      // All 0 = the 3.1 drop, unchanged.
+      { key: 'subDive', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Sub dive', group: 'SPACE', hint: 'a pure sine that dives under the hit — mono, centred' },
+      { key: 'subFrom', type: 'number', default: 62, min: 30, max: 120, step: 0.5, unit: 'Hz', label: 'Dive from', group: 'SPACE' },
+      { key: 'subTo', type: 'number', default: 31, min: 18, max: 60, step: 0.5, unit: 'Hz', label: 'Dive to', group: 'SPACE' },
+      { key: 'subLen', type: 'number', default: 2.5, min: 0.3, max: 8, step: 0.05, unit: 's', label: 'Dive length', group: 'SPACE' },
+      { key: 'spaceTail', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Space tail', group: 'SPACE', hint: 'a huge room after the hit — only above Crossover, so the low end stays tight' },
+      { key: 'spaceSize', type: 'number', default: 5, min: 1, max: 14, step: 0.1, unit: 's', label: 'Room size', group: 'SPACE' },
+      { key: 'spacePre', type: 'number', default: 0.04, min: 0, max: 0.3, step: 0.005, unit: 's', label: 'Pre-delay', group: 'SPACE' },
+      { key: 'spaceDuck', type: 'number', default: 0.5, min: 0, max: 1, step: 0.01, label: 'Tail duck', group: 'SPACE', hint: 'the tail dips on every beat of the drop, so the drums punch through it' },
+      { key: 'crossover', type: 'number', default: 140, min: 60, max: 400, step: 1, unit: 'Hz', label: 'Crossover', group: 'SPACE', hint: 'below this stays mono and centred' },
+      { key: 'spaceWidth', type: 'number', default: 0.8, min: 0, max: 1, step: 0.01, label: 'Width', group: 'SPACE', hint: 'how wide the space above Crossover spreads' },
+      { key: 'swell', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Reverse swell', group: 'SPACE', hint: 'the room played backwards into the hit — ends exactly on the drop' },
+      { key: 'swellBeats', type: 'number', default: 2, min: 0.5, max: 8, step: 0.25, unit: 'beats', label: 'Swell length', group: 'SPACE' },
+      { key: 'orbit', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Orbit', group: 'SPACE', hint: 'the space circles around your head (3D, best on headphones)' },
+      { key: 'orbitBars', type: 'number', default: 2, min: 0.25, max: 16, step: 0.25, unit: 'bars', label: 'Orbit time', group: 'SPACE', hint: 'bars for one full circle' },
       { key: 'downLevel', type: 'number', default: 0.5, min: 0, max: 1, step: 0.01, label: 'Downlifter', group: 'DROP' },
       { key: 'downLen', type: 'number', default: 1, min: 0.25, max: 4, step: 0.25, unit: 'bars', label: 'Downlifter length', group: 'DROP' },
       { key: 'vocalTrimStart', type: 'number', default: 0, min: 0, max: 0.95, step: 0.005, label: 'Trim start', group: 'VOCAL', hint: 'skip this much of the start of her clip' },
@@ -108,6 +125,59 @@
       const vHp = ac.createBiquadFilter(); vHp.type = 'highpass'; vHp.connect(vocal);
       const throwG = ac.createGain(); throwG.gain.value = 0; vHp.connect(throwG); throwG.connect(K.audio.reverbSend);
       [fx, vocal, vHp, throwG].forEach(n => ctx.track(n));
+      // ---- 3.53 SPACE: spaceIn → (pre-delay → room) and swell → high-pass at Crossover → width (Haas) → 3D panner → fx.
+      // The sub dive goes straight to fx — mono, never widened or moved.
+      const spaceIn = ac.createGain(), pre = ac.createDelay(0.5), room = ac.createConvolver(), spHp = ac.createBiquadFilter(), spHp2 = ac.createBiquadFilter(), duck = ac.createGain(), spOut = ac.createGain();
+      const split = ac.createChannelSplitter(2), merge = ac.createChannelMerger(2), haas = ac.createDelay(0.05), wideG = ac.createGain(), dryC = ac.createGain();
+      const orbitP = ac.createPanner(); orbitP.channelCount = 1; orbitP.channelCountMode = 'explicit'; orbitP.panningModel = 'HRTF';   // mono in: the full binaural image (a stereo input weakens it)
+      orbitP.distanceModel = 'inverse'; orbitP.refDistance = 1; orbitP.positionX.value = 0; orbitP.positionY.value = 0; orbitP.positionZ.value = -1;
+      const orbitDry = ac.createGain(), orbitWet = ac.createGain(), orbitPan = ac.createStereoPanner(), inHp = ac.createBiquadFilter();   // the pan follows the circle: HRTF alone swings only a few dB
+      spHp.type = spHp2.type = inHp.type = 'highpass'; spHp.Q.value = spHp2.Q.value = inHp.Q.value = 0.707;
+      spaceIn.gain.value = 10;   // the room is normalised (Convolver): this puts its tail ~20 dB under the impact
+      spaceIn.connect(inHp); inHp.connect(pre); pre.connect(room); room.connect(spHp); spHp.connect(spHp2); spHp2.connect(duck);   // cut before the room too: a long tail smears whatever low end goes in
+      duck.connect(dryC); dryC.connect(merge, 0, 0); duck.connect(split); split.connect(haas, 1); haas.connect(wideG); wideG.connect(merge, 0, 1); dryC.connect(merge, 0, 1);
+      merge.connect(orbitDry); merge.connect(orbitP); orbitP.connect(orbitPan); orbitPan.connect(orbitWet); orbitDry.connect(spOut); orbitWet.connect(spOut); spOut.connect(fx);
+      [spaceIn, pre, room, spHp, spHp2, duck, spOut, split, merge, haas, wideG, dryC, orbitP, orbitPan, inHp, orbitDry, orbitWet].forEach(n => ctx.track(n));
+      let irSize = 0;
+      function ir() { const L = P.get('spaceSize'); if (Math.abs(L - irSize) < 0.05) return; irSize = L; const n = Math.floor(ac.sampleRate * L), b = ac.createBuffer(2, n, ac.sampleRate), r = dsp.mulberry32(53);
+        for (let c = 0; c < 2; c++) { const d = b.getChannelData(c); for (let i = 0; i < n; i++) { const t = i / n; d[i] = (r() * 2 - 1) * Math.pow(1 - t, 3) * (i < 64 ? i / 64 : 1); } } room.buffer = b; }
+      function applySpace() {
+        ir(); pre.delayTime.value = P.get('spacePre'); const xo = P.get('crossover'); spHp.frequency.value = spHp2.frequency.value = inHp.frequency.value = xo;
+        const w = P.get('spaceWidth'); haas.delayTime.value = 0.004 + 0.014 * w; wideG.gain.value = w; dryC.gain.value = 1 - 0.5 * w;
+        const o = P.get('orbit'); orbitWet.gain.value = o; orbitDry.gain.value = 1 - o; spOut.gain.value = 0.9;
+      }
+      applySpace(); ['spaceSize', 'spacePre', 'crossover', 'spaceWidth', 'orbit'].forEach(k => P.onChange(k, applySpace));
+      // the drop's space: sub dive, the room after the hit (fed by the impact + crash), ducked per beat, orbiting for the drop
+      function spaceDrop(t, dropSec, dest) {
+        const out = dest || fx, beat = 60 / ctx.bpm;
+        const sd = P.get('subDive');
+        if (sd > 0) { const o = ac.createOscillator(), g = ac.createGain(), L = P.get('subLen'); o.type = 'sine'; o.frequency.setValueAtTime(P.get('subFrom'), t); o.frequency.exponentialRampToValueAtTime(Math.max(10, P.get('subTo')), t + L);
+          g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(sd * 0.9, t + 0.012); g.gain.setTargetAtTime(0, t + L * 0.55, L * 0.18);
+          o.connect(g); g.connect(out); o.start(t); o.stop(t + L * 1.4 + 0.1); track([o], g); }
+        const tl = P.get('spaceTail');
+        if (tl > 0) {   // a burst of the impact's colour into the room: noise + the boom's 2nd harmonic, high-passed by the crossover anyway
+          const n = dsp.noiseSource(ac, 'white'), bp = ac.createBiquadFilter(), g = ac.createGain(); bp.type = 'bandpass'; bp.frequency.value = 900; bp.Q.value = 0.5;
+          g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(tl * 0.8, t + 0.004); g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+          const o = ac.createOscillator(), og = ac.createGain(); o.frequency.value = P.get('impactPitch') * 2; og.gain.setValueAtTime(tl * 0.5, t); og.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+          n.connect(bp); bp.connect(g); g.connect(spaceIn); o.connect(og); og.connect(spaceIn); n.start(t); n.stop(t + 0.4); o.start(t); o.stop(t + 0.7); track([n, o], bp, g, og);
+          const dk = P.get('spaceDuck'); duck.gain.cancelScheduledValues(t); duck.gain.setValueAtTime(1, t);
+          if (dk > 0) for (let b = 1; b * beat < Math.min(dropSec, 64 * beat); b++) { const tb = t + b * beat; duck.gain.setValueAtTime(1 - dk * 0.9, tb); duck.gain.setTargetAtTime(1, tb + 0.02, beat * 0.22); }
+        }
+        const o = P.get('orbit');
+        if (o > 0) {   // one circle per Orbit time, for the length of the drop: x = sin, z = −cos (starts in front of you)
+          const per = P.get('orbitBars') * 4 * beat, dur = Math.max(per, Math.min(dropSec + P.get('spaceSize'), 120)), N = Math.max(16, Math.round(dur / per * 64));
+          const xs = new Float32Array(N), zs = new Float32Array(N), ps = new Float32Array(N); for (let i = 0; i < N; i++) { const a = i / (N - 1) * dur / per * Math.PI * 2; xs[i] = Math.sin(a) * 1.5; zs[i] = -Math.cos(a) * 1.5; ps[i] = Math.sin(a) * 0.8; }
+          [orbitP.positionX, orbitP.positionZ].forEach(pr => pr.cancelScheduledValues(t)); orbitP.positionX.setValueCurveAtTime(xs, t, dur); orbitP.positionZ.setValueCurveAtTime(zs, t, dur);
+          orbitPan.pan.cancelScheduledValues(t); orbitPan.pan.setValueCurveAtTime(ps, t, dur);
+        }
+      }
+      // the room backwards into the hit: a reversed decaying burst through the same high-passed, widened space, ending ON the drop
+      function swellInto(tDrop, dest) {
+        const lv = P.get('swell'); if (!lv) return; const L = P.get('swellBeats') * 60 / ctx.bpm, t = Math.max(ac.currentTime, tDrop - L), n = Math.max(32, Math.floor((tDrop - t) * ac.sampleRate));
+        const b = ac.createBuffer(2, n, ac.sampleRate), r = dsp.mulberry32(97); for (let c = 0; c < 2; c++) { const d = b.getChannelData(c); for (let i = 0; i < n; i++) d[i] = (r() * 2 - 1) * Math.pow(i / n, 3); }
+        const s = ac.createBufferSource(), g = ac.createGain(); s.buffer = b; g.gain.value = lv * 0.7; s.connect(g); g.connect(spHp); s.start(t); s.stop(tDrop); track([s], g);
+      }
+      ctx.spaceDrop = spaceDrop; ctx.swellInto = swellInto;
       // cues per section + after
       let cues = { TENSION: {}, BUILD: {}, PAUSE: {}, DROP: {}, AFTER: {} }; // {target, slot, djStart, djEnd, energy, energyTarget, mutes:[]}
       let vox = null; // {hash, name, buffer, rev}
@@ -261,7 +331,7 @@
         if (sec === 'TENSION') { tensionPad(t, Math.min(4, Math.max(1, P.get('tensionBars') || 2)) * bar, g); }
         else if (sec === 'BUILD') { const d = Math.min(4, Math.max(1, P.get('buildBars') || 2)) * bar; riser(t, d, g); rollHits(t, d, sd).forEach(h => snareHit(h.t, 0.25 + 0.75 * h.prog, P.get('rollPitch') * h.prog, g)); }
         else if (sec === 'PAUSE') { const d = bar / 2 + Math.max(P.get('pauseBars'), 0.25) * bar; gapSound(t + d, Math.max(P.get('pauseBars'), 0.25) * bar + P.get('gapLen') * 60 / ctx.bpm, g); impact(t + d, g); }
-        else if (sec === 'DROP') { impact(t, g); downlifter(t + 60 / ctx.bpm * 0.5, P.get('downLen') * bar, g); }
+        else if (sec === 'DROP') { const t2 = t + (P.get('swell') ? P.get('swellBeats') * 60 / ctx.bpm : 0); swellInto(t2); impact(t2, g); spaceDrop(t2, Math.min(4, Math.max(1, P.get('dropBars'))) * bar, g); downlifter(t2 + 60 / ctx.bpm * 0.5, P.get('downLen') * bar, g); }
         ctx.emitUI('section_audition', { on: true, section: sec });
       });
       ctx.onUI('tension_sound', { type: 'object', required: ['name'] }, (p) => { const s = TSOUNDS[p.name]; if (!s) return ctx.fault('RUNTIME_002', 'tension sound ' + p.name); Object.keys(s).forEach(k => P.set(k, s[k])); });
@@ -335,6 +405,7 @@
         if (bd > 0) rollHits(b.BUILD.ts, bd, stepDur).forEach(h => snareHit(h.t, 0.25 + 0.75 * h.prog, P.get('rollPitch') * h.prog));
         gapSound(b.DROP.ts, (b.PAUSE.te - b.PAUSE.ts) + P.get('gapLen') * 60 / ctx.bpm);
         impact(b.DROP.ts);
+        swellInto(b.DROP.ts); spaceDrop(b.DROP.ts, b.DROP.te - b.DROP.ts);
         downlifter(b.DROP.ts + 60 / ctx.bpm * 0.5, P.get('downLen') * 240 / ctx.bpm);
         run.vocal = scheduleVocal(b);
         // DJ filter automation (kernel API only)
@@ -428,7 +499,7 @@
       ctx.on('kernel:organism-mounted', null, () => ctx.syncUI());
       ctx.saveExtra = () => ({ cues, vocal: vox ? { hash: vox.hash, name: vox.name } : null });
       ctx.loadExtra = async (x) => { if (!x) return; if (x.cues) cues = Object.assign({ TENSION: {}, BUILD: {}, PAUSE: {}, DROP: {}, AFTER: {} }, x.cues); if (x.vocal && x.vocal.hash) await loadVocalHash(x.vocal.hash, x.vocal.name); ctx.syncUI(); };
-      ctx.internals = { get run() { return run; }, get armed() { return armed; }, get cues() { return cues; }, get vox() { return vox; } };
+      ctx.internals = { get run() { return run; }, get armed() { return armed; }, get cues() { return cues; }, get vox() { return vox; }, orbitP, orbitPan, duck, spHp };
       setTimeout(plan, 0);
       return { unmount() { if (run) finishRun('abort'); } };
     },
