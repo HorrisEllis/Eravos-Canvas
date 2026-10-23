@@ -284,7 +284,9 @@
     const cats = h('div', { class: 'sbk-chips sbk-cats' }), search = h('input', { class: 'sbk-q', placeholder: 'find a song, genre or tool…', type: 'search' });
     search.addEventListener('input', () => { q = search.value.trim().toLowerCase(); paint(); });
     search.addEventListener('keydown', (e) => e.stopPropagation());
-    const close = () => { ov.remove(); document.removeEventListener('keydown', key, true); open = null; };
+    const close = () => { if (window.SongPreview) SongPreview.stop(); if (io) io.disconnect(); ov.remove(); document.removeEventListener('keydown', key, true); open = null; };
+    // 3.60 previews: a strip of the song's shape on every card (drawn when it scrolls into view), a map + ▶ Preview in the detail
+    const SP = window.SongPreview, io = SP && 'IntersectionObserver' in window ? new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting && e.target._song) { SP.draw(e.target, e.target._song, { mini: true }); io.unobserve(e.target); } }), { rootMargin: '200px' }) : null;
     const key = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
     ov.append(h('div', { class: 'sbk-box' }, [
       h('header', { class: 'sbk-head' }, [h('div', {}, [h('b', { text: '📖 Songs' }), h('span', { class: 'sbk-sub', text: ' every song in one place — write one in any genre (a new one every press), the song for her, and My songs you saved' })]), h('button', { class: 'sbk-x', title: 'Close (Esc)', text: '×', onclick: close })]),
@@ -317,12 +319,14 @@
         const G = genreOf(s), lk = locked(s);
         const card = h('button', { class: 'sbk-card' + (s.id === selId ? ' sel' : '') + (lk ? ' locked' : ''), style: { '--acc': (G && G.accent) || '#ff2266' } }, [
           h('span', { class: 'sbk-ic', text: lk ? '🔒' : ((G && G.icon) || '💘') }), h('b', { text: s.title + (G && G.voice ? ' 🎤' : '') }), h('small', { text: (G ? G.label : s.genre) + ' · ' + (G ? G.bpm[0] + (G.bpm[1] !== G.bpm[0] ? '–' + G.bpm[1] : '') : s.bpm) + ' BPM' })]);
+        if (io && !s.recipe && G) { const strip = h('canvas', { class: 'sbk-strip', 'aria-hidden': 'true' }); strip._song = s; card.appendChild(strip); io.observe(strip); }
         card.onclick = () => { selId = s.id; paint(); }; card.ondblclick = () => { if (write(s, false, shift)) close(); };
         grid.appendChild(card);
       });
       const s = sel, G = genreOf(s), lk = locked(s);
       detail.innerHTML = '';
       detail.append(h('h3', { text: s.title }), h('div', { class: 'sbk-meta', text: (G ? G.label + ' · ' + G.tagline : s.genre) }),
+        previewBox(h, s),
         h('h4', { text: 'Listen for' }), h('p', { text: s.listen }),
         h('h4', { text: 'The drop' }), h('p', { text: s.drop }),
         h('h4', { text: 'Her voice clips' }), h('p', { text: s.voice }));
@@ -344,6 +348,23 @@
           h('button', { class: 'sbk-alt', style: { marginTop: 0 }, text: '⟲ Open', title: 'open the song on the canvas (with every tool as it was)', onclick: async () => { close(); if (window.Shell) window.Shell.activate(); await window.Workspace.projects.load(x.project); } }),
           h('button', { class: 'sbk-alt', style: { marginTop: 0 }, text: '🗑', title: 'delete', onclick: async () => { if (!confirm('Delete “' + x.name + '” from My songs?')) return; await removeSong(x.name); paint(); } })])])));
       detail.innerHTML = ''; detail.append(h('h3', { text: 'My songs' }), h('p', { text: 'Every song you save from the Song Recorder: listen here, or open it back onto the canvas exactly as it was.' }));
+    }
+    // the detail's preview: the song's map, ▶ Preview renders the build → pause → drop in its own offline universe and plays it
+    function previewBox(h, s) {
+      if (!SP || s.recipe || !genreOf(s)) return h('span');
+      const cv = h('canvas', { class: 'sbk-map', role: 'img', 'aria-label': 'the shape of ' + s.title + ': sections and parts' }), st = h('span', { class: 'sbk-note', style: { margin: '0 0 0 8px' }, text: '' });
+      const btn = h('button', { class: 'sbk-alt sbk-prev', style: { marginTop: 0 }, text: SP.playing === s.id ? '■ Stop' : '▶ Preview', title: 'hear the build, the pause and the drop — rendered on the side, your canvas is untouched' });
+      const w = SP.window(s);
+      btn.onclick = async () => {
+        if (SP.playing === s.id) { SP.stop(); btn.textContent = '▶ Preview'; return; }
+        btn.disabled = true; st.textContent = 'rendering…';
+        try {
+          const ok = await SP.play(s, (bar) => { SP.draw(cv, s, { at: bar }); if (bar === null) { btn.textContent = '▶ Preview'; st.textContent = ''; } });
+          btn.textContent = ok ? '■ Stop' : '▶ Preview'; st.textContent = ok ? (w ? 'bars ' + w.from + '–' + (w.from + w.bars - 1) : '') : ok === null ? 'no sound came out' : '';
+        } catch (e) { st.textContent = 'could not render: ' + e.message; } finally { btn.disabled = false; }
+      };
+      requestAnimationFrame(() => SP.draw(cv, s));
+      return h('div', { class: 'sbk-preview' }, [cv, h('div', { class: 'sbk-actions', style: { marginTop: '4px', alignItems: 'center' } }, [btn, st])]);
     }
     paint(); document.body.appendChild(ov); open = { close, ov };
   }
