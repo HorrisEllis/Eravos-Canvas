@@ -1,0 +1,6 @@
+{
+  "schema": "eravos.pack/1", "id": "particle-field.odd-couples", "version": "1.0.0", "label": "Odd Couples", "prefix": "Odd", "author": "James Brooks", "tags": ["odd-couples", "cross-genre", "3.54"], "for": "eravos.particle-field",
+  "items": { "eravos.particle-field": { "presets": {
+    "Fractal 808 Well": { "params": { "gravity": 2.4, "burst": 1.6, "curl": 1.4, "entropy": 0.3, "damping": 0.08, "basins": 1.6, "memory": 240, "learn": 1.2, "trail": 0.9, "palette": "pitch", "spin": 0.25 } }
+  } } }
+}

@@ -94,6 +94,8 @@ tools:
     - eravos.midi-mapper (MIDI Map) mode=music units=[engine,midi] needs=[audio,midi] in=2 out=5
   Video:
     - eravos.video.video-clip (Video Clip) mode=null units=[] needs=[] in=2 out=2
+  Visuals:
+    - eravos.particle-field (Field) mode=music units=[engine] needs=[audio,mod] in=18 out=0
   Voice & samples:
     - eravos.clip-maker (Clip Maker) mode=music units=[engine,transport,tempo,meter] needs=[audio,clock,mod,files,assets] in=8 out=2
     - eravos.sample-player (Sample) mode=music units=[engine,meter,midi] needs=[audio,midi,mod,notes,files,assets] in=15 out=2

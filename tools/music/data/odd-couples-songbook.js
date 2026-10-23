@@ -144,7 +144,8 @@
         pad: { role: 'chords', organism: 'eravos.syn-partials', preset: O('Spectral Glass Pad'), style: 'sustain', voicing: 'triad', octave: 4, name: 'Partials' },   // 3.43: drawn spectra evolving under the trap
         lead: { role: 'lead', organism: 'eravos.xen-synth', preset: O('Slendro Riddim Bells'), octave: 5, name: 'Slendro' } },
       fx: [{ organism: 'eravos.fx-pitch', preset: O('Octave Under the Choir'), on: 'pad' }, { organism: 'eravos.fx-glitch', preset: O('Gospel Stutter'), on: 'lead' }],
-      mods: HER(O('Steppers Pull-up')).concat([{ organism: 'eravos.recursive-spectra', preset: O('Trap Spectrum Drone') }, { organism: 'eravos.harmonic-analyzer', preset: O('Organ + Wub (layers)') }]),
+      mods: HER(O('Steppers Pull-up')).concat([{ organism: 'eravos.recursive-spectra', preset: O('Trap Spectrum Drone') }, { organism: 'eravos.harmonic-analyzer', preset: O('Organ + Wub (layers)') },
+        { organism: 'eravos.particle-field', preset: O('Fractal 808 Well'), wireFrom: ['sub', 'sub.hook.audio_out'], wireTo: 'pf.hook.audio_in' }]),   // 3.54: the 808 pulls the field in, its notes dig the basins
       master: { compThresh: -10, compRatio: 3, reverbMix: 0.18 } },
 
     // 8 — a funeral coven on the dembow: witches chatting on the dancehall triplet, a yoi wobble under them
