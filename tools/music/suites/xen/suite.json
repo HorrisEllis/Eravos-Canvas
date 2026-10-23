@@ -1,0 +1,200 @@
+{
+  "schema": "eravos.suite/1",
+  "id": "music.xen",
+  "label": "Xen",
+  "icon": "🔮",
+  "accent": "#33e0c0",
+  "version": "1.0.0",
+  "blurb": "Music between the keys, as a system. Ratio Lattice plays pure ratios and hands its tuning and its notes to Xen Synth; Recursive Spectra plays the same notes and hands its spectrum to Xen Synth too, so the timbre fits the tuning. A long Echo holds it all. SHIMMER, MORPH, BRIGHT and SPREAD turn all of it.",
+  "hub": "eravos.suite-hub",
+  "parts": [
+    {
+      "tool": "eravos.ratio-lattice",
+      "role": "lattice",
+      "required": true,
+      "preset": "Harmonic Seventh 4:5:6:7",
+      "why": "pure ratios: plays them and sends the tuning and the notes on"
+    },
+    {
+      "tool": "eravos.xen-synth",
+      "role": "voice",
+      "required": true,
+      "preset": "Golden Bells",
+      "why": "plays the lattice's notes in the lattice's tuning, with the spectrum's partials"
+    },
+    {
+      "tool": "eravos.recursive-spectra",
+      "role": "spectrum",
+      "required": true,
+      "preset": "Golden Drift",
+      "why": "a spectrum that folds into itself — heard, and sent to the voice"
+    },
+    {
+      "tool": "eravos.fx-echo",
+      "role": "echo",
+      "required": false,
+      "preset": "Odd · Golden Echo",
+      "why": "a long golden echo"
+    }
+  ],
+  "wiring": [
+    {
+      "from": [
+        "eravos.ratio-lattice",
+        "lat.hook.tuning_out"
+      ],
+      "to": [
+        "eravos.xen-synth",
+        "xen.hook.tuning_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.ratio-lattice",
+        "lat.hook.note_out"
+      ],
+      "to": [
+        "eravos.xen-synth",
+        "xen.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.ratio-lattice",
+        "lat.hook.note_out"
+      ],
+      "to": [
+        "eravos.recursive-spectra",
+        "rec.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.recursive-spectra",
+        "rec.hook.spectrum_out"
+      ],
+      "to": [
+        "eravos.xen-synth",
+        "xen.hook.spectrum_in"
+      ]
+    }
+  ],
+  "output": [
+    "eravos.ratio-lattice",
+    "eravos.xen-synth",
+    "eravos.recursive-spectra",
+    "eravos.fx-echo"
+  ],
+  "macros": [
+    {
+      "label": "SHIMMER",
+      "default": 0.4,
+      "hint": "the voice's shimmer",
+      "targets": [
+        {
+          "tool": "eravos.xen-synth",
+          "key": "shimmer"
+        }
+      ]
+    },
+    {
+      "label": "MORPH",
+      "default": 0.5,
+      "hint": "how far the spectrum folds and morphs",
+      "targets": [
+        {
+          "tool": "eravos.recursive-spectra",
+          "key": "morph"
+        },
+        {
+          "tool": "eravos.recursive-spectra",
+          "key": "amount"
+        }
+      ]
+    },
+    {
+      "label": "BRIGHT",
+      "default": 0.5,
+      "hint": "how bright the voice is",
+      "targets": [
+        {
+          "tool": "eravos.xen-synth",
+          "key": "bright",
+          "min": 600,
+          "max": 12000
+        }
+      ]
+    },
+    {
+      "label": "SPREAD",
+      "default": 0.3,
+      "hint": "how wide the voices spread",
+      "targets": [
+        {
+          "tool": "eravos.xen-synth",
+          "key": "spread",
+          "min": 0,
+          "max": 30
+        }
+      ]
+    }
+  ],
+  "starter": "Golden",
+  "scenes": {
+    "Golden": {
+      "eravos.ratio-lattice": {
+        "preset": "Harmonic Seventh 4:5:6:7"
+      },
+      "eravos.xen-synth": {
+        "preset": "Golden Bells"
+      },
+      "eravos.recursive-spectra": {
+        "preset": "Golden Drift"
+      }
+    },
+    "Bohlen–Pierce": {
+      "eravos.ratio-lattice": {
+        "preset": "Undecimal Neutral 8:11:12"
+      },
+      "eravos.xen-synth": {
+        "preset": "Bohlen–Pierce Clarinet"
+      },
+      "eravos.recursive-spectra": {
+        "preset": "Stretching Organ"
+      }
+    },
+    "Slendro": {
+      "eravos.ratio-lattice": {
+        "preset": "Just Major Triad 4:5:6"
+      },
+      "eravos.xen-synth": {
+        "preset": "Slendro Metallophone"
+      },
+      "eravos.recursive-spectra": {
+        "preset": "Bell Fractal"
+      }
+    },
+    "Prime Ghost": {
+      "eravos.ratio-lattice": {
+        "preset": "Utonal Minor 1/4:1/5:1/6"
+      },
+      "eravos.xen-synth": {
+        "preset": "Prime Ghost (otonal)"
+      },
+      "eravos.recursive-spectra": {
+        "preset": "Mirror Choir"
+      }
+    },
+    "Séance": {
+      "eravos.ratio-lattice": {
+        "preset": "Odd · Séance Lattice"
+      },
+      "eravos.xen-synth": {
+        "preset": "π Drone"
+      },
+      "eravos.recursive-spectra": {
+        "preset": "Witch Bell Loop"
+      }
+    }
+  }
+}

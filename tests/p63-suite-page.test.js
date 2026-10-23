@@ -66,3 +66,38 @@ describe('P63 · Heavy Drops suite · a page for every suite · a click opens th
     } finally { ToolPage.close(); AddMenu.close(); }
   });
 });
+
+/* 3.63 — "Where are the rest of the suites. Synthesis tool for each suite": the four suites the 3.48 map named and never built
+ * (Synthwave, Gothic, Sound System, Xen — Heavy Drops is the drop rig), and every suite window a control panel: macros on all six. */
+describe('P63 · the rest of the suites — every suite a control panel', () => {
+  const F = () => OrganismFactory;
+  const NEW = ['music.synthwave', 'music.gothic', 'music.sound-system', 'music.xen'];
+  it('every suite has macros, and every macro names a part’s real number knob', () => {
+    const all = Suites.list(); NEW.concat(['music.wub-lab', 'music.synthesis-lab', 'music.edm-lab', 'music.heavy-drops']).forEach(id => assert.ok(Suites.get(id), id + ' is offered'));
+    all.forEach(s => {
+      assert.ok((s.macros || []).length >= 3 && s.macros.length <= 4, `${s.id}: 3–4 macros on its panel (${(s.macros || []).length})`);
+      s.macros.forEach(m => m.targets.forEach(t => {
+        assert.ok(s.parts.some(p => p.tool === t.tool), `${s.id} · ${m.label}: ${t.tool} is a part`);
+        const c = (F().def(t.tool).config || []).find(x => x.key === t.key);
+        assert.ok(c && typeof c.min === 'number' && typeof c.max === 'number', `${s.id} · ${m.label}: ${t.tool}.${t.key} is a number knob`);
+      }));
+    });
+  });
+  NEW.forEach(id => it(id.split('.')[1] + ': built whole, every wire on, every macro turns its knobs, and the system sounds', async () => {
+    const s = Suites.get(id), U = TH.universe(4.5, { bpm: 120 }), K = U.K, hub = Suites.open(id, { K });
+    const want = s.parts.filter(p => p.required), out = Suites.build(K, hub);
+    assert.equal(out.filter(Boolean).length, want.length, 'every required part');
+    assert.equal(Suites.members(K, hub).size, want.length, 'all of them members');
+    assert.ok(Suites.wiring(K, hub).every(w => w.on || !w.possible), 'every possible wire is on: ' + JSON.stringify(Suites.wiring(K, hub).filter(w => w.possible && !w.on).map(w => w.wire)));
+    assert.equal(F().handle(hub).ctx.params.get('scene'), s.starter, 'starter scene');
+    s.macros.forEach((m, i) => [0, 1].forEach(v => {
+      Suites.macro(K, hub, i, v);
+      m.targets.forEach(t => { const c = F().def(t.tool).config.find(x => x.key === t.key), lo = t.min !== undefined ? t.min : c.min, hi = t.max !== undefined ? t.max : c.max;
+        const got = F().handle(Suites.instanceOf(K, hub, t.tool)).ctx.params.get(t.key); assert.ok(Math.abs(got - (v ? hi : lo)) <= Math.abs(hi - lo) * 0.02 + 1e-6, `${m.label} ${v}: ${t.tool}.${t.key} = ${got}`); });
+      Suites.macro(K, hub, i, m.default);
+    }));
+    U.T.bpm = 120; U.T.renderTicks(0, 32, 0.05);
+    const b = await TH.render(U);
+    assert.gt(TH.db(TH.rms(b, 0.3, 4)), -45, 'the system sounds through the suite: ' + TH.db(TH.rms(b, 0.3, 4)).toFixed(1) + ' dB');
+  }));
+});

@@ -1,0 +1,328 @@
+{
+  "schema": "eravos.suite/1",
+  "id": "music.synthwave",
+  "label": "Synthwave",
+  "icon": "🌆",
+  "accent": "#ff3cac",
+  "version": "1.0.0",
+  "blurb": "Night drive as a system. Chords play the Supersaw's wide pad through a Phaser; the same chords feed the Arp, which plays Retro Poly through a Juno chorus and a dotted tape delay. A four-on-the-floor Groove plays gated 80s drums through Dynamics. NEON, BRIGHT, ECHO and DRIVE turn all of it.",
+  "hub": "eravos.suite-hub",
+  "parts": [
+    {
+      "tool": "eravos.groove-gen",
+      "role": "rhythm",
+      "required": true,
+      "preset": "House Four",
+      "why": "four on the floor: plays the drums",
+      "notes": false
+    },
+    {
+      "tool": "eravos.pads",
+      "role": "drums",
+      "required": true,
+      "preset": "Retro Machines · Synthwave Gated",
+      "why": "gated 80s drums",
+      "notes": false
+    },
+    {
+      "tool": "eravos.fx-dynamics",
+      "role": "gate",
+      "required": true,
+      "preset": "80s Gated Snare",
+      "why": "the big gated snare"
+    },
+    {
+      "tool": "eravos.chord-gen",
+      "role": "chords",
+      "required": true,
+      "preset": "Lifted add9",
+      "why": "the progression: plays the pad and feeds the arp",
+      "notes": false
+    },
+    {
+      "tool": "eravos.supersaw",
+      "role": "pad",
+      "required": true,
+      "preset": "80s · Hyperspace Pad",
+      "why": "the wide chord pad"
+    },
+    {
+      "tool": "eravos.fx-phaser",
+      "role": "swirl",
+      "required": true,
+      "preset": "80s · Small Stone Swirl",
+      "why": "the pad's slow swirl"
+    },
+    {
+      "tool": "eravos.arp",
+      "role": "arp",
+      "required": true,
+      "preset": "Synthwave 1/16 Up",
+      "why": "sixteenths up the chord",
+      "notes": false
+    },
+    {
+      "tool": "eravos.retro-poly",
+      "role": "lead",
+      "required": true,
+      "preset": "80s · Stranger Arp",
+      "why": "the arp's voice: a poly synth with drift"
+    },
+    {
+      "tool": "eravos.fx-moddelay",
+      "role": "chorus",
+      "required": true,
+      "preset": "80s · Juno Chorus II",
+      "why": "Juno chorus on the arp"
+    },
+    {
+      "tool": "eravos.fx-echo",
+      "role": "delay",
+      "required": true,
+      "preset": "80s · Dotted Synthwave Delay",
+      "why": "the dotted-eighth tape delay"
+    }
+  ],
+  "wiring": [
+    {
+      "from": [
+        "eravos.groove-gen",
+        "groove.hook.note_out"
+      ],
+      "to": [
+        "eravos.pads",
+        "pads.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.pads",
+        "pads.hook.audio_out"
+      ],
+      "to": [
+        "eravos.fx-dynamics",
+        "fx.hook.audio_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.chord-gen",
+        "chordg.hook.note_out"
+      ],
+      "to": [
+        "eravos.supersaw",
+        "saw.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.supersaw",
+        "saw.hook.audio_out"
+      ],
+      "to": [
+        "eravos.fx-phaser",
+        "fx.hook.audio_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.chord-gen",
+        "chordg.hook.chord_out"
+      ],
+      "to": [
+        "eravos.arp",
+        "arp.hook.chord_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.arp",
+        "arp.hook.note_out"
+      ],
+      "to": [
+        "eravos.retro-poly",
+        "rp.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.retro-poly",
+        "rp.hook.audio_out"
+      ],
+      "to": [
+        "eravos.fx-moddelay",
+        "fx.hook.audio_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.fx-moddelay",
+        "fx.hook.audio_out"
+      ],
+      "to": [
+        "eravos.fx-echo",
+        "fx.hook.audio_in"
+      ]
+    }
+  ],
+  "output": [
+    "eravos.fx-dynamics",
+    "eravos.fx-phaser",
+    "eravos.fx-echo"
+  ],
+  "macros": [
+    {
+      "label": "NEON",
+      "default": 0.5,
+      "hint": "chorus and swirl: how wide and wet the 80s shimmer is",
+      "targets": [
+        {
+          "tool": "eravos.fx-moddelay",
+          "key": "mix"
+        },
+        {
+          "tool": "eravos.fx-phaser",
+          "key": "mix"
+        }
+      ]
+    },
+    {
+      "label": "BRIGHT",
+      "default": 0.55,
+      "hint": "the filters open on the arp and the pad",
+      "targets": [
+        {
+          "tool": "eravos.retro-poly",
+          "key": "cutoff",
+          "min": 500,
+          "max": 9000
+        },
+        {
+          "tool": "eravos.supersaw",
+          "key": "cutoff",
+          "min": 800,
+          "max": 14000
+        }
+      ]
+    },
+    {
+      "label": "ECHO",
+      "default": 0.4,
+      "hint": "the tape delay: how loud and how long",
+      "targets": [
+        {
+          "tool": "eravos.fx-echo",
+          "key": "mix",
+          "min": 0,
+          "max": 0.7
+        },
+        {
+          "tool": "eravos.fx-echo",
+          "key": "feedback",
+          "min": 0.1,
+          "max": 0.8
+        }
+      ]
+    },
+    {
+      "label": "DRIVE",
+      "default": 0.6,
+      "hint": "how busy the drums and the chords are",
+      "targets": [
+        {
+          "tool": "eravos.groove-gen",
+          "key": "energy"
+        },
+        {
+          "tool": "eravos.chord-gen",
+          "key": "energy"
+        }
+      ]
+    }
+  ],
+  "starter": "Night Drive",
+  "scenes": {
+    "Night Drive": {
+      "eravos.supersaw": {
+        "preset": "80s · Hyperspace Pad"
+      },
+      "eravos.retro-poly": {
+        "preset": "80s · Stranger Arp"
+      },
+      "eravos.arp": {
+        "preset": "Synthwave 1/16 Up"
+      },
+      "eravos.fx-echo": {
+        "preset": "80s · Dotted Synthwave Delay"
+      },
+      "eravos.pads": {
+        "preset": "Retro Machines · Synthwave Gated"
+      }
+    },
+    "Outrun": {
+      "eravos.supersaw": {
+        "preset": "80s · Jump Brass (Van)"
+      },
+      "eravos.retro-poly": {
+        "preset": "Outrun Lead"
+      },
+      "eravos.arp": {
+        "preset": "Octave Jumper"
+      },
+      "eravos.fx-moddelay": {
+        "preset": "80s · Dimension D Wide"
+      },
+      "eravos.pads": {
+        "preset": "Retro Machines · 808 Classic"
+      }
+    },
+    "Darksynth": {
+      "eravos.supersaw": {
+        "preset": "EDM Pad · Dark Minor Seventh Pad"
+      },
+      "eravos.retro-poly": {
+        "preset": "Darksynth Saw"
+      },
+      "eravos.arp": {
+        "preset": "Gallop"
+      },
+      "eravos.chord-gen": {
+        "preset": "Dark Minor"
+      },
+      "eravos.pads": {
+        "preset": "Retro Machines · Darkwave Cold"
+      }
+    },
+    "Miami Bass": {
+      "eravos.retro-poly": {
+        "preset": "80s · Miami Night Bass"
+      },
+      "eravos.arp": {
+        "preset": "Thumb Pedal (bass)"
+      },
+      "eravos.supersaw": {
+        "preset": "80s · Hyperspace Pad"
+      },
+      "eravos.fx-echo": {
+        "preset": "80s · Gated Slap '84"
+      }
+    },
+    "Blade Runner": {
+      "eravos.retro-poly": {
+        "preset": "80s · Blade Runner Pad"
+      },
+      "eravos.arp": {
+        "preset": "Dreamy 1/8 Down"
+      },
+      "eravos.supersaw": {
+        "preset": "Airy Sus Pad"
+      },
+      "eravos.fx-moddelay": {
+        "preset": "Slow Shimmer"
+      },
+      "eravos.fx-echo": {
+        "preset": "Worn Tape"
+      }
+    }
+  }
+}

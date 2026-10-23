@@ -1,0 +1,300 @@
+{
+  "schema": "eravos.suite/1",
+  "id": "music.sound-system",
+  "label": "Sound System",
+  "icon": "🔊",
+  "accent": "#ffd24a",
+  "version": "1.0.0",
+  "blurb": "A dub sound system as a system. The Groove plays a one-drop on the drums; Chords and the Bassline put a reggae sub under it. Dub Station skanks, sirens and rides the big knob, with your sample through a Filter going into it, then the Sidechain pumps it and the tape Echo throws it. SIREN, ECHO, KNOB and PUMP turn all of it.",
+  "hub": "eravos.suite-hub",
+  "parts": [
+    {
+      "tool": "eravos.groove-gen",
+      "role": "rhythm",
+      "required": true,
+      "preset": "Breaks",
+      "why": "the riddim: plays the drums and tells the Bassline where the kick is",
+      "notes": false
+    },
+    {
+      "tool": "eravos.pads",
+      "role": "drums",
+      "required": true,
+      "preset": "Trap, Phonk & Dancehall · Roots One Drop 3.0",
+      "why": "one-drop drums",
+      "notes": false
+    },
+    {
+      "tool": "eravos.chord-gen",
+      "role": "key",
+      "required": true,
+      "preset": "Odd · Dub Siren Cluster",
+      "why": "the chords the bass follows",
+      "notes": false
+    },
+    {
+      "tool": "eravos.bass-gen",
+      "role": "bassline",
+      "required": true,
+      "preset": "Odd · Reggae One Drop",
+      "why": "the reggae bassline",
+      "notes": false
+    },
+    {
+      "tool": "eravos.sub-engine",
+      "role": "sub",
+      "required": true,
+      "preset": "Sound-System Sub (reggae)",
+      "why": "the sub you feel"
+    },
+    {
+      "tool": "eravos.dub-station",
+      "role": "dub",
+      "required": true,
+      "preset": "Roots One Drop",
+      "why": "skank, siren, horn and the big knob — and whatever comes in"
+    },
+    {
+      "tool": "eravos.sidechain-compressor",
+      "role": "pump",
+      "required": true,
+      "preset": "Classic 1/4 Pump",
+      "why": "pumps the dub on the beat"
+    },
+    {
+      "tool": "eravos.fx-echo",
+      "role": "echo",
+      "required": true,
+      "preset": "Dub Throw",
+      "why": "the tape echo it throws into"
+    },
+    {
+      "tool": "eravos.sample-player",
+      "role": "sample",
+      "required": false,
+      "preset": "Chop 8",
+      "why": "drop a voice or a record here — it plays into the dub"
+    },
+    {
+      "tool": "eravos.fx-filter",
+      "role": "filter",
+      "required": false,
+      "preset": "Muffled Intro",
+      "why": "the sample through a filter on its way in"
+    }
+  ],
+  "wiring": [
+    {
+      "from": [
+        "eravos.groove-gen",
+        "groove.hook.note_out"
+      ],
+      "to": [
+        "eravos.pads",
+        "pads.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.groove-gen",
+        "groove.hook.step_out"
+      ],
+      "to": [
+        "eravos.bass-gen",
+        "bassg.hook.groove_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.chord-gen",
+        "chordg.hook.chord_out"
+      ],
+      "to": [
+        "eravos.bass-gen",
+        "bassg.hook.chord_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.bass-gen",
+        "bassg.hook.note_out"
+      ],
+      "to": [
+        "eravos.sub-engine",
+        "sub.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.sample-player",
+        "samp.hook.audio_out"
+      ],
+      "to": [
+        "eravos.fx-filter",
+        "fx.hook.audio_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.fx-filter",
+        "fx.hook.audio_out"
+      ],
+      "to": [
+        "eravos.dub-station",
+        "dub.hook.audio_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.dub-station",
+        "dub.hook.audio_out"
+      ],
+      "to": [
+        "eravos.sidechain-compressor",
+        "sc.hook.audio_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.sidechain-compressor",
+        "sc.hook.audio_out"
+      ],
+      "to": [
+        "eravos.fx-echo",
+        "fx.hook.audio_in"
+      ]
+    }
+  ],
+  "output": [
+    "eravos.pads",
+    "eravos.sub-engine",
+    "eravos.fx-echo"
+  ],
+  "macros": [
+    {
+      "label": "SIREN",
+      "default": 0.4,
+      "hint": "the siren: how loud and how far it rises",
+      "targets": [
+        {
+          "tool": "eravos.dub-station",
+          "key": "sirenLevel"
+        },
+        {
+          "tool": "eravos.dub-station",
+          "key": "sirenRise",
+          "min": 0,
+          "max": 12
+        }
+      ]
+    },
+    {
+      "label": "ECHO",
+      "default": 0.45,
+      "hint": "the dub echo: Dub Station's own and the tape throw",
+      "targets": [
+        {
+          "tool": "eravos.dub-station",
+          "key": "echo"
+        },
+        {
+          "tool": "eravos.fx-echo",
+          "key": "feedback",
+          "min": 0.2,
+          "max": 0.95
+        }
+      ]
+    },
+    {
+      "label": "KNOB",
+      "default": 0.6,
+      "hint": "the big knob — ride it",
+      "targets": [
+        {
+          "tool": "eravos.dub-station",
+          "key": "bigKnob",
+          "min": 120,
+          "max": 3000
+        }
+      ]
+    },
+    {
+      "label": "PUMP",
+      "default": 0.5,
+      "hint": "how hard the sidechain pumps",
+      "targets": [
+        {
+          "tool": "eravos.sidechain-compressor",
+          "key": "depth"
+        }
+      ]
+    }
+  ],
+  "starter": "Roots",
+  "scenes": {
+    "Roots": {
+      "eravos.dub-station": {
+        "preset": "Roots One Drop"
+      },
+      "eravos.sub-engine": {
+        "preset": "Sound-System Sub (reggae)"
+      },
+      "eravos.pads": {
+        "preset": "Trap, Phonk & Dancehall · Roots One Drop 3.0"
+      },
+      "eravos.fx-echo": {
+        "preset": "Dub Throw"
+      }
+    },
+    "Tubby": {
+      "eravos.dub-station": {
+        "preset": "Tubby Echo Chamber"
+      },
+      "eravos.fx-echo": {
+        "preset": "Worn Tape"
+      },
+      "eravos.sidechain-compressor": {
+        "preset": "Subtle Glue"
+      }
+    },
+    "Steppers": {
+      "eravos.dub-station": {
+        "preset": "Steppers Dub"
+      },
+      "eravos.sub-engine": {
+        "preset": "Odd · Steppers Sub"
+      },
+      "eravos.pads": {
+        "preset": "Odd · Steppers Machine"
+      },
+      "eravos.sidechain-compressor": {
+        "preset": "Odd · Steppers Pump 1/4"
+      },
+      "eravos.fx-echo": {
+        "preset": "Odd · Steppers Tape"
+      }
+    },
+    "Bun Dem": {
+      "eravos.dub-station": {
+        "preset": "Bun Dem (dancehall)"
+      },
+      "eravos.pads": {
+        "preset": "Trap, Phonk & Dancehall · Dancehall Bun"
+      },
+      "eravos.sub-engine": {
+        "preset": "808 Boom"
+      }
+    },
+    "Siren Call": {
+      "eravos.dub-station": {
+        "preset": "Sound System Siren"
+      },
+      "eravos.fx-echo": {
+        "preset": "Dub Throw"
+      },
+      "eravos.sidechain-compressor": {
+        "preset": "Half-time 1/2"
+      }
+    }
+  }
+}

@@ -1,0 +1,295 @@
+{
+  "schema": "eravos.suite/1",
+  "id": "music.gothic",
+  "label": "Gothic",
+  "icon": "🕯",
+  "accent": "#8a5cff",
+  "version": "1.0.0",
+  "blurb": "A cathedral after dark, as a system. Chords play the Gothic Organ, the Coven choir and a dark Pad Forge at once. The choir sings through Haunt (screwed tape, ghosts), and the organ and the choir share one long Echo. A slow stomp is there if you want drums. DARK, HAUNT, BREATH and SPACE turn all of it.",
+  "hub": "eravos.suite-hub",
+  "parts": [
+    {
+      "tool": "eravos.chord-gen",
+      "role": "chords",
+      "required": true,
+      "preset": "Dark Minor",
+      "why": "the progression all three voices play",
+      "notes": false
+    },
+    {
+      "tool": "eravos.organ",
+      "role": "organ",
+      "required": true,
+      "preset": "Gothic Chord Funeral",
+      "why": "the pipes"
+    },
+    {
+      "tool": "eravos.coven",
+      "role": "choir",
+      "required": true,
+      "preset": "Witch House Choir",
+      "why": "the choir"
+    },
+    {
+      "tool": "eravos.fx-haunt",
+      "role": "haunt",
+      "required": true,
+      "preset": "Witch Fog",
+      "why": "the choir through screwed tape and ghosts"
+    },
+    {
+      "tool": "eravos.fx-echo",
+      "role": "echo",
+      "required": true,
+      "preset": "Odd · Cathedral Throw",
+      "why": "the long room the organ and the choir share"
+    },
+    {
+      "tool": "eravos.pad-forge",
+      "role": "pad",
+      "required": true,
+      "preset": "Dark Choir",
+      "why": "a dark bed under it all"
+    },
+    {
+      "tool": "eravos.groove-gen",
+      "role": "stomp",
+      "required": false,
+      "preset": "Odd · Organ Hall Stomp",
+      "why": "a slow stomp — add it for drums",
+      "notes": false
+    },
+    {
+      "tool": "eravos.pads",
+      "role": "drums",
+      "required": false,
+      "preset": "Odd · Séance Trap",
+      "why": "the drums the stomp plays",
+      "notes": false
+    }
+  ],
+  "wiring": [
+    {
+      "from": [
+        "eravos.chord-gen",
+        "chordg.hook.note_out"
+      ],
+      "to": [
+        "eravos.organ",
+        "organ.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.chord-gen",
+        "chordg.hook.note_out"
+      ],
+      "to": [
+        "eravos.coven",
+        "cov.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.chord-gen",
+        "chordg.hook.note_out"
+      ],
+      "to": [
+        "eravos.pad-forge",
+        "pad.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.coven",
+        "cov.hook.audio_out"
+      ],
+      "to": [
+        "eravos.fx-haunt",
+        "fx.hook.audio_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.fx-haunt",
+        "fx.hook.audio_out"
+      ],
+      "to": [
+        "eravos.fx-echo",
+        "fx.hook.audio_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.organ",
+        "organ.hook.audio_out"
+      ],
+      "to": [
+        "eravos.fx-echo",
+        "fx.hook.audio_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.groove-gen",
+        "groove.hook.note_out"
+      ],
+      "to": [
+        "eravos.pads",
+        "pads.hook.note_in"
+      ]
+    }
+  ],
+  "output": [
+    "eravos.fx-echo",
+    "eravos.pad-forge",
+    "eravos.pads"
+  ],
+  "macros": [
+    {
+      "label": "DARK",
+      "default": 0.5,
+      "hint": "how dark the organ and the choir are (all the way: lights out)",
+      "targets": [
+        {
+          "tool": "eravos.organ",
+          "key": "dark",
+          "min": 9000,
+          "max": 900
+        },
+        {
+          "tool": "eravos.coven",
+          "key": "dark",
+          "min": 9000,
+          "max": 700
+        }
+      ]
+    },
+    {
+      "label": "HAUNT",
+      "default": 0.45,
+      "hint": "the ghosts on the choir: tape warble and the ghost voices",
+      "targets": [
+        {
+          "tool": "eravos.fx-haunt",
+          "key": "mix"
+        },
+        {
+          "tool": "eravos.fx-haunt",
+          "key": "ghost"
+        }
+      ]
+    },
+    {
+      "label": "BREATH",
+      "default": 0.4,
+      "hint": "the organ and the choir breathe",
+      "targets": [
+        {
+          "tool": "eravos.organ",
+          "key": "breathDepth"
+        },
+        {
+          "tool": "eravos.coven",
+          "key": "breath"
+        }
+      ]
+    },
+    {
+      "label": "SPACE",
+      "default": 0.5,
+      "hint": "the room: the echo and the pad's space",
+      "targets": [
+        {
+          "tool": "eravos.fx-echo",
+          "key": "mix",
+          "min": 0,
+          "max": 0.7
+        },
+        {
+          "tool": "eravos.pad-forge",
+          "key": "space"
+        }
+      ]
+    }
+  ],
+  "starter": "Funeral",
+  "scenes": {
+    "Funeral": {
+      "eravos.organ": {
+        "preset": "Gothic Chord Funeral"
+      },
+      "eravos.coven": {
+        "preset": "Witch House Choir"
+      },
+      "eravos.fx-haunt": {
+        "preset": "Witch Fog"
+      },
+      "eravos.pad-forge": {
+        "preset": "Dark Choir"
+      },
+      "eravos.fx-echo": {
+        "preset": "Odd · Cathedral Throw"
+      }
+    },
+    "Vampire Ballroom": {
+      "eravos.organ": {
+        "preset": "Vampire Ballroom"
+      },
+      "eravos.coven": {
+        "preset": "Crystal Coven"
+      },
+      "eravos.fx-haunt": {
+        "preset": "Haunted Cassette"
+      },
+      "eravos.pad-forge": {
+        "preset": "Frozen Halo (hold)"
+      }
+    },
+    "Séance": {
+      "eravos.organ": {
+        "preset": "Eerie Celeste"
+      },
+      "eravos.coven": {
+        "preset": "Séance Pad"
+      },
+      "eravos.fx-haunt": {
+        "preset": "Séance Radio"
+      },
+      "eravos.chord-gen": {
+        "preset": "Cluster Drop"
+      },
+      "eravos.pad-forge": {
+        "preset": "Underwater"
+      }
+    },
+    "Breathing Crypt": {
+      "eravos.organ": {
+        "preset": "Breathing Crypt"
+      },
+      "eravos.coven": {
+        "preset": "Hex Drone"
+      },
+      "eravos.fx-haunt": {
+        "preset": "Telephone From Below"
+      },
+      "eravos.pad-forge": {
+        "preset": "Dark Choir"
+      }
+    },
+    "Screwed Chant": {
+      "eravos.organ": {
+        "preset": "Lanegan Drone"
+      },
+      "eravos.coven": {
+        "preset": "Graveyard Chant (screwed)"
+      },
+      "eravos.fx-haunt": {
+        "preset": "Chopped & Screwed"
+      },
+      "eravos.fx-echo": {
+        "preset": "Worn Tape"
+      }
+    }
+  }
+}
