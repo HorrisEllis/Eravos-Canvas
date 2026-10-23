@@ -441,7 +441,7 @@ describe('eravos.curve-synth (spec eravos.organism.curve-synth)', () => {
   stdTests('eravos.curve-synth', { note: 60 });
   it('spec: straight rising curve 0→1 over 1 s → frequency rises low→high monotonically', async () => {
     const U = TH.universe(1.3); const a = TH.spawn(U, 'eravos.curve-synth'); const c = P14.ctxOf(a);
-    P14.set(U, a, { slot: 5, duration: 1, lowNote: 48, highNote: 84, edge: false, noise: 0, drive: 0, sustain: 1, wave: 'sine' });
+    P14.set(U, a, { follow: 'range', slot: 5, duration: 1, lowNote: 48, highNote: 84, edge: false, noise: 0, drive: 0, sustain: 1, wave: 'sine' });
     c.playCurve(5, 60, 1, 0.05); const buf = await TH.render(U);
     const fs = [0.15, 0.4, 0.65, 0.9].map(t => TH.zcFreq(buf, t, t + 0.08)); for (let i = 1; i < fs.length; i++) assert.gt(fs[i], fs[i - 1], fs.join(','));
     assert.near(fs[0], MusicTheory.hz(48 + 0.12 * 36), 25);

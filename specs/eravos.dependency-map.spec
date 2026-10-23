@@ -73,7 +73,7 @@ tools:
     - eravos.fx-box (FX Box) mode=music units=[engine,transport,tempo,meter,midi] needs=[audio,clock,midi,mod,notes] in=3 out=2
   Sound sources:
     - eravos.acid-synth (Acid Synth) mode=music units=[engine,key,meter,midi] needs=[audio,key,midi,mod,notes] in=11 out=2
-    - eravos.curve-synth (Curve) mode=music units=[engine,meter,midi] needs=[audio,midi,mod,notes] in=14 out=1
+    - eravos.curve-synth (Curve) mode=music units=[engine,meter,midi] needs=[audio,midi,mod,notes] in=17 out=1
     - eravos.pad-forge (Pad Forge) mode=music units=[engine,key,meter,midi] needs=[audio,key,midi,mod,notes] in=23 out=1
     - eravos.reese-bass (Reese Bass) mode=music units=[engine,transport,tempo,meter,midi] needs=[audio,clock,midi,mod,notes] in=26 out=1
     - eravos.sub-engine (Deep Sub) mode=music units=[engine,key,meter,midi] needs=[audio,key,midi,mod,notes] in=16 out=1

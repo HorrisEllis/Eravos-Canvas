@@ -26,7 +26,9 @@
       "wave": "sine",
       "noise": 0.1,
       "drive": 0.25,
-      "sustain": 0.1
+      "sustain": 0.1,
+      "follow": "range",
+      "length": "fixed"
      }
     },
     "Ricochet": {
@@ -39,7 +41,10 @@
       "decay": 0.75,
       "wave": "triangle",
       "noise": 0.25,
-      "drive": 0.4
+      "drive": 0.4,
+      "follow": "range",
+      "length": "fixed",
+      "sustain": 0.2
      }
     },
     "Siren": {
@@ -52,7 +57,9 @@
       "wave": "square",
       "noise": 0,
       "drive": 0.3,
-      "sustain": 1
+      "sustain": 1,
+      "follow": "range",
+      "length": "fixed"
      }
     },
     "Drop Whoop": {
@@ -67,7 +74,103 @@
       "wave": "sawtooth",
       "noise": 0.2,
       "drive": 0.5,
-      "sustain": 0.5
+      "sustain": 0.5,
+      "follow": "range",
+      "length": "fixed"
+     }
+    },
+    "Bending Lead": {
+     "params": {
+      "edge": false,
+      "bounces": 0,
+      "noise": 0.03,
+      "drive": 0.35,
+      "level": 0.6,
+      "follow": "note",
+      "length": "note",
+      "slot": 7,
+      "span": 2,
+      "wave": "sawtooth",
+      "sustain": 0.85
+     }
+    },
+    "Plain Lead (no bend)": {
+     "params": {
+      "edge": false,
+      "bounces": 0,
+      "noise": 0.03,
+      "drive": 0.25,
+      "level": 0.6,
+      "follow": "note",
+      "length": "note",
+      "slot": 4,
+      "span": 0,
+      "wave": "square",
+      "sustain": 0.8
+     }
+    },
+    "Vibrato Lead": {
+     "params": {
+      "edge": false,
+      "bounces": 0,
+      "noise": 0.0,
+      "drive": 0.25,
+      "level": 0.6,
+      "follow": "note",
+      "length": "note",
+      "slot": 2,
+      "span": 1,
+      "wave": "triangle",
+      "sustain": 0.9
+     }
+    },
+    "Laser Pluck": {
+     "params": {
+      "edge": false,
+      "bounces": 0,
+      "noise": 0.03,
+      "drive": 0.4,
+      "level": 0.6,
+      "follow": "note",
+      "length": "note",
+      "slot": 6,
+      "span": 24,
+      "wave": "square",
+      "sustain": 0.15
+     }
+    },
+    "Whoop Bass": {
+     "params": {
+      "edge": true,
+      "bounces": 2,
+      "noise": 0.03,
+      "drive": 0.6,
+      "level": 0.6,
+      "follow": "note",
+      "length": "note",
+      "slot": 0,
+      "span": 12,
+      "wave": "sawtooth",
+      "sustain": 0.7,
+      "restitution": 0.5,
+      "decay": 0.5
+     }
+    },
+    "Ricochet Notes": {
+     "params": {
+      "edge": true,
+      "bounces": 4,
+      "noise": 0.1,
+      "drive": 0.25,
+      "level": 0.6,
+      "follow": "note",
+      "length": "note",
+      "slot": 1,
+      "span": 7,
+      "wave": "triangle",
+      "sustain": 0.4,
+      "restitution": 0.6,
+      "decay": 0.6
      }
     }
    }

@@ -34,3 +34,7 @@
 .tlpr-edit.open { display: flex; }
 .tlpr-eh { display: flex; align-items: center; gap: 6px; font: 12px var(--font, sans-serif); color: #ffd24a; }
 .tlpr-knobs { display: flex; gap: 10px; }
+/* 3.53 full screen: the roll moved onto the page (timeline.pianoroll.js setFull) — over everything, the grid takes the room */
+.tlpr.tlpr-full { position: fixed; inset: 0; z-index: 150500; display: flex; flex: none !important; margin: 0; border-radius: 0; border: 0; height: 100vh !important; width: 100vw; box-shadow: 0 0 0 100vmax rgba(0,0,0,.6); }
+.tlpr.tlpr-full .tlpr-bar { padding: 8px 12px; background: #0d131b; }
+.tlpr.tlpr-full .tlpr-scroll { flex: 1; }

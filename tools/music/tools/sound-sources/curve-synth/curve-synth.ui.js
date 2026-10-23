@@ -15,6 +15,9 @@ OrganismFactory.reg('eravos.curve-synth', function (view) {
       const end = sp[sp.length - 1]; if (s.edge && (end.y >= 0.97 || end.y <= 0.03)) { let d = 1, a = 1, x0 = end.x; g.setLineDash([4, 4]); for (let b = 1; b <= (s.bounces || 0); b++) { d *= s.decay || 0.6; a *= s.restitution || 0.6; g.strokeStyle = `rgba(255,106,42,${a})`; g.beginPath(); const rev = sp.slice().reverse(); rev.forEach((p, i) => { const x = x0 - (1 - p.x) * d * 0.25 * (b % 2 ? 1 : -1); i ? g.lineTo(X(Math.max(0, Math.min(1, x)), W), Y(p.y)) : g.moveTo(X(Math.max(0, Math.min(1, x)), W), Y(p.y)); }); g.stroke(); } g.setLineDash([]); }
     }
     if (live) { const el = (performance.now() - live.at) / 1000; const seg = live.plan.find(p => el >= p.t && el < p.t + p.dur); if (seg && sp.length) { const u = (el - seg.t) / seg.dur, fx = seg.dir > 0 ? u : 1 - u; let y = sp[0].y; for (let i = 1; i < sp.length; i++) if (sp[i].x >= fx) { const a = sp[i - 1], b = sp[i], k = (fx - a.x) / Math.max(1e-6, b.x - a.x); y = a.y + (b.y - a.y) * k; break; } g.fillStyle = '#fff'; g.beginPath(); g.arc(X(fx, W), Y(y), 3 + seg.amp * 6, 0, 7); g.fill(); } else if (el > live.plan[live.plan.length - 1].t + 1) live = null; }
+    // Follow note: the start of the drawing IS the note played — mark that height, and how far the edges bend from it
+    if (s.follow === 'note' && sp.length) { const y0 = sp[0].y, sp2 = s.span || 0; g.setLineDash([2, 5]); g.strokeStyle = '#ffffff55'; g.beginPath(); g.moveTo(M, Y(y0)); g.lineTo(W - M, Y(y0)); g.stroke(); g.setLineDash([]);
+      g.fillStyle = '#ffd2b0'; g.font = '10px monospace'; g.fillText('the note you play', M + 4, Y(y0) - 4); g.fillStyle = '#a0603a'; g.fillText('+' + (+((1 - y0) * sp2).toFixed(1)) + ' st', W - M - 62, M + 12); g.fillText('−' + (+(y0 * sp2).toFixed(1)) + ' st', W - M - 62, H - M - 16); }
     g.fillStyle = '#a0603a'; g.font = '10px monospace'; g.fillText('draw a gesture · end on the orange edge to bounce · shift = line', M + 4, H - 4);
   }, 60);
   let last = null;
@@ -29,5 +32,5 @@ OrganismFactory.reg('eravos.curve-synth', function (view) {
   view.on('state_sync', (s) => { if (s.curves) curves = s.curves; });
   view.root.append(
     h('div', { class: 'org-row', style: { justifyContent: 'space-between', gap: '6px', flexWrap: 'wrap' } }, [UI.presetBar(view), slots.el, UI.Button({ label: '▶ Fire', onClick: () => view.emit('play', {}) }).el]), cv,
-    UI.paramPanel(view, ['duration', 'lowNote', 'highNote', 'edge', 'bounces', 'restitution', 'decay', 'wave', 'noise', 'drive', 'sustain', 'level'], { size: 30 }));
+    UI.paramPanel(view, ['follow', 'span', 'length', 'duration', 'lowNote', 'highNote', 'edge', 'bounces', 'restitution', 'decay', 'wave', 'noise', 'drive', 'sustain', 'level'], { size: 30 }));
 });

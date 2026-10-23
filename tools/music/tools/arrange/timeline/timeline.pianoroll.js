@@ -76,6 +76,19 @@
     const fillBtn = UI.Button({ label: '✦ Fill', hint: 'replace this clip with a chord progression in the song key', onClick: () => { if (clip && (!notes.length || confirm('Replace the notes in this clip?'))) view.emit('clip_fill', { id: clip.id, progression: progSel.get(), style: styleSel.get(), voicing: voiceSel.get() }); } });
     const clearBtn = UI.Button({ label: 'Clear', kind: 'danger', onClick: () => { if (clip && notes.length && confirm('Delete every note in this clip?')) commit([]); } });
     const closeBtn = UI.Button({ label: '×', hint: 'close piano roll', onClick: () => { hide(); if (opts && opts.onClose) opts.onClose(); } });
+    // 3.53 "a way to full screen the notes screen, its cramped": the roll lives inside the canvas world (CSS-transformed, so
+    // position:fixed would stay inside it) — full screen MOVES the roll onto the page over everything, and back to the same
+    // spot after. Every hit test maps by the live rect (toContent), so nothing else changes. ⛶ again, Esc or closing the clip.
+    let full = null;
+    const fullBtn = UI.Button({ label: '⛶ Full screen', hint: 'the notes fill the whole screen — ⛶ again or Esc puts it back', onClick: () => setFull(!full) });
+    function fullKey(e) { if (e.key !== 'Escape' || !full) return; if (S.size || stepOn || editor.classList.contains('open')) return; e.preventDefault(); e.stopPropagation(); setFull(false); }
+    function setFull(on) {
+      if (!!on === !!full) return;
+      if (on) { full = { parent: el.parentNode, next: el.nextSibling }; document.body.appendChild(el); el.classList.add('tlpr-full'); document.addEventListener('keydown', fullKey, true); }
+      else { const f = full; full = null; el.classList.remove('tlpr-full'); document.removeEventListener('keydown', fullKey, true); if (f.parent) f.parent.insertBefore(el, f.next && f.next.parentNode === f.parent ? f.next : null); }
+      fullBtn.set(full ? '⤡ Back to the timeline' : '⛶ Full screen'); fullBtn.el.classList.toggle('on', !!full);
+      if (clip) requestAnimationFrame(() => { draw(); cv.focus({ preventScroll: true }); });
+    }
     const readout = h('span', { class: 'tlpr-pos', 'aria-live': 'polite', text: '' });
     const qSel = UI.Select({ label: 'Quantize', hint: 'how far Q pulls note starts onto the grid', options: [{ value: '1', label: '100 %' }, { value: '0.75', label: '75 %' }, { value: '0.5', label: '50 %' }, { value: '0.25', label: '25 %' }], value: '1', onChange: (v) => { qStrength = +v; } });
     const ebtn = (text, hint, fn) => { const b = h('button', { class: 'tlpr-tool tlpr-ed', title: hint, 'aria-label': hint, text }); b.addEventListener('click', (e) => { e.stopPropagation(); fn(); cv.focus({ preventScroll: true }); }); return b; };
@@ -84,7 +97,7 @@
     const legBtn = ebtn('⟷', 'Legato (L) — each note lasts until the next one starts', () => legato());
     const stepBtn = ebtn('⏎', 'Step input — type notes on Z S X D C V G B H N J M (an octave up: Q 2 W 3 E R 5 T 6 Y 7 U); Space = rest; Backspace = back', () => setStep(!stepOn));
     const edBox = h('span', { class: 'tlpr-tools', role: 'group', 'aria-label': 'edit' }, [qSel.el, qBtn, huBtn, legBtn, stepBtn]);
-    const bar = h('div', { class: 'tlpr-bar' }, [title, bars.el, h('span', { class: 'tlpr-sep' }), toolBox, gridSel.el, lenSel.el, stampSel.el, lockT.el, zoomSel.el, rowSel.el, edBox, readout, h('span', { class: 'tlpr-sep' }), progSel.el, styleSel.el, voiceSel.el, fillBtn.el, clearBtn.el, closeBtn.el]);
+    const bar = h('div', { class: 'tlpr-bar' }, [title, bars.el, h('span', { class: 'tlpr-sep' }), toolBox, gridSel.el, lenSel.el, stampSel.el, lockT.el, zoomSel.el, rowSel.el, edBox, readout, h('span', { class: 'tlpr-sep' }), progSel.el, styleSel.el, voiceSel.el, fillBtn.el, clearBtn.el, fullBtn.el, closeBtn.el]);
     const keys = document.createElement('canvas'); keys.className = 'tlpr-keys';
     const ruler = document.createElement('canvas'); ruler.className = 'tlpr-ruler';
     const cv = document.createElement('canvas'); cv.className = 'tlpr-grid'; cv.tabIndex = 0; cv.setAttribute('role', 'application'); cv.setAttribute('aria-label', 'Note grid — 1 draw, 2 paint, 3 split, 4 erase, 5 select; click to add, drag to move, drag an edge to stretch, Shift-click or drag a box to select, Ctrl+C / V / D, arrow keys nudge, Q quantize, double-click for the note knobs; hold Alt for no snap');
@@ -486,10 +499,10 @@
       el.classList.add('open'); drawKeys(); draw();
       if (first) requestAnimationFrame(() => { if (drums) { scroll.scrollTop = 0; scroll.scrollLeft = 0; return; } const ps = notes.map(n => n.n); const mid = ps.length ? ps.reduce((a, b) => a + b, 0) / ps.length : 60 + key.root; scroll.scrollTop = Math.max(0, yOf(Math.round(mid)) - scroll.clientHeight / 2); scroll.scrollLeft = 0; });
     }
-    function hide() { clip = null; openedId = null; closeEditor(); setStep(false); el.classList.remove('open'); }
+    function hide() { setFull(false); clip = null; openedId = null; closeEditor(); setStep(false); el.classList.remove('open'); }
     function playhead(barPos) { if (!clip) return; const p = barPos === null ? null : (barPos - clip.startBar) * 16; if (p !== playStep) { playStep = p; draw(); } }
     setMode(null); setTool('draw');
-    return { el, show, hide, playhead, get open() { return !!clip; }, get clipId() { return clip && clip.id; }, get drums() { return drums; },
+    return { el, show, hide, playhead, setFull, get full() { return !!full; }, get open() { return !!clip; }, get clipId() { return clip && clip.id; }, get drums() { return drums; },
       // for tests and the timeline's own keys: the grid/tool/zoom the roll is in, and what it holds
       get state() { return { tool, grid, len, lastLen, pps, row: ROW, step: stepOn, cursor, notes: notes.map(n => Object.assign({}, n)) }; }, setTool, zoomTo, setRow,
       setGrid: (v) => { gridSel.set(v); grid = GRIDS.find(g => g[0] === String(v))[2]; draw(); }, canvas: cv, ruler, vel, openEditor, setStep, get selected() { return Array.from(S).sort((a, b) => a - b); } };

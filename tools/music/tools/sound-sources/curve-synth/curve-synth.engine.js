@@ -28,7 +28,7 @@
     return out;
   }
   OrganismFactory.define({
-    id: 'eravos.curve-synth', preview: 'lead', domain: 'music', version: '1.0.0', label: 'Curve', icon: '⤵', accent: '#c4541b', phase: 'P14',
+    id: 'eravos.curve-synth', preview: 'lead', domain: 'music', version: '1.1.0', label: 'Curve', icon: '⤵', accent: '#c4541b', phase: 'P14',
     category: 'Sound sources', blurb: 'Draw a pitch gesture; the sound follows it, slams the edge and ricochets back — dives, whoops, sirens, lasers.',
     size: { w: 560, h: 560 }, minSize: { w: 440, h: 440 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
@@ -37,6 +37,11 @@
     hooks: [S.audio_out('curve.hook.audio_out'), S.note_in('curve.hook.note_in'), S.midi_in('curve.hook.midi_in')],
     config: [
       { key: 'slot', type: 'integer', default: 0, min: 0, max: 7, label: 'Curve', group: 'CURVE' },
+      // 1.1 (3.53 "the curve tool … not doing much"): on the Timeline the gesture now plays the NOTE — it starts on the note
+      // played and bends ±Span from it, and lasts as long as the note. 'range' / 'fixed' are 1.0 (a fixed sweep, Duration long).
+      { key: 'follow', type: 'enum', options: ['note', 'range'], default: 'note', label: 'Follow', group: 'CURVE', hint: 'note: the gesture starts on the note you play and bends ±Span from it · range: it sweeps Low note → High note (shifted by the note)' },
+      { key: 'span', type: 'number', default: 12, min: 0, max: 48, step: 0.5, unit: 'st', label: 'Span', group: 'CURVE', hint: 'Follow note: how far the drawing bends from the note, top to bottom of the canvas' },
+      { key: 'length', type: 'enum', options: ['note', 'fixed'], default: 'note', label: 'Length', group: 'CURVE', hint: 'note: the gesture lasts as long as the note (Timeline, Sequencer) · fixed: always Duration' },
       { key: 'duration', type: 'number', default: 0.45, min: 0.05, max: 4, step: 0.001, unit: 's', label: 'Duration', group: 'CURVE' },
       { key: 'lowNote', type: 'integer', default: 24, min: 0, max: 120, label: 'Low note', group: 'CURVE' },
       { key: 'highNote', type: 'integer', default: 106, min: 1, max: 127, label: 'High note', group: 'CURVE' },
@@ -47,12 +52,12 @@
       { key: 'wave', type: 'enum', options: ['sine', 'triangle', 'sawtooth', 'square'], default: 'sine', label: 'Wave', group: 'VOICE' },
       { key: 'noise', type: 'number', default: 0.15, min: 0, max: 1, step: 0.01, label: 'Noise', group: 'VOICE' },
       { key: 'drive', type: 'number', default: 0.2, min: 0, max: 1, step: 0.01, label: 'Drive', group: 'VOICE' },
-      { key: 'sustain', type: 'number', default: 0.2, min: 0, max: 1, step: 0.01, label: 'Sustain', group: 'VOICE', hint: '0 = percussive decay over the gesture, 1 = held' },
+      { key: 'sustain', type: 'number', default: 0.7, min: 0, max: 1, step: 0.01, label: 'Sustain', group: 'VOICE', hint: '0 = percussive decay over the gesture, 1 = held' },
       { key: 'level', type: 'number', default: 0.7, min: 0, max: 1.5, step: 0.01, label: 'Level', group: 'VOICE' },
     ],
     ui_hooks: ['curve_set', 'play'],
     ui_hook_labels: { curve_set: 'draw curve' },
-    defaultPreset: 'Songs-for-the-Dead Dive',
+    defaultPreset: 'Bending Lead',
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, dsp = ctx.dsp, MT = window.MusicTheory;
       let curves = DEFAULT_CURVES.map(c => c.map(p => Object.assign({}, p)));
@@ -62,8 +67,10 @@
       ['drive', 'level'].forEach(k => P.onChange(k, apply)); apply();
       const noiseBuf = dsp.noise(ac, 2, 'white');
       function path(slot, note) {
-        const ys = smooth(curves[slot] || curves[0], 256), lo = P.get('lowNote'), hi = Math.max(lo + 1, P.get('highNote')), tr = (note === undefined ? 60 : note) - 60;
-        return { ys, freqs: Float32Array.from(ys, y => Math.min(ac.sampleRate * 0.45, Math.max(16, MT.hz(lo + tr + y * (hi - lo))))) };
+        const ys = smooth(curves[slot] || curves[0], 256), n = note === undefined ? 60 : note, hz = (m) => Math.min(ac.sampleRate * 0.45, Math.max(16, MT.hz(m)));
+        if (P.get('follow') === 'note') { const y0 = ys[0], sp = P.get('span'); return { ys, freqs: Float32Array.from(ys, y => hz(n + (y - y0) * sp)) }; }   // starts ON the note
+        const lo = P.get('lowNote'), hi = Math.max(lo + 1, P.get('highNote')), tr = n - 60;
+        return { ys, freqs: Float32Array.from(ys, y => hz(lo + tr + y * (hi - lo))) };
       }
       function segment(freqs, t, dur, amp, pan) {
         const o = ac.createOscillator(); o.type = P.get('wave'); o.frequency.setValueCurveAtTime(freqs, t, dur);
@@ -73,8 +80,10 @@
         const nz = P.get('noise'); if (nz > 0) { const n = ac.createBufferSource(); n.buffer = noiseBuf; n.loop = true; const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 6; bp.frequency.setValueCurveAtTime(freqs, t, dur); const ng = ac.createGain(); ng.gain.value = nz * 1.4; n.connect(bp); bp.connect(ng); ng.connect(g); n.start(t, Math.random()); n.stop(t + dur + 0.05); nodes.push(n, bp, ng); }
         o.start(t); o.stop(t + dur + 0.05); o.onended = () => nodes.forEach(x => { try { x.disconnect(); } catch (e) {} });
       }
-      function play(slot, note, vel, t) {
-        t = Math.max(t || ac.currentTime, ac.currentTime) + 0.002; const { ys, freqs } = path(slot, note), dur = P.get('duration');
+      // every note is its own voice: overlapping notes each play their whole gesture (and bounces) — nothing is cut
+      function play(slot, note, vel, t, noteDur) {
+        t = Math.max(t || ac.currentTime, ac.currentTime) + 0.002; const { ys, freqs } = path(slot, note);
+        const dur = P.get('length') === 'note' && noteDur > 0.02 ? Math.min(30, noteDur) : P.get('duration');
         segment(freqs, t, dur, 0.25 + 0.75 * vel, 0);
         const plan = [{ t, dur, amp: 0.25 + 0.75 * vel, dir: 1 }];
         const endY = ys[ys.length - 1], atEdge = endY >= 0.97 || endY <= 0.03;
@@ -90,9 +99,9 @@
         return plan;
       }
       ctx.playCurve = play;
-      ctx.onNote((p) => play(P.get('slot'), p.note, p.velocity, p.time));
+      ctx.onNote((p) => play(P.get('slot'), p.note, p.velocity, p.time, p.duration));
       ctx.onMidi((p) => { if (p.on) play(P.get('slot'), p.note, p.velocity); });
-      ctx.audition = (p) => play(P.get('slot'), p.note || 60, p.velocity || 0.9);
+      ctx.audition = (p) => play(P.get('slot'), p.note || 60, p.velocity || 0.9, undefined, p.duration);
       ctx.onUI('play', { type: 'object' }, (p) => play(typeof p.slot === 'number' ? p.slot : P.get('slot'), 60, 0.9));
       ctx.onUI('curve_set', { type: 'object', required: ['slot', 'pts'] }, (p) => { if (p.slot < 0 || p.slot > 7 || !Array.isArray(p.pts)) return; curves[p.slot] = p.pts.slice(0, 256).filter(q => q && Number.isFinite(q.x) && Number.isFinite(q.y)).map(q => ({ x: Math.max(0, Math.min(1, q.x)), y: Math.max(0, Math.min(1, q.y)) })); ctx.syncUI(); });
       ctx.saveExtra = () => ({ curves: curves.map(c => c.map(p => [+p.x.toFixed(4), +p.y.toFixed(4)])) });
