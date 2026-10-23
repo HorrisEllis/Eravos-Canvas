@@ -56,8 +56,8 @@
       { key: 'laneH', type: 'integer', default: 48, min: 28, max: 160, label: 'Lane height', group: 'VIEW', hint: 'taller lanes = bigger clips (Alt + wheel over the lanes)' },
       { key: 'songBars', type: 'integer', default: 64, min: 1, max: 512, label: 'Song bars', group: 'VIEW' },
     ],
-    ui_hooks: ['transport_play', 'restart', 'seek', 'loop_set', 'lane_add', 'lane_edit', 'lane_remove', 'auto_points', 'rec_knobs', 'clip_add', 'clip_edit', 'clip_remove', 'clip_split', 'clip_duplicate', 'clip_repeat', 'lane_split', 'marker_edit', 'bounce', 'drop_file', 'export', 'note_audition', 'clip_fill', 'export_midi', 'export_stems', 'tool_set', 'tool_preset'],
-    ui_hook_labels: { clip_add: 'new clip', clip_edit: 'edit clip / notes', clip_remove: 'delete clip', clip_split: 'split clip', clip_duplicate: 'duplicate clip', clip_repeat: 'repeat clip', lane_split: 'split lane',
+    ui_hooks: ['transport_play', 'restart', 'seek', 'loop_set', 'lane_add', 'lane_edit', 'lane_remove', 'auto_points', 'rec_knobs', 'clip_add', 'clip_edit', 'clip_remove', 'clip_split', 'clip_split_at', 'clip_duplicate', 'clip_repeat', 'lane_split', 'marker_edit', 'bounce', 'drop_file', 'export', 'note_audition', 'clip_fill', 'export_midi', 'export_stems', 'tool_set', 'tool_preset'],
+    ui_hook_labels: { clip_add: 'new clip', clip_edit: 'edit clip / notes', clip_remove: 'delete clip', clip_split: 'split clip', clip_split_at: 'split at the frame', clip_duplicate: 'duplicate clip', clip_repeat: 'repeat clip', lane_split: 'split lane',
       clip_fill: 'fill chords', lane_add: 'new track', lane_edit: 'track settings', lane_remove: 'remove track', marker_edit: 'marker', drop_file: 'drop audio', loop_set: 'loop' },
     restoreTwice: true,
     engine(ctx) {
@@ -498,6 +498,20 @@
       }
       ctx.split = split;
       ctx.onUI('clip_split', { type: 'object', required: ['id', 'bar'] }, (p) => split(p.id, p.bar));
+      // 3.62 FRAME SPLIT — James, 2026-10-23: "you select a frame in the timine and clit split to cut a pattern in half". Every clip on
+      // the given lanes that a cut line falls inside is cut there (a frame = two lines: its start and its end; a click = one line).
+      // Note and pattern clips cut on whole bars (their length is in bars); audio cuts where the line is. One undo step.
+      function splitAt(laneIds, bars) {
+        const ids = new Set(laneIds || []), cuts = Array.from(new Set((bars || []).map(Number).filter(isFinite))).sort((a, b) => a - b), made = [];
+        cuts.forEach(bar => clips.filter(c => ids.has(c.lane)).forEach(c => {
+          const len = c.kind === 'audio' ? c.lengthSec / barSec() : c.bars, at = c.kind === 'audio' ? bar : Math.round(bar);
+          if (at > c.startBar + 1e-6 && at < c.startBar + len - 1e-6) { const r = split(c.id, at); if (r) made.push(r[1].id); }
+        }));
+        if (!made.length) ctx.emitUI('export_state', { error: 'Split: no clip crosses that line' + (cuts.length > 1 ? 's' : '') + ' (note and pattern clips cut on whole bars).' });
+        return made;
+      }
+      ctx.splitAt = splitAt;
+      ctx.onUI('clip_split_at', { type: 'object', required: ['lanes', 'bars'] }, (p) => splitAt(p.lanes, p.bars));
       ctx.onUI('clip_duplicate', { type: 'object', required: ['id'] }, (p) => {
         const c = clips.find(x => x.id === p.id); if (!c) return ctx.fault('RUNTIME_002', 'clip ' + p.id);
         const len = c.kind === 'audio' ? c.lengthSec / barSec() : c.bars;

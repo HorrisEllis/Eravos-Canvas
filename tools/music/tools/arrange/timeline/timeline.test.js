@@ -556,3 +556,20 @@ describe('tool · Timeline — repeating clips, Repeat ×N, split lanes (3.62)',
     assert.ok(made.every(l => / · /.test(l.name)), made.map(l => l.name).join());
   });
 });
+
+// 3.62 — James, 2026-10-23: "you select a frame in the timine and clit split to cut a pattern in half"
+describe('tool · Timeline — split at a frame (3.62)', () => {
+  const uni = (sec) => { const ctx = new OfflineAudioContext(1, Math.ceil(sec * 8000), 8000), K = Kernel.create({ ctx, quiet: true, syncIR: true }), T = MasterTransport.create(K, { offline: true, bpm: 120 }); T.boot(); return { ctx, K, T }; };
+  it('a frame over two lanes cuts every clip there at both edges; lanes outside the frame are untouched', () => {
+    const U = uni(0.2), tl = OrganismFactory.spawn('eravos.timeline', { K: U.K, headless: true }), a = OrganismFactory.spawn('eravos.supersaw', { K: U.K, headless: true }), b = OrganismFactory.spawn('eravos.wobble-bass', { K: U.K, headless: true }), c = OrganismFactory.handle(tl).ctx;
+    const pub = (k, p) => U.K.bus.publish('ui:' + k + ':' + tl, p);
+    [a, b, a].forEach((t, i) => pub('lane_add', { kind: 'inst', target: t, name: 'L' + i }));
+    const L = c.internals.lanes.filter(l => l.kind === 'inst');
+    L.forEach(l => pub('clip_add', { kind: 'notes', lane: l.id, startBar: 1, bars: 8, notes: [0, 32, 64, 96].map(s => ({ s, l: 4, n: 48, v: 0.8 })) }));
+    pub('clip_split_at', { lanes: [L[0].id, L[1].id], bars: [3, 5] });
+    const on = (l) => c.internals.clips.filter(x => x.lane === l.id).sort((x, y) => x.startBar - y.startBar).map(x => [x.startBar, x.bars, x.notes.length]);
+    assert.deepEqual(on(L[0]), [[1, 2, 1], [3, 2, 1], [5, 4, 2]], 'cut at bar 3 and bar 5, notes with their pieces');
+    assert.deepEqual(on(L[1]), on(L[0])); assert.deepEqual(on(L[2]), [[1, 8, 4]], 'the lane outside the frame is whole');
+    pub('clip_split_at', { lanes: [L[2].id], bars: [5] }); assert.deepEqual(on(L[2]), [[1, 4, 2], [5, 4, 2]], 'one line: the pattern in half');
+  });
+});

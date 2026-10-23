@@ -89,3 +89,18 @@
   O2 K2: the 3.53–3.61 work still needs its own addendum in timeline.spec (what each version added, with his words). Only he has the quotes
      from those sessions that are not already in code comments. The comments carry some of them: they are copied into this map's
      PROGRESS entry, not invented.
+
+## ADDENDUM 2026-10-23 (later) — R2 corrected by his words: "split" = cut clips at a framed stretch, not split a lane
+  James, 2026-10-23, after 3.62 shipped ✂ lane split from the coder's reading R2: "im saying you select a frame in the timine and clit split
+  to cut a pattern in half"
+  - His meaning: select a stretch of the timeline (a frame) and press split, so the pattern (clip) is cut there. R2 ("take one lane apart
+    into several") was the coder's misreading. The lane split stays: it is built, tested and harmless, and it is kept as an extra (§0.3).
+    Whether to keep it is his call.
+  P62.7 FRAME SPLIT                                                                                         BUILT
+        Drag across empty space in a track, or Shift+drag over the clips, to frame bars a–b over the lanes the drag covers (snapped to the
+        grid); a click is one cut line. ✂ Split in the toolbar (or S) cuts every clip in the frame at its edges: ui hook clip_split_at
+        { lanes, bars }, one undo step. Note and pattern clips cut on whole bars (their length is in bars); audio cuts where the line is.
+        The inspector gains ✂ In half. Esc clears the frame.
+        depends_on: [P62.1]
+        files: timeline.engine.js (splitAt) · timeline.ui.js (frame, ✂ Split, In half) · timeline.test.js · tests/p23-timeline-ux.test.js
+  Open O5: a cut inside a bar (e.g. half of a 1-bar clip) needs note clips measured in steps instead of whole bars. Not built.

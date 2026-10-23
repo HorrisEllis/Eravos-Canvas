@@ -115,4 +115,21 @@ describe('Timeline inspector keeps its controls while you drag them (3.62)', () 
       assert.equal(I.clips.find(x => x.id === c.id).loop, 16, 'repeats every bar');
     } finally { OrganismFactory.close(tl); OrganismFactory.close(syn); }
   });
+  it('drag across a track to frame bars 3–5, ✂ Split: the clip is cut there (3.62 "select a frame … split to cut a pattern in half")', async () => {
+    host(); const tl = OrganismFactory.spawn('eravos.timeline', { x: 10, y: 10 }), syn = OrganismFactory.spawn('eravos.supersaw', { x: 900, y: 10 });
+    try {
+      await TH.sleep(30); const pub = (t, p) => Kernel.bus.publish('ui:' + t + ':' + tl, p), I = OrganismFactory.handle(tl).ctx.internals, v = OrganismFactory.handle(tl).view;
+      pub('config_change', { key: 'snap', value: 'bar' }); pub('lane_add', { kind: 'inst', target: syn, name: 'Keys' });
+      pub('clip_add', { kind: 'notes', target: syn, startBar: 1, bars: 8, notes: [{ s: 0, l: 4, n: 60, v: 0.8 }] }); await TH.sleep(40);
+      const cv = v.root.querySelector('canvas[aria-label^="arrangement"]'), li = I.lanes.findIndex(l => l.name === 'Keys'), r = cv.getBoundingClientRect(), s = r.width / cv.offsetWidth, ppb = OrganismFactory.handle(tl).ctx.params.get('pxPerBar');
+      // the clip fills the lane: Shift+drag frames over it (a plain drag would move the clip)
+      const Y = (i) => r.top + (26 + i * 48 + 24) * s, X = (bar) => r.left + (bar - 1) * ppb * s;
+      const ev = (t, x, y) => cv.dispatchEvent(new PointerEvent(t, { bubbles: true, clientX: x, clientY: y, pointerId: 21, button: 0, buttons: t === 'pointerup' ? 0 : 1, pointerType: 'mouse', shiftKey: true }));
+      ev('pointerdown', X(3), Y(li)); ev('pointermove', X(4), Y(li)); ev('pointermove', X(5), Y(li)); ev('pointerup', X(5), Y(li)); await TH.sleep(20);
+      assert.deepEqual(Object.assign({}, v.frame, { l0: undefined, l1: undefined }), { a: 3, b: 5, l0: undefined, l1: undefined }, 'framed bars 3–5');
+      const btn = [...v.root.querySelectorAll('button')].find(b => /✂ Split/.test(b.textContent)); btn.click(); await TH.sleep(20);
+      assert.deepEqual(I.clips.filter(c => c.lane === I.lanes[li].id).map(c => [c.startBar, c.bars]).sort((a, b) => a[0] - b[0]), [[1, 2], [3, 2], [5, 4]]);
+      assert.equal(v.frame, null, 'the frame is used up'); assert.equal(I.clips.filter(c => c.lane === I.lanes[li].id).length, 3, 'the clip was not moved by the Shift+drag');
+    } finally { OrganismFactory.close(tl); OrganismFactory.close(syn); }
+  });
 });

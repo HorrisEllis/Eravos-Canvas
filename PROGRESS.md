@@ -19,7 +19,10 @@ arp, etc" · "make sure your on the mian branch". Map: specs/eravos.phase62-map.
   - My first guess (stolen voices left connected) was measured and was WRONG. Nothing was shipped for it.
 - **Repeat patterns**: ⟳ Repeat every (1 beat … 8 bars) on a note clip. Stretch the clip and the pattern keeps going; edit the first bars
   and every repeat follows. ⧉ Repeat ×… lays copies end to end. MIDI export and Split write the repeats out.
-- **Split lanes**: ✂ in an instrument lane's header: one lane per drum pad, low / high notes (where they part), or at a note you name.
+- **Split at a frame** (his correction, later the same day: "im saying you select a frame in the timine and clit split to cut a pattern in
+  half"): drag across empty space in a track, or Shift+drag over the clips, then ✂ Split (or S). Every clip in the frame is cut at its
+  edges. A click without a drag is one cut line. The inspector has ✂ In half.
+- **Split lanes** (my first reading of "split the lanes", kept as an extra): ✂ in an instrument lane's header: one lane per drum pad, low / high notes (where they part), or at a note you name.
   The new lanes play the same tool until you pick another.
 - **⛶ the whole timeline full screen**: tracks, curve lanes, transport, inspector and piano roll. Esc to leave. (The roll's own ⛶ shows
   only the notes.)

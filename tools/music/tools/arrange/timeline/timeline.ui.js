@@ -4,7 +4,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
   const UI = view.ui, h = UI.h;
   const RULER = 26, HEAD_W = 268;   // room for the name, M · S, the instrument, the 〰 curve picker and ✂ (3.62)
   const laneH = () => Math.max(28, Math.min(160, view.state.laneH || 48));
-  let A = null, sel = null, playBar = null, drag = null, hover = null, pendingSel = null, headSig = '';
+  let A = null, sel = null, playBar = null, drag = null, hover = null, pendingSel = null, headSig = '', frame = null;   // 3.62 frame: { a, b, l0, l1 } bars × lanes
   const laneKindFor = (c) => c.kind === 'audio' ? 'audio' : c.kind === 'notes' ? 'inst' : 'pattern';
   const isInstDef = (d) => (d.hooks || []).some(hk => hk.direction === 'in' && hk.event_type === 'note:trigger');
   const cfg = (k) => view.descriptor.config.find(c => c.key === k);
@@ -63,6 +63,17 @@ OrganismFactory.reg('eravos.timeline', function (view) {
   });
   split.addEventListener('dblclick', () => setRollH(((view.root.clientHeight || 600) - 80) / 2));
   view.root.style.display = 'flex'; view.root.style.flexDirection = 'column';
+  // ---- 3.62 the frame and ✂ Split
+  function frameOf(d) { const a = Math.min(d.b0, d.b1), b = Math.max(d.b0, d.b1); return { a, b: d.moved ? b : a, l0: Math.min(d.l0, d.l1), l1: Math.max(d.l0, d.l1) }; }
+  function frameSay() { if (!frame) return ''; const f = (v) => { const bar = Math.floor(v + 1e-9), beat = Math.round((v - bar) * 4) + 1; return bar + '.' + beat; }; return frame.a === frame.b ? '✂ at ' + f(frame.a) : '✂ ' + f(frame.a) + ' – ' + f(frame.b); }
+  function doSplit() {
+    if (frame && A) { const ids = A.lanes.slice(frame.l0, frame.l1 + 1).map(l => l.id); view.emit('clip_split_at', { lanes: ids, bars: frame.a === frame.b ? [frame.a] : [frame.a, frame.b] }); frame = null; splitB.el.classList.remove('on'); draw(); return; }
+    const c = A && A.clips.find(x => x.id === sel);
+    if (c && playBar) view.emit('clip_split', { id: c.id, bar: playBar });
+    else expSt.textContent = 'Split: drag across a track to frame where to cut (or pick a clip and put the playhead on it)';
+  }
+  const splitB = UI.Button({ label: '✂ Split', hint: 'drag across empty space in a track — or Shift+drag over the clips — to frame a stretch — ✂ cuts every clip there at the frame’s edges (a click without a drag: one cut line). S does the same. Esc clears the frame.', onClick: () => doSplit() });
+  view.splitFrame = doSplit; Object.defineProperty(view, 'frame', { get: () => frame, configurable: true });
   // 3.62 ⛶ THE WHOLE TIMELINE FULL SCREEN — tracks, curve lanes, transport, the clip inspector and the piano roll over the page (the roll's
   // own ⛶ shows only the notes). Same move as the roll's (3.53): the timeline lives inside the CSS-transformed canvas, so it is MOVED onto
   // the page and back to the same spot; every hit test maps through the live rect. ⛶ again or Esc.
@@ -82,7 +93,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
   // 3.53 record what you play: while this is on and the song plays, any knob you turn on a track's tool is written into its
   // own automation lane (a lane is made for it the first time)
   const recK = UI.Toggle({ label: '⏺ knobs', hint: 'record what you play — while the song plays, every knob you turn on a track’s tool is written into an automation lane', onChange: (v) => view.emit('rec_knobs', { on: v }) });
-  view.root.append(h('div', { class: 'org-row', style: { flexWrap: 'wrap' } }, [UI.presetBar(view), restart.el, play.el, pos, addT.el, recK.el, snap.el, zoom.el, h('span', { class: 'org-label', text: 'lanes' }), laneDn.el, laneUp.el, fitB.el, fullT.el, loop.el, addL.el, expM.el, expSt]), body, split, roll.el, insp,
+  view.root.append(h('div', { class: 'org-row', style: { flexWrap: 'wrap' } }, [UI.presetBar(view), restart.el, play.el, pos, addT.el, recK.el, snap.el, zoom.el, h('span', { class: 'org-label', text: 'lanes' }), laneDn.el, laneUp.el, fitB.el, fullT.el, splitB.el, loop.el, addL.el, expM.el, expSt]), body, split, roll.el, insp,
     UI.hint('＋ Track adds an instrument with a clip · dbl-click an instrument lane for a new clip, click a clip to open its piano roll · drop audio onto a lane · drag clips (alt = copy) · drag edges to trim · dbl-click a pattern lane for a pattern block · click the ruler to jump, drag it to loop · ⏮ / Home restart · S split · Del delete · wheel / Shift+wheel scroll, Ctrl+wheel zooms · + / − zoom · F fit · ⤢ fills the screen (Esc back)'));
   const ppb = () => view.state.pxPerBar || 64;
   const xOf = (bar) => (bar - 1) * ppb();
@@ -209,6 +220,12 @@ OrganismFactory.reg('eravos.timeline', function (view) {
         for (let b = 1; b < c.bars; b++) { g.fillStyle = 'rgba(0,212,255,.35)'; g.fillRect(r.x + b * pb, r.y + 4, 1, r.h - 8); }
       }
     });
+    if (frame) {   // 3.62 the frame: the stretch to cut, over the lanes it covers (a single line when it is a click)
+      const fy = laneY(frame.l0), fh = (frame.l1 - frame.l0 + 1) * laneH(), fx = xOf(frame.a), fw = (frame.b - frame.a) * pb;
+      if (fw > 0) { g.fillStyle = 'rgba(255,210,74,.13)'; g.fillRect(fx, fy, fw, fh); }
+      g.fillStyle = '#ffd24a'; g.fillRect(fx - 1, fy, 2, fh); if (fw > 0) g.fillRect(fx + fw - 1, fy, 2, fh);
+      g.font = '600 11px sans-serif'; g.fillText('✂', fx + 4, fy + 13);
+    }
     // ruler — stays at the top while the lanes scroll under it
     const ry = rulerY();
     g.fillStyle = '#111823'; g.fillRect(x0, ry, VW, RULER); g.fillStyle = '#2d3f57'; g.fillRect(x0, ry + RULER - 1, VW, 1);
@@ -321,6 +338,8 @@ OrganismFactory.reg('eravos.timeline', function (view) {
       onChange: (v) => { setTimeout(() => repSel.set(''), 50); if (+v) view.emit('clip_repeat', { id: c.id, times: +v }); } });
     repSel.el.title = 'copies laid end to end after this clip — each its own clip (to keep them in step, use ⟳ Repeat every instead)';
     insp.append(repSel.el);
+    const lenC = c.kind === 'audio' ? c.lengthSec / A.barSec : c.bars;
+    insp.append(UI.Button({ label: '✂ In half', hint: 'cut this clip in the middle (note and pattern clips: on a whole bar)', onClick: () => { const mid = c.kind === 'audio' ? c.startBar + lenC / 2 : c.startBar + Math.max(1, Math.round(lenC / 2)); if (c.kind !== 'audio' && lenC < 2) { expSt.textContent = 'This clip is 1 bar long — make it longer to cut it on a bar'; return; } view.emit('clip_split', { id: c.id, bar: mid }); } }).el);
     insp.append(UI.Button({ label: 'Split at playhead', onClick: () => playBar && view.emit('clip_split', { id: c.id, bar: playBar }) }).el, UI.Button({ label: 'Duplicate', onClick: () => view.emit('clip_duplicate', { id: c.id }) }).el, UI.Button({ label: 'Delete', kind: 'danger', onClick: () => { view.emit('clip_remove', { id: c.id }); sel = null; } }).el);
   }
   view.on('auto_live', (p) => { const l = A && A.lanes.find(x => x.id === p.id); if (l) { l.points = p.points; draw(); } });
@@ -407,8 +426,10 @@ OrganismFactory.reg('eravos.timeline', function (view) {
       return;
     }
     const hc = hit(x, y);
-    if (!hc) { sel = null; drawInsp(); syncRoll(); draw(); return; }
-    sel = hc.c.id; drawInsp(); syncRoll();
+    // 3.62 FRAME: press on empty space in a track (or Shift+drag anywhere, over clips too) and drag — that stretch of time over those lanes is the frame; ✂ Split (or S) cuts
+    // every clip there at the frame's edges. A click without a drag is one cut line.
+    if (!hc || (e.shiftKey && lane && lane.kind !== 'auto')) { sel = null; drawInsp(); syncRoll(); frame = null; if (lane && lane.kind !== 'marker') { drag = { kind: 'frame', x0: x, b0: snapB(barOf(x)), b1: snapB(barOf(x)), l0: li, l1: li }; } draw(); return; }
+    frame = null; sel = hc.c.id; drawInsp(); syncRoll();
     const edge = x - hc.r.x < 7 ? 'left' : hc.r.x + hc.r.w - x < 7 ? 'right' : null;
     const top = y - hc.r.y < 9;
     const mode = hc.c.kind === 'audio' && top && edge === 'left' ? 'fadeIn' : hc.c.kind === 'audio' && top && edge === 'right' ? 'fadeOut' : hc.c.kind === 'notes' && edge === 'left' ? 'move' : edge ? 'trim-' + edge : 'move';
@@ -428,6 +449,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     const { x, y } = local(e);
     if (drag.kind === 'ruler') { if (Math.abs(x - drag.x0) > 6) { const a = snapB(barOf(Math.min(x, drag.x0))), b = snapB(barOf(Math.max(x, drag.x0))); drag.loop = [Math.round(a), Math.max(Math.round(a) + 1, Math.round(b))]; } return; }
     if (drag.kind === 'marker') { drag.bar = snapB(barOf(x)); return; }
+    if (drag.kind === 'frame') { drag.b1 = snapB(barOf(x)); drag.l1 = Math.max(0, Math.min(A.lanes.length - 1, Math.floor((y - RULER) / laneH()))); drag.moved = drag.moved || Math.abs(x - drag.x0) > 4; frame = frameOf(drag); posSay(frameSay()); draw(); return; }
     if (drag.kind === 'auto') { const q = drag.pts[drag.at], lo = drag.at > 0 ? drag.pts[drag.at - 1][0] + 1e-3 : 1, hi = drag.at < drag.pts.length - 1 ? drag.pts[drag.at + 1][0] - 1e-3 : 1e9; q[0] = Math.max(lo, Math.min(hi, snapB(barOf(x)))); q[1] = aVal(drag.k, aF(drag.li, y)); posSay(aSay(drag.k, q[1])); draw(); return; }
     const c = drag.c, dxBar = (x - drag.x0) / ppb();
     if (drag.mode === 'move') {
@@ -450,6 +472,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     if (!drag) return; const d = drag; drag = null; const { x } = local(e);
     if (d.kind === 'ruler') { if (d.loop) view.emit('loop_set', { start: d.loop[0], end: d.loop[1], on: true }); else view.emit('seek', { bar: barOf(x) }); return; }
     if (d.kind === 'marker') { if (d.bar) view.emit('marker_edit', { op: 'move', index: d.index, bar: d.bar }); return; }
+    if (d.kind === 'frame') { frame = frameOf(d); posSay(frameSay()); splitB.el.classList.add('on'); draw(); return; }
     if (d.kind === 'auto') { view.emit('auto_points', { id: d.id, points: d.pts }); return; }
     if (d.mode === 'move' && d.patch) { if (d.alt) view.emit('clip_duplicate', { id: d.c.id, startBar: d.patch.startBar }); else view.emit('clip_edit', { id: d.c.id, patch: d.patch }); }
     draw();
@@ -465,7 +488,8 @@ OrganismFactory.reg('eravos.timeline', function (view) {
   cv.addEventListener('keydown', (e) => {
     const c = A && A.clips.find(x => x.id === sel);
     if (e.key === 'Delete' || e.key === 'Backspace') { if (c) { view.emit('clip_remove', { id: c.id }); sel = null; } e.preventDefault(); }
-    else if ((e.key === 's' || e.key === 'S') && c && playBar) view.emit('clip_split', { id: c.id, bar: playBar });
+    else if ((e.key === 's' || e.key === 'S') && !e.ctrlKey && !e.metaKey && (frame || (c && playBar))) { e.preventDefault(); doSplit(); }
+    else if (e.key === 'Escape' && frame) { e.preventDefault(); e.stopPropagation(); frame = null; splitB.el.classList.remove('on'); draw(); }
     else if ((e.key === 'd' || e.key === 'D') && (e.ctrlKey || e.metaKey) && c) { view.emit('clip_duplicate', { id: c.id }); e.preventDefault(); }
     else if ((e.key === 'l' || e.key === 'L') && c) { const len = c.kind === 'audio' ? c.lengthSec / A.barSec : c.bars; view.emit('loop_set', { start: Math.floor(c.startBar), end: Math.ceil(c.startBar + len), on: true }); }
     else if (e.key === 'Home') { e.preventDefault(); view.emit('restart', {}); }
