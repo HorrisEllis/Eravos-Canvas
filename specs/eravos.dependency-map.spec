@@ -27,7 +27,7 @@ tools:
   Arrange:
     - eravos.bass-drop-builder (Drop Builder) mode=music units=[engine,transport,tempo,key,meter] needs=[audio,clock,key,mod,files] in=63 out=6
     - eravos.song-recorder (Song Recorder) mode=music units=[engine,transport,tempo,meter] needs=[audio,clock,mod,files,assets] in=10 out=4
-    - eravos.timeline (Timeline) mode=music units=[engine,transport,tempo,meter] needs=[audio,clock,mod,files] in=11 out=8
+    - eravos.timeline (Timeline) mode=music units=[engine,transport,tempo,meter] needs=[audio,clock,mod,files] in=11 out=9
   Code:
     - eravos.coding.code-cell (Code Cell) mode=null units=[] needs=[] in=2 out=2
   Drums & rhythm:

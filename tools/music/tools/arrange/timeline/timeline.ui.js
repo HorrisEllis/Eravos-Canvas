@@ -63,13 +63,22 @@ OrganismFactory.reg('eravos.timeline', function (view) {
   });
   split.addEventListener('dblclick', () => setRollH(((view.root.clientHeight || 600) - 80) / 2));
   view.root.style.display = 'flex'; view.root.style.flexDirection = 'column';
-  view.root.append(h('div', { class: 'org-row', style: { flexWrap: 'wrap' } }, [UI.presetBar(view), restart.el, play.el, pos, addT.el, snap.el, zoom.el, h('span', { class: 'org-label', text: 'lanes' }), laneDn.el, laneUp.el, fitB.el, loop.el, addL.el, expM.el, expSt]), body, split, roll.el, insp,
+  // 3.53 record what you play: while this is on and the song plays, any knob you turn on a track's tool is written into its
+  // own automation lane (a lane is made for it the first time)
+  const recK = UI.Toggle({ label: '⏺ knobs', hint: 'record what you play — while the song plays, every knob you turn on a track’s tool is written into an automation lane', onChange: (v) => view.emit('rec_knobs', { on: v }) });
+  view.root.append(h('div', { class: 'org-row', style: { flexWrap: 'wrap' } }, [UI.presetBar(view), restart.el, play.el, pos, addT.el, recK.el, snap.el, zoom.el, h('span', { class: 'org-label', text: 'lanes' }), laneDn.el, laneUp.el, fitB.el, loop.el, addL.el, expM.el, expSt]), body, split, roll.el, insp,
     UI.hint('＋ Track adds an instrument with a clip · dbl-click an instrument lane for a new clip, click a clip to open its piano roll · drop audio onto a lane · drag clips (alt = copy) · drag edges to trim · dbl-click a pattern lane for a pattern block · click the ruler to jump, drag it to loop · ⏮ / Home restart · S split · Del delete · wheel / Shift+wheel scroll, Ctrl+wheel zooms · + / − zoom · F fit · ⤢ fills the screen (Esc back)'));
   const ppb = () => view.state.pxPerBar || 64;
   const xOf = (bar) => (bar - 1) * ppb();
   const barOf = (x) => x / ppb() + 1;
   function laneY(i) { return RULER + i * laneH(); }
   const rulerY = () => body.scrollTop || 0;
+  // ---- 3.53 automation lanes: the knob's range maps to the lane's height (choices: one band each)
+  const knobOf = (l) => A && A.knobs && (A.knobs[l.target] || []).find(k => k.key === l.key);
+  const aFrac = (k, v) => !k ? 0.5 : k.type === 'enum' ? (k.options.length > 1 ? Math.max(0, k.options.map(String).indexOf(String(v))) / (k.options.length - 1) : 0.5) : Math.max(0, Math.min(1, (+v - k.min) / ((k.max - k.min) || 1)));
+  const aVal = (k, f) => { f = Math.max(0, Math.min(1, f)); if (k.type === 'enum') return k.options[Math.round(f * (k.options.length - 1))]; let v = k.min + f * (k.max - k.min); if (k.type === 'integer') v = Math.round(v); else if (k.step) v = Math.round(v / k.step) * k.step; return +Math.max(k.min, Math.min(k.max, v)).toFixed(6); };
+  const aY = (i, f) => laneY(i) + 5 + (1 - f) * (laneH() - 10), aF = (i, y) => 1 - (y - laneY(i) - 5) / (laneH() - 10);
+  const aSay = (k, v) => k ? k.label + ' ' + (k.type === 'enum' ? v : (Math.abs(v) >= 100 ? Math.round(v) : +(+v).toFixed(2)) + (k.unit ? ' ' + k.unit : '')) : '';
   function snapB(b) { const q = { none: 0, bar: 1, beat: 0.25, '1/8': 0.125, '1/16': 0.0625 }[view.state.snap]; return q ? Math.max(1, 1 + Math.round((b - 1) / q) * q) : Math.max(1, b); }
   function clipRect(c) {
     const li = A.lanes.findIndex(l => l.id === c.lane); if (li < 0) return null;
@@ -106,6 +115,19 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     A.lanes.forEach((l, i) => {
       const y = laneY(i); g.fillStyle = i % 2 ? '#0c121a' : '#0e151f'; g.globalAlpha = 0.9; g.fillRect(x0, y, VW, laneH()); g.globalAlpha = 1;
       g.fillStyle = '#1a2533'; g.fillRect(x0, y + laneH() - 1, VW, 1);
+      if (l.kind === 'auto') {
+        const k = knobOf(l), pts = drag && drag.kind === 'auto' && drag.id === l.id ? drag.pts : (l.points || []);
+        g.fillStyle = '#ffd24a14'; g.fillRect(x0, y + 4, VW, laneH() - 8);
+        if (pts.length) {
+          g.strokeStyle = l.mute ? '#6b5a20' : '#ffd24a'; g.lineWidth = 2; g.beginPath();
+          const step = k && k.type === 'enum';
+          g.moveTo(x0, aY(i, aFrac(k, pts[0][1])));
+          pts.forEach((q, qi) => { const x = xOf(q[0]), yy = aY(i, aFrac(k, q[1])); if (qi === 0) g.lineTo(x, yy); else { if (step) g.lineTo(x, aY(i, aFrac(k, pts[qi - 1][1]))); g.lineTo(x, yy); } });
+          g.lineTo(x1, aY(i, aFrac(k, pts[pts.length - 1][1]))); g.stroke(); g.lineWidth = 1;
+          g.fillStyle = '#fff'; pts.forEach(q => { const x = xOf(q[0]); if (x < x0 - 4 || x > x1 + 4) return; g.beginPath(); g.arc(x, aY(i, aFrac(k, q[1])), 3, 0, 7); g.fill(); });
+        } else { g.fillStyle = '#7f93a8'; g.font = '10px sans-serif'; g.fillText('click to add a point · right-click removes · ● records the knob while the song plays', Math.max(x0, 0) + 8, y + laneH() / 2 + 4); }
+        if (l.rec) { g.fillStyle = '#ff4466'; g.beginPath(); g.arc(Math.max(x0, 0) + VW - 12, y + 10, 4, 0, 7); g.fill(); }
+      }
       if (l.kind === 'marker') A.markers.forEach((m, mi) => { const x = xOf(m.bar); g.fillStyle = '#ffaa00'; g.fillRect(x, y + 4, 2, laneH() - 8); g.beginPath(); g.moveTo(x, y + 4); g.lineTo(x + 12, y + 10); g.lineTo(x, y + 16); g.fill(); g.font = '600 11px sans-serif'; g.fillText(m.name, x + 6, y + 30); g.fillStyle = 'rgba(255,170,0,.25)'; g.fillRect(x, RULER, 1, H - RULER); });
     });
     // clips
@@ -158,7 +180,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
   function drawHeads() {
     heads.innerHTML = '';
     A.lanes.forEach((l) => {
-      const nm = h('span', { style: { font: '600 11px var(--font)', color: l.color, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: '1', cursor: 'text', minWidth: '0' }, text: (l.kind === 'pattern' ? '▦ ' : l.kind === 'marker' ? '⚑ ' : l.kind === 'inst' ? '🎹 ' : '♫ ') + l.name, title: 'dbl-click to rename' });
+      const nm = h('span', { style: { font: '600 11px var(--font)', color: l.color, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: '1', cursor: 'text', minWidth: '0' }, text: (l.kind === 'pattern' ? '▦ ' : l.kind === 'marker' ? '⚑ ' : l.kind === 'inst' ? '🎹 ' : l.kind === 'auto' ? '⤴ ' : '♫ ') + l.name, title: 'dbl-click to rename' });
       nm.addEventListener('dblclick', () => UI.ask('Lane name', l.name).then((n) => { if (n) view.emit('lane_edit', { id: l.id, patch: { name: n } }); }));
       const btn = (label, key, title) => h('button', { class: 'uk-toggle' + (l[key] ? ' on' : ''), title, style: { padding: '0 4px', fontSize: '10px' }, text: label, onclick: (e) => { e.stopPropagation(); view.emit('lane_edit', { id: l.id, patch: { [key]: !l[key] } }); } });
       const x = h('button', { class: 'uk-btn', style: { padding: '0 4px', fontSize: '10px' }, text: '×', onclick: () => { if (confirm('Remove lane ' + l.name + ' and its clips?')) view.emit('lane_remove', { id: l.id }); } });
@@ -173,6 +195,17 @@ OrganismFactory.reg('eravos.timeline', function (view) {
         pick.addEventListener('change', () => view.emit('lane_edit', { id: l.id, patch: { target: pick.value || null } }));
         pick.addEventListener('pointerdown', (e) => e.stopPropagation());
         row.append(pick);
+        // 3.53 ⤴ automate one of this tool's knobs: a lane under the track
+        const ks = (A.knobs && A.knobs[l.target]) || [];
+        if (live && ks.length) {
+          const au = h('select', { class: 'uk-select', title: 'automate a knob of this tool — its own lane under the track', style: { width: '26px', fontSize: '10px', padding: '0 2px' } }, [h('option', { value: '', text: '⤴' })].concat(ks.map(k => h('option', { value: k.key, text: (k.group ? k.group.toLowerCase() + ' · ' : '') + k.label }))));
+          au.addEventListener('change', () => { if (au.value) view.emit('lane_add', { kind: 'auto', target: l.target, key: au.value }); au.value = ''; });
+          au.addEventListener('pointerdown', (e) => e.stopPropagation()); row.append(au);
+        }
+      }
+      if (l.kind === 'auto') {
+        const k = knobOf(l); nm.title = (k ? k.label : l.key) + ' of ' + l.target + ' — click the lane to add points, drag them, right-click removes';
+        row.append(btn('M', 'mute', 'mute this automation (the knob is the tool’s own again)'), h('button', { class: 'uk-toggle' + (l.rec ? ' on' : ''), title: 'record: while the song plays, turning this knob writes it here', style: { padding: '0 4px', fontSize: '10px', color: l.rec ? '#ff4466' : '' }, text: '●', onclick: (e) => { e.stopPropagation(); view.emit('lane_edit', { id: l.id, patch: { rec: !l.rec } }); } }));
       }
       row.append(x);
       heads.appendChild(row);
@@ -200,6 +233,8 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     }
     insp.append(UI.Button({ label: 'Split at playhead', onClick: () => playBar && view.emit('clip_split', { id: c.id, bar: playBar }) }).el, UI.Button({ label: 'Duplicate', onClick: () => view.emit('clip_duplicate', { id: c.id }) }).el, UI.Button({ label: 'Delete', kind: 'danger', onClick: () => { view.emit('clip_remove', { id: c.id }); sel = null; } }).el);
   }
+  view.on('auto_live', (p) => { const l = A && A.lanes.find(x => x.id === p.id); if (l) { l.points = p.points; draw(); } });
+  function posSay(t) { pos.textContent = t; }   // the value under the pointer while a point is placed or dragged (the playhead takes the readout back)
   view.on('arrangement_sync', (a) => {
     // attach buffer durations to clips for waveform mapping
     a.clips.forEach(c => { if (c.kind === 'audio') { const as = view.K.assets.get(c.assetHash); c.bufDur = as && as.buffer ? as.buffer.duration : c.offsetSec + c.lengthSec; } });
@@ -207,7 +242,8 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     if (pendingSel) { const ln = a.lanes.find(l => l.target === pendingSel.target || l.id === pendingSel.lane); const c = ln && a.clips.find(x => x.lane === ln.id && x.kind === 'notes' && Math.abs(x.startBar - pendingSel.startBar) < 1e-6); if (c) { sel = c.id; pendingSel = null; } }
     if (sel && !a.clips.some(c => c.id === sel)) sel = null;
     // 3.34: lane heads are rebuilt only when what they show changes — a gain knob is not destroyed by its own drag
-    const sig = JSON.stringify([a.lanes.map(l => [l.id, l.kind, l.name, l.color, l.mute, l.solo, l.armed, l.target]), (a.instruments || []).map(o => o.value + o.label), laneH()]);
+    const sig = JSON.stringify([a.lanes.map(l => [l.id, l.kind, l.name, l.color, l.mute, l.solo, l.armed, l.target, l.rec, l.key]), (a.instruments || []).map(o => o.value + o.label), Object.keys(a.knobs || {}).map(t => t + (a.knobs[t] || []).length), laneH()]);
+    if (recK.set) recK.set(!!a.recKnobs);
     if (sig !== headSig) { headSig = sig; drawHeads(); }
     drawInsp(); syncRoll(); draw();
   });
@@ -266,6 +302,14 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     const { x, y } = local(e);
     if (y < rulerY() + RULER) { drag = { kind: 'ruler', x0: x }; return; }
     const li = Math.floor((y - RULER) / laneH()), lane = A.lanes[li];
+    if (lane && lane.kind === 'auto') {   // 3.53 points: click adds, drag moves, right-click removes
+      const k = knobOf(lane); if (!k) return;
+      const pts = (lane.points || []).map(q => q.slice()), near = pts.findIndex(q => Math.abs(xOf(q[0]) - x) < 7 && Math.abs(aY(li, aFrac(k, q[1])) - y) < 8);
+      if (e.button === 2) { if (near >= 0) { pts.splice(near, 1); view.emit('auto_points', { id: lane.id, points: pts }); } return; }
+      let at = near;
+      if (at < 0) { pts.push([snapB(barOf(x)), aVal(k, aF(li, y))]); pts.sort((a, b) => a[0] - b[0]); at = pts.findIndex(q => q[0] === snapB(barOf(x))); }
+      drag = { kind: 'auto', id: lane.id, li, k, pts, at }; posSay(aSay(k, pts[at][1])); draw(); return;
+    }
     if (lane && lane.kind === 'marker') {
       const mi = A.markers.findIndex(m => Math.abs(xOf(m.bar) - x) < 8);
       if (e.button === 2 && mi >= 0) { view.emit('marker_edit', { op: 'remove', index: mi }); return; }
@@ -294,6 +338,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     const { x, y } = local(e);
     if (drag.kind === 'ruler') { if (Math.abs(x - drag.x0) > 6) { const a = snapB(barOf(Math.min(x, drag.x0))), b = snapB(barOf(Math.max(x, drag.x0))); drag.loop = [Math.round(a), Math.max(Math.round(a) + 1, Math.round(b))]; } return; }
     if (drag.kind === 'marker') { drag.bar = snapB(barOf(x)); return; }
+    if (drag.kind === 'auto') { const q = drag.pts[drag.at], lo = drag.at > 0 ? drag.pts[drag.at - 1][0] + 1e-3 : 1, hi = drag.at < drag.pts.length - 1 ? drag.pts[drag.at + 1][0] - 1e-3 : 1e9; q[0] = Math.max(lo, Math.min(hi, snapB(barOf(x)))); q[1] = aVal(drag.k, aF(drag.li, y)); posSay(aSay(drag.k, q[1])); draw(); return; }
     const c = drag.c, dxBar = (x - drag.x0) / ppb();
     if (drag.mode === 'move') {
       const li = Math.max(0, Math.min(A.lanes.length - 1, Math.floor((y - RULER) / laneH())));
@@ -315,6 +360,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     if (!drag) return; const d = drag; drag = null; const { x } = local(e);
     if (d.kind === 'ruler') { if (d.loop) view.emit('loop_set', { start: d.loop[0], end: d.loop[1], on: true }); else view.emit('seek', { bar: barOf(x) }); return; }
     if (d.kind === 'marker') { if (d.bar) view.emit('marker_edit', { op: 'move', index: d.index, bar: d.bar }); return; }
+    if (d.kind === 'auto') { view.emit('auto_points', { id: d.id, points: d.pts }); return; }
     if (d.mode === 'move' && d.patch) { if (d.alt) view.emit('clip_duplicate', { id: d.c.id, startBar: d.patch.startBar }); else view.emit('clip_edit', { id: d.c.id, patch: d.patch }); }
     draw();
   });

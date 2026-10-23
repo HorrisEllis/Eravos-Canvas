@@ -36,6 +36,8 @@
       // P11 gate D: drum tools announce their pads (name, note, colour) — tracks playing them show pad rows, not piano keys
       Object.assign(S.event('tl.hook.pads_in', 'in', 'pad:bank-change', { type: 'object', required: ['pads'] }, '1.0.0'), { rail: false }),
       S.note_out('tl.hook.note_out'),
+      // 3.53 automation lanes: a knob of any tool, moved over the song (sdk-music turns it into a live value at that time)
+      Object.assign(S.event('tl.hook.knob_out', 'out', 'knob:live', { type: 'object', required: ['target', 'key'] }, '1.0.0'), { rail: false }),
       S.event('tl.hook.cue_out', 'out', 'seq:pattern_cue', { type: 'object', required: ['target', 'slot'] }, '1.0.0'),
       S.event('tl.hook.seek_out', 'out', 'timeline:seek', { type: 'object', required: ['position_sec', 'bar', 'beat'] }, '1.0.0'),
       S.event('tl.hook.clip_play_out', 'out', 'timeline:clip_play', { type: 'object', required: ['clip_id', 'lane_id', 'asset_id', 'position_sec'] }, '1.0.0'),
@@ -54,7 +56,7 @@
       { key: 'laneH', type: 'integer', default: 48, min: 28, max: 160, label: 'Lane height', group: 'VIEW', hint: 'taller lanes = bigger clips (Alt + wheel over the lanes)' },
       { key: 'songBars', type: 'integer', default: 64, min: 1, max: 512, label: 'Song bars', group: 'VIEW' },
     ],
-    ui_hooks: ['transport_play', 'restart', 'seek', 'loop_set', 'lane_add', 'lane_edit', 'lane_remove', 'clip_add', 'clip_edit', 'clip_remove', 'clip_split', 'clip_duplicate', 'marker_edit', 'bounce', 'drop_file', 'export', 'note_audition', 'clip_fill', 'export_midi', 'export_stems'],
+    ui_hooks: ['transport_play', 'restart', 'seek', 'loop_set', 'lane_add', 'lane_edit', 'lane_remove', 'auto_points', 'rec_knobs', 'clip_add', 'clip_edit', 'clip_remove', 'clip_split', 'clip_duplicate', 'marker_edit', 'bounce', 'drop_file', 'export', 'note_audition', 'clip_fill', 'export_midi', 'export_stems'],
     ui_hook_labels: { clip_add: 'new clip', clip_edit: 'edit clip / notes', clip_remove: 'delete clip', clip_split: 'split clip', clip_duplicate: 'duplicate clip',
       clip_fill: 'fill chords', lane_add: 'new track', lane_edit: 'track settings', lane_remove: 'remove track', marker_edit: 'marker', drop_file: 'drop audio', loop_set: 'loop' },
     restoreTwice: true,
@@ -79,12 +81,15 @@
       }
       function addLane(kind, o) {
         const n = lanes.filter(l => l.kind === kind).length + 1;
-        const name = kind === 'audio' ? 'Audio ' + n : kind === 'pattern' ? 'Pattern ' + n : kind === 'inst' ? 'Track ' + n : 'Markers';
-        const color = kind === 'audio' ? '#aa44ff' : kind === 'pattern' ? '#00d4ff' : kind === 'inst' ? INST_COLORS[(n - 1) % INST_COLORS.length] : '#ffaa00';
-        const l = Object.assign({ id: uid('L'), kind, name, color, gain: 1, pan: 0, mute: false, solo: false, armed: false }, kind === 'inst' ? { target: null } : {}, o || {});
+        const name = kind === 'audio' ? 'Audio ' + n : kind === 'pattern' ? 'Pattern ' + n : kind === 'inst' ? 'Track ' + n : kind === 'auto' ? 'Automation ' + n : 'Markers';
+        const color = kind === 'audio' ? '#aa44ff' : kind === 'pattern' ? '#00d4ff' : kind === 'inst' ? INST_COLORS[(n - 1) % INST_COLORS.length] : kind === 'auto' ? '#ffd24a' : '#ffaa00';
+        const l = Object.assign({ id: uid('L'), kind, name, color, gain: 1, pan: 0, mute: false, solo: false, armed: false }, kind === 'inst' ? { target: null } : {}, kind === 'auto' ? { target: null, key: null, points: [], rec: false } : {}, o || {});
         if (kind === 'inst') { // tracks sit right under the markers, in the order they were added
           let at = 0; lanes.forEach((x, i) => { if (x.kind === 'marker' || x.kind === 'inst') at = i + 1; });
           lanes.splice(at, 0, l);
+        } else if (kind === 'auto') { // under the track that plays its tool (and its other automation), else at the end
+          let at = -1; lanes.forEach((x, i) => { if ((x.kind === 'inst' || x.kind === 'auto') && x.target === l.target) at = i; });
+          if (at >= 0) lanes.splice(at + 1, 0, l); else lanes.push(l);
         } else lanes.push(l);
         if (kind === 'audio') laneNode(l); applyLanes(); return l;
       }
@@ -95,7 +100,7 @@
       // 3.53: each instrument lane's knobs (what a note can set for itself — the piano roll's expression lanes)
       function knobsOf() {
         const o = {};
-        lanes.forEach(l => { if (l.kind !== 'inst' || !l.target || o[l.target]) return; const r = K.registry.get(l.target); if (!r) return;
+        lanes.forEach(l => { if ((l.kind !== 'inst' && l.kind !== 'auto') || !l.target || o[l.target]) return; const r = K.registry.get(l.target); if (!r) return;
           o[l.target] = (r.descriptor.config || []).filter(c => !c.hidden && !c.settingsOnly && (((c.type === 'number' || c.type === 'integer') && isFinite(c.min) && isFinite(c.max)) || (c.type === 'enum' && (c.options || []).length > 1)))
             .map(c => ({ key: c.key, label: c.label || c.key, group: c.group || '', type: c.type, min: c.min, max: c.max, step: c.step, unit: c.unit || '', options: c.options, def: c.default })); });
         return o;
@@ -215,11 +220,11 @@
       }
       ctx.scheduleFrom = scheduleFrom; ctx.scheduled = () => scheduled;
       ctx.onPlay((p) => { playing = true; stopAll(p.time); scheduleFrom((p.step16 || 0) / 16 + 1, p.time); });
-      ctx.onStop((p) => { playing = false; stopAll(p && p.time !== undefined ? p.time : ac.currentTime); ctx.emitUI('playhead_update', { bar: null }); });
+      ctx.onStop((p) => { playing = false; stopAll(p && p.time !== undefined ? p.time : ac.currentTime); ctx.emitUI('playhead_update', { bar: null }); releaseAuto(); endTakes(); });
       ctx.on('transport:loop', null, (p) => { if (!playing) return; stopAll(p.time); scheduleFrom(p.toStep16 / 16 + 1, p.time); });
       ctx.onTick((tk) => {
-        curBar = tk.step16 / 16 + 1;
-        playNotes(tk);
+        curBar = tk.step16 / 16 + 1; lastTk = tk;
+        playNotes(tk); playAuto(tk);
         // pattern clips: cue one bar ahead of their start bar
         if (tk.step16 % 16 === 0) clips.forEach(c => { if (c.kind === 'pattern' && c.target && Math.abs(c.startBar - (tk.bar + 1)) < 1e-6) ctx.emit('seq:pattern_cue', { target: c.target, slot: c.slot, bar: c.startBar }); });
         if (tk.sixteenth === 1 || tk.step16 % 4 === 0) ctx.emitUI('playhead_update', { bar: tk.bar + (tk.beat - 1) / 4, beat: tk.beat, position_sec: tk.step16 * tk.stepDur, time: tk.time });
@@ -267,7 +272,7 @@
         applyLanes();
         const peaks = {}; clips.forEach(c => { if (c.kind === 'audio' && peaksCache.has(c.assetHash)) peaks[c.assetHash] = peaksCache.get(c.assetHash); });
         const end = songEnd();
-        ctx.emitUI('arrangement_sync', { lanes, clips, markers, peaks, barSec: barSec(), songEnd: end, key: ctx.key, instruments: instruments(), drumNames: drumNamesLive(), knobs: knobsOf(),
+        ctx.emitUI('arrangement_sync', { lanes, clips, markers, peaks, barSec: barSec(), songEnd: end, key: ctx.key, instruments: instruments(), drumNames: drumNamesLive(), knobs: knobsOf(), recKnobs: recAll,
           progressions: Object.keys(PROGRESSIONS).map(k => ({ value: k, label: PROGRESSIONS[k].label })), fillStyles: Object.keys(FILL_STYLES).map(k => ({ value: k, label: FILL_STYLES[k].label })), sequencers: K.registry.byOrganism('eravos.sequencer').map(r => ({ value: r.instance_id, label: '⬛ ' + r.instance_id.split('-').slice(-2).join('') })) });
         ctx.emit('timeline:song_length', { bars: Math.max(end, 1) });
       }
@@ -299,8 +304,85 @@
         ctx.emit('ui:transport-loop', { on: P.get('loopOn'), start: P.get('loopStartBar'), end: P.get('loopEndBar') });
       });
       function validTarget(t) { const r = t && K.registry.get(t); return !!(r && isInstrument(r)); }
+      // ---- 3.53 AUTOMATION LANES — a knob of a tool over song position: points [[bar, value]] (bar 1 = the start; numbers
+      // ramp straight between points, choices hold until the next point). Playing: every 16th, four values (each 1/64)
+      // go out as knob:live at their audio time; the tool holds the knob there (a live value — never saved, never undone)
+      // and gets it back when the song stops. RECORD WHAT YOU PLAY (the trajectory-recorder idea, made for ERAVOS): an armed
+      // lane (●) writes the knob as you turn it while the song plays — over what was there in that stretch — thinned when
+      // you stop; '⏺ knobs' arms everything: any knob you turn on a track's tool gets its own lane.
+      let lastTk = null, recAll = false;
+      const knobCfg = (target, key) => { const r = K.registry.get(target); return r && (r.descriptor.config || []).find(c => c.key === key); };
+      function cleanPoints(pts, c) {
+        const out = []; (Array.isArray(pts) ? pts : []).forEach(q => { if (!Array.isArray(q)) return; const b = +q[0]; let v = q[1]; if (!isFinite(b) || b < 1 || b > 2049) return;
+          if (c && c.type === 'enum') { if (!(c.options || []).map(String).includes(String(v))) return; v = c.options.find(o => String(o) === String(v)); }
+          else { v = +v; if (!isFinite(v)) return; if (c && isFinite(c.min) && isFinite(c.max)) v = clamp(v, c.min, c.max); }
+          out.push([Math.round(b * 1e4) / 1e4, v]); });
+        out.sort((a, b) => a[0] - b[0]); return out.filter((q, i) => !i || q[0] !== out[i - 1][0] || (out[i - 1] = q, false)).slice(0, 4000);
+      }
+      function valueAt(pts, bar, c) {
+        if (!pts.length) return undefined; if (bar <= pts[0][0]) return pts[0][1]; const L = pts[pts.length - 1]; if (bar >= L[0]) return L[1];
+        let i = 1; while (pts[i][0] < bar) i++; const a = pts[i - 1], b = pts[i];
+        if (c && c.type === 'enum' || typeof a[1] !== 'number') return a[1];
+        const v = a[1] + (b[1] - a[1]) * (bar - a[0]) / (b[0] - a[0]); return c && c.type === 'integer' ? Math.round(v) : +v.toFixed(6);
+      }
+      ctx.valueAt = valueAt;
+      const sentAuto = new Map();   // lane id → last value sent
+      function playAuto(tk) {
+        const solo = lanes.some(l => l.solo);
+        lanes.forEach(l => {
+          if (l.kind !== 'auto' || l.mute || (solo && !l.solo) || !l.target || !l.key || !l.points.length || !K.registry.has(l.target)) return;
+          if (l.rec && takes.has(l.id)) return;   // writing: your hand has the knob
+          const c = knobCfg(l.target, l.key);
+          for (let k = 0; k < 4; k++) {
+            const bar = (tk.step16 + k / 4) / 16 + 1, v = valueAt(l.points, bar, c);
+            if (v === undefined || sentAuto.get(l.id) === v) continue; sentAuto.set(l.id, v);
+            ctx.emit('knob:live', { target: l.target, key: l.key, value: v, time: tk.time + k * tk.stepDur / 4 });
+          }
+        });
+      }
+      function releaseAuto() { lanes.forEach(l => { if (l.kind === 'auto' && l.target && l.key && sentAuto.has(l.id)) ctx.emit('knob:live', { target: l.target, key: l.key, value: null }); }); sentAuto.clear(); }
+      ctx.playAuto = playAuto;
+      // -- recording: a take per lane — points written while the song plays, thinned when it stops
+      const takes = new Map(), watched = new Map();   // lane id → { from, pts } · target → unsubscribe
+      const songBar = () => { if (!lastTk) return curBar || 1; const dt = Math.max(0, ac.currentTime - lastTk.time); return (lastTk.step16 + dt / (lastTk.stepDur || 0.125)) / 16 + 1; };
+      ctx.songBar = songBar;
+      function heard(target, p) {
+        if (!playing || !p || typeof p.key !== 'string') return;
+        let l = lanes.find(x => x.kind === 'auto' && x.target === target && x.key === p.key && x.rec);
+        if (!l && recAll && lanes.some(x => x.kind === 'inst' && x.target === target)) { const c = knobCfg(target, p.key); if (!c || !(c.type === 'number' || c.type === 'integer' || c.type === 'enum')) return; l = addLane('auto', { target, key: p.key, name: (c.label || p.key), rec: true }); }
+        if (!l) return;
+        const c = knobCfg(target, p.key), bar = songBar(); let t = takes.get(l.id);
+        if (!t) { t = { from: bar, pts: [] }; takes.set(l.id, t); }
+        const v = c && c.type === 'enum' ? p.value : +p.value; if (v === undefined || (typeof v === 'number' && !isFinite(v))) return;
+        t.pts.push([bar, v]);
+        l.points = cleanPoints(l.points.filter(q => q[0] < t.from - 1e-6 || q[0] > bar + 1e-6).concat(t.pts), c);   // over what was there, live
+        ctx.emitUI('auto_live', { id: l.id, points: l.points });
+      }
+      function thin(pts, eps) {   // Ramer–Douglas–Peucker on (bar, value): keeps the shape, drops the redundant points
+        if (pts.length < 3 || typeof pts[0][1] !== 'number') return pts;
+        const span = Math.max(1e-9, Math.max(...pts.map(q => q[1])) - Math.min(...pts.map(q => q[1]))), keep = new Array(pts.length).fill(false); keep[0] = keep[pts.length - 1] = true;
+        const st = [[0, pts.length - 1]];
+        while (st.length) { const [a, b] = st.pop(); let mx = 0, at = -1; for (let i = a + 1; i < b; i++) { const t = (pts[i][0] - pts[a][0]) / ((pts[b][0] - pts[a][0]) || 1), y = pts[a][1] + (pts[b][1] - pts[a][1]) * t, d = Math.abs(pts[i][1] - y) / span; if (d > mx) { mx = d; at = i; } } if (mx > eps && at > 0) { keep[at] = true; st.push([a, at], [at, b]); } }
+        return pts.filter((_, i) => keep[i]);
+      }
+      function endTakes() {
+        if (!takes.size) return;
+        takes.forEach((t, id) => { const l = lanes.find(x => x.id === id); if (!l) return; const c = knobCfg(l.target, l.key); const mine = l.points.filter(q => q[0] >= t.from - 1e-6 && q[0] <= t.pts[t.pts.length - 1][0] + 1e-6); l.points = cleanPoints(l.points.filter(q => !mine.includes(q)).concat(thin(mine, 0.005)), c); });
+        takes.clear(); sync();
+      }
+      function watch() {   // listen to the knobs of every tool an armed lane (or ⏺ knobs) is recording
+        const want = new Set(); lanes.forEach(l => { if (l.kind === 'auto' && l.rec && l.target) want.add(l.target); if (recAll && l.kind === 'inst' && l.target) want.add(l.target); });
+        watched.forEach((un, t) => { if (!want.has(t)) { un(); watched.delete(t); } });
+        want.forEach(t => { if (!watched.has(t)) watched.set(t, ctx.on('ui:config_change:' + t, null, (p) => heard(t, p))); });
+      }
+      ctx.onUI('auto_points', { type: 'object', required: ['id', 'points'] }, (p) => { const l = lanes.find(x => x.id === p.id && x.kind === 'auto'); if (!l) return ctx.fault('RUNTIME_002', 'automation lane ' + p.id); l.points = cleanPoints(p.points, knobCfg(l.target, l.key)); sentAuto.delete(l.id); sync(); });
+      ctx.onUI('rec_knobs', { type: 'object', required: ['on'] }, (p) => { recAll = !!p.on; watch(); sync(); });
       ctx.onUI('lane_add', { type: 'object', required: ['kind'] }, (p) => {
-        if (!['audio', 'pattern', 'marker', 'inst'].includes(p.kind)) return ctx.fault('RUNTIME_002', 'lane kind');
+        if (!['audio', 'pattern', 'marker', 'inst', 'auto'].includes(p.kind)) return ctx.fault('RUNTIME_002', 'lane kind');
+        if (p.kind === 'auto') {
+          const c = p.target && p.key && knobCfg(p.target, p.key); if (!c) return ctx.fault('RUNTIME_002', 'automation: ' + p.target + ' has no knob ' + p.key);
+          addLane('auto', { target: p.target, key: p.key, name: p.name || c.label || p.key, points: cleanPoints(p.points, c), rec: !!p.rec }); watch(); sync(); return;
+        }
         if (p.kind === 'inst') {
           if (p.target && !validTarget(p.target)) return ctx.fault('RUNTIME_002', 'lane target ' + p.target + ' is not an instrument');
           const r = p.target && K.registry.get(p.target), o = { target: p.target || null }, nm = p.name || (r && r.descriptor.label);
@@ -317,9 +399,11 @@
           l.target = p.patch.target; missingTargets.delete(l.target);
         }
         ['name', 'color', 'gain', 'pan', 'mute', 'solo', 'armed'].forEach(k => { if (p.patch[k] !== undefined) l[k] = p.patch[k]; });
+        if (l.kind === 'auto' && p.patch.rec !== undefined) { l.rec = !!p.patch.rec; watch(); }
+        if (l.kind === 'auto' && p.patch.mute && sentAuto.has(l.id)) { ctx.emit('knob:live', { target: l.target, key: l.key, value: null }); sentAuto.delete(l.id); }
         if (p.patch.armed) lanes.forEach(o => { if (o !== l) o.armed = false; }); sync();
       });
-      ctx.onUI('lane_remove', { type: 'object', required: ['id'] }, (p) => { lanes = lanes.filter(l => l.id !== p.id); clips = clips.filter(c => c.lane !== p.id); const n = laneNodes.get(p.id); if (n) { n.g.disconnect(); n.p.disconnect(); laneNodes.delete(p.id); } sync(); });
+      ctx.onUI('lane_remove', { type: 'object', required: ['id'] }, (p) => { const gone = lanes.find(l => l.id === p.id); if (gone && gone.kind === 'auto' && gone.target && sentAuto.has(gone.id)) { ctx.emit('knob:live', { target: gone.target, key: gone.key, value: null }); sentAuto.delete(gone.id); } lanes = lanes.filter(l => l.id !== p.id); clips = clips.filter(c => c.lane !== p.id); const n = laneNodes.get(p.id); if (n) { n.g.disconnect(); n.p.disconnect(); laneNodes.delete(p.id); } sync(); });
       ctx.onUI('clip_add', { type: 'object', required: ['kind'] }, async (p) => {
         if (p.kind === 'audio') { if (!p.hash) return ctx.fault('RUNTIME_002', 'clip_add audio needs hash'); await addAudioClip(p.hash, p.name, snapBar(p.startBar || 1), p.lane); }
         else if (p.kind === 'notes') addNoteClip(p);
@@ -434,11 +518,12 @@
         lanes = x.lanes || lanes; clips = x.clips || []; markers = x.markers || [];
         // 3.26: a saved arrangement (user preset) — tracks whose instrument is gone wait for you to pick one in the lane header
         if (o && o.preset) lanes.forEach(l => { if (l.target && !K.registry.has(l.target)) l.target = null; });
-        lanes.forEach(l => { if (l.kind === 'audio') laneNode(l); });
+        lanes.forEach(l => { if (l.kind === 'audio') laneNode(l); if (l.kind === 'auto') { l.points = cleanPoints(l.points, l.target && knobCfg(l.target, l.key)); l.rec = !!l.rec; } });
+        watch();
         for (const c of clips) if (c.kind === 'audio') await bufferOf(c.assetHash);
         sync();
       };
-      ctx.internals = { get lanes() { return lanes; }, get clips() { return clips; }, get markers() { return markers; }, addLane, bufferOf, instruments, PROGRESSIONS, FILL_STYLES };
+      ctx.internals = { get recAll() { return recAll; }, get lanes() { return lanes; }, get clips() { return clips; }, get markers() { return markers; }, addLane, bufferOf, instruments, PROGRESSIONS, FILL_STYLES };
       setTimeout(sync, 0);
       return { unmount() { stopAll(ac.currentTime); } };
     },

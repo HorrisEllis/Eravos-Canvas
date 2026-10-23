@@ -421,9 +421,19 @@ registerProcessor('eravos-pitch', EravosPitch);`;
         const has = new Set(P.schema().map(c => c.key)), keys = Object.keys(p.params).filter(k => has.has(k)); if (!keys.length) return;
         const tok = ++noteTok, take = () => keys.forEach(k => { P.live(k, p.params[k]); noteOwner.set(k, tok); });
         if (quiet || t <= ac.currentTime + 0.002) take(); else ctx.atAudioTime(t, take);
-        ctx.atAudioTime(end, () => keys.forEach(k => { if (noteOwner.get(k) === tok) { noteOwner.delete(k); P.live(k, null); } }));
+        ctx.atAudioTime(end, () => keys.forEach(k => { if (noteOwner.get(k) === tok) { noteOwner.delete(k); P.live(k, autoLive.has(k) ? autoLive.get(k) : null); } }));
       }
-      ctx.onSilence(() => { if (ctx.params) noteOwner.forEach((_, k) => ctx.params.live(k, null)); noteOwner.clear(); noteTok++; });
+      // 3.53 AUTOMATION — a Timeline automation lane moves a knob: knob:live { target, key, value, time } holds the knob at that
+      // value from that audio time on (value null = hand it back). A note with its own setting for the knob wins while it
+      // plays, then the knob returns to where the automation has it.
+      const autoLive = new Map();
+      ctx.on('knob:live', { type: 'object', required: ['target', 'key'] }, (p) => {
+        const P = ctx.params; if (p.target !== ctx.id || !P || !P.schema().some(c => c.key === p.key)) return;
+        const v = p.value === undefined ? null : p.value;
+        const set = () => { if (v === null) autoLive.delete(p.key); else autoLive.set(p.key, v); if (!noteOwner.has(p.key)) P.live(p.key, v); };
+        if (v === null || typeof p.time !== 'number' || p.time <= ac.currentTime + 0.003) set(); else ctx.atAudioTime(p.time, set);
+      });
+      ctx.onSilence(() => { if (ctx.params) { noteOwner.forEach((_, k) => ctx.params.live(k, autoLive.has(k) ? autoLive.get(k) : null)); } noteOwner.clear(); noteTok++; });
       ctx.onNote = (fn) => ctx.on('note:trigger', NOTE_SCHEMA, (p) => {
         if (!ctx.isTarget(p)) return;
         const t = typeof p.time === 'number' ? p.time : ac.currentTime, end = t + (typeof p.duration === 'number' ? p.duration : 1);

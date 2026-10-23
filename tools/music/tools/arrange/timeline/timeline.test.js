@@ -219,3 +219,59 @@ describe('tool · Timeline — per-note settings (expression lanes)', () => {
     assert.equal(w.params.get('depth'), 7); U.K.silence({ hard: true, reason: 'test' }); assert.equal(w.params.get('depth'), base);
   });
 });
+
+// 3.53 — automation lanes in the timeline, and record what you play
+describe('tool · Timeline — automation lanes', () => {
+  const uni = (sec) => { const ctx = new OfflineAudioContext(1, Math.ceil(sec * 8000), 8000), K = Kernel.create({ ctx, quiet: true, syncIR: true }), T = MasterTransport.create(K, { offline: true, bpm: 120 }); T.boot(); return { ctx, K, T }; };
+  function rig(sec) {
+    const U = uni(sec || 3), tl = OrganismFactory.spawn('eravos.timeline', { K: U.K, headless: true }), wb = OrganismFactory.spawn('eravos.wobble-bass', { K: U.K, headless: true });
+    U.K.bus.publish('ui:lane_add:' + tl, { kind: 'inst', target: wb, name: 'Bass' });
+    return { U, tl, wb, T: OrganismFactory.handle(tl).ctx, W: OrganismFactory.handle(wb).ctx };
+  }
+  it('a lane under its track; points clean to the knob’s range; ramps between points, choices hold', () => {
+    const r = rig(0.3);
+    r.U.K.bus.publish('ui:lane_add:' + r.tl, { kind: 'auto', target: r.wb, key: 'depth', points: [[3, 8], [1, 0], [2, 99], ['x', 1]] });
+    r.U.K.bus.publish('ui:lane_add:' + r.tl, { kind: 'auto', target: r.wb, key: 'div', points: [[1, '1/4'], [2, '1/16'], [2.5, 'nope']] });
+    const ls = r.T.internals.lanes, i = ls.findIndex(l => l.kind === 'inst'), a = ls[i + 1], b = ls[i + 2];
+    assert.equal(a.kind, 'auto'); assert.deepEqual(a.points, [[1, 0], [2, 8], [3, 8]], 'sorted, clamped to 0..8, junk dropped');
+    assert.equal(r.T.valueAt(a.points, 1.5, { type: 'number' }), 4); assert.equal(r.T.valueAt(b.points, 1.9, { type: 'enum', options: ['1/4', '1/16'] }), '1/4');
+    assert.deepEqual(b.points, [[1, '1/4'], [2, '1/16']]);
+  });
+  it('playing: the knob follows the lane on the audio clock, never saved; Stop hands it back', async () => {
+    const r = rig(3), base = r.W.params.get('depth'), seen = {};
+    r.U.K.bus.publish('ui:lane_add:' + r.tl, { kind: 'auto', target: r.wb, key: 'depth', points: [[1, 0], [2, 8]] });
+    r.U.T.renderTicks(0, 32, 0.05);                                  // bar 1 → 3 at 120 BPM (2 s per bar)
+    r.U.ctx.suspend(1.05).then(() => { seen.mid = r.W.params.get('depth'); seen.saved = r.W.serialize().params.depth; r.U.ctx.resume(); });
+    r.U.ctx.suspend(2.6).then(() => { seen.end = r.W.params.get('depth'); r.U.ctx.resume(); });
+    await r.U.ctx.startRendering();
+    assert.near(seen.mid, 4, 0.3, 'halfway through bar 1 the ramp is halfway'); assert.equal(seen.saved, base, 'the saved knob is untouched'); assert.equal(seen.end, 8);
+    r.U.K.bus.publish('transport:stop', { time: 3 }); assert.equal(r.W.params.get('depth'), base, 'Stop: the tool’s own knob again');
+  });
+  it('record what you play: an armed lane writes the knob while the song plays, over what was there, thinned at Stop', () => {
+    const r = rig(0.3);
+    r.U.K.bus.publish('ui:lane_add:' + r.tl, { kind: 'auto', target: r.wb, key: 'depth', points: [[1, 2], [1.5, 2], [3, 2]], rec: true });
+    const lane = r.T.internals.lanes.find(l => l.kind === 'auto');
+    r.U.K.bus.publish('transport:play', { time: 0, step16: 0 });
+    for (let s = 4; s <= 12; s++) { r.U.T.renderTicks(s, s + 1, s * 0.125); r.U.K.bus.publish('ui:config_change:' + r.wb, { key: 'depth', value: (s - 4) * 0.5 }); }
+    r.U.K.bus.publish('transport:stop', { time: 2 });
+    const pts = lane.points; assert.ok(pts.some(q => q[1] === 0) && pts.some(q => q[1] === 4), 'the take is there: ' + JSON.stringify(pts));
+    assert.ok(!pts.some(q => q[0] === 1.5), 'the old point inside the take was written over'); assert.ok(pts.some(q => q[0] === 3), 'the old point after it stays');
+    assert.lt(pts.length, 9 + 2, 'a straight ramp thins to a few points');
+  });
+  it('⏺ knobs: any knob turned on a track’s tool while playing gets its own lane', () => {
+    const r = rig(0.3);
+    r.U.K.bus.publish('ui:rec_knobs:' + r.tl, { on: true }); r.U.K.bus.publish('transport:play', { time: 0, step16: 0 });
+    r.U.T.renderTicks(0, 2, 0.05); r.U.K.bus.publish('ui:config_change:' + r.wb, { key: 'cutoff', value: 900 });
+    r.U.T.renderTicks(2, 4, 0.3); r.U.K.bus.publish('ui:config_change:' + r.wb, { key: 'cutoff', value: 2400 });
+    r.U.K.bus.publish('transport:stop', { time: 1 });
+    const l = r.T.internals.lanes.find(x => x.kind === 'auto' && x.key === 'cutoff'); assert.ok(l, 'a cutoff lane appeared'); assert.equal(l.target, r.wb); assert.ok(l.points.length >= 2);
+  });
+  it('a note’s own setting wins while it plays, then the knob goes back to where the automation has it', async () => {
+    const r = rig(2), seen = {};
+    r.U.K.bus.publish('knob:live', { target: r.wb, key: 'depth', value: 5 });
+    r.U.K.bus.publish('note:trigger', { target: r.wb, note: 40, velocity: 0.9, time: 0.2, duration: 0.5, params: { depth: 1 } });
+    r.U.ctx.suspend(0.5).then(() => { seen.note = r.W.params.get('depth'); r.U.ctx.resume(); });
+    r.U.ctx.suspend(1.2).then(() => { seen.after = r.W.params.get('depth'); r.U.ctx.resume(); });
+    await r.U.ctx.startRendering(); assert.equal(seen.note, 1); assert.equal(seen.after, 5);
+  });
+});

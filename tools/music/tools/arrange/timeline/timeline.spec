@@ -107,6 +107,7 @@ dependencies:
   outputs:
     - tl.hook.audio_out (audio · port out)
     - tl.hook.note_out (note:trigger)
+    - tl.hook.knob_out (knob:live)
     - tl.hook.cue_out (seq:pattern_cue)
     - tl.hook.seek_out (timeline:seek)
     - tl.hook.clip_play_out (timeline:clip_play)
