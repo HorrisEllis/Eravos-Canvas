@@ -51,4 +51,16 @@ describe('Songs — shelved by category, the Synthesis showcase, key & tempo', (
       c.payload.notes.forEach((n, j) => assert.equal(d.payload.notes[j].n, drums ? n.n : n.n + 5, c.payload.name));
     });
   });
+  it('Bun Dem · Fire: every preset exists, it writes with no fault, it sits beside Bun Dem, and the drop bass is higher than the verse bass', async () => {
+    const G = SongEngine.genres().find(g => g.id === 'bun-dem-fire'); assert.ok(G, 'genre');
+    const bad = []; [].concat(Object.values(G.parts), G.fx || [], G.mods || []).forEach(p => { const d = OrganismFactory.def(p.organism); [].concat(p.preset || []).forEach(n => { if (!d || !(d.presets || {})[n]) bad.push(p.organism + ' "' + n + '"'); }); });
+    assert.equal(bad.join(' · '), '');
+    window.BunDemFireSongbook.songs.forEach(id => { const s = Songbook.all().find(x => x.id === id); assert.ok(s, id); assert.equal(Songbook.categoryOf(s), Songbook.categoryOf(Songbook.all().find(x => x.id === 'bun-dem'))); });
+    const U = TH.universe(0.2, { bpm: 150 }), n0 = U.K.faults.list().length, rec = Recipes.get('eravos.recipe.engine.bun-dem-fire'); rec._pinned = 75;
+    await Recipes.run(rec.id, { K: U.K, headless: true, clear: true });
+    assert.equal(U.K.faults.list().slice(n0).map(f => f.fault_class + ' ' + f.message).join(' | '), '');
+    rec._seed = 75; rec._shift = null; const clips = rec.steps.filter(s => s.op === 'event' && s.topic === 'clip_add');
+    const avg = (re) => { const ns = clips.filter(c => re.test(c.payload.name)).flatMap(c => c.payload.notes.map(n => n.n)); return ns.reduce((a, b) => a + b, 0) / ns.length; };
+    assert.gt(avg(/^Screech · drop/), avg(/^Sub · verse/) + 6, 'the drop screech sits above the verse bass');
+  });
 });
