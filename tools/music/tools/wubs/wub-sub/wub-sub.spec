@@ -23,15 +23,24 @@ dependencies:
   services:
     - audio: Audio engine — processes sound
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 1 modulation input — LFO / XY / Macro can move them
+    - mod: 10 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - wubs.hook.note_in (note:trigger)
     - wubs.hook.midi_in (midi:note) — ambient broadcast
     - wubs.hook.mod_level (modulation · port mod.level)
     - slot.tone.return (audio · port slot.tone.return)
+    - knob.follow (modulation · port mod.knob.follow)
+    - knob.wave (modulation · port mod.knob.wave)
+    - knob.octave (modulation · port mod.knob.octave)
+    - knob.transpose (modulation · port mod.knob.transpose)
+    - knob.harmonics (modulation · port mod.knob.harmonics)
+    - knob.cut (modulation · port mod.knob.cut)
+    - knob.glide (modulation · port mod.knob.glide)
+    - knob.attack (modulation · port mod.knob.attack)
+    - knob.release (modulation · port mod.knob.release)
   outputs:
     - wubs.hook.audio_out (audio · port out)
     - slot.tone.send (audio · port slot.tone.send)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe, registry_read, audio_in]
-  works_with: [eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
+  works_with: [eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen, eravos.midi-mapper, eravos.lyric-rhythm]

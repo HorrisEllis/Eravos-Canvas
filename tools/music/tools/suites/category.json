@@ -1,0 +1,1 @@
+{ "schema": "eravos.category/1", "id": "suites", "label": "Suites", "icon": "🧰", "order": 5, "blurb": "A suite is a system of tools. Its window is where the parts connect: every part is still its own tool, and every one ends here. Build the whole system, add parts one by one, or mix in parts from other suites." }

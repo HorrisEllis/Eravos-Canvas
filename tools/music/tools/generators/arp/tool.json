@@ -1,0 +1,59 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.arp",
+  "version": "1.0.0",
+  "label": "Arp",
+  "icon": "🪜",
+  "accent": "#00d4ff",
+  "domain": "music",
+  "category": "generators",
+  "summary": "Hold notes (or wire in Chords): it steps through them on the beat and plays any instrument wired to it.",
+  "tags": [
+    "generators",
+    "arp",
+    "arpeggiator"
+  ],
+  "files": {
+    "engine": "arp.engine.js",
+    "ui": "arp.ui.js",
+    "spec": "arp.spec",
+    "tests": "arp.test.js",
+    "preview": "preview.png",
+    "thumb": "thumb.png"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "midi_in",
+      "bus_publish",
+      "bus_subscribe",
+      "registry_read"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory",
+      "odd-couples"
+    ]
+  },
+  "works_with": [
+    "eravos.breath",
+    "eravos.embodiment-lab",
+    "eravos.fx-dynamics",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.sidechain-compressor",
+    "eravos.syn-env",
+    "eravos.wub-rate",
+    "eravos.xy-pad"
+  ],
+  "conflicts": [],
+  "status": "built"
+}

@@ -1,0 +1,59 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.groove-gen",
+  "version": "1.0.0",
+  "label": "Groove",
+  "icon": "🥁",
+  "accent": "#ffaa00",
+  "domain": "music",
+  "category": "generators",
+  "summary": "Paint where the rhythm is busy, turn ENERGY: it plays any drum tool wired to it. EDM Lab’s rhythm, as a part.",
+  "tags": [
+    "generators",
+    "groove",
+    "drums",
+    "edm"
+  ],
+  "files": {
+    "engine": "groove-gen.engine.js",
+    "ui": "groove-gen.ui.js",
+    "spec": "groove-gen.spec",
+    "tests": "groove-gen.test.js",
+    "preview": "preview.png",
+    "thumb": "thumb.png"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "bus_publish",
+      "bus_subscribe",
+      "registry_read"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory",
+      "odd-couples"
+    ]
+  },
+  "works_with": [
+    "eravos.breath",
+    "eravos.embodiment-lab",
+    "eravos.fx-dynamics",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.sidechain-compressor",
+    "eravos.syn-env",
+    "eravos.wub-rate",
+    "eravos.xy-pad"
+  ],
+  "conflicts": [],
+  "status": "built"
+}

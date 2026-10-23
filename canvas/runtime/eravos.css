@@ -95,6 +95,10 @@ svg.wires { position: absolute; pointer-events: none; overflow: visible; z-index
 .uk-knob-track { fill: none; stroke: #243244; stroke-width: 4; stroke-linecap: round; }
 .uk-knob-arc { fill: none; stroke: var(--acc); stroke-width: 4; stroke-linecap: round; filter: drop-shadow(0 0 3px var(--acc)); }
 .uk-knob-dot { fill: #e8f4ff; }
+/* 3.49 P49.1: a knob a mover is moving (a tool wired to it) — where it is now (its own value stays the arc) */
+.uk-knob-live { fill: #c58bff; filter: drop-shadow(0 0 3px #c58bff); }
+.uk-knob.moving .uk-knob-label::after, .uk-toggle.moving::after { content: " ∿"; color: #c58bff; }
+.uk-seg.moving, .uk-select.moving { box-shadow: 0 0 0 1px #c58bff; }
 .uk-knob.active .uk-knob-arc { stroke-width: 5; }
 .uk-knob-val { font: 10.5px var(--mono); color: var(--text); margin-top: -2px; }
 .uk-knob-label { font: 600 9.5px var(--font); color: var(--dim); text-align: center; line-height: 1.1; max-width: 100%; overflow: hidden; white-space: normal; overflow-wrap: break-word; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; min-height: 2.2em; max-width: calc(100% + 16px); margin: 0 -8px; } /* 3.37: two lines, never an ellipsis; a long single word may overhang the knob a little instead of breaking */
@@ -377,3 +381,45 @@ svg.wires path.wire.hot { stroke-width: 4.5; filter: drop-shadow(0 0 4px current
 .md-cat { font: 700 9px var(--mono); letter-spacing: 1.5px; color: var(--faint); text-transform: uppercase; padding: 6px 4px 2px; }
 .md-item { text-align: left; background: none; border: 0; border-radius: 5px; padding: 3px 6px; cursor: pointer; color: var(--text); font-size: 12px; }
 .md-item:hover { background: var(--panel2); }
+
+/* tool-page.js — 📘 a whole page for every tool */
+.tp-overlay { position: fixed; inset: 52px 0 0 0; z-index: 9000; background: rgba(3,6,10,.72); display: flex; justify-content: center; align-items: flex-start; padding: 28px 16px; overflow: auto; }
+.tp-page { width: min(980px, 100%); background: var(--bg2, #0b1119); border: 1px solid var(--line2, #26364a); border-top: 3px solid var(--acc, #00d4ff); border-radius: 10px; padding: 18px 20px 28px; color: var(--text, #d8e2ee); font: 13px var(--font, sans-serif); outline: none; max-height: calc(100vh - 108px); overflow: auto; }
+.tp-head { display: flex; gap: 14px; align-items: flex-start; }
+.tp-ic { font-size: 34px; line-height: 1; }
+.tp-ht { flex: 1; min-width: 0; }
+.tp-ht h2 { margin: 0; font-size: 20px; color: var(--acc, #00d4ff); }
+.tp-ht p { margin: 6px 0 0; color: var(--dim, #8fa1b6); }
+.tp-meta { font-size: 11px; color: var(--dim, #8fa1b6); text-transform: uppercase; letter-spacing: .06em; }
+.tp-act { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.tp-btn { background: #111a26; color: inherit; border: 1px solid var(--line2, #26364a); border-radius: 6px; padding: 4px 10px; cursor: pointer; font: inherit; white-space: nowrap; }
+.tp-btn:hover { border-color: var(--acc, #00d4ff); }
+.tp-btn.pri { background: color-mix(in srgb, var(--acc, #00d4ff) 22%, #0b1119); border-color: var(--acc, #00d4ff); font-weight: 700; }
+.tp-btn.on { color: var(--acc, #00d4ff); }
+.tp-on { margin: 12px 0 6px; display: flex; gap: 8px; align-items: center; color: var(--dim, #8fa1b6); }
+.tp-target, .tp-q { background: #070b11; color: inherit; border: 1px solid var(--line2, #26364a); border-radius: 6px; padding: 4px 8px; font: inherit; }
+.tp-q { width: 100%; box-sizing: border-box; margin: 8px 0; }
+.tp-nav { display: flex; gap: 6px; flex-wrap: wrap; position: sticky; top: -18px; background: var(--bg2, #0b1119); padding: 8px 0; z-index: 1; border-bottom: 1px solid var(--line, #1a2533); }
+.tp-sec { margin-top: 18px; }
+.tp-h { margin: 0 0 8px; font-size: 15px; } .tp-h small { color: var(--dim, #8fa1b6); font-weight: 400; }
+.tp-p { margin: 0 0 8px; } .tp-dim { color: var(--dim, #8fa1b6); }
+.tp-list { display: flex; flex-direction: column; gap: 4px; }
+.tp-row, .tp-mod { display: flex; gap: 8px; align-items: center; padding: 6px 8px; background: #0e1520; border: 1px solid var(--line, #1a2533); border-radius: 6px; }
+.tp-row.off { opacity: .55; }
+.tp-rt { flex: 1; min-width: 0; display: flex; flex-direction: column; } .tp-rt small { color: var(--dim, #8fa1b6); }
+.tp-tag { font-size: 11px; padding: 1px 6px; border-radius: 4px; white-space: nowrap; } .tp-tag.mod { background: #1d2a1a; color: #9be37a; } .tp-tag.lnk { background: #14243a; color: #7fc4ff; }
+.tp-slot, .tp-pack, .tp-cg { margin-bottom: 12px; }
+.tp-sh { display: flex; gap: 6px; align-items: baseline; margin: 6px 0; } .tp-sh small { color: var(--dim, #8fa1b6); }
+.tp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 4px; max-height: 320px; overflow: auto; }
+.tp-cat { grid-column: 1 / -1; font-size: 11px; color: var(--dim, #8fa1b6); text-transform: uppercase; letter-spacing: .06em; margin-top: 4px; }
+.tp-pack.off .tp-presets { opacity: .45; }
+.tp-presets { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 4px; }
+.tp-pre { display: flex; gap: 6px; align-items: center; padding: 3px 6px; background: #0e1520; border-radius: 5px; }
+.tp-pn { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tp-tab { width: 100%; border-collapse: collapse; } .tp-tab td { padding: 3px 6px; border-bottom: 1px solid var(--line, #1a2533); vertical-align: top; }
+.tp-cl { white-space: nowrap; font-weight: 600; } .tp-cr, .tp-cd { color: var(--dim, #8fa1b6); font-size: 12px; } .tp-ch { font-size: 12px; } .tp-mv { color: var(--acc, #00d4ff); }
+@media (max-width: 600px) { .tp-head { flex-wrap: wrap; } .tp-tab .tp-ch { display: none; } }
+.wm-head .wm-icon, .wm-head .wm-title { cursor: pointer; border-radius: 4px; }
+.wm-head .wm-title:hover { color: var(--acc, #00d4ff); text-decoration: underline; text-underline-offset: 3px; }
+.tp-open { display: inline-flex; align-items: center; justify-content: center; }
+.tp-open svg { display: block; }

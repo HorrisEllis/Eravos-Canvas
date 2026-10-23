@@ -125,3 +125,15 @@ describe('3.32 — ContentPacks: one registry for every pack', () => {
     assert.ok(ContentPacks.items('eravos.pads', 'kits').length >= 10);
   });
 });
+describe('3.44 · Songs by category', () => {
+  it('every song sits in a real category (none under More), and every category shown has songs', () => {
+    const all = Songbook.all(), more = all.filter(s => Songbook.categoryOf(s) === 'more').map(s => s.genre);
+    assert.equal(more.join(', '), '', 'uncategorised genres');
+    const ids = new Set(all.map(s => Songbook.categoryOf(s))); Songbook.categories().filter(c => c.id !== 'more').forEach(c => assert.ok(ids.has(c.id), c.label + ' is empty'));
+  });
+  it('the page groups the cards under category headings and still shows every song in All', () => {
+    Songbook.open(); const ov = document.querySelector('.overlay.sbk');
+    try { assert.equal(ov.querySelectorAll('.sbk-card').length, Songbook.all().length); assert.gt(ov.querySelectorAll('.sbk-sec').length, 8); }
+    finally { ov.querySelector('.sbk-x').click(); }   // close it the way a person does — remove() left the page "open" for the next test
+  });
+});

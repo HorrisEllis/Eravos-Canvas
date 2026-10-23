@@ -1,32 +1,25 @@
 {
   "schema": "eravos.tool/1",
   "id": "eravos.edm-lab",
-  "version": "4.0.0",
-  "label": "EDM Lab",
+  "version": "3.0.0",
+  "label": "EDM Lab (all-in-one)",
   "icon": "⚗",
   "accent": "#ff2266",
   "domain": "music",
   "category": "generators",
-  "summary": "A groove workstation: paint the drums, turn TENSION and ENERGY — kit, bass, chords and a lead follow in key. Patterns, chains, a 32-bar song, PRINT and MIDI.",
+  "summary": "Paint where the rhythm is busy, turn TENSION: drums, bass and chords follow — always in key.",
   "tags": [
     "generators",
     "edm",
-    "lab",
-    "groove",
-    "drums",
-    "bass",
-    "chords",
-    "arp",
-    "midi"
+    "lab"
   ],
   "files": {
     "engine": "edm-lab.engine.js",
     "ui": "edm-lab.ui.js",
-    "css": "edm-lab.css",
     "spec": "edm-lab.spec",
     "preview": "preview.png",
-    "thumb": "thumb.png",
-    "tests": "edm-lab.test.js"
+    "tests": "edm-lab.test.js",
+    "thumb": "thumb.png"
   },
   "needs": {
     "units": [
@@ -71,8 +64,10 @@
     "eravos.macro-automation",
     "eravos.master-fx",
     "eravos.sidechain-compressor",
+    "eravos.suite-hub",
     "eravos.syn-env",
     "eravos.syn-osc",
+    "eravos.wobble-bass",
     "eravos.wub-filter",
     "eravos.wub-osc",
     "eravos.wub-rate",

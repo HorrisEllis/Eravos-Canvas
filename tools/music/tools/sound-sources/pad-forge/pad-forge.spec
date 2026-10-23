@@ -40,7 +40,7 @@ dependencies:
     - audio: Audio engine — makes sound
     - key: Song key & scale — plays in key
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 3 modulation inputs — LFO / XY / Macro can move them
+    - mod: 22 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - pad.hook.note_in (note:trigger)
@@ -49,7 +49,26 @@ dependencies:
     - pad.hook.mod_x (modulation · port mod.x)
     - pad.hook.mod_y (modulation · port mod.y)
     - pad.hook.mod_cutoff (modulation · port mod.cutoff)
+    - knob.cornerA (modulation · port mod.knob.cornerA)
+    - knob.cornerB (modulation · port mod.knob.cornerB)
+    - knob.cornerC (modulation · port mod.knob.cornerC)
+    - knob.cornerD (modulation · port mod.knob.cornerD)
+    - knob.orbit (modulation · port mod.knob.orbit)
+    - knob.orbitRate (modulation · port mod.knob.orbitRate)
+    - knob.orbitSize (modulation · port mod.knob.orbitSize)
+    - knob.bloom (modulation · port mod.knob.bloom)
+    - knob.warmth (modulation · port mod.knob.warmth)
+    - knob.width (modulation · port mod.knob.width)
+    - knob.attack (modulation · port mod.knob.attack)
+    - knob.release (modulation · port mod.knob.release)
+    - knob.hold (modulation · port mod.knob.hold)
+    - knob.space (modulation · port mod.knob.space)
+    - knob.shimmer (modulation · port mod.knob.shimmer)
+    - knob.size (modulation · port mod.knob.size)
+    - knob.level (modulation · port mod.knob.level)
+    - knob.octave (modulation · port mod.knob.octave)
+    - knob.transpose (modulation · port mod.knob.transpose)
   outputs:
     - pad.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.timeline, eravos.sequencer, eravos.fx-moddelay, eravos.sub-engine, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
+  works_with: [eravos.timeline, eravos.sequencer, eravos.fx-moddelay, eravos.sub-engine, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen]

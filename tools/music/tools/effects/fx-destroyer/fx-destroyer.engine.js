@@ -77,6 +77,12 @@ registerProcessor('eravos-crush2', EravosCrush2);`;
     id: 'eravos.fx-destroyer', domain: 'music', version: '2.0.0', label: 'Destroyer', icon: '👾', accent: '#aaff00', phase: 'P10',
     category: 'Effects', blurb: 'Warm tape, grit, fold growl, 8-bit crunch. From a little colour to total destruction.',
     size: { w: 460, h: 520 }, minSize: { w: 340, h: 380 },
+    // its suite (canvas/runtime/tool-page.js)
+    suite: { label: 'Talking grit', blurb: 'A Wub Filter inside the damage (mixed by Mix) and an LFO pushing the drive in time.',
+      members: [
+        { tool: 'eravos.wub-filter', as: 'mod', slot: 'after', preset: 'Bandpass Yap', why: 'the grit talks — inside, so Mix blends it' },
+        { tool: 'eravos.lfo', as: 'linked', preset: 'Wobble 1/8', wire: { from: ['self', 'lfo.hook.mod_out'], to: ['host', 'dst.hook.mod_drive'] }, why: 'the drive breathes on the 1/8' },
+      ] },
     permissions: ['audio_out', 'audio_in', 'bus_publish', 'bus_subscribe'],
     provides: ['capability.audio_out', 'capability.fx'],
     curves: { shapeCurve, makeup },

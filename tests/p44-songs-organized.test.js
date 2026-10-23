@@ -10,21 +10,17 @@ describe('Songs — shelved by category, the Synthesis showcase, key & tempo', (
     assert.equal(stray.join(', '), '');
     assert.gt(new Set(all.map(Songbook.categoryOf)).size, 10);
   });
-  it('the page groups by shelf, the rail counts add up, search narrows, sort A→Z is alphabetical', () => {
-    Songbook.open(); const ov = document.querySelector('.overlay.sbk');
+  it('Make it yours: every Song Engine song shows Key and Tempo, and Write passes them on', () => {
+    const real = SongEngine.write; let got = null; SongEngine.write = (g, seed, o) => { got = { g, seed, o }; return true; };
     try {
-      const rail = [...ov.querySelectorAll('.sbk-rail-item')], total = +rail[0].querySelector('small').textContent;
-      assert.equal(total, Songbook.all().length);
-      assert.equal(rail.slice(1).reduce((n, b) => n + +b.querySelector('small').textContent, 0), total);
-      assert.gt(ov.querySelectorAll('.sbk-sec').length, 10);
-      const q = ov.querySelector('.sbk-search'); q.value = 'synthesis'; q.dispatchEvent(new Event('input'));
-      assert.equal(ov.querySelectorAll('.sbk-card').length, window.SynthesisSongbook.songs.length);
-      q.value = ''; q.dispatchEvent(new Event('input'));
-      const so = ov.querySelector('.sbk-sort'); so.value = 'az'; so.dispatchEvent(new Event('change'));
-      const t = [...ov.querySelectorAll('.sbk-card b')].map(b => b.textContent.toLowerCase());
-      assert.equal(ov.querySelectorAll('.sbk-sec').length, 0);
-      assert.ok(t.every((x, i) => !i || t[i - 1] <= x), 'sorted');
-    } finally { ov.remove(); }
+      Songbook.open(); const ov = document.querySelector('.overlay.sbk');
+      const card = [...ov.querySelectorAll('.sbk-card')].find(c => c.querySelector('b').textContent === 'Bun Dem'); assert.ok(card, 'Bun Dem card'); card.click();
+      const box = ov.querySelector('.sbk-shift'); assert.ok(box, 'key & tempo panel');
+      [...box.querySelectorAll('button')].find(b => b.textContent === 'Higher + slower').click();
+      ov.querySelector('.sbk-go').click();
+      assert.equal(got.g, 'reggae'); assert.deepEqual(got.o, { shift: { semis: 5, tempo: 0.85 } });
+      Songbook.open(); const ov2 = document.querySelector('.overlay.sbk'); [...ov2.querySelectorAll('.sbk-card')].find(c => c.querySelector('b').textContent === 'Bun Dem').click(); [...ov2.querySelector('.sbk-shift').querySelectorAll('button')].find(b => b.textContent === 'Reset').click(); ov2.querySelector('.sbk-x').click();
+    } finally { SongEngine.write = real; const o = document.querySelector('.overlay.sbk'); if (o) o.querySelector('.sbk-x').click(); }
   });
   it('the Synthesis showcase plays every Synthesis tool, and each genre writes with no fault', async () => {
     const SB = window.SynthesisSongbook, gs = SongEngine.genres().filter(g => SB.genres.includes(g.id)), used = new Set();

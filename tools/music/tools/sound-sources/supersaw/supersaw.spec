@@ -62,7 +62,7 @@ dependencies:
     - audio: Audio engine — makes sound
     - key: Song key & scale — plays in key
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 2 modulation inputs — LFO / XY / Macro can move them
+    - mod: 18 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - saw.hook.note_in (note:trigger)
@@ -70,7 +70,23 @@ dependencies:
     - saw.hook.theory_in (theory:key-change) — ambient broadcast
     - saw.hook.mod_cutoff (modulation · port mod.cutoff)
     - saw.hook.mod_detune (modulation · port mod.detune)
+    - knob.unison (modulation · port mod.knob.unison)
+    - knob.mix (modulation · port mod.knob.mix)
+    - knob.spread (modulation · port mod.knob.spread)
+    - knob.res (modulation · port mod.knob.res)
+    - knob.fEnv (modulation · port mod.knob.fEnv)
+    - knob.fA (modulation · port mod.knob.fA)
+    - knob.fD (modulation · port mod.knob.fD)
+    - knob.fS (modulation · port mod.knob.fS)
+    - knob.fR (modulation · port mod.knob.fR)
+    - knob.aA (modulation · port mod.knob.aA)
+    - knob.aD (modulation · port mod.knob.aD)
+    - knob.aS (modulation · port mod.knob.aS)
+    - knob.aR (modulation · port mod.knob.aR)
+    - knob.chordMode (modulation · port mod.knob.chordMode)
+    - knob.octave (modulation · port mod.knob.octave)
+    - knob.level (modulation · port mod.knob.level)
   outputs:
     - saw.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
+  works_with: [eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen, eravos.midi-mapper, eravos.lyric-rhythm]

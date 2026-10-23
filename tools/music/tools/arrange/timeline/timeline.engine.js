@@ -101,7 +101,7 @@
         const max = bars * 16;
         return (Array.isArray(arr) ? arr : []).map(n => ({ s: +n.s, l: +n.l, n: Math.round(+n.n), v: n.v === undefined ? 0.85 : +n.v }))
           .filter(n => isFinite(n.s) && isFinite(n.l) && isFinite(n.n) && isFinite(n.v) && n.s >= 0 && n.s < max)
-          .map(n => ({ s: Math.round(n.s * 64) / 64, l: clamp(Math.round(n.l * 64) / 64, 0.25, max - n.s), n: clamp(n.n, 0, 127), v: clamp(n.v, 0.05, 1) }))
+          .map(n => ({ s: Math.round(n.s * 192) / 192, l: clamp(Math.round(n.l * 192) / 192, 0.125, max - n.s), n: clamp(n.n, 0, 127), v: clamp(n.v, 0.05, 1) }))   // 3.48: 1/192 step — exact for 1/64 and every triplet; 1/128-note minimum
           .sort((a, b) => a.s - b.s || a.n - b.n);
       }
       const snap16 = (b) => Math.max(1, 1 + Math.round((b - 1) * 16) / 16);

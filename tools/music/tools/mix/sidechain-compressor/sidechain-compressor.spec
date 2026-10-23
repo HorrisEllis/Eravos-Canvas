@@ -65,11 +65,24 @@ dependencies:
   services:
     - audio: Audio engine — processes sound
     - clock: Master clock & tempo — locks to the beat
+    - mod: 12 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - sc.hook.audio_in (audio · port in)
     - sc.hook.trig_in (pad:trigger|seq:fire|note:trigger)
     - sc.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
+    - knob.target (modulation · port mod.knob.target)
+    - knob.mode (modulation · port mod.knob.mode)
+    - knob.triggerMode (modulation · port mod.knob.triggerMode)
+    - knob.division (modulation · port mod.knob.division)
+    - knob.depth (modulation · port mod.knob.depth)
+    - knob.attack (modulation · port mod.knob.attack)
+    - knob.hold (modulation · port mod.knob.hold)
+    - knob.release (modulation · port mod.knob.release)
+    - knob.curve (modulation · port mod.knob.curve)
+    - knob.shapeLength (modulation · port mod.knob.shapeLength)
+    - knob.smoothing (modulation · port mod.knob.smoothing)
+    - knob.enabled (modulation · port mod.knob.enabled)
   outputs:
     - sc.hook.audio_out (audio · port out)
     - sc.hook.duck_out (modulation · port env)

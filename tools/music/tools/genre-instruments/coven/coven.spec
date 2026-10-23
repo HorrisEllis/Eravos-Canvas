@@ -38,7 +38,7 @@ dependencies:
     - clock: Master clock & tempo — locks to the beat
     - key: Song key & scale — plays in key
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 1 modulation input — LFO / XY / Macro can move them
+    - mod: 15 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - cov.hook.note_in (note:trigger)
@@ -46,7 +46,21 @@ dependencies:
     - cov.hook.theory_in (theory:key-change) — ambient broadcast
     - cov.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
     - cov.hook.mod_screw (modulation · port mod.screw)
+    - knob.chantDiv (modulation · port mod.knob.chantDiv)
+    - knob.glide (modulation · port mod.knob.glide)
+    - knob.voices (modulation · port mod.knob.voices)
+    - knob.spread (modulation · port mod.knob.spread)
+    - knob.breath (modulation · port mod.knob.breath)
+    - knob.vibrato (modulation · port mod.knob.vibrato)
+    - knob.hex (modulation · port mod.knob.hex)
+    - knob.hexMix (modulation · port mod.knob.hexMix)
+    - knob.static (modulation · port mod.knob.static)
+    - knob.summon (modulation · port mod.knob.summon)
+    - knob.dark (modulation · port mod.knob.dark)
+    - knob.attack (modulation · port mod.knob.attack)
+    - knob.release (modulation · port mod.knob.release)
+    - knob.level (modulation · port mod.knob.level)
   outputs:
     - cov.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.organ, eravos.fx-haunt, eravos.drum-forge, eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
+  works_with: [eravos.organ, eravos.fx-haunt, eravos.drum-forge, eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen]

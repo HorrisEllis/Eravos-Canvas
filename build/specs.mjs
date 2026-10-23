@@ -4,7 +4,7 @@
  * - every existing specs/eravos.organism.<name>.spec gets its "# ---- dependencies (generated)" block replaced
  * - a tool without a spec gets one generated from its descriptor and the header comment of its engine file
  * - specs/eravos.dependency-map.spec lists every tool by mode / category with toolbar units, services and ports */
-import { chromium } from 'playwright';
+import { chromium } from '../host/driver/glass.js';   // Clear Glass's driver, not Playwright (his call, 2026-10-21)
 import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'), SPECS = path.join(ROOT, 'specs');
 const b = await chromium.launch(); const p = await b.newPage();

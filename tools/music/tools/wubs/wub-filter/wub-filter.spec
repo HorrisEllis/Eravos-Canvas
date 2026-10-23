@@ -29,7 +29,7 @@ dependencies:
   toolbar_units: [music.engine, music.meter]   # ui expansion when added: Audio engine · Master meter
   services:
     - audio: Audio engine — processes sound
-    - mod: 4 modulation inputs — LFO / XY / Macro can move them
+    - mod: 17 modulation inputs — LFO / XY / Macro can move them
   inputs:
     - fx.hook.audio_in (audio · port in)
     - fx.hook.mod_mix (modulation · port mod.mix)
@@ -37,6 +37,19 @@ dependencies:
     - wubf.hook.mod_cutoff (modulation · port mod.cutoff)
     - wubf.hook.mod_res (modulation · port mod.res)
     - slot.after.return (audio · port slot.after.return)
+    - knob.mode (modulation · port mod.knob.mode)
+    - knob.slope (modulation · port mod.knob.slope)
+    - knob.range (modulation · port mod.knob.range)
+    - knob.position (modulation · port mod.knob.position)
+    - knob.invert (modulation · port mod.knob.invert)
+    - knob.drive (modulation · port mod.knob.drive)
+    - knob.vowelA (modulation · port mod.knob.vowelA)
+    - knob.vowelB (modulation · port mod.knob.vowelB)
+    - knob.formant (modulation · port mod.knob.formant)
+    - knob.comb (modulation · port mod.knob.comb)
+    - knob.inGain (modulation · port mod.knob.inGain)
+    - knob.outGain (modulation · port mod.knob.outGain)
+    - knob.bypass (modulation · port mod.knob.bypass)
   outputs:
     - fx.hook.audio_out (audio · port out)
     - slot.after.send (audio · port slot.after.send)

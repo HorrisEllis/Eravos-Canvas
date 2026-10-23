@@ -111,3 +111,93 @@ describe('Wobble Bass 3.3 · Sub in phase', () => {
     for (const p of ['Classic Wub 1/8', 'Half-time Growl 1/4t']) { const off = await spread(p, false), on = await spread(p, true); assert.lt(on, off - 1, `${p}: spread ${off.toFixed(1)} dB off → ${on.toFixed(1)} dB on`); }
   }, { timeout: 120000 });
 });
+describe('tool · Wobble Bass 3.4 — toward the Bun Dem growl', () => {
+  const SR = 48000;
+  async function play(params, sec) {
+    const U = TH.universe(sec || 2.4, { bpm: 140 }), w = TH.spawn(U, 'eravos.wobble-bass'), c = OrganismFactory.handle(w).ctx; c.presets.load('Bun Dem Growl (dancehall drop)'); c.params.setMany(params || {});
+    U.K.audio.chain.out.disconnect(U.ctx.destination); U.K.audio.port(w, 'out').node.connect(U.ctx.destination);
+    U.T.bpm = 140; U.T.renderTicks(0, 36, 0.05); U.K.bus.publish('note:trigger', { target: w, note: 41, velocity: 1, time: 0.05, duration: (sec || 2.4) - 0.2 });
+    return { d: (await TH.render(U)).getChannelData(0), c };
+  }
+  // the share of energy in the growl band (800 Hz – 5 kHz) and how far the brightness moves (10th → 90th percentile, octaves)
+  function growl(d) {
+    const N = 2048, re = new Float32Array(N), im = new Float32Array(N), win = OrganismSDK.dsp.hann(N), cents = []; let mid = 0, tot = 0;
+    for (let o = Math.round(0.3 * SR); o + N < d.length - SR * 0.25; o += 960) { for (let i = 0; i < N; i++) { re[i] = d[o + i] * win[i]; im[i] = 0; } OrganismSDK.dsp.fft(re, im); let num = 0, den = 0;
+      for (let k = 1; k < N / 2; k++) { const m = Math.hypot(re[k], im[k]), f = k * SR / N; num += m * f; den += m; if (f > 800 && f < 5000) mid += m * m; tot += m * m; } cents.push(num / Math.max(1e-9, den)); }
+    cents.sort((a, b) => a - b); return { band: mid / tot, range: Math.log2(cents[Math.floor(cents.length * 0.9)] / cents[Math.floor(cents.length * 0.1)]) };
+  }
+  it('FM that moves with the wobble puts more of the sound in the growl band and makes it talk wider than the old preset', async () => {
+    const old = growl((await play({ fmIndex: 0, fmWub: 0, squash: 0 })).d), now = growl((await play({ fmIndex: 3.2, fmWub: 0.7, squash: 0 })).d);
+    assert.gt(now.band, old.band * 1.15, `growl band ${(100 * old.band).toFixed(1)} % → ${(100 * now.band).toFixed(1)} %`);
+    assert.gt(now.range, old.range * 1.2, `talking range ${old.range.toFixed(2)} → ${now.range.toFixed(2)} oct`);
+  });
+  it('FM stays in tune: the growl’s pitch is the note’s', async () => {
+    const { d } = await play({ fmIndex: 3.2, fmWub: 0.7, fmRatio: '1', squash: 0, wubOn: false, filterMode: 'lowpass', cutoff: 2000, depth: 0 });
+    const hz = TH.acFreq({ getChannelData: () => d, sampleRate: SR }, 0.4, 1.2, 30, 400); assert.lt(Math.abs(1200 * Math.log2(hz / MusicTheory.hz(41 - 12))), 30, hz.toFixed(1) + ' Hz');
+  });
+  it('Squash adds no delay and leaves the sub as it was', async () => {
+    const a = await play({ squash: 0 }), b = await play({ squash: 0.8 });
+    assert.equal(b.c.latency || 0, 0, 'no latency reported');
+    const sub = (d) => { let re = 0, im = 0; const f = MusicTheory.hz(41 - 12), s0 = Math.round(0.4 * SR), n = Math.round(1.2 * SR); for (let i = s0; i < s0 + n; i++) { re += d[i] * Math.cos(2 * Math.PI * f * i / SR); im += d[i] * Math.sin(2 * Math.PI * f * i / SR); } return Math.hypot(re, im) / n; };
+    assert.lt(Math.abs(20 * Math.log10(sub(b.d) / sub(a.d))), 2, 'sub level within 2 dB');
+    const first = (d) => { for (let i = Math.round(0.05 * SR); i < d.length; i++) if (Math.abs(d[i]) > 1e-3) return i; return -1; };
+    assert.lt(Math.abs(first(b.d) - first(a.d)), 8, 'the note starts at the same sample');
+  });
+});
+describe('tool · Wobble Bass 3.5 — power, control, fluidity', () => {
+  const SR = 48000;
+  function rig(params, sec) {
+    const U = TH.universe(sec || 1.6, { bpm: 140 }), w = TH.spawn(U, 'eravos.wobble-bass'), c = OrganismFactory.handle(w).ctx; c.presets.load('Classic Wub 1/8'); c.params.setMany(params || {});
+    U.K.audio.chain.out.disconnect(U.ctx.destination); U.K.audio.port(w, 'out').node.connect(U.ctx.destination); U.T.bpm = 140; return { U, w, c };
+  }
+  it('every control the engine has is on the window (FM, Squash, Grit type … were missing), and waiting controls are dimmed', () => {
+    const U = TH.universe(0.2), w = TH.spawn(U, 'eravos.wobble-bass'), rec = OrganismFactory.handle(w), host = document.createElement('div'); document.body.appendChild(host);
+    try {
+      const v = OrganismFactory.mountUI(rec, host); assert.deepEqual(v.orphans, [], 'not on the window');
+      ['fmIndex', 'fmRatio', 'fmWub', 'squash', 'gritMode', 'sqOct', 'subAlign', 'rateBend', 'rateGlide'].forEach(k => assert.ok(host.querySelector(`[data-key="${k}"]`), k));
+      assert.equal(host.querySelector('[data-key="lfoHz"]').style.opacity, '0.35', 'Free rate dimmed while Sync is on');
+    } finally { host.remove(); }
+  });
+  it('Rate bend ×2 doubles how fast it wobbles', async () => {
+    // the wobble read straight off the volume: Vol wub 1 on a sine wobble, 10 ms RMS frames, period by autocorrelation
+    const speed = async (b) => { const { U, w } = rig({ div: '1/4', lfoShape: 'sine', rateBend: b, wubOn: false, retrig: true, ampMod: 1, depth: 0, cutoff: 8000 }, 2.4); U.K.bus.publish('note:trigger', { target: w, note: 45, velocity: 0.9, time: 0.05, duration: 2.3 });
+      const d = (await TH.render(U)).getChannelData(0), F = 480, env = []; for (let o = Math.round(0.3 * SR); o + F < 2.3 * SR; o += F) { let q = 0; for (let i = 0; i < F; i++) q += d[o + i] * d[o + i]; env.push(Math.sqrt(q / F)); }
+      const m = env.reduce((a, x) => a + x, 0) / env.length, e = env.map(x => x - m); let best = 0, lag = 0;
+      for (let L = 8; L < 120; L++) { let c = 0; for (let i = 0; i + L < e.length; i++) c += e[i] * e[i + L]; if (c > best) { best = c; lag = L; } }
+      return 100 / lag; };
+    const a = await speed(1), b = await speed(2); assert.lt(Math.abs(b / a - 2), 0.15, `${a.toFixed(2)} Hz → ${b.toFixed(2)} Hz`);
+  });
+  it('Rate glide on: wub-seq steps glide the running wobble to their rate instead of restarting it', async () => {
+    const { U, w, c } = rig({ wubOn: true, wubStep: '1/4', wubLen: 4, wubSeq: ['1/4', '1/8', '1/16', '1/8', '', '', '', '', '', '', '', '', '', '', '', ''], rateGlide: 0.2 }, 2);
+    U.T.renderTicks(0, 28, 0.05); U.K.bus.publish('note:trigger', { target: w, note: 45, velocity: 0.9, time: 0.05, duration: 1.9 });
+    await TH.render(U); const log = c.internals.lfoLog.filter(e => e.t > 0.1);
+    assert.gt(log.length, 3, 'steps happened'); assert.ok(log.every(e => e.glide), 'every step glided, none restarted');
+  });
+  it('Pitch wub 1200 c bends a full octave each way (it stopped at 100 c)', async () => {
+    const { U, w } = rig({ lfoShape: 'square', div: '1/2', vibrato: 1200, depth: 0, cutoff: 8000, filterMode: 'lowpass', fmIndex: 0, osc2: 0, sub: 0, shaper: 0, drive: 0, spread: 0, noise: 0, wubOn: false, retrig: true, glide: 0 }, 1.0);
+    U.K.bus.publish('note:trigger', { target: w, note: 57, velocity: 0.9, time: 0.02, duration: 0.95 });
+    const b = await TH.render(U), lo = TH.zcFreq(b, 0.1, 0.35), hi = TH.zcFreq(b, 0.55, 0.8);   // one plain saw: one zero crossing a period
+    const oct = Math.abs(Math.log2(hi / lo)); assert.gt(oct, 1.7, `${lo.toFixed(0)} Hz ↔ ${hi.toFixed(0)} Hz = ${oct.toFixed(2)} octaves`);
+  });
+  it('the new pitch input: an Envelope wired into it bends the growl up on every note', async () => {
+    const { U, w } = rig({ depth: 0, cutoff: 8000, fmIndex: 0, osc2: 0, sub: 0, shaper: 0, drive: 0, wubOn: false, glide: 0 }, 0.8);
+    const e = TH.spawn(U, 'eravos.syn-env'); OrganismFactory.handle(e).ctx.params.setMany({ attack: 0.001, decay: 5, sustain: 1, depth: 0.5, velocity: 0 });
+    assert.ok(U.K.wires.register({ src: { instanceId: e, hookId: 'env.hook.mod_out' }, dst: { instanceId: w, hookId: 'wobble.hook.mod_pitch' } }).ok, 'wired');
+    U.K.bus.publish('note:trigger', { target: w, note: 57, velocity: 0.9, time: 0.02, duration: 0.75 });
+    const b = await TH.render(U), hz = TH.acFreq(b, 0.3, 0.6, 30, 2000); assert.gt(1200 * Math.log2(hz / MusicTheory.hz(57 - 12)), 1000, hz.toFixed(1) + ' Hz: an octave up (depth 0.5 = +12 st)');
+  });
+});
+
+describe('Wobble Bass 3.50 · Pitch', () => {
+  it('Pitch −12 st lowers the note an octave (the sub rides with it); 0 is unchanged', async () => {
+    const freqAt = async (tr) => {
+      const U = TH.universe(0.6, { bpm: 140 }), w = TH.spawn(U, 'eravos.wobble-bass'), c = OrganismFactory.handle(w).ctx;
+      c.params.set('transpose', tr);
+      TH.note(U, w, 45, 0.05, { duration: 0.4 }); await TH.render(U);
+      return c.internals.sub.frequency.value;
+    };
+    assert.near(await freqAt(0), 55, 0.01, 'default');
+    assert.near(await freqAt(-12), 27.5, 0.05, '−12 st');
+    assert.near(await freqAt(7), 55 * Math.pow(2, 7 / 12), 0.05, '+7 st');
+  });
+});

@@ -268,6 +268,27 @@ registerProcessor('eravos-pitch', EravosPitch);`;
     d.permissions = d.permissions || []; ['audio_in', 'audio_out'].forEach(p => { if (!d.permissions.includes(p)) d.permissions.push(p); });
   });
 
+  // 3.49 MOTION CORE (eravos.phase49-map P49.1, D-49.1): every knob can be moved by an LFO, an Envelope, Wub Rate, an XY Pad… —
+  // James, 2026-10-22: "Motion core: any knob can be moved by an LFO or envelope". Each settable knob of a music tool that has no
+  // mod input of its own gets one: hook knob.<key>, off the dot rail (the knob's right-click menu wires it). Knobs that already
+  // have a mod input keep their audio-rate path. Tools without audio permission get none (the kernel allows modulation ports only
+  // for audio tools) — tests/p49-motion.test.js lists them.
+  const KNOB_TYPES = new Set(['number', 'integer', 'enum', 'boolean']);
+  function knobKeys(d) {
+    const own = new Set((d.hooks || []).filter(h => h.wire_type === 'modulation' && h.direction === 'in' && h.mod_key).map(h => h.mod_key));
+    const ranged = (c) => c.type === 'boolean' || (c.type === 'enum' ? (c.options || []).length > 1 : typeof c.min === 'number' && typeof c.max === 'number' && c.max > c.min);
+    return (d.config || []).filter(c => KNOB_TYPES.has(c.type) && !c.hidden && !c.settingsOnly && c.motion !== false && !own.has(c.key) && ranged(c))
+      .map(c => c.key);
+  }
+  if (global.OrganismFactory) global.OrganismFactory.onDefine((d) => {
+    if (d.domain !== 'music' || d._knobInputs) return;
+    const perms = d.permissions || [];
+    if (!perms.includes('audio_out') && !perms.includes('audio_in')) { d._knobInputs = []; return; }
+    const keys = knobKeys(d), have = new Set((d.hooks || []).map(h => h.hook_id));
+    d._knobInputs = keys.filter(k => !have.has('knob.' + k));
+    d._knobInputs.forEach(k => { const c = d.config.find(x => x.key === k); d.hooks.push(Object.assign(MUSIC_STD.mod_in('knob.' + k, 'knob.' + k), { rail: false, knob: k, intent: 'move ' + (c.label || k) })); });
+  });
+
   SDK.extend({
     id: 'music',
     std: MUSIC_STD,
@@ -294,6 +315,49 @@ registerProcessor('eravos-pitch', EravosPitch);`;
       });
       ctx.dsp = dsp;
       ctx.now = () => ac.currentTime;
+      // 3.48 (P48.10): who this instance's hook is wired to — a generator sends its notes to exactly the tools wired from its
+      // note out (any drum, bass or poly tool: mixed and matched), and listens only to the parts wired into its event ins
+      ctx.wiredOut = (hookId) => ctx.K.wires.list().filter(w => w.src.instanceId === ctx.id && w.src.hookId === hookId).map(w => w.dst.instanceId);
+      ctx.wiredIn = (hookId) => ctx.K.wires.list().filter(w => w.dst.instanceId === ctx.id && w.dst.hookId === hookId).map(w => w.src.instanceId);
+      // 3.49 knob inputs (P49.1): port mod.knob.<key>, range −1…1. Nothing runs until a wire arrives: then its source starts and the
+      // knob is sampled ~60× a second → params.live(own value + signal × half the knob's range). Unwired → live(key, null): his value.
+      const knobs = new Map();   // key → { cs, an, buf, c }
+      // read from the hooks (the registry's copy of a descriptor carries hooks, not define-time extras — found 2026-10-22)
+      (ctx.descriptor.hooks || []).filter(hk => hk.knob).map(hk => hk.knob).forEach(k => {
+        const c = (ctx.descriptor.config || []).find(x => x.key === k); if (!c) return;
+        const cs = ac.createConstantSource(); cs.offset.value = 0;
+        try { ctx.port('mod.knob.' + k, { kind: 'param', direction: 'in', param: cs.offset, range: { min: -1, max: 1 }, label: c.label || k }); }
+        catch (e) { K.fault('RUNTIME_003', { instance_id: ctx.id, organism_id: ctx.descriptor.id, message: `knob input ${k} could not open: ${e.message}` }); return; }   // §1.2 never silent
+        knobs.set(k, { cs, an: null, buf: null, c, started: false });
+      });
+      function knobValue(c, base, m) {
+        if (c.type === 'boolean') return ((base ? 1 : 0) + m) >= 0.5;
+        if (c.type === 'enum') { const o = c.options, i = Math.max(0, o.findIndex(x => String(x) === String(base))); return o[Math.max(0, Math.min(o.length - 1, Math.round(i + m * (o.length - 1) / 2)))]; }
+        let v = base + m * (c.max - c.min) / 2; v = Math.max(c.min, Math.min(c.max, v));
+        if (c.type === 'integer') v = Math.round(v); else if (c.step) v = Math.round(v / c.step) * c.step;
+        return +v.toFixed(6);
+      }
+      let knobTimer = null;
+      const wiredKnobs = () => Array.from(knobs.keys()).filter(k => ctx.wiredIn('knob.' + k).length);
+      function sampleKnobs() {
+        if (!ctx.params) return;
+        wiredKnobs().forEach(k => { const n = knobs.get(k); if (!n.an) return; n.an.getFloatTimeDomainData(n.buf); const m = n.buf[n.buf.length - 1] || 0; ctx.params.live(k, knobValue(n.c, ctx.params.base(k), m)); });
+      }
+      ctx.sampleKnobs = sampleKnobs;
+      function knobWires() {
+        const on = wiredKnobs();
+        knobs.forEach((n, k) => {
+          if (on.includes(k)) { if (!n.started) { n.an = ac.createAnalyser(); n.an.fftSize = 32; n.buf = new Float32Array(32); n.cs.connect(n.an); n.cs.start(); n.started = true; ctx.track(n.cs); } }
+          else if (ctx.params && ctx.params.isLive(k)) ctx.params.live(k, null);
+        });
+        if (on.length && !knobTimer) knobTimer = ctx.interval(sampleKnobs, 16);
+        else if (!on.length && knobTimer) { clearInterval(knobTimer); knobTimer = null; }
+      }
+      if (knobs.size) {
+        const mine = (w) => w && w.dst && w.dst.instanceId === ctx.id && /^knob\./.test(w.dst.hookId);
+        ctx.on('kernel:wire-registered', null, (w) => { if (mine(w)) knobWires(); });
+        ctx.on('kernel:wire-removed', null, (w) => { if (mine(w)) knobWires(); });
+      }
       ctx.modBus = function (key, range, opts2) {
         // shared ConstantSource summing bus → port 'mod.<key>' (kind param) — connect output to any number of AudioParams
         const cs = ac.createConstantSource(); cs.offset.value = 0; cs.start();

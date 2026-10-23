@@ -62,6 +62,79 @@ Techno, Trap, Synthwave (80s), Darkwave (80s), Witch House). Every press writes 
 drums, bass, chords, lead and the arrangement — on the Timeline, all in key. Click any clip to edit it in the piano roll.
 The song's name ends in its number: `SongEngine.write('synthwave', 4242)` builds that exact song again.
 
+## 3.48.1 — the MIDI button on a fresh install · the web build and ERAVOS.exe are the same
+- **Mods fixed**: Clip Maker was offered as a mod, and inside any tool it silenced the sound (it records clips; it doesn't
+  pass sound through). It is no longer offered. Every other mod in every slot was checked: 83 host × mod pairs, all
+  pass sound, and a test now checks every tool the ＋ mod picker offers.
+- **A tool's page opens when you click its name** (or icon) in the window title; dragging still moves the window. The
+  page button is a clean drawn icon (the 📘 emoji looked fragmented).
+- **Spectrum at rest**: the display under every instrument shows its frequency grid and "play a note" instead of an empty box.
+- **Fixed** "That needs a pack that isn't installed" when clicking **MIDI / Connect pads** on a fresh install, as on
+  ERAVOS.exe's first start. Any tool opened by name now installs itself first and then opens; this also covers Learn,
+  Sounds and the Song dock. Check it with `node tests/fresh-profile.mjs`.
+- **One server for both**: `node serve.js` now runs ERAVOS Glass, the same server ERAVOS.exe runs inside itself. The web
+  build gets the event stream and command door too, and the exe now serves `voice/` (her recordings) like the web build.
+  The only remaining differences are the desktop's own folders (drop, packs, projects, exports), which a browser cannot have.
+
+## 3.48 (P48.1) — a precise piano roll
+- **Notes land where you aim**: a ghost shows exactly where a click will land, and the toolbar reads the position
+  (bar.beat.tick) and the note. A click never slides: notes follow the cell and row under the pointer, so a small slide
+  inside the cell you clicked no longer moves the note a step or a semitone. Before, it did.
+- **Finer grids**: 1/32, 1/64, 1/8 · 1/16 · 1/32 triplets, and off. Hold **Alt** to place freely.
+- **Zoom**: taller rows (Rows, or Ctrl+Shift+wheel), smooth zoom (Ctrl+wheel keeps your spot), and fit clip.
+- **Ruler**: song bars and beats above the notes; click or drag it to move the playhead.
+- **Tools**: ✎ Draw · 🖌 **Paint** (drag = one note per grid cell, following the pointer) · ✂ Split · ⌫ Erase (drag
+  across notes), on keys 1–4.
+- **Stretch notes from either edge**; the edge is easier to grab on short notes. New notes take the length you last drew.
+- Notes now keep exact triplet timing in the song (1/192 step).
+- **Edit many**: ⬚ Select (5) or Shift-drag a box, Shift-click to add. Drag moves the lot, Ctrl+drag copies, and an edge
+  stretches them all. Ctrl+C/X/V (paste at the pointer), Ctrl+D duplicate, ← → nudge, ↑ ↓ transpose.
+  **Q** quantize (25–100 %), **H** humanize, **L** legato. Each edit is one undo step.
+- **Velocity lane** under the notes: drag to draw velocities, Ctrl-drag for a ramp.
+- **The note's knobs**: double-click a note for Start (snaps to the grid), Length, Pitch and Velocity knobs.
+  It's live and nothing to type. Right-click deletes.
+- **Step input** ⏎: type notes on Z S X D C V G B H N J M (Q 2 W 3 E R 5 T 6 Y 7 U an octave up). Space rests, Backspace steps back.
+
+## 3.47 — ERAVOS Glass + ERAVOS COS (from Nexus Clear Glass and COS, made for ERAVOS)
+- **ERAVOS COS** (`host/cos.js`): compartments **nest** like the project: the canvas › each **domain** (music, image, video,
+  agents, coding, dataflow) › each **tool**. Each earns its place through **birth gates**:
+  - **canvas**: no domain words in its skeleton.
+  - **domain**: its `domain.json` is whole, its loader matches its tools exactly, the build ships it, and it never reaches into another domain.
+  - **tool**: manifest, shape, sealed (reaches nothing outside its folder), presets checked against its real settings, spec, plus `--deep` for its own tests and the sound survey.
+
+  A parent passes only when everything inside it passes. `node host/eravos.mjs cos gate` checks the whole tree (69, all
+  passing); `cos archetype` generates the COS `eravos-canvas` archetype from this repo.
+- **ERAVOS Glass** (`host/glass.js`): the canvas served with a live **event stream** and one **command door**. Anything on your
+  machine can drive the open canvas, a script today and the Ollama DJ next: open tools, turn knobs, load presets, wire, load
+  suites, read the whole state back. All of it is undoable, like a person doing it.
+  `node host/eravos.mjs glass --open`, then e.g. `node host/eravos.mjs send canvas.spawn '{"tool":"eravos.wobble-bass"}'`.
+- **ERAVOS.exe** runs Glass inside the app (`eravos://app/glass/`, and `127.0.0.1:4748` for outside callers).
+
+## 3.46 — a whole page for every tool
+- **📘 on every window** (and "📘 Its page" in ＋ Add): its **suite**: load the lot in one click, or ＋ one by one. Also: every **mod**
+  that fits each slot, the tools it **plays with**, every **sound pack** (▶ hear, Load, pack on/off), **every control** (range, default,
+  ∿ = an input can move it) and its inputs and outputs.
+- Suites: Wobble Bass (The drop rig), Wub Osc (A whole wub), Morph Osc (Morph voice), Destroyer (Talking grit).
+- **Wobble Bass 3.6**: a **growl** mod slot. Its mods run on the wub only; the sub stays clean and in time.
+
+## 3.45 — Wobble Bass: everything on screen, fluid rates, the Bun Dem screech
+- **Fixed**: seven controls (FM, FM ratio, FM wub, Squash, Grit type, Square oct, Sub in phase) were missing from the window.
+  Now every control is there, grouped (Rate · Mouth · Growl · Pitch · Tone); a control that waits on a switch is dimmed and says why.
+- **Perform pad**: drag sideways to bend the wobble speed smoothly (×¼ … ×4), up and down to open the mouth; springs back on release.
+- **Rate glide**: rate changes swoop instead of jumping — wub-seq steps glide into each other. **Pitch wub** to 2400 c (an octave
+  scream; it stopped at 1 semitone). **Octave +2**. New inputs: **rate · FM · pitch** — wire an Envelope or LFO into them.
+- **Bun Dem presets**: Screech (the drop lead, octave up, FM, octave-wide bends), Talking Growl, Rate Ramp (glide).
+- **Matched to the track**: the drop measured (1/8-triplet movement at ~141 BPM, mono F#1 sub, scooped low-mids, a flat bright
+  top) and the Wobble Bass tuned against it by an offline search — "Bun Dem · Matched to the track (1/8t)" and "… + drop rhythm".
+
+## 3.44 — Songs by category · the Bun Dem growl
+- **Songs page by category**: 🔊 Dubstep & Wubs · ⚡ Drum & Bass · 🏠 House · 🌀 Techno & Trance · 🎛 Trap & Phonk · 🔥 Reggae &
+  Dub · 🌆 80s · 🖤 Dark · 🌙 Chill, then the collections 💜 For Her · 🥀 Lost Love · 🧪 Odd Couples. Counts on every chip,
+  headings in the grid, a search box (title, genre or tool), and the mood chips still narrow it down.
+- **Wobble Bass 3.4 — the growl**: **FM** (a sine bending the saws, in tune) and **FM wub** (the wobble opens the FM too, so
+  the growl talks with its harmonics, not just a filter) and **Squash** (3-band OTT-style; the sub stays clean). The
+  "Bun Dem Growl" preset now uses FM; new Bun Dem presets: FM Talker, Half-time Yoi 1/4t, Sub Growl (ratio ½).
+
 ## 3.43 — small tools that combine · Links · Mods · Synthesis
 - **Links — tools grow when they meet.** Every window shows what it is wired to (⇠ feeds it · ⇢ it feeds). Click a chip and
   that tool's main controls unfold inside this window; pairs that belong together (Wub Rate → Wub Filter, Morph Osc → Morph

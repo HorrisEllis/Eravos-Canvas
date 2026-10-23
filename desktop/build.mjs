@@ -39,8 +39,8 @@ function copyDir(src, dst, skip) {
 }
 // The exe folder has the project's layout: canvas/ tools/ schemas/ README.md beside ERAVOS.exe, the same folders as the
 // repo, so the exe loads every domain from tools/ exactly like the dev build. Your folders sit next to them and survive a rebuild.
-const SHIP = ['canvas', 'tools', 'schemas', 'README.md'];
-const KEEP = ['projects', 'exports', 'drop', 'packs', '.appdata', 'ERAVOS Library'];   // yours — never deleted by a rebuild
+const SHIP = ['canvas', 'tools', 'schemas', 'host', 'README.md'];   // host/: ERAVOS Glass + COS (run by main.js, never served to the page)
+const KEEP = ['projects', 'exports', 'drop', 'packs', 'voice', '.appdata', 'ERAVOS Library'];   // yours — never deleted by a rebuild
 const OVERLAY = process.argv.includes('--no-electron');
 
 say('assembling ' + APP);
@@ -56,6 +56,7 @@ const res = path.join(APP, 'resources', 'app'); fs.mkdirSync(res, { recursive: t
 ['main.js', 'preload.js'].forEach(f => fs.copyFileSync(path.join(HERE, f), path.join(res, f)));
 fs.writeFileSync(path.join(res, 'package.json'), JSON.stringify({ name: pkg.name, productName: pkg.productName, version: pkg.version, description: pkg.description, author: pkg.author, main: 'main.js', private: true }, null, 2));
 for (const s of SHIP) { const src = path.join(ROOT, s), dst = path.join(APP, s); if (fs.statSync(src).isDirectory()) copyDir(src, dst, (rel, n) => n === 'node_modules' || n.startsWith('.')); else fs.copyFileSync(src, dst); }
+if (fs.existsSync(path.join(ROOT, 'voice')) && !fs.existsSync(path.join(APP, 'voice'))) copyDir(path.join(ROOT, 'voice'), path.join(APP, 'voice'));   // her recordings travel with the exe
 say('canvas/ + tools/ (' + fs.readdirSync(path.join(ROOT, 'tools')).filter(d => fs.existsSync(path.join(ROOT, 'tools', d, 'index.js'))).join(', ') + ') + schemas/ → ' + APP);
 fs.writeFileSync(path.join(APP, 'READ ME FIRST.txt'), [
   'ERAVOS ' + pkg.version, '',

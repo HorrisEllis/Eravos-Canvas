@@ -23,11 +23,19 @@ dependencies:
   services:
     - audio: Audio engine — processes sound
     - clock: Master clock & tempo — locks to the beat
+    - mod: 7 modulation inputs — LFO / XY / Macro can move them
     - files: Your files — drop audio / MIDI on it
     - assets: Clip output — renders sounds other tools can load
   inputs:
     - clip.hook.audio_in (audio · port in)
     - clip.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
+    - knob.snapZero (modulation · port mod.knob.snapZero)
+    - knob.normalizeTarget (modulation · port mod.knob.normalizeTarget)
+    - knob.normalizeMode (modulation · port mod.knob.normalizeMode)
+    - knob.silenceThresh (modulation · port mod.knob.silenceThresh)
+    - knob.minGap (modulation · port mod.knob.minGap)
+    - knob.fadeShape (modulation · port mod.knob.fadeShape)
+    - knob.source (modulation · port mod.knob.source)
   outputs:
     - clip.hook.asset_out (asset:ready)
     - clip.hook.audio_out (audio · port out)

@@ -1,0 +1,306 @@
+/* ERAVOS runtime — tool-page.js → window.ToolPage (spec eravos.tool-pages). Domain-free.
+ * 📘 A whole page for every tool: what it is, its SUITE (the tools it was made to play with — load the lot in one click or
+ * one by one), every MOD that fits each of its slots, the tools it LINKS with, every SOUND PACK with ▶ to hear a preset
+ * and Load to put it on, every control (range, default, what can move it) and every input and output.
+ * Opened from 📘 on a window (it then works on that window) or from ＋ Add (it works on a window it opens when needed).
+ *   descriptor.suite { label?, blurb?, members: [member] }
+ *     member { tool, as: 'mod' | 'linked', slot? (as mod), preset?, why?,
+ *              wire?: { from: [ref, hookId], to: [ref, hookId] } }   ref = 'host' | 'self' | another member's tool id
+ *     A linked member with no wire is joined to the host by the first pair of ports that fit (its link rule's way first);
+ *     wire: false leaves it unwired (a tool that follows its partner without a cable).
+ * Every step acts like the user: spawn, ui:* events, kernel wires, Mods.add — so all of it is undoable and saved. */
+(function (global) {
+  'use strict';
+  const doc = global.document;
+  const TP = { open, close, isOpen: () => !!cur, load, loadSuite, addMod, addLinked, presetGroups, partners, current: () => cur && { defId: cur.d.id, target: cur.target } };
+  let cur = null;   // { d, target, el, K, made: Map(tool → instanceId) }
+
+  const F = () => global.OrganismFactory;
+  const kern = (o) => (o && o.K) || global.Kernel;
+  const live = (id) => { const r = id && F().handle(id); return r && !r.unmounted ? r : null; };
+  const toast = (m, k, ms) => { if (global.Shell && global.Shell.toast) global.Shell.toast(m, k || '', ms || 2200); };
+  const hostedIds = () => new Set(Array.from(doc.querySelectorAll('.wm-win[data-instance]')).map(w => w.getAttribute('data-instance')));
+  // windows of this tool on the canvas (mods hosted inside another tool have no window of their own)
+  function windowsOf(K, defId) { const open_ = hostedIds(); return K.registry.byOrganism(defId).map(r => r.instance_id).filter(id => open_.has(id) && live(id)); }
+
+  // ---------------------------------------------------------------- doing things (the page and tests use these)
+  function ensureHost(st) {
+    if (live(st.target)) return st.target;
+    const id = F().spawn(st.d.id, { K: st.K }); if (!id) return null;
+    st.target = id; st.made.set(st.d.id, id); repaint(); return id;
+  }
+  function presetLoad(K, id, name) { if (name) K.bus.publish('ui:preset_load:' + id, { name }); }
+  function nextTo(hostId, n) {
+    const w = global.CanvasWM && global.CanvasWM.windowOf(hostId); if (!w) return {};
+    return { x: Math.round(parseFloat(w.style.left) + w.offsetWidth + 24), y: Math.round(parseFloat(w.style.top) + n * 60) };
+  }
+  // the instance a member's ref names
+  function refId(st, ref, selfId) {
+    if (ref === 'host') return st.target; if (ref === 'self') return selfId;
+    if (live(st.made.get(ref))) return st.made.get(ref);
+    return windowsOf(st.K, ref).filter(id => id !== st.target)[0] || null;
+  }
+  const ports = (d, dir) => (d.hooks || []).filter(h => !h.internal && (h.direction === dir || h.direction === 'inout') && !/^slot\./.test(h.hook_id));
+  // first pair of ports that fit, a → b
+  function autoWire(K, a, b) {
+    const da = live(a).def, db = live(b).def;
+    for (const o of ports(da, 'out')) for (const i of ports(db, 'in')) {
+      if (o.wire_type !== i.wire_type || o.wire_type === 'event_bus') continue;
+      const r = K.wires.register({ src: { instanceId: a, hookId: o.hook_id }, dst: { instanceId: b, hookId: i.hook_id } });
+      if (r && r.ok) return r.wire_id;
+    }
+    return null;
+  }
+  function addMod(st, slotId, tool, preset) {
+    st = st || cur; const host = ensureHost(st); if (!host) return null;
+    const M = global.Mods, u = M.add(host, slotId, tool); if (!u) return null;
+    if (preset) {
+      let n = 0; const tryLoad = () => { const c = M.childOf(host, u); if (c) presetLoad(st.K, c, preset); else if (n++ < 30) global.setTimeout(tryLoad, 20); };
+      tryLoad();
+    }
+    return u;
+  }
+  function addLinked(st, tool, o) {
+    st = st || cur; o = o || {};
+    const host = ensureHost(st); if (!host) return null;
+    const id = F().spawn(tool, Object.assign({ K: st.K }, nextTo(host, st.made.size))); if (!id) return null;
+    st.made.set(tool, id); presetLoad(st.K, id, o.preset);
+    let ok = false;
+    if (o.wire) {
+      const src = refId(st, o.wire.from[0], id), dst = refId(st, o.wire.to[0], id);
+      const r = src && dst && st.K.wires.register({ src: { instanceId: src, hookId: o.wire.from[1] }, dst: { instanceId: dst, hookId: o.wire.to[1] } });
+      ok = !!(r && r.ok);
+    }
+    if (!ok && o.wire === undefined) ok = !!(o.dir === 'in' ? (autoWire(st.K, id, host) || autoWire(st.K, host, id)) : (autoWire(st.K, host, id) || autoWire(st.K, id, host)));
+    return id;
+  }
+  function load(st, m) { st = st || cur; return m.as === 'mod' ? addMod(st, m.slot, m.tool, m.preset) : addLinked(st, m.tool, m); }
+  function loadSuite(st) {
+    st = st || cur; const s = st.d.suite; if (!s || !(s.members || []).length) return [];
+    if (!ensureHost(st)) return [];
+    // linked tools first (a mod's wire may name one), then the mods
+    const order = s.members.filter(m => m.as !== 'mod').concat(s.members.filter(m => m.as === 'mod'));
+    const out = order.map(m => load(st, m));
+    toast(`${st.d.icon || ''} ${st.d.label}: the whole suite is on (${out.filter(Boolean).length} of ${order.length}) — Ctrl+Z takes it back a step at a time`, 'good', 3500);
+    return out;
+  }
+
+  // ---------------------------------------------------------------- what the page lists
+  function presetGroups(d) {
+    const CP = global.ContentPacks, keys = Object.keys(d.presets || {}), used = new Set(), groups = [];
+    if (CP) CP.list({ tool: d.id, kind: 'presets' }).forEach(p => {
+      const pk = CP.get(p.id), tag = pk && (pk.prefix !== undefined ? pk.prefix : pk.label);
+      const names = Object.keys((pk && pk.items[d.id] && pk.items[d.id].presets) || {});
+      // a preset two packs both carry (same name) is listed once, under the first
+      const items = names.map(n => ({ name: n, key: (tag ? tag + ' · ' : '') + n })).filter(x => !used.has(x.key) && (!p.enabled || keys.includes(x.key)));
+      items.forEach(x => used.add(x.key)); if (!items.length) return;
+      groups.push({ pack: p.id, label: p.label, enabled: p.enabled, author: p.author, items });
+    });
+    const rest = keys.filter(k => !used.has(k));
+    if (rest.length) groups.unshift({ pack: null, label: 'Built in', enabled: true, items: rest.map(k => ({ name: k, key: k })) });
+    return groups;
+  }
+  // tools it links with: its own rules naming tools, and other tools whose rules name it
+  function partners(d) {
+    const out = new Map();
+    (d.links || []).forEach(r => [].concat(r.with || []).forEach(t => { if (F().def(t) && !out.has(t)) out.set(t, { tool: t, dir: r.dir || 'out', hint: r.hint || '' }); }));
+    F().defined().forEach(o => (o.links || []).forEach(r => { if ([].concat(r.with || []).includes(d.id) && !out.has(o.id)) out.set(o.id, { tool: o.id, dir: r.dir === 'out' ? 'in' : 'out', hint: r.hint || '' }); }));
+    return Array.from(out.values());
+  }
+
+  // ---------------------------------------------------------------- the page
+  function open(defId, o) {
+    o = o || {}; const K = kern(o), d = F().def(defId); if (!d) return null;
+    close();
+    const target = live(o.instanceId) ? o.instanceId : windowsOf(K, defId)[0] || null;
+    cur = { d, K, target, made: new Map(), el: null, q: '' };
+    const UI = global.UIKit, h = UI.h;
+    const el = cur.el = h('div', { class: 'tp-overlay', role: 'dialog', 'aria-label': d.label + ' — its page', style: { '--acc': d.accent || '#00d4ff' } });
+    el.addEventListener('pointerdown', (e) => { if (e.target === el) close(); });
+    el.addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } });
+    el.appendChild(h('div', { class: 'tp-page', tabindex: '-1' }));
+    doc.body.appendChild(el);
+    cur.unsubs = ['kernel:organism-mounted', 'kernel:organism-unmounted', 'canvas:mods', 'contentpacks:changed'].map(tp => K.bus.subscribe(tp, () => soon(), 'tool-page'));
+    if (global.ContentPacks) cur.unsubs.push(global.ContentPacks.onChange(() => soon()));
+    repaint(); el.querySelector('.tp-page').focus();
+    return el;
+  }
+  let pend = null;
+  function soon() { if (pend) return; pend = global.setTimeout(() => { pend = null; repaint(); }, 30); }
+  function close() {
+    if (!cur) return; (cur.unsubs || []).forEach(u => { try { u(); } catch (e) {} });
+    if (global.Preview && global.Preview.current && global.Preview.current.defId === cur.d.id) global.Preview.stop();
+    cur.el.remove(); cur = null;
+  }
+
+  function repaint() {
+    if (!cur) return;
+    const st = cur, d = st.d, K = st.K, UI = global.UIKit, h = UI.h, M = global.Mods;
+    const page = st.el.querySelector('.tp-page'), keepY = page.scrollTop; page.innerHTML = '';
+    if (!live(st.target)) st.target = null;
+    const btn = (text, title, fn, cls) => { const b = h('button', { class: 'tp-btn ' + (cls || ''), title, text }); b.addEventListener('click', (e) => { e.stopPropagation(); fn(); }); return b; };
+    const name = (id) => { const x = F().def(id); return x ? `${x.icon || '◻'} ${x.label}` : id; };
+    const sec = (title, sub, kids, id) => h('section', { class: 'tp-sec', 'data-sec': id }, [h('h3', { class: 'tp-h' }, [title, sub ? h('small', { text: ' ' + sub }) : null])].concat(kids));
+
+    // head: what it is + which window the page works on
+    const wins = windowsOf(K, d.id);
+    const pick = h('select', { class: 'tp-target', 'aria-label': 'which window this page works on' },
+      [h('option', { value: '', text: '— a new window (opened when you add something)' })].concat(wins.map(id => h('option', { value: id, text: `${d.label} · ${id.split('-').slice(-2).join('')}` }))));
+    pick.value = st.target || ''; pick.addEventListener('change', () => { st.target = pick.value || null; repaint(); });
+    const suite = d.suite && (d.suite.members || []).length ? d.suite : null;
+    page.appendChild(h('header', { class: 'tp-head' }, [
+      h('span', { class: 'tp-ic', text: d.icon || '◻' }),
+      h('div', { class: 'tp-ht' }, [h('h2', { text: d.label }), h('div', { class: 'tp-meta', text: [d.category, 'v' + d.version].filter(Boolean).join(' · ') }), h('p', { text: d.blurb || '' })]),
+      h('div', { class: 'tp-act' }, [
+        btn(st.target ? '↗ Go to it' : '＋ Add to canvas', st.target ? 'show its window' : 'open one on the canvas', () => { if (st.target) { K.bus.publish('canvas:focus-request', { instanceId: st.target }); close(); } else ensureHost(st); }, 'pri'),
+        suite ? btn('＋ Load the whole suite', 'the tool and every tool in its suite, wired up and set — one click (Ctrl+Z takes it back)', () => loadSuite(st), 'pri tp-suite-all') : null,
+        btn('✕', 'close (Esc)', close, 'tp-x'),
+      ]),
+    ]));
+    page.appendChild(h('div', { class: 'tp-on' }, [h('span', { text: 'Works on: ' }), pick]));
+    // 3.49 (P49.4): this tool as parts — a suite whose allInOne names it (and the suites it is a part of)
+    const SU = global.Suites, asParts = SU ? SU.list().filter(x => x.allInOne === d.id) : [], partOf = SU ? SU.forTool(d.id) : [];
+    if (asParts.length || partOf.length) page.appendChild(h('div', { class: 'tp-on tp-parts' }, [].concat(
+      asParts.map(x => btn('🧰 As parts: ' + x.label, 'the same tool rebuilt from parts you can swap and use elsewhere — opens its suite window', () => { close(); SU.openAsync(x.id, { K }); }, 'pri tp-asparts')),
+      partOf.map(x => btn('🧰 Part of: ' + x.label, 'open that suite', () => { close(); SU.openAsync(x.id, { K }); }, 'tp-partof')))));
+
+    const nav = h('nav', { class: 'tp-nav' }); page.appendChild(nav);
+    const navTo = (id, label) => nav.appendChild(btn(label, 'jump to ' + label, () => { const s = page.querySelector(`[data-sec="${id}"]`); if (s) s.scrollIntoView({ block: 'start' }); }));
+
+    // the suite
+    if (suite) {
+      navTo('suite', '🧰 Suite');
+      page.appendChild(sec('🧰 ' + (suite.label || 'The suite'), `· ${suite.members.length} tools`, [
+        suite.blurb ? h('p', { class: 'tp-p', text: suite.blurb }) : null,
+        h('div', { class: 'tp-list' }, suite.members.map(m => {
+          const ok = !!F().def(m.tool), slot = m.as === 'mod' && (d.slots || []).find(s => s.id === m.slot);
+          return h('div', { class: 'tp-row' + (ok ? '' : ' off') }, [
+            h('span', { class: 'tp-tag ' + (m.as === 'mod' ? 'mod' : 'lnk'), text: m.as === 'mod' ? '🧩 mod' : '🔗 linked' }),
+            h('div', { class: 'tp-rt' }, [h('b', { text: name(m.tool) + (m.preset ? ' — ' + m.preset : '') }), h('small', { text: m.why || (slot ? 'inside: ' + (slot.label || slot.id) : '') })]),
+            ok && m.preset && global.Preview ? global.Preview.button(m.tool, m.preset) : null,
+            ok ? btn('＋', 'add just this one', () => load(st, m)) : h('small', { class: 'tp-dim', text: 'not installed' }),
+          ]);
+        })),
+      ], 'suite'));
+    }
+
+    // mods, slot by slot
+    if ((d.slots || []).length && M) {
+      navTo('mods', '🧩 Mods');
+      const kids = (d.slots || []).map(sl => {
+        const inIt = st.target ? M.entries(st.target).filter(e => e.slot === sl.id) : [];
+        const fits = st.target ? M.compatible(st.target, sl.id) : compatibleFor(d, sl);
+        const q = h('input', { class: 'tp-q', placeholder: `find a mod (${fits.length})`, value: st.q });
+        const grid = h('div', { class: 'tp-grid' });
+        const paint = () => {
+          grid.innerHTML = ''; const s = q.value.trim().toLowerCase(); st.q = q.value; let cat = null;
+          fits.filter(t => !s || (t.label + ' ' + t.category + ' ' + t.blurb).toLowerCase().includes(s)).forEach(t => {
+            if (t.category !== cat) { cat = t.category; grid.appendChild(h('div', { class: 'tp-cat', text: cat || 'other' })); }
+            grid.appendChild(h('div', { class: 'tp-mod' }, [h('div', { class: 'tp-rt' }, [h('b', { text: `${t.icon} ${t.label}` }), h('small', { text: t.blurb })]), btn('＋', `put ${t.label} inside ${d.label} — ${sl.label || sl.id}`, () => addMod(st, sl.id, t.id))]));
+          });
+        };
+        q.addEventListener('input', paint); q.addEventListener('keydown', (e) => e.stopPropagation()); paint();
+        return h('div', { class: 'tp-slot' }, [
+          h('div', { class: 'tp-sh' }, [h('b', { text: sl.label || sl.id }), h('small', { text: ' ' + (sl.hint || '') })]),
+          inIt.length ? h('div', { class: 'tp-list' }, inIt.map(e => h('div', { class: 'tp-row' + (e.bypass ? ' off' : '') }, [
+            h('span', { class: 'tp-tag mod', text: e.bypass ? '⏻ off' : '🧩 in' }), h('div', { class: 'tp-rt' }, [h('b', { text: name(e.tool) })]),
+            btn('⏻', 'switch it on / off', () => M.bypass(st.target, e.uid)), btn('×', 'take it out', () => M.remove(st.target, e.uid)),
+          ]))) : h('p', { class: 'tp-p tp-dim', text: st.target ? 'nothing inside yet — add one below' : 'add one and a window opens with it inside' }),
+          q, grid,
+        ]);
+      });
+      page.appendChild(sec('🧩 Mods', '· tools that run inside it, one by one', kids, 'mods'));
+    }
+
+    // tools it links with
+    const ps = partners(d);
+    if (ps.length) {
+      navTo('links', '🔗 Links');
+      page.appendChild(sec('🔗 Plays with', '· wired in, they show their controls on its window', [h('div', { class: 'tp-list' }, ps.map(p => h('div', { class: 'tp-row' }, [
+        h('span', { class: 'tp-tag lnk', text: p.dir === 'in' ? '⇠ feeds it' : '⇢ it feeds' }),
+        h('div', { class: 'tp-rt' }, [h('b', { text: name(p.tool) }), h('small', { text: p.hint })]),
+        btn('＋', 'add it next to this one, wired up', () => addLinked(st, p.tool, { dir: p.dir })),
+      ])))], 'links'));
+    }
+
+    // sound packs
+    const groups = presetGroups(d);
+    if (groups.length) {
+      navTo('packs', '🎛 Packs');
+      const total = groups.reduce((n, g) => n + g.items.length, 0);
+      page.appendChild(sec('🎛 Sound packs', `· ${total} presets in ${groups.length} pack${groups.length > 1 ? 's' : ''}`, groups.map(g => {
+        const on = g.enabled !== false;
+        const tog = g.pack && global.ContentPacks ? btn(on ? 'on' : 'off', on ? 'this pack is on — click to switch it off' : 'switch this pack on', () => global.ContentPacks.setEnabled(g.pack, !on), on ? 'on' : '') : null;
+        return h('div', { class: 'tp-pack' + (on ? '' : ' off') }, [
+          h('div', { class: 'tp-sh' }, [h('b', { text: g.label }), h('small', { text: ` · ${g.items.length}` + (g.author ? ' · ' + g.author : '') }), h('span', { class: 'wm-spacer' }), tog]),
+          h('div', { class: 'tp-presets' }, g.items.map(x => h('div', { class: 'tp-pre' }, [
+            on && global.Preview ? global.Preview.button(d.id, x.key) : null,
+            h('span', { class: 'tp-pn', text: x.name, title: x.key }),
+            on ? btn('Load', st.target ? 'put it on the window this page works on' : 'open one with this preset', () => { const id = ensureHost(st); presetLoad(K, id, x.key); toast(`${d.label}: ${x.name}`, 'good', 1500); }) : null,
+          ]))),
+        ]);
+      }), 'packs'));
+    }
+
+    // every control
+    const params = (d.config || []).filter(c => !c.hidden);
+    if (params.length) {
+      navTo('controls', '🎚 Controls');
+      const movable = new Set((d.hooks || []).filter(x => x.direction === 'in' && /\.mod_/.test(x.hook_id)).map(x => x.mod_key || x.port));
+      const range = (c) => c.type === 'enum' ? (c.options || []).join(' · ') : c.type === 'boolean' ? 'on / off' : (c.min !== undefined ? `${c.min} – ${c.max}${c.unit ? ' ' + c.unit : ''}` : c.type);
+      const show = (v) => v === undefined ? '' : typeof v === 'boolean' ? (v ? 'on' : 'off') : typeof v === 'object' ? '…' : String(v);
+      const byGroup = new Map(); params.forEach(c => { const g = c.group || 'Settings'; if (!byGroup.has(g)) byGroup.set(g, []); byGroup.get(g).push(c); });
+      page.appendChild(sec('🎚 Every control', `· ${params.length}`, Array.from(byGroup.entries()).map(([g, cs]) => h('div', { class: 'tp-cg' }, [
+        h('div', { class: 'tp-sh' }, [h('b', { text: g })]),
+        h('table', { class: 'tp-tab' }, [h('tbody', {}, cs.map(c => h('tr', {}, [
+          h('td', { class: 'tp-cl' }, [c.label || c.key, movable.has(c.key) ? h('span', { class: 'tp-mv', title: 'an input can move this', text: ' ∿' }) : null, c.settingsOnly ? h('span', { class: 'tp-dim', title: 'in ⚙ settings', text: ' ⚙' }) : null]),
+          h('td', { class: 'tp-cr', text: range(c) }), h('td', { class: 'tp-cd', text: show(c.default) }), h('td', { class: 'tp-ch', text: c.hint || '' }),
+        ])))]),
+      ])), 'controls'));
+    }
+
+    // inputs and outputs
+    const io = (d.hooks || []).filter(x => !x.internal && !/^slot\./.test(x.hook_id) && x.wire_type !== 'ui');
+    if (io.length) {
+      navTo('io', '⇄ In / out');
+      page.appendChild(sec('⇄ Inputs and outputs', `· ${io.length}`, [h('div', { class: 'tp-list' }, io.map(x => h('div', { class: 'tp-row' }, [
+        h('span', { class: 'tp-tag ' + (x.direction === 'out' ? 'lnk' : 'mod'), text: x.direction === 'out' ? 'out ⇢' : '⇠ in' }),
+        h('div', { class: 'tp-rt' }, [h('b', { text: (x.port || x.hook_id.split('.').pop()) + ' · ' + x.wire_type }), h('small', { text: x.intent || x.hook_id })]),
+      ])))], 'io'));
+    }
+    page.scrollTop = keepY;
+  }
+  // no window yet: which tools would fit a slot (the same rule Mods.compatible uses, read from the descriptors)
+  function compatibleFor(d, sl) {
+    const io = (x, dir) => (x.hooks || []).some(h => h.wire_type === sl.wire_type && h.direction === dir && !h.internal);
+    const acc = sl.accepts || {};
+    return F().defined().filter(x => x.id !== d.id && !x.singleton && !x.system && !x.noMod && io(x, 'in') && io(x, 'out')
+      && (!acc.provides || (x.provides || []).includes(acc.provides)) && (!acc.category || String(x.category || '').toLowerCase() === String(acc.category).toLowerCase()) && !(acc.not || []).includes(x.id))
+      .map(x => ({ id: x.id, label: x.label, icon: x.icon || '', category: x.category || '', blurb: x.blurb || '' }))
+      .sort((a, b) => (a.category + a.label).localeCompare(b.category + b.label));
+  }
+
+  // a crisp drawn icon (an emoji book renders fragmented at title-bar size on some systems)
+  const BOOK = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M2.5 3.2c1.9-.7 3.8-.6 5.5.6v9.1c-1.7-1.1-3.6-1.2-5.5-.5zM13.5 3.2c-1.9-.7-3.8-.6-5.5.6v9.1c1.7-1.1 3.6-1.2 5.5-.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
+  if (global.CanvasWM) global.CanvasWM.addTitleAction({
+    when: (d) => !d.system,
+    make(rec) {
+      const b = global.UIKit.h('button', { class: 'wm-min tp-open', title: 'its page — mods, sound packs, suite, every control', 'aria-label': rec.def.label + ' page' });
+      b.innerHTML = BOOK;
+      b.addEventListener('pointerdown', (e) => e.stopPropagation());
+      b.addEventListener('click', (e) => { e.stopPropagation(); open(rec.id, { instanceId: rec.instanceId, K: rec.K }); });
+      return b;
+    },
+  });
+  // clicking a window's icon or name opens its page (a drag of the title bar still moves the window)
+  if (doc) {
+    let down = null;
+    doc.addEventListener('pointerdown', (e) => { const t = e.target.closest && e.target.closest('.wm-head .wm-icon, .wm-head .wm-title'); down = t ? { x: e.clientX, y: e.clientY, t } : null; }, true);
+    doc.addEventListener('pointerup', (e) => {
+      const d = down; down = null; if (!d || e.button !== 0 || Math.hypot(e.clientX - d.x, e.clientY - d.y) > 4) return;
+      const win = d.t.closest('.wm-win'), id = win && win.getAttribute('data-instance'), rec = id && F().handle(id);
+      if (rec && !rec.def.system) open(rec.id, { instanceId: id, K: rec.K });
+    }, true);
+  }
+  global.ToolPage = TP;
+})(typeof window !== 'undefined' ? window : globalThis);

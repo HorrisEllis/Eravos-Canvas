@@ -22,12 +22,21 @@ dependencies:
   services:
     - audio: Audio engine — processes sound
     - key: Song key & scale — plays in key
-    - mod: 2 modulation inputs — LFO / XY / Macro can move them
+    - mod: 11 modulation inputs — LFO / XY / Macro can move them
   inputs:
     - fx.hook.audio_in (audio · port in)
     - fx.hook.mod_mix (modulation · port mod.mix)
     - pitch.hook.theory_in (theory:key-change) — ambient broadcast
     - pitch.hook.mod_semitones (modulation · port mod.semitones)
+    - knob.cents (modulation · port mod.knob.cents)
+    - knob.window (modulation · port mod.knob.window)
+    - knob.glide (modulation · port mod.knob.glide)
+    - knob.harm1 (modulation · port mod.knob.harm1)
+    - knob.harm2 (modulation · port mod.knob.harm2)
+    - knob.harmLevel (modulation · port mod.knob.harmLevel)
+    - knob.inGain (modulation · port mod.knob.inGain)
+    - knob.outGain (modulation · port mod.knob.outGain)
+    - knob.bypass (modulation · port mod.knob.bypass)
   outputs:
     - fx.hook.audio_out (audio · port out)
   permissions: [audio_out, audio_in, bus_publish, bus_subscribe]

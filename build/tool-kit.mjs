@@ -9,7 +9,7 @@
  *   preview.png              thumbnail, rendered only when missing (or all with --thumbs-all)
  * Order for a new tool: build/new-tool.mjs → build/index-tools.mjs (so the page loads it) → this → build/validate.mjs. */
 import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
-import { chromium } from 'playwright';
+import { chromium } from '../host/driver/glass.js';   // Clear Glass's driver, not Playwright (his call, 2026-10-21)
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'), DOM = path.join(ROOT, 'tools');
 const ALL_THUMBS = process.argv.includes('--thumbs-all');
 const folders = [];

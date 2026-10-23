@@ -1,0 +1,58 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.bass-gen",
+  "version": "1.0.0",
+  "label": "Bassline",
+  "icon": "🎸",
+  "accent": "#7c4dff",
+  "domain": "music",
+  "category": "generators",
+  "summary": "The root of the chord on the kick: follows a wired Chords and Groove, plays any bass tool wired to it.",
+  "tags": [
+    "generators",
+    "bass",
+    "edm"
+  ],
+  "files": {
+    "engine": "bass-gen.engine.js",
+    "ui": "bass-gen.ui.js",
+    "spec": "bass-gen.spec",
+    "tests": "bass-gen.test.js",
+    "preview": "preview.png",
+    "thumb": "thumb.png"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "bus_publish",
+      "bus_subscribe",
+      "registry_read"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory",
+      "odd-couples"
+    ]
+  },
+  "works_with": [
+    "eravos.breath",
+    "eravos.embodiment-lab",
+    "eravos.fx-dynamics",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.sidechain-compressor",
+    "eravos.syn-env",
+    "eravos.wub-rate",
+    "eravos.xy-pad"
+  ],
+  "conflicts": [],
+  "status": "built"
+}

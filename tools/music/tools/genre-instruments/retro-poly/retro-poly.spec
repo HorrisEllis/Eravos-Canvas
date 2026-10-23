@@ -53,7 +53,7 @@ dependencies:
     - clock: Master clock & tempo — locks to the beat
     - key: Song key & scale — plays in key
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 2 modulation inputs — LFO / XY / Macro can move them
+    - mod: 31 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - rp.hook.note_in (note:trigger)
@@ -62,7 +62,36 @@ dependencies:
     - rp.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
     - rp.hook.mod_cutoff (modulation · port mod.cutoff)
     - rp.hook.mod_pwm (modulation · port mod.pwm)
+    - knob.saw (modulation · port mod.knob.saw)
+    - knob.pulse (modulation · port mod.knob.pulse)
+    - knob.width (modulation · port mod.knob.width)
+    - knob.pwmRate (modulation · port mod.knob.pwmRate)
+    - knob.sub (modulation · port mod.knob.sub)
+    - knob.noise (modulation · port mod.knob.noise)
+    - knob.drift (modulation · port mod.knob.drift)
+    - knob.octave (modulation · port mod.knob.octave)
+    - knob.res (modulation · port mod.knob.res)
+    - knob.envAmt (modulation · port mod.knob.envAmt)
+    - knob.keytrack (modulation · port mod.knob.keytrack)
+    - knob.hpf (modulation · port mod.knob.hpf)
+    - knob.fA (modulation · port mod.knob.fA)
+    - knob.fD (modulation · port mod.knob.fD)
+    - knob.fS (modulation · port mod.knob.fS)
+    - knob.attack (modulation · port mod.knob.attack)
+    - knob.decay (modulation · port mod.knob.decay)
+    - knob.sustain (modulation · port mod.knob.sustain)
+    - knob.release (modulation · port mod.knob.release)
+    - knob.chorus (modulation · port mod.knob.chorus)
+    - knob.unison (modulation · port mod.knob.unison)
+    - knob.mono (modulation · port mod.knob.mono)
+    - knob.glide (modulation · port mod.knob.glide)
+    - knob.arp (modulation · port mod.knob.arp)
+    - knob.arpDiv (modulation · port mod.knob.arpDiv)
+    - knob.arpOct (modulation · port mod.knob.arpOct)
+    - knob.arpGate (modulation · port mod.knob.arpGate)
+    - knob.arpHold (modulation · port mod.knob.arpHold)
+    - knob.level (modulation · port mod.knob.level)
   outputs:
     - rp.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.drum-forge, eravos.pad-forge, eravos.fx-echo, eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
+  works_with: [eravos.drum-forge, eravos.pad-forge, eravos.fx-echo, eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen]

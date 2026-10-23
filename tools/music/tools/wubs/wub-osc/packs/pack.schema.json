@@ -30,8 +30,13 @@
                       },
                       "octave": {
                         "type": "integer",
-                        "minimum": -3,
+                        "minimum": -4,
                         "maximum": 3
+                      },
+                      "transpose": {
+                        "type": "number",
+                        "minimum": -36,
+                        "maximum": 24
                       },
                       "fine": {
                         "type": "number",

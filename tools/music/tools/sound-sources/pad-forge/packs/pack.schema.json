@@ -143,6 +143,16 @@
                         "type": "number",
                         "minimum": 0,
                         "maximum": 1.5
+                      },
+                      "octave": {
+                        "type": "integer",
+                        "minimum": -3,
+                        "maximum": 2
+                      },
+                      "transpose": {
+                        "type": "number",
+                        "minimum": -24,
+                        "maximum": 24
                       }
                     },
                     "additionalProperties": false

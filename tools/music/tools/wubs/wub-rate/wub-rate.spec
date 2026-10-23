@@ -34,10 +34,18 @@ dependencies:
   services:
     - audio: Audio engine — shares the audio clock
     - clock: Master clock & tempo — locks to the beat
-    - mod: 1 modulation input — LFO / XY / Macro can move them
+    - mod: 9 modulation inputs — LFO / XY / Macro can move them
   inputs:
     - wubrate.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
     - wubrate.hook.mod_depth (modulation · port mod.depth)
+    - knob.length (modulation · port mod.knob.length)
+    - knob.stepLen (modulation · port mod.knob.stepLen)
+    - knob.shape (modulation · port mod.knob.shape)
+    - knob.phase (modulation · port mod.knob.phase)
+    - knob.smooth (modulation · port mod.knob.smooth)
+    - knob.polarity (modulation · port mod.knob.polarity)
+    - knob.retrig (modulation · port mod.knob.retrig)
+    - knob.noteRetrig (modulation · port mod.knob.noteRetrig)
   outputs:
     - wubrate.hook.mod_out (modulation · port out)
   permissions: [audio_out, bus_publish, bus_subscribe, registry_read]

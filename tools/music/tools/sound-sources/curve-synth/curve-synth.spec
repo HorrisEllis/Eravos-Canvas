@@ -22,11 +22,25 @@ dependencies:
   services:
     - audio: Audio engine — makes sound
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
+    - mod: 13 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - curve.hook.note_in (note:trigger)
     - curve.hook.midi_in (midi:note) — ambient broadcast
+    - knob.slot (modulation · port mod.knob.slot)
+    - knob.duration (modulation · port mod.knob.duration)
+    - knob.lowNote (modulation · port mod.knob.lowNote)
+    - knob.highNote (modulation · port mod.knob.highNote)
+    - knob.edge (modulation · port mod.knob.edge)
+    - knob.bounces (modulation · port mod.knob.bounces)
+    - knob.restitution (modulation · port mod.knob.restitution)
+    - knob.decay (modulation · port mod.knob.decay)
+    - knob.wave (modulation · port mod.knob.wave)
+    - knob.noise (modulation · port mod.knob.noise)
+    - knob.drive (modulation · port mod.knob.drive)
+    - knob.sustain (modulation · port mod.knob.sustain)
+    - knob.level (modulation · port mod.knob.level)
   outputs:
     - curve.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.drum-forge, eravos.sequencer, eravos.fx-echo, eravos.timeline, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
+  works_with: [eravos.drum-forge, eravos.sequencer, eravos.fx-echo, eravos.timeline, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen]

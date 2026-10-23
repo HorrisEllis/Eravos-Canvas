@@ -30,11 +30,21 @@ dependencies:
   services:
     - audio: Audio engine — makes sound
     - clock: Master clock & tempo — locks to the beat
+    - mod: 9 modulation inputs — LFO / XY / Macro can move them
     - files: Your files — drop audio / MIDI on it
     - assets: Clip output — renders sounds other tools can load
   inputs:
     - songrec.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
     - songrec.hook.asset_in (asset:ready)
+    - knob.snap (modulation · port mod.knob.snap)
+    - knob.zoom (modulation · port mod.knob.zoom)
+    - knob.follow (modulation · port mod.knob.follow)
+    - knob.format (modulation · port mod.knob.format)
+    - knob.range (modulation · port mod.knob.range)
+    - knob.stems (modulation · port mod.knob.stems)
+    - knob.tail (modulation · port mod.knob.tail)
+    - knob.level (modulation · port mod.knob.level)
+    - knob.withSong (modulation · port mod.knob.withSong)
   outputs:
     - songrec.hook.audio_out (audio · port out)
     - songrec.hook.asset_out (asset:ready)

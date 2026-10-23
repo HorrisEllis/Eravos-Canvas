@@ -3,7 +3,7 @@
  * wheel, and the canvas does not move while it does. The bug (3.38): the panel sits on the window frame, outside
  * .wm-body, so the canvas took the wheel and panned — every setting below PACKS was unreachable.
  *   node tests/p39-settings-wheel.mjs   → exit 1 on any failure */
-import { chromium } from 'playwright'; import path from 'path'; import { fileURLToPath } from 'url';
+import { chromium } from '../host/driver/glass.js';   // Clear Glass's driver, not Playwright (his call, 2026-10-21) import path from 'path'; import { fileURLToPath } from 'url';
 const ROOT = process.argv[2] || path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'); let failed = 0, checked = 0;
 const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1600, height: 1000 } }); p.on('dialog', d => d.accept());
 const errs = []; p.on('pageerror', e => errs.push(e.message));

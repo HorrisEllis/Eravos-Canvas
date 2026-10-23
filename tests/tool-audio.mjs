@@ -10,7 +10,7 @@
  * Effects: a 110 Hz saw burst goes in → valid · clipping · silent · DC · Stop all.
  * Beat tools (they play from the transport): 2 bars at 128 BPM → every onset against the 16th grid (ms).
  * Verdicts: FAIL (broken: NaN, silent, clipping, Stop ignored, off the grid) · WARN (worth a look) · OK. */
-import { chromium } from 'playwright'; import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
+import { chromium } from '../host/driver/glass.js';   // Clear Glass's driver, not Playwright (his call, 2026-10-21) import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
 const HERE = path.dirname(fileURLToPath(import.meta.url)), ROOT = path.join(HERE, '..');
 const argv = process.argv.slice(2), opt = (k) => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : null; };
 const FILTER = argv.find((a, i) => !a.startsWith('--') && !(i > 0 && argv[i - 1].startsWith('--'))) || '';

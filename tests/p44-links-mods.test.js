@@ -118,4 +118,19 @@ describe('P44 · links — small tools grow when they meet', () => {
     const keys = Links.faceKeys(OrganismFactory.def('eravos.fx-echo'));
     assert.gt(keys.length, 0); ['mix', 'inGain', 'outGain', 'bypass', 'mods'].forEach(k => assert.ok(!keys.includes(k), k));
   });
+  it('every tool the ＋ mod picker offers passes the sound through (none silences the host) — 3.48.1', async () => {
+    const ctxOf = (id) => OrganismFactory.handle(id).ctx;
+    const solo = (U, inst) => { U.K.audio.chain.out.disconnect(U.ctx.destination); U.K.audio.port(inst, 'out').node.connect(U.ctx.destination); };
+    const feedSaw = (U, inst, hz, from, to) => { const o = U.ctx.createOscillator(), g = U.ctx.createGain(); o.type = 'sawtooth'; o.frequency.value = hz; g.gain.value = 0.3; o.connect(g); g.connect(U.K.audio.port(inst, 'in').node); o.start(from); o.stop(to); };
+    const U0 = TH.universe(0.1), h0 = TH.spawn(U0, 'eravos.fx-destroyer'), list = Mods.compatible(h0, 'after').map(t => t.id);
+    assert.ok(!list.includes('eravos.clip-maker'), 'Clip Maker records and plays clips — it is not a mod');
+    const silent = [];
+    for (const m of list) {
+      const U = TH.universe(0.8), d = TH.spawn(U, 'eravos.fx-destroyer'), c = ctxOf(d); if (c.ready) await c.ready;
+      const kid = Mods.childOf(d, Mods.add(d, 'after', m)), k = kid && ctxOf(kid); if (k && k.ready) await k.ready;
+      solo(U, d); feedSaw(U, d, 110, 0.02, 0.75);
+      const db = TH.db(TH.rms(await TH.render(U), 0.3, 0.7)); if (!kid || db < -50) silent.push(`${m} ${db.toFixed(1)} dB`);
+    }
+    assert.equal(silent.length, 0, 'silenced the host: ' + silent.join(', '));
+  });
 });

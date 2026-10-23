@@ -1,5 +1,5 @@
 // node shot.mjs out.png "js to run in page (async)" [w h]
-import { chromium } from 'playwright';
+import { chromium } from '../host/driver/glass.js';   // Clear Glass's driver, not Playwright (his call, 2026-10-21)
 const [,, out, code, w, h] = process.argv;
 const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
 const p = await b.newPage({ viewport: { width: +(w || 1600), height: +(h || 1000) } });

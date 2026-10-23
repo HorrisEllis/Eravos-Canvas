@@ -88,6 +88,7 @@ dependencies:
   services:
     - audio: Audio engine — makes sound
     - clock: Master clock & tempo — locks to the beat
+    - mod: 8 modulation inputs — LFO / XY / Macro can move them
     - files: Your files — drop audio / MIDI on it
   inputs:
     - tl.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
@@ -95,6 +96,14 @@ dependencies:
     - tl.hook.asset_in (asset:ready)
     - tl.hook.pads_in (pad:bank-change)
     - tl.hook.marker_jump_in (ui:marker_jump)
+    - knob.pxPerBar (modulation · port mod.knob.pxPerBar)
+    - knob.snap (modulation · port mod.knob.snap)
+    - knob.loopOn (modulation · port mod.knob.loopOn)
+    - knob.loopStartBar (modulation · port mod.knob.loopStartBar)
+    - knob.loopEndBar (modulation · port mod.knob.loopEndBar)
+    - knob.follow (modulation · port mod.knob.follow)
+    - knob.laneH (modulation · port mod.knob.laneH)
+    - knob.songBars (modulation · port mod.knob.songBars)
   outputs:
     - tl.hook.audio_out (audio · port out)
     - tl.hook.note_out (note:trigger)
@@ -105,4 +114,4 @@ dependencies:
     - tl.hook.marker_out (timeline:marker)
     - tl.hook.length_out (timeline:song_length)
   permissions: [audio_out, bus_publish, bus_subscribe, filesystem_read, registry_read]
-  works_with: [eravos.song-recorder, eravos.pads, eravos.sequencer, eravos.embodiment-lab, eravos.coven, eravos.organ, eravos.retro-poly, eravos.bass-forge]
+  works_with: [eravos.song-recorder, eravos.pads, eravos.sequencer, eravos.embodiment-lab, eravos.arp, eravos.coven, eravos.organ, eravos.retro-poly]

@@ -84,7 +84,9 @@
     const svg = doc.createElementNS(svgNS, 'svg'); svg.setAttribute('width', size); svg.setAttribute('height', size); svg.setAttribute('viewBox', '0 0 40 40');
     const track = doc.createElementNS(svgNS, 'path'), arc = doc.createElementNS(svgNS, 'path'), dot = doc.createElementNS(svgNS, 'circle');
     track.setAttribute('class', 'uk-knob-track'); arc.setAttribute('class', 'uk-knob-arc'); dot.setAttribute('class', 'uk-knob-dot'); dot.setAttribute('r', '2.6');
-    svg.append(track, arc, dot);
+    // 3.49 (P49.1): where a moving knob is right now (a mover is wired to it) — a second dot; its own value stays the arc
+    const liveDot = doc.createElementNS(svgNS, 'circle'); liveDot.setAttribute('class', 'uk-knob-live'); liveDot.setAttribute('r', '2.2'); liveDot.style.display = 'none';
+    svg.append(track, arc, dot, liveDot);
     const lbl = h('div', { class: 'uk-knob-label', text: o.label || o.key || '' });
     const val = h('div', { class: 'uk-knob-val' });
     const el = h('div', { class: 'uk-knob' + (o.big ? ' big' : ''), title: (o.label || '') + (o.hint ? ' — ' + o.hint : '') + '\n(drag or arrow keys · shift fine · dbl-click / Delete resets)',
@@ -125,7 +127,12 @@
     svg.addEventListener('wheel', (e) => { if (!wheelStartedOn(svg)) return; e.preventDefault(); e.stopPropagation(); const nv = m.fromN(m.toN(value) - Math.sign(e.deltaY) * (e.shiftKey ? 0.002 : 0.01)); if (nv !== value) { value = nv; draw(); o.onChange && o.onChange(value); } }, { passive: false });
     svg.addEventListener('dblclick', () => { value = o.default !== undefined ? o.default : o.min; draw(); o.onChange && o.onChange(value); });
     draw();
-    return { el, set(v) { if (typeof v === 'number') { value = v; draw(); } }, get: () => value };
+    function live(v) {
+      if (v === null || v === undefined || typeof v !== 'number') { liveDot.style.display = 'none'; el.classList.remove('moving'); return; }
+      const [x, y] = pol(A0 + (A1 - A0) * Math.max(0, Math.min(1, m.toN(v))), 16.5); liveDot.setAttribute('cx', x); liveDot.setAttribute('cy', y);
+      liveDot.style.display = ''; el.classList.add('moving');
+    }
+    return { el, set(v) { if (typeof v === 'number') { value = v; draw(); } }, get: () => value, live };
   }
 
   // ---------------------------------------------------------------- Fader (vertical)
@@ -286,6 +293,9 @@
     else if (c.type === 'string') { const inp = h('input', { class: 'uk-text', value: view.state[c.key] || '' }); inp.addEventListener('change', () => send(inp.value)); inp.addEventListener('pointerdown', e => e.stopPropagation()); ctl = { el: h('label', { class: 'uk-field' }, [h('span', { text: c.label || c.key }), inp]), set: (v) => { inp.value = v; } }; }
     else return null;
     view.bind(c.key, (v) => ctl.set(v));
+    // 3.49 (P49.1): a knob being moved shows where it is now; right-click offers what can move it (UIKit.knobMenu, from a domain)
+    if (view.on) view.on('param_live', (p) => { if (!p || p.key !== c.key) return; if (ctl.live) ctl.live(p.value); else ctl.el.classList.toggle('moving', p.value !== null); });
+    ctl.el.addEventListener('contextmenu', (e) => { if (!global.UIKit.knobMenu) return; e.preventDefault(); e.stopPropagation(); global.UIKit.knobMenu(e, view, c, ctl); });
     return ctl;
   }
   function paramPanel(view, keys, o) {
@@ -346,6 +356,24 @@
   function mapPoint(rect, w, h2, clientX, clientY) { const sx = rect.width > 0 && w > 0 ? w / rect.width : 1, sy = rect.height > 0 && h2 > 0 ? h2 / rect.height : 1; return { x: (clientX - rect.left) * sx, y: (clientY - rect.top) * sy }; }
   function toContent(el, clientX, clientY) { return mapPoint(el.getBoundingClientRect(), el.offsetWidth, el.offsetHeight, clientX, clientY); }
 
-  global.UIKit = { wheelStartedOn, h, fmt, mapper, ask, Knob, Fader, Toggle, Select, Segmented, Button, NumberDrag, Canvas, loop, paramControl, paramPanel, presetBar, hint, mapPoint, toContent, drag,
+  // 3.48.7 UIKit.fit(el, fn) — what is inside a window grows with it (eravos.phase48-map P48.7). fn({ w, h }) runs when el's
+  // laid-out size changes (the resize grip, ⤢, the dock), at most once a frame, and never for a size it already saw. It stops
+  // by itself once el has been on the page and leaves it. Sizes are the window's own pixels (canvas zoom does not change them).
+  function fit(el, fn) {
+    let last = '', raf = 0, seen = false, ro = null;
+    const run = () => {
+      raf = 0;
+      if (!el.isConnected) { if (seen && ro) { ro.disconnect(); ro = null; } return; }
+      seen = true; const w = el.clientWidth, h2 = el.clientHeight, k = w + 'x' + h2;
+      if (!w || k === last) return; last = k;
+      try { fn({ w, h: h2 }); } catch (e) { console.warn('UIKit.fit', e); }
+    };
+    const soon = () => { if (!raf) raf = global.requestAnimationFrame ? global.requestAnimationFrame(run) : global.setTimeout(run, 16); };
+    if (global.ResizeObserver) { ro = new global.ResizeObserver(soon); ro.observe(el); }
+    soon();
+    return { stop() { if (ro) ro.disconnect(); ro = null; }, now: run };
+  }
+
+  global.UIKit = { wheelStartedOn, h, fit, fmt, mapper, ask, Knob, Fader, Toggle, Select, Segmented, Button, NumberDrag, Canvas, loop, paramControl, paramPanel, presetBar, hint, mapPoint, toContent, drag,
     extend(o) { Object.keys(o || {}).forEach(k => { if (!(k in global.UIKit)) global.UIKit[k] = o[k]; }); } };
 })(typeof window !== 'undefined' ? window : globalThis);

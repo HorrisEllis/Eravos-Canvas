@@ -46,13 +46,32 @@ dependencies:
     - audio: Audio engine — processes sound
     - clock: Master clock & tempo — locks to the beat
     - key: Song key & scale — plays in key
-    - mod: 2 modulation inputs — LFO / XY / Macro can move them
+    - mod: 21 modulation inputs — LFO / XY / Macro can move them
   inputs:
     - dub.hook.audio_in (audio · port in)
     - dub.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
     - dub.hook.theory_in (theory:key-change) — ambient broadcast
     - dub.hook.mod_knob (modulation · port mod.bigKnob)
     - dub.hook.mod_sweep (modulation · port mod.echoSweep)
+    - knob.skankOn (modulation · port mod.knob.skankOn)
+    - knob.skankStyle (modulation · port mod.knob.skankStyle)
+    - knob.prog (modulation · port mod.knob.prog)
+    - knob.skankTone (modulation · port mod.knob.skankTone)
+    - knob.skankLevel (modulation · port mod.knob.skankLevel)
+    - knob.sirenPitch (modulation · port mod.knob.sirenPitch)
+    - knob.sirenRate (modulation · port mod.knob.sirenRate)
+    - knob.sirenDepth (modulation · port mod.knob.sirenDepth)
+    - knob.sirenShape (modulation · port mod.knob.sirenShape)
+    - knob.sirenRise (modulation · port mod.knob.sirenRise)
+    - knob.sirenLevel (modulation · port mod.knob.sirenLevel)
+    - knob.hornLevel (modulation · port mod.knob.hornLevel)
+    - knob.spring (modulation · port mod.knob.spring)
+    - knob.echo (modulation · port mod.knob.echo)
+    - knob.echoDiv (modulation · port mod.knob.echoDiv)
+    - knob.echoFeedback (modulation · port mod.knob.echoFeedback)
+    - knob.rewindLen (modulation · port mod.knob.rewindLen)
+    - knob.rewindRestart (modulation · port mod.knob.rewindRestart)
+    - knob.level (modulation · port mod.knob.level)
   outputs:
     - dub.hook.audio_out (audio · port out)
     - dub.hook.transport_out (ui:transport-stop|ui:transport-play|ui:transport-seek)

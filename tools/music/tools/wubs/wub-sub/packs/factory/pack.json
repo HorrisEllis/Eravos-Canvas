@@ -66,6 +66,16 @@
       "cut": 90,
       "level": 1
      }
+    },
+    "Deep Sub (heard on small speakers)": {
+     "params": {
+      "wave": "sine",
+      "octave": -2,
+      "harmonics": 0.5,
+      "cut": 260,
+      "glide": 0.05,
+      "level": 0.8
+     }
     }
    }
   }

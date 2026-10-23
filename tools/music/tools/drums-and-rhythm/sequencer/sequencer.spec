@@ -98,4 +98,4 @@ dependencies:
     - seq.hook.transport_out (ui:transport-play|ui:transport-bpm|ui:transport-stop)
     - seq.hook.auto_out (ui:config_change)
   permissions: [bus_publish, bus_subscribe, filesystem_read, registry_read]
-  works_with: [eravos.bass-drop-builder, eravos.timeline, eravos.pads, eravos.embodiment-lab, eravos.edm-lab, eravos.coven, eravos.organ, eravos.retro-poly]
+  works_with: [eravos.bass-drop-builder, eravos.timeline, eravos.pads, eravos.embodiment-lab, eravos.arp, eravos.edm-lab, eravos.coven, eravos.organ]

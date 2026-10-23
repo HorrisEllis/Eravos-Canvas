@@ -69,7 +69,7 @@ dependencies:
     - audio: Audio engine — makes sound
     - key: Song key & scale — plays in key
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 2 modulation inputs — LFO / XY / Macro can move them
+    - mod: 10 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - acid.hook.note_in (note:trigger)
@@ -77,8 +77,16 @@ dependencies:
     - acid.hook.theory_in (theory:key-change) — ambient broadcast
     - acid.hook.mod_cutoff (modulation · port mod.cutoff)
     - acid.hook.mod_res (modulation · port mod.res)
+    - knob.envMod (modulation · port mod.knob.envMod)
+    - knob.decay (modulation · port mod.knob.decay)
+    - knob.accent (modulation · port mod.knob.accent)
+    - knob.drive (modulation · port mod.knob.drive)
+    - knob.level (modulation · port mod.knob.level)
+    - knob.wave (modulation · port mod.knob.wave)
+    - knob.octave (modulation · port mod.knob.octave)
+    - knob.tune (modulation · port mod.knob.tune)
   outputs:
     - acid.hook.audio_out (audio · port out)
     - acid.hook.pattern_out (seq:pattern_suggest)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
+  works_with: [eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen, eravos.midi-mapper, eravos.lyric-rhythm]

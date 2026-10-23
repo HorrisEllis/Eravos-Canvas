@@ -24,7 +24,7 @@ dependencies:
     - clock: Master clock & tempo — locks to the beat
     - key: Song key & scale — plays in key
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 1 modulation input — LFO / XY / Macro can move them
+    - mod: 36 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - organ.hook.note_in (note:trigger)
@@ -32,7 +32,42 @@ dependencies:
     - organ.hook.theory_in (theory:key-change) — ambient broadcast
     - organ.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
     - organ.hook.breath_in (modulation · port mod.breath)
+    - knob.d0 (modulation · port mod.knob.d0)
+    - knob.d1 (modulation · port mod.knob.d1)
+    - knob.d2 (modulation · port mod.knob.d2)
+    - knob.d3 (modulation · port mod.knob.d3)
+    - knob.d4 (modulation · port mod.knob.d4)
+    - knob.d5 (modulation · port mod.knob.d5)
+    - knob.d6 (modulation · port mod.knob.d6)
+    - knob.d7 (modulation · port mod.knob.d7)
+    - knob.d8 (modulation · port mod.knob.d8)
+    - knob.pipe (modulation · port mod.knob.pipe)
+    - knob.perc (modulation · port mod.knob.perc)
+    - knob.percHarm (modulation · port mod.knob.percHarm)
+    - knob.celeste (modulation · port mod.knob.celeste)
+    - knob.chiff (modulation · port mod.knob.chiff)
+    - knob.wind (modulation · port mod.knob.wind)
+    - knob.reed (modulation · port mod.knob.reed)
+    - knob.tremRate (modulation · port mod.knob.tremRate)
+    - knob.tremDepth (modulation · port mod.knob.tremDepth)
+    - knob.breathPeriod (modulation · port mod.knob.breathPeriod)
+    - knob.breathDepth (modulation · port mod.knob.breathDepth)
+    - knob.pulse (modulation · port mod.knob.pulse)
+    - knob.pulseRate (modulation · port mod.knob.pulseRate)
+    - knob.pulseShape (modulation · port mod.knob.pulseShape)
+    - knob.drive (modulation · port mod.knob.drive)
+    - knob.ampTone (modulation · port mod.knob.ampTone)
+    - knob.rotary (modulation · port mod.knob.rotary)
+    - knob.rotorSpeed (modulation · port mod.knob.rotorSpeed)
+    - knob.chord (modulation · port mod.knob.chord)
+    - knob.scrape (modulation · port mod.knob.scrape)
+    - knob.pedal (modulation · port mod.knob.pedal)
+    - knob.space (modulation · port mod.knob.space)
+    - knob.dark (modulation · port mod.knob.dark)
+    - knob.attack (modulation · port mod.knob.attack)
+    - knob.release (modulation · port mod.knob.release)
+    - knob.level (modulation · port mod.knob.level)
   outputs:
     - organ.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.breath, eravos.coven, eravos.fx-haunt, eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
+  works_with: [eravos.breath, eravos.coven, eravos.fx-haunt, eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen]

@@ -34,6 +34,16 @@
                         "minimum": -4,
                         "maximum": 1
                       },
+                      "transpose": {
+                        "type": "number",
+                        "minimum": -36,
+                        "maximum": 24
+                      },
+                      "harmonics": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
                       "cut": {
                         "type": "number",
                         "minimum": 40,

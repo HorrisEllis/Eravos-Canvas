@@ -2,7 +2,7 @@
 /* P39 shell test: the desktop app (Electron) has no window.prompt — "prompt() is not supported" broke every rename /
  * new-pack button. With prompt() made to THROW like Electron does, the in-page ask dialog must do the job:
  * ＋ New pack in a tool's ⚙ Settings, and a preset save from the preset bar.   node tests/p39-no-prompt.mjs */
-import { chromium } from 'playwright'; import path from 'path'; import { fileURLToPath } from 'url';
+import { chromium } from '../host/driver/glass.js';   // Clear Glass's driver, not Playwright (his call, 2026-10-21) import path from 'path'; import { fileURLToPath } from 'url';
 const ROOT = process.argv[2] || path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'); let failed = 0;
 const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1400, height: 900 } }); const errs = [];
 p.on('pageerror', e => errs.push(e.message));

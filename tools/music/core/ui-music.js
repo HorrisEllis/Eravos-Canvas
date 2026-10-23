@@ -54,36 +54,67 @@
     const c = Canvas(o.width || 260, o.height || 80, 'uk-spectrum');
     let bins = new Float32Array(an ? an.frequencyBinCount : 1024);
     c.stop = loop(c, () => {
+      if (c.fit) c.fit();   // draw at the size it is shown (stretched pixels blur the labels)
       const g = c.g, W = c.W, H = c.H;
       g.clearRect(0, 0, W, H); g.fillStyle = '#080b10'; g.fillRect(0, 0, W, H);
+      // 3.48.1 the display at rest is still a display: a frequency grid (100 · 1k · 10k) and dB lines, never a blank box
+      const xf = (f) => Math.log(f / 20) / Math.log(1000) * W;
+      g.fillStyle = '#121a25'; [50, 200, 500, 2000, 5000].forEach(f => g.fillRect(Math.round(xf(f)), 0, 1, H));
+      g.fillStyle = '#1c2838'; [100, 1000, 10000].forEach(f => g.fillRect(Math.round(xf(f)), 0, 1, H)); [0.25, 0.5, 0.75].forEach(t => g.fillRect(0, Math.round(H * t), W, 1));
+      if (H >= 40) { g.fillStyle = '#4d6178'; g.font = '9px monospace'; [[100, '100'], [1000, '1k'], [10000, '10k']].forEach(([f, t]) => g.fillText(t, xf(f) + 3, H - 4)); }
       if (!an) return;
       if (bins.length !== an.frequencyBinCount) bins = new Float32Array(an.frequencyBinCount);
       an.getFloatFrequencyData(bins);
       const sr = an.context.sampleRate, ny = sr / 2;
+      let loud = 0;
       g.beginPath(); g.moveTo(0, H);
       for (let x = 0; x < W; x++) {
         const f = 20 * Math.pow(1000, x / W); const b = Math.min(bins.length - 1, Math.round(f / ny * bins.length));
-        const db = bins[b]; const y = H - Math.max(0, Math.min(1, (db + 100) / 90)) * H;
+        const db = bins[b]; const v = Math.max(0, Math.min(1, (db + 100) / 90)), y = H - v * H; if (v > loud) loud = v;
         g.lineTo(x, y);
       }
       g.lineTo(W, H); g.closePath();
       g.fillStyle = (o.color || '#00d4ff') + '55'; g.fill(); g.strokeStyle = o.color || '#00d4ff'; g.stroke();
+      if (loud < 0.02) { g.fillStyle = (o.color || '#00d4ff') + '55'; g.fillRect(0, H - 1.5, W, 1.5); if (H >= 40) { g.fillStyle = '#4d6178'; g.font = '10px sans-serif'; g.textAlign = 'right'; g.fillText('play a note to see its spectrum', W - 8, 14); g.textAlign = 'left'; } }
       if (o.overlay) o.overlay(g, W, H);
     }, 30);
     return c;
   }
-  // playable keyboard, scale-highlighted
+  // playable keyboard, scale-highlighted.
+  // 3.48.7 it grows with its window (eravos.phase48-map P48.7, D-48.7). The tool's own range [low, high] is the least it shows.
+  // A wider window adds whole white keys below and above in turn, so the register stays in the middle, up to a piano's 88 keys
+  // (A0 = 21 … C8 = 108). A narrower one gives them back. o.grow === false keeps the fixed range. o.keyWidth sets the px per white key.
+  // James, 2026-10-21: "make it so the tools expand when resized, like that way it can expand to capture the full range of piano keys"
+  const PIANO_LO = 21, PIANO_HI = 108, WHITE = [0, 2, 4, 5, 7, 9, 11];
+  const isWhite = (n) => WHITE.includes(((n % 12) + 12) % 12);
+  function keyRange(lo0, hi0, width, keyW) {
+    let a = Math.max(PIANO_LO, lo0), b = Math.min(PIANO_HI, hi0), whites = 0;
+    for (let n = a; n <= b; n++) if (isWhite(n)) whites++;
+    const want = Math.floor(width / (keyW || 24)); let below = true;
+    while (whites < want && (a > PIANO_LO || b < PIANO_HI)) {
+      if (below && a > PIANO_LO) { do { a--; } while (a > PIANO_LO && !isWhite(a)); whites++; }
+      else if (b < PIANO_HI) { do { b++; } while (b < PIANO_HI && !isWhite(b)); whites++; }
+      else { do { a--; } while (a > PIANO_LO && !isWhite(a)); whites++; }
+      below = !below;
+    }
+    return [a, b];
+  }
   function Keyboard(o) {
     const el = h('div', { class: 'uk-keys' });
-    const lo = o.low || 48, hi = o.high || 72;
+    const lo0 = o.low || 48, hi0 = o.high || 72;
+    let lo = lo0, hi = hi0;
     let root = (o.key && o.key.root) || 9, scale = (o.key && o.key.scale) || 'minor', lock = o.lock !== false;
-    const keys = [];
-    const white = [0, 2, 4, 5, 7, 9, 11];
-    for (let n = lo; n <= hi; n++) {
-      const isW = white.includes(n % 12);
-      const k = h('div', { class: 'uk-key ' + (isW ? 'w' : 'b'), 'data-n': n });
-      k.appendChild(h('span', { text: n % 12 === root % 12 ? global.MusicTheory.noteName(n).replace(/\d+$/, '') : '' }));
-      keys.push([n, k]); el.appendChild(k);
+    let keys = [];
+    function build() {
+      el.innerHTML = ''; keys = [];
+      for (let n = lo; n <= hi; n++) {
+        const k = h('div', { class: 'uk-key ' + (isWhite(n) ? 'w' : 'b'), 'data-n': n });
+        k.appendChild(h('span', { text: '' }));
+        k.addEventListener('pointerdown', (e) => down(e, n));
+        keys.push([n, k]); el.appendChild(k);
+      }
+      el.classList.toggle('grown', lo < lo0 || hi > hi0);
+      el.dataset.range = lo + '-' + hi;
     }
     const held = new Map();
     const down = (e, n) => {
@@ -93,14 +124,14 @@
       held.set(e.pointerId, play); o.onDown && o.onDown(play, 0.8); mark(play, true);
     };
     const up = (e) => { const n = held.get(e.pointerId); if (n !== undefined) { held.delete(e.pointerId); o.onUp && o.onUp(n); mark(n, false); } };
-    keys.forEach(([n, k]) => { k.addEventListener('pointerdown', (e) => down(e, n)); });
     el.addEventListener('pointerup', up); el.addEventListener('pointerleave', up); el.addEventListener('pointercancel', up);
     function mark(n, on) { keys.forEach(([m, k]) => { if (m === n) k.classList.toggle('down', on); }); }
     // P11.4 (gate A): playable from the keyboard — Tab to it, ←/→ pick a note (in key), Space or Enter plays it
     el.setAttribute('tabindex', '0'); el.setAttribute('role', 'group');
     const MTn = (n) => global.MusicTheory.noteName(n);
-    let cur = keys.find(([n]) => (n - root) % 12 === 0) ? keys.find(([n]) => (n - root) % 12 === 0)[0] : lo, kHeld = null;
-    const label = () => el.setAttribute('aria-label', `Keyboard — ${MTn(cur)} selected. Left and right arrows choose a note, Space plays it.`);
+    let cur = lo, kHeld = null;
+    for (let n = lo; n <= hi; n++) if ((n - root) % 12 === 0) { cur = n; break; }
+    const label = () => el.setAttribute('aria-label', `Keyboard ${MTn(lo)}–${MTn(hi)} — ${MTn(cur)} selected. Left and right arrows choose a note, Space plays it.`);
     const showCur = () => { keys.forEach(([n, k]) => k.classList.toggle('kcur', n === cur && el === doc.activeElement)); label(); };
     el.addEventListener('focus', showCur); el.addEventListener('blur', () => { keys.forEach(([, k]) => k.classList.remove('kcur')); if (kHeld !== null) { o.onUp && o.onUp(kHeld); mark(kHeld, false); kHeld = null; } });
     el.addEventListener('keydown', (e) => {
@@ -109,16 +140,25 @@
       if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); e.stopPropagation(); kHeld = cur; o.onDown && o.onDown(cur, 0.8); mark(cur, true); }
     });
     el.addEventListener('keyup', (e) => { if ((e.key === ' ' || e.key === 'Enter') && kHeld !== null) { e.preventDefault(); o.onUp && o.onUp(kHeld); mark(kHeld, false); kHeld = null; } });
-    label();
     function paint() {
+      const grown = lo < lo0 || hi > hi0;
       keys.forEach(([n, k]) => {
-        const inS = global.MusicTheory.inScale(n, root, scale);
-        k.classList.toggle('in', inS); k.classList.toggle('out', !inS && lock); k.classList.toggle('root', (n - root) % 12 === 0);
-        k.firstChild.textContent = (n - root) % 12 === 0 ? global.MusicTheory.noteName(n) : '';
+        const inS = global.MusicTheory.inScale(n, root, scale), isRoot = (n - root) % 12 === 0;
+        k.classList.toggle('in', inS); k.classList.toggle('out', !inS && lock); k.classList.toggle('root', isRoot);
+        // grown past its own range: every C carries its octave, so you can tell where you are
+        k.firstChild.textContent = isRoot || (grown && n % 12 === 0) ? global.MusicTheory.noteName(n) : '';
       });
+      // a note still held keeps its lit key across a rebuild
+      held.forEach(n => mark(n, true)); if (kHeld !== null) mark(kHeld, true);
     }
-    paint();
-    return { el, setKey(k) { root = k.root; scale = k.scale; paint(); }, setLock(v) { lock = v; paint(); }, mark };
+    function setRange(a, b) {
+      if (a === lo && b === hi && keys.length) return false;
+      lo = a; hi = b; if (cur < lo || cur > hi) cur = Math.max(lo, Math.min(hi, cur));
+      build(); paint(); label(); return true;
+    }
+    build(); paint(); label();
+    if (o.grow !== false && global.UIKit && global.UIKit.fit) global.UIKit.fit(el, ({ w }) => { const r = keyRange(lo0, hi0, w, o.keyWidth); setRange(r[0], r[1]); });
+    return { el, setKey(k) { root = k.root; scale = k.scale; paint(); }, setLock(v) { lock = v; paint(); }, mark, range: () => [lo, hi], own: [lo0, hi0], setWidth: (w) => { const r = keyRange(lo0, hi0, w, o.keyWidth); return setRange(r[0], r[1]); } };
   }
 
   function divisionLadder(view, key, options) {
@@ -193,5 +233,46 @@
     return { hit };
   }
   const presetBar = (view) => global.UIKit.presetBar(view), paramPanel = (v, k, op) => global.UIKit.paramPanel(v, k, op), hint = (t) => global.UIKit.hint(t);
-  UI.extend({ atTime, Meter, readLevel, Scope, Spectrum, Keyboard, divisionLadder, audioRouting, instrumentPanel, alive });
+  // 3.49 MOTION CORE (eravos.phase49-map P49.1): right-click any knob → what can move it. James, 2026-10-22: "Motion core: any knob can
+  // be moved by an LFO or envelope". The movers are the part tools themselves (D-49.1): adding one opens it beside the window, wired
+  // to this knob. A mover already on the canvas can be wired instead. Stop removes the wire (the knob is its own value again).
+  // Every step is the user's own (spawn, kernel wire, remove), so Ctrl+Z takes it back.
+  const MOVERS = [['eravos.lfo', 'LFO', 'a steady movement in time'], ['eravos.syn-env', 'Envelope', 'a shape on every note this tool plays'],
+    ['eravos.wub-rate', 'Wub Rate', 'a rhythm of rates (the wobble)'], ['eravos.xy-pad', 'XY Pad', 'your hand, on a pad'], ['eravos.macro-automation', 'Macro', 'drawn over the song']];
+  const modOut = (d) => (d && d.hooks || []).find(hk => hk.wire_type === 'modulation' && (hk.direction === 'out' || hk.direction === 'inout'));
+  // the input that moves this knob: its own audio-rate input if it has one, else its knob input
+  function knobHook(d, key) { const own = (d.hooks || []).find(hk => hk.wire_type === 'modulation' && hk.direction === 'in' && hk.mod_key === key); return own ? own.hook_id : ((d.hooks || []).some(hk => hk.hook_id === 'knob.' + key) ? 'knob.' + key : null); }
+  let menuEl = null;
+  function closeKnobMenu() { if (menuEl) { menuEl.remove(); menuEl = null; } }
+  function moveWith(K, id, key, srcId) {
+    const F = global.OrganismFactory, r = F.handle(id), src = F.handle(srcId); if (!r || !src) return null;
+    const hk = knobHook(r.def, key), o = modOut(src.def); if (!hk || !o) return null;
+    const w = K.wires.register({ src: { instanceId: srcId, hookId: o.hook_id }, dst: { instanceId: id, hookId: hk } });
+    return w && w.ok ? w.wire_id : null;
+  }
+  function addMover(K, id, key, tool) {
+    const F = global.OrganismFactory, WM = global.CanvasWM, win = WM && WM.windowOf && WM.windowOf(id);
+    const at = win ? { x: Math.round(parseFloat(win.style.left) + win.offsetWidth + 24), y: Math.round(parseFloat(win.style.top)) } : {};
+    const m = F.spawn(tool, Object.assign({ K }, at)); if (!m) return null;
+    return moveWith(K, id, key, m) ? m : null;
+  }
+  function knobMenu(e, view, c) {
+    closeKnobMenu();
+    const K = view.K, F = global.OrganismFactory, id = view.instanceId, hk = knobHook(view.descriptor, c.key);
+    if (!hk) return;   // a setting nothing can move (texts, files, or a tool without sound)
+    const into = K.wires.list().filter(w => w.dst.instanceId === id && w.dst.hookId === hk);
+    const here = K.registry.list().map(x => F.handle(x.instance_id)).filter(x => x && !x.unmounted && x.instanceId !== id && modOut(x.def) && !into.some(w => w.src.instanceId === x.instanceId));
+    const item = (text, hint, fn, cls) => { const b = h('button', { class: 'km-item' + (cls ? ' ' + cls : ''), text, title: hint || '' }); b.addEventListener('click', (ev) => { ev.stopPropagation(); closeKnobMenu(); fn(); }); return b; };
+    menuEl = h('div', { class: 'km', role: 'menu', 'aria-label': 'move ' + (c.label || c.key) }, [h('div', { class: 'km-h', text: 'Move “' + (c.label || c.key) + '” with' })]
+      .concat(MOVERS.filter(([t]) => F.def(t)).map(([t, l, why]) => item('＋ ' + (F.def(t).icon || '') + ' ' + l, why + ' — opens beside this window, wired to this knob', () => addMover(K, id, c.key, t))))
+      .concat(here.length ? [h('div', { class: 'km-s', text: 'on the canvas' })].concat(here.map(x => item('⇠ ' + (x.def.icon || '') + ' ' + x.def.label, 'wire it to this knob', () => moveWith(K, id, c.key, x.instanceId)))) : [])
+      .concat(into.length ? [h('div', { class: 'km-s', text: 'moving it now' })].concat(into.map(w => { const sr = F.handle(w.src.instanceId); return item('× stop ' + (sr ? sr.def.label : 'it'), 'unwire it: the knob is its own value again', () => K.wires.remove(w.wire_id, 'user'), 'stop'); })) : []));
+    doc.body.appendChild(menuEl);
+    const W = global.innerWidth || 1200, H = global.innerHeight || 800;
+    menuEl.style.left = Math.min(e.clientX, W - 240) + 'px'; menuEl.style.top = Math.min(e.clientY, H - menuEl.offsetHeight - 8) + 'px';
+    setTimeout(() => { const off = (ev) => { if (menuEl && !menuEl.contains(ev.target)) { closeKnobMenu(); doc.removeEventListener('pointerdown', off, true); } }; doc.addEventListener('pointerdown', off, true); }, 0);
+  }
+  if (doc) doc.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeKnobMenu(); }, true);
+
+  UI.extend({ knobMenu, motion: { MOVERS, knobHook, moveWith, addMover, close: closeKnobMenu }, atTime, Meter, readLevel, Scope, Spectrum, Keyboard, keyRange, divisionLadder, audioRouting, instrumentPanel, alive });
 })(typeof window !== 'undefined' ? window : globalThis);

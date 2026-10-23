@@ -71,7 +71,17 @@
                       "vibrato": {
                         "type": "number",
                         "minimum": 0,
-                        "maximum": 100
+                        "maximum": 2400
+                      },
+                      "rateBend": {
+                        "type": "number",
+                        "minimum": 0.25,
+                        "maximum": 4
+                      },
+                      "rateGlide": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 2
                       },
                       "wubOn": {
                         "type": "boolean"
@@ -138,6 +148,30 @@
                         "minimum": 0.5,
                         "maximum": 20
                       },
+                      "fmIndex": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 12
+                      },
+                      "fmRatio": {
+                        "enum": [
+                          "0.5",
+                          "1",
+                          "1.5",
+                          "2",
+                          "3"
+                        ]
+                      },
+                      "fmWub": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "squash": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
                       "osc2": {
                         "type": "number",
                         "minimum": 0,
@@ -171,6 +205,11 @@
                         "type": "integer",
                         "minimum": -3,
                         "maximum": 3
+                      },
+                      "transpose": {
+                        "type": "number",
+                        "minimum": -36,
+                        "maximum": 24
                       },
                       "spread": {
                         "type": "number",
@@ -233,6 +272,7 @@
                         "minimum": 0.005,
                         "maximum": 1
                       },
+                      "mods": {},
                       "tempoX": {
                         "enum": [
                           "¼",

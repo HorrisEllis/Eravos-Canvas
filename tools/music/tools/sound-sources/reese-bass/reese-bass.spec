@@ -67,7 +67,7 @@ dependencies:
     - audio: Audio engine — makes sound
     - clock: Master clock & tempo — locks to the beat
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 3 modulation inputs — LFO / XY / Macro can move them
+    - mod: 25 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - reese.hook.note_in (note:trigger)
@@ -76,7 +76,29 @@ dependencies:
     - reese.hook.mod_cutoff (modulation · port mod.cutoff)
     - reese.hook.mod_comb (modulation · port mod.combTime)
     - reese.hook.mod_width (modulation · port mod.width)
+    - knob.voices (modulation · port mod.knob.voices)
+    - knob.detune (modulation · port mod.knob.detune)
+    - knob.octave (modulation · port mod.knob.octave)
+    - knob.transpose (modulation · port mod.knob.transpose)
+    - knob.res (modulation · port mod.knob.res)
+    - knob.envAmt (modulation · port mod.knob.envAmt)
+    - knob.envDecay (modulation · port mod.knob.envDecay)
+    - knob.drift (modulation · port mod.knob.drift)
+    - knob.driftRate (modulation · port mod.knob.driftRate)
+    - knob.combFb (modulation · port mod.knob.combFb)
+    - knob.combSync (modulation · port mod.knob.combSync)
+    - knob.combRate (modulation · port mod.knob.combRate)
+    - knob.combHz (modulation · port mod.knob.combHz)
+    - knob.combMix (modulation · port mod.knob.combMix)
+    - knob.dist (modulation · port mod.knob.dist)
+    - knob.level (modulation · port mod.knob.level)
+    - knob.sub (modulation · port mod.knob.sub)
+    - knob.subOct (modulation · port mod.knob.subOct)
+    - knob.subWarm (modulation · port mod.knob.subWarm)
+    - knob.glide (modulation · port mod.knob.glide)
+    - knob.attack (modulation · port mod.knob.attack)
+    - knob.release (modulation · port mod.knob.release)
   outputs:
     - reese.hook.audio_out (audio · port out)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
-  works_with: [eravos.timeline, eravos.sequencer, eravos.midi-mapper, eravos.lyric-rhythm, eravos.ratio-lattice]
+  works_with: [eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen, eravos.midi-mapper, eravos.lyric-rhythm]

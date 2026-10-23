@@ -887,7 +887,7 @@ describe('P9 tracks — timeline instrument lanes', () => {
   it('clip_edit cleans notes: out-of-range dropped, clamped, sorted', () => {
     const { U, tl, c, lane } = setup(); const cl = c.addNoteClip({ lane: lane.id, bars: 1 });
     U.K.bus.publish('ui:clip_edit:' + tl, { id: cl.id, patch: { notes: [{ s: 8, l: 99, n: 200, v: 3 }, { s: 99, l: 1, n: 60 }, { s: 1, l: 0, n: 61 }, { s: 'x', l: 1, n: 1 }] } });
-    assert.equal(cl.notes.length, 2); assert.equal(cl.notes[0].s, 1); assert.equal(cl.notes[0].l, 0.25);
+    assert.equal(cl.notes.length, 2); assert.equal(cl.notes[0].s, 1); assert.equal(cl.notes[0].l, 0.125, '3.48: the shortest note is a 1/128 (free grid)');
     assert.equal(cl.notes[1].n, 127); assert.equal(cl.notes[1].l, 8); assert.equal(cl.notes[1].v, 1);
   });
   it('a note clip cannot move onto an audio lane', () => {

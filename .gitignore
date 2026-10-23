@@ -8,3 +8,9 @@ tests/out/
 /drop/
 /packs/
 /.appdata/
+
+# her recordings (build/voice-bundle.mjs → voice/voice.js) — kept beside ERAVOS, never committed
+/voice/
+
+# ERAVOS host (host/): COS state + snapshots, the Glass ledger — your machine only
+/.eravos/

@@ -20,11 +20,28 @@ dependencies:
   toolbar_units: [music.engine, music.meter]   # ui expansion when added: Audio engine · Master meter
   services:
     - audio: Audio engine — processes sound
-    - mod: 1 modulation input — LFO / XY / Macro can move them
+    - mod: 18 modulation inputs — LFO / XY / Macro can move them
   inputs:
     - fx.hook.audio_in (audio · port in)
     - fx.hook.mod_mix (modulation · port mod.mix)
     - dyn.hook.key_in (audio · port key)
+    - knob.gateOn (modulation · port mod.knob.gateOn)
+    - knob.gateThresh (modulation · port mod.knob.gateThresh)
+    - knob.gateRange (modulation · port mod.knob.gateRange)
+    - knob.gateAttack (modulation · port mod.knob.gateAttack)
+    - knob.gateHold (modulation · port mod.knob.gateHold)
+    - knob.gateRelease (modulation · port mod.knob.gateRelease)
+    - knob.compOn (modulation · port mod.knob.compOn)
+    - knob.thresh (modulation · port mod.knob.thresh)
+    - knob.ratio (modulation · port mod.knob.ratio)
+    - knob.knee (modulation · port mod.knob.knee)
+    - knob.attack (modulation · port mod.knob.attack)
+    - knob.release (modulation · port mod.knob.release)
+    - knob.makeup (modulation · port mod.knob.makeup)
+    - knob.keyed (modulation · port mod.knob.keyed)
+    - knob.inGain (modulation · port mod.knob.inGain)
+    - knob.outGain (modulation · port mod.knob.outGain)
+    - knob.bypass (modulation · port mod.knob.bypass)
   outputs:
     - fx.hook.audio_out (audio · port out)
     - dyn.hook.gr_out (modulation · port gr)

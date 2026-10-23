@@ -29,8 +29,33 @@ dependencies:
   services:
     - audio: Audio engine — makes sound
     - key: Song key & scale — plays in key
+    - mod: 24 modulation inputs — LFO / XY / Macro can move them
   inputs:
     - breath.hook.theory_in (theory:key-change) — ambient broadcast
+    - knob.pattern (modulation · port mod.knob.pattern)
+    - knob.cIn (modulation · port mod.knob.cIn)
+    - knob.cHold (modulation · port mod.knob.cHold)
+    - knob.cOut (modulation · port mod.knob.cOut)
+    - knob.cRest (modulation · port mod.knob.cRest)
+    - knob.pace (modulation · port mod.knob.pace)
+    - knob.curve (modulation · port mod.knob.curve)
+    - knob.tempoLink (modulation · port mod.knob.tempoLink)
+    - knob.session (modulation · port mod.knob.session)
+    - knob.program (modulation · port mod.knob.program)
+    - knob.guide (modulation · port mod.knob.guide)
+    - knob.depth (modulation · port mod.knob.depth)
+    - knob.floor (modulation · port mod.knob.floor)
+    - knob.voiceOn (modulation · port mod.knob.voiceOn)
+    - knob.voice (modulation · port mod.knob.voice)
+    - knob.chord (modulation · port mod.knob.chord)
+    - knob.octave (modulation · port mod.knob.octave)
+    - knob.rise (modulation · port mod.knob.rise)
+    - knob.bright (modulation · port mod.knob.bright)
+    - knob.air (modulation · port mod.knob.air)
+    - knob.bell (modulation · port mod.knob.bell)
+    - knob.bellTone (modulation · port mod.knob.bellTone)
+    - knob.bellLevel (modulation · port mod.knob.bellLevel)
+    - knob.level (modulation · port mod.knob.level)
   outputs:
     - breath.hook.breath_out (modulation · port breath)
     - breath.hook.inverse_out (modulation · port inverse)

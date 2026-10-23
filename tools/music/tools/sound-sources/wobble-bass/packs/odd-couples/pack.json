@@ -30,7 +30,13 @@
       "vowelA": "OO",
       "vowelB": "OH",
       "formantShift": -3,
-      "level": 0.85
+      "level": 0.85,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0,
+      "rateBend": 1,
+      "rateGlide": 0
      }
     },
     "Steppers Wobble": {
@@ -46,7 +52,13 @@
       "drive": 0.35,
       "shaper": 0.35,
       "octave": -1,
-      "level": 0.85
+      "level": 0.85,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0,
+      "rateBend": 1,
+      "rateGlide": 0
      }
     },
     "Acid Wobble": {
@@ -62,7 +74,13 @@
       "drive": 0.55,
       "shaper": 0.5,
       "octave": -1,
-      "level": 0.8
+      "level": 0.8,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0,
+      "rateBend": 1,
+      "rateGlide": 0
      }
     },
     "Golden Wobble": {
@@ -82,7 +100,13 @@
       "drive": 0.85,
       "shaper": 0.7,
       "noise": 0.08,
-      "level": 0.85
+      "level": 0.85,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0,
+      "rateBend": 1,
+      "rateGlide": 0
      }
     },
     "Lullaby Wub": {
@@ -101,7 +125,13 @@
       "width": 0.6,
       "glide": 0.07,
       "release": 0.3,
-      "level": 0.8
+      "level": 0.8,
+      "fmIndex": 0,
+      "fmRatio": "1",
+      "fmWub": 0,
+      "squash": 0,
+      "rateBend": 1,
+      "rateGlide": 0
      }
     }
    }

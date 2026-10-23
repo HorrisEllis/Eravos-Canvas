@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* Render every tool window to docs/tools/<name>.png (node build/shots.mjs). */
-import { chromium } from 'playwright';
+import { chromium } from '../host/driver/glass.js';   // Clear Glass's driver, not Playwright (his call, 2026-10-21)
 import path from 'path'; import { fileURLToPath } from 'url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'), OUT = process.env.SHOTS_OUT || path.join(ROOT, 'docs', 'tools');
 const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] }); const p = await b.newPage({ viewport: { width: 1500, height: 1500 }, deviceScaleFactor: Number(process.env.SHOTS_SCALE || 2) });
