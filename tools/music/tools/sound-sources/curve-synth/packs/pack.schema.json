@@ -24,6 +24,23 @@
                         "minimum": 0,
                         "maximum": 7
                       },
+                      "follow": {
+                        "enum": [
+                          "note",
+                          "range"
+                        ]
+                      },
+                      "span": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 48
+                      },
+                      "length": {
+                        "enum": [
+                          "note",
+                          "fixed"
+                        ]
+                      },
                       "duration": {
                         "type": "number",
                         "minimum": 0.05,

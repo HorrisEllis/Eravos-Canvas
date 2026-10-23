@@ -27,7 +27,10 @@
       "drive": 0,
       "lowNote": 60,
       "highNote": 96,
-      "level": 0.55
+      "level": 0.55,
+      "follow": "range",
+      "length": "fixed",
+      "sustain": 0.2
      }
     },
     "Siren Into Drop": {
@@ -41,7 +44,9 @@
       "noise": 0,
       "drive": 0.35,
       "sustain": 0.6,
-      "level": 0.5
+      "level": 0.5,
+      "follow": "range",
+      "length": "fixed"
      }
     },
     "Falling Coin": {
@@ -58,7 +63,9 @@
       "drive": 0.5,
       "sustain": 0.5,
       "decay": 0.3,
-      "level": 0.5
+      "level": 0.5,
+      "follow": "range",
+      "length": "fixed"
      }
     }
    }

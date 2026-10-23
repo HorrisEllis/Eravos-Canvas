@@ -25,6 +25,19 @@ describe('tool · Timeline — piano roll precision (3.48)', () => {
     return { pr, log, pt, fire, click, dragTo, key, done, notes: () => pr.state.notes, edits: () => log.filter(x => x[0] === 'clip_edit').length };
   }
 
+  // 3.53 "a way to full screen the notes screen, its cramped"
+  it('⛶ full screen: the roll fills the window, clicks still land on their cell, Esc puts it back where it was', () => {
+    const r = roll({ z: 0.6 }), home = r.pr.el.parentNode;
+    try {
+      const btn = [...r.pr.el.querySelectorAll('button')].find(b => /Full screen/.test(b.textContent)); assert.ok(btn, 'a ⛶ button in the roll'); btn.click();
+      assert.ok(r.pr.full, 'full'); assert.equal(r.pr.el.parentNode, document.body, 'moved out of the zoomed canvas');
+      const rc = r.pr.el.getBoundingClientRect(); assert.near(rc.width, innerWidth, 2); assert.near(rc.height, innerHeight, 2);
+      r.click(6, 65); assert.equal(r.notes().length, 1); assert.equal(r.notes()[0].s, 6); assert.equal(r.notes()[0].n, 65);
+      r.key('Escape'); assert.ok(r.pr.full, 'the first Esc only clears the selection (the new note)');
+      r.key('Escape'); assert.ok(!r.pr.full, 'the next Esc leaves full screen'); assert.equal(r.pr.el.parentNode, home, 'back in its window');
+      btn.click(); r.pr.hide(); assert.ok(!r.pr.full && r.pr.el.parentNode === home, 'closing the clip leaves full screen too');
+    } finally { if (r.pr.full) r.pr.setFull(false); r.done(); }
+  });
   [1, 0.6].forEach(z => it(`a click with a 3 px wobble lands exactly on the ghost's cell (canvas zoom ${z})`, () => {
     const r = roll({ z });
     try {
