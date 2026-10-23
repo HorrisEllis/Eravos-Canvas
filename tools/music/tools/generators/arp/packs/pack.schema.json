@@ -24,28 +24,94 @@
                           "up",
                           "down",
                           "up-down",
+                          "down-up",
+                          "converge",
+                          "diverge",
+                          "pinky",
+                          "thumb",
+                          "scale",
                           "random",
-                          "played"
+                          "played",
+                          "chord"
                         ]
                       },
                       "div": {
                         "enum": [
+                          "1/1",
+                          "1/2",
+                          "1/2t",
                           "1/4",
+                          "1/4t",
                           "1/8",
                           "1/16",
                           "1/8t",
                           "1/16t",
-                          "1/32"
+                          "1/32",
+                          "1/32t"
                         ]
                       },
                       "octaves": {
                         "type": "integer",
                         "minimum": 1,
-                        "maximum": 3
+                        "maximum": 4
+                      },
+                      "octDir": {
+                        "enum": [
+                          "up",
+                          "down",
+                          "center"
+                        ]
+                      },
+                      "repeat": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 8
+                      },
+                      "length": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 32
+                      },
+                      "restart": {
+                        "enum": [
+                          "off",
+                          "bar",
+                          "notes"
+                        ]
+                      },
+                      "steps": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 32
+                      },
+                      "swing": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 0.75
+                      },
+                      "chance": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
                       },
                       "gate": {
                         "type": "number",
                         "minimum": 0.05,
+                        "maximum": 2
+                      },
+                      "gateRand": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "humanize": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 40
+                      },
+                      "slide": {
+                        "type": "number",
+                        "minimum": 0,
                         "maximum": 1
                       },
                       "latch": {
@@ -53,13 +119,37 @@
                       },
                       "velocity": {
                         "type": "number",
-                        "minimum": 0.1,
+                        "minimum": 0.05,
+                        "maximum": 1
+                      },
+                      "velRand": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "velRamp": {
+                        "type": "number",
+                        "minimum": -1,
                         "maximum": 1
                       },
                       "transpose": {
                         "type": "integer",
-                        "minimum": -24,
-                        "maximum": 24
+                        "minimum": -36,
+                        "maximum": 36
+                      },
+                      "stack": {
+                        "enum": [
+                          "none",
+                          "+oct",
+                          "+5th",
+                          "+oct+5th",
+                          "-oct"
+                        ]
+                      },
+                      "seed": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9999
                       },
                       "tempoX": {
                         "enum": [
