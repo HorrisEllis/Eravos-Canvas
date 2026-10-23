@@ -93,14 +93,19 @@
         const base = Math.min(16000, P.get('cutoff') * Math.pow(f / 261.6, P.get('keytrack') * 0.8)), env = P.get('envAmt'), peak = Math.max(40, Math.min(18000, base * Math.pow(2, env * 5)));
         lp1.frequency.setValueAtTime(base, t); lp1.frequency.linearRampToValueAtTime(peak, t + P.get('fA')); lp1.frequency.setTargetAtTime(base + (peak - base) * P.get('fS'), t + P.get('fA'), P.get('fD') / 3);
         lp2.frequency.value = Math.min(18000, peak * 1.6);
-        dsp.adsr(amp.gain, t, { a: P.get('attack'), d: P.get('decay'), s: P.get('sustain'), peak: 0.25 + 0.75 * vel });
-        return { amp, lp1, oscs, nodes, f, pitched, unhook };
+        const top = 0.25 + 0.75 * vel; dsp.adsr(amp.gain, t, { a: P.get('attack'), d: P.get('decay'), s: P.get('sustain'), peak: top });
+        return { amp, lp1, oscs, nodes, f, pitched, unhook, sus: top * P.get('sustain') };
       }
       function noteOn(note, vel, t, dur) {
         t = Math.max(t || ac.currentTime, ac.currentTime); const f = MT.hz(Math.max(0, note + 12 * P.get('octave')));
         if (P.get('mono') && voices.length) {
           const v = voices[voices.length - 1];
-          if (v.off === Infinity || v.off > t) { const g = P.get('glide'); v.voice.pitched.forEach(({ o, k, dl }) => { o.frequency.cancelScheduledValues(t); o.frequency.setValueAtTime(o.frequency.value, t); if (g > 0) o.frequency.exponentialRampToValueAtTime(f * k, t + g); else o.frequency.setValueAtTime(f * k, t); if (dl) dl.delayTime.setTargetAtTime(P.get('width') / f, t, Math.max(0.005, g / 3)); }); v.voice.f = f; v.note = note; v.off = dur !== undefined ? t + dur : Infinity; if (dur !== undefined) rel(v, t + dur); return v; }
+          if (v.off === Infinity || v.off > t) { const g = P.get('glide'); v.voice.pitched.forEach(({ o, k, dl }) => { o.frequency.cancelScheduledValues(t); o.frequency.setValueAtTime(o.frequency.value, t); if (g > 0) o.frequency.exponentialRampToValueAtTime(f * k, t + g); else o.frequency.setValueAtTime(f * k, t); if (dl) dl.delayTime.setTargetAtTime(P.get('width') / f, t, Math.max(0.005, g / 3)); }); v.voice.f = f; v.note = note;
+            // 3.53 legato: the note this one takes over had its release (and its oscillators' stop) booked for ITS end — inside
+            // this note. Unbook it: hold the level here and settle back to sustain; rel() below books the new end (a source may
+            // be given a new stop time until it has stopped). Before, overlapping lead notes went silent from the first old end on.
+            const a = v.voice.amp.gain; if (typeof a.cancelAndHoldAtTime === 'function') a.cancelAndHoldAtTime(t); else a.cancelScheduledValues(t); a.setTargetAtTime(v.voice.sus, t, 0.008);
+            v.off = Infinity; if (dur !== undefined) rel(v, t + dur); else v.voice.oscs.forEach(o => { try { o.stop(t + 3600); } catch (e) {} }); return v; }
         }
         while (voices.length >= 6 || (P.get('mono') && voices.length)) kill(voices[0], t);
         const v = { note, voice: voice(f, t, vel), off: Infinity }; voices.push(v);

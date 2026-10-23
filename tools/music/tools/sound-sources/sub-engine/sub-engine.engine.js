@@ -86,11 +86,15 @@
         const f = MT.hz(Math.max(0, note + 12 * P.get('octave')));
         const legato = held && held.off > t - 1e-4;
         setF(f, t, legato ? P.get('glide') : 0, legato ? 0 : P.get('drop'));
+        // 3.53 legato: the note this one glides out of booked its release for ITS end, inside this note — unbook it (hold here,
+        // settle back to sustain); this note books its own below. Before, overlapping notes went silent from the first old end.
+        if (legato) { const a = amp.gain; if (typeof a.cancelAndHoldAtTime === 'function') a.cancelAndHoldAtTime(t); else a.cancelScheduledValues(t); a.setTargetAtTime(held.sus, t, 0.008); }
+        const sus = legato ? held.sus : (0.25 + 0.75 * vel) * P.get('sustain');
         if (!legato) {
           dsp.adsr(amp.gain, t, { a: P.get('attack'), d: P.get('decay'), s: P.get('sustain'), peak: 0.25 + 0.75 * vel });
           const ck = P.get('click'); if (ck > 0) { const o = ac.createOscillator(), g = ac.createGain(); o.frequency.setValueAtTime(f * 16, t); o.frequency.exponentialRampToValueAtTime(f * 2, t + 0.012); g.gain.setValueAtTime(ck * 0.35 * vel, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.018); o.connect(g); g.connect(clickG); clickG.gain.setValueAtTime(1, t); o.start(t); o.stop(t + 0.03); o.onended = () => { try { o.disconnect(); g.disconnect(); } catch (e) {} }; }
         }
-        held = { note, off: dur !== undefined ? t + dur : Infinity };
+        held = { note, sus, off: dur !== undefined ? t + dur : Infinity };
         if (dur !== undefined) dsp.release(amp.gain, t + dur, P.get('release'));
         ctx.lastNote = { f, t };
       }
