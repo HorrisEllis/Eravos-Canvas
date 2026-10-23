@@ -36,7 +36,8 @@
     ['8t', '1/8 triplet', 4 / 3], ['16t', '1/16 triplet', 2 / 3], ['32t', '1/32 triplet', 1 / 3], ['off', 'off (free)', 0]];
   const FREE = 0.125, DEAD = 4, PPS_MIN = 4, PPS_MAX = 96, VEL = 46, TPB = 480;   // ticks per beat (a 1/16 step = 120)
   const STEPKEYS = 'zsxdcvgbhnjm', STEPKEYS2 = 'q2w3er5t6y7u';
-  let CLIPBOARD = null;   // shared by every piano roll: copy in one clip, paste in another
+  let CLIPBOARD = null;
+  const TOOL_PANEL = { on: true };   // 3.59 the tool panel on/off, shared by every piano roll for this session   // shared by every piano roll: copy in one clip, paste in another
   const mod = (a, n) => ((a % n) + n) % n;
   const clampN = (v, a, b) => Math.max(a, Math.min(b, v));
   const q = (v) => Math.round(v * 192) / 192;   // the engine's resolution (1/192 step: exact for 1/64 and every triplet)
@@ -65,6 +66,13 @@
     }
     // ---- toolbar
     const title = h('span', { class: 'tlpr-title', text: '' });
+    // 3.59 THE ROLL IS THE TOOL'S EDITOR: the corner says (and changes) which tool this track plays; the side panel is that tool
+    // (its presets and every knob, live) until you click a note — then that note — and back to the tool when you let it go.
+    let toolsAll = {}, toolOn = TOOL_PANEL.on, edMode = null, toolCtl = new Map(), toolSig = '';
+    const toolSel = UI.Select({ label: '', hint: 'the tool this track plays — change it here', options: [{ value: '', label: '— tool —' }], value: '', onChange: (v) => { if (lane && v && v !== lane.target) view.emit('lane_edit', { id: lane.id, patch: { target: v } }); } });
+    toolSel.el.classList.add('tlpr-toolsel');
+    const toolBtn = h('button', { class: 'tlpr-tool tlpr-ed', title: 'the tool panel: its presets and every knob, beside the notes (on / off)', text: '🎛' });
+    toolBtn.addEventListener('click', (e) => { e.stopPropagation(); toolOn = TOOL_PANEL.on = !toolOn; toolBtn.classList.toggle('on', toolOn); if (edMode !== 'note') closeEditor(); });
     const bars = UI.NumberDrag({ label: 'bars', min: 1, max: 128, step: 1, value: 4, suffix: ' bars', onChange: (v) => clip && view.emit('clip_edit', { id: clip.id, patch: { bars: v } }) });
     const tools = [['draw', '✎', 'Draw (1) — click adds, drag moves, drag an edge to stretch'], ['paint', '🖌', 'Paint (2) — drag across the grid: one note per grid cell, following the pointer'],
       ['split', '✂', 'Split (3) — click a note to cut it at the grid line'], ['erase', '⌫', 'Erase (4) — click or drag across notes to delete them'],
@@ -122,7 +130,7 @@
     const legBtn = ebtn('⟷', 'Legato (L) — each note lasts until the next one starts', () => legato());
     const stepBtn = ebtn('⏎', 'Step input — type notes on Z S X D C V G B H N J M (an octave up: Q 2 W 3 E R 5 T 6 Y 7 U); Space = rest; Backspace = back', () => setStep(!stepOn));
     const edBox = h('span', { class: 'tlpr-tools', role: 'group', 'aria-label': 'edit' }, [qSel.el, qBtn, huBtn, legBtn, stepBtn]);
-    const bar = h('div', { class: 'tlpr-bar' }, [title, bars.el, h('span', { class: 'tlpr-sep' }), toolBox, gridSel.el, lenSel.el, stampSel.el, lockT.el, sketchSel.el, zoomSel.el, rowSel.el, laneSel.el, edBox, readout, h('span', { class: 'tlpr-sep' }), progSel.el, styleSel.el, voiceSel.el, fillBtn.el, clearBtn.el, fullBtn.el, closeBtn.el]);
+    const bar = h('div', { class: 'tlpr-bar' }, [toolSel.el, title, bars.el, toolBtn, h('span', { class: 'tlpr-sep' }), toolBox, gridSel.el, lenSel.el, stampSel.el, lockT.el, sketchSel.el, zoomSel.el, rowSel.el, laneSel.el, edBox, readout, h('span', { class: 'tlpr-sep' }), progSel.el, styleSel.el, voiceSel.el, fillBtn.el, clearBtn.el, fullBtn.el, closeBtn.el]);
     const keys = document.createElement('canvas'); keys.className = 'tlpr-keys';
     const ruler = document.createElement('canvas'); ruler.className = 'tlpr-ruler';
     const cv = document.createElement('canvas'); cv.className = 'tlpr-grid'; cv.tabIndex = 0; cv.setAttribute('role', 'application'); cv.setAttribute('aria-label', 'Note grid — 1 draw, 2 paint, 3 split, 4 erase, 5 select; click to add, drag to move, drag an edge to stretch, Shift-click or drag a box to select, Ctrl+C / V / D, arrow keys nudge, Q quantize, double-click for the note knobs; hold Alt for no snap');
@@ -597,7 +605,7 @@
     let insts = [];
     const toolName = () => { const r = lane && insts.find(x => x.value === lane.target); return r ? r.label.replace(/\s*·[^·]*$/, '') : (lane ? lane.name : 'this tool'); };
     function openEditor(i) {
-      const a0 = notes[i]; if (!a0) return; if (!S.has(i)) selOnly(i); draw(); editor.innerHTML = '';   // a note inside a selection keeps the selection
+      const a0 = notes[i]; if (!a0) return; if (!S.has(i)) selOnly(i); draw(); editor.innerHTML = ''; edMode = 'note'; toolCtl = new Map(); toolSig = '';   // a note inside a selection keeps the selection
       let cur = Object.assign({}, a0), timer = null;
       const st = steps(), gs = grid || FREE;
       const apply = (patch) => {
@@ -684,7 +692,31 @@
       return { start: (v) => apply({ s: Math.round(v / gs) * gs }), length: (v) => apply({ l: Math.max(gs, Math.round(v / gs) * gs) }), pitch: (n) => apply({ n }), velocity: (v) => apply({ v: v / 127 }), finish,
         bend: (b) => setB(b, true), osc: (o) => setO(o, true), quick: (label) => { const q2 = quick.concat(oquick).find(x => x.textContent.includes(label)); if (q2) q2.click(); }, knob: (key, v) => apply({ p: Object.assign({}, cur.p, { [key]: v }) }), get note() { return Object.assign({}, cur); } };
     }
-    function closeEditor() { editor.classList.remove('open'); editor.innerHTML = ''; }
+    function closeEditor() { edMode = null; editor.classList.remove('open'); editor.innerHTML = ''; toolCtl = new Map(); toolSig = ''; if (toolOn && clip && lane && lane.target && toolsAll[lane.target]) openTool(); }
+    // ---- the tool panel
+    function openTool() {
+      const t = toolsAll[lane.target], list = (knobsAll[lane.target] || []), sig = lane.target + '|' + list.map(k => k.key).join() + '|' + (t.presets || []).length;
+      if (edMode === 'tool' && toolSig === sig) { list.forEach(k => { const c = toolCtl.get(k.key); if (c && c.set && !c.el.contains(document.activeElement) && !c.el.matches(':active')) c.set(k.type === 'number' || k.type === 'integer' ? +k.val : k.val); }); return; }
+      edMode = 'tool'; toolSig = sig; toolCtl = new Map(); editor.innerHTML = '';
+      const send = (key, v) => view.emit('tool_set', { target: lane.target, key, value: v });
+      const goto = h('button', { class: 'tlpr-tool', title: 'show its own window', text: '↗' }); goto.addEventListener('click', (e) => { e.stopPropagation(); if (window.Kernel) Kernel.bus.publish('canvas:focus-request', { instanceId: lane.target }); });
+      const pre = UI.Select({ label: 'Preset', hint: 'load one of its presets', options: [{ value: '', label: '— preset —' }].concat((t.presets || []).map(n => ({ value: n, label: n }))), value: '', onChange: (v) => { if (v) { view.emit('tool_preset', { target: lane.target, name: v }); readout.textContent = (t.label || 'tool') + ': ' + v; } } });
+      editor.append(h('div', { class: 'tlpr-eh tlpr-ihead' }, [h('b', { text: (t.icon ? t.icon + ' ' : '') + t.label }), h('span', { class: 'tlpr-hint', text: ' · the whole track · click a note to give it its own' }), h('span', { class: 'wm-spacer' }), goto]), pre.el);
+      const groups = new Map(); list.forEach(k => { const g = k.group || 'SOUND'; if (!groups.has(g)) groups.set(g, []); groups.get(g).push(k); });
+      let first = true;
+      groups.forEach((ks, gname) => {
+        const row = h('div', { class: 'tlpr-knobs' });
+        ks.forEach(k => {
+          const v = k.val !== undefined ? k.val : k.def;
+          const c = k.type === 'enum' ? UI.Select({ label: k.label, options: k.options.map(o => ({ value: o, label: String(o) })), value: v, onChange: (nv) => send(k.key, k.options.find(o => String(o) === String(nv))) })
+            : k.type === 'boolean' ? UI.Toggle({ label: k.label, value: !!v, onChange: (nv) => send(k.key, !!nv) })
+            : UI.Knob({ label: k.label, min: k.min, max: k.max, step: k.step || (k.type === 'integer' ? 1 : (k.max - k.min) / 200), value: +v, default: k.def, unit: k.unit, size: 36, onChange: (nv) => send(k.key, k.type === 'integer' ? Math.round(nv) : nv) });
+          toolCtl.set(k.key, c); row.append(h('span', { class: 'tlpr-pk own' }, [c.el]));
+        });
+        const det = h('details', { class: 'tlpr-group' }, [h('summary', { text: gname.toLowerCase() }), row]); if (first) det.open = true; first = false; editor.append(det);
+      });
+      editor.classList.add('open');
+    }
     // ---- P4 step input
     function setStep(on) { stepOn = !!on; stepBtn.classList.toggle('on', stepOn); if (stepOn) cursor = q(clampN(playStep !== null && playStep >= 0 ? cellOf(playStep, grid) : (S.size ? Math.max(...Array.from(S).map(i => notes[i] ? notes[i].s + notes[i].l : 0)) : 0), 0, steps() - FREE)); readout.textContent = stepOn ? 'step input · cursor ' + where(cursor) : ''; draw(); }
     function stepKey(e) {
@@ -734,10 +766,16 @@
         if (xk && !list.some(k => k.key === xk.key)) setLane(''); else if (xk) xk = list.find(k => k.key === xk.key);
         if (autoL && laneSel.select.value !== 'curve:' + autoL.id) laneSel.set('curve:' + autoL.id); if (!autoL && String(laneSel.select.value).startsWith('curve:')) setLane(''); }
       if (A) { if (A.progressions && progs !== A.progressions) { progs = A.progressions; setOptions(progSel, progs); } if (A.fillStyles && styles !== A.fillStyles) { styles = A.fillStyles; setOptions(styleSel, styles); } }
-      title.textContent = '🎹 ' + (ln ? ln.name : '') + ' · ' + (c.name || 'clip'); title.style.color = ln ? ln.color : '';
+      title.textContent = (ln ? ln.name : '') + ' · ' + (c.name || 'clip'); title.style.color = ln ? ln.color : '';
+      if (A && A.tools) toolsAll = A.tools;
+      if (A && A.instruments) { const opts = [{ value: '', label: '— tool —' }].concat(A.instruments.map(o => ({ value: o.value, label: o.label }))), sg = opts.map(o => o.value + o.label).join(); if (toolSel._sg !== sg) { toolSel._sg = sg; toolSel.setOptions(opts); } }
+      if (toolSel.select.value !== ((ln && ln.target) || '')) toolSel.set((ln && ln.target) || '');
+      toolBtn.classList.toggle('on', toolOn);
+      if (edMode !== 'note') { if (toolOn && ln && ln.target && toolsAll[ln.target]) openTool(); else if (edMode === 'tool') closeEditor(); }
       if (bars.set) bars.set(c.bars);
       el.classList.add('open'); drawKeys(); draw();
-      if (first) requestAnimationFrame(() => { if (drums) { scroll.scrollTop = 0; scroll.scrollLeft = 0; return; } const ps = notes.map(n => n.n); const mid = ps.length ? ps.reduce((a, b) => a + b, 0) / ps.length : 60 + key.root; scroll.scrollTop = Math.max(0, yOf(Math.round(mid)) - scroll.clientHeight / 2); scroll.scrollLeft = 0; });
+      // 3.59: an empty bass track opens down where basses live
+      if (first) requestAnimationFrame(() => { if (drums) { scroll.scrollTop = 0; scroll.scrollLeft = 0; return; } const ps = notes.map(n => n.n); const tl0 = ln && toolsAll[ln.target], low = tl0 && /bass|sub|wub|reese|808/i.test(tl0.id + ' ' + tl0.label + ' ' + tl0.category); const mid = ps.length ? ps.reduce((a, b) => a + b, 0) / ps.length : (low ? 36 : 60) + key.root; scroll.scrollTop = Math.max(0, yOf(Math.round(mid)) - scroll.clientHeight / 2); scroll.scrollLeft = 0; });
     }
     function hide() { setFull(false); clip = null; openedId = null; closeEditor(); setStep(false); el.classList.remove('open'); }
     function playhead(barPos) { if (!clip) return; const p = barPos === null ? null : (barPos - clip.startBar) * 16; if (p !== playStep) { playStep = p; draw(); } }

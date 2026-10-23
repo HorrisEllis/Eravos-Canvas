@@ -94,3 +94,82 @@ describe('The screen follows the sound (event-driven CSS)', () => {
     SoundCSS.set(false); assert.ok(document.documentElement.classList.contains('snd-off')); SoundCSS.set(true);
   });
 });
+
+// 3.59 — "the piano roll completely in relation to the tool … a drop down in the corner to change the lane's tool"
+describe('The piano roll is its tool’s editor', () => {
+  function roll(A) {
+    const log = [], view = { ui: UIKit, emit: (k, p) => log.push([k, p]) }, host = document.createElement('div'); host.style.cssText = 'position:fixed;left:0;top:0;width:1000px;height:520px;z-index:99999;display:flex;flex-direction:column'; document.body.appendChild(host);
+    const pr = EravosTimelinePianoRoll.create(view, {}); host.appendChild(pr.el); pr.el.style.flex = '1';
+    pr.show({ id: 'c1', bars: 2, startBar: 1, notes: [{ s: 0, l: 4, n: 40, v: 0.9 }] }, { id: 'l1', name: 'Bass', color: '#66ffcc', target: 't1' }, Object.assign({ key: { root: 0, scale: 'chromatic' } }, A));
+    return { pr, log, done: () => host.remove() };
+  }
+  const A = { instruments: [{ value: 't1', label: '🌊 Supersaw ·k1f' }, { value: 't2', label: '🔊 Wobble Bass ·i3g' }],
+    tools: { t1: { id: 'eravos.supersaw', label: 'Supersaw', icon: '🌊', category: 'Sound sources', presets: ['Anthem Lead', 'Hoover'] } },
+    knobs: { t1: [{ key: 'cutoff', label: 'Cutoff', group: 'FILTER', type: 'number', min: 40, max: 8000, def: 800, val: 1200 }, { key: 'wave', label: 'Wave', group: 'OSC', type: 'enum', options: ['saw', 'square'], def: 'saw', val: 'square' }] } };
+  it('the corner dropdown shows the track’s tool and changes it', () => {
+    const r = roll(A);
+    try {
+      const box = r.pr.el.querySelector('.tlpr-toolsel'), sel = box.matches('select') ? box : box.querySelector('select'); assert.equal(sel.value, 't1'); assert.ok(sel.parentElement.parentElement === r.pr.el.querySelector('.tlpr-bar') || r.pr.el.querySelector('.tlpr-bar').contains(sel), 'in the roll’s bar');
+      assert.equal(r.pr.el.querySelector('.tlpr-bar').firstElementChild.contains(sel), true, 'first thing in the corner');
+      sel.value = 't2'; sel.dispatchEvent(new Event('change')); assert.deepEqual(r.log.find(x => x[0] === 'lane_edit')[1], { id: 'l1', patch: { target: 't2' } });
+    } finally { r.done(); }
+  });
+  it('with no note picked the side panel IS the tool: its presets and every knob, at its settings — turning one turns the tool', () => {
+    const r = roll(A);
+    try {
+      const ed = r.pr.el.querySelector('.tlpr-edit'); assert.ok(ed.classList.contains('open'), 'shown'); assert.ok(/Supersaw/.test(ed.textContent));
+      const pre = [...ed.querySelectorAll('select')].find(s => [...s.options].some(o => o.value === 'Hoover')); assert.ok(pre, 'its presets');
+      pre.value = 'Hoover'; pre.dispatchEvent(new Event('change')); assert.deepEqual(r.log.find(x => x[0] === 'tool_preset')[1], { target: 't1', name: 'Hoover' });
+      const wave = [...ed.querySelectorAll('select')].find(s => [...s.options].some(o => o.value === 'square')); assert.equal(wave.value, 'square', 'at the tool’s setting');
+      wave.value = 'saw'; wave.dispatchEvent(new Event('change')); assert.deepEqual(r.log.find(x => x[0] === 'tool_set')[1], { target: 't1', key: 'wave', value: 'saw' });
+      const ed2 = r.pr.openEditor(0); assert.ok(/note E2/.test(ed.textContent), 'a note: its own settings'); ed2.finish(); assert.ok(/Supersaw/.test(ed.textContent) && /the whole track/.test(ed.textContent), 'and back to the tool');
+    } finally { r.done(); }
+  });
+  it('the timeline turns the real tool: tool_set and tool_preset reach it like its own window would', () => {
+    const ctx = new OfflineAudioContext(1, 8000, 8000), K = Kernel.create({ ctx, quiet: true }); MasterTransport.create(K, { offline: true, bpm: 120 }).boot();
+    const tl = OrganismFactory.spawn('eravos.timeline', { K, headless: true }), sb = OrganismFactory.spawn('eravos.sub-engine', { K, headless: true }), s = OrganismFactory.handle(sb).ctx;
+    K.bus.publish('ui:lane_add:' + tl, { kind: 'inst', target: sb, name: 'Sub' });
+    const key = s.params.schema().find(c => c.type === 'number' && !c.hidden).key, c = s.params.schema().find(x => x.key === key), v = +(c.min + (c.max - c.min) * 0.37).toFixed(3);
+    K.bus.publish('ui:tool_set:' + tl, { target: sb, key, value: v }); assert.near(s.params.get(key), v, (c.step || 0.01) + 1e-6, 'knob turned');
+    const pre = Object.keys(OrganismFactory.def('eravos.sub-engine').presets || {})[0]; if (pre) { K.bus.publish('ui:tool_preset:' + tl, { target: sb, name: pre }); assert.equal(s.currentPreset, pre, 'preset loaded'); }
+    assert.fault(K, 'RUNTIME_002', () => K.bus.publish('ui:tool_set:' + tl, { target: 'nope', key, value: 1 }), 'only the tools on its tracks');
+  });
+});
+
+// 3.59 — "Can you make songs with a heavy bass drop"
+describe('💥 Heavy Drops: songs built around the drop', () => {
+  const G = () => SongEngine.genres().find(g => g.id === 'hd-heavy-drops');
+  it('eight songs on their own shelf, every preset real', () => {
+    assert.ok(G(), 'genre'); assert.equal(window.HeavyDropsSongbook.songs.length, 8);
+    const bad = []; [].concat(Object.values(G().parts), G().fx || [], G().mods || []).forEach(p => { const d = OrganismFactory.def(p.organism); [].concat(p.preset || []).forEach(n => { if (!d || !(d.presets || {})[n]) bad.push(p.organism + ' "' + n + '"'); }); });
+    assert.equal(bad.join(' · '), '');
+    window.HeavyDropsSongbook.songs.forEach(id => { const s = Songbook.all().find(x => x.id === id); assert.ok(s, id); assert.equal(Songbook.categoryOf(s), 'heavy', id + ' on the 💥 Heavy Drops shelf'); });
+    assert.equal(Songbook.categories().find(c => c.id === 'heavy').label, '💥 Heavy Drops');
+  });
+  it('the drop is written with everything: the floor falls out, dives at every turn, per-note wobble, a speed-up, a Pitch riser, the Drop Builder’s room', () => {
+    const st = SongEngine.generate('hd-heavy-drops', 5901), steps = st.steps || st, clips = steps.filter(s => s.op === 'event' && s.topic === 'clip_add');
+    const notesOf = (re) => clips.filter(c => re.test(c.payload.name)).flatMap(c => c.payload.notes);
+    assert.ok(notesOf(/^Sub · pause$/).some(n => n.b && n.b.to === -24), 'pause: the sub dives two octaves');
+    assert.gt(notesOf(/^Sub · drop$/).filter(n => n.b && n.b.to <= -12).length, 2, 'the sub dives at the turns');
+    const wob = notesOf(/^Wobble · drop$/); assert.gt(new Set(wob.filter(n => n.p).map(n => n.p.div)).size, 2, 'a wobble rate per note');
+    assert.ok(wob.some(n => n.b && n.b.osc && n.b.osc.rateTo === '1/32'), 'a wobble that speeds up'); assert.ok(wob.some(n => n.b && n.b.from > 0), 'glides in from above');
+    const lanes = steps.filter(s => s.op === 'event' && s.topic === 'lane_add');
+    const pitch = lanes.find(l => l.payload.key === '@pitch'); assert.ok(pitch, 'a Pitch riser lane'); assert.equal(pitch.payload.target, '@pad'); assert.equal(Math.max(...pitch.payload.points.map(p => p[1])), 7);
+    const depth = lanes.find(l => l.payload.key === 'depth'); assert.ok(depth && depth.payload.osc, 'the wobble depth lane swings');
+    const db = steps.find(s => s.op === 'mount' && s.organism === 'eravos.bass-drop-builder'); assert.ok(db, 'Drop Builder');
+    const cf = steps.find(s => s.op === 'configure' && s.target === db.as); assert.gt(cf.params.subDive, 0); assert.gt(cf.params.spaceTail, 0); assert.gt(cf.params.orbit, 0); assert.equal(cf.params.tensionBars, 0);
+  });
+  it('it writes into a session with no fault: the lanes land on the right tracks, the Drop Builder fires on drop and drop 2', async () => {
+    const U = TH.universe(0.2, { bpm: 145 }), n0 = U.K.faults.list().length, rec = Recipes.get('eravos.recipe.engine.hd-heavy-drops'); rec._pinned = 5901;
+    await Recipes.run(rec.id, { K: U.K, headless: true, clear: true });
+    assert.equal(U.K.faults.list().slice(n0).map(f => f.fault_class + ' ' + f.message).join(' | '), '');
+    const tl = U.K.registry.byOrganism('eravos.timeline')[0].instance_id, ex = OrganismFactory.handle(tl).ctx.serialize().extra;
+    const auto = ex.lanes.filter(l => l.kind === 'auto'); assert.equal(auto.length, 2, 'Pitch riser + wobble depth');
+    const pad = U.K.registry.byOrganism('eravos.pad-forge')[0].instance_id; assert.equal(auto.find(l => l.key === '@pitch').target, pad, 'on the pad');
+    assert.ok(auto.find(l => l.key === 'depth').osc, 'the depth lane oscillates');
+    assert.ok(ex.markers.some(m => m.name === 'drop') && ex.markers.some(m => m.name === 'drop 2'));
+    const d = OrganismFactory.handle(U.K.registry.byOrganism('eravos.bass-drop-builder')[0].instance_id).ctx; let armed = 0;
+    ['drop', 'drop 2'].forEach((name, i) => { d.internals.armed; U.K.bus.publish('timeline:marker', { name, bar: i ? 59 : 26, time: 0 }); if (d.internals.armed) armed++; U.K.bus.publish('ui:abort:' + d.id, {}); });
+    assert.equal(armed, 2, 'both drops arm it');
+  });
+});
