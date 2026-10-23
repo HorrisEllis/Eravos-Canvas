@@ -57,3 +57,5 @@
 .tlpr-pk:not(.own) { opacity: .5; }
 .tlpr-pk.own { opacity: 1; }
 .tlpr-edit .tlpr-eh b { color: var(--tool-acc, #ffd24a); }
+/* 3.59 the roll's corner: which tool this track plays */
+select.tlpr-toolsel, .tlpr-toolsel select { font-weight: 600; color: var(--tool-acc, #ffd24a); border-color: var(--tool-acc, #ffd24a); max-width: 200px; }

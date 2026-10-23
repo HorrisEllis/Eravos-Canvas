@@ -56,7 +56,7 @@
       { key: 'laneH', type: 'integer', default: 48, min: 28, max: 160, label: 'Lane height', group: 'VIEW', hint: 'taller lanes = bigger clips (Alt + wheel over the lanes)' },
       { key: 'songBars', type: 'integer', default: 64, min: 1, max: 512, label: 'Song bars', group: 'VIEW' },
     ],
-    ui_hooks: ['transport_play', 'restart', 'seek', 'loop_set', 'lane_add', 'lane_edit', 'lane_remove', 'auto_points', 'rec_knobs', 'clip_add', 'clip_edit', 'clip_remove', 'clip_split', 'clip_duplicate', 'marker_edit', 'bounce', 'drop_file', 'export', 'note_audition', 'clip_fill', 'export_midi', 'export_stems'],
+    ui_hooks: ['transport_play', 'restart', 'seek', 'loop_set', 'lane_add', 'lane_edit', 'lane_remove', 'auto_points', 'rec_knobs', 'clip_add', 'clip_edit', 'clip_remove', 'clip_split', 'clip_duplicate', 'marker_edit', 'bounce', 'drop_file', 'export', 'note_audition', 'clip_fill', 'export_midi', 'export_stems', 'tool_set', 'tool_preset'],
     ui_hook_labels: { clip_add: 'new clip', clip_edit: 'edit clip / notes', clip_remove: 'delete clip', clip_split: 'split clip', clip_duplicate: 'duplicate clip',
       clip_fill: 'fill chords', lane_add: 'new track', lane_edit: 'track settings', lane_remove: 'remove track', marker_edit: 'marker', drop_file: 'drop audio', loop_set: 'loop' },
     restoreTwice: true,
@@ -106,6 +106,18 @@
           if (isInstrument(r)) o[l.target].unshift({ key: PITCH.key, label: '〰 Pitch (bend the track)', group: '', type: 'number', min: PITCH.min, max: PITCH.max, step: PITCH.step, unit: 'st', def: 0, lane: true }); });
         return o;
       }
+      // 3.59 the piano roll is the tool's own editor: who each track's tool is, and its presets
+      function toolInfo() {
+        const o = {}; lanes.forEach(l => { if (l.kind !== 'inst' || !l.target || o[l.target]) return; const r = K.registry.get(l.target); if (!r) return;
+          const d = (window.OrganismFactory && OrganismFactory.def(r.organism_id)) || r.descriptor || {};
+          o[l.target] = { id: r.organism_id, label: d.label || r.organism_id, icon: d.icon || '', accent: d.accent || '', category: d.category || '', presets: Object.keys(d.presets || {}).slice(0, 200) }; });
+        return o;
+      }
+      const isTrackTool = (t) => lanes.some(l => l.kind === 'inst' && l.target === t) && K.registry.has(t);
+      // turn the tool's own knob / load its preset from the roll — the same message its window sends
+      ctx.onUI('tool_set', { type: 'object', required: ['target', 'key'] }, (p) => { if (!isTrackTool(p.target) || !knobCfg(p.target, p.key) || p.key[0] === '@') return ctx.fault('RUNTIME_002', 'tool_set ' + p.target + '.' + p.key); K.bus.publish('ui:config_change:' + p.target, { key: p.key, value: p.value }); syncSoon(); });
+      ctx.onUI('tool_preset', { type: 'object', required: ['target', 'name'] }, (p) => { if (!isTrackTool(p.target)) return ctx.fault('RUNTIME_002', 'tool_preset ' + p.target); K.bus.publish('ui:preset_load:' + p.target, { name: p.name }); syncSoon(); });
+      let syncT = null; const syncSoon = () => { clearTimeout(syncT); syncT = setTimeout(() => sync(), 60); };
       function instruments() {
         return K.registry.list().filter(r => r.instance_id !== ctx.id && isInstrument(r))
           .map(r => ({ value: r.instance_id, label: (r.descriptor.icon ? r.descriptor.icon + ' ' : '') + (r.descriptor.label || r.organism_id) + ' ·' + r.instance_id.split('-').slice(-1)[0], organism: r.organism_id }));
@@ -288,7 +300,7 @@
         applyLanes();
         const peaks = {}; clips.forEach(c => { if (c.kind === 'audio' && peaksCache.has(c.assetHash)) peaks[c.assetHash] = peaksCache.get(c.assetHash); });
         const end = songEnd();
-        ctx.emitUI('arrangement_sync', { lanes, clips, markers, peaks, barSec: barSec(), songEnd: end, key: ctx.key, instruments: instruments(), drumNames: drumNamesLive(), knobs: knobsOf(), recKnobs: recAll,
+        ctx.emitUI('arrangement_sync', { lanes, clips, markers, peaks, barSec: barSec(), songEnd: end, key: ctx.key, instruments: instruments(), drumNames: drumNamesLive(), knobs: knobsOf(), tools: toolInfo(), recKnobs: recAll,
           progressions: Object.keys(PROGRESSIONS).map(k => ({ value: k, label: PROGRESSIONS[k].label })), fillStyles: Object.keys(FILL_STYLES).map(k => ({ value: k, label: FILL_STYLES[k].label })), sequencers: K.registry.byOrganism('eravos.sequencer').map(r => ({ value: r.instance_id, label: '⬛ ' + r.instance_id.split('-').slice(-2).join('') })) });
         ctx.emit('timeline:song_length', { bars: Math.max(end, 1) });
       }
@@ -417,7 +429,7 @@
         if (!['audio', 'pattern', 'marker', 'inst', 'auto'].includes(p.kind)) return ctx.fault('RUNTIME_002', 'lane kind');
         if (p.kind === 'auto') {
           const c = p.target && p.key && knobCfg(p.target, p.key); if (!c) return ctx.fault('RUNTIME_002', 'automation: ' + p.target + ' has no knob ' + p.key);
-          addLane('auto', { target: p.target, key: p.key, name: p.name || c.label || p.key, points: cleanPoints(p.points, c), rec: !!p.rec }); watch(); sync(); return;
+          const ln = addLane('auto', { target: p.target, key: p.key, name: p.name || c.label || p.key, points: cleanPoints(p.points, c), rec: !!p.rec }); const os = cleanOsc(p.osc, c); if (os) ln.osc = os; watch(); sync(); return;
         }
         if (p.kind === 'inst') {
           if (p.target && !validTarget(p.target)) return ctx.fault('RUNTIME_002', 'lane target ' + p.target + ' is not an instrument');

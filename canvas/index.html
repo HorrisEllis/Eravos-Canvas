@@ -17,6 +17,7 @@
   <div id="slot-bar" class="tb-slot"></div>
   <div class="tb-spacer"></div>
   <div id="slot-bar-right" class="tb-slot"></div>
+  <button class="tb-btn" id="organizeBtn" title="Organize — every window in rows, edges touching (drag a window near another: its edges connect · Alt: free)">⊞ Organize</button>
   <div id="faultLed" title="Fault log (nothing silently fails)"></div>
   <div class="tb-opts">
     <button class="tb-btn" id="optBtn" title="Options — undo, stop all, ports, fit, clear, library" aria-haspopup="menu">⋯ Options</button>
@@ -117,6 +118,7 @@
   window.ShellAdd = (view) => AddMenu.show(S, X, { view });
   document.getElementById('fitBtn').onclick = () => CanvasWM.fitAll();
   document.getElementById('tidyBtn').onclick = () => CanvasWM.tidy();
+  document.getElementById('organizeBtn').onclick = () => CanvasWM.tidy();
   document.getElementById('portsBtn').onclick = (e) => { document.body.classList.toggle('show-ports'); e.currentTarget.classList.toggle('on'); };
   document.getElementById('clearBtn').onclick = () => {
     if (!confirm('Remove every tool from the canvas? (Autosave keeps the last state, and Ctrl+Z brings them back.)')) return;

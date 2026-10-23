@@ -479,7 +479,7 @@
       ctx.on('ui:drop_fire', { type: 'object' }, (p) => { if (!p.target || p.target === ctx.id) arm({}); });
       // timeline marker 'DROP' at bar N → start early enough that DROP lands on bar N
       ctx.on('timeline:marker', { type: 'object', required: ['name', 'bar', 'time'] }, (p) => {
-        if (String(p.name).toUpperCase() !== 'DROP' || run) return;
+        if (!/^DROP(\s*\d+)?$/.test(String(p.name).trim().toUpperCase()) || run) return;   // 3.59: 'drop 2' fires it again
         const pre = (bars().TENSION + bars().BUILD + bars().PAUSE) * 16;
         const dropStep = Math.round((p.bar - 1) * 16);
         arm({ atStep: Math.max(0, dropStep - pre) });

@@ -165,6 +165,13 @@
       });
       bar += sec.bars;
     });
+    // 3.59: a genre with `curves` writes curve lanes too (a Pitch riser into the drop, a filter that opens, a wobble that speeds up):
+    // G.curves(sections, r) → [{ part, key, points: [[bar, value]…], osc? }]. Genres without it are untouched.
+    if (G.curves) {
+      let b = 1; const sections = form.map(sec => { const x = { name: sec.name, kind: sec.kind || sec.name.replace(/\s*\d+$/, ''), bar: b, bars: sec.bars }; b += sec.bars; return x; });
+      (G.curves(sections, r) || []).forEach(c => { if (!G.parts[c.part]) return;
+        steps.push({ op: 'event', target: 'tl', topic: 'lane_add', payload: Object.assign({ kind: 'auto', target: '@' + c.part, key: c.key, points: c.points, name: c.name }, c.osc ? { osc: c.osc } : {}) }); });
+    }
     // 3.41: a genre with `voice` sings with her recordings (data/her-voice.js): the timeline's audio goes through a vocal
     // chain (EQ → level), then her phrases are laid on the timeline by section. Genres without it are untouched.
     if (G.voice) {
