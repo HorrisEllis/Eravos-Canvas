@@ -173,3 +173,33 @@ describe('💥 Heavy Drops: songs built around the drop', () => {
     assert.equal(armed, 2, 'both drops arm it');
   });
 });
+
+// 3.60 — "the songs are supposed to have previews"
+describe('Song previews', () => {
+  const song = (id) => Songbook.all().find(x => x.id === id);
+  it('every genre song has a map of its shape: sections with the drop, its parts, its tempo', () => {
+    const m = SongPreview.map(song('hx1')); assert.ok(m, 'mapped'); assert.ok(m.secs.some(s => s.kind === 'drop') && m.secs.some(s => s.kind === 'pause'));
+    assert.ok(m.parts.some(p => p.key === 'sub') && m.parts.some(p => p.key === 'growl')); assert.gt(m.bpm, 100); assert.equal(m.bars, m.secs.reduce((a, s) => a + s.bars, 0));
+    const w = SongPreview.window(song('hx1')), drop = m.secs.find(s => s.kind === 'drop'); assert.equal(w.from, drop.bar - 3, 'two bars of build and the pause before the drop'); assert.ok(w.bars <= 9 && w.from + w.bars > drop.bar + 3, 'and the first bars of the drop');
+    const missing = Songbook.all().filter(s => !s.recipe && SongEngine.genres().some(g => g.id === s.genre)).filter(s => !SongPreview.map(s)).map(s => s.id); assert.equal(missing.join(), '', 'every genre song');
+  });
+  it('the Songs page draws a strip on the cards and a map with ▶ Preview in the detail', async () => {
+    Songbook.open(); const ov = document.querySelector('.overlay.sbk');
+    try {
+      const card = [...ov.querySelectorAll('.sbk-card')].find(c => /Floor Falls Out/.test(c.textContent)); card.click(); card.scrollIntoView();
+      assert.ok(ov.querySelector('.sbk-card .sbk-strip'), 'strips on cards'); assert.ok(ov.querySelector('.sbk-detail .sbk-map'), 'a map'); assert.ok(/Preview/.test(ov.querySelector('.sbk-detail .sbk-prev').textContent));
+      await TH.sleep(80); const cv = ov.querySelector('.sbk-detail .sbk-map'), d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data; let lit = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 0) lit++;
+      assert.gt(lit, 500, 'the map is drawn');
+    } finally { ov.querySelector('.sbk-x').click(); }
+  });
+  it('▶ Preview renders the build → pause → drop in its own universe (the canvas is untouched) — and you hear the drop', async () => {
+    const n0 = Kernel.registry.list().length, r = await SongPreview.render(song('hx1'));
+    assert.equal(Kernel.registry.list().length, n0, 'nothing added to your canvas'); assert.ok(r && !r.silent, 'sound');
+    const x = r.buf.getChannelData(0), SR = r.buf.sampleRate, k = 1 - Math.exp(-2 * Math.PI * 120 / SR), d = new Float32Array(x.length); let y1 = 0, y2 = 0;   // the low end: two one-pole stages at 120 Hz
+    for (let i = 0; i < x.length; i++) { y1 += k * (x[i] - y1); y2 += k * (y1 - y2); d[i] = y2; }
+    const rms = (a, b) => { let q = 0, n = 0; for (let i = Math.floor(a * SR); i < Math.min(d.length, b * SR); i++) { q += d[i] * d[i]; n++; } return Math.sqrt(q / Math.max(1, n)); };
+    const dropAt = 3 * r.barSec + 0.05;   // two bars of build, one bar of pause, then the drop
+    assert.gt(rms(dropAt + 0.1, dropAt + 2 * r.barSec), rms(0.05, r.barSec * 2) * 1.5, 'the drop’s low end is far heavier than the build’s');
+    assert.equal(await SongPreview.render(song('hx1')), r, 'rendered once, kept');
+  }, { timeout: 60000 });
+});
