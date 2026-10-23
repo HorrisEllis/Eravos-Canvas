@@ -27,7 +27,7 @@ dependencies:
   services:
     - audio: Audio engine — makes sound
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 16 modulation inputs — LFO / XY / Macro can move them
+    - mod: 17 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - curve.hook.note_in (note:trigger)
@@ -48,7 +48,9 @@ dependencies:
     - knob.drive (modulation · port mod.knob.drive)
     - knob.sustain (modulation · port mod.knob.sustain)
     - knob.level (modulation · port mod.knob.level)
+    - bend.in (modulation · port mod.bendin)
   outputs:
     - curve.hook.audio_out (audio · port out)
+    - curve.out (modulation · port curve)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
   works_with: [eravos.drum-forge, eravos.sequencer, eravos.fx-echo, eravos.timeline, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen]

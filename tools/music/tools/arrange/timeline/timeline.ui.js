@@ -78,6 +78,11 @@ OrganismFactory.reg('eravos.timeline', function (view) {
   const aFrac = (k, v) => !k ? 0.5 : k.type === 'enum' ? (k.options.length > 1 ? Math.max(0, k.options.map(String).indexOf(String(v))) / (k.options.length - 1) : 0.5) : Math.max(0, Math.min(1, (+v - k.min) / ((k.max - k.min) || 1)));
   const aVal = (k, f) => { f = Math.max(0, Math.min(1, f)); if (k.type === 'enum') return k.options[Math.round(f * (k.options.length - 1))]; let v = k.min + f * (k.max - k.min); if (k.type === 'integer') v = Math.round(v); else if (k.step) v = Math.round(v / k.step) * k.step; return +Math.max(k.min, Math.min(k.max, v)).toFixed(6); };
   const aY = (i, f) => laneY(i) + 5 + (1 - f) * (laneH() - 10), aF = (i, y) => 1 - (y - laneY(i) - 5) / (laneH() - 10);
+  // 3.57 a lane's oscillation, the same maths as the engine (timeline.engine oscAt): drawn around the curve so you see the swing
+  const RDIV = { '4/1': 1 / 16, '2/1': 1 / 8, '1/1': 0.25, '1/2': 0.5, '1/2t': 0.75, '1/4': 1, '1/4t': 1.5, '1/8': 2, '1/8t': 3, '1/16': 4, '1/16t': 6, '1/32': 8 };
+  const owave = (sh, ph) => { const f = ph - Math.floor(ph); if (sh === 'triangle') return 1 - 4 * Math.abs(f - 0.5); if (sh === 'saw') return 2 * f - 1; if (sh === 'square') return f < 0.5 ? 1 : -1; if (sh === 'random') { const x = Math.sin(Math.floor(ph) * 12.9898 + 78.233) * 43758.5453; return 2 * (x - Math.floor(x)) - 1; } return Math.sin(2 * Math.PI * f); };
+  const ptsAt = (pts, bar) => { if (bar <= pts[0][0]) return pts[0][1]; const L = pts[pts.length - 1]; if (bar >= L[0]) return L[1]; let j = 1; while (pts[j][0] < bar) j++; const a = pts[j - 1], b = pts[j]; return typeof a[1] !== 'number' ? a[1] : a[1] + (b[1] - a[1]) * (bar - a[0]) / (b[0] - a[0]); };
+  const oscVal = (o, bar, v) => { const beats = (bar - 1) * 4, ph = typeof o.rate === 'number' ? beats * (60 / ((A && A.bpm) || 120)) * o.rate : beats * (RDIV[o.rate] || 1); return v + o.depth * owave(o.shape, ph); };
   const aSay = (k, v) => k ? k.label + ' ' + (k.type === 'enum' ? v : (Math.abs(v) >= 100 ? Math.round(v) : +(+v).toFixed(2)) + (k.unit ? ' ' + k.unit : '')) : '';
   function snapB(b) { const q = { none: 0, bar: 1, beat: 0.25, '1/8': 0.125, '1/16': 0.0625 }[view.state.snap]; return q ? Math.max(1, 1 + Math.round((b - 1) / q) * q) : Math.max(1, b); }
   function clipRect(c) {
@@ -126,6 +131,11 @@ OrganismFactory.reg('eravos.timeline', function (view) {
           g.lineTo(x1, aY(i, aFrac(k, pts[pts.length - 1][1]))); g.stroke(); g.lineWidth = 1;
           g.fillStyle = '#fff'; pts.forEach(q => { const x = xOf(q[0]); if (x < x0 - 4 || x > x1 + 4) return; g.beginPath(); g.arc(x, aY(i, aFrac(k, q[1])), 3, 0, 7); g.fill(); });
         } else { g.fillStyle = '#7f93a8'; g.font = '10px sans-serif'; g.fillText('click to add a point · right-click removes · ● records the knob while the song plays', Math.max(x0, 0) + 8, y + laneH() / 2 + 4); }
+        if (l.osc && k && k.type !== 'enum') {   // the swing: a thin line around the curve (or the knob, with no points)
+          g.strokeStyle = '#7cf7ff'; g.globalAlpha = l.mute ? 0.3 : 0.85; g.lineWidth = 1.2; g.beginPath();
+          for (let x = Math.max(0, x0); x <= x1; x += 2) { const bar = barOf(x), base = pts.length ? ptsAt(pts, bar) : (k.def !== undefined ? k.def : 0), v = Math.max(k.min, Math.min(k.max, oscVal(l.osc, bar, +base))); const yy = aY(i, aFrac(k, v)); x === Math.max(0, x0) ? g.moveTo(x, yy) : g.lineTo(x, yy); }
+          g.stroke(); g.globalAlpha = 1; g.lineWidth = 1;
+        }
         if (l.rec) { g.fillStyle = '#ff4466'; g.beginPath(); g.arc(Math.max(x0, 0) + VW - 12, y + 10, 4, 0, 7); g.fill(); }
       }
       if (l.kind === 'marker') A.markers.forEach((m, mi) => { const x = xOf(m.bar); g.fillStyle = '#ffaa00'; g.fillRect(x, y + 4, 2, laneH() - 8); g.beginPath(); g.moveTo(x, y + 4); g.lineTo(x + 12, y + 10); g.lineTo(x, y + 16); g.fill(); g.font = '600 11px sans-serif'; g.fillText(m.name, x + 6, y + 30); g.fillStyle = 'rgba(255,170,0,.25)'; g.fillRect(x, RULER, 1, H - RULER); });
@@ -182,6 +192,23 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     if (playBar) { const x = xOf(playBar); g.fillStyle = '#fff'; g.fillRect(x, 0, 2, H); g.beginPath(); g.moveTo(x - 5, ry); g.lineTo(x + 7, ry); g.lineTo(x + 1, ry + 8); g.fill(); }
     if (drag && drag.ghost) { g.strokeStyle = '#00ff88'; g.setLineDash([4, 3]); g.strokeRect(drag.ghost.x, drag.ghost.y, drag.ghost.w, drag.ghost.h); g.setLineDash([]); }
   }
+  // 3.57 the ∿ panel of a curve lane: rate (locked to the song, or Hz), depth (in the knob's own units), shape — live
+  let oscP = null;
+  function oscPanel(l, k, anchor) {
+    if (oscP) { oscP.remove(); oscP = null; return; }
+    const r = anchor.getBoundingClientRect(), o = Object.assign({ rate: '1/8', depth: k.key === '@pitch' ? 1 : +((k.max - k.min) / 8).toFixed(3), shape: 'sine' }, l.osc || {});
+    const send = (patch) => { Object.assign(o, patch); view.emit('lane_edit', { id: l.id, patch: { osc: o.rate ? o : null } }); };
+    const rates = ['1/1', '1/2', '1/4', '1/4t', '1/8', '1/8t', '1/16', '1/16t', '1/32'].map(v => ({ value: v, label: v })).concat([0.5, 1, 2, 4, 6, 8].map(v => ({ value: 'hz' + v, label: v + ' Hz' })));
+    const rs = UI.Select({ label: 'Rate', options: rates, value: typeof o.rate === 'number' ? 'hz' + o.rate : o.rate, onChange: (v) => send({ rate: String(v).startsWith('hz') ? +String(v).slice(2) : v }) });
+    const dk = UI.Knob({ label: 'Depth', min: 0, max: (k.max - k.min) / 2, step: k.step || 0.01, value: o.depth, default: o.depth, unit: k.unit, size: 34, onChange: (v) => send({ depth: v }) });
+    const ss = UI.Select({ label: 'Shape', options: ['sine', 'triangle', 'saw', 'square', 'random'].map(v => ({ value: v, label: v })), value: o.shape, onChange: (v) => send({ shape: v }) });
+    const off = UI.Button({ label: 'Off', onClick: () => { view.emit('lane_edit', { id: l.id, patch: { osc: null } }); oscP.remove(); oscP = null; } });
+    const close = UI.Button({ label: '✓', onClick: () => { oscP.remove(); oscP = null; } });
+    oscP = h('div', { class: 'tl-oscp', style: { position: 'fixed', left: Math.round(r.right + 6) + 'px', top: Math.round(r.top - 8) + 'px', zIndex: 100000, background: '#0d1520', border: '1px solid #7cf7ff', borderRadius: '8px', padding: '8px', display: 'flex', gap: '8px', alignItems: 'flex-end', boxShadow: '0 8px 24px rgba(0,0,0,.5)' } },
+      [h('b', { text: '∿ ' + k.label, style: { color: '#7cf7ff', font: '600 11px var(--font)', alignSelf: 'center' } }), rs.el, dk.el, ss.el, off.el, close.el]);
+    ['pointerdown', 'keydown', 'wheel'].forEach(t => oscP.addEventListener(t, (e) => e.stopPropagation()));
+    document.body.appendChild(oscP); if (!l.osc) send({});
+  }
   function drawHeads() {
     heads.innerHTML = '';
     A.lanes.forEach((l) => {
@@ -212,6 +239,8 @@ OrganismFactory.reg('eravos.timeline', function (view) {
       if (l.kind === 'auto') {
         const k = knobOf(l); nm.title = (k ? k.label : l.key) + ' of ' + l.target + ' — click the lane to add points, drag them, right-click removes';
         row.append(btn('M', 'mute', 'mute this automation (the knob is the tool’s own again)'), h('button', { class: 'uk-toggle' + (l.rec ? ' on' : ''), title: 'record: while the song plays, turning this knob writes it here', style: { padding: '0 4px', fontSize: '10px', color: l.rec ? '#ff4466' : '' }, text: '●', onclick: (e) => { e.stopPropagation(); view.emit('lane_edit', { id: l.id, patch: { rec: !l.rec } }); } }));
+        if (k && k.type !== 'enum') { const ob = h('button', { class: 'uk-toggle' + (l.osc ? ' on' : ''), title: 'oscillate: swing this curve — vibrato, trill, wobble, a siren', style: { padding: '0 4px', fontSize: '11px', color: l.osc ? '#7cf7ff' : '' }, text: '∿' });
+          ob.addEventListener('click', (e) => { e.stopPropagation(); oscPanel(l, k, ob); }); row.append(ob); }
       }
       row.append(x);
       heads.appendChild(row);

@@ -32,7 +32,7 @@ dependencies:
   services:
     - audio: Audio engine — processes sound
     - key: Song key & scale — plays in key
-    - mod: 21 modulation inputs — LFO / XY / Macro can move them
+    - mod: 22 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
     - files: Your files — drop audio / MIDI on it
   inputs:
@@ -61,7 +61,9 @@ dependencies:
     - knob.inGain (modulation · port mod.knob.inGain)
     - knob.outGain (modulation · port mod.knob.outGain)
     - knob.bypass (modulation · port mod.knob.bypass)
+    - bend.in (modulation · port mod.bendin)
   outputs:
     - fx.hook.audio_out (audio · port out)
+    - curve.out (modulation · port curve)
   permissions: [audio_out, audio_in, midi_in, bus_publish, bus_subscribe, filesystem_read]
   works_with: [eravos.song-recorder, eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen, eravos.drum-forge]

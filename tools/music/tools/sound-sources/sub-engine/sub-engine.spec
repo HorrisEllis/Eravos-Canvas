@@ -35,7 +35,7 @@ dependencies:
     - audio: Audio engine — makes sound
     - key: Song key & scale — plays in key
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 15 modulation inputs — LFO / XY / Macro can move them
+    - mod: 16 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - sub.hook.note_in (note:trigger)
@@ -56,7 +56,9 @@ dependencies:
     - knob.decay (modulation · port mod.knob.decay)
     - knob.sustain (modulation · port mod.knob.sustain)
     - knob.release (modulation · port mod.knob.release)
+    - bend.in (modulation · port mod.bendin)
   outputs:
     - sub.hook.audio_out (audio · port out)
+    - curve.out (modulation · port curve)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
   works_with: [eravos.sidechain-compressor, eravos.sequencer, eravos.timeline, eravos.reese-bass, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen]

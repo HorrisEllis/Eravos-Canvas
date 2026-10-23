@@ -53,7 +53,7 @@ dependencies:
     - clock: Master clock & tempo — locks to the beat
     - key: Song key & scale — plays in key
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 31 modulation inputs — LFO / XY / Macro can move them
+    - mod: 32 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - rp.hook.note_in (note:trigger)
@@ -91,7 +91,9 @@ dependencies:
     - knob.arpGate (modulation · port mod.knob.arpGate)
     - knob.arpHold (modulation · port mod.knob.arpHold)
     - knob.level (modulation · port mod.knob.level)
+    - bend.in (modulation · port mod.bendin)
   outputs:
     - rp.hook.audio_out (audio · port out)
+    - curve.out (modulation · port curve)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
   works_with: [eravos.drum-forge, eravos.pad-forge, eravos.fx-echo, eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen]

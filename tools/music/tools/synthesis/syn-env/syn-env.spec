@@ -24,7 +24,7 @@ dependencies:
   services:
     - audio: Audio engine — shares the audio clock
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 13 modulation inputs — LFO / XY / Macro can move them
+    - mod: 14 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - env.hook.note_in (note:trigger)
@@ -42,7 +42,9 @@ dependencies:
     - knob.velocity (modulation · port mod.knob.velocity)
     - knob.retrig (modulation · port mod.knob.retrig)
     - knob.follow (modulation · port mod.knob.follow)
+    - bend.in (modulation · port mod.bendin)
   outputs:
     - env.hook.mod_out (modulation · port out)
+    - curve.out (modulation · port curve)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe, registry_read]
   works_with: [eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen, eravos.midi-mapper, eravos.lyric-rhythm]

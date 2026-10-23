@@ -39,7 +39,7 @@ dependencies:
     - audio: Audio engine — makes sound
     - clock: Master clock & tempo — locks to the beat
     - midi: MIDI input — plays from a controller (arm with the MIDI button)
-    - mod: 16 modulation inputs — LFO / XY / Macro can move them
+    - mod: 17 modulation inputs — LFO / XY / Macro can move them
     - notes: Notes from a sequencer, timeline or keys — or play its own keyboard
   inputs:
     - rec.hook.note_in (note:trigger)
@@ -62,10 +62,12 @@ dependencies:
     - knob.attack (modulation · port mod.knob.attack)
     - knob.release (modulation · port mod.knob.release)
     - knob.autoSend (modulation · port mod.knob.autoSend)
+    - bend.in (modulation · port mod.bendin)
   outputs:
     - rec.hook.audio_out (audio · port out)
     - rec.hook.spectrum_out (xen:spectrum)
     - rec.hook.tuning_out (xen:tuning)
+    - curve.out (modulation · port curve)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
   works_with: [eravos.harmonic-analyzer, eravos.xen-synth, eravos.fx-haunt, eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen]
   notes:
