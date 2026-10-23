@@ -25,7 +25,7 @@ tools:
   Analysis:
     - eravos.harmonic-analyzer (Harmonic Analyzer) mode=music.lab units=[engine] needs=[audio,mod,files] in=13 out=2
   Arrange:
-    - eravos.bass-drop-builder (Drop Builder) mode=music units=[engine,transport,tempo,key,meter] needs=[audio,clock,key,mod,files] in=63 out=6
+    - eravos.bass-drop-builder (Drop Builder) mode=music units=[engine,transport,tempo,key,meter] needs=[audio,clock,key,mod,files] in=77 out=6
     - eravos.song-recorder (Song Recorder) mode=music units=[engine,transport,tempo,meter] needs=[audio,clock,mod,files,assets] in=10 out=4
     - eravos.timeline (Timeline) mode=music units=[engine,transport,tempo,meter] needs=[audio,clock,mod,files] in=11 out=9
   Code:

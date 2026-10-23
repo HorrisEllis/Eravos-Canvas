@@ -100,7 +100,7 @@ dependencies:
     - audio: Audio engine — makes sound
     - clock: Master clock & tempo — locks to the beat
     - key: Song key & scale — plays in key
-    - mod: 61 modulation inputs — LFO / XY / Macro can move them
+    - mod: 75 modulation inputs — LFO / XY / Macro can move them
     - files: Your files — drop audio / MIDI on it
   inputs:
     - drop.hook.transport_in (transport:tick|transport:play|transport:stop) — ambient broadcast
@@ -156,6 +156,20 @@ dependencies:
     - knob.tSub (modulation · port mod.knob.tSub)
     - knob.tAir (modulation · port mod.knob.tAir)
     - knob.tSpace (modulation · port mod.knob.tSpace)
+    - knob.subDive (modulation · port mod.knob.subDive)
+    - knob.subFrom (modulation · port mod.knob.subFrom)
+    - knob.subTo (modulation · port mod.knob.subTo)
+    - knob.subLen (modulation · port mod.knob.subLen)
+    - knob.spaceTail (modulation · port mod.knob.spaceTail)
+    - knob.spaceSize (modulation · port mod.knob.spaceSize)
+    - knob.spacePre (modulation · port mod.knob.spacePre)
+    - knob.spaceDuck (modulation · port mod.knob.spaceDuck)
+    - knob.crossover (modulation · port mod.knob.crossover)
+    - knob.spaceWidth (modulation · port mod.knob.spaceWidth)
+    - knob.swell (modulation · port mod.knob.swell)
+    - knob.swellBeats (modulation · port mod.knob.swellBeats)
+    - knob.orbit (modulation · port mod.knob.orbit)
+    - knob.orbitBars (modulation · port mod.knob.orbitBars)
     - knob.downLevel (modulation · port mod.knob.downLevel)
     - knob.downLen (modulation · port mod.knob.downLen)
     - knob.vocalTrimStart (modulation · port mod.knob.vocalTrimStart)
