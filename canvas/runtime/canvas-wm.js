@@ -200,7 +200,7 @@
     // drag (title bar). Controls inside the bar keep their clicks; drags always end (up / cancel / lost capture).
     const NO_DRAG = 'button, input, select, textarea, .wm-vol, .uk-num, [data-nodrag]';
     let drag = null;
-    const endDrag = () => { if (!drag) return; drag.done(); drag = null; doc.body.classList.remove('wm-dragging'); K.bus.publish('canvas:layout', { instanceId: rec.instanceId, final: true }); };
+    const endDrag = () => { if (!drag) return; showSnap([]); drag.done(); drag = null; doc.body.classList.remove('wm-dragging'); K.bus.publish('canvas:layout', { instanceId: rec.instanceId, final: true }); };
     header.addEventListener('pointerdown', (e) => {
       if (e.button !== 0 || (e.target.closest && e.target.closest(NO_DRAG)) || win.classList.contains('maximized')) return;
       drag = { x: e.clientX, y: e.clientY, l: parseFloat(win.style.left), t: parseFloat(win.style.top), done: guard(() => endDrag()) };
@@ -212,21 +212,23 @@
       const cr = canvas.getBoundingClientRect(), z = WM.view.z, w0 = win.offsetWidth * z;
       const sx = Math.max(cr.left - w0 + 90, Math.min(cr.right - 90, cr.left + WM.view.x + (drag.l + (e.clientX - drag.x) / z) * z));
       const sy = Math.max(cr.top + 2, Math.min(cr.bottom - 34, cr.top + WM.view.y + (drag.t + (e.clientY - drag.y) / z) * z));
-      win.style.left = Math.round((sx - cr.left - WM.view.x) / z) + 'px';
-      win.style.top = Math.round((sy - cr.top - WM.view.y) / z) + 'px';
+      let L = Math.round((sx - cr.left - WM.view.x) / z), T = Math.round((sy - cr.top - WM.view.y) / z);
+      if (!e.altKey) { const sn = snapMove(win, L, T, win.offsetWidth, win.offsetHeight, z); L = sn.l; T = sn.t; showSnap(sn.to); } else showSnap([]);   // 3.58 edges connect (Alt: free)
+      win.style.left = L + 'px'; win.style.top = T + 'px';
       layoutSoon({ instanceId: rec.instanceId });
     });
     ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => header.addEventListener(t, endDrag));
     header.addEventListener('dblclick', (e) => { if (e.target.closest && e.target.closest(NO_DRAG)) return; if (win.classList.contains('maximized')) { maximize(rec.instanceId, false); return; } win.classList.toggle('collapsed'); K.bus.publish('canvas:layout', {}); });
     // resize
     let rs = null;
-    const endRs = () => { if (!rs) return; rs.done(); rs = null; doc.body.classList.remove('wm-dragging'); K.bus.publish('canvas:resize', { instanceId: rec.instanceId, final: true }); };
+    const endRs = () => { if (!rs) return; showSnap([]); rs.done(); rs = null; doc.body.classList.remove('wm-dragging'); K.bus.publish('canvas:resize', { instanceId: rec.instanceId, final: true }); };
     grip.addEventListener('pointerdown', (e) => { e.stopPropagation(); if (win.classList.contains('maximized')) return; rs = { x: e.clientX, y: e.clientY, w: win.offsetWidth, h: win.offsetHeight, done: guard(() => endRs()) }; try { grip.setPointerCapture(e.pointerId); } catch (_) {} doc.body.classList.add('wm-dragging'); });
     grip.addEventListener('pointermove', (e) => {
       if (!rs) return;
       const minW = (d.minSize && d.minSize.w) || 220, minH = (d.minSize && d.minSize.h) || 120;
-      win.style.width = Math.max(minW, Math.round(rs.w + (e.clientX - rs.x) / WM.view.z)) + 'px';
-      win.style.height = Math.max(minH, Math.round(rs.h + (e.clientY - rs.y) / WM.view.z)) + 'px';
+      let W = Math.max(minW, Math.round(rs.w + (e.clientX - rs.x) / WM.view.z)), H = Math.max(minH, Math.round(rs.h + (e.clientY - rs.y) / WM.view.z));
+      if (!e.altKey) { const sn = snapSize(win, parseFloat(win.style.left) || 0, parseFloat(win.style.top) || 0, W, H, WM.view.z); W = Math.max(minW, sn.w); H = Math.max(minH, sn.h); showSnap(sn.to); } else showSnap([]);
+      win.style.width = W + 'px'; win.style.height = H + 'px';
       layoutSoon({ instanceId: rec.instanceId });
       K.bus.publish('canvas:resize', { instanceId: rec.instanceId });
     });
@@ -305,6 +307,45 @@
     return { x: parseFloat(w.style.left), y: parseFloat(w.style.top), w: w.offsetWidth, h: w.offsetHeight, collapsed: w.classList.contains('collapsed') };
   }
   function place(instanceId, r) { const w = windowOf(instanceId); if (!w) return; if (r.x !== undefined) w.style.left = r.x + 'px'; if (r.y !== undefined) w.style.top = r.y + 'px'; if (r.w) w.style.width = r.w + 'px'; if (r.h) w.style.height = r.h + 'px'; K.bus.publish('canvas:layout', {}); }
+  // ---- 3.58 EDGES CONNECT ("auto connect to edge … I want the UI to stay clean and organized"): a window you drag or resize
+  // snaps to the edges of the windows near it — side by side with a 10 px gap, or lined up with their edges — within 14 screen
+  // px. Hold Alt to place it freely. The windows it connects to light up while you drag.
+  const SNAP_GAP = 10;
+  const rectsBut = (self) => Array.from(world.querySelectorAll('.wm-win')).filter(w => w !== self && !w.classList.contains('maximized') && w.offsetParent !== null)
+    .map(w => ({ el: w, l: parseFloat(w.style.left) || 0, t: parseFloat(w.style.top) || 0, w: w.offsetWidth, h: w.offsetHeight }));
+  function snapMove(self, l, t, w, h, z) {
+    const T = 14 / z, near = 60 / z; let bx = null, by = null, dx = T, dy = T, gx = null, gy = null;
+    rectsBut(self).forEach(o => {
+      const vNear = t < o.t + o.h + near && t + h > o.t - near, hNear = l < o.l + o.w + near && l + w > o.l - near;
+      if (vNear) [o.l, o.l + o.w - w, o.l + o.w + SNAP_GAP, o.l - w - SNAP_GAP].forEach(x => { const d = Math.abs(x - l); if (d < dx) { dx = d; bx = x; gx = o.el; } });
+      if (hNear) [o.t, o.t + o.h - h, o.t + o.h + SNAP_GAP, o.t - h - SNAP_GAP].forEach(y => { const d = Math.abs(y - t); if (d < dy) { dy = d; by = y; gy = o.el; } });
+    });
+    return { l: bx !== null ? Math.round(bx) : l, t: by !== null ? Math.round(by) : t, to: [gx, gy].filter(Boolean) };
+  }
+  function snapSize(self, l, t, w, h, z) {
+    const T = 14 / z, near = 60 / z; let bw = null, bh = null, dw = T, dh = T, gx = null, gy = null;
+    rectsBut(self).forEach(o => {
+      const vNear = t < o.t + o.h + near && t + h > o.t - near, hNear = l < o.l + o.w + near && l + w > o.l - near;
+      if (vNear) [o.l - SNAP_GAP, o.l + o.w].forEach(r => { const d = Math.abs(r - (l + w)); if (d < dw) { dw = d; bw = r - l; gx = o.el; } });
+      if (hNear) [o.t - SNAP_GAP, o.t + o.h].forEach(b => { const d = Math.abs(b - (t + h)); if (d < dh) { dh = d; bh = b - t; gy = o.el; } });
+    });
+    return { w: bw !== null ? Math.round(bw) : w, h: bh !== null ? Math.round(bh) : h, to: [gx, gy].filter(Boolean) };
+  }
+  function showSnap(list) { world.querySelectorAll('.wm-win.wm-snap').forEach(w => { if (!list.includes(w)) w.classList.remove('wm-snap'); }); list.forEach(w => w.classList.add('wm-snap')); }
+  /** ⊞ Tidy: every window in rows, in the order the domain gives (WM.tidyRank(descriptor) → a number, low first), edges touching
+   * (10 px gaps), from where the windows start now. One move, animated; then everything is fitted into view. */
+  function tidy() {
+    const wins = Array.from(world.querySelectorAll('.wm-win')).filter(w => !w.classList.contains('maximized'));
+    if (!wins.length) return;
+    const recOf = (w) => { const id = w.dataset.instance || w.dataset.instanceId || w.dataset.id; const r = id && K && K.registry.get(id); return r && r.descriptor; };
+    const rank = (w) => { const d = recOf(w) || {}; try { return WM.tidyRank ? +WM.tidyRank(d) || 0 : 0; } catch (e) { return 0; } };   // a domain says what goes first
+    const order = wins.map((w, i) => ({ w, i, r: rank(w), lab: (recOf(w) || {}).label || '' })).sort((a, b) => a.r - b.r || a.lab.localeCompare(b.lab) || a.i - b.i).map(x => x.w);
+    const x0 = Math.min(...wins.map(w => parseFloat(w.style.left) || 0)), y0 = Math.min(...wins.map(w => parseFloat(w.style.top) || 0));
+    const maxRow = Math.max(1800, ...wins.map(w => w.offsetWidth));
+    let x = x0, y = y0, rowH = 0;
+    order.forEach(w => { const ww = w.offsetWidth, hh = w.offsetHeight; if (x > x0 && x - x0 + ww > maxRow) { x = x0; y += rowH + SNAP_GAP; rowH = 0; } w.classList.add('wm-tidying'); w.style.left = Math.round(x) + 'px'; w.style.top = Math.round(y) + 'px'; x += ww + SNAP_GAP; rowH = Math.max(rowH, hh); });
+    setTimeout(() => { order.forEach(w => w.classList.remove('wm-tidying')); K.bus.publish('canvas:layout', { final: true }); fitAll(); }, 320);
+  }
   function fitAll() {
     const wins = Array.from(world.querySelectorAll('.wm-win'));
     if (!wins.length) { WM.view = { x: 0, y: 0, z: 1 }; applyView(); return; }
@@ -316,6 +357,6 @@
     applyView();
   }
 
-  Object.assign(WM, { maximize, maximizeDock, layoutDock, init, open, removeWindow, windowOf, rectOf, place, fitAll, toWorld, setFocus, raise, centerOn, applyView });
+  Object.assign(WM, { maximize, maximizeDock, layoutDock, init, open, removeWindow, windowOf, rectOf, place, fitAll, toWorld, setFocus, raise, centerOn, applyView, tidy, snapMove, snapSize });
   global.CanvasWM = WM;
 })(typeof window !== 'undefined' ? window : globalThis);

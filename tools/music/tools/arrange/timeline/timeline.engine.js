@@ -102,7 +102,7 @@
         const o = {};
         lanes.forEach(l => { if ((l.kind !== 'inst' && l.kind !== 'auto') || !l.target || o[l.target]) return; const r = K.registry.get(l.target); if (!r) return;
           o[l.target] = (r.descriptor.config || []).filter(c => !c.hidden && !c.settingsOnly && (((c.type === 'number' || c.type === 'integer') && isFinite(c.min) && isFinite(c.max)) || (c.type === 'enum' && (c.options || []).length > 1)))
-            .map(c => ({ key: c.key, label: c.label || c.key, group: c.group || '', type: c.type, min: c.min, max: c.max, step: c.step, unit: c.unit || '', options: c.options, def: c.default }));
+            .map(c => { let val; try { val = K.registry.readParam(ctx.id, l.target, c.key); } catch (e) {} return { key: c.key, label: c.label || c.key, group: c.group || '', type: c.type, min: c.min, max: c.max, step: c.step, unit: c.unit || '', options: c.options, def: c.default, val: val === undefined ? c.default : val }; });   // 3.58 val: where the tool's knob is now (the inspector shows it)
           if (isInstrument(r)) o[l.target].unshift({ key: PITCH.key, label: '〰 Pitch (bend the track)', group: '', type: 'number', min: PITCH.min, max: PITCH.max, step: PITCH.step, unit: 'st', def: 0, lane: true }); });
         return o;
       }

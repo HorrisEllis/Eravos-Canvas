@@ -25,6 +25,7 @@
       <button class="tb-btn stopall" id="stopAllBtn" title="Stop all — every tool goes quiet now, echoes and drones included (Shift+Esc)">■ Stop all</button>
       <button class="tb-btn" id="portsBtn" title="Show all port names">⌁ Ports</button>
       <button class="tb-btn" id="fitBtn" title="Fit all windows in view">⤢ Fit all</button>
+      <button class="tb-btn" id="tidyBtn" title="Tidy up — every window in rows, edges touching (drag a window near another: its edges connect · Alt: free)">⊞ Tidy up</button>
       <button class="tb-btn" id="clearBtn" title="Remove everything from the canvas">Clear canvas</button>
     </div>
   </div>
@@ -115,6 +116,7 @@
   document.getElementById('addBtn').onclick = () => AddMenu.show(S, X);
   window.ShellAdd = (view) => AddMenu.show(S, X, { view });
   document.getElementById('fitBtn').onclick = () => CanvasWM.fitAll();
+  document.getElementById('tidyBtn').onclick = () => CanvasWM.tidy();
   document.getElementById('portsBtn').onclick = (e) => { document.body.classList.toggle('show-ports'); e.currentTarget.classList.toggle('on'); };
   document.getElementById('clearBtn').onclick = () => {
     if (!confirm('Remove every tool from the canvas? (Autosave keeps the last state, and Ctrl+Z brings them back.)')) return;

@@ -423,3 +423,6 @@ svg.wires path.wire.hot { stroke-width: 4.5; filter: drop-shadow(0 0 4px current
 .wm-head .wm-title:hover { color: var(--acc, #00d4ff); text-decoration: underline; text-underline-offset: 3px; }
 .tp-open { display: inline-flex; align-items: center; justify-content: center; }
 .tp-open svg { display: block; }
+/* 3.58 edges connect: the windows a dragged window snaps to light up; Tidy moves windows smoothly */
+.wm-win.wm-snap { box-shadow: 0 0 0 1px #7cf7ffaa, 0 0 14px #7cf7ff55 !important; }
+.wm-win.wm-tidying { transition: left .28s ease, top .28s ease; }

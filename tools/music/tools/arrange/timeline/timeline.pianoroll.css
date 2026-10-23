@@ -46,3 +46,14 @@
 .tlpr-quick .tlpr-tool { width: auto; padding: 0 8px; }
 .tlpr-pk { display: inline-flex; align-items: flex-end; gap: 2px; }
 .tlpr-tool[data-tool="bend"] { color: #ffe08a; font-weight: 700; }
+/* 3.58 the note inspector, docked beside the notes (click a note) — in the track's colour */
+.tlpr-main { display: flex; flex: 1; min-height: 0; }
+.tlpr-main > .tlpr-scroll { flex: 1; min-width: 0; }
+.tlpr-main > .tlpr-edit { position: static; flex: none; width: 340px; max-width: 45%; max-height: none; overflow: auto; border: 0; border-left: 2px solid var(--tool-acc, #ffd24a); border-radius: 0; box-shadow: none; padding: 8px 10px; }
+.tlpr-ihead { position: sticky; top: -8px; background: #0d1520; padding: 4px 0; z-index: 2; }
+.tlpr-group { border-top: 1px solid #1a2533; padding: 3px 0; }
+.tlpr-group > summary { cursor: pointer; font: 600 10px var(--mono, monospace); letter-spacing: .06em; color: #7f93a8; text-transform: uppercase; padding: 2px 0; }
+.tlpr-group[open] > summary { color: var(--tool-acc, #ffd24a); }
+.tlpr-pk:not(.own) { opacity: .5; }
+.tlpr-pk.own { opacity: 1; }
+.tlpr-edit .tlpr-eh b { color: var(--tool-acc, #ffd24a); }
