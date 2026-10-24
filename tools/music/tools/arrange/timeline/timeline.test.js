@@ -665,15 +665,15 @@ describe('tool · Timeline — per-note curves (monophonic)', () => {
     try {
       const ed = r.pr.openEditor(0), box = r.pr.el.querySelector('.tlpr-csec');
       assert.ok(box && box.querySelector('canvas.tlpr-curve'), 'a Curves section with its canvas');
-      assert.equal(box.querySelector('select').value, 'cutoff', 'it starts on the filter (then drive, then depth)');
-      assert.ok(!Array.from(box.querySelectorAll('select option')).some(o => o.value === 'div'), 'choice knobs are not offered');
+      assert.equal(box.querySelector('.tlpr-cknob select').value, 'cutoff', 'it starts on the filter (then drive, then depth)');
+      assert.ok(!Array.from(box.querySelectorAll('.tlpr-cknob select option')).some(o => o.value === 'div'), 'choice knobs are not offered');
       ed.curveShape('cutoff', 'open'); const c = ed.note.c.cutoff;
       assert.ok(c.length > 2 && c[0][0] === 0 && c[c.length - 1][0] === 1, 'from the start to the end: ' + JSON.stringify(c));
       assert.lt(c[0][1], 100); assert.gt(c[c.length - 1][1], 4000); assert.lt(c[Math.floor(c.length / 2)][1], 1000, 'halfway it is still low: the log knob opens evenly to the ear');
       ed.curveShape('drive', 'swell'); assert.deepEqual(Object.keys(ed.note.c).sort(), ['cutoff', 'drive'], 'a second knob: one note, several curves');
       ed.finish(); const n = r.last()[0];
       assert.deepEqual(Object.keys(n.c).sort(), ['cutoff', 'drive']); assert.deepEqual(n.p, { depth: 1 }, 'its own settings stay beside them');
-      const ed2 = r.pr.openEditor(0); r.pr.el.querySelector('.tlpr-csec select').dispatchEvent(new Event('change')); r.pr.el.querySelector('.tlpr-csec .tlpr-quick button').click(); await TH.sleep(320);   // a shape button, as a person clicks it
+      const ed2 = r.pr.openEditor(0);  r.pr.el.querySelector('.tlpr-csec .tlpr-quick button').click(); await TH.sleep(320);   // a shape button, as a person clicks it
       const heard = r.log.filter(x => x[0] === 'note_audition').pop();
       assert.ok(heard && heard[1].curves && heard[1].curves.cutoff && heard[1].curves.drive && heard[1].params.depth === 1, 'you hear the note with its curves and its own settings');
       assert.gt(heard[1].duration, 0.9, 'for the whole note (a curve needs its length)');
@@ -706,6 +706,72 @@ describe('tool · Timeline — per-note curves (monophonic)', () => {
       cv.dispatchEvent(new PointerEvent('pointerup', Object.assign({ bubbles: true, cancelable: true, pointerId: 1, pointerType: 'mouse', button: 0, buttons: 0 }, p)));
       const ns = r.last(); assert.equal(ns.length, 2, 'cut in two');
       assert.deepEqual(ns[0].c.cutoff, [[0, 100], [1, 500]], 'the first half: 100 → 500'); assert.deepEqual(ns[1].c.cutoff, [[0, 500], [1, 900]], 'the second: 500 → 900');
+    } finally { r.done(); }
+  });
+  // ---- ◈ behaviours
+  it('behaviours: the timeline keeps yours with the project (cleaned), beside the built-in ones; a name clash with a built-in one is renamed', () => {
+    const U = uni(0.3), tl = OrganismFactory.spawn('eravos.timeline', { K: U.K, headless: true }), c = OrganismFactory.handle(tl).ctx;
+    U.K.bus.publish('ui:behaviour_save:' + tl, { name: 'My Dive', bend: { from: 0, to: -12 }, curves: { filter: [[1, 2], [0, 0.4], ['x', 1]], 'knob:res': [[0, 0.1]], 'bad role': [[0, 1]] } });
+    U.K.bus.publish('ui:behaviour_save:' + tl, { name: 'Floor Dive', curves: { drive: [[0, 0.5]] } });
+    U.K.bus.publish('ui:behaviour_save:' + tl, { name: 'empty' });
+    const mine = c.internals.behaviours; assert.equal(mine.length, 2, 'the empty one refused');
+    assert.deepEqual(mine[0].curves, { filter: [[0, 0.4], [1, 1]], 'knob:res': [[0, 0.1]] }, 'fractions clamped to 0…1, sorted, bad roles dropped'); assert.equal(mine[0].bend.to, -12);
+    assert.equal(mine[1].name, 'Floor Dive (mine)', 'a built-in name is not overwritten');
+    const saved = c.serialize().extra; assert.equal(saved.behaviours.length, 2, 'saved with the project');
+    const tl2 = OrganismFactory.spawn('eravos.timeline', { K: U.K, headless: true }), c2 = OrganismFactory.handle(tl2).ctx;
+    return c2.loadExtra(saved).then(() => { assert.deepEqual(c2.internals.behaviours.map(b => b.name), ['My Dive', 'Floor Dive (mine)'], 'and loads back');
+      U.K.bus.publish('ui:behaviour_remove:' + tl2, { id: c2.internals.behaviours[0].id }); assert.equal(c2.internals.behaviours.length, 1, 'removed'); });
+  });
+  const FACT = [{ id: 'f-floor-dive', name: 'Floor Dive', factory: true, bend: { from: 0, to: -24, shape: 'late', at: 0.1 }, curves: { filter: [[0, 0.55], [1, 0.12]] } },
+    { id: 'f-growl-build', name: 'Growl Build', factory: true, curves: { drive: [[0, 0.15], [1, 0.95]], filter: [[0, 0.35], [1, 0.8]] } },
+    { id: 'u-x', name: 'Odd', curves: { 'knob:spin': [[0, 0], [1, 1]], wobble: [[0, 0], [1, 1]] } }];
+  function broll(notes, knobs) {
+    const r = roll(notes); r.pr.show({ id: 'c1', bars: 2, startBar: 1, notes }, { id: 'l1', name: 'Bass', color: '#ff2266', target: 't1' }, { key: { root: 0, scale: 'chromatic' }, knobs: knobs || KN, behaviours: FACT }); return r;
+  }
+  it('apply a behaviour: each role finds this tool’s knob, the curve lands in the knob’s own picture, the bend comes too', () => {
+    const r = broll([{ s: 0, l: 8, n: 36, v: 0.9 }]);
+    try {
+      const ed = r.pr.openEditor(0), res = ed.behave('Floor Dive'), n = ed.note;
+      assert.deepEqual(res.used, ['Cutoff']); assert.deepEqual(n.b, { from: 0, to: -24, shape: 'late', at: 0.1 });
+      const cut = n.c.cutoff, lg = (v) => Math.log(v / 40) / Math.log(200);
+      assert.near(lg(cut[0][1]), 0.55, 0.01, 'starts 55 % up the (log) cutoff'); assert.near(lg(cut[cut.length - 1][1]), 0.12, 0.01, 'ends at 12 %');
+      const r2 = ed.behave('Odd'); assert.deepEqual(r2.used, ['Depth']); assert.deepEqual(r2.skipped, ['knob:spin'], 'a knob this tool lacks is skipped, and said');
+      assert.deepEqual(ed.note.c.depth, [[0, 0], [1, 8]], 'wobble → Depth, 0…8'); assert.ok(ed.note.c.cutoff, 'the earlier curve stays');
+      ed.finish(); assert.ok(r.last()[0].c.cutoff && r.last()[0].c.depth && r.last()[0].b);
+    } finally { r.done(); }
+  });
+  it('intensity scales around the knob’s own setting, reverse plays it backwards, the bend scales and flips too', () => {
+    const r = broll([{ s: 0, l: 8, n: 36, v: 0.9, p: { drive: 0.5 } }]);
+    try {
+      const ed = r.pr.openEditor(0);
+      ed.behave('Growl Build', { intensity: 0 }); assert.ok(ed.note.c.drive.every(q => Math.abs(q[1] - 0.5) < 1e-6), 'intensity 0: held at the note’s own drive (0.5)');
+      ed.behave('Growl Build', { intensity: 0.5 }); const d = ed.note.c.drive; assert.near(d[0][1], 0.325, 0.001); assert.near(d[d.length - 1][1], 0.725, 0.001, 'half way from 0.5 to the saved curve');
+      ed.behave('Growl Build', { reverse: true }); const rv = ed.note.c.drive; assert.near(rv[0][1], 0.95, 0.001); assert.near(rv[rv.length - 1][1], 0.15, 0.001, 'backwards');
+      ed.behave('Floor Dive', { intensity: 0.5, reverse: true }); assert.deepEqual(ed.note.b, { from: -12, to: 0, shape: 'early', at: 0.1 }, 'half the dive, flipped into a rise from below');
+      ed.finish();
+    } finally { r.done(); }
+  });
+  it('apply to a selection: every selected note gets it, stretched to its own length', () => {
+    const r = broll([{ s: 0, l: 4, n: 36, v: 0.9 }, { s: 8, l: 16, n: 38, v: 0.9 }, { s: 28, l: 2, n: 40, v: 0.9 }]);
+    try {
+      r.pr.canvas.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', ctrlKey: true, bubbles: true }));
+      const ed = r.pr.openEditor(1); assert.equal(r.pr.selected.length, 3, 'all three selected');
+      ed.behave('Growl Build'); ed.finish(); const ns = r.last();
+      assert.ok(ns.every(n => n.c && n.c.drive && n.c.cutoff), 'all three carry it'); assert.deepEqual(ns[0].c.drive, ns[1].c.drive, 'the same curve over each note’s own length (stored 0 … 1)');
+    } finally { r.done(); }
+  });
+  it('save a note’s curves as a behaviour, then apply it on a tool with other ranges: the same opening, in that tool’s knob', () => {
+    const r = broll([{ s: 0, l: 8, n: 36, v: 0.9, b: { from: 0, to: -5 }, c: { cutoff: [[0, 40], [1, 8000]], drive: [[0, 0.2], [1, 0.6]] } }]);
+    try {
+      const ed = r.pr.openEditor(0); ed.saveBehaviour('Mine'); const sv = r.log.filter(x => x[0] === 'behaviour_save').pop()[1];
+      assert.equal(sv.name, 'Mine'); assert.deepEqual(sv.bend, { from: 0, to: -5 }); assert.deepEqual(sv.curves.filter, [[0, 0], [1, 1]], 'cutoff → the filter role, in fractions');
+      assert.deepEqual(sv.curves.drive, [[0, 0.2], [1, 0.6]]); ed.finish();
+      const other = { t1: [{ key: 'freq', label: 'Freq', type: 'number', min: 20, max: 20000, unit: 'Hz', def: 500, val: 500 }, { key: 'grit', label: 'Grit', type: 'number', min: 0, max: 10, def: 2, val: 2 }] };
+      const r2 = broll([{ s: 0, l: 8, n: 36, v: 0.9 }], other);
+      try { r2.pr.show({ id: 'c1', bars: 2, startBar: 1, notes: [{ s: 0, l: 8, n: 36, v: 0.9 }] }, { id: 'l1', name: 'X', color: '#0cf', target: 't1' }, { key: { root: 0, scale: 'chromatic' }, knobs: other, behaviours: [Object.assign({ id: 'u-m' }, sv)] });
+        const e2 = r2.pr.openEditor(0), res = e2.behave('Mine'); assert.deepEqual(res.used, ['Freq', 'Grit']);
+        const f = e2.note.c.freq; assert.near(f[0][1], 20, 0.5); assert.near(f[f.length - 1][1], 20000, 50, 'the whole range, on that tool'); assert.deepEqual(e2.note.c.grit, [[0, 2], [1, 6]]);
+        e2.finish(); } finally { r2.done(); }
     } finally { r.done(); }
   });
   it('you hear it: the filter stays shut while the curve is low, then opens with it — matching the same knob held still at each end', async () => {

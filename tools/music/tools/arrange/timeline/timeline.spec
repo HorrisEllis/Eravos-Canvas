@@ -142,3 +142,14 @@ dependencies:
     - tl.hook.length_out (timeline:song_length)
   permissions: [audio_out, bus_publish, bus_subscribe, filesystem_read, registry_read]
   works_with: [eravos.song-recorder, eravos.pads, eravos.sequencer, eravos.embodiment-lab, eravos.arp, eravos.coven, eravos.organ, eravos.retro-poly]
+
+## 3.65 per-note curves and note behaviours (monophonic by design)
+  note.c = { knob: [[t, value], …] }  t 0…1 over the note · number knobs only · ≤ 8 knobs · ≤ 64 points · sorted · sent as note:trigger.curves
+  playback (sdk-music noteCurves): the knob follows the curve on the audio clock while the note owns it. Ownership = per-note settings:
+    newer note wins · an older curve never writes over a newer note · a note's end hands back only a knob it still owns (to automation,
+    else the tool's own) · Stop all clears every owner. The knob is the tool's: overlapping notes take it in turn (one line, a bass).
+  editing: the note inspector's Curves (draw / shapes / audition); the roll's split tool and the timeline's clip split crop curves.
+  behaviours: { id, name, bend?, curves: { role: [[t, f]] } }  role filter | drive | wobble | knob:<key> · f 0…1 in the knob's picture (log
+    for a frequency knob). ui:behaviour_save / ui:behaviour_remove; saved in the timeline (saveExtra.behaviours); 6 built-in, sent in
+    arrangement_sync.behaviours. Applied in the roll: role → this tool's knob, stretched to the note, intensity around the knob's setting,
+    reverse; to the selection.

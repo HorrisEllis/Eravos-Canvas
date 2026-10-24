@@ -236,6 +236,20 @@
       const o = b.osc; if (o && o.depth > 0) { const beats = nt.l / 4, c0 = cyc(o.rate, beats), c1 = o.rateTo ? cyc(o.rateTo, beats) : c0, ph = c0 * f + (c1 - c0) * f * f / 2, fd = o.fade > 0 ? Math.min(1, f / o.fade) : 1; st += o.depth * fd * owave(o.shape, ph); }
       return yOf(nt.n) + ROW / 2 - st * ROW;
     }
+    // 3.65 curve helpers shared by the curve editor and note behaviours. A knob's ROLE: filter, drive, wobble (else knob:<key>);
+    // its PICTURE: 0…1 across its range — on a frequency knob as the ear hears it (log), so a curve drawn or saved on one tool's
+    // cutoff means the same opening on another's
+    const C_ROLES = [['filter', /cutoff|bright|tone|freq/i], ['drive', /drive|grit|fold|crush|dist/i], ['wobble', /depth|wobble/i]];
+    const roleRank = (k) => { const r = C_ROLES.findIndex(([, re]) => re.test(k.key) || re.test(k.label || '')); return r < 0 ? 9 : r; };
+    const roleOf = (k) => { const r = C_ROLES.find(([, re]) => re.test(k.key) || re.test(k.label || '')); return r ? r[0] : 'knob:' + k.key; };
+    const numKnobs = () => ((lane && knobsAll[lane.target]) || []).filter(k => k.type === 'number' || k.type === 'integer');
+    const knobForRole = (role) => { const ks = numKnobs(); if (role.startsWith('knob:')) return ks.find(k => k.key === role.slice(5)) || null; const re = (C_ROLES.find(x => x[0] === role) || [])[1]; return re ? ks.filter(k => re.test(k.key) || re.test(k.label || '')).sort((a, b) => roleRank(a) - roleRank(b))[0] || null : null; };
+    const isLogK = (k) => k.unit === 'Hz' && k.min > 0 && k.max / k.min >= 20;
+    const fyK = (k, v) => isLogK(k) ? clampN(Math.log(Math.max(k.min, +v) / k.min) / Math.log(k.max / k.min), 0, 1) : xFrac(k, v);
+    const vyK = (k, f) => { f = clampN(f, 0, 1); let v = isLogK(k) ? k.min * Math.pow(k.max / k.min, f) : k.min + f * (k.max - k.min); if (k.type === 'integer') v = Math.round(v); return +(+v).toPrecision(4); };
+    // a picture-space curve onto a knob: on a log knob each segment is resampled, so the straight line the tool plays sounds as drawn
+    const toKnob = (k, pts) => { const out = []; pts.forEach((q, i) => { if (i && isLogK(k)) { const a = pts[i - 1]; for (let j = 1; j < 4; j++) { const f = j / 4; out.push([+(a[0] + (q[0] - a[0]) * f).toFixed(4), vyK(k, a[1] + (q[1] - a[1]) * f)]); } } out.push([q[0], vyK(k, q[1])]); }); return out; };
+    let behavioursAll = [];
     // 3.65 the part of a note's curves between f0 and f1 (fractions of it), as the curves of that part (the split tool)
     function cropCurves(c, f0, f1) {
       const o = {}; Object.keys(c).forEach(k => { const pts = c[k], at = (x) => { if (x <= pts[0][0]) return pts[0][1]; for (let i = 1; i < pts.length; i++) if (x <= pts[i][0]) { const a = pts[i - 1], b = pts[i]; return b[0] > a[0] ? a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]) : b[1]; } return pts[pts.length - 1][1]; };
@@ -689,14 +703,10 @@
       const knobList = (lane && knobsAll[lane.target]) || [], nums = knobList.filter(k => k.type === 'number' || k.type === 'integer');
       if (!drums && nums.length) editor.append(curveSection());
       function curveSection() {
-        const ROLES = [/cutoff|bright|tone|freq/i, /drive|grit|fold|crush|dist/i, /depth|wobble|amount/i];
-        const rank = (k) => { const r = ROLES.findIndex(re => re.test(k.key) || re.test(k.label || '')); return r < 0 ? 9 : r; };
-        const sorted = nums.slice().sort((a, b) => rank(a) - rank(b));
+        const sorted = nums.slice().sort((a, b) => roleRank(a) - roleRank(b));
         let ck = (cur.c && Object.keys(cur.c).find(key => nums.some(k => k.key === key))) || sorted[0].key;
         const kOf = (key) => nums.find(k => k.key === key);
-        const isLog = (k) => k.unit === 'Hz' && k.min > 0 && k.max / k.min >= 20;
-        const fy = (k, v) => isLog(k) ? clampN(Math.log(Math.max(k.min, +v) / k.min) / Math.log(k.max / k.min), 0, 1) : xFrac(k, v);
-        const vy = (k, f) => { f = clampN(f, 0, 1); let v = isLog(k) ? k.min * Math.pow(k.max / k.min, f) : k.min + f * (k.max - k.min); if (k.type === 'integer') v = Math.round(v); return +(+v).toPrecision(4); };
+        const fy = fyK, vy = vyK;
         const ptsOf = (key) => (cur.c && cur.c[key]) ? cur.c[key].map(q => q.slice()) : null;
         const setC = (key, pts, quiet) => { const c = Object.assign({}, cur.c); if (pts && pts.length) c[key] = pts.map(q => [Math.round(clampN(q[0], 0, 1) * 10000) / 10000, q[1]]).sort((a, b) => a[0] - b[0]); else delete c[key]; apply({ c }); drawC(); syncC(); if (!quiet) hear(true); };
         // quick shapes, in the knob's own picture (on a log knob — cutoff — they are resampled, so they sound as they look)
@@ -704,8 +714,7 @@
           ['⌐ late open', 'holds shut, then opens at the end — into the next hit', [[0, 0.08], [0.6, 0.14], [1, 0.95]]],
           ['∧ swell', 'up and back', [[0, 0.15], [0.5, 0.9], [1, 0.15]]], ['∨ dip', 'down and back', [[0, 0.85], [0.5, 0.15], [1, 0.85]]],
           ['⋀⋀ pump', 'four pumps across the note', [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => [i / 8, i % 2 ? 0.15 : 0.9])]];
-        const shapeTo = (k, name) => { const sh = SHAPES.find(x => x[0] === name || x[0].includes(name)); if (!sh) return null; const out = [];
-          sh[2].forEach((q, i) => { if (i && isLog(k)) { const a = sh[2][i - 1]; for (let j = 1; j < 4; j++) { const f = j / 4; out.push([a[0] + (q[0] - a[0]) * f, vy(k, a[1] + (q[1] - a[1]) * f)]); } } out.push([q[0], vy(k, q[1])]); }); return out; };
+        const shapeTo = (k, name) => { const sh = SHAPES.find(x => x[0] === name || x[0].includes(name)); return sh ? toKnob(k, sh[2]) : null; };
         const sel = UI.Select({ label: 'Knob', hint: 'which of the tool’s knobs moves across this note (● = this note has a curve on it)', options: [], value: ck, onChange: (v) => { ck = v; drawC(); syncC(); } });
         function syncC() { const opts = sorted.map(k => ({ value: k.key, label: (cur.c && cur.c[k.key] ? '● ' : '') + k.label + (k.unit ? ' (' + k.unit + ')' : '') })); sel.setOptions(opts); sel.set(ck); rm.disabled = !ptsOf(ck); chips.innerHTML = ''; Object.keys(cur.c || {}).forEach(key => { const k = kOf(key); if (!k) return; const b = h('button', { class: 'tlpr-tool tlpr-ed' + (key === ck ? ' on' : ''), title: 'edit the ' + k.label + ' curve', text: k.label }); b.addEventListener('click', (e) => { e.stopPropagation(); ck = key; drawC(); syncC(); }); chips.append(b); }); }
         const rm = h('button', { class: 'tlpr-tool', title: 'remove this curve — the knob stays where the tool (or the note’s own setting) has it', text: '×' });
@@ -757,11 +766,51 @@
         cc.addEventListener('pointerup', endC); cc.addEventListener('pointercancel', endC); cc.addEventListener('lostpointercapture', endC);
         cc.addEventListener('dblclick', (e) => { e.stopPropagation(); const i = near(at(e)), pts = ptsOf(ck); if (i >= 0 && pts) { pts.splice(i, 1); setC(ck, pts); } });
         if (window.ResizeObserver) new ResizeObserver(() => drawC()).observe(cc);
+        // ◈ BEHAVIOURS — a note's curves and bend, saved to use again: apply one to this note (or every selected note), stretched to
+        // each note, reversed, or scaled (intensity 0 = the knob held where it is · 1 = as saved · 2 = twice as far)
+        let inten = 1, rev = false, bsel = '';
+        const bList = () => behavioursAll || [];
+        const bSelect = UI.Select({ label: 'Behaviour', hint: 'a saved set of curves (and a bend) — fits any tool: filter, drive and wobble find this tool’s own knobs', options: [], value: '', onChange: (v) => { bsel = v; syncB2(); } });
+        const bApply = h('button', { class: 'tlpr-tool tlpr-ed', title: 'put it on this note — and on every selected note', text: 'Apply' });
+        const bKnob = knob('Intensity', { min: 0, max: 2, step: 0.01, value: 1, default: 1, size: 36, format: (v) => Math.round(v * 100) + ' %' }, (v) => { inten = v; });
+        const bRev = UI.Toggle({ label: '⇆ Reverse', hint: 'play it backwards across the note', value: false, onChange: (v) => { rev = !!v; } });
+        const bSave = h('button', { class: 'tlpr-tool tlpr-ed', title: 'save this note’s curves and bend as a behaviour', text: '＋ Save' });
+        const bDel = h('button', { class: 'tlpr-tool', title: 'remove this behaviour (yours only)', text: '×' });
+        function syncB2() { const L = bList(); bSelect.setOptions([{ value: '', label: '— behaviour —' }].concat(L.map(b => ({ value: b.id, label: (b.factory ? '' : '★ ') + b.name })))); bSelect.set(bsel); const b = L.find(x => x.id === bsel); bApply.disabled = !b; bDel.disabled = !b || !!b.factory; bSave.disabled = !cur.c && !cur.b; }
+        function behave(b, o) {
+          o = o || {}; const I = o.intensity !== undefined ? o.intensity : inten, RV = o.reverse !== undefined ? o.reverse : rev, used = [], skipped = [];
+          const onNote = (nt) => { const out = Object.assign({}, nt), c = Object.assign({}, nt.c);
+            Object.keys(b.curves || {}).forEach(role => { const k = knobForRole(role); if (!k) { if (!skipped.includes(role)) skipped.push(role); return; } if (!used.includes(k.label)) used.push(k.label);
+              const base = fyK(k, nt.p && nt.p[k.key] !== undefined ? nt.p[k.key] : (k.val !== undefined ? k.val : k.def));
+              let pts = b.curves[role].map(q => [RV ? 1 - q[0] : q[0], clampN(base + (q[1] - base) * I, 0, 1)]); if (RV) pts.sort((x, y) => x[0] - y[0]);
+              c[k.key] = toKnob(k, pts); });
+            if (Object.keys(c).length) out.c = c;
+            if (b.bend) { const bb = Object.assign({}, b.bend), r1 = (v) => Math.round(v * I * 10) / 10; bb.from = r1(b.bend.from || 0); bb.to = r1(b.bend.to || 0); if (bb.osc) bb.osc = Object.assign({}, bb.osc, { depth: Math.round(bb.osc.depth * I * 100) / 100 });
+              if (RV) { const f = bb.from; bb.from = bb.to; bb.to = f; bb.shape = bb.shape === 'early' ? 'late' : bb.shape === 'late' ? 'early' : bb.shape; }
+              if (bb.from || bb.to || (bb.osc && bb.osc.depth > 0)) out.b = bb; else delete out.b; }
+            return out; };
+          Array.from(S).filter(j => j !== ed.i && notes[j]).forEach(j => { notes[j] = onNote(notes[j]); });
+          const mine = onNote(cur); apply({ c: mine.c, b: mine.b }); if (!mine.b) { delete cur.b; notes[ed.i] = Object.assign({}, cur); }
+          if (cur.c && !cur.c[ck]) ck = Object.keys(cur.c)[0] || ck; drawC(); syncC(); if (typeof syncB === 'function') syncB(); syncB2();
+          readout.textContent = b.name + (used.length ? ' → ' + used.join(', ') : '') + (b.bend ? (used.length ? ' + ' : ' → ') + 'bend' : '') + (skipped.length ? ' · skipped (no such knob here): ' + skipped.join(', ') : '') + (S.size > 1 ? ' · on ' + S.size + ' notes' : '');
+          if (!o.quiet) hear(true); return { used, skipped };
+        }
+        function saveAs(name) {
+          const curves = {}; Object.keys(cur.c || {}).forEach(key => { const k = kOf(key); if (!k) return; let role = roleOf(k); if (knobForRole(role) !== k) role = 'knob:' + k.key; curves[role] = cur.c[key].map(q => [q[0], +fyK(k, q[1]).toFixed(4)]); });
+          view.emit('behaviour_save', Object.assign({ name }, cur.b ? { bend: cur.b } : {}, { curves }));
+        }
+        bApply.addEventListener('click', (e) => { e.stopPropagation(); const b = bList().find(x => x.id === bsel); if (b) behave(b); });
+        bSave.addEventListener('click', (e) => { e.stopPropagation(); UI.ask('Name this behaviour').then((n) => { if (n && String(n).trim()) saveAs(String(n).trim()); }); });
+        bDel.addEventListener('click', (e) => { e.stopPropagation(); const b = bList().find(x => x.id === bsel); if (b && !b.factory) { view.emit('behaviour_remove', { id: b.id }); bsel = ''; } });
+        ed.behave = (name, o) => { const b = bList().find(x => x.name === name || x.id === name); return b ? behave(b, Object.assign({ quiet: true }, o)) : null; };
+        ed.saveBehaviour = saveAs; ed.syncBehaviours = syncB2;
+        syncB2();
         const sec = h('div', { class: 'tlpr-csec' }, [
           h('div', { class: 'tlpr-eh' }, [h('b', { text: '〽 Curves' }), h('span', { class: 'tlpr-hint', text: ' knobs that move across it', title: 'one line at a time: the knob is the tool’s, so overlapping notes take turns (the later note wins)' })]),
+          h('div', { class: 'tlpr-knobs tlpr-crow tlpr-brow' }, [h('span', { class: 'tlpr-blabel', text: '◈' }), bSelect.el, bApply, bKnob.el, bRev.el, bSave, bDel]),
           h('div', { class: 'tlpr-knobs tlpr-crow' }, [sel.el, rm, chips]), h('div', { class: 'tlpr-quick' }, quick), cc]);
         ed.curve = (key, pts) => { if (key) ck = key; setC(ck, pts, true); }; ed.curveShape = (key, name) => { ck = key; setC(ck, shapeTo(kOf(key), name), true); };
-        syncC(); requestAnimationFrame(drawC);
+        sel.el.classList.add('tlpr-cknob'); syncC(); requestAnimationFrame(drawC);
         return sec;
       }
       // SOUND — EVERY knob of this track's tool, grouped the way the tool groups them (3.58: "click a note and edit it completely").
@@ -797,7 +846,7 @@
       editor.classList.add('open');
       // for tests and scripts: the same path a knob takes
       return { start: (v) => apply({ s: Math.round(v / gs) * gs }), length: (v) => apply({ l: Math.max(gs, Math.round(v / gs) * gs) }), pitch: (n) => apply({ n }), velocity: (v) => apply({ v: v / 127 }), finish,
-        bend: (b) => setB(b, true), osc: (o) => setO(o, true), quick: (label) => { const q2 = quick.concat(oquick).find(x => x.textContent.includes(label)); if (q2) q2.click(); }, knob: (key, v) => apply({ p: Object.assign({}, cur.p, { [key]: v }) }), curve: (key, pts) => ed.curve && ed.curve(key, pts), curveShape: (key, name) => ed.curveShape && ed.curveShape(key, name), get note() { return Object.assign({}, cur); } };
+        bend: (b) => setB(b, true), osc: (o) => setO(o, true), quick: (label) => { const q2 = quick.concat(oquick).find(x => x.textContent.includes(label)); if (q2) q2.click(); }, knob: (key, v) => apply({ p: Object.assign({}, cur.p, { [key]: v }) }), curve: (key, pts) => ed.curve && ed.curve(key, pts), behave: (name, o) => ed.behave && ed.behave(name, o), saveBehaviour: (name) => ed.saveBehaviour && ed.saveBehaviour(name), curveShape: (key, name) => ed.curveShape && ed.curveShape(key, name), get note() { return Object.assign({}, cur); } };
     }
     function closeEditor() { edNote = null; edMode = null; editor.classList.remove('open'); editor.innerHTML = ''; toolCtl = new Map(); toolSig = ''; if (toolOn && clip && lane && lane.target && toolsAll[lane.target]) openTool(); }
     // ---- the tool panel
@@ -876,6 +925,7 @@
       if (first) { S.clear(); closeEditor(); }
       if (!drag && !(edNote && edNote.pending)) notes = adopt((c.notes || []).map(n => Object.assign({}, n)));
       // (the track-wide Pitch lane is not a per-note knob)
+      if (A && Array.isArray(A.behaviours)) { const sig = JSON.stringify(A.behaviours.map(b => b.id + b.name)); if (sig !== (behavioursAll._sig || '')) { behavioursAll = A.behaviours.slice(); behavioursAll._sig = sig; if (edNote && edNote.syncBehaviours) edNote.syncBehaviours(); } }   // 3.65
       if (A && A.knobs) { knobsAll = {}; Object.keys(A.knobs).forEach(t => { knobsAll[t] = A.knobs[t].filter(k => !k.lane); }); const list = (ln && knobsAll[ln.target]) || []; const ks = list.map(k => k.key).join();
         knobsRaw = A.knobs; lanesAll = (A.lanes || []).filter(l => l.kind === 'auto' && ln && l.target === ln.target);
         if (pendingCurve) { const nl = lanesAll.find(l => l.key === pendingCurve); if (nl) { pendingCurve = null; requestAnimationFrame(() => setLane('curve:' + nl.id)); } }
