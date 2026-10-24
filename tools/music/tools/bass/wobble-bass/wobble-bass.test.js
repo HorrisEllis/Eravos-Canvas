@@ -90,7 +90,7 @@ describe('Wobble Bass 3.1 · sub at the wub’s pitch, fold grit, mid-range grow
     const mids = async (name) => { const { U, w } = rig(2.3, name, { wubOn: false, lfoSync: false, lfoHz: 0.25, retrig: true, lfoShape: 'sine' });   // opens over 2 s
       TH.note(U, w, 45, 0.05, { duration: 2.2 }); const b = await TH.render(U); return bands(b, 1.85, [20, 800, 20000])[1]; };
     const classic = await mids('Classic Wub 1/8');
-    for (const n of ['Bun Dem Growl (dancehall drop)', 'Sound-System Screech', 'Fold Growl Wub 1/8']) assert.gt(await mids(n), classic * 2, n);
+    for (const n of ['Sound-System Screech', 'Fold Growl Wub 1/8']) assert.gt(await mids(n), classic * 2, n);
   }, { timeout: 60000 });
 });
 
@@ -111,10 +111,10 @@ describe('Wobble Bass 3.3 · Sub in phase', () => {
     for (const p of ['Classic Wub 1/8', 'Half-time Growl 1/4t']) { const off = await spread(p, false), on = await spread(p, true); assert.lt(on, off - 1, `${p}: spread ${off.toFixed(1)} dB off → ${on.toFixed(1)} dB on`); }
   }, { timeout: 120000 });
 });
-describe('tool · Wobble Bass 3.4 — toward the Bun Dem growl', () => {
-  const SR = 48000;
+describe('tool · Wobble Bass 3.4 — toward the dancehall growl', () => {
+  const SR = 48000, GROWL = {"div": "1/8", "lfoShape": "yoy", "shapePts": [[0, -1, 0.5], [0.2, 1, 0], [0.42, 0.15, -0.4], [0.55, 0.55, 0.3], [0.62, 0.1, 0]], "depth": 4.5, "lfoSync": true, "lfoHz": 4, "retrig": true, "lfoPhase": 0, "ampMod": 0, "vibrato": 0, "wubOn": true, "wubLen": 8, "wubStep": "1/4", "wubSeq": ["1/8", "1/8", "1/16", "1/8t", "1/8:yoy", "1/16:yoy", "1/32", "x", "", "", "", "", "", "", "", ""], "filterMode": "formant", "vowelA": "OO", "vowelB": "AH", "formantShift": 2, "cutoff": 500, "res": 12, "fmIndex": 3.2, "fmRatio": "1", "fmWub": 0.7, "squash": 0, "osc2": 0.8, "sub": 0.55, "drive": 0.9, "shaper": 0.75, "gritMode": "fold", "octave": -1, "spread": 10, "width": 0.3, "noise": 0, "sqOct": "0", "subOct": "0", "subAlign": false, "level": 1, "glide": 0.05, "attack": 0.005, "release": 0.12, "pitchDive": 0, "diveTime": 0.08, "rateBend": 1, "rateGlide": 0};   // a dancehall growl patch (its presets were removed in 3.69; the engine features stay)
   async function play(params, sec) {
-    const U = TH.universe(sec || 2.4, { bpm: 140 }), w = TH.spawn(U, 'eravos.wobble-bass'), c = OrganismFactory.handle(w).ctx; c.presets.load('Bun Dem Growl (dancehall drop)'); c.params.setMany(params || {});
+    const U = TH.universe(sec || 2.4, { bpm: 140 }), w = TH.spawn(U, 'eravos.wobble-bass'), c = OrganismFactory.handle(w).ctx; c.params.setMany(Object.assign({}, GROWL, params || {}));
     U.K.audio.chain.out.disconnect(U.ctx.destination); U.K.audio.port(w, 'out').node.connect(U.ctx.destination);
     U.T.bpm = 140; U.T.renderTicks(0, 36, 0.05); U.K.bus.publish('note:trigger', { target: w, note: 41, velocity: 1, time: 0.05, duration: (sec || 2.4) - 0.2 });
     return { d: (await TH.render(U)).getChannelData(0), c };
