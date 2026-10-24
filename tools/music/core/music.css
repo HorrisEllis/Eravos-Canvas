@@ -250,3 +250,13 @@ html:not(.snd-off) #logo { filter: drop-shadow(0 0 calc(var(--snd-pulse) * 10px)
 .sr-cover { width: 200px; height: 200px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(255,255,255,.1); box-shadow: 0 10px 30px -10px rgba(0,0,0,.6); }
 .sr-cover.empty { display: grid; place-items: center; color: #6d7f93; background: rgba(0,0,0,.25); }
 .sr-tags-btns { display: flex; gap: 6px; }
+/* 3.71 the Pattern Library page (data/pattern-library.js) — the Songbook's overlay, a grid of pattern cards */
+.plib-genres { padding-top: 0; }
+.plib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(236px, 1fr)); gap: 10px; padding: 14px 18px; overflow: auto; flex: 1; min-height: 0; align-content: start; }
+.plib-card { display: flex; flex-direction: column; gap: 4px; padding: 8px; border: 1px solid var(--line2); border-left: 3px solid var(--acc, #00d4ff); border-radius: 9px; background: #0b121b; min-width: 0; }
+.plib-card b { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.plib-card small { color: var(--dim); font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.plib-draw { width: 100%; height: 54px; border-radius: 5px; display: block; }
+.plib-actions { display: flex; gap: 6px; align-items: center; min-width: 0; }
+.plib-actions .sbk-alt { margin-top: 0; white-space: nowrap; flex: none; }
+.plib-tool { color: var(--dim); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }

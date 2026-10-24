@@ -45,3 +45,11 @@
   P70.3 HIS SESSION, OPTIMIZED (a copy) + A/B renders                                                         BUILT
         depends_on: []
         files: none in the repo (his data; delivered as files)
+
+## ADDENDUM 2026-10-24 (later) — "what about instead of so much songs, we have a pattern library" → "continue"
+  The 8 Floor Falls songs leave the shelf (their genre stays a Song Engine generator, their moves become patterns). The library is built here
+  as 3.71 (specs/eravos.pattern-library.spec addendum). The right-click menu goes to main with it.
+  P71.1 PATTERN LIBRARY, first slice                                                                            BUILT
+        depends_on: [P70.1]
+        files: tools/music/data/pattern-library.js (new) · tools/music/data/floor-falls-songbook.js (no shelf songs) · tools/music/index.js ·
+               tools/music/domain.js (toolbar "Patterns") · tools/music/core/music.css · tests/p71-pattern-library.test.js

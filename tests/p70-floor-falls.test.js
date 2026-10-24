@@ -3,13 +3,13 @@ window.__phase = 'P70';
 describe('🕳 Floor Falls: more Floor Falls Out and Raven Drop — curves and deep drops (3.70)', () => {
   const G = () => SongEngine.genres().find(g => g.id === 'hd-floor-falls');
   const gen = (seed) => { const st = SongEngine.generate('hd-floor-falls', seed); return st.steps || st; };
-  it('eight songs on the 💥 Heavy Drops shelf, every preset real, each move twice', () => {
-    assert.ok(G(), 'genre'); assert.equal(window.FloorFallsSongbook.songs.length, 8);
+  it('the eight songs are NOT on the shelf (3.71: "instead of so much songs, we have a pattern library") — kept as data, each move twice', () => {
+    assert.ok(G(), 'the genre stays a generator'); assert.equal(window.FloorFallsSongbook.songs.length, 0); assert.equal(window.FloorFallsSongbook.shelf.length, 8, 'kept (§0.3)');
     const bad = []; [].concat(Object.values(G().parts), G().fx, G().mods).forEach(p => { const d = OrganismFactory.def(p.organism); if (!d) return bad.push(p.organism); [].concat(p.preset || []).forEach(n => { if (!(d.presets || {})[n]) bad.push(p.organism + ' "' + n + '"'); }); });
     assert.equal(bad.join(' · '), '');
-    const songs = window.FloorFallsSongbook.songs.map(id => Songbook.all().find(x => x.id === id)); assert.ok(songs.every(Boolean));
-    assert.ok(songs.every(s => Songbook.categoryOf(s) === 'heavy'));
-    const count = {}; songs.forEach(s => { count[s.move] = (count[s.move] || 0) + 1; }); assert.deepEqual(count, { falls: 2, stairs: 2, freefall: 2, rises: 2 });
+    const ids = new Set(window.FloorFallsSongbook.shelf.map(x => x.id)); assert.ok(!Songbook.all().some(s => ids.has(s.id)), 'none of the eight on the shelf');
+    assert.ok(Songbook.all().filter(s => s.genre === 'hd-floor-falls').length <= 1, 'only the genre’s own “write one” card');
+    const count = {}; window.FloorFallsSongbook.shelf.forEach(s => { count[s.move] = (count[s.move] || 0) + 1; }); assert.deepEqual(count, { falls: 2, stairs: 2, freefall: 2, rises: 2 });
   });
   it('deep that is heard: the sub plays its real note (Octave 0) and no dive goes under ~18 Hz', () => {
     [7001, 7002, 7003, 7004].forEach(seed => {
