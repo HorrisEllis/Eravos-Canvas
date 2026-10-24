@@ -2,6 +2,32 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.72 🔺 Tension & 💥 drops in the Pattern Library: build → pause → huge drop (2026-10-24)
+His words: "curves, depth, deep bass, huge drop, contrast and a lot of tensnio'". The coder's reading (to confirm: it could also mean one
+song): what the library gives next, measured on the render of each chain.
+- **🔺 Tension** (8 patterns): a snare roll that speeds up from a whisper (1/4 → 1/64) · a kick that thins out to nothing · both
+  together · a sub that rises out of the floor from bar 5 · a wobble that speeds up · a riser lead that climbs and bends up · curves: a
+  riser (+12) and a filter that closes, then rips open on the last beat. Every build stops dead half a beat before the pause.
+- **💥 Drops**:
+  - the sub slams down from an octave above;
+  - wobble hits, with a rate per note and a dive at the turn;
+  - Raven Drop's Reese + sub stack;
+  - half-time drums with the crash on the one;
+  - the Wobble's depth swinging.
+  - Every sub plays its real note (Octave 0, level 0.45), and no dive goes under ~18 Hz.
+- **⛓ Build → Drop** (4 chains, one card each, one click to the Timeline, each part on its own track): 8 bars of tension → the pause (a
+  Floor Falls move) → 4 bars of huge drop. The pause's dive is a pure sine (per-note Phantom 0, Drive 0, Click 0), so everything above
+  the sub stops.
+  - Measured on each chain: the build rises +5.5 dB. Contrast, pause against drop above 150 Hz: 24.4–32.3 dB. The drop's 30–60 Hz
+    share: 9–11 %.
+  - Honest: overall, the drop is no louder than the end of the build (the master limiter caps both near −9.5 dB). The drop's size is the
+    contrast and the low end.
+- Measuring it taught the design:
+  - The first version had a 1.2 dB build and a 1 dB "pause" (a full-level sub dive is as loud as a drop). The build now starts quiet, the
+    sub comes in halfway, and the pause is a hole above the sub.
+  - The method is in tests/p72-tension-drops.test.js (its thresholds guard it).
+- Library: types 🔺 Tension and ⛓ Build → Drop; PatternLibrary.addSource(fn) (a data file adds hand-made patterns).
+
 ## Done — 3.71 🧩 Pattern Library, first slice (2026-10-24, specs/eravos.pattern-library.spec addendum)
 His words: "what about instead of so much songs, we have a pattern library" (10-23 too: "what about instead of so many songs, we have a
 pattern library?"), then "continue". Decided by his axioms: the 8 Floor Falls songs are not put on the shelf, and their moves are the

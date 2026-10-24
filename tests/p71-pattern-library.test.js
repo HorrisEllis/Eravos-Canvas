@@ -5,7 +5,7 @@ describe('🧩 Pattern Library: one idea at a time, from every genre (3.71)', ()
   it('at least 300 patterns, every type, each with a genre, a real tool, a length, its notes or its curve', () => {
     const lib = L(); assert.gt(lib.length, 299, lib.length + ' patterns');
     PatternLibrary.types.forEach(t => assert.ok(lib.some(p => p.type === t.id), 'type ' + t.id));
-    const bad = lib.filter(p => !p.genre || !OrganismFactory.def(p.tool) || !(p.bars >= 1) || (p.type === 'curve' ? !(p.curve && p.curve.points.length) : !(p.notes && p.notes.length)));
+    const bad = lib.filter(p => !p.genre || !OrganismFactory.def(p.tool) || !(p.bars >= 1) || !((p.curve && p.curve.points.length) || (p.notes && p.notes.length) || (p.parts && p.parts.length)));
     assert.equal(bad.map(p => p.name + ' (' + p.tool + ')').slice(0, 5).join(' · '), '');
     assert.equal(new Set(lib.map(p => p.id)).size, lib.length, 'ids unique');
   });

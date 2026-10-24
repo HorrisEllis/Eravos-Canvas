@@ -58,3 +58,19 @@
   Timeline: the right track or a new one with the tool, at the playhead, in the session's key); toolbar button "Patterns".
   NOT in this slice (open): Send to Sequencer / Wub Rate / Arp, Euclid, pattern packs and "Mine", "Open as patterns" on a song card,
   drag a card onto a window. The acceptance's ≥ 300 patterns is checked by a test.
+
+## ADDENDUM 2026-10-24 (3.72) — "curves, depth, deep bass, huge drop, contrast and a lot of tensnio'"
+  His words, verbatim, right after the library's first slice was merged. The coder's reading (TO CONFIRM — it could also be one song): what
+  the library should give next, by his words, one by one:
+    tension    🔺 TENSION patterns: a snare roll that speeds up (1/4 → 1/32), a kick that thins out to nothing, a sub that rises out of
+               the floor, a wobble whose rate speeds up, curves: a riser (+12), a filter that closes then rips open, the pad's pitch climbing
+    contrast   the pause: the build stops dead before the hit (the chains below leave one bar of near-silence, measured)
+    huge drop  🕳 DROP patterns that slam: the sub lands from an octave above, wobble hits with a rate per note and a dive at the turn,
+    deep bass  a Reese + sub stack — every sub at its real note (Octave 0: C#1 = 35 Hz), no dive under ~18 Hz (3.70's finding)
+    curves     every build and drop carries its curves (riser, filter, depth swing)
+    → ⛓ BUILD → DROP chains: one card = a build (8 bars of tension) + the pause (one of the four Floor Falls moves) + a 4-bar huge drop,
+      sent to the Timeline in one click, each part on its own track.
+  Proof is measured on each chain's render: tension = the build's last bar louder and brighter than its first (dB); contrast = the pause
+  against the drop (dB); depth = the drop's share of 30–60 Hz. Thresholds are in tests/p72-tension-drops.test.js.
+  Pattern gains: type 'tension' and type 'chain' { parts: [{ at: bar offset, pattern }] }; PatternLibrary.addSource(fn) (a data file adds
+  hand-made patterns; generated ones stay generated).

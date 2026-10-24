@@ -11,10 +11,11 @@
 (function (global) {
   'use strict';
   const SE = () => global.SongEngine, F = () => global.OrganismFactory;
-  const TYPES = [['drums', '🥁 Drums'], ['bass', '🔊 Bass'], ['wobble', '〰 Wobble'], ['chords', '🎹 Chords'], ['lead', '🎵 Lead'], ['arp', '🪜 Arp'], ['drop', '🕳 Drops'], ['fill', '🥁 Fills'], ['curve', '📈 Curves']];
+  const TYPES = [['drums', '🥁 Drums'], ['bass', '🔊 Bass'], ['wobble', '〰 Wobble'], ['chords', '🎹 Chords'], ['lead', '🎵 Lead'], ['arp', '🪜 Arp'], ['drop', '🕳 Drops'], ['fill', '🥁 Fills'], ['curve', '📈 Curves'], ['tension', '🔺 Tension'], ['chain', '⛓ Build → Drop']];   // 3.72: tension · chains
   const MAX_BARS = 4;
   let LIB = null;
-  const sig = (p) => p.type + '|' + p.tool + '|' + (p.move || '') + '|' + JSON.stringify(p.notes || p.curve);   // a named move is its own pattern even when its notes match another's (freefall = falls' notes + its curves)
+  const sources = [];   // 3.72: data files add hand-made patterns (PatternLibrary.addSource(fn → patterns[]))
+  const sig = (p) => p.type + '|' + p.tool + '|' + (p.move || '') + '|' + JSON.stringify(p.notes || p.curve || (p.parts || []).map(x => [x.at, x.pattern.name]));   // a named move is its own pattern even when its notes match another's (freefall = falls' notes + its curves)
   function typeOf(G, P) {
     if (P.role === 'drums') return 'drums';
     if (P.organism === 'eravos.arp') return 'arp';
@@ -60,7 +61,8 @@
     // Floor Falls first: its four pause moves and its freefall curves, by name (the moves come from the seed: 7001 falls · 7002 stairs …)
     const FF = global.FloorFallsSongbook, G = FF && SE() && SE().genres().find(g => g.id === 'hd-floor-falls');
     if (G) [7001, 7002, 7003, 7004].forEach(seed => { const mv = FF.moveOf(seed), label = { falls: 'The floor falls', stairs: 'Stairs down', freefall: 'Freefall', rises: 'Rises from the floor' }[mv];
-      fromGenre(G, seed, label).filter(p => p.type === 'drop' || (p.type === 'curve' && /Freefall/.test(p.name))).forEach(p => { p.move = mv; add(p); }); });
+      fromGenre(G, seed, label).filter(p => p.type === 'drop' || (!!p.curve && /Freefall/.test(p.name))).forEach(p => { p.move = mv; add(p); }); });
+    sources.forEach(fn => { try { (fn() || []).forEach(add); } catch (e) { console.error('[ERAVOS] pattern source failed', e); } });   // 3.72 hand-made first
     const named = new Set(out.map(p => p.type + '|' + p.tool + '|' + JSON.stringify(p.notes || p.curve)));
     (SE() ? SE().genres() : []).forEach(Gx => [1, 2].forEach(seed => fromGenre(Gx, seed).forEach(p => { if (!named.has(p.type + '|' + p.tool + '|' + JSON.stringify(p.notes || p.curve))) add(p); })));
     return out;
@@ -83,11 +85,15 @@
     let tl = (K.registry.byOrganism('eravos.timeline')[0] || {}).instance_id;
     if (!tl) tl = F().spawn('eravos.timeline', Object.assign({ K }, o.headless ? { headless: true } : {}));
     if (!tl) return null;
+    if (p.type === 'chain') {   // 3.72: every part at its offset — each on the track for its kind of tool — starting after the song's last clip
+      const T0 = F().handle(tl).ctx, end0 = Math.max(1, ...T0.internals.clips.map(c => c.startBar + (c.bars || 0))), b0 = o.bar || end0;
+      const done = p.parts.map(x => send(x.pattern, { K, bar: b0 + x.at, headless: o.headless })); return { tl, bar: b0, parts: done, lane: done[0] && done[0].lane, tool: done[0] && done[0].tool };
+    }
     const T = F().handle(tl).ctx, lane = trackFor(K, tl, p, o.headless); if (!lane) return null;
     const root = T.key ? +T.key.root || 0 : 0, pub = (k, v) => K.bus.publish('ui:' + k + ':' + tl, v);
     const end = Math.max(1, ...T.internals.clips.filter(c => c.lane === lane.id).map(c => c.startBar + (c.bars || 0)));
     const bar = o.bar || end;
-    if (p.type === 'curve') {
+    if (!!p.curve) {
       pub('lane_add', Object.assign({ kind: 'auto', target: lane.target, key: p.curve.key, name: p.name.replace(/\s*\(.*$/, ''), points: p.curve.points.map(q => [q[0] + bar, q[1]]) }, p.curve.osc ? { osc: p.curve.osc } : {}));
       return { tl, lane, tool: lane.target, bar };
     }
@@ -99,12 +105,12 @@
   const sounds = new Map(); let playing = null;
   async function render(p) {
     if (sounds.has(p.id)) return sounds.get(p.id);
-    const reps = p.bars <= 1 ? 4 : p.bars <= 2 ? 2 : 1, bars = p.bars * reps, barSec = 240 / p.bpm, SR = 24000;
+    const reps = p.type === 'chain' || p.type === 'tension' ? 1 : p.bars <= 1 ? 4 : p.bars <= 2 ? 2 : 1, bars = p.bars * reps, barSec = 240 / p.bpm, SR = 24000;
     const ctx = new OfflineAudioContext(2, Math.ceil(SR * (bars * barSec + 1.5)), SR), K = global.Kernel.create({ ctx, quiet: true, syncIR: true });
     const T = global.MasterTransport.create(K, { offline: true, bpm: p.bpm }); T.boot();
     try {
-      const r = send(p, { K, bar: 1, headless: true, bars, loop: p.type === 'curve' ? 0 : p.bars * 16 }); if (!r) return null;
-      if (p.type === 'curve') {   // a curve is heard on a held note of its tool
+      const r = send(p, Object.assign({ K, bar: 1, headless: true }, p.type === 'chain' ? {} : { bars, loop: !!p.curve ? 0 : p.bars * 16 })); if (!r) return null;
+      if (!!p.curve) {   // a curve is heard on a held note of its tool
         K.bus.publish('ui:clip_add:' + r.tl, { kind: 'notes', lane: r.lane.id, startBar: 1, bars, notes: [{ s: 0, l: bars * 16 - 1, n: /sub|bass|wobble|reese|wub/.test(p.tool) ? 36 : 60, v: 0.9 }] });
       }
       await new Promise(res => setTimeout(res, 30));
@@ -112,7 +118,7 @@
       const buf = await ctx.startRendering();
       let pk = 0; for (let c = 0; c < 2; c++) { const d = buf.getChannelData(c); for (let i = 0; i < d.length; i++) pk = Math.max(pk, Math.abs(d[i])); }
       if (pk > 1e-4) { const k = 0.89 / pk; for (let c = 0; c < 2; c++) { const d = buf.getChannelData(c); for (let i = 0; i < d.length; i++) d[i] *= k; } }
-      const out = { buf, silent: pk <= 1e-4 }; sounds.set(p.id, out); if (sounds.size > 24) sounds.delete(sounds.keys().next().value); return out;
+      const out = { buf, silent: pk <= 1e-4, gain: pk > 1e-4 ? 0.89 / pk : 1, barSec }; sounds.set(p.id, out); if (sounds.size > 24) sounds.delete(sounds.keys().next().value); return out;
     } finally { try { F().clearAll(K); } catch (e) {} }
   }
   function stop() { if (!playing) return; try { playing.src.stop(); } catch (e) {} const pl = playing; playing = null; if (pl.onend) pl.onend(); }
@@ -128,7 +134,12 @@
   function drawCard(cv, p) {
     const W = cv.width = 220, H = cv.height = 54, g = cv.getContext('2d'); g.fillStyle = '#0a1018'; g.fillRect(0, 0, W, H);
     const steps = p.bars * 16; g.fillStyle = '#16202c'; for (let b = 1; b < p.bars; b++) g.fillRect(b * 16 / steps * W, 0, 1, H);
-    if (p.type === 'curve') {
+    if (p.type === 'chain') {
+      const COL = { tension: '#ffd24a', drop: '#ff2266', drums: '#8fa3b8', bass: '#ff2266', wobble: '#b066ff', curve: '#ffd24a', lead: '#00d4ff', chords: '#7cf7ff' }, rows = p.parts.length, rh = (H - 4) / rows;
+      p.parts.forEach((x, i) => { const q = x.pattern; g.fillStyle = COL[q.type] || '#00d4ff'; g.globalAlpha = 0.85; g.fillRect(x.at / p.bars * W, 2 + i * rh, Math.max(3, q.bars / p.bars * W - 1), Math.max(2, rh - 2)); });
+      g.globalAlpha = 1; return;
+    }
+    if (!!p.curve) {
       const ys = p.curve.points.map(q => q[1]).filter(v => typeof v === 'number'); if (!ys.length) return;
       const lo = Math.min(...ys), hi = Math.max(...ys), Y = (v) => H - 6 - (hi === lo ? 0.5 : (v - lo) / (hi - lo)) * (H - 12);
       g.strokeStyle = '#ffd24a'; g.lineWidth = 2; g.beginPath(); p.curve.points.forEach((q, i) => { const x = q[0] / p.bars * W; i ? g.lineTo(x, Y(q[1])) : g.moveTo(x, Y(q[1])); }); g.lineTo(W, Y(ys[ys.length - 1])); g.stroke();
@@ -170,9 +181,9 @@
         const cv = h('canvas', { class: 'plib-draw', 'aria-hidden': 'true' }); cv._p = p; if (io) io.observe(cv); else drawCard(cv, p);
         const hear = h('button', { class: 'sbk-alt sm', text: '▶', title: 'hear it — rendered off the canvas, nothing changes' });
         hear.onclick = async () => { if (playing && playing.id === p.id) { stop(); return; } hear.textContent = '…'; const ok = await play(p, () => { hear.textContent = '▶'; }); hear.textContent = ok ? '■' : '▶'; if (ok === null) status.textContent = 'no sound came out of “' + p.name + '”'; };
-        const sendB = h('button', { class: 'sbk-alt sm', text: '→ Timeline', title: p.type === 'curve' ? 'adds this curve to the track that plays this kind of tool (or a new track with it)' : 'adds it after what is on the track that plays this kind of tool (or a new track with it), in your song’s key' });
+        const sendB = h('button', { class: 'sbk-alt sm', text: '→ Timeline', title: !!p.curve ? 'adds this curve to the track that plays this kind of tool (or a new track with it)' : 'adds it after what is on the track that plays this kind of tool (or a new track with it), in your song’s key' });
         sendB.onclick = () => { const r = send(p); status.textContent = r ? '“' + p.name + '” → the Timeline, bar ' + r.bar : 'could not send it'; };
-        grid.appendChild(h('div', { class: 'plib-card', style: { '--acc': p.type === 'drop' ? '#ff2266' : p.type === 'curve' ? '#ffd24a' : '#00d4ff' } }, [
+        grid.appendChild(h('div', { class: 'plib-card', style: { '--acc': p.type === 'drop' ? '#ff2266' : !!p.curve ? '#ffd24a' : '#00d4ff' } }, [
           h('b', { text: p.name }), h('small', { text: (TYPES.find(t => t[0] === p.type) || [0, p.type])[1] + ' · ' + p.genreLabel + ' · ' + p.bars + (p.bars > 1 ? ' bars' : ' bar') + ' · ' + p.bpm + ' BPM' }),
           cv, h('div', { class: 'plib-actions' }, [hear, sendB, h('span', { class: 'plib-tool', text: ((F().def(p.tool) || {}).label || p.tool) + (p.preset ? ' · ' + p.preset : '') })])]));
       });
@@ -182,5 +193,5 @@
     page = { close };
     return page;
   }
-  global.PatternLibrary = { all, types: TYPES.map(t => ({ id: t[0], label: t[1] })), get: (id) => all().find(p => p.id === id) || null, send, render, play, stop, open, rebuild: () => { LIB = null; return all(); }, fromGenre };
+  global.PatternLibrary = { addSource: (fn) => { if (typeof fn === 'function') { sources.push(fn); LIB = null; } }, all, types: TYPES.map(t => ({ id: t[0], label: t[1] })), get: (id) => all().find(p => p.id === id) || null, send, render, play, stop, open, rebuild: () => { LIB = null; return all(); }, fromGenre };
 })(typeof window !== 'undefined' ? window : globalThis);
