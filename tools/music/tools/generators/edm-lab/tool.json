@@ -94,5 +94,6 @@
     "eravos.xy-pad"
   ],
   "status": "built",
-  "conflicts": []
+  "conflicts": [],
+  "hidden": true
 }

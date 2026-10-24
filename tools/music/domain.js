@@ -225,7 +225,7 @@
         ['pointerdown', 'keydown', 'touchstart'].forEach(t => global.addEventListener(t, wake, true));
         // P11 L-01: opened straight from disk → MIDI (Firefox), mic and dependable saving are limited; say so, once, visibly
         if (global.location && global.location.protocol === 'file:') {
-          const chip = h('button', { class: 'tb-btn', title: 'Opened from a file — click for why this matters', style: { color: 'var(--amber, #ffaa00)', borderColor: 'var(--amber, #ffaa00)' }, text: '⚠ file mode' });
+          const chip = h('button', { class: 'tb-btn', title: 'Opened from a file — click for why this matters', style: { color: 'var(--amber, #ffaa00)', borderColor: 'var(--amber, #ffaa00)' }, 'data-ic': 'triangle-alert', text: 'file mode' });
           chip.onclick = () => S.toast('ERAVOS is open straight from a file. MIDI controllers (Firefox), the microphone and saving work best via “Start ERAVOS” in the ERAVOS folder, which opens http://localhost:4747. Save your song first (Session → Save), then open it there.', 'bad', 12000);
           S.slot('bar').appendChild(chip);
         }
@@ -282,7 +282,7 @@
         })();
       } }),
       Object.assign({}, UNITS.dock, { domain: MUSIC, requires: [UNITS.engine.id, UNITS.transport.id], build() {
-        const b = h('button', { class: 'tb-btn', id: 'dockBtn', title: 'Song Recorder — pinned along the bottom', 'data-unit': UNITS.dock.id, text: '⏺ Song' });
+        const b = h('button', { class: 'tb-btn', id: 'dockBtn', title: 'Song Recorder — pinned along the bottom', 'data-unit': UNITS.dock.id, 'data-ic': 'panel-bottom', text: 'Song' });
         const ensure = () => { const ex = K.registry.byOrganism('eravos.song-recorder')[0]; if (ex) return ex.instance_id; return global.OrganismFactory.spawn('eravos.song-recorder'); };
         b.onclick = () => { const had = K.registry.byOrganism('eravos.song-recorder').length; ensure(); const d = global.document.getElementById('dock'); if (had && d) { d.classList.toggle('folded'); global.CanvasWM.layoutDock(); } };
         S.slot('bar').appendChild(h('div', { class: 'tb-group', 'data-unit': UNITS.dock.id }, [b]));
@@ -331,9 +331,9 @@
       // 3.29: Songbook + Learn live OFF the canvas (their own full-screen pages, data/songbook.js · data/learn.js)
       Object.assign({}, UNITS.studio, { domain: MUSIC, requires: [UNITS.engine.id], build() {
         const g = h('div', { class: 'tb-group', 'data-unit': UNITS.studio.id });
-        const sb = h('button', { class: 'tb-btn', id: 'songbookBtn', title: 'Songs — every song in one place: write a new one in any genre, the song for her, your saved songs (off the canvas)', text: '📖 Songs' });
-        const lb = h('button', { class: 'tb-btn', id: 'learnBtn', title: 'Learn — short lessons, a map you choose your own path through (off the canvas)', text: '🧠 Learn' });
-        const sd = h('button', { class: 'tb-btn', id: 'soundsBtn', title: 'Sounds — every preset, drum kit packs (mix & match pads), capture any sound to a pad (off the canvas)', text: '🎚 Sounds' });
+        const sb = h('button', { class: 'tb-btn', id: 'songbookBtn', title: 'Songs — every song in one place: write a new one in any genre, the song for her, your saved songs (off the canvas)', 'data-ic': 'library', text: 'Songs' });
+        const lb = h('button', { class: 'tb-btn', id: 'learnBtn', title: 'Learn — short lessons, a map you choose your own path through (off the canvas)', 'data-ic': 'graduation-cap', text: 'Learn' });
+        const sd = h('button', { class: 'tb-btn', id: 'soundsBtn', title: 'Sounds — every preset, drum kit packs (mix & match pads), capture any sound to a pad (off the canvas)', 'data-ic': 'audio-lines', text: 'Sounds' });
         sb.onclick = () => global.Songbook && global.Songbook.open(); lb.onclick = () => global.Learn && global.Learn.open(); sd.onclick = () => global.Sounds && global.Sounds.open();
         g.append(sb, sd, lb); S.slot('bar').appendChild(g);
       } }),

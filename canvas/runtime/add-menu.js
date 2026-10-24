@@ -9,6 +9,7 @@
  * descriptors, modes and units the packs registered. */
 (function (global) {
   'use strict';
+  const IC = (x, text, fb) => global.Icons ? global.Icons.label(x, text, { fallback: fb }) : ((fb || '') + ' ' + text).trim();   // 3.64 a drawn icon, then the words
   let open = null;
 
   function show(S, X, o) {
@@ -34,7 +35,7 @@
 
     // P38 catalog: installed tools (defined) + tools the catalog offers but this canvas has not installed (cards say so; adding installs)
     const Cat = global.Catalog;
-    const avail = () => Cat ? Cat.available().filter(t => !Cat.isRemoved(t.id)).map(t => ({ id: t.id, label: t.label, icon: t.icon, accent: t.accent, blurb: t.summary, category: t.category, presets: {}, _avail: t })) : [];
+    const avail = () => Cat ? Cat.available().filter(t => !t.hidden && !Cat.isRemoved(t.id)).map(t => ({ id: t.id, label: t.label, icon: t.icon, accent: t.accent, blurb: t.summary, category: t.category, presets: {}, _avail: t })) : [];
     // 3.48 suites (eravos.suites ADDENDUM 2026-10-21): each suite is a card of its own; adding it opens its suite window
     // (a fresh profile has not installed the suite window yet: the card still shows, from the catalog, and adding installs it)
     const hubMeta = (s) => F.def(s.hub) || (Cat && Cat.meta && Cat.meta(s.hub)) || null;
@@ -73,10 +74,10 @@
     function chip(text, cls, title) { return h('span', { class: 'ap-chip ' + (cls || ''), text, title: title || '' }); }
 
     async function add(d) {
-      if (d._suite) { const id = await global.Suites.openAsync(d._suite.id, { K: S.K }); if (id) S.toast(`${d.icon || ''} ${d.label} — its window is on the canvas: ＋ Build the whole system, or add parts one by one`, 'good', 3200); close(); return; }
-      if (d._avail) { S.toast(`Installing ${d.icon || ''} ${d.label}…`, '', 1500); const got = await Cat.install(d.id, S.K); if (!got.includes(d.id)) { S.toast(`${d.label} could not be installed — details: the red dot, top right.`, 'bad', 6000); return; } }
+      if (d._suite) { const id = await global.Suites.openAsync(d._suite.id, { K: S.K }); if (id) S.toast(`${d.label} — its window is on the canvas: ＋ Build the whole system, or add parts one by one`, 'good', 3200); close(); return; }
+      if (d._avail) { S.toast(`Installing ${d.label}…`, '', 1500); const got = await Cat.install(d.id, S.K); if (!got.includes(d.id)) { S.toast(`${d.label} could not be installed — details: the red dot, top right.`, 'bad', 6000); return; } }
       const id = F.spawn(d.id);
-      if (id) S.toast(`${d.icon || ''} ${d.label} added`, 'good', 1800);
+      if (id) S.toast(`${d.label} added`, 'good', 1800);
       close();
     }
 
@@ -88,21 +89,35 @@
       return true;
     }
 
+    // 3.64 the drawn picture of a card with no screenshot: the icon on its accent; a suite also shows the tools it is made of
+    function tileOf(d, size, cls) {
+      if (!global.Icons) return h('span', { class: cls || '', text: d.icon || '◻' });
+      const t = global.Icons.tile(d, { size, accent: d.accent, fallback: d.icon || '◻' }); if (cls) t.classList.add(cls); return t;
+    }
+    function cardArt(d) {
+      const art = h('div', { class: 'ap-art' }, [tileOf(d, 64, 'ap-art-tile')]);
+      if (d._suite) art.appendChild(h('div', { class: 'ap-art-parts' }, d._suite.parts.slice(0, 8).map(p => {
+        const o = F.def(p.tool) || (Cat && Cat.meta && Cat.meta(p.tool)) || { id: p.tool };
+        return h('span', { class: 'ap-art-part', title: (o.label || p.tool) + (p.role ? ' — ' + p.role : ''), html: IC(o.id ? o : { id: p.tool }, '', o.icon || '◻') });
+      })));
+      return art;
+    }
+
     // ---------------------------------------------------------------- rail
     function renderRail() {
       rail.innerHTML = '';
-      const item = (label, count, on, fn, cls) => rail.appendChild(h('button', { class: 'ap-rail-item ' + (on ? 'on ' : '') + (cls || ''), onclick: fn }, [h('span', { text: label }), count !== null ? h('small', { text: String(count) }) : null]));
-      if (X.modes().length) item('◈ Modes', X.modes().length, state.view === 'modes' && !state.q, () => { state.view = 'modes'; state.q = ''; q.value = ''; render(); }, 'top');
-      item('▦ All tools', defs().length, state.view === 'all' && !state.q, () => { state.view = 'all'; state.q = ''; q.value = ''; render(); }, 'top');
+      const item = (label, count, on, fn, cls, ic) => rail.appendChild(h('button', { class: 'ap-rail-item ' + (on ? 'on ' : '') + (cls || ''), onclick: fn }, [h('span', { class: 'ap-rail-l', html: IC(ic || null, label) }), count !== null ? h('small', { text: String(count) }) : null]));
+      if (X.modes().length) item('Modes', X.modes().length, state.view === 'modes' && !state.q, () => { state.view = 'modes'; state.q = ''; q.value = ''; render(); }, 'top', 'layers');
+      item('All tools', defs().length, state.view === 'all' && !state.q, () => { state.view = 'all'; state.q = ''; q.value = ''; render(); }, 'top', 'square-stack');
       const cats = categories(); if (!cats.length) return;
       rail.appendChild(h('div', { class: 'ap-rail-sec', text: 'CATEGORIES' }));
-      cats.forEach(c => item(c.id, c.n, state.view === 'cat' && state.cat === c.id && !state.q, () => { state.view = 'cat'; state.cat = c.id; state.q = ''; q.value = ''; render(); }));
+      cats.forEach(c => item(c.id, c.n, state.view === 'cat' && state.cat === c.id && !state.q, () => { state.view = 'cat'; state.cat = c.id; state.q = ''; q.value = ''; render(); }, '', 'cat:' + c.id));
     }
     function renderChips() {
       modeChips.innerHTML = '';
       const act = X.modes().filter(m => X.isActive(m.id));
       if (!act.length) modeChips.appendChild(chip(X.built().length ? 'expanded by the tools you added' : 'agnostic canvas — nothing loaded yet', 'dim'));
-      act.forEach(m => modeChips.appendChild(chip((m.icon || '') + ' ' + m.label, 'mode', 'active mode')));
+      act.forEach(m => { const c = chip('', 'mode', 'active mode'); c.innerHTML = IC('mode:' + m.id, m.label, m.icon); modeChips.appendChild(c); });
     }
 
     // ---------------------------------------------------------------- modes page
@@ -113,9 +128,9 @@
       X.modes().forEach(m => {
         const on = X.isActive(m.id);
         const tools = defs().filter(d => m.categories.includes(d.category)).length;
-        const unitsRow = h('div', { class: 'ap-chiprow' }, m.units.map(u => { const L = X.units().find(x => x.id === u); return chip((L ? (L.icon + ' ' + L.label) : u).trim(), L && L.built ? 'built' : 'new', L ? L.describes : ''); }));
+        const unitsRow = h('div', { class: 'ap-chiprow' }, m.units.map(u => { const L = X.units().find(x => x.id === u); return chip((L ? L.label : u).trim(), L && L.built ? 'built' : 'new', L ? L.describes : ''); }));
         grid.appendChild(h('div', { class: 'ap-mode ' + (on ? 'on' : ''), style: { '--acc': m.accent || '#00d4ff' } }, [
-          h('div', { class: 'ap-mode-top' }, [h('span', { class: 'ap-mode-ic', text: m.icon || '◈' }), h('div', {}, [h('b', { text: m.label }), h('small', { text: `${tools} tools · ${m.categories.length} categories` })])]),
+          h('div', { class: 'ap-mode-top' }, [h('span', { class: 'ap-mode-ic', html: IC('mode:' + m.id, '', m.icon || '◈') }), h('div', {}, [h('b', { text: m.label }), h('small', { text: `${tools} tools · ${m.categories.length} categories` })])]),
           h('p', { text: m.blurb || '' }),
           h('div', { class: 'ap-sub', text: 'Turns on' }), unitsRow,
           h('div', { class: 'ap-sub', text: 'Shows' }), h('div', { class: 'ap-chiprow' }, m.categories.map(c => chip(c, 'cat'))),
@@ -149,7 +164,7 @@
         if (state.view !== 'cat' && cat !== lastCat) { grid.appendChild(h('div', { class: 'ap-grid-sec', text: cat.toUpperCase() })); lastCat = cat; }
         const dd = dep(d);
         const chips = [];
-        if (dd.modeLabel && !X.isActive(dd.mode)) chips.push(chip(((X.mode_(dd.mode) || {}).icon || '') + ' ' + dd.modeLabel, 'mode', 'belongs to this mode — adding the tool does not switch the mode on'));
+        if (dd.modeLabel && !X.isActive(dd.mode)) chips.push(chip(dd.modeLabel, 'mode', 'belongs to this mode — adding the tool does not switch the mode on'));
         if (dd.pending.length) chips.push(chip('＋' + dd.pending.length + ' toolbar', 'new', 'adds: ' + dd.pending.map(u => u.label).join(', ')));
         else if (dd.toolbar.length) chips.push(chip('ready', 'built', 'everything it needs is already on'));
         const meta = Cat && Cat.meta(d.id), np = d._avail ? d._avail.presets : Object.keys(d.presets || {}).length;
@@ -157,11 +172,11 @@
         if (np) chips.push(chip(np + ' presets', 'dim', 'presets in its packs'));
         // 3.44: the card leads with the tool's own display (thumb.png, 16:10) — the old 84×52 corner of the whole window showed
         // only a title bar. No picture → the icon on the tool's colour, same frame, so the grid stays even.
-        const pic = meta && (meta.thumb || meta.preview), frame = h('div', { class: 'ap-card-pic' + (meta && meta.thumb ? '' : ' fit') }, [h('span', { class: 'ap-card-ic', text: d.icon || '◻' })]);
+        const pic = meta && (meta.thumb || meta.preview), frame = h('div', { class: 'ap-card-pic' + (meta && meta.thumb ? '' : ' fit') + (d._suite ? ' suite' : '') }, [cardArt(d)]);
         if (pic) frame.appendChild(h('img', { class: 'ap-card-img', src: pic, alt: '', loading: 'lazy', onerror: (e) => e.target.remove() }));
         const card = h('div', { class: 'ap-card' + (d._avail ? ' avail' : ''), tabindex: '-1', style: { '--acc': d.accent || '#00d4ff' }, 'data-id': d.id }, [
           frame,
-          h('div', { class: 'ap-card-tx' }, [h('b', {}, [h('span', { class: 'ap-card-glyph', text: d.icon || '' }), d.label]), h('small', { text: d.blurb || '' }), h('div', { class: 'ap-chiprow' }, chips)]),
+          h('div', { class: 'ap-card-tx' }, [h('b', {}, [h('span', { class: 'ap-card-glyph', html: IC(d, '', d.icon || '') }), d.label]), h('small', { text: d.blurb || '' }), h('div', { class: 'ap-chiprow' }, chips)]),
         ]);
         card.onclick = () => page(d);
         grid.appendChild(card); cards.push({ el: card, d });
@@ -189,21 +204,21 @@
       const portName = (x) => (x.port ? x.port + ' · ' : '') + x.kind;
       // 3.48 fix (his screenshot, 2026-10-21): a tool not installed yet has no page or remove button; append(null) printed "nullnull"
       detail.append(...[
-        h('div', { class: 'ap-d-head', style: { '--acc': d.accent || '#00d4ff' } }, [h('span', { class: 'ap-d-ic', text: d.icon || '◻' }), h('div', {}, [h('h3', { text: d.label }), h('small', { text: (d.category || 'General') + ' · v' + (d.version || '1.0.0') })])]),
+        h('div', { class: 'ap-d-head', style: { '--acc': d.accent || '#00d4ff' } }, [tileOf(d, 48, 'ap-d-tile'), h('div', {}, [h('h3', { text: d.label }), h('small', { text: (d.category || 'General') + ' · v' + (d.version || '1.0.0') })])]),
         (Cat && Cat.meta(d.id) && Cat.meta(d.id).preview) ? h('div', { class: 'ap-d-shot' }, [h('img', { src: Cat.meta(d.id).preview, alt: d.label + ' — the whole window', onerror: (e) => e.target.parentNode.remove() })]) : '',
         h('p', { class: 'ap-d-blurb', text: d.blurb || '' }),
         h('button', { class: 'tb-btn primary ap-addbtn', text: d._suite ? 'Open the suite' : d._avail ? 'Install + add to canvas' : dd.pending.length ? `Add — turns on ${dd.pending.length} toolbar item${dd.pending.length > 1 ? 's' : ''}` : 'Add to canvas', onclick: () => add(d) }),
-        !d._avail && global.ToolPage ? h('button', { class: 'tb-btn ap-pagebtn', text: d._suite ? '📘 Its page — parts, scenes, wiring' : '📘 Its page — mods, packs, suite', title: d._suite ? 'every part, its scenes and macros, how it is wired: build it whole or a part at a time' : 'everything this tool can do: load its whole suite or its mods one by one, hear every preset', onclick: () => page(d) }) : null,
+        !d._avail && global.ToolPage ? h('button', { class: 'tb-btn ap-pagebtn', html: IC('book-open', d._suite ? 'Its page — parts, scenes, wiring' : 'Its page — mods, packs, suite'), title: d._suite ? 'every part, its scenes and macros, how it is wired: build it whole or a part at a time' : 'everything this tool can do: load its whole suite or its mods one by one, hear every preset', onclick: () => page(d) }) : null,
         Cat && Cat.meta(d.id) && !d._avail ? h('button', { class: 'tb-btn ap-rmbtn', text: 'Remove from this canvas', title: 'uninstall: gone from ＋ Add now; its code leaves at the next start. Windows already open keep working.', onclick: () => { Cat.remove(d.id); S.toast(`${d.label} removed — gone after the next start. Add it again any time from ＋ Add.`, '', 4000); } }) : null,
       ].filter(Boolean));
       [
-        sec('MODE', [row(d._avail ? 'not installed yet — adding it installs it' + (d._avail.domain ? ' (' + d._avail.domain + ')' : '') : dd.modeLabel ? ((X.mode_(dd.mode) || {}).icon || '') + ' ' + dd.modeLabel : 'none — domain-free', dd.mode ? (X.isActive(dd.mode) ? 'active' : 'stays off — only what this tool needs turns on') : '')]),
+        sec('MODE', [row(d._avail ? 'not installed yet — adding it installs it' + (d._avail.domain ? ' (' + d._avail.domain + ')' : '') : dd.modeLabel ? dd.modeLabel : 'none — domain-free', dd.mode ? (X.isActive(dd.mode) ? 'active' : 'stays off — only what this tool needs turns on') : '')]),
         sec('NEEDS', dd.services.map(s => row('• ' + s.label, s.why || ''))),
-        sec('ADDS TO THE TOOLBAR', dd.toolbar.map(u => row((u.built ? '✓ ' : '✚ ') + (u.icon ? u.icon + ' ' : '') + u.label, u.built ? 'already on' : u.describes, u.built ? 'built' : 'new'))),
+        sec('ADDS TO THE TOOLBAR', dd.toolbar.map(u => row((u.built ? '✓ ' : '✚ ') + u.label, u.built ? 'already on' : u.describes, u.built ? 'built' : 'new'))),
         sec('INPUTS', ins.map(x => row('← ' + portName(x), x.intent))),
         sec('OUTPUTS', outs.map(x => row('→ ' + portName(x), x.intent))),
         sec('FOLLOWS', follows.length ? [row(follows.map(x => x.kind.split('|')[0]).join(' · '), 'global broadcasts — no wire needed')] : []),
-        sec('WORKS WITH', dd.works_with.length ? [h('div', { class: 'ap-chiprow' }, dd.works_with.map(id => { const o = F.def(id); const c = chip((o.icon || '') + ' ' + o.label, 'link'); c.onclick = () => { if (!cards.some(x => x.d.id === id)) { state.view = 'all'; state.q = ''; q.value = ''; renderTools(); } select(id); }; return c; }))] : []),
+        sec('WORKS WITH', dd.works_with.length ? [h('div', { class: 'ap-chiprow' }, dd.works_with.map(id => { const o = F.def(id); const c = chip('', 'link'); c.innerHTML = IC(o, o.label, o.icon); c.onclick = () => { if (!cards.some(x => x.d.id === id)) { state.view = 'all'; state.q = ''; q.value = ''; renderTools(); } select(id); }; return c; }))] : []),
         sec('PRESETS', presets.length ? [h('div', { class: 'ap-chiprow' }, presets.slice(0, 10).map(p => chip(p, 'dim')).concat(presets.length > 10 ? [chip('+' + (presets.length - 10) + ' more', 'dim')] : []))] : []),
         sec('NOTES', dd.notes.map(n => row(n))),
       ].forEach(x => { if (x) detail.appendChild(x); });

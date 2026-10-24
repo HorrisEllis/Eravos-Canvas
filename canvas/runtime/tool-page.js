@@ -19,6 +19,12 @@
   let cur = null;   // { d, target, el, K, made: Map(tool → instanceId) }
 
   const F = () => global.OrganismFactory;
+  // 3.64 drawn icons: IC(thing, words) → an icon then the words (markup); E escapes words for markup
+  const E = (t) => String(t).replace(/[<>&"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
+  const IC = (x, text, fb) => global.Icons ? global.Icons.label(x, text || '', { fallback: fb }) : E(((fb || '') + ' ' + (text || '')).trim());
+  const tileOf = (x, size, fb) => global.Icons ? global.Icons.tile(x, { size, accent: x && x.accent, fallback: fb }) : global.UIKit.h('span', { class: 'tp-ic', text: fb || '◻' });
+  const defOf = (id) => F().def(id) || { id, label: id };
+  const nameH = (id) => { const x = defOf(id); return IC(x, x.label, x.icon || '◻'); };
   const kern = (o) => (o && o.K) || global.Kernel;
   const live = (id) => { const r = id && F().handle(id); return r && !r.unmounted ? r : null; };
   const toast = (m, k, ms) => { if (global.Shell && global.Shell.toast) global.Shell.toast(m, k || '', ms || 2200); };
@@ -84,7 +90,7 @@
     // linked tools first (a mod's wire may name one), then the mods
     const order = s.members.filter(m => m.as !== 'mod').concat(s.members.filter(m => m.as === 'mod'));
     const out = order.map(m => load(st, m));
-    toast(`${st.d.icon || ''} ${st.d.label}: the whole suite is on (${out.filter(Boolean).length} of ${order.length}) — Ctrl+Z takes it back a step at a time`, 'good', 3500);
+    toast(`${st.d.label}: the whole suite is on (${out.filter(Boolean).length} of ${order.length}) — Ctrl+Z takes it back a step at a time`, 'good', 3500);
     return out;
   }
 
@@ -107,7 +113,7 @@
   function partners(d) {
     const out = new Map();
     (d.links || []).forEach(r => [].concat(r.with || []).forEach(t => { if (F().def(t) && !out.has(t)) out.set(t, { tool: t, dir: r.dir || 'out', hint: r.hint || '' }); }));
-    F().defined().forEach(o => (o.links || []).forEach(r => { if ([].concat(r.with || []).includes(d.id) && !out.has(o.id)) out.set(o.id, { tool: o.id, dir: r.dir === 'out' ? 'in' : 'out', hint: r.hint || '' }); }));
+    F().defined().filter(o => !o.hidden).forEach(o => (o.links || []).forEach(r => { if ([].concat(r.with || []).includes(d.id) && !out.has(o.id)) out.set(o.id, { tool: o.id, dir: r.dir === 'out' ? 'in' : 'out', hint: r.hint || '' }); }));
     return Array.from(out.values());
   }
 
@@ -148,9 +154,8 @@
     const st = cur, d = st.d, K = st.K, UI = global.UIKit, h = UI.h, M = global.Mods;
     const page = st.el.querySelector('.tp-page'), keepY = page.scrollTop; page.innerHTML = '';
     if (!live(st.target)) st.target = null;
-    const btn = (text, title, fn, cls) => { const b = h('button', { class: 'tp-btn ' + (cls || ''), title, text }); b.addEventListener('click', (e) => { e.stopPropagation(); fn(); }); return b; };
-    const name = (id) => { const x = F().def(id); return x ? `${x.icon || '◻'} ${x.label}` : id; };
-    const sec = (title, sub, kids, id) => h('section', { class: 'tp-sec', 'data-sec': id }, [h('h3', { class: 'tp-h' }, [title, sub ? h('small', { text: ' ' + sub }) : null])].concat(kids));
+    const btn = (text, title, fn, cls, ic) => { const b = h('button', { class: 'tp-btn ' + (cls || ''), title, html: ic ? IC(ic, text) : E(text) }); b.addEventListener('click', (e) => { e.stopPropagation(); fn(); }); return b; };
+    const sec = (title, sub, kids, id, ic) => h('section', { class: 'tp-sec', 'data-sec': id }, [h('h3', { class: 'tp-h', html: IC(ic, title) + (sub ? `<small> ${E(sub)}</small>` : '') })].concat(kids));
 
     // head: what it is + which window the page works on
     const wins = windowsOf(K, d.id);
@@ -159,44 +164,45 @@
     pick.value = st.target || ''; pick.addEventListener('change', () => { st.target = pick.value || null; repaint(); });
     const suite = d.suite && (d.suite.members || []).length ? d.suite : null;
     page.appendChild(h('header', { class: 'tp-head' }, [
-      h('span', { class: 'tp-ic', text: d.icon || '◻' }),
+      tileOf(d, 56, d.icon || '◻'),
       h('div', { class: 'tp-ht' }, [h('h2', { text: d.label }), h('div', { class: 'tp-meta', text: [d.category, 'v' + d.version].filter(Boolean).join(' · ') }), h('p', { text: d.blurb || '' })]),
       h('div', { class: 'tp-act' }, [
-        btn(st.target ? '↗ Go to it' : '＋ Add to canvas', st.target ? 'show its window' : 'open one on the canvas', () => { if (st.target) { K.bus.publish('canvas:focus-request', { instanceId: st.target }); close(); } else ensureHost(st); }, 'pri'),
-        suite ? btn('＋ Load the whole suite', 'the tool and every tool in its suite, wired up and set — one click (Ctrl+Z takes it back)', () => loadSuite(st), 'pri tp-suite-all') : null,
-        backBtn(btn), btn('✕', 'close (Esc)', close, 'tp-x'),
+        btn(st.target ? 'Go to it' : 'Add to canvas', st.target ? 'show its window' : 'open one on the canvas', () => { if (st.target) { K.bus.publish('canvas:focus-request', { instanceId: st.target }); close(); } else ensureHost(st); }, 'pri', st.target ? 'arrow-up-right' : 'plus'),
+        suite ? btn('Load the whole suite', 'the tool and every tool in its suite, wired up and set — one click (Ctrl+Z takes it back)', () => loadSuite(st), 'pri tp-suite-all', 'layers') : null,
+        backBtn(btn), btn('', 'close (Esc)', close, 'tp-x tp-ico', 'x'),
       ]),
     ]));
     page.appendChild(h('div', { class: 'tp-on' }, [h('span', { text: 'Works on: ' }), pick]));
     // 3.49 (P49.4): this tool as parts — a suite whose allInOne names it (and the suites it is a part of)
     const SU = global.Suites, asParts = SU ? SU.list().filter(x => x.allInOne === d.id) : [], partOf = SU ? SU.forTool(d.id) : [];
     if (asParts.length || partOf.length) page.appendChild(h('div', { class: 'tp-on tp-parts' }, [].concat(
-      asParts.map(x => btn('🧰 As parts: ' + x.label, 'the same tool rebuilt from parts you can swap and use elsewhere — opens its suite window', () => { close(); SU.openAsync(x.id, { K }); }, 'pri tp-asparts')),
-      partOf.map(x => btn('🧰 Part of: ' + x.label, 'open that suite', () => { close(); SU.openAsync(x.id, { K }); }, 'tp-partof')))));
+      asParts.map(x => btn('As parts: ' + x.label, 'the same tool rebuilt from parts you can swap and use elsewhere — opens its suite window', () => { close(); SU.openAsync(x.id, { K }); }, 'pri tp-asparts', 'suite:' + x.id)),
+      partOf.map(x => btn('Part of: ' + x.label, 'open its page', () => openSuite(x.id, { K, back: () => open(d.id, { K, instanceId: st.target, back: st.back }) }), 'tp-partof', 'suite:' + x.id)))));
 
     const nav = h('nav', { class: 'tp-nav' }); page.appendChild(nav);
-    const navTo = (id, label) => nav.appendChild(btn(label, 'jump to ' + label, () => { const s = page.querySelector(`[data-sec="${id}"]`); if (s) s.scrollIntoView({ block: 'start' }); }));
+    const navTo = (id, label, ic) => nav.appendChild(btn(label, 'jump to ' + label, () => { const s = page.querySelector(`[data-sec="${id}"]`); if (s) s.scrollIntoView({ block: 'start' }); }, '', ic));
 
     // the suite
     if (suite) {
-      navTo('suite', '🧰 Suite');
-      page.appendChild(sec('🧰 ' + (suite.label || 'The suite'), `· ${suite.members.length} tools`, [
+      navTo('suite', 'Suite', 'blocks');
+      page.appendChild(sec(suite.label || 'The suite', `· ${suite.members.length} tools`, [
         suite.blurb ? h('p', { class: 'tp-p', text: suite.blurb }) : null,
         h('div', { class: 'tp-list' }, suite.members.map(m => {
           const ok = !!F().def(m.tool), slot = m.as === 'mod' && (d.slots || []).find(s => s.id === m.slot);
           return h('div', { class: 'tp-row' + (ok ? '' : ' off') }, [
-            h('span', { class: 'tp-tag ' + (m.as === 'mod' ? 'mod' : 'lnk'), text: m.as === 'mod' ? '🧩 mod' : '🔗 linked' }),
-            h('div', { class: 'tp-rt' }, [h('b', { text: name(m.tool) + (m.preset ? ' — ' + m.preset : '') }), h('small', { text: m.why || (slot ? 'inside: ' + (slot.label || slot.id) : '') })]),
+            tileOf(defOf(m.tool), 30, (defOf(m.tool).icon || '◻')),
+            h('div', { class: 'tp-rt' }, [h('b', { html: E(defOf(m.tool).label) + (m.preset ? `<span class="tp-pre-n"> — ${E(m.preset)}</span>` : '') }), h('small', { text: m.why || (slot ? 'inside: ' + (slot.label || slot.id) : '') })]),
             ok && m.preset && global.Preview ? global.Preview.button(m.tool, m.preset) : null,
-            ok ? btn('＋', 'add just this one', () => load(st, m)) : h('small', { class: 'tp-dim', text: 'not installed' }),
+            h('span', { class: 'tp-tag ' + (m.as === 'mod' ? 'mod' : 'lnk'), text: m.as === 'mod' ? 'mod' : 'linked' }),
+            ok ? btn('', 'add just this one', () => load(st, m), 'tp-ico', 'plus') : h('small', { class: 'tp-dim', text: 'not installed' }),
           ]);
         })),
-      ], 'suite'));
+      ], 'suite', 'suite:' + ((SU && SU.list().find(x => x.allInOne === d.id || x.parts.some(p => p.tool === d.id)) || {}).id || '')));
     }
 
     // mods, slot by slot
     if ((d.slots || []).length && M) {
-      navTo('mods', '🧩 Mods');
+      navTo('mods', 'Mods', 'puzzle');
       const kids = (d.slots || []).map(sl => {
         const inIt = st.target ? M.entries(st.target).filter(e => e.slot === sl.id) : [];
         const fits = st.target ? M.compatible(st.target, sl.id) : compatibleFor(d, sl);
@@ -206,39 +212,39 @@
           grid.innerHTML = ''; const s = q.value.trim().toLowerCase(); st.q = q.value; let cat = null;
           fits.filter(t => !s || (t.label + ' ' + t.category + ' ' + t.blurb).toLowerCase().includes(s)).forEach(t => {
             if (t.category !== cat) { cat = t.category; grid.appendChild(h('div', { class: 'tp-cat', text: cat || 'other' })); }
-            grid.appendChild(h('div', { class: 'tp-mod' }, [h('div', { class: 'tp-rt' }, [h('b', { text: `${t.icon} ${t.label}` }), h('small', { text: t.blurb })]), btn('＋', `put ${t.label} inside ${d.label} — ${sl.label || sl.id}`, () => addMod(st, sl.id, t.id))]));
+            grid.appendChild(h('div', { class: 'tp-mod' }, [h('div', { class: 'tp-rt' }, [h('b', { html: IC(t, t.label, t.icon) }), h('small', { text: t.blurb })]), btn('', `put ${t.label} inside ${d.label} — ${sl.label || sl.id}`, () => addMod(st, sl.id, t.id), 'tp-ico', 'plus')]));
           });
         };
         q.addEventListener('input', paint); q.addEventListener('keydown', (e) => e.stopPropagation()); paint();
         return h('div', { class: 'tp-slot' }, [
           h('div', { class: 'tp-sh' }, [h('b', { text: sl.label || sl.id }), h('small', { text: ' ' + (sl.hint || '') })]),
           inIt.length ? h('div', { class: 'tp-list' }, inIt.map(e => h('div', { class: 'tp-row' + (e.bypass ? ' off' : '') }, [
-            h('span', { class: 'tp-tag mod', text: e.bypass ? '⏻ off' : '🧩 in' }), h('div', { class: 'tp-rt' }, [h('b', { text: name(e.tool) })]),
+            h('span', { class: 'tp-tag mod', text: e.bypass ? '⏻ off' : 'inside' }), h('div', { class: 'tp-rt' }, [h('b', { html: nameH(e.tool) })]),
             btn('⏻', 'switch it on / off', () => M.bypass(st.target, e.uid)), btn('×', 'take it out', () => M.remove(st.target, e.uid)),
           ]))) : h('p', { class: 'tp-p tp-dim', text: st.target ? 'nothing inside yet — add one below' : 'add one and a window opens with it inside' }),
           q, grid,
         ]);
       });
-      page.appendChild(sec('🧩 Mods', '· tools that run inside it, one by one', kids, 'mods'));
+      page.appendChild(sec('Mods', '· tools that run inside it, one by one', kids, 'mods', 'puzzle'));
     }
 
     // tools it links with
     const ps = partners(d);
     if (ps.length) {
-      navTo('links', '🔗 Links');
-      page.appendChild(sec('🔗 Plays with', '· wired in, they show their controls on its window', [h('div', { class: 'tp-list' }, ps.map(p => h('div', { class: 'tp-row' }, [
+      navTo('links', 'Links', 'link-2');
+      page.appendChild(sec('Plays with', '· wired in, they show their controls on its window', [h('div', { class: 'tp-list' }, ps.map(p => h('div', { class: 'tp-row' }, [
         h('span', { class: 'tp-tag lnk', text: p.dir === 'in' ? '⇠ feeds it' : '⇢ it feeds' }),
-        h('div', { class: 'tp-rt' }, [h('b', { text: name(p.tool) }), h('small', { text: p.hint })]),
-        btn('＋', 'add it next to this one, wired up', () => addLinked(st, p.tool, { dir: p.dir })),
-      ])))], 'links'));
+        h('div', { class: 'tp-rt' }, [h('b', { html: nameH(p.tool) }), h('small', { text: p.hint })]),
+        btn('', 'add it next to this one, wired up', () => addLinked(st, p.tool, { dir: p.dir }), 'tp-ico', 'plus'),
+      ])))], 'links', 'link-2'));
     }
 
     // sound packs
     const groups = presetGroups(d);
     if (groups.length) {
-      navTo('packs', '🎛 Packs');
+      navTo('packs', 'Packs', 'package');
       const total = groups.reduce((n, g) => n + g.items.length, 0);
-      page.appendChild(sec('🎛 Sound packs', `· ${total} presets in ${groups.length} pack${groups.length > 1 ? 's' : ''}`, groups.map(g => {
+      page.appendChild(sec('Sound packs', `· ${total} presets in ${groups.length} pack${groups.length > 1 ? 's' : ''}`, groups.map(g => {
         const on = g.enabled !== false;
         const tog = g.pack && global.ContentPacks ? btn(on ? 'on' : 'off', on ? 'this pack is on — click to switch it off' : 'switch this pack on', () => global.ContentPacks.setEnabled(g.pack, !on), on ? 'on' : '') : null;
         return h('div', { class: 'tp-pack' + (on ? '' : ' off') }, [
@@ -249,38 +255,38 @@
             on ? btn('Load', st.target ? 'put it on the window this page works on' : 'open one with this preset', () => { const id = ensureHost(st); presetLoad(K, id, x.key); toast(`${d.label}: ${x.name}`, 'good', 1500); }) : null,
           ]))),
         ]);
-      }), 'packs'));
+      }), 'packs', 'package'));
     }
 
     // every control
     const params = (d.config || []).filter(c => !c.hidden);
     if (params.length) {
-      navTo('controls', '🎚 Controls');
+      navTo('controls', 'Controls', 'sliders-vertical');
       const movable = new Set((d.hooks || []).filter(x => x.direction === 'in' && /\.mod_/.test(x.hook_id)).map(x => x.mod_key || x.port));
       const range = (c) => c.type === 'enum' ? (c.options || []).join(' · ') : c.type === 'boolean' ? 'on / off' : (c.min !== undefined ? `${c.min} – ${c.max}${c.unit ? ' ' + c.unit : ''}` : c.type);
       const show = (v) => v === undefined ? '' : typeof v === 'boolean' ? (v ? 'on' : 'off') : typeof v === 'object' ? '…' : String(v);
       const byGroup = new Map(); params.forEach(c => { const g = c.group || 'Settings'; if (!byGroup.has(g)) byGroup.set(g, []); byGroup.get(g).push(c); });
-      page.appendChild(sec('🎚 Every control', `· ${params.length}`, Array.from(byGroup.entries()).map(([g, cs]) => h('div', { class: 'tp-cg' }, [
+      page.appendChild(sec('Every control', `· ${params.length}`, Array.from(byGroup.entries()).map(([g, cs]) => h('div', { class: 'tp-cg' }, [
         h('div', { class: 'tp-sh' }, [h('b', { text: g })]),
         h('table', { class: 'tp-tab' }, [h('tbody', {}, cs.map(c => h('tr', {}, [
           h('td', { class: 'tp-cl' }, [c.label || c.key, movable.has(c.key) ? h('span', { class: 'tp-mv', title: 'an input can move this', text: ' ∿' }) : null, c.settingsOnly ? h('span', { class: 'tp-dim', title: 'in ⚙ settings', text: ' ⚙' }) : null]),
           h('td', { class: 'tp-cr', text: range(c) }), h('td', { class: 'tp-cd', text: show(c.default) }), h('td', { class: 'tp-ch', text: c.hint || '' }),
         ])))]),
-      ])), 'controls'));
+      ])), 'controls', 'sliders-vertical'));
     }
 
     // inputs and outputs
     const io = (d.hooks || []).filter(x => !x.internal && !/^slot\./.test(x.hook_id) && x.wire_type !== 'ui');
     if (io.length) {
-      navTo('io', '⇄ In / out');
-      page.appendChild(sec('⇄ Inputs and outputs', `· ${io.length}`, [h('div', { class: 'tp-list' }, io.map(x => h('div', { class: 'tp-row' }, [
+      navTo('io', 'In / out', 'arrow-left-right');
+      page.appendChild(sec('Inputs and outputs', `· ${io.length}`, [h('div', { class: 'tp-list' }, io.map(x => h('div', { class: 'tp-row' }, [
         h('span', { class: 'tp-tag ' + (x.direction === 'out' ? 'lnk' : 'mod'), text: x.direction === 'out' ? 'out ⇢' : '⇠ in' }),
         h('div', { class: 'tp-rt' }, [h('b', { text: (x.port || x.hook_id.split('.').pop()) + ' · ' + x.wire_type }), h('small', { text: x.intent || x.hook_id })]),
-      ])))], 'io'));
+      ])))], 'io', 'arrow-left-right'));
     }
     page.scrollTop = keepY;
   }
-  const backBtn = (btn) => cur && cur.back ? btn('← Back', 'back to where you were', () => { const b = cur.back; close(); b(); }, 'tp-back') : null;
+  const backBtn = (btn) => cur && cur.back ? btn('Back', 'back to where you were', () => { const b = cur.back; close(); b(); }, 'tp-back', 'arrow-left') : null;
 
   // ---------------------------------------------------------------- 3.63 the page of a SUITE
   function openSuite(suiteId, o) {
@@ -299,16 +305,15 @@
   }
   async function buildSuite(st) { st = st || cur; const hub = await ensureSuite(st); if (!hub) return []; const out = global.Suites.build(st.K, hub); soon(); return out; }
   async function addSuitePart(st, tool, preset) { const hub = await ensureSuite(st); if (!hub) return null; const id = global.Suites.addPart(st.K, hub, tool, preset ? { preset } : {}); soon(); return id; }
-  async function suiteScene(st, name) { const hub = await ensureSuite(st); if (!hub) return 0; const n = global.Suites.scene(st.K, hub, name); toast(`${st.suite.icon || ''} ${st.suite.label}: ${name}`, 'good', 1600); soon(); return n; }
+  async function suiteScene(st, name) { const hub = await ensureSuite(st); if (!hub) return 0; const n = global.Suites.scene(st.K, hub, name); toast(`${st.suite.label}: ${name}`, 'good', 1600); soon(); return n; }
   TP.buildSuite = buildSuite; TP.addSuitePart = addSuitePart; TP.suiteScene = suiteScene;
 
   function repaintSuite() {
     const st = cur, s = st.suite, K = st.K, SU = global.Suites, UI = global.UIKit, h = UI.h;
     const page = st.el.querySelector('.tp-page'), keepY = page.scrollTop; page.innerHTML = '';
     if (!live(st.target)) st.target = null;
-    const btn = (text, title, fn, cls) => { const b = h('button', { class: 'tp-btn ' + (cls || ''), title, text }); b.addEventListener('click', (e) => { e.stopPropagation(); fn(); }); return b; };
-    const name = (id) => { const x = F().def(id); return x ? `${x.icon || '◻'} ${x.label}` : id; };
-    const sec = (title, sub, kids, id) => h('section', { class: 'tp-sec', 'data-sec': id }, [h('h3', { class: 'tp-h' }, [title, sub ? h('small', { text: ' ' + sub }) : null])].concat(kids));
+    const btn = (text, title, fn, cls, ic) => { const b = h('button', { class: 'tp-btn ' + (cls || ''), title, html: ic ? IC(ic, text) : E(text) }); b.addEventListener('click', (e) => { e.stopPropagation(); fn(); }); return b; };
+    const sec = (title, sub, kids, id, ic) => h('section', { class: 'tp-sec', 'data-sec': id }, [h('h3', { class: 'tp-h', html: IC(ic, title) + (sub ? `<small> ${E(sub)}</small>` : '') })].concat(kids));
     const hub = st.target, stat = hub ? SU.status(K, hub) : [], here = (tool) => stat.find(x => x.part.tool === tool && x.instanceId);
 
     const hubs = suiteWindows(K, s);
@@ -317,63 +322,63 @@
     pick.value = st.target || ''; pick.addEventListener('change', () => { st.target = pick.value || null; repaint(); });
     const nParts = s.parts.length, nOn = stat.filter(x => x.instanceId && !x.mixed).length;
     page.appendChild(h('header', { class: 'tp-head' }, [
-      h('span', { class: 'tp-ic', text: s.icon || '🧰' }),
+      tileOf({ id: 'suite:' + s.id, accent: s.accent, icon: s.icon }, 56, s.icon || '◻'),
       h('div', { class: 'tp-ht' }, [h('h2', { text: s.label }), h('div', { class: 'tp-meta', text: ['Suite', nParts + ' parts', s.version ? 'v' + s.version : ''].filter(Boolean).join(' · ') + (hub ? ` · ${nOn} of ${nParts} on the canvas` : '') }), h('p', { text: s.blurb || '' })]),
       h('div', { class: 'tp-act' }, [
-        btn('＋ Build the whole suite', 'every part it needs, wired up, on its starter scene' + (s.starter ? ' (' + s.starter + ')' : '') + ' — one click (Ctrl+Z takes it back)', () => buildSuite(st), 'pri tp-suite-all'),
-        btn(hub ? '↗ Go to it' : '🧰 Just the suite window', hub ? 'show the suite window' : 'open the suite window and add the parts yourself', () => { if (hub) { K.bus.publish('canvas:focus-request', { instanceId: hub }); close(); } else ensureSuite(st); }),
-        backBtn(btn), btn('✕', 'close (Esc)', close, 'tp-x'),
+        btn('Build the whole suite', 'every part it needs, wired up, on its starter scene' + (s.starter ? ' (' + s.starter + ')' : '') + ' — one click (Ctrl+Z takes it back)', () => buildSuite(st), 'pri tp-suite-all', 'layers'),
+        btn(hub ? 'Go to it' : 'Just the suite window', hub ? 'show the suite window' : 'open the suite window and add the parts yourself', () => { if (hub) { K.bus.publish('canvas:focus-request', { instanceId: hub }); close(); } else ensureSuite(st); }, '', hub ? 'arrow-up-right' : 'box'),
+        backBtn(btn), btn('', 'close (Esc)', close, 'tp-x tp-ico', 'x'),
       ]),
     ]));
     page.appendChild(h('div', { class: 'tp-on' }, [h('span', { text: 'Works on: ' }), pick]));
-    if (s.allInOne && F().def(s.allInOne)) page.appendChild(h('div', { class: 'tp-on tp-parts' }, [btn('◻ All in one: ' + name(s.allInOne), 'the same thing in one window — its page', () => open(s.allInOne, { K, back: () => openSuite(s.id, { K, back: st.back }) }), 'tp-allinone')]));
+    if (s.allInOne && F().def(s.allInOne)) page.appendChild(h('div', { class: 'tp-on tp-parts' }, [btn('All in one: ' + defOf(s.allInOne).label, 'the same thing in one window — its page', () => open(s.allInOne, { K, back: () => openSuite(s.id, { K, back: st.back }) }), 'tp-allinone', s.allInOne)]));
 
     const nav = h('nav', { class: 'tp-nav' }); page.appendChild(nav);
-    const navTo = (id, label) => nav.appendChild(btn(label, 'jump to ' + label, () => { const x = page.querySelector(`[data-sec="${id}"]`); if (x) x.scrollIntoView({ block: 'start' }); }));
+    const navTo = (id, label, ic) => nav.appendChild(btn(label, 'jump to ' + label, () => { const x = page.querySelector(`[data-sec="${id}"]`); if (x) x.scrollIntoView({ block: 'start' }); }, '', ic));
 
     // the parts
-    navTo('parts', '🧩 Parts');
-    page.appendChild(sec('🧩 Parts', `· ${nParts} tools — each one still a tool of its own`, [h('div', { class: 'tp-list' }, s.parts.map(p => {
-      const ok = !!F().def(p.tool), on = here(p.tool), inn = p.as === 'mod' && p.in ? ' · inside ' + name(p.in) + (p.slot ? ' (' + p.slot + ')' : '') : '';
+    navTo('parts', 'Parts', 'blocks');
+    page.appendChild(sec('Parts', `· ${nParts} tools — each one still a tool of its own`, [h('div', { class: 'tp-list' }, s.parts.map(p => {
+      const ok = !!F().def(p.tool), on = here(p.tool), inn = p.as === 'mod' && p.in ? ' · inside ' + defOf(p.in).label + (p.slot ? ' (' + p.slot + ')' : '') : '';
       return h('div', { class: 'tp-row tp-part' + (ok ? '' : ' off') + (on ? ' on' : ''), 'data-tool': p.tool }, [
-        h('span', { class: 'tp-tag ' + (p.as === 'mod' ? 'mod' : 'lnk'), text: (p.role || (p.as === 'mod' ? 'mod' : 'part')) + (p.required ? '' : ' · extra') }),
-        h('div', { class: 'tp-rt' }, [h('b', { text: name(p.tool) + (p.preset ? ' — ' + p.preset : '') }), h('small', { text: (p.why || '') + inn })]),
+        tileOf(defOf(p.tool), 34, defOf(p.tool).icon || '◻'),
+        h('div', { class: 'tp-rt' }, [h('b', { html: E(defOf(p.tool).label) + (p.preset ? `<span class="tp-pre-n"> — ${E(p.preset)}</span>` : '') + `<span class="tp-tag ${p.as === 'mod' ? 'mod' : 'lnk'}">${E((p.role || (p.as === 'mod' ? 'mod' : 'part')) + (p.required ? '' : ' · extra'))}</span>` }), h('small', { text: (p.why || '') + inn })]),
         ok && p.preset && global.Preview ? global.Preview.button(p.tool, p.preset) : null,
-        on ? h('span', { class: 'tp-dim tp-onmark', text: '✓ on' }) : ok ? btn('＋', 'add just this one to the suite', () => addSuitePart(st, p.tool)) : h('small', { class: 'tp-dim', text: 'installs with the suite' }),
-        ok ? btn('📘', 'its own page', () => open(p.tool, { K, instanceId: on ? on.instanceId : undefined, back: () => openSuite(s.id, { K, instanceId: st.target, back: st.back }) }), 'tp-partpage') : null,
+        on ? h('span', { class: 'tp-onmark', html: IC('circle-check', 'On') }) : ok ? btn('Add', 'add just this one to the suite', () => addSuitePart(st, p.tool), '', 'plus') : h('small', { class: 'tp-dim', text: 'installs with the suite' }),
+        ok ? btn('', 'its own page', () => open(p.tool, { K, instanceId: on ? on.instanceId : undefined, back: () => openSuite(s.id, { K, instanceId: st.target, back: st.back }) }), 'tp-partpage tp-ico', 'book-open') : null,
       ]);
-    }))], 'parts'));
+    }))], 'parts', 'blocks'));
 
     // scenes
     const scenes = Object.keys(s.scenes || {});
     if (scenes.length) {
-      navTo('scenes', '🎬 Scenes');
+      navTo('scenes', 'Scenes', 'clapperboard');
       const curScene = hub ? live(hub).ctx.params.get('scene') : null;
-      page.appendChild(sec('🎬 Scenes', '· one click sets every part', [h('div', { class: 'tp-list' }, scenes.map(n => h('div', { class: 'tp-row tp-scene' + (n === curScene ? ' on' : '') }, [
+      page.appendChild(sec('Scenes', '· one click sets every part', [h('div', { class: 'tp-list' }, scenes.map(n => h('div', { class: 'tp-row tp-scene' + (n === curScene ? ' on' : '') }, [
         h('span', { class: 'tp-tag lnk', text: n === s.starter ? '★ starter' : 'scene' }),
         h('div', { class: 'tp-rt' }, [h('b', { text: n }), h('small', { text: Object.keys(s.scenes[n]).map(t => (F().def(t) ? F().def(t).label : t) + ': ' + (s.scenes[n][t].preset || '…')).join(' · ') })]),
         btn(n === curScene ? '✓ on' : 'Load', hub ? 'set every part to this scene' : 'open the suite and set it to this scene', () => suiteScene(st, n)),
-      ])))], 'scenes'));
+      ])))], 'scenes', 'clapperboard'));
     }
 
     // macros
     if ((s.macros || []).length) {
-      navTo('macros', '🎛 Macros');
-      page.appendChild(sec('🎛 Macros', '· one knob turns several parts — on the suite window', [h('div', { class: 'tp-list' }, s.macros.map(m => h('div', { class: 'tp-row' }, [
+      navTo('macros', 'Macros', 'sliders-horizontal');
+      page.appendChild(sec('Macros', '· one knob turns several parts — on the suite window', [h('div', { class: 'tp-list' }, s.macros.map(m => h('div', { class: 'tp-row' }, [
         h('span', { class: 'tp-tag mod', text: m.label }),
-        h('div', { class: 'tp-rt' }, [h('b', { text: (m.targets || []).map(t => name(t.tool) + ' · ' + t.key).join('  +  ') }), h('small', { text: m.hint || '' })]),
-      ])))], 'macros'));
+        h('div', { class: 'tp-rt' }, [h('b', { html: (m.targets || []).map(t => nameH(t.tool) + ' <span class="tp-dim">· ' + E(t.key) + '</span>').join('<span class="tp-plus">+</span>') }), h('small', { text: m.hint || '' })]),
+      ])))], 'macros', 'sliders-horizontal'));
     }
 
     // wiring
     const wires = hub ? SU.wiring(K, hub) : (s.wiring || []).map(w => ({ wire: w })).concat(SU.outputs(s).map(t => ({ wire: { from: [t], to: ['suite'] }, toSuite: true })));
     if (wires.length) {
-      navTo('wiring', '🔌 Wiring');
+      navTo('wiring', 'Wiring', 'cable');
       const short = (hk) => hk ? ' · ' + String(hk).split('.').pop().replace(/_/g, ' ') : '';
-      page.appendChild(sec('🔌 How it is wired', '· the suite makes these wires for you', [h('div', { class: 'tp-list' }, wires.map(w => h('div', { class: 'tp-row' + (hub && !w.on ? ' off' : '') }, [
+      page.appendChild(sec('How it is wired', '· the suite makes these wires for you', [h('div', { class: 'tp-list' }, wires.map(w => h('div', { class: 'tp-row' + (hub && !w.on ? ' off' : '') }, [
         h('span', { class: 'tp-tag ' + (w.toSuite ? 'mod' : 'lnk'), text: hub ? (w.on ? '● on' : w.possible ? '○ off' : '○ —') : w.toSuite ? 'out' : 'wire' }),
-        h('div', { class: 'tp-rt' }, [h('b', { text: name(w.wire.from[0]) + short(w.wire.from[1]) + '  →  ' + (w.toSuite ? (s.icon || '🧰') + ' ' + s.label : name(w.wire.to[0]) + short(w.wire.to[1])) })]),
-      ])))], 'wiring'));
+        h('div', { class: 'tp-rt' }, [h('b', { html: nameH(w.wire.from[0]) + E(short(w.wire.from[1])) + '<span class="tp-arrow">→</span>' + (w.toSuite ? IC({ id: 'suite:' + s.id, icon: s.icon }, s.label, s.icon) : nameH(w.wire.to[0]) + E(short(w.wire.to[1]))) })]),
+      ])))], 'wiring', 'cable'));
     }
     page.scrollTop = keepY;
   }

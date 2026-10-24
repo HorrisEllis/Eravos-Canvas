@@ -4,6 +4,7 @@
  * ＋ also moves a window already on the canvas inside (⇲). Every edit is undoable. */
 (function (global) {
   'use strict';
+  const IC = (x, text, fb) => global.Icons ? global.Icons.label(x, text, { fallback: fb }) : ((fb || '') + ' ' + text).trim();   // 3.64 a drawn icon, then the words
   const doc = global.document;
   const folded = new Map();   // mod child id → 'face' | 'full' | 'shut'
 
@@ -38,7 +39,7 @@
       const btn = (text, title, fn, on) => { const b = h('button', { class: 'md-btn' + (on ? ' on' : ''), title, text }); b.addEventListener('click', (ev) => { ev.stopPropagation(); fn(); }); return b; };
       const el = h('div', { class: 'md-card' + (e.bypass ? ' off' : ''), style: { '--mc': (d && d.accent) || '#00d4ff' } });
       el.appendChild(h('div', { class: 'md-chead' }, [
-        h('span', { class: 'md-name', text: `${(d && d.icon) || '◻'} ${(d && d.label) || e.tool}` }),
+        h('span', { class: 'md-name', html: IC(d || { id: e.tool }, (d && d.label) || e.tool, (d && d.icon) || '◻') }),
         btn('⏻', e.bypass ? 'switched off — click to switch on' : 'on — click to bypass', () => M.bypass(hostId, e.uid), !e.bypass),
         btn('↑', 'earlier in the chain', () => M.move(hostId, e.uid, -1)), btn('↓', 'later in the chain', () => M.move(hostId, e.uid, 1)),
         btn(mode === 'full' ? '▣' : '⤢', mode === 'full' ? 'show just its main controls' : 'show all of it', () => { folded.set(cid, mode === 'full' ? 'face' : 'full'); render(hostId); WM.fitToContent(hostId); }),
@@ -66,11 +67,11 @@
         const here = M.movable(hostId, sl.id).filter(t => !s || t.label.toLowerCase().includes(s));
         if (here.length) {
           listEl.appendChild(h('div', { class: 'md-cat', text: 'on the canvas — move it inside' }));
-          here.forEach(t => { const b = h('button', { class: 'md-item', title: 'moves this window inside; what fed it now feeds what it fed', text: `⇲ ${t.icon} ${t.label} · ${t.instanceId.split('-').slice(-2).join('')}` }); b.addEventListener('click', (ev) => { ev.stopPropagation(); pop.remove(); M.absorb(hostId, sl.id, t.instanceId); }); listEl.appendChild(b); });
+          here.forEach(t => { const b = h('button', { class: 'md-item', title: 'moves this window inside; what fed it now feeds what it fed', html: '⇲ ' + IC(t, `${t.label} · ${t.instanceId.split('-').slice(-2).join('')}`, t.icon) }); b.addEventListener('click', (ev) => { ev.stopPropagation(); pop.remove(); M.absorb(hostId, sl.id, t.instanceId); }); listEl.appendChild(b); });
         }
         tools.filter(t => !s || (t.label + ' ' + t.category + ' ' + t.blurb).toLowerCase().includes(s)).forEach(t => {
           if (t.category !== cat) { cat = t.category; listEl.appendChild(h('div', { class: 'md-cat', text: cat || 'other' })); }
-          const b = h('button', { class: 'md-item', title: t.blurb, text: `${t.icon} ${t.label}` });
+          const b = h('button', { class: 'md-item', title: t.blurb, html: IC(t, t.label, t.icon) });
           b.addEventListener('click', (ev) => { ev.stopPropagation(); pop.remove(); M.add(hostId, sl.id, t.id); });
           listEl.appendChild(b);
         });

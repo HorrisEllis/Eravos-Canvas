@@ -80,7 +80,7 @@ describe('P48.10 · EDM Lab as a suite — Groove, Chords, Bassline as parts; th
       assert.equal(win.querySelectorAll('.su-card').length, 6, 'a card per part');
       const gc = win.querySelector(`.su-card[data-instance="${Suites.instanceOf(K, hub, 'eravos.groove-gen')}"]`);
       assert.ok(gc && gc.querySelector('.uk-knob'), 'the Groove’s knobs are on its card');
-      Array.from(gc.querySelectorAll('.su-chead button')).find(b => b.textContent === '⤢').click(); await TH.sleep(40);
+      gc.querySelector('.su-chead button[data-act="full"]').click(); await TH.sleep(40);
       assert.ok(win.querySelector(`.su-card[data-instance="${Suites.instanceOf(K, hub, 'eravos.groove-gen')}"] .gg-map`), '⤢ shows its whole face — the paint canvas — inside the suite');
       win.querySelector('.su-fold').click(); await TH.sleep(20);
       assert.ok(ids().every(id => !CanvasWM.windowOf(id) || CanvasWM.windowOf(id).classList.contains('collapsed')), 'every part window folded to its title bar');

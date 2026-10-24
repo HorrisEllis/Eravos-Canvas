@@ -428,3 +428,87 @@ svg.wires path.wire.hot { stroke-width: 4.5; filter: drop-shadow(0 0 4px current
 /* 3.58 edges connect: the windows a dragged window snaps to light up; Tidy moves windows smoothly */
 .wm-win.wm-snap { box-shadow: 0 0 0 1px #7cf7ffaa, 0 0 14px #7cf7ff55 !important; }
 .wm-win.wm-tidying { transition: left .28s ease, top .28s ease; }
+/* 3.64 drawn icons (runtime/icons.js): an icon is 1em square and takes the text colour; a tile is the icon on its accent */
+.ic { display: inline-flex; align-items: center; justify-content: center; width: 1em; height: 1em; line-height: 1; flex: none; vertical-align: -0.14em; }
+.ic svg { display: block; width: 100%; height: 100%; }
+.ic.ic-text { width: auto; height: auto; vertical-align: baseline; }
+.ic-tile { --acc: #00d4ff; position: relative; display: inline-grid; place-items: center; flex: none; width: 40px; height: 40px; font-size: 20px; border-radius: 11px; color: color-mix(in srgb, var(--acc) 30%, #fff);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--acc) 34%, #101826) 0%, color-mix(in srgb, var(--acc) 12%, #0a0f17) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), inset 0 0 0 1px color-mix(in srgb, var(--acc) 40%, transparent), 0 6px 18px -8px color-mix(in srgb, var(--acc) 55%, transparent); }
+.ic-tile .ic { filter: drop-shadow(0 1px 6px color-mix(in srgb, var(--acc) 60%, transparent)); }
+/* 3.64 ＋ Add, drawn: the card art (no screenshot) is the tool's icon on its accent over a fine grid; a suite's card also lines up
+   the tools it is made of. The rail and the mode cards carry icons too. */
+.ap-art { position: relative; z-index: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; width: 100%; height: 100%; }
+.ap-card-pic { background: radial-gradient(90% 80% at 50% 0%, color-mix(in srgb, var(--acc) 26%, transparent), transparent 70%), linear-gradient(180deg, #0c121b, #070b11); }
+.ap-card-pic::before { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: .55;
+  background: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px) 0 0 / 16px 16px, linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px) 0 0 / 16px 16px;
+  -webkit-mask: radial-gradient(80% 80% at 50% 40%, #000, transparent); mask: radial-gradient(80% 80% at 50% 40%, #000, transparent); }
+.ap-card-pic .ap-card-img { z-index: 1; }
+.ap-art-tile { width: 64px; height: 64px; font-size: 30px; border-radius: 18px; }
+.ap-card-pic.suite .ap-art { gap: 12px; }
+.ap-art-parts { display: flex; gap: 6px; padding: 5px 8px; border-radius: 99px; background: rgba(6,10,16,.6); border: 1px solid rgba(255,255,255,.06); backdrop-filter: blur(4px); }
+.ap-art-part { display: grid; place-items: center; width: 22px; height: 22px; font-size: 13px; border-radius: 7px; color: color-mix(in srgb, var(--acc) 35%, #d6e4f0); background: rgba(255,255,255,.04); }
+.ap-card-glyph .ic { font-size: 14px; vertical-align: -2px; }
+.ap-card-tx b { display: flex; align-items: center; gap: 0; letter-spacing: .1px; }
+.ap-d-tile { width: 48px; height: 48px; font-size: 24px; border-radius: 13px; }
+.ap-rail-l { display: inline-flex; align-items: center; gap: 9px; min-width: 0; }
+.ap-rail-l .ic { font-size: 15px; color: var(--dim); }
+.ap-rail-item.on .ap-rail-l .ic, .ap-rail-item:hover .ap-rail-l .ic { color: var(--cyan); }
+.ap-mode-ic .ic { font-size: 22px; color: color-mix(in srgb, var(--acc, var(--cyan)) 40%, #fff); }
+.ap-chip .ic { font-size: 11px; vertical-align: -1.5px; }
+.ap-chip .ic-lbl { margin-left: 1px; }
+.wm-icon .ic { font-size: 15px; color: color-mix(in srgb, var(--acc, #00d4ff) 55%, #fff); }
+/* 3.64 the tool and suite pages, refined: above the dock, a glass backdrop, the icon tile in the header, icon buttons, quiet rows */
+.tp-overlay { z-index: 120000; background: rgba(3,6,10,.62); backdrop-filter: blur(8px) saturate(120%); }
+.tp-page { border-radius: 16px; border: 1px solid rgba(255,255,255,.07); border-top: 1px solid rgba(255,255,255,.07); padding: 0 0 28px; position: relative;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--acc, #00d4ff) 7%, #0c121b) 0, #0a0f16 220px);
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,.7), 0 0 0 1px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.04); }
+.tp-page::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; border-radius: 16px 16px 0 0; background: linear-gradient(90deg, transparent, var(--acc, #00d4ff), transparent); opacity: .8; }
+.tp-page > * { margin-left: 24px; margin-right: 24px; }
+.tp-head { gap: 16px; align-items: flex-start; padding: 24px 0 6px; }
+.tp-head .ic-tile { width: 56px; height: 56px; border-radius: 16px; font-size: 27px; }
+.tp-ht h2 { font-size: 22px; font-weight: 700; letter-spacing: -.2px; color: #eef4fb; }
+.tp-meta { margin-top: 2px; font: 600 10.5px var(--mono, monospace); letter-spacing: .08em; color: color-mix(in srgb, var(--acc, #00d4ff) 60%, #8fa1b6); }
+.tp-ht p { max-width: 640px; line-height: 1.5; font-size: 13px; color: #9fb0c3; }
+.tp-head { flex-wrap: wrap; }
+.tp-head .tp-act { align-self: flex-start; }
+.tp-btn { display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 12px; border-radius: 8px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.09); font-weight: 600; font-size: 12.5px; transition: background .12s, border-color .12s, color .12s; }
+.tp-btn:hover { background: rgba(255,255,255,.06); border-color: color-mix(in srgb, var(--acc, #00d4ff) 55%, transparent); }
+.tp-btn .ic { font-size: 15px; opacity: .9; }
+.tp-btn.pri { color: #fff; border-color: transparent; background: linear-gradient(180deg, color-mix(in srgb, var(--acc, #00d4ff) 85%, #fff 0%), color-mix(in srgb, var(--acc, #00d4ff) 70%, #000)); box-shadow: 0 6px 18px -8px var(--acc, #00d4ff), inset 0 1px 0 rgba(255,255,255,.25); }
+.tp-btn.pri:hover { filter: brightness(1.08); }
+.tp-btn.tp-ico { width: 32px; padding: 0; justify-content: center; }
+.tp-btn.tp-x { background: transparent; border-color: transparent; color: #8fa1b6; } .tp-btn.tp-x:hover { color: #fff; background: rgba(255,255,255,.06); }
+.tp-on { margin: 14px 24px 4px; font-size: 12px; }
+.tp-target { height: 30px; border-radius: 8px; border-color: rgba(255,255,255,.1); background: rgba(0,0,0,.25); }
+.tp-nav { top: 0; margin-top: 10px; padding: 10px 24px; margin-left: 0; margin-right: 0; gap: 4px; background: rgba(10,15,22,.92); backdrop-filter: blur(6px); border-bottom: 1px solid rgba(255,255,255,.06); }
+.tp-nav .tp-btn { height: 30px; background: transparent; border-color: transparent; color: #9fb0c3; font-weight: 600; }
+.tp-nav .tp-btn:hover { color: #fff; background: rgba(255,255,255,.05); }
+.tp-sec { margin-top: 26px; }
+.tp-h { display: flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 700; letter-spacing: .1px; color: #e6eef7; margin-bottom: 10px; }
+.tp-h .ic { font-size: 17px; color: var(--acc, #00d4ff); }
+.tp-h small { font-weight: 500; color: #7d8ea2; }
+.tp-list { gap: 6px; }
+.tp-row, .tp-mod { gap: 12px; padding: 9px 12px; border-radius: 11px; background: rgba(255,255,255,.022); border: 1px solid rgba(255,255,255,.06); transition: border-color .12s, background .12s; }
+.tp-row:hover, .tp-mod:hover { background: rgba(255,255,255,.035); border-color: rgba(255,255,255,.1); }
+.tp-row .ic-tile { width: 34px; height: 34px; border-radius: 10px; font-size: 17px; }
+.tp-rt b { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 13px; font-weight: 600; color: #e6eef7; }
+.tp-rt b .ic { font-size: 14px; color: color-mix(in srgb, var(--acc, #00d4ff) 50%, #cfe0f0); }
+.tp-rt small { margin-top: 2px; font-size: 11.5px; color: #7d8ea2; }
+.tp-pre-n { font-weight: 500; color: #8fa1b6; }
+.tp-tag { font: 600 10px var(--mono, monospace); letter-spacing: .04em; padding: 2px 7px; border-radius: 99px; text-transform: uppercase; }
+.tp-tag.mod { background: rgba(155,227,122,.1); color: #a8e88c; } .tp-tag.lnk { background: rgba(127,196,255,.1); color: #8fcaff; }
+.tp-row.on { border-color: color-mix(in srgb, var(--acc, #00d4ff) 40%, transparent); background: color-mix(in srgb, var(--acc, #00d4ff) 6%, rgba(255,255,255,.02)); }
+.tp-onmark { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border-radius: 8px; font-weight: 600; font-size: 12px; color: #7ef0b0; background: rgba(46,204,113,.1); }
+.tp-onmark .ic { font-size: 15px; }
+.tp-plus { margin: 0 8px; color: #56677a; } .tp-arrow { margin: 0 10px; color: var(--acc, #00d4ff); }
+.tp-pre { border-radius: 8px; padding: 5px 8px; background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.05); }
+.tp-tab td { border-bottom-color: rgba(255,255,255,.05); padding: 6px 8px; }
+/* 3.64 the top bar's drawn icons */
+.tb-btn.has-ic { display: inline-flex; align-items: center; gap: 7px; }
+.tb-btn.has-ic > .ic { font-size: 15px; opacity: .85; }
+.tb-btn.primary.has-ic > .ic { opacity: 1; }
+@media (max-width: 1800px) {   /* the top bar fits: the secondary buttons show their icon only (their name stays in the tooltip) */
+  #songbookBtn.has-ic, #soundsBtn.has-ic, #learnBtn.has-ic, #dockBtn.has-ic, #organizeBtn.has-ic, #optBtn.has-ic { font-size: 0; gap: 0; padding-left: 10px; padding-right: 10px; }
+  #songbookBtn.has-ic > .ic, #soundsBtn.has-ic > .ic, #learnBtn.has-ic > .ic, #dockBtn.has-ic > .ic, #organizeBtn.has-ic > .ic, #optBtn.has-ic > .ic { width: 16px; height: 16px; font-size: 16px; }
+}

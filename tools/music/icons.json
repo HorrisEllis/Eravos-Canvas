@@ -1,0 +1,35 @@
+{
+  "_": "Which drawn icon each music tool, suite and category shows (names from the Lucide set). build/icons.mjs turns this into core/icons.gen.js.",
+  "tools": {
+    "eravos.harmonic-analyzer": "radar", "eravos.bass-drop-builder": "arrow-big-down-dash", "eravos.song-recorder": "disc-3", "eravos.timeline": "chart-gantt",
+    "eravos.pads": "drum", "eravos.sequencer": "grid-3x3", "eravos.fx-destroyer": "flame", "eravos.fx-dynamics": "gauge",
+    "eravos.fx-echo": "cassette-tape", "eravos.fx-eq": "chart-spline", "eravos.fx-filter": "funnel", "eravos.fx-glitch": "shuffle",
+    "eravos.fx-haunt": "ghost", "eravos.fx-moddelay": "waves", "eravos.fx-phaser": "orbit", "eravos.fx-pitch": "arrow-up-down",
+    "eravos.embodiment-lab": "person-standing", "eravos.arp": "chart-no-axes-column-increasing", "eravos.bass-gen": "guitar", "eravos.chord-gen": "piano",
+    "eravos.edm-lab": "party-popper", "eravos.groove-gen": "metronome", "eravos.coven": "moon-star", "eravos.dub-station": "megaphone",
+    "eravos.organ": "church", "eravos.retro-poly": "sunset", "eravos.channel": "sliders-vertical", "eravos.master-fx": "crown",
+    "eravos.mixer": "sliders-horizontal", "eravos.sidechain-compressor": "heart-pulse", "eravos.breath": "wind", "eravos.lfo": "activity",
+    "eravos.macro-automation": "spline", "eravos.xy-pad": "move", "eravos.bass-forge": "anvil", "eravos.drum-forge": "hammer",
+    "eravos.fx-box": "bomb", "eravos.acid-synth": "zap", "eravos.curve-synth": "spline-pointer", "eravos.pad-forge": "cloud",
+    "eravos.reese-bass": "speaker", "eravos.sub-engine": "circle-dot", "eravos.supersaw": "audio-lines", "eravos.wobble-bass": "volume-2",
+    "eravos.coach": "compass", "eravos.session": "layout-dashboard", "eravos.suite-hub": "blocks", "eravos.granular": "grip",
+    "eravos.syn-env": "triangle-right", "eravos.syn-osc": "audio-waveform", "eravos.syn-partials": "chart-no-axes-column", "eravos.contrast-analyser": "contrast",
+    "eravos.midi-mapper": "cable", "eravos.particle-field": "atom", "eravos.clip-maker": "scissors", "eravos.sample-player": "file-music",
+    "eravos.lyric-rhythm": "mic-vocal", "eravos.wub-filter": "speech", "eravos.wub-osc": "tornado", "eravos.wub-rate": "timer",
+    "eravos.wub-sub": "target", "eravos.ratio-lattice": "hash", "eravos.recursive-spectra": "aperture", "eravos.xen-synth": "hexagon"
+  },
+  "suites": {
+    "music.wub-lab": "boom-box", "music.synthesis-lab": "test-tube-diagonal", "music.edm-lab": "party-popper", "music.heavy-drops": "flame-kindling",
+    "music.synthwave": "sun", "music.gothic": "castle", "music.sound-system": "radio-tower", "music.xen": "gem"
+  },
+  "categories": {
+    "Start here": "compass", "Sound sources": "audio-waveform", "Wubs": "volume-2", "Genre instruments": "keyboard-music",
+    "Sound Forge": "anvil", "Voice & samples": "mic-vocal", "Drums & rhythm": "drum", "Arrange": "chart-gantt",
+    "Effects": "wand-sparkles", "Mix": "sliders-horizontal", "Modulation": "activity", "Generators": "workflow",
+    "Tools": "toolbox", "Xenharmonic": "hexagon", "Analysis": "radar", "Visuals": "atom",
+    "Synthesis": "test-tube-diagonal", "Suites": "blocks"
+  },
+  "modes": {
+    "music": "audio-lines", "music.lab": "flask-conical"
+  }
+}

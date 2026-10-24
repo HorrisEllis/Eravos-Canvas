@@ -189,7 +189,7 @@
     const order = want.filter(p => p.as !== 'mod').concat(want.filter(p => p.as === 'mod'));
     const out = order.map(p => addPart(K, hubId, p.tool));
     if (s.starter && s.scenes[s.starter]) scene(K, hubId, s.starter);
-    toast(`${s.icon || ''} ${s.label}: the whole system is on (${out.filter(Boolean).length} of ${order.length}) — Ctrl+Z takes it back a step at a time`, 'good', 3500);
+    toast(`${s.label}: the whole system is on (${out.filter(Boolean).length} of ${order.length}) — Ctrl+Z takes it back a step at a time`, 'good', 3500);
     return out;
   }
   // a scene sets every part here; a missing required part opens first

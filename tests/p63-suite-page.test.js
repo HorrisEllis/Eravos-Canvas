@@ -101,3 +101,43 @@ describe('P63 · the rest of the suites — every suite a control panel', () => 
     assert.gt(TH.db(TH.rms(b, 0.3, 4)), -45, 'the system sounds through the suite: ' + TH.db(TH.rms(b, 0.3, 4)).toFixed(1) + ' dB');
   }));
 });
+
+/* 3.64 — "Replace all those icons with high quality ones. No all in one EDM lab. Only the suite. And make them enterprise grade." */
+describe('P63 · drawn icons everywhere · EDM Lab is the suite only', () => {
+  function host() { const h = document.getElementById('wmhost'); if (!CanvasWM.world) { CanvasWM.init(h, Kernel); WireSystem.init(Kernel); OrganismFactory.boot(Kernel); } Kernel.audio.boot(); }
+  it('every tool, every suite and every category has a drawn icon', () => {
+    const tools = OrganismFactory.defined().filter(d => !d.hidden && !/^test\./.test(d.id)).filter(d => !Icons.has(d)).map(d => d.id);   // test.* are the suite's own fixtures
+    assert.equal(tools.join(', '), '', 'tools without a drawing');
+    assert.equal(Suites.list().filter(s => !Icons.has('suite:' + s.id)).map(s => s.id).join(', '), '', 'suites without a drawing');
+    const cats = new Set(OrganismFactory.defined().filter(d => !d.hidden && d.domain === 'music').map(d => d.category));
+    assert.equal(Array.from(cats).filter(c => !Icons.has('cat:' + c)).join(', '), '', 'categories without a drawing');
+    const s = Icons.svg('eravos.wobble-bass'); assert.ok(/^<svg [^>]*viewBox="0 0 24 24"/.test(s) && /stroke="currentColor"/.test(s), 'a line icon in the text colour');
+    assert.equal(Icons.node({ id: 'no.such.tool', icon: '◇' }).textContent, '◇', 'nothing drawn → its emoji, never empty');
+  });
+  it('＋ Add: no EDM Lab all-in-one (the suite is EDM Lab); cards, rail and the detail use drawn icons', async () => {
+    host(); const S = window.Shell || { K: Kernel, activate() {}, toast() {} }, X = S.X || Expansion.create(S, Kernel);
+    try {
+      AddMenu.show(S, X, { view: 'all' }); await TH.sleep(30);
+      assert.ok(!document.querySelector('.ap-card[data-id="eravos.edm-lab"]'), 'no all-in-one card');
+      assert.ok(document.querySelector('.ap-card[data-id="suite:music.edm-lab"]'), 'the EDM Lab suite card');
+      const suiteCard = document.querySelector('.ap-card[data-id="suite:music.gothic"]');
+      assert.ok(suiteCard.querySelector('.ap-art-tile svg'), 'a suite card: its icon tile');
+      assert.equal(suiteCard.querySelectorAll('.ap-art-part svg').length, Suites.get('music.gothic').parts.length, 'and the icon of every part it is made of');
+      assert.ok(document.querySelector('.ap-card[data-id="eravos.fx-echo"] .ap-card-glyph svg'), 'a tool card: a drawn glyph by its name');
+      assert.ok(document.querySelectorAll('.ap-rail-item svg').length >= 10, 'the rail: one per category');
+      assert.ok(!Suites.get('music.edm-lab').allInOne, 'the suite points at no all-in-one');
+    } finally { AddMenu.close(); }
+  });
+  it('a window title, a tool page and a suite window draw their icons', async () => {
+    host(); const id = OrganismFactory.spawn('eravos.sub-engine', { x: 20, y: 20 });
+    try {
+      await TH.sleep(20); assert.ok(CanvasWM.windowOf(id).querySelector('.wm-icon svg'), 'the title bar');
+      ToolPage.open('eravos.sub-engine', { K: Kernel }); assert.ok(document.querySelector('.tp-head .ic-tile svg'), 'the page header tile');
+      assert.ok(document.querySelectorAll('.tp-nav svg').length >= 3, 'the page nav');
+      ToolPage.close();
+      const hub = Suites.open('music.xen', { K: Kernel }); await TH.sleep(30);
+      const w = CanvasWM.windowOf(hub); assert.ok(w.querySelector('.su-head .ic-tile svg') && w.querySelector('.wm-icon svg[data-icon="gem"]'), 'the suite window: its tile and its title icon');
+      OrganismFactory.close(hub);
+    } finally { ToolPage.close(); OrganismFactory.close(id); }
+  });
+});

@@ -37,7 +37,7 @@ describe('P49.4a · Arp — the arpeggiator as a part any instrument can use', (
 });
 describe('P49.4b · an all-in-one tool points at its parts', () => {
   it('Wobble Bass and EDM Lab (all-in-one): their 📘 pages offer “As parts”, and the parts’ pages say what they are part of', () => {
-    assert.equal(Suites.get('music.wub-lab').allInOne, 'eravos.wobble-bass'); assert.equal(Suites.get('music.edm-lab').allInOne, 'eravos.edm-lab');
+    assert.equal(Suites.get('music.wub-lab').allInOne, 'eravos.wobble-bass'); assert.ok(!Suites.get('music.edm-lab').allInOne, '3.64: no all-in-one — the suite is EDM Lab');
     try {
       let el = ToolPage.open('eravos.wobble-bass', { K: Kernel }); assert.ok(/As parts: Wub Lab/.test(el.querySelector('.tp-asparts').textContent));
       el = ToolPage.open('eravos.wub-filter', { K: Kernel }); assert.ok(Array.from(el.querySelectorAll('.tp-partof')).some(b => /Wub Lab/.test(b.textContent)), 'Wub Filter: Part of Wub Lab');

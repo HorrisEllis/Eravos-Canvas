@@ -26,7 +26,7 @@ describe('Odd Couples — a pack for every tool, songs from tools that never mee
   it('every music tool plays a part somewhere in the set (lane, insert, modulator or follower)', () => {
     const inSet = new Set(['eravos.session', 'eravos.timeline']);   // every Song Engine song mounts these two itself
     genres().forEach(G => used(G).forEach(([org]) => inSet.add(org)));
-    const notUsed = OrganismFactory.defined().filter(d => d.domain === 'music' && !inSet.has(d.id)).map(d => d.id);
+    const notUsed = OrganismFactory.defined().filter(d => d.domain === 'music' && !d.hidden && !inSet.has(d.id)).map(d => d.id);   // 3.64 a hidden tool (EDM Lab all-in-one) is not offered, so no song uses it
     // not song material: the recorder, the mixer view, the coach, MIDI mapping, the contrast analyser, the sequencer (songs use the Timeline)
     // 3.48 the suite window (eravos.suite-hub): the system its parts end in, no sound of its own
     // 3.48/3.49 the generator parts (Groove, Chords, Bassline, Arp) play only through a wire from their note out into an instrument, and the Song
