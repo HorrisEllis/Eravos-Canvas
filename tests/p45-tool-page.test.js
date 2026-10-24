@@ -125,4 +125,15 @@ describe('P45 · tool pages — suites, mods one by one, sound packs', () => {
   it('every bass tool sits in one Bass category', () => {
     ['eravos.wobble-bass', 'eravos.reese-bass', 'eravos.sub-engine', 'eravos.acid-synth', 'eravos.bass-forge', 'eravos.bass-gen'].forEach(id => assert.equal(F().def(id).category, 'Bass', id));
   });
+  it('the page is tabs, not one long page: one section shows; a tab switches; the tab stays through a repaint', async () => {
+    const K = Kernel, id = F().spawn('eravos.pads', { K });
+    try {
+      const el = ToolPage.open('eravos.pads', { instanceId: id, K }), shown = () => Array.from(el.querySelectorAll('.tp-page > .tp-sec')).filter(x => !x.hidden).map(x => x.dataset.sec);
+      assert.equal(shown().length, 1, 'one section at a time: ' + shown());
+      const tab = el.querySelector('.tp-nav [data-tab="kind-kits"]'); assert.ok(tab, 'a Kits tab'); tab.click();
+      assert.deepEqual(shown(), ['kind-kits']); assert.ok(tab.classList.contains('on') && tab.getAttribute('aria-selected') === 'true');
+      Kernel.bus.publish('canvas:mods', { instanceId: id }); await TH.sleep(80);
+      assert.deepEqual(shown(), ['kind-kits'], 'still on Kits after the page repainted');
+    } finally { ToolPage.close(); F().close(id); }
+  });
 });

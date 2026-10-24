@@ -513,3 +513,5 @@ svg.wires path.wire.hot { stroke-width: 4.5; filter: drop-shadow(0 0 4px current
   #songbookBtn.has-ic > .ic, #soundsBtn.has-ic > .ic, #learnBtn.has-ic > .ic, #dockBtn.has-ic > .ic, #organizeBtn.has-ic > .ic, #optBtn.has-ic > .ic { width: 16px; height: 16px; font-size: 16px; }
 }
 .tp-panel { position: relative; border: 1px solid var(--line, #1a2533); border-radius: 8px; padding: 10px; background: rgba(9,13,19,.6); max-height: 640px; overflow: auto; }
+.tp-sec[hidden] { display: none; }
+.tp-nav .tp-btn.tp-tab.on { color: #fff; background: rgba(255,255,255,.07); box-shadow: inset 0 -2px 0 var(--acc, #00d4ff); }

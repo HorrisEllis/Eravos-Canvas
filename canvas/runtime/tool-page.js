@@ -167,6 +167,19 @@
     cur.el.remove(); cur = null;
   }
 
+  // 3.48.4 "tabs, not a long page": the bar above the sections is a tab bar — one section shows at a time, and the page
+  // keeps the tab you picked while it repaints (a window opening, a pack switched on…)
+  function tabBtn(nav, btn, st, page, id, label, ic) {
+    nav.setAttribute('role', 'tablist');
+    const b = btn(label, label, () => { st.tab = id; showTab(st, page); page.scrollTop = 0; }, 'tp-tab', ic);
+    b.dataset.tab = id; b.setAttribute('role', 'tab'); nav.appendChild(b); return b;
+  }
+  function showTab(st, page) {
+    const secs = Array.from(page.querySelectorAll(':scope > .tp-sec')); if (!secs.length) return;
+    if (!secs.some(x => x.dataset.sec === st.tab)) st.tab = secs[0].dataset.sec;
+    secs.forEach(x => { x.hidden = x.dataset.sec !== st.tab; x.setAttribute('role', 'tabpanel'); });
+    page.querySelectorAll('.tp-nav [data-tab]').forEach(b => { const on = b.dataset.tab === st.tab; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+  }
   function repaint() {
     if (!cur) return; if (cur.suite) return repaintSuite();
     const st = cur, d = st.d, K = st.K, UI = global.UIKit, h = UI.h, M = global.Mods;
@@ -198,7 +211,7 @@
       partOf.map(x => btn('Part of: ' + x.label, 'open its page', () => openSuite(x.id, { K, back: () => open(d.id, { K, instanceId: st.target, back: st.back }) }), 'tp-partof', 'suite:' + x.id)))));
 
     const nav = h('nav', { class: 'tp-nav' }); page.appendChild(nav);
-    const navTo = (id, label, ic) => nav.appendChild(btn(label, 'jump to ' + label, () => { const s = page.querySelector(`[data-sec="${id}"]`); if (s) s.scrollIntoView({ block: 'start' }); }, '', ic));
+    const navTo = (id, label, ic) => tabBtn(nav, btn, st, page, id, label, ic);
 
     // 3.48.3 its own panel, live (every tool's whole window, its editors included) — edit it right here
     const uiFn = F().ui && F().ui(d.id);
@@ -329,7 +342,7 @@
         h('div', { class: 'tp-rt' }, [h('b', { text: (x.port || x.hook_id.split('.').pop()) + ' · ' + x.wire_type }), h('small', { text: x.intent || x.hook_id })]),
       ])))], 'io', 'arrow-left-right'));
     }
-    page.scrollTop = keepY;
+    showTab(st, page); page.scrollTop = keepY;
   }
   const backBtn = (btn) => cur && cur.back ? btn('Back', 'back to where you were', () => { const b = cur.back; close(); b(); }, 'tp-back', 'arrow-left') : null;
 
@@ -379,7 +392,7 @@
     if (s.allInOne && F().def(s.allInOne)) page.appendChild(h('div', { class: 'tp-on tp-parts' }, [btn('All in one: ' + defOf(s.allInOne).label, 'the same thing in one window — its page', () => open(s.allInOne, { K, back: () => openSuite(s.id, { K, back: st.back }) }), 'tp-allinone', s.allInOne)]));
 
     const nav = h('nav', { class: 'tp-nav' }); page.appendChild(nav);
-    const navTo = (id, label, ic) => nav.appendChild(btn(label, 'jump to ' + label, () => { const x = page.querySelector(`[data-sec="${id}"]`); if (x) x.scrollIntoView({ block: 'start' }); }, '', ic));
+    const navTo = (id, label, ic) => tabBtn(nav, btn, st, page, id, label, ic);
 
     // the parts
     navTo('parts', 'Parts', 'blocks');
@@ -425,7 +438,7 @@
         h('div', { class: 'tp-rt' }, [h('b', { html: nameH(w.wire.from[0]) + E(short(w.wire.from[1])) + '<span class="tp-arrow">→</span>' + (w.toSuite ? IC({ id: 'suite:' + s.id, icon: s.icon }, s.label, s.icon) : nameH(w.wire.to[0]) + E(short(w.wire.to[1]))) })]),
       ])))], 'wiring', 'cable'));
     }
-    page.scrollTop = keepY;
+    showTab(st, page); page.scrollTop = keepY;
   }
 
   // no window yet: which tools would fit a slot (the same rule Mods.compatible uses, read from the descriptors)
