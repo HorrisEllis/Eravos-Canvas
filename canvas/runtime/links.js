@@ -65,7 +65,7 @@
         chips.appendChild(chip);
         if (!mine.has(peer)) return;
         const keys = faceKeys(prec.def, own).filter(k => (prec.def.config || []).some(c => c.key === k));
-        const face = h('div', { class: 'lk-face', style: { '--lc': prec.def.accent || '#00d4ff' } });
+        const face = h('div', { class: 'lk-face', style: { '--lc': prec.def.accent || '#00d4ff', '--acc': prec.def.accent || '#00d4ff' } });
         const v = F.makeView(prec, face); views.get(id).push(v);
         face.appendChild(h('div', { class: 'lk-face-head' }, [
           h('span', { html: IC(prec.def, l.label, l.icon) }),

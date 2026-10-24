@@ -482,3 +482,6 @@ svg.wires path.wire.hot { stroke-width: 4.5; filter: drop-shadow(0 0 4px current
   #songbookBtn.has-ic, #soundsBtn.has-ic, #learnBtn.has-ic, #dockBtn.has-ic, #organizeBtn.has-ic, #optBtn.has-ic { font-size: 0; gap: 0; padding-left: 10px; padding-right: 10px; }
   #songbookBtn.has-ic > .ic, #soundsBtn.has-ic > .ic, #learnBtn.has-ic > .ic, #dockBtn.has-ic > .ic, #organizeBtn.has-ic > .ic, #optBtn.has-ic > .ic { width: 16px; height: 16px; font-size: 16px; }
 }
+.tp-panel { position: relative; border: 1px solid var(--line, #1a2533); border-radius: 6px; padding: 10px; background: var(--panel); max-height: 640px; overflow: auto; }
+.tp-sec[hidden] { display: none; }
+.tp-nav .tp-btn.tp-tab.on { color: #041018; background: var(--acc, #00d4ff); border-color: var(--acc, #00d4ff); font-weight: 700; }

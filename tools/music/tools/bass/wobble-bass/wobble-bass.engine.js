@@ -97,7 +97,7 @@
 
   OrganismFactory.define({
     id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '3.6.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
-    category: 'Sound sources', blurb: 'Dubstep wobble / talking "yoi" bass locked to the tempo. The drop.',
+    category: 'Bass', blurb: 'Dubstep wobble / talking "yoi" bass locked to the tempo. The drop.',
     size: { w: 1100, h: 640 }, minSize: { w: 420, h: 380 },   // 3.58 wide: the cards sit side by side; narrower stacks them
     slots: [{ id: 'growl', label: 'the growl (the sub stays clean)', wire_type: 'audio', hint: 'empty — a Destroyer, Phaser or Echo here works on the wub only; the sub underneath stays clean and in time' }],
     // 3.6 its suite (canvas/runtime/tool-page.js): one click loads it all, or ＋ one by one

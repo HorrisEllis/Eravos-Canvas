@@ -7,7 +7,8 @@
  * 3.69 "all the accent colours, anywhere, event-driven — like a visualiser" (and no rainbows): the accent colours THEMSELVES move.
  * The app's palette (--cyan --green --pink --violet --amber --red --acc on <html>) brightens with the mix and flashes on each hit;
  * each tool's own --acc (its window, knobs, buttons, the tool page) brightens with that tool's own sound. Every colour keeps its
- * hue — only its light moves — and goes back exactly to what it was in silence or when switched off.
+ * hue — only its light moves — and goes back exactly to what it was in silence or when switched off. (Merged with 3.48.2's
+ * living accent: same API — liveAcc / restoreAcc, data-acc-live (hex) for canvases that draw with the accent — but no hue sweep.)
  * Quiet when nothing plays (the values fall to 0 and stop updating). Respects reduced motion (calmer, no pulse). Off/on in
  * ⋯ Options (◐ Reactive colours, remembered). Only listens while the page is visible. */
 (function (global) {
@@ -34,7 +35,10 @@
     const hx = (v) => Math.round(clamp(v + M, 0, 1) * 255).toString(16).padStart(2, '0'); return '#' + hx(a) + hx(bb) + hx(cc);
   }
   function accOf(el) { if (el.dataset.acc0 === undefined) el.dataset.acc0 = el.style.getPropertyValue('--acc').trim(); return el.dataset.acc0; }
-  function light(el, k) { const b = accOf(el); if (!b) return; el.style.setProperty('--acc', lit(b, k)); live.add(el); }
+  function light(el, k) { const b = accOf(el); if (!b) return; const c = lit(b, k); el.style.setProperty('--acc', c); el.dataset.accLive = c; live.add(el); }
+  // a sounding window (and the controls in it that carry an accent) lit by its level lv 0…1; restoreAcc = its own colour again
+  function liveAcc(w, lv, ts) { const k = clamp(lv * 0.85 + pulse * 0.25 * lv, 0, 1); light(w, k); accented(w, ts || performance.now()).forEach(el => light(el, k)); }
+  function restoreAcc(w) { [w].concat(w._accEls || []).forEach(el => { if (el.dataset.acc0 !== undefined) { if (el.dataset.acc0) el.style.setProperty('--acc', el.dataset.acc0); delete el.dataset.accLive; live.delete(el); } }); }
   // a tool's accent lives on its window and again on some of its controls (knobs carry their own) — found once a second
   function accented(root, ts) { if (!root._accAt || ts - root._accAt > 1000) { root._accAt = ts; root._accEls = Array.from(root.querySelectorAll('[style*="--acc"]')); } return root._accEls; }
   let on = true; try { on = global.localStorage.getItem('eravos.reactive') !== '0'; } catch (e) {}
@@ -43,7 +47,7 @@
   function zero() {
     ['--snd-low', '--snd-high', '--snd-level', '--snd-pulse'].forEach(k => set(k, '0')); doc.querySelectorAll('.wm-win[style*="--tool-level"]').forEach(w => w.style.setProperty('--tool-level', '0'));
     PALETTE.forEach(k => root.style.removeProperty(k));
-    live.forEach(el => { if (el.dataset.acc0) el.style.setProperty('--acc', el.dataset.acc0); }); live.clear();
+    live.forEach(el => { if (el.dataset.acc0) el.style.setProperty('--acc', el.dataset.acc0); delete el.dataset.accLive; }); live.clear();
   }
   function ensure() {
     if (an || !K || !K.audio || !K.audio.ctx || !K.audio.output) return !!an;
@@ -85,7 +89,7 @@
       if (w.classList.contains('collapsed') || w.offsetParent === null) return; const t = toolTap(w); if (!t || t.none) return;
       t.an.getFloatTimeDomainData(t.buf); let s = 0; for (let i = 0; i < t.buf.length; i++) s += t.buf[i] * t.buf[i];
       const v = clamp((10 * Math.log10(s / t.buf.length + 1e-12) + 50) / 44, 0, 1); t.lv = (t.lv || 0) + (v - (t.lv || 0)) * 0.4; w.style.setProperty('--tool-level', t.lv.toFixed(3));
-      const k = clamp(t.lv * 0.85 + pulse * 0.25 * t.lv, 0, 1); light(w, k); accented(w, ts).forEach(el => light(el, k));
+      if (t.lv > 0.02) liveAcc(w, t.lv, ts); else restoreAcc(w);
     });
   }
   const SoundCSS = {
@@ -94,6 +98,7 @@
     set(v) { on = !!v; try { global.localStorage.setItem('eravos.reactive', on ? '1' : '0'); } catch (e) {} root.classList.toggle('snd-off', !on); if (!on) zero(); },
     // tests: one analysis step on demand (offline pages have no running clock)
     step() { last = -1e9; frame(performance.now() + 1e6); global.cancelAnimationFrame(raf); raf = global.requestAnimationFrame(frame); },
+    liveAcc, restoreAcc,   // tests
     _taps: taps, lit,
   };
   global.SoundCSS = SoundCSS;

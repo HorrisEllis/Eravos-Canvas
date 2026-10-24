@@ -39,7 +39,8 @@
                       },
                       "keymap": {
                         "type": "boolean"
-                      }
+                      },
+                      "mods": {}
                     },
                     "additionalProperties": false
                   },

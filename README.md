@@ -2,6 +2,20 @@
 
 A canvas of living instruments for making music — everything in key, everything on the beat.
 
+## 3.48.3 — every pack kind, a tool's own panel on its page, mods for the Drum Machine, one Bass category
+- **Tool pages show everything a tool has.** **Its panel**: the tool's own controls, live, on its page (the Drum Machine's
+  pad editor, any tool's whole window). **Every pack kind**, not only presets: the Drum Machine lists all of its **kits**,
+  from every kit pack and your own ("Mine"), each with **Load kit**. A domain says how a kind loads (`ToolPage.addKind`).
+- **Drum Machine 3.1**: a mod slot after the whole kit. Put a Squash, Destroyer or Echo on every pad at once.
+- **Bass**: one category with Wobble Bass, Reese Bass, Sub Engine, Acid Synth, Bass Forge and Bass Gen. Wub Sub stays with
+  the wub tools it belongs to.
+
+## 3.48.2 — accents follow the sound
+- Every sounding window's accent colour moves with its own sound: knob arcs, active buttons, toggles, sliders, the border
+  and its spectrum. As it gets louder it drifts toward the hue of the mix (violet and red for bass weight, teal for bright
+  tops) and brightens on each hit; when it goes quiet it returns to the tool's own colour. Knobs no longer pin a fixed colour
+  each. Tools inside another (mod cards, linked faces) keep their own colour. ⋯ Options › Reactive colours turns it off.
+
 ## Layout — the canvas and the tools are separate
 
     canvas/        the empty canvas — what ERAVOS.exe is. Domain-free: kernel/, runtime/, index.html, scripts.js

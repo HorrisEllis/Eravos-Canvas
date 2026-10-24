@@ -287,7 +287,7 @@
     o = o || {};
     const send = (v) => view.emit('config_change', { key: c.key, value: v });
     let ctl;
-    if (c.type === 'number' || c.type === 'integer') ctl = Knob(Object.assign({}, c, { value: view.state[c.key], onChange: send, accent: view.descriptor.accent, big: o.big, size: o.size }));
+    if (c.type === 'number' || c.type === 'integer') ctl = Knob(Object.assign({}, c, { value: view.state[c.key], onChange: send, big: o.big, size: o.size }));   // 3.48.2: the accent comes from where it sits (the window's --acc follows the sound)
     else if (c.type === 'boolean') ctl = Toggle({ label: c.label || c.key, value: view.state[c.key], onChange: send, hint: c.hint });
     else if (c.type === 'enum') ctl = (c.options.length <= (o.segMax || 5) ? Segmented : Select)({ label: o.noLabel ? '' : (c.label || c.key), options: c.options, value: view.state[c.key], onChange: send, hint: c.hint });
     else if (c.type === 'string') { const inp = h('input', { class: 'uk-text', value: view.state[c.key] || '' }); inp.addEventListener('change', () => send(inp.value)); inp.addEventListener('pointerdown', e => e.stopPropagation()); ctl = { el: h('label', { class: 'uk-field' }, [h('span', { text: c.label || c.key }), inp]), set: (v) => { inp.value = v; } }; }

@@ -8,7 +8,7 @@
   const DIVS = ['4/1', '2/1', '1/1', '1/2', '1/4', '1/8', '1/16'];
   OrganismFactory.define({
     id: 'eravos.reese-bass', preview: 'bass', domain: 'music', version: '2.0.0', label: 'Reese Bass', icon: '🔈', accent: '#ff2266', phase: 'P2',
-    category: 'Sound sources', blurb: 'Huge rolling drum & bass / neuro bass — detuned saws that breathe and flange.',
+    category: 'Bass', blurb: 'Huge rolling drum & bass / neuro bass — detuned saws that breathe and flange.',
     size: { w: 540, h: 400 }, minSize: { w: 420, h: 320 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
     provides: ['capability.audio_out', 'capability.note_in'],

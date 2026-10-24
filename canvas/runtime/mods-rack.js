@@ -37,7 +37,7 @@
       const cid = e.child, c = cid && F.handle(cid), d = c ? c.def : F.def(e.tool);
       const mode = folded.get(cid) || 'face';
       const btn = (text, title, fn, on) => { const b = h('button', { class: 'md-btn' + (on ? ' on' : ''), title, text }); b.addEventListener('click', (ev) => { ev.stopPropagation(); fn(); }); return b; };
-      const el = h('div', { class: 'md-card' + (e.bypass ? ' off' : ''), style: { '--mc': (d && d.accent) || '#00d4ff' } });
+      const el = h('div', { class: 'md-card' + (e.bypass ? ' off' : ''), style: { '--mc': (d && d.accent) || '#00d4ff', '--acc': (d && d.accent) || '#00d4ff' } });
       el.appendChild(h('div', { class: 'md-chead' }, [
         h('span', { class: 'md-name', html: IC(d || { id: e.tool }, (d && d.label) || e.tool, (d && d.icon) || '◻') }),
         btn('⏻', e.bypass ? 'switched off — click to switch on' : 'on — click to bypass', () => M.bypass(hostId, e.uid), !e.bypass),

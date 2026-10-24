@@ -11,7 +11,7 @@
   const PATTERNS = { 'groove kick': [0, 10], 'every beat': [0, 4, 8, 12], 'offbeats': [2, 6, 10, 14], 'eighths': [0, 2, 4, 6, 8, 10, 12, 14], 'half-time': [0] };
   OrganismFactory.define({
     id: 'eravos.bass-gen', domain: 'music', version: '1.0.0', label: 'Bassline', icon: '🎸', accent: '#7c4dff',
-    category: 'Generators', blurb: 'The root of the chord on the kick: follows a wired Chords and Groove, plays any bass tool wired to it.',
+    category: 'Bass', blurb: 'The root of the chord on the kick: follows a wired Chords and Groove, plays any bass tool wired to it.',
     size: { w: 400, h: 300 }, minSize: { w: 320, h: 240 },
     permissions: ['audio_out', 'bus_publish', 'bus_subscribe', 'registry_read'],   // audio_out: its mod input is an audio-rate port
     provides: ['capability.generation', 'capability.note_out'],

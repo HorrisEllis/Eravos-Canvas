@@ -103,3 +103,25 @@
 ## Order the coder would propose (his to set)
   E (asked twice, specced, small) → D survey (finds what P48–P49 broke) → B finish (the patch, plus a Windows run) → C one tool per
   push → A1 (SISO the canvas) → the A2 measure → his answers to A's open questions decide A3–A5.
+
+## ADDENDUM 2026-10-22 (later) — F. A UNIVERSAL CANVAS TOOL (brainstorm only; nothing built)
+  His words: "what if we make a canvas tool, univarsal. how meta would that be but it can be for the timeline, image editing I
+  eventually want to take a shot at rivaling photoshop. ambitous i know but its for free."
+  What already exists, read today (§8.6):
+  - tools/image/: domain.spec plus 15 planned tool specs (layers, layer-stack, mask-brush, selection, curves, crop-transform, text,
+    export, …). One is built: image-adjust (image-core.js, 68 lines).
+  - The piano roll (timeline.pianoroll.js) is already a drawing surface. It has zoom and scroll, tools on keys 1–6, box select,
+    one undo step per drag, snap, and now freehand curves (Bend, P52.6a).
+  - canvas/runtime/canvas-wm.js and history.js handle windows and undo for the app itself.
+  The coder's reading, to confirm: one domain-free SURFACE in canvas/runtime holds what the piano roll and an image editor share:
+  - a view (zoom, pan, grid and snap);
+  - a tool registry (pointer in, edit out);
+  - selection, and one history step per gesture;
+  - layers of objects, and a render loop.
+  Each domain brings its own content: the timeline brings notes on a time × pitch grid; image brings pixel and vector layers on a
+  GPU (WebGL2) engine of its own. The boundary rule holds: the surface never knows what a note or a pixel is.
+  The coder's lean on "rival Photoshop": compete on what Eravos already is, not feature for feature. Photopea shows a free
+  browser editor can carry real work. Where Eravos differs: every step is a non-destructive tool on the canvas, re-wireable and
+  modulatable, so a knob in an image can follow an LFO or a song. The hard parts are pixel speed on big images (tiles on the
+  GPU), brush feel, selection quality, colour management and PSD import. Each is its own phase.
+  His to set: which comes first on the surface, the timeline or an image editor; and raster (paint) or vector (shapes) first.

@@ -26,6 +26,12 @@
     removeMine(name) { delete mem.mine[name]; keep(); },
     kits() { return KitPacks.list().filter(p => KitPacks.enabled(p.id)).flatMap(p => Object.keys(p.kits).map(n => ({ pack: p.label, packId: p.id, name: n, pads: p.kits[n] }))); },
   };
+  // 3.48.3 a Drum Machine's page lists every kit (not only its presets): Load puts the kit on that Drum Machine; "Mine" too
+  if (window.ToolPage && window.ToolPage.addKind) window.ToolPage.addKind('kits', {
+    noun: 'kits', label: 'Load kit', title: 'put this kit on the Drum Machine this page works on (its current bank)',
+    apply: (K, id, item) => K.bus.publish('ui:kit_load:' + id, { pads: item.value }),
+    extra: (d) => d.id === 'eravos.pads' && Object.keys(mem.mine).length ? [{ label: 'Mine', items: Object.keys(mem.mine).map(n => ({ name: n, value: mem.mine[n] })) }] : [],
+  });
   KitPacks.add({ id: 'island', label: 'Island', kits: {
     'Roots One Drop': [P('kick', { tune: -3, decay: 0.5 }), P('rim', { tune: -2, decay: 0.12 }), P('hat', { tune: -2, decay: 0.06 }), P('openhat', { decay: 0.3 }),
       P('snare', { tune: -4, decay: 0.3 }), P('clap', { decay: 0.2, level: 0.8 }), P('tom', { tune: -5, decay: 0.5 }), P('tom', { tune: 2, decay: 0.4 }),

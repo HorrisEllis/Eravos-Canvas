@@ -1,24 +1,24 @@
 {
   "schema": "eravos.tool/1",
-  "id": "eravos.reese-bass",
-  "version": "2.0.0",
-  "label": "Reese Bass",
-  "icon": "🔈",
-  "accent": "#ff2266",
+  "id": "eravos.bass-forge",
+  "version": "1.0.0",
+  "label": "Bass Forge",
+  "icon": "🜂",
+  "accent": "#ff3d00",
   "domain": "music",
-  "category": "sound-sources",
-  "summary": "Huge rolling drum & bass / neuro bass — detuned saws that breathe and flange.",
+  "category": "bass",
+  "summary": "FM growls, riddim, neuro, screech — one LFO talks through FM, fold, vowel, comb, notch. MATCH learns a reference bass recursively.",
   "tags": [
-    "sound-sources",
-    "reese",
-    "bass"
+    "sound-forge",
+    "bass",
+    "forge"
   ],
   "files": {
-    "engine": "reese-bass.engine.js",
-    "ui": "reese-bass.ui.js",
-    "spec": "reese-bass.spec",
+    "engine": "bass-forge.engine.js",
+    "ui": "bass-forge.ui.js",
+    "spec": "bass-forge.spec",
     "preview": "preview.png",
-    "tests": "reese-bass.test.js",
+    "tests": "bass-forge.test.js",
     "thumb": "thumb.png"
   },
   "needs": {
@@ -30,7 +30,8 @@
       "audio_out",
       "midi_in",
       "bus_publish",
-      "bus_subscribe"
+      "bus_subscribe",
+      "filesystem_read"
     ]
   },
   "packs": {
@@ -45,7 +46,6 @@
     "eravos.acid-synth",
     "eravos.arp",
     "eravos.bass-drop-builder",
-    "eravos.bass-forge",
     "eravos.bass-gen",
     "eravos.breath",
     "eravos.channel",
@@ -82,6 +82,7 @@
     "eravos.particle-field",
     "eravos.ratio-lattice",
     "eravos.recursive-spectra",
+    "eravos.reese-bass",
     "eravos.retro-poly",
     "eravos.sample-player",
     "eravos.sidechain-compressor",

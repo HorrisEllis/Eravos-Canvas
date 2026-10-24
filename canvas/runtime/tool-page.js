@@ -15,7 +15,7 @@
 (function (global) {
   'use strict';
   const doc = global.document;
-  const TP = { open, openSuite, close, isOpen: () => !!cur, load, loadSuite, addMod, addLinked, presetGroups, partners, current: () => cur && (cur.suite ? { suiteId: cur.suite.id, target: cur.target } : { defId: cur.d.id, target: cur.target }) };
+  const TP = { addKind, kindGroups, open, openSuite, close, isOpen: () => !!cur, load, loadSuite, addMod, addLinked, presetGroups, partners, current: () => cur && (cur.suite ? { suiteId: cur.suite.id, target: cur.target } : { defId: cur.d.id, target: cur.target }) };
   let cur = null;   // { d, target, el, K, made: Map(tool → instanceId) }
 
   const F = () => global.OrganismFactory;
@@ -95,6 +95,24 @@
   }
 
   // ---------------------------------------------------------------- what the page lists
+  // 3.48.3 packs carry more than presets (kits, patterns, anything a tool takes): a domain says how this page loads
+  // a kind — ToolPage.addKind(kind, { label, noun, apply(K, instanceId, item), extra?(descriptor) → [{ label, items }] })
+  const KINDS = new Map();
+  function addKind(kind, o) { if (kind && o && typeof o.apply === 'function') KINDS.set(kind, o); }
+  // every non-preset kind this tool's packs hold, grouped by pack (+ what the domain adds, e.g. your own saved ones)
+  function kindGroups(d) {
+    const CP = global.ContentPacks, out = new Map();
+    if (CP) CP.list({ tool: d.id }).forEach(p => {
+      const pk = CP.get(p.id), mine = (pk && pk.items && pk.items[d.id]) || {};
+      Object.keys(mine).filter(k => k !== 'presets').forEach(k => {
+        const v = mine[k], items = Array.isArray(v) ? v.map((x, i) => ({ name: (x && (x.name || x.label)) || String(i + 1), value: x })) : Object.keys(v || {}).map(n => ({ name: n, value: v[n] }));
+        if (!items.length) return; if (!out.has(k)) out.set(k, []);
+        out.get(k).push({ pack: p.id, label: p.label, enabled: p.enabled, author: p.author, items });
+      });
+    });
+    KINDS.forEach((o, k) => { const ex = o.extra ? (o.extra(d) || []) : []; ex.filter(g => g.items && g.items.length).forEach(g => { if (!out.has(k)) out.set(k, []); out.get(k).push(Object.assign({ enabled: true }, g)); }); });
+    return out;
+  }
   function presetGroups(d) {
     const CP = global.ContentPacks, keys = Object.keys(d.presets || {}), used = new Set(), groups = [];
     if (CP) CP.list({ tool: d.id, kind: 'presets' }).forEach(p => {
@@ -144,15 +162,28 @@
   let pend = null;
   function soon() { if (pend) return; pend = global.setTimeout(() => { pend = null; repaint(); }, 30); }
   function close() {
-    if (!cur) return; (cur.unsubs || []).forEach(u => { try { u(); } catch (e) {} });
+    if (!cur) return; (cur.unsubs || []).forEach(u => { try { u(); } catch (e) {} }); (cur.views || []).forEach(v => { try { v.dispose(); } catch (e) {} });
     if (global.Preview && global.Preview.current && (cur.suite ? cur.suite.parts.some(p => p.tool === global.Preview.current.defId) : global.Preview.current.defId === cur.d.id)) global.Preview.stop();
     cur.el.remove(); cur = null;
   }
 
+  // 3.48.4 "tabs, not a long page": the bar above the sections is a tab bar — one section shows at a time, and the page
+  // keeps the tab you picked while it repaints (a window opening, a pack switched on…)
+  function tabBtn(nav, btn, st, page, id, label, ic) {
+    nav.setAttribute('role', 'tablist');
+    const b = btn(label, label, () => { st.tab = id; showTab(st, page); page.scrollTop = 0; }, 'tp-tab', ic);
+    b.dataset.tab = id; b.setAttribute('role', 'tab'); nav.appendChild(b); return b;
+  }
+  function showTab(st, page) {
+    const secs = Array.from(page.querySelectorAll(':scope > .tp-sec')); if (!secs.length) return;
+    if (!secs.some(x => x.dataset.sec === st.tab)) st.tab = secs[0].dataset.sec;
+    secs.forEach(x => { x.hidden = x.dataset.sec !== st.tab; x.setAttribute('role', 'tabpanel'); });
+    page.querySelectorAll('.tp-nav [data-tab]').forEach(b => { const on = b.dataset.tab === st.tab; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+  }
   function repaint() {
     if (!cur) return; if (cur.suite) return repaintSuite();
     const st = cur, d = st.d, K = st.K, UI = global.UIKit, h = UI.h, M = global.Mods;
-    const page = st.el.querySelector('.tp-page'), keepY = page.scrollTop; page.innerHTML = '';
+    const page = st.el.querySelector('.tp-page'), keepY = page.scrollTop; (st.views || []).forEach(v => { try { v.dispose(); } catch (e) {} }); st.views = []; page.innerHTML = '';
     if (!live(st.target)) st.target = null;
     const btn = (text, title, fn, cls, ic) => { const b = h('button', { class: 'tp-btn ' + (cls || ''), title, html: ic ? IC(ic, text) : E(text) }); b.addEventListener('click', (e) => { e.stopPropagation(); fn(); }); return b; };
     const sec = (title, sub, kids, id, ic) => h('section', { class: 'tp-sec', 'data-sec': id }, [h('h3', { class: 'tp-h', html: IC(ic, title) + (sub ? `<small> ${E(sub)}</small>` : '') })].concat(kids));
@@ -180,7 +211,17 @@
       partOf.map(x => btn('Part of: ' + x.label, 'open its page', () => openSuite(x.id, { K, back: () => open(d.id, { K, instanceId: st.target, back: st.back }) }), 'tp-partof', 'suite:' + x.id)))));
 
     const nav = h('nav', { class: 'tp-nav' }); page.appendChild(nav);
-    const navTo = (id, label, ic) => nav.appendChild(btn(label, 'jump to ' + label, () => { const s = page.querySelector(`[data-sec="${id}"]`); if (s) s.scrollIntoView({ block: 'start' }); }, '', ic));
+    const navTo = (id, label, ic) => tabBtn(nav, btn, st, page, id, label, ic);
+
+    // 3.48.3 its own panel, live (every tool's whole window, its editors included) — edit it right here
+    const uiFn = F().ui && F().ui(d.id);
+    if (uiFn) {
+      navTo('panel', 'Panel', 'sliders-horizontal');
+      const box = h('div', { class: 'tp-panel' }), rec = live(st.target);
+      if (rec) { const v = F().makeView(rec, box); st.views.push(v); try { uiFn(v); if (rec.ctx.syncUI) rec.ctx.syncUI(); } catch (x) { box.appendChild(UI.hint('its panel could not open here: ' + x.message)); } }
+      else box.append(h('p', { class: 'tp-p tp-dim', text: `${d.label}'s own controls open here, live, once one is on the canvas.` }), btn('Add to canvas', 'open one — its panel appears here', () => ensureHost(st), 'pri', 'plus'));
+      page.appendChild(sec('Its panel', rec ? '· the tool itself, live — every change is its window\'s too' : '', [box], 'panel', 'sliders-horizontal'));
+    }
 
     // the suite
     if (suite) {
@@ -258,6 +299,23 @@
       }), 'packs', 'package'));
     }
 
+    // the other kinds its packs hold (kits, patterns, …)
+    kindGroups(d).forEach((gs, kind) => {
+      const act = KINDS.get(kind), noun = (act && act.noun) || kind, cap = noun.charAt(0).toUpperCase() + noun.slice(1), total = gs.reduce((n, g) => n + g.items.length, 0);
+      navTo('kind-' + kind, cap, 'package');
+      page.appendChild(sec(cap, `· ${total} in ${gs.length} pack${gs.length > 1 ? 's' : ''}`, gs.map(g => {
+        const on = g.enabled !== false;
+        const tog = g.pack && global.ContentPacks ? btn(on ? 'on' : 'off', on ? 'this pack is on — click to switch it off' : 'switch this pack on', () => global.ContentPacks.setEnabled(g.pack, !on), on ? 'on' : '') : null;
+        return h('div', { class: 'tp-pack' + (on ? '' : ' off'), 'data-kind': kind }, [
+          h('div', { class: 'tp-sh' }, [h('b', { text: g.label }), h('small', { text: ` · ${g.items.length}` + (g.author ? ' · ' + g.author : '') }), h('span', { class: 'wm-spacer' }), tog]),
+          h('div', { class: 'tp-presets' }, g.items.map(x => h('div', { class: 'tp-pre' }, [
+            h('span', { class: 'tp-pn', text: x.name }),
+            on && act ? btn(act.label || 'Load', act.title || 'put it on the window this page works on', () => { const id = ensureHost(st); if (id) { act.apply(K, id, x); toast(`${d.label}: ${x.name}`, 'good', 1500); } }) : null,
+          ]))),
+        ]);
+      }), 'kind-' + kind, 'package'));
+    });
+
     // every control
     const params = (d.config || []).filter(c => !c.hidden);
     if (params.length) {
@@ -284,7 +342,7 @@
         h('div', { class: 'tp-rt' }, [h('b', { text: (x.port || x.hook_id.split('.').pop()) + ' · ' + x.wire_type }), h('small', { text: x.intent || x.hook_id })]),
       ])))], 'io', 'arrow-left-right'));
     }
-    page.scrollTop = keepY;
+    showTab(st, page); page.scrollTop = keepY;
   }
   const backBtn = (btn) => cur && cur.back ? btn('Back', 'back to where you were', () => { const b = cur.back; close(); b(); }, 'tp-back', 'arrow-left') : null;
 
@@ -334,7 +392,7 @@
     if (s.allInOne && F().def(s.allInOne)) page.appendChild(h('div', { class: 'tp-on tp-parts' }, [btn('All in one: ' + defOf(s.allInOne).label, 'the same thing in one window — its page', () => open(s.allInOne, { K, back: () => openSuite(s.id, { K, back: st.back }) }), 'tp-allinone', s.allInOne)]));
 
     const nav = h('nav', { class: 'tp-nav' }); page.appendChild(nav);
-    const navTo = (id, label, ic) => nav.appendChild(btn(label, 'jump to ' + label, () => { const x = page.querySelector(`[data-sec="${id}"]`); if (x) x.scrollIntoView({ block: 'start' }); }, '', ic));
+    const navTo = (id, label, ic) => tabBtn(nav, btn, st, page, id, label, ic);
 
     // the parts
     navTo('parts', 'Parts', 'blocks');
@@ -380,7 +438,7 @@
         h('div', { class: 'tp-rt' }, [h('b', { html: nameH(w.wire.from[0]) + E(short(w.wire.from[1])) + '<span class="tp-arrow">→</span>' + (w.toSuite ? IC({ id: 'suite:' + s.id, icon: s.icon }, s.label, s.icon) : nameH(w.wire.to[0]) + E(short(w.wire.to[1]))) })]),
       ])))], 'wiring', 'cable'));
     }
-    page.scrollTop = keepY;
+    showTab(st, page); page.scrollTop = keepY;
   }
 
   // no window yet: which tools would fit a slot (the same rule Mods.compatible uses, read from the descriptors)
