@@ -2,6 +2,24 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.71 🧩 Pattern Library, first slice (2026-10-24, specs/eravos.pattern-library.spec addendum)
+His words: "what about instead of so much songs, we have a pattern library" (10-23 too: "what about instead of so many songs, we have a
+pattern library?"), then "continue". Decided by his axioms: the 8 Floor Falls songs are not put on the shelf, and their moves are the
+library's first patterns (the songs' data is kept, §0.3).
+- **Patterns** (toolbar → Patterns): 1256 of them from 85 genres, all generated from the Song Engine, so a new genre adds its own.
+  - Types: Drums 344 · Bass 239 · Wobble 90 · Chords 190 · Lead 364 · Arp 2 · Drops 6 · Fills 8 · Curves 13.
+  - A Drop is the bass in the pause. Floor Falls' four are named: The floor falls · Stairs down · Freefall · Rises from the floor.
+  - A pattern keeps the timeline's own notes (bends, oscillation, per-note knobs such as the Wobble's rate), written relative to the
+    key. That is the coder's amendment to the spec's step format, which could not hold them.
+- **The page**: type chips × genre chips, search, a drawing on every card (notes, bends, curves).
+  - ▶ renders it off the canvas (nothing changes on your canvas) and plays it.
+  - → Timeline adds it to the track that plays that kind of tool (or a new track with the tool, its preset and settings), after what is
+    already there, in your song's key. A curve lands under that track.
+- Not yet (open): Send to the Sequencer / Wub Rate / Arp, Euclid, pattern packs + "Mine", "Open as patterns" on a song, drag a card onto a
+  window. The genre chips are the 85 Song Engine genres until P69.2 (8 genres → subgenres) lands.
+- Tests: tests/p71-pattern-library.test.js (5): ≥ 300 patterns · every type · the four drops and their bends · → Timeline (track, key, after,
+  curve) · ▶ renders sound without touching the canvas · the page filters.
+
 ## Done — 3.70 Floor Falls songs · right-click menu · his #5901 session optimized (2026-10-24, map specs/eravos.phase70-map.spec)
 His words: "i mean it sounds good to me, but any optimization the better." · "also more songs like floor falls out. like the part after
 24. bass drops, curves. describe it" · "more floor falls out and raven drop. curves and deep bass drops," · "also right clikc on the canvas

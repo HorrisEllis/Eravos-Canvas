@@ -40,3 +40,21 @@
   Send to Sequencer/Timeline places it exactly (step-for-step test) · Euclid E(5,16) = x..x..x..x..x... rotated as asked ·
   Scope's Lissajous is a line for mono and opens for wide stereo (tested) · Clip Maker: reverse twice = original,
   chop ×8 = 8 equal pads (tested)
+
+## ADDENDUM 2026-10-24 (P69.3 built as 3.71 — the first slice) — decided by his axioms after "continue"
+  His words, 2026-10-24, after the coder asked whether the 8 Floor Falls songs stay songs: "what about instead of so much songs, we have a
+  pattern library" · then "continue" (no answer to the two calls). Decided by his axioms, recorded as his system deciding: the direction is
+  his and stated (USER_AUTONOMY: "instead of so much songs"), so the 8 Floor Falls songs do NOT go on the Songbook shelf; their moves are
+  the library's first patterns, and their code stays as the source (§0.3, nothing deleted). The coder builds the library (§8.6: nothing of it
+  existed; the session that mapped it has not started, checked on origin 2026-10-24).
+  FORMAT AMENDED (the coder's call, D-71.1): a pattern stores the timeline's own clip notes { s, l, r | n, v, p?, b? } — r = semitones from
+  the key's root (pitched parts), n = the pad's note (drums) — not step tokens. Step tokens cannot hold what makes a drop: per-note bends,
+  oscillation, per-note knobs (wobble rate). A new type CURVE stores a curve lane (knob, points from bar 0, oscillation) for a kind of tool.
+  Pattern: { id, name, type: drums | bass | wobble | chords | lead | arp | drop | fill | curve, genre, genreLabel, bpm, bars, tool, preset?,
+             configure?, scale, drums?, notes?, curve?: { key, points, osc? }, source }
+  FIRST SLICE (3.71): the library is GENERATED from the Song Engine (every genre: every part's first bars of every section kind, the pause
+  as a DROP pattern, the build's last bar of drums as a FILL, every curve lane as a CURVE), the Floor Falls moves named (falls · stairs ·
+  freefall · rises); the page (type chips × genre chips, search, a mini drawing per card, ▶ Hear it rendered off the canvas, Send to the
+  Timeline: the right track or a new one with the tool, at the playhead, in the session's key); toolbar button "Patterns".
+  NOT in this slice (open): Send to Sequencer / Wub Rate / Arp, Euclid, pattern packs and "Mine", "Open as patterns" on a song card,
+  drag a card onto a window. The acceptance's ≥ 300 patterns is checked by a test.

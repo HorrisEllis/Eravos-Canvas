@@ -145,6 +145,8 @@
     ['hf7', 'Rise From the Floor', 7007, ['heavy', 'party']], ['hf8', 'Deepest Drop', 7008, ['heavy', 'dark']],
   ];
   const SONGS = SHELF.map(([id, title, seed, mood]) => Object.assign({ id, title, genre: G.id, seed, mood: ['edm'].concat(mood), move: moveOf(seed) }, NOTE(moveOf(seed))));
-  if (window.Songbook && window.Songbook.add) SONGS.forEach(window.Songbook.add);
-  window.FloorFallsSongbook = { genres: [G.id], songs: SONGS.map(s => s.id), moveOf, MOVES };
+  // 3.71 — James, 2026-10-24: "what about instead of so much songs, we have a pattern library". These eight are NOT put on the Songbook
+  // shelf; the genre stays a Song Engine generator and its moves are the Pattern Library's first patterns (data/pattern-library.js).
+  // The list is kept (§0.3): window.FloorFallsSongbook.shelf, should he want them back on the shelf.
+  window.FloorFallsSongbook = { genres: [G.id], shelf: SONGS, songs: [], moveOf, MOVES };
 })();
