@@ -2,6 +2,13 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Mapped next — 3.69 (specs/eravos.phase69-map.spec)
+P69.1 a v10 theme you pick in ⋯ Options (current look stays default and frozen) → P69.2 songs by genre + subgenre →
+P69.3 Pattern Library → P69.4 Scope + Phase Space → P69.5 Clip Maker 2.0 → P69.6 GPU particle field → P69.7 voice analyser +
+live transcription. Specs: eravos.themes, eravos.songbook-genres, eravos.pattern-library, eravos.migration-components.
+Fonts for v10 (Orbitron, Share Tech Mono, Rajdhani, OFL) are fetched as @fontsource 5.3.0 at build time of P69.1.
+Done this round: 3.48.4 tool and suite pages are tabs.
+
 ## Done — 3.68 Export tags & cover (2026-10-24)
 His words: "The export have a meta data editor option and have it autofilled. Option to upload cover image."
 - Song Recorder → 🏷 Tags: title, artist, album, genre, year, BPM, key, comment, and a cover. Every field is filled in for you
