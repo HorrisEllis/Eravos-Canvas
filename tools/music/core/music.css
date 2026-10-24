@@ -231,3 +231,20 @@ html:not(.snd-off) #logo { background: linear-gradient(90deg, hsl(calc(var(--snd
 .sbk-preview { margin: 8px 0 4px; }
 .sbk-map { display: block; width: 100%; height: 120px; border-radius: 6px; background: #0a0f15; border: 1px solid var(--line2); }
 .sbk-prev { font-weight: 700; }
+/* 3.68 the recorder's Tags & cover panel */
+.sr-tags { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 130000; width: min(720px, calc(100vw - 32px)); max-height: calc(100vh - 80px); overflow: auto;
+  background: linear-gradient(180deg, #121a25, #0a0f16); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 18px 20px; color: var(--text, #d8e2ee);
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,.75), 0 0 0 1px rgba(0,0,0,.4); }
+.sr-tags-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px; } .sr-tags-head b { font-size: 16px; } .sr-tags-head small { color: #7d8ea2; flex: 1; }
+.sr-tags-x { background: transparent; border: 0; color: #8fa1b6; font-size: 16px; cursor: pointer; } .sr-tags-x:hover { color: #fff; }
+.sr-tags-body { display: flex; gap: 20px; flex-wrap: wrap; }
+.sr-tags-fields { flex: 1 1 320px; display: flex; flex-direction: column; gap: 6px; }
+.sr-tag-row { display: grid; grid-template-columns: 70px 1fr 40px; align-items: center; gap: 8px; }
+.sr-tag-l { font: 600 10px var(--mono, monospace); letter-spacing: .08em; text-transform: uppercase; color: #8fa1b6; }
+.sr-tag-in { height: 30px; padding: 0 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.1); background: rgba(0,0,0,.3); color: #e6eef7; font: 13px var(--font, sans-serif); min-width: 0; }
+.sr-tag-in::placeholder { color: #6d7f93; } .sr-tag-in:focus { outline: none; border-color: var(--cyan, #00d4ff); }
+.sr-tag-hint { color: #6d7f93; font-size: 11px; }
+.sr-tags-cover { flex: 0 0 200px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.sr-cover { width: 200px; height: 200px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(255,255,255,.1); box-shadow: 0 10px 30px -10px rgba(0,0,0,.6); }
+.sr-cover.empty { display: grid; place-items: center; color: #6d7f93; background: rgba(0,0,0,.25); }
+.sr-tags-btns { display: flex; gap: 6px; }

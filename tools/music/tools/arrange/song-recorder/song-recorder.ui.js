@@ -25,6 +25,45 @@ OrganismFactory.reg('eravos.song-recorder', function (view) {
   const expB = UI.Button({ label: '⤓ Export', kind: 'primary', hint: 'render the song offline and save it', onClick: () => view.emit('export', {}) });
   const songB = UI.Button({ label: '📖 Save to Songs', hint: 'keep this song (audio + everything on the canvas) in the Songbook → My songs', onClick: () => view.emit('save_song', {}) });
   const expSt = h('span', { class: 'sr-exp' });
+  // 3.68 TAGS — the file's metadata, autofilled (the song's name, your artist name, genre, year, BPM, key), and its cover
+  const tagB = UI.Button({ label: '🏷 Tags', hint: 'the tags and cover every export carries — filled in for you; change any of them', onClick: () => openTags() });
+  let metaSt = null, tagPanel = null;
+  view.on('meta', (m) => { metaSt = m; if (tagPanel) paintTags(); });
+  const FIELDS = [['title', 'Title'], ['artist', 'Artist'], ['album', 'Album'], ['genre', 'Genre'], ['year', 'Year'], ['bpm', 'BPM'], ['key', 'Key'], ['comment', 'Comment']];
+  function openTags() {
+    if (tagPanel) { closeTags(); return; }
+    tagPanel = h('div', { class: 'sr-tags', role: 'dialog', 'aria-label': 'tags and cover' });
+    tagPanel.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Escape') closeTags(); });
+    tagPanel.addEventListener('pointerdown', (e) => e.stopPropagation());
+    document.body.appendChild(tagPanel); paintTags(); view.emit('want_meta', {});
+  }
+  function closeTags() { if (tagPanel) { tagPanel.remove(); tagPanel = null; } }
+  view.onDispose && view.onDispose(closeTags);
+  const coverFile = h('input', { type: 'file', accept: 'image/png,image/jpeg', style: { display: 'none' } });
+  coverFile.addEventListener('change', async () => { const f = coverFile.files[0]; if (f) view.emit('cover_set', { arrayBuffer: await f.arrayBuffer(), mime: f.type, name: f.name }); coverFile.value = ''; });
+  function paintTags() {
+    const m = metaSt || { own: {}, auto: {}, resolved: {} }, el = tagPanel; el.innerHTML = '';
+    const close = h('button', { class: 'sr-tags-x', title: 'close (Esc)', text: '✕' }); close.onclick = closeTags;
+    const rows = FIELDS.map(([k, label]) => {
+      const inp = h('input', { class: 'sr-tag-in', value: (m.own && m.own[k]) || '', placeholder: (m.auto && m.auto[k]) || '', 'aria-label': label, 'data-key': k });
+      const send = () => { if ((inp.value || '') !== ((m.own && m.own[k]) || '')) view.emit('meta_set', { patch: { [k]: inp.value } }); };
+      inp.addEventListener('change', send); inp.addEventListener('blur', send);
+      const auto = !(m.own && m.own[k]) && (m.auto && m.auto[k]);
+      return h('label', { class: 'sr-tag-row' }, [h('span', { class: 'sr-tag-l', text: label }), inp, h('small', { class: 'sr-tag-hint', text: auto ? 'auto' : (m.own && m.own[k]) ? 'yours' : '' })]);
+    });
+    const img = m.cover ? h('img', { class: 'sr-cover', src: m.cover, alt: 'the cover' }) : h('div', { class: 'sr-cover empty', text: 'no cover' });
+    const up = h('button', { class: 'tb-btn', text: m.uploaded ? 'Change image…' : 'Upload image…', title: 'a PNG or JPEG, square works best' }); up.onclick = () => coverFile.click();
+    const rm = m.uploaded ? h('button', { class: 'tb-btn', text: 'Remove', title: 'back to the auto cover (or none)' }) : null; if (rm) rm.onclick = () => view.emit('cover_clear', {});
+    el.append(
+      h('div', { class: 'sr-tags-head' }, [h('b', { text: 'Tags & cover' }), h('small', { text: ' every export carries these — grey = filled in for you; type to change one, clear it to go back' }), close]),
+      h('div', { class: 'sr-tags-body' }, [
+        h('div', { class: 'sr-tags-fields' }, rows),
+        h('div', { class: 'sr-tags-cover' }, [img, h('div', { class: 'sr-tags-btns' }, [up, rm].filter(Boolean)), UI.paramControl(view, cfg('autoCover')).el,
+          h('small', { class: 'sr-tag-hint', text: m.uploaded ? 'your image' : m.autoCover ? 'drawn from the song (the final one uses the whole export)' : 'no cover' })]),
+      ]),
+      h('small', { class: 'sr-tag-hint', text: 'Written into MP3, WAV, FLAC and AIFF. Opus files carry no tags. Your artist name is remembered on this computer for every project.' }),
+      coverFile);
+  }
   const file = h('input', { type: 'file', accept: 'audio/*', multiple: true, style: { display: 'none' } });
   file.addEventListener('change', async () => { for (const f of Array.from(file.files)) view.emit('import', { arrayBuffer: await f.arrayBuffer(), name: f.name }); file.value = ''; });
   const impB = UI.Button({ label: '＋ Audio', hint: 'add audio files at the playhead (or drop them on a lane)', onClick: () => file.click() });
@@ -32,7 +71,7 @@ OrganismFactory.reg('eravos.song-recorder', function (view) {
   const insp = h('span', { class: 'sr-insp' });
   view.bind('format', (v) => fmtSel.set(v)); view.bind('source', (v) => srcSel.set(v || 'master'));
   const bar = h('div', { class: 'sr-bar' }, [recB, playB.el, homeB.el, pos, h('span', { class: 'sr-l', text: 'REC FROM' }), srcSel.el, h('span', { class: 'sr-sep' }), h('span', { class: 'sr-l', text: 'SNAP' }), snapSel.el, impB.el, laneB.el, withSong.el, insp,
-    h('span', { class: 'sr-grow' }), nameIn.el, fmtSel.el, rangeSel.el, stemsT.el, expB.el, songB.el, expSt, file]);
+    h('span', { class: 'sr-grow' }), nameIn.el, fmtSel.el, rangeSel.el, stemsT.el, tagB.el, expB.el, songB.el, expSt, file]);
   // ---------------- lanes + canvas
   const heads = h('div', { class: 'sr-heads' });
   const cv = UI.Canvas(800, 200); cv.className += ' sr-canvas'; cv.tabIndex = 0;

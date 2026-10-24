@@ -2,6 +2,17 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.68 Export tags & cover (2026-10-24)
+His words: "The export have a meta data editor option and have it autofilled. Option to upload cover image."
+- Song Recorder → 🏷 Tags: title, artist, album, genre, year, BPM, key, comment, and a cover. Every field is filled in for you
+  (grey): the song's name, or the song the Songbook just wrote, its genre, this year, the BPM, the key, "Made with ERAVOS".
+  Type to change one; clear it to go back to auto. The artist is typed once and remembered on this computer (never in a save).
+- Cover: upload a PNG or JPEG, or let it draw one from the song (1000 px, a ring of the export's own waveform, title, BPM, key).
+- Written into MP3 (ID3v2.3, UTF-16, front cover), WAV (LIST/INFO + id3 chunk), FLAC (Vorbis comment + PICTURE) and AIFF
+  (NAME/AUTH/ANNO + ID3). Exports, stems and Save to Songs all carry them; Opus says it carries none. The audio is untouched
+  (WAV and FLAC decode bit-identical with and without tags).
+- Tests (p68-export-tags: 7): each format read back byte by byte, autofill and overrides, the remembered artist, covers.
+
 ## Done — 3.67 Bézier handles on per-note curves (2026-10-24)
 - A point may carry the handle of the segment that ends at it: [t, value, [hx 0…1, handle value]] — that segment is the quadratic
   Bézier through its ends (an arc, an ease in or out); no handle = a straight line, as before. Played by the SDK exactly as drawn,

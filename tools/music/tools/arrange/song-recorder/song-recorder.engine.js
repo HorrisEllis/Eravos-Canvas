@@ -32,13 +32,16 @@
       { key: 'stems', type: 'boolean', default: false, label: 'Stems', group: 'EXPORT', hint: 'one file per lane, zipped' },
       { key: 'tail', type: 'number', default: 2, min: 0, max: 12, step: 0.1, unit: 's', label: 'Tail', group: 'EXPORT' },
       { key: 'songName', type: 'string', default: 'my song', label: 'Song name', group: 'EXPORT' },
+      // 3.68 the file's tags: only what you typed (an empty field is filled in at export — see autoMeta) and an uploaded cover
+      { key: 'meta', type: 'object', default: {}, label: 'Tags', group: 'EXPORT', hidden: true },
+      { key: 'autoCover', type: 'boolean', default: true, label: 'Auto cover', group: 'EXPORT', hint: 'no cover chosen: draw one from the song itself' },
       { key: 'level', type: 'number', default: 1, min: 0, max: 1.5, step: 0.01, label: 'Playback', group: 'OUT' },
       // 3.27: the recorder's ▶ plays ONLY the takes (the canvas stays silent). Takes join the song's transport only when this is on
       // (overdubbing) — otherwise a take of the master would play on top of the live canvas that made it (heard twice).
       { key: 'withSong', type: 'boolean', default: false, label: 'Play with song', group: 'OUT', hint: 'takes also play when the whole canvas plays (for overdubs)' },
     ],
-    ui_hooks: ['record', 'play', 'stop', 'seek', 'clip_move', 'clip_trim', 'clip_split', 'clip_delete', 'clip_dup', 'clip_edit', 'lane_add', 'lane_edit', 'lane_delete', 'lane_arm', 'select', 'import', 'export', 'want_peaks', 'save_song'],
-    ui_hook_labels: { clip_move: 'move clip', clip_trim: 'trim clip', clip_split: 'split clip', clip_delete: 'delete clip', clip_dup: 'duplicate clip', clip_edit: 'edit clip', lane_add: 'add lane', lane_edit: 'edit lane', lane_delete: 'delete lane', import: 'import audio', record: 'record take' },
+    ui_hooks: ['record', 'play', 'stop', 'seek', 'clip_move', 'clip_trim', 'clip_split', 'clip_delete', 'clip_dup', 'clip_edit', 'lane_add', 'lane_edit', 'lane_delete', 'lane_arm', 'select', 'import', 'export', 'want_peaks', 'save_song', 'meta_set', 'cover_set', 'cover_clear', 'want_meta'],
+    ui_hook_labels: { clip_move: 'move clip', clip_trim: 'trim clip', clip_split: 'split clip', clip_delete: 'delete clip', clip_dup: 'duplicate clip', clip_edit: 'edit clip', lane_add: 'add lane', lane_edit: 'edit lane', lane_delete: 'delete lane', import: 'import audio', record: 'record take', meta_set: 'edit tags', cover_set: 'set cover', cover_clear: 'remove cover' },
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, K = ctx.K, dsp = ctx.dsp;
       const out = ac.createGain(); out.gain.value = P.get('level'); ctx.track(out);
@@ -205,6 +208,68 @@
         return A.startRendering();
       }
       ctx.render = render;
+      // ---- 3.68 METADATA — every export carries the song's tags (Codecs writes them into MP3 / WAV / FLAC / AIFF).
+      // Autofilled: the title (the song name, or the song the Songbook last wrote), the artist (typed once, remembered on this computer —
+      // never in a save), the genre (that song's), the year, BPM, key, "Made with ERAVOS". Whatever you type wins; an empty field goes
+      // back to the autofill. The cover: an image you upload (kept with the project), else — Auto cover — one drawn from the song.
+      let lastSong = null;
+      ctx.on('song:written', null, (p) => { if (p && typeof p === 'object') { lastSong = { title: String(p.title || '').slice(0, 120), genre: String(p.genre || '').slice(0, 60) }; ctx.syncUI(); } });
+      const artistMem = ctx.secret ? ctx.secret('artist') : null;
+      const NOTE = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+      const keyName = () => { const k = ctx.key || (K.music && K.music.key); if (!k || typeof k.root !== 'number') return ''; return NOTE[((k.root % 12) + 12) % 12] + (/minor|aeolian|dorian|phrygian|locrian/i.test(k.scale || '') ? 'm' : ''); };
+      const META_KEYS = ['title', 'artist', 'album', 'genre', 'year', 'bpm', 'key', 'comment'];
+      function autoMeta() {
+        const nm = String(P.get('songName') || '').trim();
+        return { title: nm && nm !== 'my song' ? nm : (lastSong && lastSong.title) || nm || 'my song', artist: artistMem ? artistMem.get() : '', album: '',
+          genre: (lastSong && lastSong.genre) || '', year: String(new Date().getFullYear()), bpm: String(Math.round(ctx.bpm)), key: keyName(), comment: 'Made with ERAVOS' };
+      }
+      const own = () => Object.assign({}, P.get('meta') || {});
+      function metaOf() { const m = own(), a = autoMeta(), o = { encoder: 'ERAVOS' }; META_KEYS.forEach(k => { o[k] = m[k] !== undefined && String(m[k]).trim() !== '' ? String(m[k]) : a[k]; }); return o; }
+      ctx.onUI('meta_set', { type: 'object', required: ['patch'] }, (p) => {
+        const m = own(); Object.keys(p.patch || {}).forEach(k => { if (!META_KEYS.includes(k)) return; const v = String(p.patch[k] == null ? '' : p.patch[k]).slice(0, 200); if (v.trim()) m[k] = v; else delete m[k]; });
+        if (p.patch && typeof p.patch.artist === 'string' && p.patch.artist.trim() && artistMem) artistMem.set(p.patch.artist.trim());   // remembered for every project
+        P.set('meta', m); sendMeta();
+      });
+      ctx.onUI('cover_set', { type: 'object', required: ['arrayBuffer'] }, (p) => {
+        const mime = /^image\/(png|jpeg)$/.test(p.mime || '') ? p.mime : null; if (!mime || !(p.arrayBuffer instanceof ArrayBuffer)) return ctx.emitUI('export_state', { error: 'A cover is a PNG or JPEG image.' });
+        if (p.arrayBuffer.byteLength > 6 * 1048576) return ctx.emitUI('export_state', { error: 'That image is over 6 MB — pick a smaller one.' });
+        const a = K.assets.register(p.arrayBuffer, { name: p.name || 'cover', mime }); P.set('meta', Object.assign(own(), { coverHash: a.hash, coverMime: mime })); sendMeta();
+      });
+      ctx.onUI('cover_clear', null, () => { const m = own(); delete m.coverHash; delete m.coverMime; P.set('meta', m); sendMeta(); });
+      const coverAsset = () => { const m = own(), a = m.coverHash && K.assets.get(m.coverHash); return a && a.data ? { mime: m.coverMime || a.mime || 'image/png', bytes: new Uint8Array(a.data) } : null; };
+      // the auto cover: the song's own waveform as a ring, on a colour taken from its title, with its name, artist, BPM and key
+      function waveOf(b) { const d = b ? b.getChannelData(0) : null, n = 720, w = new Float32Array(n); if (!d) return w; const step = Math.max(1, Math.floor(d.length / n)); for (let i = 0; i < n; i++) { let m = 0; for (let j = i * step, e = Math.min(d.length, j + step); j < e; j += 4) m = Math.max(m, Math.abs(d[j])); w[i] = m; } return w; }
+      function peaksWave() { const w = new Float32Array(720); const cs = clips.slice().sort((x, y) => x.start - y.start); const all = []; cs.forEach(c => { const pk = peaks.get(c.hash); if (pk) for (let i = 0; i < pk.length; i++) all.push(Math.abs(pk[i])); }); if (!all.length) return w; for (let i = 0; i < 720; i++) w[i] = all[Math.floor(i / 720 * all.length)] || 0; return w; }
+      function drawCover(m, wave, size) {
+        const S = size || 1000, cv = document.createElement('canvas'); cv.width = cv.height = S; const g = cv.getContext('2d');
+        let hsh = 0; for (const ch of String(m.title || '')) hsh = (hsh * 31 + ch.codePointAt(0)) >>> 0; const hue = hsh % 360, acc = `hsl(${hue}, 92%, 60%)`;
+        const bg = g.createLinearGradient(0, 0, S, S); bg.addColorStop(0, `hsl(${(hue + 250) % 360}, 45%, 9%)`); bg.addColorStop(1, `hsl(${hue}, 55%, 14%)`); g.fillStyle = bg; g.fillRect(0, 0, S, S);
+        g.strokeStyle = 'rgba(255,255,255,0.04)'; g.lineWidth = 1; for (let x = 0; x <= S; x += S / 20) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, S); g.stroke(); g.beginPath(); g.moveTo(0, x); g.lineTo(S, x); g.stroke(); }
+        let mx = 1e-6; for (let i = 0; i < wave.length; i++) mx = Math.max(mx, wave[i]);
+        const cx = S / 2, cy = S * 0.42, r0 = S * 0.2, glow = g.createRadialGradient(cx, cy, r0 * 0.3, cx, cy, r0 * 2.2); glow.addColorStop(0, `hsla(${hue}, 90%, 60%, 0.35)`); glow.addColorStop(1, 'transparent'); g.fillStyle = glow; g.fillRect(0, 0, S, S);
+        g.strokeStyle = acc; g.lineWidth = S * 0.004; g.lineCap = 'round';
+        for (let i = 0; i < wave.length; i += 2) { const a = (i / wave.length) * Math.PI * 2 - Math.PI / 2, v = wave[i] / mx, r1 = r0, r2 = r0 + S * 0.16 * Math.max(0.03, v); g.globalAlpha = 0.45 + 0.55 * v; g.beginPath(); g.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1); g.lineTo(cx + Math.cos(a) * r2, cy + Math.sin(a) * r2); g.stroke(); }
+        g.globalAlpha = 1; g.beginPath(); g.arc(cx, cy, r0 * 0.94, 0, Math.PI * 2); g.fillStyle = 'rgba(5,8,12,0.85)'; g.fill(); g.strokeStyle = 'rgba(255,255,255,0.15)'; g.lineWidth = S * 0.002; g.stroke();
+        g.fillStyle = acc; g.font = `700 ${S * 0.05}px system-ui, sans-serif`; g.textAlign = 'center'; g.fillText([m.bpm ? m.bpm + ' BPM' : '', m.key].filter(Boolean).join(' · '), cx, cy + S * 0.018);
+        g.textAlign = 'left'; const fit = (t, px, w) => { g.font = `800 ${px}px system-ui, sans-serif`; while (px > 24 && g.measureText(t).width > w) { px -= 4; g.font = `800 ${px}px system-ui, sans-serif`; } return px; };
+        g.fillStyle = '#ffffff'; fit(String(m.title || ''), S * 0.085, S * 0.84); g.fillText(String(m.title || ''), S * 0.08, S * 0.8);
+        if (m.artist) { g.fillStyle = 'rgba(255,255,255,0.72)'; fit(String(m.artist), S * 0.045, S * 0.84); g.fillText(String(m.artist), S * 0.08, S * 0.87); }
+        g.fillStyle = 'rgba(255,255,255,0.35)'; g.font = `600 ${S * 0.022}px ui-monospace, monospace`; g.fillText(['ERAVOS', m.genre, m.year].filter(Boolean).join('  ·  ').toUpperCase(), S * 0.08, S * 0.93);
+        return cv;
+      }
+      const pngOf = (cv) => new Promise((res) => cv.toBlob(async (b) => res(b ? new Uint8Array(await b.arrayBuffer()) : null), 'image/png'));
+      async function tagsFor(b, extra) {
+        const m = Object.assign(metaOf(), extra || {}); let cover = coverAsset();
+        if (!cover && P.get('autoCover') && typeof document !== 'undefined') { const bytes = await pngOf(drawCover(m, waveOf(b), 1000)); if (bytes) cover = { mime: 'image/png', bytes, size: 1000 }; }
+        if (cover) m.cover = cover; return m;
+      }
+      function sendMeta() {
+        const m = own(), cov = coverAsset(); let preview = null;
+        if (cov) { let bin = ''; const B = cov.bytes; for (let i = 0; i < B.length; i += 0x8000) bin += String.fromCharCode.apply(null, B.subarray(i, i + 0x8000)); preview = 'data:' + cov.mime + ';base64,' + btoa(bin); }
+        else if (P.get('autoCover') && typeof document !== 'undefined') preview = drawCover(metaOf(), peaksWave(), 360).toDataURL('image/png');
+        ctx.emitUI('meta', { own: m, auto: autoMeta(), resolved: metaOf(), cover: preview, uploaded: !!cov, autoCover: !!P.get('autoCover') });
+      }
+      ctx.onUI('want_meta', null, sendMeta); P.onChange('autoCover', sendMeta);
       let exporting = false;
       ctx.onUI('export', { type: 'object' }, async (p) => {
         if (exporting) return; if (!clips.length) return ctx.emitUI('export_state', { error: 'Nothing recorded yet — press ⏺ and play.' });
@@ -213,11 +278,11 @@
           ctx.emitUI('export_state', { busy: true, text: 'rendering…' });
           if (p.stems || P.get('stems')) {
             const files = [];
-            for (const l of lanes) { if (!clips.some(c => c.lane === l.id)) continue; const b = await render(l.id); const r = await window.Codecs.encode(b, fmt.startsWith('opus') ? 'wav24' : fmt); files.push({ name: `${name} - ${l.name}.${r.ext}`.replace(/[\\/:*?"<>|]+/g, '_'), data: new Uint8Array(await r.blob.arrayBuffer()) }); ctx.emitUI('export_state', { busy: true, text: `stem ${files.length}/${lanes.length}` }); }
+            for (const l of lanes) { if (!clips.some(c => c.lane === l.id)) continue; const b = await render(l.id); const r = await window.Codecs.encode(b, fmt.startsWith('opus') ? 'wav24' : fmt, { meta: await tagsFor(b, { title: metaOf().title + ' — ' + l.name }) }); files.push({ name: `${name} - ${l.name}.${r.ext}`.replace(/[\\/:*?"<>|]+/g, '_'), data: new Uint8Array(await r.blob.arrayBuffer()) }); ctx.emitUI('export_state', { busy: true, text: `stem ${files.length}/${lanes.length}` }); }
             const z = window.Codecs.zip(files); window.Codecs.download(z, name + ' (stems).zip'); ctx.emitUI('export_state', { done: true, text: `${files.length} stems · ${(z.size / 1048576).toFixed(1)} MB` });
           } else {
-            const b = await render(); const r = await window.Codecs.encode(b, fmt, { onProgress: (x) => ctx.emitUI('export_state', { busy: true, text: `encoding ${Math.round(x * 100)}%` }) });
-            window.Codecs.download(r.blob, `${name}.${r.ext}`); ctx.emitUI('export_state', { done: true, text: `${r.label} · ${b.duration.toFixed(1)} s · ${(r.bytes / 1048576).toFixed(2)} MB` });
+            const b = await render(); const r = await window.Codecs.encode(b, fmt, { meta: await tagsFor(b), onProgress: (x) => ctx.emitUI('export_state', { busy: true, text: `encoding ${Math.round(x * 100)}%` }) });
+            window.Codecs.download(r.blob, `${name}.${r.ext}`); ctx.emitUI('export_state', { done: true, text: `${r.label} · ${b.duration.toFixed(1)} s · ${(r.bytes / 1048576).toFixed(2)} MB` + (r.tagged ? ' · tagged' : ' · no tags in this format') });
             ctx.lastExport = r;
           }
         } catch (e) { ctx.emitUI('export_state', { error: e.message }); ctx.fault('RUNTIME_003', 'export: ' + e.message); }
@@ -229,7 +294,7 @@
         exporting = true; const name = String(P.get('songName') || 'my song').trim() || 'my song';
         try {
           ctx.emitUI('export_state', { busy: true, text: 'saving to Songs…' });
-          const b = await render(); let r; try { r = await window.Codecs.encode(b, 'mp3-192'); } catch (e) { r = await window.Codecs.encode(b, 'flac16'); }
+          const b = await render(), meta = await tagsFor(b, { title: name }); let r; try { r = await window.Codecs.encode(b, 'mp3-192', { meta }); } catch (e) { r = await window.Codecs.encode(b, 'flac16', { meta }); }
           const audio = await r.blob.arrayBuffer();
           ctx.emit('song:saved', { name, audio, mime: r.blob.type || 'audio/mpeg', duration: b.duration, bpm: ctx.bpm });
           ctx.emitUI('export_state', { done: true, text: `📖 “${name}” is in Songs → My songs (${b.duration.toFixed(1)} s)` });
@@ -244,7 +309,7 @@
         ctx.syncUI();
       };
       ctx.stateExtra = () => ({ lanes, clips, sel, armed, recording: rec ? { waiting: !!rec.waitPlay, startBeat: rec.startBeat, lane: rec.lane } : null, bpm: ctx.bpm, formats: window.Codecs ? window.Codecs.FORMATS.map(f => ({ value: f.id, label: f.label + (f.available() ? '' : ' (n/a here)') })) : [], head, playing: !!playing });
-      ctx.internals = { get clips() { return clips; }, get lanes() { return lanes; }, buffers, split, beatNow, schedule, stopAll };
+      ctx.internals = { metaOf, autoMeta, tagsFor, drawCover, get lastSong() { return lastSong; }, get clips() { return clips; }, get lanes() { return lanes; }, buffers, split, beatNow, schedule, stopAll };
       ctx.onDispose(() => { stopAll(); if (rec) { try { rec.r.dispose(); } catch (e) {} } });
       return {};
     },

@@ -55,3 +55,4 @@ dependencies:
   notes:
     - Always docked at the bottom; drag its top edge to resize, double-click to fold.
     - Records the master you hear; its own playback is never re-recorded.
+    - 🏷 Tags (3.68): title / artist / album / genre / year / BPM / key / comment + cover, autofilled (song name or the Songbook's last song, genre, year, BPM, key); typed values override, empty = auto again. Artist remembered per computer (ctx.secret), never saved. Cover: uploaded PNG/JPEG, else (autoCover) a 1000 px cover drawn from the export. Written into MP3 / WAV / FLAC / AIFF by Codecs (not Opus) on export, stems and Save to Songs; audio untouched.
