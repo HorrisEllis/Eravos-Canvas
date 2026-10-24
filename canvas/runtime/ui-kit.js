@@ -76,6 +76,13 @@
   }
 
   // ---------------------------------------------------------------- Knob
+  // 3.72 the knob cap's shading, defined once for the page (every knob's cap fills from it)
+  function capDefs() {
+    if (doc.getElementById('uk-defs')) return;
+    const NS = 'http://www.w3.org/2000/svg', d = doc.createElementNS(NS, 'svg'); d.setAttribute('id', 'uk-defs'); d.setAttribute('aria-hidden', 'true'); d.setAttribute('width', '0'); d.setAttribute('height', '0'); d.style.position = 'absolute';
+    d.innerHTML = '<defs><radialGradient id="uk-cap" cx="38%" cy="28%" r="80%"><stop offset="0" stop-color="#3d4a5a"/><stop offset=".55" stop-color="#1b232d"/><stop offset="1" stop-color="#0b1016"/></radialGradient></defs>';
+    (doc.body || doc.documentElement).appendChild(d);
+  }
   function Knob(o) {
     const m = mapper(o);
     let value = o.value !== undefined ? o.value : o.default;
@@ -83,10 +90,16 @@
     const svgNS = 'http://www.w3.org/2000/svg';
     const svg = doc.createElementNS(svgNS, 'svg'); svg.setAttribute('width', size); svg.setAttribute('height', size); svg.setAttribute('viewBox', '0 0 40 40');
     const track = doc.createElementNS(svgNS, 'path'), arc = doc.createElementNS(svgNS, 'path'), dot = doc.createElementNS(svgNS, 'circle');
-    track.setAttribute('class', 'uk-knob-track'); arc.setAttribute('class', 'uk-knob-arc'); dot.setAttribute('class', 'uk-knob-dot'); dot.setAttribute('r', '2.6');
+    track.setAttribute('class', 'uk-knob-track'); arc.setAttribute('class', 'uk-knob-arc'); dot.setAttribute('class', 'uk-knob-dot'); dot.setAttribute('r', '1.6');
     // 3.49 (P49.1): where a moving knob is right now (a mover is wired to it) — a second dot; its own value stays the arc
-    const liveDot = doc.createElementNS(svgNS, 'circle'); liveDot.setAttribute('class', 'uk-knob-live'); liveDot.setAttribute('r', '2.2'); liveDot.style.display = 'none';
-    svg.append(track, arc, dot, liveDot);
+    const liveDot = doc.createElementNS(svgNS, 'circle'); liveDot.setAttribute('class', 'uk-knob-live'); liveDot.setAttribute('r', '1.9'); liveDot.style.display = 'none';
+    // 3.72 the look kit: a shaded cap with a pointer inside the ring, and the swing of a moving knob as a thin outer arc
+    capDefs();
+    const cap = doc.createElementNS(svgNS, 'circle'), capHi = doc.createElementNS(svgNS, 'circle'), ptr = doc.createElementNS(svgNS, 'line'), swing = doc.createElementNS(svgNS, 'path');
+    cap.setAttribute('class', 'uk-knob-cap'); cap.setAttribute('cx', '20'); cap.setAttribute('cy', '20'); cap.setAttribute('r', '11.5');
+    capHi.setAttribute('class', 'uk-knob-caphi'); capHi.setAttribute('cx', '20'); capHi.setAttribute('cy', '20'); capHi.setAttribute('r', '10.6');
+    ptr.setAttribute('class', 'uk-knob-ptr'); swing.setAttribute('class', 'uk-knob-swing');
+    svg.append(track, swing, arc, cap, capHi, ptr, dot, liveDot);
     const lbl = h('div', { class: 'uk-knob-label', text: o.label || o.key || '' });
     const val = h('div', { class: 'uk-knob-val' });
     const el = h('div', { class: 'uk-knob' + (o.big ? ' big' : ''), title: (o.label || '') + (o.hint ? ' — ' + o.hint : '') + '\n(drag or arrow keys · shift fine · dbl-click / Delete resets)',
@@ -96,14 +109,15 @@
     const A0 = -135, A1 = 135;
     const pol = (a, r) => { const rad = (a - 90) * Math.PI / 180; return [20 + r * Math.cos(rad), 20 + r * Math.sin(rad)]; };
     const arcPath = (a0, a1, r) => { const [x0, y0] = pol(a0, r), [x1, y1] = pol(a1, r); const large = Math.abs(a1 - a0) > 180 ? 1 : 0; return `M${x0} ${y0} A${r} ${r} 0 ${large} ${a1 > a0 ? 1 : 0} ${x1} ${y1}`; };
-    track.setAttribute('d', arcPath(A0, A1, 15));
+    track.setAttribute('d', arcPath(A0, A1, 15.5));
     function draw() {
       const n = Math.max(0, Math.min(1, m.toN(value)));
       const bip = o.min < 0 && o.max > 0;
       const zeroA = bip ? A0 + (A1 - A0) * m.toN(0) : A0;
       const a = A0 + (A1 - A0) * n;
-      arc.setAttribute('d', Math.abs(a - zeroA) < 0.5 ? '' : arcPath(Math.min(zeroA, a), Math.max(zeroA, a), 15));
-      const [x, y] = pol(a, 10); dot.setAttribute('cx', x); dot.setAttribute('cy', y);
+      arc.setAttribute('d', Math.abs(a - zeroA) < 0.5 ? '' : arcPath(Math.min(zeroA, a), Math.max(zeroA, a), 15.5));
+      const [x, y] = pol(a, 8.6); dot.setAttribute('cx', x); dot.setAttribute('cy', y);
+      const [x0, y0] = pol(a, 3.5); ptr.setAttribute('x1', x0); ptr.setAttribute('y1', y0); ptr.setAttribute('x2', x); ptr.setAttribute('y2', y);
       val.textContent = o.format ? o.format(value) : fmt(value, o);
       el.setAttribute('aria-valuenow', String(value)); el.setAttribute('aria-valuetext', val.textContent + (o.unit && !/[a-z]$/i.test(val.textContent) ? ' ' + o.unit : ''));
     }
@@ -127,9 +141,13 @@
     svg.addEventListener('wheel', (e) => { if (!wheelStartedOn(svg)) return; e.preventDefault(); e.stopPropagation(); const nv = m.fromN(m.toN(value) - Math.sign(e.deltaY) * (e.shiftKey ? 0.002 : 0.01)); if (nv !== value) { value = nv; draw(); o.onChange && o.onChange(value); } }, { passive: false });
     svg.addEventListener('dblclick', () => { value = o.default !== undefined ? o.default : o.min; draw(); o.onChange && o.onChange(value); });
     draw();
+    // a moving knob: a dot where it is now, and the range it has swung through lately (it eases back as the movement narrows)
+    let lo = null, hi = null;
     function live(v) {
-      if (v === null || v === undefined || typeof v !== 'number') { liveDot.style.display = 'none'; el.classList.remove('moving'); return; }
-      const [x, y] = pol(A0 + (A1 - A0) * Math.max(0, Math.min(1, m.toN(v))), 16.5); liveDot.setAttribute('cx', x); liveDot.setAttribute('cy', y);
+      if (v === null || v === undefined || typeof v !== 'number') { liveDot.style.display = 'none'; swing.setAttribute('d', ''); lo = hi = null; el.classList.remove('moving'); return; }
+      const n = Math.max(0, Math.min(1, m.toN(v))), [x, y] = pol(A0 + (A1 - A0) * n, 19); liveDot.setAttribute('cx', x); liveDot.setAttribute('cy', y);
+      if (lo === null) { lo = hi = n; } lo = Math.min(n, lo + (n - lo) * 0.02); hi = Math.max(n, hi + (n - hi) * 0.02);
+      swing.setAttribute('d', hi - lo < 0.004 ? '' : arcPath(A0 + (A1 - A0) * lo, A0 + (A1 - A0) * hi, 19));
       liveDot.style.display = ''; el.classList.add('moving');
     }
     return { el, set(v) { if (typeof v === 'number') { value = v; draw(); } }, get: () => value, live };

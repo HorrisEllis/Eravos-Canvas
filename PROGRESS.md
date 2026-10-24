@@ -2,6 +2,21 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.72 The look kit (pro-plugin) · tool pages as devices · Groove in it (2026-10-24)
+His words on the 3.71 Groove: "looks horrible … cheap"; on the tool pages: "tabs … load the default tab with the content and have
+the tabs horizontal"; "the tool page to be the pink button, and the add to canvas under it"; on a mock-up: "that's way better.
+Continue that."
+- Look kit (canvas/runtime: ui-kit.js + eravos.css, same controls and class names, same sizes — only the drawing changed, so
+  every tool has it): knobs with a shaded cap and pointer inside a glowing value ring, a moving knob's swing as a violet outer arc;
+  lit segmented strips; LED toggles; machined buttons, the primary lit; recessed fields and LCD numbers; metal fader caps;
+  drawn displays as recessed screens; windows and sections as a chassis with inset panels and mono caps headings.
+- Tool / suite page: the device look; tabs in one row along the top (the Controls table shared the .tp-tab name — its width:100%
+  had stacked them); Panel opens with the tool live even before it is on the canvas (a windowless sketch; Add to canvas keeps
+  what you set); a tool adds its own tabs; Add to canvas is the pink key. + Add: the pink button opens the page, Add under it.
+- Groove: the window is the pattern screen + style strip + a knob bank (ENERGY large) + loop/fill strips; its page adds Feel (a
+  mixer strip per drum: LED mute/solo, level fader, hit meter, chance, pad; evolve), Motion (slots, drawn shape tiles, a lit rate
+  strip, a live scope, depth/phase) and Perform (an XY pad with a trail, four coloured macro cards, Learn).
+
 ## Done — 3.71 Motion + Perform (shared) · Groove 1.1, the pilot (2026-10-24)
 His words: "Bass and drums forge. Fix box. Drop builder. Breath. Eq. Side chain. Embodyment. Recursive spectra. Automation.
 Baseline. Chords. Groove. All need more dynamic control and a better ui." — dynamic = movement over time, variation and feel,
