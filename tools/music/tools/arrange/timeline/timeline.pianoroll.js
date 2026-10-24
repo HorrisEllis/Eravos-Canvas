@@ -201,9 +201,10 @@
         if (drums && rowNotes.indexOf(nt.n) < 0) return; // a note no pad answers to: kept in the clip, not drawn as a hit
         const x = nt.s * pps, y = yOf(nt.n), w = Math.max(3, nt.l * pps - 1);
         const c2 = drums ? ((drums[rowNotes.indexOf(nt.n)] || {}).color || col) : col;
-        if (!drums && nt.b) { drawBend(g, nt, S.has(i)); return; }   // 3.58 a bent note IS its curve: the block bends
+        if (!drums && nt.b) { drawBend(g, nt, S.has(i)); curveMark(g, nt, x, y, w); return; }   // 3.58 a bent note IS its curve: the block bends
         g.globalAlpha = 0.35 + 0.65 * nt.v; g.fillStyle = c2; g.fillRect(x + 1, y + 1, w - 1, ROW - 2); g.globalAlpha = 1;
         g.strokeStyle = S.has(i) ? '#fff' : '#000'; g.lineWidth = 1; g.strokeRect(x + 1.5, y + 1.5, w - 2, ROW - 3);
+        curveMark(g, nt, x, y, w);
       });
       // 3.62 a repeating clip: past its repeat point the notes are the first bars again — shaded, drawn faint, not editable there
       const L = clip.loop || 0;
@@ -234,6 +235,19 @@
       const b = nt.b, at = b.at || 0, k = f <= at ? 0 : (SHAPES[b.shape] || SHAPES.smooth)((f - at) / (1 - at)); let st = b.from + (b.to - b.from) * k;
       const o = b.osc; if (o && o.depth > 0) { const beats = nt.l / 4, c0 = cyc(o.rate, beats), c1 = o.rateTo ? cyc(o.rateTo, beats) : c0, ph = c0 * f + (c1 - c0) * f * f / 2, fd = o.fade > 0 ? Math.min(1, f / o.fade) : 1; st += o.depth * fd * owave(o.shape, ph); }
       return yOf(nt.n) + ROW / 2 - st * ROW;
+    }
+    // 3.65 the part of a note's curves between f0 and f1 (fractions of it), as the curves of that part (the split tool)
+    function cropCurves(c, f0, f1) {
+      const o = {}; Object.keys(c).forEach(k => { const pts = c[k], at = (x) => { if (x <= pts[0][0]) return pts[0][1]; for (let i = 1; i < pts.length; i++) if (x <= pts[i][0]) { const a = pts[i - 1], b = pts[i]; return b[0] > a[0] ? a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]) : b[1]; } return pts[pts.length - 1][1]; };
+        o[k] = [[0, at(f0)]].concat(pts.filter(q => q[0] > f0 && q[0] < f1).map(q => [(q[0] - f0) / (f1 - f0), q[1]]), [[1, at(f1)]]); }); return o;
+    }
+    // 3.65 a note with curves shows the first of them as a thin line through its block (low at the bottom, high at the top)
+    function curveMark(g, nt, x, y, w) {
+      if (!nt.c || w < 8) return; const key = Object.keys(nt.c)[0], pts = nt.c[key], k = ((lane && knobsAll[lane.target]) || []).find(z => z.key === key); if (!pts || !k) return;
+      const f = (v) => k.unit === 'Hz' && k.min > 0 && k.max / k.min >= 20 ? Math.log(Math.max(k.min, v) / k.min) / Math.log(k.max / k.min) : (v - k.min) / ((k.max - k.min) || 1);
+      const Y = (v) => y + ROW - 3 - clampN(f(v), 0, 1) * (ROW - 6);
+      g.save(); g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(x + 2, Y(pts[0][1]));
+      pts.forEach(q => g.lineTo(x + 2 + q[0] * (w - 4), Y(q[1]))); g.lineTo(x + w - 2, Y(pts[pts.length - 1][1])); g.stroke(); g.restore();
     }
     function drawBend(g, nt, on) {
       const x0 = nt.s * pps + 1, w = Math.max(3, nt.l * pps - 2), col = lane ? lane.color : '#ff66cc';
@@ -367,7 +381,7 @@
         draw(); return;
       }
       if (tool === 'split') {
-        if (i >= 0) { const a = notes[i], at = q(snapTo(x / pps, g)); if (at > a.s + 1e-6 && at < a.s + a.l - 1e-6) { const next = notes.slice(); next.splice(i, 1, Object.assign({}, a, { l: q(at - a.s) }), Object.assign({}, a, { s: at, l: q(a.s + a.l - at) })); selOnly(i + 1); commit(next); } }
+        if (i >= 0) { const a = notes[i], at = q(snapTo(x / pps, g)); if (at > a.s + 1e-6 && at < a.s + a.l - 1e-6) { const next = notes.slice(); const fc = (at - a.s) / a.l, L = Object.assign({}, a, { l: q(at - a.s) }), Rn = Object.assign({}, a, { s: at, l: q(a.s + a.l - at) }); if (a.c) { L.c = cropCurves(a.c, 0, fc); Rn.c = cropCurves(a.c, fc, 1); } next.splice(i, 1, L, Rn); selOnly(i + 1); commit(next); } }   // 3.65 each half keeps its part of the curves
         return;
       }
       if (tool === 'paint') {
@@ -621,6 +635,7 @@
         cur = Object.assign({}, cur, patch); cur.s = q(clampN(cur.s, 0, st - FREE)); cur.l = q(clampN(cur.l, FREE, st - cur.s)); cur.n = Math.round(clampN(cur.n, drums ? 0 : LO, drums ? 127 : HI)); cur.v = clampN(Math.round(cur.v * 100) / 100, 0.05, 1);
         if (cur.b && !cur.b.from && !cur.b.to && !(cur.b.osc && cur.b.osc.depth > 0)) delete cur.b;
         if (cur.p && !Object.keys(cur.p).length) delete cur.p;
+        if (!cur.c || !Object.keys(cur.c).length) delete cur.c;
         notes[ed.i] = Object.assign({}, cur); draw(); say(cur.s, cur.n, lenName(cur.l) + ' · vel ' + Math.round(cur.v * 127) + (cur.b ? ' · bend ' + bendSay(cur.b) : ''));
         clearTimeout(timer); timer = setTimeout(() => { timer = null; commit(notes.slice()); }, 250);   // one commit after the knob settles
       };
@@ -633,7 +648,8 @@
       const done = h('button', { class: 'tlpr-tool', title: 'done (Esc)', text: '✓' });
       editor.append(h('div', { class: 'tlpr-eh tlpr-ihead' }, [h('b', { text: '🎹 ' + toolName(), style: { color: lane ? lane.color : '' } }), h('span', { class: 'tlpr-hint', text: ' · note ' + nameOf(cur.n) }), h('span', { class: 'wm-spacer' }), done]), h('div', { class: 'tlpr-knobs' }, [kS.el, kL.el, kP.el, kV.el]));
       // 3.56 BEND — the note's pitch curve, with knobs; you hear it as you turn them
-      let hearT = null; const hear = () => { clearTimeout(hearT); hearT = setTimeout(() => { if (lane && cur.b) view.emit('note_audition', { lane: lane.id, note: cur.n, bend: cur.b, duration: 0.9 }); }, 280); };
+      const noteSec = () => clampN(cur.l / 4 * 60 / ((window.Kernel && Kernel.music && Kernel.music.bpm) || 120), 0.3, 4);
+      let hearT = null; const hear = (always) => { clearTimeout(hearT); hearT = setTimeout(() => { if (lane && (cur.b || cur.c || always)) view.emit('note_audition', Object.assign({ lane: lane.id, note: cur.n, duration: cur.c ? noteSec() : 0.9 }, cur.b ? { bend: cur.b } : {}, cur.c ? { curves: cur.c } : {}, cur.p ? { params: cur.p } : {})); }, 280); };
       const B = () => Object.assign({ from: 0, to: 0, shape: 'smooth', at: 0 }, cur.b || {});   // (keeps its osc)
       const setB = (patch, quiet) => { apply({ b: Object.assign(B(), patch) }); syncB(); if (!quiet) hear(); };
       const stFmt = (v) => (v > 0 ? '+' : '') + (+(+v).toFixed(1)) + ' st';
@@ -666,6 +682,88 @@
         .map(([t, hint, o]) => { const btn = h('button', { class: 'tlpr-tool tlpr-ed', title: hint, text: t }); btn.addEventListener('click', (e) => { e.stopPropagation(); setO(o); }); return btn; });
       if (!drums) editor.append(h('div', { class: 'tlpr-eh' }, [h('b', { text: '∿ Oscillate' }), h('span', { class: 'tlpr-hint', text: ' swings around it' })]),
         h('div', { class: 'tlpr-knobs' }, [oRate.el, oTo.el, oDepth.el, oShape.el, oFade.el]), h('div', { class: 'tlpr-quick' }, oquick));
+      // 3.65 CURVES — knobs that move ACROSS this note: a filter that opens, drive that builds, a wobble that deepens. MONOPHONIC by
+      // design: the knob is the tool's, so overlapping notes take it in turn (the later note wins) — meant for one line, a bass.
+      // Click to add a point, drag it, double-click (or right-click) to remove it; a quick shape replaces the curve; you hear the note
+      // with its curves as you shape them. A curve is stored over the note's length (0 … 1), so it moves, stretches and copies with it.
+      const knobList = (lane && knobsAll[lane.target]) || [], nums = knobList.filter(k => k.type === 'number' || k.type === 'integer');
+      if (!drums && nums.length) editor.append(curveSection());
+      function curveSection() {
+        const ROLES = [/cutoff|bright|tone|freq/i, /drive|grit|fold|crush|dist/i, /depth|wobble|amount/i];
+        const rank = (k) => { const r = ROLES.findIndex(re => re.test(k.key) || re.test(k.label || '')); return r < 0 ? 9 : r; };
+        const sorted = nums.slice().sort((a, b) => rank(a) - rank(b));
+        let ck = (cur.c && Object.keys(cur.c).find(key => nums.some(k => k.key === key))) || sorted[0].key;
+        const kOf = (key) => nums.find(k => k.key === key);
+        const isLog = (k) => k.unit === 'Hz' && k.min > 0 && k.max / k.min >= 20;
+        const fy = (k, v) => isLog(k) ? clampN(Math.log(Math.max(k.min, +v) / k.min) / Math.log(k.max / k.min), 0, 1) : xFrac(k, v);
+        const vy = (k, f) => { f = clampN(f, 0, 1); let v = isLog(k) ? k.min * Math.pow(k.max / k.min, f) : k.min + f * (k.max - k.min); if (k.type === 'integer') v = Math.round(v); return +(+v).toPrecision(4); };
+        const ptsOf = (key) => (cur.c && cur.c[key]) ? cur.c[key].map(q => q.slice()) : null;
+        const setC = (key, pts, quiet) => { const c = Object.assign({}, cur.c); if (pts && pts.length) c[key] = pts.map(q => [Math.round(clampN(q[0], 0, 1) * 10000) / 10000, q[1]]).sort((a, b) => a[0] - b[0]); else delete c[key]; apply({ c }); drawC(); syncC(); if (!quiet) hear(true); };
+        // quick shapes, in the knob's own picture (on a log knob — cutoff — they are resampled, so they sound as they look)
+        const SHAPES = [['↗ open', 'opens across the note', [[0, 0.08], [1, 0.92]]], ['↘ close', 'closes across the note', [[0, 0.92], [1, 0.08]]],
+          ['⌐ late open', 'holds shut, then opens at the end — into the next hit', [[0, 0.08], [0.6, 0.14], [1, 0.95]]],
+          ['∧ swell', 'up and back', [[0, 0.15], [0.5, 0.9], [1, 0.15]]], ['∨ dip', 'down and back', [[0, 0.85], [0.5, 0.15], [1, 0.85]]],
+          ['⋀⋀ pump', 'four pumps across the note', [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => [i / 8, i % 2 ? 0.15 : 0.9])]];
+        const shapeTo = (k, name) => { const sh = SHAPES.find(x => x[0] === name || x[0].includes(name)); if (!sh) return null; const out = [];
+          sh[2].forEach((q, i) => { if (i && isLog(k)) { const a = sh[2][i - 1]; for (let j = 1; j < 4; j++) { const f = j / 4; out.push([a[0] + (q[0] - a[0]) * f, vy(k, a[1] + (q[1] - a[1]) * f)]); } } out.push([q[0], vy(k, q[1])]); }); return out; };
+        const sel = UI.Select({ label: 'Knob', hint: 'which of the tool’s knobs moves across this note (● = this note has a curve on it)', options: [], value: ck, onChange: (v) => { ck = v; drawC(); syncC(); } });
+        function syncC() { const opts = sorted.map(k => ({ value: k.key, label: (cur.c && cur.c[k.key] ? '● ' : '') + k.label + (k.unit ? ' (' + k.unit + ')' : '') })); sel.setOptions(opts); sel.set(ck); rm.disabled = !ptsOf(ck); chips.innerHTML = ''; Object.keys(cur.c || {}).forEach(key => { const k = kOf(key); if (!k) return; const b = h('button', { class: 'tlpr-tool tlpr-ed' + (key === ck ? ' on' : ''), title: 'edit the ' + k.label + ' curve', text: k.label }); b.addEventListener('click', (e) => { e.stopPropagation(); ck = key; drawC(); syncC(); }); chips.append(b); }); }
+        const rm = h('button', { class: 'tlpr-tool', title: 'remove this curve — the knob stays where the tool (or the note’s own setting) has it', text: '×' });
+        rm.addEventListener('click', (e) => { e.stopPropagation(); setC(ck, null); });
+        const chips = h('span', { class: 'tlpr-cchips' });
+        const quick = SHAPES.map(([t, hint]) => { const b = h('button', { class: 'tlpr-tool tlpr-ed', title: hint, text: t }); b.addEventListener('click', (e) => { e.stopPropagation(); setC(ck, shapeTo(kOf(ck), t)); }); return b; });
+        // the curve canvas
+        const CH = 96, cc = h('canvas', { class: 'tlpr-curve', height: String(CH), 'aria-label': 'the curve of this knob across the note' });
+        const box = () => { const r = cc.getBoundingClientRect(); return { r, w: cc.clientWidth || 300 }; };
+        function drawC() {
+          const w = cc.clientWidth || 300, dpr = Math.min(2, window.devicePixelRatio || 1); if (cc.width !== Math.round(w * dpr)) { cc.width = Math.round(w * dpr); cc.height = Math.round(CH * dpr); }
+          const g = cc.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, CH);
+          g.fillStyle = '#080d14'; g.fillRect(0, 0, w, CH); g.strokeStyle = '#18222f'; g.lineWidth = 1;
+          for (let i = 1; i < 4; i++) { g.beginPath(); g.moveTo(Math.round(w * i / 4) + 0.5, 0); g.lineTo(Math.round(w * i / 4) + 0.5, CH); g.stroke(); }
+          const k = kOf(ck), Y = (f) => 6 + (1 - f) * (CH - 12), X = (t) => 6 + t * (w - 12);
+          const col = lane ? lane.color : '#ff66cc';
+          // the knob where the tool has it (dashed): what the note returns to when it ends
+          const base = cur.p && cur.p[ck] !== undefined ? cur.p[ck] : (k.val !== undefined ? k.val : k.def); g.setLineDash([3, 4]); g.strokeStyle = '#3d5575'; g.beginPath(); g.moveTo(0, Y(fy(k, base))); g.lineTo(w, Y(fy(k, base))); g.stroke(); g.setLineDash([]);
+          // the note's other curves, faint
+          Object.keys(cur.c || {}).filter(key => key !== ck && kOf(key)).forEach(key => { const k2 = kOf(key); g.strokeStyle = 'rgba(160,180,200,.35)'; plot(g, cur.c[key], k2, X, Y); });
+          const pts = ptsOf(ck);
+          g.fillStyle = '#5d6f82'; g.font = '10px sans-serif'; g.fillText(k.label + ' · ' + fmtV(k, vy(k, 1)), 8, 14); g.fillText(fmtV(k, vy(k, 0)), 8, CH - 6);
+          if (!pts) { g.fillStyle = '#8fa1b6'; g.textAlign = 'center'; g.fillText('click to start a curve — or pick a shape', w / 2, CH / 2 + 4); g.textAlign = 'left'; return; }
+          g.strokeStyle = col; g.lineWidth = 2; plot(g, pts, k, X, Y); g.lineWidth = 1;
+          pts.forEach((q, i) => { g.fillStyle = i === hot ? '#fff' : col; g.beginPath(); g.arc(X(q[0]), Y(fy(k, q[1])), i === hot ? 5 : 4, 0, Math.PI * 2); g.fill(); g.strokeStyle = '#000'; g.stroke(); });
+        }
+        // the knob moves in a straight line between points (as the tool plays it); on a log knob that line is drawn as it sounds — curved
+        function plot(g, pts, k, X, Y) { g.beginPath(); pts.forEach((q, i) => { if (!i) { g.moveTo(X(0), Y(fy(k, q[1]))); g.lineTo(X(q[0]), Y(fy(k, q[1]))); return; } const a = pts[i - 1]; for (let j = 1; j <= 12; j++) { const f = j / 12; g.lineTo(X(a[0] + (q[0] - a[0]) * f), Y(fy(k, a[1] + (q[1] - a[1]) * f))); } }); const last = pts[pts.length - 1]; g.lineTo(X(1), Y(fy(k, last[1]))); g.stroke(); }
+        const fmtV = (k, v) => (Math.abs(v) >= 100 ? Math.round(v) : +(+v).toFixed(2)) + (k.unit ? ' ' + k.unit : '');
+        let hot = -1, dragC = null;
+        const at = (e) => { const { r, w } = box(), x = (e.clientX - r.left) * (w / r.width), y = (e.clientY - r.top) * (CH / r.height); return { t: clampN((x - 6) / (w - 12), 0, 1), f: clampN(1 - (y - 6) / (CH - 12), 0, 1), x, y }; };
+        const near = (p) => { const pts = ptsOf(ck) || [], k = kOf(ck), w = box().w; return pts.findIndex(q => Math.hypot(6 + q[0] * (w - 12) - p.x, 6 + (1 - fy(k, q[1])) * (CH - 12) - p.y) < 8); };
+        cc.addEventListener('contextmenu', (e) => e.preventDefault());
+        cc.addEventListener('pointerdown', (e) => {
+          e.stopPropagation(); const p = at(e), k = kOf(ck); let pts = ptsOf(ck) || []; let i = near(p);
+          if (e.button === 2) { if (i >= 0) { pts.splice(i, 1); setC(ck, pts); } return; }
+          if (i < 0) { pts.push([p.t, vy(k, p.f)]); pts.sort((a, b) => a[0] - b[0]); i = pts.findIndex(q => q[0] === p.t); cur.c = Object.assign({}, cur.c, { [ck]: pts }); }
+          dragC = { i, pts }; hot = i; try { cc.setPointerCapture(e.pointerId); } catch (x) {} drawC(); syncC();
+        });
+        cc.addEventListener('pointermove', (e) => {
+          const p = at(e);
+          if (!dragC) { const i = near(p); if (i !== hot) { hot = i; drawC(); } cc.style.cursor = i >= 0 ? 'grab' : 'crosshair'; return; }
+          const k = kOf(ck), pts = dragC.pts, i = dragC.i, lo = i > 0 ? pts[i - 1][0] + 0.002 : 0, hi = i < pts.length - 1 ? pts[i + 1][0] - 0.002 : 1;
+          pts[i] = [clampN(p.t, lo, hi), vy(k, p.f)]; cur.c = Object.assign({}, cur.c, { [ck]: pts }); drawC();
+          readout.textContent = k.label + ' ' + fmtV(k, pts[i][1]) + ' at ' + Math.round(pts[i][0] * 100) + ' % of the note';
+          if (!dragC.heard || performance.now() - dragC.heard > 350) { dragC.heard = performance.now(); apply({ c: cur.c }); hear(true); }
+        });
+        const endC = () => { if (!dragC) return; const pts = dragC.pts; dragC = null; setC(ck, pts); };
+        cc.addEventListener('pointerup', endC); cc.addEventListener('pointercancel', endC); cc.addEventListener('lostpointercapture', endC);
+        cc.addEventListener('dblclick', (e) => { e.stopPropagation(); const i = near(at(e)), pts = ptsOf(ck); if (i >= 0 && pts) { pts.splice(i, 1); setC(ck, pts); } });
+        if (window.ResizeObserver) new ResizeObserver(() => drawC()).observe(cc);
+        const sec = h('div', { class: 'tlpr-csec' }, [
+          h('div', { class: 'tlpr-eh' }, [h('b', { text: '〽 Curves' }), h('span', { class: 'tlpr-hint', text: ' knobs that move across it', title: 'one line at a time: the knob is the tool’s, so overlapping notes take turns (the later note wins)' })]),
+          h('div', { class: 'tlpr-knobs tlpr-crow' }, [sel.el, rm, chips]), h('div', { class: 'tlpr-quick' }, quick), cc]);
+        ed.curve = (key, pts) => { if (key) ck = key; setC(ck, pts, true); }; ed.curveShape = (key, name) => { ck = key; setC(ck, shapeTo(kOf(key), name), true); };
+        syncC(); requestAnimationFrame(drawC);
+        return sec;
+      }
       // SOUND — EVERY knob of this track's tool, grouped the way the tool groups them (3.58: "click a note and edit it completely").
       // A faded knob = this note uses the tool's own setting (shown where the tool has it now); turn it and the note has its own
       // value (gold); × hands it back to the tool.
@@ -699,7 +797,7 @@
       editor.classList.add('open');
       // for tests and scripts: the same path a knob takes
       return { start: (v) => apply({ s: Math.round(v / gs) * gs }), length: (v) => apply({ l: Math.max(gs, Math.round(v / gs) * gs) }), pitch: (n) => apply({ n }), velocity: (v) => apply({ v: v / 127 }), finish,
-        bend: (b) => setB(b, true), osc: (o) => setO(o, true), quick: (label) => { const q2 = quick.concat(oquick).find(x => x.textContent.includes(label)); if (q2) q2.click(); }, knob: (key, v) => apply({ p: Object.assign({}, cur.p, { [key]: v }) }), get note() { return Object.assign({}, cur); } };
+        bend: (b) => setB(b, true), osc: (o) => setO(o, true), quick: (label) => { const q2 = quick.concat(oquick).find(x => x.textContent.includes(label)); if (q2) q2.click(); }, knob: (key, v) => apply({ p: Object.assign({}, cur.p, { [key]: v }) }), curve: (key, pts) => ed.curve && ed.curve(key, pts), curveShape: (key, name) => ed.curveShape && ed.curveShape(key, name), get note() { return Object.assign({}, cur); } };
     }
     function closeEditor() { edNote = null; edMode = null; editor.classList.remove('open'); editor.innerHTML = ''; toolCtl = new Map(); toolSig = ''; if (toolOn && clip && lane && lane.target && toolsAll[lane.target]) openTool(); }
     // ---- the tool panel

@@ -649,6 +649,65 @@ describe('tool · Timeline — per-note curves (monophonic)', () => {
     at(U, [0.15, 0.65], (t) => { seen[t] = w.params.get('depth'); });
     await U.ctx.startRendering(); assert.equal(seen[0.15], 0, 'held at the bottom of 0…8'); assert.equal(seen[0.65], 8, 'and the top');
   });
+  // ---- the editor: the note inspector's 〽 Curves
+  const KN = { t1: [{ key: 'depth', label: 'Depth', type: 'number', min: 0, max: 8, step: 0.01, def: 3, val: 3 }, { key: 'cutoff', label: 'Cutoff', type: 'number', min: 40, max: 8000, step: 1, unit: 'Hz', def: 300, val: 300 },
+    { key: 'drive', label: 'Drive', type: 'number', min: 0, max: 1, step: 0.01, def: 0.4, val: 0.4 }, { key: 'div', label: 'Rate', type: 'enum', options: ['1/4', '1/8'], def: '1/8' }] };
+  function roll(notes) {
+    const log = [], view = { ui: UIKit, emit: (k, p) => log.push([k, p]) };
+    const host = document.createElement('div'); host.style.cssText = 'position:fixed;left:0;top:0;width:900px;height:620px;z-index:99999;background:#000'; document.body.appendChild(host);
+    const pr = EravosTimelinePianoRoll.create(view, {}); host.appendChild(pr.el);
+    pr.show({ id: 'c1', bars: 2, startBar: 1, notes }, { id: 'l1', name: 'Bass', color: '#ff2266', target: 't1' }, { key: { root: 0, scale: 'chromatic' }, knobs: KN });
+    const last = () => { const e = log.filter(x => x[0] === 'clip_edit').pop(); return e ? e[1].patch.notes : null; };
+    return { pr, log, last, done: () => host.remove() };
+  }
+  it('the inspector: 〽 Curves opens on the filter, a shape writes the curve (cutoff resampled as it sounds), you hear the note with it', async () => {
+    const r = roll([{ s: 0, l: 8, n: 36, v: 0.9, p: { depth: 1 } }]);
+    try {
+      const ed = r.pr.openEditor(0), box = r.pr.el.querySelector('.tlpr-csec');
+      assert.ok(box && box.querySelector('canvas.tlpr-curve'), 'a Curves section with its canvas');
+      assert.equal(box.querySelector('select').value, 'cutoff', 'it starts on the filter (then drive, then depth)');
+      assert.ok(!Array.from(box.querySelectorAll('select option')).some(o => o.value === 'div'), 'choice knobs are not offered');
+      ed.curveShape('cutoff', 'open'); const c = ed.note.c.cutoff;
+      assert.ok(c.length > 2 && c[0][0] === 0 && c[c.length - 1][0] === 1, 'from the start to the end: ' + JSON.stringify(c));
+      assert.lt(c[0][1], 100); assert.gt(c[c.length - 1][1], 4000); assert.lt(c[Math.floor(c.length / 2)][1], 1000, 'halfway it is still low: the log knob opens evenly to the ear');
+      ed.curveShape('drive', 'swell'); assert.deepEqual(Object.keys(ed.note.c).sort(), ['cutoff', 'drive'], 'a second knob: one note, several curves');
+      ed.finish(); const n = r.last()[0];
+      assert.deepEqual(Object.keys(n.c).sort(), ['cutoff', 'drive']); assert.deepEqual(n.p, { depth: 1 }, 'its own settings stay beside them');
+      const ed2 = r.pr.openEditor(0); r.pr.el.querySelector('.tlpr-csec select').dispatchEvent(new Event('change')); r.pr.el.querySelector('.tlpr-csec .tlpr-quick button').click(); await TH.sleep(320);   // a shape button, as a person clicks it
+      const heard = r.log.filter(x => x[0] === 'note_audition').pop();
+      assert.ok(heard && heard[1].curves && heard[1].curves.cutoff && heard[1].curves.drive && heard[1].params.depth === 1, 'you hear the note with its curves and its own settings');
+      assert.gt(heard[1].duration, 0.9, 'for the whole note (a curve needs its length)');
+      ed2.curve('drive', null); ed2.finish(); assert.deepEqual(Object.keys(r.last()[0].c), ['cutoff'], '× removes one curve');
+    } finally { r.done(); }
+  });
+  it('drawing on the curve: click adds a point and drags it, double-click removes it; the block shows its curve', () => {
+    const r = roll([{ s: 0, l: 8, n: 36, v: 0.9 }]);
+    try {
+      r.pr.openEditor(0); const cc = r.pr.el.querySelector('canvas.tlpr-curve'), rect = cc.getBoundingClientRect(), W = cc.clientWidth, H = 96;
+      const P = (t, f) => ({ clientX: rect.left + (6 + t * (W - 12)) * rect.width / W, clientY: rect.top + (6 + (1 - f) * (H - 12)) * rect.height / H });
+      const fire = (type, p, extra) => cc.dispatchEvent(new PointerEvent(type, Object.assign({ bubbles: true, cancelable: true, pointerId: 3, pointerType: 'mouse', button: 0, buttons: type === 'pointerup' ? 0 : 1 }, p, extra || {})));
+      fire('pointerdown', P(0.5, 0)); fire('pointermove', P(0.5, 1)); fire('pointerup', P(0.5, 1));
+      fire('pointerdown', P(0.25, 0.5)); fire('pointerup', P(0.25, 0.5));
+      const ed = r.pr.openEditor(0); const pts = ed.note.c.cutoff;
+      assert.equal(pts.length, 2, 'two points'); assert.near(pts[1][0], 0.5, 0.01); assert.near(pts[1][1], 8000, 1, 'dragged to the top of the knob');
+      assert.near(pts[0][0], 0.25, 0.01); assert.near(pts[0][1], 40 * Math.pow(200, 0.5), 15, 'halfway up a log knob ≈ 566 Hz');
+      const cc2 = r.pr.el.querySelector('canvas.tlpr-curve'); cc2.dispatchEvent(new MouseEvent('dblclick', Object.assign({ bubbles: true }, P(0.25, 0.5))));
+      assert.equal(ed.note.c.cutoff.length, 1, 'double-click removed it'); ed.finish();
+    } finally { r.done(); }
+  });
+  it('a note cut in two by the split tool: each half keeps its part of the curve; moving a note keeps its curves', () => {
+    const r = roll([{ s: 0, l: 8, n: 36, v: 0.9, c: { cutoff: [[0, 100], [1, 900]] } }]);
+    try {
+      const ed = r.pr.openEditor(0); ed.start(4); ed.finish(); assert.deepEqual(r.last()[0].c, { cutoff: [[0, 100], [1, 900]] }, 'moved, curves unchanged');
+      r.pr.show({ id: 'c1', bars: 2, startBar: 1, notes: [{ s: 0, l: 8, n: 36, v: 0.9, c: { cutoff: [[0, 100], [1, 900]] } }] }, { id: 'l1', name: 'Bass', color: '#ff2266', target: 't1' }, { key: { root: 0, scale: 'chromatic' }, knobs: KN });
+      r.pr.setTool('split'); const cv = r.pr.canvas, b = cv.getBoundingClientRect(), st = r.pr.state, k = b.width / cv.offsetWidth;
+      const p = { clientX: b.left + (4 * st.pps) * k, clientY: b.top + ((107 - 36) * st.row + st.row / 2) * k };
+      cv.dispatchEvent(new PointerEvent('pointerdown', Object.assign({ bubbles: true, cancelable: true, pointerId: 1, pointerType: 'mouse', button: 0, buttons: 1 }, p)));
+      cv.dispatchEvent(new PointerEvent('pointerup', Object.assign({ bubbles: true, cancelable: true, pointerId: 1, pointerType: 'mouse', button: 0, buttons: 0 }, p)));
+      const ns = r.last(); assert.equal(ns.length, 2, 'cut in two');
+      assert.deepEqual(ns[0].c.cutoff, [[0, 100], [1, 500]], 'the first half: 100 → 500'); assert.deepEqual(ns[1].c.cutoff, [[0, 500], [1, 900]], 'the second: 500 → 900');
+    } finally { r.done(); }
+  });
   it('you hear it: the filter stays shut while the curve is low, then opens with it — matching the same knob held still at each end', async () => {
     async function render(curves, params) {
       const U = uni(1.6), { a } = wob(U);
