@@ -8,7 +8,7 @@
   const S = OrganismSDK.STD;
   OrganismFactory.define({
     id: 'eravos.sub-engine', preview: 'bass', domain: 'music', version: '1.0.0', label: 'Deep Sub', icon: '◉', accent: '#7a5cff', phase: 'P14',
-    category: 'Sound sources', blurb: 'The deepest bass: pure mono sub, 808 drops and slides, plus phantom harmonics so it is heard even on a phone.',
+    category: 'Bass', blurb: 'The deepest bass: pure mono sub, 808 drops and slides, plus phantom harmonics so it is heard even on a phone.',
     size: { w: 520, h: 520 }, minSize: { w: 420, h: 400 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
     provides: ['capability.audio_out', 'capability.note_in', 'capability.bass'],

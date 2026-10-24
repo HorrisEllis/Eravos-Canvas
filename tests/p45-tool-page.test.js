@@ -99,4 +99,30 @@ describe('P45 · tool pages — suites, mods one by one, sound packs', () => {
       assert.ok(CanvasWM.windowOf(id).querySelector('.tp-open svg'), 'the page button is a drawn icon, not an emoji');
     } finally { ToolPage.close(); F().close(id); }
   });
+  // 3.48.3 — "packs aren't just presets. like for the drum pad. where are all of them? mods, packs, pad editor"
+  it('the Drum Machine page has its live pad editor, every kit (Load kit works), and mods for the whole kit', async () => {
+    if (!CanvasWM.world) { CanvasWM.init(document.getElementById('wmhost'), Kernel); WireSystem.init(Kernel); OrganismFactory.boot(Kernel); }
+    const K = Kernel, id = F().spawn('eravos.pads', { K, x: 40, y: 40 }); await TH.sleep(30);
+    try {
+      const el = ToolPage.open('eravos.pads', { instanceId: id, K });
+      const panel = el.querySelector('[data-sec="panel"] .tp-panel'); assert.ok(panel && panel.querySelector('.dm3-editor'), 'the pad editor, live, on the page');
+      const kits = el.querySelector('[data-sec="kind-kits"]'); assert.ok(kits, 'a Kits section');
+      const rows = kits.querySelectorAll('.tp-pre'); assert.gt(rows.length, 5, 'kits from the kit packs: ' + rows.length);
+      assert.ok(el.querySelector('[data-sec="mods"]'), 'a Mods section (the whole kit)');
+      const row = Array.from(rows).find(r => /Roots One Drop/.test(r.textContent)); assert.ok(row, 'Roots One Drop listed');
+      row.querySelector('button').click(); await TH.sleep(20);
+      const pads = F().handle(id).ctx.stateExtra().banks[F().handle(id).ctx.params.get('bank')];
+      assert.equal(pads[1].voice, 'rim', 'the kit is on the pads (pad 2 = rim)');
+    } finally { ToolPage.close(); F().close(id); }
+  });
+  it('a mod in the Drum Machine\'s kit slot plays every pad through it', async () => {
+    const U = TH.universe(0.8), d = TH.spawn(U, 'eravos.pads'), kid = Mods.childOf(d, Mods.add(d, 'kit', 'eravos.fx-destroyer'));
+    assert.ok(kid, 'a Destroyer inside'); const k = F().handle(kid).ctx; if (k.ready) await k.ready;
+    assert.equal(U.K.wires.list().filter(w => w.meta && w.meta.insert && w.meta.host === d).length, 2, 'wired through');
+    U.K.bus.publish('ui:pad_press:' + d, { index: 0, velocity: 1 });
+    const b = await TH.render(U); assert.gt(TH.db(TH.rms(b, 0, 0.5)), -45, 'the kick comes through the mod');
+  });
+  it('every bass tool sits in one Bass category', () => {
+    ['eravos.wobble-bass', 'eravos.reese-bass', 'eravos.sub-engine', 'eravos.acid-synth', 'eravos.bass-forge', 'eravos.bass-gen'].forEach(id => assert.equal(F().def(id).category, 'Bass', id));
+  });
 });

@@ -1,24 +1,24 @@
 {
   "schema": "eravos.tool/1",
-  "id": "eravos.bass-forge",
+  "id": "eravos.sub-engine",
   "version": "1.0.0",
-  "label": "Bass Forge",
-  "icon": "🜂",
-  "accent": "#ff3d00",
+  "label": "Deep Sub",
+  "icon": "◉",
+  "accent": "#7a5cff",
   "domain": "music",
-  "category": "sound-forge",
-  "summary": "FM growls, riddim, neuro, screech — one LFO talks through FM, fold, vowel, comb, notch. MATCH learns a reference bass recursively.",
+  "category": "bass",
+  "summary": "The deepest bass: pure mono sub, 808 drops and slides, plus phantom harmonics so it is heard even on a phone.",
   "tags": [
-    "sound-forge",
-    "bass",
-    "forge"
+    "sound-sources",
+    "sub",
+    "engine"
   ],
   "files": {
-    "engine": "bass-forge.engine.js",
-    "ui": "bass-forge.ui.js",
-    "spec": "bass-forge.spec",
+    "engine": "sub-engine.engine.js",
+    "ui": "sub-engine.ui.js",
+    "spec": "sub-engine.spec",
     "preview": "preview.png",
-    "tests": "bass-forge.test.js",
+    "tests": "sub-engine.test.js",
     "thumb": "thumb.png"
   },
   "needs": {
@@ -30,8 +30,7 @@
       "audio_out",
       "midi_in",
       "bus_publish",
-      "bus_subscribe",
-      "filesystem_read"
+      "bus_subscribe"
     ]
   },
   "packs": {
@@ -46,6 +45,7 @@
     "eravos.acid-synth",
     "eravos.arp",
     "eravos.bass-drop-builder",
+    "eravos.bass-forge",
     "eravos.bass-gen",
     "eravos.breath",
     "eravos.channel",
@@ -87,7 +87,6 @@
     "eravos.sample-player",
     "eravos.sidechain-compressor",
     "eravos.song-recorder",
-    "eravos.sub-engine",
     "eravos.suite-hub",
     "eravos.supersaw",
     "eravos.syn-env",

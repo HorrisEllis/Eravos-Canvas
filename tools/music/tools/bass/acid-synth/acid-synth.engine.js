@@ -8,7 +8,7 @@
   const S = OrganismSDK.STD;
   OrganismFactory.define({
     id: 'eravos.acid-synth', preview: 'bass', domain: 'music', version: '2.0.0', label: 'Acid Synth', icon: '⚡', accent: '#00ff88', phase: 'P2',
-    category: 'Sound sources', blurb: 'The squelchy 303 line. Has a GENERATE button that writes an in-key bassline.',
+    category: 'Bass', blurb: 'The squelchy 303 line. Has a GENERATE button that writes an in-key bassline.',
     size: { w: 470, h: 420 }, minSize: { w: 380, h: 330 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
     provides: ['capability.audio_out', 'capability.note_in'],

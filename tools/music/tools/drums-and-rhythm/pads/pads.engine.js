@@ -59,10 +59,12 @@
   }
 
   OrganismFactory.define({
-    id: 'eravos.pads', preview: 'kit', domain: 'music', version: '3.0.0', label: 'Drum Machine', icon: '🥁', accent: '#00ff88', phase: 'P2',
+    id: 'eravos.pads', preview: 'kit', domain: 'music', version: '3.1.0', label: 'Drum Machine', icon: '🥁', accent: '#00ff88', phase: 'P2',
     category: 'Drums & rhythm', blurb: '16 pads · every drum has several synthesis models and its own sound design · kits for every genre — or drop any sound on a pad.',
     lib: { MODELS, DRIVE_TYPES },
     size: { w: 580, h: 680 }, minSize: { w: 420, h: 420 },
+    // 3.1: a mod slot after the whole kit (before the volume) — a Squash, Destroyer, Echo… on every pad at once
+    slots: [{ id: 'kit', label: 'the whole kit', wire_type: 'audio', hint: 'empty — a Squash or Destroyer here hits every pad; an Echo throws the whole kit' }],
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe', 'filesystem_read'],
     provides: ['capability.pad_trigger', 'capability.audio_out', 'capability.bank_select', 'capability.note_in'],
     requires: ['capability.audio_context'],
@@ -91,6 +93,7 @@
       const levelMod = ctx.modBus('level', { min: 0, max: 1.5 });
       levelMod.connect(mix.gain);
       ctx.port('out', { kind: 'audio', direction: 'out', node: mix, label: 'drums' });
+      const kitBus = ac.createGain(); ctx.track(kitBus); ctx.slot('kit', kitBus, { label: 'the whole kit' }).connect(mix);   // every pad → its mods → the volume
       const active = []; // {amp, choke, end}
       const last808 = { freq: 0, t: 0 };
 
@@ -353,7 +356,7 @@
         if (p.choke) active.forEach(a => { if (a.choke === p.choke && a.end > t) { const g = a.chain.gain; g.cancelScheduledValues(t); g.setValueAtTime(a.level, t); g.setTargetAtTime(0, t, 0.0006); a.end = t; } });
         const chain = ac.createGain(); chain.gain.value = p.level;
         const pan = ac.createStereoPanner(); pan.pan.value = p.pan;
-        chain.connect(pan); pan.connect(mix);
+        chain.connect(pan); pan.connect(kitBus);
         // 3.0 post stage (only when a 3.0 key asks for it — classic pads with tone 0 build exactly the 2.0 graph)
         const fresh = p.model && p.model !== 'classic', fn = fresh && M[p.voice] && M[p.voice][p.model];
         let into = chain;

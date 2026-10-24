@@ -143,7 +143,7 @@
 
   OrganismFactory.define({
     id: 'eravos.bass-forge', preview: 'bass', domain: 'music', version: '1.0.0', label: 'Bass Forge', icon: '🜂', accent: '#ff3d00', phase: 'P14',
-    category: 'Sound Forge', blurb: 'FM growls, riddim, neuro, screech — one LFO talks through FM, fold, vowel, comb, notch. MATCH learns a reference bass recursively.',
+    category: 'Bass', blurb: 'FM growls, riddim, neuro, screech — one LFO talks through FM, fold, vowel, comb, notch. MATCH learns a reference bass recursively.',
     size: { w: 620, h: 660 }, minSize: { w: 480, h: 480 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe', 'filesystem_read'],
     provides: ['capability.audio_out', 'capability.note_in', 'capability.lead_voice', 'capability.bass'],

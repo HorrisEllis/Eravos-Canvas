@@ -73,6 +73,10 @@
                       "songName": {
                         "type": "string"
                       },
+                      "meta": {},
+                      "autoCover": {
+                        "type": "boolean"
+                      },
                       "level": {
                         "type": "number",
                         "minimum": 0,

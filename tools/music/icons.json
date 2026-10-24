@@ -24,7 +24,7 @@
     "music.synthwave": "sun", "music.gothic": "castle", "music.sound-system": "radio-tower", "music.xen": "gem"
   },
   "categories": {
-    "Start here": "compass", "Sound sources": "audio-waveform", "Wubs": "volume-2", "Genre instruments": "keyboard-music",
+    "Start here": "compass", "Bass": "speaker", "Sound sources": "audio-waveform", "Wubs": "volume-2", "Genre instruments": "keyboard-music",
     "Sound Forge": "anvil", "Voice & samples": "mic-vocal", "Drums & rhythm": "drum", "Arrange": "chart-gantt",
     "Effects": "wand-sparkles", "Mix": "sliders-horizontal", "Modulation": "activity", "Generators": "workflow",
     "Tools": "toolbox", "Xenharmonic": "hexagon", "Analysis": "radar", "Visuals": "atom",
