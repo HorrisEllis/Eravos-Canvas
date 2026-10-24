@@ -260,3 +260,54 @@ html:not(.snd-off) #logo { filter: drop-shadow(0 0 calc(var(--snd-pulse) * 10px)
 .plib-actions { display: flex; gap: 6px; align-items: center; min-width: 0; }
 .plib-actions .sbk-alt { margin-top: 0; white-space: nowrap; flex: none; }
 .plib-tool { color: var(--dim); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+/* 3.71 MOTION + PERFORM (core/motion-ui.js) — the app's own tokens and controls; tabs are a .uk-seg */
+.mo-tabbed { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.mo-tabrow { display: flex; align-items: center; gap: 8px; justify-content: space-between; flex-wrap: wrap; }
+.mo-tabs button { font: 700 10.5px var(--mono); letter-spacing: .8px; text-transform: uppercase; padding: 5px 10px; }
+.mo-pane[hidden] { display: none; }
+.mo-panel { display: flex; flex-direction: column; gap: 6px; }
+.mo-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.mo-cap { font: 700 10px var(--mono); letter-spacing: 1.2px; color: var(--acc); }
+.mo-dim { color: var(--dim); font-size: 11px; flex: 1; min-width: 120px; }
+.mo-sel { background: var(--bg2); color: var(--text); border: 1px solid var(--line2); border-radius: 6px; padding: 3px 6px; font: 11px var(--font); max-width: 150px; }
+.mo-row { display: flex; align-items: center; gap: 8px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); flex-wrap: wrap; }
+.mo-row.off { opacity: .5; }
+.mo-row .uk-knob-val { display: none; }
+.mo-name { min-width: 84px; font-size: 12px; }
+.mo-rate { width: 76px; }
+.mo-pic, .mo-steps { border: 1px solid var(--line); border-radius: 4px; background: var(--bg); }
+.mo-pic { width: 92px; height: 26px; } .mo-steps { width: 184px; height: 44px; cursor: ns-resize; }
+.mo-sub { display: flex; align-items: center; gap: 8px; flex-basis: 100%; padding: 2px 0 2px 92px; }
+.mo-sub .mo-dim { flex: none; }
+.mo-pgrid { display: grid; grid-template-columns: 160px 1fr; gap: 12px; align-items: start; }
+.mo-padcol { display: flex; flex-direction: column; gap: 6px; }
+.mo-xy { width: 150px; height: 150px; border: 1px solid var(--line2); border-radius: 6px; background: var(--bg); cursor: crosshair; touch-action: none; }
+.mo-axes { display: flex; flex-direction: column; gap: 4px; } .mo-axes .mo-sel { max-width: 150px; }
+.mo-macros { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.mo-mrow { display: flex; gap: 10px; align-items: center; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); }
+.mo-mrow.learning { border-color: var(--acc); }
+.mo-mbody { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.mo-mtop { display: flex; gap: 6px; align-items: center; }
+.mo-mname { flex: 1; min-width: 0; background: var(--bg2); color: var(--text); border: 1px solid var(--line2); border-radius: 6px; padding: 3px 6px; font: 600 12px var(--font); }
+.mo-chips { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+.mo-chip { display: inline-flex; align-items: center; gap: 5px; padding: 1px 2px 1px 7px; border: 1px solid var(--line2); border-radius: 4px; background: var(--bg2); font-size: 11px; }
+.mo-chip .uk-num { font: 700 10.5px var(--mono); color: var(--acc); min-width: 34px; text-align: right; }
+.mo-x { background: none; border: 0; color: var(--dim); cursor: pointer; padding: 0 4px; font-size: 13px; } .mo-x:hover { color: var(--text); }
+.mo-add { max-width: 120px; padding: 1px 4px; }
+.mo-learn { padding: 5px 8px; border: 1px dashed var(--acc); border-radius: 6px; color: var(--acc); font-size: 11.5px; }
+.mo-learn[hidden] { display: none; }
+@media (max-width: 520px) { .mo-pgrid { grid-template-columns: 1fr; } }
+/* 3.71 Groove 1.1: the row table on Feel */
+.gg-play, .gg-feel { display: flex; flex-direction: column; gap: 8px; }
+.gg-rows { display: flex; flex-direction: column; gap: 2px; }
+.gg-rh, .gg-row { display: grid; grid-template-columns: 74px 30px 30px 62px 62px 60px; gap: 6px; align-items: center; }
+.gg-rh span { font: 700 9.5px var(--mono); letter-spacing: 1px; text-transform: uppercase; color: var(--dim); }
+.gg-row { padding: 2px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); }
+.gg-row.muted { opacity: .5; }
+.gg-row b { font: 700 11px var(--mono); }
+.gg-tg { padding: 2px 0; font: 700 10px var(--mono); }
+.gg-tg.on { background: var(--acc); color: #041018; border-color: var(--acc); }
+.gg-row .uk-num { font: 11px var(--mono); }
+.mo-row .mo-pic { flex: none; width: 92px !important; height: 26px !important; }
+.mo-sub .mo-steps { flex: none; width: 184px !important; height: 44px !important; }
+.mo-mrow .uk-knob-label { display: none; }

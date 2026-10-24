@@ -36,7 +36,14 @@
   function ensureHost(st) {
     if (live(st.target)) return st.target;
     const id = F().spawn(st.d.id, { K: st.K }); if (!id) return null;
+    dropSketch(st, id);   // what you set on the page's sketch comes along
     st.target = id; st.made.set(st.d.id, id); repaint(); return id;
+  }
+  function dropSketch(st, into) {
+    const sk = live(st.sketch); st.sketch = null; if (!sk) return;
+    if (into) { const r = live(into); if (r && sk.ctx.serialize) { try { r.ctx.deserialize(JSON.parse(JSON.stringify(sk.ctx.serialize()))); } catch (e) {} } }
+    try { st.K.silence({ hard: true, instanceId: sk.instanceId, reason: 'page' }); } catch (e) {}
+    F().close(sk.instanceId, 'page');
   }
   function presetLoad(K, id, name) { if (name) K.bus.publish('ui:preset_load:' + id, { name }); }
   function nextTo(hostId, n) {
@@ -163,6 +170,7 @@
   function soon() { if (pend) return; pend = global.setTimeout(() => { pend = null; repaint(); }, 30); }
   function close() {
     if (!cur) return; (cur.unsubs || []).forEach(u => { try { u(); } catch (e) {} }); (cur.views || []).forEach(v => { try { v.dispose(); } catch (e) {} });
+    dropSketch(cur);
     if (global.Preview && global.Preview.current && (cur.suite ? cur.suite.parts.some(p => p.tool === global.Preview.current.defId) : global.Preview.current.defId === cur.d.id)) global.Preview.stop();
     cur.el.remove(); cur = null;
   }
@@ -217,10 +225,20 @@
     const uiFn = F().ui && F().ui(d.id);
     if (uiFn) {
       navTo('panel', 'Panel', 'sliders-horizontal');
-      const box = h('div', { class: 'tp-panel' }), rec = live(st.target);
-      if (rec) { const v = F().makeView(rec, box); st.views.push(v); try { uiFn(v); if (rec.ctx.syncUI) rec.ctx.syncUI(); } catch (x) { box.appendChild(UI.hint('its panel could not open here: ' + x.message)); } }
-      else box.append(h('p', { class: 'tp-p tp-dim', text: `${d.label}'s own controls open here, live, once one is on the canvas.` }), btn('Add to canvas', 'open one — its panel appears here', () => ensureHost(st), 'pri', 'plus'));
-      page.appendChild(sec('Its panel', rec ? '· the tool itself, live — every change is its window\'s too' : '', [box], 'panel', 'sliders-horizontal'));
+      // 3.71 the panel is there the moment the page opens: with none on the canvas, a sketch (no window, not saved, not in
+      // undo) is played here — Add to canvas carries everything set on it over to the real window
+      if (!live(st.target) && !live(st.sketch)) st.sketch = F().spawn(d.id, { K, ephemeral: true, headless: true }) || null;
+      const box = h('div', { class: 'tp-panel' }), rec = live(st.target) || live(st.sketch);
+      let v = null;
+      if (rec) {
+        v = F().makeView(rec, box); st.views.push(v); v.inPage = true; v.pageTabs = []; v.pageTab = (id, label, el, ic) => v.pageTabs.push({ id, label, el, ic });
+        try { uiFn(v); if (rec.ctx.syncUI) rec.ctx.syncUI(); } catch (x) { box.appendChild(UI.hint('its panel could not open here: ' + x.message)); }
+      } else box.append(h('p', { class: 'tp-p tp-dim', text: `${d.label}'s own controls open here, live, once one is on the canvas.` }), btn('Add to canvas', 'open one — its panel appears here', () => ensureHost(st), 'pri', 'plus'));
+      page.appendChild(sec('Its panel', !rec ? '' : live(st.target) ? '· the tool itself, live — every change is its window\'s too' : '· try it here — Add to canvas keeps what you set', [box], 'panel', 'sliders-horizontal'));
+      // the tool's own extra tabs (view.pageTab), then what its domain adds for every such tool (UIKit.pageTabsFor)
+      if (v) [].concat(v.pageTabs, (UI.pageTabsFor && UI.pageTabsFor(v)) || []).forEach(t => {
+        navTo(t.id, t.label, t.ic || 'sliders-horizontal'); page.appendChild(sec(t.label, t.sub || '', [h('div', { class: 'tp-panel' }, [t.el])], t.id, t.ic || 'sliders-horizontal'));
+      });
     }
 
     // the suite

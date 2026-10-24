@@ -285,6 +285,7 @@ registerProcessor('eravos-pitch', EravosPitch);`;
   }
   if (global.OrganismFactory) global.OrganismFactory.onDefine((d) => {
     if (d.domain !== 'music' || d._knobInputs) return;
+    if (d.perform && global.MusicMotion) global.MusicMotion.augment(d);   // 3.71 the macro knobs + the motion/perform settings, before the knob inputs
     const perms = d.permissions || [];
     if (!perms.includes('audio_out') && !perms.includes('audio_in')) { d._knobInputs = []; return; }
     const keys = knobKeys(d), have = new Set((d.hooks || []).map(h => h.hook_id));
@@ -367,19 +368,37 @@ registerProcessor('eravos-pitch', EravosPitch);`;
       }
       let knobTimer = null;
       const wiredKnobs = () => Array.from(knobs.keys()).filter(k => ctx.wiredIn('knob.' + k).length);
-      function sampleKnobs() {
+      // 3.71 a tool with perform: true also moves its own knobs (core/motion.js) — summed with what is wired in
+      const motion = global.MusicMotion && global.MusicMotion.performs(ctx.descriptor) ? global.MusicMotion.runner(ctx) : null;
+      const cfgOf = (k) => (ctx.descriptor.config || []).find(x => x.key === k);
+      let driven = new Set();
+      function sampleKnobs(at) {
         if (!ctx.params) return;
-        wiredKnobs().forEach(k => { const n = knobs.get(k); if (!n.an) return; n.an.getFloatTimeDomainData(n.buf); const m = n.buf[n.buf.length - 1] || 0; ctx.params.live(k, knobValue(n.c, ctx.params.base(k), m)); });
+        const wired = new Map();
+        wiredKnobs().forEach(k => { const n = knobs.get(k); if (!n.an) return; n.an.getFloatTimeDomainData(n.buf); wired.set(k, n.buf[n.buf.length - 1] || 0); });
+        const extra = motion ? motion.contributions(typeof at === 'number' ? at : ac.currentTime, wired) : null, now = new Set(wired.keys());
+        if (extra) extra.forEach((m, k) => now.add(k));
+        now.forEach(k => { const c = cfgOf(k); if (!c) return; ctx.params.live(k, knobValue(c, ctx.params.base(k), (wired.get(k) || 0) + ((extra && extra.get(k)) || 0))); });
+        driven.forEach(k => { if (!now.has(k) && ctx.params.isLive(k)) ctx.params.live(k, null); });
+        driven = now;
       }
       ctx.sampleKnobs = sampleKnobs;
       function knobWires() {
         const on = wiredKnobs();
         knobs.forEach((n, k) => {
           if (on.includes(k)) { if (!n.started) { n.an = ac.createAnalyser(); n.an.fftSize = 32; n.buf = new Float32Array(32); n.cs.connect(n.an); n.cs.start(); n.started = true; ctx.track(n.cs); } }
-          else if (ctx.params && ctx.params.isLive(k)) ctx.params.live(k, null);
+          else if (ctx.params && ctx.params.isLive(k) && !(motion && motion.active())) ctx.params.live(k, null);
         });
-        if (on.length && !knobTimer) knobTimer = ctx.interval(sampleKnobs, 16);
-        else if (!on.length && knobTimer) { clearInterval(knobTimer); knobTimer = null; }
+        const run = on.length || (motion && motion.active());
+        if (run && !knobTimer) knobTimer = ctx.interval(sampleKnobs, 16);
+        else if (!run && knobTimer) { clearInterval(knobTimer); knobTimer = null; sampleKnobs(); }
+      }
+      ctx.motionRefresh = knobWires;
+      if (motion) {
+        // on every step a pattern tool plays, its knobs are where the movement is at THAT step's time (ticks run ahead of the clock)
+        ctx.on('transport:tick', null, (t) => { if (t && typeof t.time === 'number' && (knobTimer || motion.active())) sampleKnobs(t.time); });
+        ['_motion', '_perform'].concat(global.MusicMotion.MACROS).forEach(k => ctx.params.onChange(k, () => knobWires()));
+        Promise.resolve().then(() => { if (!ctx.disposed) knobWires(); });   // a loaded project's movements start by themselves
       }
       if (knobs.size) {
         const mine = (w) => w && w.dst && w.dst.instanceId === ctx.id && /^knob\./.test(w.dst.hookId);

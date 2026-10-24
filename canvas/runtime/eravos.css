@@ -250,7 +250,8 @@ svg.wires { position: absolute; pointer-events: none; overflow: visible; z-index
 .ap-d-head small { color: var(--faint); font: 600 10px var(--mono); }
 .ap-d-ic { font-size: 26px; width: 48px; height: 48px; flex: none; display: grid; place-items: center; border-radius: 12px; background: color-mix(in srgb, var(--acc) 18%, var(--panel)); }
 .ap-d-blurb { color: var(--dim); margin: 10px 0 12px; }
-.ap-addbtn { width: 100%; height: 38px; margin-bottom: 6px; }
+.ap-addbtn { width: 100%; height: 38px; margin-bottom: 6px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.ap-addbtn2 { width: 100%; height: 32px; margin-bottom: 6px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 .ap-d-sec { margin-top: 12px; display: flex; flex-direction: column; gap: 4px; }
 .ap-d-row { display: flex; flex-direction: column; padding: 5px 8px; border-radius: 7px; background: rgba(255,255,255,.025); }
 .ap-d-row small { color: var(--faint); font-size: 11px; }
@@ -484,7 +485,13 @@ svg.wires path.wire.hot { stroke-width: 4.5; filter: drop-shadow(0 0 4px current
 }
 .tp-panel { position: relative; border: 1px solid var(--line, #1a2533); border-radius: 6px; padding: 10px; background: var(--panel); max-height: 640px; overflow: auto; }
 .tp-sec[hidden] { display: none; }
-.tp-nav .tp-btn.tp-tab.on { color: #041018; background: var(--acc, #00d4ff); border-color: var(--acc, #00d4ff); font-weight: 700; }
+/* 3.71 the page's tabs: one horizontal row (the Controls table shares the .tp-tab name — its width: 100% stacked them) */
+.tp-nav { flex-wrap: nowrap; gap: 0; overflow-x: auto; padding: 0; scrollbar-width: none; }
+.tp-nav .tp-btn.tp-tab { width: auto; flex: none; background: transparent; border: 0; border-bottom: 2px solid transparent; border-radius: 0; color: var(--dim); padding: 10px 14px 8px; font-weight: 600; }
+.tp-nav .tp-btn.tp-tab:hover { color: var(--text); border-bottom-color: var(--line2); }
+.tp-nav .tp-btn.tp-tab.on { color: var(--text); border-bottom-color: var(--acc, #00d4ff); }
+.tp-nav .tp-btn.tp-tab.on .ic { color: var(--acc, #00d4ff); }
+table.tp-tab { width: 100%; }
 /* 3.70 the right-click menu (runtime/context-menu.js) — above full-screen window views */
 .cm { position: fixed; z-index: 200000; min-width: 220px; max-width: 320px; max-height: 80vh; overflow: auto; padding: 4px; display: flex; flex-direction: column; background: #0b1119; border: 1px solid var(--line2, #2a3a4e); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,.55); font: 12px var(--font, sans-serif); color: var(--text, #d7e0ea); }
 .cm-h { padding: 5px 8px 4px; font-weight: 700; color: var(--acc, #00d4ff); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

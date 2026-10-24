@@ -1,7 +1,7 @@
 {
   "schema": "eravos.tool/1",
   "id": "eravos.groove-gen",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "label": "Groove",
   "icon": "🥁",
   "accent": "#ffaa00",
