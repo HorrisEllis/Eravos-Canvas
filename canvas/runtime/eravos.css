@@ -592,3 +592,28 @@ table.tp-tab { width: 100%; }
 .tp-row, .tp-mod, .tp-pre { border-radius: 3px; border: 1px solid #000; background: var(--well); box-shadow: 0 0 0 1px var(--line); }
 .tp-row.on { box-shadow: 0 0 0 1px var(--acc); border-color: #000; }
 .tp-tag { border-radius: 2px; font: 700 9px var(--mono); letter-spacing: 1px; text-transform: uppercase; }
+/* 3.73 "make the ui completely dynamic and fluid": everything eases — keys and strips light up and settle, faders glide to a
+   new value, a tab's content and a page slide in, a new window grows into place; and sections reflow to the room they have
+   (container queries: a narrow window stacks, a wide one spreads). Reduced motion: none of the movement, all of the reflow. */
+.uk-btn, .uk-toggle, .uk-seg button, .tp-btn, .tb-btn, .uk-select, .uk-text, .uk-num, .tp-nav .tp-btn.tp-tab {
+  transition: background-color .14s ease, color .14s ease, box-shadow .18s ease, border-color .14s ease, transform .08s ease, filter .14s ease; }
+.uk-btn:active, .uk-toggle:active, .uk-seg button:active, .tp-btn:active, .tb-btn:active { transform: translateY(1px) scale(.98); }
+.uk-fader:not(:active) .uk-fader-thumb { transition: bottom .16s cubic-bezier(.2,.8,.3,1); }
+.uk-fader:not(:active) .uk-fader-fill { transition: height .16s cubic-bezier(.2,.8,.3,1); }
+.uk-knob svg { transition: transform .12s ease; } .uk-knob:hover svg { transform: scale(1.04); } .uk-knob.active svg { transform: scale(1.06); }
+@keyframes uk-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes uk-pop { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
+.tp-sec:not([hidden]) { animation: uk-in .22s cubic-bezier(.2,.8,.3,1); }
+.tp-page { animation: uk-pop .22s cubic-bezier(.2,.8,.3,1); }
+.tp-overlay { animation: uk-fade .18s ease; } @keyframes uk-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes uk-grow { from { opacity: 0; } to { opacity: 1; } }   /* a fade only: a window is its exact size from the first frame (it may be maximised at once) */
+.wm-win.wm-new { animation: uk-grow .24s cubic-bezier(.2,.8,.3,1); }
+/* reflow: sections know their own width */
+.wm-body, .tp-panel { container-type: inline-size; }
+@container (max-width: 520px) {
+  .uk-panel { gap: 6px; } .uk-group { flex: 1 1 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tp-sec:not([hidden]), .tp-page, .tp-overlay, .wm-win.wm-new { animation: none; }
+  .uk-fader-thumb, .uk-fader-fill, .uk-knob svg { transition: none !important; }
+}

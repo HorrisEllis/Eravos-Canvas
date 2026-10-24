@@ -334,3 +334,39 @@ html:not(.snd-off) #logo { filter: drop-shadow(0 0 calc(var(--snd-pulse) * 10px)
 .gg-small { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .gg-small .uk-num { min-width: 46px; padding: 2px 4px; font-size: 10px; }
 .gg-fd .uk-fader .uk-knob-label { display: none; }
+/* 3.73 his call: "square pads" — every pad grid (FX Box, Drum Forge, Glitch, Dub Station; the Drum Machine in pads.css) */
+html .fxbox-pad, html .forge-pad, html .glitch-pad, html .dub2-pad { aspect-ratio: 1; min-height: 0; height: auto; border-radius: 4px; }
+/* ============================================================================================================================
+   3.73 "make the accents, fonts, all of the accents use the event variable driven ui when sound plays — in the tools, the ui".
+   One level per place: --lvl is the mix (and its hits) everywhere, and inside a window its own sound (--tool-level: its output,
+   or what it plays, or the mix — core/sound-css.js). The accent colours already move (sound-css lights --acc and the palette);
+   these make the TEXT and the drawn parts answer too: accent text glows, labels warm toward the accent, LCDs and lit keys
+   flare, panel edges catch the light, and every drawn display brightens. Paint only (colour, shadow, filter) — no layout
+   moves, so it costs nothing to keep running. Off with ⋯ Options → Reactive colours.
+   ============================================================================================================================ */
+:root { --lvl: min(1, max(calc(var(--snd-level) * 1.1), var(--snd-pulse))); }
+.wm-win, #dock { --lvl: min(1, calc(var(--tool-level, 0) * 1.6)); }
+html:not(.snd-off) .wm-title, html:not(.snd-off) .uk-knob-val, html:not(.snd-off) .uk-num, html:not(.snd-off) .mo-cap, html:not(.snd-off) .uk-group-title,
+html:not(.snd-off) .tp-ht h2, html:not(.snd-off) .tp-meta, html:not(.snd-off) .mo-mname, html:not(.snd-off) .mo-lcd, html:not(.snd-off) .gg-chn,
+html:not(.snd-off) .uk-seg button.on, html:not(.snd-off) .uk-toggle.on, html:not(.snd-off) .tp-nav .tp-tab.on, html:not(.snd-off) .org-label {
+  text-shadow: 0 0 calc(var(--lvl) * 14px) color-mix(in srgb, var(--acc) calc(var(--lvl) * 100%), transparent), 0 0 calc(var(--lvl) * 4px) color-mix(in srgb, var(--acc) calc(var(--lvl) * 80%), transparent); }
+html:not(.snd-off) .uk-knob-val, html:not(.snd-off) .uk-num, html:not(.snd-off) .gg-chn { color: color-mix(in srgb, var(--acc) calc(var(--lvl) * 70%), var(--text)); }
+html:not(.snd-off) .uk-knob-label, html:not(.snd-off) .mo-lab, html:not(.snd-off) .uk-field > span, html:not(.snd-off) .tp-h {
+  color: color-mix(in srgb, var(--acc) calc(var(--lvl) * 85%), var(--dim)); }
+html:not(.snd-off) .wm-title, html:not(.snd-off) .tp-ht h2 { color: color-mix(in srgb, var(--acc) calc(var(--lvl) * 45%), var(--text)); }
+html:not(.snd-off) .uk-num, html:not(.snd-off) .mo-lcd { box-shadow: 0 0 0 1px color-mix(in srgb, var(--acc) calc(var(--lvl) * 70%), var(--line2)), inset 0 1px 4px rgba(0,0,0,.6), 0 0 calc(var(--lvl) * 10px) color-mix(in srgb, var(--acc) calc(var(--lvl) * 40%), transparent); }
+html:not(.snd-off) .uk-seg button.on { box-shadow: 0 0 calc(6px + var(--lvl) * 14px) color-mix(in srgb, var(--acc) calc(30% + var(--lvl) * 40%), transparent); }
+html:not(.snd-off) .uk-group, html:not(.snd-off) .gg-sec, html:not(.snd-off) .tp-panel { box-shadow: 0 0 0 1px color-mix(in srgb, var(--acc) calc(var(--lvl) * 70%), var(--line)) inset, 0 1px 0 var(--edge) inset, inset 0 0 calc(var(--lvl) * 30px) color-mix(in srgb, var(--acc) calc(var(--lvl) * 14%), transparent); }
+html:not(.snd-off) .uk-group-title::before, html:not(.snd-off) .mo-dot, html:not(.snd-off) .tp-h::before { box-shadow: 0 0 calc(4px + var(--lvl) * 12px) var(--acc); transform: scale(calc(1 + var(--lvl) * .6)); }
+html:not(.snd-off) .uk-canvas { filter: brightness(calc(1 + var(--lvl) * .35)) saturate(calc(1 + var(--lvl) * .3)); }
+html:not(.snd-off) .uk-knob-cap { filter: drop-shadow(0 0 calc(var(--lvl) * 4px) var(--acc)); }
+html:not(.snd-off) .uk-fader-fill { filter: brightness(calc(1 + var(--lvl) * .5)); }
+html:not(.snd-off) .wm-win::before, html:not(.snd-off) .tp-page::before { box-shadow: 0 0 calc(8px + var(--lvl) * 22px) var(--acc); }
+html:not(.snd-off) .tb-btn.primary, html:not(.snd-off) #logo { filter: drop-shadow(0 0 calc(var(--lvl) * 10px) var(--pink)); }
+@media (prefers-reduced-motion: reduce) { html:not(.snd-off) .uk-group-title::before, html:not(.snd-off) .mo-dot, html:not(.snd-off) .tp-h::before { transform: none; } }
+/* 3.73 fluid: Groove, Motion and Perform reflow to their room */
+@container (max-width: 760px) { .gg-mixer { grid-template-columns: repeat(4, minmax(0, 1fr)); } .mo-shapes { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+@container (max-width: 640px) { .mo-pgrid { grid-template-columns: 1fr; } .mo-xy { width: 100% !important; height: auto !important; aspect-ratio: 1; max-width: 260px; } .gg-bank { flex-direction: column; align-items: stretch; } }
+@container (max-width: 420px) { .mo-macros { grid-template-columns: 1fr; } .gg-mixer { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.mo-tile, .mo-slot, .gg-ch, .mo-mrow { transition: box-shadow .18s ease, transform .1s ease, background-color .14s ease; }
+.mo-tile:hover, .mo-slot:hover { transform: translateY(-1px); }

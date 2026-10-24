@@ -85,12 +85,27 @@
     doc.querySelectorAll('.tp-overlay').forEach(o => { light(o, kMix); accented(o, ts).forEach(el => light(el, kMix)); });
     if (Math.random() < 0.02) taps.forEach((t, id) => { if (!t.win || !t.win.isConnected) { try { if (t.node && t.an) t.node.disconnect(t.an); } catch (e) {} taps.delete(id); } });   // closed windows let go
     // each window that makes sound: its own level
+    // 3.73 "all of the accents … when sound plays — in the tools, the ui": a window that makes no sound of its own (a pattern tool,
+    // the timeline, a modulator) follows the tools it plays (wired from it), or else the mix — so every window answers the sound
+    const lvOf = new Map(), quiet = [];
     doc.querySelectorAll('.wm-win').forEach(w => {
-      if (w.classList.contains('collapsed') || w.offsetParent === null) return; const t = toolTap(w); if (!t || t.none) return;
-      t.an.getFloatTimeDomainData(t.buf); let s = 0; for (let i = 0; i < t.buf.length; i++) s += t.buf[i] * t.buf[i];
-      const v = clamp((10 * Math.log10(s / t.buf.length + 1e-12) + 50) / 44, 0, 1); t.lv = (t.lv || 0) + (v - (t.lv || 0)) * 0.4; w.style.setProperty('--tool-level', t.lv.toFixed(3));
+      if (w.classList.contains('collapsed') || w.offsetParent === null) return; const t = toolTap(w); if (!t || t.none) { quiet.push(w); return; }
+      t.an.getFloatTimeDomainData(t.buf); let s = 0, pk = 0; for (let i = 0; i < t.buf.length; i++) { const x = t.buf[i]; s += x * x; const a = x < 0 ? -x : x; if (a > pk) pk = a; }
+      // 3.73 a meter's envelope: the loudness or the peak (a drum hit is short — its peak is what you see), up fast, down slower
+      const vr = clamp((10 * Math.log10(s / t.buf.length + 1e-12) + 50) / 44, 0, 1), vp = clamp((20 * Math.log10(pk + 1e-9) + 36) / 36, 0, 1), v = Math.max(vr, vp * 0.95);
+      t.lv = (t.lv || 0) + (v - (t.lv || 0)) * (v > (t.lv || 0) ? 0.6 : 0.12); w.style.setProperty('--tool-level', t.lv.toFixed(3));
+      lvOf.set(w.dataset.instance, t.lv);
       if (t.lv > 0.02) liveAcc(w, t.lv, ts); else restoreAcc(w);
     });
+    if (quiet.length) {
+      const wires = (K.wires && K.wires.list && K.wires.list()) || [];
+      quiet.forEach(w => {
+        const id = w.dataset.instance, outs = wires.filter(x => x.src && x.src.instanceId === id).map(x => lvOf.get(x.dst.instanceId)).filter(v => v !== undefined);
+        const v = outs.length ? Math.max(...outs) : clamp(level * 0.6 + pulse * 0.25, 0, 1), prev = +w.dataset.lv || 0, lv = prev + (v - prev) * 0.4;
+        w.dataset.lv = lv.toFixed(3); w.style.setProperty('--tool-level', lv.toFixed(3));
+        if (lv > 0.02) liveAcc(w, lv, ts); else restoreAcc(w);
+      });
+    }
   }
   const SoundCSS = {
     init(kernel) { K = kernel; if (!raf) raf = global.requestAnimationFrame(frame); root.classList.toggle('snd-off', !on); return SoundCSS; },

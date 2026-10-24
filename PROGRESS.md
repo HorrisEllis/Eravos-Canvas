@@ -2,6 +2,23 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.73 Living UI · square pads · fluid · patterns that curve (2026-10-24)
+His words: "make the accents, fonts, all of the accents use the event variable driven ui when sound plays. Like in the tools, the
+ui, etc. Square pads. Make the ui completely dynamic and fluid. Also the patterns. Why do barely any of them curve?"
+- **Why they didn't curve:** of 183 464 notes the 85 genres wrote, 0 had a per-note curve and 218 a bend — per-note curves came
+  later and nothing wrote them. The Song Engine now plays every melodic part with movement chosen by role and section (bass:
+  growl / talk / open / wobble deepens, a dive with a bend at the end of a drop; chords: swells and plucks, a chord moving as one;
+  leads: glide-in bends and plucks) as Bézier arcs on the tool's own filter / drive / wobble knobs, centred on its preset. Now
+  36 908 curved notes and 5 060 bends, in all 85 genres; drums stay straight. Seeded apart: the notes are identical (the old
+  golden hashes match with curve: false); a genre or part can opt out.
+- **Sound everywhere:** one level per place (--lvl: the mix, or a window's own sound — a window with no sound follows the tools
+  it plays, else the mix); accent text glows, labels/values warm toward the accent, LCDs flare, panel edges and drawn displays
+  light. Window meters follow peaks (a drum hit shows), up fast, down slow.
+- **Square pads:** Drum Machine, Drum Forge, FX Box, Glitch, Dub Station.
+- **Fluid:** values set from outside glide (presets sweep the knobs); keys, strips and faders ease; tabs and pages slide in; new
+  windows fade in; sections reflow to their room (container queries). Reduced motion keeps the reflow, drops the movement.
+- Tests: p73 (every genre curves, the notes unchanged, curves in range; square pads; knobs glide; Groove lights with its drums).
+
 ## Done — 3.72 The look kit (pro-plugin) · tool pages as devices · Groove in it (2026-10-24)
 His words on the 3.71 Groove: "looks horrible … cheap"; on the tool pages: "tabs … load the default tab with the content and have
 the tabs horizontal"; "the tool page to be the pink button, and the add to canvas under it"; on a mock-up: "that's way better.

@@ -110,8 +110,23 @@
     const pol = (a, r) => { const rad = (a - 90) * Math.PI / 180; return [20 + r * Math.cos(rad), 20 + r * Math.sin(rad)]; };
     const arcPath = (a0, a1, r) => { const [x0, y0] = pol(a0, r), [x1, y1] = pol(a1, r); const large = Math.abs(a1 - a0) > 180 ? 1 : 0; return `M${x0} ${y0} A${r} ${r} 0 ${large} ${a1 > a0 ? 1 : 0} ${x1} ${y1}`; };
     track.setAttribute('d', arcPath(A0, A1, 15.5));
+    // 3.73 fluid: a value set from outside (a preset, a macro, undo) glides there; a drag or a key is exact at once
+    let shownN = null, glideRaf = 0;
+    function glideTo() {
+      const target = Math.max(0, Math.min(1, m.toN(value))); if (shownN === null || reduceMotion()) { shownN = target; return; }
+      global.cancelAnimationFrame(glideRaf);
+      const step = () => { shownN += (target - shownN) * 0.28; if (Math.abs(target - shownN) < 0.002) shownN = target; drawArc(); if (shownN !== target) glideRaf = global.requestAnimationFrame(step); };
+      glideRaf = global.requestAnimationFrame(step);
+    }
+    function drawArc() {
+      const n = shownN === null ? Math.max(0, Math.min(1, m.toN(value))) : shownN;
+      const bip = o.min < 0 && o.max > 0, zeroA = bip ? A0 + (A1 - A0) * m.toN(0) : A0, a = A0 + (A1 - A0) * n;
+      arc.setAttribute('d', Math.abs(a - zeroA) < 0.5 ? '' : arcPath(Math.min(zeroA, a), Math.max(zeroA, a), 15.5));
+      const [x, y] = pol(a, 8.6), [x0, y0] = pol(a, 3.5); dot.setAttribute('cx', x); dot.setAttribute('cy', y);
+      ptr.setAttribute('x1', x0); ptr.setAttribute('y1', y0); ptr.setAttribute('x2', x); ptr.setAttribute('y2', y);
+    }
     function draw() {
-      const n = Math.max(0, Math.min(1, m.toN(value)));
+      const n = Math.max(0, Math.min(1, m.toN(value))); shownN = n;
       const bip = o.min < 0 && o.max > 0;
       const zeroA = bip ? A0 + (A1 - A0) * m.toN(0) : A0;
       const a = A0 + (A1 - A0) * n;
@@ -150,7 +165,7 @@
       swing.setAttribute('d', hi - lo < 0.004 ? '' : arcPath(A0 + (A1 - A0) * lo, A0 + (A1 - A0) * hi, 19));
       liveDot.style.display = ''; el.classList.add('moving');
     }
-    return { el, set(v) { if (typeof v === 'number') { value = v; draw(); } }, get: () => value, live };
+    return { el, set(v) { if (typeof v === 'number') { const was = shownN; value = v; draw(); if (was !== null) { shownN = was; drawArc(); glideTo(); } } }, get: () => value, live };
   }
 
   // ---------------------------------------------------------------- Fader (vertical)
