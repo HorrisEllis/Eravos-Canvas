@@ -56,8 +56,8 @@
       { key: 'laneH', type: 'integer', default: 48, min: 28, max: 160, label: 'Lane height', group: 'VIEW', hint: 'taller lanes = bigger clips (Alt + wheel over the lanes)' },
       { key: 'songBars', type: 'integer', default: 64, min: 1, max: 512, label: 'Song bars', group: 'VIEW' },
     ],
-    ui_hooks: ['transport_play', 'restart', 'seek', 'loop_set', 'lane_add', 'lane_edit', 'lane_remove', 'auto_points', 'rec_knobs', 'clip_add', 'clip_edit', 'clip_remove', 'clip_split', 'clip_split_at', 'clip_duplicate', 'clip_repeat', 'lane_split', 'marker_edit', 'bounce', 'drop_file', 'export', 'note_audition', 'clip_fill', 'export_midi', 'export_stems', 'tool_set', 'tool_preset'],
-    ui_hook_labels: { clip_add: 'new clip', clip_edit: 'edit clip / notes', clip_remove: 'delete clip', clip_split: 'split clip', clip_split_at: 'split at the frame', clip_duplicate: 'duplicate clip', clip_repeat: 'repeat clip', lane_split: 'split lane',
+    ui_hooks: ['transport_play', 'restart', 'seek', 'loop_set', 'lane_add', 'lane_edit', 'lane_remove', 'auto_points', 'rec_knobs', 'clip_add', 'clip_edit', 'clip_remove', 'clip_split', 'clip_split_at', 'clip_duplicate', 'clip_repeat', 'lane_split', 'marker_edit', 'bounce', 'drop_file', 'export', 'note_audition', 'clip_fill', 'export_midi', 'export_stems', 'tool_set', 'tool_preset', 'behaviour_save', 'behaviour_remove'],
+    ui_hook_labels: { behaviour_save: 'save note behaviour', behaviour_remove: 'remove note behaviour', clip_add: 'new clip', clip_edit: 'edit clip / notes', clip_remove: 'delete clip', clip_split: 'split clip', clip_split_at: 'split at the frame', clip_duplicate: 'duplicate clip', clip_repeat: 'repeat clip', lane_split: 'split lane',
       clip_fill: 'fill chords', lane_add: 'new track', lane_edit: 'track settings', lane_remove: 'remove track', marker_edit: 'marker', drop_file: 'drop audio', loop_set: 'loop' },
     restoreTwice: true,
     engine(ctx) {
@@ -130,6 +130,55 @@
         Object.keys(p).slice(0, 16).forEach(k => { const v = p[k]; if (/^[A-Za-z][\w.]{0,40}$/.test(k) && ((typeof v === 'number' && isFinite(v)) || (typeof v === 'string' && v.length <= 40) || typeof v === 'boolean')) o[k] = v; });
         return Object.keys(o).length ? o : null;
       }
+      // 3.65 per-note CURVES: c = { knob: [[t, value], …] } — that knob moves along the curve over this note (t: 0 = the note's start,
+      // 1 = its end, so a resized note stretches its curves and a moved or copied one keeps them). Number knobs only (the tool checks
+      // keys and ranges when the note plays); at most 8 knobs, 64 points each, sorted by t. MONOPHONIC by design: the knob is the tool's,
+      // so two overlapping notes with curves for the same knob take it in turn (the later note wins) — meant for one line, a bass.
+      function cleanC(c) {
+        if (!c || typeof c !== 'object' || Array.isArray(c)) return null; const o = {};
+        Object.keys(c).slice(0, 8).forEach(k => {
+          if (!/^[A-Za-z][\w.]{0,40}$/.test(k) || !Array.isArray(c[k])) return;
+          const seen = new Set(), pts = c[k].filter(q => Array.isArray(q) && isFinite(+q[0]) && isFinite(+q[1]))
+            .map(q => [Math.round(clamp(+q[0], 0, 1) * 10000) / 10000, +(+q[1]).toPrecision(6)]).sort((a, b) => a[0] - b[0])
+            .filter(q => !seen.has(q[0]) && seen.add(q[0])).slice(0, 64);
+          if (pts.length) o[k] = pts;
+        });
+        return Object.keys(o).length ? o : null;
+      }
+      // the part of a note's curves between f0 and f1 (fractions of the note), as the curves of that part — a note cut in two keeps
+      // the halves of its curves, not two squeezed copies
+      function cropC(c, f0, f1) {
+        if (!c || !(f1 > f0)) return c || null; const o = {};
+        Object.keys(c).forEach(k => {
+          const pts = c[k], at = (x) => { if (x <= pts[0][0]) return pts[0][1]; for (let i = 1; i < pts.length; i++) if (x <= pts[i][0]) { const a = pts[i - 1], b = pts[i]; return b[0] > a[0] ? a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]) : b[1]; } return pts[pts.length - 1][1]; };
+          const mid = pts.filter(q => q[0] > f0 && q[0] < f1).map(q => [(q[0] - f0) / (f1 - f0), q[1]]);
+          o[k] = cleanC({ k: [[0, at(f0)]].concat(mid, [[1, at(f1)]]) }).k;
+        });
+        return o;
+      }
+      // 3.65 NOTE BEHAVIOURS — a note's curves (and bend) saved to use again on other notes, other tools:
+      //   { id, name, bend?, curves: { role: [[t, f], …] } }   role: 'filter' | 'drive' | 'wobble' | 'knob:<key>' (any other knob)
+      //   t: 0…1 across the note · f: 0…1 across the knob's own range (on a frequency knob, as the ear hears it: log)
+      // so one behaviour fits a Wobble Bass, a Reese, a Sub — the piano roll matches each role to the track's own knob when it applies
+      // it, stretched to the note, reversed or scaled. Built-in ones, plus yours (saved with the project, in this timeline).
+      const B_ROLE = /^(filter|drive|wobble|knob:[A-Za-z][\w.]{0,40})$/;
+      function cleanBehaviour(x) {
+        if (!x || typeof x !== 'object') return null; const name = String(x.name || '').trim().slice(0, 40); if (!name) return null;
+        const curves = {}; Object.keys(x.curves || {}).slice(0, 8).forEach(r => { if (!B_ROLE.test(r) || !Array.isArray(x.curves[r])) return;
+          const seen = new Set(), pts = x.curves[r].filter(q => Array.isArray(q) && isFinite(+q[0]) && isFinite(+q[1])).map(q => [Math.round(clamp(+q[0], 0, 1) * 10000) / 10000, Math.round(clamp(+q[1], 0, 1) * 10000) / 10000])
+            .sort((a, b) => a[0] - b[0]).filter(q => !seen.has(q[0]) && seen.add(q[0])).slice(0, 64); if (pts.length) curves[r] = pts; });
+        const bend = cleanB(x.bend); if (!Object.keys(curves).length && !bend) return null;
+        return Object.assign({ id: /^[\w-]{1,40}$/.test(x.id || '') ? x.id : uid('B'), name }, bend ? { bend } : {}, Object.keys(curves).length ? { curves } : {});
+      }
+      const FACTORY_BEHAVIOURS = [
+        { id: 'f-floor-dive', name: 'Floor Dive', factory: true, bend: { from: 0, to: -24, shape: 'late', at: 0.1 }, curves: { filter: [[0, 0.55], [1, 0.12]] } },
+        { id: 'f-late-open', name: 'Filter Opens Late', factory: true, curves: { filter: [[0, 0.1], [0.6, 0.16], [1, 0.95]] } },
+        { id: 'f-growl-build', name: 'Growl Build', factory: true, curves: { drive: [[0, 0.15], [1, 0.95]], filter: [[0, 0.35], [1, 0.8]] } },
+        { id: 'f-wobble-deepens', name: 'Wobble Deepens', factory: true, curves: { wobble: [[0, 0.2], [0.7, 0.55], [1, 1]] } },
+        { id: 'f-talk', name: 'Talk (yoi-yoi)', factory: true, curves: { filter: [[0, 0.2], [0.25, 0.8], [0.5, 0.25], [0.75, 0.85], [1, 0.2]] } },
+        { id: 'f-glide-open', name: 'Glide In + Open', factory: true, bend: { from: -12, to: 0, shape: 'early', at: 0 }, curves: { filter: [[0, 0.2], [1, 0.75]] } },
+      ];
+      let behaviours = [];
       // 3.56 a note's pitch curve: { from, to } semitones (±48), shape, at (where in the note the bend starts) — null if flat
       const BEND_SHAPES = ['smooth', 'linear', 'early', 'late'];
       function cleanB(b) {
@@ -147,9 +196,9 @@
       }
       function cleanNotes(arr, bars) {
         const max = bars * 16;
-        return (Array.isArray(arr) ? arr : []).map(n => ({ s: +n.s, l: +n.l, n: Math.round(+n.n), v: n.v === undefined ? 0.85 : +n.v, p: cleanP(n.p), b: cleanB(n.b) }))
+        return (Array.isArray(arr) ? arr : []).map(n => ({ s: +n.s, l: +n.l, n: Math.round(+n.n), v: n.v === undefined ? 0.85 : +n.v, p: cleanP(n.p), b: cleanB(n.b), c: cleanC(n.c) }))
           .filter(n => isFinite(n.s) && isFinite(n.l) && isFinite(n.n) && isFinite(n.v) && n.s >= 0 && n.s < max)
-          .map(n => Object.assign({ s: Math.round(n.s * 192) / 192, l: clamp(Math.round(n.l * 192) / 192, 0.125, max - n.s), n: clamp(n.n, 0, 127), v: clamp(n.v, 0.05, 1) }, n.p ? { p: n.p } : {}, n.b ? { b: n.b } : {}))   // 3.48: 1/192 step — exact for 1/64 and every triplet; 1/128-note minimum
+          .map(n => Object.assign({ s: Math.round(n.s * 192) / 192, l: clamp(Math.round(n.l * 192) / 192, 0.125, max - n.s), n: clamp(n.n, 0, 127), v: clamp(n.v, 0.05, 1) }, n.p ? { p: n.p } : {}, n.b ? { b: n.b } : {}, n.c ? { c: n.c } : {}))   // 3.48: 1/192 step — exact for 1/64 and every triplet; 1/128-note minimum
           .sort((a, b) => a.s - b.s || a.n - b.n);
       }
       const snap16 = (b) => Math.max(1, 1 + Math.round((b - 1) * 16) / 16);
@@ -208,7 +257,7 @@
           c.notes.forEach(n => {
             if (Math.floor(n.s + 1e-9) !== lp || n.s >= room) return;
             const len = Math.min(n.l, room - n.s);
-            ctx.emit('note:trigger', Object.assign({ target: lane.target, note: n.n, velocity: n.v, time: tk.time + (n.s - lp) * sd, duration: len * sd * 0.98 }, n.p ? { params: n.p } : {}, n.b ? { bend: n.b } : {}));
+            ctx.emit('note:trigger', Object.assign({ target: lane.target, note: n.n, velocity: n.v, time: tk.time + (n.s - lp) * sd, duration: len * sd * 0.98 }, n.p ? { params: n.p } : {}, n.b ? { bend: n.b } : {}, n.c ? { curves: n.c } : {}));
           });
         });
       }
@@ -310,7 +359,7 @@
         applyLanes();
         const peaks = {}; clips.forEach(c => { if (c.kind === 'audio' && peaksCache.has(c.assetHash)) peaks[c.assetHash] = peaksCache.get(c.assetHash); });
         const end = songEnd();
-        ctx.emitUI('arrangement_sync', { lanes, clips, markers, peaks, barSec: barSec(), songEnd: end, key: ctx.key, instruments: instruments(), drumNames: drumNamesLive(), knobs: knobsOf(), tools: toolInfo(), recKnobs: recAll,
+        ctx.emitUI('arrangement_sync', { lanes, clips, markers, peaks, barSec: barSec(), songEnd: end, key: ctx.key, instruments: instruments(), drumNames: drumNamesLive(), knobs: knobsOf(), tools: toolInfo(), recKnobs: recAll, behaviours: FACTORY_BEHAVIOURS.concat(behaviours),
           progressions: Object.keys(PROGRESSIONS).map(k => ({ value: k, label: PROGRESSIONS[k].label })), fillStyles: Object.keys(FILL_STYLES).map(k => ({ value: k, label: FILL_STYLES[k].label })), sequencers: K.registry.byOrganism('eravos.sequencer').map(r => ({ value: r.instance_id, label: '⬛ ' + r.instance_id.split('-').slice(-2).join('') })) });
         ctx.emit('timeline:song_length', { bars: Math.max(end, 1) });
       }
@@ -490,7 +539,7 @@
         if (c.kind === 'notes') {
           const cut = nb * 16, left = [], right = [];
           if (c.loop) { c.notes = notesOf(c); delete c.loop; }   // 3.62: a repeating clip is written out, then cut
-          c.notes.forEach(n => { if (n.s < cut) left.push(Object.assign({}, n, { l: Math.min(n.l, cut - n.s) })); else right.push(Object.assign({}, n, { s: n.s - cut })); });
+          c.notes.forEach(n => { if (n.s < cut) { const l = Math.min(n.l, cut - n.s), a = Object.assign({}, n, { l }); if (n.c && l < n.l) a.c = cropC(n.c, 0, l / n.l); left.push(a); } else right.push(Object.assign({}, n, { s: n.s - cut })); });   // 3.65 a cut note keeps its part of its curves
           const d = { id: uid('C'), kind: 'notes', lane: c.lane, name: c.name, startBar: c.startBar + nb, bars: c.bars - nb, notes: right };
           c.bars = nb; c.notes = left; clips.push(d); sync(); return [c, d];
         }
@@ -560,11 +609,19 @@
         const c = clips.find(x => x.id === p.id); if (!c || c.kind !== 'notes') return ctx.fault('RUNTIME_002', 'clip_fill needs a note clip');
         fillNotes(c, p.progression, p.style, p.voicing); sync();
       });
+      // 3.65 save a note behaviour (by name: the same name replaces yours) / remove one of yours
+      ctx.onUI('behaviour_save', { type: 'object', required: ['name'] }, (p) => {
+        const b = cleanBehaviour(p); if (!b) return ctx.fault('RUNTIME_002', 'a behaviour needs a name and a curve or a bend');
+        if (FACTORY_BEHAVIOURS.some(f => f.name.toLowerCase() === b.name.toLowerCase())) b.name += ' (mine)';
+        const i = behaviours.findIndex(x => x.name.toLowerCase() === b.name.toLowerCase()); if (i >= 0) { b.id = behaviours[i].id; behaviours[i] = b; } else behaviours.push(b);
+        sync(); ctx.emitUI('export_state', { message: 'Saved the behaviour “' + b.name + '” — it is in every note’s ◈ Behaviours now' });
+      });
+      ctx.onUI('behaviour_remove', { type: 'object', required: ['id'] }, (p) => { const n = behaviours.length; behaviours = behaviours.filter(x => x.id !== p.id); if (behaviours.length !== n) sync(); });
       ctx.onUI('note_audition', { type: 'object', required: ['note'] }, (p) => {
         const lane = lanes.find(l => l.id === p.lane); const target = (lane && lane.target) || p.target;
         if (!target || !K.registry.has(target)) return;
-        const b = cleanB(p.bend), dur = b ? clamp(+p.duration || 0.9, 0.1, 4) : 0.3;   // 3.56: hear the curve while you shape it
-        (Array.isArray(p.notes) ? p.notes : [p.note]).forEach(n => ctx.emit('note:trigger', Object.assign({ target, note: clamp(Math.round(n), 0, 127), velocity: 0.8, time: ac.currentTime + 0.01, duration: dur }, b ? { bend: b } : {})));
+        const b = cleanB(p.bend), cv = cleanC(p.curves), pp = cleanP(p.params), dur = b || cv ? clamp(+p.duration || 0.9, 0.1, 4) : 0.3;   // 3.56/3.65: hear the curves while you shape them
+        (Array.isArray(p.notes) ? p.notes : [p.note]).forEach(n => ctx.emit('note:trigger', Object.assign({ target, note: clamp(Math.round(n), 0, 127), velocity: 0.8, time: ac.currentTime + 0.01, duration: dur }, b ? { bend: b } : {}, cv ? { curves: cv } : {}, pp ? { params: pp } : {})));
       });
       ctx.onUI('marker_edit', { type: 'object', required: ['op'] }, (p) => {
         if (p.op === 'add') markers.push({ bar: snapBar(p.bar || 1), name: p.name || 'marker' });
@@ -624,10 +681,10 @@
       ctx.on('kernel:organism-mounted', null, (p) => { if (p && p.instanceId) missingTargets.delete(p.instanceId); sync(); });
       ctx.on('kernel:organism-unmounted', null, () => sync());
       ctx.stateExtra = () => { setTimeout(sync, 0); return {}; };
-      ctx.saveExtra = () => ({ lanes, clips, markers });
+      ctx.saveExtra = () => Object.assign({ lanes, clips, markers }, behaviours.length ? { behaviours } : {});
       ctx.loadExtra = async (x, o) => {
         if (!x) return;
-        lanes = x.lanes || lanes; clips = x.clips || []; markers = x.markers || [];
+        lanes = x.lanes || lanes; clips = x.clips || []; markers = x.markers || []; behaviours = (Array.isArray(x.behaviours) ? x.behaviours : []).map(cleanBehaviour).filter(Boolean).slice(0, 200);
         // 3.26: a saved arrangement (user preset) — tracks whose instrument is gone wait for you to pick one in the lane header
         if (o && o.preset) lanes.forEach(l => { if (l.target && !K.registry.has(l.target)) l.target = null; });
         lanes.forEach(l => { if (l.kind === 'audio') laneNode(l); if (l.kind === 'auto') { l.points = cleanPoints(l.points, l.target && knobCfg(l.target, l.key)); l.rec = !!l.rec; const o = cleanOsc(l.osc, l.target && knobCfg(l.target, l.key)); if (o) l.osc = o; else delete l.osc; } });
@@ -635,7 +692,7 @@
         for (const c of clips) if (c.kind === 'audio') await bufferOf(c.assetHash);
         sync();
       };
-      ctx.internals = { get recAll() { return recAll; }, get lanes() { return lanes; }, get clips() { return clips; }, get markers() { return markers; }, addLane, bufferOf, instruments, PROGRESSIONS, FILL_STYLES };
+      ctx.internals = { get behaviours() { return behaviours; }, cleanBehaviour, get recAll() { return recAll; }, get lanes() { return lanes; }, get clips() { return clips; }, get markers() { return markers; }, addLane, bufferOf, instruments, PROGRESSIONS, FILL_STYLES };
       setTimeout(sync, 0);
       return { unmount() { stopAll(ac.currentTime); } };
     },

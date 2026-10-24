@@ -1,0 +1,12 @@
+{
+  "_": "Which drawn icon each image tool and category shows (Lucide names). build/icons.mjs \u2192 core/icons.gen.js.",
+  "tools": {
+    "eravos.image.image-adjust": "image"
+  },
+  "categories": {
+    "Image": "image"
+  },
+  "modes": {
+    "image": "image"
+  }
+}

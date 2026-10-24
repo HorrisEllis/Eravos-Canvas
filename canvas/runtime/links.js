@@ -8,6 +8,7 @@
  * Engines see the same list through ctx.links() / ctx.onLinks(fn) (organism-sdk.js). */
 (function (global) {
   'use strict';
+  const IC = (x, text, fb) => global.Icons ? global.Icons.label(x, text, { fallback: fb }) : ((fb || '') + ' ' + text).trim();   // 3.64 a drawn icon, then the words
   const doc = global.document;
   const SKIP = new Set(['mix', 'inGain', 'outGain', 'bypass', 'mods']);
 
@@ -59,7 +60,7 @@
         if (!offered.has(peer)) { offered.add(peer); if (rule) mine.add(peer); }
         const arrow = l.dirs.size > 1 ? '⇄' : l.dirs.has('in') ? '⇠' : '⇢';
         const chip = h('button', { class: 'lk-chip' + (mine.has(peer) ? ' on' : ''), title: (rule && rule.hint) || `${l.dirs.has('in') ? l.label + ' feeds this' : 'this feeds ' + l.label} — click to show its controls here`,
-          style: { '--lc': prec.def.accent || '#00d4ff' }, text: `${arrow} ${l.icon} ${(rule && rule.label) || l.label}` });
+          style: { '--lc': prec.def.accent || '#00d4ff' }, html: arrow + ' ' + IC(prec.def, (rule && rule.label) || l.label, l.icon) });
         chip.addEventListener('click', () => { if (mine.has(peer)) mine.delete(peer); else mine.add(peer); render(id); WM.fitToContent(id); });
         chips.appendChild(chip);
         if (!mine.has(peer)) return;
@@ -67,7 +68,7 @@
         const face = h('div', { class: 'lk-face', style: { '--lc': prec.def.accent || '#00d4ff' } });
         const v = F.makeView(prec, face); views.get(id).push(v);
         face.appendChild(h('div', { class: 'lk-face-head' }, [
-          h('span', { text: `${l.icon} ${l.label}` }),
+          h('span', { html: IC(prec.def, l.label, l.icon) }),
           h('button', { class: 'lk-go', title: 'go to its window', text: '↗', onclick: () => { K.bus.publish('canvas:focus', { instanceId: peer }); } }),
         ]));
         if (keys.length) face.appendChild(UI.paramPanel(v, keys, { flat: true, noTitles: true, size: 26, compact: true }));

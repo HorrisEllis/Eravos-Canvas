@@ -3,6 +3,7 @@
  * Focus: window pointerdown → canvas:focus {instanceId}. Removal of a .wm-win from the canvas by any
  * route (× button, CLEAR ALL) unmounts the organism exactly once (R9). */
 (function (global) {
+  const IC = (x, text, fb) => global.Icons ? global.Icons.label(x, text, { fallback: fb }) : ((fb || '') + ' ' + text).trim();   // 3.64 a drawn icon, then the words
   'use strict';
   const doc = global.document;
   const titleActions = [];
@@ -156,7 +157,7 @@
     const foldBtn = h('button', { class: 'wm-min', title: 'fold / unfold (or double-click the edge)', text: '▾' });
     const maxBtn = h('button', { class: 'wm-min wm-max', title: 'expand to the full screen / back', 'aria-label': 'Expand ' + d.label, text: '⤢' });
     const actions = titleActions.filter(a => !a.noDock && a.when(d)).map(a => a.make(rec, K)).filter(Boolean);
-    const header = h('div', { class: 'wm-head' }, [h('span', { class: 'wm-icon', text: d.icon || '◻' }), h('span', { class: 'wm-title', text: d.label }), h('span', { class: 'wm-spacer' }), ...actions, maxBtn, foldBtn, closeBtn]);
+    const header = h('div', { class: 'wm-head' }, [h('span', { class: 'wm-icon', html: IC(d, '', d.icon || '◻') }), h('span', { class: 'wm-title', text: d.label }), h('span', { class: 'wm-spacer' }), ...actions, maxBtn, foldBtn, closeBtn]);
     const body = h('div', { class: 'wm-body' });
     const win = h('div', { class: 'wm-win docked', 'data-instance': rec.instanceId, 'data-organism': d.id, style: { '--acc': d.accent || '#00d4ff' } }, [header, body]);
     host.appendChild(win);
@@ -188,7 +189,7 @@
     const actions = titleActions.filter(a => a.when(d)).map(a => a.make(rec, K)).filter(Boolean);
     const tag = h('span', { class: 'wm-tag', text: rec.instanceId.split('-').slice(-2).join('') });
     const header = h('div', { class: 'wm-head' }, [
-      h('span', { class: 'wm-icon', text: d.icon || '◻', title: 'open its page' }), h('span', { class: 'wm-title', text: d.label, title: 'open its page — mods, packs, every control' }), tag,
+      h('span', { class: 'wm-icon', html: IC(d, '', d.icon || '◻'), title: 'open its page' }), h('span', { class: 'wm-title', text: d.label, title: 'open its page — mods, packs, every control' }), tag,
       rec.ctx.readOnly ? h('span', { class: 'wm-ro', text: 'READ-ONLY' }) : null,
       h('span', { class: 'wm-spacer' }), ...actions, maxBtn, minBtn, closeBtn,
     ]);

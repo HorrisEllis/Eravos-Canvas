@@ -1,0 +1,12 @@
+{
+  "_": "Which drawn icon each coding tool and category shows (Lucide names). build/icons.mjs \u2192 core/icons.gen.js.",
+  "tools": {
+    "eravos.coding.code-cell": "square-terminal"
+  },
+  "categories": {
+    "Code": "square-terminal"
+  },
+  "modes": {
+    "coding": "square-terminal"
+  }
+}

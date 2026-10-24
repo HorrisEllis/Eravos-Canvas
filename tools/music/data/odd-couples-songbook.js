@@ -119,7 +119,7 @@
         brass: { role: 'lead', organism: 'eravos.retro-poly', preset: O('Steppers Brass'), octave: 5, name: 'Brass' },
         pad: { role: 'chords', organism: 'eravos.supersaw', preset: O('Steppers Pluck'), style: 'stab', voicing: 'triad', octave: 5, name: 'Pluck' } },
       fx: [{ organism: 'eravos.dub-station', preset: O('Synthwave Steppers'), on: 'bubble' }, { organism: 'eravos.fx-echo', preset: O('Steppers Tape'), on: 'brass' }, { organism: 'eravos.fx-moddelay', preset: O('Steppers Flange'), on: 'drums' }, { organism: 'eravos.sidechain-compressor', preset: O('Steppers Pump 1/4'), on: 'pad' }],
-      mods: HER(O('Steppers Pull-up')).concat([{ organism: 'eravos.wub-rate', preset: O('Steppers Switch') }, { organism: 'eravos.edm-lab', preset: O('Steppers Lab') }]),
+      mods: HER(O('Steppers Pull-up')).concat([{ organism: 'eravos.wub-rate', preset: O('Steppers Switch') }]),   // 3.64: no EDM Lab all-in-one (the suite is EDM Lab)
       master: { compThresh: -11, compRatio: 2.5, reverbMix: 0.2 } },
 
     // 6 — a body-awareness drone that breathes, under a 174 drum & bass roller
@@ -196,7 +196,7 @@
         choir: { role: 'chords', organism: 'eravos.coven', preset: [O('Golden Ghost Choir'), O('Riddim Requiem')], style: 'sustain', voicing: 'triad', octave: 4, name: 'Choir' },
         organ: { role: 'chords', organism: 'eravos.organ', preset: O('Organ Into Wobble'), style: 'sustain', voicing: 'triad', octave: 3, name: 'Organ' } },
       fx: [{ organism: 'eravos.fx-filter', preset: O('Choir Behind Glass'), on: 'choir' }, { organism: 'eravos.wub-filter', preset: O('Acid Mouth'), on: 'wobble' }, { organism: 'eravos.fx-destroyer', preset: O('Organ Crush'), on: 'organ' }, { organism: 'eravos.granular', preset: O('Choir Grain Halo'), on: 'choir' }],   // 3.43: the choir scattered into a halo behind itself
-      mods: HER(O('Cathedral Drop')).concat([{ organism: 'eravos.edm-lab', preset: O('Machine Choir Roller') }, { organism: 'eravos.wub-rate', preset: O('Golden Rate'), to: 'fx1', key: 'wub' }]),
+      mods: HER(O('Cathedral Drop')).concat([{ organism: 'eravos.wub-rate', preset: O('Golden Rate'), to: 'fx1', key: 'wub' }]),   // 3.64: no EDM Lab all-in-one
       master: { compThresh: -10, compRatio: 3, reverbMix: 0.2 } },
 
     // 12 — the hanging tree goes to the sound system: desert-goth organ drone, dub siren, a wub-sub floor, a synthwave chapel

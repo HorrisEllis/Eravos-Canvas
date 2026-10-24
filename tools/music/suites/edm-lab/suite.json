@@ -5,9 +5,8 @@
   "icon": "⚗",
   "accent": "#ff2266",
   "version": "4.0.0",
-  "blurb": "EDM Lab, rebuilt as a system. Groove paints the rhythm and plays Pads; Chords voices the progression by TENSION and plays Pad Forge; Bassline puts the root on the kick and plays Reese Bass. ENERGY and TENSION here turn all of them. Swap any instrument for another and it still plays.",
+  "blurb": "Groove paints the rhythm and plays Pads; Chords voices the progression by TENSION and plays Pad Forge; Bassline puts the root on the kick and plays Reese Bass. ENERGY and TENSION here turn all of them. Swap any instrument for another and it still plays.",
   "hub": "eravos.suite-hub",
-  "allInOne": "eravos.edm-lab",
   "parts": [
     {
       "tool": "eravos.groove-gen",

@@ -8,21 +8,152 @@
   "blurb": "Sound from scratch, one job per tool. Morph Osc is the voice, an Envelope scans its morph on every note, an LFO moves its FM, and Partials layers a drawn spectrum under it. Each part is its own tool, and they all end in this suite.",
   "hub": "eravos.suite-hub",
   "parts": [
-    { "tool": "eravos.syn-osc", "role": "voice", "required": true, "preset": "Morph Lead", "why": "the voice: a wave that morphs, with FM and ring inputs" },
-    { "tool": "eravos.syn-env", "role": "shape", "required": true, "preset": "Morph Scan", "why": "every note scans the morph, then it settles" },
-    { "tool": "eravos.lfo", "role": "motion", "preset": "Wobble 1/8", "why": "moves the FM in time" },
-    { "tool": "eravos.syn-partials", "role": "layer", "preset": "Glass Keys", "why": "a drawn spectrum under the voice" }
+    {
+      "tool": "eravos.syn-osc",
+      "role": "voice",
+      "required": true,
+      "preset": "Morph Lead",
+      "why": "the voice: a wave that morphs, with FM and ring inputs"
+    },
+    {
+      "tool": "eravos.syn-env",
+      "role": "shape",
+      "required": true,
+      "preset": "Morph Scan",
+      "why": "every note scans the morph, then it settles"
+    },
+    {
+      "tool": "eravos.lfo",
+      "role": "motion",
+      "preset": "Wobble 1/8",
+      "why": "moves the FM in time"
+    },
+    {
+      "tool": "eravos.syn-partials",
+      "role": "layer",
+      "preset": "Glass Keys",
+      "why": "a drawn spectrum under the voice"
+    }
   ],
   "wiring": [
-    { "from": ["eravos.syn-env", "env.hook.mod_out"], "to": ["eravos.syn-osc", "mosc.hook.mod_morph"] },
-    { "from": ["eravos.lfo", "lfo.hook.mod_out"], "to": ["eravos.syn-osc", "mosc.hook.mod_fm"] }
+    {
+      "from": [
+        "eravos.syn-env",
+        "env.hook.mod_out"
+      ],
+      "to": [
+        "eravos.syn-osc",
+        "mosc.hook.mod_morph"
+      ]
+    },
+    {
+      "from": [
+        "eravos.lfo",
+        "lfo.hook.mod_out"
+      ],
+      "to": [
+        "eravos.syn-osc",
+        "mosc.hook.mod_fm"
+      ]
+    }
   ],
-  "output": ["eravos.syn-osc", "eravos.syn-partials"],
+  "output": [
+    "eravos.syn-osc",
+    "eravos.syn-partials"
+  ],
   "starter": "Morph Lead",
   "scenes": {
-    "Morph Lead": { "eravos.syn-osc": { "preset": "Morph Lead" }, "eravos.syn-env": { "preset": "Morph Scan" } },
-    "Glass Pad": { "eravos.syn-osc": { "preset": "Glass Pad" }, "eravos.syn-env": { "preset": "Slow Swell" }, "eravos.syn-partials": { "preset": "Glass Keys" } },
-    "Vowel Bass": { "eravos.syn-osc": { "preset": "Vowel Bass" }, "eravos.syn-env": { "preset": "Pluck Sweep" } },
-    "Pluck": { "eravos.syn-osc": { "preset": "Pluck" }, "eravos.syn-env": { "preset": "Pluck Sweep" }, "eravos.syn-partials": { "preset": "Mallet" } }
-  }
+    "Morph Lead": {
+      "eravos.syn-osc": {
+        "preset": "Morph Lead"
+      },
+      "eravos.syn-env": {
+        "preset": "Morph Scan"
+      }
+    },
+    "Glass Pad": {
+      "eravos.syn-osc": {
+        "preset": "Glass Pad"
+      },
+      "eravos.syn-env": {
+        "preset": "Slow Swell"
+      },
+      "eravos.syn-partials": {
+        "preset": "Glass Keys"
+      }
+    },
+    "Vowel Bass": {
+      "eravos.syn-osc": {
+        "preset": "Vowel Bass"
+      },
+      "eravos.syn-env": {
+        "preset": "Pluck Sweep"
+      }
+    },
+    "Pluck": {
+      "eravos.syn-osc": {
+        "preset": "Pluck"
+      },
+      "eravos.syn-env": {
+        "preset": "Pluck Sweep"
+      },
+      "eravos.syn-partials": {
+        "preset": "Mallet"
+      }
+    }
+  },
+  "macros": [
+    {
+      "label": "MORPH",
+      "default": 0.3,
+      "hint": "where the voice sits between its waves",
+      "targets": [
+        {
+          "tool": "eravos.syn-osc",
+          "key": "morph"
+        }
+      ]
+    },
+    {
+      "label": "FM",
+      "default": 0.2,
+      "hint": "how hard the LFO and FM push the voice",
+      "targets": [
+        {
+          "tool": "eravos.syn-osc",
+          "key": "fmIndex",
+          "min": 0,
+          "max": 16
+        }
+      ]
+    },
+    {
+      "label": "SHAPE",
+      "default": 0.6,
+      "hint": "how far every note's envelope moves the morph",
+      "targets": [
+        {
+          "tool": "eravos.syn-env",
+          "key": "depth"
+        }
+      ]
+    },
+    {
+      "label": "MOTION",
+      "default": 0.4,
+      "hint": "how deep the LFO moves",
+      "targets": [
+        {
+          "tool": "eravos.lfo",
+          "key": "depth"
+        },
+        {
+          "tool": "eravos.syn-partials",
+          "key": "evolve",
+          "min": 0,
+          "max": 6
+        }
+      ]
+    }
+  ]
 }

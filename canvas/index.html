@@ -12,21 +12,21 @@
 <body>
 <div id="topbar">
   <div id="logo" title="ERAVOS 3.36.0-alpha — kernel 3.2">ERAVOS</div>
-  <button class="tb-btn primary" id="startBtn" title="Start from a recipe">✦ Start</button>
-  <button class="tb-btn" id="addBtn" title="Add a tool to the canvas — every tool lists what it needs">＋ Add</button>
+  <button class="tb-btn primary" id="startBtn" data-ic="sparkles" title="Start from a recipe">Start</button>
+  <button class="tb-btn" id="addBtn" data-ic="plus" title="Add a tool to the canvas — every tool lists what it needs">Add</button>
   <div id="slot-bar" class="tb-slot"></div>
   <div class="tb-spacer"></div>
   <div id="slot-bar-right" class="tb-slot"></div>
-  <button class="tb-btn" id="organizeBtn" title="Organize — every window in rows, edges touching (drag a window near another: its edges connect · Alt: free)">⊞ Organize</button>
+  <button class="tb-btn" id="organizeBtn" title="Organize — every window in rows, edges touching (drag a window near another: its edges connect · Alt: free)" data-ic="layout-grid">Organize</button>
   <div id="faultLed" title="Fault log (nothing silently fails)"></div>
   <div class="tb-opts">
-    <button class="tb-btn" id="optBtn" title="Options — undo, stop all, ports, fit, clear, library" aria-haspopup="menu">⋯ Options</button>
+    <button class="tb-btn" id="optBtn" title="Options — undo, stop all, ports, fit, clear, library" aria-haspopup="menu" data-ic="ellipsis">Options</button>
     <div id="optMenu" role="menu" hidden>
       <div id="slot-options" class="opt-slot"></div>
-      <button class="tb-btn stopall" id="stopAllBtn" title="Stop all — every tool goes quiet now, echoes and drones included (Shift+Esc)">■ Stop all</button>
-      <button class="tb-btn" id="portsBtn" title="Show all port names">⌁ Ports</button>
-      <button class="tb-btn" id="fitBtn" title="Fit all windows in view">⤢ Fit all</button>
-      <button class="tb-btn" id="tidyBtn" title="Tidy up — every window in rows, edges touching (drag a window near another: its edges connect · Alt: free)">⊞ Tidy up</button>
+      <button class="tb-btn stopall" id="stopAllBtn" title="Stop all — every tool goes quiet now, echoes and drones included (Shift+Esc)" data-ic="square">Stop all</button>
+      <button class="tb-btn" id="portsBtn" title="Show all port names" data-ic="cable">Ports</button>
+      <button class="tb-btn" id="fitBtn" title="Fit all windows in view" data-ic="maximize">Fit all</button>
+      <button class="tb-btn" id="tidyBtn" title="Tidy up — every window in rows, edges touching (drag a window near another: its edges connect · Alt: free)" data-ic="layout-grid">Tidy up</button>
       <button class="tb-btn" id="clearBtn" title="Remove everything from the canvas">Clear canvas</button>
     </div>
   </div>
@@ -213,10 +213,10 @@
 
   // ---------------- undo / redo (P11.1, runtime/history.js — works for any organism a pack adds)
   const history = window.ShellHistory = History.create(K);
-  const undoBtn = h('button', { class: 'tb-btn', text: '↶', title: 'Undo (Ctrl+Z)', disabled: true, onclick: () => doHist('undo') });
-  const redoBtn = h('button', { class: 'tb-btn', text: '↷', title: 'Redo (Ctrl+Shift+Z)', disabled: true, onclick: () => doHist('redo') });
+  const undoBtn = h('button', { class: 'tb-btn', 'data-ic': 'undo-2', title: 'Undo (Ctrl+Z)', disabled: true, onclick: () => doHist('undo') });
+  const redoBtn = h('button', { class: 'tb-btn', 'data-ic': 'redo-2', title: 'Redo (Ctrl+Shift+Z)', disabled: true, onclick: () => doHist('redo') });
   // 3.30: the bar holds only Start · Add · Options at first — undo/redo live in Options (Ctrl+Z still works anywhere)
-  undoBtn.textContent = '↶ Undo'; redoBtn.textContent = '↷ Redo';
+  undoBtn.textContent = 'Undo'; redoBtn.textContent = 'Redo';
   const optSlot = document.getElementById('slot-options'); optSlot.parentNode.insertBefore(undoBtn, optSlot); optSlot.parentNode.insertBefore(redoBtn, optSlot);
   const optBtn = document.getElementById('optBtn'), optMenu = document.getElementById('optMenu');
   optBtn.onclick = (e) => { e.stopPropagation(); optMenu.hidden = !optMenu.hidden; };

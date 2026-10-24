@@ -2,6 +2,53 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.65 Per-note curves and reusable note behaviours (2026-10-24)
+His words: "Let each note carry time-varying filter, drive and wobble-depth curves. Keep those curves attached when notes move, resize
+or duplicate. Save curve combinations as reusable behaviours, with stretch, reverse and intensity scaling. Add live audio feedback while
+dragging" · "make the initial feature explicitly monophonic-focused" · "A curve must not leave a shared knob at its final value or
+accidentally restore an older value over a newer note." · "Keep the synth engines untouched" (they are: all of it is the timeline + SDK).
+- **Data**: a note's `c = { knob: [[t 0…1, value], …] }` beside `p` and `b` (timeline cleanC: number knobs, 8 knobs, 64 points). Stored
+  over the note's length, so moving, copying and resizing keep it (resizing stretches it); a cut note keeps its part (cropC).
+- **Playback** (sdk-music noteCurves, MONOPHONIC by design): the knob follows the curve on the audio clock (a 12 ms chained step), with
+  the per-note ownership rules: the newer note wins, the older curve stops writing and never restores over it, the note's end hands
+  the knob back to the automation's value or the tool's own, Stop all clears it. A knob in both p and c follows the curve.
+- **Editor**: the note inspector's 〽 Curves — pick a knob (filter, drive, wobble first), draw points (click adds and drags,
+  double-click / right-click removes) or a shape (open, close, late open, swell, dip, pump); a frequency knob is drawn log and its
+  shapes resampled so they sound as drawn; you hear the note with its curves while shaping. Blocks show their curve.
+- **◈ Behaviours**: a note's curves (by ROLE — filter / drive / wobble / knob:<key> — in the knob's own 0…1 picture) and bend, saved
+  with the project; six built-in (Floor Dive, Filter Opens Late, Growl Build, Wobble Deepens, Talk, Glide In + Open). Apply to a note
+  or the whole selection, stretched to each note, with Intensity (around the knob's own setting) and Reverse; a role this tool lacks
+  is skipped and said.
+- Not yet: Bézier handles (next), behaviours shared across projects, true per-voice curves (would mean changing each synth).
+- Tests: timeline.test.js "per-note curves" (16): cleaning, sending, cropping; values over time, note end, automation hand-back,
+  overlap, interruption, Stop all, ranges; the rendered audio matching the knob held still at each end; the editor; behaviours.
+
+## Done — 3.64 Drawn icons everywhere · EDM Lab is the suite only · a refined look (2026-10-24)
+His words: "Replace all those icons with high quality ones. No all in one EDM lab. Only the suite. And make them enterprise grade. Beautiful
+ui and icons."
+- **Icons**: every emoji icon is now a drawn line icon (Lucide, ISC — LICENSES/lucide.txt; Feather-derived ones MIT). canvas/runtime/icons.js
+  (window.Icons, domain-free: add · map · svg · html · label · node · tile · decorate); each domain says which icon each tool, suite,
+  category and mode shows in tools/<d>/icons.json; `node build/icons.mjs <lucide-static/icons>` writes the generated sets (committed).
+  Drawn: window title bars, ＋ Add (cards, the rail, the detail, mode cards), tool and suite pages, the suite window, the mods rack, links,
+  the top bar (data-ic). Anything with no drawing falls back to its emoji. Inside the tools' own panels, emoji labels stay for now.
+- **EDM Lab = the suite**: the all-in-one is hidden (descriptor and tool.json `hidden`, a schema field) — not in ＋ Add, not a partner, not
+  the suite's allInOne; two Odd Couples songs no longer open it. It still loads for saved canvases that have one.
+- **The look**: suite cards show the suite's icon tile and the icons of the tools it is made of; pages have a glass backdrop above the dock,
+  an icon tile header, icon buttons and quiet rows; the suite window has a segmented tab bar, a lit macro plate and part cards with tiles.
+  The top bar shows icon-only secondary buttons below 1800 px so it fits (it was clipping at 1600).
+- Tests: tests/p63-suite-page.test.js (every tool, suite and category drawn; ＋ Add has no all-in-one; title bar, pages and suite window draw).
+
+## Done — 3.63b The rest of the suites · every suite a control panel (2026-10-23)
+His words: "Where are the rest of the suites. Synthesis tool for each suite". The 3.48 map named seven suites; four were never built.
+- **Synthwave** (Groove → gated drums → Dynamics · Chords → Supersaw → Phaser · Chords → Arp → Retro Poly → Juno chorus → dotted Echo),
+  **Gothic** (Chords → Gothic Organ, Coven → Haunt, Pad Forge · organ and choir share one Echo · an optional stomp),
+  **Sound System** (one-drop Groove → drums · Chords → Bassline → reggae sub · Sample → Filter → Dub Station → Sidechain → Echo),
+  **Xen** (Ratio Lattice → its notes and tuning → Xen Synth · Recursive Spectra hears the same notes and sends its spectrum to the voice).
+  Each: 4 macros on its panel, 5 scenes. Heavy Drops is the drop rig the map named.
+- **Every suite window is a control panel now**: Wub Lab (WUB · VOWEL · FM · GRIT) and Synthesis Lab (MORPH · FM · SHAPE · MOTION) had none.
+- Tests (tests/p63-suite-page.test.js): every macro names a part's real number knob; each new suite builds whole, every wire on, every macro
+  moves its knobs end to end, and it sounds through the suite with nothing played by hand.
+
 ## Done — 3.63 Heavy Drops suite · a page for every suite · a click in ＋ Add opens the page (2026-10-23)
 His words: "i like the drops, the wobble and sub. especially between 26 - 41" · "Make a page for the suite like the rest. Have it open the page
 by default" · "It opens the tool page but for a suite. I'm saying all tools. Like open the tool page when you click on them."

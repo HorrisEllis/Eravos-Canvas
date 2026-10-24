@@ -44,7 +44,7 @@
     o = o || {}; const K = o.K || global.Kernel;
     if (!defs.has(id) && installable(id)) {
       const meta = global.Catalog.meta(id), S = global.Shell;
-      if (S && S.toast && !o.headless) S.toast(`Installing ${meta.icon || ''} ${meta.label || id}…`, '', 1500);
+      if (S && S.toast && !o.headless) S.toast(`Installing ${meta.label || id}…`, '', 1500);
       await global.Catalog.install([id], K);
     }
     return spawn(id, Object.assign({}, o, { _installing: true }));

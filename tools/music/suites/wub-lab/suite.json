@@ -176,5 +176,53 @@
         "preset": "808 Slide"
       }
     }
-  }
+  },
+  "macros": [
+    {
+      "label": "WUB",
+      "default": 0.7,
+      "hint": "how far the rhythm opens the mouth",
+      "targets": [
+        {
+          "tool": "eravos.wub-rate",
+          "key": "depth"
+        }
+      ]
+    },
+    {
+      "label": "VOWEL",
+      "default": 0.4,
+      "hint": "where the mouth sits: OO … AH … EE",
+      "targets": [
+        {
+          "tool": "eravos.wub-filter",
+          "key": "position"
+        }
+      ]
+    },
+    {
+      "label": "FM",
+      "default": 0.3,
+      "hint": "FM growl in the voice",
+      "targets": [
+        {
+          "tool": "eravos.wub-osc",
+          "key": "index",
+          "min": 0,
+          "max": 16
+        }
+      ]
+    },
+    {
+      "label": "GRIT",
+      "default": 0.4,
+      "hint": "the Destroyer's teeth",
+      "targets": [
+        {
+          "tool": "eravos.fx-destroyer",
+          "key": "drive"
+        }
+      ]
+    }
+  ]
 }

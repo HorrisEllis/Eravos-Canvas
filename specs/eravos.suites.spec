@@ -99,3 +99,10 @@
   - Suite music.edm-lab (4.0.0): Groove → Pads · Chords → Pad Forge · Bassline → Reese Bass · Chords → Bassline (chord) ·
     Groove → Bassline (kick) · optional Bass Drop Builder. Macros ENERGY, TENSION, SWING. Scenes Dubstep, UKG, House, Neuro.
   - Glass: canvas.suite.macro {instanceId, index, value} · canvas.suite.fold {instanceId, on?}
+
+## ADDENDUM 2026-10-23 — the rest of the first wave; every suite a control panel
+  James, 2026-10-23: "Where are the rest of the suites. Synthesis tool for each suite".
+  Built: music.synthwave · music.gothic · music.sound-system · music.xen (tools/music/suites/<id>/suite.json). music.heavy-drops (3.63)
+  is the drop rig (music.drop-rig above). Each has macros (3–4) so its suite window opens on a PANEL you play — the "synthesis tool of
+  the respective tools" of the 2026-10-21 addendum. music.wub-lab and music.synthesis-lab gained macros (they had none).
+  Every suite has a page (ToolPage.openSuite, 3.63): parts, scenes, macros, wiring. Tests: tests/p63-suite-page.test.js.
