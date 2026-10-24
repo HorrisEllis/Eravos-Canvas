@@ -43,4 +43,25 @@ describe('tool · Wub Rate — the wobble rhythm', () => {
     assert.fault(U.K, 'RUNTIME_002', () => U.K.bus.publish('ui:step_set:' + id, { index: 3, value: 'fast' }));
     U.K.bus.publish('ui:steps_shift:' + id, { by: 1 }); assert.equal(c.params.get('steps')[4], '1/16t', 'shifted one later');
   });
+  // 1.1 — the speed controls the Wobble Bass had and Wub Rate lacked
+  it('Rate bend ×2: 1/8 at 120 BPM cycles at 8 Hz instead of 4 — moved smoothly, never restarted', async () => {
+    const { U } = setup(1.5, { steps: Array(16).fill('1/8'), rateBend: 2 });
+    const b = await TH.render(U); assert.near(cycles(b, 0.25, 1.25, 0.5), 8, 1);
+  });
+  it('Rate glide: the next step’s rate swoops in and the wobble glides on (no restart from closed); without it, it restarts', async () => {
+    const run = async (glide) => { const { U } = setup(2.2, { steps: ['1/4', '1/16'].concat(Array(14).fill('1/8')), length: 2, stepLen: '1/2', rateBend: 1.25, rateGlide: glide }); U.T.renderTicks(0, 17, 0); return TH.render(U); };
+    const at = (b, t) => b.getChannelData(0)[Math.floor(t * b.sampleRate)];
+    const jump = await run(0), glide = await run(0.4);   // at 2.5 Hz the wobble is wide open at the 1 s boundary
+    assert.gt(at(jump, 0.995), 0.9); assert.lt(at(jump, 1.004), 0.1, 'no glide: the new rate restarts from closed');
+    assert.gt(at(glide, 0.995), 0.9); assert.gt(at(glide, 1.004), 0.85, 'glide: it carries on from where it was');
+    assert.lt(cycles(glide, 1.0, 1.15, 0.5), cycles(jump, 1.0, 1.15, 0.5) + 0.5, 'it speeds up over the glide, not at once');
+    assert.near(cycles(glide, 1.4, 1.98, 0.5), 10 * 0.58, 1.5, 'then runs at the new rate (1/16 × 1.25 = 10 Hz)');
+  });
+  it('the rate input: an LFO held high pushes the speed up', async () => {
+    const U = TH.universe(1.5, { bpm: 120 }), id = TH.spawn(U, 'eravos.wub-rate'), c = OrganismFactory.handle(id).ctx, l = TH.spawn(U, 'eravos.lfo'), L = OrganismFactory.handle(l).ctx;
+    [['smooth', 0], ['steps', Array(16).fill('1/8')]].forEach(([k, v]) => c.params.set(k, v)); L.params.set('depth', 0); L.params.set('offset', 1);
+    assert.ok(U.K.wires.register({ src: { instanceId: l, hookId: 'lfo.hook.mod_out' }, dst: { instanceId: id, hookId: 'wubrate.hook.mod_rate' } }).ok, 'wired');
+    c.internals.out.connect(U.ctx.destination); const b = await TH.render(U);
+    assert.gt(cycles(b, 0.25, 1.25, 0.5), 6, 'faster than its own 4 Hz: ' + cycles(b, 0.25, 1.25, 0.5));
+  });
 });

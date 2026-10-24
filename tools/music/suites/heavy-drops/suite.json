@@ -82,6 +82,15 @@
       "role": "pad",
       "preset": "EDM Pad · Melodic Dubstep Halo",
       "why": "the pad for the intro and the break"
+    },
+    {
+      "tool": "eravos.fx-squash",
+      "role": "squash",
+      "as": "mod",
+      "slot": "growl",
+      "in": "eravos.wobble-bass",
+      "preset": "OTT Growl",
+      "why": "squash after the Destroyer, still inside the growl — the sub stays clean"
     }
   ],
   "wiring": [

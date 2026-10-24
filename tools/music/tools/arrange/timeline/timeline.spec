@@ -153,3 +153,8 @@ dependencies:
     for a frequency knob). ui:behaviour_save / ui:behaviour_remove; saved in the timeline (saveExtra.behaviours); 6 built-in, sent in
     arrangement_sync.behaviours. Applied in the roll: role → this tool's knob, stretched to the note, intensity around the knob's setting,
     reverse; to the selection.
+
+## 3.67 Bézier handles
+  a point [t, v, [hx, hv]]: the segment ending at it is the quadratic Bézier (ends + control (a.t + hx·(b.t − a.t), hv)); bent in the
+  knob's picture (log for a Hz knob with max/min ≥ 20, else linear); straight segments are linear in the knob's value, as before.
+  cutting a curved segment flattens it (8 straight pieces); behaviours carry handles in fractions; reversing mirrors them.

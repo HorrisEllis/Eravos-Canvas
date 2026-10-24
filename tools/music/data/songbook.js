@@ -225,9 +225,11 @@
   // sh = { semis, tempo } (Make it yours): the same song higher / lower, faster / slower — SongEngine.reshape
   function write(s, fresh, sh) {
     if (locked(s)) return false;
-    if (s.recipe) { const r = R.get(s.recipe); if (!r) return false; R.run(s.recipe, { clear: true, origin: { x: 30, y: 20 } }); return true; }
+    // 3.68 say which song this is (the Song Recorder fills an export's title and genre from it)
+    const said = () => { try { if (window.Kernel) Kernel.bus.publish('song:written', { title: s.title || '', genre: (genreOf(s) || {}).label || '' }); } catch (e) {} };
+    if (s.recipe) { const r = R.get(s.recipe); if (!r) return false; R.run(s.recipe, { clear: true, origin: { x: 30, y: 20 } }); said(); return true; }
     const seed = fresh ? 1 + Math.floor(Math.random() * 99999) : s.seed, shifted = sh && (sh.semis || sh.tempo !== 1);
-    if (shifted) SE.write(s.genre, seed, { shift: { semis: sh.semis, tempo: sh.tempo } }); else SE.write(s.genre, seed); return true;
+    if (shifted) SE.write(s.genre, seed, { shift: { semis: sh.semis, tempo: sh.tempo } }); else SE.write(s.genre, seed); said(); return true;
   }
   const shift = { semis: 0, tempo: 1 };   // Make it yours — kept while ERAVOS is open, from song to song
   function shiftBox(h, s, repaint) {

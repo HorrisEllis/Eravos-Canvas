@@ -2,6 +2,41 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.68 Export tags & cover (2026-10-24)
+His words: "The export have a meta data editor option and have it autofilled. Option to upload cover image."
+- Song Recorder → 🏷 Tags: title, artist, album, genre, year, BPM, key, comment, and a cover. Every field is filled in for you
+  (grey): the song's name, or the song the Songbook just wrote, its genre, this year, the BPM, the key, "Made with ERAVOS".
+  Type to change one; clear it to go back to auto. The artist is typed once and remembered on this computer (never in a save).
+- Cover: upload a PNG or JPEG, or let it draw one from the song (1000 px, a ring of the export's own waveform, title, BPM, key).
+- Written into MP3 (ID3v2.3, UTF-16, front cover), WAV (LIST/INFO + id3 chunk), FLAC (Vorbis comment + PICTURE) and AIFF
+  (NAME/AUTH/ANNO + ID3). Exports, stems and Save to Songs all carry them; Opus says it carries none. The audio is untouched
+  (WAV and FLAC decode bit-identical with and without tags).
+- Tests (p68-export-tags: 7): each format read back byte by byte, autofill and overrides, the remembered artist, covers.
+
+## Done — 3.67 Bézier handles on per-note curves (2026-10-24)
+- A point may carry the handle of the segment that ends at it: [t, value, [hx 0…1, handle value]] — that segment is the quadratic
+  Bézier through its ends (an arc, an ease in or out); no handle = a straight line, as before. Played by the SDK exactly as drawn,
+  and bent in the knob's own picture: log on a frequency knob (an arc on cutoff is a clean arc to the ear, not a jump then a plateau).
+- Editor: a ◇ in each segment — drag to bend, double-click or right-click to straighten; new shapes ease in, ease out, arc.
+- Cutting a note through a curved segment turns it into short straight pieces (values kept). Behaviours keep handles (saved in the
+  knob's picture, scaled by intensity; reversed, a handle moves to its mirrored segment).
+- Tests (timeline.test.js, per-note curves: 21): playback on a bowed segment (6 of 8 at the middle), log bending on cutoff
+  (~3.2 kHz halfway 100 Hz → 8 kHz), cleaning, cutting, the editor's handle, behaviours with handles.
+
+## Done — 3.66 Wub Rate speed controls · Squash (2026-10-24)
+His words: "Wub Seq and a multiband squash" (the Wobble Bass gaps). Found on the way: Wub Rate already IS the step sequencer of wobble
+rates (16 steps of rates, off, hold) — so no second tool; what it lacked from the Wobble Bass was the speed control.
+- **Wub Rate 1.1**: Rate bend ×¼…×4 (smooth, as the oscillator's detune — never restarts), Rate glide (a step's new rate swoops in
+  and the wobble glides on instead of restarting — the speed-up into a drop), and a rate input (wubrate.hook.mod_rate: an Envelope,
+  LFO or curve pushes the speed ±2 octaves). All off by default. Tests: ×2 = 8 Hz, glide carries on where a jump restarts from shut,
+  an LFO held high speeds it up.
+- **Squash** (eravos.fx-squash, new): three-band OTT-style squash for any sound — Linkwitz–Riley 24 dB/oct split (flat ±1 dB at
+  Squash 0), each band into a soft limiter with makeup, zero latency; Lows clean (default) and Mono lows; per-band amount and level,
+  crossovers, mix. 7 factory presets + 2 Odd Couples; used in an Odd Couples song; an optional part of Wub Lab (after the mouth)
+  and Heavy Drops (in the growl, after the Destroyer). Tests: the quiet/loud gap shrinks ≥ 8 dB with the loud part within 6 dB,
+  lows clean keep a 45 Hz sub exact, mono lows put a left-only sub in both sides, flat at 0, an impulse on time, mix 0 = input.
+  Found while testing: a 12 dB/oct split leaked a tenth of a sub into the stereo mids, and Web Audio takes lowpass/highpass Q in dB.
+
 ## Done — 3.65 Per-note curves and reusable note behaviours (2026-10-24)
 His words: "Let each note carry time-varying filter, drive and wobble-depth curves. Keep those curves attached when notes move, resize
 or duplicate. Save curve combinations as reusable behaviours, with stretch, reverse and intensity scaling. Add live audio feedback while

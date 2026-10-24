@@ -3,7 +3,15 @@
  *   WAV  16 / 24-bit PCM, 32-bit float · AIFF 16 / 24 · FLAC 16 / 24 (own encoder: fixed predictors 0–4 per channel,
  *   Rice2 residuals, CRC-8/16 — lossless, verified by round-trip) · MP3 128 / 192 / 256 / 320 (lamejs, LGPL, separate
  *   file) · Opus in WebM or Ogg (MediaRecorder — real-time, where the browser offers it) · stems as a ZIP of WAVs.
- * encode(buffer, id) → Promise<{ blob, ext, mime, bytes }>. Formats the runtime cannot make are listed with ok:false. */
+ * encode(buffer, id) → Promise<{ blob, ext, mime, bytes }>. Formats the runtime cannot make are listed with ok:false.
+ * 3.68 METADATA: encode(buffer, id, { meta }) writes the song's tags into the file —
+ *   meta { title, artist, album, genre, year, bpm, key, comment, encoder, cover: { mime: 'image/png' | 'image/jpeg', bytes: Uint8Array } }
+ *   MP3: an ID3v2.3 tag in front (text, BPM, key, comment, encoder, the cover as APIC front cover)
+ *   WAV: a LIST/INFO chunk (title, artist, album, genre, date, comment, software) + an 'id3 ' chunk (the same ID3 tag, with the cover)
+ *   FLAC: a VORBIS_COMMENT block + a PICTURE block (front cover) after STREAMINFO
+ *   AIFF: NAME / AUTH / ANNO chunks + an 'ID3 ' chunk (with the cover)
+ *   Opus (MediaRecorder): no tags — the browser writes the container. Every tag is added after the audio is encoded: the samples are
+ *   the same bytes as without metadata. */
 (function (global) {
   'use strict';
   const clamp = (x) => x < -1 ? -1 : x > 1 ? 1 : x;
@@ -157,6 +165,60 @@
     return new Blob(locals.concat(cents, [new Uint8Array(end.buffer)]), { type: 'application/zip' });
   }
 
+  // ---------------------------------------------------------------- 3.68 metadata (tags)
+  const utf8 = (t) => new TextEncoder().encode(String(t));
+  const cat = (parts) => { const n = parts.reduce((s, p) => s + p.length, 0), o = new Uint8Array(n); let i = 0; parts.forEach(p => { o.set(p, i); i += p.length; }); return o; };
+  const u32be = (v) => new Uint8Array([(v >>> 24) & 255, (v >>> 16) & 255, (v >>> 8) & 255, v & 255]);
+  const u32le = (v) => new Uint8Array([v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255]);
+  const ascii = (t) => new Uint8Array(Array.from(String(t), c => c.charCodeAt(0) & 255));
+  const has = (v) => v !== undefined && v !== null && String(v).trim() !== '';
+  // the text fields every format carries, in one order
+  const FIELDS = (m) => [['title', m.title], ['artist', m.artist], ['album', m.album], ['genre', m.genre], ['year', m.year], ['bpm', m.bpm && Math.round(+m.bpm)], ['key', m.key], ['comment', m.comment], ['encoder', m.encoder]].filter(([, v]) => has(v));
+  // ID3v2.3: UTF-16 text (encoding 1, with BOM) so any name survives; frame sizes plain 32-bit, the tag size syncsafe
+  function id3(m) {
+    const u16 = (t) => { const b = [0xff, 0xfe]; for (const ch of String(t)) { const c = ch.codePointAt(0); if (c > 0xffff) { const h = 0xd800 + ((c - 0x10000) >> 10), l = 0xdc00 + ((c - 0x10000) & 0x3ff); b.push(h & 255, h >> 8, l & 255, l >> 8); } else b.push(c & 255, c >> 8); } return new Uint8Array(b); };
+    const frame = (id, body) => cat([ascii(id), u32be(body.length), new Uint8Array([0, 0]), body]);
+    const text = (id, t) => frame(id, cat([new Uint8Array([1]), u16(t)]));
+    const ID = { title: 'TIT2', artist: 'TPE1', album: 'TALB', genre: 'TCON', year: 'TYER', bpm: 'TBPM', key: 'TKEY', encoder: 'TSSE' }, fr = [];
+    FIELDS(m).forEach(([k, v]) => { if (k === 'comment') fr.push(frame('COMM', cat([new Uint8Array([1]), ascii('eng'), u16(''), new Uint8Array([0, 0]), u16(v)]))); else fr.push(text(ID[k], v)); });
+    if (m.cover && m.cover.bytes && m.cover.bytes.length) fr.push(frame('APIC', cat([new Uint8Array([0]), ascii(m.cover.mime || 'image/png'), new Uint8Array([0, 3, 0]), m.cover.bytes])));   // 3 = front cover
+    const body = cat(fr), n = body.length, ss = new Uint8Array([(n >> 21) & 127, (n >> 14) & 127, (n >> 7) & 127, n & 127]);
+    return cat([ascii('ID3'), new Uint8Array([3, 0, 0]), ss, body]);
+  }
+  // a RIFF/IFF chunk, padded to an even length
+  const chunk = (id, body, be) => cat([ascii(id), be ? u32be(body.length) : u32le(body.length), body].concat(body.length % 2 ? [new Uint8Array([0])] : []));
+  function tagWav(ab, m) {
+    const src = new Uint8Array(ab), INFO = { title: 'INAM', artist: 'IART', album: 'IPRD', genre: 'IGNR', year: 'ICRD', comment: 'ICMT', encoder: 'ISFT' };
+    const subs = FIELDS(m).filter(([k]) => INFO[k]).map(([k, v]) => chunk(INFO[k], cat([utf8(v), new Uint8Array([0])])));
+    const add = cat([subs.length ? chunk('LIST', cat([ascii('INFO')].concat(subs))) : new Uint8Array(0), chunk('id3 ', id3(m))]);
+    const out = cat([src, add]); new DataView(out.buffer).setUint32(4, out.length - 8, true); return out.buffer;
+  }
+  function tagAiff(ab, m) {
+    const src = new Uint8Array(ab), F = Object.fromEntries(FIELDS(m)), parts = [];
+    if (has(F.title)) parts.push(chunk('NAME', utf8(F.title), true)); if (has(F.artist)) parts.push(chunk('AUTH', utf8(F.artist), true));
+    if (has(F.comment)) parts.push(chunk('ANNO', utf8(F.comment), true)); parts.push(chunk('ID3 ', id3(m), true));
+    const out = cat([src].concat(parts)); new DataView(out.buffer).setUint32(4, out.length - 8); return out.buffer;
+  }
+  function tagFlac(ab, m) {
+    const src = new Uint8Array(ab); if (String.fromCharCode(...src.subarray(0, 4)) !== 'fLaC') return ab;
+    const siEnd = 4 + 4 + ((src[5] << 16) | (src[6] << 8) | src[7]);   // our encoder writes STREAMINFO alone, marked last
+    const VC = { title: 'TITLE', artist: 'ARTIST', album: 'ALBUM', genre: 'GENRE', year: 'DATE', bpm: 'BPM', key: 'INITIALKEY', comment: 'COMMENT', encoder: 'ENCODER' };
+    const vendor = utf8('ERAVOS'), entries = FIELDS(m).map(([k, v]) => utf8(VC[k] + '=' + v));
+    const vc = cat([u32le(vendor.length), vendor, u32le(entries.length)].concat(...entries.map(e => [u32le(e.length), e])));
+    const blocks = [[4, vc]];
+    if (m.cover && m.cover.bytes && m.cover.bytes.length) { const mime = ascii(m.cover.mime || 'image/png'), dim = m.cover.size || 0;
+      blocks.push([6, cat([u32be(3), u32be(mime.length), mime, u32be(0), u32be(dim), u32be(dim), u32be(24), u32be(0), u32be(m.cover.bytes.length), m.cover.bytes])]); }
+    const head = (type, last, len) => new Uint8Array([(last ? 128 : 0) | type, (len >> 16) & 255, (len >> 8) & 255, len & 255]);
+    const si = src.slice(0, siEnd); si[4] = si[4] & 127;   // STREAMINFO is no longer the last block
+    const out = cat([si].concat(...blocks.map(([t, b], i) => [head(t, i === blocks.length - 1, b.length), b]), [src.subarray(siEnd)]));
+    return out.buffer;
+  }
+  async function tag(ext, r, m) {
+    if (ext === 'mp3') return new Blob([id3(m), r instanceof Blob ? r : new Uint8Array(r)], { type: 'audio/mpeg' });
+    const ab = r instanceof Blob ? await r.arrayBuffer() : r;
+    return ext === 'wav' ? tagWav(ab, m) : ext === 'aiff' ? tagAiff(ab, m) : ext === 'flac' ? tagFlac(ab, m) : r;
+  }
+
   const FORMATS = [
     { id: 'wav24', label: 'WAV 24-bit', ext: 'wav', mime: 'audio/wav', kind: 'lossless', make: (b) => wav(b, 24) },
     { id: 'wav16', label: 'WAV 16-bit (CD, dithered)', ext: 'wav', mime: 'audio/wav', kind: 'lossless', make: (b) => wav(b, 16) },
@@ -174,13 +236,14 @@
   async function encode(buffer, id, o) {
     const f = FORMATS.find(x => x.id === id); if (!f) throw new Error('unknown format ' + id);
     if (f.ok && !f.ok()) throw new Error(f.label + ' is not available in this runtime');
-    const r = await f.make(buffer, o);
+    let r = await f.make(buffer, o);
+    const tagged = !!(o && o.meta && !f.realtime); if (tagged) r = await tag(f.ext, r, o.meta);
     const blob = r instanceof Blob ? r : new Blob([r], { type: f.mime });
-    return { blob, ext: f.ext, mime: f.mime, bytes: blob.size, label: f.label };
+    return { blob, ext: f.ext, mime: f.mime, bytes: blob.size, label: f.label, tagged };
   }
   function download(blob, name) {
     const url = URL.createObjectURL(blob), a = global.document.createElement('a'); a.href = url; a.download = name; global.document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
   }
-  global.Codecs = { FORMATS: FORMATS.map(f => ({ id: f.id, label: f.label, ext: f.ext, kind: f.kind, realtime: !!f.realtime, available: () => !f.ok || f.ok() })), encode, download, wav, aiff, flac, mp3, zip, crc32 };
+  global.Codecs = { FORMATS: FORMATS.map(f => ({ id: f.id, label: f.label, ext: f.ext, kind: f.kind, realtime: !!f.realtime, available: () => !f.ok || f.ok() })), encode, download, wav, aiff, flac, mp3, zip, crc32, id3, tagWav, tagAiff, tagFlac, tags: (id) => { const f = FORMATS.find(x => x.id === id); return !!f && !f.realtime; } };
 })(typeof window !== 'undefined' ? window : globalThis);

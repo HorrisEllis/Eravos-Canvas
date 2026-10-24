@@ -134,12 +134,21 @@
       // 1 = its end, so a resized note stretches its curves and a moved or copied one keeps them). Number knobs only (the tool checks
       // keys and ranges when the note plays); at most 8 knobs, 64 points each, sorted by t. MONOPHONIC by design: the knob is the tool's,
       // so two overlapping notes with curves for the same knob take it in turn (the later note wins) — meant for one line, a bass.
+      // 3.67 a point may carry the Bézier handle of the segment that ends at it: [t, value, [hx 0…1, handle value]] (see sdk-music).
+      const logOf = (c) => c && c.unit === 'Hz' && c.min > 0 && c.max / c.min >= 20 ? c : null;   // a curved segment bends in log on these
+      const segAt = (a, b, x, lg) => { if (!(b[0] > a[0])) return b[1]; const h = b[2]; if (!h) return a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]);
+        if (lg) { const L = (v) => Math.log(Math.max(lg.min, +v)); return Math.exp(segAt([a[0], L(a[1])], [b[0], L(b[1]), [h[0], L(h[1])]], x)); }
+        const cx = a[0] + h[0] * (b[0] - a[0]), A = a[0] - 2 * cx + b[0], B = 2 * (cx - a[0]), C = a[0] - x; let u = Math.abs(A) < 1e-12 ? -C / B : (-B + Math.sqrt(Math.max(0, B * B - 4 * A * C))) / (2 * A); u = clamp(u, 0, 1);
+        return (1 - u) * (1 - u) * a[1] + 2 * u * (1 - u) * h[1] + u * u * b[1]; };
+      // a curve with its handles turned into short straight pieces (what cutting a note does to a curved segment)
+      const flatten = (pts, lg) => { if (!pts.some(q => q[2])) return pts; const out = [pts[0].slice(0, 2)]; for (let i = 1; i < pts.length; i++) { const a = pts[i - 1], b = pts[i];
+        if (b[2]) for (let j = 1; j < 8; j++) { const x = a[0] + (b[0] - a[0]) * j / 8; out.push([x, segAt(a, b, x, lg)]); } out.push(b.slice(0, 2)); } return out; };
       function cleanC(c) {
         if (!c || typeof c !== 'object' || Array.isArray(c)) return null; const o = {};
         Object.keys(c).slice(0, 8).forEach(k => {
           if (!/^[A-Za-z][\w.]{0,40}$/.test(k) || !Array.isArray(c[k])) return;
           const seen = new Set(), pts = c[k].filter(q => Array.isArray(q) && isFinite(+q[0]) && isFinite(+q[1]))
-            .map(q => [Math.round(clamp(+q[0], 0, 1) * 10000) / 10000, +(+q[1]).toPrecision(6)]).sort((a, b) => a[0] - b[0])
+            .map(q => { const o = [Math.round(clamp(+q[0], 0, 1) * 10000) / 10000, +(+q[1]).toPrecision(6)]; if (Array.isArray(q[2]) && isFinite(+q[2][0]) && isFinite(+q[2][1])) o.push([Math.round(clamp(+q[2][0], 0, 1) * 10000) / 10000, +(+q[2][1]).toPrecision(6)]); return o; }).sort((a, b) => a[0] - b[0])
             .filter(q => !seen.has(q[0]) && seen.add(q[0])).slice(0, 64);
           if (pts.length) o[k] = pts;
         });
@@ -147,10 +156,10 @@
       }
       // the part of a note's curves between f0 and f1 (fractions of the note), as the curves of that part — a note cut in two keeps
       // the halves of its curves, not two squeezed copies
-      function cropC(c, f0, f1) {
+      function cropC(c, f0, f1, cfgOf) {
         if (!c || !(f1 > f0)) return c || null; const o = {};
         Object.keys(c).forEach(k => {
-          const pts = c[k], at = (x) => { if (x <= pts[0][0]) return pts[0][1]; for (let i = 1; i < pts.length; i++) if (x <= pts[i][0]) { const a = pts[i - 1], b = pts[i]; return b[0] > a[0] ? a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]) : b[1]; } return pts[pts.length - 1][1]; };
+          const pts = flatten(c[k], logOf(cfgOf && cfgOf(k))), at = (x) => { if (x <= pts[0][0]) return pts[0][1]; for (let i = 1; i < pts.length; i++) if (x <= pts[i][0]) { const a = pts[i - 1], b = pts[i]; return b[0] > a[0] ? a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]) : b[1]; } return pts[pts.length - 1][1]; };
           const mid = pts.filter(q => q[0] > f0 && q[0] < f1).map(q => [(q[0] - f0) / (f1 - f0), q[1]]);
           o[k] = cleanC({ k: [[0, at(f0)]].concat(mid, [[1, at(f1)]]) }).k;
         });
@@ -165,7 +174,8 @@
       function cleanBehaviour(x) {
         if (!x || typeof x !== 'object') return null; const name = String(x.name || '').trim().slice(0, 40); if (!name) return null;
         const curves = {}; Object.keys(x.curves || {}).slice(0, 8).forEach(r => { if (!B_ROLE.test(r) || !Array.isArray(x.curves[r])) return;
-          const seen = new Set(), pts = x.curves[r].filter(q => Array.isArray(q) && isFinite(+q[0]) && isFinite(+q[1])).map(q => [Math.round(clamp(+q[0], 0, 1) * 10000) / 10000, Math.round(clamp(+q[1], 0, 1) * 10000) / 10000])
+          const f4 = (v) => Math.round(clamp(+v, 0, 1) * 10000) / 10000;
+          const seen = new Set(), pts = x.curves[r].filter(q => Array.isArray(q) && isFinite(+q[0]) && isFinite(+q[1])).map(q => { const o = [f4(q[0]), f4(q[1])]; if (Array.isArray(q[2]) && isFinite(+q[2][0]) && isFinite(+q[2][1])) o.push([f4(q[2][0]), f4(q[2][1])]); return o; })
             .sort((a, b) => a[0] - b[0]).filter(q => !seen.has(q[0]) && seen.add(q[0])).slice(0, 64); if (pts.length) curves[r] = pts; });
         const bend = cleanB(x.bend); if (!Object.keys(curves).length && !bend) return null;
         return Object.assign({ id: /^[\w-]{1,40}$/.test(x.id || '') ? x.id : uid('B'), name }, bend ? { bend } : {}, Object.keys(curves).length ? { curves } : {});
@@ -539,7 +549,7 @@
         if (c.kind === 'notes') {
           const cut = nb * 16, left = [], right = [];
           if (c.loop) { c.notes = notesOf(c); delete c.loop; }   // 3.62: a repeating clip is written out, then cut
-          c.notes.forEach(n => { if (n.s < cut) { const l = Math.min(n.l, cut - n.s), a = Object.assign({}, n, { l }); if (n.c && l < n.l) a.c = cropC(n.c, 0, l / n.l); left.push(a); } else right.push(Object.assign({}, n, { s: n.s - cut })); });   // 3.65 a cut note keeps its part of its curves
+          c.notes.forEach(n => { if (n.s < cut) { const l = Math.min(n.l, cut - n.s), a = Object.assign({}, n, { l }); if (n.c && l < n.l) { const ln = lanes.find(x => x.id === c.lane); a.c = cropC(n.c, 0, l / n.l, (key) => ln && ln.target ? knobCfg(ln.target, key) : null); } left.push(a); } else right.push(Object.assign({}, n, { s: n.s - cut })); });   // 3.65 a cut note keeps its part of its curves
           const d = { id: uid('C'), kind: 'notes', lane: c.lane, name: c.name, startBar: c.startBar + nb, bars: c.bars - nb, notes: right };
           c.bars = nb; c.notes = left; clips.push(d); sync(); return [c, d];
         }

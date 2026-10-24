@@ -28,7 +28,7 @@ describe('P63 · Heavy Drops suite · a page for every suite · a click opens th
       ToolPage.openSuite('music.heavy-drops', { K: Kernel });
       assert.ok(ov(), 'the page is open'); assert.equal(ToolPage.current().suiteId, 'music.heavy-drops');
       const t = ov().textContent;
-      assert.ok(/Heavy Drops/.test(t) && /10 parts/.test(t), 'name and parts');
+      assert.ok(/Heavy Drops/.test(t) && new RegExp(Suites.get('music.heavy-drops').parts.length + ' parts').test(t), 'name and parts');
       const s = Suites.get('music.heavy-drops');
       assert.equal(ov().querySelectorAll('.tp-part').length, s.parts.length, 'one row per part');
       ['scenes', 'macros', 'wiring'].forEach(k => assert.ok(ov().querySelector(`[data-sec="${k}"]`), 'a ' + k + ' section'));

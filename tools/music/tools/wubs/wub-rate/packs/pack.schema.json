@@ -67,6 +67,16 @@
                         "minimum": 0,
                         "maximum": 1
                       },
+                      "rateBend": {
+                        "type": "number",
+                        "minimum": 0.25,
+                        "maximum": 4
+                      },
+                      "rateGlide": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 2
+                      },
                       "retrig": {
                         "enum": [
                           "on change",

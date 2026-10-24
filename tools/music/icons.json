@@ -16,7 +16,8 @@
     "eravos.syn-env": "triangle-right", "eravos.syn-osc": "audio-waveform", "eravos.syn-partials": "chart-no-axes-column", "eravos.contrast-analyser": "contrast",
     "eravos.midi-mapper": "cable", "eravos.particle-field": "atom", "eravos.clip-maker": "scissors", "eravos.sample-player": "file-music",
     "eravos.lyric-rhythm": "mic-vocal", "eravos.wub-filter": "speech", "eravos.wub-osc": "tornado", "eravos.wub-rate": "timer",
-    "eravos.wub-sub": "target", "eravos.ratio-lattice": "hash", "eravos.recursive-spectra": "aperture", "eravos.xen-synth": "hexagon"
+    "eravos.wub-sub": "target", "eravos.ratio-lattice": "hash", "eravos.recursive-spectra": "aperture", "eravos.xen-synth": "hexagon",
+    "eravos.fx-squash": "chevrons-down-up"
   },
   "suites": {
     "music.wub-lab": "boom-box", "music.synthesis-lab": "test-tube-diagonal", "music.edm-lab": "party-popper", "music.heavy-drops": "flame-kindling",

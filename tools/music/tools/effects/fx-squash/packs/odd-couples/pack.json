@@ -1,0 +1,47 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "fx-squash.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "ERAVOS",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.66"
+ ],
+ "for": "eravos.fx-squash",
+ "items": {
+  "eravos.fx-squash": {
+   "presets": {
+    "Cathedral Squash": {
+     "params": {
+      "amount": 0.55,
+      "low": 0.2,
+      "mid": 1,
+      "high": 0.5,
+      "xLo": 160,
+      "xHi": 2200,
+      "lowClean": true,
+      "monoLow": true,
+      "mix": 0.8,
+      "outGain": -1
+     }
+    },
+    "Choir Squeeze": {
+     "params": {
+      "amount": 0.3,
+      "low": 0.1,
+      "mid": 0.6,
+      "high": 0.8,
+      "xLo": 220,
+      "xHi": 3500,
+      "lowClean": true,
+      "monoLow": false,
+      "mix": 0.5
+     }
+    }
+   }
+  }
+ }
+}

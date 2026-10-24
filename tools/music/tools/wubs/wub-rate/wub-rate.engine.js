@@ -1,8 +1,12 @@
-/* eravos.wub-rate 1.0.0 — Wub Rate · spec wub-rate.spec
+/* eravos.wub-rate 1.1.0 — Wub Rate · spec wub-rate.spec
  * The rhythm of a wobble, and nothing else: a step pattern of wobble rates (1/4, 1/8, 1/8t, 1/16 … or off / hold),
  * one shape, one polarity. Its violet output opens and closes whatever it is wired to (Wub Filter's "wub" input, or
  * any violet input). Steps land on the transport's 16ths, sample-accurate; each new rate restarts the wobble from
- * its closed point, so every step speaks on the beat. No sound of its own. */
+ * its closed point, so every step speaks on the beat. No sound of its own.
+ * 1.1 (what only the Wobble Bass could do, now a part anyone can use): RATE BEND ×¼…×4 — the wobble speeds up or slows down
+ *   smoothly between the grid rates (as the oscillator's detune, so it never jumps or restarts); RATE GLIDE — a step's new rate
+ *   swoops in over the glide time and the wobble glides on instead of restarting (the Wobble Bass's speed-up into a drop); and a
+ *   RATE input, so an Envelope, an LFO or a Timeline curve can push the speed (±2 octaves of rate). All default to off. */
 (function () {
   'use strict';
   const S = OrganismSDK.STD;
@@ -41,7 +45,7 @@
   const cleanSteps = (a) => Array.from({ length: MAX_STEPS }, (_, i) => STEP_OPTS.includes(a && a[i]) ? a[i] : '1/8');
 
   OrganismFactory.define({
-    id: 'eravos.wub-rate', domain: 'music', version: '1.0.0', label: 'Wub Rate', icon: '〽', accent: '#b066ff',
+    id: 'eravos.wub-rate', domain: 'music', version: '1.1.0', label: 'Wub Rate', icon: '〽', accent: '#b066ff',
     category: 'Wubs', blurb: 'The wobble’s rhythm: a step pattern of rates (1/8, 1/16, triplets, off) — wire its violet dot to Wub Filter.',
     size: { w: 520, h: 470 }, minSize: { w: 400, h: 340 },
     permissions: ['audio_out', 'bus_publish', 'bus_subscribe', 'registry_read'],
@@ -52,6 +56,7 @@
       S.mod_out('wubrate.hook.mod_out', 'out'),
       S.transport_in('wubrate.hook.transport_in'),
       S.mod_in('wubrate.hook.mod_depth', 'depth'),
+      S.mod_in('wubrate.hook.mod_rate', 'rate'),
     ],
     config: [
       { key: 'steps', type: 'array', default: DEFAULT_STEPS.slice(), label: 'Steps', group: 'PATTERN', hidden: true },
@@ -62,6 +67,8 @@
       { key: 'smooth', type: 'number', default: 0.15, min: 0, max: 1, step: 0.01, label: 'Smooth', group: 'SHAPE', hint: 'rounds hard edges (square, saw, off) so they don’t click' },
       { key: 'polarity', type: 'enum', options: POLARITY, default: 'unipolar+', label: 'Polarity', group: 'OUTPUT', hint: 'unipolar+ = 0 → 1 (opens). unipolar− = 0 → −1. bipolar swings both ways; inverted flips it' },
       { key: 'depth', type: 'number', default: 1, min: 0, max: 1, step: 0.01, label: 'Depth', group: 'OUTPUT' },
+      { key: 'rateBend', type: 'number', default: 1, min: 0.25, max: 4, step: 0.001, unit: '×', label: 'Rate bend', group: 'SPEED', hint: 'speeds the wobble up or slows it down smoothly, between the grid rates (×2 = one rate faster)' },
+      { key: 'rateGlide', type: 'number', default: 0, min: 0, max: 2, step: 0.001, unit: 's', label: 'Rate glide', group: 'SPEED', hint: 'a step’s new rate swoops in over this time and the wobble glides on instead of restarting — the speed-up into a drop (0 = jump)' },
       { key: 'retrig', type: 'enum', options: ['on change', 'every step', 'never'], default: 'on change', label: 'Restart', group: 'SYNC', hint: 'when the wobble starts again from closed' },
       { key: 'noteRetrig', type: 'boolean', default: true, label: 'Notes restart', group: 'SYNC', hint: 'each new note on a Wub Osc restarts the wobble (slides don’t)' },
     ],
@@ -76,6 +83,11 @@
       [sum, smooth, out, oscG, off].forEach(n => ctx.track(n));
       ctx.port('out', { kind: 'mod', direction: 'out', node: out, label: 'wub' });
       const depthMod = ctx.modBus('depth', { min: -1, max: 1 }); depthMod.connect(out.gain);
+      // 1.1 rate: Rate bend (and the rate input) as the oscillator's detune in cents — ×2 = +1200 — so it moves smoothly, never restarts
+      const bendC = ac.createConstantSource(); bendC.offset.value = 0; bendC.start(); ctx.track(bendC);
+      const rateMod = ctx.modBus('rate', { min: -2400, max: 2400 });
+      const bendCents = () => 1200 * Math.log2(Math.max(0.25, Math.min(4, +P.get('rateBend') || 1)));
+      const applyBend = () => bendC.offset.setTargetAtTime(bendCents(), ac.currentTime, 0.03); bendC.offset.value = bendCents();
 
       const waves = {};
       const curWave = () => { const k = P.get('shape') + '@' + P.get('phase').toFixed(3); return waves[k] || (waves[k] = makeWave(ac, shapeFn(P.get('shape')), P.get('phase'))); };
@@ -96,16 +108,18 @@
         t = Math.max(t, ac.currentTime);
         live.forEach(o => { if (o.stopAt > t) { try { o.stop(t); o.stopAt = t; } catch (e) {} } });
         osc = ac.createOscillator(); const o = osc; o.stopAt = Infinity; live.add(o);
-        o.onended = () => { live.delete(o); try { o.disconnect(); } catch (e) {} ctx.untrack(o); }; osc.setPeriodicWave(curWave().wave);
-        osc.frequency.setValueAtTime(rateHz(div), t); osc.connect(oscG); osc.start(t); ctx.track(osc);
+        o.onended = () => { live.delete(o); try { o.disconnect(); } catch (e) {} try { bendC.disconnect(o.detune); rateMod.disconnect(o.detune); } catch (e) {} ctx.untrack(o); }; osc.setPeriodicWave(curWave().wave);   // 1.1: an ended oscillator lets go of its rate inputs too
+        osc.frequency.setValueAtTime(rateHz(div), t); bendC.connect(osc.detune); rateMod.connect(osc.detune); osc.connect(oscG); osc.start(t); ctx.track(osc);
         cur = div;
       }
       // apply one step's value at audio time t
       function apply(v, t) {
         if (v === 'hold') return;
         if (v === 'off') { if (gate) { levels(t, false); gate = false; } cur = 'off'; return; }
-        const mode = P.get('retrig'), changed = v !== cur;
-        if (!gate || !osc || mode === 'every step' || (mode === 'on change' && changed)) restart(t, v);
+        const mode = P.get('retrig'), changed = v !== cur, glide = +P.get('rateGlide') || 0;
+        // 1.1 glide: a sounding wobble swoops to the new rate (no restart); off → on still restarts from closed, as before
+        if (glide > 0.001 && gate && osc && changed && mode !== 'every step') { osc.frequency.cancelScheduledValues(t); osc.frequency.setValueAtTime(rateHz(cur), t); osc.frequency.setTargetAtTime(rateHz(v), t, glide / 3); cur = v; }
+        else if (!gate || !osc || mode === 'every step' || (mode === 'on change' && changed)) restart(t, v);
         else if (changed) { osc.frequency.setValueAtTime(rateHz(v), t); cur = v; }
         if (!gate) { levels(t, true); gate = true; }
       }
@@ -135,7 +149,7 @@
       ctx.onTick((tk) => { if (bpmPending && osc && RATES.includes(cur)) { osc.frequency.setValueAtTime(rateHz(cur), tk.time); bpmPending = false; } });
       ['shape', 'phase'].forEach(k => P.onChange(k, () => { if (osc) osc.setPeriodicWave(curWave().wave); levels(ac.currentTime, gate); ctx.syncUI(); }));
       ['polarity', 'depth'].forEach(k => P.onChange(k, () => levels(ac.currentTime, gate)));
-      P.onChange('smooth', applySmooth);
+      P.onChange('smooth', applySmooth); P.onChange('rateBend', applyBend);
       ['steps', 'length'].forEach(k => P.onChange(k, () => { if (!playing) freeRun(); }));
 
       ctx.onUI('step_set', { type: 'object', required: ['index', 'value'] }, (p) => {
@@ -153,7 +167,7 @@
       });
       ctx.shapeAt = (ph) => shapeFn(P.get('shape'))((((ph + P.get('phase')) % 1) + 1) % 1);
       ctx.stateExtra = () => ({ stepOptions: STEP_OPTS, current: stepIdx, rate: cur });
-      ctx.internals = { out, oscG, off, smooth, get osc() { return osc; }, get cur() { return cur; }, get gate() { return gate; } };
+      ctx.internals = { out, oscG, off, smooth, bendC, get osc() { return osc; }, get cur() { return cur; }, get gate() { return gate; } };
       return {};
     },
   });
