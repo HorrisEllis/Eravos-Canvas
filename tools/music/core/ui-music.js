@@ -275,5 +275,14 @@
   }
   if (doc) doc.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeKnobMenu(); }, true);
 
+  // 3.70 the right-click menu (canvas/runtime/context-menu.js): what every music tool adds to its window's menu
+  if (global.ContextMenu) global.ContextMenu.contribute(({ rec, def, K, instanceId }) => {
+    const ins = (def.hooks || []).some(hk => hk.direction === 'in' && hk.event_type === 'note:trigger'), hooks = def.ui_hooks || [], out = [];
+    if (ins && rec.ctx.audition) out.push({ label: '▶ Hear it', hint: 'play a note on it', run: () => K.bus.publish('ui:audition:' + instanceId, {}) });
+    if (hooks.includes('release_all')) out.push({ label: '■ Let go of every note', run: () => K.bus.publish('ui:release_all:' + instanceId, {}) });
+    else if (ins) out.push({ label: '■ Quiet', hint: 'stop what it is playing', run: () => rec.ctx.silenceNow && rec.ctx.silenceNow({ hard: true, reason: 'menu' }) });
+    const ps = Object.keys(def.presets || {}); if (ps.length > 1) out.push({ label: '🎲 A random preset', run: () => K.bus.publish('ui:preset_load:' + instanceId, { name: ps[Math.floor(Math.random() * ps.length)] }) });
+    return out;
+  });
   UI.extend({ knobMenu, motion: { MOVERS, knobHook, moveWith, addMover, close: closeKnobMenu }, atTime, Meter, readLevel, Scope, Spectrum, Keyboard, keyRange, divisionLadder, audioRouting, instrumentPanel, alive });
 })(typeof window !== 'undefined' ? window : globalThis);

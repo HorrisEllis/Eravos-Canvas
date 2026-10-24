@@ -477,7 +477,28 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     if (d.mode === 'move' && d.patch) { if (d.alt) view.emit('clip_duplicate', { id: d.c.id, startBar: d.patch.startBar }); else view.emit('clip_edit', { id: d.c.id, patch: d.patch }); }
     draw();
   });
-  cv.addEventListener('contextmenu', (e) => e.preventDefault());
+  // 3.70: right-click deletes on a curve lane and a marker lane (its own job there); anywhere else the right-click menu opens with the
+  // timeline's own items (view.contextMenu below) — the clip under the pointer, the frame, the song
+  cv.addEventListener('contextmenu', (e) => { if (!A) return e.preventDefault(); const { y } = local(e); const ln = A.lanes[Math.floor((y - RULER) / laneH())]; if (y < rulerY() + RULER || (ln && (ln.kind === 'auto' || ln.kind === 'marker'))) e.preventDefault(); });
+  view.contextMenu = (e) => {
+    if (!A) return [];
+    const items = [], p = e && e.target === cv ? local(e) : null, hc = p ? hit(p.x, p.y) : null, c = hc ? hc.c : A.clips.find(x => x.id === sel);
+    if (frame) items.push({ label: '✂ Split at the frame', hint: 'cut every clip in the frame at its edges', run: () => doSplit() });
+    if (c) {
+      const len = c.kind === 'audio' ? c.lengthSec / A.barSec : c.bars, at = p ? snapB(barOf(p.x)) : null;
+      items.push({ section: (c.name || 'clip') + ' · ' + (Math.round(len * 100) / 100) + ' bars' });
+      if (at && at > c.startBar && at < c.startBar + len) items.push({ label: '✂ Split here (bar ' + (Math.round(at * 4) / 4) + ')', run: () => view.emit('clip_split_at', { lanes: [c.lane], bars: [at] }) });
+      if (len >= 2 || c.kind === 'audio') items.push({ label: '✂ In half', run: () => view.emit('clip_split', { id: c.id, bar: c.kind === 'audio' ? c.startBar + len / 2 : c.startBar + Math.max(1, Math.round(len / 2)) }) });
+      items.push({ label: '⧉ Repeat ×1', run: () => view.emit('clip_repeat', { id: c.id, times: 1 }) }, { label: '⧉ Repeat ×3 (four in a row)', run: () => view.emit('clip_repeat', { id: c.id, times: 3 }) });
+      if (c.kind === 'notes') items.push({ label: '🎹 Edit its notes', run: () => { sel = c.id; drawInsp(); syncRoll(); draw(); } });
+      items.push({ label: '🗑 Delete the clip', danger: true, run: () => { view.emit('clip_remove', { id: c.id }); if (sel === c.id) sel = null; } }, { sep: true });
+    }
+    items.push({ label: tlFull ? '⤡ Back to the canvas' : '⛶ The whole timeline full screen', run: () => setTlFull(!tlFull) },
+      { label: '⤢ Fit the song', run: () => fit() },
+      { label: '⤓ Bounce to WAV', hint: 'plays the song once, in real time', run: () => view.emit('bounce', {}) },
+      { label: '⤓ Export MIDI', run: () => view.emit('export_midi', {}) });
+    return items;
+  };
   cv.addEventListener('dblclick', (e) => {
     if (!A) return; const { x, y } = local(e); const li = Math.floor((y - RULER) / laneH()), lane = A.lanes[li];
     if (!lane) return;
