@@ -13,6 +13,7 @@
       duration: { type: 'number', minimum: 0 }, accent: { type: 'boolean' }, slide: { type: 'boolean' },
       freq: { type: 'number', minimum: 0 }, // xen: an exact (often irrational) frequency; `note` stays the nearest 12-TET key
       params: { type: 'object' },   // 3.53 per-note settings: { knob: value } for this note only (see ctx.onNote)
+      curves: { type: 'object' },   // 3.65 per-note curves: { knob: [[t 0…1, value], …] } over this note (see noteCurves)
       bend: { type: 'object' },     // 3.56 the note's pitch curve: { from, to (semitones), shape, at (0…0.95 of the note) } (see PITCH WHEEL)
     },
   };
@@ -537,6 +538,40 @@ registerProcessor('eravos-pitch', EravosPitch);`;
         if (quiet || t <= ac.currentTime + 0.002) take(); else ctx.atAudioTime(t, take);
         ctx.atAudioTime(end, () => keys.forEach(k => { if (noteOwner.get(k) === tok) { noteOwner.delete(k); P.live(k, autoLive.has(k) ? autoLive.get(k) : null); } }));
       }
+      // 3.65 PER-NOTE CURVES — a note may carry curves { knob: [[t, value], …] } (t: 0 = its start, 1 = its end): that knob follows the
+      // curve over the note, as a live value like a per-note setting (never saved, never undoable). MONOPHONIC BY DESIGN: the knob is
+      // the tool's, not one voice's, so it is meant for one line at a time (a bass); overlapping notes take the knob in turn.
+      // The rules (the same ownership as per-note settings):
+      //   · the note owns the knob from its start (at once if nothing of this tool sounds — the voice is built with it);
+      //   · while it owns it, the knob follows the curve on the audio clock — one step every CURVE_STEP s, chained (one timer per note,
+      //     not one per point), each step reading the clock, so a late step still lands on the right value for its moment;
+      //   · a newer note that takes the knob ends this curve there: no later step of the older note writes over it, and its end does
+      //     not hand the knob back while the newer note holds it;
+      //   · at its end, only if it still owns the knob, the knob goes back to where the automation has it, else the tool's own knob —
+      //     a curve never leaves the knob at its last value;
+      //   · Stop all clears every owner, so every pending step finds it no longer owns anything and does nothing.
+      // A knob in both params and curves follows the curve. Values are clamped to the knob's range; whole-number knobs are rounded.
+      const CURVE_STEP = 0.012;
+      function curveAt(pts, x) {
+        if (x <= pts[0][0]) return +pts[0][1];
+        for (let i = 1; i < pts.length; i++) if (x <= pts[i][0]) { const a = pts[i - 1], b = pts[i]; return b[0] > a[0] ? +a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]) : +b[1]; }
+        return +pts[pts.length - 1][1];
+      }
+      function noteCurves(p, t, end, quiet) {
+        const P = ctx.params; if (!P || !p.curves || typeof p.curves !== 'object') return [];
+        const sch = new Map(P.schema().map(c => [c.key, c]));
+        const keys = Object.keys(p.curves).filter(k => { const c = sch.get(k), v = p.curves[k]; return c && (c.type === 'number' || c.type === 'integer') && Array.isArray(v) && v.length && v.every(q => Array.isArray(q) && isFinite(+q[0]) && isFinite(+q[1])); });
+        if (!keys.length) return [];
+        const pts = {}; keys.forEach(k => { pts[k] = p.curves[k].map(q => [+q[0], +q[1]]).sort((a, b) => a[0] - b[0]); });
+        const dur = Math.max(1e-3, end - t), tok = ++noteTok;
+        const val = (k, x) => { const c = sch.get(k); let v = curveAt(pts[k], Math.max(0, Math.min(1, x))); if (typeof c.min === 'number') v = Math.max(c.min, v); if (typeof c.max === 'number') v = Math.min(c.max, v); return c.type === 'integer' ? Math.round(v) : v; };
+        const write = () => { const x = (ac.currentTime - t) / dur; let mine = false; keys.forEach(k => { if (noteOwner.get(k) !== tok) return; mine = true; P.live(k, val(k, x)); }); return mine; };
+        const step = () => { if (write() && ac.currentTime < end - CURVE_STEP / 2) ctx.atAudioTime(Math.min(end - 0.001, ac.currentTime + CURVE_STEP), step); };
+        const take = () => { keys.forEach(k => noteOwner.set(k, tok)); write(); ctx.atAudioTime(Math.min(end - 0.001, Math.max(ac.currentTime, t) + CURVE_STEP), step); };
+        if (quiet || t <= ac.currentTime + 0.002) take(); else ctx.atAudioTime(t, take);
+        ctx.atAudioTime(end, () => keys.forEach(k => { if (noteOwner.get(k) === tok) { noteOwner.delete(k); P.live(k, autoLive.has(k) ? autoLive.get(k) : null); } }));
+        return keys;
+      }
       // 3.53 AUTOMATION — a Timeline automation lane moves a knob: knob:live { target, key, value, time } holds the knob at that
       // value from that audio time on (value null = hand it back). A note with its own setting for the knob wins while it
       // plays, then the knob returns to where the automation has it.
@@ -556,7 +591,8 @@ registerProcessor('eravos-pitch', EravosPitch);`;
         const t = typeof p.time === 'number' ? p.time : ac.currentTime, end = t + (typeof p.duration === 'number' ? p.duration : 1);
         sounding = sounding.filter(e => e > t);
         if (sounding.length >= NOTE_CEILING) { if (ctx.notesDropped++ % 64 === 0) K.fault('RUNTIME_005', { instance_id: ctx.id, message: `more than ${NOTE_CEILING} notes at once — extra notes skipped`, quiet: true }); return; }
-        if (p.params) noteParams(p, t, end, !sounding.length);
+        const quiet = !sounding.length, curved = p.curves ? noteCurves(p, t, end, quiet) : [];
+        if (p.params) { if (curved.length) { const rest = Object.assign({}, p.params); curved.forEach(k => delete rest[k]); noteParams(Object.assign({}, p, { params: rest }), t, end, quiet); } else noteParams(p, t, end, quiet); }
         sounding.push(end);
         // 3.39 delay compensation: a tool whose whole voice runs through an oversampled shaper is late by ctx.latency
         // seconds — its notes start that much earlier so the SOUND lands on the beat (clamped to now for live input)

@@ -573,3 +573,95 @@ describe('tool · Timeline — split at a frame (3.62)', () => {
     pub('clip_split_at', { lanes: [L[2].id], bars: [5] }); assert.deepEqual(on(L[2]), [[1, 4, 2], [5, 4, 2]], 'one line: the pattern in half');
   });
 });
+
+// 3.65 — per-note curves: "let each note carry time-varying filter, drive and wobble-depth curves", monophonic by design, with
+// the safeguard asked for: "a curve must not leave a shared knob at its final value or accidentally restore an older value over a
+// newer note."
+window.__phase = 'P65';
+describe('tool · Timeline — per-note curves (monophonic)', () => {
+  const SR = 8000;
+  const uni = (sec) => { const ctx = new OfflineAudioContext(1, Math.ceil(sec * SR), SR), K = Kernel.create({ ctx, quiet: true, syncIR: true }), T = MasterTransport.create(K, { offline: true, bpm: 120 }); T.boot(); return { ctx, K, T }; };
+  const wob = (U) => { const a = OrganismFactory.spawn('eravos.wobble-bass', { K: U.K, headless: true }); return { a, w: OrganismFactory.handle(a).ctx }; };
+  const at = (U, times, fn) => times.forEach(t => U.ctx.suspend(t).then(() => { fn(t); U.ctx.resume(); }));
+  it('a note keeps its curves through cleaning and the timeline sends them with it; a cut note keeps its part of them', () => {
+    const U = uni(0.5), tl = OrganismFactory.spawn('eravos.timeline', { K: U.K, headless: true }), { a } = wob(U), c = OrganismFactory.handle(tl).ctx;
+    U.K.bus.publish('ui:lane_add:' + tl, { kind: 'inst', target: a, name: 'Bass' });
+    U.K.bus.publish('ui:clip_add:' + tl, { kind: 'notes', target: a, startBar: 1, bars: 2, notes: [
+      { s: 8, l: 16, n: 40, v: 0.9, p: { depth: 2 }, b: { from: 0, to: -12 }, c: { cutoff: [[1, 4000], [0, 200], ['x', 3], [0.5, 900], [2, 5000]], drive: 'no', 'bad key': [[0, 1]] } },
+      { s: 0, l: 4, n: 40, v: 0.9 }] });
+    let clip = c.serialize().extra.clips.find(x => x.kind === 'notes'), n = clip.notes.find(x => x.s === 8);
+    assert.deepEqual(n.c, { cutoff: [[0, 200], [0.5, 900], [1, 4000]] }, 'sorted, t clamped to 0…1 (the 1 kept first), junk and bad keys dropped');
+    assert.ok(n.p && n.b, 'its settings and its bend are kept beside it'); assert.equal(clip.notes.find(x => x.s === 0).c, undefined, 'a plain note stays plain');
+    const sent = []; U.K.bus.subscribe('note:trigger', (p) => sent.push(p)); U.T.renderTicks(0, 32, 0.1);
+    assert.deepEqual(sent.find(p => p.curves).curves, n.c, 'sent as curves'); assert.deepEqual(sent.find(p => p.curves).params, { depth: 2 });
+    U.K.bus.publish('ui:clip_split:' + tl, { id: clip.id, bar: 2 });   // the note runs steps 8…24, the cut is at 16: its first half
+    clip = c.serialize().extra.clips.find(x => x.id === clip.id); n = clip.notes.find(x => x.s === 8);
+    assert.equal(n.l, 8); assert.deepEqual(n.c.cutoff, [[0, 200], [1, 900]], 'the left half keeps the first half of its curve, not a squeezed whole');
+  });
+  it('the knob follows the curve over the note on the audio clock, never saved, and goes back at the end — never left at the last value', async () => {
+    const U = uni(1.8), { a, w } = wob(U), base = w.params.get('cutoff'), seen = {};
+    U.K.bus.publish('note:trigger', { target: a, note: 40, velocity: 0.9, time: 0.2, duration: 1, curves: { cutoff: [[0, 200], [1, 4200]] } });
+    seen.start = w.params.get('cutoff');
+    at(U, [0.45, 0.95, 1.15, 1.5], (t) => { seen[t] = w.params.get('cutoff'); if (t === 0.95) seen.saved = w.serialize().params.cutoff; });
+    await U.ctx.startRendering();
+    assert.equal(seen.start, 200, 'nothing sounding: the voice is built at the curve’s start');
+    assert.near(seen[0.45], 1200, 90, 'a quarter in'); assert.near(seen[0.95], 3200, 90, 'three quarters in');
+    assert.near(seen[1.15], 4000, 120, 'near the end'); assert.equal(seen[1.5], base, 'after the note: the tool’s own knob, not the curve’s last value');
+    assert.equal(seen.saved, base, 'the saved knob is untouched');
+  });
+  it('after the note the knob goes back to where the automation has it', async () => {
+    const U = uni(1.5), { a, w } = wob(U), seen = {};
+    U.K.bus.publish('knob:live', { target: a, key: 'depth', value: 5 });
+    U.K.bus.publish('note:trigger', { target: a, note: 40, velocity: 0.9, time: 0.1, duration: 0.6, curves: { depth: [[0, 0], [1, 8]] } });
+    at(U, [0.4, 1.0], (t) => { seen[t] = w.params.get('depth'); });
+    await U.ctx.startRendering();
+    assert.near(seen[0.4], 4, 0.4, 'mid-curve'); assert.equal(seen[1.0], 5, 'back to the automation’s value');
+  });
+  it('overlap: a newer note takes the knob — the older curve never writes over it, and its end never restores over it', async () => {
+    const U = uni(2), { a, w } = wob(U), base = w.params.get('depth'), seen = {};
+    U.K.bus.publish('note:trigger', { target: a, note: 40, velocity: 0.9, time: 0.2, duration: 0.8, curves: { depth: [[0, 0], [1, 8]] } });
+    U.K.bus.publish('note:trigger', { target: a, note: 43, velocity: 0.9, time: 0.6, duration: 0.8, curves: { depth: [[0, 2], [1, 2]] } });
+    at(U, [0.5, 0.8, 0.98, 1.1, 1.6], (t) => { seen[t] = w.params.get('depth'); });
+    await U.ctx.startRendering();
+    assert.near(seen[0.5], 3, 0.35, 'the first note’s curve while it alone holds the knob');
+    assert.equal(seen[0.8], 2, 'the second note holds it'); assert.equal(seen[0.98], 2, 'the first curve’s later steps do not write over it');
+    assert.equal(seen[1.1], 2, 'the first note ending does not hand back a knob the second holds'); assert.equal(seen[1.6], base, 'the second note ending does');
+  });
+  it('a newer note with a plain setting for the knob also ends an older curve', async () => {
+    const U = uni(1.5), { a, w } = wob(U), seen = {};
+    U.K.bus.publish('note:trigger', { target: a, note: 40, velocity: 0.9, time: 0.1, duration: 1, curves: { cutoff: [[0, 200], [1, 4000]] } });
+    U.K.bus.publish('note:trigger', { target: a, note: 43, velocity: 0.9, time: 0.5, duration: 0.8, params: { cutoff: 900 } });
+    at(U, [0.7, 1.0], (t) => { seen[t] = w.params.get('cutoff'); });
+    await U.ctx.startRendering(); assert.equal(seen[0.7], 900); assert.equal(seen[1.0], 900, 'the older curve stays stopped');
+  });
+  it('Stop all hands the knob back at once, and no pending step of the curve writes it again', async () => {
+    const U = uni(1.4), { a, w } = wob(U), base = w.params.get('cutoff'), seen = {};
+    U.K.bus.publish('note:trigger', { target: a, note: 40, velocity: 0.9, time: 0.1, duration: 1.2, curves: { cutoff: [[0, 200], [1, 4000]] } });
+    at(U, [0.4], () => { seen.before = w.params.get('cutoff'); U.K.silence({ hard: true, reason: 'test' }); seen.stopped = w.params.get('cutoff'); });
+    at(U, [0.8, 1.35], (t) => { seen[t] = w.params.get('cutoff'); });
+    await U.ctx.startRendering();
+    assert.ok(seen.before > 200 && seen.before < 4000, 'moving before Stop: ' + seen.before);
+    assert.equal(seen.stopped, base); assert.equal(seen[0.8], base, 'no later step'); assert.equal(seen[1.35], base);
+  });
+  it('a knob the tool does not have, or a choice knob, is ignored; a curve beyond the knob’s range is held inside it', async () => {
+    const U = uni(0.8), { a, w } = wob(U), seen = {};
+    U.K.bus.publish('note:trigger', { target: a, note: 40, velocity: 0.9, time: 0.1, duration: 0.6, curves: { nope: [[0, 1]], div: [[0, 1]], depth: [[0, -50], [1, 50]] } });
+    at(U, [0.15, 0.65], (t) => { seen[t] = w.params.get('depth'); });
+    await U.ctx.startRendering(); assert.equal(seen[0.15], 0, 'held at the bottom of 0…8'); assert.equal(seen[0.65], 8, 'and the top');
+  });
+  it('you hear it: the filter stays shut while the curve is low, then opens with it — matching the same knob held still at each end', async () => {
+    async function render(curves, params) {
+      const U = uni(1.6), { a } = wob(U);
+      U.K.bus.publish('note:trigger', Object.assign({ target: a, note: 36, velocity: 0.9, time: 0.2, duration: 1.2, params: Object.assign({ depth: 0, drive: 0 }, params || {}) }, curves ? { curves } : {}));
+      for (let t = 0.02; t < 1.58; t += 0.02) U.ctx.suspend(+t.toFixed(3)).then(() => U.ctx.resume());   // a real-time clock gives the timers their turn; offline, the render pauses for them
+      return (await U.ctx.startRendering()).getChannelData(0);
+    }
+    const bright = (d, a, b) => { let x = 0, dx = 0; for (let i = Math.floor(a * SR) + 1; i < b * SR; i++) { x += d[i] * d[i]; dx += (d[i] - d[i - 1]) ** 2; } return Math.sqrt(dx / Math.max(1e-12, x)); };
+    // low for its first half (120 → 200 Hz), then open to 3500 Hz
+    const swept = await render({ cutoff: [[0, 120], [0.5, 200], [1, 3500]] }), shut = await render(null, { cutoff: 120 }), open = await render(null, { cutoff: 3500 });
+    const E = [0.3, 0.6], L = [1.2, 1.38], s0 = bright(swept, ...E), s1 = bright(swept, ...L), lo = bright(shut, ...E), hi = bright(open, ...L);
+    assert.near(s0 / lo, 1, 0.2, `early in the note it sounds like the knob held at 120 Hz (${s0.toFixed(3)} vs ${lo.toFixed(3)})`);
+    assert.near(s1 / hi, 1, 0.15, `late it sounds like the knob held at 3500 Hz (${s1.toFixed(3)} vs ${hi.toFixed(3)})`);
+    assert.gt(s1 / s0, 1.6, `and the note opened on its way (${s0.toFixed(3)} → ${s1.toFixed(3)})`);
+  });
+});
