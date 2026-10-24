@@ -4,6 +4,10 @@
  *   --snd-level 0…1  how loud the mix is             --snd-pulse 0…1  jumps on each hit, then falls back
  *   --snd-hue   deg  where the sound's weight sits: deep red/violet for a bass drop … cyan/teal for bright tops
  * and on every tool window that makes sound: --tool-level 0…1 (its own output) — eravos.css makes the window glow with it.
+ * 3.48.2 "all the accent colours are supposed to change with the sound": each sounding window's own --acc (every knob arc,
+ *   active button, toggle, slider, border and drawn display in it) moves with ITS sound — toward the mix's hue as it gets
+ *   louder, brighter on each hit — and returns to the tool's own colour when it goes quiet. Also data-acc-live (hex) for
+ *   canvases that draw with the accent.
  * Quiet when nothing plays (the values fall to 0 and stop updating). Respects reduced motion (calmer, no pulse). Off/on in
  * ⋯ Options (◐ Reactive colours, remembered). Only listens while the page is visible. */
 (function (global) {
@@ -15,7 +19,19 @@
   let on = true; try { on = global.localStorage.getItem('eravos.reactive') !== '0'; } catch (e) {}
   const calm = () => global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const set = (k, v) => root.style.setProperty(k, v);
-  function zero() { ['--snd-low', '--snd-high', '--snd-level', '--snd-pulse'].forEach(k => set(k, '0')); doc.querySelectorAll('.wm-win[style*="--tool-level"]').forEach(w => w.style.setProperty('--tool-level', '0')); }
+  function zero() { ['--snd-low', '--snd-high', '--snd-level', '--snd-pulse'].forEach(k => set(k, '0')); doc.querySelectorAll('.wm-win[style*="--tool-level"]').forEach(w => { w.style.setProperty('--tool-level', '0'); restoreAcc(w); }); }
+  // ---- the living accent: the tool's own colour mixed toward the sound's hue by its level, lifted on hits
+  const hex2 = (c) => { c = String(c || '').trim(); const m = c.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i); if (!m) return null; let x = m[1]; if (x.length === 3) x = x.split('').map(ch => ch + ch).join(''); const n = parseInt(x, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+  const hsl2 = (hh, s, l) => { s /= 100; l /= 100; const k = (n) => (n + hh / 30) % 12, a = s * Math.min(l, 1 - l), f = (n) => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1))); return [f(0) * 255, f(8) * 255, f(4) * 255]; };
+  const toHex = (rgb) => '#' + rgb.map(v => Math.round(clamp(v, 0, 255)).toString(16).padStart(2, '0')).join('');
+  function baseAcc(w) { if (w.dataset.accBase === undefined) w.dataset.accBase = w.style.getPropertyValue('--acc').trim() || ''; return w.dataset.accBase; }
+  function liveAcc(w, lv) {
+    const base = hex2(baseAcc(w)); if (!base) return;
+    const mix = clamp(lv * 0.75 + pulse * 0.2, 0, 0.85), tgt = hsl2(hue, 90, 60 + pulse * 12), lift = 1 + pulse * 0.18 * lv;
+    const out = toHex(base.map((b, i) => (b + (tgt[i] - b) * mix) * lift));
+    if (w.dataset.accLive === out) return; w.dataset.accLive = out; w.style.setProperty('--acc', out);
+  }
+  function restoreAcc(w) { if (w.dataset.accBase === undefined) return; if (w.dataset.accBase) w.style.setProperty('--acc', w.dataset.accBase); delete w.dataset.accLive; }
   function ensure() {
     if (an || !K || !K.audio || !K.audio.ctx || !K.audio.output) return !!an;
     const ac = K.audio.ctx; an = ac.createAnalyser(); an.fftSize = 2048; an.smoothingTimeConstant = 0.6; an.minDecibels = -110; an.maxDecibels = -10;
@@ -51,12 +67,14 @@
       if (w.classList.contains('collapsed') || w.offsetParent === null) return; const t = toolTap(w); if (!t || t.none) return;
       t.an.getFloatTimeDomainData(t.buf); let s = 0; for (let i = 0; i < t.buf.length; i++) s += t.buf[i] * t.buf[i];
       const v = clamp((10 * Math.log10(s / t.buf.length + 1e-12) + 50) / 44, 0, 1); t.lv = (t.lv || 0) + (v - (t.lv || 0)) * 0.4; w.style.setProperty('--tool-level', t.lv.toFixed(3));
+      if (t.lv > 0.02) liveAcc(w, t.lv); else restoreAcc(w);
     });
   }
   const SoundCSS = {
     init(kernel) { K = kernel; if (!raf) raf = global.requestAnimationFrame(frame); root.classList.toggle('snd-off', !on); return SoundCSS; },
     get on() { return on; },
     set(v) { on = !!v; try { global.localStorage.setItem('eravos.reactive', on ? '1' : '0'); } catch (e) {} root.classList.toggle('snd-off', !on); if (!on) zero(); },
+    liveAcc, restoreAcc,   // tests
     // tests: one analysis step on demand (offline pages have no running clock)
     step() { last = -1e9; frame(performance.now() + 1e6); global.cancelAnimationFrame(raf); raf = global.requestAnimationFrame(frame); },
     _taps: taps,

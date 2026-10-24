@@ -2,6 +2,12 @@
 
 A canvas of living instruments for making music — everything in key, everything on the beat.
 
+## 3.48.2 — accents follow the sound
+- Every sounding window's accent colour moves with its own sound: knob arcs, active buttons, toggles, sliders, the border
+  and its spectrum. As it gets louder it drifts toward the hue of the mix (violet and red for bass weight, teal for bright
+  tops) and brightens on each hit; when it goes quiet it returns to the tool's own colour. Knobs no longer pin a fixed colour
+  each. Tools inside another (mod cards, linked faces) keep their own colour. ⋯ Options › Reactive colours turns it off.
+
 ## Layout — the canvas and the tools are separate
 
     canvas/        the empty canvas — what ERAVOS.exe is. Domain-free: kernel/, runtime/, index.html, scripts.js
