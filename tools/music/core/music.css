@@ -311,3 +311,27 @@ html:not(.snd-off) #logo { filter: drop-shadow(0 0 calc(var(--snd-pulse) * 10px)
 .mo-row .mo-pic { flex: none; width: 92px !important; height: 26px !important; }
 .mo-sub .mo-steps { flex: none; width: 184px !important; height: 44px !important; }
 .mo-mrow .uk-knob-label { display: none; }
+/* 3.73 Patterns page: quick picks, families that fold, sections that fold */
+.plib .sbk-filter .sbk-chips { padding: 5px 18px 3px; align-items: center; }
+.plib-lbl { color: var(--dim); font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; min-width: 46px; }
+.plib-quick .plib-q { font-weight: 600; }
+.plib-fam { display: inline-flex; align-items: center; gap: 2px; padding: 0 10px 0 4px; }
+.plib-fam button { background: none; border: 0; color: inherit; font: inherit; cursor: pointer; padding: 4px 2px; }
+.plib-fam.some { border-color: #ff2266; }
+.plib-fam.open { box-shadow: inset 0 -2px 0 #ff2266; }
+.plib-caret { width: 14px; display: inline-block; text-align: center; opacity: .8; }
+.plib-genres { flex-direction: column; align-items: stretch; gap: 4px; }
+.plib-genres[hidden] { display: none; }
+.plib-fgroup { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; padding-left: 10px; border-left: 2px solid var(--line2); }
+.plib-fgroup .sbk-chip { padding: 3px 10px; font-size: 11.5px; }
+.plib-bpm { min-width: 0; width: 64px; padding: 4px 8px; }
+.plib-sel { min-width: 0; width: auto; padding: 4px 8px; }
+.plib-list { overflow: auto; flex: 1; min-height: 0; padding: 6px 0 14px; }
+.plib-sec .plib-grid { overflow: visible; flex: none; padding: 4px 18px 10px; }
+.plib-sec-head { display: flex; align-items: center; gap: 6px; width: 100%; background: none; border: 0; border-bottom: 1px solid var(--line); color: var(--text); padding: 8px 18px 6px; cursor: pointer; text-align: left; font-size: 12.5px; position: sticky; top: 0; z-index: 1; background: var(--panel, #0b121b); }
+.plib-sec-head:hover .plib-caret { opacity: 1; }
+.plib-more { margin: 0 18px 10px; }
+.plib-top { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.plib-top b { flex: 1; min-width: 0; }
+.plib-star { background: none; border: 0; color: var(--dim); cursor: pointer; font-size: 14px; line-height: 1; padding: 0 2px; flex: none; }
+.plib-star.on { color: #ffd24a; }

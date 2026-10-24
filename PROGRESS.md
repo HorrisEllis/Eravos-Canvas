@@ -2,6 +2,13 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.73 🧩 Patterns page: families that fold, quick picks, sections (2026-10-24)
+His words, on the page: "needs to be able to collapse tge catogaries. curves, deep drops. make it powerful." The ~90-genre wall is now 13
+families, folded (caret opens one; the name picks the whole family); quick picks 🕳 Deep drops · 📈 Curves · 🔺 Tension · ⛓ Build → Drop ·
+★ Favourites; types and genres multi-pick (shift-click adds); search words narrow; BPM range; sort; results in folding sections (by type,
+family or genre) with "Show more"; folds, open families and favourites persist. Style unchanged. Spec: eravos.pattern-library.spec
+(addendum 3.73). Tests: tests/p73-patterns-page.test.js.
+
 ## Done — 3.72 🔺 Tension & 💥 drops in the Pattern Library: build → pause → huge drop (2026-10-24)
 His words: "curves, depth, deep bass, huge drop, contrast and a lot of tensnio'". The coder's reading (to confirm: it could also mean one
 song): what the library gives next, measured on the render of each chain.

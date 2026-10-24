@@ -151,47 +151,154 @@
       if (n.b && (n.b.from || n.b.to)) { g.strokeStyle = g.fillStyle; g.lineWidth = 2; g.beginPath(); g.moveTo(x, y - (n.b.from || 0) / span * (H - 10)); g.lineTo(x + w, y - (n.b.to || 0) / span * (H - 10)); g.stroke(); }
       else g.fillRect(x, y, w, Math.max(2, (H - 10) / span - 1)); });
   }
+  // 3.73 — James, 2026-10-24, on the page: "needs to be able to collapse tge catogaries. curves, deep drops. make it powerful."
+  // ~90 genres in one wall → FAMILIES (collapsed, a caret opens one); types and genres pick several at once; quick picks for deep drops,
+  // curves, tension and build → drop; results in sections (by type, family or genre) that fold; sort, BPM range, ★ favourites.
+  // What you pick stays picked the next time the page opens; folds and favourites stay across visits.
+  const FAMILIES = [
+    ['deep', '🕳 Deep drops & tension', /^(hd-|tension-)/],
+    ['dubstep', 'Dubstep', /^(dubstep|riddim|melodic|tearout|deathstep|trapstep|drumstep|wub-|brostep|talker|dancehall-dubstep|reese-vs-wub)/],
+    ['dnb', 'Drum & Bass', /^(dnb|neuro|jungle|breakbeat|reese-roller|halftime-reese)$/],
+    ['house', 'House & Garage', /^(house|deep-house|tech-house|ukg|future-garage|electro|big-room|bass-house|progressive)$/],
+    ['techno', 'Techno & Trance', /^(techno|trance|psytrance|hardstyle)$/],
+    ['trap', 'Trap & Hip-hop', /^(trap|phonk|future-bass|moombahton)$/],
+    ['reggae', 'Reggae & Dancehall', /^(reggae|dancehall|bun-dem)/],
+    ['synth', 'Synth & Dark', /^(synthwave|darkwave|witch-house|hanging-tree)$/],
+    ['chill', 'Chill & Ambient', /^(lofi|ambient|am-)/],
+    ['lost-love', 'Lost Love', /^ll-/], ['for-her', 'For Her', /^her-/], ['odd-couples', 'Odd Couples', /^oc-/], ['synthesis', 'Synthesis', /^syn-/]];
+  const familyOf = (genre) => (FAMILIES.find(f => f[2].test(genre)) || ['other', 'More'])[0];
+  const familyLabel = (id) => (FAMILIES.find(f => f[0] === id) || [0, 'More'])[1];
+  const QUICK = [['deep', '🕳 Deep drops', { family: 'deep' }], ['curve', '📈 Curves', { type: 'curve' }], ['tension', '🔺 Tension', { type: 'tension' }],
+    ['chain', '⛓ Build → Drop', { type: 'chain' }], ['fav', '★ Favourites', { fav: true }]];
+  const SORTS = [['genre', 'Genre'], ['name', 'Name'], ['bpm', 'BPM ↑'], ['bpm-', 'BPM ↓'], ['bars', 'Longest']];
+  const GROUPS = [['type', 'Sections: type'], ['family', 'Sections: family'], ['genre', 'Sections: genre'], ['none', 'No sections']];
+  const STORE = 'eravos.patterns.page', SECTION = 24;
+  const store = { get() { try { return JSON.parse(global.localStorage.getItem(STORE)) || {}; } catch (e) { return {}; } },
+    set(o) { try { global.localStorage.setItem(STORE, JSON.stringify(Object.assign(store.get(), o))); } catch (e) {} } };
+  const pick = { types: new Set(), genres: new Set(), fav: false, q: '', lo: '', hi: '', sort: 'genre', group: 'type' };   // kept while the app runs
+  function matches(p, o) {   // o: { types:Set, genres:Set, fav, favs:Set, words:[], lo, hi }
+    if (o.types.size && !o.types.has(p.type)) return false;
+    if (o.genres.size && !o.genres.has(p.genre)) return false;
+    if (o.fav && !o.favs.has(p.id)) return false;
+    if (o.lo !== '' && p.bpm < +o.lo) return false; if (o.hi !== '' && p.bpm > +o.hi) return false;
+    if (o.words.length) { const hay = (p.name + ' ' + p.genreLabel + ' ' + familyLabel(familyOf(p.genre)) + ' ' + p.type + ' ' + p.tool + ' ' + (p.move || '') + ' ' + (p.preset || '') + ' ' + p.bpm).toLowerCase(); if (!o.words.every(w => hay.includes(w))) return false; }
+    return true;
+  }
   let page = null;
   function open() {
     if (page) { page.close(); return; }
-    const UI = global.UIKit, h = UI.h, lib = all();
-    let type = 'all', genre = 'all', q = '';
+    const UI = global.UIKit, h = UI.h, lib = all(), saved = store.get();
+    const favs = new Set(saved.favs || []), folded = new Set(saved.folded || []), openFam = new Set(saved.openFam || []), more = {};
+    const typeLabel = (t) => (TYPES.find(x => x[0] === t) || [0, t])[1];
     const ov = h('div', { class: 'overlay sbk plib', role: 'dialog', 'aria-label': 'Patterns' });
-    const typeRow = h('div', { class: 'sbk-chips' }), genreRow = h('div', { class: 'sbk-chips plib-genres' }), grid = h('div', { class: 'plib-grid' }), status = h('span', { class: 'sbk-sub' });
-    const search = h('input', { class: 'sbk-q', type: 'search', placeholder: 'find a pattern, a genre, a tool…' });
-    search.addEventListener('input', () => { q = search.value.trim().toLowerCase(); paint(); }); search.addEventListener('keydown', (e) => e.stopPropagation());
+    const quickRow = h('div', { class: 'sbk-chips plib-quick' }), typeRow = h('div', { class: 'sbk-chips' }), famRow = h('div', { class: 'sbk-chips plib-fams' }),
+      genreRow = h('div', { class: 'sbk-chips plib-genres' }), grid = h('div', { class: 'plib-list' }), status = h('span', { class: 'sbk-sub' });
+    const search = h('input', { class: 'sbk-q', type: 'search', placeholder: 'find a pattern, a genre, a tool, a BPM… (words narrow it)', value: pick.q });
+    const num = (ph, k) => { const i = h('input', { class: 'sbk-q plib-bpm', type: 'number', min: '40', max: '220', placeholder: ph, title: 'BPM ' + ph, value: pick[k] });
+      i.addEventListener('input', () => { pick[k] = i.value.trim(); paint(); }); i.addEventListener('keydown', (e) => e.stopPropagation()); return i; };
+    const sel = (opts, k, title) => { const s = h('select', { class: 'sbk-q plib-sel', title }); opts.forEach(([v, l]) => { const o = h('option', { value: v, text: l }); if (pick[k] === v) o.selected = true; s.appendChild(o); });
+      s.addEventListener('change', () => { pick[k] = s.value; paint(); }); return s; };
+    const lo = num('min', 'lo'), hi = num('max', 'hi'), sortSel = sel(SORTS, 'sort', 'sort by'), groupSel = sel(GROUPS, 'group', 'sections');
+    const foldAll = h('button', { class: 'sbk-alt sm', text: 'Fold all', title: 'fold every section (or open them all)' });
+    const clear = h('button', { class: 'sbk-alt sm', text: 'Clear', title: 'pick nothing — every pattern' });
+    search.addEventListener('input', () => { pick.q = search.value.trim().toLowerCase(); paint(); });
+    search.addEventListener('keydown', (e) => e.stopPropagation());
+    clear.onclick = () => { pick.types.clear(); pick.genres.clear(); pick.fav = false; pick.q = search.value = ''; pick.lo = lo.value = ''; pick.hi = hi.value = ''; paint(); };
     const close = () => { stop(); if (io) io.disconnect(); ov.remove(); document.removeEventListener('keydown', key, true); page = null; };
-    const key = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
+    const key = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } else if (e.key === '/' && document.activeElement !== search) { e.preventDefault(); search.focus(); } };
     const io = 'IntersectionObserver' in global ? new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting && e.target._p) { drawCard(e.target, e.target._p); io.unobserve(e.target); } })) : null;
     ov.append(h('div', { class: 'sbk-box' }, [
       h('header', { class: 'sbk-head' }, [h('div', {}, [h('b', { text: '🧩 Patterns' }), h('span', { class: 'sbk-sub', text: ' one idea at a time — hear it, send it to your song. ' + lib.length + ' patterns, from every genre' })]), h('button', { class: 'sbk-x', text: '×', 'aria-label': 'close', onclick: () => close() })]),
-      h('div', { class: 'sbk-filter' }, [typeRow, genreRow, h('div', { class: 'sbk-row2' }, [search, status])]), grid]));
+      h('div', { class: 'sbk-filter' }, [quickRow, typeRow, famRow, genreRow, h('div', { class: 'sbk-row2' }, [search, h('span', { class: 'sbk-sub', text: 'BPM' }), lo, hi, sortSel, groupSel, foldAll, clear, status])]), grid]));
     ov.addEventListener('mousedown', (e) => { if (e.target === ov) close(); });
     document.addEventListener('keydown', key, true);
     const genres = Array.from(new Map(lib.map(p => [p.genre, p.genreLabel])).entries()).sort((a, b) => a[1].localeCompare(b[1]));
+    const fams = FAMILIES.map(f => f[0]).concat(['other']).map(id => ({ id, label: familyLabel(id), genres: genres.filter(g => familyOf(g[0]) === id) })).filter(f => f.genres.length);
+    const toggle = (set, v, e) => { if (e && (e.shiftKey || e.ctrlKey || e.metaKey)) { set.has(v) ? set.delete(v) : set.add(v); } else if (set.has(v) && set.size === 1) set.clear(); else { set.clear(); set.add(v); } };
+    const tog = (set, v) => { set.has(v) ? set.delete(v) : set.add(v); };
+    const chip = (text, on, fn, cls, title) => { const b = h('button', { class: 'sbk-chip' + (cls ? ' ' + cls : '') + (on ? ' on' : ''), text, title: title || '' }); b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.onclick = (e) => { fn(e); paint(); }; return b; };
+    const opts = (over) => Object.assign({ types: pick.types, genres: pick.genres, fav: pick.fav, favs, words: pick.q.split(/\s+/).filter(Boolean), lo: pick.lo, hi: pick.hi }, over);
+    const count = (over) => lib.reduce((n, p) => n + (matches(p, opts(over)) ? 1 : 0), 0);
+    const famOn = (f) => f.genres.every(g => pick.genres.has(g[0])), famSome = (f) => f.genres.some(g => pick.genres.has(g[0]));
+    function card(p) {
+      const cv = h('canvas', { class: 'plib-draw', 'aria-hidden': 'true' }); cv._p = p; if (io) io.observe(cv); else drawCard(cv, p);
+      const hear = h('button', { class: 'sbk-alt sm', text: '▶', title: 'hear it — rendered off the canvas, nothing changes' });
+      hear.onclick = async () => { if (playing && playing.id === p.id) { stop(); return; } hear.textContent = '…'; const ok = await play(p, () => { hear.textContent = '▶'; }); hear.textContent = ok ? '■' : '▶'; if (ok === null) status.textContent = 'no sound came out of “' + p.name + '”'; };
+      const sendB = h('button', { class: 'sbk-alt sm', text: '→ Timeline', title: !!p.curve ? 'adds this curve to the track that plays this kind of tool (or a new track with it)' : 'adds it after what is on the track that plays this kind of tool (or a new track with it), in your song’s key' });
+      sendB.onclick = () => { const r = send(p); status.textContent = r ? '“' + p.name + '” → the Timeline, bar ' + r.bar : 'could not send it'; };
+      const star = h('button', { class: 'plib-star' + (favs.has(p.id) ? ' on' : ''), text: favs.has(p.id) ? '★' : '☆', title: 'keep it in ★ Favourites', 'aria-label': 'favourite' });
+      star.onclick = () => { tog(favs, p.id); store.set({ favs: [...favs] }); star.classList.toggle('on', favs.has(p.id)); star.textContent = favs.has(p.id) ? '★' : '☆'; if (pick.fav) paint(); };
+      return h('div', { class: 'plib-card', style: { '--acc': p.type === 'drop' ? '#ff2266' : !!p.curve ? '#ffd24a' : '#00d4ff' } }, [
+        h('div', { class: 'plib-top' }, [h('b', { text: p.name }), star]), h('small', { text: typeLabel(p.type) + ' · ' + p.genreLabel + ' · ' + p.bars + (p.bars > 1 ? ' bars' : ' bar') + ' · ' + p.bpm + ' BPM' }),
+        cv, h('div', { class: 'plib-actions' }, [hear, sendB, h('span', { class: 'plib-tool', text: ((F().def(p.tool) || {}).label || p.tool) + (p.preset ? ' · ' + p.preset : '') })])]);
+    }
     function paint() {
-      const inType = (p) => type === 'all' || p.type === type, inGenre = (p) => genre === 'all' || p.genre === genre;
-      typeRow.innerHTML = ''; [['all', 'All']].concat(TYPES).forEach(([id, label]) => { const n = lib.filter(p => (id === 'all' || p.type === id) && inGenre(p)).length; if (!n && id !== 'all') return;
-        const b = h('button', { class: 'sbk-chip' + (type === id ? ' on' : ''), text: label + ' ' + n }); b.onclick = () => { type = id; paint(); }; typeRow.appendChild(b); });
-      genreRow.innerHTML = ''; [['all', 'Every genre']].concat(genres).forEach(([id, label]) => { const n = lib.filter(p => (id === 'all' || p.genre === id) && inType(p)).length; if (!n) return;
-        const b = h('button', { class: 'sbk-chip' + (genre === id ? ' on' : ''), text: label + ' ' + n }); b.onclick = () => { genre = id; paint(); }; genreRow.appendChild(b); });
-      const list = lib.filter(p => inType(p) && inGenre(p) && (!q || (p.name + ' ' + p.genreLabel + ' ' + p.type + ' ' + p.tool + ' ' + (p.move || '')).toLowerCase().includes(q)));
-      grid.innerHTML = ''; status.textContent = list.length + ' shown';
-      list.slice(0, 240).forEach(p => {
-        const cv = h('canvas', { class: 'plib-draw', 'aria-hidden': 'true' }); cv._p = p; if (io) io.observe(cv); else drawCard(cv, p);
-        const hear = h('button', { class: 'sbk-alt sm', text: '▶', title: 'hear it — rendered off the canvas, nothing changes' });
-        hear.onclick = async () => { if (playing && playing.id === p.id) { stop(); return; } hear.textContent = '…'; const ok = await play(p, () => { hear.textContent = '▶'; }); hear.textContent = ok ? '■' : '▶'; if (ok === null) status.textContent = 'no sound came out of “' + p.name + '”'; };
-        const sendB = h('button', { class: 'sbk-alt sm', text: '→ Timeline', title: !!p.curve ? 'adds this curve to the track that plays this kind of tool (or a new track with it)' : 'adds it after what is on the track that plays this kind of tool (or a new track with it), in your song’s key' });
-        sendB.onclick = () => { const r = send(p); status.textContent = r ? '“' + p.name + '” → the Timeline, bar ' + r.bar : 'could not send it'; };
-        grid.appendChild(h('div', { class: 'plib-card', style: { '--acc': p.type === 'drop' ? '#ff2266' : !!p.curve ? '#ffd24a' : '#00d4ff' } }, [
-          h('b', { text: p.name }), h('small', { text: (TYPES.find(t => t[0] === p.type) || [0, p.type])[1] + ' · ' + p.genreLabel + ' · ' + p.bars + (p.bars > 1 ? ' bars' : ' bar') + ' · ' + p.bpm + ' BPM' }),
-          cv, h('div', { class: 'plib-actions' }, [hear, sendB, h('span', { class: 'plib-tool', text: ((F().def(p.tool) || {}).label || p.tool) + (p.preset ? ' · ' + p.preset : '') })])]));
+      // quick picks
+      quickRow.innerHTML = ''; quickRow.appendChild(h('span', { class: 'plib-lbl', text: 'Quick' }));
+      QUICK.forEach(([id, label, q]) => {
+        const f = q.family && fams.find(x => x.id === q.family);
+        const on = q.fav ? pick.fav : q.type ? pick.types.size === 1 && pick.types.has(q.type) : !!f && famOn(f) && pick.genres.size === f.genres.length;
+        const n = q.fav ? favs.size : q.type ? lib.filter(p => p.type === q.type).length : f ? lib.filter(p => familyOf(p.genre) === f.id).length : 0;
+        if (!n && !q.fav) return;
+        quickRow.appendChild(chip(label + ' ' + n, on, () => {
+          if (q.fav) { pick.fav = !pick.fav; return; }
+          if (q.type) { if (on) pick.types.clear(); else { pick.types.clear(); pick.types.add(q.type); } return; }
+          pick.genres.clear(); if (!on) { f.genres.forEach(g => pick.genres.add(g[0])); openFam.add(f.id); store.set({ openFam: [...openFam] }); }
+        }, 'plib-q', q.fav ? 'only the ones you starred' : q.type ? 'only ' + label.slice(2).toLowerCase() : 'Floor Falls, Heavy Drops and the tension studies'));
       });
-      if (list.length > 240) grid.appendChild(h('p', { class: 'sbk-note', text: (list.length - 240) + ' more — pick a type or a genre, or search' }));
+      // types (click = only this one · shift/ctrl-click = add it)
+      typeRow.innerHTML = ''; typeRow.appendChild(h('span', { class: 'plib-lbl', text: 'Type' }));
+      typeRow.appendChild(chip('All ' + count({ types: new Set() }), !pick.types.size, () => pick.types.clear()));
+      TYPES.forEach(([id, label]) => { const n = count({ types: new Set([id]) }); if (!n && !pick.types.has(id)) return;
+        typeRow.appendChild(chip(label + ' ' + n, pick.types.has(id), (e) => toggle(pick.types, id, e), '', 'click: only these · shift-click: add these too')); });
+      // families: the name picks the whole family, the caret opens its genres
+      famRow.innerHTML = ''; famRow.appendChild(h('span', { class: 'plib-lbl', text: 'Genre' }));
+      famRow.appendChild(chip('Every genre', !pick.genres.size, () => pick.genres.clear()));
+      fams.forEach(f => {
+        const gs = new Set(f.genres.map(g => g[0])), n = count({ genres: gs }); if (!n && !famSome(f)) return;
+        const isOpen = openFam.has(f.id), sel = f.genres.filter(g => pick.genres.has(g[0])).length;
+        const name = h('button', { class: 'plib-fam-name', text: f.label + ' ' + n + (sel && !famOn(f) ? ' · ' + sel + '/' + f.genres.length : ''), title: 'click: only this family · shift-click: add it' });
+        name.onclick = (e) => { const add = e.shiftKey || e.ctrlKey || e.metaKey, full = famOn(f); if (!add) { const only = full && pick.genres.size === gs.size; pick.genres.clear(); if (!only) gs.forEach(g => pick.genres.add(g)); } else gs.forEach(g => full ? pick.genres.delete(g) : pick.genres.add(g)); paint(); };
+        const caret = h('button', { class: 'plib-caret', text: isOpen ? '▾' : '▸', title: (isOpen ? 'fold ' : 'open ') + f.label + ' (' + f.genres.length + ' genres)', 'aria-expanded': isOpen ? 'true' : 'false' });
+        caret.onclick = () => { tog(openFam, f.id); store.set({ openFam: [...openFam] }); paint(); };
+        const g = h('span', { class: 'sbk-chip plib-fam' + (famOn(f) ? ' on' : famSome(f) ? ' some' : '') + (isOpen ? ' open' : ''), 'data-fam': f.id }, [caret, name]);
+        famRow.appendChild(g);
+      });
+      genreRow.innerHTML = ''; genreRow.hidden = true;
+      fams.filter(f => openFam.has(f.id)).forEach(f => {
+        const box = h('div', { class: 'plib-fgroup', 'data-fam': f.id }, [h('span', { class: 'plib-lbl', text: f.label })]);
+        f.genres.forEach(([id, label]) => { const n = count({ genres: new Set([id]) }); if (!n && !pick.genres.has(id)) return;
+          box.appendChild(chip((label.indexOf(f.label + ' · ') === 0 ? label.slice(f.label.length + 3) : label) + ' ' + n, pick.genres.has(id), (e) => toggle(pick.genres, id, e), '', 'click: only this · shift-click: add it')); });
+        genreRow.appendChild(box); genreRow.hidden = false;
+      });
+      // the list, in sections that fold
+      const o = opts(), list = lib.filter(p => matches(p, o)), byName = (a, b) => a.name.localeCompare(b.name);
+      const cmp = { genre: (a, b) => a.genreLabel.localeCompare(b.genreLabel) || byName(a, b), name: byName, bpm: (a, b) => a.bpm - b.bpm || byName(a, b), 'bpm-': (a, b) => b.bpm - a.bpm || byName(a, b), bars: (a, b) => b.bars - a.bars || byName(a, b) }[pick.sort] || byName;
+      list.sort(cmp);
+      const keyOf = { type: (p) => p.type, family: (p) => familyOf(p.genre), genre: (p) => p.genre, none: () => 'all' }[pick.group] || ((p) => p.type);
+      const labelOf = { type: typeLabel, family: familyLabel, genre: (g) => (genres.find(x => x[0] === g) || [0, g])[1], none: () => 'Every pattern' }[pick.group] || typeLabel;
+      const order = pick.group === 'type' ? TYPES.map(t => t[0]) : pick.group === 'family' ? fams.map(f => f.id) : null;
+      const sections = new Map(); list.forEach(p => { const k = keyOf(p); if (!sections.has(k)) sections.set(k, []); sections.get(k).push(p); });
+      const keys = [...sections.keys()]; if (order) keys.sort((a, b) => order.indexOf(a) - order.indexOf(b)); else if (pick.group === 'genre') keys.sort((a, b) => labelOf(a).localeCompare(labelOf(b)));
+      grid.innerHTML = ''; status.textContent = list.length + ' shown · ' + keys.length + (keys.length === 1 ? ' section' : ' sections');
+      const allFolded = keys.length && keys.every(k => folded.has(pick.group + ':' + k)); foldAll.textContent = allFolded ? 'Open all' : 'Fold all';
+      foldAll.onclick = () => { keys.forEach(k => allFolded ? folded.delete(pick.group + ':' + k) : folded.add(pick.group + ':' + k)); store.set({ folded: [...folded] }); paint(); };
+      keys.forEach(k => {
+        const items = sections.get(k), fk = pick.group + ':' + k, isF = folded.has(fk), shown = more[fk] || SECTION;
+        const head = h('button', { class: 'plib-sec-head', 'aria-expanded': isF ? 'false' : 'true' }, [h('span', { class: 'plib-caret', text: isF ? '▸' : '▾' }), h('b', { text: labelOf(k) }), h('span', { class: 'sbk-sub', text: ' ' + items.length })]);
+        head.onclick = () => { tog(folded, fk); store.set({ folded: [...folded] }); paint(); };
+        const sec = h('section', { class: 'plib-sec' + (isF ? ' folded' : ''), 'data-sec': k }, [head]);
+        if (!isF) {
+          const g = h('div', { class: 'plib-grid' }); items.slice(0, shown).forEach(p => g.appendChild(card(p))); sec.appendChild(g);
+          if (items.length > shown) { const m = h('button', { class: 'sbk-alt sm plib-more', text: 'Show ' + Math.min(SECTION * 2, items.length - shown) + ' more of ' + (items.length - shown) }); m.onclick = () => { more[fk] = shown + SECTION * 2; paint(); }; sec.appendChild(m); }
+        }
+        grid.appendChild(sec);
+      });
+      if (!list.length) grid.appendChild(h('p', { class: 'sbk-note', text: 'nothing matches — Clear, or pick less' }));
     }
     paint(); document.body.appendChild(ov); search.focus();
-    page = { close };
+    page = { close, paint };
     return page;
   }
-  global.PatternLibrary = { addSource: (fn) => { if (typeof fn === 'function') { sources.push(fn); LIB = null; } }, all, types: TYPES.map(t => ({ id: t[0], label: t[1] })), get: (id) => all().find(p => p.id === id) || null, send, render, play, stop, open, rebuild: () => { LIB = null; return all(); }, fromGenre };
+  global.PatternLibrary = { addSource: (fn) => { if (typeof fn === 'function') { sources.push(fn); LIB = null; } }, all, types: TYPES.map(t => ({ id: t[0], label: t[1] })), get: (id) => all().find(p => p.id === id) || null, send, render, play, stop, open, rebuild: () => { LIB = null; return all(); }, fromGenre, families: FAMILIES.map(f => ({ id: f[0], label: f[1] })), familyOf, matches };
 })(typeof window !== 'undefined' ? window : globalThis);
