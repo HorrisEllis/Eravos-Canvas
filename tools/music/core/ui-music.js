@@ -260,12 +260,24 @@
   function knobMenu(e, view, c) {
     closeKnobMenu();
     const K = view.K, F = global.OrganismFactory, id = view.instanceId, hk = knobHook(view.descriptor, c.key);
-    if (!hk) return;   // a setting nothing can move (texts, files, or a tool without sound)
+    if (!hk && !(global.MusicMotion && global.MusicMotion.performs(view.descriptor))) return;   // a setting nothing can move (texts, files, or a tool without sound) — unless the tool moves its own (3.71)
     const into = K.wires.list().filter(w => w.dst.instanceId === id && w.dst.hookId === hk);
-    const here = K.registry.list().map(x => F.handle(x.instance_id)).filter(x => x && !x.unmounted && x.instanceId !== id && modOut(x.def) && !into.some(w => w.src.instanceId === x.instanceId));
+    const here = !hk ? [] : K.registry.list().map(x => F.handle(x.instance_id)).filter(x => x && !x.unmounted && x.instanceId !== id && modOut(x.def) && !into.some(w => w.src.instanceId === x.instanceId));
     const item = (text, hint, fn, cls) => { const b = h('button', { class: 'km-item' + (cls ? ' ' + cls : ''), text, title: hint || '' }); b.addEventListener('click', (ev) => { ev.stopPropagation(); closeKnobMenu(); fn(); }); return b; };
-    menuEl = h('div', { class: 'km', role: 'menu', 'aria-label': 'move ' + (c.label || c.key) }, [h('div', { class: 'km-h', text: 'Move “' + (c.label || c.key) + '” with' })]
-      .concat(MOVERS.filter(([t]) => F.def(t)).map(([t, l, why]) => item('＋ ' + (F.def(t).icon || '') + ' ' + l, why + ' — opens beside this window, wired to this knob', () => addMover(K, id, c.key, t))))
+    // 3.71 a tool with its own motion (core/motion.js): move the knob right here, or put it on a macro — no new windows
+    const MM = global.MusicMotion, own = [];
+    if (MM && MM.performs(view.descriptor) && (c.type === 'number' || c.type === 'integer') && !c.perform) {
+      const ms = MM.cleanMotion(view.state._motion), mine = ms.find(m => m.key === c.key), setM = (arr) => view.emit('config_change', { key: '_motion', value: arr });
+      const put = (shape, beats, label, why) => item(label, why, () => setM(ms.filter(m => m.key !== c.key).concat([{ key: c.key, shape, beats, depth: 0.5, phase: 0 }])));
+      own.push(h('div', { class: 'km-s', text: 'in this tool (see its Motion tab)' }), put('sine', 4, '∿ Move it — smooth, every bar', 'a sine around where it is, one cycle a bar'),
+        put('random', 1, '⚄ Move it — a new place every beat', 'random steps on each beat'), put('follow', 4, '◐ Move it with the mix', 'louder mix → further'));
+      if (mine) own.push(item('× Stop its movement', 'the knob is its own value again', () => setM(ms.filter(m => m.key !== c.key))));
+      const pf = MM.cleanPerform(view.state._perform);
+      MM.MACROS.forEach((mk, i) => { if (!(c.key in pf.map[i])) own.push(item('◇ On ' + pf.names[i], 'this macro turns it (set how far in Perform)', () => { pf.map[i][c.key] = 0.5; view.emit('config_change', { key: '_perform', value: pf }); })); });
+      if (hk) own.push(h('div', { class: 'km-s', text: 'or open a mover' }));
+    }
+    menuEl = h('div', { class: 'km', role: 'menu', 'aria-label': 'move ' + (c.label || c.key) }, [h('div', { class: 'km-h', text: 'Move “' + (c.label || c.key) + '” with' })].concat(own)
+      .concat(MOVERS.filter(([t]) => hk && F.def(t)).map(([t, l, why]) => item('＋ ' + (F.def(t).icon || '') + ' ' + l, why + ' — opens beside this window, wired to this knob', () => addMover(K, id, c.key, t))))
       .concat(here.length ? [h('div', { class: 'km-s', text: 'on the canvas' })].concat(here.map(x => item('⇠ ' + (x.def.icon || '') + ' ' + x.def.label, 'wire it to this knob', () => moveWith(K, id, c.key, x.instanceId)))) : [])
       .concat(into.length ? [h('div', { class: 'km-s', text: 'moving it now' })].concat(into.map(w => { const sr = F.handle(w.src.instanceId); return item('× stop ' + (sr ? sr.def.label : 'it'), 'unwire it: the knob is its own value again', () => K.wires.remove(w.wire_id, 'user'), 'stop'); })) : []));
     doc.body.appendChild(menuEl);

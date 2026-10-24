@@ -2,6 +2,25 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.71 Motion + Perform (shared) · Groove 1.1, the pilot (2026-10-24)
+His words: "Bass and drums forge. Fix box. Drop builder. Breath. Eq. Side chain. Embodyment. Recursive spectra. Automation.
+Baseline. Chords. Groove. All need more dynamic control and a better ui." — dynamic = movement over time, variation and feel,
+performance controls, deeper sound controls, "all the above while not cluttering or making it overwhelming". One tool first.
+- **Shared, opt-in (`perform: true`)** — core/motion.js + core/motion-ui.js:
+  - MOTION: any knob moves on its own — sine, triangle, saw down/up, square, random, smooth random, steps (draw 2–16 bars), follow
+    the mix — rate in bars/beats synced to the song position, depth (± half its range), phase. No windows, no wires. Right-click
+    a knob: move it right there, or put it on a macro. The knob keeps its own value; the movement is drawn around it.
+  - PERFORM: four macro knobs (real knobs: MIDI learn, automation lanes, presets, knob inputs), each turning any knobs by its own
+    amount (chips, drag the %; or Learn: turn a knob and it joins as far as you turned it); an XY pad plays two macros.
+  - Window: tabs (a .uk-seg) so the main view stays clean — the tool's own tabs, then Motion and Perform.
+- **Groove 1.1**: Play (the painting; click a row name to mute, Alt-click solo) · Feel (humanize, accent, rolls, fill every N,
+  evolve every N, 1- or 2-bar loop; per row mute / solo / level / chance / pad) · Motion · Perform. All neutral by default — the
+  same notes as 1.0.
+- Tests: p71-motion (shapes, opt-in, a synced sine on ENERGY, macros, the window), Groove 1.1 (defaults identical, rows, humanize,
+  accent, rolls, fill, evolve, loop).
+- Next, after his OK on Groove: the same for Bass Forge, Drum Forge, FX Box, Drop Builder, Breath, EQ, Sidechain, Embodiment,
+  Recursive Spectra, Automation, Bassline, Chords.
+
 ## Done — 3.70 Floor Falls songs · right-click menu · his #5901 session optimized (2026-10-24, map specs/eravos.phase70-map.spec)
 His words: "i mean it sounds good to me, but any optimization the better." · "also more songs like floor falls out. like the part after
 24. bass drops, curves. describe it" · "more floor falls out and raven drop. curves and deep bass drops," · "also right clikc on the canvas
