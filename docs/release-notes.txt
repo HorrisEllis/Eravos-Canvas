@@ -1,3 +1,29 @@
+ERAVOS v0.1.0 — first tagged release (2026-10-24)
+
+The first numbered release. (Builds before this were named by their map phase, e.g. 3.36.0-alpha; from here on
+releases are v0.x.y.) Run it the same way: double-click "Open ERAVOS.html", or Start ERAVOS.bat with Node.js, or
+build ERAVOS.exe with "Build ERAVOS.exe.bat".
+
+What is in it
+- A canvas of instruments, effects and arrangement tools: Timeline with a piano roll (per-note settings, per-note
+  curves with Bézier handles, note behaviours, pitch bends), Song Recorder (export WAV/FLAC/AIFF/MP3/Opus and stems,
+  with tags and a cover — autofilled, or upload your own image), Session, Mixer.
+- Suites — tools that come as a system, each with its own page and macros: Heavy Drops, Wub Lab, Synthesis Lab,
+  Synthwave, Gothic, Sound System, Xen.
+- The Wobble Bass family: Wobble Bass, Wub Osc / Filter / Rate (speed bend, glide, rate input) / Sub, Squash (three-
+  band OTT-style squash), Destroyer, Drop Builder, Sub Engine.
+- Songbooks: songs by genre, including Floor Falls (8 deep-drop songs) and Heavy Drops; a pattern library.
+- Right-click menus on the canvas and on every tool.
+- Reactive colours (Options → Reactive colours): the accent colours follow the sound — the app's with the mix, each
+  tool's with its own output; every colour keeps its own hue.
+- Drawn icons throughout; tool and suite pages open from + Add.
+
+Known limits
+- Per-note curves are monophonic-focused: overlapping notes on one instrument share its knobs.
+- Opus exports carry no tags.
+
+------------------------------------------------------------------------------------------------------------------
+
 ERAVOS 3.36.0-alpha — one zip (everything except the unchanged Electron runtime)
 
 FASTEST: double-click "Open ERAVOS.html" (use Edge or Chrome). Nothing to install. Your StarryPad works there.
