@@ -152,7 +152,7 @@
         for (let b = 0; b < sec.bars; b++) {
           const deg = prog[b % prog.length], o = b * 16, add = (arr) => arr.forEach(x => notes.push(Object.assign({}, x, { s: x.s + o })));
           // 3.34.2: a genre can write its own bars too (G.bar) — same contract as X.bar; X wins, then the genre, then the stock bar below
-          const cx = { role: P.role, P, sec, kind, b, deg, r, e, key, prog, partKey: p, motif, G };
+          const cx = { role: P.role, P, sec, kind, b, deg, r, e, key, prog, partKey: p, motif, G, seed };   // 3.70: the seed too (a genre may pick a move per song)
           let own = X && X.bar ? X.bar(cx) : null;
           if (!own && G.bar) own = G.bar(cx);
           if (own) add(own);
@@ -180,7 +180,7 @@
     // G.curves(sections, r) → [{ part, key, points: [[bar, value]…], osc? }]. Genres without it are untouched.
     if (G.curves) {
       let b = 1; const sections = form.map(sec => { const x = { name: sec.name, kind: sec.kind || sec.name.replace(/\s*\d+$/, ''), bar: b, bars: sec.bars }; b += sec.bars; return x; });
-      (G.curves(sections, r) || []).forEach(c => { if (!G.parts[c.part]) return;
+      (G.curves(sections, r, { key, prog, bpm, seed }) || []).forEach(c => { if (!G.parts[c.part]) return;
         steps.push({ op: 'event', target: 'tl', topic: 'lane_add', payload: Object.assign({ kind: 'auto', target: '@' + c.part, key: c.key, points: c.points, name: c.name }, c.osc ? { osc: c.osc } : {}) }); });
     }
     // 3.41: a genre with `voice` sings with her recordings (data/her-voice.js): the timeline's audio goes through a vocal

@@ -2,6 +2,41 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.70 Floor Falls songs · right-click menu · his #5901 session optimized (2026-10-24, map specs/eravos.phase70-map.spec)
+His words: "i mean it sounds good to me, but any optimization the better." · "also more songs like floor falls out. like the part after
+24. bass drops, curves. describe it" · "more floor falls out and raven drop. curves and deep bass drops," · "also right clikc on the canvas
+for context menu. tool dependant context menu" · "merge that branch" (claude/nice-dirac-t64qeo → main, fast-forward, 45dd40c).
+- **Found, measured:** every Heavy Drops song's sub is pitched where nobody can hear it.
+  - Sub Engine presets play Octave −2, and the genre writes the sub at octave 1, so the fundamental lands at 8.7–23 Hz, under the
+    tool's own 24 Hz floor.
+  - In his #5901 session a third of the sub's energy sat under 20 Hz, and only the Phantom overtones were heard.
+  - Heavy Drops is NOT changed (his song; offered). His session is optimized as a copy:
+    - Sub Octave 0, level 0.20, and the Wub Lab chain removed (it gets no notes; null-tested: the mix measures the same without it).
+    - In the drop: energy under 20 Hz −8.4 → −29.2 dB, the real sub (30–60 Hz) −4.7 → −2.3 dB, the master's clipper 0.07 → 0.06 %.
+- **🕳 Floor Falls (deep drops)**: 8 songs on the 💥 Heavy Drops shelf.
+  - Built like Floor Falls Out after bar 24: the pause, then the half-time drop with a wobble rate per note, slides, a speed-up into
+    each turn, and the swinging Wobble depth curve.
+  - Drop 2 is Raven Drop's: the Reese "Her Drop" talks, its filter opens every phrase (a curve), and a slow pitch ripple runs on it
+    ("Ripples", after his song).
+  - The sub plays its real note, and no dive goes under ~18 Hz.
+  - A move per song in the pause: falls · stairs (four steps down) · freefall (Pitch curves bend the Wobble, the Reese and the pad down
+    together) · rises (out of the floor into the hit).
+  - His own dark Supersaw pad from his fix of #5901.
+  - Pause-to-drop measured against Floor Falls Out: under 20 Hz 6.4 % → 0.9–3.0 %, 1.4–2.4 dB fuller, the clipper no busier (drop 2
+    with the Reese: 0.17 %).
+  - Song Engine: cx.seed and curves(…, { key, prog, bpm, seed }), so a genre can pick a move per song.
+- **Right-click menu** (canvas/runtime/context-menu.js, domain-free):
+  - On the canvas: ＋ Add a tool here (it lands where you clicked), ⊞ Tidy, ⤢ Show everything, ↶ ↷ (with what they undo), ■ Stop all.
+  - On a window: the tool's own items first, then its presets, ⧉ Duplicate (same settings), 📖 page, ⚙ settings, ⤢ expand, fold,
+    × close.
+  - Music tools add ▶ Hear it, ■ let go / quiet, 🎲 a random preset.
+  - The timeline adds, over a clip: ✂ Split here, ✂ In half, ⧉ Repeat, 🎹 Edit its notes, 🗑 Delete; plus ✂ Split at the frame,
+    ⛶ full screen, ⤢ Fit, ⤓ WAV / MIDI.
+  - Knobs keep "Move with", curve and marker lanes keep right-click-to-delete, and text fields keep the browser's menu.
+- Tests: tests/p70-floor-falls.test.js (5) · tests/p70-context-menu.test.js (4).
+- To confirm: "maybe? bass synthesis modulation synthewave" — read as tool categories in ＋ Add (Bass exists since the merged branch;
+  Synthwave would gather Retro Poly and the 80s tools). Not built.
+
 ## Done — 3.69 Reactive colours that react · suites in the app's own look · Bun Dem wobbles gone (2026-10-24)
 - **Reactive colours** (⋯ Options → ◐ Reactive colours): they were measuring the sound fine but only drew a faint ring and a 10 %
   haze, in a violet/teal hue sweep. Now the accent colours themselves move: the app's palette (cyan, green, pink, violet, amber, red)
