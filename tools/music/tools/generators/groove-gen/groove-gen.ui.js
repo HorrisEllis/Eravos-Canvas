@@ -1,4 +1,4 @@
-/* eravos.groove-gen UI — 1.1 (3.71): four tabs so the painting stays clean.
+/* eravos.groove-gen UI — 1.1 (3.71): the window is the painting; its page adds tabs (Feel here, Motion and Perform from the domain).
  *   PLAY     the density canvas from EDM Lab (paint where the rhythm is busy; right-click erases; click a row's name to mute it,
  *            Alt-click to solo it), style, ENERGY, swing, seed
  *   FEEL     humanize, accent, rolls, fill, evolve, loop — and each drum row: mute, solo, level, chance, which pad it plays
@@ -79,11 +79,8 @@ OrganismFactory.reg('eravos.groove-gen', function (view) {
     rowBox,
   ]);
 
-  const tabs = UI.toolTabs(view, [
-    { id: 'play', label: 'Play', el: play, hint: 'paint the rhythm' },
-    { id: 'feel', label: 'Feel', el: feel, hint: 'humanize, accents, rolls, fills, evolve — and each drum row', onShow: paintRows },
-    { id: 'motion', label: 'Motion', el: UI.motionPanel(view).el, hint: 'knobs that move on their own' },
-    { id: 'perform', label: 'Perform', el: UI.performPanel(view).el, hint: 'four macros and an XY pad' },
-  ]);
-  view.root.append(tabs.el);
+  // the window is the tool: Play. Feel is a tab on its page (with Motion and Perform) — his call, 3.71
+  view.root.append(play);
+  if (view.pageTab) view.pageTab('feel', 'Feel', feel, 'sliders-vertical');
+  paintRows();
 });

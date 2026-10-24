@@ -39,19 +39,26 @@ describe('P71 · motion and perform, built into a tool', () => {
     assert.equal(c.params.base('energy'), 0.4, 'its own value stays');
     const s = c.serialize(); assert.equal(s.params._perform.names[0], 'Push', 'saved with the tool'); assert.equal(s.params.m1, 0.5);
   });
-  it('the window: four tabs, Motion adds a movement from its list, Perform has the pad and four macros with chips', async () => {
+  it('the PAGE: horizontal tabs (Panel, Feel, Motion, Perform …); Panel shows the tool live before it is on the canvas; Add to canvas keeps what you set', async () => {
     const host = document.getElementById('wmhost'); if (!CanvasWM.world) { CanvasWM.init(host, Kernel); WireSystem.init(Kernel); OrganismFactory.boot(Kernel); }
-    const id = OrganismFactory.spawn('eravos.groove-gen', { x: 40, y: 40 }); await TH.sleep(30);
+    OrganismFactory.clearAll && OrganismFactory.clearAll(Kernel);
+    const before = Kernel.registry.list().length;
+    ToolPage.open('eravos.groove-gen', { K: Kernel }); await TH.sleep(80);
     try {
-      const w = CanvasWM.windowOf(id), tabs = [...w.querySelectorAll('.mo-tabs button')].map(b => b.textContent);
-      assert.deepEqual(tabs, ['Play', 'Feel', 'Motion', 'Perform']);
-      w.querySelector('.mo-tabs button:nth-child(3)').click(); await TH.sleep(10);
-      const sel = w.querySelector('[data-tab="motion"] .mo-head select'); sel.value = 'swing'; sel.dispatchEvent(new Event('change')); await TH.sleep(30);
-      assert.equal(ctxOf(id).params.get('_motion')[0].key, 'swing', 'a movement was added'); assert.ok(w.querySelector('[data-tab="motion"] .mo-row'), 'and shown');
-      w.querySelector('.mo-tabs button:nth-child(4)').click(); await TH.sleep(10);
-      assert.ok(w.querySelector('.mo-xy'), 'the XY pad'); assert.equal(w.querySelectorAll('.mo-mrow').length, 4, 'four macros');
-      const add = w.querySelector('.mo-mrow .mo-add'); add.value = 'energy'; add.dispatchEvent(new Event('change')); await TH.sleep(30);
-      assert.equal(ctxOf(id).params.get('_perform').map[0].energy, 0.5); assert.ok(w.querySelector('.mo-chip'), 'a chip for it');
-    } finally { OrganismFactory.close(id); }
+      const nav = document.querySelector('.tp-nav'), tabs = [...nav.querySelectorAll('.tp-tab')];
+      assert.deepEqual(tabs.slice(0, 4).map(b => b.textContent.trim()), ['Panel', 'Feel', 'Motion', 'Perform']);
+      const r0 = tabs[0].getBoundingClientRect(), r1 = tabs[1].getBoundingClientRect(); assert.near(r0.top, r1.top, 1, 'one row'); assert.gt(r1.left, r0.left, 'side by side');
+      assert.ok(r0.width < nav.getBoundingClientRect().width / 2, 'sized to their names, not full width');
+      const panel = document.querySelector('.tp-sec[data-sec="panel"]'); assert.ok(!panel.hidden && panel.querySelector('.gg-map'), 'Panel open by default, the painting in it');
+      assert.ok(!CanvasWM.windowOf || !document.querySelector('.wm-win[data-organism="eravos.groove-gen"]'), 'nothing added to the canvas yet');
+      // set something on the page, then add it
+      tabs[2].click(); await TH.sleep(20); const sel = document.querySelector('.tp-sec[data-sec="motion"] .mo-head select'); sel.value = 'swing'; sel.dispatchEvent(new Event('change')); await TH.sleep(30);
+      document.querySelector('.tp-act .tp-btn.pri').click(); await TH.sleep(80);
+      const win = document.querySelector('.wm-win[data-organism="eravos.groove-gen"]'); assert.ok(win, 'now on the canvas');
+      const id = win.dataset.instance; assert.equal(OrganismFactory.handle(id).ctx.params.get('_motion')[0].key, 'swing', 'what you set on the page came along');
+      assert.ok(!win.querySelector('.mo-tabs'), 'the window has no tabs of its own: it is the tool');
+      OrganismFactory.close(id);
+    } finally { ToolPage.close(); }
+    await TH.sleep(30); assert.equal(Kernel.registry.list().length, before, 'closing the page leaves nothing behind');
   });
 });

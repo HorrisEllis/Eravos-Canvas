@@ -1,6 +1,6 @@
 /* ERAVOS music — motion-ui.js · 3.71 the window side of core/motion.js: tabs, the Motion panel and the Perform panel.
  * Built from the app's own controls (knobs, .uk-seg, .uk-btn, selects) so a tool that opts in looks like every other tool.
- *   UI.toolTabs(view, tabs)   a tab bar (a .uk-seg) over panes — the tool's main view stays clean, the extras sit one click away
+ *   UI.pageTabsFor(view)      the Motion and Perform tabs a tool's page shows (canvas/runtime/tool-page.js asks for them)
  *   UI.motionPanel(view)      the knobs that move on their own: shape · rate · depth · phase, a live picture of each, steps editor
  *   UI.performPanel(view)     an XY pad + the four macro knobs; each macro lists the knobs it turns (chips), Learn by turning one */
 (function (global) {
@@ -161,5 +161,10 @@
     return { el, learn: setLearn };
   }
 
-  UI.extend({ toolTabs, motionPanel, performPanel });
+  // 3.71 his call: these live on the tool's PAGE as tabs (horizontal, beside Panel) — the window stays the tool itself
+  const pageTabsFor = (view) => (M() && M().performs(view.descriptor)) ? [
+    { id: 'motion', label: 'Motion', ic: 'activity', sub: '· knobs that move on their own, in time with the song', el: motionPanel(view).el },
+    { id: 'perform', label: 'Perform', ic: 'gauge', sub: '· four macros and an XY pad', el: performPanel(view).el },
+  ] : [];
+  UI.extend({ toolTabs, motionPanel, performPanel, pageTabsFor });
 })(typeof window !== 'undefined' ? window : globalThis);
