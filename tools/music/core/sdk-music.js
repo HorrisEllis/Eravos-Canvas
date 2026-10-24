@@ -551,20 +551,34 @@ registerProcessor('eravos-pitch', EravosPitch);`;
       //     a curve never leaves the knob at its last value;
       //   · Stop all clears every owner, so every pending step finds it no longer owns anything and does nothing.
       // A knob in both params and curves follows the curve. Values are clamped to the knob's range; whole-number knobs are rounded.
+      // 3.67 BÉZIER: a point may carry a handle for the segment that ENDS at it — [t, value, [hx, hv]] (hx 0…1 across the segment,
+      // hv a knob value): that segment is the quadratic Bézier through its two ends with that control point (an arc, an ease in or
+      // out), bent in the knob's own picture — on a frequency knob (Hz, a wide range) in log, as the ear and the editor see it; without
+      // a handle the segment is a straight line, as before. The editor draws exactly this.
       const CURVE_STEP = 0.012;
-      function curveAt(pts, x) {
+      const logOf = (c) => c && c.unit === 'Hz' && c.min > 0 && c.max / c.min >= 20 ? c : null;
+      function bezAt(a, b, x, lg) {   // the value at x on the segment a → b (b[2] = its handle, or none: straight); lg: bend in log
+        if (!(b[0] > a[0])) return +b[1]; const h = b[2];
+        if (!h) return +a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]);
+        if (lg) { const L = (v) => Math.log(Math.max(lg.min, +v)); return Math.exp(bezAt([a[0], L(a[1])], [b[0], L(b[1]), [h[0], L(h[1])]], x)); }
+        const cx = a[0] + Math.max(0, Math.min(1, +h[0])) * (b[0] - a[0]), A = a[0] - 2 * cx + b[0], B = 2 * (cx - a[0]), C = a[0] - x;
+        let u = Math.abs(A) < 1e-12 ? -C / B : (-B + Math.sqrt(Math.max(0, B * B - 4 * A * C))) / (2 * A); u = Math.max(0, Math.min(1, u));
+        return (1 - u) * (1 - u) * a[1] + 2 * u * (1 - u) * h[1] + u * u * b[1];
+      }
+      function curveAt(pts, x, lg) {
         if (x <= pts[0][0]) return +pts[0][1];
-        for (let i = 1; i < pts.length; i++) if (x <= pts[i][0]) { const a = pts[i - 1], b = pts[i]; return b[0] > a[0] ? +a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]) : +b[1]; }
+        for (let i = 1; i < pts.length; i++) if (x <= pts[i][0]) return bezAt(pts[i - 1], pts[i], x, lg);
         return +pts[pts.length - 1][1];
       }
       function noteCurves(p, t, end, quiet) {
         const P = ctx.params; if (!P || !p.curves || typeof p.curves !== 'object') return [];
         const sch = new Map(P.schema().map(c => [c.key, c]));
         const keys = Object.keys(p.curves).filter(k => { const c = sch.get(k), v = p.curves[k]; return c && (c.type === 'number' || c.type === 'integer') && Array.isArray(v) && v.length && v.every(q => Array.isArray(q) && isFinite(+q[0]) && isFinite(+q[1])); });
+        const hOf = (q) => Array.isArray(q[2]) && isFinite(+q[2][0]) && isFinite(+q[2][1]) ? [+q[2][0], +q[2][1]] : null;
         if (!keys.length) return [];
-        const pts = {}; keys.forEach(k => { pts[k] = p.curves[k].map(q => [+q[0], +q[1]]).sort((a, b) => a[0] - b[0]); });
+        const pts = {}; keys.forEach(k => { pts[k] = p.curves[k].map(q => { const h = hOf(q); return h ? [+q[0], +q[1], h] : [+q[0], +q[1]]; }).sort((a, b) => a[0] - b[0]); });
         const dur = Math.max(1e-3, end - t), tok = ++noteTok;
-        const val = (k, x) => { const c = sch.get(k); let v = curveAt(pts[k], Math.max(0, Math.min(1, x))); if (typeof c.min === 'number') v = Math.max(c.min, v); if (typeof c.max === 'number') v = Math.min(c.max, v); return c.type === 'integer' ? Math.round(v) : v; };
+        const val = (k, x) => { const c = sch.get(k); let v = curveAt(pts[k], Math.max(0, Math.min(1, x)), logOf(c)); if (typeof c.min === 'number') v = Math.max(c.min, v); if (typeof c.max === 'number') v = Math.min(c.max, v); return c.type === 'integer' ? Math.round(v) : v; };
         const write = () => { const x = (ac.currentTime - t) / dur; let mine = false; keys.forEach(k => { if (noteOwner.get(k) !== tok) return; mine = true; P.live(k, val(k, x)); }); return mine; };
         const step = () => { if (write() && ac.currentTime < end - CURVE_STEP / 2) ctx.atAudioTime(Math.min(end - 0.001, ac.currentTime + CURVE_STEP), step); };
         const take = () => { keys.forEach(k => noteOwner.set(k, tok)); write(); ctx.atAudioTime(Math.min(end - 0.001, Math.max(ac.currentTime, t) + CURVE_STEP), step); };

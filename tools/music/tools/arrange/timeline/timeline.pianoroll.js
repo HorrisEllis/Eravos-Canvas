@@ -247,12 +247,22 @@
     const isLogK = (k) => k.unit === 'Hz' && k.min > 0 && k.max / k.min >= 20;
     const fyK = (k, v) => isLogK(k) ? clampN(Math.log(Math.max(k.min, +v) / k.min) / Math.log(k.max / k.min), 0, 1) : xFrac(k, v);
     const vyK = (k, f) => { f = clampN(f, 0, 1); let v = isLogK(k) ? k.min * Math.pow(k.max / k.min, f) : k.min + f * (k.max - k.min); if (k.type === 'integer') v = Math.round(v); return +(+v).toPrecision(4); };
-    // a picture-space curve onto a knob: on a log knob each segment is resampled, so the straight line the tool plays sounds as drawn
-    const toKnob = (k, pts) => { const out = []; pts.forEach((q, i) => { if (i && isLogK(k)) { const a = pts[i - 1]; for (let j = 1; j < 4; j++) { const f = j / 4; out.push([+(a[0] + (q[0] - a[0]) * f).toFixed(4), vyK(k, a[1] + (q[1] - a[1]) * f)]); } } out.push([q[0], vyK(k, q[1])]); }); return out; };
+    // 3.67 BÉZIER: a point may carry the handle of the segment that ends at it — [t, v, [hx 0…1 across the segment, handle v]] — the
+    // segment is then the quadratic Bézier through its ends with that control point (the SDK plays exactly this: sdk-music bezAt)
+    // a curved segment bends in the knob's own picture: log on a frequency knob (k: the knob, when known)
+    const segAt = (a, b, x, k) => { if (!(b[0] > a[0])) return b[1]; const hd = b[2]; if (!hd) return a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]);
+      if (k && isLogK(k)) { const L = (v) => Math.log(Math.max(k.min, +v)); return Math.exp(segAt([a[0], L(a[1])], [b[0], L(b[1]), [hd[0], L(hd[1])]], x)); }
+      const cx = a[0] + hd[0] * (b[0] - a[0]), A = a[0] - 2 * cx + b[0], B = 2 * (cx - a[0]), C = a[0] - x; let u = Math.abs(A) < 1e-12 ? -C / B : (-B + Math.sqrt(Math.max(0, B * B - 4 * A * C))) / (2 * A); u = clampN(u, 0, 1);
+      return (1 - u) * (1 - u) * a[1] + 2 * u * (1 - u) * hd[1] + u * u * b[1]; };
+    const valAt = (pts, x, k) => { if (x <= pts[0][0]) return pts[0][1]; for (let i = 1; i < pts.length; i++) if (x <= pts[i][0]) return segAt(pts[i - 1], pts[i], x, k); return pts[pts.length - 1][1]; };
+    const flattenC = (pts, k) => { if (!pts.some(q => q[2])) return pts; const out = [pts[0].slice(0, 2)]; for (let i = 1; i < pts.length; i++) { const a = pts[i - 1], b = pts[i]; if (b[2]) for (let j = 1; j < 8; j++) { const x = a[0] + (b[0] - a[0]) * j / 8; out.push([x, segAt(a, b, x, k)]); } out.push(b.slice(0, 2)); } return out; };
+    // a picture-space curve onto a knob: on a log knob each straight segment is resampled, so the straight line the tool plays sounds as
+    // drawn; a curved segment keeps its handle (moved into the knob's units)
+    const toKnob = (k, pts) => { const out = []; pts.forEach((q, i) => { if (i && isLogK(k) && !q[2]) { const a = pts[i - 1]; for (let j = 1; j < 4; j++) { const f = j / 4; out.push([+(a[0] + (q[0] - a[0]) * f).toFixed(4), vyK(k, a[1] + (q[1] - a[1]) * f)]); } } out.push(q[2] ? [q[0], vyK(k, q[1]), [q[2][0], vyK(k, q[2][1])]] : [q[0], vyK(k, q[1])]); }); return out; };
     let behavioursAll = [];
     // 3.65 the part of a note's curves between f0 and f1 (fractions of it), as the curves of that part (the split tool)
     function cropCurves(c, f0, f1) {
-      const o = {}; Object.keys(c).forEach(k => { const pts = c[k], at = (x) => { if (x <= pts[0][0]) return pts[0][1]; for (let i = 1; i < pts.length; i++) if (x <= pts[i][0]) { const a = pts[i - 1], b = pts[i]; return b[0] > a[0] ? a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]) : b[1]; } return pts[pts.length - 1][1]; };
+      const o = {}; Object.keys(c).forEach(k => { const pts = flattenC(c[k], numKnobs().find(z => z.key === k)), at = (x) => { if (x <= pts[0][0]) return pts[0][1]; for (let i = 1; i < pts.length; i++) if (x <= pts[i][0]) { const a = pts[i - 1], b = pts[i]; return b[0] > a[0] ? a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]) : b[1]; } return pts[pts.length - 1][1]; };
         o[k] = [[0, at(f0)]].concat(pts.filter(q => q[0] > f0 && q[0] < f1).map(q => [(q[0] - f0) / (f1 - f0), q[1]]), [[1, at(f1)]]); }); return o;
     }
     // 3.65 a note with curves shows the first of them as a thin line through its block (low at the bottom, high at the top)
@@ -260,8 +270,8 @@
       if (!nt.c || w < 8) return; const key = Object.keys(nt.c)[0], pts = nt.c[key], k = ((lane && knobsAll[lane.target]) || []).find(z => z.key === key); if (!pts || !k) return;
       const f = (v) => k.unit === 'Hz' && k.min > 0 && k.max / k.min >= 20 ? Math.log(Math.max(k.min, v) / k.min) / Math.log(k.max / k.min) : (v - k.min) / ((k.max - k.min) || 1);
       const Y = (v) => y + ROW - 3 - clampN(f(v), 0, 1) * (ROW - 6);
-      g.save(); g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(x + 2, Y(pts[0][1]));
-      pts.forEach(q => g.lineTo(x + 2 + q[0] * (w - 4), Y(q[1]))); g.lineTo(x + w - 2, Y(pts[pts.length - 1][1])); g.stroke(); g.restore();
+      g.save(); g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 1.2; g.beginPath(); const N = Math.max(8, Math.min(64, Math.round(w / 3)));
+      for (let j = 0; j <= N; j++) { const t = j / N, px = x + 2 + t * (w - 4); if (j) g.lineTo(px, Y(valAt(pts, t, k))); else g.moveTo(px, Y(valAt(pts, t, k))); } g.stroke(); g.restore();
     }
     function drawBend(g, nt, on) {
       const x0 = nt.s * pps + 1, w = Math.max(3, nt.l * pps - 2), col = lane ? lane.color : '#ff66cc';
@@ -708,12 +718,16 @@
         const kOf = (key) => nums.find(k => k.key === key);
         const fy = fyK, vy = vyK;
         const ptsOf = (key) => (cur.c && cur.c[key]) ? cur.c[key].map(q => q.slice()) : null;
-        const setC = (key, pts, quiet) => { const c = Object.assign({}, cur.c); if (pts && pts.length) c[key] = pts.map(q => [Math.round(clampN(q[0], 0, 1) * 10000) / 10000, q[1]]).sort((a, b) => a[0] - b[0]); else delete c[key]; apply({ c }); drawC(); syncC(); if (!quiet) hear(true); };
+        const setC = (key, pts, quiet) => { const c = Object.assign({}, cur.c); if (pts && pts.length) c[key] = pts.map(q => { const o = [Math.round(clampN(q[0], 0, 1) * 10000) / 10000, q[1]]; if (q[2]) o.push(q[2].slice()); return o; }).sort((a, b) => a[0] - b[0]); else delete c[key]; apply({ c }); drawC(); syncC(); if (!quiet) hear(true); };
         // quick shapes, in the knob's own picture (on a log knob — cutoff — they are resampled, so they sound as they look)
         const SHAPES = [['↗ open', 'opens across the note', [[0, 0.08], [1, 0.92]]], ['↘ close', 'closes across the note', [[0, 0.92], [1, 0.08]]],
           ['⌐ late open', 'holds shut, then opens at the end — into the next hit', [[0, 0.08], [0.6, 0.14], [1, 0.95]]],
           ['∧ swell', 'up and back', [[0, 0.15], [0.5, 0.9], [1, 0.15]]], ['∨ dip', 'down and back', [[0, 0.85], [0.5, 0.15], [1, 0.85]]],
-          ['⋀⋀ pump', 'four pumps across the note', [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => [i / 8, i % 2 ? 0.15 : 0.9])]];
+          ['⋀⋀ pump', 'four pumps across the note', [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => [i / 8, i % 2 ? 0.15 : 0.9])],
+          // 3.67 curved shapes (Bézier handles): drag a segment's ◇ to bend it yourself
+          ['◟ ease in', 'stays low, then opens fast at the end', [[0, 0.08], [1, 0.92, [0.92, 0.08]]]],
+          ['◜ ease out', 'opens fast, then settles', [[0, 0.08], [1, 0.92, [0.08, 0.92]]]],
+          ['⌒ arc', 'rises in an arc and falls back', [[0, 0.1], [0.5, 0.9, [0.12, 0.9]], [1, 0.1, [0.88, 0.9]]]]];
         const shapeTo = (k, name) => { const sh = SHAPES.find(x => x[0] === name || x[0].includes(name)); return sh ? toKnob(k, sh[2]) : null; };
         const sel = UI.Select({ label: 'Knob', hint: 'which of the tool’s knobs moves across this note (● = this note has a curve on it)', options: [], value: ck, onChange: (v) => { ck = v; drawC(); syncC(); } });
         function syncC() { const opts = sorted.map(k => ({ value: k.key, label: (cur.c && cur.c[k.key] ? '● ' : '') + k.label + (k.unit ? ' (' + k.unit + ')' : '') })); sel.setOptions(opts); sel.set(ck); rm.disabled = !ptsOf(ck); chips.innerHTML = ''; Object.keys(cur.c || {}).forEach(key => { const k = kOf(key); if (!k) return; const b = h('button', { class: 'tlpr-tool tlpr-ed' + (key === ck ? ' on' : ''), title: 'edit the ' + k.label + ' curve', text: k.label }); b.addEventListener('click', (e) => { e.stopPropagation(); ck = key; drawC(); syncC(); }); chips.append(b); }); }
@@ -739,32 +753,44 @@
           g.fillStyle = '#5d6f82'; g.font = '10px sans-serif'; g.fillText(k.label + ' · ' + fmtV(k, vy(k, 1)), 8, 14); g.fillText(fmtV(k, vy(k, 0)), 8, CH - 6);
           if (!pts) { g.fillStyle = '#8fa1b6'; g.textAlign = 'center'; g.fillText('click to start a curve — or pick a shape', w / 2, CH / 2 + 4); g.textAlign = 'left'; return; }
           g.strokeStyle = col; g.lineWidth = 2; plot(g, pts, k, X, Y); g.lineWidth = 1;
+          for (let i = 1; i < pts.length; i++) { if (pts[i][0] - pts[i - 1][0] < 0.04) continue; const hp = handlePos(pts, i), hx = X(hp[0]), hy = Y(fy(k, hp[1])), on = hotH === i, curved = !!pts[i][2];
+            if (curved) { g.setLineDash([2, 3]); g.strokeStyle = 'rgba(255,255,255,.35)'; g.beginPath(); g.moveTo(X(pts[i - 1][0]), Y(fy(k, pts[i - 1][1]))); g.lineTo(hx, hy); g.lineTo(X(pts[i][0]), Y(fy(k, pts[i][1]))); g.stroke(); g.setLineDash([]); }
+            g.save(); g.translate(hx, hy); g.rotate(Math.PI / 4); g.fillStyle = curved ? (on ? '#fff' : col) : 'rgba(8,13,20,.9)'; g.strokeStyle = on ? '#fff' : col; g.lineWidth = 1.5; const r = on ? 4.5 : 3.5; g.fillRect(-r, -r, 2 * r, 2 * r); g.strokeRect(-r, -r, 2 * r, 2 * r); g.restore(); }
           pts.forEach((q, i) => { g.fillStyle = i === hot ? '#fff' : col; g.beginPath(); g.arc(X(q[0]), Y(fy(k, q[1])), i === hot ? 5 : 4, 0, Math.PI * 2); g.fill(); g.strokeStyle = '#000'; g.stroke(); });
         }
-        // the knob moves in a straight line between points (as the tool plays it); on a log knob that line is drawn as it sounds — curved
-        function plot(g, pts, k, X, Y) { g.beginPath(); pts.forEach((q, i) => { if (!i) { g.moveTo(X(0), Y(fy(k, q[1]))); g.lineTo(X(q[0]), Y(fy(k, q[1]))); return; } const a = pts[i - 1]; for (let j = 1; j <= 12; j++) { const f = j / 12; g.lineTo(X(a[0] + (q[0] - a[0]) * f), Y(fy(k, a[1] + (q[1] - a[1]) * f))); } }); const last = pts[pts.length - 1]; g.lineTo(X(1), Y(fy(k, last[1]))); g.stroke(); }
+        // drawn as the tool plays it: straight between points, or along a segment's Bézier; on a log knob as it sounds (a straight line curves)
+        function plot(g, pts, k, X, Y) { g.beginPath(); const N = 160; for (let j = 0; j <= N; j++) { const t = j / N; if (j) g.lineTo(X(t), Y(fy(k, valAt(pts, t, k)))); else g.moveTo(X(t), Y(fy(k, valAt(pts, t, k)))); } g.stroke(); }
+        // a segment's handle: where it is drawn (its own control point, or the middle of a straight segment, ready to pull)
+        const handlePos = (pts, i) => { const a = pts[i - 1], b = pts[i], k = kOf(ck); if (b[2]) return [a[0] + b[2][0] * (b[0] - a[0]), b[2][1]]; const mx = (a[0] + b[0]) / 2; return [mx, valAt([a, b], mx, k)]; };   // on the line itself
         const fmtV = (k, v) => (Math.abs(v) >= 100 ? Math.round(v) : +(+v).toFixed(2)) + (k.unit ? ' ' + k.unit : '');
-        let hot = -1, dragC = null;
+        let hot = -1, hotH = -1, dragC = null;
         const at = (e) => { const { r, w } = box(), x = (e.clientX - r.left) * (w / r.width), y = (e.clientY - r.top) * (CH / r.height); return { t: clampN((x - 6) / (w - 12), 0, 1), f: clampN(1 - (y - 6) / (CH - 12), 0, 1), x, y }; };
         const near = (p) => { const pts = ptsOf(ck) || [], k = kOf(ck), w = box().w; return pts.findIndex(q => Math.hypot(6 + q[0] * (w - 12) - p.x, 6 + (1 - fy(k, q[1])) * (CH - 12) - p.y) < 8); };
+        const nearH = (p) => { const pts = ptsOf(ck) || [], k = kOf(ck), w = box().w; for (let i = 1; i < pts.length; i++) { if (pts[i][0] - pts[i - 1][0] < 0.04) continue; const hp = handlePos(pts, i); if (Math.hypot(6 + hp[0] * (w - 12) - p.x, 6 + (1 - fy(k, hp[1])) * (CH - 12) - p.y) < 7) return i; } return -1; };
         cc.addEventListener('contextmenu', (e) => e.preventDefault());
         cc.addEventListener('pointerdown', (e) => {
           e.stopPropagation(); const p = at(e), k = kOf(ck); let pts = ptsOf(ck) || []; let i = near(p);
+          const hi0 = i < 0 ? nearH(p) : -1;   // 3.67 a segment's ◇: drag it to bend the segment (right-click or double-click straightens it)
+          if (hi0 > 0) { if (e.button === 2) { delete pts[hi0][2]; pts[hi0] = pts[hi0].slice(0, 2); setC(ck, pts); return; } dragC = { h: hi0, pts }; hotH = hi0; try { cc.setPointerCapture(e.pointerId); } catch (x) {} drawC(); return; }
           if (e.button === 2) { if (i >= 0) { pts.splice(i, 1); setC(ck, pts); } return; }
           if (i < 0) { pts.push([p.t, vy(k, p.f)]); pts.sort((a, b) => a[0] - b[0]); i = pts.findIndex(q => q[0] === p.t); cur.c = Object.assign({}, cur.c, { [ck]: pts }); }
           dragC = { i, pts }; hot = i; try { cc.setPointerCapture(e.pointerId); } catch (x) {} drawC(); syncC();
         });
         cc.addEventListener('pointermove', (e) => {
           const p = at(e);
-          if (!dragC) { const i = near(p); if (i !== hot) { hot = i; drawC(); } cc.style.cursor = i >= 0 ? 'grab' : 'crosshair'; return; }
-          const k = kOf(ck), pts = dragC.pts, i = dragC.i, lo = i > 0 ? pts[i - 1][0] + 0.002 : 0, hi = i < pts.length - 1 ? pts[i + 1][0] - 0.002 : 1;
-          pts[i] = [clampN(p.t, lo, hi), vy(k, p.f)]; cur.c = Object.assign({}, cur.c, { [ck]: pts }); drawC();
+          if (!dragC) { const i = near(p), j = i < 0 ? nearH(p) : -1; if (i !== hot || j !== hotH) { hot = i; hotH = j; drawC(); } cc.style.cursor = i >= 0 || j > 0 ? 'grab' : 'crosshair'; return; }
+          const k = kOf(ck), pts = dragC.pts;
+          if (dragC.h) { const j = dragC.h, a = pts[j - 1], b = pts[j]; pts[j] = [b[0], b[1], [Math.round(clampN((p.t - a[0]) / ((b[0] - a[0]) || 1), 0.02, 0.98) * 1000) / 1000, vy(k, p.f)]]; cur.c = Object.assign({}, cur.c, { [ck]: pts }); drawC();
+            readout.textContent = k.label + ' · this segment bends toward ' + fmtV(k, pts[j][2][1]);
+            if (!dragC.heard || performance.now() - dragC.heard > 350) { dragC.heard = performance.now(); apply({ c: cur.c }); hear(true); } return; }
+          const i = dragC.i, lo = i > 0 ? pts[i - 1][0] + 0.002 : 0, hi = i < pts.length - 1 ? pts[i + 1][0] - 0.002 : 1;
+          pts[i] = [clampN(p.t, lo, hi), vy(k, p.f)].concat(pts[i][2] ? [pts[i][2]] : []); cur.c = Object.assign({}, cur.c, { [ck]: pts }); drawC();
           readout.textContent = k.label + ' ' + fmtV(k, pts[i][1]) + ' at ' + Math.round(pts[i][0] * 100) + ' % of the note';
           if (!dragC.heard || performance.now() - dragC.heard > 350) { dragC.heard = performance.now(); apply({ c: cur.c }); hear(true); }
         });
         const endC = () => { if (!dragC) return; const pts = dragC.pts; dragC = null; setC(ck, pts); };
         cc.addEventListener('pointerup', endC); cc.addEventListener('pointercancel', endC); cc.addEventListener('lostpointercapture', endC);
-        cc.addEventListener('dblclick', (e) => { e.stopPropagation(); const i = near(at(e)), pts = ptsOf(ck); if (i >= 0 && pts) { pts.splice(i, 1); setC(ck, pts); } });
+        cc.addEventListener('dblclick', (e) => { e.stopPropagation(); const p = at(e), i = near(p), pts = ptsOf(ck); if (!pts) return; if (i >= 0) { pts.splice(i, 1); setC(ck, pts); return; } const j = nearH(p); if (j > 0 && pts[j][2]) { pts[j] = pts[j].slice(0, 2); setC(ck, pts); } });
         if (window.ResizeObserver) new ResizeObserver(() => drawC()).observe(cc);
         // ◈ BEHAVIOURS — a note's curves and bend, saved to use again: apply one to this note (or every selected note), stretched to
         // each note, reversed, or scaled (intensity 0 = the knob held where it is · 1 = as saved · 2 = twice as far)
@@ -782,7 +808,10 @@
           const onNote = (nt) => { const out = Object.assign({}, nt), c = Object.assign({}, nt.c);
             Object.keys(b.curves || {}).forEach(role => { const k = knobForRole(role); if (!k) { if (!skipped.includes(role)) skipped.push(role); return; } if (!used.includes(k.label)) used.push(k.label);
               const base = fyK(k, nt.p && nt.p[k.key] !== undefined ? nt.p[k.key] : (k.val !== undefined ? k.val : k.def));
-              let pts = b.curves[role].map(q => [RV ? 1 - q[0] : q[0], clampN(base + (q[1] - base) * I, 0, 1)]); if (RV) pts.sort((x, y) => x[0] - y[0]);
+              const sc = (f) => clampN(base + (f - base) * I, 0, 1), src = b.curves[role], n = src.length;
+              let pts = src.map(q => q[2] ? [q[0], sc(q[1]), [q[2][0], sc(q[2][1])]] : [q[0], sc(q[1])]);
+              // reversed: time runs back; a segment's handle moves to its new end point and mirrors across the segment
+              if (RV) pts = pts.slice().reverse().map((q, j) => { const r4 = (v) => Math.round(v * 10000) / 10000, o = [r4(1 - q[0]), q[1]], from = pts[n - j]; if (j && from && from[2]) o.push([r4(1 - from[2][0]), from[2][1]]); return o; });
               c[k.key] = toKnob(k, pts); });
             if (Object.keys(c).length) out.c = c;
             if (b.bend) { const bb = Object.assign({}, b.bend), r1 = (v) => Math.round(v * I * 10) / 10; bb.from = r1(b.bend.from || 0); bb.to = r1(b.bend.to || 0); if (bb.osc) bb.osc = Object.assign({}, bb.osc, { depth: Math.round(bb.osc.depth * I * 100) / 100 });
@@ -796,7 +825,7 @@
           if (!o.quiet) hear(true); return { used, skipped };
         }
         function saveAs(name) {
-          const curves = {}; Object.keys(cur.c || {}).forEach(key => { const k = kOf(key); if (!k) return; let role = roleOf(k); if (knobForRole(role) !== k) role = 'knob:' + k.key; curves[role] = cur.c[key].map(q => [q[0], +fyK(k, q[1]).toFixed(4)]); });
+          const curves = {}; Object.keys(cur.c || {}).forEach(key => { const k = kOf(key); if (!k) return; let role = roleOf(k); if (knobForRole(role) !== k) role = 'knob:' + k.key; curves[role] = cur.c[key].map(q => q[2] ? [q[0], +fyK(k, q[1]).toFixed(4), [q[2][0], +fyK(k, q[2][1]).toFixed(4)]] : [q[0], +fyK(k, q[1]).toFixed(4)]); });
           view.emit('behaviour_save', Object.assign({ name }, cur.b ? { bend: cur.b } : {}, { curves }));
         }
         bApply.addEventListener('click', (e) => { e.stopPropagation(); const b = bList().find(x => x.id === bsel); if (b) behave(b); });

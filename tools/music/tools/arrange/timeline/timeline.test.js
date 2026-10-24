@@ -774,6 +774,60 @@ describe('tool · Timeline — per-note curves (monophonic)', () => {
         e2.finish(); } finally { r2.done(); }
     } finally { r.done(); }
   });
+  // ---- 3.67 Bézier handles
+  it('Bézier: a segment with a handle plays its curve (halfway up a bowed segment is 6 of 8, not 4); the timeline keeps the handle', async () => {
+    const U = uni(1.4), { a, w } = wob(U), seen = {};
+    U.K.bus.publish('note:trigger', { target: a, note: 40, velocity: 0.9, time: 0.1, duration: 1, curves: { depth: [[0, 0], [1, 8, [0.5, 8]]] } });
+    at(U, [0.35, 0.6, 0.85], (t) => { seen[t] = w.params.get('depth'); });
+    await U.ctx.startRendering();
+    assert.near(seen[0.6], 6, 0.25, 'halfway: (0 + 2·8 + 8) / 4 = 6'); assert.near(seen[0.35], 0.25 * 0.25 * 8 * 0 + 2 * 0.25 * 0.75 * 8 + 0.0625 * 8, 0.3, 'a quarter in: 3.5');
+    assert.gt(seen[0.85], 7.4, 'three quarters in: 7.5');
+    const U2 = uni(0.3), tl = OrganismFactory.spawn('eravos.timeline', { K: U2.K, headless: true }), c = OrganismFactory.handle(tl).ctx;
+    U2.K.bus.publish('ui:lane_add:' + tl, { kind: 'inst', target: a, name: 'Bass' });
+    U2.K.bus.publish('ui:clip_add:' + tl, { kind: 'notes', target: a, startBar: 1, bars: 1, notes: [{ s: 0, l: 8, n: 40, v: 0.9, c: { depth: [[0, 0], [1, 8, [1.7, 8]], [0.5, 2, 'x']] } }] });
+    assert.deepEqual(c.serialize().extra.clips.find(x => x.kind === 'notes').notes[0].c.depth, [[0, 0], [0.5, 2], [1, 8, [1, 8]]], 'handle kept (hx clamped to 0…1), a bad one dropped');
+  });
+  it('Bézier on a frequency knob bends in log, as you hear and see it: halfway up a bowed 100 Hz → 10 kHz is ~3.2 kHz', async () => {
+    const U = uni(1.4), { a, w } = wob(U), seen = {};
+    U.K.bus.publish('note:trigger', { target: a, note: 40, velocity: 0.9, time: 0.1, duration: 1, curves: { cutoff: [[0, 100], [1, 8000, [0.5, 8000]]] } });
+    at(U, [0.6], (t) => { seen[t] = w.params.get('cutoff'); });
+    await U.ctx.startRendering();
+    const want = Math.exp(0.25 * Math.log(100) + 0.75 * Math.log(8000)); assert.near(seen[0.6] / want, 1, 0.05, `${seen[0.6].toFixed(0)} Hz vs ${want.toFixed(0)}`);
+  });
+  it('Bézier: a note cut through a curved segment keeps the curve’s values — as short straight pieces', () => {
+    const U = uni(0.3), tl = OrganismFactory.spawn('eravos.timeline', { K: U.K, headless: true }), { a } = wob(U), c = OrganismFactory.handle(tl).ctx;
+    U.K.bus.publish('ui:lane_add:' + tl, { kind: 'inst', target: a, name: 'Bass' });
+    U.K.bus.publish('ui:clip_add:' + tl, { kind: 'notes', target: a, startBar: 1, bars: 2, notes: [{ s: 8, l: 16, n: 40, v: 0.9, c: { depth: [[0, 0], [1, 8, [0.5, 8]]] } }] });
+    const id = c.serialize().extra.clips.find(x => x.kind === 'notes').id; U.K.bus.publish('ui:clip_split:' + tl, { id, bar: 2 });
+    const n = c.serialize().extra.clips.find(x => x.id === id).notes[0], pts = n.c.depth;
+    assert.equal(n.l, 8); assert.ok(pts.every(q => q.length === 2), 'no handles left: straight pieces');
+    assert.near(pts[pts.length - 1][1], 6, 0.05, 'it ends where the curve was at the cut (6, not the straight line’s 4)');
+  });
+  it('the editor: drag a segment’s ◇ to bend it, double-click to straighten; the curved shapes carry handles', () => {
+    const r = roll([{ s: 0, l: 8, n: 36, v: 0.9, c: { depth: [[0, 0], [1, 8]] } }]);
+    try {
+      const ed = r.pr.openEditor(0), sel = r.pr.el.querySelector('.tlpr-cknob select'); sel.value = 'depth'; sel.dispatchEvent(new Event('change'));
+      const cc = r.pr.el.querySelector('canvas.tlpr-curve'), rect = cc.getBoundingClientRect(), W = cc.clientWidth, H = 96;
+      const P = (t, f) => ({ clientX: rect.left + (6 + t * (W - 12)) * rect.width / W, clientY: rect.top + (6 + (1 - f) * (H - 12)) * rect.height / H });
+      const fire = (type, p) => cc.dispatchEvent(new PointerEvent(type, Object.assign({ bubbles: true, cancelable: true, pointerId: 4, pointerType: 'mouse', button: 0, buttons: type === 'pointerup' ? 0 : 1 }, p)));
+      fire('pointerdown', P(0.5, 0.5)); fire('pointermove', P(0.3, 0.95)); fire('pointerup', P(0.3, 0.95));
+      const h = ed.note.c.depth[1][2]; assert.ok(h, 'the segment has a handle'); assert.near(h[0], 0.3, 0.02); assert.near(h[1], 7.6, 0.2);
+      assert.equal(ed.note.c.depth.length, 2, 'no point was added');
+      cc.dispatchEvent(new MouseEvent('dblclick', Object.assign({ bubbles: true }, P(0.3, 0.95)))); assert.equal(ed.note.c.depth[1].length, 2, 'double-click straightened it');
+      ed.curveShape('depth', 'ease in'); const e = ed.note.c.depth; assert.ok(e[1][2] && e[1][2][1] < 1, 'ease in: the handle sits low, near the end: ' + JSON.stringify(e));
+      ed.finish(); assert.ok(r.last()[0].c.depth[1][2], 'saved with the note');
+    } finally { r.done(); }
+  });
+  it('behaviours keep handles: saved in the knob’s picture, and reversed the handle moves to the mirrored segment', () => {
+    const FB = [{ id: 'u-bz', name: 'Bowed', curves: { wobble: [[0, 0], [1, 1, [0.8, 0]]] } }];
+    const r = roll([{ s: 0, l: 8, n: 36, v: 0.9 }]); r.pr.show({ id: 'c1', bars: 2, startBar: 1, notes: [{ s: 0, l: 8, n: 36, v: 0.9 }] }, { id: 'l1', name: 'Bass', color: '#ff2266', target: 't1' }, { key: { root: 0, scale: 'chromatic' }, knobs: KN, behaviours: FB });
+    try {
+      const ed = r.pr.openEditor(0); ed.behave('Bowed'); assert.deepEqual(ed.note.c.depth, [[0, 0], [1, 8, [0.8, 0]]], 'onto Depth 0…8, handle and all');
+      ed.behave('Bowed', { reverse: true }); assert.deepEqual(ed.note.c.depth, [[0, 8], [1, 0, [0.2, 0]]], 'backwards: the handle mirrored onto the new end');
+      ed.saveBehaviour('Back'); const sv = r.log.filter(x => x[0] === 'behaviour_save').pop()[1]; assert.deepEqual(sv.curves.wobble, [[0, 1], [1, 0, [0.2, 0]]], 'saved as fractions, with its handle');
+      ed.finish();
+    } finally { r.done(); }
+  });
   it('you hear it: the filter stays shut while the curve is low, then opens with it — matching the same knob held still at each end', async () => {
     async function render(curves, params) {
       const U = uni(1.6), { a } = wob(U);

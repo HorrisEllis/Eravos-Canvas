@@ -2,6 +2,16 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.67 Bézier handles on per-note curves (2026-10-24)
+- A point may carry the handle of the segment that ends at it: [t, value, [hx 0…1, handle value]] — that segment is the quadratic
+  Bézier through its ends (an arc, an ease in or out); no handle = a straight line, as before. Played by the SDK exactly as drawn,
+  and bent in the knob's own picture: log on a frequency knob (an arc on cutoff is a clean arc to the ear, not a jump then a plateau).
+- Editor: a ◇ in each segment — drag to bend, double-click or right-click to straighten; new shapes ease in, ease out, arc.
+- Cutting a note through a curved segment turns it into short straight pieces (values kept). Behaviours keep handles (saved in the
+  knob's picture, scaled by intensity; reversed, a handle moves to its mirrored segment).
+- Tests (timeline.test.js, per-note curves: 21): playback on a bowed segment (6 of 8 at the middle), log bending on cutoff
+  (~3.2 kHz halfway 100 Hz → 8 kHz), cleaning, cutting, the editor's handle, behaviours with handles.
+
 ## Done — 3.66 Wub Rate speed controls · Squash (2026-10-24)
 His words: "Wub Seq and a multiband squash" (the Wobble Bass gaps). Found on the way: Wub Rate already IS the step sequencer of wobble
 rates (16 steps of rates, off, hold) — so no second tool; what it lacked from the Wobble Bass was the speed control.
