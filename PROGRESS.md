@@ -2,6 +2,20 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.66 Wub Rate speed controls · Squash (2026-10-24)
+His words: "Wub Seq and a multiband squash" (the Wobble Bass gaps). Found on the way: Wub Rate already IS the step sequencer of wobble
+rates (16 steps of rates, off, hold) — so no second tool; what it lacked from the Wobble Bass was the speed control.
+- **Wub Rate 1.1**: Rate bend ×¼…×4 (smooth, as the oscillator's detune — never restarts), Rate glide (a step's new rate swoops in
+  and the wobble glides on instead of restarting — the speed-up into a drop), and a rate input (wubrate.hook.mod_rate: an Envelope,
+  LFO or curve pushes the speed ±2 octaves). All off by default. Tests: ×2 = 8 Hz, glide carries on where a jump restarts from shut,
+  an LFO held high speeds it up.
+- **Squash** (eravos.fx-squash, new): three-band OTT-style squash for any sound — Linkwitz–Riley 24 dB/oct split (flat ±1 dB at
+  Squash 0), each band into a soft limiter with makeup, zero latency; Lows clean (default) and Mono lows; per-band amount and level,
+  crossovers, mix. 7 factory presets + 2 Odd Couples; used in an Odd Couples song; an optional part of Wub Lab (after the mouth)
+  and Heavy Drops (in the growl, after the Destroyer). Tests: the quiet/loud gap shrinks ≥ 8 dB with the loud part within 6 dB,
+  lows clean keep a 45 Hz sub exact, mono lows put a left-only sub in both sides, flat at 0, an impulse on time, mix 0 = input.
+  Found while testing: a 12 dB/oct split leaked a tenth of a sub into the stereo mids, and Web Audio takes lowpass/highpass Q in dB.
+
 ## Done — 3.65 Per-note curves and reusable note behaviours (2026-10-24)
 His words: "Let each note carry time-varying filter, drive and wobble-depth curves. Keep those curves attached when notes move, resize
 or duplicate. Save curve combinations as reusable behaviours, with stretch, reverse and intensity scaling. Add live audio feedback while

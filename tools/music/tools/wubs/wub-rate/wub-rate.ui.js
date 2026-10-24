@@ -53,8 +53,8 @@ OrganismFactory.reg('eravos.wub-rate', function (view) {
       h('span', {}, [UI.Button({ label: '◀', hint: 'move the pattern one step earlier', onClick: () => view.emit('steps_shift', { by: -1 }) }).el, UI.Button({ label: '▶', hint: 'one step later', onClick: () => view.emit('steps_shift', { by: 1 }) }).el]),
     ]),
     grid,
-    UI.paramPanel(view, ['length', 'phase', 'smooth', 'depth'], { size: 32 }),
-    UI.hint('Drag the violet dot onto Wub Filter’s “wub” input. Each step is one rate: · = off (mouth shut), → = hold (keep going). Notes on a Wub Osc restart the wobble.'),
+    UI.paramPanel(view, ['length', 'phase', 'smooth', 'depth', 'rateBend', 'rateGlide'], { size: 32 }),
+    UI.hint('Drag the violet dot onto Wub Filter’s “wub” input. Each step is one rate: · = off (mouth shut), → = hold (keep going). Notes on a Wub Osc restart the wobble. Rate bend speeds it up smoothly; Rate glide makes each new rate swoop in — wire an Envelope into its rate input for a speed-up into the drop.'),
   );
   paint();
 });

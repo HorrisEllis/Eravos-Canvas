@@ -1,0 +1,112 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "fx-squash.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "ERAVOS",
+ "tags": [
+  "factory",
+  "effects"
+ ],
+ "for": "eravos.fx-squash",
+ "items": {
+  "eravos.fx-squash": {
+   "presets": {
+    "OTT Growl": {
+     "params": {
+      "amount": 0.6,
+      "low": 0.3,
+      "mid": 1,
+      "high": 0.7,
+      "xLo": 180,
+      "xHi": 2400,
+      "lowClean": true,
+      "monoLow": false,
+      "mix": 1
+     }
+    },
+    "Gentle Glue": {
+     "params": {
+      "amount": 0.25,
+      "low": 0.3,
+      "mid": 0.7,
+      "high": 0.5,
+      "xLo": 150,
+      "xHi": 3000,
+      "lowClean": true,
+      "monoLow": false,
+      "mix": 0.6
+     }
+    },
+    "Fizz Up Front": {
+     "params": {
+      "amount": 0.7,
+      "low": 0.2,
+      "mid": 0.6,
+      "high": 1,
+      "xLo": 200,
+      "xHi": 2000,
+      "lowClean": true,
+      "monoLow": false,
+      "highGain": 1.5,
+      "mix": 1
+     }
+    },
+    "Riddim Wall": {
+     "params": {
+      "amount": 0.9,
+      "low": 0.4,
+      "mid": 1,
+      "high": 0.8,
+      "xLo": 160,
+      "xHi": 2600,
+      "lowClean": true,
+      "monoLow": true,
+      "mix": 1,
+      "outGain": -2
+     }
+    },
+    "Mids Only": {
+     "params": {
+      "amount": 0.8,
+      "low": 0,
+      "mid": 1,
+      "high": 0,
+      "xLo": 250,
+      "xHi": 3500,
+      "lowClean": true,
+      "monoLow": false,
+      "mix": 1
+     }
+    },
+    "Sub Clean · Mono": {
+     "params": {
+      "amount": 0.4,
+      "low": 0.3,
+      "mid": 0.9,
+      "high": 0.6,
+      "xLo": 120,
+      "xHi": 2400,
+      "lowClean": true,
+      "monoLow": true,
+      "mix": 1
+     }
+    },
+    "Parallel Smash": {
+     "params": {
+      "amount": 1,
+      "low": 0.6,
+      "mid": 1,
+      "high": 1,
+      "xLo": 180,
+      "xHi": 2400,
+      "lowClean": false,
+      "monoLow": false,
+      "mix": 0.35
+     }
+    }
+   }
+  }
+ }
+}

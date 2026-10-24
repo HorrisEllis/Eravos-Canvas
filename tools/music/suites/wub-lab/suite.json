@@ -52,6 +52,15 @@
       "in": "eravos.wub-osc",
       "preset": "Fold Growl",
       "why": "teeth inside the osc, before the mouth"
+    },
+    {
+      "tool": "eravos.fx-squash",
+      "role": "squash",
+      "as": "mod",
+      "slot": "after",
+      "in": "eravos.wub-filter",
+      "preset": "OTT Growl",
+      "why": "OTT-style squash after the mouth: quiet detail up, the growl up front, the sub (Wub Sub) untouched"
     }
   ],
   "wiring": [
