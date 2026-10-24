@@ -55,6 +55,7 @@
     let bins = new Float32Array(an ? an.frequencyBinCount : 1024);
     c.stop = loop(c, () => {
       if (c.fit) c.fit();   // draw at the size it is shown (stretched pixels blur the labels)
+      const win = c._win || (c._win = c.closest && c.closest('.wm-win')), col = (win && win.dataset.accLive) || o.color || '#00d4ff';   // 3.48.2 the accent follows the sound
       const g = c.g, W = c.W, H = c.H;
       g.clearRect(0, 0, W, H); g.fillStyle = '#080b10'; g.fillRect(0, 0, W, H);
       // 3.48.1 the display at rest is still a display: a frequency grid (100 · 1k · 10k) and dB lines, never a blank box
@@ -74,8 +75,8 @@
         g.lineTo(x, y);
       }
       g.lineTo(W, H); g.closePath();
-      g.fillStyle = (o.color || '#00d4ff') + '55'; g.fill(); g.strokeStyle = o.color || '#00d4ff'; g.stroke();
-      if (loud < 0.02) { g.fillStyle = (o.color || '#00d4ff') + '55'; g.fillRect(0, H - 1.5, W, 1.5); if (H >= 40) { g.fillStyle = '#4d6178'; g.font = '10px sans-serif'; g.textAlign = 'right'; g.fillText('play a note to see its spectrum', W - 8, 14); g.textAlign = 'left'; } }
+      g.fillStyle = col + '55'; g.fill(); g.strokeStyle = col; g.stroke();
+      if (loud < 0.02) { g.fillStyle = col + '55'; g.fillRect(0, H - 1.5, W, 1.5); if (H >= 40) { g.fillStyle = '#4d6178'; g.font = '10px sans-serif'; g.textAlign = 'right'; g.fillText('play a note to see its spectrum', W - 8, 14); g.textAlign = 'left'; } }
       if (o.overlay) o.overlay(g, W, H);
     }, 30);
     return c;
