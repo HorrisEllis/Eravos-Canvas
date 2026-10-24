@@ -125,7 +125,7 @@
         S('drop 2', 'drop', 16, ['drums', 'bass', 'wub', 'pad', 'lead'], { drums: 'half', lift: 2, pat: { bass: 'sub', wub: ['yoi', 'tri', 'wubHi', 'gunroll'] } }),
         S('outro', 'outro', 8, ['pad', 'drums'], { drums: 'light' })],
       parts: { drums: KIT('House · Melodic House', 'Lost Love · Heaven Takes the Long Way'), bass: SUB(['Dubstep Sub Layer', 'Club · Deep House Sub'], 'offbeat'),
-        wub: { role: 'bass', organism: 'eravos.wobble-bass', preset: ['Bun Dem Growl (dancehall drop)', 'Wide Melodic Wub', 'Yoi Talker', 'Monstercat Wub 1/4'], style: 'half', name: 'Wub' },
+        wub: { role: 'bass', organism: 'eravos.wobble-bass', preset: ['Wide Melodic Wub', 'Yoi Talker', 'Monstercat Wub 1/4'], style: 'half', name: 'Wub' },
         pad: PAD(['Her Essence', 'EDM Pad · Melodic Dubstep Halo', 'Golden Hour Strings']), pluck: { role: 'lead', organism: 'eravos.supersaw', preset: ['Monstercat Pluck', 'Trance Pluck'], octave: 5, name: 'Pluck' },
         lead: { role: 'lead', organism: 'eravos.supersaw', preset: ['Euphoric Lead', 'Festival Lead'], octave: 5, riser: true, name: 'Lead' } },
       fx: [{ organism: 'eravos.fx-echo', preset: 'Future Pluck Echo', on: 'pluck' }, { organism: 'eravos.sidechain-compressor', preset: 'Classic 1/4 Pump', on: 'pad' }],

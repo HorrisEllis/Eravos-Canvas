@@ -51,7 +51,7 @@
       drums: { role: 'drums', organism: 'eravos.pads', preset: 'Heavy (Dubstep/Trap)', name: 'Drums' },
       sub: { role: 'bass', organism: 'eravos.sub-engine', preset: ['Sound-System Sub (reggae)', 'Dubstep Sub Layer'], style: 'onedrop', name: 'Sub' },
       wub: { role: 'bass', organism: 'eravos.wub-osc', preset: ['Dancehall Growl Stack (FM 1:1)', 'FM Growl 1:1', 'Hollow Yoi'], style: 'half', name: 'Growl' },
-      screech: { role: 'bass', organism: 'eravos.wobble-bass', preset: ['Sound-System Screech', 'Bun Dem Growl (dancehall drop)'], configure: { octave: 0 }, style: 'half', name: 'Screech' },
+      screech: { role: 'bass', organism: 'eravos.wobble-bass', preset: ['Sound-System Screech'], configure: { octave: 0 }, style: 'half', name: 'Screech' },
       skank: { role: 'chords', organism: 'eravos.pad-forge', preset: 'Dub Chord Bed', style: 'skank', voicing: 'triad', octave: 4, name: 'Skank' },
       bubble: { role: 'chords', organism: 'eravos.organ', preset: 'Desert Gospel', style: 'bubble', octave: 4, name: 'Bubble' },
       horn: { role: 'lead', organism: 'eravos.retro-poly', preset: ["Brass Stab '84", '80s · Juno Brass Swell'], configure: { arp: 'off' }, octave: 5, name: 'Horns' },

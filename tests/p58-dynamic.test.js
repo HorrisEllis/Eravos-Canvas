@@ -93,6 +93,23 @@ describe('The screen follows the sound (event-driven CSS)', () => {
     assert.lt(v('--snd-low'), 0.05, 'settles in silence');
     SoundCSS.set(false); assert.ok(document.documentElement.classList.contains('snd-off')); SoundCSS.set(true);
   });
+  it('3.69 the accent colours themselves follow the sound — each keeps its own hue (no rainbow) and comes back exactly in silence', async () => {
+    const K = Kernel; K.audio.boot(); const ac = K.audio.ctx; await ac.resume(); SoundCSS.init(K); SoundCSS.set(true);
+    const L = SoundCSS.lit, hueOf = (c) => { const n = parseInt(c.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+      const h = mx === r ? ((g - b) / d + 6) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; return h * 60; };
+    ['#00d4ff', '#ff2266', '#00ff88', '#b066ff', '#ffaa00'].forEach(c => { assert.equal(L(c, 0), c, 'silent = itself'); assert.lt(Math.abs(hueOf(L(c, 0.8)) - hueOf(c)), 4, c + ' keeps its hue'); assert.ok(L(c, 0.8) !== c, 'and lights up'); });
+    const host = document.createElement('div'); host.innerHTML = '<div class="tp-overlay" style="--acc:#ff2266"><div class="uk-knob" style="--acc:#ff2266"></div></div>'; document.body.appendChild(host);
+    const root = document.documentElement, pink0 = getComputedStyle(root).getPropertyValue('--pink').trim(), knob = host.querySelector('.uk-knob');
+    const o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = 80; g.gain.value = 0.8; o.connect(g); g.connect(K.audio.chain.out); o.start();
+    try {
+      for (let i = 0; i < 12; i++) { await TH.sleep(40); SoundCSS.step(); }
+      const pinkNow = root.style.getPropertyValue('--pink'); assert.ok(pinkNow && pinkNow !== pink0, 'the app’s pink is lit: ' + pinkNow);
+      assert.ok(knob.style.getPropertyValue('--acc') !== '#ff2266', 'a control on a page lights too: ' + knob.style.getPropertyValue('--acc'));
+    } finally { o.stop(); o.disconnect(); }
+    for (let i = 0; i < 25; i++) { await TH.sleep(40); SoundCSS.step(); }
+    assert.equal(root.style.getPropertyValue('--pink'), '', 'silence: the palette is the stylesheet’s again'); assert.equal(knob.style.getPropertyValue('--acc'), '#ff2266', 'and the control its own colour');
+    host.remove();
+  });
 });
 
 // 3.59 — "the piano roll completely in relation to the tool … a drop down in the corner to change the lane's tool"

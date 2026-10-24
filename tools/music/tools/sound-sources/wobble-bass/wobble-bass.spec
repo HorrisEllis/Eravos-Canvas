@@ -203,3 +203,8 @@ dependencies:
     - curve.out (modulation · port curve)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe, audio_in]
   works_with: [eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen, eravos.midi-mapper, eravos.lyric-rhythm]
+
+# ---- 3.69 · the Bun Dem presets removed
+His call: "all the Bun Dem sound packs are terrible … just remove them". The nine "Bun Dem …" presets above are gone from the
+factory pack (songs that listed one as an alternative use their others). The engine features they showed (FM wub, pitch wub,
+rate glide, fold grit) stay; their tests now use a plain dancehall growl patch.

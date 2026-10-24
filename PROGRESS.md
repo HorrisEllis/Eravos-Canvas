@@ -2,6 +2,16 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.69 Reactive colours that react · suites in the app's own look · Bun Dem wobbles gone (2026-10-24)
+- **Reactive colours** (⋯ Options → ◐ Reactive colours): they were measuring the sound fine but only drew a faint ring and a 10 %
+  haze, in a violet/teal hue sweep. Now the accent colours themselves move: the app's palette (cyan, green, pink, violet, amber, red)
+  lights with the mix and flashes on each hit; each tool's own accent (its window, knobs, buttons, the tool page) lights with that
+  tool's own sound, and knob arcs / on-buttons glow with it. Every colour keeps its hue (no rainbow) and returns exactly in silence.
+- **Suites restyled to match the app**: 3.64's soft look (16 px corners, glass blur, gradients, pills) taken out of the suite window,
+  the tool/suite pages and the icon tiles — app tokens, 6 px corners, 1 px lines, buttons and tabs that are .uk-btn / .uk-seg.
+- **Wobble Bass**: the nine "Bun Dem …" presets removed (songs that listed one use their other choices).
+- Tests: p58 accent colours (hue kept, lit while playing, restored in silence); wobble tests use a plain growl patch.
+
 ## Done — 3.68 Export tags & cover (2026-10-24)
 His words: "The export have a meta data editor option and have it autofilled. Option to upload cover image."
 - Song Recorder → 🏷 Tags: title, artist, album, genre, year, BPM, key, comment, and a cover. Every field is filled in for you

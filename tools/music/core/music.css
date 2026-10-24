@@ -216,15 +216,17 @@
 /* 3.58 SOUND → CSS (core/sound-css.js writes these while something plays; all 0 in silence) */
 :root { --snd-low: 0; --snd-high: 0; --snd-level: 0; --snd-pulse: 0; --snd-hue: 210; }
 .wm-win { --tool-level: 0; }
-/* a window glows with its own sound, in the colour of the mix */
+/* 3.69 the accents themselves move (sound-css.js lights --acc and the palette); these add the glow — each in its OWN colour, no hue sweep */
 html:not(.snd-off) .wm-win::after { content: ''; position: absolute; inset: -1px; border-radius: 10px; pointer-events: none;
-  box-shadow: 0 0 0 1px hsla(var(--snd-hue), 85%, 62%, calc(var(--tool-level) * .6)), 0 0 calc(2px + var(--tool-level) * 26px) hsla(var(--snd-hue), 90%, 58%, calc(var(--tool-level) * .5)); }
-/* its top accent leans toward the mix colour as it plays */
-html:not(.snd-off) .wm-win::before { background: color-mix(in srgb, var(--acc) calc(100% - var(--tool-level) * 60%), hsl(var(--snd-hue), 90%, 62%)); }
-/* behind everything: a breath of colour on each hit, deeper with the low end */
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--acc) calc(var(--tool-level) * 70%), transparent), 0 0 calc(2px + var(--tool-level) * 30px) color-mix(in srgb, var(--acc) calc(var(--tool-level) * 55%), transparent); }
+html:not(.snd-off) .wm-win .uk-knob-arc { filter: drop-shadow(0 0 calc(3px + var(--tool-level) * 9px) var(--acc)); }
+html:not(.snd-off) .wm-win .uk-toggle.on, html:not(.snd-off) .wm-win .uk-btn.primary { box-shadow: 0 0 calc(var(--tool-level) * 14px) color-mix(in srgb, var(--acc) calc(var(--tool-level) * 70%), transparent); }
+html:not(.snd-off) .tp-overlay .uk-knob-arc { filter: drop-shadow(0 0 calc(3px + var(--snd-level) * 7px + var(--snd-pulse) * 6px) var(--acc)); }
+/* behind everything: a breath of the app's own colours on each hit, deeper with the low end */
 html:not(.snd-off) #canvas::before { content: ''; position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(ellipse at 50% 110%, hsla(var(--snd-hue), 90%, 45%, calc(var(--snd-low) * .10 + var(--snd-pulse) * .10)), transparent 65%); }
-html:not(.snd-off) #logo { background: linear-gradient(90deg, hsl(calc(var(--snd-hue) - 40), 90%, 62%), hsl(var(--snd-hue), 90%, 65%), var(--pink)); -webkit-background-clip: text; background-clip: text; }
+  background: radial-gradient(ellipse at 50% 112%, color-mix(in srgb, var(--pink) calc(var(--snd-low) * 16% + var(--snd-pulse) * 14%), transparent), transparent 62%),
+              radial-gradient(ellipse at 50% -12%, color-mix(in srgb, var(--cyan) calc(var(--snd-high) * 12%), transparent), transparent 55%); }
+html:not(.snd-off) #logo { filter: drop-shadow(0 0 calc(var(--snd-pulse) * 10px) var(--pink)); }
 @media (prefers-reduced-motion: reduce) { html:not(.snd-off) #canvas::before { display: none; } }
 /* 3.60 song previews: a strip of the song's shape on every card, a map + ▶ Preview in the detail */
 .sbk-strip { display: block; width: 100%; height: 22px; margin-top: 6px; border-radius: 4px; background: #0a0f15; }
