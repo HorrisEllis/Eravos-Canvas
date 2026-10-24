@@ -74,3 +74,15 @@
   against the drop (dB); depth = the drop's share of 30–60 Hz. Thresholds are in tests/p72-tension-drops.test.js.
   Pattern gains: type 'tension' and type 'chain' { parts: [{ at: bar offset, pattern }] }; PatternLibrary.addSource(fn) (a data file adds
   hand-made patterns; generated ones stay generated).
+
+## ADDENDUM 2026-10-24 (3.73) — "needs to be able to collapse tge catogaries. curves, deep drops. make it powerful."
+  His words, on a screenshot of the page (≈90 genre chips in one wall). Built:
+    FAMILIES   genres fold into 13 families (🕳 Deep drops & tension · Dubstep · Drum & Bass · House & Garage · Techno & Trance ·
+               Trap & Hip-hop · Reggae & Dancehall · Synth & Dark · Chill & Ambient · Lost Love · For Her · Odd Couples · Synthesis),
+               folded; the caret opens a family's genres, the name picks the whole family. No genre falls into "More" (tested).
+    QUICK      🕳 Deep drops (Floor Falls · Heavy Drops · the tension studies) · 📈 Curves · 🔺 Tension · ⛓ Build → Drop · ★ Favourites
+    PICKING    type and genre chips: click = only this · shift/ctrl-click = add it; search words all narrow (name, genre, family, type,
+               tool, move, preset, BPM); BPM min–max; sort (genre · name · BPM ↑↓ · longest); Clear; "/" focuses search
+    SECTIONS   results grouped by type (or family, genre, none); each section folds (Fold all / Open all); 24 cards, "Show more"
+    KEPT       the pick stays for the session; folds, open families and ★ favourites persist (localStorage eravos.patterns.page)
+  Look unchanged (existing chip and card styles; no theme touched). Tests: tests/p73-patterns-page.test.js.
