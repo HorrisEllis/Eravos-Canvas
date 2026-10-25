@@ -2,6 +2,15 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Mapped — 3.75 Voice · Audio in/out · Suites as control surface · Genres that contrast EDM (2026-10-25)
+His words: "t-pain like full autotune … production quality" · "Suites are supposed to be like the main control panel" · "no each
+tool is sovereign" · "tools for voice. including settings for audio input and output like ableton or fruity loops but better" ·
+"expanding to other genres … contrast edm" · "each part of a tool should be broken into it's capabilities or components and connect
+to the control surface" · "update the specs. phase it all". Spec: specs/eravos.phase75-map.spec, phased 3.75 → 3.9x:
+A (AudioIO, Options › Audio, Mic In / Audio Out) → V (Pitch Track, Scale Snap, Voice Shift → Autotune suite; De-esser, Rider,
+Doubler, Space → Voice suite) → S (suite Panel as a synth face, macros on the Timeline) → C (existing tools into components) →
+G (Keys, Guitar, Ensemble, Kits as components → genres that contrast EDM). Nothing built yet.
+
 ## Done — 3.74 📈 Curves in every genre (2026-10-25)
 His words: "why doesn't the pattern library have more curves? like floor falls."
 - **Why, measured** on main: the library is generated from the Song Engine, and only 3 of its 85 genres write curves (Heavy Drops, Arp &
