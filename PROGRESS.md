@@ -2,6 +2,24 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.74 📈 Curves in every genre (2026-10-25)
+His words: "why doesn't the pattern library have more curves? like floor falls."
+- **Why, measured** on main: the library is generated from the Song Engine, and only 3 of its 85 genres write curves (Heavy Drops, Arp &
+  Motion, Floor Falls). That gave 16 curve patterns, and only 28 of 1253 note patterns bent or oscillated (4 genres).
+- **Now** the library adds the curves itself, with Floor Falls Out's moves (data/curve-patterns.js, PatternLibrary.addTransform). Your
+  songs are unchanged.
+  - **"· curved" versions** of every bass, wobble and lead line:
+    - a slide in from a 4th above;
+    - a dive at each phrase's end (never under ~18 Hz);
+    - wobbles get a rate per note and the speed-up into the turn (1/8 → 1/32);
+    - leads glide into leaps and bloom a vibrato.
+  - **Curve shapes** for every tool a genre plays: Riser +7 · Freefall −12 · Ripples · Filter opens · Filter closes, then rips open ·
+    Depth swing (where the tool has those knobs).
+  - Library: 1273 → 1967 patterns · curve patterns 16 → 79 · curved lines 28 → 659 · from 4 genres → all 85.
+- Also: the P72 chain renders took ~22 s on main (64e3d99, before this change too), over the 20 s test limit; they get 60 s, noted in the
+  test.
+- Tests: tests/p74-curves-everywhere.test.js (4).
+
 ## Done — 3.73 🧩 Patterns page: families that fold, quick picks, sections (2026-10-24)
 His words, on the page: "needs to be able to collapse tge catogaries. curves, deep drops. make it powerful." The ~90-genre wall is now 13
 families, folded (caret opens one; the name picks the whole family); quick picks 🕳 Deep drops · 📈 Curves · 🔺 Tension · ⛓ Build → Drop ·

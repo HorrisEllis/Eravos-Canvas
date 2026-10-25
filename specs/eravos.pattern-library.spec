@@ -86,3 +86,13 @@
     SECTIONS   results grouped by type (or family, genre, none); each section folds (Fold all / Open all); 24 cards, "Show more"
     KEPT       the pick stays for the session; folds, open families and ★ favourites persist (localStorage eravos.patterns.page)
   Look unchanged (existing chip and card styles; no theme touched). Tests: tests/p73-patterns-page.test.js.
+
+## ADDENDUM 2026-10-25 (3.74) — "why doesn't the pattern library have more curves? like floor falls."
+  Measured on main 64e3d99: the library is generated from the Song Engine, and only 3 of 85 genres write curve lanes (Heavy Drops, Arp &
+  Motion, Floor Falls) → 16 curve patterns; only 28 of 1253 note patterns bend or oscillate, from 4 genres. That is the answer to "why".
+  Decided by his axioms (USER_AUTONOMY: the songs are his and unchanged; the library is where variety lives, his 10-24 direction): the
+  library adds the curves itself, in a pass over what it built (PatternLibrary.addTransform, data/curve-patterns.js), with Floor Falls Out's
+  own moves: CURVED versions of every bass, wobble and lead line (slide in from a 4th above · a dive at each phrase's end, never under ~18
+  Hz · a wobble rate per note and a speed-up into the turn · a lead that glides into leaps and blooms a vibrato) and CURVE SHAPES for every
+  tool a genre plays (Riser +7 · Freefall −12 · Ripples · Filter opens · Filter closes, then rips open · Depth swing — by the tool's knobs).
+  After: 1967 patterns, 79 curve patterns, 659 note patterns that bend, from all 85 genres. tests/p74-curves-everywhere.test.js.

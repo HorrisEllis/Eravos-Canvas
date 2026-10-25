@@ -32,7 +32,7 @@ describe('🔺 Tension & 💥 drops: build → pause → huge drop, measured (3.
     assert.gt(last.db - first.db, 3, 'tension: the build gets louder — ' + say);
     assert.gt(dropAbove - pause.above, 15, 'contrast: above the sub, the pause is a hole — ' + say);   // the sub's dive is the pause's event (Floor Falls Out), so the hole is above it
     assert.gt(drop.reduce((a, x) => a + x.deep, 0) / 4, 0.08, 'depth: the drop’s share of 30–60 Hz — ' + say);
-  }));
+  }, { timeout: 60000 }));   // 3.74: 13 bars of 11 tracks rendered offline; the first render of a page took ~22 s on main 64e3d99 (the 20 s default)
   it('→ Timeline: a chain lands as parts on their own tracks, at their bars', () => {
     const ctx = new OfflineAudioContext(2, 24000, 24000), K = Kernel.create({ ctx, quiet: true, syncIR: true }); MasterTransport.create(K, { offline: true, bpm: 145 }).boot();
     const ch = L().find(p => p.type === 'chain' && p.move === 'falls'), res = PatternLibrary.send(ch, { K, headless: true, bar: 1 });

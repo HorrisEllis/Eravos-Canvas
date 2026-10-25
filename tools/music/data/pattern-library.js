@@ -14,7 +14,7 @@
   const TYPES = [['drums', '🥁 Drums'], ['bass', '🔊 Bass'], ['wobble', '〰 Wobble'], ['chords', '🎹 Chords'], ['lead', '🎵 Lead'], ['arp', '🪜 Arp'], ['drop', '🕳 Drops'], ['fill', '🥁 Fills'], ['curve', '📈 Curves'], ['tension', '🔺 Tension'], ['chain', '⛓ Build → Drop']];   // 3.72: tension · chains
   const MAX_BARS = 4;
   let LIB = null;
-  const sources = [];   // 3.72: data files add hand-made patterns (PatternLibrary.addSource(fn → patterns[]))
+  const sources = [], transforms = [];   // 3.74 transforms: fn(the built library) → more patterns (curves for every genre)   // 3.72: data files add hand-made patterns (PatternLibrary.addSource(fn → patterns[]))
   const sig = (p) => p.type + '|' + p.tool + '|' + (p.move || '') + '|' + JSON.stringify(p.notes || p.curve || (p.parts || []).map(x => [x.at, x.pattern.name]));   // a named move is its own pattern even when its notes match another's (freefall = falls' notes + its curves)
   function typeOf(G, P) {
     if (P.role === 'drums') return 'drums';
@@ -65,6 +65,7 @@
     sources.forEach(fn => { try { (fn() || []).forEach(add); } catch (e) { console.error('[ERAVOS] pattern source failed', e); } });   // 3.72 hand-made first
     const named = new Set(out.map(p => p.type + '|' + p.tool + '|' + JSON.stringify(p.notes || p.curve)));
     (SE() ? SE().genres() : []).forEach(Gx => [1, 2].forEach(seed => fromGenre(Gx, seed).forEach(p => { if (!named.has(p.type + '|' + p.tool + '|' + JSON.stringify(p.notes || p.curve))) add(p); })));
+    transforms.forEach(fn => { try { (fn(out.slice()) || []).forEach(add); } catch (e) { console.error('[ERAVOS] pattern transform failed', e); } });   // 3.74
     return out;
   }
   const all = () => { if (!LIB) LIB = build(); return LIB; };
@@ -300,5 +301,5 @@
     page = { close, paint };
     return page;
   }
-  global.PatternLibrary = { addSource: (fn) => { if (typeof fn === 'function') { sources.push(fn); LIB = null; } }, all, types: TYPES.map(t => ({ id: t[0], label: t[1] })), get: (id) => all().find(p => p.id === id) || null, send, render, play, stop, open, rebuild: () => { LIB = null; return all(); }, fromGenre, families: FAMILIES.map(f => ({ id: f[0], label: f[1] })), familyOf, matches };
+  global.PatternLibrary = { addTransform: (fn) => { if (typeof fn === 'function') { transforms.push(fn); LIB = null; } }, addSource: (fn) => { if (typeof fn === 'function') { sources.push(fn); LIB = null; } }, all, types: TYPES.map(t => ({ id: t[0], label: t[1] })), get: (id) => all().find(p => p.id === id) || null, send, render, play, stop, open, rebuild: () => { LIB = null; return all(); }, fromGenre, families: FAMILIES.map(f => ({ id: f[0], label: f[1] })), familyOf, matches };
 })(typeof window !== 'undefined' ? window : globalThis);
