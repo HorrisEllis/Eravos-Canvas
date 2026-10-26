@@ -2,6 +2,13 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Mapped — themes, honestly · genre packs across tools (2026-10-26)
+His words: "okay, what happened to theme? also all the packs were supposed to be additive, like synthwave in relation to the tools.
+like find all tools for it. bass tools. synthesis. etc". Theme: P69.1 was never built, and the look kit (5697b50, 95614cb, merged in
+PR #48) changed the default look directly, against the theme rule. specs/eravos.themes.spec addendum: three themes (Classic = the look
+before the kit, Studio = the kit, v10), default his call. Packs: specs/eravos.genre-packs.spec: a genre pack is one id adding to every
+tool that fits, with a page listing its tools by category, its sounds, patterns, songs, suites, the missing tools, and Build the rig.
+
 ## Mapped — 3.75 Voice · Audio in/out · Suites as control surface · Genres that contrast EDM (2026-10-25)
 His words: "t-pain like full autotune … production quality" · "Suites are supposed to be like the main control panel" · "no each
 tool is sovereign" · "tools for voice. including settings for audio input and output like ableton or fruity loops but better" ·
