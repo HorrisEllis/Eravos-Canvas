@@ -34,8 +34,11 @@
     rim: { classic: {} }, shaker: { classic: {} }, cowbell: { classic: {} }, sample: { classic: {} },
   };
   const DRIVE_TYPES = ['soft', 'hard', 'asym', 'fold', 'crush'];
+  // 3.75 packs ADD sounds as recipes (core/drum-recipes.js); a model is a built-in graph or a pack's recipe — MD gives its defaults
+  const DRX = () => (typeof window !== 'undefined' && window.DrumRecipes) || null;
+  const MD = (v, m) => (MODELS[v] && MODELS[v][m]) || (DRX() && DRX().defaults(v, m)) || null;
   const SD = { model: 'classic', tone: 0, snap: 0.5, sweep: 24, body: 0.5, driveType: 'soft' };   // sound-design defaults
-  function pad(voice, o) { const q = Object.assign({ voice, tune: 0, decay: VOICE_DEFAULTS[voice].decay, level: 1, pan: 0, drive: 0, choke: VOICE_DEFAULTS[voice].choke || 0, color: VOICE_DEFAULTS[voice].color, sample: null }, SD, o || {}); if (!MODELS[voice][q.model]) q.model = 'classic'; if (!DRIVE_TYPES.includes(q.driveType)) q.driveType = 'soft'; return q; }
+  function pad(voice, o) { const q = Object.assign({ voice, tune: 0, decay: VOICE_DEFAULTS[voice].decay, level: 1, pan: 0, drive: 0, choke: VOICE_DEFAULTS[voice].choke || 0, color: VOICE_DEFAULTS[voice].color, sample: null }, SD, o || {}); if (!MD(voice, q.model)) q.model = 'classic'; if (!DRIVE_TYPES.includes(q.driveType)) q.driveType = 'soft'; return q; }
   function defaultBanks() {
     return [
       // A — EDM core kit
@@ -345,6 +348,42 @@
         },
       };
 
+      // 3.75 a pack's recipe played from its layers (core/drum-recipes.js documents them). Tune shifts every pitch and filter;
+      // Decay stretches every envelope against the recipe's own decay; Sweep scales the pitch drops (24 = as written);
+      // Body leans tone ↔ noise (0.5 = as written); Snap scales the clicks (layers shorter than 30 ms).
+      function recipeVoice(rc, dst, t, p, vel) {
+        const ps = R(p.tune || 0), ts = Math.max(0.05, p.decay / (rc.decay || 0.3)), sw = (p.sweep === undefined ? 24 : p.sweep) / 24;
+        const bodyT = Math.min(2, (p.body === undefined ? 0.5 : p.body) * 2), bodyN = Math.min(2, (1 - (p.body === undefined ? 0.5 : p.body)) * 2), snap = (p.snap === undefined ? 0.5 : p.snap) * 2;
+        const out = ac.createGain(); out.gain.value = vel; out.connect(dst); let end = t + 0.02;
+        function shape(g, peak, L) {   // attack · decay or a gated hold · returns the end
+          const a = (L.a || 0.001), d = Math.max(0.004, L.d * ts), at = t + a; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, at);
+          if (L.hold) { const h = L.hold * ts; g.gain.exponentialRampToValueAtTime(Math.max(0.0001, peak * 0.55), at + h); g.gain.linearRampToValueAtTime(0, at + h + 0.012); return at + h + 0.012; }
+          g.gain.exponentialRampToValueAtTime(0.0001, at + d); return at + d;
+        }
+        function filt(F) { const b = ac.createBiquadFilter(); b.type = F.type || 'bandpass'; b.frequency.setValueAtTime(Math.min(20000, F.f * ps), t); b.Q.value = F.q === undefined ? 0.8 : F.q;
+          if (F.to) b.frequency.exponentialRampToValueAtTime(Math.min(20000, F.to * ps), t + (F.time || 0.1) * ts); return b; }
+        function chain(src, L, peak) { const g = ac.createGain(), e = shape(g, peak, L); let n = src; if (L.filter) { const b = filt(L.filter); n.connect(b); n = b; } n.connect(g); g.connect(out); end = Math.max(end, e); return e; }
+        function pitch(o, L) { const f = L.f * ps; if (L.from && L.from !== 1) { o.frequency.setValueAtTime(f * Math.pow(L.from, sw), t); o.frequency.exponentialRampToValueAtTime(Math.max(15, f), t + (L.glide || 0.05) * Math.max(0.3, ts)); } }
+        const lend = (L) => t + (L.a || 0.001) + (L.hold ? L.hold * ts + 0.02 : L.d * ts) + 0.02;
+        rc.layers.forEach(L => {
+          const tone = L.k !== 'noise' && L.k !== 'burst', g0 = (L.gain || 0.5) * (tone ? bodyT : bodyN) * (L.d < 0.03 && !L.hold ? snap : 1);
+          if (g0 <= 0.0005) return;
+          if (L.k === 'tone') { const o = osc(L.wave || 'sine', L.f * ps, t, lend(L)); pitch(o, L); chain(o, L, g0); }
+          else if (L.k === 'noise') chain(noise(t, lend(L), L.color), L, g0);
+          else if (L.k === 'fm') { const e = lend(L), c = osc('sine', L.f * ps, t, e), m = osc('sine', L.f * ps * L.ratio, t, e), mg = ac.createGain(); pitch(c, L);
+            mg.gain.setValueAtTime(L.index * L.f * ps * L.ratio, t); mg.gain.exponentialRampToValueAtTime(Math.max(0.01, L.index * L.f * ps * L.ratio * 0.05), t + Math.max(0.005, L.d * ts * 0.6)); m.connect(mg); mg.connect(c.frequency); chain(c, L, g0); }
+          else if (L.k === 'metal') { const e = lend(L), mix2 = ac.createGain(); mix2.gain.value = 0.3; (L.ratios || [1, 1.4826, 1.8003, 2.546, 2.6303, 3.8967]).forEach(k => osc('square', (L.base || 205.3) * k * ps, t, e).connect(mix2)); chain(mix2, L, g0); }
+          else if (L.k === 'stack') { const e = lend(L), mix2 = ac.createGain(); mix2.gain.value = 1 / Math.sqrt(L.notes.length * 2);
+            L.notes.forEach((st, i) => [-1, 1].forEach(sg => { const o = osc(L.wave || 'sawtooth', L.f * ps * R(st), t, e); o.detune.value = sg * (L.detune || 8) + i; o.connect(mix2); })); chain(mix2, L, g0); }
+          else if (L.k === 'burst') { const n = noise(t, t + (L.count * L.gap + (L.tail || 0.1)) * Math.max(1, ts) + 0.05, L.color), b = filt(L.filter), g = ac.createGain(); n.connect(b); b.connect(g); g.connect(out);
+            let te = t; g.gain.setValueAtTime(0, t);   // count−1 short hits, then the last one rings out over the tail
+            for (let i = 0; i < L.count; i++) { const ti = t + i * L.gap, last = i === L.count - 1; g.gain.setValueAtTime(0, ti); g.gain.linearRampToValueAtTime(g0, ti + 0.001);
+              te = ti + 0.001 + (last ? Math.max(0.01, (L.tail || 0.1) * ts) : Math.min(L.each, L.gap * 0.9)); g.gain.exponentialRampToValueAtTime(last ? 0.0001 : g0 * 0.08, te); }
+            end = Math.max(end, te); }
+        });
+        return { amp: out, end: end + 0.02 };
+      }
+
       function trigger(index, velocity, time, source) {
         const bank = ctx.params.get('bank');
         const p = banks[bank][index];
@@ -358,7 +397,7 @@
         const pan = ac.createStereoPanner(); pan.pan.value = p.pan;
         chain.connect(pan); pan.connect(kitBus);
         // 3.0 post stage (only when a 3.0 key asks for it — classic pads with tone 0 build exactly the 2.0 graph)
-        const fresh = p.model && p.model !== 'classic', fn = fresh && M[p.voice] && M[p.voice][p.model];
+        const fresh = p.model && p.model !== 'classic', rc = fresh && !(M[p.voice] && M[p.voice][p.model]) && DRX() && DRX().get(p.voice, p.model), fn = rc ? (d, t2, q, v2) => recipeVoice(rc, d, t2, q, v2) : fresh && M[p.voice] && M[p.voice][p.model];
         let into = chain;
         if (p.tone) { const sh = ac.createBiquadFilter(); sh.type = 'highshelf'; sh.frequency.value = 2500; sh.gain.value = p.tone * 12; const ls = ac.createBiquadFilter(); ls.type = 'lowshelf'; ls.frequency.value = 250; ls.gain.value = -p.tone * 6; sh.connect(ls); ls.connect(into); into = sh; }
         if (fresh && p.drive > 0) { const ws = ac.createWaveShaper(); ws.curve = driveCurve(p.driveType, p.drive); ws.oversample = p.driveType === 'crush' ? 'none' : '2x'; const mk = ac.createGain(); mk.gain.value = 1 / (1 + p.drive * (p.driveType === 'hard' || p.driveType === 'fold' ? 1.4 : 0.6)); ws.connect(mk); mk.connect(into); into = ws; }
@@ -392,7 +431,7 @@
         if (!pd) return ctx.fault('RUNTIME_002', 'pad_edit: bad index');
         if (p.key === 'color') { pd.color = String(p.value); }
         else if (p.key === 'voice') { if (!VOICES.includes(p.value)) return ctx.fault('RUNTIME_002', 'pad_edit: voice ' + p.value); pd.voice = p.value; pd.decay = VOICE_DEFAULTS[p.value].decay; pd.color = VOICE_DEFAULTS[p.value].color; pd.choke = VOICE_DEFAULTS[p.value].choke || 0; Object.assign(pd, SD); }
-        else if (p.key === 'model') { const md = MODELS[pd.voice][p.value]; if (!md) return ctx.fault('RUNTIME_002', `pad_edit: ${pd.voice} has no model ${p.value}`); Object.assign(pd, SD, { model: p.value, decay: VOICE_DEFAULTS[pd.voice].decay, drive: 0 }, md); }
+        else if (p.key === 'model') { const md = MD(pd.voice, p.value); if (!md) return ctx.fault('RUNTIME_002', `pad_edit: ${pd.voice} has no model ${p.value}`); Object.assign(pd, SD, { model: p.value, decay: VOICE_DEFAULTS[pd.voice].decay, drive: 0 }, md); }
         else if (p.key === 'driveType') { if (!DRIVE_TYPES.includes(p.value)) return ctx.fault('RUNTIME_002', 'pad_edit: drive type ' + p.value); pd.driveType = p.value; }
         else if (p.key === 'reverse' || p.key === 'start' || p.key === 'end') { if (pd.sample) pd.sample[p.key] = p.key === 'reverse' ? !!p.value : Math.max(0, Math.min(1, +p.value)); }
         else if (PAD_KEYS[p.key]) { if (typeof p.value !== 'number') return ctx.fault('RUNTIME_002', `pad_edit ${p.key}: number required`); const [lo, hi] = PAD_KEYS[p.key]; pd[p.key] = Math.max(lo, Math.min(hi, p.value)); if (p.key === 'choke') pd.choke = Math.round(pd.choke); }
@@ -411,7 +450,7 @@
       }
       ctx.onUI('pad_load', { type: 'object', required: ['index', 'arrayBuffer'] }, (p) => loadSample(p.index, p.arrayBuffer, p.name || 'sample'));
       // 3.30 kits: load a whole kit into the current bank, or one pad from anywhere (mix & match) — data from kit packs
-      function cleanPad(x) { if (!x || !VOICES.includes(x.voice)) return null; const q = pad(x.voice, Object.assign({}, x.model && MODELS[x.voice][x.model] || {}, x)); if (q.voice === 'sample' && !(q.sample && ctx.K.assets.get(q.sample.hash))) q.sample = null; Object.keys(PAD_KEYS).forEach(k => { if (k !== 'voice' && typeof q[k] === 'number') q[k] = Math.max(PAD_KEYS[k][0], Math.min(PAD_KEYS[k][1], q[k])); }); return q; }
+      function cleanPad(x) { if (!x || !VOICES.includes(x.voice)) return null; const q = pad(x.voice, Object.assign({}, x.model && MD(x.voice, x.model) || {}, x)); if (q.voice === 'sample' && !(q.sample && ctx.K.assets.get(q.sample.hash))) q.sample = null; Object.keys(PAD_KEYS).forEach(k => { if (k !== 'voice' && typeof q[k] === 'number') q[k] = Math.max(PAD_KEYS[k][0], Math.min(PAD_KEYS[k][1], q[k])); }); return q; }
       ctx.onUI('kit_load', { type: 'object', required: ['pads'] }, async (p) => {
         if (!Array.isArray(p.pads) || p.pads.length !== 16) return ctx.fault('RUNTIME_002', 'kit_load: 16 pads required');
         const b = typeof p.bank === 'number' ? p.bank : ctx.params.get('bank'), ps = p.pads.map(cleanPad); if (ps.some(x => !x)) return ctx.fault('RUNTIME_002', 'kit_load: unknown voice');
@@ -437,7 +476,7 @@
       });
 
       ctx.audition = (p) => trigger(typeof p.index === 'number' ? p.index : 0, p.velocity || 0.9, ac.currentTime);
-      ctx.stateExtra = () => ({ banks: banks.map(b => b.map(p => Object.assign({}, p, { sample: p.sample ? Object.assign({}, p.sample) : null }))), voices: VOICES, models: Object.fromEntries(VOICES.map(v => [v, Object.keys(MODELS[v])])), driveTypes: DRIVE_TYPES });
+      ctx.stateExtra = () => ({ banks: banks.map(b => b.map(p => Object.assign({}, p, { sample: p.sample ? Object.assign({}, p.sample) : null }))), voices: VOICES, models: Object.fromEntries(VOICES.map(v => [v, Object.keys(MODELS[v]).concat(DRX() ? DRX().names(v).filter(n => !MODELS[v][n]) : [])])), driveTypes: DRIVE_TYPES });
       ctx.models = M;
       ctx.saveExtra = () => ({ banks });
       ctx.loadExtra = async (x) => {

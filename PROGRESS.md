@@ -2,6 +2,24 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.75 🥁 Drum packs that ADD their own sounds · Synthwave, the full range (2026-10-25)
+His words: "also each pack for the dumpad needs to be completely different sounds. every pack needs to be additive." · "yes like there is
+supposed to be full range of synthwave sounds and tools". Map: specs/eravos.phase75-map.spec.
+- **Why, measured** on main: 13 packs, 51 kits, 816 pads, but only 51 distinct sounds, and 48 of them sat in 3 or more packs. A pack could
+  only re-tune the Drum Machine's fixed models; 11 packs owned no sound of their own.
+- **Now** a pack adds sounds as data (core/drum-recipes.js): layers of tone, noise, FM, metal, hand-claps and chords, with pitch drops and a
+  GATED tail. The Drum Machine plays them next to its own models; another pack can never overwrite one. Old kits play exactly as before.
+- **Synthwave** (data/drum-packs/synthwave.js): 22 sounds of its own — LinnDrum kick, snare, clap, hat · DMX kick, snare, open hat, cowbell ·
+  Simmons kick, snare and the "pew" tom · the GATED-reverb snare, clap and crash · Syndrum · tambourine · cabasa · claves · the orchestra
+  hit · a synth stab · a pulse bass hit. 4 kits: Neon Gated · Night Drive Simmons · DMX Outrun · Chrome Ballroom.
+- **"Completely different" is a number**: each sound is rendered and fingerprinted (loudness over time + spectrum). Every Synthwave sound
+  is at least 6 dB per feature from every other sound in the machine (the built-in models get as close as 3.2 to each other). On the first
+  render 10 of 22 were too close; they were redesigned until all passed.
+- **The tools**, inventoried (not built): synthwave has Retro Poly, Supersaw, Arp, Chords, Tape Echo, Mod Delay chorus, Phaser, a gate.
+  Missing: a gated-reverb effect, FM keys (DX7 piano and bells), brass stabs, a vocoder, a standalone ensemble chorus. Your call on order.
+- **Next** (P75.3): the other 12 packs, one at a time, each with its own sounds under the same test.
+- Tests: tests/p75-drum-packs.test.js (4).
+
 ## Done — 3.74 📈 Curves in every genre (2026-10-25)
 His words: "why doesn't the pattern library have more curves? like floor falls."
 - **Why, measured** on main: the library is generated from the Song Engine, and only 3 of its 85 genres write curves (Heavy Drops, Arp &
