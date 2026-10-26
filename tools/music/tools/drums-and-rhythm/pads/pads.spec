@@ -100,3 +100,21 @@ dependencies:
     - curve.out (modulation · port curve)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe, filesystem_read]
   works_with: [eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen, eravos.midi-mapper, eravos.sample-player]
+
+# ============================================================
+# ADDENDUM 2026-10-26 — 3.74b: models can come from packs (recipes) · map specs/eravos.phase74b-map.spec
+# ============================================================
+# James, 2026-10-25: "also each pack for the dumpad needs to be completely different sounds. every pack needs to be additive." · "yes like there
+#  is supposed to be full range of synthwave sounds and tools".
+# Drift from the body above (which stays, §0.3):
+#   pad_params gains `model` (3.0 added it in code; this spec still listed 2.0's keys) and the 3.0 sound-design keys
+#   tone · snap · sweep · body · driveType. A model is EITHER a built-in graph (MODELS / M in pads.engine.js) OR a pack's
+#   recipe (core/drum-recipes.js → window.DrumRecipes), looked up by MD(voice, model) in that order — a built-in name always wins.
+#   recipeVoice(rc, dst, t, p, vel) plays a recipe from its layers: tone · noise · fm · metal · burst · stack, with `hold` = a
+#   gated tail. Pad keys act on it: Tune shifts every pitch and filter · Decay stretches every envelope against the recipe's
+#   own decay · Sweep scales the pitch drops (24 = as written) · Body leans tone ↔ noise (0.5 = as written) · Snap scales the
+#   clicks (layers < 30 ms) · Tone / Drive / Level / Pan as on any pad.
+#   stateExtra.models[voice] = the built-in names then the recipe names; pad_edit `model`, kit_load and cleanPad accept both.
+#   Additive: DrumRecipes.add refuses a voice+name another pack owns. Classic and built-in models take the old path unchanged.
+#   Acceptance: tests/p74b-drum-packs.test.js — every pack sound renders, loads in a kit, and measures ≥ 6 dB per feature
+#   (loudness over 7 windows + 9 octave bands, attack and body) from every built-in model and every other pack sound.

@@ -141,3 +141,11 @@
   Order and why: audio in first (nothing vocal works without it) → the voice he asked for (Autotune) → the rest of the
   voice → the suite as control surface (now with real components to show) → components for the old tools → instruments
   that are not synths → the genres that use them.
+
+## ADDENDUM 2026-10-26 — from the drum packs work (3.74b, specs/eravos.phase74b-map.spec); nothing above is changed
+  James, 2026-10-25: "also each pack for the dumpad needs to be completely different sounds. every pack needs to be additive."
+  - C1 (Drum Machine → Pad voice component) and G4 (KITS: acoustic, boom-bap, brushes, live percussion, log drum) now have substrate:
+    core/drum-recipes.js lets a pack add its own drum sounds as data, played by the Drum Machine's recipe interpreter. A G4 kit should
+    bring its sounds as recipes in data/drum-packs/<pack>.js and pass tests/p74b-drum-packs.test.js (≥ 6 dB per feature from every
+    other sound), so each new genre's kit is its own sound, not a re-tune — his "completely different" rule.
+  - A Pad voice component (C1) can play the same recipes: recipeVoice in pads.engine.js is the one interpreter to reuse (§8.6).

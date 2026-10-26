@@ -63,3 +63,11 @@ Built under 3.75 while another session mapped a different 3.75 (Voice · Audio i
 reserving 3.75–3.86), which reached main first. Two contracts cannot share a number, so this map is 3.74b, and nothing in theirs is
 changed. Phase ids P75.x → P74b.x, decisions D-75.x → D-74b.x, test tests/p74b-drum-packs.test.js. Their phase G ("Kits as components")
 touches drum kits: the DrumRecipes registry here is the substrate it can stand on.
+
+## ADDENDUM 2026-10-26 — specs updated, one gap opened
+  Addenda added to: tools/music/tools/drums-and-rhythm/pads/pads.spec (recipes as models, the interpreter, acceptance) ·
+  specs/eravos.structure.spec §4 · specs/eravos.pack.format.spec · specs/eravos.phasemap.spec · specs/eravos.phase75-map.spec (C1, G4).
+  P74b.5 recipes onto ContentPacks: today a switched-off pack hides its kits but its sounds stay on the model chips, and a dropped
+         .zip carrying recipes is untested                                                                                       open
+        depends_on: [P74b.1]
+        files: tools/music/core/drum-recipes.js · tools/music/data/kits.js · canvas/runtime/content-packs.js

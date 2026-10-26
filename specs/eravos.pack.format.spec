@@ -492,3 +492,15 @@ example_drum_machine_zip:
         "spawn_at_drop_position": true
       }
     }
+
+# ============================================================
+# ADDENDUM 2026-10-26 — 3.74b: a drum pack's own sounds (specs/eravos.phase74b-map.spec)
+# James, 2026-10-25: "also each pack for the dumpad needs to be completely different sounds. every pack needs to be additive." · "yes like there
+#  is supposed to be full range of synthwave sounds and tools".
+#   A kit pad may name a pack sound: { voice, model: '<recipe name>', tune, decay, … }. The sound itself ships in the same
+#   pack file as data:  DrumRecipes.add({ pack, voice, name, label, decay, color?, layers: [...] })  — layer kinds and keys are
+#   documented in tools/music/core/drum-recipes.js. A voice+name belongs to one pack; a second pack cannot overwrite it (it
+#   throws). A pack's kits then KitPacks.add({ id, label, kits }) as before. Example: tools/music/data/drum-packs/synthwave.js.
+#   A dropped .zip pack carrying recipes is UNTESTED: no test drops one; whether its data file runs after core/drum-recipes.js is
+#   not proven — open, P74b.5.
+# ============================================================

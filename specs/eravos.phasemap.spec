@@ -305,3 +305,11 @@ forge:
 #   test 327 (tests/run.mjs now batches in fresh pages). Organ drive test recalibrated (measured 2.6×, not 3×).
 #   EDM Pads pack (data/preset-packs.js): 44 pads — Pad Forge 20, Supersaw 14, Retro Poly 10.
 # ============================================================
+
+# ============================================================
+# ADDENDUM 2026-10-26 — 3.74b drum packs that add their own sounds (specs/eravos.phase74b-map.spec)
+#   James, 2026-10-25: "also each pack for the dumpad needs to be completely different sounds. every pack needs to be additive."
+#   Done: P74b.1 DrumRecipes + interpreter · P74b.2 Synthwave (22 sounds, 4 kits, measured apart) · P74b.4 synthwave tools inventory.
+#   Open: P74b.3 the other 12 packs, one at a time · P74b.5 recipes onto ContentPacks + dropped zips. Numbered 3.74b because
+#   specs/eravos.phase75-map.spec (another session) reserves 3.75–3.86.
+# ============================================================

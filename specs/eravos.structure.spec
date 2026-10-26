@@ -119,3 +119,13 @@
       no tools. Tools are everything else and arrive as packs (ERAVOS Library\\Mods or a dropped .zip).
   Verified: tests/run.mjs 809/809 · validate 127 manifests · page loads 6 domains, 54 tools, 52 packs, 0 errors
   (file://, root redirect, serve.js) · exe overlay boots bare with 0 errors.
+
+## ADDENDUM 2026-10-26 — §4 Packs: drum packs can carry SOUNDS (3.74b, specs/eravos.phase74b-map.spec)
+  James, 2026-10-25: "also each pack for the dumpad needs to be completely different sounds. every pack needs to be additive." · "yes like there
+  is supposed to be full range of synthwave sounds and tools".
+  - New kind of content: a drum RECIPE (core/drum-recipes.js → DrumRecipes) — a named sound for one Drum Machine voice, as data
+    (layers of tone, noise, FM, metal, bursts, chords). R3 holds: a recipe is content, not code; the Drum Machine's interpreter is
+    the only code that plays it. First pack: data/drum-packs/synthwave.js (22 sounds, 4 kits). Pack files live in data/drum-packs/.
+  - DRIFT, said plainly: recipes register on DrumRecipes directly, NOT through ContentPacks. Switching the "Synthwave" kit pack off
+    hides its kits but its sounds stay offered on every pad's model chips. Moving recipes onto ContentPacks (a kind "drum-sounds",
+    switched with their pack) is open, P74b.5.
