@@ -237,7 +237,7 @@
       page.appendChild(sec('Its panel', !rec ? '' : live(st.target) ? '· the tool itself, live — every change is its window\'s too' : '· try it here — Add to canvas keeps what you set', [box], 'panel', 'sliders-horizontal'));
       // the tool's own extra tabs (view.pageTab), then what its domain adds for every such tool (UIKit.pageTabsFor)
       if (v) [].concat(v.pageTabs, (UI.pageTabsFor && UI.pageTabsFor(v)) || []).forEach(t => {
-        navTo(t.id, t.label, t.ic || 'sliders-horizontal'); page.appendChild(sec(t.label, t.sub || '', [h('div', { class: 'tp-panel' }, [t.el])], t.id, t.ic || 'sliders-horizontal'));
+        navTo(t.id, t.label, t.ic || 'sliders-horizontal'); page.appendChild(h('section', { class: 'tp-sec', 'data-sec': t.id }, [h('div', { class: 'tp-panel' }, [t.el])]));   // the tab names it; its panel heads itself
       });
     }
 

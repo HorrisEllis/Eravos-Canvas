@@ -501,3 +501,119 @@ table.tp-tab { width: 100%; }
 .cm-item:hover, .cm-item:focus { background: #1a2533; outline: none; }
 .cm-item:disabled { opacity: .4; cursor: default; }
 .cm-item.danger { color: #ff8aa0; }
+
+/* ============================================================================================================================
+   3.72 THE LOOK KIT — his call, 2026-10-24: "all of them pro-plugin look. the whole ui" ("that's way better").
+   A device, not a web page: a dark chassis, sections set into it, recessed screens, real knobs (a shaded cap and pointer inside
+   a glowing value ring, a moving knob's swing as a thin violet arc), lit segmented strips, LED toggles, metal fader caps, mono
+   caps labels. Same controls and class names as before — only how they are drawn changes, so every tool gets it at once.
+   ============================================================================================================================ */
+:root { --chassis: #0d1218; --chassis2: #121a23; --well: #06080b; --edge: rgba(255,255,255,.045); --mod: #b066ff; }
+/* windows: a chassis with a lit top edge in the tool's colour */
+.wm-win { border-radius: 6px; border-color: #000; background: linear-gradient(180deg, var(--chassis2), #0b1016 220px); box-shadow: 0 0 0 1px var(--line2) inset, 0 1px 0 var(--edge) inset, 0 14px 44px rgba(0,0,0,.6); }
+.wm-win::before { height: 2px; border-radius: 6px 6px 0 0; background: linear-gradient(90deg, transparent, var(--acc) 18%, var(--acc) 82%, transparent); box-shadow: 0 0 10px var(--acc); }
+.wm-head { border-bottom: 1px solid #000; box-shadow: 0 1px 0 var(--edge); }
+.wm-title { font: 700 11px var(--mono); letter-spacing: 1.8px; text-transform: uppercase; }
+/* sections set into the chassis */
+.uk-group { background: var(--chassis); border: 1px solid #000; border-radius: 4px; box-shadow: 0 0 0 1px var(--line) inset, 0 1px 0 var(--edge) inset; }
+.uk-group-title { display: flex; align-items: center; gap: 7px; font: 700 9.5px var(--mono); letter-spacing: 2px; color: var(--dim); }
+.uk-group-title::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--acc); box-shadow: 0 0 6px var(--acc); flex: none; }
+.uk-group-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line2), transparent); }
+/* knobs */
+.uk-knob-track { stroke: var(--well); stroke-width: 4.5; }
+.uk-knob-arc { stroke-width: 3; filter: drop-shadow(0 0 2.5px var(--acc)); }
+.uk-knob.active .uk-knob-arc { stroke-width: 3.6; }
+.uk-knob-cap { fill: url(#uk-cap); stroke: #000; stroke-width: .8; }
+.uk-knob-caphi { fill: none; stroke: rgba(255,255,255,.07); stroke-width: .6; }
+.uk-knob-ptr { stroke: #e9f1f8; stroke-width: 1.8; stroke-linecap: round; }
+.uk-knob-dot { fill: #e9f1f8; }
+.uk-knob-swing { fill: none; stroke: var(--mod); stroke-width: 1.4; stroke-linecap: round; opacity: .9; }
+.uk-knob-live { fill: #fff; filter: drop-shadow(0 0 3px var(--mod)); }
+.uk-knob.moving .uk-knob-label::after, .uk-toggle.moving::after { color: var(--mod); }
+.uk-knob-val { font: 600 10.5px var(--mono); margin-top: 0; }
+.uk-knob-label { font: 600 8.5px var(--mono); letter-spacing: 1.1px; text-transform: uppercase; color: var(--dim); }
+/* buttons: machined, 3 px corners; primary is lit */
+.uk-toggle, .uk-btn { border-radius: 3px; border: 1px solid #000; background: linear-gradient(180deg, #1b2530, #131b24); box-shadow: 0 1px 0 var(--edge) inset, 0 0 0 1px var(--line2); font-weight: 600; }
+.uk-btn:hover, .uk-toggle:hover { border-color: #000; box-shadow: 0 1px 0 var(--edge) inset, 0 0 0 1px var(--acc); }
+.uk-btn.primary { color: #08110a; border-color: #000; background: linear-gradient(180deg, color-mix(in srgb, var(--acc) 70%, #fff), var(--acc)); box-shadow: 0 1px 0 rgba(255,255,255,.3) inset, 0 0 12px color-mix(in srgb, var(--acc) 35%, transparent); }
+/* a toggle is an LED key */
+.uk-toggle.on { color: #fff; border-color: #000; background: linear-gradient(180deg, color-mix(in srgb, var(--acc) 40%, #1b2530), color-mix(in srgb, var(--acc) 22%, #0b1016)); box-shadow: 0 0 0 1px var(--acc), 0 0 10px color-mix(in srgb, var(--acc) 40%, transparent); text-shadow: 0 0 6px var(--acc); }
+/* segmented strips: a recessed strip, the chosen one lit */
+.uk-seg { border: 1px solid #000; border-radius: 3px; background: var(--well); box-shadow: 0 0 0 1px var(--line2); }
+.uk-seg button { background: transparent; border-right: 1px solid #000; font: 600 10px var(--mono); letter-spacing: .6px; color: var(--dim); }
+.uk-seg button:hover { color: var(--text); }
+.uk-seg button.on { color: #120c00; background: linear-gradient(180deg, color-mix(in srgb, var(--acc) 72%, #fff), var(--acc)); box-shadow: 0 0 10px color-mix(in srgb, var(--acc) 40%, transparent); font-weight: 700; }
+.uk-seg.vertical button { border-bottom: 1px solid #000; }
+/* fields: recessed wells */
+.uk-select, .uk-text { border-radius: 3px; border: 1px solid #000; background: var(--well); box-shadow: 0 0 0 1px var(--line2); font: 600 11px var(--mono); color: var(--text); }
+.uk-select { appearance: none; -webkit-appearance: none; padding-right: 16px;
+  background: linear-gradient(45deg, transparent 50%, var(--dim) 50%) right 11px center / 4px 4px no-repeat, linear-gradient(135deg, var(--dim) 50%, transparent 50%) right 7px center / 4px 4px no-repeat, var(--well); }
+.uk-select:focus, .uk-text:focus { outline: none; box-shadow: 0 0 0 1px var(--acc); }
+.uk-field > span { letter-spacing: 1.2px; }
+/* a number is a small LCD */
+.uk-num { border-radius: 3px; border: 1px solid #000; background: var(--well); box-shadow: 0 0 0 1px var(--line2), inset 0 1px 4px rgba(0,0,0,.6); color: var(--acc); font: 600 11.5px var(--mono); }
+/* faders: a slot, a lit fill, a metal cap */
+.uk-fader-slot { width: 10px; background: var(--well); border: 1px solid #000; border-radius: 2px; box-shadow: 0 0 0 1px var(--line); }
+.uk-fader-fill { left: 2px; right: 2px; bottom: 2px; border-radius: 1px; opacity: 1; background: linear-gradient(0deg, color-mix(in srgb, var(--acc) 35%, transparent), var(--acc)); }
+.uk-fader-thumb { left: -6px; width: 22px; height: 10px; border-radius: 2px; background: linear-gradient(180deg, #eef4fa, #9fb0c3); box-shadow: 0 1px 3px rgba(0,0,0,.8), 0 0 0 1px #000; }
+/* drawn displays are recessed screens */
+.uk-canvas { border-radius: 3px; background: radial-gradient(120% 140% at 50% 0%, #0b1119, #05070a); box-shadow: 0 0 0 1px #000, 0 0 0 2px var(--line), inset 0 2px 8px rgba(0,0,0,.8); }
+.uk-hint { color: var(--faint); font: 10px var(--mono); letter-spacing: .3px; }
+.org-label { letter-spacing: 1.8px; }
+/* the tool / suite page as a device: a chassis, the tabs along its top, its parts in inset panels; Add to canvas is the pink key */
+.tp-page { border-radius: 6px; border: 1px solid #000; border-top: 1px solid #000; background: linear-gradient(180deg, #121a23, #0b1016 260px); box-shadow: 0 0 0 1px var(--line2) inset, 0 1px 0 var(--edge) inset, 0 30px 80px rgba(0,0,0,.7); position: relative; }
+.tp-page::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; border-radius: 6px 6px 0 0; background: linear-gradient(90deg, transparent, var(--acc) 18%, var(--acc) 82%, transparent); box-shadow: 0 0 12px var(--acc); }
+.tp-head .ic-tile { border-radius: 4px; background: var(--well); border: 1px solid #000; box-shadow: 0 0 0 1px var(--line2), inset 0 0 18px color-mix(in srgb, var(--acc) 18%, transparent); }
+.tp-ht h2 { font: 700 18px var(--mono); letter-spacing: 3px; text-transform: uppercase; color: var(--text); }
+.tp-meta { font: 600 10px var(--mono); letter-spacing: 1.6px; color: var(--acc); }
+.tp-ht p { color: var(--dim); }
+.tp-btn { border-radius: 3px; border: 1px solid #000; background: linear-gradient(180deg, #1b2530, #131b24); box-shadow: 0 1px 0 var(--edge) inset, 0 0 0 1px var(--line2); font-weight: 600; }
+.tp-btn:hover { border-color: #000; box-shadow: 0 1px 0 var(--edge) inset, 0 0 0 1px var(--acc); }
+.tp-btn.pri { color: #fff; border-color: #000; background: linear-gradient(180deg, #ff3b78, #d01a52); box-shadow: 0 1px 0 rgba(255,255,255,.25) inset, 0 0 0 1px #ff2266, 0 0 14px rgba(255,34,102,.3); font-weight: 700; }
+.tp-btn.pri:hover { box-shadow: 0 1px 0 rgba(255,255,255,.25) inset, 0 0 0 1px #ff5c8f, 0 0 18px rgba(255,34,102,.45); }
+.tp-btn.tp-x { background: transparent; box-shadow: none; }
+.tp-target { border-radius: 3px; border: 1px solid #000; background: var(--well); box-shadow: 0 0 0 1px var(--line2); font: 600 11px var(--mono); color: var(--text); }
+.tp-on > span:first-child { font: 600 9.5px var(--mono); letter-spacing: 1.4px; text-transform: uppercase; color: var(--dim); }
+.tp-partof { font-size: 11px; }
+/* the tabs: one row across the device, mono caps, the open one lit underneath */
+.tp-nav { background: transparent; border-bottom: 1px solid #000; box-shadow: 0 1px 0 var(--edge); position: static; margin-top: 12px; }
+.tp-nav .tp-btn.tp-tab { box-shadow: none; background: transparent; font: 600 10.5px var(--mono); letter-spacing: 1.6px; text-transform: uppercase; padding: 12px 16px 10px; }
+.tp-nav .tp-btn.tp-tab .ic { display: none; }
+.tp-nav .tp-btn.tp-tab.on { background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--acc) 9%, transparent)); box-shadow: inset 0 -2px 0 var(--acc); border-bottom-color: transparent; }
+.tp-nav .tp-btn.tp-tab:hover { box-shadow: inset 0 -2px 0 var(--line2); }
+.tp-nav .tp-btn.tp-tab.on:hover { box-shadow: inset 0 -2px 0 var(--acc); }
+/* each section: a heading like a panel's, its content in an inset panel */
+.tp-h { font: 700 10px var(--mono); letter-spacing: 2px; text-transform: uppercase; color: var(--dim); }
+.tp-h .ic { display: none; }
+.tp-h::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--acc); box-shadow: 0 0 6px var(--acc); flex: none; }
+.tp-h::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line2), transparent); }
+.tp-h small { font: 500 10px var(--mono); letter-spacing: .4px; text-transform: none; color: var(--faint); order: 2; }
+.tp-panel { border-radius: 4px; border: 1px solid #000; background: var(--chassis); box-shadow: 0 0 0 1px var(--line) inset, 0 1px 0 var(--edge) inset; max-height: none; }
+.tp-row, .tp-mod, .tp-pre { border-radius: 3px; border: 1px solid #000; background: var(--well); box-shadow: 0 0 0 1px var(--line); }
+.tp-row.on { box-shadow: 0 0 0 1px var(--acc); border-color: #000; }
+.tp-tag { border-radius: 2px; font: 700 9px var(--mono); letter-spacing: 1px; text-transform: uppercase; }
+/* 3.73 "make the ui completely dynamic and fluid": everything eases — keys and strips light up and settle, faders glide to a
+   new value, a tab's content and a page slide in, a new window grows into place; and sections reflow to the room they have
+   (container queries: a narrow window stacks, a wide one spreads). Reduced motion: none of the movement, all of the reflow. */
+.uk-btn, .uk-toggle, .uk-seg button, .tp-btn, .tb-btn, .uk-select, .uk-text, .uk-num, .tp-nav .tp-btn.tp-tab {
+  transition: background-color .14s ease, color .14s ease, box-shadow .18s ease, border-color .14s ease, transform .08s ease, filter .14s ease; }
+.uk-btn:active, .uk-toggle:active, .uk-seg button:active, .tp-btn:active, .tb-btn:active { transform: translateY(1px) scale(.98); }
+.uk-fader:not(:active) .uk-fader-thumb { transition: bottom .16s cubic-bezier(.2,.8,.3,1); }
+.uk-fader:not(:active) .uk-fader-fill { transition: height .16s cubic-bezier(.2,.8,.3,1); }
+.uk-knob svg { transition: transform .12s ease; } .uk-knob:hover svg { transform: scale(1.04); } .uk-knob.active svg { transform: scale(1.06); }
+@keyframes uk-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes uk-pop { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
+.tp-sec:not([hidden]) { animation: uk-in .22s cubic-bezier(.2,.8,.3,1); }
+.tp-page { animation: uk-pop .22s cubic-bezier(.2,.8,.3,1); }
+.tp-overlay { animation: uk-fade .18s ease; } @keyframes uk-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes uk-grow { from { opacity: 0; } to { opacity: 1; } }   /* a fade only: a window is its exact size from the first frame (it may be maximised at once) */
+.wm-win.wm-new { animation: uk-grow .24s cubic-bezier(.2,.8,.3,1); }
+/* reflow: sections know their own width */
+.wm-body, .tp-panel { container-type: inline-size; }
+@container (max-width: 520px) {
+  .uk-panel { gap: 6px; } .uk-group { flex: 1 1 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tp-sec:not([hidden]), .tp-page, .tp-overlay, .wm-win.wm-new { animation: none; }
+  .uk-fader-thumb, .uk-fader-fill, .uk-knob svg { transition: none !important; }
+}

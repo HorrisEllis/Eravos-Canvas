@@ -30,27 +30,41 @@
     return { el, show, get current() { return cur; } };
   }
 
-  // ---------------------------------------------------------------- the picture of one movement (the cursor runs while it plays)
-  function preview(view, getM) {
-    const cv = UI.Canvas(92, 26); cv.classList.add('mo-pic');
+  // ---------------------------------------------------------------- 3.72 the look: drawn shape tiles, a live scope, a steps editor
+  const SHAPE_ICON = { sine: 'M2 14 C 8 0, 14 0, 20 14 S 32 28, 38 14', triangle: 'M2 22 L11 4 L29 24 L38 6', saw: 'M2 4 L20 24 L20 4 L38 24', ramp: 'M2 24 L20 4 L20 24 L38 4',
+    square: 'M2 22 L2 6 L20 6 L20 22 L38 22 L38 6', random: 'M2 18 H8 V6 H14 V20 H20 V10 H26 V24 H32 V12 H38', smooth: 'M2 18 C 6 6, 10 6, 14 14 S 22 24, 26 12 S 34 4, 38 16',
+    steps: 'M2 24 V16 H10 V8 H18 V20 H26 V4 H34 V14 H38', follow: 'M2 14 L6 10 L9 18 L12 6 L15 22 L18 9 L21 17 L24 12 L27 15 L30 13 L34 14 L38 14' };
+  function shapeTiles(cur, onPick) {
+    const el = h('div', { class: 'mo-shapes', role: 'radiogroup', 'aria-label': 'shape' });
+    M().SHAPES.forEach(sh => {
+      const t = h('button', { class: 'mo-tile' + (sh === cur ? ' on' : ''), title: M().SHAPE_LABEL[sh], role: 'radio', 'aria-checked': sh === cur ? 'true' : 'false',
+        html: `<svg width="40" height="28" viewBox="0 0 40 28" aria-hidden="true"><path d="${SHAPE_ICON[sh]}"/></svg>` });
+      t.addEventListener('click', (e) => { e.stopPropagation(); onPick(sh); }); el.appendChild(t);
+    });
+    return el;
+  }
+  function scope(view, getM) {
+    const cv = UI.Canvas(360, 64); cv.classList.add('mo-scope');
     UI.loop(cv, () => {
       const g = cv.g, W = cv.fit().W, H = cv.H, m = getM(); g.clearRect(0, 0, W, H); if (!m) return;
-      const acc = getComputedStyle(cv).getPropertyValue('--acc').trim() || '#00d4ff';
-      g.strokeStyle = 'rgba(127,147,168,.25)'; g.beginPath(); g.moveTo(0, H / 2); g.lineTo(W, H / 2); g.stroke();
-      g.strokeStyle = acc; g.lineWidth = 1.5; g.beginPath();
-      for (let x = 0; x <= W; x++) { const c = x / W * 2 + m.phase, v = m.shape === 'follow' ? Math.sin(x / W * 9) * 0.5 * Math.abs(Math.sin(x / W * 3)) : M().shapeAt(m.shape, c, 11, m.steps); const y = H / 2 - v * m.depth * (H / 2 - 2); x ? g.lineTo(x, y) : g.moveTo(x, y); }
-      g.stroke();
-      const ac = view.ac, beats = ac ? ac.currentTime * ((view.K && view.K.music && view.K.music.bpm) || 120) / 60 : 0, px = ((beats / m.beats) % 2) / 2 * W;
-      g.fillStyle = acc; g.fillRect(px, 0, 1.5, H);
-    }, 20);
+      const acc = getComputedStyle(cv).getPropertyValue('--acc').trim() || '#ffaa00';
+      g.strokeStyle = 'rgba(127,147,168,.16)'; g.lineWidth = 1; for (let i = 1; i < 4; i++) { g.beginPath(); g.moveTo(i * W / 4, 0); g.lineTo(i * W / 4, H); g.stroke(); }
+      g.beginPath(); g.moveTo(0, H / 2); g.lineTo(W, H / 2); g.stroke();
+      const at = (c) => m.shape === 'follow' ? Math.sin(c * 9) * 0.5 * Math.abs(Math.sin(c * 3)) : M().shapeAt(m.shape, c, 11, m.steps);
+      g.strokeStyle = acc; g.lineWidth = 2; g.shadowColor = acc; g.shadowBlur = 8; g.beginPath();
+      for (let x = 0; x <= W; x++) { const y = H / 2 - at(x / W * 2 + m.phase) * m.depth * (H / 2 - 4); x ? g.lineTo(x, y) : g.moveTo(x, y); }
+      g.stroke(); g.shadowBlur = 0;
+      const ac = view.ac, beats = ac ? ac.currentTime * ((view.K && view.K.music && view.K.music.bpm) || 120) / 60 : 0, c = (beats / m.beats) % 2, px = c / 2 * W, py = H / 2 - at(c + m.phase) * m.depth * (H / 2 - 4);
+      g.fillStyle = '#fff'; g.beginPath(); g.arc(px, py, 3, 0, Math.PI * 2); g.fill();
+    }, 30);
     return cv;
   }
-  // the steps of a 'steps' movement: drag up/down on a bar
   function stepsEditor(m, onChange) {
-    const cv = UI.Canvas(184, 44); cv.classList.add('mo-steps'); let down = false;
+    const cv = UI.Canvas(360, 56); cv.classList.add('mo-steps'); let down = false;
     UI.loop(cv, () => {
-      const g = cv.g, W = cv.fit().W, H = cv.H, s = m.steps, w = W / s.length, acc = getComputedStyle(cv).getPropertyValue('--acc').trim() || '#00d4ff'; g.clearRect(0, 0, W, H);
-      s.forEach((v, i) => { g.fillStyle = 'rgba(127,147,168,.12)'; g.fillRect(i * w + 1, 0, w - 2, H); g.fillStyle = acc; const y = H / 2 - v * (H / 2 - 1); g.fillRect(i * w + 1, Math.min(y, H / 2), w - 2, Math.max(1.5, Math.abs(y - H / 2))); });
+      const g = cv.g, W = cv.fit().W, H = cv.H, s = m.steps, w = W / s.length, acc = getComputedStyle(cv).getPropertyValue('--acc').trim() || '#ffaa00'; g.clearRect(0, 0, W, H);
+      s.forEach((v, i) => { g.fillStyle = 'rgba(127,147,168,.08)'; g.fillRect(i * w + 2, 2, w - 4, H - 4); const y = H / 2 - v * (H / 2 - 3); g.fillStyle = acc; g.shadowColor = acc; g.shadowBlur = 6; g.fillRect(i * w + 3, Math.min(y, H / 2), w - 6, Math.max(2, Math.abs(y - H / 2))); g.shadowBlur = 0; });
+      g.fillStyle = 'rgba(127,147,168,.25)'; g.fillRect(0, H / 2, W, 1);
     }, 15);
     const set = (e) => { const r = cv.getBoundingClientRect(), i = clamp(Math.floor((e.clientX - r.left) / r.width * m.steps.length), 0, m.steps.length - 1); m.steps[i] = +clamp(1 - 2 * (e.clientY - r.top) / r.height, -1, 1).toFixed(2); };
     cv.addEventListener('pointerdown', (e) => { e.stopPropagation(); down = true; try { cv.setPointerCapture(e.pointerId); } catch (x) {} set(e); });
@@ -58,42 +72,50 @@
     ['pointerup', 'pointercancel'].forEach(t => cv.addEventListener(t, () => { if (down) { down = false; onChange(); } }));
     return cv;
   }
+  const head = (title, right) => h('div', { class: 'mo-head' }, [h('span', { class: 'mo-dot' }), h('span', { class: 'mo-cap', text: title }), h('span', { class: 'mo-rule' })].concat(right || []));
 
-  // ---------------------------------------------------------------- MOTION
+  // ---------------------------------------------------------------- MOTION: slots for the moving knobs, then the chosen one's shape, rate, depth, phase
   function motionPanel(view) {
-    const el = h('div', { class: 'mo-panel' });
+    const el = h('div', { class: 'mo-panel mo-motion' });
     const list = () => M().cleanMotion(view.state._motion);
-    let sig = '';
+    let sig = '', sel = null;
     const save = (arr, keep) => { if (keep) sig = JSON.stringify(arr); view.emit('config_change', { key: '_motion', value: arr }); };   // keep: a value turned here — no rebuild under the hand
     function paint() {
       el.innerHTML = '';
       const ms = list(), free = knobsOf(view).filter(c => !ms.some(m => m.key === c.key));
-      const add = select([['', '＋ Move a knob…']].concat(free.map(c => [c.key, c.label || c.key])), '', (k) => { if (!k) return; save(ms.concat([{ key: k, shape: 'sine', beats: 4, depth: 0.5, phase: 0 }])); });
-      el.appendChild(h('div', { class: 'mo-head' }, [h('span', { class: 'mo-cap', text: 'MOTION' }), h('span', { class: 'mo-dim', text: ms.length ? 'knobs moving on their own, in time with the song' : 'nothing moves yet — pick a knob to move it on its own' }), add]));
-      ms.forEach((m, i) => {
-        const upd = (patch, keep) => { const arr = list(); Object.assign(arr[i], patch); if (patch.shape === 'steps' && !arr[i].steps) arr[i].steps = [1, 0.5, 0, -0.5, -1, -0.5, 0, 0.5]; save(arr, keep); };
-        const depth = UI.Knob({ key: 'depth', label: 'Depth', min: -1, max: 1, step: 0.01, value: m.depth, size: 30, onChange: (v) => upd({ depth: v }, true) });
-        const phase = UI.Knob({ key: 'phase', label: 'Phase', min: 0, max: 1, step: 0.01, value: m.phase, size: 30, onChange: (v) => upd({ phase: v }, true) });
-        const row = h('div', { class: 'mo-row' + (m.off ? ' off' : '') }, [
-          h('b', { class: 'mo-name', text: labelOf(view, m.key) }),
-          select(M().SHAPES.map(s => [s, M().SHAPE_LABEL[s]]), m.shape, (v) => upd({ shape: v })),
-          m.shape === 'follow' ? h('span', { class: 'mo-dim mo-rate', text: 'the mix' }) : select(M().RATES.map(([v, l]) => [v, l]), M().RATES.some(([v]) => Math.abs(v - m.beats) < 1e-6) ? m.beats : 4, (v) => upd({ beats: +v }), 'mo-rate'),
-          depth.el, phase.el, preview(view, () => list()[i]),
-          UI.Button({ label: m.off ? 'Off' : 'On', hint: 'pause this movement (it keeps its settings)', onClick: () => upd({ off: !m.off }) }).el,
-          UI.Button({ label: '×', hint: 'stop moving this knob', onClick: () => save(list().filter((_, j) => j !== i)) }).el,
-        ]);
-        el.appendChild(row);
-        if (m.shape === 'steps') row.appendChild(h('div', { class: 'mo-sub' }, [h('span', { class: 'mo-dim', text: 'steps — drag the bars' }), stepsEditor(m, () => upd({ steps: m.steps.slice() }, true)),
-          UI.Button({ label: '−', hint: 'fewer steps', onClick: () => upd({ steps: m.steps.slice(0, Math.max(2, m.steps.length - 1)) }) }).el,
-          UI.Button({ label: '+', hint: 'more steps', onClick: () => upd({ steps: m.steps.concat([0]).slice(0, 16) }) }).el]));
-      });
+      if (!ms.some(m => m.key === sel)) sel = ms.length ? ms[0].key : null;
+      const add = select([['', '＋ Move a knob']].concat(free.map(c => [c.key, c.label || c.key])), '', (k) => { if (!k) return; sel = k; save(ms.concat([{ key: k, shape: 'sine', beats: 4, depth: 0.5, phase: 0 }])); }, 'mo-addsel');
+      el.appendChild(head('Motion', [h('span', { class: 'mo-count', text: ms.length ? ms.length + ' moving' : 'none moving' }), add]));
+      if (!ms.length) { el.appendChild(h('div', { class: 'mo-empty', text: 'Pick a knob above and it moves on its own, in time with the song. Or right-click any knob.' })); return; }
+      // the slots
+      el.appendChild(h('div', { class: 'mo-slots' }, ms.map(m => {
+        const b = h('button', { class: 'mo-slot' + (m.key === sel ? ' sel' : '') + (m.off ? ' off' : ''), text: labelOf(view, m.key), title: 'edit how ' + labelOf(view, m.key) + ' moves' });
+        b.addEventListener('click', (e) => { e.stopPropagation(); sel = m.key; paint(); }); return b;
+      })));
+      const i = ms.findIndex(m => m.key === sel), m = ms[i];
+      const upd = (patch, keep) => { const arr = list(); Object.assign(arr[i], patch); if (patch.shape === 'steps' && !arr[i].steps) arr[i].steps = [1, 0.5, 0, -0.5, -1, -0.5, 0, 0.5]; save(arr, keep); };
+      el.appendChild(h('div', { class: 'mo-lab', text: 'Shape — ' + labelOf(view, m.key) }));
+      el.appendChild(shapeTiles(m.shape, (sh) => upd({ shape: sh })));
+      const rate = m.shape === 'follow' ? h('span', { class: 'mo-lcd', text: 'THE MIX' }) : UI.Segmented({ options: M().RATES.map(([v, l]) => ({ value: v, label: l.toUpperCase() })), value: M().RATES.some(([v]) => Math.abs(v - m.beats) < 1e-6) ? M().RATES.find(([v]) => Math.abs(v - m.beats) < 1e-6)[0] : 4, onChange: (v) => upd({ beats: +v }) }).el;
+      const depth = UI.Knob({ key: 'depth', label: 'Depth', min: -1, max: 1, step: 0.01, value: m.depth, size: 46, format: (v) => (v > 0 ? '+' : '') + v.toFixed(2), onChange: (v) => upd({ depth: v }, true) });
+      const phase = UI.Knob({ key: 'phase', label: 'Phase', min: 0, max: 1, step: 0.01, value: m.phase, size: 46, format: (v) => Math.round(v * 360) + '°', onChange: (v) => upd({ phase: v }, true) });
+      depth.el.classList.add('mo-modknob'); phase.el.classList.add('mo-modknob');
+      el.appendChild(h('div', { class: 'mo-lab', text: 'Rate' })); el.appendChild(h('div', { class: 'mo-rate' }, [rate]));
+      el.appendChild(h('div', { class: 'mo-edit' }, [scope(view, () => list()[i]), depth.el, phase.el]));
+      if (m.shape === 'steps') el.appendChild(h('div', { class: 'mo-stepsrow' }, [stepsEditor(m, () => upd({ steps: m.steps.slice() }, true)),
+        UI.Button({ label: '−', hint: 'fewer steps', onClick: () => upd({ steps: m.steps.slice(0, Math.max(2, m.steps.length - 1)) }) }).el,
+        UI.Button({ label: '+', hint: 'more steps', onClick: () => upd({ steps: m.steps.concat([0]).slice(0, 16) }) }).el]));
+      const on = UI.Toggle({ label: m.off ? 'OFF' : 'ON', value: !m.off, hint: 'pause this movement (it keeps its settings)', onChange: (v) => upd({ off: !v }) });
+      el.appendChild(h('div', { class: 'mo-foot' }, [h('span', { class: 'mo-note', text: 'SYNCED TO THE SONG · THE KNOB KEEPS ITS OWN VALUE' }), on.el,
+        UI.Button({ label: 'Remove', hint: 'stop moving this knob', onClick: () => save(list().filter((_, j) => j !== i)) }).el]));
     }
     const repaint = () => { const s = JSON.stringify(M().cleanMotion(view.state._motion)); if (s === sig && el.childNodes.length) return; sig = s; paint(); };
     view.bind('_motion', repaint); view.on('state_sync', repaint); repaint(); stop(el);
     return { el, repaint };
   }
 
-  // ---------------------------------------------------------------- PERFORM
+  // ---------------------------------------------------------------- PERFORM: the XY pad (with its trail) and four macro cards
+  const MAC_COL = ['#ff2266', '#ffaa00', '#00d4ff', '#b066ff'];
   function performPanel(view) {
     const el = h('div', { class: 'mo-panel mo-perform' }), MAC = M().MACROS;
     const pf = () => M().cleanPerform(view.state._perform);
@@ -101,15 +123,18 @@
     const save = (p, keep) => { if (keep) sig = JSON.stringify(p); view.emit('config_change', { key: '_perform', value: p }); };
     const live = {}; view.on('param_live', (p) => { if (p && MAC.includes(p.key)) live[p.key] = p.value; });
     const val = (k) => (live[k] !== undefined && live[k] !== null ? live[k] : +view.state[k] || 0);
-    // the XY pad: X and Y each turn a macro
-    const pad = UI.Canvas(150, 150); pad.classList.add('mo-xy'); let down = false, lastSend = 0;
+    // the pad: X and Y each turn a macro; where it has been fades behind it
+    const pad = UI.Canvas(200, 200); pad.classList.add('mo-xy'); let down = false, lastSend = 0; const trail = [];
     UI.loop(pad, () => {
-      const g = pad.g, W = pad.fit().W, H = pad.H, p = pf(), acc = getComputedStyle(pad).getPropertyValue('--acc').trim() || '#00d4ff'; g.clearRect(0, 0, W, H);
-      g.strokeStyle = 'rgba(127,147,168,.14)'; for (let i = 1; i < 4; i++) { g.beginPath(); g.moveTo(i * W / 4, 0); g.lineTo(i * W / 4, H); g.moveTo(0, i * H / 4); g.lineTo(W, i * H / 4); g.stroke(); }
-      const x = val(MAC[p.xy.x]) * W, y = (1 - val(MAC[p.xy.y])) * H;
-      g.strokeStyle = acc; g.globalAlpha = 0.35; g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); g.globalAlpha = 1;
-      g.fillStyle = acc; g.beginPath(); g.arc(x, y, 6, 0, Math.PI * 2); g.fill();
-      g.fillStyle = 'rgba(214,228,240,.55)'; g.font = '9px monospace'; g.fillText('X ' + p.names[p.xy.x], 4, H - 5); g.save(); g.translate(10, H - 26); g.rotate(-Math.PI / 2); g.fillText('Y ' + p.names[p.xy.y], 0, 0); g.restore();
+      const g = pad.g, W = pad.fit().W, H = pad.H, p = pf(), cx = MAC_COL[p.xy.x], cy = MAC_COL[p.xy.y]; g.clearRect(0, 0, W, H);
+      g.strokeStyle = 'rgba(127,147,168,.12)'; g.lineWidth = 1; for (let i = 1; i < 6; i++) { g.beginPath(); g.moveTo(i * W / 6, 0); g.lineTo(i * W / 6, H); g.moveTo(0, i * H / 6); g.lineTo(W, i * H / 6); g.stroke(); }
+      const x = val(MAC[p.xy.x]) * W, y = (1 - val(MAC[p.xy.y])) * H, last = trail[trail.length - 1];
+      if (!last || Math.hypot(last[0] - x, last[1] - y) > 1) trail.push([x, y]); if (trail.length > 48) trail.shift();
+      trail.forEach((q, i) => { g.fillStyle = cx; g.globalAlpha = i / trail.length * 0.45; g.beginPath(); g.arc(q[0], q[1], 2 + i / trail.length * 3, 0, Math.PI * 2); g.fill(); }); g.globalAlpha = 1;
+      g.strokeStyle = cx; g.globalAlpha = 0.35; g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); g.strokeStyle = cy; g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); g.globalAlpha = 1;
+      g.shadowColor = cx; g.shadowBlur = 16; g.fillStyle = cx; g.beginPath(); g.arc(x, y, 7, 0, Math.PI * 2); g.fill(); g.shadowBlur = 0; g.fillStyle = '#fff'; g.beginPath(); g.arc(x, y, 2.5, 0, Math.PI * 2); g.fill();
+      g.font = '600 9px monospace'; g.fillStyle = 'rgba(214,228,240,.55)'; g.fillText('X · ' + p.names[p.xy.x].toUpperCase(), 6, H - 6);
+      g.save(); g.translate(12, H - 24); g.rotate(-Math.PI / 2); g.fillText('Y · ' + p.names[p.xy.y].toUpperCase(), 0, 0); g.restore();
     }, 30);
     const fromPad = (e, force) => {
       const r = pad.getBoundingClientRect(), p = pf(), x = +clamp((e.clientX - r.left) / r.width, 0, 1).toFixed(3), y = +clamp(1 - (e.clientY - r.top) / r.height, 0, 1).toFixed(3), now = performance.now();
@@ -119,33 +144,34 @@
     pad.addEventListener('pointerdown', (e) => { e.stopPropagation(); down = true; try { pad.setPointerCapture(e.pointerId); } catch (x) {} fromPad(e, true); });
     pad.addEventListener('pointermove', (e) => { if (down) fromPad(e); });
     ['pointerup', 'pointercancel'].forEach(t => pad.addEventListener(t, (e) => { if (down) { down = false; fromPad(e, true); } }));
-    const axes = h('div', { class: 'mo-axes' });
-    const macros = h('div', { class: 'mo-macros' });
+    const axes = h('div', { class: 'mo-axes' }), macros = h('div', { class: 'mo-macros' });
     let learning = -1, snap = null;
     const banner = h('div', { class: 'mo-learn', hidden: true });
     function paint() {
       const p = pf(); axes.innerHTML = ''; macros.innerHTML = '';
-      const ax = (which) => select(MAC.map((_, i) => [i, which.toUpperCase() + ' → ' + p.names[i]]), p.xy[which], (v) => { const q = pf(); q.xy[which] = +v; save(q); });
-      axes.append(ax('x'), ax('y'));
+      ['x', 'y'].forEach(which => axes.appendChild(h('div', { class: 'mo-axis' }, [h('span', { class: 'mo-lab', text: which.toUpperCase() }),
+        UI.Segmented({ options: MAC.map((_, i) => ({ value: i, label: String(i + 1), hint: p.names[i] })), value: p.xy[which], onChange: (v) => { const q = pf(); q.xy[which] = +v; save(q); } }).el])));
       MAC.forEach((mk, i) => {
-        const c = (view.descriptor.config || []).find(x => x.key === mk); const kn = UI.paramControl(view, Object.assign({}, c, { label: '' }), { size: 38 });
-        const name = h('input', { class: 'uk-text mo-mname', value: p.names[i], title: 'rename this macro' }); stop(name);
+        const c = (view.descriptor.config || []).find(x => x.key === mk), kn = UI.paramControl(view, Object.assign({}, c, { label: '' }), { size: 54 });
+        const name = h('input', { class: 'mo-mname', value: p.names[i], title: 'rename this macro', 'aria-label': 'macro ' + (i + 1) + ' name' }); stop(name);
         name.addEventListener('change', () => { const q = pf(); q.names[i] = name.value || ('Macro ' + (i + 1)); save(q); });
-        const chips = Object.keys(p.map[i]).map(k => {
-          const amt = p.map[i][k], n = UI.NumberDrag ? UI.NumberDrag({ value: Math.round(amt * 100), min: -100, max: 100, step: 1, format: (v) => (v > 0 ? '+' : '') + v + '%', onChange: (v) => { const q = pf(); q.map[i][k] = clamp(v / 100, -1, 1); if (!q.map[i][k]) delete q.map[i][k]; save(q, !!q.map[i][k]); } }) : null;
-          return h('span', { class: 'mo-chip', title: 'how far this macro turns ' + labelOf(view, k) + ' (drag the number)' }, [h('span', { text: labelOf(view, k) }), n ? n.el : h('span', { text: Math.round(amt * 100) + '%' }),
+        const dests = Object.keys(p.map[i]).map(k => {
+          const amt = p.map[i][k], n = UI.NumberDrag({ value: Math.round(amt * 100), min: -100, max: 100, step: 1, label: 'how far ' + p.names[i] + ' turns ' + labelOf(view, k), format: (v) => (v > 0 ? '+' : '') + v + '%', onChange: (v) => { const q = pf(); q.map[i][k] = clamp(v / 100, -1, 1); if (!q.map[i][k]) delete q.map[i][k]; save(q, !!q.map[i][k]); } });
+          return h('div', { class: 'mo-chip mo-dest' }, [h('span', { class: 'mo-dn', text: labelOf(view, k) }), n.el,
             h('button', { class: 'mo-x', text: '×', title: 'take it off this macro', onclick: (e) => { e.stopPropagation(); const q = pf(); delete q.map[i][k]; save(q); } })]);
         });
         const free = knobsOf(view).filter(c2 => !(c2.key in p.map[i]));
-        const add = select([['', '＋ knob']].concat(free.map(c2 => [c2.key, c2.label || c2.key])), '', (k) => { if (!k) return; const q = pf(); q.map[i][k] = 0.5; save(q); }, 'mo-add');
-        const learn = UI.Button({ label: learning === i ? 'Done' : 'Learn', hint: 'turn knobs in the Play tab: each one you turn is added — as far as you turned it', onClick: () => setLearn(learning === i ? -1 : i) });
-        if (learning === i) learn.el.classList.add('on');
-        macros.appendChild(h('div', { class: 'mo-mrow' + (learning === i ? ' learning' : '') }, [kn ? kn.el : h('span'), h('div', { class: 'mo-mbody' }, [h('div', { class: 'mo-mtop' }, [name, learn.el]), h('div', { class: 'mo-chips' }, chips.concat([add]))])]));
+        const add = select([['', '＋ Add a knob']].concat(free.map(c2 => [c2.key, c2.label || c2.key])), '', (k) => { if (!k) return; const q = pf(); q.map[i][k] = 0.5; save(q); }, 'mo-add');
+        const learn = UI.Toggle({ label: 'LEARN', value: learning === i, hint: 'turn knobs on the Panel: each one you turn joins this macro — as far as you turned it', onChange: (v) => setLearn(v ? i : -1) });
+        const card = h('div', { class: 'mo-mrow' + (learning === i ? ' learning' : ''), style: { '--acc': MAC_COL[i] } }, [
+          h('div', { class: 'mo-mtop' }, [name, learn.el]), h('div', { class: 'mo-mknob' }, [kn ? kn.el : h('span')]),
+          h('div', { class: 'mo-dests' }, dests.length ? dests : [h('div', { class: 'mo-none', text: 'turns nothing yet' })]), add]);
+        macros.appendChild(card);
       });
     }
     function setLearn(i) {
       learning = i; snap = i >= 0 ? Object.assign({}, view.state) : null;
-      banner.hidden = i < 0; banner.textContent = i >= 0 ? 'Learning ' + pf().names[i] + ': turn any knob — it is added as far as you turn it, then goes back. Done when finished.' : '';
+      banner.hidden = i < 0; banner.textContent = i >= 0 ? 'LEARNING ' + pf().names[i].toUpperCase() + ' — turn any knob on the Panel: it joins as far as you turn it, then goes back' : '';
       paint();
     }
     // learn: a knob turned while learning joins the macro (the turn = its amount) and the knob goes back where it was
@@ -154,8 +180,8 @@
       const amt = clamp((v - snap[c.key]) / (c.max - c.min), -1, 1); if (Math.abs(amt) < 0.01) return;
       const q = pf(); q.map[learning][c.key] = +amt.toFixed(2); save(q); view.emit('config_change', { key: c.key, value: snap[c.key] });
     }));
-    el.append(h('div', { class: 'mo-head' }, [h('span', { class: 'mo-cap', text: 'PERFORM' }), h('span', { class: 'mo-dim', text: 'four macros turn many knobs at once; the pad plays two of them — MIDI-learn or automate a macro like any knob' })]),
-      banner, h('div', { class: 'mo-pgrid' }, [h('div', { class: 'mo-padcol' }, [pad, axes]), macros]));
+    el.append(head('Perform', [h('span', { class: 'mo-count', text: 'MIDI-LEARN OR AUTOMATE A MACRO LIKE ANY KNOB' })]), banner,
+      h('div', { class: 'mo-pgrid' }, [h('div', { class: 'mo-padcol' }, [pad, axes]), macros]));
     const repaint = () => { const s = JSON.stringify(M().cleanPerform(view.state._perform)); if (s === sig && macros.childNodes.length) return; sig = s; paint(); };
     view.bind('_perform', repaint); view.on('state_sync', repaint); repaint(); stop(el);
     return { el, learn: setLearn };
