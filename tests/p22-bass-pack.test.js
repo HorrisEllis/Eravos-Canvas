@@ -64,6 +64,9 @@ describe('Bass Pack (wubs, dubs, bass drops)', () => {
     // 3.58: dubstep re-taken after the Wobble Bass window went wide (560 → 1100 px): only window positions moved — the song with
     // every "at" removed is byte-identical before/after, and the old size still gives 3488627402
     const gold = { 'dubstep:7': 3834994118, 'house:5': 3208681780, 'darkwave:3': 3685006575, 'neuro:11': 3776661450, 'trance:2': 2790197795 };
-    Object.keys(gold).forEach(k => { const [id, seed] = k.split(':'); assert.equal(hash(JSON.stringify(SongEngine.generate(id, +seed))), gold[k], k); });
+    // 3.73: songs now carry movement (per-note curves and bends — "why do barely any of them curve?"). With it switched off
+    // (G.curve = false) every song is byte-identical to these hashes: nothing else changed. The movement itself: tests/p73.
+    Object.keys(gold).forEach(k => { const [id, seed] = k.split(':'), G = SongEngine.genres().find(g => g.id === id); G.curve = false;
+      try { assert.equal(hash(JSON.stringify(SongEngine.generate(id, +seed))), gold[k], k); } finally { delete G.curve; } });
   });
 });

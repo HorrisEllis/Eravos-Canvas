@@ -97,6 +97,66 @@
 
   // ---------------------------------------------------------------- genre → recipe steps
   const SIZE = { w: 500, h: 460 };
+  // ---------------------------------------------------------------- 3.73 movement: notes that curve
+  // James, 2026-10-24: "the patterns. Why do barely any of them curve?" — of 183 464 notes the 85 genres wrote, none had a per-note
+  // curve and 218 had a bend: the curves came later and nothing wrote them. Now every melodic part plays with movement, chosen by its
+  // role and the section — its filter opens, its growl builds, it talks, it dives at the end of a drop, a lead glides in — as curved
+  // per-note curves (Bézier arcs) on the tool's own filter / drive / wobble knobs, and bends. Centred on the part's preset (its own
+  // sound, moved). Seeded apart from the song's random numbers: the notes are exactly the same as before, only their movement is new.
+  // A genre turns it off with curve: false, a part with P.curve === false; a note the genre already shaped (c / b) is kept.
+  const KNOB_RE = { filter: /^cutoff$|cutoff|bright|tone|freq|tilt|morph|fmIndex/i, drive: /drive|grit|fold|crush|dist|shaper/i, wobble: /^depth$|depth|wobble/i };
+  function knobsFor(organism, presetName) {
+    const d = window.OrganismFactory && window.OrganismFactory.def(organism); if (!d) return {};
+    const ks = (d.config || []).filter(c => (c.type === 'number') && !c.hidden && !c.perform && c.max > c.min);
+    const pre = (presetName && d.presets && d.presets[presetName] && (d.presets[presetName].params || d.presets[presetName])) || {};
+    const out = {};
+    Object.keys(KNOB_RE).forEach(role => { const k = ks.find(c => KNOB_RE[role].test(c.key)) || ks.find(c => KNOB_RE[role].test(c.label || '')); if (k) out[role] = { k, v: typeof pre[k.key] === 'number' ? pre[k.key] : k.default }; });
+    return out;
+  }
+  const isLog = (k) => k.unit === 'Hz' && k.min > 0 && k.max / k.min >= 20;
+  const toF = (k, v) => isLog(k) ? Math.log(Math.max(k.min, v) / k.min) / Math.log(k.max / k.min) : (v - k.min) / (k.max - k.min);
+  const fromF = (k, f) => { f = Math.max(0, Math.min(1, f)); const v = isLog(k) ? k.min * Math.pow(k.max / k.min, f) : k.min + f * (k.max - k.min); return Math.round(v * 1000) / 1000; };
+  // a move: per role, points [t 0…1, offset −1…1 from the knob's own place, handle?: [hx 0…1 along the segment, offset]] — handles make arcs
+  const MOVES = {
+    open:   { filter: [[0, -0.35], [1, 0.35, [0.8, -0.3]]] },                                   // opens late, a rising arc
+    swell:  { filter: [[0, -0.3], [0.55, 0.25, [0.5, -0.25]], [1, -0.05, [0.4, 0.3]]] },         // breathes in and back
+    pluck:  { filter: [[0, 0.35], [0.35, -0.2, [0.1, -0.15]], [1, -0.3]] },                     // bright attack, falls away fast
+    growl:  { drive: [[0, -0.25], [1, 0.4, [0.75, -0.2]]], filter: [[0, -0.2], [1, 0.3, [0.7, -0.15]]] },
+    talk:   { filter: [[0, -0.3], [0.25, 0.3, [0.5, 0.45]], [0.5, -0.3, [0.5, -0.45]], [0.75, 0.3, [0.5, 0.45]], [1, -0.3, [0.5, -0.45]]] },
+    deepen: { wobble: [[0, -0.3], [1, 0.4, [0.75, -0.25]]] },
+    dive:   { filter: [[0, 0.25], [1, -0.45, [0.25, 0.3]]] },
+  };
+  function moveCurves(name, K, span) {
+    const m = MOVES[name], c = {}; if (!m) return null;
+    Object.keys(m).forEach(role => {
+      const x = K[role]; if (!x) return; const f0 = Math.max(0.12, Math.min(0.88, toF(x.k, x.v)));
+      c[x.k.key] = m[role].map(([t, o, hd]) => { const pt = [t, fromF(x.k, f0 + o * span)]; if (hd) pt.push([hd[0], fromF(x.k, f0 + hd[1] * span)]); return pt; });
+    });
+    return Object.keys(c).length ? c : null;
+  }
+  function shapeNotes(notes, P, K, kind, e, rr, last) {
+    if (P.role === 'drums' || P.curve === false || !notes.length) return;
+    const pickW = (opts) => { const tot = opts.reduce((a, o) => a + o[1], 0); let x = rr() * tot; for (const o of opts) { if ((x -= o[1]) <= 0) return o[0]; } return opts[0][0]; };
+    const span = 0.55 + 0.35 * e, hot = kind === 'drop' || kind === 'chorus', byStart = new Map();
+    notes.forEach(n => { const g = byStart.get(n.s) || []; g.push(n); byStart.set(n.s, g); });   // a chord moves as one (they share the knob)
+    const starts = Array.from(byStart.keys()).sort((a, b) => a - b), lastS = starts[starts.length - 1];
+    starts.forEach(s0 => {
+      const grp = byStart.get(s0), L = Math.max(...grp.map(n => n.l)); if (grp.some(n => n.c)) return;
+      let mv = null, bend = null;
+      if (P.role === 'bass') {
+        if (hot && s0 === lastS && last && rr() < 0.75) { mv = 'dive'; bend = { from: 0, to: -12, shape: 'late', at: 0.45 }; }
+        else if (L >= 2 && rr() < (hot ? 0.7 : kind === 'build' ? 0.6 : 0.3)) mv = L < 4 ? pickW([['pluck', 2], ['growl', hot ? 2 : 0], ['open', 1]]) : hot ? pickW([['growl', 3], ['talk', 2], ['open', 1], ['deepen', K.wobble ? 2 : 0]]) : kind === 'build' ? 'open' : pickW([['open', 2], ['swell', 1]]);
+      } else if (P.role === 'chords') {
+        if (L >= 8 && rr() < (hot ? 0.45 : 0.65)) mv = hot ? pickW([['pluck', 2], ['open', 1]]) : pickW([['swell', 3], ['open', 2]]);
+        else if (rr() < (hot ? 0.4 : 0.25)) mv = 'pluck';   // a stab: a filter snap
+      } else {   // lead, arp and the genre's own parts
+        if (L >= 2 && rr() < (hot ? 0.35 : 0.25)) bend = { from: pickW([[-2, 3], [-1, 2], [-12, hot ? 1 : 0], [2, 1]]), to: 0, shape: 'early', at: 0 };
+        if (rr() < 0.4) mv = L < 4 ? 'pluck' : pickW([['pluck', 2], ['open', 2], ['swell', L >= 8 ? 2 : 0]]);
+      }
+      const c = mv ? moveCurves(mv, K, span) : null;
+      grp.forEach(n => { if (c) n.c = JSON.parse(JSON.stringify(c)); if (bend && !n.b) n.b = Object.assign({}, bend); });
+    });
+  }
   // X (optional, 3.34.1 — used by RhythmExpand): { name, form:[sections], bar(ctx) → notes[] | null } — a caller can supply its own form and
   // write a part's bar itself (null = the genre's own bar). Without X nothing here changes: same seed → the same song as before.
   function generate(G, seed, X) {
@@ -115,8 +175,9 @@
     const sz = (org) => { const d = window.OrganismFactory && window.OrganismFactory.def(org); return (d && d.size) || SIZE; };
     let cx = 0, cy = 680, rowH = 0, col = 0;
     const place = (org) => { const z = sz(org); if (col === 4) { cx = 0; cy += rowH + 120; rowH = 0; col = 0; } const at = [cx, cy]; cx += z.w + 30; rowH = Math.max(rowH, z.h); col++; return at; };
+    const presetOf = {};
     parts.forEach((p) => {
-      const P = G.parts[p], preset = Array.isArray(P.preset) ? pick(r, P.preset) : P.preset;
+      const P = G.parts[p], preset = Array.isArray(P.preset) ? pick(r, P.preset) : P.preset; presetOf[p] = preset;
       steps.push({ op: 'mount', organism: P.organism, as: p, at: place(P.organism), preset });
       if (P.configure) steps.push({ op: 'configure', target: p, params: P.configure });
       steps.push({ op: 'event', target: 'tl', topic: 'lane_add', payload: { kind: 'inst', target: '@' + p, name: P.name || p } });
@@ -164,11 +225,14 @@
         }
         // the gap: everything stops half a beat before the drop, so the drop hits out of silence (the head-shake)
         if (nextIsDrop) { const cut = (sec.bars - 1) * 16 + 14; for (let i = notes.length - 1; i >= 0; i--) { const x = notes[i]; if (x.s >= cut) notes.splice(i, 1); else if (x.s + x.l > cut) x.l = cut - x.s; } }
+        // 3.73 movement (see shapeNotes): its own random numbers, so the song's notes stay exactly what they were
+        if (G.curve !== false) { const hs = (str) => { let x = 2166136261; for (const ch of str) x = Math.imul(x ^ ch.charCodeAt(0), 16777619); return x >>> 0; };
+          shapeNotes(notes, P, knobsFor(P.organism, presetOf[p]), kind, e, rng((seed * 2654435761 ^ hs(p + '|' + sec.name + '|' + bar)) >>> 0), !nextIsDrop); }
         // 3.62: a part with `repeat` writes one turn of the progression and lets the clip repeat it (⟳ Repeat every) — only when every
         // turn is the same notes; a section whose last bar differs (the gap before a drop, a fill) is written out in full, as before
         let loop = 0;
         if (P.repeat && notes.length) {
-          const L = prog.length * 16, total = sec.bars * 16, key = (n) => [n.s % L, n.l, n.n, n.v, JSON.stringify(n.b || null), JSON.stringify(n.p || null)].join('|');
+          const L = prog.length * 16, total = sec.bars * 16, key = (n) => [n.s % L, n.l, n.n, n.v, JSON.stringify(n.b || null), JSON.stringify(n.p || null), JSON.stringify(n.c || null)].join('|');
           if (total > L && total % L === 0) { const first = notes.filter(n => n.s < L), sig = first.map(key).sort().join(';'), same = Array.from({ length: total / L }, (_, k) => notes.filter(n => n.s >= k * L && n.s < (k + 1) * L && n.s + n.l <= (k + 1) * L + 1e-9).map(key).sort().join(';')).every(x => x === sig) && notes.every(n => Math.floor(n.s / L) === Math.floor((n.s + n.l - 1e-9) / L));
             if (same) { loop = L; notes.splice(0, notes.length, ...first); } }
         }

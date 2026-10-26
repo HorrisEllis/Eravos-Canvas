@@ -18,21 +18,26 @@
   const copy = (n) => Object.assign({}, n, n.p ? { p: Object.assign({}, n.p) } : {}, n.b ? { b: Object.assign({}, n.b) } : {});
   // Floor Falls' moves on any line of notes; null when there is nothing to curve
   function curved(p) {
-    const ns = p.notes.map(copy).sort((a, b) => a.s - b.s || a.r - b.r); if (ns.length < 2 || ns.some(n => n.b)) return null;
+    const ns = p.notes.map(copy).sort((a, b) => a.s - b.s || a.r - b.r); if (ns.length < 2) return null;
+    const own = new Set(ns.filter(n => n.b)); let moved = 0;   // 3.73 merge: a note the song already bends keeps its bend; the moves go on the others
     const wob = p.type === 'wobble', lead = p.type === 'lead', phrase = Math.max(16, Math.min(64, p.bars * 16));
     const dive = (n, by) => Math.max(by, FLOOR - n.r);   // never under ~18 Hz (r is from the key's root; the root adds 0–11 on top)
     ns.forEach((n, i) => {
       const prev = ns[i - 1], next = ns[i + 1], endsPhrase = !next || Math.floor(next.s / phrase) !== Math.floor(n.s / phrase);
-      if (wob) n.p = Object.assign({}, n.p, { div: WRATE(n.l) });
+      if (wob && !(n.p && n.p.div)) { n.p = Object.assign({}, n.p, { div: WRATE(n.l) }); moved++; }
+      if (own.has(n)) return;
+      const had = n.b;
       if (lead) {
         if (prev && Math.abs(n.r - prev.r) > 4 && n.l >= 2) n.b = { from: Math.max(-12, Math.min(12, prev.r - n.r)), to: 0, shape: 'early' };   // glides into a leap
         if (n.l >= 6) n.b = Object.assign(n.b || { from: 0, to: 0 }, { osc: { rate: 5.5, depth: 0.3, shape: 'sine', fade: 0.5 } });          // a vibrato that blooms
+        if (n.b !== had) moved++;
         return;
       }
       if (i === 0 && n.l >= 2) n.b = { from: 5, to: 0, shape: 'early' };                                                                     // slides in from a 4th above
       if (endsPhrase && n.l >= 3) { const to = dive(n, -12); if (to < 0) n.b = Object.assign({ from: n.b ? n.b.from : 0 }, { to, shape: 'late', at: 0.4 }, wob ? { osc: { rate: '1/8', rateTo: '1/32', depth: 0.4, shape: 'sine' } } : {}); }
+      if (n.b !== had) moved++;
     });
-    if (!ns.some(n => n.b)) return null;
+    if (!moved) return null;
     return Object.assign({}, p, { id: undefined, name: p.name + ' · curved', notes: ns, move: 'curved', source: (p.source || '') + ' · curved by the library (Floor Falls’ moves)' });
   }
   // curve shapes for a tool, from what its knobs allow
