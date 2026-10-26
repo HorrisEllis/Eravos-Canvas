@@ -34,7 +34,7 @@
     rim: { classic: {} }, shaker: { classic: {} }, cowbell: { classic: {} }, sample: { classic: {} },
   };
   const DRIVE_TYPES = ['soft', 'hard', 'asym', 'fold', 'crush'];
-  // 3.75 packs ADD sounds as recipes (core/drum-recipes.js); a model is a built-in graph or a pack's recipe — MD gives its defaults
+  // 3.74b packs ADD sounds as recipes (core/drum-recipes.js); a model is a built-in graph or a pack's recipe — MD gives its defaults
   const DRX = () => (typeof window !== 'undefined' && window.DrumRecipes) || null;
   const MD = (v, m) => (MODELS[v] && MODELS[v][m]) || (DRX() && DRX().defaults(v, m)) || null;
   const SD = { model: 'classic', tone: 0, snap: 0.5, sweep: 24, body: 0.5, driveType: 'soft' };   // sound-design defaults
@@ -348,7 +348,7 @@
         },
       };
 
-      // 3.75 a pack's recipe played from its layers (core/drum-recipes.js documents them). Tune shifts every pitch and filter;
+      // 3.74b a pack's recipe played from its layers (core/drum-recipes.js documents them). Tune shifts every pitch and filter;
       // Decay stretches every envelope against the recipe's own decay; Sweep scales the pitch drops (24 = as written);
       // Body leans tone ↔ noise (0.5 = as written); Snap scales the clicks (layers shorter than 30 ms).
       function recipeVoice(rc, dst, t, p, vel) {

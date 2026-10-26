@@ -1,9 +1,9 @@
-/* 3.75 — James, 2026-10-25: "also each pack for the dumpad needs to be completely different sounds. every pack needs to be additive." ·
- * "yes like there is supposed to be full range of synthwave sounds and tools". "Completely different" is MEASURED (specs/eravos.phase75-map.spec
- * D-75.2): every sound is rendered offline and fingerprinted — its loudness over time (7 windows) and its spectrum (9 octave bands, attack and
+/* 3.74b — James, 2026-10-25: "also each pack for the dumpad needs to be completely different sounds. every pack needs to be additive." ·
+ * "yes like there is supposed to be full range of synthwave sounds and tools". "Completely different" is MEASURED (specs/eravos.phase74b-map.spec
+ * D-74b.2): every sound is rendered offline and fingerprinted — its loudness over time (7 windows) and its spectrum (9 octave bands, attack and
  * body) in dB — and a pack's sound must sit far from every built-in model and every other pack's sound. */
-window.__phase = 'P75';
-describe('🥁 Drum packs that add their own sounds: Synthwave (3.75)', () => {
+window.__phase = 'P74b';
+describe('🥁 Drum packs that add their own sounds: Synthwave (3.74b)', () => {
   const BUILTIN = { kick: ['classic', '909', '808', 'punch', 'tearout', 'thump', 'hardstyle', 'rumble', 'zap'], snare: ['classic', '909', '808', 'crack', 'slam', 'rimshot', 'brush', 'electro', 'lofi'],
     clap: ['classic', 'stacked', 'snap', '808'], hat: ['classic', '909', 'tick', 'fm', 'lofi'], openhat: ['classic', '909', 'fm', 'lofi'], '808': ['classic', 'dist', 'reese', 'sub'],
     tom: ['classic', 'electro', 'conga', 'tabla'], crash: ['classic', 'ride', 'china', 'swell'], perc: ['classic', 'wood', 'clang', 'laser'], rim: ['classic'], shaker: ['classic'], cowbell: ['classic'] };

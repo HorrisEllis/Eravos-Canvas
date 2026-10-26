@@ -1,4 +1,4 @@
-/* ERAVOS drum recipes (3.75 · specs/eravos.phase75-map.spec D-75.1) — window.DrumRecipes. Packs ADD drum sounds as data.
+/* ERAVOS drum recipes (3.74b · specs/eravos.phase74b-map.spec D-74b.1) — window.DrumRecipes. Packs ADD drum sounds as data.
  * James, 2026-10-25: "each pack for the dumpad needs to be completely different sounds. every pack needs to be additive." · "yes like there
  * is supposed to be full range of synthwave sounds and tools".
  * A recipe is one named sound for one of the Drum Machine's voices (kick snare clap hat openhat 808 rim tom crash perc shaker cowbell),

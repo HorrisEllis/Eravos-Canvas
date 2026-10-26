@@ -1,4 +1,4 @@
-/* ERAVOS drum pack: SYNTHWAVE (3.75 · specs/eravos.phase75-map.spec P75.2) — its OWN sounds, added next to every other pack's.
+/* ERAVOS drum pack: SYNTHWAVE (3.74b · specs/eravos.phase74b-map.spec P74b.2) — its OWN sounds, added next to every other pack's.
  * James, 2026-10-25: "also each pack for the dumpad needs to be completely different sounds. every pack needs to be additive." · "yes like
  * there is supposed to be full range of synthwave sounds and tools".
  * The full range of the 80s machines synthwave is built from, as recipes (core/drum-recipes.js), none of them a re-tune of a built-in model:
@@ -6,7 +6,7 @@
  *   Simmons SDS-V (the swept "pew" toms and kick, the electronic snare) · the GATED-REVERB snare and clap (the room held, then cut) ·
  *   Syndrum (the long falling tom) · tambourine · cabasa · claves · the orchestra hit · a synth stab · a pulse bass hit · a gated crash.
  * Kits: Neon Gated (Linn + gated room) · Night Drive Simmons · DMX Outrun · Chrome Ballroom (darker, slower). Every pad of every kit plays
- * a Synthwave sound (tests/p75-drum-packs.test.js measures each one apart from every other pack's sounds). */
+ * a Synthwave sound (tests/p74b-drum-packs.test.js measures each one apart from every other pack's sounds). */
 (function (global) {
   'use strict';
   const DR = global.DrumRecipes, KP = global.KitPacks; if (!DR) return;
