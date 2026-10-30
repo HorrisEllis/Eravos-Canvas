@@ -23,7 +23,7 @@ OrganismFactory.reg('eravos.wobble-bass', function (view) {
   const cfg = (k) => view.descriptor.config.find(c => c.key === k);
   const ctl = (k, o) => UI.paramControl(view, cfg(k), o);
   const shape = ctl('lfoShape'), mode = ctl('filterMode'), va = ctl('vowelA'), vb = ctl('vowelB');
-  const sync = ctl('lfoSync'), retrig = ctl('retrig'), subOct = ctl('subOct'), keepRange = ctl('keepRange');   // 3.77 Keep in range beside Sub oct
+  const sync = ctl('lfoSync'), retrig = ctl('retrig'), subOct = ctl('subOct'), keepRange = ctl('keepRange');   // 3.74d Keep in range beside Sub oct
   const ladderBox = h('div', { style: { display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' } }, [divLadder.el]);
   // the grid ladder is in charge when Sync is on; the Free rate knob when it is off
   view.bind('lfoSync', (on) => { ladderBox.style.opacity = on ? '1' : '0.3'; ladderBox.title = on ? '' : 'Sync is off — the Free rate knob sets the speed'; });

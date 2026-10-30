@@ -94,7 +94,7 @@
       const T = (n) => { ctx.track(n); return n; };
       const out = T(ac.createGain()), ringVca = T(ac.createGain()), sum = T(ac.createGain()), level = T(ac.createGain());
       sum.connect(ringVca); ringVca.connect(level); level.gain.value = P.get('level') * 0.6;
-      const hr = ctx.dsp.headroom(ac); hr.nodes.forEach(n => T(n)); level.connect(hr.input); hr.output.connect(out);   // 3.77 a chord never goes over full scale (peaks rounded, unity under −3 dBFS)
+      const hr = ctx.dsp.headroom(ac); hr.nodes.forEach(n => T(n)); level.connect(hr.input); hr.output.connect(out);   // 3.74d a chord never goes over full scale (peaks rounded, unity under −3 dBFS)
       ctx.port('out', { kind: 'audio', direction: 'out', node: out, label: 'morph osc' });
       // inputs: FM (shared → per-voice depth) and RING (multiplies the sum: gain = 1 − amt + amt·ring)
       const fmIn = T(ac.createGain()), ringIn = T(ac.createGain()), ringAmt = T(ac.createGain());

@@ -45,10 +45,10 @@
     // none 0 · 2x 128 · 4x 192 — at every sample rate). Parallel paths and note timing must account for it.
     OS_SAMPLES: { none: 0, '2x': 128, '4x': 192 },
     osLatency(ac, mode) { return (dsp.OS_SAMPLES[mode] || 0) / ac.sampleRate; },
-    // 3.77 KEEP IN RANGE (the sound audit: Wobble Bass, Reese, Bass Forge, Wub Sub, Wub Osc, Xen Synth put much of their energy under
+    // 3.74d KEEP IN RANGE (the sound audit: Wobble Bass, Reese, Bass Forge, Wub Sub, Wub Osc, Xen Synth put much of their energy under
     // 25 Hz on a bass note — under hearing, as Deep Sub did): a frequency under lo (30 Hz) is lifted by whole octaves until it is not
     keepRange(f, lo) { lo = lo || 30; let x = +f || 0; if (x <= 0) return x; for (let i = 0; i < 6 && x < lo; i++) x *= 2; return x; },
-    // 3.77 HEADROOM (the sound audit: a plain chord took Supersaw and Morph Osc +2.5 / +3 dB over full scale): exactly unity up to
+    // 3.74d HEADROOM (the sound audit: a plain chord took Supersaw and Morph Osc +2.5 / +3 dB over full scale): exactly unity up to
     // −3 dBFS, then a smooth knee that never passes 0.98 — normal notes are untouched, only peaks are rounded. No latency (no oversampling:
     // it only acts on the rare peak, where a 2nd-order knee adds little).
     headroom(ac) {
@@ -299,8 +299,8 @@ registerProcessor('eravos-pitch', EravosPitch);`;
   if (global.OrganismFactory) global.OrganismFactory.onDefine((d) => {
     if (d.domain !== 'music' || d._knobInputs) return;
     if (d.perform && global.MusicMotion) global.MusicMotion.augment(d);
-    // 3.77 each tool's own reactive colours (its ⚙ → Reactive colours): follow the app, or its own mode / amount / colours — saved with it
-    if (!(d.config || []).some(c => c.key === '_react')) { d.config = d.config || []; d.config.push({ key: '_react', type: 'object', default: { mode: 'follow' }, hidden: true, label: 'Reactive colours' }); }   // 3.71 the macro knobs + the motion/perform settings, before the knob inputs
+    // 3.74d each tool's own reactive colours (its ⚙ → Reactive colours): follow the app, or its own mode / amount / colours — saved with it
+    if (!(d.config || []).some(c => c.key === '_react')) { d.config = d.config || []; d.config.push({ key: '_react', type: 'object', default: { mode: 'follow' }, hidden: true, label: 'Reactive colours' }); }   // 3.71b the macro knobs + the motion/perform settings, before the knob inputs
     const perms = d.permissions || [];
     if (!perms.includes('audio_out') && !perms.includes('audio_in')) { d._knobInputs = []; return; }
     const keys = knobKeys(d), have = new Set((d.hooks || []).map(h => h.hook_id));
@@ -383,7 +383,7 @@ registerProcessor('eravos-pitch', EravosPitch);`;
       }
       let knobTimer = null;
       const wiredKnobs = () => Array.from(knobs.keys()).filter(k => ctx.wiredIn('knob.' + k).length);
-      // 3.71 a tool with perform: true also moves its own knobs (core/motion.js) — summed with what is wired in
+      // 3.71b a tool with perform: true also moves its own knobs (core/motion.js) — summed with what is wired in
       const motion = global.MusicMotion && global.MusicMotion.performs(ctx.descriptor) ? global.MusicMotion.runner(ctx) : null;
       const cfgOf = (k) => (ctx.descriptor.config || []).find(x => x.key === k);
       let driven = new Set();

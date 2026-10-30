@@ -85,3 +85,15 @@ tests/p16-ui.mjs had failed since 3.34 (it looked for Song Engine cards on the s
     (Fold Growl spread 9.3 / 5.4 dB). Not changed.
   · vibrato on Wobble lands 192 samples behind its filter wobble (oscillator detune passes both shapers).
   · effect latency on a track (2.7–4 ms) is not compensated across the mixer (no plugin delay compensation between tracks).
+
+
+# ADDENDUM 3.74c–3.74d (2026-10-30) — the sound audit (his: "can you run tests like that on all of them")
+#   build/sound-audit.mjs, every sound tool at default settings. EFFECTS: a loud 50 Hz + a quiet 1 kHz → intermodulation (sidebands
+#   ±50/100 Hz under the 1 kHz; ≤ −20 dB clean — the blown-speaker test), level change (−18 dBFS 220 Hz in vs out), DC, peak, NaN.
+#   INSTRUMENTS: A1, A3, A5 and a C chord → peak, DC, energy under 20 Hz (0.7 Hz bins), tail 2 s after release, NaN. BY_DESIGN notes: Clip
+#   Maker, Breath, Embodiment Lab, Recursive Spectra, Squash.
+#   Found and fixed: Destroyer (the sub went through the shaper: −1.6 → −49 dB) · Deep Sub (fundamental 8–25 Hz under its own 24 Hz floor) ·
+#   Supersaw / Morph Osc (+2.5 / +3 dBFS on a chord → dsp.headroom: unity under −3 dBFS) · Xen Synth (−0.2 dB of its energy under 20 Hz) and
+#   Reese (−11 dB) → keepRange (dsp.keepRange: lifted by octaves; subs ≥ 30 Hz, notes ≥ 25 Hz), also on Wobble Bass, Bass Forge, Wub Sub,
+#   Wub Osc (borderline). Still flagged → eravos.phase74e-map.spec: Wub Filter intermodulation −4.2 dB · Channel DC −0.015 · long tails
+#   (Pad Forge, Gothic Organ, Xen Synth) · CPU.

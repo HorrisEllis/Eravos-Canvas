@@ -4,7 +4,7 @@ OrganismFactory.reg('eravos.fx-destroyer', function (view) {
   const UI = view.ui, h = UI.h, cfg = (k) => view.descriptor.config.find(c => c.key === k), C = view.descriptor.curves;
   const an = view.tap('out', 2048); const buf = new Float32Array(2048);
   const cv = UI.Canvas(440, 140); let key = '', curve = null, drawn = '';
-  // 3.77: drawn in the window's live colour (it reacts with the sound, in whichever Reactive colours mode), and only redrawn when
+  // 3.74d: drawn in the window's live colour (it reacts with the sound, in whichever Reactive colours mode), and only redrawn when
   // something changed — a silent Destroyer with the same settings draws nothing (it used to redraw 30× a second regardless)
   const win = () => cv._w || (cv._w = cv.closest && cv.closest('.wm-win'));
   UI.loop(cv, () => {

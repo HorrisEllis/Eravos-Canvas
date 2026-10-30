@@ -1,7 +1,7 @@
-/* 3.71 MOTION + PERFORM — "more dynamic control and a better ui … all the above while not cluttering". A tool with perform: true
+/* 3.71b MOTION + PERFORM — "more dynamic control and a better ui … all the above while not cluttering". A tool with perform: true
  * moves its own knobs (no extra windows, no wires): shapes in time with the song, four macro knobs, an XY pad. Groove is the first. */
-window.__phase = 'P71';
-describe('P71 · motion and perform, built into a tool', () => {
+window.__phase = 'P71b';
+describe('P71b · motion and perform, built into a tool', () => {
   const ctxOf = (id) => OrganismFactory.handle(id).ctx;
   const M = () => window.MusicMotion;
   it('the shapes: sine / triangle / saws / square in −1…1, random repeats per cycle and changes between cycles, steps read their bars', () => {

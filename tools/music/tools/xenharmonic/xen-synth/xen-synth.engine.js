@@ -31,7 +31,7 @@
       { key: 'period', type: 'enum', options: PERIODS, default: '2 (octave)', label: 'Period', group: 'TUNING' },
       { key: 'scaleText', type: 'string', default: '9/8 5/4 phi 3/2 2^(11/12) 2/1', label: 'Scale (ratios / cents, last = period)', group: 'TUNING' },
       { key: 'baseHz', type: 'number', default: 261.63, min: 16, max: 1000, step: 0.01, unit: 'Hz', label: 'Base Hz', group: 'TUNING' },
-      { key: 'keepRange', type: 'boolean', default: true, label: 'Keep in range', group: 'TUNING', hint: 'never under 25 Hz, no partial under 20 Hz — lifted by periods of 2, so it is heard (3.77 sound audit)' },
+      { key: 'keepRange', type: 'boolean', default: true, label: 'Keep in range', group: 'TUNING', hint: 'never under 25 Hz, no partial under 20 Hz — lifted by periods of 2, so it is heard (3.74d sound audit)' },
       { key: 'baseNote', type: 'integer', default: 60, min: 0, max: 127, label: 'Base key', group: 'TUNING' },
       { key: 'spectrum', type: 'enum', options: Object.keys(XT.SPECTRA).concat(['received']), default: 'harmonic', label: 'Spectrum', group: 'SPECTRUM' },
       { key: 'partials', type: 'integer', default: 10, min: 1, max: 24, label: 'Partials', group: 'SPECTRUM' },
@@ -82,12 +82,12 @@
       function freqOfStep(step) { return XT.freq(tun, step, P.get('baseHz')); }
       function noteOn(o) {
         const t = Math.max(o.time || ac.currentTime, ac.currentTime), vel = o.velocity === undefined ? 0.8 : o.velocity;
-        const keep = P.get('keepRange') !== false, fr = o.freq || freqOfStep(o.step), f0 = keep && fr > 0 ? ctx.dsp.keepRange(fr, 25) : fr;   // 3.77 never under 25 Hz
+        const keep = P.get('keepRange') !== false, fr = o.freq || freqOfStep(o.step), f0 = keep && fr > 0 ? ctx.dsp.keepRange(fr, 25) : fr;   // 3.74d never under 25 Hz
         if (!(f0 > 0) || f0 > 20000) return null;
         while (voices.length >= MAXV) kill(voices[0], t);
         const amp = ac.createGain(); amp.gain.value = 0; amp.connect(out);
         const ny = ac.sampleRate * 0.45, br = P.get('bright'), sp = P.get('spread'), sh = P.get('shimmer'), pd = P.get('partialDecay');
-        const parts = spec.filter(p => f0 * p.r < ny && (!keep || f0 * p.r >= 20));   // 3.77 no partial under hearing
+        const parts = spec.filter(p => f0 * p.r < ny && (!keep || f0 * p.r >= 20));   // 3.74d no partial under hearing
         const amps = parts.map(p => p.a / (1 + Math.pow(f0 * p.r / br, 2)));
         const norm = 0.28 / Math.sqrt(amps.reduce((s, a) => s + a * a, 0) || 1);
         const rnd = dsp.mulberry32((Math.round(f0 * 1000) ^ voices.length * 7919) >>> 0);

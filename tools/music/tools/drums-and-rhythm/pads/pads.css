@@ -60,7 +60,7 @@
 .dm3-extra:empty { display: none; }
 .dm3-extra { display: flex; align-items: center; gap: 10px; }
 @media (prefers-reduced-motion: reduce) { .dm3-pad, .dm3-chip { transition: none; } .dm3-pad.hit { transform: none; } }
-/* 3.73 his call: "square pads" — and in the look kit (machined corners, the LED strip lit by the hit) */
+/* 3.73b his call: "square pads" — and in the look kit (machined corners, the LED strip lit by the hit) */
 .dm3-grid { grid-auto-rows: auto; align-content: start; }
 html .dm3-pad { aspect-ratio: 1; min-height: 0; height: auto; border-radius: 4px; }
 .dm3-chip { border-radius: 3px; }

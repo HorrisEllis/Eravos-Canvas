@@ -1,4 +1,4 @@
-/* eravos.groove-gen UI — 1.1 (3.71/3.72, in the look kit). The window is the tool: the pattern screen (paint where the rhythm is
+/* eravos.groove-gen UI — 1.1 (3.71b/3.72b, in the look kit). The window is the tool: the pattern screen (paint where the rhythm is
  * busy; right-click erases; click a row's name to mute it, Alt-click to solo), the style strip, a knob bank (ENERGY large, swing,
  * humanize, accent, rolls, seed) and the loop / fill strips. Its page adds FEEL — a mixer strip per drum (LED mute / solo, a
  * level fader, a hit meter, chance and pad) and evolve — beside MOTION and PERFORM from the domain. */

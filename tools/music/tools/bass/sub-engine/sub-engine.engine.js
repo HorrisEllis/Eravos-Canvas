@@ -3,7 +3,7 @@
  * legato glide, kept pure below; above it, PHANTOM harmonics: the sub is folded into its 2nd–5th harmonics and
  * band-limited to 90–600 Hz, so the ear rebuilds the missing fundamental on phones and laptop speakers
  * (psychoacoustic bass). Transient click for definition, warm drive on a separate band, infrasonic floor + DC block.
- * 1.1 (3.76): KEEP IN RANGE. Measured on main: Octave −2 on the notes the songs write put the fundamental at 8–25 Hz in 53 of
+ * 1.1 (3.74c): KEEP IN RANGE. Measured on main: Octave −2 on the notes the songs write put the fundamental at 8–25 Hz in 53 of
  * the 54 genres that play this tool — under hearing, and under this tool's own Floor (24 Hz), which cut it. A note that would
  * land under the floor is lifted by whole octaves until it sits at 30–60 Hz (the sub you hear and feel). The note keeps its
  * name; the line keeps its shape. Off = 1.0 (the note exactly where Octave puts it). */

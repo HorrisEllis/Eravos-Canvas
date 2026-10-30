@@ -97,7 +97,7 @@
 
   // ---------------------------------------------------------------- genre → recipe steps
   const SIZE = { w: 500, h: 460 };
-  // ---------------------------------------------------------------- 3.73 movement: notes that curve
+  // ---------------------------------------------------------------- 3.73b movement: notes that curve
   // James, 2026-10-24: "the patterns. Why do barely any of them curve?" — of 183 464 notes the 85 genres wrote, none had a per-note
   // curve and 218 had a bend: the curves came later and nothing wrote them. Now every melodic part plays with movement, chosen by its
   // role and the section — its filter opens, its growl builds, it talks, it dives at the end of a drop, a lead glides in — as curved
@@ -225,7 +225,7 @@
         }
         // the gap: everything stops half a beat before the drop, so the drop hits out of silence (the head-shake)
         if (nextIsDrop) { const cut = (sec.bars - 1) * 16 + 14; for (let i = notes.length - 1; i >= 0; i--) { const x = notes[i]; if (x.s >= cut) notes.splice(i, 1); else if (x.s + x.l > cut) x.l = cut - x.s; } }
-        // 3.73 movement (see shapeNotes): its own random numbers, so the song's notes stay exactly what they were
+        // 3.73b movement (see shapeNotes): its own random numbers, so the song's notes stay exactly what they were
         if (G.curve !== false) { const hs = (str) => { let x = 2166136261; for (const ch of str) x = Math.imul(x ^ ch.charCodeAt(0), 16777619); return x >>> 0; };
           shapeNotes(notes, P, knobsFor(P.organism, presetOf[p]), kind, e, rng((seed * 2654435761 ^ hs(p + '|' + sec.name + '|' + bar)) >>> 0), !nextIsDrop); }
         // 3.62: a part with `repeat` writes one turn of the progression and lets the clip repeat it (⟳ Repeat every) — only when every

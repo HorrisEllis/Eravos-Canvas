@@ -11,7 +11,7 @@
  * living accent: same API — liveAcc / restoreAcc, data-acc-live (hex) for canvases that draw with the accent — but no hue sweep.)
  * Quiet when nothing plays (the values fall to 0 and stop updating). Respects reduced motion (calmer, no pulse). Off/on in
  * ⋯ Options (◐ Reactive colours, remembered). Only listens while the page is visible.
- * 3.77 "the inside of the tools are supposed to react. anywhere there is color, and not one color, have options for the reactive
+ * 3.74d "the inside of the tools are supposed to react. anywhere there is color, and not one color, have options for the reactive
  * color — like changing, the way it is now (static), and a way to customize. the option needs to work, it does nothing when
  * trying to disable." MODES (⋯ Options → Reactive colours): Off · Static (each colour keeps its hue, its light moves — as before)
  * · Changing (colours travel round the wheel with the music: warmer on the low end, cooler on the top, a jump on each hit, a slow
@@ -38,12 +38,12 @@
     const rgb = rgbOf(c); if (!rgb || k < 0.005) return c;
     let [r, g, b] = rgb.map(x => x / 255); const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
     let hh = 0, sa = 0; if (d) { sa = d / (1 - Math.abs(2 * l - 1)); hh = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; hh = (hh + 6) % 6; }
-    // 3.77: lit means brighter and richer, not paler
+    // 3.74d: lit means brighter and richer, not paler
     const L = l + (0.8 - l) * clamp(k, 0, 1) * 0.5, S = Math.min(1, sa * (1 + 0.35 * k)), C = (1 - Math.abs(2 * L - 1)) * S, X = C * (1 - Math.abs((hh % 2 + 2) % 2 - 1)), M = L - C / 2;
     const [a, bb, cc] = hh < 1 ? [C, X, 0] : hh < 2 ? [X, C, 0] : hh < 3 ? [0, C, X] : hh < 4 ? [0, X, C] : hh < 5 ? [X, 0, C] : [C, 0, X];
     const hx = (v) => Math.round(clamp(v + M, 0, 1) * 255).toString(16).padStart(2, '0'); return '#' + hx(a) + hx(bb) + hx(cc);
   }
-  // ---- 3.77 modes: how a colour answers the sound (k 0…1 already scaled by Amount)
+  // ---- 3.74d modes: how a colour answers the sound (k 0…1 already scaled by Amount)
   const MODES = ['off', 'static', 'changing', 'custom'];
   let mode = 'static', amt = 0.8, custom = { low: '#ff2266', high: '#00d4ff', hit: '#ffffff' }, shift = 0, drift = 0;
   try {
@@ -63,7 +63,7 @@
     const [a2, b2, c2] = hh < 1 ? [C, X, 0] : hh < 2 ? [X, C, 0] : hh < 3 ? [0, C, X] : hh < 4 ? [0, X, C] : hh < 5 ? [X, 0, C] : [C, 0, X];
     return hex([a2, b2, c2].map(v => (v + M) * 255));
   }
-  // o (per window, 3.77): { mode, shift, colors, low, high, pulse } — each tool can have its own; the app's when it follows the app
+  // o (per window, 3.74d): { mode, shift, colors, low, high, pulse } — each tool can have its own; the app's when it follows the app
   function colourFor(c, k, o) {
     o = o || G(); const md = o.mode; if (k < 0.005 || md === 'off') return c;
     if (md === 'changing') return lit(rotate(c, o.shift * Math.min(1, k * 1.6)), k * 0.6);
@@ -151,17 +151,17 @@
     if (on) doc.querySelectorAll('.tp-overlay').forEach(o => { light(o, kMix, G()); accented(o, ts).forEach(el => light(el, kMix, G())); });
     if (Math.random() < 0.02) taps.forEach((t, id) => { if (!t.win || !t.win.isConnected) { try { if (t.node && t.an) t.node.disconnect(t.an); } catch (e) {} taps.delete(id); } });   // closed windows let go
     // each window that makes sound: its own level
-    // 3.73 "all of the accents … when sound plays — in the tools, the ui": a window that makes no sound of its own (a pattern tool,
+    // 3.73b "all of the accents … when sound plays — in the tools, the ui": a window that makes no sound of its own (a pattern tool,
     // the timeline, a modulator) follows the tools it plays (wired from it), or else the mix — so every window answers the sound
     const lvOf = new Map(), quiet = [];
     doc.querySelectorAll('.wm-win').forEach(w => {
       if (w.classList.contains('collapsed') || w.offsetParent === null) return; const t = toolTap(w); if (!t || t.none) { quiet.push(w); return; }
       t.an.getFloatTimeDomainData(t.buf); let s = 0, pk = 0; for (let i = 0; i < t.buf.length; i++) { const x = t.buf[i]; s += x * x; const a = x < 0 ? -x : x; if (a > pk) pk = a; }
-      // 3.73 a meter's envelope: the loudness or the peak (a drum hit is short — its peak is what you see), up fast, down slower
+      // 3.73b a meter's envelope: the loudness or the peak (a drum hit is short — its peak is what you see), up fast, down slower
       const vr = clamp((10 * Math.log10(s / t.buf.length + 1e-12) + 50) / 44, 0, 1), vp = clamp((20 * Math.log10(pk + 1e-9) + 36) / 36, 0, 1), v = Math.max(vr, vp * 0.95);
       const before = t.lv || 0; t.lv = before + (v - before) * (v > before ? 0.6 : 0.12); w.style.setProperty('--tool-level', t.lv.toFixed(3));
       lvOf.set(w.dataset.instance, t.lv);
-      // 3.77 "changing … each sound": this tool's own colour turn — from where ITS sound sits (its own spectrum), its own hits and
+      // 3.74d "changing … each sound": this tool's own colour turn — from where ITS sound sits (its own spectrum), its own hits and
       // its own slow drift (each window starts at its own phase), so every tool moves with what it plays, not all together
       const S = settingsOf(w), o = Object.assign(G(), S); w.dataset.react = o.mode;
       if (o.mode === 'changing' && t.lv > 0.02) {

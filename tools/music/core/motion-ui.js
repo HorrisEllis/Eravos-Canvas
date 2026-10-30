@@ -1,4 +1,4 @@
-/* ERAVOS music — motion-ui.js · 3.71 the window side of core/motion.js: tabs, the Motion panel and the Perform panel.
+/* ERAVOS music — motion-ui.js · 3.71b the window side of core/motion.js: tabs, the Motion panel and the Perform panel.
  * Built from the app's own controls (knobs, .uk-seg, .uk-btn, selects) so a tool that opts in looks like every other tool.
  *   UI.pageTabsFor(view)      the Motion and Perform tabs a tool's page shows (canvas/runtime/tool-page.js asks for them)
  *   UI.motionPanel(view)      the knobs that move on their own: shape · rate · depth · phase, a live picture of each, steps editor
@@ -30,7 +30,7 @@
     return { el, show, get current() { return cur; } };
   }
 
-  // ---------------------------------------------------------------- 3.72 the look: drawn shape tiles, a live scope, a steps editor
+  // ---------------------------------------------------------------- 3.72b the look: drawn shape tiles, a live scope, a steps editor
   const SHAPE_ICON = { sine: 'M2 14 C 8 0, 14 0, 20 14 S 32 28, 38 14', triangle: 'M2 22 L11 4 L29 24 L38 6', saw: 'M2 4 L20 24 L20 4 L38 24', ramp: 'M2 24 L20 4 L20 24 L38 4',
     square: 'M2 22 L2 6 L20 6 L20 22 L38 22 L38 6', random: 'M2 18 H8 V6 H14 V20 H20 V10 H26 V24 H32 V12 H38', smooth: 'M2 18 C 6 6, 10 6, 14 14 S 22 24, 26 12 S 34 4, 38 16',
     steps: 'M2 24 V16 H10 V8 H18 V20 H26 V4 H34 V14 H38', follow: 'M2 14 L6 10 L9 18 L12 6 L15 22 L18 9 L21 17 L24 12 L27 15 L30 13 L34 14 L38 14' };
@@ -187,7 +187,7 @@
     return { el, learn: setLearn };
   }
 
-  // 3.71 his call: these live on the tool's PAGE as tabs (horizontal, beside Panel) — the window stays the tool itself
+  // 3.71b his call: these live on the tool's PAGE as tabs (horizontal, beside Panel) — the window stays the tool itself
   const pageTabsFor = (view) => (M() && M().performs(view.descriptor)) ? [
     { id: 'motion', label: 'Motion', ic: 'activity', sub: '· knobs that move on their own, in time with the song', el: motionPanel(view).el },
     { id: 'perform', label: 'Perform', ic: 'gauge', sub: '· four macros and an XY pad', el: performPanel(view).el },

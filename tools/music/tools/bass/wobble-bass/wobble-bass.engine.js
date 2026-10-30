@@ -156,7 +156,7 @@
       { key: 'width', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Width', group: 'TONE' },
       { key: 'noise', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Noise', group: 'TONE' },
       { key: 'sqOct', type: 'enum', options: ['0', '-1'], default: '0', label: 'Square oct', group: 'TONE', hint: 'the Square layer against the saw: 0 = same pitch, −1 = an octave under (thick, but 27.5 Hz under an A2 is rumble you feel more than hear)' },
-      { key: 'keepRange', type: 'boolean', default: true, label: 'Keep in range', group: 'TONE', hint: 'the sub never under 30 Hz, the note never under 25 Hz — lifted by octaves, so it is heard (3.77 sound audit)' },
+      { key: 'keepRange', type: 'boolean', default: true, label: 'Keep in range', group: 'TONE', hint: 'the sub never under 30 Hz, the note never under 25 Hz — lifted by octaves, so it is heard (3.74d sound audit)' },
       { key: 'subOct', type: 'enum', options: ['0', '-1', '-2'], default: '0', label: 'Sub oct', group: 'TONE', hint: 'the sub against the wub: 0 = same pitch (the usual), −1 / −2 = deeper (−2 is below most speakers)' },
       { key: 'subAlign', type: 'boolean', default: false, label: 'Sub in phase', group: 'TONE', hint: 'line the clean sub up with the wub layer (it reaches the output 8 ms later through the grit): a more even low end from note to note; off = the original sound' },
       { key: 'level', type: 'number', default: 1, min: 0, max: 1.5, step: 0.01, label: 'Level', group: 'TONE' },
@@ -385,7 +385,7 @@
       let held = null; // {note, off}
       let curF = 55;
       function setFreq(f, t0, glide, fromHz) {
-        const from = fromHz || curF, keep = P.get('keepRange') !== false, subK0 = SUBK[P.get('subOct')] || 1, subK = keep ? dsp.keepRange(f * subK0, 30) / f : subK0;   // 3.77 the sub never under 30 Hz
+        const from = fromHz || curF, keep = P.get('keepRange') !== false, subK0 = SUBK[P.get('subOct')] || 1, subK = keep ? dsp.keepRange(f * subK0, 30) / f : subK0;   // 3.74d the sub never under 30 Hz
         [[saw, 1, true], [sq, P.get('sqOct') === '-1' ? 0.5 : 1, true], [saw2, 1, true], [sub, subK, false], [fmOsc, +P.get('fmRatio') || 1, true], [{ frequency: fHz.offset }, 1, true]].forEach(([o, k, shaped]) => {
           const t = (shaped || P.get('subAlign')) ? Math.max(ac.currentTime, t0 - OSC_LAT) : t0;   // 3.39: the shaped layer's pitch leaves early; the sub's too when it is in phase
           o.frequency.cancelScheduledValues(t);
@@ -395,7 +395,7 @@
         curF = f;
       }
       // 3.50: Pitch (semitones, decimals ok) tunes the whole bass; the sub and the FM modulator follow it (they ride on curF)
-      const noteHz = (note) => { const f = Math.max(8, MT.hz(Math.max(12, note + 12 * P.get('octave'))) * Math.pow(2, P.get('transpose') / 12)); return P.get('keepRange') !== false ? dsp.keepRange(f, 25) : f; };   // 3.77 never under 25 Hz
+      const noteHz = (note) => { const f = Math.max(8, MT.hz(Math.max(12, note + 12 * P.get('octave'))) * Math.pow(2, P.get('transpose') / 12)); return P.get('keepRange') !== false ? dsp.keepRange(f, 25) : f; };   // 3.74d never under 25 Hz
       function noteOn(note, vel, t, o) {
         o = o || {}; ctx.wake();
         t = Math.max(t, ac.currentTime);

@@ -1,7 +1,7 @@
-/* 3.77 — "anywhere there is color, and not one color, have options for the reactive color — like changing, the way it is now
+/* 3.74d — "anywhere there is color, and not one color, have options for the reactive color — like changing, the way it is now
  * (static), and a way to customize. the option needs to work, it does nothing, when trying to disable." */
-window.__phase = 'P77';
-describe('P77 · reactive colours: Off · Static · Changing · Custom', () => {
+window.__phase = 'P74d';
+describe('P74d · reactive colours: Off · Static · Changing · Custom', () => {
   const host = () => { if (!CanvasWM.world) { CanvasWM.init(document.getElementById('wmhost'), Kernel); WireSystem.init(Kernel); OrganismFactory.boot(Kernel); } };
   const hueOf = (c) => { const n = parseInt(c.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; if (!d) return 0; const h = mx === r ? ((g - b) / d + 6) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; return h * 60; };
   it('turning a colour round the wheel keeps its light; Static keeps the hue; Custom leans toward your colours', () => {
@@ -64,7 +64,7 @@ describe('P77 · reactive colours: Off · Static · Changing · Custom', () => {
     host(); const K = Kernel; K.audio.boot(); await K.audio.ctx.resume(); SoundCSS.init(K); const was = SoundCSS.mode; SoundCSS.setMode('changing');
     const sub = OrganismFactory.spawn('eravos.sub-engine', { x: 40, y: 40 }), pads = OrganismFactory.spawn('eravos.pads', { x: 600, y: 40 }); await TH.sleep(60);
     try {
-      await TH.sleep(150); for (let i = 0; i < 28; i++) { const t = K.audio.ctx.currentTime + 0.01; K.bus.publish('note:trigger', { target: sub, note: 40, velocity: 1, time: t, duration: 0.3 }); K.bus.publish('note:trigger', { target: pads, note: 39, velocity: 1, time: t, duration: 0.2 }); await TH.sleep(45); SoundCSS.step(); }
+      await TH.sleep(150); for (let i = 0; i < 28; i++) { const t = K.audio.ctx.currentTime + 0.01; K.bus.publish('note:trigger', { target: sub, note: 40, velocity: 1, time: t, duration: 0.3 }); K.bus.publish('note:trigger', { target: pads, note: 38, velocity: 1, time: t, duration: 0.2 }); await TH.sleep(45); SoundCSS.step(); }   // a clap: bright, and loud enough to light it every run
       const a = CanvasWM.windowOf(sub)._shift, b = CanvasWM.windowOf(pads)._shift;
       assert.ok(typeof a === 'number' && typeof b === 'number', 'each has its own turn: ' + a + ' / ' + b + ' lv ' + CanvasWM.windowOf(sub).style.getPropertyValue('--tool-level') + ' / ' + CanvasWM.windowOf(pads).style.getPropertyValue('--tool-level') + ' ' + CanvasWM.windowOf(pads).dataset.react); assert.gt(Math.abs(a - b), 15, `sub ${a.toFixed(0)}° vs drums ${b.toFixed(0)}°`);
     } finally { OrganismFactory.close(sub); OrganismFactory.close(pads); SoundCSS.setMode(was === 'off' ? 'static' : was); }

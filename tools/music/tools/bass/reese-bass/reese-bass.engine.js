@@ -37,7 +37,7 @@
       { key: 'dist', type: 'number', default: 0.35, min: 0, max: 1, step: 0.01, label: 'Drive', group: 'DRIVE+SUB' },
       { key: 'level', type: 'number', default: 1, min: 0, max: 1.5, step: 0.01, label: 'Level', group: 'DRIVE+SUB', hint: 'output level (every instrument has one)' },
       { key: 'sub', type: 'number', default: 0.5, min: 0, max: 1, step: 0.01, label: 'Sub', group: 'DRIVE+SUB' },
-      { key: 'keepRange', type: 'boolean', default: true, label: 'Keep in range', group: 'DRIVE+SUB', hint: 'the sub never under 30 Hz, the note never under 25 Hz — lifted by octaves, so it is heard (3.77 sound audit)' },
+      { key: 'keepRange', type: 'boolean', default: true, label: 'Keep in range', group: 'DRIVE+SUB', hint: 'the sub never under 30 Hz, the note never under 25 Hz — lifted by octaves, so it is heard (3.74d sound audit)' },
       { key: 'subOct', type: 'enum', options: ['0', '-1', '-2'], default: '-1', label: 'Sub oct', group: 'DRIVE+SUB', hint: 'the sub against the stack: −1 = an octave under (as before), −2 = two octaves (very deep), 0 = the same pitch' },
       { key: 'subWarm', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Sub harmonics', group: 'DRIVE+SUB', hint: 'adds overtones above the sub so a very deep note is still heard on laptop speakers, phones and headphones (needs Sub above 0)' },
       { key: 'glide', type: 'number', default: 0.08, min: 0, max: 2, step: 0.001, unit: 's', label: 'Glide', group: 'DRIVE+SUB' },
@@ -68,7 +68,7 @@
       const sh = ac.createWaveShaper(); sh.oversample = '4x'; dsum.connect(sh);
       const sub = ac.createOscillator(); sub.type = 'sine'; sub.start(); ctx.track(sub);
       const subG = ac.createGain(); sub.connect(subG);
-      const SUBK = { '0': 1, '-1': 0.5, '-2': 0.25 }, subHz = (h) => { const x = h * (SUBK[P.get('subOct')] || 0.5); return P.get('keepRange') !== false ? dsp.keepRange(x, 30) : x; };   // 3.51 Sub oct · 3.77 never under 30 Hz
+      const SUBK = { '0': 1, '-1': 0.5, '-2': 0.25 }, subHz = (h) => { const x = h * (SUBK[P.get('subOct')] || 0.5); return P.get('keepRange') !== false ? dsp.keepRange(x, 30) : x; };   // 3.51 Sub oct · 3.74d never under 30 Hz
       // 3.51 Sub harmonics: a symmetric soft clip of the clean sub → 3rd/5th overtones (82 Hz for a 27 Hz note) the ear rebuilds the low note from
       const warmSh = ac.createWaveShaper(), warmG = ac.createGain(); warmG.gain.value = 0; ctx.track(warmSh); ctx.track(warmG);
       { const wc = new Float32Array(2049), nm = Math.tanh(4); for (let i = 0; i < 2049; i++) wc[i] = Math.tanh(4 * (i / 1024 - 1)) / nm; warmSh.curve = wc; }
@@ -134,7 +134,7 @@
       let env = { t0: -1, att: 0.001, peak: 0 };
       const envAt = (t) => t <= env.t0 ? 0 : t >= env.t0 + env.att ? env.peak : env.peak * (t - env.t0) / env.att;
       function releaseAt(t) { const g = amp.gain; g.cancelScheduledValues(t); g.setValueAtTime(envAt(t), t); g.setTargetAtTime(0, t, Math.max(0.002, P.get('release') / 4)); }
-      const noteHz = (note) => { const f = Math.max(8, MT.hz(Math.max(0, note - 12 + 12 * P.get('octave'))) * Math.pow(2, P.get('transpose') / 12)); return P.get('keepRange') !== false ? dsp.keepRange(f, 25) : f; };   // 3.50 Octave + Pitch · 3.77 never under 25 Hz
+      const noteHz = (note) => { const f = Math.max(8, MT.hz(Math.max(0, note - 12 + 12 * P.get('octave'))) * Math.pow(2, P.get('transpose') / 12)); return P.get('keepRange') !== false ? dsp.keepRange(f, 25) : f; };   // 3.50 Octave + Pitch · 3.74d never under 25 Hz
       function noteOn(note, vel, t, o) {
         o = o || {};
         t = Math.max(t, ac.currentTime);

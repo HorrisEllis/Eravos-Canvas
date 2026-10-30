@@ -63,7 +63,7 @@ dependencies:
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
   works_with: [eravos.sidechain-compressor, eravos.sequencer, eravos.timeline, eravos.reese-bass, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen]
 
-# ---- 1.1 (3.76) · Keep in range
+# ---- 1.1 (3.74c) · Keep in range
 Measured on main (2026-10-30): Octave −2 (the default) on the notes the songs write put the fundamental at 8–25 Hz in 53 of the 54
 genres that play Deep Sub — under hearing, and under this tool's own Floor (24 Hz high-pass), which cut it: only the phantom
 harmonics were left. keepRange (boolean, default true): a note whose Octave pitch is under max(30 Hz, floor + 6) is lifted by whole

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Sound audit — every tool that makes or changes sound, measured the way the Destroyer was (3.77, his ask: "can you run tests like that
+/* Sound audit — every tool that makes or changes sound, measured the way the Destroyer was (3.74d, his ask: "can you run tests like that
  * on all of them"). node build/sound-audit.mjs [--out docs/sound-audit.md] [--only id,id]
  * Runs in the test page (headless Chromium), offline renders, default settings:
  *   EFFECTS (audio in → out): a loud 50 Hz + a quiet 1 kHz → INTERMODULATION (what the bass does to the music: the blown-speaker

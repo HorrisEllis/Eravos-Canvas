@@ -8,7 +8,7 @@
  * were brick-walls (fizz), the crusher's downsample folded every partial back as inharmonic hash (alias louder than the
  * signal on Total Destruction), and bass went through the shaper full-band (mud). All four are fixed here.
  * If AudioWorklet is unavailable: WaveShaper quantiser, downsample disabled, a fault says so (§1.2).
- * 2.1 (3.77, "too deep … sounds like a blown speaker" + "performance optimization"): measured with a loud 50 Hz + a quiet 1 kHz,
+ * 2.1 (3.74d, "too deep … sounds like a blown speaker" + "performance optimization"): measured with a loud 50 Hz + a quiet 1 kHz,
  * the default put the sub through the shaper and the bass then gated everything above it — intermodulation at −1.6 dB (as loud as
  * the music); with the sub kept clean it is −24.7 dB (no shaper at all: −25.6). So LOW KEEP is on by default (100 Hz: the sub
  * goes around the damage, in phase) and TIGHT starts at 40 Hz. Speed: stages that change nothing are taken out of the path —

@@ -260,7 +260,7 @@ html:not(.snd-off) #logo { filter: drop-shadow(0 0 calc(var(--snd-pulse) * 10px)
 .plib-actions { display: flex; gap: 6px; align-items: center; min-width: 0; }
 .plib-actions .sbk-alt { margin-top: 0; white-space: nowrap; flex: none; }
 .plib-tool { color: var(--dim); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-/* 3.71/3.72 MOTION + PERFORM (core/motion-ui.js) — in the look kit: slots, drawn shape tiles, a lit rate strip, a scope; macro cards */
+/* 3.71b/3.72b MOTION + PERFORM (core/motion-ui.js) — in the look kit: slots, drawn shape tiles, a lit rate strip, a scope; macro cards */
 .mo-pane[hidden] { display: none; }
 .mo-panel { display: flex; flex-direction: column; gap: 8px; }
 .mo-head { display: flex; align-items: center; gap: 8px; }
@@ -316,7 +316,7 @@ html:not(.snd-off) #logo { filter: drop-shadow(0 0 calc(var(--snd-pulse) * 10px)
 .mo-learn { padding: 6px 10px; border: 1px solid #000; box-shadow: 0 0 0 1px var(--acc); border-radius: 3px; color: var(--acc); font: 600 10px var(--mono); letter-spacing: 1px; }
 .mo-learn[hidden] { display: none; }
 @media (max-width: 640px) { .mo-pgrid { grid-template-columns: 1fr; } .mo-shapes { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
-/* 3.72 Groove 1.1 in the look kit: the pattern panel, the knob bank, the mixer strips on Feel */
+/* 3.72b Groove 1.1 in the look kit: the pattern panel, the knob bank, the mixer strips on Feel */
 .gg-play, .gg-feel { display: flex; flex-direction: column; gap: 8px; }
 /* 3.73 Patterns page: quick picks, families that fold, sections that fold */
 .plib .sbk-filter .sbk-chips { padding: 5px 18px 3px; align-items: center; }
@@ -369,10 +369,10 @@ html:not(.snd-off) #logo { filter: drop-shadow(0 0 calc(var(--snd-pulse) * 10px)
 .gg-small { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .gg-small .uk-num { min-width: 46px; padding: 2px 4px; font-size: 10px; }
 .gg-fd .uk-fader .uk-knob-label { display: none; }
-/* 3.73 his call: "square pads" — every pad grid (FX Box, Drum Forge, Glitch, Dub Station; the Drum Machine in pads.css) */
+/* 3.73b his call: "square pads" — every pad grid (FX Box, Drum Forge, Glitch, Dub Station; the Drum Machine in pads.css) */
 html .fxbox-pad, html .forge-pad, html .glitch-pad, html .dub2-pad { aspect-ratio: 1; min-height: 0; height: auto; border-radius: 4px; }
 /* ============================================================================================================================
-   3.73 "make the accents, fonts, all of the accents use the event variable driven ui when sound plays — in the tools, the ui".
+   3.73b "make the accents, fonts, all of the accents use the event variable driven ui when sound plays — in the tools, the ui".
    One level per place: --lvl is the mix (and its hits) everywhere, and inside a window its own sound (--tool-level: its output,
    or what it plays, or the mix — core/sound-css.js). The accent colours already move (sound-css lights --acc and the palette);
    these make the TEXT and the drawn parts answer too: accent text glows, labels warm toward the accent, LCDs and lit keys
@@ -399,13 +399,13 @@ html:not(.snd-off) .uk-fader-fill { filter: brightness(calc(1 + var(--lvl) * .5)
 html:not(.snd-off) .wm-win::before, html:not(.snd-off) .tp-page::before { box-shadow: 0 0 calc(8px + var(--lvl) * 22px) var(--acc); }
 html:not(.snd-off) .tb-btn.primary, html:not(.snd-off) #logo { filter: drop-shadow(0 0 calc(var(--lvl) * 10px) var(--pink)); }
 @media (prefers-reduced-motion: reduce) { html:not(.snd-off) .uk-group-title::before, html:not(.snd-off) .mo-dot, html:not(.snd-off) .tp-h::before { transform: none; } }
-/* 3.73 fluid: Groove, Motion and Perform reflow to their room */
+/* 3.73b fluid: Groove, Motion and Perform reflow to their room */
 @container (max-width: 760px) { .gg-mixer { grid-template-columns: repeat(4, minmax(0, 1fr)); } .mo-shapes { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
 @container (max-width: 640px) { .mo-pgrid { grid-template-columns: 1fr; } .mo-xy { width: 100% !important; height: auto !important; aspect-ratio: 1; max-width: 260px; } .gg-bank { flex-direction: column; align-items: stretch; } }
 @container (max-width: 420px) { .mo-macros { grid-template-columns: 1fr; } .gg-mixer { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .mo-tile, .mo-slot, .gg-ch, .mo-mrow { transition: box-shadow .18s ease, transform .1s ease, background-color .14s ease; }
 .mo-tile:hover, .mo-slot:hover { transform: translateY(-1px); }
-/* 3.77 Reactive colours panel (core/react-panel.js) — ⋯ Options and every tool's ⚙ settings */
+/* 3.74d Reactive colours panel (core/react-panel.js) — ⋯ Options and every tool's ⚙ settings */
 .rcp { display: flex; flex-direction: column; gap: 14px; color: var(--text); }
 .rcp-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .rcp-dot { width: 7px; height: 7px; border-radius: 50%; background: conic-gradient(var(--pink), var(--amber), var(--green), var(--cyan), var(--violet), var(--pink)); box-shadow: 0 0 10px var(--cyan); align-self: center; }

@@ -39,7 +39,7 @@
     defaultPreset: 'Festival Lead',
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, MT = window.MusicTheory;
-      // 3.77 a chord no longer goes over full scale: level → headroom (unity under −3 dBFS, peaks rounded) → out
+      // 3.74d a chord no longer goes over full scale: level → headroom (unity under −3 dBFS, peaks rounded) → out
       const lvl = ac.createGain(); lvl.gain.value = P.get('level') * 0.5; const hr = ctx.dsp.headroom(ac), out = ac.createGain(); lvl.connect(hr.input); hr.output.connect(out); hr.nodes.forEach(n => ctx.track(n)); ctx.track(lvl);
       ctx.port('out', { kind: 'audio', direction: 'out', node: out, label: 'supersaw' });
       const cutMod = ctx.modBus('cutoff', { min: -4800, max: 4800 });

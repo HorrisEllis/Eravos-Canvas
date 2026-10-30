@@ -22,7 +22,7 @@ describe('Sub Engine — legato never drops a held note', () => {
   });
 });
 
-describe('Deep Sub 1.1 · Keep in range (3.76)', () => {
+describe('Deep Sub 1.1 · Keep in range (3.74c)', () => {
   const rig = (params) => { const U = TH.universe(1.2, { bpm: 120 }), id = TH.spawn(U, 'eravos.sub-engine'), c = OrganismFactory.handle(id).ctx; c.params.setMany(Object.assign({ phantom: 0, click: 0, drop: 0, drive: 0 }, params || {})); return { U, id, c }; };
   it('a note the songs write (A1, Octave −2 → 13.75 Hz, under the 24 Hz floor) is lifted to 55 Hz — heard, and not cut by the floor', async () => {
     const { U, id, c } = rig(); assert.near(c.subHz(33), 55, 0.01, 'two octaves up to 30–60 Hz');

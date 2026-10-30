@@ -225,7 +225,7 @@
     const uiFn = F().ui && F().ui(d.id);
     if (uiFn) {
       navTo('panel', 'Panel', 'sliders-horizontal');
-      // 3.71 the panel is there the moment the page opens: with none on the canvas, a sketch (no window, not saved, not in
+      // 3.71b the panel is there the moment the page opens: with none on the canvas, a sketch (no window, not saved, not in
       // undo) is played here — Add to canvas carries everything set on it over to the real window
       if (!live(st.target) && !live(st.sketch)) st.sketch = F().spawn(d.id, { K, ephemeral: true, headless: true }) || null;
       const box = h('div', { class: 'tp-panel' }), rec = live(st.target) || live(st.sketch);

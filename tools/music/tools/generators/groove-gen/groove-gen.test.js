@@ -3,7 +3,7 @@
  * obeyed. Add this tool's own tests below it. */
 TH.toolContract('eravos.groove-gen');
 
-describe('Groove 1.1 · feel and rows (3.71)', () => {
+describe('Groove 1.1 · feel and rows (3.71b)', () => {
   const ctxOf = (id) => OrganismFactory.handle(id).ctx;
   function rig(params, bars) {
     const U = TH.universe(0.2, { bpm: 120 }), g = TH.spawn(U, 'eravos.groove-gen'), pads = TH.spawn(U, 'eravos.pads'), c = ctxOf(g);

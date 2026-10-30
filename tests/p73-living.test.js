@@ -1,7 +1,7 @@
-/* 3.73 — "make the accents, fonts, all of the accents use the event variable driven ui when sound plays … square pads … make the
+/* 3.73b — "make the accents, fonts, all of the accents use the event variable driven ui when sound plays … square pads … make the
  * ui completely dynamic and fluid … the patterns: why do barely any of them curve?" */
-window.__phase = 'P73';
-describe('P73 · patterns that curve', () => {
+window.__phase = 'P73b';
+describe('P73b · patterns that curve', () => {
   const notesOf = (steps) => steps.filter(s => s.topic === 'clip_add' && s.payload && s.payload.notes).flatMap(s => s.payload.notes.map(n => Object.assign({ part: s.payload.target }, n)));
   it('every genre writes notes that move: per-note curves (with Bézier arcs) and bends — none on drums', () => {
     let curved = 0, arcs = 0, total = 0;
@@ -32,7 +32,7 @@ describe('P73 · patterns that curve', () => {
   });
 });
 
-describe('P73 · square pads, fluid controls, every window answers the sound', () => {
+describe('P73b · square pads, fluid controls, every window answers the sound', () => {
   const host = () => { if (!CanvasWM.world) { CanvasWM.init(document.getElementById('wmhost'), Kernel); WireSystem.init(Kernel); OrganismFactory.boot(Kernel); } };
   it('the Drum Machine’s pads are square', async () => {
     host(); const id = OrganismFactory.spawn('eravos.pads', { x: 40, y: 40, w: 640, h: 700 }); await TH.sleep(60);

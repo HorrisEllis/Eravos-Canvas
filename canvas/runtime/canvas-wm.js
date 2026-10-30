@@ -196,7 +196,7 @@
     const body = h('div', { class: 'wm-body' });
     const grip = h('div', { class: 'wm-grip' });
     const win = h('div', { class: 'wm-win', role: 'group', 'aria-label': d.label, 'data-instance': rec.instanceId, 'data-organism': d.id, style: { left: pos.x + 'px', top: pos.y + 'px', width: w + 'px', height: hgt + 'px', '--acc': d.accent || '#00d4ff' } }, [header, body, grip]);
-    win.classList.add('wm-new'); global.setTimeout(() => win.classList.remove('wm-new'), 320);   // 3.73 fluid: it grows into place
+    win.classList.add('wm-new'); global.setTimeout(() => win.classList.remove('wm-new'), 320);   // 3.73b fluid: it grows into place
     win.style.zIndex = ++zTop;
     world.appendChild(win);
     // drag (title bar). Controls inside the bar keep their clicks; drags always end (up / cancel / lost capture).

@@ -1,4 +1,4 @@
-/* ERAVOS music — react-panel.js · 3.77 the Reactive colours panel (his words: "that panel, do it right this time … worth the space it
+/* ERAVOS music — react-panel.js · 3.74d the Reactive colours panel (his words: "that panel, do it right this time … worth the space it
  * takes up" · "give each tool the ability to adjust it … in the settings for each tool").
  * One panel, two places: ⋯ Options → Reactive colours (the app's) and every tool's ⚙ settings (that tool's own: Follow the app, or its
  * own mode / amount / colours, saved with the tool). Each mode is a card with a LIVE preview of what it does — the same colour code

@@ -38,7 +38,7 @@ function loaderOutput(file, win) {
 }
 const rel = (p) => p.replace(/^music\//, '');
 
-// ---------------------------------------------------------------- 3.76 one tool = one zip with EVERYTHING it is and uses
+// ---------------------------------------------------------------- 3.74c one tool = one zip with EVERYTHING it is and uses
 // James, 2026-10-30: "each tool is supposed to be bundled with its dag, tool file, ui and packs, anything that tool uses and has, is
 // its own zip." The zip carries the whole tool folder (tool.json, engine, ui, styles, spec, tests, every pack and its schema,
 // pictures) and dag.json — the tool as a node: what it needs (the core pack, units, tools, permissions), its hooks in and out,

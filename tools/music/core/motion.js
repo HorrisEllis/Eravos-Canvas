@@ -1,4 +1,4 @@
-/* ERAVOS music — motion.js · 3.71 MOTION + PERFORM, built into a tool (no extra windows, no wires)
+/* ERAVOS music — motion.js · 3.71b MOTION + PERFORM, built into a tool (no extra windows, no wires)
  * James, 2026-10-24: "all need more dynamic control and a better ui" — movement over time, variation, performance controls,
  * deeper controls, "all the above while not cluttering or making it overwhelming".
  * A tool opts in with `perform: true` on its definition. It then carries:

@@ -4,7 +4,7 @@
  * allow — the same rule EDM Lab 3.0 plays (its density map and hit rule, carried over). It makes no sound: it sends notes to every
  * drum tool wired from its note out (Pads, Drum Forge: note 36 + pad index), and tells wired parts each step (groove:step — the
  * Bassline follows the kick).
- * 1.1 (3.71, "more dynamic control and a better ui … without cluttering"): FEEL — humanize, accents on the beat, rolls on the
+ * 1.1 (3.71b, "more dynamic control and a better ui … without cluttering"): FEEL — humanize, accents on the beat, rolls on the
  * hats, a fill every N bars, a pattern that evolves bar to bar, 1- or 2-bar loop; per drum row: mute, solo, level, chance, pad;
  * and the shared MOTION + PERFORM (perform: true — any knob moves on its own, four macros, an XY pad). All neutral by default:
  * an old song plays exactly as before. */

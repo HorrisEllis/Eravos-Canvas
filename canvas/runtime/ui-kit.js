@@ -76,7 +76,7 @@
   }
 
   // ---------------------------------------------------------------- Knob
-  // 3.72 the knob cap's shading, defined once for the page (every knob's cap fills from it)
+  // 3.72b the knob cap's shading, defined once for the page (every knob's cap fills from it)
   function capDefs() {
     if (doc.getElementById('uk-defs')) return;
     const NS = 'http://www.w3.org/2000/svg', d = doc.createElementNS(NS, 'svg'); d.setAttribute('id', 'uk-defs'); d.setAttribute('aria-hidden', 'true'); d.setAttribute('width', '0'); d.setAttribute('height', '0'); d.style.position = 'absolute';
@@ -93,7 +93,7 @@
     track.setAttribute('class', 'uk-knob-track'); arc.setAttribute('class', 'uk-knob-arc'); dot.setAttribute('class', 'uk-knob-dot'); dot.setAttribute('r', '1.6');
     // 3.49 (P49.1): where a moving knob is right now (a mover is wired to it) — a second dot; its own value stays the arc
     const liveDot = doc.createElementNS(svgNS, 'circle'); liveDot.setAttribute('class', 'uk-knob-live'); liveDot.setAttribute('r', '1.9'); liveDot.style.display = 'none';
-    // 3.72 the look kit: a shaded cap with a pointer inside the ring, and the swing of a moving knob as a thin outer arc
+    // 3.72b the look kit: a shaded cap with a pointer inside the ring, and the swing of a moving knob as a thin outer arc
     capDefs();
     const cap = doc.createElementNS(svgNS, 'circle'), capHi = doc.createElementNS(svgNS, 'circle'), ptr = doc.createElementNS(svgNS, 'line'), swing = doc.createElementNS(svgNS, 'path');
     cap.setAttribute('class', 'uk-knob-cap'); cap.setAttribute('cx', '20'); cap.setAttribute('cy', '20'); cap.setAttribute('r', '11.5');
@@ -110,7 +110,7 @@
     const pol = (a, r) => { const rad = (a - 90) * Math.PI / 180; return [20 + r * Math.cos(rad), 20 + r * Math.sin(rad)]; };
     const arcPath = (a0, a1, r) => { const [x0, y0] = pol(a0, r), [x1, y1] = pol(a1, r); const large = Math.abs(a1 - a0) > 180 ? 1 : 0; return `M${x0} ${y0} A${r} ${r} 0 ${large} ${a1 > a0 ? 1 : 0} ${x1} ${y1}`; };
     track.setAttribute('d', arcPath(A0, A1, 15.5));
-    // 3.73 fluid: a value set from outside (a preset, a macro, undo) glides there; a drag or a key is exact at once
+    // 3.73b fluid: a value set from outside (a preset, a macro, undo) glides there; a drag or a key is exact at once
     let shownN = null, glideRaf = 0;
     function glideTo() {
       const target = Math.max(0, Math.min(1, m.toN(value))); if (shownN === null || reduceMotion()) { shownN = target; return; }

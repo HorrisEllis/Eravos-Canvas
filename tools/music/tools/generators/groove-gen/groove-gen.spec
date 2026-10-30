@@ -33,7 +33,7 @@ dependencies:
   permissions: [audio_out, bus_publish, bus_subscribe, registry_read]
   works_with: [eravos.pads, eravos.embodiment-lab, eravos.arp, eravos.bass-gen, eravos.coven, eravos.organ, eravos.retro-poly, eravos.bass-forge]
 
-# ---- 1.1 (3.71) · feel, rows, motion, perform
+# ---- 1.1 (3.71b) · feel, rows, motion, perform
 config (FEEL, all neutral by default — 1.0 songs play the same notes): humanize 0…1 (±12 ms, ±25 % velocity, seeded) · accent 0…1
 (beats ×1+0.45a, off-beat 16ths ×1−0.35a) · rolls 0…1 (hat / open hat / perc / shaker: chance rolls×0.5 of 2–4 hits in the step) ·
 fill off|2|4|8|16 (the half-bar before every N bars: snare, ghost, perc at least 0.55 density, energy +0.35) · evolve off|1|2|4|8

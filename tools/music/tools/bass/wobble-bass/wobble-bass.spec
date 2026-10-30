@@ -209,4 +209,4 @@ His call: "all the Bun Dem sound packs are terrible … just remove them". The n
 factory pack (songs that listed one as an alternative use their others). The engine features they showed (FM wub, pitch wub,
 rate glide, fold grit) stay; their tests now use a plain dancehall growl patch.
 
-# ---- 3.77 keepRange (default on): the sub never under 30 Hz, the note never under 25 Hz (lifted by octaves); off = as before.
+# ---- 3.74d keepRange (default on): the sub never under 30 Hz, the note never under 25 Hz (lifted by octaves); off = as before.

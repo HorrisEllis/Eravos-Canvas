@@ -34,7 +34,7 @@
     ],
     config: [
       { key: 'wave', type: 'enum', options: WAVES, default: 'saw', label: 'Wave', group: 'TONE' },
-      { key: 'keepRange', type: 'boolean', default: true, label: 'Keep in range', group: 'TONE', hint: 'never under 25 Hz — a note that would be is lifted by octaves, so it is heard (3.77 sound audit)' },
+      { key: 'keepRange', type: 'boolean', default: true, label: 'Keep in range', group: 'TONE', hint: 'never under 25 Hz — a note that would be is lifted by octaves, so it is heard (3.74d sound audit)' },
       { key: 'octave', type: 'integer', default: -1, min: -4, max: 3, label: 'Octave', group: 'TONE' },
       { key: 'transpose', type: 'number', default: 0, min: -36, max: 24, step: 0.1, unit: 'st', label: 'Pitch', group: 'TONE', hint: 'tune the whole instrument up or down in semitones (−36 … +24, three octaves down) — turn it down when everything sounds too high; decimals detune between notes' },
       { key: 'fine', type: 'number', default: 0, min: -100, max: 100, step: 1, unit: 'c', label: 'Fine', group: 'TONE' },
@@ -136,7 +136,7 @@
         curF = f;
       }
       const peak = (vel) => 0.08 + 0.92 * Math.pow(Math.max(0, Math.min(1, vel)), 1.5);
-      const noteHz = (note) => { const f = Math.max(8, MT.hz(Math.max(0, Math.min(127, note + 12 * P.get('octave')))) * Math.pow(2, P.get('transpose') / 12)); return P.get('keepRange') !== false ? ctx.dsp.keepRange(f, 25) : f; };   // 3.50 Pitch · 3.77 never under 25 Hz
+      const noteHz = (note) => { const f = Math.max(8, MT.hz(Math.max(0, Math.min(127, note + 12 * P.get('octave')))) * Math.pow(2, P.get('transpose') / 12)); return P.get('keepRange') !== false ? ctx.dsp.keepRange(f, 25) : f; };   // 3.50 Pitch · 3.74d never under 25 Hz
       function noteOn(note, vel, t, o) {
         o = o || {}; t = Math.max(t, ac.currentTime);
         const f = noteHz(note);

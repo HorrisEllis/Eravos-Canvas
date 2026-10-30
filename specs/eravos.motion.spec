@@ -69,3 +69,15 @@
   knob with no window, M1 can still be built on params.live, which already exists.
   M2–M5 are unchanged and re-phased: M4 → P49.2, M2/M3 → P49.5, M5 → P49.6. M5's "new buses" for the static tools are no longer
   needed: every knob is an input now.
+
+# ============================================================
+# ADDENDUM 3.71b (2026-10-24) — motion INSIDE the knob, no window (the "to confirm" above, built)
+#   core/motion.js + core/motion-ui.js. A tool opts in with perform: true (the registry copy of a definition drops define-time flags, so a tool
+#   "performs" when its config carries _perform — MusicMotion.performs(d)). It then has:
+#   MOTION — _motion [{ key, shape (sine triangle saw ramp square random smooth steps follow), beats, depth ±1 (half-ranges), phase, steps?, off? }]:
+#     sampled into params.live() with the knob inputs (sdk-music sampleKnobs), at every transport tick (tick time — exact for pattern tools)
+#     and ~60/s; synced to the song position while it plays. The knob keeps its own value.
+#   PERFORM — four macro knobs m1…m4 (real knobs: MIDI learn, automation, presets, knob inputs) + _perform { names, map[i]{key: amount ±1}, xy }.
+#     A macro adds value × amount × 2 half-ranges to each knob it holds; macros can themselves move (motion on a macro).
+#   UI: the tool's PAGE gets Motion and Perform tabs (UIKit.pageTabsFor); right-click any knob → move it here / put it on a macro.
+#   Tests: tests/p71-motion.test.js. Numbering: this session's releases are 3.71b–3.74d (the other session's 3.71–3.74b are the Pattern Library and drum packs; 3.75–3.86 are reserved by eravos.phase75-map.spec).

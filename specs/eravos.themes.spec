@@ -36,3 +36,20 @@
   switching is instant and survives a reload with no flash · every window, page, menu and the top bar take v10 ·
   fonts load from disk with the network off · boundary test (no domain words in theme-v10.css / themes.js) ·
   screenshots of: canvas with 3 tools, a tool page, a suite page, ＋ Add, the piano roll — sent before merging
+
+
+# ADDENDUM 3.72b–3.74d (2026-10-24 … 10-30) — the look kit and the living UI
+# 3.72b LOOK KIT ("all of them pro-plugin look. the whole ui"): same controls, class names and SIZES (the timeline tests measure them) —
+#   only the drawing: knobs with a shaded cap (#uk-cap, defined once), pointer and glowing value ring, a moving knob's swing as a violet
+#   outer arc; lit segmented strips; LED toggles; machined buttons; recessed fields and LCD numbers; metal fader caps; drawn displays as
+#   recessed screens; windows and sections as a chassis with inset panels and mono caps headings. canvas/runtime/eravos.css + ui-kit.js.
+# 3.73b LIVING: --lvl (the mix; inside a window its own sound, or what it plays, or the mix) drives accent text glow, labels and values
+#   warming to the accent, LCDs, panel edges, drawn displays. Fluid: values set from outside glide, keys/strips/faders ease, tabs and
+#   pages slide in, windows fade in, sections reflow (container queries). Square pads.
+# 3.74d REACTIVE COLOURS — Off · Static · Changing · Custom, Amount, custom colours (low end · top · hits) + palettes:
+#   colourFor(colour, k, {mode, shift, colors, low, high, pulse}); EVERY inline colour variable on every element in a window reacts (base kept
+#   per element; a base the tool changes is taken up); Changing turns each window by ITS own spectrum, hits and drift (--win-shift); Custom
+#   leans each colour toward the nearest of yours. Off stops everything, the older UI.alive layer included. Per tool: _react on every music
+#   tool ({mode: follow|off|static|changing|custom, amount, colors}) set in its ⚙ settings, saved with it, wins over the app's (even Off).
+#   The panel: core/react-panel.js (⋯ Options → Reactive colours, and every tool's settings) — mode cards with live previews of the real
+#   colour code, Amount, swatches, palettes. Tests: p58, p73-living, p74d-reactive-modes. Numbering: this session's releases are 3.71b–3.74d (the other session's 3.71–3.74b are the Pattern Library and drum packs; 3.75–3.86 are reserved by eravos.phase75-map.spec).

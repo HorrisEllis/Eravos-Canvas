@@ -19,7 +19,7 @@
   // Floor Falls' moves on any line of notes; null when there is nothing to curve
   function curved(p) {
     const ns = p.notes.map(copy).sort((a, b) => a.s - b.s || a.r - b.r); if (ns.length < 2) return null;
-    const own = new Set(ns.filter(n => n.b)); let moved = 0;   // 3.73 merge: a note the song already bends keeps its bend; the moves go on the others
+    const own = new Set(ns.filter(n => n.b)); let moved = 0;   // 3.73b merge: a note the song already bends keeps its bend; the moves go on the others
     const wob = p.type === 'wobble', lead = p.type === 'lead', phrase = Math.max(16, Math.min(64, p.bars * 16));
     const dive = (n, by) => Math.max(by, FLOOR - n.r);   // never under ~18 Hz (r is from the key's root; the root adds 0–11 on top)
     ns.forEach((n, i) => {

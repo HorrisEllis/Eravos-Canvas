@@ -485,7 +485,7 @@ svg.wires path.wire.hot { stroke-width: 4.5; filter: drop-shadow(0 0 4px current
 }
 .tp-panel { position: relative; border: 1px solid var(--line, #1a2533); border-radius: 6px; padding: 10px; background: var(--panel); max-height: 640px; overflow: auto; }
 .tp-sec[hidden] { display: none; }
-/* 3.71 the page's tabs: one horizontal row (the Controls table shares the .tp-tab name — its width: 100% stacked them) */
+/* 3.71b the page's tabs: one horizontal row (the Controls table shares the .tp-tab name — its width: 100% stacked them) */
 .tp-nav { flex-wrap: nowrap; gap: 0; overflow-x: auto; padding: 0; scrollbar-width: none; }
 .tp-nav .tp-btn.tp-tab { width: auto; flex: none; background: transparent; border: 0; border-bottom: 2px solid transparent; border-radius: 0; color: var(--dim); padding: 10px 14px 8px; font-weight: 600; }
 .tp-nav .tp-btn.tp-tab:hover { color: var(--text); border-bottom-color: var(--line2); }
@@ -503,7 +503,7 @@ table.tp-tab { width: 100%; }
 .cm-item.danger { color: #ff8aa0; }
 
 /* ============================================================================================================================
-   3.72 THE LOOK KIT — his call, 2026-10-24: "all of them pro-plugin look. the whole ui" ("that's way better").
+   3.72b THE LOOK KIT — his call, 2026-10-24: "all of them pro-plugin look. the whole ui" ("that's way better").
    A device, not a web page: a dark chassis, sections set into it, recessed screens, real knobs (a shaded cap and pointer inside
    a glowing value ring, a moving knob's swing as a thin violet arc), lit segmented strips, LED toggles, metal fader caps, mono
    caps labels. Same controls and class names as before — only how they are drawn changes, so every tool gets it at once.
@@ -592,7 +592,7 @@ table.tp-tab { width: 100%; }
 .tp-row, .tp-mod, .tp-pre { border-radius: 3px; border: 1px solid #000; background: var(--well); box-shadow: 0 0 0 1px var(--line); }
 .tp-row.on { box-shadow: 0 0 0 1px var(--acc); border-color: #000; }
 .tp-tag { border-radius: 2px; font: 700 9px var(--mono); letter-spacing: 1px; text-transform: uppercase; }
-/* 3.73 "make the ui completely dynamic and fluid": everything eases — keys and strips light up and settle, faders glide to a
+/* 3.73b "make the ui completely dynamic and fluid": everything eases — keys and strips light up and settle, faders glide to a
    new value, a tab's content and a page slide in, a new window grows into place; and sections reflow to the room they have
    (container queries: a narrow window stacks, a wide one spreads). Reduced motion: none of the movement, all of the reflow. */
 .uk-btn, .uk-toggle, .uk-seg button, .tp-btn, .tb-btn, .uk-select, .uk-text, .uk-num, .tp-nav .tp-btn.tp-tab {

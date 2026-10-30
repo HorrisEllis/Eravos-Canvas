@@ -105,4 +105,4 @@ dependencies:
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
   works_with: [eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen, eravos.midi-mapper, eravos.lyric-rhythm]
 
-# ---- 3.77 keepRange (default on): the sub never under 30 Hz, the note never under 25 Hz. Energy under 20 Hz on an A1: −11 dB of the total → −51 dB.
+# ---- 3.74d keepRange (default on): the sub never under 30 Hz, the note never under 25 Hz. Energy under 20 Hz on an A1: −11 dB of the total → −51 dB.

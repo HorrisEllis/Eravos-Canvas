@@ -35,3 +35,5 @@
 ## Acceptance
   no song in "More" · every card shows a genre and subgenre · chips: 8 genres, not 16 categories + 11 moods ·
   a Heavy Drops song appears under its genre AND under Collection › Heavy Drops · tests in p19 (Songs by category) updated
+
+# ADDENDUM 3.73b — every genre's melodic parts now move (eravos.pattern-library.spec, addendum 3.73b); a genre opts out with curve: false.

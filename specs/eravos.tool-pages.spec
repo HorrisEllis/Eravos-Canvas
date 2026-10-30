@@ -31,3 +31,13 @@ tests: tests/p45-tool-page.test.js
 3.48 (specs/eravos.suites.spec): suites become their own systems with their own page (canvas/runtime/suite-page.js);
   a tool page gains "Part of: <suite> 🧰" (opens the suite page). descriptor.suite stays as the tool's starter rig.
   Shared parts (preset lists, mod pickers, control tables) move into one module both pages use — no copy of the code.
+
+
+# ADDENDUM 3.71b–3.72b (2026-10-24) — his words: "with the tool pages to have tabs. load the default tab with the content and have the tabs
+#   horizontal" · "the tool page to be the pink button, and the add to canvas under it".
+#   Tabs: one horizontal row (the tab buttons shared the .tp-tab class with the Controls table, whose width:100% stacked them).
+#   Panel opens by default with the tool LIVE even when none is on the canvas: a windowless sketch (ephemeral, headless) plays in the page;
+#   Add to canvas carries what was set on it (serialize → deserialize); closing the page leaves nothing behind.
+#   A tool adds its own tabs: view.pageTab(id, label, el, icon); a domain adds tabs for every tool: UIKit.pageTabsFor(view) (Motion, Perform).
+#   + Add: the pink primary button opens the page; Add to canvas sits under it. 3.72b: the page is a device (chassis, tabs along the top,
+#   inset panels, the pink Add key). Tests: p71-motion (the page test). Numbering: this session's releases are 3.71b–3.74d (the other session's 3.71–3.74b are the Pattern Library and drum packs; 3.75–3.86 are reserved by eravos.phase75-map.spec).

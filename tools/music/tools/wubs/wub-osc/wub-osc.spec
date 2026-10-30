@@ -63,4 +63,4 @@ dependencies:
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe, audio_in]
   works_with: [eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen, eravos.midi-mapper, eravos.lyric-rhythm]
 
-# ---- 3.77 keepRange (default on): never under 25 Hz.
+# ---- 3.74d keepRange (default on): never under 25 Hz.

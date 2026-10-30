@@ -219,7 +219,7 @@
     let live = 0, peak = 0, flash = 0, tone = 0.5; const reduce = global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let an = null; try { an = view.tap(o.port || 'out', 2048); } catch (e) {}
     const buf = an ? new Float32Array(an.fftSize) : null, fbuf = an ? new Uint8Array(an.frequencyBinCount) : null;
-    // 3.77 it follows ⋯ Options → Reactive colours: Off stops it (all at rest), Static keeps the second colour on the tool's own hue,
+    // 3.74d it follows ⋯ Options → Reactive colours: Off stops it (all at rest), Static keeps the second colour on the tool's own hue,
     // Changing turns it with the sound's brightness (as it always did), Custom takes your Top colour
     const RC = () => global.SoundCSS || null, mode = () => (RC() ? RC().mode : 'static');
     const acc2 = () => { const m = mode(); return m === 'changing' ? `hsl(${(hue0 + (tone - 0.5) * 120 + 360) % 360} 90% 65%)` : m === 'custom' ? RC().colors.high : `hsl(${hue0} 90% 65%)`; };
@@ -269,11 +269,11 @@
   function knobMenu(e, view, c) {
     closeKnobMenu();
     const K = view.K, F = global.OrganismFactory, id = view.instanceId, hk = knobHook(view.descriptor, c.key);
-    if (!hk && !(global.MusicMotion && global.MusicMotion.performs(view.descriptor))) return;   // a setting nothing can move (texts, files, or a tool without sound) — unless the tool moves its own (3.71)
+    if (!hk && !(global.MusicMotion && global.MusicMotion.performs(view.descriptor))) return;   // a setting nothing can move (texts, files, or a tool without sound) — unless the tool moves its own (3.71b)
     const into = K.wires.list().filter(w => w.dst.instanceId === id && w.dst.hookId === hk);
     const here = !hk ? [] : K.registry.list().map(x => F.handle(x.instance_id)).filter(x => x && !x.unmounted && x.instanceId !== id && modOut(x.def) && !into.some(w => w.src.instanceId === x.instanceId));
     const item = (text, hint, fn, cls) => { const b = h('button', { class: 'km-item' + (cls ? ' ' + cls : ''), text, title: hint || '' }); b.addEventListener('click', (ev) => { ev.stopPropagation(); closeKnobMenu(); fn(); }); return b; };
-    // 3.71 a tool with its own motion (core/motion.js): move the knob right here, or put it on a macro — no new windows
+    // 3.71b a tool with its own motion (core/motion.js): move the knob right here, or put it on a macro — no new windows
     const MM = global.MusicMotion, own = [];
     if (MM && MM.performs(view.descriptor) && (c.type === 'number' || c.type === 'integer') && !c.perform) {
       const ms = MM.cleanMotion(view.state._motion), mine = ms.find(m => m.key === c.key), setM = (arr) => view.emit('config_change', { key: '_motion', value: arr });

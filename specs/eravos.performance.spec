@@ -76,3 +76,11 @@ node build/perf-idle.mjs.
    Real-time contexts sleep on their own (checked every 250 ms); offline renders stay awake unless K.audio.sleepOffline is set.
 Open: Embodiment Lab is a drone (needs its own "stopped" state); effects need a "no input" test; Pad Forge's reverb while playing
 (a cheaper IR at the same sound) is the next cost by this table.
+
+
+# ADDENDUM 3.74d (2026-10-30) — measured per tool
+#   build/sound-audit.mjs → docs/sound-audit.md: every sound tool, offline, default settings: CPU (ms of work per second of sound), plus the
+#   quality measures in eravos.p42-tool-audio.spec. Heavy (> 60 ms/s, one instance): Pad Forge ~220 · Gothic Organ ~145 · Xen Synth ~135 ·
+#   Partials ~115 · Coven ~97 · Morph Osc ~90 · Retro Poly ~68 — Q2 in eravos.phase74e-map.spec. Destroyer 2.1: stages that change nothing
+#   are routed out (the crusher worklet and its filters at 16 bits, the crossover with Low keep off, flat shelves) — ~11 % less; its scope
+#   rests in silence. Motion (3.71b) costs nothing while no knob moves.

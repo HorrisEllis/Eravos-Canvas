@@ -2,7 +2,16 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
-## Done — 3.77 Destroyer 2.1 · Reactive colours: modes, a real panel, per tool · a sound audit of every tool (2026-10-30)
+## Mapped — 3.74e+ everything still open from 3.68 … 3.74d (2026-10-30)
+His words: "merge and push, then map the rest. make sure you update and add addendums to the specs." Map: specs/eravos.phase74e-map.spec —
+Q sound quality (Q1 Wub Filter intermodulation · Q2 CPU of Pad Forge, Gothic Organ, Xen, Partials, Coven, Morph Osc, Retro Poly · Q3 tails ·
+Q4 Channel DC · Q5 the sound audit as a test gate · Q6 the borderline p74b test · Q7 the Core zip URL) · T the other eleven tools the Groove
+way (Bassline, Chords, Drum Forge, Bass Forge, FX Box, Drop Builder, Sidechain, EQ, Breath, Embodiment, Recursive Spectra, Automation) ·
+R reactive leftovers · P packaging · D his decisions. Spec addenda: motion, tool-pages, themes, pack.format, performance, p42-tool-audio,
+pattern-library, codecs, songbook-genres, phasemap. This session's releases renumbered 3.71b–3.74d (they collided with the other session's
+3.71–3.73 and the 3.75–3.86 it reserved).
+
+## Done — 3.74d Destroyer 2.1 · Reactive colours: modes, a real panel, per tool · a sound audit of every tool (2026-10-30)
 His words: "DESTROYER needs refinement. its too deep … sounds like a blown speaker. also needs performance optimization" · "the inside of the
 tools are supposed to react … have options for the reactive color, like changing, the way it is now lets call it static, and a way to
 customize. also the option needs to work, it does nothing, when trying to disable" · "that panel, do it right this time" · "can you run tests
@@ -24,7 +33,7 @@ like that on all of them" · "give each tool the ability to adjust it … in the
   Gothic Organ, Partials, Coven, Morph Osc), long release tails (Pad Forge, Gothic Organ, Xen), Wub Filter intermodulation, Channel DC.
 - Tests: Destroyer (3), p77 reactive modes (6), Wobble Bass / Reese keep-in-range.
 
-## Done — 3.76 Deep Sub: the sub you can hear · one tool = one complete zip (2026-10-30)
+## Done — 3.74c Deep Sub: the sub you can hear · one tool = one complete zip (2026-10-30)
 His words: "push and commit and then give me the replacement. you know each tool is supposed to be bundled with its dag, tool file,
 ui and packs, anything that tool uses and has, is its own zip."
 - **Measured:** Deep Sub plays Octave −2 by default; on the notes the songs write its fundamental sat at 8–25 Hz in 53 of the 54 genres
@@ -133,7 +142,7 @@ library's first patterns (the songs' data is kept, §0.3).
   window. The genre chips are the 85 Song Engine genres until P69.2 (8 genres → subgenres) lands.
 - Tests: tests/p71-pattern-library.test.js (5): ≥ 300 patterns · every type · the four drops and their bends · → Timeline (track, key, after,
   curve) · ▶ renders sound without touching the canvas · the page filters.
-## Done — 3.73 Living UI · square pads · fluid · patterns that curve (2026-10-24)
+## Done — 3.73b Living UI · square pads · fluid · patterns that curve (2026-10-24)
 His words: "make the accents, fonts, all of the accents use the event variable driven ui when sound plays. Like in the tools, the
 ui, etc. Square pads. Make the ui completely dynamic and fluid. Also the patterns. Why do barely any of them curve?"
 - **Why they didn't curve:** of 183 464 notes the 85 genres wrote, 0 had a per-note curve and 218 a bend — per-note curves came
@@ -150,7 +159,7 @@ ui, etc. Square pads. Make the ui completely dynamic and fluid. Also the pattern
   windows fade in; sections reflow to their room (container queries). Reduced motion keeps the reflow, drops the movement.
 - Tests: p73 (every genre curves, the notes unchanged, curves in range; square pads; knobs glide; Groove lights with its drums).
 
-## Done — 3.72 The look kit (pro-plugin) · tool pages as devices · Groove in it (2026-10-24)
+## Done — 3.72b The look kit (pro-plugin) · tool pages as devices · Groove in it (2026-10-24)
 His words on the 3.71 Groove: "looks horrible … cheap"; on the tool pages: "tabs … load the default tab with the content and have
 the tabs horizontal"; "the tool page to be the pink button, and the add to canvas under it"; on a mock-up: "that's way better.
 Continue that."
@@ -165,7 +174,7 @@ Continue that."
   mixer strip per drum: LED mute/solo, level fader, hit meter, chance, pad; evolve), Motion (slots, drawn shape tiles, a lit rate
   strip, a live scope, depth/phase) and Perform (an XY pad with a trail, four coloured macro cards, Learn).
 
-## Done — 3.71 Motion + Perform (shared) · Groove 1.1, the pilot (2026-10-24)
+## Done — 3.71b Motion + Perform (shared) · Groove 1.1, the pilot (2026-10-24)
 His words: "Bass and drums forge. Fix box. Drop builder. Breath. Eq. Side chain. Embodyment. Recursive spectra. Automation.
 Baseline. Chords. Groove. All need more dynamic control and a better ui." — dynamic = movement over time, variation and feel,
 performance controls, deeper sound controls, "all the above while not cluttering or making it overwhelming". One tool first.
@@ -181,7 +190,7 @@ performance controls, deeper sound controls, "all the above while not cluttering
   same notes as 1.0.
 - Tests: p71-motion (shapes, opt-in, a synced sine on ENERGY, macros, the window), Groove 1.1 (defaults identical, rows, humanize,
   accent, rolls, fill, evolve, loop).
-- Next, after his OK on Groove: the same for Bass Forge, Drum Forge, FX Box, Drop Builder, Breath, EQ, Sidechain, Embodiment,
+- Next (3.71b), after his OK on Groove: the same for Bass Forge, Drum Forge, FX Box, Drop Builder, Breath, EQ, Sidechain, Embodiment,
   Recursive Spectra, Automation, Bassline, Chords.
 
 ## Done — 3.70 Floor Falls songs · right-click menu · his #5901 session optimized (2026-10-24, map specs/eravos.phase70-map.spec)

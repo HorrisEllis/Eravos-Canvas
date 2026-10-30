@@ -30,7 +30,7 @@ describe('tool · Reese Bass — deep bass (3.51)', () => {
     return await TH.render(U);
   };
   it('Sub oct −2 moves the sub down an octave (55 Hz → 27.5 Hz); the default is unchanged (−1 = 55 Hz)', async () => {
-    const one = await render({ subOct: '-1' }), two = await render({ subOct: '-2', keepRange: false });   // 3.77: Sub oct itself (Keep in range would lift 27.5 Hz)
+    const one = await render({ subOct: '-1' }), two = await render({ subOct: '-2', keepRange: false });   // 3.74d: Sub oct itself (Keep in range would lift 27.5 Hz)
     assert.gt(mag(one, 55), mag(one, 27.5) * 5, 'default: the sub is at 55 Hz');
     assert.gt(mag(two, 27.5), mag(two, 55) * 5, 'Sub oct −2: the sub is at 27.5 Hz');
   });

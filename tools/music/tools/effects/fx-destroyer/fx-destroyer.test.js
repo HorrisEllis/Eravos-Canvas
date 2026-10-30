@@ -37,7 +37,7 @@ describe('tool · Destroyer 2.0 — sounds good at every setting', () => {
   });
 });
 
-describe('Destroyer 2.1 · no blown speaker, less work (3.77)', () => {
+describe('Destroyer 2.1 · no blown speaker, less work (3.74d)', () => {
   async function imd(params) {   // a loud 50 Hz (the bass) + a quiet 1 kHz (the music): what the bass does to the music
     const SR = 48000, U = TH.universe(1.2), id = TH.spawn(U, 'eravos.fx-destroyer'), c = OrganismFactory.handle(id).ctx; if (c.ready) await c.ready;
     c.params.setMany(Object.assign({ mix: 1 }, params || {}));
