@@ -7,7 +7,7 @@
  *   { id, name, type, genre, genreLabel, bpm, bars, tool, preset?, configure?, scale, drums?, notes?, curve?: { key, points, osc? }, source }
  * The library is GENERATED from the Song Engine — every genre's parts, section by section — nothing stored by hand, so a new genre adds its
  * patterns by itself. Floor Falls' four pause moves (falls · stairs · freefall · rises) are named.
- *   PatternLibrary.all() · types · get(id) · send(p, { K?, bar?, headless? }) → { tl, lane, tool } · render(p) · play(p) · stop() · open() */
+ *   PatternLibrary.all() · types · get(id) · forTool(tool, { drums }) (3.76) · send(p, { K?, bar?, lane?, headless? }) → { tl, lane, tool } · render(p) · play(p) · stop() · open() */
 (function (global) {
   'use strict';
   const SE = () => global.SongEngine, F = () => global.OrganismFactory;
@@ -90,7 +90,7 @@
       const T0 = F().handle(tl).ctx, end0 = Math.max(1, ...T0.internals.clips.map(c => c.startBar + (c.bars || 0))), b0 = o.bar || end0;
       const done = p.parts.map(x => send(x.pattern, { K, bar: b0 + x.at, headless: o.headless })); return { tl, bar: b0, parts: done, lane: done[0] && done[0].lane, tool: done[0] && done[0].tool };
     }
-    const T = F().handle(tl).ctx, lane = trackFor(K, tl, p, o.headless); if (!lane) return null;
+    const T = F().handle(tl).ctx, lane = (o.lane && T.internals.lanes.find(l => l.id === o.lane)) || trackFor(K, tl, p, o.headless); if (!lane) return null;   // 3.76 o.lane: the track you asked from
     const root = T.key ? +T.key.root || 0 : 0, pub = (k, v) => K.bus.publish('ui:' + k + ':' + tl, v);
     const end = Math.max(1, ...T.internals.clips.filter(c => c.lane === lane.id).map(c => c.startBar + (c.bars || 0)));
     const bar = o.bar || end;
@@ -301,5 +301,31 @@
     page = { close, paint };
     return page;
   }
-  global.PatternLibrary = { addTransform: (fn) => { if (typeof fn === 'function') { transforms.push(fn); LIB = null; } }, addSource: (fn) => { if (typeof fn === 'function') { sources.push(fn); LIB = null; } }, all, types: TYPES.map(t => ({ id: t[0], label: t[1] })), get: (id) => all().find(p => p.id === id) || null, send, render, play, stop, open, rebuild: () => { LIB = null; return all(); }, fromGenre, families: FAMILIES.map(f => ({ id: f[0], label: f[1] })), familyOf, matches };
+  // ---- 3.76 patterns per tool (the Timeline's ♪ on every track): "I need patterns per tool for the timeline … easier to make and
+  //      understand music … I get overwhelmed by too much information". What fits THIS tool, a few at a time, each kind said in one line.
+  const ABOUT = { drums: 'The beat. Kick and snare are the skeleton; hats keep time between them.', bass: 'Low notes that lock to the kick. Usually the root of the chord.',
+    wobble: 'Bass whose tone opens and closes in rhythm: the wub.', chords: 'Several notes at once. They set the mood (minor sounds darker).',
+    lead: 'The tune you would hum. One note at a time, on top.', arp: 'A chord played one note at a time, round and round.',
+    drop: 'The bar where the floor falls out, right before the big part.', fill: 'A short drum change that says: something new is coming.',
+    curve: 'A knob moving over time: how a sound rises, opens or dives.', tension: 'A build: things speed up and rise so the drop hits harder.',
+    chain: 'Build, pause, drop: the whole move in one.' };
+  // the kinds a tool can play when no pattern was written on it yet (by what it is: a drum kit, something low, chords, or a melody)
+  function kindsFor(tool, drums) {
+    const d = (F() && F().def(tool)) || {}, w = (tool + ' ' + (d.label || '') + ' ' + (d.category || '')).toLowerCase();
+    if (drums || /drum|kit|pads|perc|beat/.test(w)) return ['drums', 'fill', 'tension'];
+    if (/wobble|wub/.test(w)) return ['wobble', 'drop', 'bass'];
+    if (/bass|sub|reese|acid/.test(w)) return ['bass', 'drop', 'wobble'];
+    if (/pad|chord|organ|poly|keys|piano|choir|coven|string/.test(w)) return ['chords', 'arp'];
+    return ['lead', 'arp', 'chords'];
+  }
+  // forTool(organism_id, { drums }) → { exact, kinds:[{ id, label, about, n }], list(kind?) → patterns }: this tool's own first; else the
+  // kinds it can play, from other tools (they play on yours: a pattern is notes)
+  function forTool(tool, o) {
+    o = o || {}; const lib = all().filter(p => p.type !== 'chain'), own = lib.filter(p => p.tool === tool), exact = own.some(p => p.type !== 'curve');
+    const pool = exact ? own : lib.filter(p => kindsFor(tool, o.drums).includes(p.type) && p.type !== 'curve').concat(own);
+    const order = exact ? TYPES.map(t => t[0]) : kindsFor(tool, o.drums);
+    const kinds = order.map(id => ({ id, label: (TYPES.find(t => t[0] === id) || [id, id])[1], about: ABOUT[id] || '', n: pool.filter(p => p.type === id).length })).filter(k => k.n);
+    return { exact, kinds, about: ABOUT, list: (kind) => pool.filter(p => !kind || p.type === kind) };
+  }
+  global.PatternLibrary = { forTool, kindsFor, about: ABOUT, draw: drawCard, addTransform: (fn) => { if (typeof fn === 'function') { transforms.push(fn); LIB = null; } }, addSource: (fn) => { if (typeof fn === 'function') { sources.push(fn); LIB = null; } }, all, types: TYPES.map(t => ({ id: t[0], label: t[1] })), get: (id) => all().find(p => p.id === id) || null, send, render, play, stop, open, rebuild: () => { LIB = null; return all(); }, fromGenre, families: FAMILIES.map(f => ({ id: f[0], label: f[1] })), familyOf, matches };
 })(typeof window !== 'undefined' ? window : globalThis);

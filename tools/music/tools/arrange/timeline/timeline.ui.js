@@ -251,6 +251,44 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     ['pointerdown', 'keydown', 'wheel'].forEach(t => oscP.addEventListener(t, (e) => e.stopPropagation()));
     document.body.appendChild(oscP); if (!l.osc) send({});
   }
+  // 3.76 ♪ patterns per tool — James: "I need patterns per tool for the timeline. I want it to be easier to make and understand music … I get
+  // overwhelmed by too much information or clutter." One track's tool, one kind at a time (a line on what that kind does), five patterns,
+  // ▶ hear (off the canvas) · ＋ add (after the last clip on this track, in the song's key) · ↻ five others.
+  let patP = null;
+  function patPanel(l, anchor) {
+    const PL = window.PatternLibrary; if (patP) { patP.close(); if (patP.lane === l.id) return; }
+    const inst = view.K.registry.get(l.target), tool = inst && inst.organism_id; if (!tool) return;
+    const drums = !!(A.drumNames && A.drumNames[l.target] && A.drumNames[l.target].length), F = PL.forTool(tool, { drums });
+    const toolName = ((OrganismFactory.def(tool) || {}).label) || tool, SHOW = 5;
+    let kind = (F.kinds[0] || {}).id, page = 0, said = '';
+    const mix = (list) => { const by = new Map(); list.forEach(p => { if (!by.has(p.genre)) by.set(p.genre, []); by.get(p.genre).push(p); }); const out = [], qs = [...by.values()]; for (let i = 0; out.length < list.length; i++) qs.forEach(q => { if (q[i]) out.push(q[i]); }); return out; };   // genres take turns, so five are five different feels
+    const r = anchor.getBoundingClientRect(), el = h('div', { class: 'tl-patp', role: 'dialog', 'aria-label': 'Patterns for ' + toolName, style: { left: Math.round(Math.min(r.left, innerWidth - 380)) + 'px', top: Math.round(Math.min(r.bottom + 6, innerHeight - 360)) + 'px' } });
+    const close = () => { PL.stop(); el.remove(); document.removeEventListener('pointerdown', away, true); document.removeEventListener('keydown', esc, true); if (patP && patP.el === el) patP = null; };
+    const away = (e) => { if (!el.contains(e.target) && e.target !== anchor) close(); }, esc = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
+    function paint() {
+      el.innerHTML = '';
+      el.append(h('div', { class: 'tl-patp-head' }, [h('b', { text: '♪ Patterns for ' + toolName }), h('button', { class: 'uk-btn', text: '×', title: 'close (Esc)', onclick: close })]));
+      if (!F.kinds.length) { el.append(h('p', { class: 'tl-patp-about', text: 'No patterns fit this tool yet.' })); return; }
+      if (!F.exact) el.append(h('p', { class: 'tl-patp-note', text: 'None written on this tool yet. These come from other tools and play on yours.' }));
+      if (F.kinds.length > 1) el.append(h('div', { class: 'tl-patp-kinds' }, F.kinds.slice(0, 4).map(k => h('button', { class: 'uk-toggle' + (k.id === kind ? ' on' : ''), text: k.label, title: k.about, onclick: () => { kind = k.id; page = 0; said = ''; PL.stop(); paint(); } }))));
+      el.append(h('p', { class: 'tl-patp-about', text: F.about[kind] || '' }));
+      const list = mix(F.list(kind)), pages = Math.max(1, Math.ceil(list.length / SHOW)), shown = list.slice((page % pages) * SHOW, (page % pages) * SHOW + SHOW);
+      shown.forEach(p => {
+        const cv = h('canvas', { class: 'tl-patp-pic' }); try { PL.draw(cv, p); } catch (e) {}
+        const hear = h('button', { class: 'uk-btn', text: '▶', title: 'hear it (nothing on your song changes)' });
+        hear.onclick = () => { el.querySelectorAll('.tl-patp-row .uk-btn.on').forEach(b => { b.classList.remove('on'); b.textContent = '▶'; }); hear.textContent = '…';
+          PL.play(p, () => { hear.classList.remove('on'); hear.textContent = '▶'; }).then(ok => { hear.textContent = ok ? '■' : '▶'; hear.classList.toggle('on', !!ok); }); };
+        const addB = h('button', { class: 'uk-btn primary', text: '＋ add', title: 'add it to this track, after its last clip, in the song’s key' });
+        addB.onclick = () => { const res = PL.send(p, { K: view.K, lane: l.id }); said = res ? '✓ ' + p.name.split(' · ')[0] + ' added at bar ' + Math.floor(res.bar) + (p.curve ? ' (a curve lane under the track)' : '') : 'Could not add it here'; paint(); };
+        el.append(h('div', { class: 'tl-patp-row' }, [cv, h('div', { class: 'tl-patp-txt' }, [h('span', { text: p.name.split(' · ')[0], title: p.name }), h('small', { text: (p.genreLabel || p.genre) + ' · ' + p.bars + (p.bars === 1 ? ' bar' : ' bars') })]), hear, addB]));
+      });
+      el.append(h('div', { class: 'tl-patp-foot' }, [h('span', { class: 'tl-patp-said', 'aria-live': 'polite', text: said || (page % pages + 1) + ' of ' + pages }),
+        pages > 1 ? h('button', { class: 'uk-btn', text: '↻ 5 others', onclick: () => { page++; said = ''; PL.stop(); paint(); } }) : h('span')]));
+    }
+    ['pointerdown', 'keydown', 'wheel'].forEach(t => el.addEventListener(t, (e) => e.stopPropagation()));
+    paint(); document.body.appendChild(el); setTimeout(() => { document.addEventListener('pointerdown', away, true); document.addEventListener('keydown', esc, true); }, 0);
+    patP = { el, close, lane: l.id };
+  }
   // "C3", "f#4", "Bb2" or a MIDI number → MIDI (C4 = 60), else null
   function noteNum(t) {
     t = String(t || '').trim(); if (/^\d+$/.test(t)) return Math.max(0, Math.min(127, +t));
@@ -270,6 +308,11 @@ OrganismFactory.reg('eravos.timeline', function (view) {
       if (l.kind === 'inst') {
         row.append(btn('M', 'mute', 'mute'), btn('S', 'solo', 'solo'));
         const live = A.instruments.some(o => o.value === l.target);
+        // 3.76 ♪ patterns for THIS track's tool (first after M · S: it is the way in, so it never wraps out of sight): a few at a time, hear one, add it after the last clip here
+        if (live && window.PatternLibrary) {
+          const pb = h('button', { class: 'uk-btn', 'aria-label': 'Patterns for this track', title: 'patterns that fit this track’s tool: hear one, add it here', style: { padding: '0 5px', fontSize: '10px', color: '#5cffb0', borderColor: '#5cffb088' }, text: '♪ patterns' });
+          pb.addEventListener('click', (e) => { e.stopPropagation(); patPanel(l, pb); }); pb.addEventListener('pointerdown', (e) => e.stopPropagation()); row.append(pb);
+        }
         const pick = h('select', { class: 'uk-select', title: live ? 'instrument this track plays' : 'instrument missing — pick one', style: { width: '58px', fontSize: '10px', padding: '0 2px', borderColor: live ? '' : '#ff4466' } },
           [h('option', { value: '', text: live ? '—' : '⚠ pick' })].concat(A.instruments.map(o => h('option', { value: o.value, text: o.label }))));
         pick.value = live ? l.target : '';

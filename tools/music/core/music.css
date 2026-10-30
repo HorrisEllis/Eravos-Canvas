@@ -216,18 +216,22 @@
 /* 3.58 SOUND → CSS (core/sound-css.js writes these while something plays; all 0 in silence) */
 :root { --snd-low: 0; --snd-high: 0; --snd-level: 0; --snd-pulse: 0; --snd-hue: 210; }
 .wm-win { --tool-level: 0; }
+/* 3.76 calm: a glow layer per sounding window, moved by opacity only (composited — nothing is restyled) */
+.snd-glow { position: absolute; inset: -1px; border-radius: 10px; pointer-events: none; opacity: 0; will-change: opacity; transition: opacity 90ms linear;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--acc, #00d4ff) 70%, transparent), 0 0 22px color-mix(in srgb, var(--acc, #00d4ff) 45%, transparent); }
+html.snd-off .snd-glow, html.snd-full .snd-glow { display: none; }
 /* 3.69 the accents themselves move (sound-css.js lights --acc and the palette); these add the glow — each in its OWN colour, no hue sweep */
-html:not(.snd-off) .wm-win::after { content: ''; position: absolute; inset: -1px; border-radius: 10px; pointer-events: none;
+html.snd-full .wm-win::after { content: ''; position: absolute; inset: -1px; border-radius: 10px; pointer-events: none;
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--acc) calc(var(--tool-level) * 70%), transparent), 0 0 calc(2px + var(--tool-level) * 30px) color-mix(in srgb, var(--acc) calc(var(--tool-level) * 55%), transparent); }
-html:not(.snd-off) .wm-win .uk-knob-arc { filter: drop-shadow(0 0 calc(3px + var(--tool-level) * 9px) var(--acc)); }
-html:not(.snd-off) .wm-win .uk-toggle.on, html:not(.snd-off) .wm-win .uk-btn.primary { box-shadow: 0 0 calc(var(--tool-level) * 14px) color-mix(in srgb, var(--acc) calc(var(--tool-level) * 70%), transparent); }
-html:not(.snd-off) .tp-overlay .uk-knob-arc { filter: drop-shadow(0 0 calc(3px + var(--snd-level) * 7px + var(--snd-pulse) * 6px) var(--acc)); }
+html.snd-full .wm-win .uk-knob-arc { filter: drop-shadow(0 0 calc(3px + var(--tool-level) * 9px) var(--acc)); }
+html.snd-full .wm-win .uk-toggle.on, html.snd-full .wm-win .uk-btn.primary { box-shadow: 0 0 calc(var(--tool-level) * 14px) color-mix(in srgb, var(--acc) calc(var(--tool-level) * 70%), transparent); }
+html.snd-full .tp-overlay .uk-knob-arc { filter: drop-shadow(0 0 calc(3px + var(--snd-level) * 7px + var(--snd-pulse) * 6px) var(--acc)); }
 /* behind everything: a breath of the app's own colours on each hit, deeper with the low end */
-html:not(.snd-off) #canvas::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+html.snd-full #canvas::before { content: ''; position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(ellipse at 50% 112%, color-mix(in srgb, var(--pink) calc(var(--snd-low) * 16% + var(--snd-pulse) * 14%), transparent), transparent 62%),
               radial-gradient(ellipse at 50% -12%, color-mix(in srgb, var(--cyan) calc(var(--snd-high) * 12%), transparent), transparent 55%); }
-html:not(.snd-off) #logo { filter: drop-shadow(0 0 calc(var(--snd-pulse) * 10px) var(--pink)); }
-@media (prefers-reduced-motion: reduce) { html:not(.snd-off) #canvas::before { display: none; } }
+html.snd-full #logo { filter: drop-shadow(0 0 calc(var(--snd-pulse) * 10px) var(--pink)); }
+@media (prefers-reduced-motion: reduce) { html.snd-full #canvas::before { display: none; } }
 /* 3.60 song previews: a strip of the song's shape on every card, a map + ▶ Preview in the detail */
 .sbk-strip { display: block; width: 100%; height: 22px; margin-top: 6px; border-radius: 4px; background: #0a0f15; }
 .sbk-preview { margin: 8px 0 4px; }
@@ -381,24 +385,24 @@ html .fxbox-pad, html .forge-pad, html .glitch-pad, html .dub2-pad { aspect-rati
    ============================================================================================================================ */
 :root { --lvl: min(1, max(calc(var(--snd-level) * 1.1), var(--snd-pulse))); }
 .wm-win, #dock { --lvl: min(1, calc(var(--tool-level, 0) * 1.6)); }
-html:not(.snd-off) .wm-title, html:not(.snd-off) .uk-knob-val, html:not(.snd-off) .uk-num, html:not(.snd-off) .mo-cap, html:not(.snd-off) .uk-group-title,
-html:not(.snd-off) .tp-ht h2, html:not(.snd-off) .tp-meta, html:not(.snd-off) .mo-mname, html:not(.snd-off) .mo-lcd, html:not(.snd-off) .gg-chn,
-html:not(.snd-off) .uk-seg button.on, html:not(.snd-off) .uk-toggle.on, html:not(.snd-off) .tp-nav .tp-tab.on, html:not(.snd-off) .org-label {
+html.snd-full .wm-title, html.snd-full .uk-knob-val, html.snd-full .uk-num, html.snd-full .mo-cap, html.snd-full .uk-group-title,
+html.snd-full .tp-ht h2, html.snd-full .tp-meta, html.snd-full .mo-mname, html.snd-full .mo-lcd, html.snd-full .gg-chn,
+html.snd-full .uk-seg button.on, html.snd-full .uk-toggle.on, html.snd-full .tp-nav .tp-tab.on, html.snd-full .org-label {
   text-shadow: 0 0 calc(var(--lvl) * 14px) color-mix(in srgb, var(--acc) calc(var(--lvl) * 100%), transparent), 0 0 calc(var(--lvl) * 4px) color-mix(in srgb, var(--acc) calc(var(--lvl) * 80%), transparent); }
-html:not(.snd-off) .uk-knob-val, html:not(.snd-off) .uk-num, html:not(.snd-off) .gg-chn { color: color-mix(in srgb, var(--acc) calc(var(--lvl) * 70%), var(--text)); }
-html:not(.snd-off) .uk-knob-label, html:not(.snd-off) .mo-lab, html:not(.snd-off) .uk-field > span, html:not(.snd-off) .tp-h {
+html.snd-full .uk-knob-val, html.snd-full .uk-num, html.snd-full .gg-chn { color: color-mix(in srgb, var(--acc) calc(var(--lvl) * 70%), var(--text)); }
+html.snd-full .uk-knob-label, html.snd-full .mo-lab, html.snd-full .uk-field > span, html.snd-full .tp-h {
   color: color-mix(in srgb, var(--acc) calc(var(--lvl) * 85%), var(--dim)); }
-html:not(.snd-off) .wm-title, html:not(.snd-off) .tp-ht h2 { color: color-mix(in srgb, var(--acc) calc(var(--lvl) * 45%), var(--text)); }
-html:not(.snd-off) .uk-num, html:not(.snd-off) .mo-lcd { box-shadow: 0 0 0 1px color-mix(in srgb, var(--acc) calc(var(--lvl) * 70%), var(--line2)), inset 0 1px 4px rgba(0,0,0,.6), 0 0 calc(var(--lvl) * 10px) color-mix(in srgb, var(--acc) calc(var(--lvl) * 40%), transparent); }
-html:not(.snd-off) .uk-seg button.on { box-shadow: 0 0 calc(6px + var(--lvl) * 14px) color-mix(in srgb, var(--acc) calc(30% + var(--lvl) * 40%), transparent); }
-html:not(.snd-off) .uk-group, html:not(.snd-off) .gg-sec, html:not(.snd-off) .tp-panel { box-shadow: 0 0 0 1px color-mix(in srgb, var(--acc) calc(var(--lvl) * 70%), var(--line)) inset, 0 1px 0 var(--edge) inset, inset 0 0 calc(var(--lvl) * 30px) color-mix(in srgb, var(--acc) calc(var(--lvl) * 14%), transparent); }
-html:not(.snd-off) .uk-group-title::before, html:not(.snd-off) .mo-dot, html:not(.snd-off) .tp-h::before { box-shadow: 0 0 calc(4px + var(--lvl) * 12px) var(--acc); transform: scale(calc(1 + var(--lvl) * .6)); }
-html:not(.snd-off) .uk-canvas { filter: brightness(calc(1 + var(--lvl) * .35)) saturate(calc(1 + var(--lvl) * .3)); }
-html:not(.snd-off) .uk-knob-cap { filter: drop-shadow(0 0 calc(var(--lvl) * 4px) var(--acc)); }
-html:not(.snd-off) .uk-fader-fill { filter: brightness(calc(1 + var(--lvl) * .5)); }
-html:not(.snd-off) .wm-win::before, html:not(.snd-off) .tp-page::before { box-shadow: 0 0 calc(8px + var(--lvl) * 22px) var(--acc); }
-html:not(.snd-off) .tb-btn.primary, html:not(.snd-off) #logo { filter: drop-shadow(0 0 calc(var(--lvl) * 10px) var(--pink)); }
-@media (prefers-reduced-motion: reduce) { html:not(.snd-off) .uk-group-title::before, html:not(.snd-off) .mo-dot, html:not(.snd-off) .tp-h::before { transform: none; } }
+html.snd-full .wm-title, html.snd-full .tp-ht h2 { color: color-mix(in srgb, var(--acc) calc(var(--lvl) * 45%), var(--text)); }
+html.snd-full .uk-num, html.snd-full .mo-lcd { box-shadow: 0 0 0 1px color-mix(in srgb, var(--acc) calc(var(--lvl) * 70%), var(--line2)), inset 0 1px 4px rgba(0,0,0,.6), 0 0 calc(var(--lvl) * 10px) color-mix(in srgb, var(--acc) calc(var(--lvl) * 40%), transparent); }
+html.snd-full .uk-seg button.on { box-shadow: 0 0 calc(6px + var(--lvl) * 14px) color-mix(in srgb, var(--acc) calc(30% + var(--lvl) * 40%), transparent); }
+html.snd-full .uk-group, html.snd-full .gg-sec, html.snd-full .tp-panel { box-shadow: 0 0 0 1px color-mix(in srgb, var(--acc) calc(var(--lvl) * 70%), var(--line)) inset, 0 1px 0 var(--edge) inset, inset 0 0 calc(var(--lvl) * 30px) color-mix(in srgb, var(--acc) calc(var(--lvl) * 14%), transparent); }
+html.snd-full .uk-group-title::before, html.snd-full .mo-dot, html.snd-full .tp-h::before { box-shadow: 0 0 calc(4px + var(--lvl) * 12px) var(--acc); transform: scale(calc(1 + var(--lvl) * .6)); }
+html.snd-full .uk-canvas { filter: brightness(calc(1 + var(--lvl) * .35)) saturate(calc(1 + var(--lvl) * .3)); }
+html.snd-full .uk-knob-cap { filter: drop-shadow(0 0 calc(var(--lvl) * 4px) var(--acc)); }
+html.snd-full .uk-fader-fill { filter: brightness(calc(1 + var(--lvl) * .5)); }
+html.snd-full .wm-win::before, html.snd-full .tp-page::before { box-shadow: 0 0 calc(8px + var(--lvl) * 22px) var(--acc); }
+html.snd-full .tb-btn.primary, html.snd-full #logo { filter: drop-shadow(0 0 calc(var(--lvl) * 10px) var(--pink)); }
+@media (prefers-reduced-motion: reduce) { html.snd-full .uk-group-title::before, html.snd-full .mo-dot, html.snd-full .tp-h::before { transform: none; } }
 /* 3.73 fluid: Groove, Motion and Perform reflow to their room */
 @container (max-width: 760px) { .gg-mixer { grid-template-columns: repeat(4, minmax(0, 1fr)); } .mo-shapes { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
 @container (max-width: 640px) { .mo-pgrid { grid-template-columns: 1fr; } .mo-xy { width: 100% !important; height: auto !important; aspect-ratio: 1; max-width: 260px; } .gg-bank { flex-direction: column; align-items: stretch; } }

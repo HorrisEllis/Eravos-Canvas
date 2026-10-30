@@ -10,7 +10,8 @@
  * hue — only its light moves — and goes back exactly to what it was in silence or when switched off. (Merged with 3.48.2's
  * living accent: same API — liveAcc / restoreAcc, data-acc-live (hex) for canvases that draw with the accent — but no hue sweep.)
  * Quiet when nothing plays (the values fall to 0 and stop updating). Respects reduced motion (calmer, no pulse). Off/on in
- * ⋯ Options (◐ Reactive colours, remembered). Only listens while the page is visible. */
+ * ⋯ Options (◐ Reactive colours, remembered). Only listens while the page is visible.
+ * 3.76: off · calm (default, cheap) · full (the above) — see the note at `mode`. */
 (function (global) {
   'use strict';
   const doc = global.document; if (!doc) return;
@@ -41,7 +42,25 @@
   function restoreAcc(w) { [w].concat(w._accEls || []).forEach(el => { if (el.dataset.acc0 !== undefined) { if (el.dataset.acc0) el.style.setProperty('--acc', el.dataset.acc0); delete el.dataset.accLive; live.delete(el); } }); }
   // a tool's accent lives on its window and again on some of its controls (knobs carry their own) — found once a second
   function accented(root, ts) { if (!root._accAt || ts - root._accAt > 1000) { root._accAt = ts; root._accEls = Array.from(root.querySelectorAll('[style*="--acc"]')); } return root._accEls; }
-  let on = true; try { on = global.localStorage.getItem('eravos.reactive') !== '0'; } catch (e) {}
+  // 3.76 "It's also laggy … I don't know why the ui keeps changing": measured (build/perf-ui.mjs, a Dubstep song playing, 8 windows) —
+  // full: 15 fps, style recalc 5.08 s · off: 56 fps, 0.14 s. Writing the palette and --snd-* on <html> 30× a second restyles every element
+  // on the page. Three levels now: off · calm (default: each sounding window's edge glows with its own sound — one glow layer per window,
+  // moved by opacity alone, which the compositor does without restyling anything) · full (everything above, as 3.73 had it).
+  let mode = 'calm'; try { const v = global.localStorage.getItem('eravos.reactive.mode'); mode = v === 'off' || v === 'full' ? v : global.localStorage.getItem('eravos.reactive') === '0' ? 'off' : 'calm'; } catch (e) {}
+  let on = mode !== 'off';
+  const glows = new Map();   // window → its glow layer (calm)
+  function glowOf(w) { let g = glows.get(w); if (g && g.isConnected) return g; g = doc.createElement('div'); g.className = 'snd-glow'; g.setAttribute('aria-hidden', 'true'); w.appendChild(g); glows.set(w, g); return g; }
+  function calmFrame(ts) {
+    if (ts - last < 66) return; last = ts;   // 15 a second is enough for a glow
+    const wins = Array.from(doc.querySelectorAll('.wm-win')).filter(w => !w.classList.contains('collapsed') && w.offsetParent !== null);   // every read first …
+    let any = false;
+    wins.forEach(w => { const t = toolTap(w); if (!t || t.none) return;
+      t.an.getFloatTimeDomainData(t.buf); let pk = 0; for (let i = 0; i < t.buf.length; i++) { const a = t.buf[i] < 0 ? -t.buf[i] : t.buf[i]; if (a > pk) pk = a; }
+      const v = clamp((20 * Math.log10(pk + 1e-9) + 36) / 36, 0, 1); t.lv = (t.lv || 0) + (v - (t.lv || 0)) * (v > (t.lv || 0) ? 0.6 : 0.15);
+      const o = t.lv < 0.02 ? 0 : +(t.lv * (calm() ? 0.5 : 0.9)).toFixed(2); if (o) any = true;
+      if (o || glows.has(w)) { const g = glowOf(w); if (g._o !== o) { g._o = o; g.style.opacity = o; } } });   // … then only opacity is written
+    if (!any) idle++; else idle = 0;
+  }
   const calm = () => global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const set = (k, v) => root.style.setProperty(k, v);
   function zero() {
@@ -64,7 +83,9 @@
   }
   function frame(ts) {
     raf = global.requestAnimationFrame(frame);
-    if (!on || doc.hidden || ts - last < 33) return; last = ts;
+    if (!on || doc.hidden) return;
+    if (mode === 'calm') { if (K && K.audio && K.audio.ctx) calmFrame(ts); return; }
+    if (ts - last < 33) return; last = ts;
     if (!ensure()) return;
     an.getFloatFrequencyData(db);
     const hz = K.audio.ctx.sampleRate / an.fftSize; let lo = 0, nl = 0, hi = 0, nh = 0, all = 0, cen = 0;
@@ -88,8 +109,8 @@
     // 3.73 "all of the accents … when sound plays — in the tools, the ui": a window that makes no sound of its own (a pattern tool,
     // the timeline, a modulator) follows the tools it plays (wired from it), or else the mix — so every window answers the sound
     const lvOf = new Map(), quiet = [];
-    doc.querySelectorAll('.wm-win').forEach(w => {
-      if (w.classList.contains('collapsed') || w.offsetParent === null) return; const t = toolTap(w); if (!t || t.none) { quiet.push(w); return; }
+    Array.from(doc.querySelectorAll('.wm-win')).filter(w => !w.classList.contains('collapsed') && w.offsetParent !== null).forEach(w => {   // 3.76 read every window's visibility before writing any style (no layout per window)
+      const t = toolTap(w); if (!t || t.none) { quiet.push(w); return; }
       t.an.getFloatTimeDomainData(t.buf); let s = 0, pk = 0; for (let i = 0; i < t.buf.length; i++) { const x = t.buf[i]; s += x * x; const a = x < 0 ? -x : x; if (a > pk) pk = a; }
       // 3.73 a meter's envelope: the loudness or the peak (a drum hit is short — its peak is what you see), up fast, down slower
       const vr = clamp((10 * Math.log10(s / t.buf.length + 1e-12) + 50) / 44, 0, 1), vp = clamp((20 * Math.log10(pk + 1e-9) + 36) / 36, 0, 1), v = Math.max(vr, vp * 0.95);
@@ -107,10 +128,15 @@
       });
     }
   }
+  function classes() { root.classList.toggle('snd-off', !on); root.classList.toggle('snd-full', mode === 'full'); }
   const SoundCSS = {
-    init(kernel) { K = kernel; if (!raf) raf = global.requestAnimationFrame(frame); root.classList.toggle('snd-off', !on); return SoundCSS; },
+    init(kernel) { K = kernel; if (!raf) raf = global.requestAnimationFrame(frame); classes(); return SoundCSS; },
     get on() { return on; },
-    set(v) { on = !!v; try { global.localStorage.setItem('eravos.reactive', on ? '1' : '0'); } catch (e) {} root.classList.toggle('snd-off', !on); if (!on) zero(); },
+    get mode() { return mode; },
+    MODES: ['off', 'calm', 'full'],
+    // set(true) = full (as before 3.76), set(false) = off · setMode('off' | 'calm' | 'full')
+    set(v) { SoundCSS.setMode(v ? 'full' : 'off'); },
+    setMode(m) { if (!SoundCSS.MODES.includes(m)) return; if (mode === 'full' && m !== 'full') zero(); mode = m; on = m !== 'off'; try { global.localStorage.setItem('eravos.reactive.mode', m); } catch (e) {} if (m !== 'calm') { glows.forEach(g => g.remove()); glows.clear(); } classes(); },
     // tests: one analysis step on demand (offline pages have no running clock)
     step() { last = -1e9; frame(performance.now() + 1e6); global.cancelAnimationFrame(raf); raf = global.requestAnimationFrame(frame); },
     liveAcc, restoreAcc,   // tests
@@ -120,8 +146,8 @@
   // ⋯ Options: the on/off switch (in the domain's own slot of the menu)
   function optionButton() {
     const slot = doc.getElementById('slot-options'); if (!slot || doc.getElementById('reactBtn')) return;
-    const b = doc.createElement('button'); b.className = 'tb-btn'; b.id = 'reactBtn'; b.title = 'Reactive colours — windows glow with their own sound, the screen follows the mix (remembered)';
-    const say = () => { b.textContent = on ? '◐ Reactive colours: on' : '◑ Reactive colours: off'; }; b.onclick = () => { SoundCSS.set(!on); say(); }; say(); slot.appendChild(b);
+    const b = doc.createElement('button'); b.className = 'tb-btn'; b.id = 'reactBtn'; b.title = 'Reactive colours — Calm: a window’s edge glows with its own sound (light on the computer) · Full: every accent and the screen follow the mix (heavy) · Off. Click to cycle (remembered)';
+    const say = () => { b.textContent = '◐ Reactive colours: ' + { off: 'off', calm: 'calm', full: 'full' }[mode]; }; b.onclick = () => { SoundCSS.setMode({ off: 'calm', calm: 'full', full: 'off' }[mode]); say(); }; say(); slot.appendChild(b);
   }
   // ⊞ Tidy up order for music: the timeline, then the song tools, drums, instruments, effects, the rest
   function tidyOrder() { if (!global.CanvasWM) return; global.CanvasWM.tidyRank = (d) => { const id = d.id || '', c = String(d.category || '').toLowerCase();
