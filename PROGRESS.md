@@ -2,6 +2,14 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.77 ♪ patterns sorted by genre · Mapped — notes: first song, his language's tools, mutation (2026-10-30)
+His words: "Just need you to take notes." · "Can we have them sorted by genre." · "I have a coding language made, and would love a full tool
+set for it." · "what if they could mutate?" · "My first song I made with it."
+- **Done**: the ♪ patterns panel lists A–Z by genre with headings, and a genre picker. tests/p76 (extended).
+- **Notes** (specs/eravos.2026-10-30-notes.map.spec): his first song "Today's going to ripple." measured (≈143.6 BPM, A minor, −12 LUFS,
+  build → drop → floor-falls break → build → drop, twice); a tool set for his language (waiting on: which language, its grammar);
+  mutation as interactive evolution on patterns (the kernel's ledger + constraints already exist). Nothing else built.
+
 ## Done — 3.76 ♪ Patterns per tool on the Timeline · Calm reactive colours (2026-10-30)
 His words: "I need patterns per tool for the timeline. I want it to be easier to make and understand music … I get overwhelmed by too much
 information or clutter. It's also laggy. I don't know why the ui keeps changing. It used to be nicer."
