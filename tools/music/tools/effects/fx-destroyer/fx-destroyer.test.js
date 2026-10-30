@@ -36,3 +36,32 @@ describe('tool · Destroyer 2.0 — sounds good at every setting', () => {
     assert.gt(raw, clean * 4, `raw ${db(Math.sqrt(raw)).toFixed(1)} dB vs clean ${db(Math.sqrt(clean)).toFixed(1)} dB`);
   });
 });
+
+describe('Destroyer 2.1 · no blown speaker, less work (3.77)', () => {
+  async function imd(params) {   // a loud 50 Hz (the bass) + a quiet 1 kHz (the music): what the bass does to the music
+    const SR = 48000, U = TH.universe(1.2), id = TH.spawn(U, 'eravos.fx-destroyer'), c = OrganismFactory.handle(id).ctx; if (c.ready) await c.ready;
+    c.params.setMany(Object.assign({ mix: 1 }, params || {}));
+    const ac = U.ctx, o1 = ac.createOscillator(), o2 = ac.createOscillator(), g1 = ac.createGain(), g2 = ac.createGain(); o1.frequency.value = 50; o2.frequency.value = 1000; g1.gain.value = 0.4; g2.gain.value = 0.1;
+    o1.connect(g1); o2.connect(g2); const inp = U.K.audio.port(id, 'in').node; g1.connect(inp); g2.connect(inp); o1.start(0); o2.start(0);
+    U.K.audio.chain.out.disconnect(ac.destination); U.K.audio.port(id, 'out').node.connect(ac.destination);
+    const d = (await TH.render(U)).getChannelData(0), N = 32768, off = Math.floor(0.3 * SR), re = new Float32Array(N), im = new Float32Array(N), w = OrganismSDK.dsp.hann(N);
+    for (let i = 0; i < N; i++) re[i] = d[off + i] * w[i]; OrganismSDK.dsp.fft(re, im);
+    const mag = (f) => { const k = Math.round(f * N / SR); let m = 0; for (let j = k - 2; j <= k + 2; j++) m = Math.max(m, Math.hypot(re[j], im[j])); return m; };
+    return { imd: 20 * Math.log10(Math.hypot(mag(950), mag(1050), mag(900), mag(1100)) / mag(1000)), sub: 20 * Math.log10(mag(50)), c };
+  }
+  it('the default keeps the sub out of the damage: the bass no longer chews the music (intermodulation under −30 dB; was −1.6) and the sub is as deep as dry', async () => {
+    const dflt = await imd(), dry = await imd({ drive: 0 });
+    assert.lt(dflt.imd, -30, 'intermodulation ' + dflt.imd.toFixed(1) + ' dB'); assert.lt(Math.abs(dflt.sub - dry.sub), 1.5, 'the sub keeps its level');
+    assert.equal(dflt.c.params.get('lowKeep'), 100); assert.equal(dflt.c.params.get('tight'), 40);
+  });
+  it('every shipped preset but Total Destruction keeps the sub clean', () => {
+    const U = TH.universe(0.2), c = OrganismFactory.handle(TH.spawn(U, 'eravos.fx-destroyer')).ctx;
+    c.presets.names().filter(n => !n.startsWith('user:')).forEach(n => { c.presets.load(n); if (!/Total Destruction/.test(n)) assert.ok(c.params.get('lowKeep') >= 20, n); });
+  });
+  it('stages that change nothing are out of the path: no crusher at 16 bits, the crusher in when crushing; no crossover with Low keep off; no shelves when flat', async () => {
+    const U = TH.universe(0.2), c = OrganismFactory.handle(TH.spawn(U, 'eravos.fx-destroyer')).ctx; if (c.ready) await c.ready;
+    assert.deepEqual(c.routing(), { tilt: false, keep: true, crush: false });
+    c.params.set('bits', 8); assert.equal(c.routing().crush, true, 'crushing: the crusher is in');
+    c.params.setMany({ bits: 16, lowKeep: 0, tilt: 0.3 }); assert.deepEqual(c.routing(), { tilt: true, keep: false, crush: false });
+  });
+});

@@ -114,6 +114,7 @@
                       "autoSend": {
                         "type": "boolean"
                       },
+                      "_react": {},
                       "tempoX": {
                         "enum": [
                           "¼",

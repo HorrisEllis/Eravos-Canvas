@@ -91,6 +91,9 @@
                         "minimum": 16,
                         "maximum": 1000
                       },
+                      "keepRange": {
+                        "type": "boolean"
+                      },
                       "baseNote": {
                         "type": "integer",
                         "minimum": 0,
@@ -178,7 +181,8 @@
                         "type": "number",
                         "minimum": 0,
                         "maximum": 1.5
-                      }
+                      },
+                      "_react": {}
                     },
                     "additionalProperties": false
                   },

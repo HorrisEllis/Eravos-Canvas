@@ -24,8 +24,8 @@
       "mix": 1,
       "asym": 0.3,
       "autoGain": true,
-      "tight": 30,
-      "lowKeep": 0,
+      "tight": 40,
+      "lowKeep": 100,
       "alias": 0.35,
       "dither": false,
       "autoTame": 0.4
@@ -43,7 +43,7 @@
       "asym": 0,
       "autoGain": true,
       "tight": 80,
-      "lowKeep": 0,
+      "lowKeep": 100,
       "alias": 0.35,
       "dither": false,
       "autoTame": 0.6
@@ -78,8 +78,8 @@
       "mix": 1,
       "asym": 0,
       "autoGain": true,
-      "tight": 25,
-      "lowKeep": 0,
+      "tight": 40,
+      "lowKeep": 100,
       "alias": 0.8,
       "dither": false,
       "autoTame": 0.5
@@ -96,8 +96,8 @@
       "mix": 1,
       "asym": 0,
       "autoGain": true,
-      "tight": 25,
-      "lowKeep": 0,
+      "tight": 40,
+      "lowKeep": 100,
       "alias": 0.15,
       "dither": true,
       "autoTame": 0.5
@@ -150,8 +150,8 @@
       "mix": 1,
       "asym": 0,
       "autoGain": true,
-      "tight": 30,
-      "lowKeep": 0,
+      "tight": 40,
+      "lowKeep": 100,
       "alias": 0.6,
       "dither": false,
       "autoTame": 0.5
@@ -167,10 +167,10 @@
       "tilt": -0.1,
       "postLP": 18000,
       "mix": 1,
-      "tight": 20,
+      "tight": 40,
       "autoTame": 0.3,
       "autoGain": true,
-      "lowKeep": 0,
+      "lowKeep": 100,
       "alias": 0.35,
       "dither": false
      }
@@ -188,7 +188,7 @@
       "tight": 90,
       "autoTame": 0.6,
       "autoGain": true,
-      "lowKeep": 0,
+      "lowKeep": 100,
       "alias": 0.35,
       "dither": false
      }
@@ -206,7 +206,7 @@
       "autoTame": 0.5,
       "asym": 0,
       "autoGain": true,
-      "lowKeep": 0,
+      "lowKeep": 100,
       "alias": 0.35,
       "dither": false
      }
@@ -257,10 +257,10 @@
       "tilt": 0.1,
       "postLP": 16000,
       "mix": 0.5,
-      "tight": 30,
+      "tight": 40,
       "autoTame": 0.4,
       "autoGain": true,
-      "lowKeep": 0,
+      "lowKeep": 100,
       "alias": 0.35,
       "dither": false
      }
@@ -279,8 +279,8 @@
       "autoTame": 0.3,
       "asym": 0,
       "autoGain": true,
-      "tight": 25,
-      "lowKeep": 0
+      "tight": 40,
+      "lowKeep": 100
      }
     }
    }

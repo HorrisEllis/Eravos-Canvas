@@ -87,6 +87,7 @@
                       "enabled": {
                         "type": "boolean"
                       },
+                      "_react": {},
                       "tempoX": {
                         "enum": [
                           "¼",

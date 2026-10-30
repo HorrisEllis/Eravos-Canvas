@@ -41,6 +41,7 @@
                           "off"
                         ]
                       },
+                      "_react": {},
                       "tempoX": {
                         "enum": [
                           "¼",

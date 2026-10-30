@@ -123,6 +123,9 @@
                         "minimum": 0,
                         "maximum": 1
                       },
+                      "keepRange": {
+                        "type": "boolean"
+                      },
                       "subOct": {
                         "enum": [
                           "0",
@@ -150,6 +153,7 @@
                         "minimum": 0.01,
                         "maximum": 10
                       },
+                      "_react": {},
                       "tempoX": {
                         "enum": [
                           "¼",

@@ -1,7 +1,7 @@
 {
   "schema": "eravos.tool/1",
   "id": "eravos.fx-destroyer",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "label": "Destroyer",
   "icon": "👾",
   "accent": "#aaff00",

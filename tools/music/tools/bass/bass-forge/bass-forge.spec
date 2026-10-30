@@ -107,3 +107,5 @@ dependencies:
   works_with: [eravos.sequencer, eravos.timeline, eravos.sub-engine, eravos.harmonic-analyzer, eravos.song-recorder, eravos.arp, eravos.bass-gen, eravos.chord-gen]
   notes:
     - MATCH analyses a clip you own (drop a bass sample on it) and steers its knobs towards it.
+
+# ---- 3.77 keepRange (default on): the note never under 25 Hz. (A 22 Hz output floor was tried and dropped: on asymmetric presets it raised the peak over full scale — Brostep Growl 1.13.)
