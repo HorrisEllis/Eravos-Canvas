@@ -2,6 +2,15 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Mapped — what is left of the motion / look / reactive / sound-quality line (2026-10-30)
+His words: "merge and push, then map the rest. make sure you update and add addendums to the specs." Map: specs/eravos.quality-and-tools-map.spec
+(no release number — IDs that take the next free number when built, since the two sessions' numbers collide): Q sound quality (Q1 Wub
+Filter intermodulation · Q2 CPU of Pad Forge, Gothic Organ, Xen, Partials, Coven, Morph Osc, Retro Poly · Q3 tails · Q4 Channel DC · Q5 the
+sound audit as a test gate · Q6 the borderline p74b test · Q7 the Core zip URL) · T the other eleven tools the Groove way (Bassline, Chords,
+Drum Forge, Bass Forge, FX Box, Drop Builder, Sidechain, EQ, Breath, Embodiment, Recursive Spectra, Automation) · R reactive leftovers ·
+P packaging · D his decisions. Spec addenda: motion, tool-pages, themes, pack.format, performance, p42-tool-audio, pattern-library, codecs,
+songbook-genres, phasemap. tests/p77: the per-tool Changing test plays a clap (bright and loud) — it was flaky with a quiet hat.
+
 ## Done — 3.78 Merge of 3.77 reactive modes with 3.76 · the same look at 2.3× the frame rate (2026-10-30)
 His words: "merge and push." (main-37 zip = GitHub main 789bced, byte for byte.) Both sessions had rebuilt reactive colours. Kept: 3.77's
 Off · Static · Changing · Custom and its panel (his request, newer). Dropped: 3.76's Calm / Full modes and glow layer.

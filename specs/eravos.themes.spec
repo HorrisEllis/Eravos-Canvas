@@ -42,3 +42,20 @@ Seven candidates rendered from the real app (token overrides only): current (Neo
 Midnight Synthwave · v10 Terminal · Paper (light). Screens: first screen, canvas with a Synthwave song, ＋ Add, Retro Poly's page.
 Finding: ~600 hard-coded colours in CSS and ~1000 in tool JS ignore the tokens (pink buttons stay pink; Paper shows black boxes).
 Before any theme ships: move those onto the tokens, then a theme is one file. The current look stays the default until he chooses.
+
+
+# ADDENDUM 3.72–3.77 (2026-10-24 … 10-30) — the look kit and the living UI
+# 3.72 LOOK KIT ("all of them pro-plugin look. the whole ui"): same controls, class names and SIZES (the timeline tests measure them) —
+#   only the drawing: knobs with a shaded cap (#uk-cap, defined once), pointer and glowing value ring, a moving knob's swing as a violet
+#   outer arc; lit segmented strips; LED toggles; machined buttons; recessed fields and LCD numbers; metal fader caps; drawn displays as
+#   recessed screens; windows and sections as a chassis with inset panels and mono caps headings. canvas/runtime/eravos.css + ui-kit.js.
+# 3.73 LIVING: --lvl (the mix; inside a window its own sound, or what it plays, or the mix) drives accent text glow, labels and values
+#   warming to the accent, LCDs, panel edges, drawn displays. Fluid: values set from outside glide, keys/strips/faders ease, tabs and
+#   pages slide in, windows fade in, sections reflow (container queries). Square pads.
+# 3.77 REACTIVE COLOURS — Off · Static · Changing · Custom, Amount, custom colours (low end · top · hits) + palettes:
+#   colourFor(colour, k, {mode, shift, colors, low, high, pulse}); EVERY inline colour variable on every element in a window reacts (base kept
+#   per element; a base the tool changes is taken up); Changing turns each window by ITS own spectrum, hits and drift (--win-shift); Custom
+#   leans each colour toward the nearest of yours. Off stops everything, the older UI.alive layer included. Per tool: _react on every music
+#   tool ({mode: follow|off|static|changing|custom, amount, colors}) set in its ⚙ settings, saved with it, wins over the app's (even Off).
+#   The panel: core/react-panel.js (⋯ Options → Reactive colours, and every tool's settings) — mode cards with live previews of the real
+#   colour code, Amount, swatches, palettes. Tests: p58, p73-living, p77-reactive-modes. Numbers: these are main's names for this work (3.71 Motion + Perform, 3.72 look kit, 3.73 living UI, 3.76 Deep Sub + tool zips, 3.77 Destroyer + reactive modes + audit); the Pattern Library's 3.71–3.73 and 3.76 share numbers — tell them apart by title.
