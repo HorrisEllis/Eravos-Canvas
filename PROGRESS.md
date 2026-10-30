@@ -2,6 +2,20 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.76 Deep Sub: the sub you can hear · one tool = one complete zip (2026-10-30)
+His words: "push and commit and then give me the replacement. you know each tool is supposed to be bundled with its dag, tool file,
+ui and packs, anything that tool uses and has, is its own zip."
+- **Measured:** Deep Sub plays Octave −2 by default; on the notes the songs write its fundamental sat at 8–25 Hz in 53 of the 54 genres
+  that use it, and its own Floor (24 Hz high-pass) cut that out — only the phantom harmonics were heard.
+- **Deep Sub 1.1, Keep in range** (on by default): a note that would land under the floor is lifted by whole octaves to 30–60 Hz. Same note
+  names, same line; off = 1.0 exactly. A1 in a song now sounds at 55 Hz (was 13.75 Hz, filtered away).
+- **One tool = one zip, everything in it** (desktop/packs.mjs): the whole tool folder (tool.json, engine, ui, styles, spec, tests, every
+  pack + its schema, pictures) and dag.json — the tool as a node: needs (core pack, units, tools, permissions), hooks in/out, works-with,
+  load order, packs, every file with role + SHA-256. Only the engine/ui/packs scripts run on install; the rest travels with it.
+  `node desktop/packs.mjs --tool eravos.sub-engine --out <dir>` builds just that tool. Checked: a bare canvas + Core zip + Deep Sub zip
+  installs with no fault (v1.1.0, 14 presets, A1 → 55 Hz).
+- Found, not fixed: installing the Core zip raises "Failed to construct 'URL'" from one core script evaluated from a blob (pre-existing).
+
 ## Mapped — 3.75 Voice · Audio in/out · Suites as control surface · Genres that contrast EDM (2026-10-25)
 His words: "t-pain like full autotune … production quality" · "Suites are supposed to be like the main control panel" · "no each
 tool is sovereign" · "tools for voice. including settings for audio input and output like ableton or fruity loops but better" ·

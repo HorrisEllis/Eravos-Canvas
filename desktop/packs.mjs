@@ -38,6 +38,45 @@ function loaderOutput(file, win) {
 }
 const rel = (p) => p.replace(/^music\//, '');
 
+// ---------------------------------------------------------------- 3.76 one tool = one zip with EVERYTHING it is and uses
+// James, 2026-10-30: "each tool is supposed to be bundled with its dag, tool file, ui and packs, anything that tool uses and has, is
+// its own zip." The zip carries the whole tool folder (tool.json, engine, ui, styles, spec, tests, every pack and its schema,
+// pictures) and dag.json — the tool as a node: what it needs (the core pack, units, tools, permissions), its hooks in and out,
+// what it works with, its packs, and every file with its role and SHA-256. Only the listed scripts run on install (engine, ui —
+// in load order); the rest travels with it (contents.files, contents.dag: not run).
+import crypto from 'crypto';
+function walk(dir, base) { let out = []; for (const n of fs.readdirSync(dir).sort()) { const f = path.join(dir, n), r = base ? base + '/' + n : n; if (fs.statSync(f).isDirectory()) out = out.concat(walk(f, r)); else out.push(r); } return out; }
+const roleOf = (f, m) => { const fl = m.files || {}, n = path.basename(f);
+  for (const [k, v] of Object.entries(fl)) if (v === n || v === f) return k;
+  return /^packs\/.*pack\.json$/.test(f) ? 'pack' : /pack\.schema\.json$/.test(f) ? 'pack-schema' : /^packs\/index\.js$/.test(f) ? 'packs-loader' : /\.css$/.test(f) ? 'style' : /\.test\.js$/.test(f) ? 'tests' : /\.spec$/.test(f) ? 'spec' : /\.png$/.test(f) ? 'picture' : n === 'tool.json' ? 'tool' : /\.js$/.test(f) ? 'code' : 'file'; };
+function hooksOf(src) {   // S.audio_out('x.hook.audio_out') · S.note_in(…) · S.mod_in(…, key) · S.event(id, 'out', topic…) — read from the engine
+  const out = { in: [], out: [] }; const re = /S\.(\w+)\(\s*'([^']+)'(?:\s*,\s*'([^']+)')?(?:\s*,\s*'([^']+)')?/g; let m;
+  while ((m = re.exec(src))) { const b = m[1], id = m[2]; if (!/hook|knob|curve|bend/.test(id)) continue;
+    const dir = b === 'event' ? (m[3] === 'out' ? 'out' : 'in') : /_out$|^mod_out$/.test(b) ? 'out' : /_in$|^mod_in$/.test(b) ? 'in' : (/out/.test(id) ? 'out' : 'in');
+    out[dir].push(Object.assign({ hook: id, kind: b.replace(/_(in|out)$/, '') }, b === 'event' && m[4] ? { topic: m[4] } : b === 'mod_in' && m[3] ? { knob: m[3] } : {})); }
+  return out;
+}
+export function toolZip(dir, list, base, styles, scripts) {
+  const abs = path.join(MUSIC, dir), m = JSON.parse(fs.readFileSync(path.join(abs, 'tool.json'), 'utf8'));
+  const all = walk(abs).map(r => dir + '/' + r), engine = m.files && m.files.engine ? fs.readFileSync(path.join(abs, m.files.engine), 'utf8') : '';
+  const packs = all.filter(f => /\/packs\/[^/]+\/pack\.json$/.test(f)).map(f => { try { const j = JSON.parse(fs.readFileSync(path.join(MUSIC, f), 'utf8')); const items = j.items || {};
+    return { id: j.id, label: j.label, version: j.version, presets: Object.values(items).reduce((a, it) => a + Object.keys((it && it.presets) || {}).length, 0), path: f }; } catch (e) { return { path: f, error: e.message }; } });
+  const sha = (f) => crypto.createHash('sha256').update(fs.readFileSync(path.join(MUSIC, f))).digest('hex');
+  const dag = {
+    schema: 'eravos.tool-dag/1', tool: m.id, label: m.label, version: m.version, category: m.category,
+    needs: { packs: [CORE.id], units: (m.needs || {}).units || [], tools: (m.needs || {}).tools || [], permissions: ((m.needs || {}).permissions || []).slice().sort() },
+    hooks: hooksOf(engine), works_with: m.works_with || [], conflicts: m.conflicts || [],
+    load_order: list.map(f => f.path), packs,
+    files: all.map(f => ({ path: f, role: roleOf(f.slice(dir.length + 1), m), bytes: fs.statSync(path.join(MUSIC, f)).size, sha256: sha(f) })),
+  };
+  const dagPath = dir + '/dag.json';
+  const manifest = Object.assign({}, base, { pack_id: m.id + '.tool', pack_type: 'organism_pack', label: m.label, tool_version: m.version, dependencies: [CORE.id], permissions: dag.needs.permissions,
+    provides: [m.id], contents: { styles: styles(list), organisms: scripts(list), dag: dagPath, files: all.concat([dagPath]) } });
+  const entries = [{ name: 'manifest.json', data: Buffer.from(JSON.stringify(manifest, null, 2)) }, { name: dagPath, data: Buffer.from(JSON.stringify(dag, null, 2)) }]
+    .concat(all.map(f => ({ name: f, data: fs.readFileSync(path.join(MUSIC, f)) })));
+  return { file: `Music · ${m.label}.zip`, manifest, dag, entries };
+}
+
 // ---------------------------------------------------------------- tool families (every organism category must be covered)
 export const FAMILIES = [
   { id: 'eravos.music.start', file: 'Music 1 - Start here.zip', label: 'Start here — Session, Coach', cats: ['Start here'] },
@@ -56,7 +95,7 @@ export const FAMILIES = [
 ];
 const CORE = { id: 'eravos.music', file: 'Music 0 - Core.zip', label: 'Music — core (theory, audio engine, transport, recipes)' };
 
-export function buildPacks(outDir) {
+export function buildPacks(outDir, only) {   // only: a Set of tool ids — just those tools' zips (no core, no bundles)
   fs.mkdirSync(outDir, { recursive: true });
   const domainFiles = loaderOutput(path.join(MUSIC, 'index.js')).map(f => ({ kind: f.kind, path: rel(f.path) }));
   const toolLoader = domainFiles.find(f => f.path === 'tools/index.js'); if (!toolLoader) throw new Error('tools/index.js not in the music loader');
@@ -69,7 +108,7 @@ export function buildPacks(outDir) {
   const base = { manifest_version: '1.0.0', kernel_target: KERNEL_TARGET, author: 'James Brooks', pack_version: VERSION };
   const styles = (list) => Object.fromEntries(list.filter(f => f.kind === 'css').map(f => [f.path, f.path]));
   const scripts = (list) => Object.fromEntries(list.filter(f => f.kind === 'js').map(f => [f.path, f.path]));
-  write(CORE.file, Object.assign({}, base, { pack_id: CORE.id, pack_type: 'domain', label: CORE.label, permissions: [],
+  if (!only) write(CORE.file, Object.assign({}, base, { pack_id: CORE.id, pack_type: 'domain', label: CORE.label, permissions: [],
     description: 'The music domain: everything the music tools share. Install first — every Music pack depends on it.',
     contents: { styles: styles(coreFiles), runtime: scripts(coreFiles) } }), coreFiles);
   // P37.0: ONE zip per tool folder (its code + its packs) — remove a tool's zip and only that tool is gone
@@ -80,10 +119,11 @@ export function buildPacks(outDir) {
   }
   let tools = 0;
   for (const [dir, list] of byTool) {
-    const m = JSON.parse(fs.readFileSync(path.join(MUSIC, dir, 'tool.json'), 'utf8'));
-    write(`Music · ${m.label}.zip`, Object.assign({}, base, { pack_id: m.id + '.tool', pack_type: 'organism_pack', label: m.label, dependencies: [CORE.id], permissions: ((m.needs || {}).permissions || []).slice().sort(),
-      provides: [m.id], contents: { styles: styles(list), organisms: scripts(list) } }), list); tools++;
+    if (only && !only.has(JSON.parse(fs.readFileSync(path.join(MUSIC, dir, 'tool.json'), 'utf8')).id)) continue;
+    const t = toolZip(dir, list, base, styles, scripts);
+    fs.writeFileSync(path.join(outDir, t.file), zip(t.entries)); made.push({ file: t.file, pack_id: t.manifest.pack_id, files: t.entries.length - 1 }); tools++;
   }
+  if (only) return { made, organisms: tools };
   // the packs that span several tools (80s, Club, EDM Pads, Sequencer songs) — content only, after the tools
   if (bundleFiles.length) write('Music · Bundles.zip', Object.assign({}, base, { pack_id: 'eravos.music.bundles', pack_type: 'organism_pack', label: 'Music — preset bundles (80s, Club, EDM Pads, Sequencer songs)', dependencies: [CORE.id], permissions: [],
     contents: { organisms: scripts(bundleFiles) } }), bundleFiles);
@@ -92,7 +132,8 @@ export function buildPacks(outDir) {
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const i = process.argv.indexOf('--out'); const out = path.resolve(i >= 0 ? process.argv[i + 1] : path.join(ROOT, '..', 'ERAVOS-packs'));
-  const r = buildPacks(out);
+  const ti = process.argv.indexOf('--tool'), only = ti >= 0 ? new Set(process.argv[ti + 1].split(',')) : null;   // --tool eravos.sub-engine[,…]: just those zips
+  const r = buildPacks(out, only);
   r.made.forEach(m => console.log(`› ${m.file.padEnd(34)} ${m.pack_id.padEnd(26)} ${m.files} files`));
-  console.log(`${r.organisms} organisms in ${r.made.length - 1} tool packs + core → ${out}`);
+  console.log(only ? `${r.organisms} tool zip(s) → ${out}` : `${r.organisms} organisms in ${r.made.length - 1} tool packs + core → ${out}`);
 }
