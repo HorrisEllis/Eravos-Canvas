@@ -76,3 +76,11 @@ node build/perf-idle.mjs.
    Real-time contexts sleep on their own (checked every 250 ms); offline renders stay awake unless K.audio.sleepOffline is set.
 Open: Embodiment Lab is a drone (needs its own "stopped" state); effects need a "no input" test; Pad Forge's reverb while playing
 (a cheaper IR at the same sound) is the next cost by this table.
+
+## ADDENDUM 2026-10-30 (3.76) — the UI thread
+His words: "It's also laggy." Reproduce: GLASS_CHROMIUM=<chrome> node build/perf-ui.mjs [full,calm,off]
+  full (3.73 reactive colours): 15.3 fps · 91/92 frames > 33 ms · RecalcStyle 5.11 s · Layout 0.94 s
+  calm (3.76 default):          55.3 fps · 26 slow · RecalcStyle 0.16 s
+  off:                          56.7 fps · 21 slow · RecalcStyle 0.14 s
+Rule from this: nothing writes a fast-changing custom property on <html>; per-frame visuals move opacity/transform only.
+Next: @property { inherits: false } for --tool-level/--lvl so Full is cheaper; Pad Forge reverb → FDN (cost grows with IR length).

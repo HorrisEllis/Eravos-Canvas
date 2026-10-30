@@ -2,6 +2,21 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.76 ♪ Patterns per tool on the Timeline · Calm reactive colours (2026-10-30)
+His words: "I need patterns per tool for the timeline. I want it to be easier to make and understand music … I get overwhelmed by too much
+information or clutter. It's also laggy. I don't know why the ui keeps changing. It used to be nicer."
+- **♪ patterns** on every instrument track (first after M · S): what fits that track's tool, one kind at a time with one line on what the
+  kind is, five patterns (genres take turns), ▶ hear (off the canvas), ＋ add (after this track's last clip, in the song's key), ↻ five others.
+  A tool with none of its own gets the kinds it can play, from other tools, and says so. PatternLibrary.forTool · send({ lane }).
+- **The lag, measured** (build/perf-ui.mjs: Dubstep #77 playing, 8 windows, headless Chromium, 2 cores):
+  reactive colours as they were: 15 fps, 91 of 92 frames slow, style recalc 5.08 s · off: 57 fps, 0.14 s.
+  Cause: the palette and --snd-* written on <html> 30× a second restyle every element; window visibility read after style writes.
+- **Now** ⋯ Options › Reactive colours cycles off · calm (default) · full. Calm: one glow layer per sounding window, moved by opacity only
+  (compositor) = 55 fps. Full = the 3.73 look, unchanged (reads batched before writes). SoundCSS.set(true) still means full.
+- **"The ui keeps changing"**: the colours pulsed with the music (calm stops that), and ~600 colours in CSS + ~1000 in tool JS are
+  hard-coded, so restyles leak. Theme previews (7 looks × first screen, canvas, ＋ Add, tool page) rendered from the real app for his pick.
+- Tests: tests/p76-patterns-per-tool.test.js (2); P23, P48, P58, P71, P73, boundary pass.
+
 ## Mapped — 3.75 Voice · Audio in/out · Suites as control surface · Genres that contrast EDM (2026-10-25)
 His words: "t-pain like full autotune … production quality" · "Suites are supposed to be like the main control panel" · "no each
 tool is sovereign" · "tools for voice. including settings for audio input and output like ableton or fruity loops but better" ·

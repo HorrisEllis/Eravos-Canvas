@@ -36,3 +36,9 @@
   switching is instant and survives a reload with no flash · every window, page, menu and the top bar take v10 ·
   fonts load from disk with the network off · boundary test (no domain words in theme-v10.css / themes.js) ·
   screenshots of: canvas with 3 tools, a tool page, a suite page, ＋ Add, the piano roll — sent before merging
+
+## ADDENDUM 2026-10-30 (3.76) — previews for his pick (nothing applied)
+Seven candidates rendered from the real app (token overrides only): current (Neon Lab) · Studio Calm · Graphite + Amber · Blueprint ·
+Midnight Synthwave · v10 Terminal · Paper (light). Screens: first screen, canvas with a Synthwave song, ＋ Add, Retro Poly's page.
+Finding: ~600 hard-coded colours in CSS and ~1000 in tool JS ignore the tokens (pink buttons stay pink; Paper shows black boxes).
+Before any theme ships: move those onto the tokens, then a theme is one file. The current look stays the default until he chooses.
