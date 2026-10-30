@@ -91,3 +91,11 @@ Next: @property { inherits: false } for --tool-level/--lvl so Full is cheaper; P
   How: read 30×/s, write every 80 ms; write only a visible step; palette ≤ 10×/s; read all windows before writing any.
   Bisected: page palette alone, window --tool-level alone, element colours alone each keep it ≤ 23 fps; the cost is any restyle at all.
   Next for more: @property { inherits: false } where a colour is read on the same element; the CSS that reads --lvl on many selectors.
+
+
+# ADDENDUM 3.77 (2026-10-30) — measured per tool
+#   build/sound-audit.mjs → docs/sound-audit.md: every sound tool, offline, default settings: CPU (ms of work per second of sound), plus the
+#   quality measures in eravos.p42-tool-audio.spec. Heavy (> 60 ms/s, one instance): Pad Forge ~220 · Gothic Organ ~145 · Xen Synth ~135 ·
+#   Partials ~115 · Coven ~97 · Morph Osc ~90 · Retro Poly ~68 — Q2 in eravos.quality-and-tools-map.spec. Destroyer 2.1: stages that change nothing
+#   are routed out (the crusher worklet and its filters at 16 bits, the crossover with Low keep off, flat shelves) — ~11 % less; its scope
+#   rests in silence. Motion (3.71) costs nothing while no knob moves.

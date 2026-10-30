@@ -313,3 +313,14 @@ forge:
 #   Open: P74b.3 the other 12 packs, one at a time · P74b.5 recipes onto ContentPacks + dropped zips. Numbered 3.74b because
 #   specs/eravos.phase75-map.spec (another session) reserves 3.75–3.86.
 # ============================================================
+
+# ============================================================
+# ADDENDUM (2026-10-30) — the motion / look / reactive / sound-quality line, and what is mapped next
+#   Done (main's names): 3.71 Motion + Perform · Groove 1.1 · 3.72 the look kit, tool pages as devices · 3.73 living UI, fluid, square pads,
+#   songs whose notes curve · 3.76 Deep Sub keep-in-range, one tool = one zip (dag.json) · 3.77 Destroyer 2.1, reactive colour modes + panel +
+#   per tool, the sound audit (docs/sound-audit.md) · 3.78 the same look at 2.3× the frame rate (other session). Numbers collide between the
+#   two sessions (the Pattern Library's 3.71–3.73 and 3.76); tell releases apart by title.
+#   Next, mapped: specs/eravos.quality-and-tools-map.spec — IDs, no number until built: Q sound quality (Wub Filter, CPU, tails, Channel DC,
+#   the audit as a test gate, the borderline p74b test, the Core zip URL) · T the other eleven tools the Groove way · R reactive leftovers ·
+#   P packaging · D his decisions.
+# ============================================================
