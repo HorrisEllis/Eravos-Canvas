@@ -253,7 +253,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
   }
   // 3.76 ♪ patterns per tool — James: "I need patterns per tool for the timeline. I want it to be easier to make and understand music … I get
   // overwhelmed by too much information or clutter." One track's tool, one kind at a time (a line on what that kind does), five patterns,
-  // ▶ hear (off the canvas) · ＋ add (after the last clip on this track, in the song's key) · ↻ five others · 3.77 sorted by genre, a genre picker.
+  // ▶ hear (off the canvas) · ＋ add (after the last clip on this track, in the song's key) · ↻ five others · 3.77b sorted by genre, a genre picker.
   let patP = null;
   function patPanel(l, anchor) {
     const PL = window.PatternLibrary; if (patP) { patP.close(); if (patP.lane === l.id) return; }
@@ -261,7 +261,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     const drums = !!(A.drumNames && A.drumNames[l.target] && A.drumNames[l.target].length), F = PL.forTool(tool, { drums });
     const toolName = ((OrganismFactory.def(tool) || {}).label) || tool, SHOW = 5;
     let kind = (F.kinds[0] || {}).id, page = 0, said = '', genre = '';
-    // 3.77 "Can we have them sorted by genre": A–Z by genre, a genre picker narrows it to one
+    // 3.77b "Can we have them sorted by genre": A–Z by genre, a genre picker narrows it to one
     const gl = (p) => p.genreLabel || p.genre, byGenre = (list) => list.slice().sort((a, b) => gl(a).localeCompare(gl(b)) || a.name.localeCompare(b.name));
     const r = anchor.getBoundingClientRect(), el = h('div', { class: 'tl-patp', role: 'dialog', 'aria-label': 'Patterns for ' + toolName, style: { left: Math.round(Math.min(r.left, innerWidth - 380)) + 'px', top: Math.round(Math.min(r.bottom + 6, innerHeight - 360)) + 'px' } });
     const close = () => { PL.stop(); el.remove(); document.removeEventListener('pointerdown', away, true); document.removeEventListener('keydown', esc, true); if (patP && patP.el === el) patP = null; };

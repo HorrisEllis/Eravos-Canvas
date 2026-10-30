@@ -1,4 +1,4 @@
-# spec_id: eravos.2026-10-30-notes · status: notes (mapped, NOT built except 3.77 genre sort) · author: James Brooks
+# spec_id: eravos.2026-10-30-notes · status: notes (mapped, NOT built except 3.77b genre sort) · author: James Brooks
 # His words: "Just need you to take notes." · "Can we have them sorted by genre." · "I started this to make EDM for my girl. Reverse
 # engineering making music while making tools to make music." · "I have a coding language made, and would love a full tool set for it.
 # I was thinking we could make code specific." · "I want to be able to experiment. Like what it they could mutate? That would be hard as
@@ -24,7 +24,7 @@ Measured from the MP3 (ffmpeg ebur128 + an FFT pass, mono 22.05 kHz, 4 s blocks)
       (−0.5 can clip after encoding). (Industry practice, from memory — not measured here.)
     - the arrangement is the textbook dubstep map, done cleanly twice: the tools taught the form.
 
-## 2. Sorted by genre — DONE 3.77 (read as: the ♪ patterns panel on each Timeline track)
+## 2. Sorted by genre — DONE 3.77b (read as: the ♪ patterns panel on each Timeline track)
   A–Z by genre with genre headings, and a genre picker (counts per genre). Open: if "them" meant songs or something else, say which.
 
 ## 3. A full tool set for his coding language ("code specific")

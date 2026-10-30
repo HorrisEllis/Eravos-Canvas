@@ -112,6 +112,7 @@
     { key: 'pitchTime', type: 'number', default: 0.08, min: 0.005, max: 1.5, step: 0.001, unit: 's', label: 'Pitch time', group: 'PITCH' },
     { key: 'glide', type: 'number', default: 0.04, min: 0, max: 2, step: 0.001, unit: 's', label: 'Glide', group: 'PITCH' },
     { key: 'octave', type: 'integer', default: -1, min: -3, max: 3, label: 'Octave', group: 'PITCH' },
+    { key: 'keepRange', type: 'boolean', default: true, label: 'Keep in range', group: 'PITCH', hint: 'never under 25 Hz — a note that would be is lifted by octaves, so it is heard (3.77 sound audit)' },
     { key: 'sub', type: 'number', default: 0.6, min: 0, max: 1, step: 0.01, label: 'Sub', group: 'OUT' },
     { key: 'attack', type: 'number', default: 0.004, min: 0.001, max: 4, step: 0.001, unit: 's', label: 'Attack', group: 'OUT' },
     { key: 'release', type: 'number', default: 0.1, min: 0.01, max: 8, step: 0.001, unit: 's', label: 'Release', group: 'OUT' },
@@ -166,7 +167,7 @@
       let held = null;
       function noteOn(note, vel, t, dur, slide) {
         t = Math.max(t || ac.currentTime, ac.currentTime);
-        const f = MT.hz(Math.max(12, note + 12 * P.get('octave'))), legato = held && held.off > t - 1e-4;
+        const f0 = MT.hz(Math.max(12, note + 12 * P.get('octave'))), f = P.get('keepRange') !== false ? ctx.dsp.keepRange(f0, 25) : f0, legato = held && held.off > t - 1e-4;   // 3.77 never under 25 Hz
         g.setFreq(f, t, legato ? P.get('glide') : 0, legato ? 0 : P.get('pitchEnv'));
         if (!legato || !slide) { g.startLfo(t); const a = g.amp.gain; a.cancelScheduledValues(t); if (!legato) a.setValueAtTime(0, t); a.linearRampToValueAtTime(0.1 + 0.9 * Math.pow(vel, 1.4), t + P.get('attack')); }
         held = { note, off: dur !== undefined ? t + dur : Infinity };

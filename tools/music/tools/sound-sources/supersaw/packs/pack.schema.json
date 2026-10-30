@@ -114,7 +114,8 @@
                         "type": "number",
                         "minimum": 0,
                         "maximum": 1
-                      }
+                      },
+                      "_react": {}
                     },
                     "additionalProperties": false
                   },

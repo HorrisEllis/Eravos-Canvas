@@ -2,7 +2,54 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
-## Done — 3.77 ♪ patterns sorted by genre · Mapped — notes: first song, his language's tools, mutation (2026-10-30)
+## Done — 3.78 Merge of 3.77 reactive modes with 3.76 · the same look at 2.3× the frame rate (2026-10-30)
+His words: "merge and push." (main-37 zip = GitHub main 789bced, byte for byte.) Both sessions had rebuilt reactive colours. Kept: 3.77's
+Off · Static · Changing · Custom and its panel (his request, newer). Dropped: 3.76's Calm / Full modes and glow layer.
+- **Still laggy, measured** (build/perf-ui.mjs, Dubstep #77 playing, 8 windows): 3.77 Static 15.5 fps, Changing 13.2 fps, Off 57.8.
+  Every write of a colour variable restyles what is under it; three kinds were written 30×/s (page palette, window level, element colours).
+  Removing any ONE left it slow; all three made 55 fps.
+- **Now, same look**: the sound is still read 30×/s, colours are written on one frame per 80 ms; a value is written only when it moves a
+  visible step (5 %); the page palette at most 10×/s; every window read before any is written. Static 35.8 fps · Changing 34.2 · Off 55.3.
+  Outside the loop (liveAcc, restoreAcc, setMode, silence) writes are never skipped.
+- Mistake on the way, caught by tests/p77: a comment placed mid-line silenced every element's colour inside windows. Fixed before commit.
+- Tests: P77, P58, P73, P48, P76, P23, P71, boundary pass.
+
+## Done — 3.77 Destroyer 2.1 · Reactive colours: modes, a real panel, per tool · a sound audit of every tool (2026-10-30)
+His words: "DESTROYER needs refinement. its too deep … sounds like a blown speaker. also needs performance optimization" · "the inside of the
+tools are supposed to react … have options for the reactive color, like changing, the way it is now lets call it static, and a way to
+customize. also the option needs to work, it does nothing, when trying to disable" · "that panel, do it right this time" · "can you run tests
+like that on all of them" · "give each tool the ability to adjust it … in the settings for each tool" · "the changing syncs all colors".
+- **Destroyer 2.1**, measured with a loud 50 Hz + a quiet 1 kHz (what the bass does to the music): default −1.6 → −49 dB; presets −6 → −30,
+  −14 → −63, −3 → −28 … The sub went through the shaper; now Low keep is on by default (100 Hz) and Tight 40 Hz, and every shipped preset
+  keeps the sub clean except Total Destruction. The sub is as deep as dry. Stages that change nothing are out of the path (the crusher and
+  its filters at 16 bits, the crossover with Low keep off, flat shelves): ~11 % less work. Its scope draws in the live colour and rests in
+  silence.
+- **Reactive colours**: Off · Static · Changing · Custom + Amount + your three colours (low end, top, hits) and palettes. Off was undone by
+  an older layer (UI.alive, 6 tools) that never asked — it obeys now. Every colour inside a window reacts (any inline colour: a pad's --pc,
+  a strip's colour …), drawn displays too. Changing is per tool: each turns by ITS own spectrum, hits and drift (a sub and drums no longer
+  move together). The panel (core/react-panel.js): mode cards with live previews of the real colour code, a wide Amount, swatches and
+  palettes; in ⋯ Options and in every tool's ⚙ settings (Follow the app, or its own — saved with the tool, it wins over the app's, even Off).
+- **Sound audit** (build/sound-audit.mjs → docs/sound-audit.md): all 45 sound tools — effects: intermodulation, level change, DC, peak,
+  CPU; instruments: peak, DC, energy under hearing, release tail, CPU. Fixed from it: Supersaw and Morph Osc clipped on a chord (+2.5 / +3
+  dBFS) → a shared headroom stage (unity under −3 dBFS); Xen Synth (−0.2 dB: almost all its energy under 20 Hz) and Reese (−11 dB) → Keep in
+  range; the same switch on Wobble Bass, Bass Forge, Wub Sub, Wub Osc. Still flagged, next: heavy CPU (Pad Forge, Xen,
+  Gothic Organ, Partials, Coven, Morph Osc), long release tails (Pad Forge, Gothic Organ, Xen), Wub Filter intermodulation, Channel DC.
+- Tests: Destroyer (3), p77 reactive modes (6), Wobble Bass / Reese keep-in-range.
+
+## Done — 3.76 Deep Sub: the sub you can hear · one tool = one complete zip (2026-10-30)
+His words: "push and commit and then give me the replacement. you know each tool is supposed to be bundled with its dag, tool file,
+ui and packs, anything that tool uses and has, is its own zip."
+- **Measured:** Deep Sub plays Octave −2 by default; on the notes the songs write its fundamental sat at 8–25 Hz in 53 of the 54 genres
+  that use it, and its own Floor (24 Hz high-pass) cut that out — only the phantom harmonics were heard.
+- **Deep Sub 1.1, Keep in range** (on by default): a note that would land under the floor is lifted by whole octaves to 30–60 Hz. Same note
+  names, same line; off = 1.0 exactly. A1 in a song now sounds at 55 Hz (was 13.75 Hz, filtered away).
+- **One tool = one zip, everything in it** (desktop/packs.mjs): the whole tool folder (tool.json, engine, ui, styles, spec, tests, every
+  pack + its schema, pictures) and dag.json — the tool as a node: needs (core pack, units, tools, permissions), hooks in/out, works-with,
+  load order, packs, every file with role + SHA-256. Only the engine/ui/packs scripts run on install; the rest travels with it.
+  `node desktop/packs.mjs --tool eravos.sub-engine --out <dir>` builds just that tool. Checked: a bare canvas + Core zip + Deep Sub zip
+  installs with no fault (v1.1.0, 14 presets, A1 → 55 Hz).
+- Found, not fixed: installing the Core zip raises "Failed to construct 'URL'" from one core script evaluated from a blob (pre-existing).
+## Done — 3.77b ♪ patterns sorted by genre · Mapped — notes: first song, his language's tools, mutation (2026-10-30)
 His words: "Just need you to take notes." · "Can we have them sorted by genre." · "I have a coding language made, and would love a full tool
 set for it." · "what if they could mutate?" · "My first song I made with it."
 - **Done**: the ♪ patterns panel lists A–Z by genre with headings, and a genre picker. tests/p76 (extended).
@@ -19,7 +66,7 @@ information or clutter. It's also laggy. I don't know why the ui keeps changing.
 - **The lag, measured** (build/perf-ui.mjs: Dubstep #77 playing, 8 windows, headless Chromium, 2 cores):
   reactive colours as they were: 15 fps, 91 of 92 frames slow, style recalc 5.08 s · off: 57 fps, 0.14 s.
   Cause: the palette and --snd-* written on <html> 30× a second restyle every element; window visibility read after style writes.
-- **Now** ⋯ Options › Reactive colours cycles off · calm (default) · full. Calm: one glow layer per sounding window, moved by opacity only
+- **Superseded by 3.78** (Calm / Full removed in the merge; 3.77's modes kept, made faster). Was: ⋯ Options › Reactive colours cycles off · calm (default) · full. Calm: one glow layer per sounding window, moved by opacity only
   (compositor) = 55 fps. Full = the 3.73 look, unchanged (reads batched before writes). SoundCSS.set(true) still means full.
 - **"The ui keeps changing"**: the colours pulsed with the music (calm stops that), and ~600 colours in CSS + ~1000 in tool JS are
   hard-coded, so restyles leak. Theme previews (7 looks × first screen, canvas, ＋ Add, tool page) rendered from the real app for his pick.

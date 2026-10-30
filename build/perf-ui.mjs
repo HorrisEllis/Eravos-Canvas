@@ -5,7 +5,7 @@
 import { chromium } from '../host/driver/glass.js';
 import path from 'path'; import { fileURLToPath } from 'url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'), SEC = +(process.env.SEC || 6);
-const modes = (process.argv[2] || 'full,calm,off').split(',');
+const modes = (process.argv[2] || 'static,changing,off').split(',');
 const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
 const out = [];
 for (const mode of modes) {
@@ -24,7 +24,7 @@ for (const mode of modes) {
     await new Promise(r => setTimeout(r, 800));
     const fr = []; let last = performance.now(); const t0 = last;
     await new Promise(res => { const f = (t) => { fr.push(t - last); last = t; if (t - t0 < SEC * 1000) requestAnimationFrame(f); else res(); }; requestAnimationFrame(f); });
-    return { frames: fr.length, fps: +(fr.length / SEC).toFixed(1), slow: fr.filter(x => x > 33).length, worst: +Math.max(...fr).toFixed(1), windows: document.querySelectorAll('.wm-win').length, els: document.getElementsByTagName('*').length, glowing: document.querySelectorAll('.snd-glow').length };
+    return { frames: fr.length, fps: +(fr.length / SEC).toFixed(1), slow: fr.filter(x => x > 33).length, worst: +Math.max(...fr).toFixed(1), windows: document.querySelectorAll('.wm-win').length, els: document.getElementsByTagName('*').length, react: document.documentElement.dataset.react };
   }, SEC);
   const m = await p._send('Performance.getMetrics').catch(() => null);
   const g = (k) => m && m.metrics ? +((m.metrics.find(x => x.name === k) || {}).value || 0).toFixed(2) : null;

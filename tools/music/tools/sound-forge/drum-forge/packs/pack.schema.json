@@ -48,7 +48,8 @@
                       },
                       "sendTo": {
                         "type": "string"
-                      }
+                      },
+                      "_react": {}
                     },
                     "additionalProperties": false
                   },

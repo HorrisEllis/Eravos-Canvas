@@ -160,6 +160,7 @@
                         "minimum": 0,
                         "maximum": 359
                       },
+                      "_react": {},
                       "tempoX": {
                         "enum": [
                           "¼",

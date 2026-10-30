@@ -19,6 +19,7 @@
     config: [
       { key: 'follow', type: 'boolean', default: true, label: 'Follow Wub Osc', group: 'NOTES', hint: 'play the notes sent to any Wub Osc too' },
       { key: 'wave', type: 'enum', options: ['sine', 'triangle', 'warm'], default: 'sine', label: 'Wave', group: 'TONE', hint: 'warm adds a little 2nd/3rd harmonic so the sub is heard on phones' },
+      { key: 'keepRange', type: 'boolean', default: true, label: 'Keep in range', group: 'TONE', hint: 'never under 30 Hz — a note that would be is lifted by octaves, so the sub is heard (3.77 sound audit)' },
       { key: 'octave', type: 'integer', default: -1, min: -4, max: 1, label: 'Octave', group: 'TONE', hint: 'against the note: −1 = the same pitch as a Wub Osc at its default octave (−1)' },
       { key: 'transpose', type: 'number', default: 0, min: -36, max: 24, step: 0.1, unit: 'st', label: 'Pitch', group: 'TONE', hint: 'semitones, −36 … +24. Set it to the same value as Wub Osc’s Pitch to keep the sub under the wub' },
       { key: 'harmonics', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Harmonics', group: 'TONE', hint: 'adds overtones above the sub so a very deep note is heard on laptop speakers, phones and headphones. Raise Low-pass above them (about 3× the note)' },
@@ -52,7 +53,7 @@
       tone(); ['wave', 'cut', 'level', 'harmonics'].forEach(k => P.onChange(k, tone));
       let held = null, curF = 55;
       const peak = (vel) => 0.25 + 0.75 * Math.max(0, Math.min(1, vel));   // a sub stays solid: velocity matters less
-      const noteHz = (note) => Math.max(8, MT.hz(Math.max(0, Math.min(127, note + 12 * P.get('octave')))) * Math.pow(2, P.get('transpose') / 12));   // 3.50 Pitch
+      const noteHz = (note) => { const f = Math.max(8, MT.hz(Math.max(0, Math.min(127, note + 12 * P.get('octave')))) * Math.pow(2, P.get('transpose') / 12)); return P.get('keepRange') !== false ? ctx.dsp.keepRange(f, 30) : f; };   // 3.50 Pitch · 3.77 never under 30 Hz
       function noteOn(note, vel, t, op) {
         op = op || {}; t = Math.max(t, ac.currentTime);
         const f = noteHz(note);

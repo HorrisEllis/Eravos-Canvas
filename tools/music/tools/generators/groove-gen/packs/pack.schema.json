@@ -43,6 +43,69 @@
                         "minimum": 1,
                         "maximum": 99999
                       },
+                      "humanize": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "accent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "rolls": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "fill": {
+                        "enum": [
+                          "off",
+                          "2",
+                          "4",
+                          "8",
+                          "16"
+                        ]
+                      },
+                      "evolve": {
+                        "enum": [
+                          "off",
+                          "1",
+                          "2",
+                          "4",
+                          "8"
+                        ]
+                      },
+                      "loop": {
+                        "enum": [
+                          "1 bar",
+                          "2 bars"
+                        ]
+                      },
+                      "rows": {},
+                      "m1": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "m2": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "m3": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "m4": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "_motion": {},
+                      "_perform": {},
+                      "_react": {},
                       "tempoX": {
                         "enum": [
                           "¼",

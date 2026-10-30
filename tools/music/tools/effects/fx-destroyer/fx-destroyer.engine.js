@@ -1,4 +1,4 @@
-/* eravos.fx-destroyer 2.0.0 — Destroyer (P10 · W-01) · spec eravos.organism.fx-destroyer · inherits STD.fx
+/* eravos.fx-destroyer 2.1.0 — Destroyer (P10 · W-01) · spec eravos.organism.fx-destroyer · inherits STD.fx
  * tilt EQ → TIGHT high-pass → LOW KEEP crossover (LR4: lows bypass the damage, delayed to stay in phase) →
  * SHAPER (soft | hard | tube | fold | tape | fuzz | rectify, own curves, 4× oversampled, ASYM bias for even harmonics) →
  * makeup gain matched across −6…−24 dBFS (real mix levels, not full scale) → DC block →
@@ -7,7 +7,13 @@
  * 2.0 (sounded harsh): drive used to add up to +13 dB on quiet input (levelled at full scale), the hard and fold curves
  * were brick-walls (fizz), the crusher's downsample folded every partial back as inharmonic hash (alias louder than the
  * signal on Total Destruction), and bass went through the shaper full-band (mud). All four are fixed here.
- * If AudioWorklet is unavailable: WaveShaper quantiser, downsample disabled, a fault says so (§1.2). */
+ * If AudioWorklet is unavailable: WaveShaper quantiser, downsample disabled, a fault says so (§1.2).
+ * 2.1 (3.77, "too deep … sounds like a blown speaker" + "performance optimization"): measured with a loud 50 Hz + a quiet 1 kHz,
+ * the default put the sub through the shaper and the bass then gated everything above it — intermodulation at −1.6 dB (as loud as
+ * the music); with the sub kept clean it is −24.7 dB (no shaper at all: −25.6). So LOW KEEP is on by default (100 Hz: the sub
+ * goes around the damage, in phase) and TIGHT starts at 40 Hz. Speed: stages that change nothing are taken out of the path —
+ * the crusher worklet and its anti-alias / anti-image filters when nothing is crushed (16 bits, no downsample, no wired mod),
+ * the crossover when Low keep is off, the tilt shelves when flat. */
 (function () {
   'use strict';
   const S = OrganismSDK.STD, SDK = OrganismSDK;
@@ -74,7 +80,7 @@ registerProcessor('eravos-crush2', EravosCrush2);`;
     return Math.max(0.05, Math.min(4, Math.exp(acc / 4)));
   }
   OrganismFactory.define({
-    id: 'eravos.fx-destroyer', domain: 'music', version: '2.0.0', label: 'Destroyer', icon: '👾', accent: '#aaff00', phase: 'P10',
+    id: 'eravos.fx-destroyer', domain: 'music', version: '2.1.0', label: 'Destroyer', icon: '👾', accent: '#aaff00', phase: 'P10',
     category: 'Effects', blurb: 'Warm tape, grit, fold growl, 8-bit crunch. From a little colour to total destruction.',
     size: { w: 460, h: 520 }, minSize: { w: 340, h: 380 },
     // its suite (canvas/runtime/tool-page.js)
@@ -97,8 +103,8 @@ registerProcessor('eravos-crush2', EravosCrush2);`;
       { key: 'drive', type: 'number', default: 0.3, min: 0, max: 1, step: 0.01, label: 'Drive', group: 'SHAPER' },
       { key: 'asym', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Asym', group: 'SHAPER', hint: 'bias → even harmonics (warmer, fatter)' },
       { key: 'autoGain', type: 'boolean', default: true, label: 'Auto gain', group: 'SHAPER', hint: 'louder drive, same volume' },
-      { key: 'tight', type: 'number', default: 25, min: 10, max: 600, step: 1, unit: 'Hz', label: 'Tight', group: 'TONE', hint: 'low cut before the shaper — less mud' },
-      { key: 'lowKeep', type: 'number', default: 0, min: 0, max: 400, step: 1, unit: 'Hz', label: 'Low keep', group: 'TONE', hint: 'lows under this stay clean (0 = off) — distort the bass, keep the sub' },
+      { key: 'tight', type: 'number', default: 40, min: 10, max: 600, step: 1, unit: 'Hz', label: 'Tight', group: 'TONE', hint: 'low cut before the shaper — less mud' },
+      { key: 'lowKeep', type: 'number', default: 100, min: 0, max: 400, step: 1, unit: 'Hz', label: 'Low keep', group: 'TONE', hint: 'lows under this stay clean (0 = off) — distort the bass, keep the sub' },
       { key: 'bits', type: 'integer', default: 16, min: 1, max: 16, label: 'Bits', group: 'CRUSH' },
       { key: 'downsample', type: 'integer', default: 1, min: 1, max: 64, label: 'Downsample', group: 'CRUSH' },
       { key: 'alias', type: 'number', default: 0.35, min: 0, max: 1, step: 0.01, label: 'Alias', group: 'CRUSH', hint: '0 clean lo-fi · 1 raw 8-bit fold-over' },
@@ -119,21 +125,35 @@ registerProcessor('eravos-crush2', EravosCrush2);`;
       const pre = T(ac.createGain()), sh = T(ac.createWaveShaper()), lvl = T(ac.createGain()), dcb = bq('highpass', 5, BW);
       const aa = bq('lowpass', 20000, BW), crushIn = T(ac.createGain()), img1 = bq('lowpass', 20000, BW), img2 = bq('lowpass', 20000, BW), tame = bq('lowpass', P.get('postLP'), BW), dcb2 = bq('highpass', 5, BW), sum = T(ac.createGain());
       sh.oversample = '4x';
-      fx.wetIn.connect(lo); lo.connect(hi); hi.connect(tight);
-      tight.connect(xHP1); xHP1.connect(xHP2); xHP2.connect(pre); pre.connect(sh); sh.connect(lvl); lvl.connect(dcb); dcb.connect(aa); aa.connect(crushIn);
-      img1.connect(img2); img2.connect(tame); tame.connect(dcb2); dcb2.connect(sum);   // a coarse quantiser makes DC of its own
-      hi.connect(xLP1); xLP1.connect(xLP2); xLP2.connect(lowDly); lowDly.connect(lowG); lowG.connect(sum);   // lows skip TIGHT too: kept means kept
+      pre.connect(sh); sh.connect(lvl); lvl.connect(dcb);
+      img1.connect(img2); img2.connect(dcb2); dcb2.connect(tame); tame.connect(sum);   // a coarse quantiser makes DC of its own
+      xLP1.connect(xLP2); xLP2.connect(lowDly); lowDly.connect(lowG); lowG.connect(sum); xHP1.connect(xHP2);
+      // 2.1 the path is rebuilt only from the stages that do something (a stage at its neutral setting is skipped, not computed)
+      const route = { tilt: null, keep: null, crush: null };
+      const link = (a, bs) => { try { a.disconnect(); } catch (e) {} bs.forEach(b => a.connect(b)); };
+      function routeTilt(on) { if (route.tilt === on) return; route.tilt = on; link(fx.wetIn, [on ? lo : tight]); if (on) { link(lo, [hi]); link(hi, [tight]); } routeKeep(route.keep, true); }
+      function routeKeep(on, force) {
+        if (route.keep === on && !force) return; route.keep = on; const src = route.tilt ? hi : fx.wetIn;
+        link(tight, [on ? xHP1 : pre]); if (on) link(xHP2, [pre]);
+        if (route.tilt) link(hi, on ? [tight, xLP1] : [tight]); else link(fx.wetIn, on ? [tight, xLP1] : [tight]);   // lows skip TIGHT too: kept means kept
+        void src;
+      }
+      const crushing = () => P.get('bits') < 16 || P.get('downsample') > 1 || ctx.modWired('bits') || ctx.modWired('downsample');
+      function routeCrush() {
+        const on = !!crushing(); if (route.crush === on) return; route.crush = on;
+        link(dcb, [on ? aa : tame]); if (on) { link(aa, [crushIn]); link(crushIn, [crush || quant || img1]); if (crush || quant) link(crush || quant, [img1]); }
+      }
+      ctx.routing = () => Object.assign({}, route);
       ctx.slot('after', sum, { label: 'after the damage', onLatency: fx.addLatency }).connect(fx.wetOut);   // its mods, inside the wet path
       const driveMod = ctx.modBus('drive', { min: -1, max: 1 }); driveMod.connect(pre.gain);
       let crush = null, quant = null;
-      crushIn.connect(img1); // until the worklet is ready (or if it never is)
+      // until the worklet is ready (or if it never is) the crush path goes straight to the anti-image filters
       const bitsMod = ctx.modBus('bits', { min: -15, max: 15 }), downMod = ctx.modBus('downsample', { min: -63, max: 63 });
       ctx.ready = ctx.loadWorklet('eravos-crush2', CRUSH).then(() => {
         crush = new AudioWorkletNode(ac, 'eravos-crush2', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2] }); ctx.track(crush);
-        crushIn.disconnect(); crushIn.connect(crush); crush.connect(img1);
-        bitsMod.connect(crush.parameters.get('bits')); downMod.connect(crush.parameters.get('down')); applyCrush(true);
+        bitsMod.connect(crush.parameters.get('bits')); downMod.connect(crush.parameters.get('down')); route.crush = null; applyCrush(true);
       }).catch(() => {
-        quant = T(ac.createWaveShaper()); crushIn.disconnect(); crushIn.connect(quant); quant.connect(img1); applyCrush(true);
+        quant = T(ac.createWaveShaper()); route.crush = null; applyCrush(true);
         ctx.fault('RUNTIME_003', 'Destroyer: AudioWorklet unavailable — bit reduction via WaveShaper, downsample disabled');
       });
       function quantCurve(bits) { if (bits >= 16) return null; const n = 4097, c = new Float32Array(n), L = Math.pow(2, bits - 1); for (let i = 0; i < n; i++) { const x = i / (n - 1) * 2 - 1; c[i] = Math.max(-1, Math.min(1, (Math.floor(x * L) + 0.5) / L)); } c[(n - 1) / 2] = 0; return c; }
@@ -153,7 +173,7 @@ registerProcessor('eravos-crush2', EravosCrush2);`;
           di.setValueAtTime(P.get('dither') ? 1 : 0, t);
         }
         if (quant) quant.curve = quantCurve(P.get('bits'));
-        crushFilters(now);
+        crushFilters(now); routeCrush();
       }
       function applyShape(now) {
         const dr = P.get('drive'), c = shapeCurve(P.get('shape'), dr, P.get('asym'));
@@ -161,11 +181,13 @@ registerProcessor('eravos-crush2', EravosCrush2);`;
         set(lo.gain, -P.get('tilt') * 6, now); set(hi.gain, P.get('tilt') * 6, now);
         set(tight.frequency, P.get('tight'), now);
         const kf = P.get('lowKeep'), on = kf >= 20; [xLP1, xLP2, xHP1, xHP2].forEach(f => set(f.frequency, on ? kf : 10, now)); set(lowG.gain, on ? 1 : 0, now);
+        routeTilt(Math.abs(P.get('tilt')) > 0.001); routeKeep(on);
         set(tame.frequency, Math.max(1000, Math.min(P.get('postLP'), 20000 * Math.pow(2, -dr * P.get('autoTame') * 2))), now);
       }
-      applyShape(true);
+      applyShape(true); applyCrush(true);   // the crush path exists from the start (straight through until the worklet is in)
       ['shape', 'drive', 'asym', 'autoGain', 'tight', 'lowKeep', 'tilt', 'postLP', 'autoTame'].forEach(k => P.onChange(k, () => applyShape(false)));
       ['bits', 'downsample', 'dither', 'alias'].forEach(k => P.onChange(k, () => applyCrush(false)));
+      ['kernel:wire-registered', 'kernel:wire-removed'].forEach(tp => ctx.on(tp, null, (w) => { if (w && w.dst && w.dst.instanceId === ctx.id) routeCrush(); }));   // a mod wired to Bits / Downsample needs the crusher in
       ctx.internals = { get crush() { return crush; }, get quant() { return quant; }, tame, aa, img: [img1, img2], crushIn, shapeCurve, makeup };
       return { unmount() {} };
     },

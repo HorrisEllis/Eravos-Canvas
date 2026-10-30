@@ -87,6 +87,7 @@
                       "noteRetrig": {
                         "type": "boolean"
                       },
+                      "_react": {},
                       "tempoX": {
                         "enum": [
                           "¼",

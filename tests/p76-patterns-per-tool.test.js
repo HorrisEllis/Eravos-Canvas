@@ -10,7 +10,7 @@ describe('♪ Patterns per tool on the Timeline (3.76)', () => {
     const drums = PatternLibrary.forTool('eravos.no-such-kit', { drums: true });
     assert.ok(!drums.exact); assert.equal(drums.kinds[0].id, 'drums', 'a kit gets drum grooves first'); assert.ok(drums.list('drums').length > 20);
   });
-  it('♪ patterns on a track: five rows, sorted by genre with a picker (3.77), ↻ shows five others, ＋ add puts it on THIS track after its last clip', async () => {
+  it('♪ patterns on a track: five rows, sorted by genre with a picker (3.77b), ↻ shows five others, ＋ add puts it on THIS track after its last clip', async () => {
     host(); const tl = OrganismFactory.spawn('eravos.timeline', { x: 10, y: 10 }), syn = OrganismFactory.spawn('eravos.supersaw', { x: 900, y: 10 });
     try {
       await TH.sleep(30); const pub = (t, p) => Kernel.bus.publish('ui:' + t + ':' + tl, p), I = OrganismFactory.handle(tl).ctx.internals, root = OrganismFactory.handle(tl).view.root;

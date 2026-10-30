@@ -79,8 +79,15 @@ Open: Embodiment Lab is a drone (needs its own "stopped" state); effects need a 
 
 ## ADDENDUM 2026-10-30 (3.76) — the UI thread
 His words: "It's also laggy." Reproduce: GLASS_CHROMIUM=<chrome> node build/perf-ui.mjs [full,calm,off]
-  full (3.73 reactive colours): 15.3 fps · 91/92 frames > 33 ms · RecalcStyle 5.11 s · Layout 0.94 s
-  calm (3.76 default):          55.3 fps · 26 slow · RecalcStyle 0.16 s
+  3.73 reactive colours:        15.3 fps · 91/92 frames > 33 ms · RecalcStyle 5.11 s · Layout 0.94 s
   off:                          56.7 fps · 21 slow · RecalcStyle 0.14 s
+  (3.76's Calm mode, 55.3 fps, was removed in the 3.78 merge — see below)
 Rule from this: nothing writes a fast-changing custom property on <html>; per-frame visuals move opacity/transform only.
 Next: @property { inherits: false } for --tool-level/--lvl so Full is cheaper; Pad Forge reverb → FDN (cost grows with IR length).
+
+## ADDENDUM 2026-10-30 (3.78, the merge) — 3.77's modes, same look, fewer writes
+  3.77 as merged:   Static 15.5 fps · Changing 13.2 fps · Off 57.8 fps
+  3.78:             Static 35.8 fps (RecalcStyle 3.03 s) · Changing 34.2 fps (3.28 s) · Off 55.3 fps (0.14 s)
+  How: read 30×/s, write every 80 ms; write only a visible step; palette ≤ 10×/s; read all windows before writing any.
+  Bisected: page palette alone, window --tool-level alone, element colours alone each keep it ≤ 23 fps; the cost is any restyle at all.
+  Next for more: @property { inherits: false } where a colour is read on the same element; the CSS that reads --lvl on many selectors.

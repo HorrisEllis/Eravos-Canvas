@@ -55,6 +55,7 @@
                         "minimum": 0.1,
                         "maximum": 1
                       },
+                      "_react": {},
                       "tempoX": {
                         "enum": [
                           "¼",

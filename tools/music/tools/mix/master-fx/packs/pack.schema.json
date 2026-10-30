@@ -133,7 +133,8 @@
                         "type": "number",
                         "minimum": -30,
                         "maximum": -4
-                      }
+                      },
+                      "_react": {}
                     },
                     "additionalProperties": false
                   },
