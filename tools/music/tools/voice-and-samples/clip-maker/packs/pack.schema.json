@@ -55,7 +55,8 @@
                           "mic",
                           "input"
                         ]
-                      }
+                      },
+                      "_react": {}
                     },
                     "additionalProperties": false
                   },

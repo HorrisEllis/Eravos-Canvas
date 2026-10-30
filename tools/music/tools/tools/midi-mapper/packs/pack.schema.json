@@ -84,7 +84,8 @@
                       },
                       "ledFeedback": {
                         "type": "boolean"
-                      }
+                      },
+                      "_react": {}
                     },
                     "additionalProperties": false
                   },

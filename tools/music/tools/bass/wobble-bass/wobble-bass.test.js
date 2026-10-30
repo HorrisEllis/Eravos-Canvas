@@ -192,12 +192,22 @@ describe('Wobble Bass 3.50 · Pitch', () => {
   it('Pitch −12 st lowers the note an octave (the sub rides with it); 0 is unchanged', async () => {
     const freqAt = async (tr) => {
       const U = TH.universe(0.6, { bpm: 140 }), w = TH.spawn(U, 'eravos.wobble-bass'), c = OrganismFactory.handle(w).ctx;
-      c.params.set('transpose', tr);
+      c.params.setMany({ transpose: tr, keepRange: false });   // the transpose itself (3.77 Keep in range would lift a 27.5 Hz sub — tested below)
       TH.note(U, w, 45, 0.05, { duration: 0.4 }); await TH.render(U);
       return c.internals.sub.frequency.value;
     };
     assert.near(await freqAt(0), 55, 0.01, 'default');
     assert.near(await freqAt(-12), 27.5, 0.05, '−12 st');
     assert.near(await freqAt(7), 55 * Math.pow(2, 7 / 12), 0.05, '+7 st');
+  });
+});
+
+describe('Wobble Bass · Keep in range (3.77 sound audit)', () => {
+  it('a sub that would sit under 30 Hz is lifted an octave; the note itself stays where it is; off = as before', async () => {
+    const subAt = async (p) => { const U = TH.universe(0.6, { bpm: 140 }), w = TH.spawn(U, 'eravos.wobble-bass'), c = OrganismFactory.handle(w).ctx; c.params.setMany(p);
+      TH.note(U, w, 45, 0.05, { duration: 0.4 }); await TH.render(U); return c.internals.sub.frequency.value; };
+    assert.near(await subAt({ subOct: '-1' }), 55, 0.05, 'A2 at Octave −1 = 55 Hz, Sub oct −1 = 27.5 → lifted to 55');
+    assert.near(await subAt({ subOct: '-1', keepRange: false }), 27.5, 0.05, 'off: 27.5 Hz as before');
+    assert.near(await subAt({ subOct: '0' }), 55, 0.05, 'in range: unchanged');
   });
 });

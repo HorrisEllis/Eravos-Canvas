@@ -40,7 +40,8 @@
                       "keymap": {
                         "type": "boolean"
                       },
-                      "mods": {}
+                      "mods": {},
+                      "_react": {}
                     },
                     "additionalProperties": false
                   },

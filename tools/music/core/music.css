@@ -405,3 +405,55 @@ html:not(.snd-off) .tb-btn.primary, html:not(.snd-off) #logo { filter: drop-shad
 @container (max-width: 420px) { .mo-macros { grid-template-columns: 1fr; } .gg-mixer { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .mo-tile, .mo-slot, .gg-ch, .mo-mrow { transition: box-shadow .18s ease, transform .1s ease, background-color .14s ease; }
 .mo-tile:hover, .mo-slot:hover { transform: translateY(-1px); }
+/* 3.77 Reactive colours panel (core/react-panel.js) — ⋯ Options and every tool's ⚙ settings */
+.rcp { display: flex; flex-direction: column; gap: 14px; color: var(--text); }
+.rcp-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.rcp-dot { width: 7px; height: 7px; border-radius: 50%; background: conic-gradient(var(--pink), var(--amber), var(--green), var(--cyan), var(--violet), var(--pink)); box-shadow: 0 0 10px var(--cyan); align-self: center; }
+.rcp-title { font: 700 12px var(--mono); letter-spacing: 2.4px; text-transform: uppercase; }
+.rcp-sub { font: 500 11px var(--font); color: var(--dim); }
+.rcp-modes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.rcp-tool .rcp-modes { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); }
+.rcp-tool .rcp-desc { font-size: 10.5px; }
+.rcp-tool .rcp-pv { height: 60px; }
+.rcp-card { display: flex; flex-direction: column; gap: 6px; align-items: stretch; text-align: left; padding: 10px; cursor: pointer; color: inherit; font: inherit;
+  border-radius: 4px; border: 1px solid #000; background: linear-gradient(180deg, #141c26, #0d1219); box-shadow: 0 0 0 1px var(--line2), 0 1px 0 var(--edge) inset; transition: box-shadow .16s ease, transform .1s ease; }
+.rcp-card:hover { box-shadow: 0 0 0 1px var(--dim), 0 1px 0 var(--edge) inset; transform: translateY(-1px); }
+.rcp-card.on { box-shadow: 0 0 0 1px var(--cyan), 0 0 18px color-mix(in srgb, var(--cyan) 28%, transparent), 0 1px 0 var(--edge) inset; }
+.rcp-pv { width: 100%; height: 72px; border-radius: 3px; background: radial-gradient(120% 140% at 50% 0%, #0b1119, #05070a); box-shadow: 0 0 0 1px #000, inset 0 2px 8px rgba(0,0,0,.8); }
+.rcp-name { font: 700 12px var(--mono); letter-spacing: 1.6px; text-transform: uppercase; display: flex; align-items: center; gap: 7px; }
+.rcp-name::before { content: ''; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--dim); flex: none; }
+.rcp-card.on .rcp-name { color: var(--cyan); } .rcp-card.on .rcp-name::before { border-color: var(--cyan); background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+.rcp-desc { font: 400 11px var(--font); color: var(--dim); line-height: 1.35; }
+.rcp-lab { font: 700 9.5px var(--mono); letter-spacing: 1.6px; text-transform: uppercase; color: var(--dim); }
+.rcp-amt { display: grid; grid-template-columns: 70px 1fr 48px; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 4px; border: 1px solid #000; background: var(--well, #06080b); box-shadow: 0 0 0 1px var(--line); }
+.rcp-amt.dim { opacity: .45; }
+.rcp-amtmain { display: flex; flex-direction: column; gap: 3px; }
+.rcp-ends { display: flex; justify-content: space-between; font: 500 9px var(--mono); letter-spacing: 1px; text-transform: uppercase; color: var(--faint); }
+.rcp-val { font: 700 13px var(--mono); color: var(--cyan); text-align: right; }
+.rcp-range { -webkit-appearance: none; appearance: none; width: 100%; height: 18px; background: transparent; margin: 0; cursor: pointer; --v: 80%; }
+.rcp-range::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--violet), var(--cyan)) 0 0 / var(--v) 100% no-repeat, #121a24; box-shadow: 0 0 0 1px #000; }
+.rcp-range::-moz-range-track { height: 6px; border-radius: 3px; background: #121a24; } .rcp-range::-moz-range-progress { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--violet), var(--cyan)); }
+.rcp-range::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; margin-top: -5px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fff, #9fb0c3); box-shadow: 0 0 0 1px #000, 0 0 10px var(--cyan); }
+.rcp-range::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: #dfe9f3; border: 1px solid #000; }
+.rcp-custom { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: 4px; border: 1px solid #000; background: var(--well, #06080b); box-shadow: 0 0 0 1px var(--line); }
+.rcp-custom[hidden] { display: none; }
+.rcp-sws { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.rcp-sw { position: relative; display: flex; flex-direction: column; gap: 5px; cursor: pointer; }
+.rcp-chip { height: 40px; border-radius: 3px; box-shadow: 0 0 0 1px #000, 0 0 0 2px var(--line2), inset 0 1px 0 rgba(255,255,255,.25); }
+.rcp-sw:hover .rcp-chip { box-shadow: 0 0 0 1px #000, 0 0 0 2px var(--text); }
+.rcp-sw input { position: absolute; inset: 0 0 18px 0; opacity: 0; cursor: pointer; width: 100%; height: 40px; }
+.rcp-swl { font: 600 9.5px var(--mono); letter-spacing: 1.2px; text-transform: uppercase; color: var(--dim); text-align: center; }
+.rcp-pals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.rcp-pal { display: flex; align-items: center; gap: 8px; padding: 5px 8px; cursor: pointer; color: var(--text); font: 600 10.5px var(--mono); border-radius: 3px; border: 1px solid #000; background: #10161f; box-shadow: 0 0 0 1px var(--line); }
+.rcp-pal:hover { box-shadow: 0 0 0 1px var(--dim); }
+.rcp-pal i { width: 34px; height: 12px; border-radius: 2px; flex: none; background: linear-gradient(90deg, var(--a), var(--b) 60%, var(--c)); box-shadow: 0 0 0 1px #000; }
+.rcp-foot { font: 500 10px var(--mono); color: var(--faint); letter-spacing: .3px; }
+.rcp-pop { position: fixed; z-index: 260000; width: min(520px, calc(100vw - 16px)); max-height: calc(100vh - 70px); overflow: auto; padding: 18px 18px 14px; border-radius: 6px; border: 1px solid #000;
+  background: linear-gradient(180deg, #121a23, #0b1016 260px); box-shadow: 0 0 0 1px var(--line2) inset, 0 1px 0 var(--edge) inset, 0 30px 80px rgba(0,0,0,.7); animation: uk-pop .2s cubic-bezier(.2,.8,.3,1); }
+.rcp-pop::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; border-radius: 6px 6px 0 0; background: linear-gradient(90deg, var(--pink), var(--amber), var(--green), var(--cyan), var(--violet)); }
+.rcp-x { position: absolute; top: 12px; right: 12px; background: none; border: 0; color: var(--dim); font-size: 14px; cursor: pointer; } .rcp-x:hover { color: var(--text); }
+.rcp-entry { justify-content: space-between !important; gap: 10px; }
+.rcp-entry-m { font: 700 9.5px var(--mono); letter-spacing: 1.2px; text-transform: uppercase; padding: 2px 6px; border-radius: 2px; background: #10161f; box-shadow: 0 0 0 1px var(--line2); color: var(--dim); }
+.rcp-entry-m.rcp-m-static { color: var(--cyan); } .rcp-entry-m.rcp-m-changing { color: #fff; background: linear-gradient(90deg, var(--pink), var(--amber), var(--green), var(--cyan)); text-shadow: 0 1px 2px #000; } .rcp-entry-m.rcp-m-custom { color: var(--violet); }
+/* Changing: drawn displays turn their hues with the sound too (by how much this window is sounding) */
+html:not(.snd-off) .wm-win[data-react="changing"] .uk-canvas { filter: brightness(calc(1 + var(--lvl) * .35)) saturate(calc(1 + var(--lvl) * .3)) hue-rotate(calc(var(--win-shift, 0deg) * var(--lvl))); }   /* each tool turns by its own sound */

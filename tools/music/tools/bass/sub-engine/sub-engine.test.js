@@ -21,3 +21,20 @@ describe('Sub Engine — legato never drops a held note', () => {
     assert.equal(silent.join(','), '', 'silent sixteenths while a note is held');
   });
 });
+
+describe('Deep Sub 1.1 · Keep in range (3.76)', () => {
+  const rig = (params) => { const U = TH.universe(1.2, { bpm: 120 }), id = TH.spawn(U, 'eravos.sub-engine'), c = OrganismFactory.handle(id).ctx; c.params.setMany(Object.assign({ phantom: 0, click: 0, drop: 0, drive: 0 }, params || {})); return { U, id, c }; };
+  it('a note the songs write (A1, Octave −2 → 13.75 Hz, under the 24 Hz floor) is lifted to 55 Hz — heard, and not cut by the floor', async () => {
+    const { U, id, c } = rig(); assert.near(c.subHz(33), 55, 0.01, 'two octaves up to 30–60 Hz');
+    TH.note(U, id, 33, 0.05, { duration: 1.0 }); const b = await TH.render(U);
+    assert.near(TH.zcFreq(b, 0.3, 1.0), 55, 2, 'the sub plays at 55 Hz'); assert.gt(TH.rms(b, 0.3, 1.0), 0.05, 'and it is loud, not filtered away');
+  });
+  it('a note already in range stays where Octave puts it; every lifted note lands at 30–60 Hz; the melody keeps its shape', () => {
+    const { c } = rig(); assert.near(c.subHz(57), 55, 0.01, 'A3 −2 oct = 55 Hz: unchanged');
+    for (let n = 24; n <= 60; n++) { const f = c.subHz(n); assert.ok(f >= 30 && f < 60.01 || f >= 60, n + ' → ' + f.toFixed(1)); }
+    assert.ok(c.subHz(36) < c.subHz(38), 'a step up is still up');
+  });
+  it('off: exactly 1.0 — the note where Octave puts it (13.75 Hz)', () => {
+    const { c } = rig({ keepRange: false }); assert.near(c.subHz(33), 13.75, 0.01);
+  });
+});

@@ -191,6 +191,9 @@
                         "minimum": -3,
                         "maximum": 3
                       },
+                      "keepRange": {
+                        "type": "boolean"
+                      },
                       "sub": {
                         "type": "number",
                         "minimum": 0,
@@ -211,6 +214,7 @@
                         "minimum": 0,
                         "maximum": 1.5
                       },
+                      "_react": {},
                       "tempoX": {
                         "enum": [
                           "¼",

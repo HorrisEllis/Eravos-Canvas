@@ -469,8 +469,8 @@
       "mix": 1,
       "asym": 0,
       "autoGain": true,
-      "tight": 30,
-      "lowKeep": 0,
+      "tight": 40,
+      "lowKeep": 100,
       "alias": 0.6,
       "dither": false,
       "autoTame": 0.5

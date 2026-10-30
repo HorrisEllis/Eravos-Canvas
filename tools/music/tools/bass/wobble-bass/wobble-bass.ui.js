@@ -23,7 +23,7 @@ OrganismFactory.reg('eravos.wobble-bass', function (view) {
   const cfg = (k) => view.descriptor.config.find(c => c.key === k);
   const ctl = (k, o) => UI.paramControl(view, cfg(k), o);
   const shape = ctl('lfoShape'), mode = ctl('filterMode'), va = ctl('vowelA'), vb = ctl('vowelB');
-  const sync = ctl('lfoSync'), retrig = ctl('retrig'), subOct = ctl('subOct');
+  const sync = ctl('lfoSync'), retrig = ctl('retrig'), subOct = ctl('subOct'), keepRange = ctl('keepRange');   // 3.77 Keep in range beside Sub oct
   const ladderBox = h('div', { style: { display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' } }, [divLadder.el]);
   // the grid ladder is in charge when Sync is on; the Free rate knob when it is off
   view.bind('lfoSync', (on) => { ladderBox.style.opacity = on ? '1' : '0.3'; ladderBox.title = on ? '' : 'Sync is off — the Free rate knob sets the speed'; });
@@ -143,7 +143,7 @@ OrganismFactory.reg('eravos.wobble-bass', function (view) {
   ]));
   const wubOn = ctl('wubOn'), wubLen = ctl('wubLen', { size: 28 }), wubStep = ctl('wubStep');
   // ---- 3.5 every control on screen, grouped by what it does; a control that waits on a switch is dimmed and says why
-  const placed = new Set(['lfoShape', 'filterMode', 'vowelA', 'vowelB', 'lfoSync', 'retrig', 'subOct', 'div', 'wubOn', 'wubLen', 'wubStep']);
+  const placed = new Set(['lfoShape', 'filterMode', 'vowelA', 'vowelB', 'lfoSync', 'retrig', 'subOct', 'keepRange', 'div', 'wubOn', 'wubLen', 'wubStep']);
   const knob = (k) => { placed.add(k); const c = ctl(k, { size: 30 }); c.el.dataset.key = k; return c; };
   const group = (title, keys, extra) => h('div', { class: 'uk-group wb-group' }, [h('div', { class: 'uk-group-title', text: title }), h('div', { class: 'uk-row' }, (extra || []).concat(keys.map(k => knob(k).el)))]);
   [shape, mode, va, vb, sync, retrig, subOct, wubOn, wubLen, wubStep].forEach((c, i) => { c.el.dataset.key = ['lfoShape', 'filterMode', 'vowelA', 'vowelB', 'lfoSync', 'retrig', 'subOct', 'wubOn', 'wubLen', 'wubStep'][i]; });
@@ -202,7 +202,7 @@ OrganismFactory.reg('eravos.wobble-bass', function (view) {
     card('SHAPE', 'drag points · click to add · double-click removes · shift-drag or wheel bends a segment', [ed, shapeRow]),
     card('WUB SEQ', 'a rate per step (fast at the top) · bottom row: that step’s shape · on = notes play pitch only · Rate glide on = steps glide',
       [h('div', { class: 'org-row', style: { flexWrap: 'wrap', gap: '6px', margin: 0, alignItems: 'center' } }, [wubOn.el, wubLen.el, wubStep.el]), roll, seqBtns]),
-    card('FILTER + VOWELS', 'the mouth: low-pass or a formant filter that talks between two vowels', [h('div', { class: 'org-row', style: { flexWrap: 'wrap', gap: '8px', margin: 0 } }, [mode.el, va.el, vb.el, subOct.el])]),
+    card('FILTER + VOWELS', 'the mouth: low-pass or a formant filter that talks between two vowels', [h('div', { class: 'org-row', style: { flexWrap: 'wrap', gap: '8px', margin: 0 } }, [mode.el, va.el, vb.el, subOct.el, keepRange.el])]),
   ].concat(groups.map(gEl => { Object.assign(gEl.style, { margin: '0 0 8px', breakInside: 'avoid' }); return gEl; })));
   view.root.append(
     h('div', { class: 'org-row', style: { justifyContent: 'space-between' } }, [UI.presetBar(view), shape.el]),

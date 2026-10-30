@@ -39,7 +39,8 @@
     defaultPreset: 'Festival Lead',
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, MT = window.MusicTheory;
-      const out = ac.createGain(); out.gain.value = P.get('level') * 0.5;
+      // 3.77 a chord no longer goes over full scale: level → headroom (unity under −3 dBFS, peaks rounded) → out
+      const lvl = ac.createGain(); lvl.gain.value = P.get('level') * 0.5; const hr = ctx.dsp.headroom(ac), out = ac.createGain(); lvl.connect(hr.input); hr.output.connect(out); hr.nodes.forEach(n => ctx.track(n)); ctx.track(lvl);
       ctx.port('out', { kind: 'audio', direction: 'out', node: out, label: 'supersaw' });
       const cutMod = ctx.modBus('cutoff', { min: -4800, max: 4800 });
       const detMod = ctx.modBus('detune', { min: 0, max: 1 });
@@ -68,7 +69,7 @@
         const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = P.get('res');
         if (wCut) cutMod.connect(lp.detune);
         const amp = ac.createGain(); amp.gain.value = 0;
-        sum.connect(hp); hp.connect(lp); lp.connect(amp); amp.connect(out);
+        sum.connect(hp); hp.connect(lp); lp.connect(amp); amp.connect(lvl);
         // ADSRs (linear decay → exact sustain at t+A+D)
         const A = P.get('aA'), D = P.get('aD'), Sus = P.get('aS');
         const peak = 0.35 + 0.65 * vel;
@@ -127,7 +128,7 @@
       ctx.onUI('key_down', { type: 'object', required: ['note'] }, (p) => noteOn(p.note, p.velocity || 0.85, ac.currentTime));
       ctx.onUI('key_up', { type: 'object', required: ['note'] }, (p) => noteOff(p.note));
       ctx.onKey(() => ctx.syncUI());
-      P.onChange('level', (v) => out.gain.setTargetAtTime(v * 0.5, ac.currentTime, 0.01));
+      P.onChange('level', (v) => lvl.gain.setTargetAtTime(v * 0.5, ac.currentTime, 0.01));
       ctx.audition = (p) => noteOn(p.note || 69, 0.85, ac.currentTime, 0.6);
       return { unmount() { voices.slice().forEach(v => kill(v, ac.currentTime)); } };
     },

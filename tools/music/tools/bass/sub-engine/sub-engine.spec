@@ -62,3 +62,10 @@ dependencies:
     - curve.out (modulation · port curve)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
   works_with: [eravos.sidechain-compressor, eravos.sequencer, eravos.timeline, eravos.reese-bass, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen]
+
+# ---- 1.1 (3.76) · Keep in range
+Measured on main (2026-10-30): Octave −2 (the default) on the notes the songs write put the fundamental at 8–25 Hz in 53 of the 54
+genres that play Deep Sub — under hearing, and under this tool's own Floor (24 Hz high-pass), which cut it: only the phantom
+harmonics were left. keepRange (boolean, default true): a note whose Octave pitch is under max(30 Hz, floor + 6) is lifted by whole
+octaves (≤ 6) until it is not — 30–60 Hz. The note keeps its name, a line keeps its shape (a step up stays up), glide / drop / 808
+slides work as before. keepRange false = 1.0 exactly. ctx.subHz(note) → where a note sounds. Tests: sub-engine.test.js (3).

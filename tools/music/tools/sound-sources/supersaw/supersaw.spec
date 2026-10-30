@@ -92,3 +92,5 @@ dependencies:
     - curve.out (modulation · port curve)
   permissions: [audio_out, midi_in, bus_publish, bus_subscribe]
   works_with: [eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen, eravos.groove-gen, eravos.midi-mapper, eravos.lyric-rhythm]
+
+# ---- 3.77: level → dsp.headroom (unity under −3 dBFS, peaks rounded to ≤ 0.98) → out. A C-major chord peaked +2.5 dBFS.

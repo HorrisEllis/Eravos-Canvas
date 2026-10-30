@@ -78,3 +78,5 @@ dependencies:
   works_with: [eravos.ratio-lattice, eravos.harmonic-analyzer, eravos.recursive-spectra, eravos.timeline, eravos.sequencer, eravos.arp, eravos.bass-gen, eravos.chord-gen]
   notes:
     - Ignores the song key on purpose: the tuning IS the key. Key C4 (60) = step 0 by default.
+
+# ---- 3.77 keepRange (default on): the note never under 25 Hz, no partial under 20 Hz. On an A1 almost all its energy (−0.2 dB) was under 20 Hz → −36 dB.

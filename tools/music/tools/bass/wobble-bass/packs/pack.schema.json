@@ -232,6 +232,9 @@
                           "-1"
                         ]
                       },
+                      "keepRange": {
+                        "type": "boolean"
+                      },
                       "subOct": {
                         "enum": [
                           "0",
@@ -273,6 +276,7 @@
                         "maximum": 1
                       },
                       "mods": {},
+                      "_react": {},
                       "tempoX": {
                         "enum": [
                           "¼",
