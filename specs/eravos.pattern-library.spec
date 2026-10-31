@@ -96,3 +96,10 @@
   Hz · a wobble rate per note and a speed-up into the turn · a lead that glides into leaps and blooms a vibrato) and CURVE SHAPES for every
   tool a genre plays (Riser +7 · Freefall −12 · Ripples · Filter opens · Filter closes, then rips open · Depth swing — by the tool's knobs).
   After: 1967 patterns, 79 curve patterns, 659 note patterns that bend, from all 85 genres. tests/p74-curves-everywhere.test.js.
+
+
+# ADDENDUM 3.73 (2026-10-24; the other session's 3.74 builds on it) — the SONGS curve too
+#   The Song Engine writes movement into every melodic part it generates (data/song-engine.js shapeNotes): per-note curves as Bézier arcs on
+#   the tool's own filter / drive / wobble knobs (centred on its preset) and bends — bass: growl / talk / open / deepen, a dive at a drop's
+#   end; chords: swells and plucks (a chord moves as one); leads: glide-in bends and plucks. Seeded apart from the song's numbers: the notes
+#   are unchanged (the golden hashes in p22 match with G.curve = false). 0 → ~37 000 curved notes in all 85 genres. tests/p73-living.

@@ -58,7 +58,8 @@
                         "type": "integer",
                         "minimum": 1,
                         "maximum": 512
-                      }
+                      },
+                      "_react": {}
                     },
                     "additionalProperties": false
                   },

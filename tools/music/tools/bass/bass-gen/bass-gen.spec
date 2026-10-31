@@ -36,3 +36,22 @@ dependencies:
     - bassg.hook.note_out (note:trigger)
   permissions: [audio_out, bus_publish, bus_subscribe, registry_read]
   works_with: [eravos.pads, eravos.embodiment-lab, eravos.arp, eravos.chord-gen, eravos.groove-gen, eravos.coven, eravos.organ, eravos.retro-poly]
+
+# ---- 1.1 (3.79) · feel, steps, motion, perform — map eravos.quality-and-tools-map T1
+# James, 2026-10-31: "bassline. bass forge, then drum forge" (the Groove way: "all need more dynamic control and a better ui")
+config FEEL (all neutral by default — 1.0 songs play the same notes, tested): slides 0…1 (default 1: the chance an off-beat note slides,
+  1 = every one as 1.0) · ghosts 0…1 (a quiet note, velocity 0.25 + 0.15 × energy, 0.45 of a step, never sliding, on a step nothing else
+  plays: chance ghosts × 0.45; following a Groove, on its steps without a kick) · jumps 0…1 (off-beat notes up an octave: chance jumps × 0.6)
+  · move 0…1 (notes off the half-bar: chance move × 0.5 → the fifth, or in the last quarter of the bar a step toward the next chord when it
+  is known — its own progression) · humanize 0…1 (±10 ms, ±20 % velocity, ±25 % length) · accent 0…1 (beats × 1 + 0.35a, the rest
+  × 1 − 0.3a) · follow 0…1 (default 1: the share of its steps or the Groove's kicks it plays; the first of the bar always) · seed.
+  All chances are seeded (seed, bar, step): the same settings play the same line.
+steps (hidden object): 16 lanes — vel −1…1 (× 1 + vel/2) · oct −1/0/+1 · slide 0 auto / 1 on / −1 off. ui hook step_set {step, vel?, oct?,
+  slide?, all?} · reseed. ui events: bass_note {note, name, time, step 0…31, dur (steps), vel, slide, ghost} · bass_step {step, time}.
+perform: true → m1…m4, _motion, _perform (core/motion.js).
+window: LINE — the last two bars as played (pitch up, length across until the next note, slides as curves, ghosts hollow, level as
+  brightness, the playhead), the note it is on and what it follows, rhythm strip, ENERGY large + length, octave, slides, ghosts, jumps,
+  own chords + bars/chord. Page tabs: Panel · Steps (the lanes: drag a level, click a cell, right-click resets; move, humanize, accent,
+  follow, seed) · Motion · Perform.
+acceptance (bass-gen.test.js, 6): defaults = 1.0's notes · ghosts in gaps, seeded; follow 0 = the downbeats · jumps and movement stay in
+  the scale and off the beat · step lanes, step_set and reset · accent and humanize · a macro turns ENERGY and plays harder

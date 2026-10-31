@@ -46,3 +46,39 @@
   a pack page lists exactly what ContentPacks reports for that pack, grouped by the catalog's categories (tested) · Synthwave touches at
   least 5 categories · off → zero items from it in every tool, the pattern library and the songbook · Build the rig opens, wires and
   plays (rendered, not silent) · every Open loads the pack's preset (tested per tool)
+
+## ADDENDUM 2026-10-31 — packs are DLC: "i want sound packs to be like dlc in a way. each pack adds new sounds or capabilities."
+  This sharpens "additive" (2026-10-25/26) into a rule every pack must pass. Everything above stays; where it conflicts, this wins.
+  DLC RULE   a pack exists to ADD what ERAVOS did not have before it was installed. Each pack must bring at least one of:
+               NEW SOUNDS        sound sources nothing else has: drum recipes (3.74b), new oscillator / wavetable / partial banks,
+                                 samples, a new voice model for an existing instrument. Measured apart from everything already
+                                 installed (the 3.74b fingerprint test: ≥ 6 dB per feature from every other sound).
+               NEW CAPABILITIES  tools that did not exist: a new effect, instrument or component (Synthwave: Gated Reverb, FM Keys,
+                                 Ensemble Chorus, Vocoder, Brass section — the P74b.4 gaps), new pattern generators, new suite scenes.
+             Presets, kits, patterns and songs ride along inside a DLC (they show off what it adds), but a pack that is ONLY retuned
+             presets of tools everyone already has is not a DLC: the validator says so, and the store does not list it as one.
+  WHAT A DLC IS ON DISK  tools/<domain>/packs/<id>/ — dlc.json (schema eravos.dlc/1: id, label, version, art, blurb, adds: { sounds,
+             tools, presets, kits, patterns, songs, scenes }, needs: { packs, tools }) · sounds/ (recipes, banks, samples as data) ·
+             tools/ (each a normal tool folder: engine + ui + spec + tests + tool.json, its category from the catalog) · content/
+             (ContentPacks files with "pack": "<id>"). Tools inside a DLC exist in the catalog only while the DLC is installed.
+             This amends eravos.pack.format ("data, never code"): a CONTENT pack stays data only; a DLC may carry tools, and every
+             tool in it passes the same gates as a built-in tool (spec, tests, sovereign, boundary). Signed by its id + hash.
+  INSTALL LIKE DLC  a PACKS page (the store): one card per DLC with its art, what it adds in numbers ("Synthwave · 3 new tools · 22 new
+             drum sounds · 1 wavetable bank · 112 presets · 40 patterns · 6 songs"), a 20-second demo you can hear before installing
+             (rendered from the pack's own song), and Install / Uninstall. Installed → its tools appear in ＋ Add under their categories
+             with a small pack badge, its sounds in the instruments, its presets in the menus, its songs and patterns in their pages.
+             Uninstall → all of it leaves, and a project that used it says what is missing and offers to reinstall (Catalog.ensure).
+             The pack page of the first addendum (Tools by category · Sounds · Patterns · Songs · Suites · Missing · Build the rig) is
+             the DLC's own page once installed.
+  NEW PHASES (replace GP1–GP5; the first addendum's acceptance still applies)
+    DLC1 the DLC format (dlc.json, schema, validator with the DLC rule), install / uninstall with tools via the catalog, the pack
+         badge, Catalog.ensure for projects                                                                                  mapped
+    DLC2 the Packs store page: cards with art, numbers, a demo to hear, Install / Uninstall                                   mapped
+    DLC3 SYNTHWAVE DLC: its 22 drum sounds (3.74b) moved in, + NEW TOOLS Gated Reverb · FM Keys · Ensemble Chorus, + the 80s
+         presets and its patterns and songs; each new tool with its own tests                                                mapped
+    DLC4 one DLC per genre after it, each with its own new sounds and at least one new capability (Dubstep: e.g. a growl resynth;
+         Reggae: spring reverb + dub siren; Hip-hop: vinyl sampler + MPC swing; Jazz: brushes + upright bass; Orchestral: the
+         ensemble instruments of eravos.phase75-map G3)                                                                      mapped
+  ACCEPTANCE  every listed DLC passes the DLC rule (tested: it adds ≥ 1 sound measured apart, or ≥ 1 tool nothing else provides) ·
+             install → its tools spawn and sound, uninstall → none of it remains anywhere (tested) · a saved project that used a
+             DLC reopens after reinstall exactly as saved · works offline in the exe and the web build.

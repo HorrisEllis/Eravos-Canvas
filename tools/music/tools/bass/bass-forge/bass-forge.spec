@@ -107,3 +107,21 @@ dependencies:
   works_with: [eravos.sequencer, eravos.timeline, eravos.sub-engine, eravos.harmonic-analyzer, eravos.song-recorder, eravos.arp, eravos.bass-gen, eravos.chord-gen]
   notes:
     - MATCH analyses a clip you own (drop a bass sample on it) and steers its knobs towards it.
+
+# ---- 3.77 keepRange (default on): the note never under 25 Hz. (A 22 Hz output floor was tried and dropped: on asymmetric presets it raised the peak over full scale — Brostep Growl 1.13.)
+
+# ---- 1.1 (3.79) · feel, the LFO as a mod out, the match picture, motion, perform — map eravos.quality-and-tools-map T4
+# James, 2026-10-31: "bassline. bass forge, then drum forge"
+config FEEL (neutral by default — the same sound as 1.0, tested): talk 0…1 (each note sets how far the LFO moves: LFO gain × (1 − talk +
+  talk × min(1, 1.15 × velocity))) · velBright 0…1 (the low-pass detune at the note: velBright × (velocity − 0.6) × 3600 cents) · lfoPhase
+  0…1 (where in its shape the LFO starts on a note; the next note takes it — only a free LFO restarts at once) · lfoFree (notes do not
+  restart the LFO).
+ports: + lfo (mod out, the LFO 0…1 after talk: its movement can move other tools). stateExtra.match {target, feat, dist, f0, iter}; the
+  match ui event carries target (the reference's measures) and feat (the forge's best render's measures).
+perform: true → m1…m4, _motion, _perform.
+window: TALK — the LFO's last ~0.7 s as a live trace over its shape, rate ladder, five shape tiles, and six stage faders (FM, Fold, Vowel,
+  Comb, Notch, Cutoff) each with a meter lit by LFO × depth now; TONE — FM index large, fold, formant, cutoff, drive, sub, level; the keys.
+  Page tabs: Panel · Sound (a rack: Feel, Filter, Voice, Shape, Pitch) · Match (centre, noise, sub, air, wobble, depth — the reference
+  outlined beside the forge filled, the distance per try, drop a clip on it) · Motion · Perform. Window 620 × 600.
+acceptance (bass-forge.test.js, 6): neutral = 1.0 · talk: soft moves less, hard fully · vel → bright only when on · the LFO start (sine from
+  the bottom / middle / top) and free running · the lfo port and match's measures · performs

@@ -49,3 +49,21 @@ dependencies:
   works_with: [eravos.sequencer, eravos.midi-mapper, eravos.pads, eravos.dub-station, eravos.harmonic-analyzer, eravos.bass-drop-builder, eravos.song-recorder, eravos.timeline]
   notes:
     - Pads 1–16 = notes 36–51; the StarryPad plays it through MIDI Map.
+
+# ---- 1.1 (3.79) · layer lengths, the drawn pitch drop, a pad's filter, velocity → tone, motion, perform — map T3
+# James, 2026-10-31: "bassline. bass forge, then drum forge"
+pad fields (D, neutral by default — the same kit as 1.0, tested; an old saved kit gets them): curve 0…1 (0.5 = the exponential drop of 1.0;
+  else f0 × (f1/f0)^(x^k), k = 2^((curve − 0.5) × 4): low falls fast then settles, high holds then falls — kick, 808, tom, zap, impact) ·
+  nlen 0.1…4 (the noise layer's length: snare, tom, impact) · clen 0.1…4 (the click layer's: kick snap and tick, snare snap, impact crack)
+  · filter −1…1 (below 0 a low-pass at 20 kHz × 2^(9f), above 0 a high-pass at 20 Hz × 2^(9f); none at 0).
+RANGE: every pad field is held to its range on slot_edit (it was not).
+config: velTone 0…1 (kit) — tone + velTone × (velocity − 0.7) × 1.2, and a low-pass at 20 kHz × 2^(−5 × velTone × (1 − velocity)) on
+  softer hits; the pad filter chains after it.
+perform: true → m1…m4, _motion, _perform. stateExtra.range.
+window: PADS — 4 × 4 square pads lit by each hit, beside the chosen pad (name, voice, wave, ▶ / WAV / send) and the kit's knobs (room,
+  volume, vel → tone); SOUND — the chosen pad's tune, decay (large), pitch drop, tone, noise, snap, drive, level. Knobs are made once and
+  set to the chosen pad. Page tabs: Panel · Layers (pad picker; the pitch drop drawn — drag the start = how far, the end = how long, the
+  middle = how it bends; body / noise / click lengths; filter, FM, room send, pan, choke) · Mix (a strip per pad: level fader, hit meter,
+  pan, room, choke; click a name to hear it) · Motion · Perform. Window 600 × 570.
+acceptance (drum-forge.test.js, 5): neutral = 1.0, old kits get defaults · the drop curve (fast / hold, the same end) · noise length, the
+  pad filter (high-pass takes the low end, low-pass darkens) · ranges held; velocity → tone only when on, and with the pad filter on · performs

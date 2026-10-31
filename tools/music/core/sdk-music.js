@@ -45,6 +45,19 @@
     // none 0 · 2x 128 · 4x 192 — at every sample rate). Parallel paths and note timing must account for it.
     OS_SAMPLES: { none: 0, '2x': 128, '4x': 192 },
     osLatency(ac, mode) { return (dsp.OS_SAMPLES[mode] || 0) / ac.sampleRate; },
+    // 3.77 KEEP IN RANGE (the sound audit: Wobble Bass, Reese, Bass Forge, Wub Sub, Wub Osc, Xen Synth put much of their energy under
+    // 25 Hz on a bass note — under hearing, as Deep Sub did): a frequency under lo (30 Hz) is lifted by whole octaves until it is not
+    keepRange(f, lo) { lo = lo || 30; let x = +f || 0; if (x <= 0) return x; for (let i = 0; i < 6 && x < lo; i++) x *= 2; return x; },
+    // 3.77 HEADROOM (the sound audit: a plain chord took Supersaw and Morph Osc +2.5 / +3 dB over full scale): exactly unity up to
+    // −3 dBFS, then a smooth knee that never passes 0.98 — normal notes are untouched, only peaks are rounded. No latency (no oversampling:
+    // it only acts on the rare peak, where a 2nd-order knee adds little).
+    headroom(ac) {
+      const n = 4097, c = new Float32Array(n), T = 0.708, top = 0.98;
+      for (let i = 0; i < n; i++) { const x = (i / (n - 1)) * 4 - 2, a = Math.abs(x); c[i] = Math.sign(x) * (a <= T ? a : T + (top - T) * Math.tanh((a - T) / (top - T))); }
+      const ws = ac.createWaveShaper(); ws.curve = c; ws.oversample = 'none';
+      const pre = ac.createGain(), post = ac.createGain(); pre.gain.value = 0.5; post.gain.value = 1; pre.connect(ws); ws.connect(post);   // the curve reads ±2 (pre halves it) and writes the real value
+      return { input: pre, output: post, nodes: [pre, ws, post] };
+    },
     mulberry32(seed) {
       let a = seed >>> 0;
       return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
@@ -285,7 +298,9 @@ registerProcessor('eravos-pitch', EravosPitch);`;
   }
   if (global.OrganismFactory) global.OrganismFactory.onDefine((d) => {
     if (d.domain !== 'music' || d._knobInputs) return;
-    if (d.perform && global.MusicMotion) global.MusicMotion.augment(d);   // 3.71 the macro knobs + the motion/perform settings, before the knob inputs
+    if (d.perform && global.MusicMotion) global.MusicMotion.augment(d);
+    // 3.77 each tool's own reactive colours (its ⚙ → Reactive colours): follow the app, or its own mode / amount / colours — saved with it
+    if (!(d.config || []).some(c => c.key === '_react')) { d.config = d.config || []; d.config.push({ key: '_react', type: 'object', default: { mode: 'follow' }, hidden: true, label: 'Reactive colours' }); }   // 3.71 the macro knobs + the motion/perform settings, before the knob inputs
     const perms = d.permissions || [];
     if (!perms.includes('audio_out') && !perms.includes('audio_in')) { d._knobInputs = []; return; }
     const keys = knobKeys(d), have = new Set((d.hooks || []).map(h => h.hook_id));

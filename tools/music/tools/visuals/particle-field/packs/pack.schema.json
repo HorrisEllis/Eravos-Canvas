@@ -108,7 +108,8 @@
                           "webgl",
                           "2d"
                         ]
-                      }
+                      },
+                      "_react": {}
                     },
                     "additionalProperties": false
                   },

@@ -90,6 +90,7 @@
                         "maximum": 8
                       },
                       "custom": {},
+                      "_react": {},
                       "tempoX": {
                         "enum": [
                           "¼",

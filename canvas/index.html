@@ -146,6 +146,8 @@
     const activeDomains = new Set(X.active().map(id => (X.mode_(id) || {}).domain));
     const visible = (r) => { const ms = X.recipeModes(r); return !ms.length || ms.some(m => X.isActive(m) || activeDomains.has((X.mode_(m) || {}).domain)); };
     const featured = Recipes.featured().filter(visible);
+    // 3.81 a featured recipe may bring a picture (an SVG it ships as data); else its icon
+    const heroPic = (r) => { if (typeof r.featured.art === 'string' && /^<svg[\s>]/.test(r.featured.art)) { const d = h('div', { class: 'big art' }); d.innerHTML = r.featured.art; return d; } return h('div', { class: 'big', text: r.featured.icon || r.icon || '✦' }); };
     const card = (r) => h('div', { class: 'card', style: { '--acc': r.accent || '#00d4ff' }, onclick: () => start(r.id) }, [h('b', { text: (r.icon || '') + ' ' + r.label }), h('small', { text: r.tagline || '' })]);
     const listed = Recipes.list().filter(r => !r.featured && !r.hidden && visible(r));
     const cards = listed.filter(r => !r.section).map(card);
@@ -170,7 +172,7 @@
       h('p', { class: 'sub', text: X.active().length ? brand.tagline : 'A blank canvas. Pick what you are making — or start empty and add any tool from any domain; it turns on only what it needs.' }),
       ...(modeCards.length ? [h('div', { class: 'boot-sec', text: 'WHAT ARE YOU MAKING?' }), h('div', { class: 'grid modes domains' }, modeCards)] : []),
       ...(moreCards.length ? [h('div', { class: 'boot-sec', text: 'MORE MODES' }), h('div', { class: 'grid modes' }, moreCards)] : []),
-      ...featured.map(r => h('div', { class: 'hero-card', onclick: () => start(r.id) }, [h('div', { class: 'big', text: r.featured.icon || r.icon || '✦' }), h('div', {}, [h('h2', { text: r.featured.title || r.label }), h('p', { text: r.featured.text || r.tagline || '' })])])),
+      ...(featured.length ? [h('div', { class: 'hero-row' }, featured.map(r => h('div', { class: 'hero-card', role: 'button', tabindex: '0', onclick: () => start(r.id), onkeydown: (e) => { if (e.key === 'Enter') e.currentTarget.click(); } }, [heroPic(r), h('div', {}, [h('h2', { text: r.featured.title || r.label }), h('p', { text: r.featured.text || r.tagline || '' })]), h('span', { class: 'hero-go', text: 'Start ▸' })])))] : []),
       ...sectionEls,
       ...(OrganismFactory.defined().length ? [] : [h('div', { class: 'hero-card', style: { cursor: 'default' } }, [h('div', { class: 'big', text: '⧉' }), h('div', {}, [h('h2', { text: 'This canvas has no tools yet' }), h('p', { text: window.ERAVOS_DESKTOP ? 'Drop a pack (.zip) onto the canvas, or put it in ERAVOS Library › Packs and it loads every start. 📁 Library opens the folder.' : 'Drop a pack (.zip) anywhere onto the canvas to add its tools.' })])])]),
       ...(cards.length || X.active().length ? [h('div', { class: 'boot-sec', text: 'START FROM' })] : []),

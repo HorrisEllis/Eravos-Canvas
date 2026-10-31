@@ -26,7 +26,7 @@
       "asym": 0,
       "autoGain": true,
       "tight": 40,
-      "lowKeep": 0,
+      "lowKeep": 100,
       "alias": 0.3,
       "dither": true,
       "autoTame": 0.5
@@ -44,7 +44,7 @@
       "asym": 0.15,
       "autoGain": true,
       "tight": 40,
-      "lowKeep": 0,
+      "lowKeep": 100,
       "alias": 0.35,
       "dither": false,
       "autoTame": 0.5

@@ -219,17 +219,26 @@
     let live = 0, peak = 0, flash = 0, tone = 0.5; const reduce = global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let an = null; try { an = view.tap(o.port || 'out', 2048); } catch (e) {}
     const buf = an ? new Float32Array(an.fftSize) : null, fbuf = an ? new Uint8Array(an.frequencyBinCount) : null;
-    const set = () => { el.style.setProperty('--live', live.toFixed(3)); el.style.setProperty('--peak', peak.toFixed(3)); el.style.setProperty('--flash', flash.toFixed(3)); el.style.setProperty('--tone', tone.toFixed(3)); el.style.setProperty('--acc2', `hsl(${(hue0 + (tone - 0.5) * 120 + 360) % 360} 90% 65%)`); };
+    // 3.77 it follows ⋯ Options → Reactive colours: Off stops it (all at rest), Static keeps the second colour on the tool's own hue,
+    // Changing turns it with the sound's brightness (as it always did), Custom takes your Top colour
+    const RC = () => global.SoundCSS || null, mode = () => (RC() ? RC().mode : 'static');
+    const acc2 = () => { const m = mode(); return m === 'changing' ? `hsl(${(hue0 + (tone - 0.5) * 120 + 360) % 360} 90% 65%)` : m === 'custom' ? RC().colors.high : `hsl(${hue0} 90% 65%)`; };
+    let rest = false;
+    const set = () => { el.style.setProperty('--live', live.toFixed(3)); el.style.setProperty('--peak', peak.toFixed(3)); el.style.setProperty('--flash', flash.toFixed(3)); el.style.setProperty('--tone', tone.toFixed(3)); el.style.setProperty('--acc2', acc2()); };
     const hit = (amt) => { flash = Math.min(1, flash + (typeof amt === 'number' ? amt : 0.8)); if (reduce) set(); };
     (o.events || []).forEach(ev => view.on(ev, (p) => hit(p && typeof p.velocity === 'number' ? 0.4 + 0.6 * p.velocity : 0.85)));
     set(); if (reduce) return { hit };
     loop(el, () => {
+      if (mode() === 'off') { if (!rest) { live = peak = flash = 0; set(); rest = true; } return; }   // off is off: at rest, nothing measured
+      rest = false;
       if (an) {
         an.getFloatTimeDomainData(buf); let sq = 0, pk = 0; for (let i = 0; i < buf.length; i++) { const x = buf[i]; sq += x * x; const a = x < 0 ? -x : x; if (a > pk) pk = a; }
         const l = Math.min(1, Math.sqrt(sq / buf.length) * 4); live += (l - live) * (l > live ? 0.35 : 0.08); peak = Math.max(pk > 0.02 ? Math.min(1, pk * 1.4) : 0, peak * 0.86);
         if (live > 0.02) { an.getByteFrequencyData(fbuf); let w = 0, t = 0; for (let i = 2; i < fbuf.length; i++) { w += fbuf[i]; t += fbuf[i] * i; } if (w) tone += ((Math.log2(1 + t / w) / Math.log2(fbuf.length)) - tone) * 0.1; }
       }
-      flash *= 0.9; if (flash < 0.004) flash = 0; set();
+      flash *= 0.9; if (flash < 0.004) flash = 0;
+      if (live < 0.003 && peak < 0.003 && !flash) { if (!el._aliveQuiet) { live = peak = 0; set(); el._aliveQuiet = true; } return; }   // silence: set once, then rest
+      el._aliveQuiet = false; set();
     }, 30);
     return { hit };
   }

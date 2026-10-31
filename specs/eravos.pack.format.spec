@@ -504,3 +504,14 @@ example_drum_machine_zip:
 #   A dropped .zip pack carrying recipes is UNTESTED: no test drops one; whether its data file runs after core/drum-recipes.js is
 #   not proven — open, P74b.5.
 # ============================================================
+
+# ============================================================
+# ADDENDUM 3.76 (2026-10-30) — one tool = one zip with everything it is and uses
+#   His words: "each tool is supposed to be bundled with its dag, tool file, ui and packs, anything that tool uses and has, is its own zip."
+#   desktop/packs.mjs toolZip(): the whole tool folder (tool.json, engine, ui, styles, spec, tests, every pack + pack.schema.json, pictures)
+#   + <tool>/dag.json (schema eravos.tool-dag/1): { tool, version, needs {packs: [eravos.music], units, tools, permissions}, hooks {in, out}
+#   (read from the engine), works_with, conflicts, load_order, packs [{id, label, version, presets}], files [{path, role, bytes, sha256}] }.
+#   manifest.contents adds dag (a string) and files (an array) — neither is run: intake runs only .js listed in object maps (engine, ui,
+#   packs loader). `node desktop/packs.mjs --tool <id>[,<id>] --out <dir>` builds just those zips.
+#   Verified: a bare canvas + Music 0 - Core.zip + Music · Deep Sub.zip installs with no fault. Open: installing the Core zip raises
+#   "Failed to construct 'URL': Invalid URL" from one core script evaluated from a blob (pre-existing) — Q7 in eravos.quality-and-tools-map.spec.

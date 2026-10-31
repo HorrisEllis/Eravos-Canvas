@@ -69,3 +69,14 @@ select.tlpr-toolsel, .tlpr-toolsel select { font-weight: 600; color: var(--tool-
 .tlpr-curve { display: block; width: 100%; height: 96px; border-radius: 8px; border: 1px solid #1c2c3c; cursor: crosshair; touch-action: none; }
 .tlpr-brow { padding: 6px 8px; border-radius: 8px; background: rgba(255,255,255,.025); border: 1px solid #1c2c3c; }
 .tlpr-blabel { font-size: 15px; color: #ffd24a; align-self: center; }
+
+/* 3.76 ♪ patterns per tool (timeline.ui.js patPanel) — the app's tokens, one kind and five patterns at a time */
+.tl-patp { position: fixed; z-index: 160000; width: 360px; background: var(--panel, #0d1520); border: 1px solid var(--line2, #243048); border-radius: 10px; padding: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.55); display: flex; flex-direction: column; gap: 8px; font: 12px var(--font); color: var(--text, #e6eefc); }
+.tl-patp-head { display: flex; align-items: center; justify-content: space-between; } .tl-patp-head b { font-size: 12.5px; color: #5cffb0; }
+.tl-patp-kinds { display: flex; gap: 4px; flex-wrap: wrap; } .tl-patp-kinds .uk-toggle { font-size: 11px; padding: 2px 8px; }
+.tl-patp-about { margin: 0; color: var(--dim, #8aa0b8); line-height: 1.4; } .tl-patp-note { margin: 0; color: #ffd166; font-size: 11px; }
+.tl-patp-row { display: grid; grid-template-columns: 110px 1fr auto auto; gap: 6px; align-items: center; }
+.tl-patp-pic { width: 110px; height: 28px; border-radius: 4px; display: block; }
+.tl-patp-txt { display: flex; flex-direction: column; min-width: 0; } .tl-patp-txt span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .tl-patp-txt small { color: var(--dim, #8aa0b8); font-size: 10.5px; }
+.tl-patp-foot { display: flex; align-items: center; justify-content: space-between; } .tl-patp-said { color: var(--dim, #8aa0b8); font-size: 11px; }
+.tl-patp-genre { width: 100%; font-size: 11.5px; } .tl-patp-g { font: 700 10px var(--mono, monospace); letter-spacing: 1.2px; text-transform: uppercase; color: var(--dim, #8aa0b8); margin-top: 2px; }

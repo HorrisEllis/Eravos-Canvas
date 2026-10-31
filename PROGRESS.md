@@ -2,12 +2,130 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Mapped — packs as DLC (2026-10-31)
+His words: "i want sound packs to be like dlc in a way. each pack adds new sounds or capabilities." specs/eravos.genre-packs.spec
+addendum: a DLC must add new sounds (measured apart) or new tools; presets only ride along. On disk tools/<domain>/packs/<id>/ with
+dlc.json, sounds/, tools/, content/; a Packs store page with art, numbers, a demo and Install / Uninstall. Phases DLC1–DLC4, Synthwave
+first (its drum sounds + new Gated Reverb, FM Keys, Ensemble Chorus). Nothing built.
+
 ## Mapped — themes, honestly · genre packs across tools (2026-10-26)
 His words: "okay, what happened to theme? also all the packs were supposed to be additive, like synthwave in relation to the tools.
 like find all tools for it. bass tools. synthesis. etc". Theme: P69.1 was never built, and the look kit (5697b50, 95614cb, merged in
 PR #48) changed the default look directly, against the theme rule. specs/eravos.themes.spec addendum: three themes (Classic = the look
 before the kit, Studio = the kit, v10), default his call. Packs: specs/eravos.genre-packs.spec: a genre pack is one id adding to every
 tool that fits, with a page listing its tools by category, its sounds, patterns, songs, suites, the missing tools, and Build the rig.
+
+## Done — 3.81 The featured songs' pictures: small paintings, not emoji (2026-10-31)
+Asked: "the icons look cheap and childish. make them beautiful and creative, rpg, starry night, bob ross, star gazin".
+tools/music/data/featured-art.js (window.FeaturedArt, SVG, loaded before recipes.js): "Make a song for her" — a starry night with Van
+Gogh swirls, a heart in the stars, a haloed crescent moon, layered mountains with snow caps and happy little trees, two on a hill with a
+telescope; "Future Bass song" — dawn over a still lake, the last stars, the music as an aurora, the sun's path on the water, reeds on
+the shore. Unframed, soft corners (a gilded frame was tried and taken off — asked). Start is a round pill in the dawn colours. Stars twinkle, the swirls and aurora flow, the lake shimmers (still for
+reduced motion). A featured recipe may now carry `art` (an SVG string); the Start screen shows it in place of the icon. The two cards
+stack one per row unless the screen is wide enough for both.
+
+## Done — 3.80 Reactive colours on every surface · the featured songs in Vagal's colours (2026-10-31)
+Asked: "the themes aren't working … i love what's in the menu, but nothing in the actual theme changes, and it's supposed to be all the
+colors in the canvas, tools, ui, anywhere" · "remake those pink sections" (Vagal colours).
+- Found: the modes worked, but only on accents and on a tool's own sound; the Emerge canvas in the screenshot was silent (no clip in its
+  Sample Player), so nothing moved. Now the surfaces react with the mix too: background, canvas grid, panels, every tool's chassis and
+  wells, lines and dim text lean toward the mode's colour of the moment, each by its own share, and come back exactly in silence / Off.
+  The canvas dots got a token (--grid, same colour). Test in p77. Spec: eravos.themes addendum.
+- Start: the two featured song cards rebuilt in Vagal's violet in the device look — side by side, icon in a well, a Start pill, a
+  breathing glow that also follows the sound.
+
+## Done — 3.79 Bassline, Bass Forge and Drum Forge the Groove way (2026-10-31)
+Asked: "bassline. bass forge, then drum forge" — map T1, T4, T3 (specs/eravos.quality-and-tools-map.spec). Each: perform: true (Motion +
+Perform tabs), its window rebuilt in the look kit, deeper controls on its page, defaults that sound / play exactly as before (tested).
+- Bassline 1.1: slides with a chance, ghost notes, octave jumps, movement (the fifth, a step toward the next chord), humanize, accent,
+  follow, seed; a 16-step lane (level, octave, slide per step) on its Steps tab; the window's LINE screen draws the last two bars as played.
+- Bass Forge 1.1: talk (velocity → how far the LFO moves), velocity → brightness, LFO start phase, free-running LFO; the LFO is a mod out;
+  the window's TALK: a live trace of the LFO and six stage faders with meters lit by what the LFO does now; Sound rack and Match tab
+  (the reference against the forge, measure by measure, and the distance per try).
+- Drum Forge 1.1: per pad a drawn pitch drop (drag start / end / bend), noise and click lengths, its own filter; the kit's velocity → tone;
+  pad edits held to their ranges (they were not); Layers and Mix (a strip per pad) tabs; knobs made once and set to the chosen pad.
+- Found and fixed on the way: Bass Forge restarted its LFO when the start phase was set (now only a free LFO does); the drum pad filter
+  is chained after the velocity low-pass (a test holds both on).
+Tests: bass-gen 6, bass-forge 6, drum-forge 5 new. Specs: an addendum in each tool's .spec; the map marks T1, T3, T4 built.
+
+## Mapped — what is left of the motion / look / reactive / sound-quality line (2026-10-30)
+His words: "merge and push, then map the rest. make sure you update and add addendums to the specs." Map: specs/eravos.quality-and-tools-map.spec
+(no release number — IDs that take the next free number when built, since the two sessions' numbers collide): Q sound quality (Q1 Wub
+Filter intermodulation · Q2 CPU of Pad Forge, Gothic Organ, Xen, Partials, Coven, Morph Osc, Retro Poly · Q3 tails · Q4 Channel DC · Q5 the
+sound audit as a test gate · Q6 the borderline p74b test · Q7 the Core zip URL) · T the other eleven tools the Groove way (Bassline, Chords,
+Drum Forge, Bass Forge, FX Box, Drop Builder, Sidechain, EQ, Breath, Embodiment, Recursive Spectra, Automation) · R reactive leftovers ·
+P packaging · D his decisions. Spec addenda: motion, tool-pages, themes, pack.format, performance, p42-tool-audio, pattern-library, codecs,
+songbook-genres, phasemap. tests/p77: the per-tool Changing test plays a clap (bright and loud) — it was flaky with a quiet hat.
+
+## Done — 3.78 Merge of 3.77 reactive modes with 3.76 · the same look at 2.3× the frame rate (2026-10-30)
+His words: "merge and push." (main-37 zip = GitHub main 789bced, byte for byte.) Both sessions had rebuilt reactive colours. Kept: 3.77's
+Off · Static · Changing · Custom and its panel (his request, newer). Dropped: 3.76's Calm / Full modes and glow layer.
+- **Still laggy, measured** (build/perf-ui.mjs, Dubstep #77 playing, 8 windows): 3.77 Static 15.5 fps, Changing 13.2 fps, Off 57.8.
+  Every write of a colour variable restyles what is under it; three kinds were written 30×/s (page palette, window level, element colours).
+  Removing any ONE left it slow; all three made 55 fps.
+- **Now, same look**: the sound is still read 30×/s, colours are written on one frame per 80 ms; a value is written only when it moves a
+  visible step (5 %); the page palette at most 10×/s; every window read before any is written. Static 35.8 fps · Changing 34.2 · Off 55.3.
+  Outside the loop (liveAcc, restoreAcc, setMode, silence) writes are never skipped.
+- Mistake on the way, caught by tests/p77: a comment placed mid-line silenced every element's colour inside windows. Fixed before commit.
+- Tests: P77, P58, P73, P48, P76, P23, P71, boundary pass.
+
+## Done — 3.77 Destroyer 2.1 · Reactive colours: modes, a real panel, per tool · a sound audit of every tool (2026-10-30)
+His words: "DESTROYER needs refinement. its too deep … sounds like a blown speaker. also needs performance optimization" · "the inside of the
+tools are supposed to react … have options for the reactive color, like changing, the way it is now lets call it static, and a way to
+customize. also the option needs to work, it does nothing, when trying to disable" · "that panel, do it right this time" · "can you run tests
+like that on all of them" · "give each tool the ability to adjust it … in the settings for each tool" · "the changing syncs all colors".
+- **Destroyer 2.1**, measured with a loud 50 Hz + a quiet 1 kHz (what the bass does to the music): default −1.6 → −49 dB; presets −6 → −30,
+  −14 → −63, −3 → −28 … The sub went through the shaper; now Low keep is on by default (100 Hz) and Tight 40 Hz, and every shipped preset
+  keeps the sub clean except Total Destruction. The sub is as deep as dry. Stages that change nothing are out of the path (the crusher and
+  its filters at 16 bits, the crossover with Low keep off, flat shelves): ~11 % less work. Its scope draws in the live colour and rests in
+  silence.
+- **Reactive colours**: Off · Static · Changing · Custom + Amount + your three colours (low end, top, hits) and palettes. Off was undone by
+  an older layer (UI.alive, 6 tools) that never asked — it obeys now. Every colour inside a window reacts (any inline colour: a pad's --pc,
+  a strip's colour …), drawn displays too. Changing is per tool: each turns by ITS own spectrum, hits and drift (a sub and drums no longer
+  move together). The panel (core/react-panel.js): mode cards with live previews of the real colour code, a wide Amount, swatches and
+  palettes; in ⋯ Options and in every tool's ⚙ settings (Follow the app, or its own — saved with the tool, it wins over the app's, even Off).
+- **Sound audit** (build/sound-audit.mjs → docs/sound-audit.md): all 45 sound tools — effects: intermodulation, level change, DC, peak,
+  CPU; instruments: peak, DC, energy under hearing, release tail, CPU. Fixed from it: Supersaw and Morph Osc clipped on a chord (+2.5 / +3
+  dBFS) → a shared headroom stage (unity under −3 dBFS); Xen Synth (−0.2 dB: almost all its energy under 20 Hz) and Reese (−11 dB) → Keep in
+  range; the same switch on Wobble Bass, Bass Forge, Wub Sub, Wub Osc. Still flagged, next: heavy CPU (Pad Forge, Xen,
+  Gothic Organ, Partials, Coven, Morph Osc), long release tails (Pad Forge, Gothic Organ, Xen), Wub Filter intermodulation, Channel DC.
+- Tests: Destroyer (3), p77 reactive modes (6), Wobble Bass / Reese keep-in-range.
+
+## Done — 3.76 Deep Sub: the sub you can hear · one tool = one complete zip (2026-10-30)
+His words: "push and commit and then give me the replacement. you know each tool is supposed to be bundled with its dag, tool file,
+ui and packs, anything that tool uses and has, is its own zip."
+- **Measured:** Deep Sub plays Octave −2 by default; on the notes the songs write its fundamental sat at 8–25 Hz in 53 of the 54 genres
+  that use it, and its own Floor (24 Hz high-pass) cut that out — only the phantom harmonics were heard.
+- **Deep Sub 1.1, Keep in range** (on by default): a note that would land under the floor is lifted by whole octaves to 30–60 Hz. Same note
+  names, same line; off = 1.0 exactly. A1 in a song now sounds at 55 Hz (was 13.75 Hz, filtered away).
+- **One tool = one zip, everything in it** (desktop/packs.mjs): the whole tool folder (tool.json, engine, ui, styles, spec, tests, every
+  pack + its schema, pictures) and dag.json — the tool as a node: needs (core pack, units, tools, permissions), hooks in/out, works-with,
+  load order, packs, every file with role + SHA-256. Only the engine/ui/packs scripts run on install; the rest travels with it.
+  `node desktop/packs.mjs --tool eravos.sub-engine --out <dir>` builds just that tool. Checked: a bare canvas + Core zip + Deep Sub zip
+  installs with no fault (v1.1.0, 14 presets, A1 → 55 Hz).
+- Found, not fixed: installing the Core zip raises "Failed to construct 'URL'" from one core script evaluated from a blob (pre-existing).
+## Done — 3.77b ♪ patterns sorted by genre · Mapped — notes: first song, his language's tools, mutation (2026-10-30)
+His words: "Just need you to take notes." · "Can we have them sorted by genre." · "I have a coding language made, and would love a full tool
+set for it." · "what if they could mutate?" · "My first song I made with it."
+- **Done**: the ♪ patterns panel lists A–Z by genre with headings, and a genre picker. tests/p76 (extended).
+- **Notes** (specs/eravos.2026-10-30-notes.map.spec): his first song "Today's going to ripple." measured (≈143.6 BPM, A minor, −12 LUFS,
+  build → drop → floor-falls break → build → drop, twice); a tool set for his language (waiting on: which language, its grammar);
+  mutation as interactive evolution on patterns (the kernel's ledger + constraints already exist). Nothing else built.
+
+## Done — 3.76 ♪ Patterns per tool on the Timeline · Calm reactive colours (2026-10-30)
+His words: "I need patterns per tool for the timeline. I want it to be easier to make and understand music … I get overwhelmed by too much
+information or clutter. It's also laggy. I don't know why the ui keeps changing. It used to be nicer."
+- **♪ patterns** on every instrument track (first after M · S): what fits that track's tool, one kind at a time with one line on what the
+  kind is, five patterns (genres take turns), ▶ hear (off the canvas), ＋ add (after this track's last clip, in the song's key), ↻ five others.
+  A tool with none of its own gets the kinds it can play, from other tools, and says so. PatternLibrary.forTool · send({ lane }).
+- **The lag, measured** (build/perf-ui.mjs: Dubstep #77 playing, 8 windows, headless Chromium, 2 cores):
+  reactive colours as they were: 15 fps, 91 of 92 frames slow, style recalc 5.08 s · off: 57 fps, 0.14 s.
+  Cause: the palette and --snd-* written on <html> 30× a second restyle every element; window visibility read after style writes.
+- **Superseded by 3.78** (Calm / Full removed in the merge; 3.77's modes kept, made faster). Was: ⋯ Options › Reactive colours cycles off · calm (default) · full. Calm: one glow layer per sounding window, moved by opacity only
+  (compositor) = 55 fps. Full = the 3.73 look, unchanged (reads batched before writes). SoundCSS.set(true) still means full.
+- **"The ui keeps changing"**: the colours pulsed with the music (calm stops that), and ~600 colours in CSS + ~1000 in tool JS are
+  hard-coded, so restyles leak. Theme previews (7 looks × first screen, canvas, ＋ Add, tool page) rendered from the real app for his pick.
+- Tests: tests/p76-patterns-per-tool.test.js (2); P23, P48, P58, P71, P73, boundary pass.
 
 ## Mapped — 3.75 Voice · Audio in/out · Suites as control surface · Genres that contrast EDM (2026-10-25)
 His words: "t-pain like full autotune … production quality" · "Suites are supposed to be like the main control panel" · "no each

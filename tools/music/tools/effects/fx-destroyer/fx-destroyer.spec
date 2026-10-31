@@ -52,3 +52,5 @@ dependencies:
     - slot.after.send (audio · port slot.after.send)
   permissions: [audio_out, audio_in, bus_publish, bus_subscribe]
   works_with: []
+
+# ---- 2.1 (3.77): Low keep 100 Hz and Tight 40 Hz by default (intermodulation of a 50 Hz + 1 kHz: −1.6 → −49 dB); presets keep the sub clean except Total Destruction; idle stages routed out (ctx.routing()); scope in the live colour, idle in silence.

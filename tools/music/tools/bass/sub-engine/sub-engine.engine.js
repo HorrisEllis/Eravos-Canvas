@@ -1,13 +1,17 @@
-/* eravos.sub-engine 1.0.0 — Deep Sub · spec eravos.organism.sub-engine
+/* eravos.sub-engine 1.1.0 — Deep Sub · spec eravos.organism.sub-engine
  * Bass you feel AND hear. A clean mono sub (sine ↔ triangle ↔ rounded square) with an 808 pitch-drop envelope and
  * legato glide, kept pure below; above it, PHANTOM harmonics: the sub is folded into its 2nd–5th harmonics and
  * band-limited to 90–600 Hz, so the ear rebuilds the missing fundamental on phones and laptop speakers
- * (psychoacoustic bass). Transient click for definition, warm drive on a separate band, infrasonic floor + DC block. */
+ * (psychoacoustic bass). Transient click for definition, warm drive on a separate band, infrasonic floor + DC block.
+ * 1.1 (3.76): KEEP IN RANGE. Measured on main: Octave −2 on the notes the songs write put the fundamental at 8–25 Hz in 53 of
+ * the 54 genres that play this tool — under hearing, and under this tool's own Floor (24 Hz), which cut it. A note that would
+ * land under the floor is lifted by whole octaves until it sits at 30–60 Hz (the sub you hear and feel). The note keeps its
+ * name; the line keeps its shape. Off = 1.0 (the note exactly where Octave puts it). */
 (function () {
   'use strict';
   const S = OrganismSDK.STD;
   OrganismFactory.define({
-    id: 'eravos.sub-engine', preview: 'bass', domain: 'music', version: '1.0.0', label: 'Deep Sub', icon: '◉', accent: '#7a5cff', phase: 'P14',
+    id: 'eravos.sub-engine', preview: 'bass', domain: 'music', version: '1.1.0', label: 'Deep Sub', icon: '◉', accent: '#7a5cff', phase: 'P14',
     category: 'Bass', blurb: 'The deepest bass: pure mono sub, 808 drops and slides, plus phantom harmonics so it is heard even on a phone.',
     size: { w: 520, h: 520 }, minSize: { w: 420, h: 400 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
@@ -18,6 +22,7 @@
       { key: 'shape', type: 'number', default: 0.15, min: 0, max: 1, step: 0.01, label: 'Shape', group: 'SUB', hint: '0 sine · 0.5 triangle · 1 rounded square' },
       { key: 'octave', type: 'integer', default: -2, min: -4, max: 1, label: 'Octave', group: 'SUB' },
       { key: 'floor', type: 'number', default: 24, min: 12, max: 45, step: 1, unit: 'Hz', label: 'Floor', group: 'SUB', hint: 'infrasonic cut — protects speakers' },
+      { key: 'keepRange', type: 'boolean', default: true, label: 'Keep in range', group: 'SUB', hint: 'a note that would fall under the floor is lifted by octaves to 30–60 Hz — the sub you can hear' },
       { key: 'drop', type: 'number', default: 0, min: 0, max: 36, step: 0.5, unit: 'st', label: 'Drop', group: 'PITCH', hint: '808 punch: start this far above and fall' },
       { key: 'dropTime', type: 'number', default: 0.06, min: 0.005, max: 2, step: 0.001, unit: 's', label: 'Drop time', group: 'PITCH' },
       { key: 'glide', type: 'number', default: 0.08, min: 0, max: 1.5, step: 0.001, unit: 's', label: 'Glide', group: 'PITCH', hint: 'legato notes slide (808 slides)' },
@@ -72,6 +77,14 @@
       }
       ['shape', 'drive', 'phantom', 'floor', 'tone', 'level'].forEach(k => P.onChange(k, apply)); apply();
       let held = null, curF = 55;
+      // where a note sounds: Octave, then (Keep in range) lifted by whole octaves until it is over the floor — 30–60 Hz
+      const lowest = () => Math.max(30, P.get('floor') + 6);
+      function subHz(note) {
+        let f = MT.hz(Math.max(0, note + 12 * P.get('octave')));
+        if (P.get('keepRange') !== false) { const lo = lowest(); for (let i = 0; i < 6 && f < lo; i++) f *= 2; }
+        return f;
+      }
+      ctx.subHz = subHz;
       function setF(f, t, glide, drop) {
         const oscs = [sine, tri, sq];
         oscs.forEach(o => { o.frequency.cancelScheduledValues(t); });
@@ -83,7 +96,7 @@
       }
       function noteOn(note, vel, t, dur) {
         t = Math.max(t || ac.currentTime, ac.currentTime);
-        const f = MT.hz(Math.max(0, note + 12 * P.get('octave')));
+        const f = subHz(note);
         const legato = held && held.off > t - 1e-4;
         setF(f, t, legato ? P.get('glide') : 0, legato ? 0 : P.get('drop'));
         // 3.53 legato: the note this one glides out of booked its release for ITS end, inside this note — unbook it (hold here,

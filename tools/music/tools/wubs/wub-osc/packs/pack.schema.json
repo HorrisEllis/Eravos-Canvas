@@ -28,6 +28,9 @@
                           "hollow"
                         ]
                       },
+                      "keepRange": {
+                        "type": "boolean"
+                      },
                       "octave": {
                         "type": "integer",
                         "minimum": -4,
@@ -108,7 +111,8 @@
                         "minimum": 0,
                         "maximum": 1.5
                       },
-                      "mods": {}
+                      "mods": {},
+                      "_react": {}
                     },
                     "additionalProperties": false
                   },

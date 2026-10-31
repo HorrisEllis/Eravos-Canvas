@@ -69,7 +69,8 @@
                         "type": "number",
                         "minimum": -12,
                         "maximum": 12
-                      }
+                      },
+                      "_react": {}
                     },
                     "additionalProperties": false
                   },
