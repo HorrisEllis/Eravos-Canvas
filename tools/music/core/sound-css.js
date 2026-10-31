@@ -18,7 +18,12 @@
  * drift while it plays) · Custom (three colours you pick — low end, top, hits — and every colour leans toward them with the sound).
  * AMOUNT: how far. EVERY colour a window carries reacts — not only its accent: any inline colour variable on any element in it
  * (a pad's --pc, a drum strip's --acc, a macro's colour …), and drawn displays (Changing turns their hues too). Off is off
- * everywhere, the older living-accent layer (UI.alive) included. */
+ * everywhere, the older living-accent layer (UI.alive) included.
+ * 3.80 "i love what's in the menu, but nothing in the actual theme changes, and it's supposed to be all the colors in the canvas,
+ * tools, ui, anywhere": the SURFACES react too — the page and canvas background, its grid, panels, a tool's chassis and wells, every
+ * line and the dim text (SURFACES below). With the mix they lean toward the mode's colour now — Changing: the colour travelling
+ * round the wheel; Static: the accent; Custom: your low / top colours by where the sound sits, flashing toward your hit colour —
+ * each by its own share (a line more than a background), and come back exactly in silence or when switched off. */
 (function (global) {
   'use strict';
   const doc = global.document; if (!doc) return;
@@ -26,6 +31,9 @@
   let lastPal = -1e9, K = null, an = null, db = null, prevLow = 0, pulse = 0, level = 0, low = 0, high = 0, hue = 210, idle = 0, raf = 0, last = 0;
   const taps = new Map();   // instanceId → { an, buf, win }
   const PALETTE = ['--cyan', '--green', '--pink', '--violet', '--amber', '--red', '--acc'];
+  // 3.80 the surfaces and how far each leans toward the colour of the moment at full sound (a line reads more than a background)
+  const SURFACES = { '--bg': 0.10, '--bg2': 0.12, '--panel': 0.14, '--panel2': 0.16, '--chassis': 0.14, '--chassis2': 0.16, '--well': 0.10,
+    '--grid': 0.5, '--line': 0.45, '--line2': 0.5, '--dim': 0.25, '--faint': 0.3 };
   let base = null;   // the palette as the stylesheet has it (read once, before anything is overridden)
   const live = new Set();   // elements whose --acc is moving now (to put back in silence)
   function rgbOf(c) {
@@ -74,6 +82,17 @@
     return lit(c, k);
   }
   const G = () => ({ mode, amt, shift, colors: custom, low, high, pulse });   // the app's own
+  // 3.80 the colour of the moment, that the surfaces lean toward
+  function tintNow() {
+    const acc = (base && base['--acc']) || '#00d4ff';
+    if (mode === 'changing') return rotate(acc, shift);
+    if (mode === 'custom') { const t = clamp(high / Math.max(1e-6, low + high), 0, 1); return hex(mixRGB(mixRGB(rgbOf(custom.low), rgbOf(custom.high), t), rgbOf(custom.hit), clamp(pulse * 0.5, 0, 1))); }
+    return lit(acc, 0.3);
+  }
+  function surfaces(k) {
+    if (!base) return; const tint = rgbOf(tintNow()); if (!tint) return;
+    Object.keys(SURFACES).forEach(n => { const b = rgbOf(base[n]); if (b) set(n, k < 0.005 ? base[n] : hex(mixRGB(b, tint, k * SURFACES[n]))); });
+  }
   const hashOf = (str) => { let x = 2166136261; for (const ch of String(str || '')) x = Math.imul(x ^ ch.charCodeAt(0), 16777619); return x >>> 0; };
   const CanvasWin = (id) => global.CanvasWM && global.CanvasWM.windowOf ? global.CanvasWM.windowOf(id) : null;
   // every inline colour variable an element carries (--acc, --pc, --c …): lit from its own base; a base the tool changes is taken up
@@ -120,7 +139,7 @@
   function zero() {
     const w0 = writing; writing = true;   // 3.78 putting colours back is never skipped
     ['--snd-low', '--snd-high', '--snd-level', '--snd-pulse'].forEach(k => set(k, '0')); doc.querySelectorAll('.wm-win[style*="--tool-level"]').forEach(w => { w.style.setProperty('--tool-level', '0'); w._lvS = '0.00'; });
-    PALETTE.forEach(k => { root.style.removeProperty(k); delete rootV[k]; }); lastPal = -1e9;
+    PALETTE.concat(Object.keys(SURFACES)).forEach(k => { root.style.removeProperty(k); delete rootV[k]; }); lastPal = -1e9;
     Array.from(live).forEach(unlight); live.clear(); set('--snd-shift', '0deg');
     writing = w0;
   }
@@ -161,8 +180,8 @@
     drift += 0.012; shift = mode === 'changing' ? clamp((hue - 225) * 1.1 + Math.sin(drift) * 40 + pulse * 35, -150, 150) * amt : 0; set('--snd-shift', q(shift, 0.25).toFixed(0) + 'deg');
     set('--snd-low', q(low, 25).toFixed(2)); set('--snd-high', q(high, 25).toFixed(2)); set('--snd-level', q(level, 25).toFixed(2)); set('--snd-pulse', q(pulse, 10).toFixed(1)); set('--snd-hue', q(hue, 0.2).toFixed(0));
     // the app's accents: the mix lights them, each hit flashes them
-    if (!base) { const cs = global.getComputedStyle(root); base = {}; PALETTE.forEach(k => { base[k] = cs.getPropertyValue(k).trim(); }); }
-    const kMix = q(clamp((level * 0.55 + pulse * 0.5) * amt * 1.25, 0, 1), 20); if (on && ts - lastPal >= 100) { lastPal = ts; PALETTE.forEach(k => { if (base[k]) set(k, colourFor(base[k], kMix, G())); }); }
+    if (!base) { const cs = global.getComputedStyle(root); base = {}; PALETTE.concat(Object.keys(SURFACES)).forEach(k => { base[k] = cs.getPropertyValue(k).trim(); }); }
+    const kMix = q(clamp((level * 0.55 + pulse * 0.5) * amt * 1.25, 0, 1), 20); if (on && ts - lastPal >= 100) { lastPal = ts; PALETTE.forEach(k => { if (base[k]) set(k, colourFor(base[k], kMix, G())); }); surfaces(kMix); }
     // a tool shown on its page (or a suite's page) lights with the mix
     if (on) doc.querySelectorAll('.tp-overlay').forEach(o => { light(o, kMix, G()); accented(o, ts).forEach(el => light(el, kMix, G())); });
     if (Math.random() < 0.02) taps.forEach((t, id) => { if (!t.win || !t.win.isConnected) { try { if (t.node && t.an) t.node.disconnect(t.an); } catch (e) {} taps.delete(id); } });   // closed windows let go
@@ -221,7 +240,7 @@
     // tests: one analysis step on demand (offline pages have no running clock)
     step() { last = -1e9; lastW = -1e9; frame(performance.now() + 1e6); global.cancelAnimationFrame(raf); raf = global.requestAnimationFrame(frame); },
     liveAcc, restoreAcc,   // tests
-    _taps: taps, lit, colourFor, rotate, settingsOf,
+    _taps: taps, lit, colourFor, rotate, settingsOf, SURFACES, tintNow,
   };
   global.SoundCSS = SoundCSS;
   // ⋯ Options → Reactive colours: core/react-panel.js (the panel, and the same panel in every tool's ⚙ settings)
