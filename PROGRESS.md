@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Mapped — packs as DLC (2026-10-31)
+His words: "i want sound packs to be like dlc in a way. each pack adds new sounds or capabilities." specs/eravos.genre-packs.spec
+addendum: a DLC must add new sounds (measured apart) or new tools; presets only ride along. On disk tools/<domain>/packs/<id>/ with
+dlc.json, sounds/, tools/, content/; a Packs store page with art, numbers, a demo and Install / Uninstall. Phases DLC1–DLC4, Synthwave
+first (its drum sounds + new Gated Reverb, FM Keys, Ensemble Chorus). Nothing built.
+
+## Mapped — themes, honestly · genre packs across tools (2026-10-26)
+His words: "okay, what happened to theme? also all the packs were supposed to be additive, like synthwave in relation to the tools.
+like find all tools for it. bass tools. synthesis. etc". Theme: P69.1 was never built, and the look kit (5697b50, 95614cb, merged in
+PR #48) changed the default look directly, against the theme rule. specs/eravos.themes.spec addendum: three themes (Classic = the look
+before the kit, Studio = the kit, v10), default his call. Packs: specs/eravos.genre-packs.spec: a genre pack is one id adding to every
+tool that fits, with a page listing its tools by category, its sounds, patterns, songs, suites, the missing tools, and Build the rig.
+
 ## Done — 3.81 The featured songs' pictures: small paintings, not emoji (2026-10-31)
 Asked: "the icons look cheap and childish. make them beautiful and creative, rpg, starry night, bob ross, star gazin".
 tools/music/data/featured-art.js (window.FeaturedArt, SVG, loaded before recipes.js): "Make a song for her" — a starry night with Van

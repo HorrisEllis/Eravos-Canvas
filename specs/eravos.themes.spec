@@ -37,6 +37,23 @@
   fonts load from disk with the network off · boundary test (no domain words in theme-v10.css / themes.js) ·
   screenshots of: canvas with 3 tools, a tool page, a suite page, ＋ Add, the piano roll — sent before merging
 
+## ADDENDUM 2026-10-26 — "okay, what happened to theme?" (and before it: "the ui looks bad")
+  What happened, from the history: P69.1 (this spec) was never built: there is no themes.js, no theme css, no Options switch on main.
+  Meanwhile another session restyled the CURRENT look directly: 5697b50 "The look kit: pro-plugin controls everywhere" and 95614cb
+  "Living UI, square pads, fluid controls" (3.72/3.73 in its numbering), merged to main on 2026-10-26 in PR #48 on his "merge any other
+  branches". That broke the rule above ("the look changes ONLY through a theme"): the default look changed without a theme.
+  Fix (phase T, replaces P69.1):
+    T1 three themes, nothing deleted:
+         classic  the look on main before 5697b50 (its css restored, scoped html[data-theme="classic"])
+         studio   the look kit as merged (scoped html[data-theme="studio"])
+         v10      as specified above
+       which one is the DEFAULT is his call (TO CONFIRM). Until he answers: classic, the look he had before he said "the ui looks bad".
+    T2 themes.js + the no-flash line in <head> + ⋯ Options › Theme (Classic · Studio · v10), remembered; screenshots of all three
+       (canvas with 3 tools, a tool page, a suite page, ＋ Add, the piano roll) sent to him before merging.
+    T3 a test that fails when a commit changes a theme's look outside its own theme file (the css of a theme is hashed; a change to
+       a hash needs a spec addendum quoting him).
+  Acceptance as above, for three themes.
+
 ## ADDENDUM 2026-10-30 (3.76) — previews for his pick (nothing applied)
 Seven candidates rendered from the real app (token overrides only): current (Neon Lab) · Studio Calm · Graphite + Amber · Blueprint ·
 Midnight Synthwave · v10 Terminal · Paper (light). Screens: first screen, canvas with a Synthwave song, ＋ Add, Retro Poly's page.
