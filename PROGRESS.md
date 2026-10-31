@@ -2,6 +2,12 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Mapped — packs are full sound packs; tools get full depth (2026-10-31)
+His words: "no it should be a pack. like full packs, are packs of sounds for tools. like tools should should have more power, like
+wobble bass, full range of depth in all aspects." Packs: one pack of sounds across every tool it fits (genre-packs.spec, first section
+reinstated, third addendum). Power: specs/eravos.tool-depth.spec, Wobble Bass audited first (source, filter, wobble, growl, drive,
+envelope, stereo, output). Nothing built.
+
 ## Mapped — packs as DLC (2026-10-31)
 His words: "i want sound packs to be like dlc in a way. each pack adds new sounds or capabilities." specs/eravos.genre-packs.spec
 addendum: a DLC must add new sounds (measured apart) or new tools; presets only ride along. On disk tools/<domain>/packs/<id>/ with
