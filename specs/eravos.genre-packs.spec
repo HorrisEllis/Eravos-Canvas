@@ -82,3 +82,25 @@
   ACCEPTANCE  every listed DLC passes the DLC rule (tested: it adds ≥ 1 sound measured apart, or ≥ 1 tool nothing else provides) ·
              install → its tools spawn and sound, uninstall → none of it remains anywhere (tested) · a saved project that used a
              DLC reopens after reinstall exactly as saved · works offline in the exe and the web build.
+
+## ADDENDUM 2026-10-31 (later) — CORRECTED by him: "what?  packs are for tools..."
+  The DLC addendum above read "packs" as genre-wide bundles that ship their own tools. That is wrong. His model:
+  A PACK BELONGS TO ONE TOOL and is that tool's DLC: it adds NEW SOUNDS or NEW CAPABILITIES to that tool.
+    Drum Machine  a pack adds drum sounds the machine never had (recipes, 3.74b) + kits that use them
+    a synth       a pack adds new oscillator/wavetable/partial banks, voice models, modes — then presets that use them
+    an effect     a pack adds new algorithms or modes (a gated room for a reverb, a spring, a tape model)
+    a generator   a pack adds new pattern styles / grooves
+  Presets ride along inside a tool's pack; a pack of retuned presets alone is not a DLC (the DLC rule above still applies, per tool).
+  GENRE = a TAG on tool packs, not a pack of its own. "Synthwave" is the set of every tool's Synthwave pack. "find all tools for it"
+  = a view: the tools that have a Synthwave pack, grouped by category (Drums · Bass · Synthesis · Effects …), each with what its pack
+  adds, Install/Uninstall per pack, and "install all Synthwave packs" as a convenience. Genres with no pack for a tool show it as
+  missing for that tool (the gap list).
+  WITHDRAWN from the addendum above: packs that carry their own tools (a new tool is a tool, installed through the catalog as today);
+  the genre-wide dlc.json. KEPT: the DLC rule (adds sounds measured apart, or a capability), install/uninstall leaving nothing behind,
+  a project naming a missing pack and offering it.
+  PHASES (replace DLC1–DLC4)
+    TP1 the tool-pack DLC model: a pack declares what it adds to its tool (sounds / capabilities / presets); the tool's engine reads
+        added sounds and capabilities from installed packs; the DLC rule validator per tool; install/uninstall on the tool page   mapped
+    TP2 Drum Machine first (its recipe interpreter exists): every one of its 13 packs adds sounds of its own (= P74b.3)             mapped
+    TP3 one synth (Retro Poly or Supersaw): packs add wave banks / voice models, not just presets                                 mapped
+    TP4 the genre view: "Synthwave" lists every tool with a Synthwave pack by category, with the gaps                             mapped
