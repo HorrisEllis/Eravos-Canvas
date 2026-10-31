@@ -34,5 +34,6 @@
   "eravos.master-fx",
   "eravos.lyric-rhythm",
   "eravos.coach"
- ]
+ ],
+ "art": "art.svg"
 }

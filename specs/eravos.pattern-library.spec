@@ -103,3 +103,22 @@
 #   the tool's own filter / drive / wobble knobs (centred on its preset) and bends — bass: growl / talk / open / deepen, a dive at a drop's
 #   end; chords: swells and plucks (a chord moves as one); leads: glide-in bends and plucks. Seeded apart from the song's numbers: the notes
 #   are unchanged (the golden hashes in p22 match with G.curve = false). 0 → ~37 000 curved notes in all 85 genres. tests/p73-living.
+
+## ADDENDUM 2026-10-31 (3.82) — songs in blocks; Songs = your songs
+Asked: "i want the songs broken into patterns, and moved to the patterns menu, piece by piece, sorted by instrument, like blocks, or
+units, then the songs library is for saved or export songs".
+- Library: every named Songbook song (genre + pinned seed; 308) is taken apart by fromGenre(G, seed, null, song): each instrument's each
+  kind of section (intro, verse, build, drop …) is one block of up to 4 bars, named "<song> · <part> · <section>", carrying
+  song { id, title } and section. Pitched notes stay semitones from the root (they play in your song's key). ~2 200 → ~5 300 patterns;
+  the library is built on first open (~1 s).
+- Page: an Instrument chip row (click = only it · shift-click adds); sections by instrument by default (drums, bass, wobble, chords, lead,
+  arp, then by name); "Sections: song" puts each song's blocks together (drums first, sections in order) with ▶ Whole song beside its
+  heading (Songbook.write: the whole song, as before). A block shows its song (♪). Search finds song titles and instruments.
+  PatternLibrary.open({ group }) opens grouped so, with nothing picked. The Timeline's ♪ panel names a song block by part · section and
+  its song on the second line.
+- Songs page (tools/music/data/songbook.js show): only your songs — 📖 saved and ⤓ exported (All / Saved / Exported), ▶ listen,
+  ⟲ open the canvas as it was, 🗑; "🧩 The built-in songs, in blocks →" opens Patterns by song; Her voice recordings stay here.
+  The catalogue page (cards, shelves, Make it yours, previews on cards) is gone from Songs — Songbook.all / categoryOf / write remain.
+- Song Recorder ⤓ Export also emits song:saved { …, exported: <format label> } → kept in Songs with its sound and the canvas.
+Tests: tests/p82-song-blocks.test.js; p42 (every song's ▶ Whole song writes that song), p19, p44, p58, p73, p76 updated.
+

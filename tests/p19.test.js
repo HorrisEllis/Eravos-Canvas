@@ -131,9 +131,10 @@ describe('3.44 · Songs by category', () => {
     assert.equal(more.join(', '), '', 'uncategorised genres');
     const ids = new Set(all.map(s => Songbook.categoryOf(s))); Songbook.categories().filter(c => c.id !== 'more').forEach(c => assert.ok(ids.has(c.id), c.label + ' is empty'));
   });
-  it('the page groups the cards under category headings and still shows every song in All', () => {
-    Songbook.open(); const ov = document.querySelector('.overlay.sbk');
-    try { assert.equal(ov.querySelectorAll('.sbk-card').length, Songbook.all().length); assert.gt(ov.querySelectorAll('.sbk-sec').length, 8); }
+  // 3.82 the built-in songs moved into 🧩 Patterns (in blocks); the Songs page is only your saved and exported songs
+  it('the Songs page shows none of the built-in songs (they are blocks in Patterns); the shelves still sort them there', async () => {
+    Songbook.open(); const ov = document.querySelector('.overlay.sbk-mine'); await TH.sleep(40);
+    try { const titles = new Set(Songbook.all().map(s => s.title)); assert.equal([...ov.querySelectorAll('.sbk-card b')].filter(b => titles.has(b.textContent)).length, 0); assert.ok(ov.querySelector('.sbk-topat'), 'a way to the blocks'); }
     finally { ov.querySelector('.sbk-x').click(); }   // close it the way a person does — remove() left the page "open" for the next test
   });
 });

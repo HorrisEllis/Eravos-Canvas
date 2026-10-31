@@ -284,6 +284,8 @@
             const b = await render(); const r = await window.Codecs.encode(b, fmt, { meta: await tagsFor(b), onProgress: (x) => ctx.emitUI('export_state', { busy: true, text: `encoding ${Math.round(x * 100)}%` }) });
             window.Codecs.download(r.blob, `${name}.${r.ext}`); ctx.emitUI('export_state', { done: true, text: `${r.label} · ${b.duration.toFixed(1)} s · ${(r.bytes / 1048576).toFixed(2)} MB` + (r.tagged ? ' · tagged' : ' · no tags in this format') });
             ctx.lastExport = r;
+            // 3.82 "the songs library is for saved or export songs": an export is kept in Songs too (its sound, and the canvas as it was)
+            ctx.emit('song:saved', { name: String(P.get('songName') || 'song').trim() || 'song', audio: await r.blob.arrayBuffer(), mime: r.blob.type || 'audio/wav', duration: b.duration, bpm: ctx.bpm, exported: r.label });
           }
         } catch (e) { ctx.emitUI('export_state', { error: e.message }); ctx.fault('RUNTIME_003', 'export: ' + e.message); }
         finally { exporting = false; }

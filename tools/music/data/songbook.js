@@ -192,7 +192,6 @@
     return (CATS.find(c => (c.id === 'her' || c.id === 'lostlove' || c.id === 'odd' || c.id === 'synthesis' || c.id === 'heavy' || c.id === 'motion') && c.re.test(g))
       || CATS.find(c => (c.ids || []).includes(g)) || CATS.find(c => c.re.test(g)) || CATS[CATS.length - 1]).id;
   }
-  const MOODS = [['mine', '📖 My songs'], ['foryou', '💜 For you'], ['all', 'Any mood'], ['edm', 'EDM'], ['her', 'For her'], ['heavy', 'Heavy'], ['dark', 'Dark'], ['goth', 'Goth'], ['80s', '80s'], ['island', 'Island'], ['warm', 'Warm'], ['party', 'Party'], ['calm', 'Calm'], ['fast', 'Fast']];
 
   // every genre the Song Engine knows gets a card, even without a hand-written one (a new genre pack shows up by itself)
   function allSongs() {
@@ -208,9 +207,9 @@
     const name = String(p.name || 'my song').trim().slice(0, 80), W = window.Workspace;
     await IDB().put('library', 'song:' + name, { name, time: Date.now(), mime: p.mime, audio: p.audio, duration: p.duration, bpm: p.bpm });
     if (W && W.projects) await W.projects.save('♪ ' + name);
-    const idx = (await mySongs()).filter(x => x.name !== name); idx.push({ name, time: Date.now(), duration: p.duration, bpm: p.bpm, project: '♪ ' + name });
+    const idx = (await mySongs()).filter(x => x.name !== name); idx.push(Object.assign({ name, time: Date.now(), duration: p.duration, bpm: p.bpm, project: '♪ ' + name }, p.exported ? { exported: String(p.exported) } : {}));
     await IDB().put('library', 'mysongs', idx);
-    if (window.Shell) window.Shell.toast('📖 Saved “' + name + '” to Songs → My songs', 'good', 3500);
+    if (window.Shell) window.Shell.toast('📖 ' + (p.exported ? 'Exported — and kept' : 'Saved') + ' “' + name + '” in Songs', 'good', 3500);
   }
   if (window.Kernel) window.Kernel.bus.subscribe('song:saved', (p) => { keepSong(p || {}); }, 'songbook');
   let audioEl = null;
@@ -231,23 +230,6 @@
     const seed = fresh ? 1 + Math.floor(Math.random() * 99999) : s.seed, shifted = sh && (sh.semis || sh.tempo !== 1);
     if (shifted) SE.write(s.genre, seed, { shift: { semis: sh.semis, tempo: sh.tempo } }); else SE.write(s.genre, seed); said(); return true;
   }
-  const shift = { semis: 0, tempo: 1 };   // Make it yours — kept while ERAVOS is open, from song to song
-  function shiftBox(h, s, repaint) {
-    const G = genreOf(s), box = h('div', { class: 'sbk-shift' });
-    if (s.recipe || !G) { box.append(h('h4', { text: 'Make it yours' }), h('p', { class: 'sbk-meta', text: 'A hand-built set — change its key and tempo in the Session window after writing it.' })); return box; }
-    const base = (G.bpm[0] + G.bpm[1]) / 2, read = h('span', { class: 'sbk-shift-read' });
-    const say = () => { read.textContent = (shift.semis ? (shift.semis > 0 ? '+' : '') + shift.semis + ' st · ' : 'original key · ') + '≈' + Math.round(base * shift.tempo) + ' BPM (' + Math.round(shift.tempo * 100) + '%)'; };
-    const slider = (label, min, max, step, val, fmt, set) => { const v = h('b', { text: fmt(val) }), r = h('input', { type: 'range', min, max, step, value: val, 'aria-label': label }); r.oninput = () => { set(+r.value); v.textContent = fmt(+r.value); say(); }; r.addEventListener('keydown', (e) => e.stopPropagation()); return h('label', { class: 'sbk-slider' }, [h('span', { text: label }), r, v]); };
-    say();
-    box.append(h('h4', { text: 'Make it yours — key & tempo' }),
-      slider('Key', -12, 12, 1, shift.semis, (x) => (x > 0 ? '+' : '') + x + ' st', (x) => { shift.semis = x; }),
-      slider('Tempo', 0.5, 1.5, 0.01, shift.tempo, (x) => Math.round(x * 100) + '%', (x) => { shift.tempo = x; }),
-      h('div', { class: 'sbk-shift-row' }, [read,
-        h('button', { class: 'sbk-alt sm', text: 'Higher + slower', title: '+5 semitones, 85% speed', onclick: () => { shift.semis = 5; shift.tempo = 0.85; repaint(); } }),
-        h('button', { class: 'sbk-alt sm', text: 'Reset', onclick: () => { shift.semis = 0; shift.tempo = 1; repaint(); } })]));
-    return box;
-  }
-
   // ---- 🎤 Her voice (3.41): the recordings songs with `voice` sing with — kept on this computer only
   function voiceBox(h) {
     const HV = window.HerVoice, box = h('div', { class: 'sbk-voice' }), list = h('div'), status = h('p', { class: 'sbk-note', text: '…' });
@@ -273,103 +255,48 @@
   }
 
   // ---------------------------------------------------------------- the page (overlay, off the canvas)
+  // 3.82 "i want the songs broken into patterns, and moved to the patterns menu, piece by piece, sorted by instrument … then the songs
+  // library is for saved or export songs": the built-in songs are blocks in 🧩 Patterns now (each instrument, each section — and a song's
+  // section there still writes the whole song). This page is YOUR songs: every one you saved (📖 Save to Songs) or exported (⤓ Export),
+  // with its audio and the canvas as it was. Her voice recordings live here too.
   let open = null;
   function show() {
     if (open) { open.close(); return; }
     const UI = window.UIKit, h = UI.h, S = window.Shell;
     if (S && S.X) S.X.enterMode('music');
-    // 3.39 (exe: 39 of 189 cards ignored clicks): allSongs() builds NEW objects for genre cards and EDM-tagged songs on every
-    // call, so a selection held as an object was never found in the next paint and snapped back to the first song — and
-    // "Write this song" then wrote that first song. The selection is an id now.
-    let mood = 'all', cat = 'all', q = '', selId = SONGS[0].id;
-    const ov = h('div', { class: 'overlay sbk', role: 'dialog', 'aria-label': 'Songs' });
-    const chips = h('div', { class: 'sbk-chips' }), grid = h('div', { class: 'sbk-grid' }), detail = h('aside', { class: 'sbk-detail' });
-    const cats = h('div', { class: 'sbk-chips sbk-cats' }), search = h('input', { class: 'sbk-q', placeholder: 'find a song, genre or tool…', type: 'search' });
+    let q = '', kind = 'all';
+    const ov = h('div', { class: 'overlay sbk sbk-mine', role: 'dialog', 'aria-label': 'Songs' });
+    const grid = h('div', { class: 'sbk-grid' }), detail = h('aside', { class: 'sbk-detail' }), chips = h('div', { class: 'sbk-chips' });
+    const search = h('input', { class: 'sbk-q', placeholder: 'find one of your songs…', type: 'search', 'aria-label': 'find one of your songs' });
     search.addEventListener('input', () => { q = search.value.trim().toLowerCase(); paint(); });
     search.addEventListener('keydown', (e) => e.stopPropagation());
-    const close = () => { if (window.SongPreview) SongPreview.stop(); if (io) io.disconnect(); ov.remove(); document.removeEventListener('keydown', key, true); open = null; };
-    // 3.60 previews: a strip of the song's shape on every card (drawn when it scrolls into view), a map + ▶ Preview in the detail
-    const SP = window.SongPreview, io = SP && 'IntersectionObserver' in window ? new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting && e.target._song) { SP.draw(e.target, e.target._song, { mini: true }); io.unobserve(e.target); } }), { rootMargin: '200px' }) : null;
+    const close = () => { if (audioEl) { audioEl.pause(); audioEl = null; } ov.remove(); document.removeEventListener('keydown', key, true); open = null; };
     const key = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
+    const toPatterns = h('button', { class: 'sbk-alt sbk-topat', text: '🧩 The built-in songs, in blocks →', title: 'every built-in song is in Patterns now — each instrument, each section; a song’s section writes the whole song', onclick: () => { close(); if (window.PatternLibrary) window.PatternLibrary.open({ group: 'song' }); } });
     ov.append(h('div', { class: 'sbk-box' }, [
-      h('header', { class: 'sbk-head' }, [h('div', {}, [h('b', { text: '📖 Songs' }), h('span', { class: 'sbk-sub', text: ' every song in one place — write one in any genre (a new one every press), the song for her, and My songs you saved' })]), h('button', { class: 'sbk-x', title: 'Close (Esc)', text: '×', onclick: close })]),
-      h('div', { class: 'sbk-filter' }, [cats, h('div', { class: 'sbk-row2' }, [search, chips])]), h('div', { class: 'sbk-body' }, [grid, detail]),
+      h('header', { class: 'sbk-head' }, [h('div', {}, [h('b', { text: '📖 Songs' }), h('span', { class: 'sbk-sub', text: ' your songs — every one you saved or exported, with its sound and the canvas as it was' })]), h('button', { class: 'sbk-x', title: 'Close (Esc)', text: '×', 'aria-label': 'close', onclick: () => close() })]),
+      h('div', { class: 'sbk-filter' }, [h('div', { class: 'sbk-row2' }, [search, chips, toPatterns])]), h('div', { class: 'sbk-body' }, [grid, detail]),
     ]));
     ov.addEventListener('mousedown', (e) => { if (e.target === ov) close(); });
     document.addEventListener('keydown', key, true);
-    function paint() {
-      chips.innerHTML = ''; MOODS.forEach(([id, label]) => { const c = h('button', { class: 'sbk-chip' + (mood === id ? ' on' : ''), text: label }); c.onclick = () => { mood = id; paint(); }; chips.appendChild(c); });
-      const every = allSongs(), count = (id) => every.filter(x => categoryOf(x) === id).length;
-      cats.innerHTML = ''; [{ id: 'all', label: 'All songs' }].concat(CATS).forEach(c => { const n = c.id === 'all' ? every.length : count(c.id); if (!n) return;
-        const b = h('button', { class: 'sbk-chip sbk-cat' + (cat === c.id ? ' on' : ''), text: `${c.label} ${n}` }); b.onclick = () => { cat = c.id; if (mood === 'mine') mood = 'all'; paint(); }; cats.appendChild(b); });
+    detail.append(h('h3', { text: 'Your songs' }),
+      h('p', { text: 'Record in the Song Recorder (bottom of the screen): 📖 Save to Songs keeps it here, and so does every ⤓ Export. Listen here, or open it back onto the canvas exactly as it was.' }),
+      h('p', { class: 'sbk-note', text: 'Looking for the built-in songs? They are in 🧩 Patterns now, taken apart: each instrument, each section a block of its own — and a song there still writes whole.' }));
+    if (window.HerVoice) detail.append(voiceBox(h));
+    async function paint() {
+      const all = await mySongs(); if (!ov.isConnected && open) return;
+      chips.innerHTML = ''; [['all', 'All ' + all.length], ['saved', '📖 Saved ' + all.filter(x => !x.exported).length], ['exported', '⤓ Exported ' + all.filter(x => x.exported).length]].forEach(([id, label]) => {
+        const c = h('button', { class: 'sbk-chip' + (kind === id ? ' on' : ''), text: label }); c.onclick = () => { kind = id; paint(); }; chips.appendChild(c); });
+      const list = all.filter(x => (kind === 'all' || (kind === 'exported') === !!x.exported) && (!q || x.name.toLowerCase().includes(q)));
       grid.innerHTML = '';
-      if (mood === 'mine') { paintMine(); return; }
-      const T = window.Taste, G0 = (s) => genreOf(s), hay = (s) => (s.title + ' ' + s.genre + ' ' + ((G0(s) && (G0(s).label + ' ' + G0(s).tagline + ' ' + Object.values(G0(s).parts || {}).map(p => p.organism).join(' '))) || '') + ' ' + (s.listen || '')).toLowerCase();
-      const list = every.filter(s => (cat === 'all' || categoryOf(s) === cat) && (!q || hay(s).includes(q)) && (mood === 'all' || (mood === 'foryou' ? T && T.get(s.genre) > 0 : s.mood.includes(mood))));
-      if (mood === 'foryou') list.sort((a, b) => T.get(b.genre) - T.get(a.genre));
-      if (mood === 'her') list.sort((a, b) => (b.mood.includes('edm') ? 1 : 0) - (a.mood.includes('edm') ? 1 : 0));   // EDM is her favourite: those first
-      if (!list.length) grid.appendChild(h('p', { class: 'sbk-note', text: mood === 'foryou' ? 'Nothing yet — rate genres (💜 below a song, or Learn → EDM tour) and the ones you love appear here first.' : 'Nothing here.' }));
-      if (list.length && !list.some(x => x.id === selId)) selId = list[0].id;
-      const sel = list.find(x => x.id === selId) || allSongs().find(x => x.id === selId) || SONGS[0];
-      // grouped: a heading per category (in category order), the songs under it — every card is still in the grid
-      const order = (s) => CATS.findIndex(c => c.id === categoryOf(s));
-      const gl = (s) => (G0(s) ? G0(s).label : String(s.genre || ''));   // inside a category, songs of one genre sit together
-      if (mood !== 'foryou' && mood !== 'her') list.sort((a, b) => order(a) - order(b) || gl(a).localeCompare(gl(b)));
-      let lastCat = null;
-      list.forEach(s => {
-        const ci = categoryOf(s);
-        if (ci !== lastCat && mood !== 'foryou') { lastCat = ci; const C = CATS.find(c => c.id === ci); grid.appendChild(h('div', { class: 'sbk-sec', text: `${C.label} · ${list.filter(x => categoryOf(x) === ci).length}` })); }
-        const G = genreOf(s), lk = locked(s);
-        const card = h('button', { class: 'sbk-card' + (s.id === selId ? ' sel' : '') + (lk ? ' locked' : ''), style: { '--acc': (G && G.accent) || '#ff2266' } }, [
-          h('span', { class: 'sbk-ic', text: lk ? '🔒' : ((G && G.icon) || '💘') }), h('b', { text: s.title + (G && G.voice ? ' 🎤' : '') }), h('small', { text: (G ? G.label : s.genre) + ' · ' + (G ? G.bpm[0] + (G.bpm[1] !== G.bpm[0] ? '–' + G.bpm[1] : '') : s.bpm) + ' BPM' })]);
-        if (io && !s.recipe && G) { const strip = h('canvas', { class: 'sbk-strip', 'aria-hidden': 'true' }); strip._song = s; card.appendChild(strip); io.observe(strip); }
-        card.onclick = () => { selId = s.id; paint(); }; card.ondblclick = () => { if (write(s, false, shift)) close(); };
-        grid.appendChild(card);
-      });
-      const s = sel, G = genreOf(s), lk = locked(s);
-      detail.innerHTML = '';
-      detail.append(h('h3', { text: s.title }), h('div', { class: 'sbk-meta', text: (G ? G.label + ' · ' + G.tagline : s.genre) }),
-        previewBox(h, s),
-        h('h4', { text: 'Listen for' }), h('p', { text: s.listen }),
-        h('h4', { text: 'The drop' }), h('p', { text: s.drop }),
-        h('h4', { text: 'Her voice clips' }), h('p', { text: s.voice }));
-      if (s.tools) detail.append(h('h4', { text: 'Tools it shows off' }), h('p', { text: s.tools }));
-      if (G && G.voice && window.HerVoice) detail.append(voiceBox(h));
-      if (window.Taste && s.genre && !s.recipe) { const v = window.Taste.get(s.genre); detail.append(h('h4', { text: 'Is this you?' }), h('div', { class: 'sbk-actions', style: { marginTop: '4px' } }, [['💜', 2, 'love it'], ['🙂', 1, 'okay'], ['🙅', -1, 'not me']].map(([t, val, tip]) => h('button', { class: 'sbk-alt' + (v === val ? ' on' : ''), style: { marginTop: 0 }, text: t, title: tip, onclick: () => { window.Taste.rate(s.genre, val); paint(); } })))); }
-      if (lk) detail.append(h('p', { class: 'sbk-lock', text: '🔒 Finish the Learn lesson “' + ((window.Learn && window.Learn.title(s.lock)) || s.lock) + '” to open this one.' }),
-        h('button', { class: 'sbk-go', text: '🧠 Go to that lesson', onclick: () => { close(); window.Learn && window.Learn.open(s.lock); } }));
-      else detail.append(shiftBox(h, s, paint), h('div', { class: 'sbk-actions' }, [
-        h('button', { class: 'sbk-go', text: '▶ Write this song', title: 'replaces what is on the canvas (Ctrl+Z brings it back)', onclick: () => { if (write(s, false, shift)) close(); } }),
-        s.recipe ? h('span') : h('button', { class: 'sbk-alt', text: '🎲 Another like it', onclick: () => { if (write(s, true, shift)) close(); } })]),
-        h('p', { class: 'sbk-note', text: 'It replaces the canvas. Press Space to play. Every clip opens in the piano roll.' }));
-    }
-    async function paintMine() {
-      const list = await mySongs(); if (mood !== 'mine') return;
-      if (!list.length) grid.appendChild(h('p', { class: 'sbk-note', text: 'No songs saved yet. Record in the Song Recorder (bottom of the screen) and press 📖 Save to Songs — it keeps the audio and everything on the canvas.' }));
-      list.forEach(x => grid.appendChild(h('div', { class: 'sbk-card', style: { '--acc': '#00ff88' } }, [h('span', { class: 'sbk-ic', text: '📖' }), h('b', { text: x.name }), h('small', { text: new Date(x.time).toLocaleString() + (x.duration ? ' · ' + Math.round(x.duration) + ' s' : '') }),
-        h('div', { class: 'org-row', style: { margin: '4px 0 0' } }, [h('button', { class: 'sbk-alt', style: { marginTop: 0 }, text: '▶', title: 'listen', onclick: (e) => playSong(x.name, e.currentTarget) }),
+      if (!list.length) grid.appendChild(h('p', { class: 'sbk-note', text: all.length ? 'Nothing matches.' : 'No songs yet. Record in the Song Recorder (bottom of the screen) and press 📖 Save to Songs or ⤓ Export — it keeps the sound and everything on the canvas.' }));
+      list.forEach(x => grid.appendChild(h('div', { class: 'sbk-card', style: { '--acc': x.exported ? '#00d4ff' : '#00ff88' } }, [h('span', { class: 'sbk-ic', text: x.exported ? '⤓' : '📖' }), h('b', { text: x.name }),
+        h('small', { text: (x.exported ? 'exported · ' + x.exported + ' · ' : 'saved · ') + new Date(x.time).toLocaleString() + (x.duration ? ' · ' + Math.round(x.duration) + ' s' : '') + (x.bpm ? ' · ' + Math.round(x.bpm) + ' BPM' : '') }),
+        h('div', { class: 'org-row', style: { margin: '4px 0 0' } }, [h('button', { class: 'sbk-alt', style: { marginTop: 0 }, text: '▶', title: 'listen', 'aria-label': 'listen to ' + x.name, onclick: (e) => playSong(x.name, e.currentTarget) }),
           h('button', { class: 'sbk-alt', style: { marginTop: 0 }, text: '⟲ Open', title: 'open the song on the canvas (with every tool as it was)', onclick: async () => { close(); if (window.Shell) window.Shell.activate(); await window.Workspace.projects.load(x.project); } }),
-          h('button', { class: 'sbk-alt', style: { marginTop: 0 }, text: '🗑', title: 'delete', onclick: async () => { if (!confirm('Delete “' + x.name + '” from My songs?')) return; await removeSong(x.name); paint(); } })])])));
-      detail.innerHTML = ''; detail.append(h('h3', { text: 'My songs' }), h('p', { text: 'Every song you save from the Song Recorder: listen here, or open it back onto the canvas exactly as it was.' }));
+          h('button', { class: 'sbk-alt', style: { marginTop: 0 }, text: '🗑', title: 'delete', 'aria-label': 'delete ' + x.name, onclick: async () => { if (!confirm('Delete “' + x.name + '” from your songs?')) return; await removeSong(x.name); paint(); } })])])));
     }
-    // the detail's preview: the song's map, ▶ Preview renders the build → pause → drop in its own offline universe and plays it
-    function previewBox(h, s) {
-      if (!SP || s.recipe || !genreOf(s)) return h('span');
-      const cv = h('canvas', { class: 'sbk-map', role: 'img', 'aria-label': 'the shape of ' + s.title + ': sections and parts' }), st = h('span', { class: 'sbk-note', style: { margin: '0 0 0 8px' }, text: '' });
-      const btn = h('button', { class: 'sbk-alt sbk-prev', style: { marginTop: 0 }, text: SP.playing === s.id ? '■ Stop' : '▶ Preview', title: 'hear the build, the pause and the drop — rendered on the side, your canvas is untouched' });
-      const w = SP.window(s);
-      btn.onclick = async () => {
-        if (SP.playing === s.id) { SP.stop(); btn.textContent = '▶ Preview'; return; }
-        btn.disabled = true; st.textContent = 'rendering…';
-        try {
-          const ok = await SP.play(s, (bar) => { SP.draw(cv, s, { at: bar }); if (bar === null) { btn.textContent = '▶ Preview'; st.textContent = ''; } });
-          btn.textContent = ok ? '■ Stop' : '▶ Preview'; st.textContent = ok ? (w ? 'bars ' + w.from + '–' + (w.from + w.bars - 1) : '') : ok === null ? 'no sound came out' : '';
-        } catch (e) { st.textContent = 'could not render: ' + e.message; } finally { btn.disabled = false; }
-      };
-      requestAnimationFrame(() => SP.draw(cv, s));
-      return h('div', { class: 'sbk-preview' }, [cv, h('div', { class: 'sbk-actions', style: { marginTop: '4px', alignItems: 'center' } }, [btn, st])]);
-    }
-    paint(); document.body.appendChild(ov); open = { close, ov };
+    paint(); document.body.appendChild(ov); search.focus(); open = { close, ov, paint };
   }
   window.Songbook = { open: show, songs: () => SONGS.slice(), all: allSongs, categoryOf, categories: () => CATS.map(c => ({ id: c.id, label: c.label })), mySongs, keepSong, write, locked, add(s) { if (s && s.id && !SONGS.some(x => x.id === s.id)) SONGS.push(s); } };
 })();

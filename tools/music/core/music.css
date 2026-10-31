@@ -337,6 +337,13 @@ html:not(.snd-off) #logo { filter: drop-shadow(0 0 calc(var(--snd-pulse) * 10px)
 .plib-sec .plib-grid { overflow: visible; flex: none; padding: 4px 18px 10px; }
 .plib-sec-head { display: flex; align-items: center; gap: 6px; width: 100%; background: none; border: 0; border-bottom: 1px solid var(--line); color: var(--text); padding: 8px 18px 6px; cursor: pointer; text-align: left; font-size: 12.5px; position: sticky; top: 0; z-index: 1; background: var(--panel, #0b121b); }
 .plib-sec-head:hover .plib-caret { opacity: 1; }
+/* 3.82 songs in blocks: a song's section heading carries ▶ Whole song; a block says which song it is from */
+.plib-sec-bar { display: flex; align-items: center; gap: 8px; position: sticky; top: 0; z-index: 1; background: var(--panel, #0b121b); border-bottom: 1px solid var(--line); }
+.plib-sec-bar .plib-sec-head { position: static; border-bottom: 0; flex: 1; }
+.plib-whole { margin-right: 18px; flex: none; border-radius: 999px; padding: 4px 12px; }
+.plib-card .plib-song { color: var(--acc); font-weight: 600; letter-spacing: .2px; }
+.plib-tools .sbk-chip { font-size: 11.5px; }
+.sbk-topat { margin-top: 0; margin-left: auto; margin-right: 18px; border-radius: 999px; }
 .plib-more { margin: 0 18px 10px; }
 .plib-top { display: flex; align-items: center; gap: 4px; min-width: 0; }
 .plib-top b { flex: 1; min-width: 0; }

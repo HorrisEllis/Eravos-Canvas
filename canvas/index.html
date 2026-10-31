@@ -148,7 +148,9 @@
     const featured = Recipes.featured().filter(visible);
     // 3.81 a featured recipe may bring a picture (an SVG it ships as data); else its icon
     const heroPic = (r) => { if (typeof r.featured.art === 'string' && /^<svg[\s>]/.test(r.featured.art)) { const d = h('div', { class: 'big art' }); d.innerHTML = r.featured.art; return d; } return h('div', { class: 'big', text: r.featured.icon || r.icon || '✦' }); };
-    const card = (r) => h('div', { class: 'card', style: { '--acc': r.accent || '#00d4ff' }, onclick: () => start(r.id) }, [h('b', { text: (r.icon || '') + ' ' + r.label }), h('small', { text: r.tagline || '' })]);
+    // 3.82 a tile may bring a painting (an SVG file it names): shown across its top
+    const pic = (src) => src ? h('img', { class: 'card-art', src, alt: '', loading: 'lazy', draggable: 'false' }) : null;
+    const card = (r) => h('div', { class: 'card' + (r.art ? ' has-art' : ''), style: { '--acc': r.accent || '#00d4ff' }, onclick: () => start(r.id) }, [pic(r.art), h('b', { text: (r.art ? '' : (r.icon || '') + ' ') + r.label }), h('small', { text: r.tagline || '' })].filter(Boolean));
     const listed = Recipes.list().filter(r => !r.featured && !r.hidden && visible(r));
     const cards = listed.filter(r => !r.section).map(card);
     // recipes may name a section of their own (3.27) — each becomes its own block on the start screen
@@ -156,8 +158,9 @@
     const sectionEls = sections.flatMap(s => [h('div', { class: 'boot-sec', text: s.name }), h('div', { class: 'grid' }, s.items.map(card))]);
     // 3.37 domains first: one big card per installed domain (its first mode) — "what are you making?" — then any other
     // modes a domain offers (Lab…) as smaller cards. Domains arrive as packs; this lists whatever is installed.
-    const modeCard = (m, big) => h('div', { class: 'card mode-card' + (big ? ' domain-card' : '') + (X.isActive(m.id) ? ' on' : ''), style: { '--acc': m.accent || '#00d4ff' }, onclick: () => { S.activate(); X.enterMode(m.id); bootScreen(first); } }, [
-      h('b', { text: (m.icon || '◈') + ' ' + m.label + (X.isActive(m.id) ? '  ✓' : '') }), h('small', { text: m.blurb || '' })]);
+    const catArt = (domainId) => { const d = window.Catalog && window.Catalog.domains().find(x => x.id === domainId); return d && d.art ? (window.ERAVOS_TOOLS || '') + d.art : null; };
+    const modeCard = (m, big) => { const art = m.art || (big ? catArt(m.domain) : null); return h('div', { class: 'card mode-card' + (big ? ' domain-card' : '') + (art ? ' has-art' : '') + (X.isActive(m.id) ? ' on' : ''), style: { '--acc': m.accent || '#00d4ff' }, onclick: () => { S.activate(); X.enterMode(m.id); bootScreen(first); } }, [
+      pic(art), h('b', { text: (art ? '' : (m.icon || '◈') + ' ') + m.label + (X.isActive(m.id) ? '  ✓' : '') }), h('small', { text: m.blurb || '' })].filter(Boolean)); };
     const seenDomain = new Set(), primary = [], more = [];
     X.modes().forEach(m => { const d = m.domain || m.id; if (seenDomain.has(d)) more.push(m); else { seenDomain.add(d); primary.push(m); } });
     const modeCards = primary.map(m => modeCard(m, true)), moreCards = more.map(m => modeCard(m, false));
@@ -166,7 +169,7 @@
     if (Cat) Cat.domains().filter(d => !d.loaded && !d.toolless && !seenDomain.has(d.id)).forEach(d => modeCards.push(h('div', { class: 'card mode-card domain-card avail', style: { '--acc': '#7f93a8' }, title: 'installs ' + (d.starter.length ? d.starter.length + ' starter tools' : 'this domain') + ' — add more from ＋ Add any time', onclick: async () => {
       S.toast(`Installing ${d.label}…`, '', 2000); Cat.chooseDomain(d.id); await Cat.install(d.starter, K); S.activate();
       const m = X.modes().find(x => x.domain === d.id); if (m) X.enterMode(m.id); bootScreen(first);
-    } }, [h('b', { text: (d.icon || '◈') + ' ' + d.label }), h('small', { text: (d.summary || '') + ' · not installed — click to install ' + (d.starter.length ? d.starter.length + ' starter tool' + (d.starter.length > 1 ? 's' : '') : 'it') })])));
+    } }, [pic(d.art ? (window.ERAVOS_TOOLS || '') + d.art : null), h('b', { text: (d.art ? '' : (d.icon || '◈') + ' ') + d.label }), h('small', { text: (d.summary || '') + ' · not installed — click to install ' + (d.starter.length ? d.starter.length + ' starter tool' + (d.starter.length > 1 ? 's' : '') : 'it') })].filter(Boolean))));
     const box = h('div', { class: 'boot' }, [
       h('h1', { text: 'ERAVOS' }),
       h('p', { class: 'sub', text: X.active().length ? brand.tagline : 'A blank canvas. Pick what you are making — or start empty and add any tool from any domain; it turns on only what it needs.' }),
@@ -177,8 +180,8 @@
       ...(OrganismFactory.defined().length ? [] : [h('div', { class: 'hero-card', style: { cursor: 'default' } }, [h('div', { class: 'big', text: '⧉' }), h('div', {}, [h('h2', { text: 'This canvas has no tools yet' }), h('p', { text: window.ERAVOS_DESKTOP ? 'Drop a pack (.zip) onto the canvas, or put it in ERAVOS Library › Packs and it loads every start. 📁 Library opens the folder.' : 'Drop a pack (.zip) anywhere onto the canvas to add its tools.' })])])]),
       ...(cards.length || X.active().length ? [h('div', { class: 'boot-sec', text: 'START FROM' })] : []),
       h('div', { class: 'grid' }, cards.concat([
-        h('div', { class: 'card', onclick: () => start(null) }, [h('b', { text: '◻ Empty canvas' }), h('small', { text: 'Agnostic — add tools yourself (＋ Add)' })]),
-        h('div', { class: 'card', onclick: () => { start(null); setTimeout(() => AddMenu.show(S, X), 30); } }, [h('b', { text: '＋ Browse every tool' }), h('small', { text: 'See what each one needs before you add it' })]),
+        h('div', { class: 'card has-art', onclick: () => start(null) }, [pic('runtime/art/blank-canvas.svg'), h('b', { text: 'Empty canvas' }), h('small', { text: 'Agnostic — add tools yourself (＋ Add)' })]),
+        h('div', { class: 'card has-art', onclick: () => { start(null); setTimeout(() => AddMenu.show(S, X), 30); } }, [pic('runtime/art/chest.svg'), h('b', { text: 'Browse every tool' }), h('small', { text: 'See what each one needs before you add it' })]),
       ])),
       h('div', { class: 'row', id: 'autosaveRow' }),
       h('p', { class: 'sub', style: { marginTop: '14px', fontSize: '11px' }, text: brand.tip }),

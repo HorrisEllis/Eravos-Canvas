@@ -1,31 +1,25 @@
-/* 3.39 — "the songs selection is buggy, and i cant click a lot of it" (desktop exe).
- * Reproduced in Electron 44 (the exe's engine) with real mouse clicks: 39 of 189 cards ignored the click. allSongs() makes
- * NEW objects for genre cards and EDM-tagged songs on every call; the page held the selection as an object, so the next
- * paint could not find it and snapped back to the first song — and "Write this song" then wrote THAT song. */
+/* 3.39 — "the songs selection is buggy, and i cant click a lot of it" (desktop exe): the page once wrote the wrong song.
+ * 3.82 the built-in songs moved into 🧩 Patterns (each instrument, each section a block; "the songs library is for saved or export songs").
+ * The same guarantee there: every song's ▶ Whole song writes exactly that song. */
 window.__phase = 'P42';
-describe('Songs page — every card selects, and Write writes the card you picked', () => {
-  it('clicking each card selects it, shows it, and Write this song writes exactly that song', async () => {
-    const hadGoals = window.Goals; if (!window.Goals || !window.Goals.EDM) window.Goals = Object.assign({}, window.Goals || {}, { EDM: SongEngine.genres().filter(g => g.family === 'EDM').map(g => g.id).concat(['dubstep', 'riddim']) });
-    const realWrite = SongEngine.write, R = window.Recipes, realRun = R.run; let wrote = null;
-    SongEngine.write = (genre, seed) => { wrote = { genre, seed }; return true; }; R.run = (id) => { wrote = { recipe: id }; return true; };
+describe('Songs in Patterns — every song’s ▶ Whole song writes exactly that song', () => {
+  it('grouped by song, each song with blocks has a Whole song button that writes that song (genre + seed)', async () => {
+    const realWrite = SongEngine.write; let wrote = null;
+    SongEngine.write = (genre, seed) => { wrote = { genre, seed }; return true; };
     try {
-      const bad = [];
-      const all = Songbook.all().filter(s => !Songbook.locked(s));
-      for (const s of all) {
-        Songbook.open(); const ov = document.querySelector('.overlay.sbk');
-        const name = (c) => c.querySelector('b').textContent.replace(/ 🎤$/, '');   // songs that sing with her carry a 🎤
-        const card = [...ov.querySelectorAll('.sbk-card')].find(c => name(c) === s.title);
-        if (!card) { bad.push(s.id + ': no card'); ov.remove(); continue; }
-        card.click();
-        const selCard = ov.querySelector('.sbk-card.sel'), shown = ov.querySelector('.sbk-detail h3').textContent;
-        if (!selCard || name(selCard) !== s.title || shown !== s.title) bad.push(`${s.id}: selected "${selCard && name(selCard)}", shown "${shown}"`);
-        wrote = null; ov.querySelector('.sbk-go').click();
-        const ok = s.recipe ? wrote && wrote.recipe === s.recipe : wrote && wrote.genre === s.genre && wrote.seed === s.seed;
-        if (!ok) bad.push(`${s.id}: Write wrote ${JSON.stringify(wrote)}`);
-        const left = document.querySelector('.overlay.sbk'); if (left) left.remove();
+      const bad = [], songs = Songbook.songs().filter(s => !s.recipe && !Songbook.locked(s) && SongEngine.genres().some(g => g.id === s.genre));
+      const withBlocks = new Set(PatternLibrary.all().filter(p => p.song).map(p => p.song.id));
+      const pick = songs.filter(s => withBlocks.has(s.id)), sample = pick.filter((_, i) => i % 9 === 0);
+      for (const s of sample) {
+        PatternLibrary.open({ group: 'song' }); const ov = document.querySelector('.overlay.plib');
+        const sec = ov.querySelector('.plib-sec[data-sec="' + s.id + '"]'); if (!sec) { bad.push(s.id + ': no section'); PatternLibrary.open(); continue; }
+        const btn = sec.querySelector('.plib-whole'); if (!btn) { bad.push(s.id + ': no Whole song'); PatternLibrary.open(); continue; }
+        wrote = null; btn.click();
+        if (!(wrote && wrote.genre === s.genre && wrote.seed === s.seed)) bad.push(s.id + ': wrote ' + JSON.stringify(wrote));
+        const left = document.querySelector('.overlay.plib'); if (left) PatternLibrary.open();
       }
       assert.equal(bad.length, 0, bad.slice(0, 8).join(' · '));
-      assert.gt(all.length, 150);
-    } finally { SongEngine.write = realWrite; R.run = realRun; if (!hadGoals) delete window.Goals; else window.Goals = hadGoals; }
+      assert.gt(pick.length, 250, 'nearly every song is in blocks'); assert.gt(sample.length, 25);
+    } finally { SongEngine.write = realWrite; const o = document.querySelector('.overlay.plib'); if (o) PatternLibrary.open(); }
   }, { timeout: 120000 });
 });

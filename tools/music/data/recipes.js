@@ -10,6 +10,8 @@
   G('eravos.genome.emerge', 'Emerge', 'GRANULAR CLOUD · EMERGENCE', ['eravos.granular', 'eravos.sample-player', 'eravos.fx-moddelay', 'eravos.fx-echo', 'eravos.lfo'], '#aaff44');
   G('eravos.genome.vagal', 'Vagal', 'BREATH · EMOTION · RESONANCE', ['eravos.breath', 'eravos.organ', 'eravos.granular', 'eravos.channel'], '#8844ff');
 
+  // 3.82 the Start screen's paintings for these (tools/music/art/start/*.svg — "make the rest of it like that")
+  const ART = (n) => (window.ERAVOS_TOOLS || '') + 'music/art/start/' + n + '.svg';
   // ---- the purpose recipe (from James's intent)
   R.register({
     id: 'eravos.recipe.raven-drop', label: 'Make a song for her', icon: '💘', accent: '#ff2266', genome: 'eravos.genome.music',
@@ -93,7 +95,7 @@
   });
   // ---- 3.37: the Wub rig — a dancehall-style dubstep drop built from the separate Wubs tools, already wired
   R.register({
-    id: 'eravos.recipe.wub-drop', label: 'Wub Drop (dancehall style)', icon: '🔊', accent: '#ff2266', genome: 'eravos.genome.music',
+    id: 'eravos.recipe.wub-drop', art: ART('wub-drop'), label: 'Wub Drop (dancehall style)', icon: '🔊', accent: '#ff2266', genome: 'eravos.genome.music',
     tagline: 'Wub Osc → Wub Filter (talking mouth) → Destroyer, Wub Rate opening it, Wub Sub under it, a half-time beat at 140',
     steps: [
       { op: 'mount', organism: 'eravos.pads', as: 'pads', at: [0, 0] },
@@ -111,7 +113,7 @@
     ],
   });
   R.register({
-    id: 'eravos.recipe.quick-beat', label: 'Quick Beat', icon: '🥁', accent: '#00ff88', genome: 'eravos.genome.music',
+    id: 'eravos.recipe.quick-beat', art: ART('quick-beat'), label: 'Quick Beat', icon: '🥁', accent: '#00ff88', genome: 'eravos.genome.music',
     tagline: 'Drum machine + sequencer, wired, ready to play',
     steps: [
       { op: 'mount', organism: 'eravos.pads', as: 'pads', at: [0, 0] },
@@ -122,7 +124,7 @@
     ],
   });
   R.register({
-    id: 'eravos.recipe.full-session', label: 'Full Session', icon: '🎛', accent: '#00d4ff', genome: 'eravos.genome.music',
+    id: 'eravos.recipe.full-session', art: ART('full-session'), label: 'Full Session', icon: '🎛', accent: '#00d4ff', genome: 'eravos.genome.music',
     tagline: 'Session, drums, bass, lead, timeline, mixer, master',
     steps: [
       { op: 'mount', organism: 'eravos.session', as: 'session', at: [0, 0] },
@@ -171,7 +173,7 @@
     ],
   });
   R.register({
-    id: 'eravos.recipe.emerge', label: 'Emerge', icon: '∞', accent: '#aaff44', genome: 'eravos.genome.emerge', tagline: 'GRANULAR CLOUD · EMERGENCE — her voice as a shimmering cloud',
+    id: 'eravos.recipe.emerge', art: ART('emerge'), label: 'Emerge', icon: '∞', accent: '#aaff44', genome: 'eravos.genome.emerge', tagline: 'GRANULAR CLOUD · EMERGENCE — her voice as a shimmering cloud',
     steps: [
       { op: 'mount', organism: 'eravos.sample-player', as: 'samp', at: [40, 40] },
       { op: 'mount', organism: 'eravos.granular', as: 'gran', at: [540, 40], preset: 'Voice Cloud' },   // built in 3.43
@@ -184,7 +186,7 @@
     ],
   });
   R.register({
-    id: 'eravos.recipe.vagal', label: 'Vagal', icon: '◎', accent: '#8844ff', genome: 'eravos.genome.vagal', tagline: 'BREATH · EMOTION · RESONANCE — breathe with the music',
+    id: 'eravos.recipe.vagal', art: ART('vagal'), label: 'Vagal', icon: '◎', accent: '#8844ff', genome: 'eravos.genome.vagal', tagline: 'BREATH · EMOTION · RESONANCE — breathe with the music',
     steps: [
       { op: 'mount', organism: 'eravos.breath', as: 'breath', at: [40, 40] },
       { op: 'configure', target: 'breath', params: { pattern: 'COHERENCE' } },

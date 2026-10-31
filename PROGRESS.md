@@ -2,6 +2,16 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.82 Songs in blocks (Patterns) · Songs = your saved and exported songs · a painting on every Start tile (2026-10-31)
+Asked: "i want the songs broken into patterns, and moved to the patterns menu, piece by piece, sorted by instrument, like blocks, or
+units, then the songs library is for saved or export songs" · "can you make the rest of it like that" (the Start screen's paintings).
+- Patterns: all 308 named songs taken apart — each instrument, each section a block (≈ 5 300 patterns). Instrument chips; sections by
+  instrument by default; "Sections: song" with ▶ Whole song on each song. Blocks say their song.
+- Songs: only yours — saved and exported (Export now keeps the song there too), with a way to the built-in songs' blocks.
+- Start: 13 paintings (starry nights, Bob Ross mountains, RPG camp, observatory, alchemist tower, treasure chest …) on every tile.
+- Tests: p82 new; six older tests moved to the new layout (the catalogue they clicked through is now in Patterns).
+Specs: pattern-library and themes addenda.
+
 ## Done — 3.81 The featured songs' pictures: small paintings, not emoji (2026-10-31)
 Asked: "the icons look cheap and childish. make them beautiful and creative, rpg, starry night, bob ross, star gazin".
 tools/music/data/featured-art.js (window.FeaturedArt, SVG, loaded before recipes.js): "Make a song for her" — a starry night with Van

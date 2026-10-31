@@ -74,3 +74,8 @@ Before any theme ships: move those onto the tokens, then a theme is one file. Th
   3.81 the featured cards' icons: small SVG paintings (tools/music/data/featured-art.js), unframed with soft corners (asked: no frame) — the
   recipe's featured.art; .hero-card .big.art 168 × 109; .tw twinkle · .flow / .swirl moving strokes · .shim (none for reduced motion).
   .hero-go: a round pill (999px) in the dawn gradient #ffb36b → #ff6fa8 → #b06bff (asked: "the buttons, too sharp, make them round and the color").
+  3.82 every Start tile carries a painting (asked: "make the rest of it like that"): SVG files with their own movement (reduced motion:
+  still) — tools/music/art/start/{wub-drop,quick-beat,full-session,emerge,vagal,lab}.svg (recipe.art / mode.art), tools/<domain>/art.svg
+  (domain.json "art", carried by the catalogue: the domain cards, installed or not), canvas/runtime/art/{blank-canvas,chest}.svg (Empty
+  canvas, Browse every tool). .boot .card.has-art: the painting across the top (240 × 110), the emoji icon dropped from the title.
+

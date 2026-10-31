@@ -18,5 +18,6 @@
  "starter": [
   "eravos.image.image-adjust"
  ],
- "summary": "Load, adjust and export images, non-destructively."
+ "summary": "Load, adjust and export images, non-destructively.",
+ "art": "art.svg"
 }

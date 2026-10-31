@@ -18,9 +18,9 @@ describe('♪ Patterns per tool on the Timeline (3.76)', () => {
       const b = root.querySelector('button[aria-label="Patterns for this track"]'); assert.ok(b, 'a ♪ on the track'); b.click(); await TH.sleep(20);
       const pp = document.querySelector('.tl-patp'); assert.ok(pp, 'the panel opens');
       assert.equal(pp.querySelectorAll('.tl-patp-row').length, 5, 'five at a time'); assert.ok(pp.querySelector('.tl-patp-about').textContent.length > 10, 'what this kind is, in a line');
-      const first = pp.querySelector('.tl-patp-txt span').textContent;
+      const first = pp.querySelector('.tl-patp-txt span').title;   // the full name (3.82: a song's blocks share their first words)
       [...pp.querySelectorAll('button')].find(x => /5 others/.test(x.textContent)).click(); await TH.sleep(10);
-      assert.ok(document.querySelector('.tl-patp .tl-patp-txt span').textContent !== first, 'five others');
+      assert.ok(document.querySelector('.tl-patp .tl-patp-txt span').title !== first, 'five others');
       const lane = I.lanes.find(l => l.name === 'Keys'), n0 = I.clips.filter(c => c.lane === lane.id).length;
       document.querySelector('.tl-patp .tl-patp-row .uk-btn.primary').click(); await TH.sleep(30);
       const mine = I.clips.filter(c => c.lane === lane.id).sort((x, y) => x.startBar - y.startBar);

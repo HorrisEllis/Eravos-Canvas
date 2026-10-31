@@ -2,7 +2,7 @@
 window.__phase = 'P73';
 describe('🧩 Patterns page: families that fold, quick picks, sections (3.73)', () => {
   const L = () => PatternLibrary.all();
-  const fresh = () => { try { localStorage.removeItem('eravos.patterns.page'); } catch (e) {} if (document.querySelector('.plib')) PatternLibrary.open(); const pg = PatternLibrary.open(); const ov = document.querySelector('.plib'); ov.querySelector('.sbk-alt.sm:not(.plib-more)') && [...ov.querySelectorAll('button')].find(b => b.textContent === 'Clear').click(); return { pg, ov }; };
+  const fresh = () => { try { localStorage.removeItem('eravos.patterns.page'); } catch (e) {} if (document.querySelector('.plib')) PatternLibrary.open(); const pg = PatternLibrary.open({ group: 'type' }); const ov = document.querySelector('.plib');   /* 3.82 the page opens by instrument; these are about sections by type */ ov.querySelector('.sbk-alt.sm:not(.plib-more)') && [...ov.querySelectorAll('button')].find(b => b.textContent === 'Clear').click(); return { pg, ov }; };
   const chips = (ov, sel) => [...ov.querySelectorAll(sel)];
   const typesShown = (ov) => new Set(chips(ov, '.plib-sec').map(s => s.dataset.sec));
   it('every genre belongs to a family; the deep-drop family holds Floor Falls and the tension studies', () => {
@@ -26,7 +26,7 @@ describe('🧩 Patterns page: families that fold, quick picks, sections (3.73)',
       chips(ov, '.plib-q').find(b => /Deep drops/.test(b.textContent)).click();
       const want = L().filter(p => PatternLibrary.familyOf(p.genre) === 'deep').length;
       assert.ok(new RegExp('^' + want + ' shown').test(ov.querySelector('.sbk-row2 > .sbk-sub:last-child').textContent), 'all ' + want + ' deep ones');
-      assert.ok(chips(ov, '.plib-card small').every(s => /Floor Falls|Heavy Drops|Tension/.test(s.textContent)), 'only the deep family');
+      assert.ok(chips(ov, '.plib-card small:not(.plib-song)').every(s => /Floor Falls|Heavy Drops|Tension/.test(s.textContent)), 'only the deep family');
       chips(ov, '.plib-q').find(b => /Curves/.test(b.textContent)).click();
       assert.deepEqual([...typesShown(ov)], ['curve'], 'deep curves only');
       chips(ov, '.plib-q').find(b => /Deep drops/.test(b.textContent)).click();   // off again
@@ -53,7 +53,7 @@ describe('🧩 Patterns page: families that fold, quick picks, sections (3.73)',
       assert.ok(chips(ov, '.plib-card').length > 0 && chips(ov, '.plib-card').every(c => /floor falls/i.test(c.textContent) && /drop/i.test(c.textContent)), 'every word matched');
       q.value = ''; q.dispatchEvent(new Event('input'));
       const [lo, hi] = chips(ov, '.plib-bpm'); lo.value = '170'; lo.dispatchEvent(new Event('input')); hi.value = '175'; hi.dispatchEvent(new Event('input'));
-      assert.ok(chips(ov, '.plib-card small').every(s => { const b = +/(\d+) BPM/.exec(s.textContent)[1]; return b >= 170 && b <= 175; }), 'in range');
+      assert.ok(chips(ov, '.plib-card small:not(.plib-song)').every(s => { const b = +/(\d+) BPM/.exec(s.textContent)[1]; return b >= 170 && b <= 175; }), 'in range');
       const star = ov.querySelector('.plib-card .plib-star'), name = star.parentNode.querySelector('b').textContent; star.click();
       chips(ov, '.plib-q').find(b => /Favourites/.test(b.textContent)).click();
       assert.equal(chips(ov, '.plib-card').length, 1, 'only the starred one'); assert.equal(ov.querySelector('.plib-card b').textContent, name);
