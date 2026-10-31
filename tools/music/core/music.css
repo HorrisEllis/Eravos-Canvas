@@ -351,6 +351,55 @@ html:not(.snd-off) #logo { filter: drop-shadow(0 0 calc(var(--snd-pulse) * 10px)
 .gg-knobs { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
 .gg-strips { display: flex; flex-direction: column; gap: 8px; } .gg-strips.row { flex-direction: row; }
 .gg-strip { display: flex; flex-direction: column; gap: 4px; }
+/* 3.79 Bassline: the note it is on and what it follows, above its line screen */
+.bl-read { display: flex; align-items: baseline; gap: 12px; }
+.bl-now { font: 700 22px var(--mono); letter-spacing: 1px; color: var(--acc); text-shadow: 0 0 calc(4px + 10px * var(--flash, 0)) var(--acc); min-width: 52px; }
+.bl-src { font: 600 9px var(--mono); letter-spacing: 1.2px; color: var(--faint); }
+/* 3.79 Bass Forge: the LFO beside its six stage faders; Match draws the reference against the forge */
+.bf-talk { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: start; }
+.bf-lfo { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.bf-scope { width: 100% !important; border-radius: 3px; border: 1px solid #000; box-shadow: 0 0 0 1px var(--line); }
+.bf-lforow .uk-seg { flex-wrap: wrap; }
+.bf-shapes { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
+.bf-shapes .mo-tile { height: 34px; }
+.bf-faders { display: flex; gap: 8px; }
+.bf-stage { display: flex; gap: 3px; align-items: flex-start; }
+.bf-stage .gg-meter { height: 112px; }
+.bf-legend { display: flex; gap: 10px; font: 700 9px var(--mono); letter-spacing: 1.2px; }
+.bf-legend span::before { content: ''; display: inline-block; width: 9px; height: 9px; margin-right: 5px; vertical-align: -1px; border-radius: 1px; }
+.bf-legend .ref { color: var(--dim); } .bf-legend .ref::before { border: 1.5px solid #8796a8; }
+.bf-legend .me { color: var(--acc); } .bf-legend .me::before { background: var(--acc); box-shadow: 0 0 6px var(--acc); }
+.bf-rack { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 8px; align-items: start; }
+.bf-rack .gg-knobs { align-items: flex-end; gap: 16px; }
+.bf-rack .bf-shape { grid-column: span 2; }
+@media (max-width: 640px) { .bf-rack .bf-shape { grid-column: auto; } }
+.bf-match.over { outline: 1px dashed var(--acc); outline-offset: 4px; }
+@media (max-width: 640px) { .bf-talk { grid-template-columns: 1fr; } .bf-faders { justify-content: space-between; } }
+/* 3.79 Drum Forge: square pads beside the chosen pad; its sound as a knob bank; Layers draws the pitch drop; Mix is a strip a pad */
+.df-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: start; }
+.df-pads { gap: 6px; }
+.df-pads .forge-pad { border: 1px solid #000; background: var(--well); box-shadow: 0 0 0 1px var(--line); font: 700 9.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; overflow: hidden; padding: 2px; transition: background .08s, box-shadow .08s; }
+.df-pads .forge-pad span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.df-pads .forge-pad small { font: 600 8px var(--mono); letter-spacing: .4px; text-transform: none; color: var(--faint); }
+.df-pads .forge-pad.sel { box-shadow: 0 0 0 1px var(--acc), 0 0 12px color-mix(in srgb, var(--acc) 22%, transparent); color: var(--acc); }
+.df-pads .forge-pad.hit { background: color-mix(in srgb, var(--acc) 40%, var(--well)); box-shadow: 0 0 0 1px var(--acc), 0 0 18px color-mix(in srgb, var(--acc) 45%, transparent); }
+.df-pad { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.df-padhead { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.df-no { font: 700 13px var(--mono); letter-spacing: 1.5px; color: var(--acc); text-shadow: 0 0 calc(3px + 8px * var(--flash, 0)) var(--acc); }
+.df-name { flex: 1; min-width: 80px; width: auto !important; }
+.df-wave { width: 100% !important; border-radius: 3px; border: 1px solid #000; box-shadow: 0 0 0 1px var(--line); }
+.df-acts { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+.df-kit { display: flex; flex-direction: column; gap: 4px; padding-top: 8px; border-top: 1px solid var(--line); }
+.df-send { display: flex; gap: 5px; flex: 1; min-width: 160px; } .df-send .uk-field, .df-send > :first-child { flex: 1; min-width: 0; }
+.df-pickrow { display: flex; align-items: center; gap: 8px; }
+.df-pick { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 3px; flex: 1; }
+.df-pk { height: 24px; border-radius: 3px; border: 1px solid #000; background: var(--well); box-shadow: 0 0 0 1px var(--line); color: var(--dim); font: 700 9.5px var(--mono); cursor: pointer; padding: 0; }
+.df-pk.on { color: var(--acc); box-shadow: 0 0 0 1px var(--acc); }
+.df-curve { touch-action: none; }
+.df-wide { gap: 18px; }
+.df-mixer { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
+.df-ch .gg-chn { cursor: pointer; }
+@media (max-width: 640px) { .df-top { grid-template-columns: 1fr; } .df-mixer { grid-template-columns: repeat(4, minmax(0, 1fr)); } .df-pick { grid-template-columns: repeat(8, minmax(0, 1fr)); } }
 .gg-hint { font: 500 9px var(--mono); letter-spacing: .9px; color: var(--faint); }
 .gg-mixer { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
 .gg-ch { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px 7px; border-radius: 3px; border: 1px solid #000; background: var(--well); box-shadow: 0 0 0 1px var(--line); min-width: 0; }

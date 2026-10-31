@@ -2,6 +2,20 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.79 Bassline, Bass Forge and Drum Forge the Groove way (2026-10-31)
+Asked: "bassline. bass forge, then drum forge" — map T1, T4, T3 (specs/eravos.quality-and-tools-map.spec). Each: perform: true (Motion +
+Perform tabs), its window rebuilt in the look kit, deeper controls on its page, defaults that sound / play exactly as before (tested).
+- Bassline 1.1: slides with a chance, ghost notes, octave jumps, movement (the fifth, a step toward the next chord), humanize, accent,
+  follow, seed; a 16-step lane (level, octave, slide per step) on its Steps tab; the window's LINE screen draws the last two bars as played.
+- Bass Forge 1.1: talk (velocity → how far the LFO moves), velocity → brightness, LFO start phase, free-running LFO; the LFO is a mod out;
+  the window's TALK: a live trace of the LFO and six stage faders with meters lit by what the LFO does now; Sound rack and Match tab
+  (the reference against the forge, measure by measure, and the distance per try).
+- Drum Forge 1.1: per pad a drawn pitch drop (drag start / end / bend), noise and click lengths, its own filter; the kit's velocity → tone;
+  pad edits held to their ranges (they were not); Layers and Mix (a strip per pad) tabs; knobs made once and set to the chosen pad.
+- Found and fixed on the way: Bass Forge restarted its LFO when the start phase was set (now only a free LFO does); the drum pad filter
+  is chained after the velocity low-pass (a test holds both on).
+Tests: bass-gen 6, bass-forge 6, drum-forge 5 new. Specs: an addendum in each tool's .spec; the map marks T1, T3, T4 built.
+
 ## Mapped — what is left of the motion / look / reactive / sound-quality line (2026-10-30)
 His words: "merge and push, then map the rest. make sure you update and add addendums to the specs." Map: specs/eravos.quality-and-tools-map.spec
 (no release number — IDs that take the next free number when built, since the two sessions' numbers collide): Q sound quality (Q1 Wub

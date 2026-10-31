@@ -46,9 +46,36 @@
                         "minimum": 0,
                         "maximum": 1.5
                       },
+                      "velTone": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
                       "sendTo": {
                         "type": "string"
                       },
+                      "m1": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "m2": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "m3": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "m4": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "_motion": {},
+                      "_perform": {},
                       "_react": {}
                     },
                     "additionalProperties": false

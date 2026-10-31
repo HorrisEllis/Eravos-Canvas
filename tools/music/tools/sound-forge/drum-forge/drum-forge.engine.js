@@ -1,4 +1,4 @@
-/* eravos.drum-forge 1.0.0 — Drum Forge · spec eravos.organism.drum-forge
+/* eravos.drum-forge 1.1.0 — Drum Forge · spec eravos.organism.drum-forge
  * Design drum-pad sounds instead of picking them. 16 slots, each a synthesized one-shot built from one voice model
  * (kick, 808, snare, gated '84 snare, clap, closed / open hat, ride, crash, tom-syndrum, rim, FM perc with any —
  * often irrational — ratio, metal bar, zap, laser, riser, downlifter, impact, vinyl crackle) and the same handful
@@ -6,12 +6,18 @@
  * StarryPad through MIDI Map). Every voice is a pure function of (context, slot, time) so the same code renders
  * offline: one slot → WAV, or the whole kit → a ZIP of 16 WAVs for any sampler / pad controller, or straight onto
  * a Drum Machine pad / Sample Player. Kits: dancehall, roots one-drop, dubstep, riddim, synthwave '84, witch house,
- * industrial goth, xen percussion. */
+ * industrial goth, xen percussion.
+ * 1.1 (3.79, James: "all need more dynamic control and a better ui"): each pad's layers get their own length (noise, click), its
+ * pitch drop a drawn curve (fast-then-slow … hold-then-drop), and its own filter (low-pass ← 0 → high-pass); the kit gets velocity →
+ * tone and the shared MOTION + PERFORM (perform: true). All neutral by default: an old kit sounds as it did. */
 (function () {
   'use strict';
   const S = OrganismSDK.STD, dsp = OrganismSDK.dsp;
   const TYPES = ['kick', '808', 'snare', 'gated snare', 'clap', 'hat', 'open hat', 'ride', 'crash', 'tom', 'rim', 'fm perc', 'metal', 'zap', 'laser', 'riser', 'downlifter', 'impact', 'vinyl', 'shaker'];
-  const D = { tune: 0, decay: 0.4, pitch: 0, ptime: 0.04, tone: 0.5, noise: 0.3, snap: 0.5, drive: 0, fm: 1.4142, fmi: 2, gate: 0, pan: 0, level: 0.9, choke: 0 };
+  const D = { tune: 0, decay: 0.4, pitch: 0, ptime: 0.04, tone: 0.5, noise: 0.3, snap: 0.5, drive: 0, fm: 1.4142, fmi: 2, gate: 0, pan: 0, level: 0.9, choke: 0, curve: 0.5, nlen: 1, clen: 1, filter: 0 };
+  // what a pad's settings may be (an edit outside is held to it)
+  const RANGE = { tune: [-24, 24], decay: [0.01, 8], pitch: [0, 48], ptime: [0.002, 0.6], tone: [0, 1], noise: [0, 1], snap: [0, 1], drive: [0, 1], fm: [0.25, 8], fmi: [0, 8],
+    gate: [0, 1], pan: [-1, 1], level: [0, 1.5], choke: [0, 4], curve: [0, 1], nlen: [0.1, 4], clen: [0.1, 4], filter: [-1, 1] };
   const slot = (type, name, o) => Object.assign({ type, name: name || type }, D, o || {});
   const KITS = {
     'Dancehall · Bun Dem': [slot('kick', 'kick', { decay: 0.32, pitch: 18, ptime: 0.03, snap: 0.7, drive: 0.35 }), slot('rim', 'rimshot', { tune: 3, decay: 0.07, snap: 0.9, level: 0.85 }), slot('snare', 'crack', { tune: 4, decay: 0.16, noise: 0.7, snap: 0.9, tone: 0.75 }), slot('hat', 'hat', { decay: 0.04, tone: 0.8 }),
@@ -51,7 +57,11 @@
   function voice(A, s, t, vel, dst, noiseBuf, gateIn) {
     const nodes = [], g = A.createGain(), pan = A.createStereoPanner(); pan.pan.value = s.pan; g.connect(pan); pan.connect(dst); nodes.push(g, pan);
     let tail = g;
-    if (s.drive > 0) { const sh = A.createWaveShaper(); sh.curve = dsp.curve('tube', s.drive); sh.oversample = '2x'; const pre = A.createGain(); pre.gain.value = 1 + s.drive * 3; pre.connect(sh); sh.connect(g); tail = pre; nodes.push(sh, pre); }
+    // velocity → tone: a softer hit closes a low-pass (set by the kit's Vel → tone; none on a full-velocity hit)
+    if (s.vlp > 0 && s.vlp < 19000) { const vf = A.createBiquadFilter(); vf.type = 'lowpass'; vf.frequency.value = s.vlp; vf.Q.value = 0.6; vf.connect(tail); tail = vf; nodes.push(vf); }
+    // 1.1 the pad's own filter: below 0 a low-pass closing, above 0 a high-pass opening (none at 0)
+    if (s.filter) { const fl = A.createBiquadFilter(); fl.type = s.filter < 0 ? 'lowpass' : 'highpass'; fl.frequency.value = s.filter < 0 ? 20000 * Math.pow(2, s.filter * 9) : 20 * Math.pow(2, s.filter * 9); fl.Q.value = 0.9; fl.connect(tail); tail = fl; nodes.push(fl); }
+    if (s.drive > 0) { const sh = A.createWaveShaper(); sh.curve = dsp.curve('tube', s.drive); sh.oversample = '2x'; const pre = A.createGain(); pre.gain.value = 1 + s.drive * 3; pre.connect(sh); sh.connect(tail); tail = pre; nodes.push(sh, pre); }
     if (s.gate > 0 && gateIn) { const sg = A.createGain(); sg.gain.value = s.gate; g.connect(sg); sg.connect(gateIn); nodes.push(sg); }
     const R = Math.pow(2, s.tune / 12), L = s.level * (0.35 + 0.65 * vel), dec = Math.max(0.01, s.decay);
     const osc = (type, f, to) => { const o = A.createOscillator(); o.type = type; o.frequency.value = f; o.connect(to || tail); o.start(t); o.stop(t + dec * 3 + 0.3); nodes.push(o); return o; };
@@ -59,18 +69,21 @@
     const noise = (to, d, peak) => { const n = A.createBufferSource(); n.buffer = noiseBuf; n.loop = true; const e = amp(to, peak, d); n.connect(e); n.start(t, Math.random() * 1.5); n.stop(t + d + 0.1); nodes.push(n); return n; };
     const filt = (type, f, q, to) => { const b = A.createBiquadFilter(); b.type = type; b.frequency.value = f; b.Q.value = q || 0.7; b.connect(to || tail); nodes.push(b); return b; };
     const sweep = (p, f0, f1, d) => { p.setValueAtTime(f0, t); p.exponentialRampToValueAtTime(Math.max(1, f1), t + d); };
+    // 1.1 the pitch drop, drawn: curve 0.5 is the plain exponential drop (as 1.0); lower drops fast then settles, higher holds then drops
+    const drop = (p, f0, f1, d) => { const c = s.curve === undefined ? 0.5 : s.curve; if (Math.abs(c - 0.5) < 1e-6 || !(f0 > 0)) return sweep(p, f0, f1, d); const k = Math.pow(2, (c - 0.5) * 4), r = Math.max(1, f1) / f0, n = 48, v = new Float32Array(n); for (let i = 0; i < n; i++) v[i] = f0 * Math.pow(r, Math.pow(i / (n - 1), k)); p.setValueCurveAtTime(v, t, Math.max(0.002, d)); };
+    const NL = s.nlen || 1, CL = s.clen || 1;   // the noise layer's and the click layer's lengths
     switch (s.type) {
       case 'kick': case '808': {
         const f = (s.type === '808' ? 49 : 52) * R, o = osc('sine', f, amp(null, L, s.type === '808' ? dec * 1.1 : dec));
-        sweep(o.frequency, f * Math.pow(2, (s.pitch || 0) / 12), f, Math.max(0.005, s.ptime));
-        if (s.snap > 0) { const c = osc('triangle', f * 8, amp(null, L * 0.4 * s.snap, 0.012)); sweep(c.frequency, f * 14, f * 3, 0.012); }
-        if (s.tone > 0.4) noise(filt('bandpass', 3500, 1), 0.006, L * (s.tone - 0.4));
+        drop(o.frequency, f * Math.pow(2, (s.pitch || 0) / 12), f, Math.max(0.005, s.ptime));
+        if (s.snap > 0) { const c = osc('triangle', f * 8, amp(null, L * 0.4 * s.snap, 0.012 * CL)); sweep(c.frequency, f * 14, f * 3, 0.012 * CL); }
+        if (s.tone > 0.4) noise(filt('bandpass', 3500, 1), 0.006 * CL, L * (s.tone - 0.4));
         break;
       }
       case 'snare': case 'gated snare': {
         const f = 185 * R; [1, 1.62].forEach((k, i) => { const o = osc('triangle', f * k, amp(null, L * (0.45 - s.noise * 0.2) / (i + 1), dec * 0.45)); sweep(o.frequency, f * k * 1.5, f * k, 0.03); });
-        noise(filt('highpass', 900 + s.tone * 3000, 0.7), s.type === 'gated snare' ? dec * 0.7 : dec, L * (0.3 + s.noise * 0.6));
-        if (s.snap > 0) noise(filt('bandpass', 5500, 1.2), 0.02, L * 0.5 * s.snap);
+        noise(filt('highpass', 900 + s.tone * 3000, 0.7), (s.type === 'gated snare' ? dec * 0.7 : dec) * NL, L * (0.3 + s.noise * 0.6));
+        if (s.snap > 0) noise(filt('bandpass', 5500, 1.2), 0.02 * CL, L * 0.5 * s.snap);
         break;
       }
       case 'clap': { const bp = filt('bandpass', 1100 + s.tone * 1400, 1.3); [0, 0.011, 0.022, 0.036].forEach((d, i) => { const n = A.createBufferSource(); n.buffer = noiseBuf; const e = A.createGain(); n.connect(e); e.connect(bp); const tt = t + d, dd = i === 3 ? dec : 0.012; e.gain.setValueAtTime(0, tt); e.gain.linearRampToValueAtTime(L * 1.3, tt + 0.001); e.gain.exponentialRampToValueAtTime(0.0001, tt + dd); n.start(tt, Math.random()); n.stop(tt + dd + 0.05); nodes.push(n, e); }); break; }
@@ -80,15 +93,15 @@
         if (s.type === 'crash' || s.type === 'ride') noise(filt('highpass', 4000, 0.5), dec * 0.8, L * 0.25);
         break;
       }
-      case 'tom': { const f = 110 * R, o = osc('sine', f, amp(null, L, dec)); sweep(o.frequency, f * Math.pow(2, (s.pitch || 3) / 12), f, Math.max(0.01, s.ptime * 2)); noise(filt('lowpass', 1500 + s.tone * 3000, 0.5), 0.03, L * 0.3 * s.tone); break; }
+      case 'tom': { const f = 110 * R, o = osc('sine', f, amp(null, L, dec)); drop(o.frequency, f * Math.pow(2, (s.pitch || 3) / 12), f, Math.max(0.01, s.ptime * 2)); noise(filt('lowpass', 1500 + s.tone * 3000, 0.5), 0.03 * NL, L * 0.3 * s.tone); break; }
       case 'rim': { const f = 480 * R; osc('triangle', f, amp(filt('bandpass', f * 2, 3), L * 1.2, dec)); osc('square', f * 2.28, amp(filt('highpass', 2000, 1), L * 0.25 * (0.5 + s.snap), dec * 0.6)); break; }
       case 'fm perc': { const f = 220 * R, mod = A.createOscillator(), mg = A.createGain(), car = osc('sine', f, amp(null, L, dec)); mod.frequency.value = f * s.fm; mg.gain.setValueAtTime(f * s.fmi * 2, t); mg.gain.exponentialRampToValueAtTime(f * 0.01 + 0.001, t + dec * 0.8); mod.connect(mg); mg.connect(car.frequency); mod.start(t); mod.stop(t + dec * 3 + 0.3); nodes.push(mod, mg); if (s.pitch) sweep(car.frequency, f * Math.pow(2, s.pitch / 12), f, 0.04); break; }
       case 'metal': { const f = 180 * R; [1, 2.756, 5.404, 8.933, 1.41, 3.6].forEach((k, i) => osc('sine', f * k, amp(null, L * 0.3 / (1 + i * 0.4), dec / (1 + i * 0.35)))); noise(filt('bandpass', f * 9, 4), 0.02, L * 0.4); break; }
-      case 'zap': { const o = osc('sawtooth', 100, amp(filt('lowpass', 6000, 2), L * 0.6, dec)); sweep(o.frequency, 100 * R * Math.pow(2, (s.pitch || 36) / 12), 60 * R, dec * 0.9); break; }
+      case 'zap': { const o = osc('sawtooth', 100, amp(filt('lowpass', 6000, 2), L * 0.6, dec)); drop(o.frequency, 100 * R * Math.pow(2, (s.pitch || 36) / 12), 60 * R, dec * 0.9); break; }
       case 'laser': { const o = osc('square', 2400 * R, amp(filt('bandpass', 1800, 4), L * 0.7, dec)); const l = A.createOscillator(), lg = A.createGain(); l.frequency.value = 28; lg.gain.value = 600; l.connect(lg); lg.connect(o.frequency); l.start(t); l.stop(t + dec * 3 + 0.3); sweep(o.frequency, 2400 * R, 200 * R, dec); nodes.push(l, lg); break; }
       case 'riser': { const e = A.createGain(); e.connect(tail); e.gain.setValueAtTime(0.0001, t); e.gain.exponentialRampToValueAtTime(L * 0.6, t + dec); e.gain.linearRampToValueAtTime(0, t + dec + 0.05); nodes.push(e); const bp = filt('bandpass', 300, 3, e); bp.frequency.setValueAtTime(300, t); bp.frequency.exponentialRampToValueAtTime(9000, t + dec); const n = A.createBufferSource(); n.buffer = noiseBuf; n.loop = true; n.connect(bp); n.start(t); n.stop(t + dec + 0.1); nodes.push(n); const o = osc('sawtooth', 110 * R, bp); sweep(o.frequency, 110 * R, 880 * R, dec); break; }
       case 'downlifter': { const bp = filt('bandpass', 9000, 2, amp(null, L * 0.7, dec)); bp.frequency.setValueAtTime(9000, t); bp.frequency.exponentialRampToValueAtTime(150, t + dec); const n = A.createBufferSource(); n.buffer = noiseBuf; n.loop = true; n.connect(bp); n.start(t); n.stop(t + dec + 0.1); nodes.push(n); break; }
-      case 'impact': { const f = 44 * R, o = osc('sine', f, amp(null, L, dec)); sweep(o.frequency, f * 4, f * 0.7, dec * 0.6); noise(filt('lowpass', 2400, 0.5), dec * 0.5, L * 0.6); noise(filt('highpass', 3000, 0.5), 0.08, L * 0.5); break; }
+      case 'impact': { const f = 44 * R, o = osc('sine', f, amp(null, L, dec)); drop(o.frequency, f * 4, f * 0.7, dec * 0.6); noise(filt('lowpass', 2400, 0.5), dec * 0.5 * NL, L * 0.6); noise(filt('highpass', 3000, 0.5), 0.08 * CL, L * 0.5); break; }
       case 'vinyl': { const hp = filt('highpass', 1500, 0.5), e = amp(hp, L * 0.12, dec, 0.02); const n = A.createBufferSource(); n.buffer = noiseBuf; n.loop = true; n.connect(e); n.start(t); n.stop(t + dec + 0.1); nodes.push(n); const r = dsp.mulberry32(Math.floor(t * 1000)); for (let i = 0; i < dec * 18; i++) { const tt = t + r() * dec; const c = A.createBufferSource(); c.buffer = noiseBuf; const ce = A.createGain(); ce.gain.setValueAtTime(L * (0.2 + r() * 0.6), tt); ce.gain.exponentialRampToValueAtTime(0.0001, tt + 0.002); c.connect(ce); ce.connect(hp); c.start(tt, r()); c.stop(tt + 0.004); nodes.push(c, ce); } break; }
       case 'shaker': default: noise(filt('bandpass', 6000 + s.tone * 3000, 1.5), dec, L * 0.6); noise(filt('highpass', 9000, 0.7), dec * 0.5, L * 0.25); break;
     }
@@ -106,9 +119,9 @@
     return { inG, gate, open(t, amount) { gate.gain.cancelScheduledValues(t); gate.gain.setValueAtTime(Math.max(gate.gain.value, 0), t); gate.gain.linearRampToValueAtTime(0.9 * Math.min(1, amount), t + 0.004); gate.gain.setValueAtTime(0.9 * Math.min(1, amount), t + 0.2); gate.gain.linearRampToValueAtTime(0, t + 0.23); } };
   }
   OrganismFactory.define({
-    id: 'eravos.drum-forge', preview: 'hit', domain: 'music', version: '1.0.0', label: 'Drum Forge', icon: '⚒', accent: '#ff7b00', phase: 'P14',
+    id: 'eravos.drum-forge', preview: 'hit', domain: 'music', version: '1.1.0', perform: true, label: 'Drum Forge', icon: '⚒', accent: '#ff7b00', phase: 'P14',
     category: 'Sound Forge', blurb: 'Design your own drum-pad sounds: 16 synthesized one-shots, gated 80s room, genre kits — render a WAV or the whole kit for your pads.',
-    size: { w: 600, h: 620 }, minSize: { w: 460, h: 460 },
+    size: { w: 600, h: 570 }, minSize: { w: 460, h: 460 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe', 'filesystem_write', 'registry_read'],
     provides: ['capability.audio_out', 'capability.note_in', 'capability.pad_trigger'],
     needs: { notes: ['Pads 1–16 = notes 36–51; the StarryPad plays it through MIDI Map.'], works_with: ['eravos.sequencer', 'eravos.midi-mapper', 'eravos.pads', 'eravos.dub-station'] },
@@ -120,6 +133,7 @@
       { key: 'sel', type: 'integer', default: 0, min: 0, max: 15, label: 'Slot', group: 'KIT' },
       { key: 'room', type: 'number', default: 0.6, min: 0, max: 1, step: 0.01, label: 'Gated room', group: 'KIT' },
       { key: 'volume', type: 'number', default: 0.9, min: 0, max: 1.5, step: 0.01, label: 'Volume', group: 'KIT' },
+      { key: 'velTone', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Vel → tone', group: 'KIT', hint: 'harder hits are brighter, softer ones darker — every pad' },
       { key: 'sendTo', type: 'string', default: '', label: 'Send to', group: 'KIT', hidden: true },
     ],
     ui_hooks: ['hit', 'slot_edit', 'render', 'render_kit', 'send', 'preview'],
@@ -143,7 +157,9 @@
         if (s.choke) { (choking.get(s.choke) || []).forEach(g => { try { g.gain.cancelScheduledValues(t); g.gain.setTargetAtTime(0, t, 0.006); } catch (e) {} }); choking.set(s.choke, []); }
         // 3.39: a driven slot's voice passes a 2x shaper (128 samples late) → it starts that much early and lands on the beat
         const tv = s.drive > 0 ? Math.max(ac.currentTime, t - ctx.dsp.osLatency(ac, '2x')) : t;
-        const v = voice(ac, Object.assign({}, s, { gate: s.gate * P.get('room') }), tv, vel, mix, noiseBuf, gate.inG);
+        const vt = P.get('velTone'), tone = vt ? Math.max(0, Math.min(1, s.tone + vt * (vel - 0.7) * 1.2)) : s.tone;
+        const vlp = vt ? 20000 * Math.pow(2, -vt * Math.max(0, 1 - vel) * 5) : 0;
+        const v = voice(ac, Object.assign({}, s, { gate: s.gate * P.get('room'), tone, vlp }), tv, vel, mix, noiseBuf, gate.inG);
         if (s.gate > 0 && P.get('room') > 0) gate.open(t, s.gate * P.get('room'));
         if (s.choke) choking.get(s.choke).push(v.gain);
         // open hats are choked by closed hats in the same group (hat → group of the next open hat)
@@ -158,7 +174,7 @@
       ctx.audition = (p) => hit(P.get('sel'), p.velocity || 0.9, ac.currentTime, 'ui');
       ctx.onUI('slot_edit', { type: 'object', required: ['i', 'patch'] }, (p) => {
         const s = slots[p.i]; if (!s) return;
-        Object.keys(p.patch).forEach(k => { if (k === 'type' && TYPES.includes(p.patch[k])) s.type = p.patch[k]; else if (k === 'name') s.name = String(p.patch[k]).slice(0, 24); else if (k in D && typeof p.patch[k] === 'number' && Number.isFinite(p.patch[k])) s[k] = p.patch[k]; });
+        Object.keys(p.patch).forEach(k => { if (k === 'type' && TYPES.includes(p.patch[k])) s.type = p.patch[k]; else if (k === 'name') s.name = String(p.patch[k]).slice(0, 24); else if (k in D && typeof p.patch[k] === 'number' && Number.isFinite(p.patch[k])) { const r = RANGE[k]; s[k] = r ? Math.max(r[0], Math.min(r[1], p.patch[k])) : p.patch[k]; } });
         ctx.syncUI(); if (p.audition) hit(p.i, 0.9, ac.currentTime, 'ui');
       });
       // ---- offline render (same voices)
@@ -188,8 +204,8 @@
       let announced = '';
       const announce = (force) => { const pads = slots.map((s, i) => ({ note: 36 + i, name: s.name, sound: s.type })); const k = JSON.stringify(pads); if (!force && k === announced) return; announced = k; ctx.emit('pad:bank-change', { bank: 0, pads }); };
       ctx.timeout(() => announce(true), 0); ctx.on('kernel:organism-mounted', null, () => announce(true));
-      ctx.stateExtra = () => { announce(false); return { slots, types: TYPES }; };
-      ctx.internals = { get slots() { return slots; }, voice, KITS };
+      ctx.stateExtra = () => { announce(false); return { slots, types: TYPES, range: RANGE }; };
+      ctx.internals = { get slots() { return slots; }, voice, KITS, D, RANGE };
       return {};
     },
   });

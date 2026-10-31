@@ -1,4 +1,4 @@
-/* eravos.bass-forge 1.0.0 — Bass Forge · spec eravos.organism.bass-forge
+/* eravos.bass-forge 1.1.0 — Bass Forge · spec eravos.organism.bass-forge
  * Growls, riddim, neuro, screech, tearout — FM-based, not filter-based (the Wobble Bass is filter-based, the Reese is
  * detune-based; this is the third, different way). Chain: 2 carriers (unison) frequency-modulated by a sine at ANY
  * ratio (incl. irrational φ, √2, π/2) → wavefolder → vowel formant morph → pitch-tracked comb → riddim notch →
@@ -7,7 +7,11 @@
  * its own depth — so a single gesture talks. Pitch envelope for zaps / lasers.
  * MATCH (recursive): drop a reference bass clip → it is measured (centroid, flatness, sub/brightness balance,
  * modulation rate + depth) → the forge renders itself offline, measures the render, nudges its knobs (coordinate
- * descent, step halving) and loops until the distance stops shrinking. Same graph code live and offline. */
+ * descent, step halving) and loops until the distance stops shrinking. Same graph code live and offline.
+ * 1.1 (3.79, James: "all need more dynamic control and a better ui"): FEEL — talk (how hard a note is played sets how far the LFO
+ * moves), velocity → brightness, the LFO's start phase and free-running (not restarted by each note); the LFO is a mod out (`lfo`)
+ * so its talk can move other tools; MATCH reports what it measured, so the window draws the reference against the forge; and the
+ * shared MOTION + PERFORM (perform: true). All neutral by default: an old song sounds as it did. */
 (function () {
   'use strict';
   const S = OrganismSDK.STD, dsp = OrganismSDK.dsp;
@@ -15,9 +19,12 @@
   const SHAPES = ['sine', 'saw', 'square', 'stair', 'talk'];
   const RATIOS = { '1': 1, '2': 2, '0.5': 0.5, '1.5': 1.5, '3': 3, 'φ 1.618': 1.6180339887, '√2 1.414': Math.SQRT2, 'π/2 1.571': Math.PI / 2, 'e/2 1.359': Math.E / 2, '7/4': 1.75 };
   const VOW = { OO: [300, 870], OH: [450, 800], AH: [730, 1090], EH: [530, 1840], EE: [270, 2290] };
-  function lfoWave(A, shape) {
+  const LFO_FN = { sine: t => -Math.cos(2 * Math.PI * t), saw: t => 1 - 2 * t, square: t => t < 0.5 ? 1 : -1, stair: t => [-1, 0.33, -0.33, 1][Math.floor(t * 4)],
+    talk: t => t < 0.18 ? -1 + 2 * (t / 0.18) : t < 0.5 ? 1 - 1.4 * ((t - 0.18) / 0.32) : t < 0.62 ? -0.4 + 0.9 * Math.sin((t - 0.5) / 0.12 * Math.PI) : -0.4 - 0.6 * ((t - 0.62) / 0.38) };
+  function lfoWave(A, shape, phase) {
     const N = 33, re = new Float32Array(N), im = new Float32Array(N);
     const draw = (fn) => { const M = 512; for (let n = 1; n < N; n++) { let a = 0, b = 0; for (let i = 0; i < M; i++) { const y = fn(i / M), w = 2 * Math.PI * n * i / M; a += y * Math.cos(w); b += y * Math.sin(w); } re[n] = 2 * a / M; im[n] = 2 * b / M; } };
+    if (phase) { const fn = LFO_FN[shape] || LFO_FN.sine; draw(t => fn((t + phase) % 1)); return A.createPeriodicWave(re, im, { disableNormalization: true }); }   // 1.1: starts part-way
     if (shape === 'sine') re[1] = -1;
     else if (shape === 'saw') draw(t => 1 - 2 * t);
     else if (shape === 'square') draw(t => t < 0.5 ? 1 : -1);
@@ -53,10 +60,10 @@
     uni.connect(dComb); dComb.connect(combFb.gain); uni.connect(dNotch); dNotch.connect(notch.detune); uni.connect(dCut); dCut.connect(lp.detune);
     [c1, c2, mod, sub, off].forEach(o => { o.frequency && (o.frequency.value = 55); o.start(); });
     let lfo = null, curF = 55; const waves = {};
-    const wave = (s) => waves[s] || (waves[s] = lfoWave(A, s));
+    const wave = (s, ph) => { const k = s + ':' + (ph || 0); return waves[k] || (waves[k] = lfoWave(A, s, ph || 0)); };
     function startLfo(t) {
       if (lfo) { try { lfo.stop(t); } catch (e) {} const old = lfo; old.onended = () => { try { old.disconnect(); } catch (e) {} }; }
-      lfo = A.createOscillator(); lfo.setPeriodicWave(wave(get('lfoShape'))); lfo.frequency.value = 1 / MT.divisionSec(get('lfoDiv'), bpm()); lfo.connect(lfoBus); lfo.start(t);
+      lfo = A.createOscillator(); lfo.setPeriodicWave(wave(get('lfoShape'), get('lfoPhase'))); lfo.frequency.value = 1 / MT.divisionSec(get('lfoDiv'), bpm()); lfo.connect(lfoBus); lfo.start(t);
     }
     function apply() {
       const t = A.currentTime, set = (p, v) => p.setTargetAtTime(v, t, 0.01);
@@ -81,7 +88,13 @@
       modG.gain.setValueAtTime(get('fm') * f, t); dFM.gain.setValueAtTime(get('lfoFM') * get('fm') * f * 1.5, t);
       comb.delayTime.setValueAtTime(Math.min(0.1, 1 / (f * get('combPitch'))), t);
     }
-    return { nodes, out, amp, startLfo, apply, setFreq, get curF() { return curF; }, get lfo() { return lfo; } };
+    // 1.1 a note's own feel: talk (velocity → how far the LFO moves) and brightness (velocity → the cutoff)
+    function feel(vel, t) {
+      const tk = get('talk') || 0, vb = get('velBright') || 0;
+      lfoBus.gain.setValueAtTime(0.5 * (tk ? (1 - tk) + tk * Math.min(1, vel * 1.15) : 1), t);
+      lp.detune.setValueAtTime(vb ? vb * (vel - 0.6) * 3600 : 0, t);
+    }
+    return { nodes, out, amp, uni, startLfo, apply, setFreq, feel, get curF() { return curF; }, get lfo() { return lfo; } };
   }
   const CFG = [
     { key: 'wave', type: 'enum', options: ['sawtooth', 'square', 'triangle', 'sine'], default: 'sawtooth', label: 'Carrier', group: 'FM' },
@@ -113,6 +126,10 @@
     { key: 'glide', type: 'number', default: 0.04, min: 0, max: 2, step: 0.001, unit: 's', label: 'Glide', group: 'PITCH' },
     { key: 'octave', type: 'integer', default: -1, min: -3, max: 3, label: 'Octave', group: 'PITCH' },
     { key: 'keepRange', type: 'boolean', default: true, label: 'Keep in range', group: 'PITCH', hint: 'never under 25 Hz — a note that would be is lifted by octaves, so it is heard (3.77 sound audit)' },
+    { key: 'talk', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Talk', group: 'FEEL', hint: 'how hard a note is played sets how far the LFO moves it (0 = every note moves fully, as before)' },
+    { key: 'velBright', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Vel → bright', group: 'FEEL', hint: 'harder notes open the filter, softer ones close it (up to an octave and a half)' },
+    { key: 'lfoPhase', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'LFO start', group: 'FEEL', hint: 'where in its shape the LFO starts on each note' },
+    { key: 'lfoFree', type: 'boolean', default: false, label: 'LFO free', group: 'FEEL', hint: 'the LFO runs on its own — notes do not restart it' },
     { key: 'sub', type: 'number', default: 0.6, min: 0, max: 1, step: 0.01, label: 'Sub', group: 'OUT' },
     { key: 'attack', type: 'number', default: 0.004, min: 0.001, max: 4, step: 0.001, unit: 's', label: 'Attack', group: 'OUT' },
     { key: 'release', type: 'number', default: 0.1, min: 0.01, max: 8, step: 0.001, unit: 's', label: 'Release', group: 'OUT' },
@@ -143,9 +160,9 @@
   }
 
   OrganismFactory.define({
-    id: 'eravos.bass-forge', preview: 'bass', domain: 'music', version: '1.0.0', label: 'Bass Forge', icon: '🜂', accent: '#ff3d00', phase: 'P14',
+    id: 'eravos.bass-forge', preview: 'bass', domain: 'music', version: '1.1.0', perform: true, label: 'Bass Forge', icon: '🜂', accent: '#ff3d00', phase: 'P14',
     category: 'Bass', blurb: 'FM growls, riddim, neuro, screech — one LFO talks through FM, fold, vowel, comb, notch. MATCH learns a reference bass recursively.',
-    size: { w: 620, h: 660 }, minSize: { w: 480, h: 480 },
+    size: { w: 620, h: 600 }, minSize: { w: 480, h: 480 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe', 'filesystem_read'],
     provides: ['capability.audio_out', 'capability.note_in', 'capability.lead_voice', 'capability.bass'],
     needs: { notes: ['MATCH analyses a clip you own (drop a bass sample on it) and steers its knobs towards it.'], works_with: ['eravos.sequencer', 'eravos.timeline', 'eravos.sub-engine', 'eravos.harmonic-analyzer'] },
@@ -161,15 +178,18 @@
       const level = ac.createGain(); g.out.connect(level); ctx.track(level);
       const levMod = ctx.modBus('level', { min: 0, max: 1.5 }); levMod.connect(level.gain);
       ctx.port('out', { kind: 'audio', direction: 'out', node: level, label: 'bass forge' });
+      ctx.port('lfo', { kind: 'mod', direction: 'out', node: g.uni, label: 'talk (its LFO, 0…1)' });
       g.apply(); g.startLfo(ac.currentTime);
-      P.onChange('*', (v, prev, k) => { if (k === 'lfoShape' || k === 'lfoDiv') { if (g.lfo) { if (k === 'lfoShape') g.startLfo(ac.currentTime); else g.lfo.frequency.setTargetAtTime(1 / MT.divisionSec(P.get('lfoDiv'), ctx.bpm), ac.currentTime, 0.01); } } else g.apply(); });
+      // the start phase is used by the next note; only a free-running LFO (no notes restart it) takes it at once
+      P.onChange('*', (v, prev, k) => { if (k === 'lfoPhase' && !P.get('lfoFree')) return; if (k === 'lfoShape' || k === 'lfoDiv' || k === 'lfoPhase') { if (g.lfo) { if (k !== 'lfoDiv') g.startLfo(ac.currentTime); else g.lfo.frequency.setTargetAtTime(1 / MT.divisionSec(P.get('lfoDiv'), ctx.bpm), ac.currentTime, 0.01); } } else g.apply(); });
       ctx.onBpm(() => { if (g.lfo) g.lfo.frequency.setTargetAtTime(1 / MT.divisionSec(P.get('lfoDiv'), ctx.bpm), ac.currentTime, 0.01); });
       let held = null;
       function noteOn(note, vel, t, dur, slide) {
         t = Math.max(t || ac.currentTime, ac.currentTime);
         const f0 = MT.hz(Math.max(12, note + 12 * P.get('octave'))), f = P.get('keepRange') !== false ? ctx.dsp.keepRange(f0, 25) : f0, legato = held && held.off > t - 1e-4;   // 3.77 never under 25 Hz
         g.setFreq(f, t, legato ? P.get('glide') : 0, legato ? 0 : P.get('pitchEnv'));
-        if (!legato || !slide) { g.startLfo(t); const a = g.amp.gain; a.cancelScheduledValues(t); if (!legato) a.setValueAtTime(0, t); a.linearRampToValueAtTime(0.1 + 0.9 * Math.pow(vel, 1.4), t + P.get('attack')); }
+        g.feel(vel, t);
+        if (!legato || !slide) { if (!P.get('lfoFree') || !g.lfo) g.startLfo(t); const a = g.amp.gain; a.cancelScheduledValues(t); if (!legato) a.setValueAtTime(0, t); a.linearRampToValueAtTime(0.1 + 0.9 * Math.pow(vel, 1.4), t + P.get('attack')); }
         held = { note, off: dur !== undefined ? t + dur : Infinity };
         if (dur !== undefined) ctx.dsp.release(g.amp.gain, t + dur, P.get('release'));
       }
@@ -187,7 +207,8 @@
       }
       ctx.renderWith = renderWith;
       const KNOBS = [['fm', 0, 10, 1.5], ['fold', 0, 1, 0.25], ['formant', 0, 1, 0.25], ['comb', 0, 0.95, 0.25], ['cutoff', 80, 16000, 0, 'log'], ['drive', 0, 1, 0.25], ['lfoFM', 0, 1, 0.3], ['lfoCut', 0, 1, 0.3], ['sub', 0, 1, 0.25], ['notch', 0, 1, 0.3]];
-      let matchJob = null;
+      let matchJob = null, lastMatch = null;
+      ctx.stateExtra = () => ({ match: lastMatch });
       async function match(buf, o) {
         o = o || {}; const job = { stop: false }; matchJob = job;
         const target = features(buf, ctx.bpm); if (!target) throw new Error('reference too short');
@@ -198,8 +219,8 @@
         if (target.rate > 0) { let best = null; DIVS.forEach(dv => { const r = 1 / MT.divisionSec(dv, ctx.bpm), e = Math.abs(Math.log(r / target.rate)); if (!best || e < best.e) best = { dv, e }; }); vals.lfoDiv = best.dv; }
         const sec = Math.min(2, Math.max(0.6, buf.duration));
         const measure = async (v) => features(await renderWith(v, f0, sec), ctx.bpm);
-        let bestD = distance(await measure(vals), target), iter = 0; const steps = Object.fromEntries(KNOBS.map(([k, , , st]) => [k, st]));
-        ctx.emitUI('match', { iter, dist: bestD, f0, target });
+        let bestF = await measure(vals), bestD = distance(bestF, target), iter = 0; const steps = Object.fromEntries(KNOBS.map(([k, , , st]) => [k, st]));
+        ctx.emitUI('match', { iter, dist: bestD, f0, target, feat: bestF });
         for (let round = 0; round < (o.rounds || 4) && !job.stop; round++) {
           let improved = false;
           for (const [k, mn, mx, , scale] of KNOBS) {
@@ -208,16 +229,17 @@
               const v = Object.assign({}, vals);
               v[k] = scale === 'log' ? Math.max(mn, Math.min(mx, vals[k] * Math.pow(2, dir * (1.5 / (round + 1))))) : Math.max(mn, Math.min(mx, vals[k] + dir * steps[k]));
               if (v[k] === vals[k]) continue;
-              const dd = distance(await measure(v), target); iter++;
-              if (dd < bestD - 1e-4) { bestD = dd; vals[k] = v[k]; improved = true; ctx.emitUI('match', { iter, dist: bestD, f0, vals }); break; }
+              const fv = await measure(v), dd = distance(fv, target); iter++;
+              if (dd < bestD - 1e-4) { bestD = dd; bestF = fv; vals[k] = v[k]; improved = true; ctx.emitUI('match', { iter, dist: bestD, f0, vals, feat: bestF }); break; }
             }
           }
           KNOBS.forEach(([k]) => { steps[k] *= improved ? 0.7 : 0.5; });
           ctx.emitUI('match', { iter, dist: bestD, round: round + 1, f0, vals });
         }
         P.setMany(vals); ctx.syncUI();
-        ctx.emitUI('match', { done: true, iter, dist: bestD, f0, vals, note: Math.round(69 + 12 * Math.log2(f0 / 440)) });
-        matchJob = null; return { dist: bestD, vals, f0, iter };
+        ctx.emitUI('match', { done: true, iter, dist: bestD, f0, vals, target, feat: bestF, note: Math.round(69 + 12 * Math.log2(f0 / 440)) });
+        lastMatch = { target, feat: bestF, dist: bestD, f0, iter };
+        matchJob = null; return { dist: bestD, vals, f0, iter, target, feat: bestF };
       }
       ctx.match = match; ctx.features = features; ctx.distance = distance;
       async function fromAB(ab, name) { const a = K.assets.register(ab, { name: name || 'reference' }); const b = await K.assets.decode(a.hash); if (!b) return ctx.fault('ASSET_001', 'could not decode reference'); try { await match(b); } catch (e) { ctx.emitUI('match', { error: e.message }); } }

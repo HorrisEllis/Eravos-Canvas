@@ -194,6 +194,24 @@
                       "keepRange": {
                         "type": "boolean"
                       },
+                      "talk": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "velBright": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "lfoPhase": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "lfoFree": {
+                        "type": "boolean"
+                      },
                       "sub": {
                         "type": "number",
                         "minimum": 0,
@@ -214,6 +232,28 @@
                         "minimum": 0,
                         "maximum": 1.5
                       },
+                      "m1": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "m2": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "m3": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "m4": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "_motion": {},
+                      "_perform": {},
                       "_react": {},
                       "tempoX": {
                         "enum": [
