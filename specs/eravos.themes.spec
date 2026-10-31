@@ -71,4 +71,6 @@ Before any theme ships: move those onto the tokens, then a theme is one file. Th
   Test: tests/p77-reactive-modes.test.js "3.80 the surfaces react too …".
   Start screen: the featured song cards (.hero-card, "Make a song for her", "Future Bass song") in Vagal's violet (#8844ff), the device
   look, side by side (.hero-row), a Start pill, a slow breathing glow (none for reduced motion) — asked: "remake those pink sections".
-
+  3.81 the featured cards' icons: small SVG paintings (tools/music/data/featured-art.js), unframed with soft corners (asked: no frame) — the
+  recipe's featured.art; .hero-card .big.art 168 × 109; .tw twinkle · .flow / .swirl moving strokes · .shim (none for reduced motion).
+  .hero-go: a round pill (999px) in the dawn gradient #ffb36b → #ff6fa8 → #b06bff (asked: "the buttons, too sharp, make them round and the color").

@@ -13,7 +13,7 @@
   // ---- the purpose recipe (from James's intent)
   R.register({
     id: 'eravos.recipe.raven-drop', label: 'Make a song for her', icon: '💘', accent: '#ff2266', genome: 'eravos.genome.music',
-    featured: { icon: '💘', title: 'Make a song for her', text: 'Dubstep at 140. Her voice lands on the drop, then the bass hits. The Coach walks you through it: add her clips, pick the line, bounce a WAV. No music theory needed.' },
+    featured: { icon: '💘', art: (window.FeaturedArt || {})['raven-drop'], title: 'Make a song for her', text: 'Dubstep at 140. Her voice lands on the drop, then the bass hits. The Coach walks you through it: add her clips, pick the line, bounce a WAV. No music theory needed.' },
     tagline: 'Dubstep at 140, her voice on the drop, a coach, one-click export',
     steps: [
       { op: 'bpm', bpm: 140 },
@@ -61,7 +61,7 @@
   const TL = (topic, payload) => ({ op: 'event', target: 'tl', topic, payload });
   R.register({
     id: 'eravos.recipe.future-bass', label: 'Future Bass (Monstercat)', icon: '🌅', accent: '#ff66cc', genome: 'eravos.genome.music',
-    featured: { icon: '🌅', title: 'Future Bass song', text: 'A 16-bar melodic EDM song already written as tracks: chords, pluck, colour bass, drums, with echo and chorus patched in. Click any clip to edit its notes, drag dots to rewire, bounce a WAV.' },
+    featured: { icon: '🌅', art: (window.FeaturedArt || {})['future-bass'], title: 'Future Bass song', text: 'A 16-bar melodic EDM song already written as tracks: chords, pluck, colour bass, drums, with echo and chorus patched in. Click any clip to edit its notes, drag dots to rewire, bounce a WAV.' },
     tagline: 'Instrument tracks + piano roll, future-bass chords, pluck, colour bass, drums at 150',
     steps: [
       { op: 'bpm', bpm: 150 },

@@ -139,8 +139,9 @@ svg.wires { position: absolute; pointer-events: none; overflow: visible; z-index
 .boot { width: min(920px, 94vw); max-height: 92vh; overflow: auto; background: var(--panel); border: 1px solid var(--line2); border-radius: 16px; padding: 28px; box-shadow: 0 30px 100px #000; }
 .boot h1 { margin: 0 0 4px; font: 800 34px var(--mono); letter-spacing: 6px; background: linear-gradient(90deg, var(--cyan), var(--violet), var(--pink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .boot p.sub { color: var(--dim); margin: 0 0 20px; }
-.boot .hero-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; margin-bottom: 16px; }
-/* 3.80 the featured songs in Vagal's colours (violet, breathing) and the device look: a chassis panel with a hairline violet edge,
+.boot .hero-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(560px, 1fr)); gap: 12px; margin-bottom: 16px; }
+@media (max-width: 640px) { .boot .hero-row { grid-template-columns: 1fr; } .boot .hero-card { flex-wrap: wrap; } }
+/* 3.80 the featured cards in Vagal's colours (violet, breathing) and the device look: a chassis panel with a hairline violet edge,
  * the icon in a recessed well, a Start pill; the glow breathes slowly (still for reduced motion) and follows the sound (--lvl) */
 .boot .hero-card { --hv: #8844ff; --hv2: #c08bff; position: relative; display: flex; gap: 16px; align-items: center; padding: 16px 18px; border-radius: 6px; cursor: pointer;
   background: radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--hv) 22%, transparent), transparent 60%), linear-gradient(180deg, var(--chassis2), var(--chassis));
@@ -151,10 +152,23 @@ svg.wires { position: absolute; pointer-events: none; overflow: visible; z-index
 .boot .hero-card > div:nth-child(2) { flex: 1; min-width: 0; }
 .boot .hero-card h2 { margin: 0 0 5px; font: 700 15px var(--mono); letter-spacing: 1.6px; text-transform: uppercase; color: var(--hv2); text-shadow: 0 0 calc(4px + var(--lvl, 0) * 10px) color-mix(in srgb, var(--hv) 70%, transparent); }
 .boot .hero-card p { margin: 0; color: var(--dim); font-size: 12.5px; line-height: 1.45; }
-.boot .hero-go { flex: none; align-self: center; font: 700 10px var(--mono); letter-spacing: 1.4px; text-transform: uppercase; color: #fff; padding: 7px 12px; border-radius: 3px; border: 1px solid #000; background: linear-gradient(180deg, var(--hv2), var(--hv)); box-shadow: 0 0 12px color-mix(in srgb, var(--hv) 50%, transparent); }
+.boot .hero-go { flex: none; align-self: center; font: 700 11px var(--mono); letter-spacing: 1.2px; text-transform: uppercase; color: #fff; padding: 9px 20px; border-radius: 999px; border: 0;
+  background: linear-gradient(120deg, #ffb36b, #ff6fa8 50%, #b06bff); box-shadow: 0 4px 16px rgba(255, 111, 168, .35), inset 0 1px 0 rgba(255,255,255,.35); text-shadow: 0 1px 2px rgba(80, 20, 60, .45); transition: transform .15s, box-shadow .15s; }
+.boot .hero-card:hover .hero-go { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(255, 111, 168, .5), inset 0 1px 0 rgba(255,255,255,.4); }
 @keyframes hero-breathe { 0%, 100% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--hv) 45%, var(--line)), 0 1px 0 var(--edge) inset, 0 0 8px color-mix(in srgb, var(--hv) 18%, transparent); }
   50% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--hv) 75%, var(--line)), 0 1px 0 var(--edge) inset, 0 0 26px color-mix(in srgb, var(--hv) 38%, transparent); } }
-@media (prefers-reduced-motion: reduce) { .boot .hero-card { animation: none; } }
+/* 3.81 a featured card's picture: a small painting, unframed, soft corners; its stars twinkle, its light moves */
+.boot .hero-card .big.art { width: 168px; height: 109px; padding: 0; border: 0; background: none; border-radius: 10px; box-shadow: 0 8px 22px rgba(0,0,0,.55), 0 0 18px color-mix(in srgb, var(--hv) 25%, transparent); overflow: hidden; }
+.boot .hero-card .big.art svg { display: block; width: 100%; height: 100%; }
+.boot .hero-card .art .tw { animation: hero-tw 3.2s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+.boot .hero-card .art .flow { stroke-dasharray: 14 6; animation: hero-flow 6s linear infinite; } .boot .hero-card .art .f2 { animation-duration: 8s; } .boot .hero-card .art .f3 { animation-duration: 11s; animation-direction: reverse; }
+.boot .hero-card .art .shim { animation: hero-shim 2.6s ease-in-out infinite alternate; }
+.boot .hero-card .art .swirl path { stroke-dasharray: 60 6; animation: hero-flow 14s linear infinite; }
+@keyframes hero-tw { from { opacity: .25; transform: scale(.7); } to { opacity: 1; transform: scale(1.15); } }
+@keyframes hero-flow { to { stroke-dashoffset: -200; } }
+@keyframes hero-shim { from { opacity: .2; } to { opacity: .9; } }
+.boot .hero-card:hover .big.art { box-shadow: 0 8px 26px rgba(0,0,0,.6), 0 0 26px color-mix(in srgb, var(--hv) 45%, transparent); }
+@media (prefers-reduced-motion: reduce) { .boot .hero-card { animation: none; } .boot .hero-card .art * { animation: none !important; } }
 .boot .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
 .boot .card { padding: 14px; border-radius: 10px; background: var(--bg2); border: 1px solid var(--line2); cursor: pointer; }
 .boot .card:hover { border-color: var(--acc); }

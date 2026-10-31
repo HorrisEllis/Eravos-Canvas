@@ -2,6 +2,15 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.81 The featured songs' pictures: small paintings, not emoji (2026-10-31)
+Asked: "the icons look cheap and childish. make them beautiful and creative, rpg, starry night, bob ross, star gazin".
+tools/music/data/featured-art.js (window.FeaturedArt, SVG, loaded before recipes.js): "Make a song for her" — a starry night with Van
+Gogh swirls, a heart in the stars, a haloed crescent moon, layered mountains with snow caps and happy little trees, two on a hill with a
+telescope; "Future Bass song" — dawn over a still lake, the last stars, the music as an aurora, the sun's path on the water, reeds on
+the shore. Unframed, soft corners (a gilded frame was tried and taken off — asked). Start is a round pill in the dawn colours. Stars twinkle, the swirls and aurora flow, the lake shimmers (still for
+reduced motion). A featured recipe may now carry `art` (an SVG string); the Start screen shows it in place of the icon. The two cards
+stack one per row unless the screen is wide enough for both.
+
 ## Done — 3.80 Reactive colours on every surface · the featured songs in Vagal's colours (2026-10-31)
 Asked: "the themes aren't working … i love what's in the menu, but nothing in the actual theme changes, and it's supposed to be all the
 colors in the canvas, tools, ui, anywhere" · "remake those pink sections" (Vagal colours).
