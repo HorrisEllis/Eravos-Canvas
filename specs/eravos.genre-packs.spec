@@ -104,3 +104,17 @@
     TP2 Drum Machine first (its recipe interpreter exists): every one of its 13 packs adds sounds of its own (= P74b.3)             mapped
     TP3 one synth (Retro Poly or Supersaw): packs add wave banks / voice models, not just presets                                 mapped
     TP4 the genre view: "Synthwave" lists every tool with a Synthwave pack by category, with the gaps                             mapped
+
+## ADDENDUM 2026-10-31 (third) — CORRECTED again by him: "no it should be a pack. like full packs, are packs of sounds for tools.
+##   like tools should should have more power, like wobble bass, full range of depth in all aspects."
+  Two different things, now kept apart:
+  1 PACKS ARE FULL PACKS OF SOUNDS. A pack is one thing (Synthwave, Riddim, …) that brings SOUNDS for the tools it fits, across many
+    tools at once: presets for the synths and basses, kits and new drum sounds for the Drum Machine, patterns, samples. That is the
+    model of the FIRST section of this spec (one pack id adding to every tool that fits, a pack page listing its tools by category,
+    on/off as one) — it stands again. A pack carries sounds, never tools.
+  2 POWER BELONGS TO THE TOOLS. New capabilities are not a pack's job: each tool itself must reach the full range of depth in every
+    aspect (his example: Wobble Bass). That is specs/eravos.tool-depth.spec.
+  WITHDRAWN: "a pack belongs to one tool" (second addendum) and "packs carry their own tools" (DLC addendum). KEPT from the DLC addendum:
+  the store-like Packs page (cards, numbers, a demo to hear, Install / Uninstall), and the DLC RULE read for sounds: a pack must add
+  sounds that are new (measured apart from what is installed — the 3.74b fingerprint test), not copies of other packs.
+  PHASES (replace TP1–TP4 and DLC1–DLC4): GP1–GP4 of the first section (+ the Packs store page from the DLC addendum), Synthwave first.
