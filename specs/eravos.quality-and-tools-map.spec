@@ -39,10 +39,10 @@
 ## T — the other eleven tools, the Groove way (each: one release, screenshots before merge, his look)
   Every tool: perform: true (Motion + Perform tabs), its window rebuilt in the look kit (a screen, a knob bank with the main knob large, lit
   strips), a FEEL or DEPTH tab on its page for what is deeper, defaults that play exactly as before (old songs unchanged — tested).
-  T1  Bassline (bass-gen) — feel: ghost notes, octave jumps, slides (with chance), note length, accent pattern, follow-the-kick strength.
+  T1  ✓ 3.79 Bassline (bass-gen) — feel: ghost notes, octave jumps, slides (with chance), note length, accent pattern, follow-the-kick strength.
   T2  Chords (chord-gen) — feel: voicing spread, inversions, strum (time between notes), rhythm patterns, humanize, chord-change anticipation.
-  T3  Drum Forge — depth: per-layer envelopes (tone, noise, click), pitch-drop curve drawn, a layer's own filter; feel: velocity → tone.
-  T4  Bass Forge — depth: the LFO bars per stage as faders with lit meters, the match result as a picture; feel: per-note talk amount.
+  T3  ✓ 3.79 Drum Forge — depth: per-layer envelopes (tone, noise, click), pitch-drop curve drawn, a layer's own filter; feel: velocity → tone.
+  T4  ✓ 3.79 Bass Forge — depth: the LFO bars per stage as faders with lit meters, the match result as a picture; feel: per-note talk amount.
   T5  FX Box — depth: per pad envelope (length, curve), pitch sweep drawn, stereo throw; square pads (done 3.73) with a hit meter each.
   T6  Drop Builder — tension / build / pause / drop as a timeline strip you drag; each part's depth on its tab; a "drop size" macro set.
   T7  Sidechain — the drawn duck shape as the screen (exists), plus per-band ducking (low only / full), lookahead, a follow-the-kick meter.
@@ -53,6 +53,7 @@
   T12 Automation (macro-automation) — lanes as the screen with Bézier handles (as the piano roll's curves), shapes from Motion, record.
   Order: as he listed them minus Groove — T1 Bassline · T2 Chords · T3 Drum Forge · T4 Bass Forge · T5 FX Box · T6 Drop Builder ·
   T7 Sidechain · T8 EQ · T9 Breath · T10 Embodiment · T11 Recursive Spectra · T12 Automation. Each gets a tool-spec addendum when built.
+  3.79 (2026-10-31, in the order asked: "bassline. bass forge, then drum forge"): T1, T4, T3 built — addenda in each tool's .spec. Left: T2, T5–T12.
 
 ## R — reactive colours, what is left
   R1 A tool with its own mode while the app is Off: its colours move, but the CSS glow (html:not(.snd-off) rules) does not — scope those
