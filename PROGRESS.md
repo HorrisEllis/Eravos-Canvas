@@ -2,6 +2,16 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.80 Reactive colours on every surface · the featured songs in Vagal's colours (2026-10-31)
+Asked: "the themes aren't working … i love what's in the menu, but nothing in the actual theme changes, and it's supposed to be all the
+colors in the canvas, tools, ui, anywhere" · "remake those pink sections" (Vagal colours).
+- Found: the modes worked, but only on accents and on a tool's own sound; the Emerge canvas in the screenshot was silent (no clip in its
+  Sample Player), so nothing moved. Now the surfaces react with the mix too: background, canvas grid, panels, every tool's chassis and
+  wells, lines and dim text lean toward the mode's colour of the moment, each by its own share, and come back exactly in silence / Off.
+  The canvas dots got a token (--grid, same colour). Test in p77. Spec: eravos.themes addendum.
+- Start: the two featured song cards rebuilt in Vagal's violet in the device look — side by side, icon in a well, a Start pill, a
+  breathing glow that also follows the sound.
+
 ## Done — 3.79 Bassline, Bass Forge and Drum Forge the Groove way (2026-10-31)
 Asked: "bassline. bass forge, then drum forge" — map T1, T4, T3 (specs/eravos.quality-and-tools-map.spec). Each: perform: true (Motion +
 Perform tabs), its window rebuilt in the look kit, deeper controls on its page, defaults that sound / play exactly as before (tested).

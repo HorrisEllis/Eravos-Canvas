@@ -59,3 +59,16 @@ Before any theme ships: move those onto the tokens, then a theme is one file. Th
 #   tool ({mode: follow|off|static|changing|custom, amount, colors}) set in its ⚙ settings, saved with it, wins over the app's (even Off).
 #   The panel: core/react-panel.js (⋯ Options → Reactive colours, and every tool's settings) — mode cards with live previews of the real
 #   colour code, Amount, swatches, palettes. Tests: p58, p73-living, p77-reactive-modes. Numbers: these are main's names for this work (3.71 Motion + Perform, 3.72 look kit, 3.73 living UI, 3.76 Deep Sub + tool zips, 3.77 Destroyer + reactive modes + audit); the Pattern Library's 3.71–3.73 and 3.76 share numbers — tell them apart by title.
+
+## ADDENDUM 2026-10-31 (3.80) — the reactive colours reach every surface (asked, not a restyle)
+  Asked: "i love what's in the menu, but nothing in the actual theme changes, and it's supposed to be all the colors in the canvas,
+  tools, ui, anywhere." The look at rest is unchanged (every value below is restored exactly in silence and with Off).
+  tools/music/core/sound-css.js SURFACES: --bg .10 · --bg2 .12 · --panel .14 · --panel2 .16 · --chassis .14 · --chassis2 .16 · --well .10
+  · --grid .50 · --line .45 · --line2 .50 · --dim .25 · --faint .30 — each = mix(its base, the colour of the moment, mix level × share),
+  written with the palette (at most 10× a second). The colour of the moment: Changing — the accent turned by the wheel shift; Static —
+  the accent, lit; Custom — your low ↔ top colours by where the sound sits, toward your hit colour on each hit.
+  New token --grid (#1a2533, the canvas dots — was hard-coded; same colour) so the canvas grid reacts too.
+  Test: tests/p77-reactive-modes.test.js "3.80 the surfaces react too …".
+  Start screen: the featured song cards (.hero-card, "Make a song for her", "Future Bass song") in Vagal's violet (#8844ff), the device
+  look, side by side (.hero-row), a Start pill, a slow breathing glow (none for reduced motion) — asked: "remake those pink sections".
+
