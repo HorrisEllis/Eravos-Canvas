@@ -21,6 +21,27 @@ PR #48) changed the default look directly, against the theme rule. specs/eravos.
 before the kit, Studio = the kit, v10), default his call. Packs: specs/eravos.genre-packs.spec: a genre pack is one id adding to every
 tool that fits, with a page listing its tools by category, its sounds, patterns, songs, suites, the missing tools, and Build the rig.
 
+## Done — 3.82 🔮 Step 2: a Looking Glass layer inside the canvas · reactive colours drawn on it (2026-10-31)
+His words: "What about this for the canvas?" (the Looking Glass bundle, SPEC v0.3) · "what would that do?" · "move to main. get to step 2".
+Map: specs/eravos.2026-10-22-brainstorm.map.spec, addendum 2026-10-31 (A2b). Step 1 (SISO the canvas) stays mapped: step 2 does not need it.
+- **canvas/runtime/glass-layer.js** (domain-free), Looking Glass's model in the browser: elements as typed data ('wash', 'glow' on a page
+  element), variables any prop can bind to, layers made on first use and removed when empty, values that ease every display frame, and a
+  motion budget (at rest it clears once and stops asking for frames). Two renderers on the same data: a 2D canvas (default) and WebGPU in
+  WGSL — the shader language of wgpu, so the shader carries into the native Looking Glass.
+- **Reactive colours › Draw with: GPU layer (default) · Page** (3.80 as it was). On the layer the mix tints the canvas and every sounding
+  window glows in its own colour; nothing on the page is written while it plays (tests/p82 watches every style change).
+- **Measured** (build/perf-ui.mjs, Dubstep #77 playing, 8 windows; this run): Page 19 fps (style recalc 4.05 s) · GPU layer Static 52 fps
+  (0.16 s) · Changing 44.8 · Off 54.8. Before 3.82, main measured Static 6.8 fps.
+- **What it taught** (measure, don't guess): a 'screen' blend made the browser re-blend the whole page every frame (13 fps) → normal
+  blending. A blur drawn every frame cost ~20 fps → each glow is drawn once into a cached sprite and stamped. WebGPU: this test machine's
+  software GPU never shows a WebGPU canvas (not even a plain red clear), so it is not verified here: the 2D canvas is the default and
+  "try WebGPU" in the panel switches (remembered) — for his machine with a real graphics card.
+- Trade-off, his to weigh: the GPU layer lights windows and the canvas, not each colour inside a tool (a pad's own colour, a knob's
+  accent) the way Page does. That needs step A2 (tool faces as typed data).
+- Mistakes on the way, caught by tests: a comment inserted mid-line swallowed the rest of a test line; a header inserted inside an
+  existing comment broke a test file. Both fixed before commit.
+- Tests: tests/p82-glass-layer.test.js (4). P77, P73, P58 set Draw with: Page (they test the page way). P48, P76, boundary pass.
+
 ## Done — 3.81 The featured songs' pictures: small paintings, not emoji (2026-10-31)
 Asked: "the icons look cheap and childish. make them beautiful and creative, rpg, starry night, bob ross, star gazin".
 tools/music/data/featured-art.js (window.FeaturedArt, SVG, loaded before recipes.js): "Make a song for her" — a starry night with Van

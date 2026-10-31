@@ -73,14 +73,23 @@
     PALETTES.forEach(([n, c]) => { const b = el('button', 'rcp-pal'); b.type = 'button'; b.title = n; b.style.setProperty('--a', c.low); b.style.setProperty('--b', c.high); b.style.setProperty('--c', c.hit);
       b.append(el('i'), el('span', '', n)); b.addEventListener('click', () => { put({ mode: 'custom', colors: c }); paint(); }); pals.appendChild(b); });
     cust.append(el('span', 'rcp-lab', 'Your colours'), sws, el('span', 'rcp-lab', 'Or a palette'), pals);
+    // 3.82 Draw with: the GPU (a Looking Glass layer over the page — nothing on the page is restyled) or the page itself (3.80)
+    const drawRow = el('div', 'rcp-draw'), drawBtns = el('div', 'rcp-drawb'), drawNote = el('span', 'rcp-drawn');
+    [['glass', 'GPU layer', 'drawn by the graphics card over the page: smooth, and light on the computer'], ['page', 'Page', 'every colour on the page moves by its own share — the most detail, the heaviest']].forEach(([d, t, h]) => {
+      const b = el('button', 'rcp-dbtn', t); b.type = 'button'; b.dataset.draw = d; b.title = h; b.addEventListener('click', () => { S().setDraw(d); paint(); }); drawBtns.appendChild(b); });
+    drawRow.append(el('span', 'rcp-lab', 'Draw with'), drawBtns, drawNote);
     const foot = el('div', 'rcp-foot', tool ? 'Saved with this tool. “Follow the app” uses ⋯ Options → Reactive colours.' : 'Remembered on this computer. Any tool can have its own: ⚙ → Reactive colours.');
-    box.append(head, cards, amtRow, cust, foot);
+    box.append(head, cards, amtRow, cust); if (!tool && S().setDraw) box.append(drawRow); box.append(foot);
 
     function paint() {
       const g = get(), eff = g.mode === 'follow' ? S().mode : g.mode;
       cards.querySelectorAll('.rcp-card').forEach(c => { const on = c.dataset.mode === g.mode; c.classList.toggle('on', on); c.setAttribute('aria-checked', on ? 'true' : 'false'); });
       amt.value = String(Math.round(g.amount * 100)); amt.style.setProperty('--v', amt.value + '%'); amtVal.textContent = amt.value + '%';
       amtRow.classList.toggle('dim', eff === 'off' || g.mode === 'follow'); amt.disabled = eff === 'off' || g.mode === 'follow';
+      if (S().setDraw) { drawBtns.querySelectorAll('.rcp-dbtn').forEach(b => { const on = b.dataset.draw === S().draw; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+        drawNote.textContent = ''; if (S().draw === 'glass' && global.GlassLayer) { const gpu = S().renderer === 'webgpu', t = el('button', 'rcp-gpu', gpu ? 'WebGPU · back to 2D' : '2D canvas · try WebGPU');
+          t.type = 'button'; t.title = gpu ? 'draw with the 2D canvas (the tested way)' : 'draw the layer with WebGPU on your graphics card — new; if the glows vanish, come back to 2D';
+          t.addEventListener('click', () => global.GlassLayer.use(gpu ? '2d' : 'webgpu').then(() => paint())); drawNote.appendChild(t); } }
       cust.hidden = eff !== 'custom'; sws.querySelectorAll('input').forEach(i => { i.value = g.colors[i.dataset.k]; i.previousSibling.style.background = i.value; });
     }
     // the previews: one loop for all of them while the panel is on screen

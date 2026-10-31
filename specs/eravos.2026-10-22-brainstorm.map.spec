@@ -125,3 +125,19 @@
   modulatable, so a knob in an image can follow an LFO or a song. The hard parts are pixel speed on big images (tiles on the
   GPU), brush feel, selection quality, colour management and PSD import. Each is its own phase.
   His to set: which comes first on the surface, the timeline or an image editor; and raster (paint) or vector (shapes) first.
+
+## ADDENDUM 2026-10-31 — Looking Glass bundle again ("What about this for the canvas?"), then "move to main. get to step 2"
+  The bundle: README + SPEC v0.3 + PHASEMAP v0.3, no code — the same design as A above (the stubs and proof report are not in it).
+  New since 22 Oct, measured (build/perf-ui.mjs, a Dubstep song playing, 8 windows, headless Chromium, 2 cores):
+    3.73 reactive colours 15 fps · 3.78 (writes only on a visible step, ≤ 12/s) 36 fps · 3.80 (surfaces react too) Static 6.8 fps,
+    Changing 8.5 fps · Off 48.5 fps. Every colour written to the page restyles what is under it; the more that reacts, the slower.
+    Looking Glass 2.4 / 2.6 (variables read by the GPU each frame, layers as textures, idle layers free) is the answer to exactly that.
+  Path (his order): A1 SISO the canvas (mapped, not needed for A2b) · A2b a Looking Glass layer INSIDE the browser canvas — building now ·
+    A2 faces as typed data · A3 Looking Glass as the shell · A4 native audio · A5 native faces.
+  A2b: canvas/runtime/glass-layer.js (domain-free) — typed elements, variables, layers removed when empty, a motion budget (draws only
+    while something is lit), WebGPU with WGSL (the same shader language as wgpu, so shaders carry into the native Looking Glass) and a
+    2D fallback. The music domain sets variables (colour of the moment, mix level, each window's level and colour) instead of writing
+    page colours. Reactive colours › Draw with: GPU layer · Page (3.80 as it is).
+  Still open, his: (1) no browser at all, or no Electron? (2) Looking Glass its own product, ERAVOS its first app? (3) its look (Q9).
+  A2b BUILT (3.82): glass-layer.js + Draw with: GPU layer (default) · Page. Default renderer 2D canvas; WebGPU written (WGSL) but unseen
+    here (software GPU presents nothing) — "try WebGPU" in Reactive colours for a real graphics card. Numbers: specs/eravos.performance.spec.

@@ -83,7 +83,7 @@ describe('The piano roll edits a note completely, beside the notes — and draws
 describe('The screen follows the sound (event-driven CSS)', () => {
   it('a loud low tone → --snd-low / --snd-level rise and the hue goes deep; silence settles back to 0; off means off', async () => {
     assert.ok(window.SoundCSS, 'loaded'); const K = Kernel; K.audio.boot(); const ac = K.audio.ctx; await ac.resume();
-    SoundCSS.init(K); SoundCSS.set(true);
+    SoundCSS.init(K); if (SoundCSS.setDraw) SoundCSS.setDraw('page'); SoundCSS.set(true);
     const o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = 55; g.gain.value = 0.8; o.connect(g); g.connect(K.audio.chain.out); o.start();
     for (let i = 0; i < 12; i++) { await TH.sleep(40); SoundCSS.step(); }
     const v = (k) => +getComputedStyle(document.documentElement).getPropertyValue(k);
@@ -94,7 +94,7 @@ describe('The screen follows the sound (event-driven CSS)', () => {
     SoundCSS.set(false); assert.ok(document.documentElement.classList.contains('snd-off')); SoundCSS.set(true);
   });
   it('3.69 the accent colours themselves follow the sound — each keeps its own hue (no rainbow) and comes back exactly in silence', async () => {
-    const K = Kernel; K.audio.boot(); const ac = K.audio.ctx; await ac.resume(); SoundCSS.init(K); SoundCSS.set(true);
+    const K = Kernel; K.audio.boot(); const ac = K.audio.ctx; await ac.resume(); SoundCSS.init(K); if (SoundCSS.setDraw) SoundCSS.setDraw('page'); SoundCSS.set(true);
     const L = SoundCSS.lit, hueOf = (c) => { const n = parseInt(c.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
       const h = mx === r ? ((g - b) / d + 6) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; return h * 60; };
     ['#00d4ff', '#ff2266', '#00ff88', '#b066ff', '#ffaa00'].forEach(c => { assert.equal(L(c, 0), c, 'silent = itself'); assert.lt(Math.abs(hueOf(L(c, 0.8)) - hueOf(c)), 4, c + ' keeps its hue'); assert.ok(L(c, 0.8) !== c, 'and lights up'); });
