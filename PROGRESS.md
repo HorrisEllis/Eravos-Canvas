@@ -2,6 +2,17 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.90 🎧 Hear by place (2026-11-01)
+His words: "what about a setting to play tools in proximity also zooming out makes it quiter."
+- ⋯ Options › 🎧 Hear by place (off by default, remembered). On, the canvas is a room you look into: a tool that makes sound is full in
+  the middle of the view, fades smoothly to a whisper (−22 dB) well off screen, and pans with where its window sits (up to 60 %); zooming
+  out quietens every one (≈ −6 dB at 50 %, −10 dB at 25 %). Effects are left alone (they pass on what feeds them, already placed).
+- How: core/proximity.js moves a PLACE stage (a gain and a balance before each source's trim), built only the first time it is on
+  (core/audio.js audio.placeStage) — off, no tool gets an extra node. Window rectangles read ~12×/s, all reads before any write.
+- Caught on the way (tests/p42, her voice 0.04 dB under its floor): a StereoPanner at centre is −3 dB per side on a mono tool. The
+  balance is the mixer strip's (unity at centre) and the stage is lazy.
+- Tests: tests/p90-hear-by-place.test.js (2). P14, P21, P42, P62 pass.
+
 ## Done — 3.89b ✎ A pattern opens in the piano roll (2026-11-01)
 His words: "the per note editing with the timeline, why not utilize that for the patterns. it also doesn't seem to work. per notes."
 - Patterns › ✎ Edit notes (every card with notes): the pattern goes on the Timeline, the Timeline comes forward and the clip opens in its
