@@ -49,7 +49,10 @@
   function rgbOf(c) {
     c = String(c || '').trim(); let m = /^#([0-9a-f]{3})$/i.exec(c); if (m) c = '#' + m[1].split('').map(x => x + x).join('');
     m = /^#([0-9a-f]{6})/i.exec(c); if (m) { const n = parseInt(m[1], 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
-    m = /rgba?\(([\d.]+)[ ,]+([\d.]+)[ ,]+([\d.]+)/.exec(c); return m ? [+m[1], +m[2], +m[3]] : null;
+    m = /rgba?\(([\d.]+)[ ,]+([\d.]+)[ ,]+([\d.]+)/.exec(c); if (m) return [+m[1], +m[2], +m[3]];
+    m = /hsla?\(\s*([\d.]+)(?:deg)?[ ,]+([\d.]+)%[ ,]+([\d.]+)%/.exec(c); if (!m) return null;   // 3.83c hsl() too (5 tools draw with it)
+    const H = (+m[1] % 360) / 60, S2 = +m[2] / 100, L2 = +m[3] / 100, C2 = (1 - Math.abs(2 * L2 - 1)) * S2, X2 = C2 * (1 - Math.abs(H % 2 - 1)), M2 = L2 - C2 / 2;
+    const t = H < 1 ? [C2, X2, 0] : H < 2 ? [X2, C2, 0] : H < 3 ? [0, C2, X2] : H < 4 ? [0, X2, C2] : H < 5 ? [X2, 0, C2] : [C2, 0, X2]; return t.map(v => Math.round((v + M2) * 255));
   }
   // the same colour, lit up by k (0…1): lighter and a touch more vivid, the hue never moves
   function lit(c, k) {
@@ -118,7 +121,7 @@
   const hashOf = (str) => { let x = 2166136261; for (const ch of String(str || '')) x = Math.imul(x ^ ch.charCodeAt(0), 16777619); return x >>> 0; };
   const CanvasWin = (id) => global.CanvasWM && global.CanvasWM.windowOf ? global.CanvasWM.windowOf(id) : null;
   // every inline colour variable an element carries (--acc, --pc, --c …): lit from its own base; a base the tool changes is taken up
-  const isCol = (v) => /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(v) || /^rgba?\(/i.test(v);   // 3.83b 8-digit (with alpha) too
+  const isCol = (v) => /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(v) || /^(rgba?|hsla?)\(/i.test(v);   // 3.83b 8-digit (with alpha) too
   function light(el, k, o) {
     if (!writing) { live.add(el); return; }
     const st = el.style; el._cb = el._cb || {}; el._cs = el._cs || {};
@@ -196,7 +199,7 @@
     { const r0 = rgbOf(c); if (r0 && (shareOf(r0) === 0 || (!overLight && shareOf(r0) < 1))) return c; }
     const key = c + '|' + k + '|' + o.mode + '|' + (o.shift || 0) + '|' + (o.acc || '') + '|' + (o.mode === 'custom' ? q(o.pulse || 0, 10) + JSON.stringify(o.colors) : ''), hit = memo.get(key); if (hit !== undefined) return hit;
     const rgb = rgbOf(c); let out = c;
-    if (rgb) { let a = null; const t = c.trim(), m = /^rgba\([^)]*,\s*([\d.]+)\s*\)$/i.exec(t), m8 = /^#[0-9a-f]{6}([0-9a-f]{2})$/i.exec(t); if (m) a = +m[1]; else if (m8) a = parseInt(m8[1], 16) / 255;
+    if (rgb) { let a = null; const t = c.trim(), m = /^(?:rgba|hsla)\([^)]*,\s*([\d.]+)\s*\)$/i.exec(t), m8 = /^#[0-9a-f]{6}([0-9a-f]{2})$/i.exec(t); if (m) a = +m[1]; else if (m8) a = parseInt(m8[1], 16) / 255;
       // Changing turns EVERY colour's hue by the full amount (a dark pink background that stayed pink under green accents read as a red
       // cast — his note on the Shape and Perform screens); only how much it brightens follows its share
       // Changing: an accent turns round the wheel (the palette keeps its variety); a dark or grey colour takes the hue the window's
