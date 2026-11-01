@@ -216,7 +216,7 @@ describe('Wobble Bass · Keep in range (3.77 sound audit)', () => {
 describe('Wobble Bass 4.0 · full depth (filter, envelope, growl, LFO 2, output)', () => {
   const rig = (secs, params) => { const U = TH.universe(secs || 1), w = TH.spawn(U, 'eravos.wobble-bass'), c = OrganismFactory.handle(w).ctx; Object.keys(params || {}).forEach(k => c.params.set(k, params[k])); return { U, w, c }; };
   // heard at the tool's own output (the master chain's compressor would even out what is measured)
-  const play = async (params, o) => { o = o || {}; const { U, c } = rig(o.secs || 1, Object.assign({ depth: 0, ampMod: 0 }, params)); c.internals.outNode.disconnect(); c.internals.outNode.connect(U.ctx.destination);
+  const play = async (params, o) => { o = o || {}; const { U, c } = rig(o.secs || 1, Object.assign({ depth: 0, ampMod: 0 }, params)); c.internals.finalOut.disconnect(); c.internals.finalOut.connect(U.ctx.destination);
     c.noteOn(o.note || 45, o.vel || 0.9, 0.05, { duration: o.dur || 0.8 }); return { buf: await TH.render(U), c }; };
   // brightness: the first difference rises 6 dB an octave, so its share of the level grows with the highs
   // (order 3: the third difference, +18 dB an octave — what sits far above the cutoff dominates)
@@ -281,5 +281,27 @@ describe('Wobble Bass 4.0 · full depth (filter, envelope, growl, LFO 2, output)
     try { const v = OrganismFactory.mountUI(OrganismFactory.handle(w), host); assert.deepEqual(v.orphans, []); const box = host.querySelector('.wb-deep'); assert.ok(box && box.hidden, 'folded by default');
       host.querySelector('.wb-deep-btn').click(); assert.ok(!box.hidden, 'opens'); assert.ok(box.querySelector('[data-key="lfo2Dest"]') && box.querySelector('[data-key="sustain"]'), 'its controls are there');
     } finally { host.remove(); }
+  });
+  it('4.1 wavetable: off makes nothing; on, Position sweeps the timbre and the table changes it', async () => {
+    const { c } = await play({}); assert.equal(c.internals.wt.a, null, 'no wavetable oscillators until it is turned up');
+    const W = { wtMix: 1 };
+    // heard on the wavetable voice itself (the saws beside it never switch off)
+    const wtAlone = async (p) => { const { U, c } = rig(1, Object.assign({}, W, p)); c.internals.finalOut.disconnect(); c.internals.wt.mix.connect(U.ctx.destination); c.noteOn(45, 0.9, 0.05, { duration: 0.8 }); return TH.render(U); };
+    const p0 = bright(await wtAlone({ wtTable: 'growl', wtPos: 0 }), 0.2, 0.7), p1 = bright(await wtAlone({ wtTable: 'growl', wtPos: 1 }), 0.2, 0.7);
+    assert.gt(Math.abs(db(p1, p0)), 3, 'Position 0 → 1 changes the brightness');
+    const { c: c2 } = await play(Object.assign({ wtTable: 'digital', wtPos: 0.5 }, W)); assert.ok(c2.internals.wt.a && c2.internals.wt.k === 3, 'frames 3 and 4 crossfaded at 0.5');
+  });
+  it('4.1 comb + and − put peaks and notches where the cutoff says (they are opposite)', async () => {
+    const C = { cutoff: 440, res: 18, shaper: 0, gritMode: 'hard', drive: 0, sub: 0 };
+    const mag = (buf, f) => { const d = buf.getChannelData(0); let re = 0, im = 0; for (let i = 9600; i < 33600; i++) { const w = 2 * Math.PI * f * i / buf.sampleRate; re += d[i] * Math.cos(w); im += d[i] * Math.sin(w); } return Math.hypot(re, im); };
+    const pos = (await play(Object.assign({ filterMode: 'comb' }, C), { note: 57 })).buf, neg = (await play(Object.assign({ filterMode: 'comb-' }, C), { note: 57 })).buf;   // note 57 at octave −1 = 110 Hz: harmonic 4 = 440
+    assert.gt(db(mag(pos, 440), mag(neg, 440)), 6, 'comb + peaks at the cutoff, comb − cuts it');
+  });
+  it('4.1 mono below: the side under the frequency goes, the side above stays', async () => {
+    const side = (buf, lo) => { const L = buf.getChannelData(0), R = buf.getChannelData(1), N = Math.round(buf.sampleRate / 150); let acc = 0, q = [], e = 0, eh = 0;
+      for (let i = 9600; i < 33600; i++) { const sd = L[i] - R[i]; acc += sd; q.push(sd); if (q.length > N) acc -= q.shift(); const l = acc / q.length; e += l * l; eh += (sd - l) * (sd - l); } return lo ? e : eh; };
+    const S = { voices: '8', width: 1, spread: 25 }, wide = (await play(S)).buf, mono = (await play(Object.assign({ monoBelow: 300 }, S))).buf;
+    assert.gt(db(Math.sqrt(side(wide, true)), Math.sqrt(side(mono, true))), 10, 'low side mostly gone');
+    assert.lt(Math.abs(db(Math.sqrt(side(wide, false)), Math.sqrt(side(mono, false)))), 6, 'high side kept');
   });
 });

@@ -25,12 +25,29 @@
  *   aspects"): filter types HP · BP · notch, slope 12/24/36 dB, key tracking, a filter envelope, velocity → cutoff · full ADSR (decay,
  *   sustain) · FM ratios 0.25…8 + fine, ring mod · sub wave · unison 2/4/6/8 voices · a SECOND LFO (pitch, cutoff, FM or volume) ·
  *   dotted rates and 1/64 · bitcrush grit · an output clipper with a ceiling. Every new control starts where today's sound is: each
- *   factory preset renders identically (the null test in wobble-bass.test.js). */
+ *   factory preset renders identically (the null test in wobble-bass.test.js).
+ * 4.1 FULL DEPTH step 2: a WAVETABLE layer (5 tables × 8 frames, Position crossfades the two nearest frames) · COMB filters
+ *   (+ and −, two taps, the wobble sweeps them) · MONO BELOW (the bass mono under a frequency; the stereo above stays). */
 (function () {
   'use strict';
   const S = OrganismSDK.STD;
   const DIVS = ['1/1', '1/2', '1/4.', '1/4', '1/8.', '1/4t', '1/8', '1/16.', '1/8t', '1/16', '1/16t', '1/32', '1/64'];   // 4.0: dotted + 1/64, slow → fast
   const FTYPE = { lowpass: 'lowpass', highpass: 'highpass', bandpass: 'bandpass', notch: 'notch' };
+  // 4.1 wavetables: 8 frames each, a frame = 32 harmonic amplitudes (sine series), so every table stays in tune at any pitch
+  const WT_FRAMES = 8, WT_H = 32;
+  const WT = {
+    growl:   (k, n) => (1 / n) * (1 + 3 * Math.exp(-Math.pow(n - (2 + k * 3), 2) / 4)),                       // a formant peak climbing the harmonics
+    vowel:   (k, n) => { const F = [[300, 870], [450, 800], [730, 1090], [640, 1190], [530, 1840], [390, 1990], [270, 2290], [490, 1350]][k], f = n * 110;
+               return (1 / n) * (0.15 + Math.exp(-Math.pow((f - F[0]) / 120, 2)) + 0.7 * Math.exp(-Math.pow((f - F[1]) / 200, 2))); },   // OO → OH → AH → UH → EH → IH → EE → ER at 110 Hz
+    metal:   (k, n) => (n % 2 ? 1 : k / 7) / Math.pow(n, 1 - k * 0.09),                                          // hollow square → bright, buzzing
+    digital: (k, n) => Math.abs(Math.sin(Math.PI * n * (0.5 - k * 0.06))) / n,                                    // pulse width 50 % → 8 %
+    organ:   (k, n) => ({ 1: 1, 2: 0.4 + k * 0.08, 3: 0.6 - k * 0.05, 4: k * 0.1, 6: k * 0.07, 8: k * 0.06 })[n] || 0,   // drawbars pulled out one by one
+  };
+  function wtFrame(ac, table, k) {
+    const re = new Float32Array(WT_H + 1), im = new Float32Array(WT_H + 1), fn = WT[table] || WT.growl;
+    for (let n = 1; n <= WT_H; n++) im[n] = fn(k, n);
+    return ac.createPeriodicWave(re, im);
+  }
   const SUBK = { '0': 1, '-1': 0.5, '-2': 0.25 };   // 3.1: sub against the wub's pitch (0 = same; was −1 by default → 27.5 Hz under A2)
   // vowel formants F1/F2/F3 (Hz) + band gains (dB)
   const VOWELS = {
@@ -102,7 +119,7 @@
   }
 
   OrganismFactory.define({
-    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '4.0.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
+    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '4.1.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
     category: 'Bass', blurb: 'Dubstep wobble / talking "yoi" bass locked to the tempo. The drop.',
     size: { w: 1100, h: 640 }, minSize: { w: 420, h: 380 },   // 3.58 wide: the cards sit side by side; narrower stacks them
     slots: [{ id: 'growl', label: 'the growl (the sub stays clean)', wire_type: 'audio', hint: 'empty — a Destroyer, Phaser or Echo here works on the wub only; the sub underneath stays clean and in time' }],
@@ -141,7 +158,7 @@
       { key: 'wubLen', type: 'integer', default: 8, min: 1, max: 16, label: 'Steps', group: 'WUB SEQ' },
       { key: 'wubStep', type: 'enum', options: Object.keys(STEPS), default: '1/4', label: 'Step', group: 'WUB SEQ' },
       { key: 'wubSeq', type: 'array', default: ['1/8', '', '1/16', '', '1/4t', 'x', '1/32', '1/8:yoy', '', '', '', '', '', '', '', ''], label: 'Wub steps', group: 'WUB SEQ', hidden: true },
-      { key: 'filterMode', type: 'enum', options: ['lowpass', 'formant', 'highpass', 'bandpass', 'notch'], default: 'lowpass', label: 'Filter', group: 'FILTER' },
+      { key: 'filterMode', type: 'enum', options: ['lowpass', 'formant', 'highpass', 'bandpass', 'notch', 'comb', 'comb-'], default: 'lowpass', label: 'Filter', group: 'FILTER' },
       { key: 'vowelA', type: 'enum', options: Object.keys(VOWELS), default: 'OO', label: 'Vowel A', group: 'FILTER' },
       { key: 'vowelB', type: 'enum', options: Object.keys(VOWELS), default: 'AH', label: 'Vowel B', group: 'FILTER' },
       { key: 'formantShift', type: 'number', default: 0, min: -24, max: 24, step: 0.1, unit: 'st', label: 'Formant', group: 'FILTER' },
@@ -158,6 +175,9 @@
       { key: 'fmFine', type: 'number', default: 0, min: -0.5, max: 0.5, step: 0.001, label: 'FM fine', group: 'GROWL+', hint: 'nudges the FM ratio off the grid: small amounts beat and churn, the growl moves on its own' },
       { key: 'ring', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Ring mod', group: 'GROWL+', hint: 'multiplies the voice by the FM sine: bell-like, metallic, robotic (follows FM ratio)' },
       { key: 'voices', type: 'enum', options: ['2', '4', '6', '8'], default: '2', label: 'Voices', group: 'GROWL+', hint: 'unison saws, spread by Unison and Width: 2 is the classic, 8 a wall' },
+      { key: 'wtMix', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Wavetable', group: 'WAVETABLE', hint: 'a wavetable voice beside the saws (0 = off): it goes through the same filter, wobble and grit' },
+      { key: 'wtTable', type: 'enum', options: Object.keys(WT), default: 'growl', label: 'Table', group: 'WAVETABLE', hint: 'growl: a peak climbing · vowel: OO → EE · metal: hollow → buzzing · digital: pulse width · organ: drawbars' },
+      { key: 'wtPos', type: 'number', default: 0, min: 0, max: 1, step: 0.001, label: 'Position', group: 'WAVETABLE', hint: 'where in the table it plays — automate it (or move it live) to sweep the timbre' },
       { key: 'subWave', type: 'enum', options: ['sine', 'triangle', 'square'], default: 'sine', label: 'Sub wave', group: 'GROWL+', hint: 'the clean sub: sine is pure, triangle a little edge, square a hollow growl under it' },
       { key: 'fmWub', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'FM wub', group: 'GROWL', hint: 'how much the wobble opens the FM too — the talking growl' },
       { key: 'squash', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Squash', group: 'GROWL', hint: '3-band OTT-style squash: fizz up front, everything loud (0 = off)' },
@@ -192,6 +212,7 @@
       { key: 'lfo2Hz', type: 'number', default: 0.5, min: 0.02, max: 20, step: 0.01, unit: 'Hz', label: 'LFO 2 free', group: 'LFO 2' },
       { key: 'lfo2Depth', type: 'number', default: 0.3, min: 0, max: 1, step: 0.01, label: 'LFO 2 depth', group: 'LFO 2', hint: 'pitch ±1 oct · cutoff ±4 oct · FM ±6 · volume ±50 % at full' },
       // 4.0 depth: the output
+      { key: 'monoBelow', type: 'number', default: 0, min: 0, max: 400, step: 1, unit: 'Hz', label: 'Mono below', group: 'OUTPUT', hint: 'the low end in mono under this frequency, the width above it stays (0 = off): a clean, centred bass in any club' },
       { key: 'clipOn', type: 'boolean', default: false, label: 'Clipper', group: 'OUTPUT', hint: 'a hard clipper at the very end: nothing goes over the ceiling (loud, and it never blows up the mix)' },
       { key: 'ceiling', type: 'number', default: -0.3, min: -24, max: 0, step: 0.1, unit: 'dB', label: 'Ceiling', group: 'OUTPUT' },
     ],
@@ -239,6 +260,13 @@
       const bands = [0, 1, 2].map(() => { const b = ac.createBiquadFilter(); b.type = 'bandpass'; const g = ac.createGain(); formIn.connect(b); b.connect(g); g.connect(formOut); return { b, g }; });
       const formMakeup = ac.createGain(); formOut.connect(formMakeup);
       const filtSel = ac.createGain(); lpOut.connect(filtSel); formMakeup.connect(filtSel);
+      // 4.1 comb (+ / −): x + g·x[n−D] + g²·x[n−2D], D = 1/cutoff; the wobble shortens D (raises the comb) by up to Depth octaves
+      const combIn = ac.createGain(), cd1 = ac.createDelay(0.06), cd2 = ac.createDelay(0.11), cg1 = ac.createGain(), cg2 = ac.createGain(), combOut = ac.createGain();
+      combOut.gain.value = 0; preSh.connect(combIn); combIn.connect(combOut); combIn.connect(cd1); combIn.connect(cd2); cd1.connect(cg1); cd2.connect(cg2); cg1.connect(combOut); cg2.connect(combOut); combOut.connect(filtSel);
+      const combMod1 = ac.createGain(), combMod2 = ac.createGain(); combMod1.gain.value = 0; combMod2.gain.value = 0; combMod1.connect(cd1.delayTime); combMod2.connect(cd2.delayTime);
+      [combIn, cd1, cd2, cg1, cg2, combOut, combMod1, combMod2].forEach(n => ctx.track(n));
+      // 4.1 wavetable: two oscillators on the two nearest frames, crossfaded by Position; made when first turned up
+      const wt = { a: null, b: null, ga: null, gb: null, mix: null, frames: {} };
       // 3.4 FM: sine at Ratio × note → depth = note Hz × (index·(1 − wub) + index·wub·wobble) → the saws' and square's frequency
       const fmOsc = ac.createOscillator(); fmOsc.type = 'sine'; fmOsc.frequency.value = 55; fmOsc.start();
       const fHz = ac.createConstantSource(); fHz.offset.value = 55; fHz.start();
@@ -319,7 +347,22 @@
         clDry.gain.setTargetAtTime(on ? 0 : 1, t, 0.004); clWet.gain.setTargetAtTime(on ? 1 : 0, t, 0.004);
         clPre.gain.setTargetAtTime(0.25 / c, t, 0.002); clPost.gain.setTargetAtTime(c, t, 0.002);
       }
-      ctx.port('out', { kind: 'audio', direction: 'out', node: outNode, label: 'wobble' });
+      // 4.1 mono below: outNode → [straight, its switch at exactly 1] or [mid + high-passed side, L/R rebuilt] → finalOut
+      const finalOut = ac.createGain(), msDry = ac.createGain(), msWet = ac.createGain(); finalOut.gain.value = 1; msDry.gain.value = 1; msWet.gain.value = 0;
+      outNode.connect(msDry); msDry.connect(finalOut);
+      const spl = ac.createChannelSplitter(2), mer = ac.createChannelMerger(2), mid = ac.createGain(), side = ac.createGain(), sideHp1 = ac.createBiquadFilter(), sideHp2 = ac.createBiquadFilter(), sideNeg = ac.createGain();
+      const lIn = ac.createGain(), rIn = ac.createGain(); lIn.gain.value = 0.5; rIn.gain.value = -0.5;
+      outNode.connect(spl); spl.connect(mid, 0); spl.connect(mid, 1); mid.gain.value = 0.5; spl.connect(lIn, 0); spl.connect(rIn, 1); lIn.connect(side); rIn.connect(side);
+      sideHp1.type = sideHp2.type = 'highpass'; sideHp1.frequency.value = sideHp2.frequency.value = 120; sideHp1.Q.value = sideHp2.Q.value = 0.707; side.connect(sideHp1); sideHp1.connect(sideHp2);
+      sideNeg.gain.value = -1; sideHp2.connect(sideNeg);
+      mid.connect(mer, 0, 0); sideHp2.connect(mer, 0, 0); mid.connect(mer, 0, 1); sideNeg.connect(mer, 0, 1); mer.connect(msWet); msWet.connect(finalOut);
+      [finalOut, msDry, msWet, spl, mer, mid, side, sideHp1, sideHp2, sideNeg, lIn, rIn].forEach(n => ctx.track(n));
+      function applyMono() {
+        const f = P.get('monoBelow') || 0, on = f > 0, t = ac.currentTime;
+        if (on || msWet.gain.value !== 0) { msDry.gain.setTargetAtTime(on ? 0 : 1, t, 0.004); msWet.gain.setTargetAtTime(on ? 1 : 0, t, 0.004); }
+        if (on) { sideHp1.frequency.setTargetAtTime(f, t, 0.01); sideHp2.frequency.setTargetAtTime(f, t, 0.01); }
+      }
+      ctx.port('out', { kind: 'audio', direction: 'out', node: finalOut, label: 'wobble' });
 
       // --- LFO → wobble (unipolar 0..1 from bipolar osc) → lowpass detune + formant freqs
       const lfoBus = ac.createGain(); lfoBus.gain.value = 0.5;               // −1..1 → −0.5..0.5
@@ -378,7 +421,20 @@
         const am = P.get('ampMod'); trem.gain.setTargetAtTime(1 - am, now, 0.01); tremDepth.gain.setTargetAtTime(am, now, 0.01);
         vibG.gain.setTargetAtTime(P.get('vibrato') * 2, now, 0.01); // lfoBus is ±0.5 → ±cents
         const rg = P.get('ring') || 0; if (rg > 0 || ringDepth.gain.value !== 0) { ringVca.gain.setTargetAtTime(1 - rg, now, 0.01); ringDepth.gain.setTargetAtTime(rg, now, 0.01); }
-        applyVoices();
+        applyVoices(); applyWt();
+      }
+      function wtWave(k) { const key = P.get('wtTable') + k; return wt.frames[key] || (wt.frames[key] = wtFrame(ac, P.get('wtTable'), k)); }
+      function applyWt() {
+        const m = P.get('wtMix') || 0, now = ac.currentTime; if (!wt.a && m <= 0) return;
+        if (!wt.a) {
+          wt.a = ac.createOscillator(); wt.b = ac.createOscillator(); wt.ga = ac.createGain(); wt.gb = ac.createGain(); wt.mix = ac.createGain(); wt.mix.gain.value = 0;
+          [wt.a, wt.b].forEach((o, i) => { o.frequency.value = fHz.offset.value; o.connect(i ? wt.gb : wt.ga); fmVca.connect(o.frequency); pitchBus.connect(o.detune); o.start(); ctx.track(o); });
+          wt.ga.connect(wt.mix); wt.gb.connect(wt.mix); wt.mix.connect(oscSum); [wt.ga, wt.gb, wt.mix].forEach(n => ctx.track(n)); wt.k = -1; wt.table = null;
+        }
+        const x = Math.max(0, Math.min(1, P.get('wtPos'))) * (WT_FRAMES - 1), k = Math.min(WT_FRAMES - 2, Math.floor(x)), fr = x - k;
+        if (k !== wt.k || wt.table !== P.get('wtTable')) { wt.a.setPeriodicWave(wtWave(k)); wt.b.setPeriodicWave(wtWave(k + 1)); wt.k = k; wt.table = P.get('wtTable'); }
+        wt.ga.gain.setTargetAtTime(Math.cos(fr * Math.PI / 2), now, 0.01); wt.gb.gain.setTargetAtTime(Math.sin(fr * Math.PI / 2), now, 0.01);
+        wt.mix.gain.setTargetAtTime(m * 0.6, now, 0.02);
       }
       // 4.0 unison: pairs 2…4 detuned 2×, 3×, 4× the Unison spread, panned wider with Width, quieter so the sum stays even
       function makeVoice(i) {
@@ -408,7 +464,14 @@
         lp3.frequency.setTargetAtTime(c, ac.currentTime, 0.01); lp3.Q.value = 0.5;
         const sl = P.get('slope') || '24', t0 = ac.currentTime;
         if (sl !== '24' || s24.gain.value !== 1) { s12.gain.setTargetAtTime(sl === '12' ? 1 : 0, t0, 0.005); s24.gain.setTargetAtTime(sl === '24' ? 1 : 0, t0, 0.005); s36.gain.setTargetAtTime(sl === '36' ? 1 : 0, t0, 0.005); }
-        lpOut.gain.setTargetAtTime(mode !== 'formant' ? 1 : 0, ac.currentTime, 0.005);
+        const comb = mode === 'comb' || mode === 'comb-';
+        lpOut.gain.setTargetAtTime(mode !== 'formant' && !comb ? 1 : 0, ac.currentTime, 0.005);
+        if (comb || combOut.gain.value !== 0) {
+          const D = 1 / Math.max(40, Math.min(8000, c)), g = (mode === 'comb-' ? -1 : 1) * Math.min(0.95, 0.3 + 0.65 * (q / 20)), lift = D * (1 - Math.pow(2, -Math.min(8, d))), tt = ac.currentTime;
+          cd1.delayTime.setTargetAtTime(D, tt, 0.01); cd2.delayTime.setTargetAtTime(2 * D, tt, 0.01); cg1.gain.setTargetAtTime(g, tt, 0.01); cg2.gain.setTargetAtTime(g * Math.abs(g), tt, 0.01);
+          combMod1.gain.setTargetAtTime(comb ? -lift : 0, tt, 0.01); combMod2.gain.setTargetAtTime(comb ? -2 * lift : 0, tt, 0.01);
+          combOut.gain.setTargetAtTime(comb ? 0.6 : 0, tt, 0.005);
+        }
         formMakeup.gain.setTargetAtTime(mode === 'formant' ? 2.2 + q * 0.12 : 0, ac.currentTime, 0.005);
       }
       function applyFm(t) {
@@ -417,6 +480,9 @@
         fmStatic.gain.setTargetAtTime(idx * (1 - w), t, 0.01); fmWubDepth.gain.setTargetAtTime(idx * w, t, 0.01);
       }
       uni.connect(fmWubDepth);   // the wobble (0..1) opens the FM
+      uni.connect(combMod1); uni.connect(combMod2);   // 4.1 the wobble sweeps the comb (both gains 0 unless a comb is chosen)
+      P.onChange('monoBelow', applyMono); applyMono();
+      ['wtMix', 'wtTable', 'wtPos'].forEach(k => P.onChange(k, applyWt));
       applyTone(); applyFilter(); applyFm(); applySquash();
       ['fmIndex', 'fmWub'].forEach(k => P.onChange(k, () => applyFm()));
       ['fmRatio', 'fmFine'].forEach(k => P.onChange(k, () => fmOsc.frequency.setTargetAtTime(curF * ratioOf(), ac.currentTime, 0.01)));
@@ -478,7 +544,7 @@
       let curF = 55;
       function setFreq(f, t0, glide, fromHz) {
         const from = fromHz || curF, keep = P.get('keepRange') !== false, subK0 = SUBK[P.get('subOct')] || 1, subK = keep ? dsp.keepRange(f * subK0, 30) / f : subK0;   // 3.77 the sub never under 30 Hz
-        [[saw, 1, true], [sq, P.get('sqOct') === '-1' ? 0.5 : 1, true], [saw2, 1, true], [sub, subK, false], [fmOsc, ratioOf(), true], [{ frequency: fHz.offset }, 1, true]].concat(extra.map(v => [v.o, 1, true])).forEach(([o, k, shaped]) => {
+        [[saw, 1, true], [sq, P.get('sqOct') === '-1' ? 0.5 : 1, true], [saw2, 1, true], [sub, subK, false], [fmOsc, ratioOf(), true], [{ frequency: fHz.offset }, 1, true]].concat(extra.map(v => [v.o, 1, true]), wt.a ? [[wt.a, 1, true], [wt.b, 1, true]] : []).forEach(([o, k, shaped]) => {
           const t = (shaped || P.get('subAlign')) ? Math.max(ac.currentTime, t0 - OSC_LAT) : t0;   // 3.39: the shaped layer's pitch leaves early; the sub's too when it is in phase
           o.frequency.cancelScheduledValues(t);
           if (glide > 0) { o.frequency.setValueAtTime(from * k, t); o.frequency.exponentialRampToValueAtTime(f * k, t + glide); }
@@ -555,7 +621,7 @@
       });
       ctx.shapeAt = (x) => drawFn(cleanPts(P.get('shapePts')) || [[0, -1, 0], [0.5, 1, 0]])(((x % 1) + 1) % 1);
       ctx.stateExtra = () => ({ vowels: VOWELS, key: ctx.key, divs: DIVS, shapes: SHAPES });
-      ctx.internals = { lp1, lp2, lp3, s12, s24, s36, lpOut, keyBus, envBus, velBus, lfo2, l2Pitch, l2Cut, l2Vol, l2Fm, ringVca, ringDepth, clWet, extra, outNode, bands, lfoBus, amp, uni, trem, vibG, noiseG, panA, panB, saw2, sub, drawDc, lfoLog, get lfo() { return lfo; }, get frozen() { return frozen; } };
+      ctx.internals = { wt, combOut, cd1, msWet, finalOut, lp1, lp2, lp3, s12, s24, s36, lpOut, keyBus, envBus, velBus, lfo2, l2Pitch, l2Cut, l2Vol, l2Fm, ringVca, ringDepth, clWet, extra, outNode, bands, lfoBus, amp, uni, trem, vibG, noiseG, panA, panB, saw2, sub, drawDc, lfoLog, get lfo() { return lfo; }, get frozen() { return frozen; } };
       return {};
     },
   });
