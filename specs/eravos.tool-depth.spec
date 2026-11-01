@@ -42,3 +42,27 @@
   output clipper. Details and proof: tools/music/tools/bass/wobble-bass/wobble-bass.spec ADDENDUM 2026-10-31.
   Still open in D1: wavetable source with morph, comb / phaser / ladder filters, a second filter, FM feedback, hard sync,
   oversampling choice, mono-below, a true-peak meter.
+
+## ADDENDUM 2026-11-01 — depth is built as COMPONENTS that interconnect (his correction)
+  His words: "what about decomposing tools into smaller tools that other tools can use. that was the intent with tools. that the
+  components can interconnect," (and 2026-10-21: "anything form a tool that other tools can use need to be decomposed").
+  What went wrong: Wobble Bass 4.0/4.1 put the new depth (multi-mode filter with slopes, key track and envelope, wavetables, comb,
+  unison, ring, LFO 2, clipper, mono below) INSIDE one tool. Other tools cannot use any of it. Meanwhile components already exist
+  that do much of it on their own: Syn Osc (banks + morph, FM, ring, unison, ADSR), Wub Filter (modes, comb, formant, slope 12/24),
+  FX Filter (types, slope, its own env + LFO), Syn Env (DAHDSR), LFO, Destroyer (bits, downsample) — and Wobble duplicates them.
+  The audit that says "Gaps (0)" (specs/eravos.decomposition.spec) matches group NAMES, not capabilities, so it cannot see this.
+  RULE from now on: a capability is built ONCE, as a shared DSP block in the music core, and it is exposed as a COMPONENT tool
+  (sovereign, its own window, audio and modulation ports so it wires to anything). All-in-one tools ASSEMBLE the same blocks, so
+  depth added to a block lands in every tool and component that uses it, and a component can always replace that stage of an
+  all-in-one by wiring. Wobble's 4.x controls stay (nothing taken away); their code moves into the blocks.
+  PHASES (replace D2–D6 order; bass music still first)
+    K1 BLOCKS — tools/music/core/blocks.js: filter (LP/HP/BP/notch/comb ±/formant, slope 12/24/36, key track, env + velocity
+       inputs), wavetable (tables × frames, position), unison stack, FM/ring operator, ADSR, clipper, mono below. Extracted from
+       Wobble 4.1 and the existing components with NO sound change (every factory preset of every touched tool nulls).
+    K2 COMPONENTS at full depth through the blocks: Wub Filter + FX Filter get every filter mode, slope 36, key track and env
+       inputs · Syn Osc gets the wavetables as banks · NEW components: Clipper, Bass Mono (mono below + width) · every block
+       control is a modulation input (the motion core already gives each knob one).
+    K3 ALL-IN-ONES ASSEMBLE BLOCKS: Wobble Bass first, then Reese, Supersaw, Retro Poly, Acid, Sub — each nulls against itself.
+    K4 INTERCONNECT, proved: the Wub Lab suite built from components can reach every Wobble Bass sound (its default within 1 dB,
+       rendered); "Open as components" on a tool's page opens its stages as wired components.
+    K5 the decomposition audit rewritten to read capabilities (the blocks each tool uses vs the components that expose them).
