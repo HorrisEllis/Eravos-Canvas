@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.94 Branches merged · Dusk at four times the frame rate, same look (2026-11-01)
+His words: "Do it. Merge any branched. Get the newest version. The reactive color".
+- Merged: claude/modest-dijkstra-sqa0gg (3.93 the piano roll opens on your notes) into main; every branch is now in main. Reactive
+  colours checked on the merged code: Changing still follows the sound (Supersaw low −138°, mid −6°, high +126°); P77/82/83/84 pass.
+- Found while checking: everything had slowed since the morning (colours Off 55 → 32 fps). Bisected to the default theme, Dusk
+  (colours Off: Dusk 10 fps · Studio 48 · Midnight 45). Two costs, both kept as looks:
+  (1) its flowing gradients repainted every window's edge, title and lit button each frame → the flow now runs only on the focused
+      window and under the pointer (a paused animation costs nothing; the gradients stay);
+  (2) each window's dusk sky was a full-window 'screen' blend, re-blended every frame while its meters move → plain transparency
+      (its gradients are 8–16 %: side by side the window reads the same).
+- Measured (build/perf-ui.mjs, Dusk): colours Off 10 → 41.5 fps · GPU layer Static 27 → 37 · Changing 18.8 → 25.2 · Page 19.
+- build/perf-ui.mjs takes a theme: mode:draw:theme.
+
 ## Done — 3.92 Your songs back in Songs · every pattern novel · the Patterns tool list fixed (2026-11-01)
 Asked (on screenshots of the Patterns page and the old Songs cards "Floor Falls Out", "Sub Dive City"): "this looks bad. can you recover
 those? those are my rythme. can you make sure all the patterns are novel. also fix the catagories".

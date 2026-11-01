@@ -783,3 +783,15 @@ html[data-theme="midnight"] .uk-knob-arc { filter: none; }
 .dg-empty { font: 13px var(--font); fill: var(--dim); }
 .dg-note { margin: 8px 0 0; color: var(--faint); font-size: 11.5px; }
 
+
+/* 3.94 DUSK, the same look at a fraction of the cost: its flowing gradients repainted every window's edge, title and lit button on every
+   frame (measured, colours Off, a song playing, 8 windows: Dusk 10 fps · Studio 48 · Midnight 45). The flow now runs only where you are —
+   the focused window and anything under the pointer; everywhere else the gradient holds still (a paused animation costs nothing). */
+html[data-theme="dusk"] .wm-win::before, html[data-theme="dusk"] .wm-title, html[data-theme="dusk"] .uk-seg button.on, html[data-theme="dusk"] .uk-btn.primary,
+html[data-theme="dusk"] .mo-dot { animation-play-state: paused; }
+html[data-theme="dusk"] .wm-win.focused::before, html[data-theme="dusk"] .wm-win.focused .wm-title,
+html[data-theme="dusk"] .uk-seg button.on:hover, html[data-theme="dusk"] .uk-btn.primary:hover, html[data-theme="dusk"] .wm-win:hover::before { animation-play-state: running; }
+/* 3.94 the window's dusk sky drawn without a blend mode: 'screen' over a window whose meters and spectra move makes the browser re-blend
+   the window every frame (the same cost measured on the glass layer, 3.82). Its gradients are faint (8–16 %), so over the dark chassis
+   plain transparency reads the same light. */
+html[data-theme="dusk"] .wm-dusk { mix-blend-mode: normal; }
