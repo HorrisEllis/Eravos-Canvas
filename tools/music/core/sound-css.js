@@ -28,7 +28,12 @@
  * addendum 2026-10-31): 'glass' (default where it runs) — the same modes and colours, but drawn by the GPU on a Looking Glass layer over
  * the page (canvas/runtime/glass-layer.js): the mix tints everything under it (a 'wash'), each sounding window lights its edge and halo
  * in its own colour (a 'glow'). Nothing on the page is written while it plays, so nothing is restyled. 'page' — 3.80 as it was: the
- * colour variables themselves move (every accent, pad and surface by its own share). */
+ * colour variables themselves move (every accent, pad and surface by its own share).
+ * 3.83 "i want the colors in the tools to use the reactive colors" — the colours a tool DRAWS and WRITES react, not only its
+ *   variables: every colour drawn on a canvas inside a window (fillStyle, strokeStyle, shadowColor) passes through colourIn(), and
+ *   every literal colour a tool's UI writes inline (ui-kit h() turns it into a --rc-* variable) is lit with the window. Each by its
+ *   share: a dark surface leans a little, a grey a bit more, an accent fully (shareOf). In glass mode the windows answer too (only
+ *   the page palette is left to the glass layer). Quiet, Off, or outside a window: the colour is returned exactly as given. */
 (function (global) {
   'use strict';
   const doc = global.document; if (!doc) return;
@@ -109,7 +114,7 @@
     const st = el.style; el._cb = el._cb || {}; el._cs = el._cs || {};
     for (let i = 0; i < st.length; i++) { const n = st[i]; if (n.charCodeAt(0) !== 45 || n.charCodeAt(1) !== 45 || n === '--tool-level' || n === '--lvl') continue;
       const v = st.getPropertyValue(n).trim(); if (!isCol(v)) continue; if (el._cs[n] !== v) el._cb[n] = v;
-      const c = colourFor(el._cb[n], k, o); if (c !== v) st.setProperty(n, c); el._cs[n] = c;
+      const c = n.startsWith('--rc-') ? colourIn0(el._cb[n], k, o) : colourFor(el._cb[n], k, o); if (c !== v) st.setProperty(n, c); el._cs[n] = c;
       if (n === '--acc') { el.dataset.accLive = c; if (el.dataset.acc0 === undefined) el.dataset.acc0 = el._cb[n]; } }
     live.add(el);
   }
@@ -125,10 +130,45 @@
     o = o || Object.assign(G(), settingsOf(w), { shift: w._shift !== undefined ? w._shift : shift });
     if (o.mode === 'off') { restoreAcc(w); return; }
     // 3.78 k in steps of 5 %, so the same colour strings repeat and are not written again
-    const k = q(clamp((lv * 0.85 + (o.pulse || 0) * 0.25 * lv) * o.amt * 1.25, 0, 1), 20); light(w, k, o); accented(w, ts || performance.now()).forEach(el => light(el, k, o));
+    if (!w._acc0) w._acc0 = w.style.getPropertyValue('--acc').trim() || (w.dataset && w.dataset.acc0) || global.getComputedStyle(w).getPropertyValue('--acc').trim() || '#00d4ff';
+    if (!o.acc) o = Object.assign({}, o, { acc: (w._cb && w._cb['--acc']) || w._acc0 });   // the window's own accent: the hue its dark colours follow
+    const k = q(clamp((lv * 0.85 + (o.pulse || 0) * 0.25 * lv) * o.amt * 1.25, 0, 1), 20); w._rk = k; w._ro = o; light(w, k, o); accented(w, ts || performance.now()).forEach(el => light(el, k, o));
   }
   function lvSet(w, v) { if (!writing) return; const s2 = q(v, 25).toFixed(2); if (w._lvS !== s2) { w._lvS = s2; w.style.setProperty('--tool-level', s2); } }   // 3.78
-  function restoreAcc(w) { [w].concat(w._accEls || []).forEach(el => { if (el._cb) unlight(el); }); }
+  function restoreAcc(w) { w._rk = 0; [w].concat(w._accEls || []).forEach(el => { if (el._cb) unlight(el); }); }
+  // ---- 3.83 colours a tool draws or writes: by its share (a dark surface leans a little, a grey more, an accent fully), alpha kept
+  function shareOf(rgb) { const mx = Math.max(...rgb) / 255, mn = Math.min(...rgb) / 255, l = (mx + mn) / 2, sa = mx === mn ? 0 : (mx - mn) / (1 - Math.abs(2 * l - 1)); return l < 0.3 ? 0.12 : sa < 0.35 ? 0.3 : 1; }
+  const memo = new Map();
+  function colourIn0(c, k, o) {
+    if (!(k >= 0.005) || !o || o.mode === 'off' || typeof c !== 'string') return c;
+    const key = c + '|' + k + '|' + o.mode + '|' + (o.shift || 0) + '|' + (o.acc || '') + '|' + (o.mode === 'custom' ? q(o.pulse || 0, 10) + JSON.stringify(o.colors) : ''), hit = memo.get(key); if (hit !== undefined) return hit;
+    const rgb = rgbOf(c); let out = c;
+    if (rgb) { let a = null; const t = c.trim(), m = /^rgba\([^)]*,\s*([\d.]+)\s*\)$/i.exec(t), m8 = /^#[0-9a-f]{6}([0-9a-f]{2})$/i.exec(t); if (m) a = +m[1]; else if (m8) a = parseInt(m8[1], 16) / 255;
+      // Changing turns EVERY colour's hue by the full amount (a dark pink background that stayed pink under green accents read as a red
+      // cast — his note on the Shape and Perform screens); only how much it brightens follows its share
+      // Changing: an accent turns round the wheel (the palette keeps its variety); a dark or grey colour takes the hue the window's
+      // accent has turned to (turning it by the same amount made blue-grey grids pink under a green accent: his "red tint")
+      const sh = shareOf(rgb), f = Math.min(1, k * 1.6); let lit2;
+      if (o.mode === 'changing') { if (sh >= 1 || !o.acc) lit2 = lit(rotate(hex(rgb), (o.shift || 0) * f), k * sh * 0.6);
+        else { const th = hueDeg(rgbOf(rotate(o.acc, o.shift || 0))), d = ((th - hueDeg(rgb) + 540) % 360) - 180; lit2 = lit(rotate(hex(rgb), d * f), k * sh * 0.6); } }
+      else lit2 = colourFor(hex(rgb), k * sh, o);
+      const r2 = rgbOf(lit2); out = a === null ? lit2 : 'rgba(' + r2[0] + ',' + r2[1] + ',' + r2[2] + ',' + (+a.toFixed(3)) + ')'; }
+    if (memo.size > 4000) memo.clear(); memo.set(key, out); return out;
+  }
+  // the reacting colour for something inside a window or a tool page (else exactly c)
+  let lastScan = 0;
+  function colourIn(el, c) {
+    if (!on && !ownAny) return c; let w = el && el._rw;
+    if (!w || !w.isConnected || el._rwAt <= lastScan) { w = el && el.closest ? el.closest('.wm-win, .tp-overlay') : null; if (el) { el._rw = w; el._rwAt = lastScan + 1; } }
+    return w && w._rk ? colourIn0(c, w._rk, w._ro) : c;
+  }
+  // every 2D canvas: what it is told to draw with passes through colourIn (a canvas outside any window gets its colour back unchanged)
+  (function patchCanvas() {
+    const P = global.CanvasRenderingContext2D && global.CanvasRenderingContext2D.prototype; if (!P || P._eravosRC) return; P._eravosRC = true;
+    ['fillStyle', 'strokeStyle', 'shadowColor'].forEach(name => { const d = Object.getOwnPropertyDescriptor(P, name); if (!d || !d.set) return;
+      Object.defineProperty(P, name, { configurable: true, enumerable: d.enumerable, get: d.get, set(v) { d.set.call(this, typeof v === 'string' && this.canvas && this.canvas.closest ? colourIn(this.canvas, v) : v); } }); });
+  })();
+
   // what in a window carries a colour — found once a second
   function accented(root, ts) { if (!root._accAt || ts - root._accAt > 1000) { root._accAt = ts; root._accEls = Array.from(root.querySelectorAll('[style*="--"]')); } return root._accEls; }
   let on = mode !== 'off', ownScan = -1e9, ownAny = false;
@@ -141,7 +181,8 @@
   // and the sound is still read 30× a second, but colours are written on one frame in every ~80 ms (WRITE_MS): the frames between
   // restyle nothing. `writing` is that frame.
   const WRITE_MS = 80; let writing = true, lastW = -1e9;
-  const set = (k, v) => { if (!writing || rootV[k] === v) return; rootV[k] = v; root.style.setProperty(k, v); };
+  let pageOff = false;   // 3.83 glass mode: the page palette is the glass layer's; the windows still answer
+  const set = (k, v) => { if (!writing || pageOff || rootV[k] === v) return; rootV[k] = v; root.style.setProperty(k, v); };
   const q = (v, n) => Math.round(v * n) / n;   // a visible step: n per unit
   function zero() {
     const w0 = writing; writing = true;   // 3.78 putting colours back is never skipped
@@ -171,7 +212,7 @@
     // the app is Off: only windows with their own reactive setting (⚙ → Reactive colours) still answer — looked for once a second
     if (!on) { if (ts - ownScan > 1000) { ownScan = ts; ownAny = Array.from(doc.querySelectorAll('.wm-win')).some(w => { const x = settingsOf(w); return x.own && x.mode !== 'off'; }); } if (!ownAny) return; }
     last = ts; writing = ts - lastW >= WRITE_MS; if (writing) lastW = ts;
-    const G2 = glass(); if (G2) writing = false;   // 3.82 drawn on the glass layer: the page is not written at all
+    const G2 = glass(); pageOff = G2;   // 3.82 drawn on the glass layer: the page is not written; 3.83 the windows still are
     const lit = G2 ? [] : null;
     if (!ensure()) return;
     an.getFloatFrequencyData(db);
@@ -193,7 +234,8 @@
     const kMix = q(clamp((level * 0.55 + pulse * 0.5) * amt * 1.25, 0, 1), 20); if (on && ts - lastPal >= 100) { lastPal = ts; PALETTE.forEach(k => { if (base[k]) set(k, colourFor(base[k], kMix, G())); }); surfaces(kMix); }
     if (G2 && on) glassMix(kMix);
     // a tool shown on its page (or a suite's page) lights with the mix
-    if (on) doc.querySelectorAll('.tp-overlay').forEach(o => { light(o, kMix, G()); accented(o, ts).forEach(el => light(el, kMix, G())); });
+    if (on) doc.querySelectorAll('.tp-overlay').forEach(o => { o._rk = kMix; o._ro = G(); light(o, kMix, G()); accented(o, ts).forEach(el => light(el, kMix, G())); });
+    if (Math.random() < 0.05) lastScan++;   // 3.83 a canvas looks up its window again now and then (it may have moved)
     if (Math.random() < 0.02) taps.forEach((t, id) => { if (!t.win || !t.win.isConnected) { try { if (t.node && t.an) t.node.disconnect(t.an); } catch (e) {} taps.delete(id); } });   // closed windows let go
     // each window that makes sound: its own level
     // 3.73 "all of the accents … when sound plays — in the tools, the ui": a window that makes no sound of its own (a pattern tool,
@@ -271,6 +313,7 @@
     // tests: one analysis step on demand (offline pages have no running clock)
     step() { last = -1e9; lastW = -1e9; frame(performance.now() + 1e6); global.cancelAnimationFrame(raf); raf = global.requestAnimationFrame(frame); },
     liveAcc, restoreAcc,   // tests
+    colourIn, shareOf,     // 3.83 the colour a tool draws or writes, reacting (tests, and code that draws outside a 2D canvas)
     _taps: taps, lit, colourFor, rotate, settingsOf, SURFACES, tintNow,
   };
   global.SoundCSS = SoundCSS;
