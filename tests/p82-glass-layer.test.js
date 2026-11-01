@@ -53,3 +53,21 @@ describe('🔮 Glass layer: Looking Glass inside the canvas (3.82)', () => {
     assert.ok(/@vertex fn vs/.test(GLy().WGSL) && /@fragment fn fs/.test(GLy().WGSL), 'vertex and fragment entry points');
   });
 });
+describe('🔮 Glass layer: the rim element (3.96)', () => {
+  it('a rim draws a ring on its box edge (not inside), travels when it has a speed, and lets the loop rest when removed', async () => {
+    const G = GlassLayer; await G.ready; const was = G.renderer; await G.use('2d');
+    const box = document.createElement('div'); Object.assign(box.style, { position: 'fixed', left: '100px', top: '100px', width: '120px', height: '60px' }); document.body.appendChild(box);
+    try {
+      const L = G.layer('p82-rim', { depth: 5 }); L.set('r', { type: 'rim', anchor: box, rainbow: true, width: 3, radius: 8, intensity: 1, speed: 90 });
+      for (let i = 0; i < 6; i++) G.frame(performance.now() + i * 100);
+      const g = L.el.getContext('2d'), s = L.dpr || 1, px = (x, y) => g.getImageData(Math.round(x * s), Math.round(y * s), 1, 1).data;
+      assert.gt(px(160, 100)[3], 60, 'the top edge is lit'); assert.lt(px(160, 130)[3], 10, 'the middle is clear');
+      const a = Array.from(px(160, 100)).slice(0, 3).join(); for (let i = 0; i < 8; i++) G.frame(performance.now() + 1000 + i * 120); const b = Array.from(px(160, 100)).slice(0, 3).join();
+      assert.ok(a !== b, 'the rainbow travelled: ' + a + ' → ' + b); assert.ok(G.stats().running, 'a moving rim keeps the loop running');
+      L.remove('r'); assert.ok(!G.has('p82-rim'), 'an empty layer is removed');
+    } finally { box.remove(); await G.use(was || '2d'); }
+  });
+  it('the WGSL takes a rim too (kind, width, phase, rainbow per instance)', () => {
+    assert.ok(/@location\(3\) ex: vec4f/.test(GlassLayer.WGSL) && /o\.ex\.x > 0\.5/.test(GlassLayer.WGSL), 'rim path in the shader');
+  });
+});
