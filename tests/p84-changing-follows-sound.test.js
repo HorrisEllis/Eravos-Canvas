@@ -23,3 +23,16 @@ describe('〰 Changing follows the sound, and only the sound (3.84)', () => {
     } finally { OrganismFactory.close(sub); OrganismFactory.close(lead); SoundCSS.setMode(was[0] === 'off' ? 'static' : was[0]); SoundCSS.setDraw(was[1]); }
   });
 });
+/* 3.95 — James: "i dont want the layer of light over the tools, only the buttons, knobs, anything that already has color, make that an
+ * option in the settings. accent around the border and the font is colored like the rest of the ui and tools" */
+describe('💡 Light over the tools: off by default (3.95)', () => {
+  it('off: the surfaces never lean, the border and title wear the accent, a theme\'s window light is hidden; on: the surfaces lean again', () => {
+    const R = document.documentElement, was = SoundCSS.light; SoundCSS.setLight(false);
+    try {
+      assert.equal(R.dataset.reactLight, 'colour');
+      const w = document.createElement('div'); w.className = 'wm-win'; w.style.setProperty('--acc', '#ff2266'); const t = document.createElement('span'); t.className = 'wm-title'; t.textContent = 'x'; w.appendChild(t); document.body.appendChild(w);
+      try { assert.equal(getComputedStyle(t).color, 'rgb(255, 34, 102)', 'the title in the accent'); assert.ok(getComputedStyle(w).borderTopColor !== 'rgba(0, 0, 0, 0)', 'an accent border'); } finally { w.remove(); }
+      SoundCSS.setLight(true); assert.equal(R.dataset.reactLight, 'over');
+    } finally { SoundCSS.setLight(was); }
+  });
+});

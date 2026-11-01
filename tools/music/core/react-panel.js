@@ -78,8 +78,13 @@
     [['glass', 'GPU layer', 'drawn by the graphics card over the page: smooth, and light on the computer'], ['page', 'Page', 'every colour on the page moves by its own share — the most detail, the heaviest']].forEach(([d, t, h]) => {
       const b = el('button', 'rcp-dbtn', t); b.type = 'button'; b.dataset.draw = d; b.title = h; b.addEventListener('click', () => { S().setDraw(d); paint(); }); drawBtns.appendChild(b); });
     drawRow.append(el('span', 'rcp-lab', 'Draw with'), drawBtns, drawNote);
+    // 3.95 Light over the tools: off = only what already has colour reacts (and each window's border and title wear its accent)
+    const lightRow = el('div', 'rcp-draw rcp-light'), lightBtns = el('div', 'rcp-drawb');
+    [[false, 'Only what has colour', 'buttons, knobs, keys, displays and accents react; each window’s border and title wear its colour; nothing is laid over the controls'], [true, 'Light over the tools too', 'also tint the canvas, the panels and the space inside each window with the sound']].forEach(([v, t, hh]) => {
+      const b = el('button', 'rcp-dbtn', t); b.type = 'button'; b.dataset.light = v ? 'over' : 'colour'; b.title = hh; b.addEventListener('click', () => { S().setLight(v); paint(); }); lightBtns.appendChild(b); });
+    lightRow.append(el('span', 'rcp-lab', 'Light'), lightBtns, el('span', 'rcp-drawn'));
     const foot = el('div', 'rcp-foot', tool ? 'Saved with this tool. “Follow the app” uses ⋯ Options → Reactive colours.' : 'Remembered on this computer. Any tool can have its own: ⚙ → Reactive colours.');
-    box.append(head, cards, amtRow, cust); if (!tool && S().setDraw) box.append(drawRow); box.append(foot);
+    box.append(head, cards, amtRow, cust); if (!tool && S().setDraw) box.append(drawRow); if (!tool && S().setLight) box.append(lightRow); box.append(foot);
 
     function paint() {
       const g = get(), eff = g.mode === 'follow' ? S().mode : g.mode;
@@ -90,6 +95,7 @@
         drawNote.textContent = ''; if (S().draw === 'glass' && global.GlassLayer) { const gpu = S().renderer === 'webgpu', t = el('button', 'rcp-gpu', gpu ? 'WebGPU · back to 2D' : '2D canvas · try WebGPU');
           t.type = 'button'; t.title = gpu ? 'draw with the 2D canvas (the tested way)' : 'draw the layer with WebGPU on your graphics card — new; if the glows vanish, come back to 2D';
           t.addEventListener('click', () => global.GlassLayer.use(gpu ? '2d' : 'webgpu').then(() => paint())); drawNote.appendChild(t); } }
+      if (S().setLight) lightBtns.querySelectorAll('.rcp-dbtn').forEach(b => { const on = (b.dataset.light === 'over') === S().light; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
       cust.hidden = eff !== 'custom'; sws.querySelectorAll('input').forEach(i => { i.value = g.colors[i.dataset.k]; i.previousSibling.style.background = i.value; });
     }
     // the previews: one loop for all of them while the panel is on screen

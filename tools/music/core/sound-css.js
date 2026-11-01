@@ -67,6 +67,13 @@
   // ---- 3.77 modes: how a colour answers the sound (k 0…1 already scaled by Amount)
   const MODES = ['off', 'static', 'changing', 'custom'], DRAWS = ['glass', 'page'];
   let draw = 'glass'; try { const d = global.localStorage.getItem('eravos.reactive.draw'); if (DRAWS.includes(d)) draw = d; } catch (e) {}
+  // 3.95 LIGHT OVER THE TOOLS (his words: "i dont want the layer of light over the tools, only the buttons, knobs, anything that already has
+  // color, make that an option in the settings"): off (the default) — only what already has a colour reacts (buttons, knobs, keys,
+  // displays, accents), and each window's border and title take its accent; on — also the light over everything: the glass wash, the
+  // light inside each window, the surfaces leaning (backgrounds, panels, lines) and a theme's window light (Dusk's sky)
+  let overLight = false; try { overLight = global.localStorage.getItem('eravos.reactive.light') === 'over'; } catch (e) {}
+  const lightAttr = () => { root.dataset.reactLight = overLight ? 'over' : 'colour'; };
+  lightAttr();
   const GL = () => global.GlassLayer, glass = () => draw === 'glass' && !!GL();
   let mode = 'static', amt = 0.8, custom = { low: '#ff2266', high: '#00d4ff', hit: '#ffffff' }, shift = 0, bright = 0.5;
   try {
@@ -105,7 +112,8 @@
     return lit(acc, 0.3);
   }
   function surfaces(k) {
-    if (!base) return; const tint = rgbOf(tintNow()); if (!tint) return;
+    // 3.95 the surfaces lean only with Light over the tools
+    if (!base || !overLight) return; const tint = rgbOf(tintNow()); if (!tint) return;
     // 3.91 the theme says how far a surface may lean (--react-surface: Dusk .55, Midnight .3, Studio 1)
     const sc = surfScale === null ? (surfScale = parseFloat(global.getComputedStyle(root).getPropertyValue('--react-surface')) || 1) : surfScale;
     Object.keys(SURFACES).forEach(n => { const b = rgbOf(base[n]); if (b) set(n, k < 0.005 ? base[n] : hex(mixRGB(b, tint, k * SURFACES[n] * sc))); });
@@ -187,7 +195,8 @@
   const memo = new Map();
   function colourIn0(c, k, o) {
     if (!(k >= 0.005) || !o || o.mode === 'off' || typeof c !== 'string') return c;
-    { const r0 = rgbOf(c); if (r0 && shareOf(r0) === 0) return c; }
+    // 3.95 without Light over the tools, only a colour reacts: a dark surface or a grey keeps its own
+    { const r0 = rgbOf(c); if (r0 && (shareOf(r0) === 0 || (!overLight && shareOf(r0) < 1))) return c; }
     const key = c + '|' + k + '|' + o.mode + '|' + (o.shift || 0) + '|' + (o.acc || '') + '|' + (o.mode === 'custom' ? q(o.pulse || 0, 10) + JSON.stringify(o.colors) : ''), hit = memo.get(key); if (hit !== undefined) return hit;
     const rgb = rgbOf(c); let out = c;
     if (rgb) { let a = null; const t = c.trim(), m = /^(?:rgba|hsla)\([^)]*,\s*([\d.]+)\s*\)$/i.exec(t), m8 = /^#[0-9a-f]{6}([0-9a-f]{2})$/i.exec(t); if (m) a = +m[1]; else if (m8) a = parseInt(m8[1], 16) / 255;
@@ -342,6 +351,7 @@
   function glassMix(kMix) {
     const L = GL().layer('reactive', { depth: 99990 });
     GL().vars.set('react.tint', tintNow()); GL().vars.set('react.mix', +(kMix * 0.2).toFixed(3));   // the surfaces' shares in the page way are 10–16 %; a wash over text needs a touch more
+    if (!overLight) { if (L.items.has('mix')) L.remove('mix'); return; }   // 3.95 the wash is light over the tools
     if (!L.items.has('mix')) L.set('mix', { type: 'wash', color: { var: 'react.tint' }, alpha: { var: 'react.mix' } });
   }
   const glowed = new Set();
@@ -349,13 +359,13 @@
     const L = GL().layer('reactive', { depth: 99990 }), seen = new Set();
     list.forEach(([w, lv, o]) => { const id = 'win:' + (w.dataset.instance || ''); seen.add(id);
       const k = o.mode === 'off' ? 0 : clamp((lv * 0.85 + (o.pulse || 0) * 0.25 * lv) * o.amt * 1.25, 0, 1);
-      L.set(id, { type: 'glow', anchor: w, color: colourFor(accBase(w), k * 0.45, o), intensity: +Math.min(1, 0.15 + k * 1.3).toFixed(3) * (k > 0.02 ? 1 : 0), radius: 6, spread: 18 + 34 * k, fill: 0.035 }); });   // the tool's own hue, only a little lit (lit fully, it washes to white)
+      L.set(id, { type: 'glow', anchor: w, color: colourFor(accBase(w), k * 0.45, o), intensity: +Math.min(1, 0.15 + k * 1.3).toFixed(3) * (k > 0.02 ? 1 : 0), radius: 6, spread: overLight ? 18 + 34 * k : 6 + 12 * k, fill: overLight ? 0.035 : 0 }); });   // 3.95 without Light over the tools: the edge only, nothing over the controls   // the tool's own hue, only a little lit (lit fully, it washes to white)
     glowed.forEach(id => { if (!seen.has(id)) L.remove(id); }); glowed.clear(); seen.forEach(id => glowed.add(id));
   }
   function glassRest() { const G0 = GL(); if (G0 && G0.has('reactive')) G0.layer('reactive').clear(); glowed.clear(); }
   const listeners = [];
   const fire = () => listeners.forEach(fn => { try { fn(SoundCSS); } catch (e) {} });
-  function save() { try { const L = global.localStorage; L.setItem('eravos.reactive', on ? '1' : '0'); L.setItem('eravos.reactive.mode', mode); L.setItem('eravos.reactive.amount', String(amt)); L.setItem('eravos.reactive.colors', JSON.stringify(custom)); L.setItem('eravos.reactive.draw', draw); } catch (e) {} }
+  function save() { try { const L = global.localStorage; L.setItem('eravos.reactive', on ? '1' : '0'); L.setItem('eravos.reactive.mode', mode); L.setItem('eravos.reactive.amount', String(amt)); L.setItem('eravos.reactive.colors', JSON.stringify(custom)); L.setItem('eravos.reactive.draw', draw); L.setItem('eravos.reactive.light', overLight ? 'over' : 'colour'); } catch (e) {} }
   const SoundCSS = {
     init(kernel) { K = kernel; if (!raf) raf = global.requestAnimationFrame(frame); root.classList.toggle('snd-off', !on); root.dataset.react = mode; return SoundCSS; },
     get on() { return on; },
@@ -364,6 +374,8 @@
     setMode(m) { if (!MODES.includes(m)) return; mode = m; on = m !== 'off'; ownScan = -1e9; save(); root.classList.toggle('snd-off', !on); root.dataset.react = m; zero(); fire(); },
     rescan() { ownScan = -1e9; },
     get draw() { return draw; }, DRAWS, get renderer() { return GL() ? GL().renderer : null; },
+    get light() { return overLight; },
+    setLight(v) { overLight = !!v; save(); lightAttr(); zero(); fire(); },   // 3.95 Light over the tools
     setDraw(d) { if (!DRAWS.includes(d) || d === draw) return; draw = d; save(); zero(); fire(); },   // 3.82 glass · page
     setAmount(a) { amt = clamp(+a || 0, 0, 1); save(); fire(); },
     setColors(c) { custom = Object.assign({}, custom, c || {}); save(); fire(); },
