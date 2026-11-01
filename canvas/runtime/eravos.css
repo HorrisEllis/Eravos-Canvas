@@ -785,7 +785,7 @@ html[data-theme="midnight"] .uk-knob-arc { filter: none; }
 
 
 /* 3.94 DUSK, the same look at a fraction of the cost: its flowing gradients repainted every window's edge, title and lit button on every
-   frame (measured, colours Off, a song playing, 8 windows: Dusk 10 fps · Studio 48 · Midnight 45). The flow now runs only where you are —
+   frame (measured, colours Off, something playing, 8 windows: Dusk 10 fps · Studio 48 · Midnight 45). The flow now runs only where you are —
    the focused window and anything under the pointer; everywhere else the gradient holds still (a paused animation costs nothing). */
 html[data-theme="dusk"] .wm-win::before, html[data-theme="dusk"] .wm-title, html[data-theme="dusk"] .uk-seg button.on, html[data-theme="dusk"] .uk-btn.primary,
 html[data-theme="dusk"] .mo-dot { animation-play-state: paused; }
