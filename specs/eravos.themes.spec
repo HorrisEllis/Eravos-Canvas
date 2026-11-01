@@ -112,3 +112,17 @@ Before any theme ships: move those onto the tokens, then a theme is one file. Th
   (domain.json "art", carried by the catalogue: the domain cards, installed or not), canvas/runtime/art/{blank-canvas,chest}.svg (Empty
   canvas, Browse every tool). .boot .card.has-art: the painting across the top (240 × 110), the emoji icon dropped from the title.
 
+## ADDENDUM 2026-11-01 (3.89) — the themes, built · a Themes section · hooked into the reactive colours
+  Asked: "the colors inside the tools aren't [right], look at the buttons, looks bad. please make those themes. and hook into the reactive.
+  make all the buttons beautiful. make a themes section in the settings."
+  canvas/runtime/themes.js → Themes { list, get, set, onChange, panel }; <html data-theme>; remembered (localStorage eravos.theme, a core
+  preference); an inline line at the top of index.html sets it before the first paint. Three themes:
+    dusk (default)  sunset gradients (the 3.87 layer, now scoped to it), round pill buttons with a soft gradient rim and sunset fills, the
+                    tool's painting faded into its title bar (--art, set by the window manager from the catalogue), rounded panels
+    studio          the device look (3.72) as it was, with no sunset layer
+    midnight        calm graphite tokens, soft rounded buttons, the accent only on what is on
+  Buttons: one rule per theme dresses every button family the same — uk-btn, uk-toggle, uk-seg, tb-btn, sbk-*, tp-btn, ap-btn, fl-btn.
+  Reactive hook: a theme sets --react-surface (Dusk .55, Midnight .3, Studio 1) — how far the reactive colours may tint a surface (the
+  wall of green); on a switch ('eravos:theme') sound-css puts every colour back and reads the palette again. UI.dusk / the spectrum draw
+  the moving sunset only in Dusk. ⋯ Options → Theme: a card per theme with a live picture, and the way to Reactive colours.
+

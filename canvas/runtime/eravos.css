@@ -659,23 +659,127 @@ table.tp-tab { width: 100%; }
 /* 3.87 DUSK — "can you make the ui more like that also? like with the wobble base. like have the colors more a gradient animated,
  * beautiful, like love the sunset one": every accent runs, slowly, from the window's own colour into sunset rose, amber and violet and
  * back. The stops are mixed FROM --acc, so each tool keeps its colour and the reactive colours still move it. Reduced motion: still. */
-:root, .wm-win, .tp-overlay { --dk1: var(--acc); --dk2: color-mix(in oklab, var(--acc) 22%, #ff6fa8); --dk3: color-mix(in oklab, var(--acc) 18%, #ffb36b); --dk4: color-mix(in oklab, var(--acc) 25%, #b06bff);
+/* 3.89 THEMES: these rules are the Dusk theme (html[data-theme="dusk"], canvas/runtime/themes.js); in the others the stops are the accent */
+:root, .wm-win, .tp-overlay { --dk1: var(--acc); --dk2: var(--acc); --dk3: var(--acc); --dk4: var(--acc); --dusk: var(--acc); }
+:root { --react-surface: 1; }
+.wm-dusk { display: none; } html[data-theme="dusk"] .wm-dusk { display: block; }
+html[data-theme="dusk"], html[data-theme="dusk"] .wm-win, html[data-theme="dusk"] .tp-overlay { --dk1: var(--acc); --dk2: color-mix(in oklab, var(--acc) 22%, #ff6fa8); --dk3: color-mix(in oklab, var(--acc) 18%, #ffb36b); --dk4: color-mix(in oklab, var(--acc) 25%, #b06bff);
   --dusk: linear-gradient(100deg, var(--dk1), var(--dk2) 25%, var(--dk3) 45%, var(--dk4) 70%, var(--dk1)); }
 @keyframes dusk-flow { from { background-position: 0% 50%; } to { background-position: 300% 50%; } }
-.wm-win::before { height: 3px; background: var(--dusk); background-size: 300% 100%; animation: dusk-flow 14s linear infinite; box-shadow: 0 0 12px color-mix(in srgb, var(--dk2) 60%, transparent); }
-.wm-title { background: var(--dusk); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: dusk-flow 14s linear infinite; }
-.uk-seg button.on { background: var(--dusk); background-size: 300% 100%; animation: dusk-flow 12s linear infinite; color: #1a0712; text-shadow: 0 1px 0 rgba(255,255,255,.25); box-shadow: 0 0 12px color-mix(in srgb, var(--dk2) 45%, transparent); }
-.uk-btn.primary { background: var(--dusk); background-size: 300% 100%; animation: dusk-flow 12s linear infinite; color: #1a0712; box-shadow: 0 1px 0 rgba(255,255,255,.3) inset, 0 0 14px color-mix(in srgb, var(--dk2) 45%, transparent); }
-.uk-toggle.on { background: linear-gradient(100deg, color-mix(in srgb, var(--dk1) 30%, #0b1016), color-mix(in srgb, var(--dk2) 30%, #0b1016), color-mix(in srgb, var(--dk4) 30%, #0b1016)); box-shadow: 0 0 0 1px var(--dk2), 0 0 12px color-mix(in srgb, var(--dk2) 40%, transparent); }
-.uk-fader-fill { background: linear-gradient(0deg, color-mix(in srgb, var(--dk4) 40%, transparent), var(--dk2) 55%, var(--dk3)); }
-.uk-knob-arc { filter: drop-shadow(0 0 3px color-mix(in srgb, var(--dk2) 70%, transparent)); }
-@media (prefers-reduced-motion: reduce) { .wm-win::before, .wm-title, .uk-seg button.on, .uk-btn.primary { animation: none; } }
+html[data-theme="dusk"] .wm-win::before { height: 3px; background: var(--dusk); background-size: 300% 100%; animation: dusk-flow 14s linear infinite; box-shadow: 0 0 12px color-mix(in srgb, var(--dk2) 60%, transparent); }
+html[data-theme="dusk"] .wm-title { background: var(--dusk); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: dusk-flow 14s linear infinite; }
+html[data-theme="dusk"] .uk-seg button.on { background: var(--dusk); background-size: 300% 100%; animation: dusk-flow 12s linear infinite; color: #1a0712; text-shadow: 0 1px 0 rgba(255,255,255,.25); box-shadow: 0 0 12px color-mix(in srgb, var(--dk2) 45%, transparent); }
+html[data-theme="dusk"] .uk-btn.primary { background: var(--dusk); background-size: 300% 100%; animation: dusk-flow 12s linear infinite; color: #1a0712; box-shadow: 0 1px 0 rgba(255,255,255,.3) inset, 0 0 14px color-mix(in srgb, var(--dk2) 45%, transparent); }
+html[data-theme="dusk"] .uk-toggle.on { background: linear-gradient(100deg, color-mix(in srgb, var(--dk1) 30%, #0b1016), color-mix(in srgb, var(--dk2) 30%, #0b1016), color-mix(in srgb, var(--dk4) 30%, #0b1016)); box-shadow: 0 0 0 1px var(--dk2), 0 0 12px color-mix(in srgb, var(--dk2) 40%, transparent); }
+html[data-theme="dusk"] .uk-fader-fill { background: linear-gradient(0deg, color-mix(in srgb, var(--dk4) 40%, transparent), var(--dk2) 55%, var(--dk3)); }
+html[data-theme="dusk"] .uk-knob-arc { filter: drop-shadow(0 0 3px color-mix(in srgb, var(--dk2) 70%, transparent)); }
+@media (prefers-reduced-motion: reduce) { html[data-theme="dusk"] .wm-win::before, html[data-theme="dusk"] .wm-title, html[data-theme="dusk"] .uk-seg button.on, html[data-theme="dusk"] .uk-btn.primary { animation: none; } }
 /* the window itself: a dusk sky behind its controls — violet low on one side, rose high on the other (still: no cost per frame) */
-.wm-dusk { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 3; mix-blend-mode: screen; opacity: .9;
+html[data-theme="dusk"] .wm-dusk { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 3; mix-blend-mode: screen; opacity: .9;
   background: radial-gradient(85% 55% at 0% 100%, color-mix(in srgb, var(--dk4) 16%, transparent), transparent 70%), radial-gradient(75% 45% at 100% 0%, color-mix(in srgb, var(--dk2) 13%, transparent), transparent 70%), radial-gradient(60% 35% at 60% 100%, color-mix(in srgb, var(--dk3) 8%, transparent), transparent 70%); }
-html.snd-calm .wm-dusk { opacity: .6; }
+html[data-theme="dusk"].snd-calm .wm-dusk { opacity: .6; }
 /* 3.88 a tool's painting: its page header and its ＋ Add card */
 .tp-head .tp-art { flex: none; width: 168px; height: 105px; object-fit: cover; border-radius: 10px; box-shadow: 0 8px 22px rgba(0,0,0,.5), 0 0 18px color-mix(in srgb, var(--acc) 22%, transparent); }
 @media (max-width: 600px) { .tp-head .tp-art { width: 100%; height: auto; aspect-ratio: 16 / 10; } }
 .ap-card-pic.painted .ap-card-img { object-fit: cover; }
+
+/* ===================================================================== 3.89 THEMES (canvas/runtime/themes.js)
+ * "make all the buttons beautiful": each theme dresses every button the same way — the controls inside tools (uk-*), the top bar (tb-btn)
+ * and the pages (sbk-*, tp-*, ap-*). */
+
+/* ---- DUSK: round pills, a soft gradient rim, sunset fills; rounded panels; the tool's painting in its title bar */
+html[data-theme="dusk"] { --react-surface: .55; }
+html[data-theme="dusk"] .wm-win { border-radius: 16px; overflow: hidden; }
+html[data-theme="dusk"] .wm-win::before { display: none; }
+html[data-theme="dusk"] .wm-head { border-bottom: 0; padding-left: 14px; background: linear-gradient(90deg, rgba(7,9,13,.94) 0%, rgba(7,9,13,.6) 45%, rgba(7,9,13,.2)), var(--art, linear-gradient(90deg, color-mix(in srgb, var(--dk4) 30%, #0b1016), color-mix(in srgb, var(--dk2) 30%, #0b1016))) center 35% / cover; }
+html[data-theme="dusk"] .wm-title { font-size: 12.5px; letter-spacing: 2.2px; }
+html[data-theme="dusk"] .wm-body canvas { border-radius: 10px; }
+html[data-theme="dusk"] :is(.uk-btn, .tb-btn, .sbk-alt, .sbk-chip, .tp-btn, .ap-btn, .fl-btn, .uk-toggle) { border-radius: 999px; border: 1px solid transparent;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--panel2) 92%, #fff), var(--bg2)) padding-box, linear-gradient(110deg, color-mix(in srgb, var(--dk2) 55%, var(--line2)), var(--line2) 45%, color-mix(in srgb, var(--dk4) 55%, var(--line2))) border-box;
+  box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 2px 8px rgba(0,0,0,.25); transition: box-shadow .15s, transform .15s, filter .15s; }
+html[data-theme="dusk"] :is(.uk-btn, .tb-btn, .sbk-alt, .sbk-chip, .tp-btn, .ap-btn, .fl-btn, .uk-toggle):hover { box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, 0 0 14px color-mix(in srgb, var(--dk2) 35%, transparent); transform: translateY(-1px); }
+html[data-theme="dusk"] :is(.uk-btn, .tb-btn, .sbk-alt, .tp-btn, .ap-btn, .fl-btn, .uk-toggle):active { transform: translateY(0); filter: brightness(.95); }
+html[data-theme="dusk"] :is(.uk-btn.primary, .tb-btn.pri, .tp-btn.pri, .sbk-go, .uk-toggle.on, .sbk-chip.on) { color: #fff; border-color: transparent; text-shadow: 0 1px 2px rgba(60,10,40,.45);
+  background: linear-gradient(110deg, var(--dk1), var(--dk2) 50%, var(--dk4)) padding-box, linear-gradient(110deg, var(--dk1), var(--dk4)) border-box; box-shadow: 0 4px 16px color-mix(in srgb, var(--dk2) 40%, transparent), 0 1px 0 rgba(255,255,255,.3) inset; }
+html[data-theme="dusk"] .uk-seg { border-radius: 999px; padding: 2px; gap: 2px; border: 1px solid var(--line2); background: var(--bg2); }
+html[data-theme="dusk"] .uk-seg button { border-radius: 999px; }
+html[data-theme="dusk"] .uk-seg button.on { color: #fff; background: linear-gradient(110deg, var(--dk1), var(--dk2) 55%, var(--dk4)); text-shadow: 0 1px 2px rgba(60,10,40,.45); }
+html[data-theme="dusk"] :is(.uk-select, .uk-text, .sbk-q, .tp-target) { border-radius: 999px; }
+html[data-theme="dusk"] .wm-body :is([class$="-card"], [class*="-card "], .gg-sec, section) { border-radius: 14px; }
+
+/* ---- MIDNIGHT: calm graphite; soft rounded buttons, the accent only on what is on; gentle reactions */
+html[data-theme="midnight"] { --bg: #0b0d12; --bg2: #11141b; --panel: #151922; --panel2: #1b202b; --line: #262c39; --line2: #313949; --text: #dfe5ef; --dim: #8d97aa; --faint: #586174;
+  --chassis: #12161e; --chassis2: #171c26; --well: #0a0c11; --grid: #1c2130; --react-surface: .3; }
+html[data-theme="midnight"] .wm-win { border-radius: 12px; }
+html[data-theme="midnight"] .wm-win::before { background: var(--acc); opacity: .55; box-shadow: none; height: 2px; }
+html[data-theme="midnight"] :is(.uk-btn, .tb-btn, .sbk-alt, .sbk-chip, .tp-btn, .ap-btn, .fl-btn, .uk-toggle) { border-radius: 10px; border: 1px solid var(--line2); background: var(--panel2); box-shadow: none; text-shadow: none; transition: border-color .15s, background .15s; }
+html[data-theme="midnight"] :is(.uk-btn, .tb-btn, .sbk-alt, .sbk-chip, .tp-btn, .ap-btn, .fl-btn, .uk-toggle):hover { border-color: color-mix(in srgb, var(--acc) 50%, var(--line2)); background: color-mix(in srgb, var(--acc) 6%, var(--panel2)); }
+html[data-theme="midnight"] :is(.uk-btn.primary, .tb-btn.pri, .tp-btn.pri, .sbk-go, .uk-toggle.on, .sbk-chip.on) { color: var(--text); background: color-mix(in srgb, var(--acc) 22%, var(--panel2)); border-color: color-mix(in srgb, var(--acc) 70%, transparent); box-shadow: none; }
+html[data-theme="midnight"] .uk-seg { border-radius: 10px; background: var(--well); }
+html[data-theme="midnight"] .uk-seg button { border-radius: 8px; }
+html[data-theme="midnight"] .uk-seg button.on { color: var(--text); background: color-mix(in srgb, var(--acc) 28%, var(--panel2)); box-shadow: 0 0 0 1px color-mix(in srgb, var(--acc) 60%, transparent) inset; }
+html[data-theme="midnight"] .uk-knob-arc { filter: none; }
+
+/* ---- the Themes section (⋯ Options → Theme) */
+.thm-entry .thm-tag { margin-left: auto; font: 700 9.5px var(--mono); letter-spacing: 1px; padding: 2px 8px; border-radius: 999px; color: #fff; background: linear-gradient(110deg, #ff2266, #ff6fa8 55%, #b06bff); }
+.thm-pop { position: fixed; inset: 0; z-index: 160000; display: grid; place-items: center; background: rgba(4,6,10,.55); backdrop-filter: blur(3px); }
+.thm-panel { width: min(780px, calc(100vw - 32px)); border-radius: 16px; background: var(--panel); border: 1px solid var(--line2); box-shadow: 0 20px 60px rgba(0,0,0,.6); padding: 16px 18px 14px; }
+.thm-headr { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.thm-headr b { font: 700 12px var(--mono); letter-spacing: 2px; } .thm-headr span { flex: 1; color: var(--dim); font-size: 12px; }
+.thm-x { background: none; border: 0; color: var(--dim); font-size: 18px; cursor: pointer; }
+.thm-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.thm-card { text-align: left; display: flex; flex-direction: column; gap: 10px; padding: 10px; border-radius: 14px; border: 1px solid var(--line2); background: var(--bg2); color: var(--text); cursor: pointer; font: inherit; transition: transform .15s, box-shadow .15s; }
+.thm-card:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,.35); }
+.thm-card.on { border-color: transparent; background: linear-gradient(var(--bg2), var(--bg2)) padding-box, linear-gradient(110deg, #ff2266, #ff6fa8, #b06bff) border-box; box-shadow: 0 0 18px rgba(255,111,168,.25); }
+.thm-tx b { display: block; font-size: 13.5px; } .thm-tx small { color: var(--dim); font-size: 11.5px; line-height: 1.35; }
+.thm-sw { display: flex; gap: 4px; } .thm-sw i { flex: 1; height: 6px; border-radius: 999px; }
+.thm-link { margin-top: 12px; background: none; border: 0; color: var(--dim); cursor: pointer; font: 12px var(--font); text-decoration: underline; text-underline-offset: 3px; }
+.thm-link:hover { color: var(--text); }
+@media (max-width: 640px) { .thm-cards { grid-template-columns: 1fr; } }
+/* the small picture on each card: a window drawn in that theme's own manner */
+.thm-mini { height: 112px; border-radius: 10px; overflow: hidden; border: 1px solid #000; display: flex; flex-direction: column; }
+.thm-mhead { height: 26px; display: flex; align-items: center; gap: 6px; padding: 0 8px; font: 700 8.5px var(--mono); letter-spacing: 1.6px; }
+.thm-mhead i { width: 6px; height: 6px; border-radius: 50%; }
+.thm-mbody { flex: 1; display: flex; flex-direction: column; gap: 7px; padding: 8px; }
+.thm-mrow { display: flex; gap: 4px; }
+.thm-mbtn, .thm-mpri { font: 700 8.5px var(--mono); padding: 3px 8px; }
+.thm-mknobs { display: flex; gap: 10px; }
+.thm-mknob { width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle at 40% 30%, #3d4a5a, #0b1016); position: relative; }
+.thm-mknob::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; border: 2px solid transparent; border-top-color: var(--mk, #00d4ff); border-right-color: var(--mk, #00d4ff); transform: rotate(calc(var(--v) * 200deg - 60deg)); }
+.thm-mpri { align-self: flex-start; }
+[data-theme-preview="dusk"] { background: linear-gradient(160deg, #1a1030, #0c1118 60%, #1a0e24); }
+[data-theme-preview="dusk"] .thm-mhead { color: #ffb3d0; background: linear-gradient(90deg, rgba(7,9,13,.9), rgba(7,9,13,.3)), linear-gradient(110deg, #4a1f6e, #c4547e, #ffb36b); }
+[data-theme-preview="dusk"] .thm-mhead i { background: #ff6fa8; box-shadow: 0 0 6px #ff6fa8; }
+[data-theme-preview="dusk"] .thm-mbtn { border-radius: 999px; color: #d6e4f0; border: 1px solid #3a2f55; background: #16202d; }
+[data-theme-preview="dusk"] .thm-mbtn.on, [data-theme-preview="dusk"] .thm-mpri { border-radius: 999px; color: #fff; border: 0; background: linear-gradient(110deg, #ff2266, #ff6fa8 55%, #b06bff); }
+[data-theme-preview="dusk"] .thm-mknob { --mk: #ff6fa8; }
+[data-theme-preview="studio"] { background: linear-gradient(180deg, #121a23, #0b1016); }
+[data-theme-preview="studio"] .thm-mhead { color: #00d4ff; border-bottom: 1px solid #000; box-shadow: 0 -2px 0 #00d4ff inset; }
+[data-theme-preview="studio"] .thm-mhead i { background: #00d4ff; }
+[data-theme-preview="studio"] .thm-mbtn { border-radius: 3px; color: #7f93a8; border: 1px solid #000; background: #06080b; }
+[data-theme-preview="studio"] .thm-mbtn.on, [data-theme-preview="studio"] .thm-mpri { border-radius: 3px; color: #041018; background: #00d4ff; border: 0; }
+[data-theme-preview="studio"] .thm-mknob { --mk: #00d4ff; }
+[data-theme-preview="midnight"] { background: #151922; }
+[data-theme-preview="midnight"] .thm-mhead { color: #c9d2e3; border-bottom: 1px solid #262c39; }
+[data-theme-preview="midnight"] .thm-mhead i { background: #8fa8ff; }
+[data-theme-preview="midnight"] .thm-mbtn { border-radius: 8px; color: #8d97aa; border: 1px solid #313949; background: #1b202b; }
+[data-theme-preview="midnight"] .thm-mbtn.on, [data-theme-preview="midnight"] .thm-mpri { border-radius: 8px; color: #dfe5ef; background: #2a3150; border: 1px solid #8fa8ff; }
+[data-theme-preview="midnight"] .thm-mknob { --mk: #8fa8ff; }
+/* ---- 3.89 Dependencies (⋯ Options → Dependencies) */
+.dg-pop { position: fixed; inset: 0; z-index: 160000; display: grid; place-items: center; background: rgba(4,6,10,.55); backdrop-filter: blur(3px); }
+.dg-panel { width: min(1040px, calc(100vw - 32px)); max-height: calc(100vh - 60px); display: flex; flex-direction: column; border-radius: 16px; background: var(--panel); border: 1px solid var(--line2); box-shadow: 0 20px 60px rgba(0,0,0,.6); padding: 14px 18px 12px; }
+.dg-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.dg-head b { font: 700 12px var(--mono); letter-spacing: 2px; } .dg-sum { flex: 1; color: var(--dim); font-size: 12px; }
+.dg-x { background: none; border: 0; color: var(--dim); font-size: 18px; cursor: pointer; }
+.dg-box { overflow: auto; min-height: 120px; }
+.dg-svg { width: 100%; height: auto; display: block; }
+.dg-col { font: 700 9.5px var(--mono); letter-spacing: 1.6px; fill: var(--dim); }
+.dg-node rect { fill: var(--bg2); stroke: var(--line2); }
+.dg-node text { font: 600 11px var(--font); fill: var(--text); }
+.dg-node.domains rect { stroke: #b06bff; } .dg-node.modes rect { stroke: #ff6fa8; } .dg-node.units rect { stroke: #ffb36b; } .dg-node.tools rect { stroke: var(--acc); fill: color-mix(in srgb, var(--acc) 10%, var(--bg2)); }
+.dg-node.faded { opacity: .45; } .dg-node.faded rect { stroke-dasharray: 4 3; }
+.dg-edge { fill: none; stroke: url(#dg-line); stroke-width: 1.4; opacity: .55; } .dg-edge.soft { opacity: .25; stroke-dasharray: 3 3; }
+.dg-edge.wire { stroke: var(--acc); opacity: .8; stroke-width: 1.8; }
+.dg-empty { font: 13px var(--font); fill: var(--dim); }
+.dg-note { margin: 8px 0 0; color: var(--faint); font-size: 11.5px; }
 

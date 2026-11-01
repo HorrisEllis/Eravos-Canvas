@@ -2,6 +2,18 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.89 Themes (Dusk · Studio · Midnight) · beautiful buttons · a dependency graph · Clear takes the dependencies too (2026-11-01)
+Asked: "the colors inside the tools … look at the buttons, looks bad. please make those themes. and hook into the reactive. make all the
+buttons beautiful. make a themes section in the settings. make a dependancy graph. also when clearing the canvas should remove all
+dependancies."
+- Themes (canvas/runtime/themes.js, ⋯ Options → Theme): Dusk (default: sunset, round pill buttons, the tool's painting in its title
+  bar), Studio (the device look as it was), Midnight (calm graphite). Each sets how far reactive colours may tint surfaces.
+- Dependencies (canvas/runtime/dep-graph.js, ⋯ Options → Dependencies): domains → modes → parts built → tools, wires as arcs; parts
+  nothing needs drawn faded; Remove what nothing needs (Expansion.prune) · Clear everything.
+- Clear canvas now also takes away what the tools brought: Expansion records what each unit adds (slot elements, keys) — teardown,
+  reset, prune, graph. Measured: 8 toolbar parts and 1 mode built → 0 and 0 after Clear; only Start and Add left.
+- Also merged PR #61 (3.86–3.88) into main.
+
 ## Done — 3.88 A painting for every tool: the ＋ Add cards and the tool pages (2026-11-01)
 Asked: "make more artwork like this. for each thumbnail" · "what about the catalogs and tool pages" · "first the cards".
 - 69 tools, each a small animated painting of what it does (build/tool-art.py): an anvil and sparks for the forges, a storm for the

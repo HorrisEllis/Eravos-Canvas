@@ -9,7 +9,10 @@
  *                                                                               dependency list from its hooks
  * A unit is built the first time something needs it: entering a mode builds all of the mode's units; adding a
  * tool builds only the units that tool depends on (factory before-spawn, recipe before-run, workspace restore).
- * deps(id) is the one dependency list the Add menu, the docs generator and the tests all read. */
+ * deps(id) is the one dependency list the Add menu, the docs generator and the tests all read.
+ * 3.89 "when clearing the canvas should remove all dependencies": what a unit adds when it is built (the elements it puts in the shell's
+ * slots, the keys it binds) is recorded, so teardown(id) takes it away again and reset() returns the shell to agnostic — nothing built,
+ * no mode, no domain touched. A unit may also bring its own teardown(S). graph() is the whole dependency graph, for the page that draws it. */
 (function (global) {
   'use strict';
 
@@ -34,8 +37,10 @@
       const did = [];
       order.forEach(id => {
         const u = units.get(id); built.add(id);
+        const before = slotKids(), keysBefore = S.boundKeys ? S.boundKeys() : [];
         try { if (typeof u.build === 'function') u.build(S); did.push(id); }
         catch (e) { K.fault('RUNTIME_003', { message: `unit ${id}: ${e.message}` }); }
+        made.set(id, { nodes: slotKids().filter(n => !before.includes(n)), keys: (S.boundKeys ? S.boundKeys() : []).filter(k => !keysBefore.includes(k)) });
         if (u.domain) touched.add(u.domain);
       });
       if (did.length) { K.ledger.write('shell_expanded', { units: did, reason: reason || 'need' }); changed({ units: did, reason }); }
@@ -52,6 +57,43 @@
       return true;
     }
     function leaveMode(id) { if (active.delete(id)) changed({ left: id }); }
+    // 3.89 what a unit put into the shell (to take away again)
+    const made = new Map();
+    const doc = global.document;
+    function slotKids() { if (!doc) return []; const out = []; doc.querySelectorAll('[id^="slot-"]').forEach(sl => Array.from(sl.children).forEach(c => out.push(c))); return out; }
+    function teardown(id) {
+      if (!built.has(id)) return false; const u = units.get(id), m = made.get(id) || { nodes: [], keys: [] };
+      try { if (u && typeof u.teardown === 'function') u.teardown(S); } catch (e) { K.fault('RUNTIME_003', { message: `unit ${id} teardown: ${e.message}` }); }
+      m.nodes.forEach(n => { try { n.remove(); } catch (e) {} }); m.keys.forEach(k => { if (S.unbindKey) S.unbindKey(k); });
+      made.delete(id); built.delete(id); return true;
+    }
+    // back to agnostic: every unit taken away (the ones others need last), no mode, no domain touched
+    function reset(reason) {
+      const order = closure(Array.from(built)).reverse(), gone = order.filter(teardown);
+      const left = Array.from(active); active.clear(); touched.clear();
+      if (gone.length || left.length) { K.ledger.write('shell_reset', { units: gone, modes: left, reason: reason || 'reset' }); changed({ reset: true, units: gone, modes: left }); }
+      return { units: gone, modes: left };
+    }
+    // only what the tools on the canvas still need stays built
+    function prune(reason) {
+      const need = new Set(), tools = (K.registry.list() || []).filter(r => !(r.descriptor && r.descriptor.system)).map(r => r.organism_id);
+      tools.forEach(t => { const dd = deps(t); if (dd) dd.units.forEach(x => need.add(x)); });
+      const gone = closure(Array.from(built)).reverse().filter(id => !need.has(id)).filter(teardown);
+      if (gone.length) { K.ledger.write('shell_pruned', { units: gone, reason: reason || 'prune' }); changed({ pruned: gone }); }
+      return gone;
+    }
+    // the whole graph: domains → modes → units (and what each unit requires) ← tools on the canvas, and the wires between tools
+    function graph() {
+      const tools = (K.registry.list() || []).filter(r => !(r.descriptor && r.descriptor.system)).map(r => ({ id: r.instance_id, tool: r.organism_id, label: (r.descriptor && r.descriptor.label) || r.organism_id, deps: deps(r.organism_id) }));
+      const needBy = {}; tools.forEach(t => (t.deps ? t.deps.units : []).forEach(u => { (needBy[u] = needBy[u] || []).push(t.id); }));
+      return {
+        domains: Array.from(touched),
+        modes: Array.from(active).map(id => { const m = modes.get(id) || {}; return { id, label: m.label || id, domain: m.domain || null, units: (m.units || []).slice() }; }),
+        units: Array.from(built).map(id => { const u = units.get(id) || {}; return { id, label: u.label || id, icon: u.icon || '', domain: u.domain || null, requires: (u.requires || []).slice(), neededBy: needBy[id] || [] }; }),
+        tools: tools.map(t => ({ id: t.id, tool: t.tool, label: t.label, mode: t.deps ? t.deps.mode : null, units: t.deps ? t.deps.units.slice() : [] })),
+        wires: ((K.wires && K.wires.list && K.wires.list()) || []).map(w => ({ from: w.src && w.src.instanceId, to: w.dst && w.dst.instanceId, type: w.wire_type })),
+      };
+    }
 
     function labelOfUnit(id) { const u = units.get(id); return u ? { id, label: u.label, icon: u.icon || '', describes: u.describes || '', built: built.has(id) } : { id, label: id, icon: '', describes: '', built: false }; }
 
@@ -141,6 +183,7 @@
       isBuilt: (id) => built.has(id),
       touched: () => Array.from(touched),
       agnostic: () => built.size === 0 && active.size === 0,
+      teardown, reset, prune, graph,
       onChange(fn) { listeners.add(fn); return () => listeners.delete(fn); },
     };
   }
