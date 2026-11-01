@@ -23,7 +23,8 @@
     "preview": "preview.png",
     "spec": "wub-osc.spec",
     "tests": "wub-osc.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

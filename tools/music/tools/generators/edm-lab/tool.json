@@ -19,7 +19,8 @@
     "spec": "edm-lab.spec",
     "preview": "preview.png",
     "tests": "edm-lab.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

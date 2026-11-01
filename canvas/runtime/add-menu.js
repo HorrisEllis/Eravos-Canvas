@@ -172,7 +172,8 @@
         if (np) chips.push(chip(np + ' presets', 'dim', 'presets in its packs'));
         // 3.44: the card leads with the tool's own display (thumb.png, 16:10) — the old 84×52 corner of the whole window showed
         // only a title bar. No picture → the icon on the tool's colour, same frame, so the grid stays even.
-        const pic = meta && (meta.thumb || meta.preview), frame = h('div', { class: 'ap-card-pic' + (meta && meta.thumb ? '' : ' fit') + (d._suite ? ' suite' : '') }, [cardArt(d)]);
+        // 3.88 a painting of what it does (art.svg) leads when the tool has one
+        const pic = meta && (meta.art || meta.thumb || meta.preview), frame = h('div', { class: 'ap-card-pic' + (meta && (meta.art || meta.thumb) ? '' : ' fit') + (meta && meta.art ? ' painted' : '') + (d._suite ? ' suite' : '') }, [cardArt(d)]);
         if (pic) frame.appendChild(h('img', { class: 'ap-card-img', src: pic, alt: '', loading: 'lazy', onerror: (e) => e.target.remove() }));
         const card = h('div', { class: 'ap-card' + (d._avail ? ' avail' : ''), tabindex: '-1', style: { '--acc': d.accent || '#00d4ff' }, 'data-id': d.id }, [
           frame,

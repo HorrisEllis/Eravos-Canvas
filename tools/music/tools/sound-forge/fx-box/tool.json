@@ -19,7 +19,8 @@
     "spec": "fx-box.spec",
     "preview": "preview.png",
     "tests": "fx-box.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

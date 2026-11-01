@@ -18,7 +18,8 @@
     "spec": "fx-haunt.spec",
     "preview": "preview.png",
     "tests": "fx-haunt.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

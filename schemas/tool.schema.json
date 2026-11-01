@@ -102,6 +102,10 @@
           "type": "string",
           "description": "thumb.png — the card picture in ＋ Add: the tool's main display, cropped 16:10 (build/tool-kit.mjs)"
         },
+        "art": {
+          "type": "string",
+          "description": "art.svg — a small painting of what the tool does, 16:10, with its own movement (3.88): the card picture in ＋ Add when present"
+        },
         "spec": {
           "type": "string",
           "description": "<tool>.spec — the behaviour contract"

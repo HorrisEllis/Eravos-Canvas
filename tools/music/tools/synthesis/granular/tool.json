@@ -19,7 +19,8 @@
     "preview": "preview.png",
     "spec": "granular.spec",
     "tests": "granular.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

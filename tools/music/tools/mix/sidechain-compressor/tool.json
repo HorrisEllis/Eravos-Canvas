@@ -19,7 +19,8 @@
     "spec": "sidechain-compressor.spec",
     "preview": "preview.png",
     "tests": "sidechain-compressor.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

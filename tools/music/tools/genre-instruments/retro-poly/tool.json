@@ -19,7 +19,8 @@
     "spec": "retro-poly.spec",
     "preview": "preview.png",
     "tests": "retro-poly.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

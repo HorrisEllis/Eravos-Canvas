@@ -19,7 +19,8 @@
     "spec": "bass-forge.spec",
     "preview": "preview.png",
     "tests": "bass-forge.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

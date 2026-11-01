@@ -20,7 +20,8 @@
     "tests": "suite-hub.test.js",
     "css": "suite-hub.css",
     "preview": "preview.png",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

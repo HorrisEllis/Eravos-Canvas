@@ -2,6 +2,16 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.88 A painting for every tool: the ＋ Add cards and the tool pages (2026-11-01)
+Asked: "make more artwork like this. for each thumbnail" · "what about the catalogs and tool pages" · "first the cards".
+- 69 tools, each a small animated painting of what it does (build/tool-art.py): an anvil and sparks for the forges, a storm for the
+  Destroyer, ripples for the echoes, aurora curtains for the filters, a rising moon for the subs, a cathedral for the organs, a synthwave
+  sun for Retro Poly, standing stones for the drums, a campfire for Groove, a waterfall over a cliff for the Drop Builder … each lit in its
+  own accent, under a sky (night, dusk, sunset, dawn, aurora, violet), with Bob Ross mountains and pines. Still for reduced motion.
+- tools/<domain>/tools/<cat>/<tool>/art.svg, tool.json files.art (schema), carried by the catalogue; ＋ Add's card leads with it, the
+  tool page's header shows it in place of the icon tile. thumb.png stays (the side preview shows the tool's real display).
+- Also: merged main (3.82–3.85, the other session) — Patterns by tool kept, song blocks kept; this branch's 3.82/3.83 renamed 3.86/3.87.
+
 ## Done — 3.87 Problems panel closes · sunset gradients (DUSK) in every window (2026-11-01)
 Asked: "this needs to be able to close" (the problems log, a wall of one entry) · "can you make the ui more like that also? like
 with the wobble base. like have the colors more a gradient animated, beautiful, like love the sunset one".

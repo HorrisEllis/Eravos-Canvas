@@ -19,7 +19,8 @@
     "spec": "ratio-lattice.spec",
     "preview": "preview.png",
     "tests": "ratio-lattice.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

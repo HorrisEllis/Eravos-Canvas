@@ -18,7 +18,8 @@
     "spec": "master-fx.spec",
     "preview": "preview.png",
     "tests": "master-fx.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

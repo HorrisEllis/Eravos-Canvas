@@ -19,7 +19,8 @@
     "spec": "song-recorder.spec",
     "preview": "preview.png",
     "tests": "song-recorder.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

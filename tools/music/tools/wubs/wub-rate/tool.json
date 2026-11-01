@@ -23,7 +23,8 @@
     "preview": "preview.png",
     "spec": "wub-rate.spec",
     "tests": "wub-rate.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

@@ -18,7 +18,8 @@
     "spec": "fx-destroyer.spec",
     "preview": "preview.png",
     "tests": "fx-destroyer.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

@@ -20,7 +20,8 @@
     "spec": "groove-gen.spec",
     "tests": "groove-gen.test.js",
     "preview": "preview.png",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

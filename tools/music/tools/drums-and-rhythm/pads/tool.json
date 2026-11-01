@@ -19,7 +19,8 @@
     "preview": "preview.png",
     "tests": "pads.test.js",
     "css": "pads.css",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

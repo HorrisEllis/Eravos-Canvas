@@ -20,7 +20,8 @@
     "preview": "preview.png",
     "spec": "syn-osc.spec",
     "tests": "syn-osc.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

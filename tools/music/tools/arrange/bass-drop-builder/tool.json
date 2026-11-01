@@ -20,7 +20,8 @@
     "spec": "bass-drop-builder.spec",
     "preview": "preview.png",
     "tests": "bass-drop-builder.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

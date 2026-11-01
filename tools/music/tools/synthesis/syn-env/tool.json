@@ -19,7 +19,8 @@
     "preview": "preview.png",
     "spec": "syn-env.spec",
     "tests": "syn-env.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

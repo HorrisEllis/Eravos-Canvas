@@ -674,4 +674,8 @@ table.tp-tab { width: 100%; }
 .wm-dusk { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 3; mix-blend-mode: screen; opacity: .9;
   background: radial-gradient(85% 55% at 0% 100%, color-mix(in srgb, var(--dk4) 16%, transparent), transparent 70%), radial-gradient(75% 45% at 100% 0%, color-mix(in srgb, var(--dk2) 13%, transparent), transparent 70%), radial-gradient(60% 35% at 60% 100%, color-mix(in srgb, var(--dk3) 8%, transparent), transparent 70%); }
 html.snd-calm .wm-dusk { opacity: .6; }
+/* 3.88 a tool's painting: its page header and its ＋ Add card */
+.tp-head .tp-art { flex: none; width: 168px; height: 105px; object-fit: cover; border-radius: 10px; box-shadow: 0 8px 22px rgba(0,0,0,.5), 0 0 18px color-mix(in srgb, var(--acc) 22%, transparent); }
+@media (max-width: 600px) { .tp-head .tp-art { width: 100%; height: auto; aspect-ratio: 16 / 10; } }
+.ap-card-pic.painted .ap-card-img { object-fit: cover; }
 
