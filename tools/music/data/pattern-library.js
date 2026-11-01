@@ -71,10 +71,24 @@
     (SE() ? SE().genres() : []).forEach(Gx => [1, 2].forEach(seed => fromGenre(Gx, seed).forEach(p => { if (!named.has(p.type + '|' + p.tool + '|' + JSON.stringify(p.notes || p.curve))) add(p); })));
     // 3.86 every named song, piece by piece: each instrument's each section is a block of its own
     songBlocks().forEach(add);
+    // 3.90 "make sure all the patterns are novel": a pattern whose notes are nearly another's (same tool and kind, 85 % of its hits the
+    // same place and pitch) is not a new idea — the first (named moves, hand-made, genres, then songs) stays
+    const kept = novel(out); out.length = 0; kept.forEach((p, i) => { p.id = 'pat-' + (i + 1).toString(36) + '-' + p.type; out.push(p); });   // numbered again: what is added next must not take a kept one's id
     transforms.forEach(fn => { try { (fn(out.slice()) || []).forEach(add); } catch (e) { console.error('[ERAVOS] pattern transform failed', e); } });   // 3.74
     return out;
   }
   const all = () => { if (!LIB) LIB = build(); return LIB; };
+  function novel(list) {
+    const buckets = new Map(), keep = [];
+    list.forEach(p => {
+      if (!p.notes || !p.notes.length || p.move) { keep.push(p); return; }
+      const set = new Set(p.notes.map(n => Math.round(n.s) + ':' + (p.drums ? n.n : n.r))), k = p.type + '|' + p.tool;
+      const b = buckets.get(k) || []; buckets.set(k, b);
+      const dup = b.some(o => { let inter = 0; set.forEach(x => { if (o.has(x)) inter++; }); return inter / (set.size + o.size - inter) >= 0.85; });
+      if (dup) return; b.push(set); keep.push(p);
+    });
+    return keep;
+  }
   function songBlocks() {
     const SB = global.Songbook, gs = SE() ? SE().genres() : []; if (!SB || !SB.songs) return [];
     const out = [];
@@ -199,7 +213,9 @@
     if (o.words.length) { const hay = (p.name + ' ' + p.genreLabel + ' ' + familyLabel(familyOf(p.genre)) + ' ' + p.type + ' ' + p.tool + ' ' + (p.move || '') + ' ' + (p.preset || '') + ' ' + (p.song ? p.song.title + ' ' + (p.section || '') : '') + ' ' + toolLabel(p.tool) + ' ' + p.bpm).toLowerCase(); if (!o.words.every(w => hay.includes(w))) return false; }
     return true;
   }
-  const toolLabel = (t) => ((F() && F().def(t)) || {}).label || t;
+  // 3.90 a tool not loaded yet is named by the catalogue (the rail showed raw ids: "eravos.drum-forge")
+  const toolMeta = (t) => (F() && F().def(t)) || (global.Catalog && global.Catalog.meta && global.Catalog.meta(t)) || {};
+  const toolLabel = (t) => toolMeta(t).label || String(t).replace(/^eravos\./, '').replace(/-/g, ' ');
   // the instruments in the order a song is built: drums, bass, then the rest (chords, leads …), each by name
   const toolRank = (t) => { const w = (t + ' ' + toolLabel(t)).toLowerCase(); return /drum|pads|kit|perc|groove/.test(w) ? 0 : /wobble|wub/.test(w) ? 2 : /bass|sub|reese|acid/.test(w) ? 1 : /arp/.test(w) ? 5 : /pad|chord|organ|poly|keys|piano|coven|string/.test(w) ? 3 : 4; };
   let page = null;
@@ -207,7 +223,12 @@
     if (page) { page.close(); if (!o) return; }
     // 3.86 Songs → "the built-in songs, in blocks" opens it by song: every tool, every song in full (nothing picked)
     if (o && o.group && GROUPS.some(g => g[0] === o.group)) { pick.group = o.group; pick.tool = ''; pick.types.clear(); pick.genres.clear(); pick.fav = false; pick.q = ''; pick.lo = pick.hi = ''; }
-    const UI = global.UIKit, h = UI.h, lib = all(), saved = store.get();
+    const UI = global.UIKit, h = UI.h, saved = store.get(); let lib = all();
+    // 3.90 a line's curved twin ("· curved", 3.74) is not a card of its own: a 〰 on the line's card turns it on
+    const twinKey = (p) => p.name.replace(/ · curved$/, '') + '|' + p.tool + '|' + p.genre;
+    const twins = new Map(); lib.forEach(p => { if (p.move === 'curved') twins.set(twinKey(p), p); });
+    const bases = new Set(lib.filter(p => p.move !== 'curved').map(twinKey)), twinIds = new Set(lib.filter(p => p.move === 'curved' && bases.has(twinKey(p))).map(p => p.id));
+    lib = lib.filter(p => !twinIds.has(p.id));   // the page works on the ideas; a twin rides on its line's card
     const favs = new Set(saved.favs || []), folded = new Set(saved.folded || []), openFam = new Set(saved.openFam || []), more = {};
     const typeLabel = (t) => (TYPES.find(x => x[0] === t) || [0, t])[1];
     const ov = h('div', { class: 'overlay sbk plib', role: 'dialog', 'aria-label': 'Patterns' });
@@ -235,8 +256,8 @@
     const moreBtn = h('button', { class: 'sbk-alt sm plib-morebtn', type: 'button' });
     moreBtn.onclick = () => { filtersOpen = !filtersOpen; store.set({ filtersOpen }); paint(); };
     const filterBox = h('div', { class: 'plib-adv' }, [quickRow, famRow, genreRow, h('div', { class: 'sbk-row2' }, [h('span', { class: 'sbk-sub', text: 'BPM' }), lo, hi, sortSel, groupSel, foldAll, clear])]);
-    const toolName = (id) => (F().def(id) || {}).label || id, toolIcon = (id) => (F().def(id) || {}).icon || '◈';
-    const kindOfTool = (id) => { const d = F().def(id) || {}, w = (id + ' ' + (d.label || '') + ' ' + (d.category || '')).toLowerCase();
+    const toolName = (id) => toolLabel(id), toolIcon = (id) => toolMeta(id).icon || '◈';
+    const kindOfTool = (id) => { const d = toolMeta(id), w = (id + ' ' + (d.label || '') + ' ' + (d.category || '')).toLowerCase();
       return /drum|kit|pads|perc|beat|groove/.test(w) ? 'Drums' : /wobble|wub|bass|sub|reese|acid/.test(w) ? 'Bass' : /pad|chord|organ|poly|keys|piano|choir|coven|string/.test(w) ? 'Keys & pads' : /lead|saw|arp|pluck|bell/.test(w) ? 'Leads' : 'More'; };
     const RAIL_ORDER = ['Drums', 'Bass', 'Keys & pads', 'Leads', 'More'];
     ov.append(h('div', { class: 'sbk-box' }, [
@@ -253,8 +274,11 @@
     const opts = (over) => Object.assign({ types: pick.types, genres: pick.genres, fav: pick.fav, favs, words: pick.q.split(/\s+/).filter(Boolean), lo: pick.lo, hi: pick.hi, tool: pick.tool }, over);
     const count = (over) => lib.reduce((n, p) => n + (matches(p, opts(over)) ? 1 : 0), 0);
     const famOn = (f) => f.genres.every(g => pick.genres.has(g[0])), famSome = (f) => f.genres.some(g => pick.genres.has(g[0]));
-    function card(p) {
+    function card(p0) {
+      let p = p0; const twin = p0.move !== 'curved' ? twins.get(twinKey(p0)) : null;
       const cv = h('canvas', { class: 'plib-draw', 'aria-hidden': 'true' }); cv._p = p; if (io) io.observe(cv); else drawCard(cv, p);
+      const curveB = twin ? h('button', { class: 'sbk-alt sm plib-curve', type: 'button', text: '〰', title: 'its curved version: the same line with bends and glides', 'aria-pressed': 'false' }) : null;
+      if (curveB) curveB.onclick = () => { const on = p === p0; p = on ? twin : p0; curveB.classList.toggle('on', on); curveB.setAttribute('aria-pressed', on ? 'true' : 'false'); drawCard(cv, p); if (playing) stop(); };
       const hear = h('button', { class: 'sbk-alt sm', text: '▶', title: 'hear it — rendered off the canvas, nothing changes' });
       hear.onclick = async () => { if (playing && playing.id === p.id) { stop(); return; } hear.textContent = '…'; const ok = await play(p, () => { hear.textContent = '▶'; }); hear.textContent = ok ? '■' : '▶'; if (ok === null) status.textContent = 'no sound came out of “' + p.name + '”'; };
       const sendB = h('button', { class: 'sbk-alt sm', text: '→ Timeline', title: !!p.curve ? 'adds this curve to the track that plays this kind of tool (or a new track with it)' : 'adds it after what is on the track that plays this kind of tool (or a new track with it), in your song’s key' });
@@ -263,7 +287,7 @@
       star.onclick = () => { tog(favs, p.id); store.set({ favs: [...favs] }); star.classList.toggle('on', favs.has(p.id)); star.textContent = favs.has(p.id) ? '★' : '☆'; if (pick.fav) paint(); };
       return h('div', { class: 'plib-card', style: { '--acc': p.type === 'drop' ? '#ff2266' : !!p.curve ? '#ffd24a' : '#00d4ff' } }, [
         h('div', { class: 'plib-top' }, [h('b', { text: p.song ? p.name.slice(p.song.title.length + 3) : p.name }), star]), p.song ? h('small', { class: 'plib-song', text: '♪ ' + p.song.title }) : null, h('small', { text: typeLabel(p.type) + ' · ' + p.genreLabel + ' · ' + p.bars + (p.bars > 1 ? ' bars' : ' bar') + ' · ' + p.bpm + ' BPM' }),
-        cv, h('div', { class: 'plib-actions' }, [hear, sendB, h('span', { class: 'plib-tool', text: pick.tool ? (p.preset || '') : ((F().def(p.tool) || {}).label || p.tool) + (p.preset ? ' · ' + p.preset : '') })])]);
+        cv, h('div', { class: 'plib-actions' }, [hear, sendB, curveB, h('span', { class: 'plib-tool', text: pick.tool ? (p.preset || '') : ((F().def(p.tool) || {}).label || p.tool) + (p.preset ? ' · ' + p.preset : '') })])]);
     }
     function paint() {
       // 3.85 the tools, each with how many of its patterns match what else is picked; grouped by what they are
