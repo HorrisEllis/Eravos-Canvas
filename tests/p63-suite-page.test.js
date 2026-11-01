@@ -132,7 +132,7 @@ describe('P63 · drawn icons everywhere · EDM Lab is the suite only', () => {
     host(); const id = OrganismFactory.spawn('eravos.sub-engine', { x: 20, y: 20 });
     try {
       await TH.sleep(20); assert.ok(CanvasWM.windowOf(id).querySelector('.wm-icon svg'), 'the title bar');
-      ToolPage.open('eravos.sub-engine', { K: Kernel }); assert.ok(document.querySelector('.tp-head .ic-tile svg'), 'the page header tile');
+      ToolPage.open('eravos.sub-engine', { K: Kernel }); assert.ok(document.querySelector('.tp-head .ic-tile svg, .tp-head img.tp-art'), 'the page header tile (or, since 3.88, its painting)');
       assert.ok(document.querySelectorAll('.tp-nav svg').length >= 3, 'the page nav');
       ToolPage.close();
       const hub = Suites.open('music.xen', { K: Kernel }); await TH.sleep(30);

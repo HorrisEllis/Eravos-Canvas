@@ -44,7 +44,7 @@
   // 3.80 the surfaces and how far each leans toward the colour of the moment at full sound (a line reads more than a background)
   const SURFACES = { '--bg': 0.10, '--bg2': 0.12, '--panel': 0.14, '--panel2': 0.16, '--chassis': 0.14, '--chassis2': 0.16, '--well': 0.10,
     '--grid': 0.5, '--line': 0.45, '--line2': 0.5, '--dim': 0.25, '--faint': 0.3 };
-  let base = null;   // the palette as the stylesheet has it (read once, before anything is overridden)
+  let base = null, surfScale = null;   // the palette as the stylesheet has it (read once, before anything is overridden)
   const live = new Set();   // elements whose --acc is moving now (to put back in silence)
   function rgbOf(c) {
     c = String(c || '').trim(); let m = /^#([0-9a-f]{3})$/i.exec(c); if (m) c = '#' + m[1].split('').map(x => x + x).join('');
@@ -103,7 +103,9 @@
   }
   function surfaces(k) {
     if (!base) return; const tint = rgbOf(tintNow()); if (!tint) return;
-    Object.keys(SURFACES).forEach(n => { const b = rgbOf(base[n]); if (b) set(n, k < 0.005 ? base[n] : hex(mixRGB(b, tint, k * SURFACES[n]))); });
+    // 3.91 the theme says how far a surface may lean (--react-surface: Dusk .55, Midnight .3, Studio 1)
+    const sc = surfScale === null ? (surfScale = parseFloat(global.getComputedStyle(root).getPropertyValue('--react-surface')) || 1) : surfScale;
+    Object.keys(SURFACES).forEach(n => { const b = rgbOf(base[n]); if (b) set(n, k < 0.005 ? base[n] : hex(mixRGB(b, tint, k * SURFACES[n] * sc))); });
   }
   const hashOf = (str) => { let x = 2166136261; for (const ch of String(str || '')) x = Math.imul(x ^ ch.charCodeAt(0), 16777619); return x >>> 0; };
   const CanvasWin = (id) => global.CanvasWM && global.CanvasWM.windowOf ? global.CanvasWM.windowOf(id) : null;
@@ -322,6 +324,8 @@
     colourIn, shareOf,     // 3.83 the colour a tool draws or writes, reacting (tests, and code that draws outside a 2D canvas)
     _taps: taps, lit, colourFor, rotate, settingsOf, SURFACES, tintNow,
   };
+  // 3.91 a new theme is a new palette: put every colour back, read the palette (and how far surfaces may lean) again
+  global.addEventListener && global.addEventListener('eravos:theme', () => { zero(); base = null; surfScale = null; });
   global.SoundCSS = SoundCSS;
   // ⋯ Options → Reactive colours: core/react-panel.js (the panel, and the same panel in every tool's ⚙ settings)
   // ⊞ Tidy up order for music: the timeline, then the song tools, drums, instruments, effects, the rest

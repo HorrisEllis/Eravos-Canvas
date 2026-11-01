@@ -76,9 +76,10 @@
       }
       g.lineTo(W, H); g.closePath();
       // 3.87 the spectrum in a slowly moving sunset: its own colour → rose → amber → violet → its own colour again
+      const thm = global.document && global.document.documentElement.dataset.theme, plain = thm && thm !== 'dusk';
       const hx = /^#[0-9a-f]{6}$/i.test(col) ? col : '#00d4ff', ph = (performance.now() / 12000) % 1, gr = g.createLinearGradient(-ph * W, 0, (2 - ph) * W, 0), gf = g.createLinearGradient(-ph * W, 0, (2 - ph) * W, 0);
       [[0, hx], [0.12, '#ff6fa8'], [0.25, '#ffb36b'], [0.37, '#b06bff'], [0.5, hx], [0.62, '#ff6fa8'], [0.75, '#ffb36b'], [0.87, '#b06bff'], [1, hx]].forEach(([o, c]) => { gr.addColorStop(o, c); gf.addColorStop(o, c + '50'); });
-      g.fillStyle = gf; g.fill(); g.strokeStyle = gr; g.lineWidth = 1.4; g.stroke(); g.lineWidth = 1;
+      if (plain) { g.fillStyle = hx + '55'; g.fill(); g.strokeStyle = hx; g.stroke(); } else { g.fillStyle = gf; g.fill(); g.strokeStyle = gr; g.lineWidth = 1.4; g.stroke(); g.lineWidth = 1; }
       if (loud < 0.02) { g.fillStyle = col + '55'; g.fillRect(0, H - 1.5, W, 1.5); if (H >= 40) { g.fillStyle = '#4d6178'; g.font = '10px sans-serif'; g.textAlign = 'right'; g.fillText('play a note to see its spectrum', W - 8, 14); g.textAlign = 'left'; } }
       if (o.overlay) o.overlay(g, W, H);
     }, 30);
@@ -247,6 +248,8 @@
   }
   // 3.87 DUSK for drawn displays: a slowly moving gradient from a colour into sunset rose, amber and violet (x0…x1 across the canvas)
   function dusk(g, x0, x1, col, alpha) {
+    // 3.91 only the Dusk theme draws in a moving sunset; the others keep the colour
+    if (global.document && global.document.documentElement.dataset.theme && global.document.documentElement.dataset.theme !== 'dusk') { const c0 = /^#[0-9a-f]{6}$/i.test(col || '') ? col : '#00d4ff'; return alpha === undefined ? c0 : c0 + Math.round(Math.max(0, Math.min(1, alpha)) * 255).toString(16).padStart(2, '0'); }
     const c = /^#[0-9a-f]{6}$/i.test(col || '') ? col : '#ff6fa8', a = alpha === undefined ? '' : Math.round(Math.max(0, Math.min(1, alpha)) * 255).toString(16).padStart(2, '0'), w = x1 - x0, ph = (performance.now() / 12000) % 1;
     const gr = g.createLinearGradient(x0 - ph * w, 0, x0 + (2 - ph) * w, 0);
     [[0, c], [0.12, '#ff6fa8'], [0.25, '#ffb36b'], [0.37, '#b06bff'], [0.5, c], [0.62, '#ff6fa8'], [0.75, '#ffb36b'], [0.87, '#b06bff'], [1, c]].forEach(([o, k]) => gr.addColorStop(o, k + a));

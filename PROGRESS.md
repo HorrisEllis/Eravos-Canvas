@@ -2,6 +2,30 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.92 Your songs back in Songs · every pattern novel · the Patterns tool list fixed (2026-11-01)
+Asked (on screenshots of the Patterns page and the old Songs cards "Floor Falls Out", "Sub Dive City"): "this looks bad. can you recover
+those? those are my rythme. can you make sure all the patterns are novel. also fix the catagories".
+- Songs: the page is back as it was before 3.86 — every song on its shelf (Heavy Drops 9, Floor Falls …), the map and ▶ Preview, Write,
+  Make it yours — with 📖 My songs holding what you saved and now also what you export (marked saved / exported). The blocks stay in Patterns.
+- Novel: a pattern whose hits are 85 % another's (same tool and kind, same steps and pitches) is not kept — 5 269 → 3 288 in the library;
+  drums 865 → 185. A line's curved twin (3.74, "· curved") is no longer a card of its own: 〰 on the line's card turns it on — the page
+  shows 1 959 ideas. Found on the way: ids were given before the pass and again after it, so a twin could carry a kept line's id (fixed).
+- Categories: the tool list named tools not yet loaded by their id ("eravos.drum-forge"); it asks the catalogue now — names, icons, and
+  each tool in its group (Drums · Bass · Keys & pads · Leads · More).
+- Tests: p42, p44, p19 back to the songs page; p58 gets its strip test back; p86 and p73 follow; p91 new (themes, reset, prune, graph).
+  The test page measures in the Studio look (themes are tested in p91). 1344/1344.
+
+## Done — 3.91 Themes (Dusk · Studio · Midnight) · beautiful buttons · a dependency graph · Clear takes the dependencies too (2026-11-01)
+Asked: "the colors inside the tools … look at the buttons, looks bad. please make those themes. and hook into the reactive. make all the
+buttons beautiful. make a themes section in the settings. make a dependancy graph. also when clearing the canvas should remove all
+dependancies."
+- Themes (canvas/runtime/themes.js, ⋯ Options → Theme): Dusk (default: sunset, round pill buttons, the tool's painting in its title
+  bar), Studio (the device look as it was), Midnight (calm graphite). Each sets how far reactive colours may tint surfaces.
+- Dependencies (canvas/runtime/dep-graph.js, ⋯ Options → Dependencies): domains → modes → parts built → tools, wires as arcs; parts
+  nothing needs drawn faded; Remove what nothing needs (Expansion.prune) · Clear everything.
+- Clear canvas now also takes away what the tools brought: Expansion records what each unit adds (slot elements, keys) — teardown,
+  reset, prune, graph. Measured: 8 toolbar parts and 1 mode built → 0 and 0 after Clear; only Start and Add left.
+- Also merged PR #61 (3.86–3.88) into main.
 ## Done — 3.90 🎧 Hear by place (2026-11-01)
 His words: "what about a setting to play tools in proximity also zooming out makes it quiter."
 - ⋯ Options › 🎧 Hear by place (off by default, remembered). On, the canvas is a room you look into: a tool that makes sound is full in

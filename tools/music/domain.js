@@ -331,7 +331,7 @@
       // 3.29: Songbook + Learn live OFF the canvas (their own full-screen pages, data/songbook.js · data/learn.js)
       Object.assign({}, UNITS.studio, { domain: MUSIC, requires: [UNITS.engine.id], build() {
         const g = h('div', { class: 'tb-group', 'data-unit': UNITS.studio.id });
-        const sb = h('button', { class: 'tb-btn', id: 'songbookBtn', title: 'Songs — your songs: every one you saved or exported (the built-in songs are blocks in Patterns)', 'data-ic': 'library', text: 'Songs' });
+        const sb = h('button', { class: 'tb-btn', id: 'songbookBtn', title: 'Songs — every song in one place: write one in any genre, the song for her, and My songs (what you saved or exported)', 'data-ic': 'library', text: 'Songs' });
         const lb = h('button', { class: 'tb-btn', id: 'learnBtn', title: 'Learn — short lessons, a map you choose your own path through (off the canvas)', 'data-ic': 'graduation-cap', text: 'Learn' });
         const sd = h('button', { class: 'tb-btn', id: 'soundsBtn', title: 'Sounds — every preset, drum kit packs (mix & match pads), capture any sound to a pad (off the canvas)', 'data-ic': 'audio-lines', text: 'Sounds' });
         // 3.71 "what about instead of so much songs, we have a pattern library"
