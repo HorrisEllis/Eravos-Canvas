@@ -45,4 +45,28 @@ describe('P83 · the colours inside the tools react', () => {
       assert.lt(turn(acc, grid), 25, 'a blue-grey grid does too, it is not turned into another colour (grid ' + grid.toFixed(0) + '°)');
     } finally { OrganismFactory.close(id); SoundCSS.setMode(m0); }
   });
+  it('3.83b lit again and again (25 times a second), a colour stays where it should: nothing is lit twice', async () => {
+    host(); const m0 = mode0(); SoundCSS.setMode('changing'); const id = OrganismFactory.spawn('eravos.dub-station', { x: 40, y: 40 }); await TH.sleep(60);
+    try {
+      const w = CanvasWM.windowOf(id), o = { mode: 'changing', amt: 1, shift: 110, pulse: 0.5, colors: SoundCSS.colors };
+      SoundCSS.liveAcc(w, 1, performance.now() + 5000, o); const once = Array.from(w.style).filter(n => n.startsWith('--')).map(n => n + '=' + w.style.getPropertyValue(n).trim()).sort().join(' ');
+      for (let i = 0; i < 25; i++) SoundCSS.liveAcc(w, 1, performance.now() + 5000 + i * 100, o);
+      const many = Array.from(w.style).filter(n => n.startsWith('--')).map(n => n + '=' + w.style.getPropertyValue(n).trim()).sort().join(' ');
+      assert.equal(many, once, 'the same colours after 25 lightings as after one');
+      SoundCSS.restoreAcc(w); assert.ok(!Array.from(w.style).some(n => n.startsWith('--rcs-')), 'quiet: the stylesheet colours are back to the sheet');
+    } finally { OrganismFactory.close(id); SoundCSS.setMode(m0); }
+  });
+  it('3.83b a colour set later (a pad border repainted) and a colour in a stylesheet react too', async () => {
+    host(); const m0 = mode0(); SoundCSS.setMode('static'); const id = OrganismFactory.spawn('eravos.wub-filter', { x: 40, y: 40 }); await TH.sleep(30);
+    try {
+      const w = CanvasWM.windowOf(id), el = document.createElement('div'); w.appendChild(el); el.style.border = '2px solid #ff6b00'; await TH.sleep(0);
+      assert.ok(/var\(--rc-/.test(el.getAttribute('style')), 'converted: ' + el.getAttribute('style'));
+      const sty = document.createElement('style'); sty.textContent = '.p83-probe { color: #ff2266; }'; document.head.appendChild(sty); const pr = document.createElement('span'); pr.className = 'p83-probe'; pr.textContent = 'x'; w.appendChild(pr);
+      const before = getComputedStyle(pr).color, b0 = getComputedStyle(el).borderTopColor;
+      SoundCSS.liveAcc(w, 0.9, performance.now() + 9000); el.style.border = '2px solid #ff6b00'; await TH.sleep(0);
+      assert.ok(getComputedStyle(pr).color !== before, 'the stylesheet colour lit: ' + getComputedStyle(pr).color);
+      assert.ok(getComputedStyle(el).borderTopColor !== b0, 'the repainted border keeps its lit colour: ' + getComputedStyle(el).borderTopColor);
+      SoundCSS.restoreAcc(w); assert.equal(getComputedStyle(pr).color, before, 'back exactly'); sty.remove();
+    } finally { OrganismFactory.close(id); SoundCSS.setMode(m0); }
+  });
 });
