@@ -13,11 +13,19 @@
 
   const doc = global.document;
 
+  // 3.83 a literal colour written inline (#hex, rgb(), rgba()) becomes its own variable (--rc-<prop>-<n>) the element carries, so
+  // whatever lights a window's colour variables lights these too. At rest the element looks exactly the same.
+  const COLOUR_PROPS = /^(color|background|backgroundColor|border|borderColor|borderTop|borderRight|borderBottom|borderLeft|borderLeftColor|borderTopColor|outline|outlineColor|boxShadow|textShadow|fill|stroke|caretColor)$/;
+  const COLOUR_LIT = /#[0-9a-fA-F]{8}\b|#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b|rgba?\([^)]*\)/g;
+  function colourVars(el, sk, val) {
+    if (typeof val !== 'string' || !COLOUR_PROPS.test(sk) || val.indexOf('var(') >= 0) return val;
+    let i = 0; return val.replace(COLOUR_LIT, (m) => { const n = '--rc-' + sk.toLowerCase() + '-' + (i++); el.style.setProperty(n, m); return 'var(' + n + ')'; });
+  }
   function h(tag, attrs, children) {
     const el = doc.createElement(tag);
     if (attrs) Object.keys(attrs).forEach(k => {
       const v = attrs[k];
-      if (k === 'style' && typeof v === 'object') Object.keys(v).forEach(sk => { if (sk.startsWith('--')) el.style.setProperty(sk, v[sk]); else el.style[sk] = v[sk]; });
+      if (k === 'style' && typeof v === 'object') Object.keys(v).forEach(sk => { if (sk.startsWith('--')) el.style.setProperty(sk, v[sk]); else el.style[sk] = colourVars(el, sk, v[sk]); });
       else if (k === 'class') el.className = v;
       else if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2), v);
       else if (k === 'text') el.textContent = v;

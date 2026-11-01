@@ -91,3 +91,18 @@ Before any theme ships: move those onto the tokens, then a theme is one file. Th
   3.81 the featured cards' icons: small SVG paintings (tools/music/data/featured-art.js), unframed with soft corners (asked: no frame) — the
   recipe's featured.art; .hero-card .big.art 168 × 109; .tw twinkle · .flow / .swirl moving strokes · .shim (none for reduced motion).
   .hero-go: a round pill (999px) in the dawn gradient #ffb36b → #ff6fa8 → #b06bff (asked: "the buttons, too sharp, make them round and the color").
+
+## ADDENDUM 2026-11-01 (3.83) — the colours INSIDE the tools react (asked: "i want the colors in the tools to use the reactive colors"
+##   · "those 4 settings are for all the colors" · "in the green one look at the red tint in the shape and perfomr")
+  The four Reactive colour modes (Off · Static · Changing · Custom) now reach every colour a tool draws or writes, not only its
+  variables (about 830 literal colours in the tool UIs never moved):
+    DRAWN     every 2D canvas inside a window or tool page: fillStyle / strokeStyle / shadowColor pass through SoundCSS.colourIn (a
+              canvas outside any window is untouched; quiet or Off returns the colour exactly; alpha kept)
+    WRITTEN   ui-kit h(): a literal colour in an inline style (background, border, color, shadow …) becomes its own variable
+              --rc-<prop>-<n>, identical at rest, lit with the window like every other colour variable
+    SHARES    a dark surface (lightness < 30 %) leans 12 %, a muted colour (saturation < 35 %) 30 %, a vivid accent fully
+    CHANGING  accents turn round the wheel; dark and muted colours take the hue the window's accent has turned to (turning every
+              colour by the same amount made blue-grey grids pink under a green accent — his "red tint")
+    GLASS     in glass mode the page palette stays the glass layer's, but the windows' own colours answer (they did not before);
+              tests/p82-glass-layer updated to say so
+  Tests: tests/p83-reactive-tools.test.js (3), mutation-checked. The look at rest is unchanged.
