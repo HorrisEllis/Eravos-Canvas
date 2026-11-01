@@ -19,7 +19,8 @@
     "spec": "sample-player.spec",
     "preview": "preview.png",
     "tests": "sample-player.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

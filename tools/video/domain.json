@@ -16,5 +16,6 @@
  "starter": [
   "eravos.video.video-clip"
  ],
- "summary": "Load, trim and export video clips locked to the beat."
+ "summary": "Load, trim and export video clips locked to the beat.",
+ "art": "art.svg"
 }

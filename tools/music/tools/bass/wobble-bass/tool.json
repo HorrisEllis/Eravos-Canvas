@@ -19,7 +19,8 @@
     "spec": "wobble-bass.spec",
     "preview": "preview.png",
     "tests": "wobble-bass.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

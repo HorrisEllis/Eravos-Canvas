@@ -18,7 +18,8 @@
     "spec": "fx-pitch.spec",
     "preview": "preview.png",
     "tests": "fx-pitch.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

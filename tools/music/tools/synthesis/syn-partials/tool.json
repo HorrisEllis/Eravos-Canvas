@@ -18,7 +18,8 @@
     "preview": "preview.png",
     "spec": "syn-partials.spec",
     "tests": "syn-partials.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

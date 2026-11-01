@@ -18,7 +18,8 @@
     "spec": "coven.spec",
     "preview": "preview.png",
     "tests": "coven.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

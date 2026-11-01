@@ -21,7 +21,8 @@
     "preview": "preview.png",
     "spec": "lyric-rhythm.spec",
     "tests": "lyric-rhythm.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

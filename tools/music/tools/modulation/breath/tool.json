@@ -22,6 +22,7 @@
     "spec": "breath.spec",
     "preview": "preview.png",
     "thumb": "thumb.png",
+    "art": "art.svg",
     "tests": "breath.test.js"
   },
   "needs": {

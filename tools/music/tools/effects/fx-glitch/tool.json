@@ -19,7 +19,8 @@
     "spec": "fx-glitch.spec",
     "preview": "preview.png",
     "tests": "fx-glitch.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

@@ -22,7 +22,8 @@
     "spec": "video-clip.spec",
     "tests": "video-clip.test.js",
     "preview": "preview.png",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [],

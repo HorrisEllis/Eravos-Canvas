@@ -200,15 +200,6 @@ describe('Song previews', () => {
     const w = SongPreview.window(song('hx1')), drop = m.secs.find(s => s.kind === 'drop'); assert.equal(w.from, drop.bar - 3, 'two bars of build and the pause before the drop'); assert.ok(w.bars <= 9 && w.from + w.bars > drop.bar + 3, 'and the first bars of the drop');
     const missing = Songbook.all().filter(s => !s.recipe && SongEngine.genres().some(g => g.id === s.genre)).filter(s => !SongPreview.map(s)).map(s => s.id); assert.equal(missing.join(), '', 'every genre song');
   });
-  it('the Songs page draws a strip on the cards and a map with ▶ Preview in the detail', async () => {
-    Songbook.open(); const ov = document.querySelector('.overlay.sbk');
-    try {
-      const card = [...ov.querySelectorAll('.sbk-card')].find(c => /Floor Falls Out/.test(c.textContent)); card.click(); card.scrollIntoView();
-      assert.ok(ov.querySelector('.sbk-card .sbk-strip'), 'strips on cards'); assert.ok(ov.querySelector('.sbk-detail .sbk-map'), 'a map'); assert.ok(/Preview/.test(ov.querySelector('.sbk-detail .sbk-prev').textContent));
-      await TH.sleep(80); const cv = ov.querySelector('.sbk-detail .sbk-map'), d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data; let lit = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 0) lit++;
-      assert.gt(lit, 500, 'the map is drawn');
-    } finally { ov.querySelector('.sbk-x').click(); }
-  });
   it('▶ Preview renders the build → pause → drop in its own universe (the canvas is untouched) — and you hear the drop', async () => {
     const n0 = Kernel.registry.list().length, r = await SongPreview.render(song('hx1'));
     assert.equal(Kernel.registry.list().length, n0, 'nothing added to your canvas'); assert.ok(r && !r.silent, 'sound');

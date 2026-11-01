@@ -18,7 +18,8 @@
     "spec": "coach.spec",
     "preview": "preview.png",
     "tests": "coach.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

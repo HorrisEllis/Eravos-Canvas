@@ -19,7 +19,8 @@
     "spec": "reese-bass.spec",
     "preview": "preview.png",
     "tests": "reese-bass.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

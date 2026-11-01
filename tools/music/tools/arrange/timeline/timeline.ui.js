@@ -287,7 +287,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
           PL.play(p, () => { hear.classList.remove('on'); hear.textContent = '▶'; }).then(ok => { hear.textContent = ok ? '■' : '▶'; hear.classList.toggle('on', !!ok); }); };
         const addB = h('button', { class: 'uk-btn primary', text: '＋ add', title: 'add it to this track, after its last clip, in the song’s key' });
         addB.onclick = () => { const res = PL.send(p, { K: view.K, lane: l.id }); said = res ? '✓ ' + p.name.split(' · ')[0] + ' added at bar ' + Math.floor(res.bar) + (p.curve ? ' (a curve lane under the track)' : '') : 'Could not add it here'; paint(); };
-        el.append(h('div', { class: 'tl-patp-row' }, [cv, h('div', { class: 'tl-patp-txt' }, [h('span', { text: p.name.split(' · ')[0], title: p.name }), h('small', { text: (p.genreLabel || p.genre) + ' · ' + p.bars + (p.bars === 1 ? ' bar' : ' bars') })]), hear, addB]));
+        el.append(h('div', { class: 'tl-patp-row' }, [cv, h('div', { class: 'tl-patp-txt' }, [h('span', { text: p.song ? p.name.slice(p.song.title.length + 3) : p.name.split(' · ')[0], title: p.name }), h('small', { text: (p.song ? '♪ ' + p.song.title + ' · ' : '') + (p.genreLabel || p.genre) + ' · ' + p.bars + (p.bars === 1 ? ' bar' : ' bars') })]), hear, addB]));
       });
       el.append(h('div', { class: 'tl-patp-foot' }, [h('span', { class: 'tl-patp-said', 'aria-live': 'polite', text: said || (page % pages + 1) + ' of ' + pages }),
         pages > 1 ? h('button', { class: 'uk-btn', text: '↻ 5 others', onclick: () => { page++; said = ''; PL.stop(); paint(); } }) : h('span')]));

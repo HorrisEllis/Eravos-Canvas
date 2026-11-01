@@ -106,3 +106,9 @@ Before any theme ships: move those onto the tokens, then a theme is one file. Th
     GLASS     in glass mode the page palette stays the glass layer's, but the windows' own colours answer (they did not before);
               tests/p82-glass-layer updated to say so
   Tests: tests/p83-reactive-tools.test.js (3), mutation-checked. The look at rest is unchanged.
+
+  3.86 every Start tile carries a painting (asked: "make the rest of it like that"): SVG files with their own movement (reduced motion:
+  still) — tools/music/art/start/{wub-drop,quick-beat,full-session,emerge,vagal,lab}.svg (recipe.art / mode.art), tools/<domain>/art.svg
+  (domain.json "art", carried by the catalogue: the domain cards, installed or not), canvas/runtime/art/{blank-canvas,chest}.svg (Empty
+  canvas, Browse every tool). .boot .card.has-art: the painting across the top (240 × 110), the emoji icon dropped from the title.
+

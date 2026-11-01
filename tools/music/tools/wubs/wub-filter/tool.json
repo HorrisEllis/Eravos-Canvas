@@ -23,7 +23,8 @@
     "preview": "preview.png",
     "spec": "wub-filter.spec",
     "tests": "wub-filter.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

@@ -22,7 +22,8 @@
     "spec": "ai-step.spec",
     "tests": "ai-step.test.js",
     "preview": "preview.png",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [],

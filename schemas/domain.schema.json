@@ -14,6 +14,7 @@
     "pages": { "type": "array", "items": { "type": "string" }, "description": "pages/<id>/ — off-canvas pages (browsers, learn)" },
     "content": { "type": "array", "items": { "type": "string" }, "description": "content/<kind>/ — domain-wide data packs (genres, lessons, songs)" },
     "summary": { "type": "string", "description": "one line shown on the catalog's domain card (specs/eravos.p38-catalog.spec)" },
+    "art": { "type": "string", "pattern": "^[a-z0-9_./-]+\\.svg$", "description": "a painting for the Start screen's domain card: an SVG file in the domain's folder (3.82)" },
     "starter": { "type": "array", "items": { "type": "string" }, "description": "tool ids the catalog installs in one click when the domain is first picked" }
   },
   "additionalProperties": false

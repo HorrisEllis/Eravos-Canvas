@@ -85,6 +85,7 @@
 
   // ---------------------------------------------------------------- Knob
   // 3.72 the knob cap's shading, defined once for the page (every knob's cap fills from it)
+  let knobSeq = 0;
   function capDefs() {
     if (doc.getElementById('uk-defs')) return;
     const NS = 'http://www.w3.org/2000/svg', d = doc.createElementNS(NS, 'svg'); d.setAttribute('id', 'uk-defs'); d.setAttribute('aria-hidden', 'true'); d.setAttribute('width', '0'); d.setAttribute('height', '0'); d.style.position = 'absolute';
@@ -107,7 +108,12 @@
     cap.setAttribute('class', 'uk-knob-cap'); cap.setAttribute('cx', '20'); cap.setAttribute('cy', '20'); cap.setAttribute('r', '11.5');
     capHi.setAttribute('class', 'uk-knob-caphi'); capHi.setAttribute('cx', '20'); capHi.setAttribute('cy', '20'); capHi.setAttribute('r', '10.6');
     ptr.setAttribute('class', 'uk-knob-ptr'); swing.setAttribute('class', 'uk-knob-swing');
-    svg.append(track, swing, arc, cap, capHi, ptr, dot, liveDot);
+    // 3.87 the arc is a gradient: the window's own accent running into sunset rose and violet (stops read the window's colours,
+    // so it still follows its accent and the reactive colours)
+    const gid = 'uk-arc-' + (++knobSeq), defs = doc.createElementNS(svgNS, 'defs');
+    defs.innerHTML = `<linearGradient id="${gid}" x1="0" y1="1" x2="1" y2="0"><stop offset="0" style="stop-color:var(--dk1, var(--acc))"/><stop offset=".55" style="stop-color:var(--dk2, var(--acc))"/><stop offset="1" style="stop-color:var(--dk4, var(--acc))"/></linearGradient>`;
+    arc.style.stroke = `url(#${gid})`;
+    svg.append(defs, track, swing, arc, cap, capHi, ptr, dot, liveDot);
     const lbl = h('div', { class: 'uk-knob-label', text: o.label || o.key || '' });
     const val = h('div', { class: 'uk-knob-val' });
     const el = h('div', { class: 'uk-knob' + (o.big ? ' big' : ''), title: (o.label || '') + (o.hint ? ' — ' + o.hint : '') + '\n(drag or arrow keys · shift fine · dbl-click / Delete resets)',

@@ -331,7 +331,7 @@
       // 3.29: Songbook + Learn live OFF the canvas (their own full-screen pages, data/songbook.js · data/learn.js)
       Object.assign({}, UNITS.studio, { domain: MUSIC, requires: [UNITS.engine.id], build() {
         const g = h('div', { class: 'tb-group', 'data-unit': UNITS.studio.id });
-        const sb = h('button', { class: 'tb-btn', id: 'songbookBtn', title: 'Songs — every song in one place: write a new one in any genre, the song for her, your saved songs (off the canvas)', 'data-ic': 'library', text: 'Songs' });
+        const sb = h('button', { class: 'tb-btn', id: 'songbookBtn', title: 'Songs — your songs: every one you saved or exported (the built-in songs are blocks in Patterns)', 'data-ic': 'library', text: 'Songs' });
         const lb = h('button', { class: 'tb-btn', id: 'learnBtn', title: 'Learn — short lessons, a map you choose your own path through (off the canvas)', 'data-ic': 'graduation-cap', text: 'Learn' });
         const sd = h('button', { class: 'tb-btn', id: 'soundsBtn', title: 'Sounds — every preset, drum kit packs (mix & match pads), capture any sound to a pad (off the canvas)', 'data-ic': 'audio-lines', text: 'Sounds' });
         // 3.71 "what about instead of so much songs, we have a pattern library"
@@ -353,9 +353,9 @@
     }
     unitDefs.forEach(u => S.unit(u));
     S.needs(resolveNeeds);
-    S.mode({ id: 'music', domain: MUSIC, label: 'Music Production', icon: '🎛', accent: '#ff2266', units: all, categories: STUDIO_CATEGORIES, brand,
+    S.mode({ id: 'music', domain: MUSIC, label: 'Music Production', icon: '🎛', art: (global.ERAVOS_TOOLS || '') + 'music/art.svg', accent: '#ff2266', units: all, categories: STUDIO_CATEGORIES, brand,
       blurb: 'The studio. Song Engine writes whole songs in any genre; every synth, drum, effect and sound-design tool. Songs, drops, mixing, export.' });
-    S.mode({ id: 'music.lab', domain: MUSIC, label: 'Lab', icon: '∿', accent: '#00ffcc', units: [UNITS.engine.id, UNITS.meter.id, UNITS.dock.id],
+    S.mode({ id: 'music.lab', domain: MUSIC, label: 'Lab', icon: '∿', art: (global.ERAVOS_TOOLS || '') + 'music/art/start/lab.svg', accent: '#00ffcc', units: [UNITS.engine.id, UNITS.meter.id, UNITS.dock.id],
       categories: LAB_CATEGORIES.concat(['Effects', 'Modulation']),
       brand: { tagline: 'The other tools: irrational tunings, inharmonic spectra, harmonic analysis, breathing.' },
       blurb: 'Everything that is not song-making: xenharmonic synths, spectra, analysis, breath. Engine and meter only — no song key, no grid.' });

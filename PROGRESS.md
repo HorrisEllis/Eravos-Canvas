@@ -2,6 +2,35 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.88 A painting for every tool: the ＋ Add cards and the tool pages (2026-11-01)
+Asked: "make more artwork like this. for each thumbnail" · "what about the catalogs and tool pages" · "first the cards".
+- 69 tools, each a small animated painting of what it does (build/tool-art.py): an anvil and sparks for the forges, a storm for the
+  Destroyer, ripples for the echoes, aurora curtains for the filters, a rising moon for the subs, a cathedral for the organs, a synthwave
+  sun for Retro Poly, standing stones for the drums, a campfire for Groove, a waterfall over a cliff for the Drop Builder … each lit in its
+  own accent, under a sky (night, dusk, sunset, dawn, aurora, violet), with Bob Ross mountains and pines. Still for reduced motion.
+- tools/<domain>/tools/<cat>/<tool>/art.svg, tool.json files.art (schema), carried by the catalogue; ＋ Add's card leads with it, the
+  tool page's header shows it in place of the icon tile. thumb.png stays (the side preview shows the tool's real display).
+- Also: merged main (3.82–3.85, the other session) — Patterns by tool kept, song blocks kept; this branch's 3.82/3.83 renamed 3.86/3.87.
+
+## Done — 3.87 Problems panel closes · sunset gradients (DUSK) in every window (2026-11-01)
+Asked: "this needs to be able to close" (the problems log, a wall of one entry) · "can you make the ui more like that also? like
+with the wobble base. like have the colors more a gradient animated, beautiful, like love the sunset one".
+- Problems: a header (count, Clear, × / Esc / click outside); the same problem again is one line ×N. Found: the Timeline read every
+  setting of a removed tool on each refresh, one fault each — the kernel now says a missing reader once per reader and tool.
+- DUSK: every accent flows slowly from the tool's own colour into sunset rose, amber and violet (window edge and title, chosen options,
+  primary buttons, toggles, faders, each knob's arc); spectra and the 3.79 tools' displays draw in a moving sunset (UI.dusk); a
+  screen-blended dusk light over each window (.wm-dusk). Mixed from --acc, so reactive colours still move it; still for reduced motion.
+
+## Done — 3.86 Songs in blocks (Patterns) · Songs = your saved and exported songs · a painting on every Start tile (2026-10-31)
+Asked: "i want the songs broken into patterns, and moved to the patterns menu, piece by piece, sorted by instrument, like blocks, or
+units, then the songs library is for saved or export songs" · "can you make the rest of it like that" (the Start screen's paintings).
+- Patterns: all 308 named songs taken apart — each instrument, each section a block (≈ 5 300 patterns). Instrument chips; sections by
+  instrument by default; "Sections: song" with ▶ Whole song on each song. Blocks say their song.
+- Songs: only yours — saved and exported (Export now keeps the song there too), with a way to the built-in songs' blocks.
+- Start: 13 paintings (starry nights, Bob Ross mountains, RPG camp, observatory, alchemist tower, treasure chest …) on every tile.
+- Tests: p82 new; six older tests moved to the new layout (the catalogue they clicked through is now in Patterns).
+Specs: pattern-library and themes addenda.
+
 ## Done — 3.85 🧩 The Patterns page by tool (2026-11-01)
 His words, on a screenshot of the page: "can you clean up the pattern ui, sort it by tool instead? its overwhelming."
 - The tools down the left (grouped Drums · Bass · Keys & pads · Leads · More, each with its count, plus Every tool). Pick one: only its
@@ -62,7 +91,6 @@ Map: specs/eravos.2026-10-22-brainstorm.map.spec, addendum 2026-10-31 (A2b). Ste
 - Mistakes on the way, caught by tests: a comment inserted mid-line swallowed the rest of a test line; a header inserted inside an
   existing comment broke a test file. Both fixed before commit.
 - Tests: tests/p82-glass-layer.test.js (4). P77, P73, P58 set Draw with: Page (they test the page way). P48, P76, boundary pass.
-
 ## Done — 3.81 The featured songs' pictures: small paintings, not emoji (2026-10-31)
 Asked: "the icons look cheap and childish. make them beautiful and creative, rpg, starry night, bob ross, star gazin".
 tools/music/data/featured-art.js (window.FeaturedArt, SVG, loaded before recipes.js): "Make a song for her" — a starry night with Van

@@ -202,8 +202,10 @@
       [h('option', { value: '', text: '— a new window (opened when you add something)' })].concat(wins.map(id => h('option', { value: id, text: `${d.label} · ${id.split('-').slice(-2).join('')}` }))));
     pick.value = st.target || ''; pick.addEventListener('change', () => { st.target = pick.value || null; repaint(); });
     const suite = d.suite && (d.suite.members || []).length ? d.suite : null;
-    page.appendChild(h('header', { class: 'tp-head' }, [
-      tileOf(d, 56, d.icon || '◻'),
+    // 3.88 its painting (art.svg, from the catalogue) in place of the icon tile, when it has one
+    const meta = global.Catalog && global.Catalog.meta && global.Catalog.meta(d.id), art = meta && meta.art;
+    page.appendChild(h('header', { class: 'tp-head' + (art ? ' has-art' : '') }, [
+      art ? h('img', { class: 'tp-art', src: art, alt: '', draggable: 'false' }) : tileOf(d, 56, d.icon || '◻'),
       h('div', { class: 'tp-ht' }, [h('h2', { text: d.label }), h('div', { class: 'tp-meta', text: [d.category, 'v' + d.version].filter(Boolean).join(' · ') }), h('p', { text: d.blurb || '' })]),
       h('div', { class: 'tp-act' }, [
         btn(st.target ? 'Go to it' : 'Add to canvas', st.target ? 'show its window' : 'open one on the canvas', () => { if (st.target) { K.bus.publish('canvas:focus-request', { instanceId: st.target }); close(); } else ensureHost(st); }, 'pri', st.target ? 'arrow-up-right' : 'plus'),

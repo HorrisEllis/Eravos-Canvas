@@ -18,7 +18,8 @@
     "spec": "organ.spec",
     "preview": "preview.png",
     "tests": "organ.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

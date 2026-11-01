@@ -18,7 +18,8 @@
     "spec": "fx-moddelay.spec",
     "preview": "preview.png",
     "tests": "fx-moddelay.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

@@ -19,7 +19,8 @@
     "spec": "harmonic-analyzer.spec",
     "preview": "preview.png",
     "tests": "harmonic-analyzer.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

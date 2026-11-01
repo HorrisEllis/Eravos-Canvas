@@ -19,7 +19,8 @@
     "spec": "pad-forge.spec",
     "preview": "preview.png",
     "tests": "pad-forge.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

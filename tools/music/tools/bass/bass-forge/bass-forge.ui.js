@@ -28,7 +28,7 @@ OrganismFactory.reg('eravos.bass-forge', function (view) {
     const sh = SHAPE[view.state.lfoShape] || SHAPE.sine, ph = +view.state.lfoPhase || 0; g.strokeStyle = '#3a4656'; g.lineWidth = 1.2; g.beginPath();
     for (let i = 0; i <= 120; i++) { const t = i / 120, y = H / 2 - sh((t * 2 + ph) % 1) * (H / 2 - 8); i ? g.lineTo(t * W, y) : g.moveTo(0, y); } g.stroke();
     if (!readLfo()) return;
-    g.strokeStyle = A; g.lineWidth = 2; g.shadowColor = A; g.shadowBlur = 8; g.beginPath();
+    g.strokeStyle = (UI.dusk ? UI.dusk(g, 0, W, A) : A); g.lineWidth = 2; g.shadowColor = A; g.shadowBlur = 8; g.beginPath();
     const N = Math.max(60, Math.round(W)), stp = lb.length / N;
     for (let i = 0; i < N; i++) { const v = Math.max(0, Math.min(1, lb[Math.floor(i * stp)])), x = i / (N - 1) * W, y = H - 6 - v * (H - 12); i ? g.lineTo(x, y) : g.moveTo(x, y); }
     g.stroke(); g.shadowBlur = 0; g.fillStyle = A; g.beginPath(); g.arc(W - 3, H - 6 - lfoNow * (H - 12), 3.5, 0, Math.PI * 2); g.fill();
@@ -91,7 +91,7 @@ OrganismFactory.reg('eravos.bass-forge', function (view) {
       const x = i * cw; g.fillStyle = '#0c121a'; g.fillRect(x + 2, 4, cw - 4, H - 34);
       const bar = (v, dx, col, fill) => { const y = 4 + (H - 34) * (1 - n(v)); g.fillStyle = col; g.globalAlpha = fill ? 1 : 0.9; if (fill) g.fillRect(x + dx, y, cw / 2 - 8, H - 30 - y); else { g.strokeStyle = col; g.lineWidth = 1.5; g.strokeRect(x + dx, y, cw / 2 - 8, H - 30 - y); } g.globalAlpha = 1; };
       if (M && M.target) bar(M.target[k] || 0, 6, '#8796a8', false);
-      if (M && M.feat) { g.shadowColor = A; g.shadowBlur = 8; bar(M.feat[k] || 0, cw / 2 + 2, A, true); g.shadowBlur = 0; }
+      if (M && M.feat) { g.shadowColor = A; g.shadowBlur = 8; bar(M.feat[k] || 0, cw / 2 + 2, (UI.dusk ? UI.dusk(g, 0, W, A) : A), true); g.shadowBlur = 0; }
       g.fillStyle = '#8796a8'; g.fillText(l.toUpperCase(), x + cw / 2, H - 17);
       g.fillStyle = '#5b6878'; if (M && M.target) g.fillText(f(M.target[k] || 0), x + cw / 2, H - 5);
     });

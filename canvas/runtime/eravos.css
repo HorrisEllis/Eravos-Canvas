@@ -157,6 +157,10 @@ svg.wires { position: absolute; pointer-events: none; overflow: visible; z-index
 .boot .hero-card:hover .hero-go { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(255, 111, 168, .5), inset 0 1px 0 rgba(255,255,255,.4); }
 @keyframes hero-breathe { 0%, 100% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--hv) 45%, var(--line)), 0 1px 0 var(--edge) inset, 0 0 8px color-mix(in srgb, var(--hv) 18%, transparent); }
   50% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--hv) 75%, var(--line)), 0 1px 0 var(--edge) inset, 0 0 26px color-mix(in srgb, var(--hv) 38%, transparent); } }
+/* 3.86 every Start tile may carry a painting across its top (an SVG file; its own movement, still for reduced motion) */
+.boot .card.has-art { padding-top: 0; overflow: hidden; display: flex; flex-direction: column; gap: 4px; }
+.boot .card .card-art { display: block; width: calc(100% + 28px); margin: 0 -14px 8px; aspect-ratio: 240 / 110; height: auto; object-fit: cover; border-bottom: 1px solid color-mix(in srgb, var(--acc) 35%, transparent); }
+.boot .card.has-art:hover .card-art { filter: brightness(1.12) saturate(1.1); }
 /* 3.81 a featured card's picture: a small painting, unframed, soft corners; its stars twinkle, its light moves */
 .boot .hero-card .big.art { width: 168px; height: 109px; padding: 0; border: 0; background: none; border-radius: 10px; box-shadow: 0 8px 22px rgba(0,0,0,.55), 0 0 18px color-mix(in srgb, var(--hv) 25%, transparent); overflow: hidden; }
 .boot .hero-card .big.art svg { display: block; width: 100%; height: 100%; }
@@ -186,8 +190,17 @@ svg.wires { position: absolute; pointer-events: none; overflow: visible; z-index
 .toast { background: var(--panel2); border: 1px solid var(--line2); border-left: 3px solid var(--cyan); border-radius: 8px; padding: 8px 12px; max-width: 460px; font-size: 12px; box-shadow: 0 8px 30px #000; animation: tin .2s; }
 .toast.bad { border-left-color: var(--red); } .toast.good { border-left-color: var(--green); }
 @keyframes tin { from { transform: translateY(8px); opacity: 0; } }
-.faultlog { position: fixed; right: 12px; top: 58px; width: 520px; max-height: 60vh; overflow: auto; background: var(--panel); border: 1px solid var(--line2); border-radius: 12px; padding: 10px; z-index: 150000; font: 11px var(--mono); }
-.faultlog div { padding: 3px 0; border-bottom: 1px solid var(--line); }
+.faultlog { position: fixed; right: 12px; top: 58px; width: 520px; max-width: calc(100vw - 24px); max-height: 60vh; display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line2); border-radius: 12px; z-index: 150000; font: 11px var(--mono); box-shadow: 0 12px 40px rgba(0,0,0,.5); overflow: hidden; }
+.faultlog .fl-head { display: flex; align-items: center; gap: 8px; padding: 8px 10px 8px 14px; border-bottom: 1px solid var(--line2); background: var(--panel2); }
+.faultlog .fl-head b { font: 700 11px var(--mono); letter-spacing: 1.4px; text-transform: uppercase; color: var(--text); }
+.faultlog .fl-count { flex: 1; color: var(--dim); }
+.faultlog .fl-btn { background: var(--bg2); border: 1px solid var(--line2); color: var(--text); border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--mono); cursor: pointer; }
+.faultlog .fl-btn:hover { border-color: var(--acc); }
+.faultlog .fl-x { padding: 2px 9px; font-size: 14px; line-height: 1; }
+.faultlog .fl-body { overflow: auto; padding: 4px 14px 10px; }
+.faultlog .fl-none { padding: 10px 0; color: var(--dim); }
+.faultlog .fl-n { margin-left: 8px; padding: 0 6px; border-radius: 999px; background: color-mix(in srgb, var(--red) 25%, transparent); color: var(--red); font-weight: 700; }
+.faultlog .fl-body > div { padding: 3px 0; border-bottom: 1px solid var(--line); }
 .faultlog .fc { color: var(--red); }
 
 .tb-slot { display: flex; align-items: center; gap: 8px; }
@@ -642,3 +655,27 @@ table.tp-tab { width: 100%; }
   .tp-sec:not([hidden]), .tp-page, .tp-overlay, .wm-win.wm-new { animation: none; }
   .uk-fader-thumb, .uk-fader-fill, .uk-knob svg { transition: none !important; }
 }
+
+/* 3.87 DUSK — "can you make the ui more like that also? like with the wobble base. like have the colors more a gradient animated,
+ * beautiful, like love the sunset one": every accent runs, slowly, from the window's own colour into sunset rose, amber and violet and
+ * back. The stops are mixed FROM --acc, so each tool keeps its colour and the reactive colours still move it. Reduced motion: still. */
+:root, .wm-win, .tp-overlay { --dk1: var(--acc); --dk2: color-mix(in oklab, var(--acc) 22%, #ff6fa8); --dk3: color-mix(in oklab, var(--acc) 18%, #ffb36b); --dk4: color-mix(in oklab, var(--acc) 25%, #b06bff);
+  --dusk: linear-gradient(100deg, var(--dk1), var(--dk2) 25%, var(--dk3) 45%, var(--dk4) 70%, var(--dk1)); }
+@keyframes dusk-flow { from { background-position: 0% 50%; } to { background-position: 300% 50%; } }
+.wm-win::before { height: 3px; background: var(--dusk); background-size: 300% 100%; animation: dusk-flow 14s linear infinite; box-shadow: 0 0 12px color-mix(in srgb, var(--dk2) 60%, transparent); }
+.wm-title { background: var(--dusk); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: dusk-flow 14s linear infinite; }
+.uk-seg button.on { background: var(--dusk); background-size: 300% 100%; animation: dusk-flow 12s linear infinite; color: #1a0712; text-shadow: 0 1px 0 rgba(255,255,255,.25); box-shadow: 0 0 12px color-mix(in srgb, var(--dk2) 45%, transparent); }
+.uk-btn.primary { background: var(--dusk); background-size: 300% 100%; animation: dusk-flow 12s linear infinite; color: #1a0712; box-shadow: 0 1px 0 rgba(255,255,255,.3) inset, 0 0 14px color-mix(in srgb, var(--dk2) 45%, transparent); }
+.uk-toggle.on { background: linear-gradient(100deg, color-mix(in srgb, var(--dk1) 30%, #0b1016), color-mix(in srgb, var(--dk2) 30%, #0b1016), color-mix(in srgb, var(--dk4) 30%, #0b1016)); box-shadow: 0 0 0 1px var(--dk2), 0 0 12px color-mix(in srgb, var(--dk2) 40%, transparent); }
+.uk-fader-fill { background: linear-gradient(0deg, color-mix(in srgb, var(--dk4) 40%, transparent), var(--dk2) 55%, var(--dk3)); }
+.uk-knob-arc { filter: drop-shadow(0 0 3px color-mix(in srgb, var(--dk2) 70%, transparent)); }
+@media (prefers-reduced-motion: reduce) { .wm-win::before, .wm-title, .uk-seg button.on, .uk-btn.primary { animation: none; } }
+/* the window itself: a dusk sky behind its controls — violet low on one side, rose high on the other (still: no cost per frame) */
+.wm-dusk { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 3; mix-blend-mode: screen; opacity: .9;
+  background: radial-gradient(85% 55% at 0% 100%, color-mix(in srgb, var(--dk4) 16%, transparent), transparent 70%), radial-gradient(75% 45% at 100% 0%, color-mix(in srgb, var(--dk2) 13%, transparent), transparent 70%), radial-gradient(60% 35% at 60% 100%, color-mix(in srgb, var(--dk3) 8%, transparent), transparent 70%); }
+html.snd-calm .wm-dusk { opacity: .6; }
+/* 3.88 a tool's painting: its page header and its ＋ Add card */
+.tp-head .tp-art { flex: none; width: 168px; height: 105px; object-fit: cover; border-radius: 10px; box-shadow: 0 8px 22px rgba(0,0,0,.5), 0 0 18px color-mix(in srgb, var(--acc) 22%, transparent); }
+@media (max-width: 600px) { .tp-head .tp-art { width: 100%; height: auto; aspect-ratio: 16 / 10; } }
+.ap-card-pic.painted .ap-card-img { object-fit: cover; }
+

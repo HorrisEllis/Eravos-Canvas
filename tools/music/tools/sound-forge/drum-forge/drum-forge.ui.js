@@ -36,7 +36,7 @@ OrganismFactory.reg('eravos.drum-forge', function (view) {
   UI.loop(wave, () => {
     const g = wave.g, W = wave.fit().W, H = wave.H, A = acc(wave); g.clearRect(0, 0, W, H); g.fillStyle = '#0c121a'; g.fillRect(0, 0, W, H);
     g.fillStyle = '#1c2836'; g.fillRect(0, H / 2, W, 1);
-    if (!prev || prev.i !== sel) return; const n = prev.peaks.length / 2; g.fillStyle = A; g.shadowColor = A; g.shadowBlur = 6;
+    if (!prev || prev.i !== sel) return; const n = prev.peaks.length / 2; g.fillStyle = (UI.dusk ? UI.dusk(g, 0, W, A) : A); g.shadowColor = A; g.shadowBlur = 6;
     for (let x = 0; x < W; x++) { const k = Math.floor(x / W * n), mn = prev.peaks[k * 2], mx = prev.peaks[k * 2 + 1]; g.fillRect(x, H / 2 - mx * H / 2 * 0.92, 1, Math.max(1, (mx - mn) * H / 2 * 0.92)); }
     g.shadowBlur = 0; g.fillStyle = '#8796a8'; g.font = '600 8.5px monospace'; g.fillText(prev.dur.toFixed(2) + ' S', W - 40, H - 6);
   }, 15);
@@ -80,7 +80,7 @@ OrganismFactory.reg('eravos.drum-forge', function (view) {
     g.fillStyle = '#0c121a'; g.fillRect(0, 0, W, H); g.strokeStyle = '#1c2836'; g.lineWidth = 1; g.font = '600 8.5px monospace'; g.fillStyle = '#5b6878';
     [0, 12, 24, 36, 48].forEach(st => { const y = Y(st); g.beginPath(); g.moveTo(30, y); g.lineTo(W - 20, y); g.stroke(); g.fillText('+' + st, 4, y + 3); });
     const on = CURVED.includes(s.type), P = s.pitch || 0, T = s.ptime || 0.04; g.globalAlpha = on ? 1 : 0.3;
-    g.strokeStyle = A; g.lineWidth = 2.2; g.shadowColor = A; g.shadowBlur = 8; g.beginPath();
+    g.strokeStyle = (UI.dusk ? UI.dusk(g, 0, W, A) : A); g.lineWidth = 2.2; g.shadowColor = A; g.shadowBlur = 8; g.beginPath();
     for (let i = 0; i <= 64; i++) { const x = i / 64, st = P * (1 - Math.pow(x, k)); i ? g.lineTo(X(x * T), Y(st)) : g.moveTo(X(0), Y(st)); }
     g.lineTo(W - 20, Y(0)); g.stroke(); g.shadowBlur = 0;
     const dot = (x, y, r) => { g.fillStyle = '#0c121a'; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill(); g.strokeStyle = A; g.lineWidth = 2; g.stroke(); };

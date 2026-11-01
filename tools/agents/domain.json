@@ -16,5 +16,6 @@
  "starter": [
   "eravos.agents.ai-step"
  ],
- "summary": "Chain prompts, tools and data into automations you can watch run."
+ "summary": "Chain prompts, tools and data into automations you can watch run.",
+ "art": "art.svg"
 }

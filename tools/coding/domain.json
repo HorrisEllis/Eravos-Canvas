@@ -16,5 +16,6 @@
  "starter": [
   "eravos.coding.code-cell"
  ],
- "summary": "Write and run code on the canvas — sandboxed, with inputs and outputs as ports."
+ "summary": "Write and run code on the canvas — sandboxed, with inputs and outputs as ports.",
+ "art": "art.svg"
 }

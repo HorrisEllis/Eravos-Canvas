@@ -22,7 +22,8 @@
     "spec": "fx-squash.spec",
     "tests": "fx-squash.test.js",
     "preview": "preview.png",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [
