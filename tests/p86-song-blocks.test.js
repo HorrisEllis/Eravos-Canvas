@@ -1,7 +1,7 @@
-/* 3.82 — "i want the songs broken into patterns, and moved to the patterns menu, piece by piece, sorted by instrument, like blocks, or
+/* 3.86 — "i want the songs broken into patterns, and moved to the patterns menu, piece by piece, sorted by instrument, like blocks, or
  * units, then the songs library is for saved or export songs". */
-window.__phase = 'P82';
-describe('P82 · songs in blocks (Patterns) · Songs = your saved and exported songs', () => {
+window.__phase = 'P86';
+describe('P86 · songs in blocks (Patterns) · Songs = your saved and exported songs', () => {
   it('every named song is taken apart: each instrument, each section a block named for the song; they play in your key', () => {
     const lib = PatternLibrary.all(), blocks = lib.filter(p => p.song);
     const s = Songbook.songs().find(x => x.id === 'bun-dem'); assert.ok(s, 'Bun Dem');
@@ -11,14 +11,13 @@ describe('P82 · songs in blocks (Patterns) · Songs = your saved and exported s
     assert.ok(mine.filter(p => !p.drums).every(p => p.notes.every(n => typeof n.r === 'number')), 'pitched blocks keep notes from the root (any key)');
     assert.gt(new Set(blocks.map(p => p.song.id)).size, 250, 'nearly every song');
   });
-  it('the page: Instrument chips, sections by instrument by default (drums first), by song with ▶ Whole song; a block says its song', () => {
-    PatternLibrary.open(); const ov = document.querySelector('.overlay.plib');
+  it('the page: pick an instrument in the tool list → only its blocks, each saying its song; by song, every song has ▶ Whole song', () => {
+    PatternLibrary.open({ group: 'type' }); const ov = document.querySelector('.overlay.plib');
     try {
-      const chips = [...ov.querySelectorAll('.plib-tools .sbk-chip')].map(c => c.textContent); assert.ok(chips.some(t => /^Drum Machine \d+/.test(t)), chips.slice(0, 5).join());
-      const heads = [...ov.querySelectorAll('.plib-sec-head b')].map(b => b.textContent); assert.ok(/Drum/.test(heads[0]), 'drums first: ' + heads.slice(0, 3));
-      const reese = [...ov.querySelectorAll('.plib-tools .sbk-chip')].find(c => /^Reese Bass/.test(c.textContent)); reese.click();
-      const secs = [...ov.querySelectorAll('.plib-sec-head b')].map(b => b.textContent); assert.deepEqual(secs, ['Reese Bass'], 'one instrument picked');
-      assert.ok(ov.querySelector('.plib-card .plib-song'), 'a block says which song it is from');
+      const rb = ov.querySelector('.plib-rt[data-tool="eravos.reese-bass"]'); assert.ok(rb, 'Reese Bass in the tool list'); rb.click();
+      const cards = [...ov.querySelectorAll('.plib-card')]; assert.gt(cards.length, 0, 'its blocks');
+      assert.ok(cards.some(c => c.querySelector('.plib-song')), 'a block says which song it is from');
+      assert.ok(PatternLibrary.all().filter(p => p.tool === 'eravos.reese-bass' && p.song).length > 50, 'Reese Bass blocks from the songs');
     } finally { PatternLibrary.open(); }
     PatternLibrary.open({ group: 'song' }); const ov2 = document.querySelector('.overlay.plib');
     try { assert.ok(ov2.querySelector('.plib-sec[data-sec="bun-dem"] .plib-whole'), 'Bun Dem has ▶ Whole song'); } finally { PatternLibrary.open(); }

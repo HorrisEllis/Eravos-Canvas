@@ -23,13 +23,17 @@
                         "enum": [
                           "1/1",
                           "1/2",
+                          "1/4.",
                           "1/4",
+                          "1/8.",
                           "1/4t",
                           "1/8",
+                          "1/16.",
                           "1/8t",
                           "1/16",
                           "1/16t",
-                          "1/32"
+                          "1/32",
+                          "1/64"
                         ]
                       },
                       "lfoShape": {
@@ -104,7 +108,12 @@
                       "filterMode": {
                         "enum": [
                           "lowpass",
-                          "formant"
+                          "formant",
+                          "highpass",
+                          "bandpass",
+                          "notch",
+                          "comb",
+                          "comb-"
                         ]
                       },
                       "vowelA": {
@@ -148,6 +157,33 @@
                         "minimum": 0.5,
                         "maximum": 20
                       },
+                      "slope": {
+                        "enum": [
+                          "12",
+                          "24",
+                          "36"
+                        ]
+                      },
+                      "keyTrack": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "fEnvAmt": {
+                        "type": "number",
+                        "minimum": -8,
+                        "maximum": 8
+                      },
+                      "fEnvDecay": {
+                        "type": "number",
+                        "minimum": 0.005,
+                        "maximum": 4
+                      },
+                      "velCutoff": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
                       "fmIndex": {
                         "type": "number",
                         "minimum": 0,
@@ -155,11 +191,60 @@
                       },
                       "fmRatio": {
                         "enum": [
+                          "0.25",
                           "0.5",
                           "1",
                           "1.5",
                           "2",
-                          "3"
+                          "3",
+                          "4",
+                          "5",
+                          "6",
+                          "8"
+                        ]
+                      },
+                      "fmFine": {
+                        "type": "number",
+                        "minimum": -0.5,
+                        "maximum": 0.5
+                      },
+                      "ring": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "voices": {
+                        "enum": [
+                          "2",
+                          "4",
+                          "6",
+                          "8"
+                        ]
+                      },
+                      "wtMix": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "wtTable": {
+                        "enum": [
+                          "growl",
+                          "vowel",
+                          "metal",
+                          "digital",
+                          "organ"
+                        ]
+                      },
+                      "wtPos": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "subWave": {
+                        "enum": [
+                          "sine",
+                          "triangle",
+                          "square"
                         ]
                       },
                       "fmWub": {
@@ -198,7 +283,8 @@
                           "soft",
                           "asym",
                           "fold",
-                          "hard"
+                          "hard",
+                          "crush"
                         ]
                       },
                       "octave": {
@@ -274,6 +360,76 @@
                         "type": "number",
                         "minimum": 0.005,
                         "maximum": 1
+                      },
+                      "decay": {
+                        "type": "number",
+                        "minimum": 0.001,
+                        "maximum": 4
+                      },
+                      "sustain": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "lfo2Dest": {
+                        "enum": [
+                          "off",
+                          "pitch",
+                          "cutoff",
+                          "fm",
+                          "volume"
+                        ]
+                      },
+                      "lfo2Shape": {
+                        "enum": [
+                          "sine",
+                          "triangle",
+                          "square",
+                          "sawtooth"
+                        ]
+                      },
+                      "lfo2Sync": {
+                        "type": "boolean"
+                      },
+                      "lfo2Div": {
+                        "enum": [
+                          "1/1",
+                          "1/2",
+                          "1/4.",
+                          "1/4",
+                          "1/8.",
+                          "1/4t",
+                          "1/8",
+                          "1/16.",
+                          "1/8t",
+                          "1/16",
+                          "1/16t",
+                          "1/32",
+                          "1/64"
+                        ]
+                      },
+                      "lfo2Hz": {
+                        "type": "number",
+                        "minimum": 0.02,
+                        "maximum": 20
+                      },
+                      "lfo2Depth": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "monoBelow": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 400
+                      },
+                      "clipOn": {
+                        "type": "boolean"
+                      },
+                      "ceiling": {
+                        "type": "number",
+                        "minimum": -24,
+                        "maximum": 0
                       },
                       "mods": {},
                       "_react": {},

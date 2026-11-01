@@ -157,7 +157,7 @@ svg.wires { position: absolute; pointer-events: none; overflow: visible; z-index
 .boot .hero-card:hover .hero-go { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(255, 111, 168, .5), inset 0 1px 0 rgba(255,255,255,.4); }
 @keyframes hero-breathe { 0%, 100% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--hv) 45%, var(--line)), 0 1px 0 var(--edge) inset, 0 0 8px color-mix(in srgb, var(--hv) 18%, transparent); }
   50% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--hv) 75%, var(--line)), 0 1px 0 var(--edge) inset, 0 0 26px color-mix(in srgb, var(--hv) 38%, transparent); } }
-/* 3.82 every Start tile may carry a painting across its top (an SVG file; its own movement, still for reduced motion) */
+/* 3.86 every Start tile may carry a painting across its top (an SVG file; its own movement, still for reduced motion) */
 .boot .card.has-art { padding-top: 0; overflow: hidden; display: flex; flex-direction: column; gap: 4px; }
 .boot .card .card-art { display: block; width: calc(100% + 28px); margin: 0 -14px 8px; aspect-ratio: 240 / 110; height: auto; object-fit: cover; border-bottom: 1px solid color-mix(in srgb, var(--acc) 35%, transparent); }
 .boot .card.has-art:hover .card-art { filter: brightness(1.12) saturate(1.1); }
@@ -656,7 +656,7 @@ table.tp-tab { width: 100%; }
   .uk-fader-thumb, .uk-fader-fill, .uk-knob svg { transition: none !important; }
 }
 
-/* 3.83 DUSK — "can you make the ui more like that also? like with the wobble base. like have the colors more a gradient animated,
+/* 3.87 DUSK — "can you make the ui more like that also? like with the wobble base. like have the colors more a gradient animated,
  * beautiful, like love the sunset one": every accent runs, slowly, from the window's own colour into sunset rose, amber and violet and
  * back. The stops are mixed FROM --acc, so each tool keeps its colour and the reactive colours still move it. Reduced motion: still. */
 :root, .wm-win, .tp-overlay { --dk1: var(--acc); --dk2: color-mix(in oklab, var(--acc) 22%, #ff6fa8); --dk3: color-mix(in oklab, var(--acc) 18%, #ffb36b); --dk4: color-mix(in oklab, var(--acc) 25%, #b06bff);

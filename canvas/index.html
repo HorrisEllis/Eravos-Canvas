@@ -70,7 +70,7 @@
     const pe = PlainErrors.describe(f, K);
     if (pe.level !== 'quiet') toast(pe.text + (pe.hint ? ' ' + pe.hint : ''), 'bad', pe.hint ? 7000 : 5000);
   }, 'shell');
-  // 3.83 the problems log: a header that closes it (× · Esc · a click outside) and clears it; the same problem again and again is one
+  // 3.87 the problems log: a header that closes it (× · Esc · a click outside) and clears it; the same problem again and again is one
   // line with how many times (it was a wall of the same entry)
   let logEl = null, cleared = 0;
   const closeLog = () => { if (!logEl) return; logEl.remove(); logEl = null; document.removeEventListener('keydown', logKey, true); document.removeEventListener('mousedown', logOut, true); };
@@ -159,7 +159,7 @@
     const featured = Recipes.featured().filter(visible);
     // 3.81 a featured recipe may bring a picture (an SVG it ships as data); else its icon
     const heroPic = (r) => { if (typeof r.featured.art === 'string' && /^<svg[\s>]/.test(r.featured.art)) { const d = h('div', { class: 'big art' }); d.innerHTML = r.featured.art; return d; } return h('div', { class: 'big', text: r.featured.icon || r.icon || '✦' }); };
-    // 3.82 a tile may bring a painting (an SVG file it names): shown across its top
+    // 3.86 a tile may bring a painting (an SVG file it names): shown across its top
     const pic = (src) => src ? h('img', { class: 'card-art', src, alt: '', loading: 'lazy', draggable: 'false' }) : null;
     const card = (r) => h('div', { class: 'card' + (r.art ? ' has-art' : ''), style: { '--acc': r.accent || '#00d4ff' }, onclick: () => start(r.id) }, [pic(r.art), h('b', { text: (r.art ? '' : (r.icon || '') + ' ') + r.label }), h('small', { text: r.tagline || '' })].filter(Boolean));
     const listed = Recipes.list().filter(r => !r.featured && !r.hidden && visible(r));

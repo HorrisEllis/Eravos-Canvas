@@ -10,7 +10,7 @@
   G('eravos.genome.emerge', 'Emerge', 'GRANULAR CLOUD · EMERGENCE', ['eravos.granular', 'eravos.sample-player', 'eravos.fx-moddelay', 'eravos.fx-echo', 'eravos.lfo'], '#aaff44');
   G('eravos.genome.vagal', 'Vagal', 'BREATH · EMOTION · RESONANCE', ['eravos.breath', 'eravos.organ', 'eravos.granular', 'eravos.channel'], '#8844ff');
 
-  // 3.82 the Start screen's paintings for these (tools/music/art/start/*.svg — "make the rest of it like that")
+  // 3.86 the Start screen's paintings for these (tools/music/art/start/*.svg — "make the rest of it like that")
   const ART = (n) => (window.ERAVOS_TOOLS || '') + 'music/art/start/' + n + '.svg';
   // ---- the purpose recipe (from James's intent)
   R.register({

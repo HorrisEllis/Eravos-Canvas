@@ -49,7 +49,7 @@ describe('P73 · square pads, fluid controls, every window answers the sound', (
     } finally { k.el.remove(); }
   });
   it('a window that makes no sound (Groove) lights with the drums it plays', async () => {
-    host(); const K = Kernel; K.audio.boot(); await K.audio.ctx.resume(); SoundCSS.init(K); SoundCSS.set(true);
+    host(); const K = Kernel; K.audio.boot(); await K.audio.ctx.resume(); SoundCSS.init(K); if (SoundCSS.setDraw) SoundCSS.setDraw('page'); SoundCSS.set(true);
     const g = OrganismFactory.spawn('eravos.groove-gen', { x: 40, y: 40 }), pads = OrganismFactory.spawn('eravos.pads', { x: 700, y: 40 }); await TH.sleep(40);
     const hk = OrganismFactory.def('eravos.pads').hooks.find(h => h.event_type === 'note:trigger' && h.direction === 'in').hook_id;
     K.wires.register({ src: { instanceId: g, hookId: 'groove.hook.note_out' }, dst: { instanceId: pads, hookId: hk } });

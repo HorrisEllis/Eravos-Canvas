@@ -154,6 +154,14 @@ OrganismFactory.reg('eravos.wobble-bass', function (view) {
     ['fmRatio', 'fmIndex', (v) => v > 0, 'turn FM up first'], ['fmWub', 'fmIndex', (v) => v > 0, 'turn FM up first'],
     ['diveTime', 'pitchDive', (v) => v !== 0, 'set a Dive first'],
     ['wubLen', 'wubOn', (v) => !!v, 'turn Wub seq on'], ['wubStep', 'wubOn', (v) => !!v, 'turn Wub seq on'],
+    // 4.0 depth
+    ['fmFine', 'fmIndex', (v) => v > 0, 'turn FM up first'], ['fEnvDecay', 'fEnvAmt', (v) => v !== 0, 'set a Filter env first'],
+    ['slope', 'filterMode', (v) => v !== 'formant', 'Slope works in the LP / HP / BP / notch filters'],
+    ['keyTrack', 'filterMode', (v) => v !== 'formant', 'Key track works in the LP / HP / BP / notch filters'],
+    ['decay', 'sustain', (v) => v < 1, 'lower Sustain first'], ['ceiling', 'clipOn', (v) => !!v, 'turn the Clipper on'],
+    ['lfo2Shape', 'lfo2Dest', (v) => v !== 'off', 'pick where LFO 2 goes'], ['lfo2Depth', 'lfo2Dest', (v) => v !== 'off', 'pick where LFO 2 goes'],
+    ['wtTable', 'wtMix', (v) => v > 0, 'turn Wavetable up first'], ['wtPos', 'wtMix', (v) => v > 0, 'turn Wavetable up first'],
+    ['lfo2Div', 'lfo2Sync', (v) => !!v, 'LFO 2 rate works with its Sync on'], ['lfo2Hz', 'lfo2Sync', (v) => !v, 'LFO 2 free works with its Sync off'],
   ];
   // ---- PERFORM: one hand on the wobble — sideways bends its speed (×¼ … ×4, glided), up/down opens the mouth
   const pad = UI.Canvas(480, 120); pad.style.cursor = 'crosshair'; pad.setAttribute('aria-label', 'perform pad: rate bend and mouth');
@@ -187,6 +195,18 @@ OrganismFactory.reg('eravos.wobble-bass', function (view) {
     group('PITCH — bends and dives', ['octave', 'transpose', 'glide', 'pitchDive', 'diveTime', 'vibrato']),
     group('TONE — layers and level', ['osc2', 'sqOct', 'sub', 'subAlign', 'spread', 'width', 'noise', 'ampMod', 'attack', 'release', 'level']),
   ];
+  // 4.0 FULL DEPTH (specs/eravos.tool-depth.spec D1): everything new behind one button, so the face stays as it was
+  const deep = [
+    group('FILTER+ — slope, tracking, envelope', ['slope', 'keyTrack', 'fEnvAmt', 'fEnvDecay', 'velCutoff']),
+    group('GROWL+ — FM fine, ring, voices, sub', ['fmFine', 'ring', 'voices', 'subWave']),
+    group('ENVELOPE+ — decay and sustain', ['decay', 'sustain']),
+    group('LFO 2 — a second motion', ['lfo2Dest', 'lfo2Shape', 'lfo2Sync', 'lfo2Div', 'lfo2Hz', 'lfo2Depth']),
+    group('WAVETABLE — a third voice', ['wtMix', 'wtTable', 'wtPos']),
+    group('OUTPUT — mono low end, clipper', ['monoBelow', 'clipOn', 'ceiling']),
+  ];
+  const deepBox = h('div', { class: 'wb-deep', hidden: true }, deep.map(gEl => { Object.assign(gEl.style, { margin: '0 0 8px', breakInside: 'avoid' }); return gEl; }));
+  const deepB = UI.Button({ label: 'More depth ▸', hint: 'slope, key tracking, a filter envelope, ADSR, ring mod, unison voices, a wavetable, a second LFO, mono low end, a clipper', onClick: () => { deepBox.hidden = !deepBox.hidden; deepB.set(deepBox.hidden ? 'More depth ▸' : 'More depth ▾'); } });
+  deepB.el.classList.add('wb-deep-btn');
   const ctlOf = (k) => view.root.querySelector(`[data-key="${k}"]`);
   function dim() {
     RULES.forEach(([k, sw, ok, why]) => { const el = ctlOf(k); if (!el) return; const on = ok(view.state[sw]); el.style.opacity = on ? '' : '0.35'; el.title = on ? (el.dataset.hint0 || '') : '⏸ ' + why; if (!el.dataset.hint0) el.dataset.hint0 = el.title && el.title.startsWith('⏸') ? '' : (el.title || ''); });
@@ -207,6 +227,7 @@ OrganismFactory.reg('eravos.wobble-bass', function (view) {
   view.root.append(
     h('div', { class: 'org-row', style: { justifyContent: 'space-between' } }, [UI.presetBar(view), shape.el]),
     grid,
+    h('div', { class: 'org-row', style: { margin: '2px 0' } }, [deepB.el]), deepBox,
     h('div', { style: { height: '6px' } }), kb.el,
     UI.hint('The screech: Octave +1, FM 3–6, Pitch wub 600–1200 c, a fast rate. The growl: Octave −1, FM 2–4 with FM wub, formant OO → AH. Card titles: hover for how to use them.'),
   );

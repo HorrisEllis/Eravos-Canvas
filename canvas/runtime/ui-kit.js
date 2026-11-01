@@ -13,11 +13,19 @@
 
   const doc = global.document;
 
+  // 3.83 a literal colour written inline (#hex, rgb(), rgba()) becomes its own variable (--rc-<prop>-<n>) the element carries, so
+  // whatever lights a window's colour variables lights these too. At rest the element looks exactly the same.
+  const COLOUR_PROPS = /^(color|background|backgroundColor|border|borderColor|borderTop|borderRight|borderBottom|borderLeft|borderLeftColor|borderTopColor|outline|outlineColor|boxShadow|textShadow|fill|stroke|caretColor)$/;
+  const COLOUR_LIT = /#[0-9a-fA-F]{8}\b|#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b|rgba?\([^)]*\)/g;
+  function colourVars(el, sk, val) {
+    if (typeof val !== 'string' || !COLOUR_PROPS.test(sk) || val.indexOf('var(') >= 0) return val;
+    let i = 0; return val.replace(COLOUR_LIT, (m) => { const n = '--rc-' + sk.toLowerCase() + '-' + (i++); el.style.setProperty(n, m); return 'var(' + n + ')'; });
+  }
   function h(tag, attrs, children) {
     const el = doc.createElement(tag);
     if (attrs) Object.keys(attrs).forEach(k => {
       const v = attrs[k];
-      if (k === 'style' && typeof v === 'object') Object.keys(v).forEach(sk => { if (sk.startsWith('--')) el.style.setProperty(sk, v[sk]); else el.style[sk] = v[sk]; });
+      if (k === 'style' && typeof v === 'object') Object.keys(v).forEach(sk => { if (sk.startsWith('--')) el.style.setProperty(sk, v[sk]); else el.style[sk] = colourVars(el, sk, v[sk]); });
       else if (k === 'class') el.className = v;
       else if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2), v);
       else if (k === 'text') el.textContent = v;
@@ -100,7 +108,7 @@
     cap.setAttribute('class', 'uk-knob-cap'); cap.setAttribute('cx', '20'); cap.setAttribute('cy', '20'); cap.setAttribute('r', '11.5');
     capHi.setAttribute('class', 'uk-knob-caphi'); capHi.setAttribute('cx', '20'); capHi.setAttribute('cy', '20'); capHi.setAttribute('r', '10.6');
     ptr.setAttribute('class', 'uk-knob-ptr'); swing.setAttribute('class', 'uk-knob-swing');
-    // 3.83 the arc is a gradient: the window's own accent running into sunset rose and violet (stops read the window's colours,
+    // 3.87 the arc is a gradient: the window's own accent running into sunset rose and violet (stops read the window's colours,
     // so it still follows its accent and the reactive colours)
     const gid = 'uk-arc-' + (++knobSeq), defs = doc.createElementNS(svgNS, 'defs');
     defs.innerHTML = `<linearGradient id="${gid}" x1="0" y1="1" x2="1" y2="0"><stop offset="0" style="stop-color:var(--dk1, var(--acc))"/><stop offset=".55" style="stop-color:var(--dk2, var(--acc))"/><stop offset="1" style="stop-color:var(--dk4, var(--acc))"/></linearGradient>`;

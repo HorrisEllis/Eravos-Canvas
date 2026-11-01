@@ -18,7 +18,7 @@ describe('♪ Patterns per tool on the Timeline (3.76)', () => {
       const b = root.querySelector('button[aria-label="Patterns for this track"]'); assert.ok(b, 'a ♪ on the track'); b.click(); await TH.sleep(20);
       const pp = document.querySelector('.tl-patp'); assert.ok(pp, 'the panel opens');
       assert.equal(pp.querySelectorAll('.tl-patp-row').length, 5, 'five at a time'); assert.ok(pp.querySelector('.tl-patp-about').textContent.length > 10, 'what this kind is, in a line');
-      const first = pp.querySelector('.tl-patp-txt span').title;   // the full name (3.82: a song's blocks share their first words)
+      const first = pp.querySelector('.tl-patp-txt span').title;   // the full name (3.86: a song's blocks share their first words)
       [...pp.querySelectorAll('button')].find(x => /5 others/.test(x.textContent)).click(); await TH.sleep(10);
       assert.ok(document.querySelector('.tl-patp .tl-patp-txt span').title !== first, 'five others');
       const lane = I.lanes.find(l => l.name === 'Keys'), n0 = I.clips.filter(c => c.lane === lane.id).length;
@@ -33,5 +33,24 @@ describe('♪ Patterns per tool on the Timeline (3.76)', () => {
       assert.equal(new Set([...document.querySelectorAll('.tl-patp-g')].map(e => e.textContent)).size, 1, 'one genre picked → one genre shown');
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })); await TH.sleep(10); assert.ok(!document.querySelector('.tl-patp'), 'Esc closes');
     } finally { document.querySelectorAll('.tl-patp').forEach(e => e.remove()); OrganismFactory.close(tl); OrganismFactory.close(syn); }
+  });
+});
+/* 3.85 — James, 2026-11-01, on the Patterns page: "can you clean up the pattern ui, sort it by tool instead? its overwhelming." */
+describe('🧩 Patterns page by tool (3.85)', () => {
+  it('opens on one tool, not the wall; the tools down the left; picking one shows only its patterns, by kind; the other filters fold away', () => {
+    try { localStorage.removeItem('eravos.patterns.page'); } catch (e) {} PatternLibrary.forget();   // a first open
+    if (document.querySelector('.plib')) PatternLibrary.open(); const pg = PatternLibrary.open(), ov = document.querySelector('.plib');
+    try {
+      const rail = [...ov.querySelectorAll('.plib-rt')]; assert.gt(rail.length, 5, 'a list of tools — every tool, even with a filter left on'); assert.ok(rail.some(b => b.dataset.tool === ''), 'and Every tool');
+      assert.ok(ov.querySelector('.plib-adv').hidden, 'the other filters are folded away'); assert.ok(ov.querySelector('.plib-fam').closest('[hidden]'), 'genre chips not on show');
+      const on = ov.querySelector('.plib-rt.on'); assert.ok(on && on.dataset.tool, 'one tool chosen');
+      const pick = rail.find(b => b.dataset.tool && b.dataset.tool !== on.dataset.tool); pick.click();
+      const id = pick.dataset.tool, want = PatternLibrary.all().filter(p => p.tool === id && p.type !== 'chain').length;
+      assert.ok(new RegExp('^' + want + ' shown').test(ov.querySelector('.plib-top-row .sbk-sub').textContent), 'only its ' + want + ' patterns');
+      assert.ok(ov.querySelector('.plib-tname').textContent.includes(OrganismFactory.def(id).label), 'its name on top');
+      const g = ov.querySelector('.plib-gsel'); assert.gt(g.options.length, 1, 'one genre menu');
+      ov.querySelector('.plib-morebtn').click(); assert.ok(!ov.querySelector('.plib-adv').hidden, '⚙ More filters opens them');
+      ov.querySelector('.plib-morebtn').click();
+    } finally { pg.close(); }
   });
 });

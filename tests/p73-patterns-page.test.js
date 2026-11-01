@@ -2,7 +2,7 @@
 window.__phase = 'P73';
 describe('🧩 Patterns page: families that fold, quick picks, sections (3.73)', () => {
   const L = () => PatternLibrary.all();
-  const fresh = () => { try { localStorage.removeItem('eravos.patterns.page'); } catch (e) {} if (document.querySelector('.plib')) PatternLibrary.open(); const pg = PatternLibrary.open({ group: 'type' }); const ov = document.querySelector('.plib');   /* 3.82 the page opens by instrument; these are about sections by type */ ov.querySelector('.sbk-alt.sm:not(.plib-more)') && [...ov.querySelectorAll('button')].find(b => b.textContent === 'Clear').click(); return { pg, ov }; };
+  const fresh = () => { try { localStorage.removeItem('eravos.patterns.page'); } catch (e) {} if (document.querySelector('.plib')) PatternLibrary.open(); const pg = PatternLibrary.open(); const ov = document.querySelector('.plib'); ov.querySelector('.plib-rt[data-tool=""]').click();   /* 3.85: these test the every-tool view */ ov.querySelector('.sbk-alt.sm:not(.plib-more)') && [...ov.querySelectorAll('button')].find(b => b.textContent === 'Clear').click(); return { pg, ov }; };
   const chips = (ov, sel) => [...ov.querySelectorAll(sel)];
   const typesShown = (ov) => new Set(chips(ov, '.plib-sec').map(s => s.dataset.sec));
   it('every genre belongs to a family; the deep-drop family holds Floor Falls and the tension studies', () => {
@@ -35,7 +35,7 @@ describe('🧩 Patterns page: families that fold, quick picks, sections (3.73)',
   });
   it('types pick several at once (shift-click adds), sections fold and stay folded on the next open', () => {
     const { pg, ov } = fresh(); try {
-      const t = (re) => chips(ov, '.sbk-chip').find(b => re.test(b.textContent) && b.parentNode.querySelector('.plib-lbl').textContent === 'Type');
+      const t = (re) => chips(ov, '.sbk-chip').find(b => re.test(b.textContent) && b.parentNode.querySelector('.plib-lbl').textContent === 'Kind');   // 3.85: the row is called Kind
       t(/Drops/).click(); t(/Curves/).dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true }));
       assert.deepEqual([...typesShown(ov)].sort(), ['curve', 'drop']);
       ov.querySelector('.plib-sec[data-sec=drop] .plib-sec-head').click();

@@ -255,7 +255,7 @@
   }
 
   // ---------------------------------------------------------------- the page (overlay, off the canvas)
-  // 3.82 "i want the songs broken into patterns, and moved to the patterns menu, piece by piece, sorted by instrument … then the songs
+  // 3.86 "i want the songs broken into patterns, and moved to the patterns menu, piece by piece, sorted by instrument … then the songs
   // library is for saved or export songs": the built-in songs are blocks in 🧩 Patterns now (each instrument, each section — and a song's
   // section there still writes the whole song). This page is YOUR songs: every one you saved (📖 Save to Songs) or exported (⤓ Export),
   // with its audio and the canvas as it was. Her voice recordings live here too.

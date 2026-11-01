@@ -262,7 +262,7 @@
       readParam(readerId, targetId, key) {
         if (readerId !== 'kernel' && !K.permissions.enforce(readerId, 'registry_read', `read ${targetId}.${key}`)) return undefined;
         const fn = paramReaders.get(targetId);
-        // 3.83 said once per reader and target: a view that reads every setting of a removed tool on each refresh flooded the log
+        // 3.87 said once per reader and target: a view that reads every setting of a removed tool on each refresh flooded the log
         if (!fn) { const k = readerId + '>' + targetId; if (!missingReads.has(k)) { missingReads.add(k); fault('MUTATION_001', { instance_id: readerId, message: `readParam: ${targetId} not found` }); } return undefined; }
         const v = fn(key);
         return v && typeof v === 'object' ? JSON.parse(JSON.stringify(v)) : v;

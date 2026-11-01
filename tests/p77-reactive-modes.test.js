@@ -23,7 +23,7 @@ describe('P77 · reactive colours: Off · Static · Changing · Custom', () => {
     } finally { OrganismFactory.close(id); SoundCSS.setMode(was === 'off' ? 'static' : was); }
   });
   it('Off is off: the class is set, the palette and every window are at rest, the older living layer stops too — and it is remembered', async () => {
-    host(); const K = Kernel; K.audio.boot(); await K.audio.ctx.resume(); SoundCSS.init(K);
+    host(); const K = Kernel; K.audio.boot(); await K.audio.ctx.resume(); SoundCSS.init(K); if (SoundCSS.setDraw) SoundCSS.setDraw('page');
     const id = OrganismFactory.spawn('eravos.pad-forge', { x: 40, y: 40 }); await TH.sleep(60); const w = CanvasWM.windowOf(id), was = SoundCSS.mode;
     try {
       SoundCSS.setMode('off'); assert.ok(document.documentElement.classList.contains('snd-off')); assert.equal(SoundCSS.on, false);
@@ -35,7 +35,7 @@ describe('P77 · reactive colours: Off · Static · Changing · Custom', () => {
     } finally { OrganismFactory.close(id); SoundCSS.setMode(was === 'off' ? 'static' : was); }
   });
   it('3.80 the surfaces react too (background, grid, panels, chassis, lines, dim text) with the mix, toward the mode’s colour; back exactly in silence; Off leaves them', async () => {
-    host(); const K = Kernel; K.audio.boot(); await K.audio.ctx.resume(); SoundCSS.init(K);
+    host(); const K = Kernel; K.audio.boot(); await K.audio.ctx.resume(); SoundCSS.init(K); if (SoundCSS.setDraw) SoundCSS.setDraw('page');
     const id = OrganismFactory.spawn('eravos.pad-forge', { x: 40, y: 40 }); await TH.sleep(60); const was = SoundCSS.mode, amt = SoundCSS.amount, R = document.documentElement;
     // at rest first (an earlier test's sound may still be lighting the page): Off puts every colour back
     SoundCSS.setMode('off'); const v = (k) => getComputedStyle(R).getPropertyValue(k).trim(), keys = Object.keys(SoundCSS.SURFACES), base = {}; keys.forEach(k => { base[k] = v(k); });
@@ -74,7 +74,7 @@ describe('P77 · reactive colours: Off · Static · Changing · Custom', () => {
     } finally { ToolSettings.close && ToolSettings.close(OrganismFactory.handle(id)); OrganismFactory.close(id); SoundCSS.setMode(was === 'off' ? 'static' : was); }
   });
   it('Changing follows each tool’s own sound: a dark sub and bright drums turn differently (no longer all together)', async () => {
-    host(); const K = Kernel; K.audio.boot(); await K.audio.ctx.resume(); SoundCSS.init(K); const was = SoundCSS.mode; SoundCSS.setMode('changing');
+    host(); const K = Kernel; K.audio.boot(); await K.audio.ctx.resume(); SoundCSS.init(K); if (SoundCSS.setDraw) SoundCSS.setDraw('page'); const was = SoundCSS.mode; SoundCSS.setMode('changing');
     const sub = OrganismFactory.spawn('eravos.sub-engine', { x: 40, y: 40 }), pads = OrganismFactory.spawn('eravos.pads', { x: 600, y: 40 }); await TH.sleep(60);
     try {
       await TH.sleep(150); for (let i = 0; i < 28; i++) { const t = K.audio.ctx.currentTime + 0.01; K.bus.publish('note:trigger', { target: sub, note: 40, velocity: 1, time: t, duration: 0.3 }); K.bus.publish('note:trigger', { target: pads, note: 38, velocity: 1, time: t, duration: 0.2 }); await TH.sleep(45); SoundCSS.step(); }

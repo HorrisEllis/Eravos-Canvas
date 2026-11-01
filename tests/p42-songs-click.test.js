@@ -1,5 +1,5 @@
 /* 3.39 — "the songs selection is buggy, and i cant click a lot of it" (desktop exe): the page once wrote the wrong song.
- * 3.82 the built-in songs moved into 🧩 Patterns (each instrument, each section a block; "the songs library is for saved or export songs").
+ * 3.86 the built-in songs moved into 🧩 Patterns (each instrument, each section a block; "the songs library is for saved or export songs").
  * The same guarantee there: every song's ▶ Whole song writes exactly that song. */
 window.__phase = 'P42';
 describe('Songs in Patterns — every song’s ▶ Whole song writes exactly that song', () => {

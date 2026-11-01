@@ -99,3 +99,11 @@ Next: @property { inherits: false } for --tool-level/--lvl so Full is cheaper; P
 #   Partials ~115 · Coven ~97 · Morph Osc ~90 · Retro Poly ~68 — Q2 in eravos.quality-and-tools-map.spec. Destroyer 2.1: stages that change nothing
 #   are routed out (the crusher worklet and its filters at 16 bits, the crossover with Low keep off, flat shelves) — ~11 % less; its scope
 #   rests in silence. Motion (3.71) costs nothing while no knob moves.
+
+## ADDENDUM 2026-10-31 (3.82) — reactive colours on a Looking Glass layer (canvas/runtime/glass-layer.js)
+  main before (3.80): Static 6.8 fps · Changing 8.5 · Off 48.5 (the surfaces' writes restyle the page)
+  3.82, same run:     Page 19 fps (RecalcStyle 4.05 s) · GPU layer Static 52 fps (0.16 s) · Changing 44.8 · Off 54.8
+  Bisected on the layer: mix-blend-mode 'screen' 13 fps → 'normal' 52 (the page is re-blended under a blending layer every frame);
+  shadowBlur every frame 30 fps → a cached sprite per glow 52.
+  WebGPU is unmeasured: the software adapter here never presents a WebGPU canvas. Measure on a real graphics card before making it default.
+  Rule from this: per-frame visuals go on a layer of their own, not into page styles; no blend modes on full-screen layers; blur once.

@@ -193,7 +193,7 @@
       rec.ctx.readOnly ? h('span', { class: 'wm-ro', text: 'READ-ONLY' }) : null,
       h('span', { class: 'wm-spacer' }), ...actions, maxBtn, minBtn, closeBtn,
     ]);
-    // 3.83 .wm-dusk: a sunset light over the window (screen-blended, never in the way of a click)
+    // 3.87 .wm-dusk: a sunset light over the window (screen-blended, never in the way of a click)
     const body = h('div', { class: 'wm-body' });
     const grip = h('div', { class: 'wm-grip' });
     const win = h('div', { class: 'wm-win', role: 'group', 'aria-label': d.label, 'data-instance': rec.instanceId, 'data-organism': d.id, style: { left: pos.x + 'px', top: pos.y + 'px', width: w + 'px', height: hgt + 'px', '--acc': d.accent || '#00d4ff' } }, [header, body, h('div', { class: 'wm-dusk', 'aria-hidden': 'true' }), grip]);

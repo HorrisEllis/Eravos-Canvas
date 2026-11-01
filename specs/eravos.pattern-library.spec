@@ -104,7 +104,7 @@
 #   end; chords: swells and plucks (a chord moves as one); leads: glide-in bends and plucks. Seeded apart from the song's numbers: the notes
 #   are unchanged (the golden hashes in p22 match with G.curve = false). 0 → ~37 000 curved notes in all 85 genres. tests/p73-living.
 
-## ADDENDUM 2026-10-31 (3.82) — songs in blocks; Songs = your songs
+## ADDENDUM 2026-10-31 (3.86) — songs in blocks; Songs = your songs
 Asked: "i want the songs broken into patterns, and moved to the patterns menu, piece by piece, sorted by instrument, like blocks, or
 units, then the songs library is for saved or export songs".
 - Library: every named Songbook song (genre + pinned seed; 308) is taken apart by fromGenre(G, seed, null, song): each instrument's each

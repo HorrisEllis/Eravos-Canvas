@@ -2,7 +2,16 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
-## Done — 3.82 Songs in blocks (Patterns) · Songs = your saved and exported songs · a painting on every Start tile (2026-10-31)
+## Done — 3.87 Problems panel closes · sunset gradients (DUSK) in every window (2026-11-01)
+Asked: "this needs to be able to close" (the problems log, a wall of one entry) · "can you make the ui more like that also? like
+with the wobble base. like have the colors more a gradient animated, beautiful, like love the sunset one".
+- Problems: a header (count, Clear, × / Esc / click outside); the same problem again is one line ×N. Found: the Timeline read every
+  setting of a removed tool on each refresh, one fault each — the kernel now says a missing reader once per reader and tool.
+- DUSK: every accent flows slowly from the tool's own colour into sunset rose, amber and violet (window edge and title, chosen options,
+  primary buttons, toggles, faders, each knob's arc); spectra and the 3.79 tools' displays draw in a moving sunset (UI.dusk); a
+  screen-blended dusk light over each window (.wm-dusk). Mixed from --acc, so reactive colours still move it; still for reduced motion.
+
+## Done — 3.86 Songs in blocks (Patterns) · Songs = your saved and exported songs · a painting on every Start tile (2026-10-31)
 Asked: "i want the songs broken into patterns, and moved to the patterns menu, piece by piece, sorted by instrument, like blocks, or
 units, then the songs library is for saved or export songs" · "can you make the rest of it like that" (the Start screen's paintings).
 - Patterns: all 308 named songs taken apart — each instrument, each section a block (≈ 5 300 patterns). Instrument chips; sections by
@@ -12,6 +21,66 @@ units, then the songs library is for saved or export songs" · "can you make the
 - Tests: p82 new; six older tests moved to the new layout (the catalogue they clicked through is now in Patterns).
 Specs: pattern-library and themes addenda.
 
+## Done — 3.85 🧩 The Patterns page by tool (2026-11-01)
+His words, on a screenshot of the page: "can you clean up the pattern ui, sort it by tool instead? its overwhelming."
+- The tools down the left (grouped Drums · Bass · Keys & pads · Leads · More, each with its count, plus Every tool). Pick one: only its
+  patterns, by kind (Kind chips show only the kinds it has), a line on the kind you pick, one genre menu (its genres only).
+- Opens on one tool — the one with the most patterns the first time, then the one you last picked — not the 2190-pattern wall.
+- Quick picks, genre families, BPM, sort, sections, fold all and clear fold away under ⚙ More filters (remembered). Nothing removed.
+- Cards on a tool's view say the preset, not the tool's name again.
+- Tests: p76 (+1: opens on one tool, rail, only its patterns, filters folded); p71, p73 open Every tool first (they test that view).
+
+## Done — 3.84 〰 Changing follows the sound, only the sound (2026-11-01)
+His words: "the colors for the knobs, sliders all the colors of each tool ui is supposed to be reactive, also the changing setting is
+supposed to change the color based on the sound."
+- Found: the tools' own colours already react since 3.83 (another session; seen here: knobs, keys, panels, displays). Changing did not
+  follow the sound: (1) a clock in it — a ±40° sine drift app-wide and ±45° per window, moving with nothing changing (tests/p84: the same
+  sound read 100 times drifted −68° → −16°); (2) each tool's brightness came from the byte spectrum, whose floor counts every empty bin,
+  so every tool read "bright": a low and a high note on Supersaw sat 24° apart.
+- Now: no clock. Each tool's turn is where its sound sits, weighted by energy, on the ear's scale (128 Hz → −150°, 4 kHz → +150°), plus
+  a kick on each hit; steps of 6°. Supersaw: a low note amber (−150°), a middle note cyan (−6°), a high note pink (+144°).
+- Measured (build/perf-ui.mjs): GPU layer Changing 25.5 → 34.2 fps (6° steps repeat colours more), Static 43.3.
+- Tests: tests/p84-changing-follows-sound.test.js (fails on the old code, passes now). P77, P83, P82, P73, P58 pass.
+
+## Mapped — packs are full sound packs; tools get full depth (2026-10-31)
+His words: "no it should be a pack. like full packs, are packs of sounds for tools. like tools should should have more power, like
+wobble bass, full range of depth in all aspects." Packs: one pack of sounds across every tool it fits (genre-packs.spec, first section
+reinstated, third addendum). Power: specs/eravos.tool-depth.spec, Wobble Bass audited first (source, filter, wobble, growl, drive,
+envelope, stereo, output). Nothing built.
+
+## Mapped — packs as DLC (2026-10-31)
+His words: "i want sound packs to be like dlc in a way. each pack adds new sounds or capabilities." specs/eravos.genre-packs.spec
+addendum: a DLC must add new sounds (measured apart) or new tools; presets only ride along. On disk tools/<domain>/packs/<id>/ with
+dlc.json, sounds/, tools/, content/; a Packs store page with art, numbers, a demo and Install / Uninstall. Phases DLC1–DLC4, Synthwave
+first (its drum sounds + new Gated Reverb, FM Keys, Ensemble Chorus). Nothing built.
+
+## Mapped — themes, honestly · genre packs across tools (2026-10-26)
+His words: "okay, what happened to theme? also all the packs were supposed to be additive, like synthwave in relation to the tools.
+like find all tools for it. bass tools. synthesis. etc". Theme: P69.1 was never built, and the look kit (5697b50, 95614cb, merged in
+PR #48) changed the default look directly, against the theme rule. specs/eravos.themes.spec addendum: three themes (Classic = the look
+before the kit, Studio = the kit, v10), default his call. Packs: specs/eravos.genre-packs.spec: a genre pack is one id adding to every
+tool that fits, with a page listing its tools by category, its sounds, patterns, songs, suites, the missing tools, and Build the rig.
+
+## Done — 3.82 🔮 Step 2: a Looking Glass layer inside the canvas · reactive colours drawn on it (2026-10-31)
+His words: "What about this for the canvas?" (the Looking Glass bundle, SPEC v0.3) · "what would that do?" · "move to main. get to step 2".
+Map: specs/eravos.2026-10-22-brainstorm.map.spec, addendum 2026-10-31 (A2b). Step 1 (SISO the canvas) stays mapped: step 2 does not need it.
+- **canvas/runtime/glass-layer.js** (domain-free), Looking Glass's model in the browser: elements as typed data ('wash', 'glow' on a page
+  element), variables any prop can bind to, layers made on first use and removed when empty, values that ease every display frame, and a
+  motion budget (at rest it clears once and stops asking for frames). Two renderers on the same data: a 2D canvas (default) and WebGPU in
+  WGSL — the shader language of wgpu, so the shader carries into the native Looking Glass.
+- **Reactive colours › Draw with: GPU layer (default) · Page** (3.80 as it was). On the layer the mix tints the canvas and every sounding
+  window glows in its own colour; nothing on the page is written while it plays (tests/p82 watches every style change).
+- **Measured** (build/perf-ui.mjs, Dubstep #77 playing, 8 windows; this run): Page 19 fps (style recalc 4.05 s) · GPU layer Static 52 fps
+  (0.16 s) · Changing 44.8 · Off 54.8. Before 3.82, main measured Static 6.8 fps.
+- **What it taught** (measure, don't guess): a 'screen' blend made the browser re-blend the whole page every frame (13 fps) → normal
+  blending. A blur drawn every frame cost ~20 fps → each glow is drawn once into a cached sprite and stamped. WebGPU: this test machine's
+  software GPU never shows a WebGPU canvas (not even a plain red clear), so it is not verified here: the 2D canvas is the default and
+  "try WebGPU" in the panel switches (remembered) — for his machine with a real graphics card.
+- Trade-off, his to weigh: the GPU layer lights windows and the canvas, not each colour inside a tool (a pad's own colour, a knob's
+  accent) the way Page does. That needs step A2 (tool faces as typed data).
+- Mistakes on the way, caught by tests: a comment inserted mid-line swallowed the rest of a test line; a header inserted inside an
+  existing comment broke a test file. Both fixed before commit.
+- Tests: tests/p82-glass-layer.test.js (4). P77, P73, P58 set Draw with: Page (they test the page way). P48, P76, boundary pass.
 ## Done — 3.81 The featured songs' pictures: small paintings, not emoji (2026-10-31)
 Asked: "the icons look cheap and childish. make them beautiful and creative, rpg, starry night, bob ross, star gazin".
 tools/music/data/featured-art.js (window.FeaturedArt, SVG, loaded before recipes.js): "Make a song for her" — a starry night with Van

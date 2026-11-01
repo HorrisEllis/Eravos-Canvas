@@ -8,7 +8,7 @@
  * The library is GENERATED from the Song Engine — every genre's parts, section by section — nothing stored by hand, so a new genre adds its
  * patterns by itself. Floor Falls' four pause moves (falls · stairs · freefall · rises) are named.
  *   PatternLibrary.all() · types · get(id) · forTool(tool, { drums }) (3.76) · send(p, { K?, bar?, lane?, headless? }) → { tl, lane, tool } · render(p) · play(p) · stop() · open()
- * 3.82 "i want the songs broken into patterns, and moved to the patterns menu, piece by piece, sorted by instrument, like blocks, or units,
+ * 3.86 "i want the songs broken into patterns, and moved to the patterns menu, piece by piece, sorted by instrument, like blocks, or units,
  * then the songs library is for saved or export songs": every named song of the Songbook is taken apart here — each instrument, each
  * section (intro, verse, build, drop …) one block, named after the song and carrying p.song { id, title }. The page sorts by instrument
  * first (Instrument chips; sections by instrument), or by song (a song's section can still write the whole song: ▶ Whole song). */
@@ -69,7 +69,7 @@
     sources.forEach(fn => { try { (fn() || []).forEach(add); } catch (e) { console.error('[ERAVOS] pattern source failed', e); } });   // 3.72 hand-made first
     const named = new Set(out.map(p => p.type + '|' + p.tool + '|' + JSON.stringify(p.notes || p.curve)));
     (SE() ? SE().genres() : []).forEach(Gx => [1, 2].forEach(seed => fromGenre(Gx, seed).forEach(p => { if (!named.has(p.type + '|' + p.tool + '|' + JSON.stringify(p.notes || p.curve))) add(p); })));
-    // 3.82 every named song, piece by piece: each instrument's each section is a block of its own
+    // 3.86 every named song, piece by piece: each instrument's each section is a block of its own
     songBlocks().forEach(add);
     transforms.forEach(fn => { try { (fn(out.slice()) || []).forEach(add); } catch (e) { console.error('[ERAVOS] pattern transform failed', e); } });   // 3.74
     return out;
@@ -189,11 +189,11 @@
   const STORE = 'eravos.patterns.page', SECTION = 24;
   const store = { get() { try { return JSON.parse(global.localStorage.getItem(STORE)) || {}; } catch (e) { return {}; } },
     set(o) { try { global.localStorage.setItem(STORE, JSON.stringify(Object.assign(store.get(), o))); } catch (e) {} } };
-  const pick = { types: new Set(), genres: new Set(), tools: new Set(), fav: false, q: '', lo: '', hi: '', sort: 'genre', group: 'tool' };   // kept while the app runs
-  function matches(p, o) {   // o: { types:Set, genres:Set, fav, favs:Set, words:[], lo, hi }
+  const pick = { types: new Set(), genres: new Set(), fav: false, q: '', lo: '', hi: '', sort: 'genre', group: 'type', tool: null };   // kept while the app runs (3.85 tool: '' = every tool, null = not chosen yet)
+  function matches(p, o) {   // o: { types:Set, genres:Set, fav, favs:Set, words:[], lo, hi, tool }
+    if (o.tool && p.tool !== o.tool) return false;   // 3.85
     if (o.types.size && !o.types.has(p.type)) return false;
     if (o.genres.size && !o.genres.has(p.genre)) return false;
-    if (o.tools && o.tools.size && !o.tools.has(p.tool)) return false;
     if (o.fav && !o.favs.has(p.id)) return false;
     if (o.lo !== '' && p.bpm < +o.lo) return false; if (o.hi !== '' && p.bpm > +o.hi) return false;
     if (o.words.length) { const hay = (p.name + ' ' + p.genreLabel + ' ' + familyLabel(familyOf(p.genre)) + ' ' + p.type + ' ' + p.tool + ' ' + (p.move || '') + ' ' + (p.preset || '') + ' ' + (p.song ? p.song.title + ' ' + (p.section || '') : '') + ' ' + toolLabel(p.tool) + ' ' + p.bpm).toLowerCase(); if (!o.words.every(w => hay.includes(w))) return false; }
@@ -205,13 +205,13 @@
   let page = null;
   function open(o) {
     if (page) { page.close(); if (!o) return; }
-    // 3.82 Songs → "the built-in songs, in blocks" opens it by song, every song in full (nothing picked)
-    if (o && o.group && GROUPS.some(g => g[0] === o.group)) { pick.group = o.group; pick.types.clear(); pick.genres.clear(); pick.tools.clear(); pick.fav = false; pick.q = ''; pick.lo = pick.hi = ''; }
+    // 3.86 Songs → "the built-in songs, in blocks" opens it by song: every tool, every song in full (nothing picked)
+    if (o && o.group && GROUPS.some(g => g[0] === o.group)) { pick.group = o.group; pick.tool = ''; pick.types.clear(); pick.genres.clear(); pick.fav = false; pick.q = ''; pick.lo = pick.hi = ''; }
     const UI = global.UIKit, h = UI.h, lib = all(), saved = store.get();
     const favs = new Set(saved.favs || []), folded = new Set(saved.folded || []), openFam = new Set(saved.openFam || []), more = {};
     const typeLabel = (t) => (TYPES.find(x => x[0] === t) || [0, t])[1];
     const ov = h('div', { class: 'overlay sbk plib', role: 'dialog', 'aria-label': 'Patterns' });
-    const quickRow = h('div', { class: 'sbk-chips plib-quick' }), typeRow = h('div', { class: 'sbk-chips' }), toolRow = h('div', { class: 'sbk-chips plib-tools' }), famRow = h('div', { class: 'sbk-chips plib-fams' }),
+    const quickRow = h('div', { class: 'sbk-chips plib-quick' }), typeRow = h('div', { class: 'sbk-chips' }), famRow = h('div', { class: 'sbk-chips plib-fams' }),
       genreRow = h('div', { class: 'sbk-chips plib-genres' }), grid = h('div', { class: 'plib-list' }), status = h('span', { class: 'sbk-sub' });
     const search = h('input', { class: 'sbk-q', type: 'search', placeholder: 'find a pattern, a genre, a tool, a BPM… (words narrow it)', value: pick.q });
     const num = (ph, k) => { const i = h('input', { class: 'sbk-q plib-bpm', type: 'number', min: '40', max: '220', placeholder: ph, title: 'BPM ' + ph, value: pick[k] });
@@ -223,13 +223,25 @@
     const clear = h('button', { class: 'sbk-alt sm', text: 'Clear', title: 'pick nothing — every pattern' });
     search.addEventListener('input', () => { pick.q = search.value.trim().toLowerCase(); paint(); });
     search.addEventListener('keydown', (e) => e.stopPropagation());
-    clear.onclick = () => { pick.types.clear(); pick.genres.clear(); pick.tools.clear(); pick.fav = false; pick.q = search.value = ''; pick.lo = lo.value = ''; pick.hi = hi.value = ''; paint(); };
+    clear.onclick = () => { pick.types.clear(); pick.genres.clear(); pick.fav = false; pick.q = search.value = ''; pick.lo = lo.value = ''; pick.hi = hi.value = ''; paint(); };
     const close = () => { stop(); if (io) io.disconnect(); ov.remove(); document.removeEventListener('keydown', key, true); page = null; };
     const key = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } else if (e.key === '/' && document.activeElement !== search) { e.preventDefault(); search.focus(); } };
     const io = 'IntersectionObserver' in global ? new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting && e.target._p) { drawCard(e.target, e.target._p); io.unobserve(e.target); } })) : null;
+    // 3.85 "clean up the pattern ui, sort it by tool instead? its overwhelming": the tools down the left (pick one, see only its
+    // patterns, by kind, each kind said in a line, one genre menu); every other filter folds away under ⚙ More filters (remembered)
+    if (pick.tool === null) { if (typeof saved.tool === 'string') pick.tool = saved.tool; else { const n = new Map(); lib.forEach(p => n.set(p.tool, (n.get(p.tool) || 0) + 1)); pick.tool = [...n.entries()].sort((a, b) => b[1] - a[1])[0][0]; } }   // first time: one tool (the one with the most), not the wall
+    let filtersOpen = !!saved.filtersOpen;
+    const rail = h('nav', { class: 'plib-rail', 'aria-label': 'Tools' }), toolHead = h('div', { class: 'plib-toolhead' }), aboutLine = h('p', { class: 'plib-about' });
+    const moreBtn = h('button', { class: 'sbk-alt sm plib-morebtn', type: 'button' });
+    moreBtn.onclick = () => { filtersOpen = !filtersOpen; store.set({ filtersOpen }); paint(); };
+    const filterBox = h('div', { class: 'plib-adv' }, [quickRow, famRow, genreRow, h('div', { class: 'sbk-row2' }, [h('span', { class: 'sbk-sub', text: 'BPM' }), lo, hi, sortSel, groupSel, foldAll, clear])]);
+    const toolName = (id) => (F().def(id) || {}).label || id, toolIcon = (id) => (F().def(id) || {}).icon || '◈';
+    const kindOfTool = (id) => { const d = F().def(id) || {}, w = (id + ' ' + (d.label || '') + ' ' + (d.category || '')).toLowerCase();
+      return /drum|kit|pads|perc|beat|groove/.test(w) ? 'Drums' : /wobble|wub|bass|sub|reese|acid/.test(w) ? 'Bass' : /pad|chord|organ|poly|keys|piano|choir|coven|string/.test(w) ? 'Keys & pads' : /lead|saw|arp|pluck|bell/.test(w) ? 'Leads' : 'More'; };
+    const RAIL_ORDER = ['Drums', 'Bass', 'Keys & pads', 'Leads', 'More'];
     ov.append(h('div', { class: 'sbk-box' }, [
       h('header', { class: 'sbk-head' }, [h('div', {}, [h('b', { text: '🧩 Patterns' }), h('span', { class: 'sbk-sub', text: ' every song in blocks — each instrument, each section. Hear it, send it to your song. ' + lib.length + ' patterns' })]), h('button', { class: 'sbk-x', text: '×', 'aria-label': 'close', onclick: () => close() })]),
-      h('div', { class: 'sbk-filter' }, [quickRow, toolRow, typeRow, famRow, genreRow, h('div', { class: 'sbk-row2' }, [search, h('span', { class: 'sbk-sub', text: 'BPM' }), lo, hi, sortSel, groupSel, foldAll, clear, status])]), grid]));
+      h('div', { class: 'plib-body' }, [rail, h('div', { class: 'plib-main' }, [h('div', { class: 'sbk-filter' }, [h('div', { class: 'sbk-row2 plib-top-row' }, [search, moreBtn, status]), toolHead, typeRow, aboutLine, filterBox]), grid])])]));
     ov.addEventListener('mousedown', (e) => { if (e.target === ov) close(); });
     document.addEventListener('keydown', key, true);
     const genres = Array.from(new Map(lib.map(p => [p.genre, p.genreLabel])).entries()).sort((a, b) => a[1].localeCompare(b[1]));
@@ -237,9 +249,8 @@
     const toggle = (set, v, e) => { if (e && (e.shiftKey || e.ctrlKey || e.metaKey)) { set.has(v) ? set.delete(v) : set.add(v); } else if (set.has(v) && set.size === 1) set.clear(); else { set.clear(); set.add(v); } };
     const tog = (set, v) => { set.has(v) ? set.delete(v) : set.add(v); };
     const chip = (text, on, fn, cls, title) => { const b = h('button', { class: 'sbk-chip' + (cls ? ' ' + cls : '') + (on ? ' on' : ''), text, title: title || '' }); b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.onclick = (e) => { fn(e); paint(); }; return b; };
-    const tools = Array.from(new Set(lib.map(p => p.tool))).sort((a, b) => toolRank(a) - toolRank(b) || toolLabel(a).localeCompare(toolLabel(b)));
     const songs = new Map(); lib.forEach(p => { if (p.song && !songs.has(p.song.id)) songs.set(p.song.id, p.song); });
-    const opts = (over) => Object.assign({ types: pick.types, genres: pick.genres, tools: pick.tools, fav: pick.fav, favs, words: pick.q.split(/\s+/).filter(Boolean), lo: pick.lo, hi: pick.hi }, over);
+    const opts = (over) => Object.assign({ types: pick.types, genres: pick.genres, fav: pick.fav, favs, words: pick.q.split(/\s+/).filter(Boolean), lo: pick.lo, hi: pick.hi, tool: pick.tool }, over);
     const count = (over) => lib.reduce((n, p) => n + (matches(p, opts(over)) ? 1 : 0), 0);
     const famOn = (f) => f.genres.every(g => pick.genres.has(g[0])), famSome = (f) => f.genres.some(g => pick.genres.has(g[0]));
     function card(p) {
@@ -252,9 +263,29 @@
       star.onclick = () => { tog(favs, p.id); store.set({ favs: [...favs] }); star.classList.toggle('on', favs.has(p.id)); star.textContent = favs.has(p.id) ? '★' : '☆'; if (pick.fav) paint(); };
       return h('div', { class: 'plib-card', style: { '--acc': p.type === 'drop' ? '#ff2266' : !!p.curve ? '#ffd24a' : '#00d4ff' } }, [
         h('div', { class: 'plib-top' }, [h('b', { text: p.song ? p.name.slice(p.song.title.length + 3) : p.name }), star]), p.song ? h('small', { class: 'plib-song', text: '♪ ' + p.song.title }) : null, h('small', { text: typeLabel(p.type) + ' · ' + p.genreLabel + ' · ' + p.bars + (p.bars > 1 ? ' bars' : ' bar') + ' · ' + p.bpm + ' BPM' }),
-        cv, h('div', { class: 'plib-actions' }, [hear, sendB, h('span', { class: 'plib-tool', text: ((F().def(p.tool) || {}).label || p.tool) + (p.preset ? ' · ' + p.preset : '') })])]);
+        cv, h('div', { class: 'plib-actions' }, [hear, sendB, h('span', { class: 'plib-tool', text: pick.tool ? (p.preset || '') : ((F().def(p.tool) || {}).label || p.tool) + (p.preset ? ' · ' + p.preset : '') })])]);
     }
     function paint() {
+      // 3.85 the tools, each with how many of its patterns match what else is picked; grouped by what they are
+      rail.innerHTML = ''; const per = new Map(); lib.forEach(p => { if (matches(p, opts({ tool: '' }))) per.set(p.tool, (per.get(p.tool) || 0) + 1); });
+      const railBtn = (id, label, n, icon) => { const b = h('button', { class: 'plib-rt' + (pick.tool === id ? ' on' : '') + (n ? '' : ' none'), type: 'button', 'data-tool': id, title: label }, [h('span', { class: 'plib-ri', text: icon }), h('span', { class: 'plib-rn', text: label }), h('span', { class: 'plib-rc', text: String(n) })]);
+        b.setAttribute('aria-pressed', pick.tool === id ? 'true' : 'false'); b.onclick = () => { pick.tool = id; pick.types.clear(); pick.genres.clear(); store.set({ tool: id }); paint(); grid.scrollTop = 0; }; return b; };
+      rail.appendChild(railBtn('', 'Every tool', [...per.values()].reduce((a, b) => a + b, 0), '◎'));
+      const tools = [...new Set(lib.map(p => p.tool))];   // every tool always (a filter left on must not empty the list); none matching = dimmed
+      RAIL_ORDER.forEach(grp => { const ids = tools.filter(id => kindOfTool(id) === grp).sort((a, b) => toolName(a).localeCompare(toolName(b))); if (!ids.length) return;
+        rail.appendChild(h('div', { class: 'plib-rg', text: grp })); ids.forEach(id => rail.appendChild(railBtn(id, toolName(id), per.get(id) || 0, toolIcon(id)))); });
+      // the chosen tool: its name, a line on it, one genre menu (the genres it has patterns in)
+      toolHead.innerHTML = '';
+      if (pick.tool) {
+        const d = F().def(pick.tool) || {}, mine = lib.filter(p => p.tool === pick.tool), gs = [...new Map(mine.map(p => [p.genre, p.genreLabel])).entries()].sort((a, b) => a[1].localeCompare(b[1]));
+        const gsel = h('select', { class: 'sbk-q plib-sel plib-gsel', 'aria-label': 'Genre' }, [h('option', { value: '', text: 'Every genre (' + gs.length + ')' })].concat(gs.map(([id, l]) => h('option', { value: id, text: l }))));
+        gsel.value = pick.genres.size === 1 ? [...pick.genres][0] : ''; gsel.onchange = () => { pick.genres.clear(); if (gsel.value) pick.genres.add(gsel.value); paint(); };
+        toolHead.append(h('b', { class: 'plib-tname', text: (d.icon ? d.icon + ' ' : '') + toolName(pick.tool) }), h('span', { class: 'sbk-sub plib-tdesc', text: d.description ? String(d.description).split(/[.—]/)[0] : '' }), gsel);
+      }
+      toolHead.hidden = !pick.tool;
+      aboutLine.textContent = pick.types.size === 1 ? (ABOUT[[...pick.types][0]] || '') : pick.tool ? 'Pick a kind above, or hear any card with ▶. → Timeline adds it to your song, in its key.' : '';
+      aboutLine.hidden = !aboutLine.textContent;
+      filterBox.hidden = !filtersOpen; moreBtn.textContent = filtersOpen ? '⚙ Fewer filters' : '⚙ More filters'; moreBtn.setAttribute('aria-expanded', filtersOpen ? 'true' : 'false');
       // quick picks
       quickRow.innerHTML = ''; quickRow.appendChild(h('span', { class: 'plib-lbl', text: 'Quick' }));
       QUICK.forEach(([id, label, q]) => {
@@ -268,13 +299,8 @@
           pick.genres.clear(); if (!on) { f.genres.forEach(g => pick.genres.add(g[0])); openFam.add(f.id); store.set({ openFam: [...openFam] }); }
         }, 'plib-q', q.fav ? 'only the ones you starred' : q.type ? 'only ' + label.slice(2).toLowerCase() : 'Floor Falls, Heavy Drops and the tension studies'));
       });
-      // instruments (3.82): the tool a block plays on — click = only this one · shift/ctrl-click = add it
-      toolRow.innerHTML = ''; toolRow.appendChild(h('span', { class: 'plib-lbl', text: 'Instrument' }));
-      toolRow.appendChild(chip('All ' + count({ tools: new Set() }), !pick.tools.size, () => pick.tools.clear()));
-      tools.forEach(t => { const n = count({ tools: new Set([t]) }); if (!n && !pick.tools.has(t)) return;
-        toolRow.appendChild(chip(toolLabel(t) + ' ' + n, pick.tools.has(t), (e) => toggle(pick.tools, t, e), '', 'click: only this instrument · shift-click: add it')); });
       // types (click = only this one · shift/ctrl-click = add it)
-      typeRow.innerHTML = ''; typeRow.appendChild(h('span', { class: 'plib-lbl', text: 'Type' }));
+      typeRow.innerHTML = ''; typeRow.appendChild(h('span', { class: 'plib-lbl', text: 'Kind' }));
       typeRow.appendChild(chip('All ' + count({ types: new Set() }), !pick.types.size, () => pick.types.clear()));
       TYPES.forEach(([id, label]) => { const n = count({ types: new Set([id]) }); if (!n && !pick.types.has(id)) return;
         typeRow.appendChild(chip(label + ' ' + n, pick.types.has(id), (e) => toggle(pick.types, id, e), '', 'click: only these · shift-click: add these too')); });
@@ -359,5 +385,7 @@
     const kinds = order.map(id => ({ id, label: (TYPES.find(t => t[0] === id) || [id, id])[1], about: ABOUT[id] || '', n: pool.filter(p => p.type === id).length })).filter(k => k.n);
     return { exact, kinds, about: ABOUT, list: (kind) => pool.filter(p => !kind || p.type === kind) };
   }
-  global.PatternLibrary = { forTool, kindsFor, about: ABOUT, draw: drawCard, addTransform: (fn) => { if (typeof fn === 'function') { transforms.push(fn); LIB = null; } }, addSource: (fn) => { if (typeof fn === 'function') { sources.push(fn); LIB = null; } }, all, types: TYPES.map(t => ({ id: t[0], label: t[1] })), get: (id) => all().find(p => p.id === id) || null, send, render, play, stop, open, rebuild: () => { LIB = null; return all(); }, fromGenre, families: FAMILIES.map(f => ({ id: f[0], label: f[1] })), familyOf, matches };
+  // tests: the page as on a fresh start (nothing picked, no tool chosen yet)
+  function forget() { pick.types.clear(); pick.genres.clear(); Object.assign(pick, { fav: false, q: '', lo: '', hi: '', sort: 'genre', group: 'type', tool: null }); }
+  global.PatternLibrary = { forTool, kindsFor, about: ABOUT, draw: drawCard, forget, addTransform: (fn) => { if (typeof fn === 'function') { transforms.push(fn); LIB = null; } }, addSource: (fn) => { if (typeof fn === 'function') { sources.push(fn); LIB = null; } }, all, types: TYPES.map(t => ({ id: t[0], label: t[1] })), get: (id) => all().find(p => p.id === id) || null, send, render, play, stop, open, rebuild: () => { LIB = null; return all(); }, fromGenre, families: FAMILIES.map(f => ({ id: f[0], label: f[1] })), familyOf, matches };
 })(typeof window !== 'undefined' ? window : globalThis);

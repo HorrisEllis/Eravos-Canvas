@@ -37,6 +37,23 @@
   fonts load from disk with the network off · boundary test (no domain words in theme-v10.css / themes.js) ·
   screenshots of: canvas with 3 tools, a tool page, a suite page, ＋ Add, the piano roll — sent before merging
 
+## ADDENDUM 2026-10-26 — "okay, what happened to theme?" (and before it: "the ui looks bad")
+  What happened, from the history: P69.1 (this spec) was never built: there is no themes.js, no theme css, no Options switch on main.
+  Meanwhile another session restyled the CURRENT look directly: 5697b50 "The look kit: pro-plugin controls everywhere" and 95614cb
+  "Living UI, square pads, fluid controls" (3.72/3.73 in its numbering), merged to main on 2026-10-26 in PR #48 on his "merge any other
+  branches". That broke the rule above ("the look changes ONLY through a theme"): the default look changed without a theme.
+  Fix (phase T, replaces P69.1):
+    T1 three themes, nothing deleted:
+         classic  the look on main before 5697b50 (its css restored, scoped html[data-theme="classic"])
+         studio   the look kit as merged (scoped html[data-theme="studio"])
+         v10      as specified above
+       which one is the DEFAULT is his call (TO CONFIRM). Until he answers: classic, the look he had before he said "the ui looks bad".
+    T2 themes.js + the no-flash line in <head> + ⋯ Options › Theme (Classic · Studio · v10), remembered; screenshots of all three
+       (canvas with 3 tools, a tool page, a suite page, ＋ Add, the piano roll) sent to him before merging.
+    T3 a test that fails when a commit changes a theme's look outside its own theme file (the css of a theme is hashed; a change to
+       a hash needs a spec addendum quoting him).
+  Acceptance as above, for three themes.
+
 ## ADDENDUM 2026-10-30 (3.76) — previews for his pick (nothing applied)
 Seven candidates rendered from the real app (token overrides only): current (Neon Lab) · Studio Calm · Graphite + Amber · Blueprint ·
 Midnight Synthwave · v10 Terminal · Paper (light). Screens: first screen, canvas with a Synthwave song, ＋ Add, Retro Poly's page.
@@ -74,7 +91,23 @@ Before any theme ships: move those onto the tokens, then a theme is one file. Th
   3.81 the featured cards' icons: small SVG paintings (tools/music/data/featured-art.js), unframed with soft corners (asked: no frame) — the
   recipe's featured.art; .hero-card .big.art 168 × 109; .tw twinkle · .flow / .swirl moving strokes · .shim (none for reduced motion).
   .hero-go: a round pill (999px) in the dawn gradient #ffb36b → #ff6fa8 → #b06bff (asked: "the buttons, too sharp, make them round and the color").
-  3.82 every Start tile carries a painting (asked: "make the rest of it like that"): SVG files with their own movement (reduced motion:
+
+## ADDENDUM 2026-11-01 (3.83) — the colours INSIDE the tools react (asked: "i want the colors in the tools to use the reactive colors"
+##   · "those 4 settings are for all the colors" · "in the green one look at the red tint in the shape and perfomr")
+  The four Reactive colour modes (Off · Static · Changing · Custom) now reach every colour a tool draws or writes, not only its
+  variables (about 830 literal colours in the tool UIs never moved):
+    DRAWN     every 2D canvas inside a window or tool page: fillStyle / strokeStyle / shadowColor pass through SoundCSS.colourIn (a
+              canvas outside any window is untouched; quiet or Off returns the colour exactly; alpha kept)
+    WRITTEN   ui-kit h(): a literal colour in an inline style (background, border, color, shadow …) becomes its own variable
+              --rc-<prop>-<n>, identical at rest, lit with the window like every other colour variable
+    SHARES    a dark surface (lightness < 30 %) leans 12 %, a muted colour (saturation < 35 %) 30 %, a vivid accent fully
+    CHANGING  accents turn round the wheel; dark and muted colours take the hue the window's accent has turned to (turning every
+              colour by the same amount made blue-grey grids pink under a green accent — his "red tint")
+    GLASS     in glass mode the page palette stays the glass layer's, but the windows' own colours answer (they did not before);
+              tests/p82-glass-layer updated to say so
+  Tests: tests/p83-reactive-tools.test.js (3), mutation-checked. The look at rest is unchanged.
+
+  3.86 every Start tile carries a painting (asked: "make the rest of it like that"): SVG files with their own movement (reduced motion:
   still) — tools/music/art/start/{wub-drop,quick-beat,full-session,emerge,vagal,lab}.svg (recipe.art / mode.art), tools/<domain>/art.svg
   (domain.json "art", carried by the catalogue: the domain cards, installed or not), canvas/runtime/art/{blank-canvas,chest}.svg (Empty
   canvas, Browse every tool). .boot .card.has-art: the painting across the top (240 × 110), the emoji icon dropped from the title.

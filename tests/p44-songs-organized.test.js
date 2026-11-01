@@ -1,4 +1,4 @@
-/* (3.82: the page's "Make it yours" panel went with the built-in songs, into Patterns — blocks play in your song's key; the engine's
+/* (3.86: the page's "Make it yours" panel went with the built-in songs, into Patterns — blocks play in your song's key; the engine's
  * key & tempo shift is still tested below.)
  * 3.44 — "can we sort and organize the songs by category?" · "add songs that show off and test the tools. the synthesis tools
  * are all new" · "make it bun dem … kind of higher and slower". Checks: every song sits on exactly one shelf and nothing falls

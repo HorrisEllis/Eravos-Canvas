@@ -211,3 +211,97 @@ describe('Wobble Bass · Keep in range (3.77 sound audit)', () => {
     assert.near(await subAt({ subOct: '0' }), 55, 0.05, 'in range: unchanged');
   });
 });
+
+// 4.0 FULL DEPTH — specs/eravos.tool-depth.spec D1. James, 2026-10-31: "tools should have more power, like wobble bass, full range of depth in all aspects."
+describe('Wobble Bass 4.0 · full depth (filter, envelope, growl, LFO 2, output)', () => {
+  const rig = (secs, params) => { const U = TH.universe(secs || 1), w = TH.spawn(U, 'eravos.wobble-bass'), c = OrganismFactory.handle(w).ctx; Object.keys(params || {}).forEach(k => c.params.set(k, params[k])); return { U, w, c }; };
+  // heard at the tool's own output (the master chain's compressor would even out what is measured)
+  const play = async (params, o) => { o = o || {}; const { U, c } = rig(o.secs || 1, Object.assign({ depth: 0, ampMod: 0 }, params)); c.internals.finalOut.disconnect(); c.internals.finalOut.connect(U.ctx.destination);
+    c.noteOn(o.note || 45, o.vel || 0.9, 0.05, { duration: o.dur || 0.8 }); return { buf: await TH.render(U), c }; };
+  // brightness: the first difference rises 6 dB an octave, so its share of the level grows with the highs
+  // (order 3: the third difference, +18 dB an octave — what sits far above the cutoff dominates)
+  const bright = (buf, from, to, order) => { let d = Array.from(buf.getChannelData(0).subarray(Math.floor(from * buf.sampleRate), Math.floor(to * buf.sampleRate))); const x = d.reduce((a, v) => a + v * v, 0);
+    for (let k = 0; k < (order || 1); k++) d = d.slice(1).map((v, i) => v - d[i]); return Math.sqrt(d.reduce((a, v) => a + v * v, 0) / (x + 1e-20)); };
+  // a crude band split: a moving average is the lows, the rest is the highs
+  const bands = (buf, from, to) => { const d = buf.getChannelData(0), sr = buf.sampleRate, s = Math.floor(from * sr), e = Math.floor(to * sr), N = Math.round(sr / 200); let acc = 0, lo = 0, hi = 0; const q = [];
+    for (let i = s; i < e; i++) { acc += d[i]; q.push(d[i]); if (q.length > N) acc -= q.shift(); const l = acc / q.length; lo += l * l; hi += (d[i] - l) * (d[i] - l); } return { lo: Math.sqrt(lo / (e - s)), hi: Math.sqrt(hi / (e - s)) }; };
+  const db = (a, b) => 20 * Math.log10((a + 1e-12) / (b + 1e-12));
+  it('the new controls start where the old sound is: after notes, every new path adds exactly nothing', async () => {
+    const { buf, c } = await play({}); const I = c.internals;
+    assert.ok(TH.rms(buf, 0.1, 0.8) > 0.01, 'it plays');
+    assert.equal(I.s24.gain.value, 1); assert.equal(I.s12.gain.value, 0); assert.equal(I.s36.gain.value, 0);
+    [I.keyBus, I.envBus, I.velBus].forEach(b => assert.equal(b.offset.value, 0, 'filter buses at 0'));
+    [I.l2Pitch, I.l2Cut, I.l2Vol, I.l2Fm, I.ringDepth, I.clWet].forEach(g => assert.equal(g.gain.value, 0, 'switched off'));
+    assert.equal(I.ringVca.gain.value, 1); assert.equal(I.extra.length, 0, 'no extra voices run');
+  });
+  it('filter types: high-pass takes the lows away, low-pass keeps them; slope 36 is darker than 12', async () => {
+    const base = { sub: 0, cutoff: 600, res: 1 };
+    const lp = bands((await play(Object.assign({ filterMode: 'lowpass' }, base))).buf, 0.2, 0.7), hp = bands((await play(Object.assign({ filterMode: 'highpass' }, base))).buf, 0.2, 0.7);
+    assert.gt(db(lp.lo / lp.hi, hp.lo / hp.hi), 6, 'HP has far less low end than LP');
+    // heard right after the filter: the grit after it would add its own highs back
+    const atFilter = async (sl) => { const { U, c } = rig(0.8, { depth: 0, ampMod: 0, cutoff: 400, res: 0.7, drive: 0, slope: sl }); c.internals.outNode.disconnect(); c.internals.lpOut.connect(U.ctx.destination); c.noteOn(45, 0.9, 0.05, { duration: 0.7 }); return TH.render(U); };
+    const b12 = await atFilter('12'), b36 = await atFilter('36'), s12 = bright(b12, 0.2, 0.7, 3), s36 = bright(b36, 0.2, 0.7, 3);
+    assert.gt(TH.rms(b36, 0.2, 0.7), 0.5 * TH.rms(b12, 0.2, 0.7), 'the 36 dB path plays (the fundamental passes at about the same level)');
+    assert.gt(db(s12, s36), 3, 'steeper = less above the cutoff');
+  });
+  it('a filter envelope opens the start of each note; velocity → cutoff darkens soft notes', async () => {
+    const F = { sub: 0, cutoff: 200, shaper: 0, drive: 0 };
+    const off = bright((await play(F)).buf, 0.06, 0.16), env = bright((await play(Object.assign({ fEnvAmt: 4, fEnvDecay: 0.6 }, F))).buf, 0.06, 0.16);
+    assert.gt(db(env, off), 3, 'brighter at the attack');
+    const V = { sub: 0, cutoff: 800, velCutoff: 1, shaper: 0, drive: 0 };
+    assert.gt(db(bright((await play(V, { vel: 1 })).buf, 0.2, 0.7), bright((await play(V, { vel: 0.3 })).buf, 0.2, 0.7)), 3, 'the soft note is darker');
+  });
+  it('ADSR: sustain 0.25 settles a held note near a quarter of its peak', async () => {
+    const full = (await play({ squash: 0 }, { dur: 0.9 })).buf, pl = (await play({ sustain: 0.25, decay: 0.05 }, { dur: 0.9 })).buf;
+    const r = TH.rms(pl, 0.5, 0.8) / TH.rms(full, 0.5, 0.8); assert.ok(r > 0.15 && r < 0.4, 'ratio ' + r.toFixed(3));
+  });
+  it('growl: FM ratios up to 8 + fine, ring mod, sub wave, 8 unison voices all change the sound', async () => {
+    const ref = TH.rms((await play({ fmIndex: 3 })).buf, 0.2, 0.7);
+    for (const p of [{ fmIndex: 3, fmRatio: '8' }, { fmIndex: 3, fmFine: 0.37 }, { ring: 1 }, { subWave: 'square', osc2: 0, cutoff: 40 }, { gritMode: 'crush', shaper: 1 }]) {
+      const b = (await play(Object.assign({ fmIndex: 3 }, p))).buf; let e = 0; const a = (await play({ fmIndex: 3 })).buf; const x = a.getChannelData(0), y = b.getChannelData(0);
+      for (let i = 0; i < x.length; i++) e += (x[i] - y[i]) ** 2; assert.gt(Math.sqrt(e / x.length), ref * 0.05, JSON.stringify(p) + ' makes no difference');
+    }
+    const { buf, c } = await play({ voices: '8', width: 1, spread: 20 }); assert.equal(c.internals.extra.length, 6, 'six extra saws');
+    const L = buf.getChannelData(0), R = buf.getChannelData(1); let side = 0, mid = 0; for (let i = 4800; i < 33600; i++) { side += (L[i] - R[i]) ** 2; mid += (L[i] + R[i]) ** 2; } assert.gt(side / mid, 0.02, 'wide');
+  });
+  it('LFO 2 moves its destination at its own rate; dotted rates and 1/64 run at their real speed', async () => {
+    const { U, c } = rig(0.3, { lfo2Dest: 'pitch', lfo2Depth: 0.5, lfo2Sync: true, lfo2Div: '1/4' }); await TH.render(U);
+    assert.near(c.internals.l2Pitch.gain.value, 600, 1, 'pitch ±600 c at depth 0.5'); assert.near(c.internals.lfo2.frequency.value, 2, 0.01, '1/4 at 120 BPM = 2 Hz');
+    // volume at 6 Hz: the level swings — the spread of 20 ms RMS windows grows a lot
+    const swing = (buf) => { const r = []; for (let t = 0.2; t < 0.78; t += 0.02) r.push(TH.rms(buf, t, t + 0.02)); return Math.max(...r) / Math.max(1e-9, Math.min(...r)); };
+    assert.gt(swing((await play({ lfo2Dest: 'volume', lfo2Depth: 1, lfo2Sync: false, lfo2Hz: 6 })).buf), 1.6 * swing((await play({})).buf), 'LFO 2 pulses the volume');
+    const { c: c2 } = rig(0.2, { div: '1/8.' }); c2.noteOn(45, 0.9, 0.05, { duration: 0.1 }); assert.near(c2.internals.lfo.frequency.value, 1 / MusicTheory.divisionSec('1/8.', 120), 0.01, 'dotted eighth');
+    const { c: c3 } = rig(0.2, { div: '1/64' }); c3.noteOn(45, 0.9, 0.05, { duration: 0.1 }); assert.near(c3.internals.lfo.frequency.value, 32, 0.01, '1/64 at 120 BPM = 32 Hz');
+  });
+  it('the clipper holds the ceiling', async () => {
+    const { buf } = await play({ level: 1.5, drive: 1, clipOn: true, ceiling: -6 }); assert.ok(TH.peak(buf, 0, 1) <= Math.pow(10, -6 / 20) + 1e-3, 'peak ' + TH.peak(buf, 0, 1));
+  });
+  it('the window keeps its face: the new depth sits behind "More depth", every control placed', () => {
+    const U = TH.universe(0.2), w = TH.spawn(U, 'eravos.wobble-bass'), host = document.createElement('div'); document.body.appendChild(host);
+    try { const v = OrganismFactory.mountUI(OrganismFactory.handle(w), host); assert.deepEqual(v.orphans, []); const box = host.querySelector('.wb-deep'); assert.ok(box && box.hidden, 'folded by default');
+      host.querySelector('.wb-deep-btn').click(); assert.ok(!box.hidden, 'opens'); assert.ok(box.querySelector('[data-key="lfo2Dest"]') && box.querySelector('[data-key="sustain"]'), 'its controls are there');
+    } finally { host.remove(); }
+  });
+  it('4.1 wavetable: off makes nothing; on, Position sweeps the timbre and the table changes it', async () => {
+    const { c } = await play({}); assert.equal(c.internals.wt.a, null, 'no wavetable oscillators until it is turned up');
+    const W = { wtMix: 1 };
+    // heard on the wavetable voice itself (the saws beside it never switch off)
+    const wtAlone = async (p) => { const { U, c } = rig(1, Object.assign({}, W, p)); c.internals.finalOut.disconnect(); c.internals.wt.mix.connect(U.ctx.destination); c.noteOn(45, 0.9, 0.05, { duration: 0.8 }); return TH.render(U); };
+    const p0 = bright(await wtAlone({ wtTable: 'growl', wtPos: 0 }), 0.2, 0.7), p1 = bright(await wtAlone({ wtTable: 'growl', wtPos: 1 }), 0.2, 0.7);
+    assert.gt(Math.abs(db(p1, p0)), 3, 'Position 0 → 1 changes the brightness');
+    const { c: c2 } = await play(Object.assign({ wtTable: 'digital', wtPos: 0.5 }, W)); assert.ok(c2.internals.wt.a && c2.internals.wt.k === 3, 'frames 3 and 4 crossfaded at 0.5');
+  });
+  it('4.1 comb + and − put peaks and notches where the cutoff says (they are opposite)', async () => {
+    const C = { cutoff: 440, res: 18, shaper: 0, gritMode: 'hard', drive: 0, sub: 0 };
+    const mag = (buf, f) => { const d = buf.getChannelData(0); let re = 0, im = 0; for (let i = 9600; i < 33600; i++) { const w = 2 * Math.PI * f * i / buf.sampleRate; re += d[i] * Math.cos(w); im += d[i] * Math.sin(w); } return Math.hypot(re, im); };
+    const pos = (await play(Object.assign({ filterMode: 'comb' }, C), { note: 57 })).buf, neg = (await play(Object.assign({ filterMode: 'comb-' }, C), { note: 57 })).buf;   // note 57 at octave −1 = 110 Hz: harmonic 4 = 440
+    assert.gt(db(mag(pos, 440), mag(neg, 440)), 6, 'comb + peaks at the cutoff, comb − cuts it');
+  });
+  it('4.1 mono below: the side under the frequency goes, the side above stays', async () => {
+    const side = (buf, lo) => { const L = buf.getChannelData(0), R = buf.getChannelData(1), N = Math.round(buf.sampleRate / 150); let acc = 0, q = [], e = 0, eh = 0;
+      for (let i = 9600; i < 33600; i++) { const sd = L[i] - R[i]; acc += sd; q.push(sd); if (q.length > N) acc -= q.shift(); const l = acc / q.length; e += l * l; eh += (sd - l) * (sd - l); } return lo ? e : eh; };
+    const S = { voices: '8', width: 1, spread: 25 }, wide = (await play(S)).buf, mono = (await play(Object.assign({ monoBelow: 300 }, S))).buf;
+    assert.gt(db(Math.sqrt(side(wide, true)), Math.sqrt(side(mono, true))), 10, 'low side mostly gone');
+    assert.lt(Math.abs(db(Math.sqrt(side(wide, false)), Math.sqrt(side(mono, false)))), 6, 'high side kept');
+  });
+});
