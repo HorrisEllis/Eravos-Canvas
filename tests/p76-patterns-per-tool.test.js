@@ -35,3 +35,22 @@ describe('♪ Patterns per tool on the Timeline (3.76)', () => {
     } finally { document.querySelectorAll('.tl-patp').forEach(e => e.remove()); OrganismFactory.close(tl); OrganismFactory.close(syn); }
   });
 });
+/* 3.85 — James, 2026-11-01, on the Patterns page: "can you clean up the pattern ui, sort it by tool instead? its overwhelming." */
+describe('🧩 Patterns page by tool (3.85)', () => {
+  it('opens on one tool, not the wall; the tools down the left; picking one shows only its patterns, by kind; the other filters fold away', () => {
+    try { localStorage.removeItem('eravos.patterns.page'); } catch (e) {}
+    if (document.querySelector('.plib')) PatternLibrary.open(); const pg = PatternLibrary.open(), ov = document.querySelector('.plib');
+    try {
+      const rail = [...ov.querySelectorAll('.plib-rt')]; assert.gt(rail.length, 5, 'a list of tools'); assert.ok(rail.some(b => b.dataset.tool === ''), 'and Every tool');
+      assert.ok(ov.querySelector('.plib-adv').hidden, 'the other filters are folded away'); assert.ok(ov.querySelector('.plib-fam').closest('[hidden]'), 'genre chips not on show');
+      const on = ov.querySelector('.plib-rt.on'); assert.ok(on && on.dataset.tool, 'one tool chosen');
+      const pick = rail.find(b => b.dataset.tool && b.dataset.tool !== on.dataset.tool); pick.click();
+      const id = pick.dataset.tool, want = PatternLibrary.all().filter(p => p.tool === id && p.type !== 'chain').length;
+      assert.ok(new RegExp('^' + want + ' shown').test(ov.querySelector('.plib-top-row .sbk-sub').textContent), 'only its ' + want + ' patterns');
+      assert.ok(ov.querySelector('.plib-tname').textContent.includes(OrganismFactory.def(id).label), 'its name on top');
+      const g = ov.querySelector('.plib-gsel'); assert.gt(g.options.length, 1, 'one genre menu');
+      ov.querySelector('.plib-morebtn').click(); assert.ok(!ov.querySelector('.plib-adv').hidden, '⚙ More filters opens them');
+      ov.querySelector('.plib-morebtn').click();
+    } finally { pg.close(); }
+  });
+});

@@ -40,7 +40,7 @@ describe('🧩 Pattern Library: one idea at a time, from every genre (3.71)', ()
   });
   it('the page: type and genre chips, a card per pattern, the type chip filters', () => {
     const pg = PatternLibrary.open(); try {
-      const ov = document.querySelector('.plib'); assert.ok(ov, 'open');
+      const ov = document.querySelector('.plib'); assert.ok(ov, 'open'); ov.querySelector('.plib-rt[data-tool=""]').click();   // 3.85: the every-tool view
       const cards = () => ov.querySelectorAll('.plib-card').length; assert.gt(cards(), 50);
       const chip = [...ov.querySelectorAll('.sbk-chip')].find(b => /Drops/.test(b.textContent)); chip.click();
       assert.ok([...ov.querySelectorAll('.plib-card small')].every(s => /Drops/.test(s.textContent)), 'only drops'); assert.ok(cards() >= 4);

@@ -514,3 +514,23 @@ html:not(.snd-off) .wm-win[data-react="changing"] .uk-canvas { filter: brightnes
 .rcp-drawn { font: 10px var(--mono); color: var(--dim); text-align: right; }
 .rcp-gpu { font: 10px var(--mono); color: var(--dim); background: none; border: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; padding: 0; }
 .rcp-gpu:hover { color: var(--text); }
+/* 3.85 Patterns by tool: the tools down the left, one tool's patterns on the right; the other filters fold away */
+.plib-body { display: grid; grid-template-columns: 220px minmax(0, 1fr); flex: 1; min-height: 0; }
+.plib-rail { overflow: auto; border-right: 1px solid var(--line); padding: 8px 6px 14px; display: flex; flex-direction: column; gap: 1px; }
+.plib-rg { font: 700 9.5px var(--mono); letter-spacing: 1.4px; text-transform: uppercase; color: var(--dim); padding: 10px 8px 4px; }
+.plib-rt { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 6px; align-items: center; text-align: left; background: none; border: 1px solid transparent; border-radius: 6px; color: var(--text); padding: 5px 8px; cursor: pointer; font: 12.5px var(--font); }
+.plib-rt:hover { background: var(--panel2); }
+.plib-rt.on { background: var(--panel2); border-color: var(--acc, #00d4ff); }
+.plib-ri { text-align: center; } .plib-rn { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .plib-rc { color: var(--dim); font: 11px var(--mono); }
+.plib-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.plib-top-row { padding: 10px 18px 6px; }
+.plib-top-row .sbk-q[type=search] { flex: 1; }
+.plib-toolhead { display: flex; align-items: center; gap: 10px; padding: 4px 18px 2px; min-width: 0; }
+.plib-toolhead[hidden], .plib-about[hidden], .plib-adv[hidden] { display: none; }
+.plib-tname { font-size: 15px; white-space: nowrap; }
+.plib-tdesc { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.plib-gsel { flex: none; }
+.plib-about { margin: 0; padding: 2px 18px 8px; color: var(--dim); font-size: 12.5px; }
+.plib-adv { border-top: 1px dashed var(--line); padding-bottom: 4px; }
+.plib-adv .sbk-row2 { padding: 6px 18px; }
+@media (max-width: 760px) { .plib-body { grid-template-columns: minmax(0, 1fr); } .plib-rail { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); } .plib-rg { display: none; } }

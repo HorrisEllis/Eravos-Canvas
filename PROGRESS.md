@@ -2,6 +2,27 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.85 🧩 The Patterns page by tool (2026-11-01)
+His words, on a screenshot of the page: "can you clean up the pattern ui, sort it by tool instead? its overwhelming."
+- The tools down the left (grouped Drums · Bass · Keys & pads · Leads · More, each with its count, plus Every tool). Pick one: only its
+  patterns, by kind (Kind chips show only the kinds it has), a line on the kind you pick, one genre menu (its genres only).
+- Opens on one tool — the one with the most patterns the first time, then the one you last picked — not the 2190-pattern wall.
+- Quick picks, genre families, BPM, sort, sections, fold all and clear fold away under ⚙ More filters (remembered). Nothing removed.
+- Cards on a tool's view say the preset, not the tool's name again.
+- Tests: p76 (+1: opens on one tool, rail, only its patterns, filters folded); p71, p73 open Every tool first (they test that view).
+
+## Done — 3.84 〰 Changing follows the sound, only the sound (2026-11-01)
+His words: "the colors for the knobs, sliders all the colors of each tool ui is supposed to be reactive, also the changing setting is
+supposed to change the color based on the sound."
+- Found: the tools' own colours already react since 3.83 (another session; seen here: knobs, keys, panels, displays). Changing did not
+  follow the sound: (1) a clock in it — a ±40° sine drift app-wide and ±45° per window, moving with nothing changing (tests/p84: the same
+  sound read 100 times drifted −68° → −16°); (2) each tool's brightness came from the byte spectrum, whose floor counts every empty bin,
+  so every tool read "bright": a low and a high note on Supersaw sat 24° apart.
+- Now: no clock. Each tool's turn is where its sound sits, weighted by energy, on the ear's scale (128 Hz → −150°, 4 kHz → +150°), plus
+  a kick on each hit; steps of 6°. Supersaw: a low note amber (−150°), a middle note cyan (−6°), a high note pink (+144°).
+- Measured (build/perf-ui.mjs): GPU layer Changing 25.5 → 34.2 fps (6° steps repeat colours more), Static 43.3.
+- Tests: tests/p84-changing-follows-sound.test.js (fails on the old code, passes now). P77, P83, P82, P73, P58 pass.
+
 ## Mapped — packs are full sound packs; tools get full depth (2026-10-31)
 His words: "no it should be a pack. like full packs, are packs of sounds for tools. like tools should should have more power, like
 wobble bass, full range of depth in all aspects." Packs: one pack of sounds across every tool it fits (genre-packs.spec, first section
