@@ -551,3 +551,8 @@ html[data-theme="dusk"] .gg-sec { background-image: linear-gradient(160deg, colo
 @media (prefers-reduced-motion: reduce) { html[data-theme="dusk"] .mo-dot { animation: none; } }
 /* 3.92 a line's curved version, on its card */
 .plib-curve.on { color: #fff; background: linear-gradient(110deg, var(--acc, #00d4ff), #b06bff); border-color: transparent; }
+/* 3.95 Light over the tools: OFF (the default) — no light laid over a tool; what already has colour reacts, and each window wears its
+   accent on its border and its title (the accent is what reacts, so both follow the sound). ON — the light over everything as before. */
+html[data-react-light="colour"][data-theme="dusk"] .wm-dusk { display: none; }
+html[data-react-light="colour"] .wm-win { border-color: color-mix(in srgb, var(--acc) 60%, #000); }
+html[data-react-light="colour"] .wm-title { background: none; -webkit-background-clip: border-box; background-clip: border-box; -webkit-text-fill-color: currentColor; color: var(--acc); animation: none; }

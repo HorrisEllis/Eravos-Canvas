@@ -35,7 +35,7 @@ describe('P77 · reactive colours: Off · Static · Changing · Custom', () => {
     } finally { OrganismFactory.close(id); SoundCSS.setMode(was === 'off' ? 'static' : was); }
   });
   it('3.80 the surfaces react too (background, grid, panels, chassis, lines, dim text) with the mix, toward the mode’s colour; back exactly in silence; Off leaves them', async () => {
-    host(); const K = Kernel; K.audio.boot(); await K.audio.ctx.resume(); SoundCSS.init(K); if (SoundCSS.setDraw) SoundCSS.setDraw('page');
+    host(); const K = Kernel; K.audio.boot(); await K.audio.ctx.resume(); SoundCSS.init(K); if (SoundCSS.setDraw) SoundCSS.setDraw('page'); if (SoundCSS.setLight) SoundCSS.setLight(true);
     const id = OrganismFactory.spawn('eravos.pad-forge', { x: 40, y: 40 }); await TH.sleep(60); const was = SoundCSS.mode, amt = SoundCSS.amount, R = document.documentElement;
     // at rest first (an earlier test's sound may still be lighting the page): Off puts every colour back
     SoundCSS.setMode('off'); const v = (k) => getComputedStyle(R).getPropertyValue(k).trim(), keys = Object.keys(SoundCSS.SURFACES), base = {}; keys.forEach(k => { base[k] = v(k); });
@@ -45,7 +45,7 @@ describe('P77 · reactive colours: Off · Static · Changing · Custom', () => {
       SoundCSS.setAmount(1); SoundCSS.setMode('changing'); await play();
       const moved = keys.filter(k => v(k) !== base[k]); assert.ok(moved.length >= keys.length - 1, 'surfaces moved: ' + moved.join(' '));
       SoundCSS.setMode('off'); keys.forEach(k => assert.equal(v(k), base[k], k + ' back exactly when switched off')); await play(); keys.forEach(k => assert.equal(v(k), base[k], k + ' Off leaves it'));
-    } finally { OrganismFactory.close(id); SoundCSS.setAmount(amt); SoundCSS.setMode(was === 'off' ? 'static' : was); }
+    } finally { OrganismFactory.close(id); SoundCSS.setAmount(amt); if (SoundCSS.setLight) SoundCSS.setLight(false); SoundCSS.setMode(was === 'off' ? 'static' : was); }
   });
   it('⋯ Options → Reactive colours opens the panel: four mode cards with live previews, Amount, and (Custom) your colours + palettes', async () => {
     const entry = document.getElementById('reactBtn'); if (!entry) return;   // the options slot exists only on the full canvas page

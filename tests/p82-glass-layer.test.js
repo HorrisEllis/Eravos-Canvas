@@ -25,7 +25,7 @@ describe('🔮 Glass layer: Looking Glass inside the canvas (3.82)', () => {
   // 3.83 James, 2026-11-01: "i want the colors in the tools to use the reactive colors" — in glass mode the page palette is still the
   // glass layer's (nothing written on <html>), but the windows' own colours now answer (they did not: only the overlay moved)
   it('Draw with GPU layer: the drums glow on the layer in their colour; the page palette is not written, the window\'s own colours answer', async () => {
-    host(); const K = Kernel; await K.audio.ctx.resume(); SoundCSS.init(K); const was = [SoundCSS.mode, SoundCSS.draw];
+    host(); const K = Kernel; await K.audio.ctx.resume(); SoundCSS.init(K); const was = [SoundCSS.mode, SoundCSS.draw]; if (SoundCSS.setLight) SoundCSS.setLight(false);
     SoundCSS.setMode('static'); SoundCSS.setDraw('glass'); await GLy().use('2d');
     const pads = OrganismFactory.spawn('eravos.pads', { x: 40, y: 40 }); await TH.sleep(40); const w = CanvasWM.windowOf(pads);
     let writes = 0; // a colour or a level written by the reactive colours (a tool's own animation, like a pad's --hit flash, is the tool's, not this)
@@ -41,7 +41,8 @@ describe('🔮 Glass layer: Looking Glass inside the canvas (3.82)', () => {
       assert.equal(writes, 0, 'no style written on the page: ' + seen.join(' | '));
       assert.gt(winWrites, 0, 'the window\'s own colours answer the drums');
       const L = GLy().layer('reactive'), e = L.items.get('win:' + pads); assert.ok(e, 'the drums have a glow'); assert.gt(e.def.intensity, 0.1, 'lit by their own sound');
-      assert.equal(e.def.anchor, w, 'placed on their window'); assert.ok(L.items.has('mix'), 'and the mix wash');
+      assert.equal(e.def.anchor, w, 'placed on their window'); assert.ok(!L.items.has('mix'), 'no wash: only what has colour (3.95)'); assert.equal(e.def.fill, 0, 'nothing laid over the controls');
+      SoundCSS.setLight(true); SoundCSS.step(); assert.ok(GLy().layer('reactive').items.has('mix'), 'Light over the tools: the wash'); SoundCSS.setLight(false);
       SoundCSS.setDraw('page'); assert.ok(!GLy().has('reactive'), 'Page: the layer is gone');
       SoundCSS.setDraw('glass'); SoundCSS.setMode('off'); assert.ok(!GLy().has('reactive'), 'Off: nothing on the layer');
     } finally { mo.disconnect(); OrganismFactory.close(pads); SoundCSS.setMode(was[0] === 'off' ? 'static' : was[0]); SoundCSS.setDraw(was[1]); }

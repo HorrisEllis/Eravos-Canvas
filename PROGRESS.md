@@ -2,6 +2,21 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.95 💡 Light over the tools: a setting, off by default (2026-11-01)
+His words: "i dont want the layer of light over the tools, only the buttons, knobs, anything that already has color, make that an option
+in the settings. accent around the border and the font is colored like the rest of the ui and tools" · "show me previews. all the color in
+eravos can be animated".
+- ⋯ Options › Reactive colours › Light: "Only what has colour" (default) · "Light over the tools too" (remembered).
+- Only what has colour: buttons, knobs, keys, displays and accents react; a dark surface or a grey keeps its own (3.83's 12 %/30 % leans
+  are off); no glass wash, no light inside a window (the glow is the edge only); the surfaces (backgrounds, panels, lines) do not lean;
+  Dusk's window sky is hidden. Each window wears its accent on its border and its title — the accent reacts, so both follow the sound.
+- Light over the tools too: everything as 3.80–3.83 had it.
+- Preview: a side-by-side recording of both, Changing, a lead climbing, Wobble Bass and drums (sent to him).
+- Mistake, third time today: a comment placed mid-line swallowed code (surfaces' tint). Caught by P77/P82; from now every inserted
+  comment goes on its own line.
+- Tests: p84 +1 (default: accent title and border, attribute); p82 (no wash by default, wash with the setting); p77 and p83 run their
+  every-colour checks with Light over the tools on.
+
 ## Done — 3.94 Branches merged · Dusk at four times the frame rate, same look (2026-11-01)
 His words: "Do it. Merge any branched. Get the newest version. The reactive color".
 - Merged: claude/modest-dijkstra-sqa0gg (3.93 the piano roll opens on your notes) into main; every branch is now in main. Reactive
