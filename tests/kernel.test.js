@@ -66,6 +66,14 @@ describe('music domain on kernel 3.2 — ports, wires, master chain, contract', 
     const r = K.wires.register({ src: { instanceId: 'a', hookId: 'mod' }, dst: { instanceId: 'b', hookId: 'p' } });
     assert.ok(r.ok); assert.equal(K.audio.modScaler(r.wire_id).gain.value, 2);
   });
+  it('3.89 a tool closing stays readable until it is gone: listeners woken by its rollback read it without MUTATION_001', () => {
+    const { K } = TH.universe(0.2); org(K, 'a'); org(K, 'b');
+    const val = { gain: 0.5 }; K.registry.bindParamReader('a', (k) => val[k]);
+    K.mutations.apply('a', { target: 'a', operation: 'set_config', payload: { gain: 0.9 } });
+    let reads = 0; K.bus.subscribe('ui:config_change:a', () => { reads++; K.registry.readParam('kernel', 'a', 'gain'); }, 'test');
+    const n0 = K.faults.list('MUTATION_001').length; K.registry.unregister('a');
+    assert.gt(reads, 0, 'the rollback woke a listener'); assert.equal(K.faults.list('MUTATION_001').length, n0, 'and its read of the closing tool did not fail');
+  });
   it('unregister → zero ports, zero wires, upstream on master', () => {
     const { K } = TH.universe(0.2);
     org(K, 'a'); org(K, 'b');

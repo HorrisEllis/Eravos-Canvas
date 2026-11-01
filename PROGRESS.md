@@ -2,6 +2,14 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.89 The flood behind the problems log, fixed at its cause (2026-11-01)
+His words, on a screenshot: "this needs a way to close it. its stuck right now" — a wall of "That item doesn't exist any more" ·
+MUTATION_001 readParam: reese-bass-3-k07 not found. (The other session's 3.87 made the log close and fold repeats; this is why it filled.)
+- Closing a tool removed its param reader, then rolled back its changes, then removed its record. The rollback wakes listeners (the
+  Timeline lists every knob of its tracks' tools): in between, the tool looked present but could not be read — one fault per knob, per
+  listener. The kernel now rolls back first; the reader and the record go together.
+- tests/kernel.test.js: a listener woken by the rollback reads the closing tool — fails on the old order, passes now.
+
 ## Done — 3.88 A painting for every tool: the ＋ Add cards and the tool pages (2026-11-01)
 Asked: "make more artwork like this. for each thumbnail" · "what about the catalogs and tool pages" · "first the cards".
 - 69 tools, each a small animated painting of what it does (build/tool-art.py): an anvil and sparks for the forges, a storm for the

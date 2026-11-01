@@ -237,8 +237,11 @@
         K.wires.list().filter(w => w.src.instanceId === instanceId || w.dst.instanceId === instanceId)
           .forEach(w => K.wires.remove(w.wire_id, 'organism_unmounted'));
         K.ports.removeAll(instanceId);
-        paramReaders.delete(instanceId);
         K.mutations.rollbackFor(instanceId);
+        // 3.89: the reader and the record go together. The rollback above wakes listeners (one that lists every param of the
+        // organisms it uses); between the reader going and the record going, the organism looked present but unreadable — one
+        // MUTATION_001 per param, per listener (his screenshot: a wall of "readParam: … not found").
+        paramReaders.delete(instanceId);
         registry.delete(instanceId);
         (rec.descriptor.provides || []).forEach(c => delCap(c, instanceId));
         bus.publish('kernel:organism-unmounted', { instanceId, organismId: rec.organism_id, reason: reason || 'unmount' });
