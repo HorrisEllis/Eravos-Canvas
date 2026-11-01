@@ -115,6 +115,16 @@
     pub('clip_add', Object.assign({ kind: 'notes', lane: lane.id, startBar: bar, bars: o.bars || p.bars, name: p.name, notes }, o.loop ? { loop: o.loop } : {}));
     return { tl, lane, tool: lane.target, bar };
   }
+  // ---- 3.89 ✎ Edit notes — James: "the per note editing with the timeline, why not utilize that for the patterns": the pattern goes to the
+  //      Timeline (as → Timeline does) and opens in its piano roll, where each note has its own knobs, bend and curves
+  function edit(p, o) {
+    o = o || {}; const K = o.K || global.Kernel, r = send(p, o); if (!r || p.type === 'chain') return r;
+    const T = F().handle(r.tl); if (!T) return r;
+    const clip = T.ctx.internals.clips.find(c => c.kind === 'notes' && r.lane && c.lane === r.lane.id && Math.abs(c.startBar - r.bar) < 1e-6);
+    K.bus.publish('canvas:focus-request', { instanceId: r.tl });
+    if (clip) { const open = () => T.view && T.view.openClip && T.view.openClip(clip.id); if (!open()) setTimeout(open, 60); }
+    return Object.assign({ clip: clip ? clip.id : null }, r);
+  }
   // ---- ▶ hear it: rendered in its own offline universe (nothing on the canvas changes), kept for the session
   const sounds = new Map(); let playing = null;
   async function render(p) {
@@ -259,11 +269,13 @@
       hear.onclick = async () => { if (playing && playing.id === p.id) { stop(); return; } hear.textContent = '…'; const ok = await play(p, () => { hear.textContent = '▶'; }); hear.textContent = ok ? '■' : '▶'; if (ok === null) status.textContent = 'no sound came out of “' + p.name + '”'; };
       const sendB = h('button', { class: 'sbk-alt sm', text: '→ Timeline', title: !!p.curve ? 'adds this curve to the track that plays this kind of tool (or a new track with it)' : 'adds it after what is on the track that plays this kind of tool (or a new track with it), in your song’s key' });
       sendB.onclick = () => { const r = send(p); status.textContent = r ? '“' + p.name + '” → the Timeline, bar ' + r.bar : 'could not send it'; };
+      const editB = !p.notes ? null : h('button', { class: 'sbk-alt sm', text: '✎ Edit notes', title: 'put it on the Timeline and open it in the piano roll: change any note, and give each note its own knobs, bend and curves' });
+      if (editB) editB.onclick = () => { const r = edit(p); if (r) close(); else status.textContent = 'could not open it'; };
       const star = h('button', { class: 'plib-star' + (favs.has(p.id) ? ' on' : ''), text: favs.has(p.id) ? '★' : '☆', title: 'keep it in ★ Favourites', 'aria-label': 'favourite' });
       star.onclick = () => { tog(favs, p.id); store.set({ favs: [...favs] }); star.classList.toggle('on', favs.has(p.id)); star.textContent = favs.has(p.id) ? '★' : '☆'; if (pick.fav) paint(); };
       return h('div', { class: 'plib-card', style: { '--acc': p.type === 'drop' ? '#ff2266' : !!p.curve ? '#ffd24a' : '#00d4ff' } }, [
         h('div', { class: 'plib-top' }, [h('b', { text: p.song ? p.name.slice(p.song.title.length + 3) : p.name }), star]), p.song ? h('small', { class: 'plib-song', text: '♪ ' + p.song.title }) : null, h('small', { text: typeLabel(p.type) + ' · ' + p.genreLabel + ' · ' + p.bars + (p.bars > 1 ? ' bars' : ' bar') + ' · ' + p.bpm + ' BPM' }),
-        cv, h('div', { class: 'plib-actions' }, [hear, sendB, h('span', { class: 'plib-tool', text: pick.tool ? (p.preset || '') : ((F().def(p.tool) || {}).label || p.tool) + (p.preset ? ' · ' + p.preset : '') })])]);
+        cv, h('div', { class: 'plib-actions' }, [hear, sendB].concat(editB ? [editB] : []).concat([h('span', { class: 'plib-tool', text: pick.tool ? (p.preset || '') : ((F().def(p.tool) || {}).label || p.tool) + (p.preset ? ' · ' + p.preset : '') })]))]);
     }
     function paint() {
       // 3.85 the tools, each with how many of its patterns match what else is picked; grouped by what they are
@@ -387,5 +399,5 @@
   }
   // tests: the page as on a fresh start (nothing picked, no tool chosen yet)
   function forget() { pick.types.clear(); pick.genres.clear(); Object.assign(pick, { fav: false, q: '', lo: '', hi: '', sort: 'genre', group: 'type', tool: null }); }
-  global.PatternLibrary = { forTool, kindsFor, about: ABOUT, draw: drawCard, forget, addTransform: (fn) => { if (typeof fn === 'function') { transforms.push(fn); LIB = null; } }, addSource: (fn) => { if (typeof fn === 'function') { sources.push(fn); LIB = null; } }, all, types: TYPES.map(t => ({ id: t[0], label: t[1] })), get: (id) => all().find(p => p.id === id) || null, send, render, play, stop, open, rebuild: () => { LIB = null; return all(); }, fromGenre, families: FAMILIES.map(f => ({ id: f[0], label: f[1] })), familyOf, matches };
+  global.PatternLibrary = { forTool, kindsFor, about: ABOUT, draw: drawCard, forget, edit, addTransform: (fn) => { if (typeof fn === 'function') { transforms.push(fn); LIB = null; } }, addSource: (fn) => { if (typeof fn === 'function') { sources.push(fn); LIB = null; } }, all, types: TYPES.map(t => ({ id: t[0], label: t[1] })), get: (id) => all().find(p => p.id === id) || null, send, render, play, stop, open, rebuild: () => { LIB = null; return all(); }, fromGenre, families: FAMILIES.map(f => ({ id: f[0], label: f[1] })), familyOf, matches };
 })(typeof window !== 'undefined' ? window : globalThis);

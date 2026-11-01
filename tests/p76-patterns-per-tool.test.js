@@ -54,3 +54,24 @@ describe('🧩 Patterns page by tool (3.85)', () => {
     } finally { pg.close(); }
   });
 });
+/* 3.89 — James, 2026-11-01: "the per note editing with the timeline, why not utilize that for the patterns." */
+describe('✎ A pattern opens in the piano roll (3.89)', () => {
+  function host() { const h = document.getElementById('wmhost'); if (!CanvasWM.world) { CanvasWM.init(h, Kernel); WireSystem.init(Kernel); OrganismFactory.boot(Kernel); } Kernel.audio.boot(); }
+  it('Edit notes: the pattern lands on the Timeline and its clip is open in the piano roll, where its notes can carry their own knobs', async () => {
+    host(); const tl = OrganismFactory.spawn('eravos.timeline', { x: 10, y: 10 }); await TH.sleep(40);
+    const p = PatternLibrary.all().find(x => x.type === 'bass' && x.notes && x.notes.length > 2);
+    let made = [];
+    try {
+      const before = new Set(Kernel.registry.list().map(r => r.instance_id));
+      const r = PatternLibrary.edit(p); made = Kernel.registry.list().map(r => r.instance_id).filter(id => !before.has(id));
+      assert.ok(r && r.clip, 'a clip on the Timeline'); await TH.sleep(120);
+      const H = OrganismFactory.handle(tl), grid = H.view.root.querySelector('canvas[aria-label^="Note grid"]');
+      assert.ok(grid && grid.offsetParent, 'the piano roll is open');
+      assert.ok(/note/i.test(H.view.root.textContent) && H.view.root.textContent.includes(p.name.split(' · ')[0]), 'on that pattern');
+      const c = H.ctx.internals.clips.find(x => x.id === r.clip); assert.equal(c.notes.length, p.notes.length, 'all its notes');
+      const knob = (OrganismFactory.def(p.tool).config || []).find(k => k.type === 'number').key;   // any of the tool's knobs
+      Kernel.bus.publish('ui:clip_edit:' + tl, { id: c.id, patch: { notes: c.notes.map((n, i) => i === 1 ? Object.assign({}, n, { p: { [knob]: 0.5 } }) : n) } });
+      await TH.sleep(20); assert.ok(H.ctx.internals.clips.find(x => x.id === c.id).notes.some(n => n.p), 'a note can carry its own knob');
+    } finally { OrganismFactory.close(tl); made.forEach(id => { try { OrganismFactory.close(id); } catch (e) {} }); }
+  });
+});

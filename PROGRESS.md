@@ -2,6 +2,15 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.89b ✎ A pattern opens in the piano roll (2026-11-01)
+His words: "the per note editing with the timeline, why not utilize that for the patterns. it also doesn't seem to work. per notes."
+- Patterns › ✎ Edit notes (every card with notes): the pattern goes on the Timeline, the Timeline comes forward and the clip opens in its
+  piano roll — click a note there for its own knobs, bend and curves. Timeline view.openClip(id); PatternLibrary.edit(p).
+- "doesn't seem to work", checked in the real app on Dubstep #77: playback applies a note's own knob (Supersaw cutoff 7000 → 300 for that
+  note only, then back); clicking a note opens its editor (Start, Length, Pitch, Velocity, Bend, then the tool's knobs). Not yet found
+  what failed for him: the editor sits in a short strip under the grid and the tool's knobs are below its fold. Asked.
+- Tests: p76 +1 (Edit notes opens that clip in the piano roll; a note carries its own knob).
+
 ## Done — 3.89 The flood behind the problems log, fixed at its cause (2026-11-01)
 His words, on a screenshot: "this needs a way to close it. its stuck right now" — a wall of "That item doesn't exist any more" ·
 MUTATION_001 readParam: reese-bass-3-k07 not found. (The other session's 3.87 made the log close and fold repeats; this is why it filled.)
