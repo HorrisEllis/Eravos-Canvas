@@ -140,6 +140,7 @@
     const gridCol = h('div', { class: 'tlpr-gridcol' }, [ruler, cv, vel]);
     const editor = h('div', { class: 'tlpr-edit', role: 'dialog', 'aria-label': 'note fields' });
     const scroll = h('div', { class: 'tlpr-scroll' }, [keyCol, gridCol]);
+    let userScrolled = false, centreRO = null, centreNow = () => {};   // 3.93 the roll keeps its notes in view until you scroll it
     const main = h('div', { class: 'tlpr-main' }, [scroll, editor]);   // 3.58 the note inspector docks beside the notes
     const el = h('div', { class: 'tlpr' }, [bar, main]);
 
@@ -973,7 +974,13 @@
       if (bars.set) bars.set(c.bars);
       el.classList.add('open'); drawKeys(); draw();
       // 3.59: an empty bass track opens down where basses live
-      if (first) requestAnimationFrame(() => { if (drums) { scroll.scrollTop = 0; scroll.scrollLeft = 0; return; } const ps = notes.map(n => n.n); const tl0 = ln && toolsAll[ln.target], low = tl0 && /bass|sub|wub|reese|808/i.test(tl0.id + ' ' + tl0.label + ' ' + tl0.category); const mid = ps.length ? ps.reduce((a, b) => a + b, 0) / ps.length : (low ? 36 : 60) + key.root; scroll.scrollTop = Math.max(0, yOf(Math.round(mid)) - scroll.clientHeight / 2); scroll.scrollLeft = 0; });
+      // 3.93 the notes in view: centred on them when it opens AND again whenever the roll changes size (it opened as a sliver, centred
+      // on nothing, and a bass line sat out of sight under C3 — "editing per note on the timeline isn't working") — until you scroll it yourself
+      const centre = () => { if (drums) { scroll.scrollTop = 0; scroll.scrollLeft = 0; return; } const ps = notes.map(n => n.n); const tl0 = ln && toolsAll[ln.target], low = tl0 && /bass|sub|wub|reese|808/i.test(tl0.id + ' ' + tl0.label + ' ' + tl0.category); const mid = ps.length ? ps.reduce((a, b) => a + b, 0) / ps.length : (low ? 36 : 60) + key.root; scroll.scrollTop = Math.max(0, yOf(Math.round(mid)) - scroll.clientHeight / 2); };
+      if (first) { userScrolled = false; requestAnimationFrame(() => { centre(); scroll.scrollLeft = 0; }); }
+      if (!centreRO && 'ResizeObserver' in window) { centreRO = new ResizeObserver(() => { if (!userScrolled) centreNow(); }); centreRO.observe(scroll);
+        ['wheel', 'pointerdown', 'keydown'].forEach(t => scroll.addEventListener(t, () => { userScrolled = true; }, { passive: true })); }
+      centreNow = centre;
     }
     function hide() { setFull(false); clip = null; openedId = null; closeEditor(); setStep(false); el.classList.remove('open'); }
     function playhead(barPos) { if (!clip) return; const p = barPos === null ? null : (barPos - clip.startBar) * 16; if (p !== playStep) { playStep = p; draw(); } }

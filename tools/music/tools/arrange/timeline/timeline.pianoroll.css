@@ -80,3 +80,5 @@ select.tlpr-toolsel, .tlpr-toolsel select { font-weight: 600; color: var(--tool-
 .tl-patp-txt { display: flex; flex-direction: column; min-width: 0; } .tl-patp-txt span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .tl-patp-txt small { color: var(--dim, #8aa0b8); font-size: 10.5px; }
 .tl-patp-foot { display: flex; align-items: center; justify-content: space-between; } .tl-patp-said { color: var(--dim, #8aa0b8); font-size: 11px; }
 .tl-patp-genre { width: 100%; font-size: 11.5px; } .tl-patp-g { font: 700 10px var(--mono, monospace); letter-spacing: 1.2px; text-transform: uppercase; color: var(--dim, #8aa0b8); margin-top: 2px; }
+/* 3.93 the roll is never a sliver: it opened one row high in a normal Timeline window (the body scrolls instead) */
+.tlpr:not(.tlpr-full) { min-height: 320px; }
