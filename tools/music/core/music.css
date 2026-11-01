@@ -506,3 +506,11 @@ html:not(.snd-off) .tb-btn.primary, html:not(.snd-off) #logo { filter: drop-shad
 .rcp-entry-m.rcp-m-static { color: var(--cyan); } .rcp-entry-m.rcp-m-changing { color: #fff; background: linear-gradient(90deg, var(--pink), var(--amber), var(--green), var(--cyan)); text-shadow: 0 1px 2px #000; } .rcp-entry-m.rcp-m-custom { color: var(--violet); }
 /* Changing: drawn displays turn their hues with the sound too (by how much this window is sounding) */
 html:not(.snd-off) .wm-win[data-react="changing"] .uk-canvas { filter: brightness(calc(1 + var(--lvl) * .35)) saturate(calc(1 + var(--lvl) * .3)) hue-rotate(calc(var(--win-shift, 0deg) * var(--lvl))); }   /* each tool turns by its own sound */
+/* 3.82 Reactive colours › Draw with (GPU layer · Page) */
+.rcp-draw { display: grid; grid-template-columns: 70px auto 1fr; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 4px; border: 1px solid #000; background: var(--well, #06080b); }
+.rcp-drawb { display: flex; gap: 4px; }
+.rcp-dbtn { font: 700 10px var(--mono); letter-spacing: 1.2px; text-transform: uppercase; padding: 6px 10px; border-radius: 3px; border: 1px solid #000; background: var(--chassis2, #121a23); color: var(--dim); cursor: pointer; box-shadow: 0 0 0 1px var(--line2) inset; }
+.rcp-dbtn.on { color: var(--text); box-shadow: 0 0 0 1px var(--acc, #00d4ff) inset, 0 0 10px color-mix(in srgb, var(--acc, #00d4ff) 35%, transparent); }
+.rcp-drawn { font: 10px var(--mono); color: var(--dim); text-align: right; }
+.rcp-gpu { font: 10px var(--mono); color: var(--dim); background: none; border: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; padding: 0; }
+.rcp-gpu:hover { color: var(--text); }

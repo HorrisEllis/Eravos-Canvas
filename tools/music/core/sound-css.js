@@ -23,7 +23,12 @@
  * tools, ui, anywhere": the SURFACES react too — the page and canvas background, its grid, panels, a tool's chassis and wells, every
  * line and the dim text (SURFACES below). With the mix they lean toward the mode's colour now — Changing: the colour travelling
  * round the wheel; Static: the accent; Custom: your low / top colours by where the sound sits, flashing toward your hit colour —
- * each by its own share (a line more than a background), and come back exactly in silence or when switched off. */
+ * each by its own share (a line more than a background), and come back exactly in silence or when switched off.
+ * 3.82 DRAW WITH (his words: "move to main. get to step 2" — Looking Glass inside the canvas, specs/eravos.2026-10-22-brainstorm.map.spec
+ * addendum 2026-10-31): 'glass' (default where it runs) — the same modes and colours, but drawn by the GPU on a Looking Glass layer over
+ * the page (canvas/runtime/glass-layer.js): the mix tints everything under it (a 'wash'), each sounding window lights its edge and halo
+ * in its own colour (a 'glow'). Nothing on the page is written while it plays, so nothing is restyled. 'page' — 3.80 as it was: the
+ * colour variables themselves move (every accent, pad and surface by its own share). */
 (function (global) {
   'use strict';
   const doc = global.document; if (!doc) return;
@@ -52,7 +57,9 @@
     const hx = (v) => Math.round(clamp(v + M, 0, 1) * 255).toString(16).padStart(2, '0'); return '#' + hx(a) + hx(bb) + hx(cc);
   }
   // ---- 3.77 modes: how a colour answers the sound (k 0…1 already scaled by Amount)
-  const MODES = ['off', 'static', 'changing', 'custom'];
+  const MODES = ['off', 'static', 'changing', 'custom'], DRAWS = ['glass', 'page'];
+  let draw = 'glass'; try { const d = global.localStorage.getItem('eravos.reactive.draw'); if (DRAWS.includes(d)) draw = d; } catch (e) {}
+  const GL = () => global.GlassLayer, glass = () => draw === 'glass' && !!GL();
   let mode = 'static', amt = 0.8, custom = { low: '#ff2266', high: '#00d4ff', hit: '#ffffff' }, shift = 0, drift = 0;
   try {
     const L = global.localStorage, m = L.getItem('eravos.reactive.mode');
@@ -141,7 +148,7 @@
     ['--snd-low', '--snd-high', '--snd-level', '--snd-pulse'].forEach(k => set(k, '0')); doc.querySelectorAll('.wm-win[style*="--tool-level"]').forEach(w => { w.style.setProperty('--tool-level', '0'); w._lvS = '0.00'; });
     PALETTE.concat(Object.keys(SURFACES)).forEach(k => { root.style.removeProperty(k); delete rootV[k]; }); lastPal = -1e9;
     Array.from(live).forEach(unlight); live.clear(); set('--snd-shift', '0deg');
-    writing = w0;
+    writing = w0; glassRest();
   }
   function ensure() {
     if (an || !K || !K.audio || !K.audio.ctx || !K.audio.output) return !!an;
@@ -164,6 +171,8 @@
     // the app is Off: only windows with their own reactive setting (⚙ → Reactive colours) still answer — looked for once a second
     if (!on) { if (ts - ownScan > 1000) { ownScan = ts; ownAny = Array.from(doc.querySelectorAll('.wm-win')).some(w => { const x = settingsOf(w); return x.own && x.mode !== 'off'; }); } if (!ownAny) return; }
     last = ts; writing = ts - lastW >= WRITE_MS; if (writing) lastW = ts;
+    const G2 = glass(); if (G2) writing = false;   // 3.82 drawn on the glass layer: the page is not written at all
+    const lit = G2 ? [] : null;
     if (!ensure()) return;
     an.getFloatFrequencyData(db);
     const hz = K.audio.ctx.sampleRate / an.fftSize; let lo = 0, nl = 0, hi = 0, nh = 0, all = 0, cen = 0;
@@ -182,6 +191,7 @@
     // the app's accents: the mix lights them, each hit flashes them
     if (!base) { const cs = global.getComputedStyle(root); base = {}; PALETTE.concat(Object.keys(SURFACES)).forEach(k => { base[k] = cs.getPropertyValue(k).trim(); }); }
     const kMix = q(clamp((level * 0.55 + pulse * 0.5) * amt * 1.25, 0, 1), 20); if (on && ts - lastPal >= 100) { lastPal = ts; PALETTE.forEach(k => { if (base[k]) set(k, colourFor(base[k], kMix, G())); }); surfaces(kMix); }
+    if (G2 && on) glassMix(kMix);
     // a tool shown on its page (or a suite's page) lights with the mix
     if (on) doc.querySelectorAll('.tp-overlay').forEach(o => { light(o, kMix, G()); accented(o, ts).forEach(el => light(el, kMix, G())); });
     if (Math.random() < 0.02) taps.forEach((t, id) => { if (!t.win || !t.win.isConnected) { try { if (t.node && t.an) t.node.disconnect(t.an); } catch (e) {} taps.delete(id); } });   // closed windows let go
@@ -207,6 +217,7 @@
         w._shift = q(clamp((t.hue - 0.5) * 220 + Math.sin(t.ph) * 45 + t.pu * 40, -160, 160) * o.amt, 0.25); if (writing && w._shS !== w._shift) { w._shS = w._shift; w.style.setProperty('--win-shift', w._shift.toFixed(0) + 'deg'); }
       }
       o.shift = w._shift || 0; o.pulse = t.pu || 0;
+      if (lit) lit.push([w, t.lv, o]);
       if (t.lv > 0.02) liveAcc(w, t.lv, ts, o); else restoreAcc(w);
     });
     if (quiet.length) {
@@ -220,13 +231,31 @@
         const dst = wires.filter(x => x.src && x.src.instanceId === id).map(x => CanvasWin(x.dst.instanceId)).find(x => x && x._shift !== undefined);
         if (o.mode === 'changing') { w._ph = (w._ph === undefined ? (hashOf(id) % 628) / 100 : w._ph + 0.012); w._shift = dst ? dst._shift : clamp((hue - 225) * 0.8 + Math.sin(w._ph) * 50 + pulse * 30, -160, 160) * o.amt; if (writing) w.style.setProperty('--win-shift', w._shift.toFixed(1) + 'deg'); }
         o.shift = w._shift || 0;
+        if (lit) lit.push([w, lv, o]);
         if (lv > 0.02) liveAcc(w, lv, ts, o); else restoreAcc(w);
       });
     }
+    if (lit) glassWindows(lit);
   }
+  // ---- 3.82 the glass layer: one wash for the mix, one glow per window. Same colours as the page way (colourFor, tintNow).
+  const accBase = (w) => (w._cb && w._cb['--acc']) || w.dataset.acc0 || w.style.getPropertyValue('--acc').trim() || (base && base['--acc']) || '#00d4ff';
+  function glassMix(kMix) {
+    const L = GL().layer('reactive', { depth: 99990 });
+    GL().vars.set('react.tint', tintNow()); GL().vars.set('react.mix', +(kMix * 0.2).toFixed(3));   // the surfaces' shares in the page way are 10–16 %; a wash over text needs a touch more
+    if (!L.items.has('mix')) L.set('mix', { type: 'wash', color: { var: 'react.tint' }, alpha: { var: 'react.mix' } });
+  }
+  const glowed = new Set();
+  function glassWindows(list) {
+    const L = GL().layer('reactive', { depth: 99990 }), seen = new Set();
+    list.forEach(([w, lv, o]) => { const id = 'win:' + (w.dataset.instance || ''); seen.add(id);
+      const k = o.mode === 'off' ? 0 : clamp((lv * 0.85 + (o.pulse || 0) * 0.25 * lv) * o.amt * 1.25, 0, 1);
+      L.set(id, { type: 'glow', anchor: w, color: colourFor(accBase(w), k * 0.45, o), intensity: +Math.min(1, 0.15 + k * 1.3).toFixed(3) * (k > 0.02 ? 1 : 0), radius: 6, spread: 18 + 34 * k, fill: 0.035 }); });   // the tool's own hue, only a little lit (lit fully, it washes to white)
+    glowed.forEach(id => { if (!seen.has(id)) L.remove(id); }); glowed.clear(); seen.forEach(id => glowed.add(id));
+  }
+  function glassRest() { const G0 = GL(); if (G0 && G0.has('reactive')) G0.layer('reactive').clear(); glowed.clear(); }
   const listeners = [];
   const fire = () => listeners.forEach(fn => { try { fn(SoundCSS); } catch (e) {} });
-  function save() { try { const L = global.localStorage; L.setItem('eravos.reactive', on ? '1' : '0'); L.setItem('eravos.reactive.mode', mode); L.setItem('eravos.reactive.amount', String(amt)); L.setItem('eravos.reactive.colors', JSON.stringify(custom)); } catch (e) {} }
+  function save() { try { const L = global.localStorage; L.setItem('eravos.reactive', on ? '1' : '0'); L.setItem('eravos.reactive.mode', mode); L.setItem('eravos.reactive.amount', String(amt)); L.setItem('eravos.reactive.colors', JSON.stringify(custom)); L.setItem('eravos.reactive.draw', draw); } catch (e) {} }
   const SoundCSS = {
     init(kernel) { K = kernel; if (!raf) raf = global.requestAnimationFrame(frame); root.classList.toggle('snd-off', !on); root.dataset.react = mode; return SoundCSS; },
     get on() { return on; },
@@ -234,6 +263,8 @@
     get mode() { return mode; }, get amount() { return amt; }, get colors() { return Object.assign({}, custom); }, MODES,
     setMode(m) { if (!MODES.includes(m)) return; mode = m; on = m !== 'off'; ownScan = -1e9; save(); root.classList.toggle('snd-off', !on); root.dataset.react = m; zero(); fire(); },
     rescan() { ownScan = -1e9; },
+    get draw() { return draw; }, DRAWS, get renderer() { return GL() ? GL().renderer : null; },
+    setDraw(d) { if (!DRAWS.includes(d) || d === draw) return; draw = d; save(); zero(); fire(); },   // 3.82 glass · page
     setAmount(a) { amt = clamp(+a || 0, 0, 1); save(); fire(); },
     setColors(c) { custom = Object.assign({}, custom, c || {}); save(); fire(); },
     onChange(fn) { listeners.push(fn); },
