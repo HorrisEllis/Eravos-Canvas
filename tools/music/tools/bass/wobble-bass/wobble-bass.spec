@@ -210,3 +210,31 @@ factory pack (songs that listed one as an alternative use their others). The eng
 rate glide, fold grit) stay; their tests now use a plain dancehall growl patch.
 
 # ---- 3.77 keepRange (default on): the sub never under 30 Hz, the note never under 25 Hz (lifted by octaves); off = as before.
+
+## ADDENDUM 2026-10-31 — 4.0 FULL DEPTH (specs/eravos.tool-depth.spec D1)
+  James, 2026-10-31: "tools should should have more power, like wobble bass, full range of depth in all aspects."
+  Added (every one starts where today's sound is):
+    FILTER+   filterMode + highpass · bandpass · notch (the same two biquads change type; formant unchanged) · slope 12/24/36 dB
+              (lp1 alone · lp1→lp2, the original path behind a switch at exactly 1 · lp1→lp2→lp3) · keyTrack 0–1 (cents =
+              kt·1200·log2(f/110), on the filter's early clock) · fEnvAmt ±8 oct + fEnvDecay (per non-legato note) · velCutoff
+              (softer = up to 2 oct darker). One bus (fDet) carries all four into lp1/lp2/lp3 detune. Formant path: untouched.
+    ENV+      decay + sustain (sustain 1 schedules nothing: the old attack/release envelope exactly; a note's end starts its release
+              from where the decay has got to, so no jump)
+    GROWL+    FM ratio options 0.25 · 4 · 5 · 6 · 8 added, fmFine ±0.5 · ring 0–1 (oscSum × (1 − ring + ring·FM sine)) · voices
+              2/4/6/8 (extra saw pairs made when first asked for: 2·, 3·, 4· the Unison spread, wider with Width, quieter as they
+              grow; they follow pitch, FM, the pitch input and Pitch wub) · subWave sine/triangle/square · gritMode 'crush'
+              (12 → 2 bits as Grit rises)
+    LFO 2     its own oscillator → pitch (±1 oct) · cutoff (±4 oct) · FM (±6) · volume (±50 %) at full depth; shape, sync,
+              rate (any division) or free Hz
+    WOBBLE    divisions 1/4. · 1/8. · 1/16. · 1/64 added (DIVS is slow → fast, so the rate ladder and "Faster/Slower" stay in order)
+    OUTPUT    clipOn + ceiling (−24…0 dB): × ¼/ceiling → hard clip → × ceiling; the port is now outNode (level → straight or
+              clipped → outNode)
+  Window: every new control sits behind "More depth ▸" (folded): the face is as it was.
+  Proof: 38 factory presets rendered on main's engine and on 4.0 — the difference sits at −69 … −85 dB, the same as two
+  renders of main's own engine against each other (−71 … −82 dB: the renderer's noise floor). Tests (wobble-bass.test.js
+  "Wobble Bass 4.0 · full depth", 8): new paths add exactly nothing at their defaults · HP vs LP low end · slope 36 vs 12
+  at the filter · filter envelope · velocity · sustain level · growl controls each change the sound, 8 voices widen · LFO 2
+  rate, depth and volume swing · dotted and 1/64 speeds · clipper ceiling · the window. Mutation-checked (slope, velocity,
+  clipper broken on purpose → their tests fail).
+  Not in this step (next in D1): wavetable source, comb/phaser/ladder filter, a second filter, FM feedback, hard sync,
+  oversampling choice, mono-below, true-peak meter.
