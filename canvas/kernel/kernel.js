@@ -255,18 +255,20 @@
       // K-3: an organism never reads another organism's state directly. The runtime binds one reader per
       // instance; other organisms ask the kernel, which checks registry_read.
       bindParamReader(instanceId, fn) {
+        missingReads.forEach(k => { if (k.endsWith('>' + instanceId)) missingReads.delete(k); });
         if (!registry.has(instanceId) || paramReaders.has(instanceId)) { fault('MUTATION_003', { instance_id: instanceId, message: 'param reader already bound or instance unknown' }); return false; }
         paramReaders.set(instanceId, fn); return true;
       },
       readParam(readerId, targetId, key) {
         if (readerId !== 'kernel' && !K.permissions.enforce(readerId, 'registry_read', `read ${targetId}.${key}`)) return undefined;
         const fn = paramReaders.get(targetId);
-        if (!fn) { fault('MUTATION_001', { instance_id: readerId, message: `readParam: ${targetId} not found` }); return undefined; }
+        // 3.83 said once per reader and target: a view that reads every setting of a removed tool on each refresh flooded the log
+        if (!fn) { const k = readerId + '>' + targetId; if (!missingReads.has(k)) { missingReads.add(k); fault('MUTATION_001', { instance_id: readerId, message: `readParam: ${targetId} not found` }); } return undefined; }
         const v = fn(key);
         return v && typeof v === 'object' ? JSON.parse(JSON.stringify(v)) : v;
       },
     };
-    const paramReaders = new Map();
+    const paramReaders = new Map(), missingReads = new Set();
 
     // -------------------------------------------------------- permissions (K-8)
     const CORE_PERMS = ['bus_publish', 'bus_subscribe', 'filesystem_read', 'filesystem_write', 'network', 'network_fetch', 'canvas_write',

@@ -35,7 +35,7 @@ OrganismFactory.reg('eravos.bass-gen', function (view) {
         }
         g.globalAlpha = 0.3 + 0.7 * n.vel; g.shadowColor = A; g.shadowBlur = n.ghost ? 0 : 8 * n.vel;
         if (n.ghost) { g.strokeStyle = A; g.lineWidth = 1; g.strokeRect(x, yy, w, nh); }
-        else { g.fillStyle = A; g.fillRect(x, yy, w, nh); }
+        else { g.fillStyle = (UI.dusk ? UI.dusk(g, 0, W, A) : A); g.fillRect(x, yy, w, nh); }
         g.shadowBlur = 0; g.globalAlpha = 0.85; g.fillStyle = '#e8eef6'; g.font = '600 8.5px monospace';
         if (!n.ghost && w > 18) g.fillText(n.name, x + 2, yy - 2);
         g.globalAlpha = 1; prev = { x, w, y: yy };

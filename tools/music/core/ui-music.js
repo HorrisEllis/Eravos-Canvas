@@ -75,7 +75,10 @@
         g.lineTo(x, y);
       }
       g.lineTo(W, H); g.closePath();
-      g.fillStyle = col + '55'; g.fill(); g.strokeStyle = col; g.stroke();
+      // 3.83 the spectrum in a slowly moving sunset: its own colour → rose → amber → violet → its own colour again
+      const hx = /^#[0-9a-f]{6}$/i.test(col) ? col : '#00d4ff', ph = (performance.now() / 12000) % 1, gr = g.createLinearGradient(-ph * W, 0, (2 - ph) * W, 0), gf = g.createLinearGradient(-ph * W, 0, (2 - ph) * W, 0);
+      [[0, hx], [0.12, '#ff6fa8'], [0.25, '#ffb36b'], [0.37, '#b06bff'], [0.5, hx], [0.62, '#ff6fa8'], [0.75, '#ffb36b'], [0.87, '#b06bff'], [1, hx]].forEach(([o, c]) => { gr.addColorStop(o, c); gf.addColorStop(o, c + '50'); });
+      g.fillStyle = gf; g.fill(); g.strokeStyle = gr; g.lineWidth = 1.4; g.stroke(); g.lineWidth = 1;
       if (loud < 0.02) { g.fillStyle = col + '55'; g.fillRect(0, H - 1.5, W, 1.5); if (H >= 40) { g.fillStyle = '#4d6178'; g.font = '10px sans-serif'; g.textAlign = 'right'; g.fillText('play a note to see its spectrum', W - 8, 14); g.textAlign = 'left'; } }
       if (o.overlay) o.overlay(g, W, H);
     }, 30);
@@ -242,6 +245,13 @@
     }, 30);
     return { hit };
   }
+  // 3.83 DUSK for drawn displays: a slowly moving gradient from a colour into sunset rose, amber and violet (x0…x1 across the canvas)
+  function dusk(g, x0, x1, col, alpha) {
+    const c = /^#[0-9a-f]{6}$/i.test(col || '') ? col : '#ff6fa8', a = alpha === undefined ? '' : Math.round(Math.max(0, Math.min(1, alpha)) * 255).toString(16).padStart(2, '0'), w = x1 - x0, ph = (performance.now() / 12000) % 1;
+    const gr = g.createLinearGradient(x0 - ph * w, 0, x0 + (2 - ph) * w, 0);
+    [[0, c], [0.12, '#ff6fa8'], [0.25, '#ffb36b'], [0.37, '#b06bff'], [0.5, c], [0.62, '#ff6fa8'], [0.75, '#ffb36b'], [0.87, '#b06bff'], [1, c]].forEach(([o, k]) => gr.addColorStop(o, k + a));
+    return gr;
+  }
   const presetBar = (view) => global.UIKit.presetBar(view), paramPanel = (v, k, op) => global.UIKit.paramPanel(v, k, op), hint = (t) => global.UIKit.hint(t);
   // 3.49 MOTION CORE (eravos.phase49-map P49.1): right-click any knob → what can move it. James, 2026-10-22: "Motion core: any knob can
   // be moved by an LFO or envelope". The movers are the part tools themselves (D-49.1): adding one opens it beside the window, wired
@@ -305,5 +315,5 @@
     const ps = Object.keys(def.presets || {}); if (ps.length > 1) out.push({ label: '🎲 A random preset', run: () => K.bus.publish('ui:preset_load:' + instanceId, { name: ps[Math.floor(Math.random() * ps.length)] }) });
     return out;
   });
-  UI.extend({ knobMenu, motion: { MOVERS, knobHook, moveWith, addMover, close: closeKnobMenu }, atTime, Meter, readLevel, Scope, Spectrum, Keyboard, keyRange, divisionLadder, audioRouting, instrumentPanel, alive });
+  UI.extend({ dusk, knobMenu, motion: { MOVERS, knobHook, moveWith, addMover, close: closeKnobMenu }, atTime, Meter, readLevel, Scope, Spectrum, Keyboard, keyRange, divisionLadder, audioRouting, instrumentPanel, alive });
 })(typeof window !== 'undefined' ? window : globalThis);

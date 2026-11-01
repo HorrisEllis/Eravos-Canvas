@@ -159,7 +159,7 @@
     const actions = titleActions.filter(a => !a.noDock && a.when(d)).map(a => a.make(rec, K)).filter(Boolean);
     const header = h('div', { class: 'wm-head' }, [h('span', { class: 'wm-icon', html: IC(d, '', d.icon || '◻') }), h('span', { class: 'wm-title', text: d.label }), h('span', { class: 'wm-spacer' }), ...actions, maxBtn, foldBtn, closeBtn]);
     const body = h('div', { class: 'wm-body' });
-    const win = h('div', { class: 'wm-win docked', 'data-instance': rec.instanceId, 'data-organism': d.id, style: { '--acc': d.accent || '#00d4ff' } }, [header, body]);
+    const win = h('div', { class: 'wm-win docked', 'data-instance': rec.instanceId, 'data-organism': d.id, style: { '--acc': d.accent || '#00d4ff' } }, [header, body, h('div', { class: 'wm-dusk', 'aria-hidden': 'true' })]);
     host.appendChild(win);
     header.addEventListener('dblclick', (e) => { if (e.target.closest('button, input, select, .wm-vol')) return; dock.classList.toggle('folded'); layoutDock(); });
     foldBtn.addEventListener('click', () => { dock.classList.toggle('folded'); layoutDock(); });
@@ -193,9 +193,10 @@
       rec.ctx.readOnly ? h('span', { class: 'wm-ro', text: 'READ-ONLY' }) : null,
       h('span', { class: 'wm-spacer' }), ...actions, maxBtn, minBtn, closeBtn,
     ]);
+    // 3.83 .wm-dusk: a sunset light over the window (screen-blended, never in the way of a click)
     const body = h('div', { class: 'wm-body' });
     const grip = h('div', { class: 'wm-grip' });
-    const win = h('div', { class: 'wm-win', role: 'group', 'aria-label': d.label, 'data-instance': rec.instanceId, 'data-organism': d.id, style: { left: pos.x + 'px', top: pos.y + 'px', width: w + 'px', height: hgt + 'px', '--acc': d.accent || '#00d4ff' } }, [header, body, grip]);
+    const win = h('div', { class: 'wm-win', role: 'group', 'aria-label': d.label, 'data-instance': rec.instanceId, 'data-organism': d.id, style: { left: pos.x + 'px', top: pos.y + 'px', width: w + 'px', height: hgt + 'px', '--acc': d.accent || '#00d4ff' } }, [header, body, h('div', { class: 'wm-dusk', 'aria-hidden': 'true' }), grip]);
     win.classList.add('wm-new'); global.setTimeout(() => win.classList.remove('wm-new'), 320);   // 3.73 fluid: it grows into place
     win.style.zIndex = ++zTop;
     world.appendChild(win);

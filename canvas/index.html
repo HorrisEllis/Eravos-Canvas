@@ -70,15 +70,26 @@
     const pe = PlainErrors.describe(f, K);
     if (pe.level !== 'quiet') toast(pe.text + (pe.hint ? ' ' + pe.hint : ''), 'bad', pe.hint ? 7000 : 5000);
   }, 'shell');
-  let logEl = null;
+  // 3.83 the problems log: a header that closes it (× · Esc · a click outside) and clears it; the same problem again and again is one
+  // line with how many times (it was a wall of the same entry)
+  let logEl = null, cleared = 0;
+  const closeLog = () => { if (!logEl) return; logEl.remove(); logEl = null; document.removeEventListener('keydown', logKey, true); document.removeEventListener('mousedown', logOut, true); };
+  const logKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); closeLog(); } };
+  const logOut = (e) => { if (logEl && !logEl.contains(e.target) && e.target !== led) closeLog(); };
   led.addEventListener('click', () => {
-    if (logEl) { logEl.remove(); logEl = null; return; }
-    logEl = h('div', { class: 'faultlog' });
-    const list = K.faults.list().slice(-200).reverse();
-    if (!list.length) logEl.appendChild(h('div', { text: 'No problems. Nothing has silently failed.' }));
+    if (logEl) { closeLog(); return; }
+    const all = K.faults.list().slice(cleared).slice(-400).reverse(), groups = [];
+    all.forEach(f => { const k = f.fault_class + '|' + (f.organism_id || '') + '|' + f.message, g = groups.find(x => x.k === k); if (g) g.n++; else groups.push({ k, f, n: 1 }); });
+    const body = h('div', { class: 'fl-body' });
+    logEl = h('div', { class: 'faultlog', role: 'dialog', 'aria-label': 'Problems' }, [
+      h('div', { class: 'fl-head' }, [h('b', { text: 'Problems' }), h('span', { class: 'fl-count', text: all.length ? all.length + (all.length === 1 ? ' entry' : ' entries') + (groups.length < all.length ? ' · ' + groups.length + ' different' : '') : '' }),
+        h('button', { class: 'fl-btn', text: 'Clear', title: 'start a clean list (the record stays in the kernel)', onclick: () => { cleared = K.faults.list().length; closeLog(); led.classList.remove('bad'); } }),
+        h('button', { class: 'fl-btn fl-x', text: '×', title: 'close (Esc)', 'aria-label': 'close', onclick: closeLog })]), body]);
+    if (!groups.length) body.appendChild(h('div', { class: 'fl-none', text: 'No problems. Nothing has silently failed.' }));
     // each entry: what it means (plain) on top, the technical record under it — for whoever fixes it
-    list.forEach(f => { const pe = PlainErrors.describe(f, K); logEl.appendChild(h('div', { class: 'fl-item' }, [h('div', { class: 'fl-plain', text: `${f.timestamp.slice(11, 19)}  ${pe.text}` }), h('div', { class: 'fl-tech' }, [h('span', { class: 'fc', text: f.fault_class + ' ' }), `${f.organism_id || ''} ${f.message}`])])); });
+    groups.forEach(({ f, n }) => { const pe = PlainErrors.describe(f, K); body.appendChild(h('div', { class: 'fl-item' }, [h('div', { class: 'fl-plain', text: `${f.timestamp.slice(11, 19)}  ${pe.text}` }, n > 1 ? [h('span', { class: 'fl-n', text: '×' + n })] : []), h('div', { class: 'fl-tech' }, [h('span', { class: 'fc', text: f.fault_class + ' ' }), `${f.organism_id || ''} ${f.message}`])])); });
     document.body.appendChild(logEl); led.classList.remove('bad');
+    document.addEventListener('keydown', logKey, true); setTimeout(() => document.addEventListener('mousedown', logOut, true), 0);
   });
   const brand = { tagline: 'A canvas of living tools.', tip: 'Tip: drag files, a pack .zip or a saved .eravos.json anywhere onto the canvas.', categories: [] };
   const activators = [], keys = new Map();
