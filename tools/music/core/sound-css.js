@@ -103,7 +103,7 @@
   }
   function surfaces(k) {
     if (!base) return; const tint = rgbOf(tintNow()); if (!tint) return;
-    // 3.89 the theme says how far a surface may lean (--react-surface: Dusk .55, Midnight .3, Studio 1)
+    // 3.91 the theme says how far a surface may lean (--react-surface: Dusk .55, Midnight .3, Studio 1)
     const sc = surfScale === null ? (surfScale = parseFloat(global.getComputedStyle(root).getPropertyValue('--react-surface')) || 1) : surfScale;
     Object.keys(SURFACES).forEach(n => { const b = rgbOf(base[n]); if (b) set(n, k < 0.005 ? base[n] : hex(mixRGB(b, tint, k * SURFACES[n] * sc))); });
   }
@@ -324,7 +324,7 @@
     colourIn, shareOf,     // 3.83 the colour a tool draws or writes, reacting (tests, and code that draws outside a 2D canvas)
     _taps: taps, lit, colourFor, rotate, settingsOf, SURFACES, tintNow,
   };
-  // 3.89 a new theme is a new palette: put every colour back, read the palette (and how far surfaces may lean) again
+  // 3.91 a new theme is a new palette: put every colour back, read the palette (and how far surfaces may lean) again
   global.addEventListener && global.addEventListener('eravos:theme', () => { zero(); base = null; surfScale = null; });
   global.SoundCSS = SoundCSS;
   // ⋯ Options → Reactive colours: core/react-panel.js (the panel, and the same panel in every tool's ⚙ settings)

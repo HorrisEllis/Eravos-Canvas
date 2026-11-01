@@ -659,7 +659,7 @@ table.tp-tab { width: 100%; }
 /* 3.87 DUSK — "can you make the ui more like that also? like with the wobble base. like have the colors more a gradient animated,
  * beautiful, like love the sunset one": every accent runs, slowly, from the window's own colour into sunset rose, amber and violet and
  * back. The stops are mixed FROM --acc, so each tool keeps its colour and the reactive colours still move it. Reduced motion: still. */
-/* 3.89 THEMES: these rules are the Dusk theme (html[data-theme="dusk"], canvas/runtime/themes.js); in the others the stops are the accent */
+/* 3.91 THEMES: these rules are the Dusk theme (html[data-theme="dusk"], canvas/runtime/themes.js); in the others the stops are the accent */
 :root, .wm-win, .tp-overlay { --dk1: var(--acc); --dk2: var(--acc); --dk3: var(--acc); --dk4: var(--acc); --dusk: var(--acc); }
 :root { --react-surface: 1; }
 .wm-dusk { display: none; } html[data-theme="dusk"] .wm-dusk { display: block; }
@@ -683,7 +683,7 @@ html[data-theme="dusk"].snd-calm .wm-dusk { opacity: .6; }
 @media (max-width: 600px) { .tp-head .tp-art { width: 100%; height: auto; aspect-ratio: 16 / 10; } }
 .ap-card-pic.painted .ap-card-img { object-fit: cover; }
 
-/* ===================================================================== 3.89 THEMES (canvas/runtime/themes.js)
+/* ===================================================================== 3.91 THEMES (canvas/runtime/themes.js)
  * "make all the buttons beautiful": each theme dresses every button the same way — the controls inside tools (uk-*), the top bar (tb-btn)
  * and the pages (sbk-*, tp-*, ap-*). */
 
@@ -765,7 +765,7 @@ html[data-theme="midnight"] .uk-knob-arc { filter: none; }
 [data-theme-preview="midnight"] .thm-mbtn { border-radius: 8px; color: #8d97aa; border: 1px solid #313949; background: #1b202b; }
 [data-theme-preview="midnight"] .thm-mbtn.on, [data-theme-preview="midnight"] .thm-mpri { border-radius: 8px; color: #dfe5ef; background: #2a3150; border: 1px solid #8fa8ff; }
 [data-theme-preview="midnight"] .thm-mknob { --mk: #8fa8ff; }
-/* ---- 3.89 Dependencies (⋯ Options → Dependencies) */
+/* ---- 3.91 Dependencies (⋯ Options → Dependencies) */
 .dg-pop { position: fixed; inset: 0; z-index: 160000; display: grid; place-items: center; background: rgba(4,6,10,.55); backdrop-filter: blur(3px); }
 .dg-panel { width: min(1040px, calc(100vw - 32px)); max-height: calc(100vh - 60px); display: flex; flex-direction: column; border-radius: 16px; background: var(--panel); border: 1px solid var(--line2); box-shadow: 0 20px 60px rgba(0,0,0,.6); padding: 14px 18px 12px; }
 .dg-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }

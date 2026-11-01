@@ -332,7 +332,7 @@
     K.ports.defineKind('mod', { permission: perm, validate: (spec) => spec.node ? null : 'node required', onRegister(port) { port._taps = []; port.range = port.range || { min: -1, max: 1 }; }, onRemove: dropPort });
     K.ports.defineKind('param', { directions: ['in'], permission: () => ['audio_out', 'audio_in'], validate: (spec) => spec.param ? null : 'param required', onRegister(port) { port._taps = []; port.range = port.range || { min: -1, max: 1 }; }, onRemove: dropPort });
     function dropPort(p) {
-      if (p.src && p.head) { try { p.src.disconnect(p.head); if (p.dcBlock) p.dcBlock.disconnect(); p.guard.disconnect(); } catch (e) {} }
+      if (p.src && p.head) { try { p.src.disconnect(p.head); if (p.dcBlock) p.dcBlock.disconnect(); p.guard.disconnect(); if (p.place) p.place.disconnect(); if (p.pan) p.pan.disconnect(); } catch (e) {} }
       if (p.node) { try { p.node.disconnect(); } catch (e) {} }
       (p._taps || []).forEach(an => { try { an.disconnect(); } catch (e) {} });
       routes.delete(key(p.instance_id, p.port_id));
@@ -401,6 +401,16 @@
         set(v) { v = Math.max(-1, Math.min(1, +v || 0)); sm(gL.gain, v > 0 ? 1 - v : 1); sm(gR.gain, v < 0 ? 1 + v : 1); } };
       return node;
     }
+    // 3.90 PLACE — built only when "Hear by place" asks for it (core/proximity.js): a gain and a balance (the strip's pan: unity at
+    // the centre, so a mono tool keeps its level — a StereoPanner's centre is −3 dB per side) spliced in just before the trim
+    function ensurePlace(port) {
+      if (port.place || !port.guard || !port.trim || !audio.ctx) return port.place ? port : null;
+      const pre = port.strip ? port.strip.nodes.pan : port.guard, place = audio.ctx.createGain(), pn = makePan(audio.ctx);
+      if (port.strip) pre.disconnect(); else { try { pre.disconnect(port.trim); } catch (e) { try { pre.disconnect(); } catch (e2) {} } }
+      pre.connect(place); place.connect(pn.input); pn.connect(port.trim); port.place = place; port.pan = pn;
+      return port;
+    }
+    audio.placeStage = (port) => ensurePlace(port);
     function ensureStrip(port) {
       if (port.strip || !port.guard || !port.trim) return port.strip;
       const ac = audio.ctx, n = {
@@ -408,8 +418,9 @@
         pan: makePan(ac) };
       n.hp.type = 'highpass'; n.hp.frequency.value = 10; n.hp.Q.value = -3.01; // Q is in dB for high-pass: −3 dB = Butterworth (no bump)
       n.lo.type = 'lowshelf'; n.lo.frequency.value = 120; n.mid.type = 'peaking'; n.mid.frequency.value = 1000; n.mid.Q.value = 0.9; n.hi.type = 'highshelf'; n.hi.frequency.value = 8000;
-      try { port.guard.disconnect(port.trim); } catch (e) { try { port.guard.disconnect(); } catch (e2) {} }
-      port.guard.connect(n.gate); n.gate.connect(n.hp); n.hp.connect(n.lo); n.lo.connect(n.mid); n.mid.connect(n.hi); n.hi.connect(n.pan.input); n.pan.connect(port.trim);
+      const pre = port.pan || port.guard;   // 3.90 the strip goes after the place stage when there is one (the last node before the trim)
+      try { pre.disconnect(port.trim); } catch (e) { try { pre.disconnect(); } catch (e2) {} }
+      pre.connect(n.gate); n.gate.connect(n.hp); n.hp.connect(n.lo); n.lo.connect(n.mid); n.mid.connect(n.hi); n.hi.connect(n.pan.input); n.pan.connect(port.trim);
       port.strip = { nodes: n, sends: {} };
       return port.strip;
     }

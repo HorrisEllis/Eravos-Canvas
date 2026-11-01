@@ -26,7 +26,7 @@ describe('P86 · songs in blocks (Patterns) · Songs = your saved and exported s
     const IDB = OrganismSDK.IDB, before = await IDB.get('library', 'mysongs');
     try {
       await IDB.put('library', 'mysongs', [{ name: 'Night Drive', time: Date.now(), duration: 64, bpm: 140, project: '♪ Night Drive' }, { name: 'For June', time: Date.now() - 1000, duration: 90, bpm: 128, project: '♪ For June', exported: 'WAV 24-bit' }]);
-      // 3.90 the songs came back to Songs (asked: "can you recover those? those are my rythme"); yours are under 📖 My songs
+      // 3.92 the songs came back to Songs (asked: "can you recover those? those are my rythme"); yours are under 📖 My songs
       Songbook.open(); const ov = document.querySelector('.overlay.sbk'); await TH.sleep(30);
       assert.ok([...ov.querySelectorAll('.sbk-card b')].some(b => /Floor Falls Out/.test(b.textContent)), 'the songs are back');
       [...ov.querySelectorAll('.sbk-chip')].find(c => /My songs/.test(c.textContent)).click(); await TH.sleep(60);

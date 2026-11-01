@@ -410,6 +410,8 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     const c = A && A.clips.find(x => x.id === sel);
     if (c && c.kind === 'notes') roll.show(c, A.lanes.find(l => l.id === c.lane), A); else if (roll.open) roll.hide();
   }
+  // 3.89 open a clip in the piano roll from outside (Patterns › ✎ Edit notes): its notes, each note's own knobs and curves
+  view.openClip = (id) => { if (!A || !A.clips.some(c => c.id === id && c.kind === 'notes')) return false; sel = id; drawInsp(); syncRoll(); draw(); return true; };
   view.on('playhead_update', (p) => {
     if (p.bar === null) { playBar = null; roll.playhead(null); draw(); return; }
     const apply = () => { playBar = p.bar; roll.playhead(p.bar); pos.textContent = `${Math.floor(p.bar)}.${Math.floor((p.bar % 1) * 4) + 1}`; draw(); if (view.state.follow && playBar) { const x = xOf(playBar); if (x > scroller.scrollLeft + scroller.clientWidth - 40 || x < scroller.scrollLeft) scroller.scrollLeft = x - 40; } };

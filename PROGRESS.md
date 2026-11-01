@@ -2,7 +2,7 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
-## Done — 3.90 Your songs back in Songs · every pattern novel · the Patterns tool list fixed (2026-11-01)
+## Done — 3.92 Your songs back in Songs · every pattern novel · the Patterns tool list fixed (2026-11-01)
 Asked (on screenshots of the Patterns page and the old Songs cards "Floor Falls Out", "Sub Dive City"): "this looks bad. can you recover
 those? those are my rythme. can you make sure all the patterns are novel. also fix the catagories".
 - Songs: the page is back as it was before 3.86 — every song on its shelf (Heavy Drops 9, Floor Falls …), the map and ▶ Preview, Write,
@@ -12,10 +12,10 @@ those? those are my rythme. can you make sure all the patterns are novel. also f
   shows 1 959 ideas. Found on the way: ids were given before the pass and again after it, so a twin could carry a kept line's id (fixed).
 - Categories: the tool list named tools not yet loaded by their id ("eravos.drum-forge"); it asks the catalogue now — names, icons, and
   each tool in its group (Drums · Bass · Keys & pads · Leads · More).
-- Tests: p42, p44, p19 back to the songs page; p58 gets its strip test back; p86 and p73 follow; p89 new (themes, reset, prune, graph).
-  The test page measures in the Studio look (themes are tested in p89). 1344/1344.
+- Tests: p42, p44, p19 back to the songs page; p58 gets its strip test back; p86 and p73 follow; p91 new (themes, reset, prune, graph).
+  The test page measures in the Studio look (themes are tested in p91). 1344/1344.
 
-## Done — 3.89 Themes (Dusk · Studio · Midnight) · beautiful buttons · a dependency graph · Clear takes the dependencies too (2026-11-01)
+## Done — 3.91 Themes (Dusk · Studio · Midnight) · beautiful buttons · a dependency graph · Clear takes the dependencies too (2026-11-01)
 Asked: "the colors inside the tools … look at the buttons, looks bad. please make those themes. and hook into the reactive. make all the
 buttons beautiful. make a themes section in the settings. make a dependancy graph. also when clearing the canvas should remove all
 dependancies."
@@ -26,6 +26,33 @@ dependancies."
 - Clear canvas now also takes away what the tools brought: Expansion records what each unit adds (slot elements, keys) — teardown,
   reset, prune, graph. Measured: 8 toolbar parts and 1 mode built → 0 and 0 after Clear; only Start and Add left.
 - Also merged PR #61 (3.86–3.88) into main.
+## Done — 3.90 🎧 Hear by place (2026-11-01)
+His words: "what about a setting to play tools in proximity also zooming out makes it quiter."
+- ⋯ Options › 🎧 Hear by place (off by default, remembered). On, the canvas is a room you look into: a tool that makes sound is full in
+  the middle of the view, fades smoothly to a whisper (−22 dB) well off screen, and pans with where its window sits (up to 60 %); zooming
+  out quietens every one (≈ −6 dB at 50 %, −10 dB at 25 %). Effects are left alone (they pass on what feeds them, already placed).
+- How: core/proximity.js moves a PLACE stage (a gain and a balance before each source's trim), built only the first time it is on
+  (core/audio.js audio.placeStage) — off, no tool gets an extra node. Window rectangles read ~12×/s, all reads before any write.
+- Caught on the way (tests/p42, her voice 0.04 dB under its floor): a StereoPanner at centre is −3 dB per side on a mono tool. The
+  balance is the mixer strip's (unity at centre) and the stage is lazy.
+- Tests: tests/p90-hear-by-place.test.js (2). P14, P21, P42, P62 pass.
+
+## Done — 3.89b ✎ A pattern opens in the piano roll (2026-11-01)
+His words: "the per note editing with the timeline, why not utilize that for the patterns. it also doesn't seem to work. per notes."
+- Patterns › ✎ Edit notes (every card with notes): the pattern goes on the Timeline, the Timeline comes forward and the clip opens in its
+  piano roll — click a note there for its own knobs, bend and curves. Timeline view.openClip(id); PatternLibrary.edit(p).
+- "doesn't seem to work", checked in the real app on Dubstep #77: playback applies a note's own knob (Supersaw cutoff 7000 → 300 for that
+  note only, then back); clicking a note opens its editor (Start, Length, Pitch, Velocity, Bend, then the tool's knobs). Not yet found
+  what failed for him: the editor sits in a short strip under the grid and the tool's knobs are below its fold. Asked.
+- Tests: p76 +1 (Edit notes opens that clip in the piano roll; a note carries its own knob).
+
+## Done — 3.89 The flood behind the problems log, fixed at its cause (2026-11-01)
+His words, on a screenshot: "this needs a way to close it. its stuck right now" — a wall of "That item doesn't exist any more" ·
+MUTATION_001 readParam: reese-bass-3-k07 not found. (The other session's 3.87 made the log close and fold repeats; this is why it filled.)
+- Closing a tool removed its param reader, then rolled back its changes, then removed its record. The rollback wakes listeners (the
+  Timeline lists every knob of its tracks' tools): in between, the tool looked present but could not be read — one fault per knob, per
+  listener. The kernel now rolls back first; the reader and the record go together.
+- tests/kernel.test.js: a listener woken by the rollback reads the closing tool — fails on the old order, passes now.
 
 ## Done — 3.88 A painting for every tool: the ＋ Add cards and the tool pages (2026-11-01)
 Asked: "make more artwork like this. for each thumbnail" · "what about the catalogs and tool pages" · "first the cards".

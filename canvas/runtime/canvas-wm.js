@@ -197,7 +197,7 @@
     const body = h('div', { class: 'wm-body' });
     const grip = h('div', { class: 'wm-grip' });
     const win = h('div', { class: 'wm-win', role: 'group', 'aria-label': d.label, 'data-instance': rec.instanceId, 'data-organism': d.id, style: { left: pos.x + 'px', top: pos.y + 'px', width: w + 'px', height: hgt + 'px', '--acc': d.accent || '#00d4ff' } }, [header, body, h('div', { class: 'wm-dusk', 'aria-hidden': 'true' }), grip]);
-    { const m = global.Catalog && global.Catalog.meta && global.Catalog.meta(d.id); if (m && m.art) win.style.setProperty('--art', 'url("' + m.art + '")'); }   // 3.89 its painting (the Dusk theme's title bar)
+    { const m = global.Catalog && global.Catalog.meta && global.Catalog.meta(d.id); if (m && m.art) win.style.setProperty('--art', 'url("' + m.art + '")'); }   // 3.91 its painting (the Dusk theme's title bar)
     win.classList.add('wm-new'); global.setTimeout(() => win.classList.remove('wm-new'), 320);   // 3.73 fluid: it grows into place
     win.style.zIndex = ++zTop;
     world.appendChild(win);

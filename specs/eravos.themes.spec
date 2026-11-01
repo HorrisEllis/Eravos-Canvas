@@ -112,7 +112,7 @@ Before any theme ships: move those onto the tokens, then a theme is one file. Th
   (domain.json "art", carried by the catalogue: the domain cards, installed or not), canvas/runtime/art/{blank-canvas,chest}.svg (Empty
   canvas, Browse every tool). .boot .card.has-art: the painting across the top (240 × 110), the emoji icon dropped from the title.
 
-## ADDENDUM 2026-11-01 (3.89) — the themes, built · a Themes section · hooked into the reactive colours
+## ADDENDUM 2026-11-01 (3.91) — the themes, built · a Themes section · hooked into the reactive colours
   Asked: "the colors inside the tools aren't [right], look at the buttons, looks bad. please make those themes. and hook into the reactive.
   make all the buttons beautiful. make a themes section in the settings."
   canvas/runtime/themes.js → Themes { list, get, set, onChange, panel }; <html data-theme>; remembered (localStorage eravos.theme, a core

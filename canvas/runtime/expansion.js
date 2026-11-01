@@ -10,7 +10,7 @@
  * A unit is built the first time something needs it: entering a mode builds all of the mode's units; adding a
  * tool builds only the units that tool depends on (factory before-spawn, recipe before-run, workspace restore).
  * deps(id) is the one dependency list the Add menu, the docs generator and the tests all read.
- * 3.89 "when clearing the canvas should remove all dependencies": what a unit adds when it is built (the elements it puts in the shell's
+ * 3.91 "when clearing the canvas should remove all dependencies": what a unit adds when it is built (the elements it puts in the shell's
  * slots, the keys it binds) is recorded, so teardown(id) takes it away again and reset() returns the shell to agnostic — nothing built,
  * no mode, no domain touched. A unit may also bring its own teardown(S). graph() is the whole dependency graph, for the page that draws it. */
 (function (global) {
@@ -57,7 +57,7 @@
       return true;
     }
     function leaveMode(id) { if (active.delete(id)) changed({ left: id }); }
-    // 3.89 what a unit put into the shell (to take away again)
+    // 3.91 what a unit put into the shell (to take away again)
     const made = new Map();
     const doc = global.document;
     function slotKids() { if (!doc) return []; const out = []; doc.querySelectorAll('[id^="slot-"]').forEach(sl => Array.from(sl.children).forEach(c => out.push(c))); return out; }

@@ -248,7 +248,7 @@
   }
   // 3.87 DUSK for drawn displays: a slowly moving gradient from a colour into sunset rose, amber and violet (x0…x1 across the canvas)
   function dusk(g, x0, x1, col, alpha) {
-    // 3.89 only the Dusk theme draws in a moving sunset; the others keep the colour
+    // 3.91 only the Dusk theme draws in a moving sunset; the others keep the colour
     if (global.document && global.document.documentElement.dataset.theme && global.document.documentElement.dataset.theme !== 'dusk') { const c0 = /^#[0-9a-f]{6}$/i.test(col || '') ? col : '#00d4ff'; return alpha === undefined ? c0 : c0 + Math.round(Math.max(0, Math.min(1, alpha)) * 255).toString(16).padStart(2, '0'); }
     const c = /^#[0-9a-f]{6}$/i.test(col || '') ? col : '#ff6fa8', a = alpha === undefined ? '' : Math.round(Math.max(0, Math.min(1, alpha)) * 255).toString(16).padStart(2, '0'), w = x1 - x0, ph = (performance.now() / 12000) % 1;
     const gr = g.createLinearGradient(x0 - ph * w, 0, x0 + (2 - ph) * w, 0);

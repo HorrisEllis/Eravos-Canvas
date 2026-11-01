@@ -1,4 +1,4 @@
-/* ERAVOS runtime — dep-graph.js → window.DepGraph (3.89) · asked: "make a dependancy graph. also when clearing the canvas should remove
+/* ERAVOS runtime — dep-graph.js → window.DepGraph (3.91) · asked: "make a dependancy graph. also when clearing the canvas should remove
  * all dependancies". One page that draws what is on, and why: the domains touched → the modes on → the parts of the shell built for them
  * (toolbar groups, services, keys) ← the tools on the canvas that need them, and the wires between the tools. A part nothing on the
  * canvas needs any more is drawn faded; "Remove what nothing needs" takes those away (Expansion.prune), "Clear everything" empties the

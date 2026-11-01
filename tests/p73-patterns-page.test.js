@@ -24,7 +24,7 @@ describe('🧩 Patterns page: families that fold, quick picks, sections (3.73)',
   it('quick picks: Deep drops → only the deep family; Curves → only curves', () => {
     const { pg, ov } = fresh(); try {
       chips(ov, '.plib-q').find(b => /Deep drops/.test(b.textContent)).click();
-      // 3.90 a line's curved twin rides on its line's card (not counted as a card of its own)
+      // 3.92 a line's curved twin rides on its line's card (not counted as a card of its own)
       const tk = (p) => p.name.replace(/ · curved$/, '') + '|' + p.tool + '|' + p.genre, bases = new Set(L().filter(p => p.move !== 'curved').map(tk));
       const want = L().filter(p => !(p.move === 'curved' && bases.has(tk(p))) && PatternLibrary.familyOf(p.genre) === 'deep').length;
       assert.ok(new RegExp('^' + want + ' shown').test(ov.querySelector('.sbk-row2 > .sbk-sub:last-child').textContent), 'all ' + want + ' deep ones');
