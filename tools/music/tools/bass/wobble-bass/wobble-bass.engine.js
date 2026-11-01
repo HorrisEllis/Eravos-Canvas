@@ -20,11 +20,17 @@
  *   wub-seq steps glide on instead of restarting) · PITCH WUB to 2400 c (an octave-scream screech; was 100 c) · Octave +2 ·
  *   three new inputs — rate, FM, pitch — so an Envelope / LFO / Wub Rate can move the speed, the growl and the pitch.
  * 3.6: a GROWL mod slot (the wub layer only — the sub stays clean, delayed to stay in time with the mods) and a SUITE
- *   (the tool page loads it all at once or one by one: canvas/runtime/tool-page.js). */
+ *   (the tool page loads it all at once or one by one: canvas/runtime/tool-page.js).
+ * 4.0 FULL DEPTH (specs/eravos.tool-depth.spec D1 — "tools should have more power, like wobble bass, full range of depth in all
+ *   aspects"): filter types HP · BP · notch, slope 12/24/36 dB, key tracking, a filter envelope, velocity → cutoff · full ADSR (decay,
+ *   sustain) · FM ratios 0.25…8 + fine, ring mod · sub wave · unison 2/4/6/8 voices · a SECOND LFO (pitch, cutoff, FM or volume) ·
+ *   dotted rates and 1/64 · bitcrush grit · an output clipper with a ceiling. Every new control starts where today's sound is: each
+ *   factory preset renders identically (the null test in wobble-bass.test.js). */
 (function () {
   'use strict';
   const S = OrganismSDK.STD;
-  const DIVS = ['1/1', '1/2', '1/4', '1/4t', '1/8', '1/8t', '1/16', '1/16t', '1/32'];
+  const DIVS = ['1/1', '1/2', '1/4.', '1/4', '1/8.', '1/4t', '1/8', '1/16.', '1/8t', '1/16', '1/16t', '1/32', '1/64'];   // 4.0: dotted + 1/64, slow → fast
+  const FTYPE = { lowpass: 'lowpass', highpass: 'highpass', bandpass: 'bandpass', notch: 'notch' };
   const SUBK = { '0': 1, '-1': 0.5, '-2': 0.25 };   // 3.1: sub against the wub's pitch (0 = same; was −1 by default → 27.5 Hz under A2)
   // vowel formants F1/F2/F3 (Hz) + band gains (dB)
   const VOWELS = {
@@ -96,7 +102,7 @@
   }
 
   OrganismFactory.define({
-    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '3.6.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
+    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '4.0.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
     category: 'Bass', blurb: 'Dubstep wobble / talking "yoi" bass locked to the tempo. The drop.',
     size: { w: 1100, h: 640 }, minSize: { w: 420, h: 380 },   // 3.58 wide: the cards sit side by side; narrower stacks them
     slots: [{ id: 'growl', label: 'the growl (the sub stays clean)', wire_type: 'audio', hint: 'empty — a Destroyer, Phaser or Echo here works on the wub only; the sub underneath stays clean and in time' }],
@@ -135,21 +141,31 @@
       { key: 'wubLen', type: 'integer', default: 8, min: 1, max: 16, label: 'Steps', group: 'WUB SEQ' },
       { key: 'wubStep', type: 'enum', options: Object.keys(STEPS), default: '1/4', label: 'Step', group: 'WUB SEQ' },
       { key: 'wubSeq', type: 'array', default: ['1/8', '', '1/16', '', '1/4t', 'x', '1/32', '1/8:yoy', '', '', '', '', '', '', '', ''], label: 'Wub steps', group: 'WUB SEQ', hidden: true },
-      { key: 'filterMode', type: 'enum', options: ['lowpass', 'formant'], default: 'lowpass', label: 'Filter', group: 'FILTER' },
+      { key: 'filterMode', type: 'enum', options: ['lowpass', 'formant', 'highpass', 'bandpass', 'notch'], default: 'lowpass', label: 'Filter', group: 'FILTER' },
       { key: 'vowelA', type: 'enum', options: Object.keys(VOWELS), default: 'OO', label: 'Vowel A', group: 'FILTER' },
       { key: 'vowelB', type: 'enum', options: Object.keys(VOWELS), default: 'AH', label: 'Vowel B', group: 'FILTER' },
       { key: 'formantShift', type: 'number', default: 0, min: -24, max: 24, step: 0.1, unit: 'st', label: 'Formant', group: 'FILTER' },
       { key: 'cutoff', type: 'number', default: 300, min: 40, max: 8000, step: 1, unit: 'Hz', label: 'Cutoff', group: 'FILTER' },
       { key: 'res', type: 'number', default: 6, min: 0.5, max: 20, step: 0.1, label: 'Reso', group: 'FILTER' },
+      // 4.0 depth: the filter
+      { key: 'slope', type: 'enum', options: ['12', '24', '36'], default: '24', label: 'Slope', group: 'FILTER+', unit: 'dB', hint: 'how steep the filter is: 12 soft, 24 the classic, 36 a wall' },
+      { key: 'keyTrack', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Key track', group: 'FILTER+', hint: 'the filter follows the note: 1 = it moves an octave with every octave you play' },
+      { key: 'fEnvAmt', type: 'number', default: 0, min: -8, max: 8, step: 0.01, unit: 'oct', label: 'Filter env', group: 'FILTER+', hint: 'each note opens (or closes) the filter by this much, then it falls back' },
+      { key: 'fEnvDecay', type: 'number', default: 0.3, min: 0.005, max: 4, step: 0.001, unit: 's', label: 'Env decay', group: 'FILTER+' },
+      { key: 'velCutoff', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Vel → cutoff', group: 'FILTER+', hint: 'softer notes are darker (up to 2 octaves)' },
       { key: 'fmIndex', type: 'number', default: 0, min: 0, max: 12, step: 0.01, label: 'FM', group: 'GROWL', hint: 'a sine bends the saws: 2–5 growls, more screams (0 = off)' },
-      { key: 'fmRatio', type: 'enum', options: ['0.5', '1', '1.5', '2', '3'], default: '1', label: 'FM ratio', group: 'GROWL', hint: '1 and 2 growl in tune, 0.5 is a thick sub-growl, 1.5 / 3 go metallic' },
+      { key: 'fmRatio', type: 'enum', options: ['0.25', '0.5', '1', '1.5', '2', '3', '4', '5', '6', '8'], default: '1', label: 'FM ratio', group: 'GROWL', hint: '1 and 2 growl in tune, 0.25 / 0.5 thick sub-growls, 1.5 / 3 / 5 metallic, 4 / 6 / 8 bright and glassy' },
+      { key: 'fmFine', type: 'number', default: 0, min: -0.5, max: 0.5, step: 0.001, label: 'FM fine', group: 'GROWL+', hint: 'nudges the FM ratio off the grid: small amounts beat and churn, the growl moves on its own' },
+      { key: 'ring', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Ring mod', group: 'GROWL+', hint: 'multiplies the voice by the FM sine: bell-like, metallic, robotic (follows FM ratio)' },
+      { key: 'voices', type: 'enum', options: ['2', '4', '6', '8'], default: '2', label: 'Voices', group: 'GROWL+', hint: 'unison saws, spread by Unison and Width: 2 is the classic, 8 a wall' },
+      { key: 'subWave', type: 'enum', options: ['sine', 'triangle', 'square'], default: 'sine', label: 'Sub wave', group: 'GROWL+', hint: 'the clean sub: sine is pure, triangle a little edge, square a hollow growl under it' },
       { key: 'fmWub', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'FM wub', group: 'GROWL', hint: 'how much the wobble opens the FM too — the talking growl' },
       { key: 'squash', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Squash', group: 'GROWL', hint: '3-band OTT-style squash: fizz up front, everything loud (0 = off)' },
       { key: 'osc2', type: 'number', default: 0.5, min: 0, max: 1, step: 0.01, label: 'Square', group: 'TONE' },
       { key: 'sub', type: 'number', default: 0.6, min: 0, max: 1, step: 0.01, label: 'Sub', group: 'TONE' },
       { key: 'drive', type: 'number', default: 0.4, min: 0, max: 1, step: 0.01, label: 'Drive', group: 'TONE' },
       { key: 'shaper', type: 'number', default: 0.3, min: 0, max: 1, step: 0.01, label: 'Grit', group: 'TONE' },
-      { key: 'gritMode', type: 'enum', options: ['auto', 'soft', 'asym', 'fold', 'hard'], default: 'auto', label: 'Grit type', group: 'TONE', hint: 'after the filter: fold = growl (harmonics that move with the wobble), hard = clipped and loud, auto = soft, asym above 0.6' },
+      { key: 'gritMode', type: 'enum', options: ['auto', 'soft', 'asym', 'fold', 'hard', 'crush'], default: 'auto', label: 'Grit type', group: 'TONE', hint: 'after the filter: fold = growl (harmonics that move with the wobble), hard = clipped and loud, crush = fewer bits (Grit sets how few), auto = soft, asym above 0.6' },
       { key: 'octave', type: 'integer', default: -1, min: -3, max: 3, label: 'Octave', group: 'TONE', hint: '+1 / +2 = the screech register' },
       { key: 'transpose', type: 'number', default: 0, min: -36, max: 24, step: 0.1, unit: 'st', label: 'Pitch', group: 'TONE', hint: 'tune the whole instrument up or down in semitones (−36 … +24, three octaves down) — turn it down when everything sounds too high; decimals detune between notes' },
       { key: 'spread', type: 'number', default: 9, min: 0, max: 50, step: 0.1, unit: 'c', label: 'Unison', group: 'TONE' },
@@ -165,6 +181,19 @@
       { key: 'release', type: 'number', default: 0.12, min: 0.01, max: 8, step: 0.001, unit: 's', label: 'Release', group: 'ENV' },
       { key: 'pitchDive', type: 'number', default: 0, min: -48, max: 48, step: 0.1, unit: 'st', label: 'Dive', group: 'ENV' },
       { key: 'diveTime', type: 'number', default: 0.08, min: 0.005, max: 1, step: 0.001, unit: 's', label: 'Dive time', group: 'ENV' },
+      // 4.0 depth: a full amp envelope (sustain 1 = the old attack/release envelope exactly)
+      { key: 'decay', type: 'number', default: 0.3, min: 0.001, max: 4, step: 0.001, unit: 's', label: 'Decay', group: 'ENV+' },
+      { key: 'sustain', type: 'number', default: 1, min: 0, max: 1, step: 0.01, label: 'Sustain', group: 'ENV+', hint: 'below 1 each note falls to this level after the attack (Decay sets how fast): plucks and stabs' },
+      // 4.0 depth: a second LFO, free of the wobble
+      { key: 'lfo2Dest', type: 'enum', options: ['off', 'pitch', 'cutoff', 'fm', 'volume'], default: 'off', label: 'LFO 2 →', group: 'LFO 2', hint: 'a second, separate LFO: drift the pitch, sweep the filter under the wobble, churn the FM, or pulse the volume' },
+      { key: 'lfo2Shape', type: 'enum', options: ['sine', 'triangle', 'square', 'sawtooth'], default: 'sine', label: 'LFO 2 shape', group: 'LFO 2' },
+      { key: 'lfo2Sync', type: 'boolean', default: true, label: 'LFO 2 sync', group: 'LFO 2' },
+      { key: 'lfo2Div', type: 'enum', options: DIVS, default: '1/1', label: 'LFO 2 rate', group: 'LFO 2' },
+      { key: 'lfo2Hz', type: 'number', default: 0.5, min: 0.02, max: 20, step: 0.01, unit: 'Hz', label: 'LFO 2 free', group: 'LFO 2' },
+      { key: 'lfo2Depth', type: 'number', default: 0.3, min: 0, max: 1, step: 0.01, label: 'LFO 2 depth', group: 'LFO 2', hint: 'pitch ±1 oct · cutoff ±4 oct · FM ±6 · volume ±50 % at full' },
+      // 4.0 depth: the output
+      { key: 'clipOn', type: 'boolean', default: false, label: 'Clipper', group: 'OUTPUT', hint: 'a hard clipper at the very end: nothing goes over the ceiling (loud, and it never blows up the mix)' },
+      { key: 'ceiling', type: 'number', default: -0.3, min: -24, max: 0, step: 0.1, unit: 'dB', label: 'Ceiling', group: 'OUTPUT' },
     ],
     ui_hooks: ['shape_pts', 'wub_seq'],
     lib: { drawFn, cleanPts, parseCell, DIVS, SHAPES },   // shared with the window (same folder) so the drawing IS the sound
@@ -186,16 +215,25 @@
       const noiseSrc = ac.createBufferSource(); noiseSrc.buffer = nb; noiseSrc.loop = true; noiseSrc.start(); ctx.track(noiseSrc);
       const noiseG = ac.createGain(); noiseG.gain.value = 0; noiseSrc.connect(noiseG); noiseG.connect(oscSum);
       [panA, panB].forEach(n => ctx.track(n));
-      sub.connect(subG);
+      sub.connect(subG); sub.type = P.get('subWave') || 'sine';
       [saw, sq, sub, saw2].forEach(o => { o.frequency.value = 55; o.start(); ctx.track(o); });
+      // 4.0 ring mod: oscSum × (1 − ring + ring · the FM sine) — at ring 0 the gain is exactly 1 (bit-identical)
+      const ringVca = ac.createGain(); ringVca.gain.value = 1; oscSum.connect(ringVca); ctx.track(ringVca);
       // pre-drive
       const pre = ac.createGain(), preSh = ac.createWaveShaper(); preSh.oversample = '4x';
-      oscSum.connect(pre); pre.connect(preSh);
+      ringVca.connect(pre); pre.connect(preSh);
       const driveMod = ctx.modBus('drive', { min: 0, max: 1 }); const driveModG = ac.createGain(); driveModG.gain.value = 4; driveMod.connect(driveModG); driveModG.connect(pre.gain);
       // lowpass path
-      const lp1 = ac.createBiquadFilter(), lp2 = ac.createBiquadFilter(); lp1.type = lp2.type = 'lowpass';
+      const lp1 = ac.createBiquadFilter(), lp2 = ac.createBiquadFilter(), lp3 = ac.createBiquadFilter(); lp1.type = lp2.type = lp3.type = 'lowpass';
       preSh.connect(lp1); lp1.connect(lp2);
-      const lpOut = ac.createGain(); lp2.connect(lpOut);
+      // 4.0 slope: 12 = lp1 alone · 24 = lp1 → lp2 (the original path, its switch at exactly 1) · 36 = → lp3
+      const lpOut = ac.createGain(), s12 = ac.createGain(), s24 = ac.createGain(), s36 = ac.createGain(); s12.gain.value = 0; s24.gain.value = 1; s36.gain.value = 0;
+      lp1.connect(s12); s12.connect(lpOut); lp2.connect(s24); s24.connect(lpOut); lp2.connect(lp3); lp3.connect(s36); s36.connect(lpOut);
+      [lp3, s12, s24, s36].forEach(n => ctx.track(n));
+      // 4.0 one bus for everything new that moves the filter (key track, filter envelope, velocity, LFO 2), in cents
+      const fDet = ac.createGain(); fDet.gain.value = 1; [lp1, lp2, lp3].forEach(b => fDet.connect(b.detune)); ctx.track(fDet);
+      const keyBus = ac.createConstantSource(), envBus = ac.createConstantSource(), velBus = ac.createConstantSource();
+      [keyBus, envBus, velBus].forEach(c => { c.offset.value = 0; c.connect(fDet); c.start(); ctx.track(c); });
       // formant path
       const formIn = ac.createGain(), formOut = ac.createGain(); preSh.connect(formIn);
       const bands = [0, 1, 2].map(() => { const b = ac.createBiquadFilter(); b.type = 'bandpass'; const g = ac.createGain(); formIn.connect(b); b.connect(g); g.connect(formOut); return { b, g }; });
@@ -209,10 +247,15 @@
       const fmWubVca = ac.createGain(); fmWubVca.gain.value = 0; fHz.connect(fmWubVca); fmWubVca.connect(fmVca.gain);
       const fmWubDepth = ac.createGain(); fmWubDepth.gain.value = 0; fmWubDepth.connect(fmWubVca.gain);
       [saw, saw2, sq].forEach(o => fmVca.connect(o.frequency));
+      const ringDepth = ac.createGain(); ringDepth.gain.value = 0; fmOsc.connect(ringDepth); ringDepth.connect(ringVca.gain); ctx.track(ringDepth);
+      // 4.0 unison voices: extra saw pairs made when first asked for (2 = the original two saws, nothing else runs)
+      const extra = [];
+      const ratioOf = () => (+P.get('fmRatio') || 1) + (+P.get('fmFine') || 0);
       // 3.5 FM input: (index added by what is wired) × note Hz → the FM depth
       const fmMod = ctx.modBus('fm', { min: -6, max: 6 }); const fmModVca = ac.createGain(); fmModVca.gain.value = 0; fHz.connect(fmModVca); fmMod.connect(fmModVca.gain); fmModVca.connect(fmVca.gain); ctx.track(fmModVca);
       // 3.5 pitch input (cents): the wub layer bends (Envelope = dives, LFO = screams); the clean sub stays on the note
       const pitchMod = ctx.modBus('pitch', { min: -2400, max: 2400 }); [saw, saw2, sq].forEach(o => pitchMod.connect(o.detune));
+      const pitchBus = ac.createGain(); pitchBus.gain.value = 1; pitchMod.connect(pitchBus); ctx.track(pitchBus);   // the extra voices bend with it
       [fmOsc, fHz, fmVca, fmStatic, fmWubVca, fmWubDepth].forEach(n => ctx.track(n));
       // post shaper → amp
       // P14 fix ("blown speaker"): only the filtered mid layer is distorted. The sub joins AFTER the shaper, clean;
@@ -265,18 +308,29 @@
         sqBands.forEach((b, i) => { if (i === 0) { b.drv.gain.setTargetAtTime(0.25, t, 0.01); b.mk.gain.setTargetAtTime(Math.tanh(1.5) / 1.5 / 0.25, t, 0.01); return; } const d = 1 + x * [0, 5, 3][i]; b.drv.gain.setTargetAtTime(d, t, 0.01); b.mk.gain.setTargetAtTime([0, 0.75, 0.5][i] / (0.6 + 0.4 * Math.sqrt(d)), t, 0.01); });
       }
       [dcBlock, fizz, subLP].forEach(n => ctx.track(n));
-      ctx.port('out', { kind: 'audio', direction: 'out', node: level, label: 'wobble' });
+      // 4.0 output clipper: level → [straight, its switch at exactly 1] or [× 1/ceiling → hard clip → × ceiling] → out
+      const outNode = ac.createGain(), clDry = ac.createGain(), clWet = ac.createGain(), clPre = ac.createGain(), clSh = ac.createWaveShaper(), clPost = ac.createGain();
+      outNode.gain.value = 1; clDry.gain.value = 1; clWet.gain.value = 0;
+      { const n = 2049, c = new Float32Array(n); for (let i = 0; i < n; i++) c[i] = Math.max(-1, Math.min(1, ((i / (n - 1)) * 2 - 1) * 4)); clSh.curve = c; }   // ±0.25 in → ±1 out: the knee at 1/4
+      level.connect(clDry); clDry.connect(outNode); level.connect(clPre); clPre.connect(clSh); clSh.connect(clPost); clPost.connect(clWet); clWet.connect(outNode);
+      [outNode, clDry, clWet, clPre, clSh, clPost].forEach(n => ctx.track(n));
+      function applyClip() {
+        const on = !!P.get('clipOn'), c = Math.pow(10, P.get('ceiling') / 20), t = ac.currentTime;
+        clDry.gain.setTargetAtTime(on ? 0 : 1, t, 0.004); clWet.gain.setTargetAtTime(on ? 1 : 0, t, 0.004);
+        clPre.gain.setTargetAtTime(0.25 / c, t, 0.002); clPost.gain.setTargetAtTime(c, t, 0.002);
+      }
+      ctx.port('out', { kind: 'audio', direction: 'out', node: outNode, label: 'wobble' });
 
       // --- LFO → wobble (unipolar 0..1 from bipolar osc) → lowpass detune + formant freqs
       const lfoBus = ac.createGain(); lfoBus.gain.value = 0.5;               // −1..1 → −0.5..0.5
       const lfoOffset = ac.createConstantSource(); lfoOffset.offset.value = 0.5; lfoOffset.start(); ctx.track(lfoOffset);
       const uni = ac.createGain(); lfoBus.connect(uni); lfoOffset.connect(uni); // uni = 0..1
-      const depthG = ac.createGain(); uni.connect(depthG); depthG.connect(lp1.detune); depthG.connect(lp2.detune);
+      const depthG = ac.createGain(); uni.connect(depthG); depthG.connect(lp1.detune); depthG.connect(lp2.detune); depthG.connect(lp3.detune);
       const depthMod = ctx.modBus('depth', { min: 0, max: 7200 }); depthMod.connect(depthG.gain);
-      const cutMod = ctx.modBus('cutoff', { min: -4800, max: 4800 }); cutMod.connect(lp1.detune); cutMod.connect(lp2.detune);
+      const cutMod = ctx.modBus('cutoff', { min: -4800, max: 4800 }); cutMod.connect(lp1.detune); cutMod.connect(lp2.detune); cutMod.connect(lp3.detune);
       // 2.1: tremolo + vibrato ride the same LFO
       const tremDepth = ac.createGain(), tremAl = ac.createDelay(0.05); tremDepth.gain.value = 0; tremAl.delayTime.value = FILT_LAT; uni.connect(tremDepth); tremDepth.connect(tremAl); tremAl.connect(trem.gain); ctx.track(tremAl);
-      const vibG = ac.createGain(); vibG.gain.value = 0; lfoBus.connect(vibG); [saw, saw2, sq].forEach(o => vibG.connect(o.detune));
+      const vibG = ac.createGain(); vibG.gain.value = 0; lfoBus.connect(vibG); [saw, saw2, sq].forEach(o => vibG.connect(o.detune)); vibG.connect(pitchBus);
       const bandScale = bands.map(bd => { const f = ac.createGain(), gg = ac.createGain(); uni.connect(f); f.connect(bd.b.frequency); uni.connect(gg); gg.connect(bd.g.gain); return { f, gg }; });
       let lfo = null;
       const waves = {};
@@ -315,7 +369,7 @@
         dsp.setSmooth(sqG.gain, P.get('osc2') * 0.55, ac); dsp.setSmooth(subG.gain, P.get('sub') * 0.55, ac);
         preSh.curve = dsp.curve('tanh', 0.1 + P.get('drive') * 0.9); pre.gain.setTargetAtTime(0.8 + P.get('drive') * 1.5, now, 0.01);
         const gm = P.get('gritMode'), kind = gm === 'auto' ? (P.get('shaper') > 0.6 ? 'asym' : 'soft') : gm;
-        post.curve = dsp.curve(kind, P.get('shaper') * (kind === 'fold' ? 1 : kind === 'hard' ? 0.5 : 0.75));
+        post.curve = kind === 'crush' ? dsp.curve('crush', Math.round(12 - P.get('shaper') * 10)) : dsp.curve(kind, P.get('shaper') * (kind === 'fold' ? 1 : kind === 'hard' ? 0.5 : 0.75));
         const comp = 1 / (0.6 + dsp.curveRms(post.curve) * 0.8);
         dsp.setSmooth(level.gain, 0.45 * comp * P.get('level'), ac);
         saw2.detune.setTargetAtTime(P.get('spread'), now, 0.02);
@@ -323,6 +377,19 @@
         dsp.setSmooth(noiseG.gain, P.get('noise') * 0.35, ac);
         const am = P.get('ampMod'); trem.gain.setTargetAtTime(1 - am, now, 0.01); tremDepth.gain.setTargetAtTime(am, now, 0.01);
         vibG.gain.setTargetAtTime(P.get('vibrato') * 2, now, 0.01); // lfoBus is ±0.5 → ±cents
+        const rg = P.get('ring') || 0; if (rg > 0 || ringDepth.gain.value !== 0) { ringVca.gain.setTargetAtTime(1 - rg, now, 0.01); ringDepth.gain.setTargetAtTime(rg, now, 0.01); }
+        applyVoices();
+      }
+      // 4.0 unison: pairs 2…4 detuned 2×, 3×, 4× the Unison spread, panned wider with Width, quieter so the sum stays even
+      function makeVoice(i) {
+        const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = fHz.offset.value; const g = ac.createGain(); g.gain.value = 0; const p = ac.createStereoPanner();
+        o.connect(g); g.connect(p); p.connect(oscSum); fmVca.connect(o.frequency); pitchBus.connect(o.detune); o.start(); [o, g, p].forEach(n => ctx.track(n));
+        return { o, g, p, sign: i % 2 ? 1 : -1, k: 2 + Math.floor(i / 2) };
+      }
+      function applyVoices() {
+        const n = (+P.get('voices') || 2) - 2, now = ac.currentTime, sp = P.get('spread'), w = P.get('width');
+        while (extra.length < n) extra.push(makeVoice(extra.length));
+        extra.forEach((v, i) => { const on = i < n; v.g.gain.setTargetAtTime(on ? 0.3 / Math.sqrt(1 + n / 2) : 0, now, 0.02); v.o.detune.setTargetAtTime(v.sign * sp * v.k, now, 0.02); v.p.pan.setTargetAtTime(v.sign * Math.min(1, w * (0.5 + v.k / 4)), now, 0.02); });
       }
       function applyFilter() {
         const mode = P.get('filterMode'), c = P.get('cutoff'), q = P.get('res'), d = P.get('depth');
@@ -337,7 +404,11 @@
           bd.g.gain.value = ga; bandScale[i].gg.gain.value = gb - ga;
         });
         formMakeup.gain.value = 2.2 + q * 0.12;
-        lpOut.gain.setTargetAtTime(mode === 'lowpass' ? 1 : 0, ac.currentTime, 0.005);
+        const ft = FTYPE[mode] || 'lowpass'; [lp1, lp2, lp3].forEach(b => { if (b.type !== ft) b.type = ft; });
+        lp3.frequency.setTargetAtTime(c, ac.currentTime, 0.01); lp3.Q.value = 0.5;
+        const sl = P.get('slope') || '24', t0 = ac.currentTime;
+        if (sl !== '24' || s24.gain.value !== 1) { s12.gain.setTargetAtTime(sl === '12' ? 1 : 0, t0, 0.005); s24.gain.setTargetAtTime(sl === '24' ? 1 : 0, t0, 0.005); s36.gain.setTargetAtTime(sl === '36' ? 1 : 0, t0, 0.005); }
+        lpOut.gain.setTargetAtTime(mode !== 'formant' ? 1 : 0, ac.currentTime, 0.005);
         formMakeup.gain.setTargetAtTime(mode === 'formant' ? 2.2 + q * 0.12 : 0, ac.currentTime, 0.005);
       }
       function applyFm(t) {
@@ -348,10 +419,14 @@
       uni.connect(fmWubDepth);   // the wobble (0..1) opens the FM
       applyTone(); applyFilter(); applyFm(); applySquash();
       ['fmIndex', 'fmWub'].forEach(k => P.onChange(k, () => applyFm()));
-      P.onChange('fmRatio', () => fmOsc.frequency.setTargetAtTime(curF * (+P.get('fmRatio') || 1), ac.currentTime, 0.01));
+      ['fmRatio', 'fmFine'].forEach(k => P.onChange(k, () => fmOsc.frequency.setTargetAtTime(curF * ratioOf(), ac.currentTime, 0.01)));
+      P.onChange('subWave', (v) => { sub.type = v || 'sine'; });
+      ['clipOn', 'ceiling'].forEach(k => P.onChange(k, applyClip)); applyClip();
+      P.onChange('velCutoff', (v) => { if (!v) velBus.offset.setValueAtTime(0, ac.currentTime); });
+      P.onChange('keyTrack', () => { keyBus.offset.setTargetAtTime(keyCents(curF), ac.currentTime, 0.01); });
       P.onChange('squash', applySquash);
-      ['osc2', 'sub', 'drive', 'shaper', 'gritMode', 'level', 'spread', 'width', 'noise', 'ampMod', 'vibrato'].forEach(k => P.onChange(k, applyTone));
-      ['filterMode', 'cutoff', 'res', 'depth', 'vowelA', 'vowelB', 'formantShift'].forEach(k => P.onChange(k, applyFilter));
+      ['osc2', 'sub', 'drive', 'shaper', 'gritMode', 'level', 'spread', 'width', 'noise', 'ampMod', 'vibrato', 'ring', 'voices'].forEach(k => P.onChange(k, applyTone));
+      ['filterMode', 'cutoff', 'res', 'depth', 'vowelA', 'vowelB', 'formantShift', 'slope'].forEach(k => P.onChange(k, applyFilter));
       ['lfoShape', 'lfoPhase', 'shapePts'].forEach(k => P.onChange(k, () => { if (lfo) setWave(curWave()); }));
       const retime = () => {
         if (!lfo || frozen) return; const t = ac.currentTime, f = lfoFreq(curDiv), g = P.get('rateGlide');
@@ -381,19 +456,38 @@
       });
       P.onChange('wubOn', (on) => { if (!on) { seqShape = null; if (frozen) startLfo(ac.currentTime, P.get('div')); } });
 
+      // --- 4.0 LFO 2: its own oscillator → one gain per destination (all 0 while it is off: nothing is added)
+      const lfo2 = ac.createOscillator(); lfo2.type = P.get('lfo2Shape') || 'sine'; lfo2.start(); ctx.track(lfo2);
+      const l2Pitch = ac.createGain(), l2Cut = ac.createGain(), l2Vol = ac.createGain(), l2FmVca = ac.createGain(), l2Fm = ac.createGain();
+      [l2Pitch, l2Cut, l2Vol, l2Fm].forEach(g => { g.gain.value = 0; lfo2.connect(g); ctx.track(g); });
+      [saw, saw2, sq].forEach(o => l2Pitch.connect(o.detune)); l2Pitch.connect(pitchBus); l2Cut.connect(fDet); l2Vol.connect(trem.gain);
+      l2FmVca.gain.value = 0; fHz.connect(l2FmVca); l2Fm.connect(l2FmVca.gain); l2FmVca.connect(fmVca.gain); ctx.track(l2FmVca);   // ± index × note Hz
+      const l2Freq = () => P.get('lfo2Sync') ? 1 / MT.divisionSec(P.get('lfo2Div'), ctx.bpm) : P.get('lfo2Hz');
+      function applyLfo2() {
+        const d = P.get('lfo2Dest'), x = P.get('lfo2Depth'), t = ac.currentTime;
+        lfo2.frequency.setTargetAtTime(l2Freq(), t, 0.01); if (lfo2.type !== P.get('lfo2Shape')) lfo2.type = P.get('lfo2Shape') || 'sine';
+        l2Pitch.gain.setTargetAtTime(d === 'pitch' ? x * 1200 : 0, t, 0.01); l2Cut.gain.setTargetAtTime(d === 'cutoff' ? x * 4800 : 0, t, 0.01);
+        l2Vol.gain.setTargetAtTime(d === 'volume' ? x * 0.5 : 0, t, 0.01); l2Fm.gain.setTargetAtTime(d === 'fm' ? x * 6 : 0, t, 0.01);
+      }
+      if (P.get('lfo2Dest') !== 'off') applyLfo2(); else lfo2.frequency.value = l2Freq();
+      ['lfo2Dest', 'lfo2Shape', 'lfo2Sync', 'lfo2Div', 'lfo2Hz', 'lfo2Depth'].forEach(k => P.onChange(k, applyLfo2));
+      ctx.onBpm(() => { if (P.get('lfo2Sync')) lfo2.frequency.setTargetAtTime(l2Freq(), ac.currentTime, 0.01); });
+
       // --- notes (mono legato)
       let held = null; // {note, off}
       let curF = 55;
       function setFreq(f, t0, glide, fromHz) {
         const from = fromHz || curF, keep = P.get('keepRange') !== false, subK0 = SUBK[P.get('subOct')] || 1, subK = keep ? dsp.keepRange(f * subK0, 30) / f : subK0;   // 3.77 the sub never under 30 Hz
-        [[saw, 1, true], [sq, P.get('sqOct') === '-1' ? 0.5 : 1, true], [saw2, 1, true], [sub, subK, false], [fmOsc, +P.get('fmRatio') || 1, true], [{ frequency: fHz.offset }, 1, true]].forEach(([o, k, shaped]) => {
+        [[saw, 1, true], [sq, P.get('sqOct') === '-1' ? 0.5 : 1, true], [saw2, 1, true], [sub, subK, false], [fmOsc, ratioOf(), true], [{ frequency: fHz.offset }, 1, true]].concat(extra.map(v => [v.o, 1, true])).forEach(([o, k, shaped]) => {
           const t = (shaped || P.get('subAlign')) ? Math.max(ac.currentTime, t0 - OSC_LAT) : t0;   // 3.39: the shaped layer's pitch leaves early; the sub's too when it is in phase
           o.frequency.cancelScheduledValues(t);
           if (glide > 0) { o.frequency.setValueAtTime(from * k, t); o.frequency.exponentialRampToValueAtTime(f * k, t + glide); }
           else o.frequency.setValueAtTime(f * k, t);
         });
         curF = f;
+        if (P.get('keyTrack') > 0) keyBus.offset.setValueAtTime(keyCents(f), Math.max(ac.currentTime, t0 - FILT_LAT));
       }
+      const keyCents = (f) => (P.get('keyTrack') || 0) * 1200 * Math.log2(Math.max(8, f) / 110);
       // 3.50: Pitch (semitones, decimals ok) tunes the whole bass; the sub and the FM modulator follow it (they ride on curF)
       const noteHz = (note) => { const f = Math.max(8, MT.hz(Math.max(12, note + 12 * P.get('octave'))) * Math.pow(2, P.get('transpose') / 12)); return P.get('keepRange') !== false ? dsp.keepRange(f, 25) : f; };   // 3.77 never under 25 Hz
       function noteOn(note, vel, t, o) {
@@ -414,11 +508,19 @@
           const g = amp.gain; g.cancelScheduledValues(t);
           if (!legato) { g.setValueAtTime(0, t); }
           g.linearRampToValueAtTime((0.08 + 0.92 * Math.pow(vel, 1.5)), t + P.get('attack'));
+          // 4.0 decay → sustain (sustain 1 schedules nothing: the old envelope exactly)
+          const sus = P.get('sustain'); if (sus < 1) g.setTargetAtTime((0.08 + 0.92 * Math.pow(vel, 1.5)) * sus, t + P.get('attack'), Math.max(0.0005, P.get('decay') / 3));
+          // 4.0 filter envelope and velocity → cutoff, on the filter's own (early) clock
+          const ft = Math.max(ac.currentTime, t - FILT_LAT), ea = P.get('fEnvAmt');
+          if (ea) { envBus.offset.cancelScheduledValues(ft); envBus.offset.setValueAtTime(ea * 1200, ft); envBus.offset.setTargetAtTime(0, ft, Math.max(0.002, P.get('fEnvDecay') / 3)); }
+          if (P.get('velCutoff') > 0) velBus.offset.setValueAtTime(P.get('velCutoff') * (vel - 1) * 2400, ft);
         }
         const off = o.duration !== undefined ? t + o.duration : Infinity;
         held = { note, off, t };
         if (off !== Infinity) {
-          amp.gain.setValueAtTime((0.08 + 0.92 * Math.pow(vel, 1.5)), off);
+          const peak = 0.08 + 0.92 * Math.pow(vel, 1.5), sus = P.get('sustain'), a = t + P.get('attack');
+          const at = sus < 1 && off > a ? peak * sus + peak * (1 - sus) * Math.exp(-(off - a) / Math.max(0.0005, P.get('decay') / 3)) : peak;
+          amp.gain.setValueAtTime(at, off);
           amp.gain.setTargetAtTime(0, off, P.get('release') / 4);
         }
         ctx.lastNote = { note, n, f, t, slide };
@@ -453,7 +555,7 @@
       });
       ctx.shapeAt = (x) => drawFn(cleanPts(P.get('shapePts')) || [[0, -1, 0], [0.5, 1, 0]])(((x % 1) + 1) % 1);
       ctx.stateExtra = () => ({ vowels: VOWELS, key: ctx.key, divs: DIVS, shapes: SHAPES });
-      ctx.internals = { lp1, lp2, bands, lfoBus, amp, uni, trem, vibG, noiseG, panA, panB, saw2, sub, drawDc, lfoLog, get lfo() { return lfo; }, get frozen() { return frozen; } };
+      ctx.internals = { lp1, lp2, lp3, s12, s24, s36, lpOut, keyBus, envBus, velBus, lfo2, l2Pitch, l2Cut, l2Vol, l2Fm, ringVca, ringDepth, clWet, extra, outNode, bands, lfoBus, amp, uni, trem, vibG, noiseG, panA, panB, saw2, sub, drawDc, lfoLog, get lfo() { return lfo; }, get frozen() { return frozen; } };
       return {};
     },
   });

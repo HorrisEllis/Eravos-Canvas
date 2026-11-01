@@ -1,4 +1,4 @@
-# spec_id: eravos.tool-depth · version 1.0.0 · status mapped (not built) · 2026-10-31
+# spec_id: eravos.tool-depth · version 1.0.0 · status D1 step 1 built (Wobble Bass 4.0) · 2026-10-31
 # "like tools should should have more power, like wobble bass, full range of depth in all aspects."
 
 ## Rule
@@ -35,3 +35,10 @@
 ## Order
   D1 Wobble Bass (his example) · D2 Reese · D3 the Wub components (Wub Osc, Wub Filter, Wub Rate, Wub Sub) · D4 Supersaw / Retro Poly ·
   D5 Drum Machine (per-pad depth) · D6 the effects · then every tool, one per push, each audit written into its own .spec first.
+
+## ADDENDUM 2026-10-31 — D1 step 1 built: Wobble Bass 4.0
+  Built: filter types HP/BP/notch, slope 12/24/36, key track, filter envelope, velocity → cutoff · decay + sustain · FM ratios
+  0.25…8 + fine, ring mod, 2/4/6/8 voices, sub wave, crush grit · LFO 2 (pitch, cutoff, FM, volume) · dotted rates + 1/64 ·
+  output clipper. Details and proof: tools/music/tools/bass/wobble-bass/wobble-bass.spec ADDENDUM 2026-10-31.
+  Still open in D1: wavetable source with morph, comb / phaser / ladder filters, a second filter, FM feedback, hard sync,
+  oversampling choice, mono-below, a true-peak meter.
