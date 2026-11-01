@@ -66,3 +66,7 @@
     K4 INTERCONNECT, proved: the Wub Lab suite built from components can reach every Wobble Bass sound (its default within 1 dB,
        rendered); "Open as components" on a tool's page opens its stages as wired components.
     K5 the decomposition audit rewritten to read capabilities (the blocks each tool uses vs the components that expose them).
+
+## ADDENDUM 2026-11-01 (later) — the word is COMPONENT (specs/eravos.components.spec, project-wide)
+  His words: "im saying overall. components are what i called them in nexus. or just parts". "Shared DSP block" in K1–K5 above means
+  a component: tools/music/components/<name>/ (its own .js, .spec, tests). The K phases stand with that word.
