@@ -249,10 +249,10 @@
     function paint() {
       // 3.85 the tools, each with how many of its patterns match what else is picked; grouped by what they are
       rail.innerHTML = ''; const per = new Map(); lib.forEach(p => { if (matches(p, opts({ tool: '' }))) per.set(p.tool, (per.get(p.tool) || 0) + 1); });
-      const railBtn = (id, label, n, icon) => { const b = h('button', { class: 'plib-rt' + (pick.tool === id ? ' on' : ''), type: 'button', 'data-tool': id, title: label }, [h('span', { class: 'plib-ri', text: icon }), h('span', { class: 'plib-rn', text: label }), h('span', { class: 'plib-rc', text: String(n) })]);
+      const railBtn = (id, label, n, icon) => { const b = h('button', { class: 'plib-rt' + (pick.tool === id ? ' on' : '') + (n ? '' : ' none'), type: 'button', 'data-tool': id, title: label }, [h('span', { class: 'plib-ri', text: icon }), h('span', { class: 'plib-rn', text: label }), h('span', { class: 'plib-rc', text: String(n) })]);
         b.setAttribute('aria-pressed', pick.tool === id ? 'true' : 'false'); b.onclick = () => { pick.tool = id; pick.types.clear(); pick.genres.clear(); store.set({ tool: id }); paint(); grid.scrollTop = 0; }; return b; };
       rail.appendChild(railBtn('', 'Every tool', [...per.values()].reduce((a, b) => a + b, 0), '◎'));
-      const tools = [...new Set(lib.map(p => p.tool))].filter(id => per.get(id) || pick.tool === id);
+      const tools = [...new Set(lib.map(p => p.tool))];   // every tool always (a filter left on must not empty the list); none matching = dimmed
       RAIL_ORDER.forEach(grp => { const ids = tools.filter(id => kindOfTool(id) === grp).sort((a, b) => toolName(a).localeCompare(toolName(b))); if (!ids.length) return;
         rail.appendChild(h('div', { class: 'plib-rg', text: grp })); ids.forEach(id => rail.appendChild(railBtn(id, toolName(id), per.get(id) || 0, toolIcon(id)))); });
       // the chosen tool: its name, a line on it, one genre menu (the genres it has patterns in)
@@ -360,5 +360,7 @@
     const kinds = order.map(id => ({ id, label: (TYPES.find(t => t[0] === id) || [id, id])[1], about: ABOUT[id] || '', n: pool.filter(p => p.type === id).length })).filter(k => k.n);
     return { exact, kinds, about: ABOUT, list: (kind) => pool.filter(p => !kind || p.type === kind) };
   }
-  global.PatternLibrary = { forTool, kindsFor, about: ABOUT, draw: drawCard, addTransform: (fn) => { if (typeof fn === 'function') { transforms.push(fn); LIB = null; } }, addSource: (fn) => { if (typeof fn === 'function') { sources.push(fn); LIB = null; } }, all, types: TYPES.map(t => ({ id: t[0], label: t[1] })), get: (id) => all().find(p => p.id === id) || null, send, render, play, stop, open, rebuild: () => { LIB = null; return all(); }, fromGenre, families: FAMILIES.map(f => ({ id: f[0], label: f[1] })), familyOf, matches };
+  // tests: the page as on a fresh start (nothing picked, no tool chosen yet)
+  function forget() { pick.types.clear(); pick.genres.clear(); Object.assign(pick, { fav: false, q: '', lo: '', hi: '', sort: 'genre', group: 'type', tool: null }); }
+  global.PatternLibrary = { forTool, kindsFor, about: ABOUT, draw: drawCard, forget, addTransform: (fn) => { if (typeof fn === 'function') { transforms.push(fn); LIB = null; } }, addSource: (fn) => { if (typeof fn === 'function') { sources.push(fn); LIB = null; } }, all, types: TYPES.map(t => ({ id: t[0], label: t[1] })), get: (id) => all().find(p => p.id === id) || null, send, render, play, stop, open, rebuild: () => { LIB = null; return all(); }, fromGenre, families: FAMILIES.map(f => ({ id: f[0], label: f[1] })), familyOf, matches };
 })(typeof window !== 'undefined' ? window : globalThis);

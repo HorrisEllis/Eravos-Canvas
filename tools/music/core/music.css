@@ -534,3 +534,4 @@ html:not(.snd-off) .wm-win[data-react="changing"] .uk-canvas { filter: brightnes
 .plib-adv { border-top: 1px dashed var(--line); padding-bottom: 4px; }
 .plib-adv .sbk-row2 { padding: 6px 18px; }
 @media (max-width: 760px) { .plib-body { grid-template-columns: minmax(0, 1fr); } .plib-rail { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); } .plib-rg { display: none; } }
+.plib-rt.none { opacity: .45; }

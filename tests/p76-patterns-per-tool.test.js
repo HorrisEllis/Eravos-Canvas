@@ -38,10 +38,10 @@ describe('♪ Patterns per tool on the Timeline (3.76)', () => {
 /* 3.85 — James, 2026-11-01, on the Patterns page: "can you clean up the pattern ui, sort it by tool instead? its overwhelming." */
 describe('🧩 Patterns page by tool (3.85)', () => {
   it('opens on one tool, not the wall; the tools down the left; picking one shows only its patterns, by kind; the other filters fold away', () => {
-    try { localStorage.removeItem('eravos.patterns.page'); } catch (e) {}
+    try { localStorage.removeItem('eravos.patterns.page'); } catch (e) {} PatternLibrary.forget();   // a first open
     if (document.querySelector('.plib')) PatternLibrary.open(); const pg = PatternLibrary.open(), ov = document.querySelector('.plib');
     try {
-      const rail = [...ov.querySelectorAll('.plib-rt')]; assert.gt(rail.length, 5, 'a list of tools'); assert.ok(rail.some(b => b.dataset.tool === ''), 'and Every tool');
+      const rail = [...ov.querySelectorAll('.plib-rt')]; assert.gt(rail.length, 5, 'a list of tools — every tool, even with a filter left on'); assert.ok(rail.some(b => b.dataset.tool === ''), 'and Every tool');
       assert.ok(ov.querySelector('.plib-adv').hidden, 'the other filters are folded away'); assert.ok(ov.querySelector('.plib-fam').closest('[hidden]'), 'genre chips not on show');
       const on = ov.querySelector('.plib-rt.on'); assert.ok(on && on.dataset.tool, 'one tool chosen');
       const pick = rail.find(b => b.dataset.tool && b.dataset.tool !== on.dataset.tool); pick.click();
