@@ -15,7 +15,7 @@
  * color — like changing, the way it is now (static), and a way to customize. the option needs to work, it does nothing when
  * trying to disable." MODES (⋯ Options → Reactive colours): Off · Static (each colour keeps its hue, its light moves — as before)
  * · Changing (colours travel round the wheel with the music: warmer on the low end, cooler on the top, a jump on each hit, a slow
- * drift while it plays) · Custom (three colours you pick — low end, top, hits — and every colour leans toward them with the sound).
+ * drift while it plays — 3.84: no drift, only the sound) · Custom (three colours you pick — low end, top, hits — and every colour leans toward them with the sound).
  * AMOUNT: how far. EVERY colour a window carries reacts — not only its accent: any inline colour variable on any element in it
  * (a pad's --pc, a drum strip's --acc, a macro's colour …), and drawn displays (Changing turns their hues too). Off is off
  * everywhere, the older living-accent layer (UI.alive) included.
@@ -65,7 +65,7 @@
   const MODES = ['off', 'static', 'changing', 'custom'], DRAWS = ['glass', 'page'];
   let draw = 'glass'; try { const d = global.localStorage.getItem('eravos.reactive.draw'); if (DRAWS.includes(d)) draw = d; } catch (e) {}
   const GL = () => global.GlassLayer, glass = () => draw === 'glass' && !!GL();
-  let mode = 'static', amt = 0.8, custom = { low: '#ff2266', high: '#00d4ff', hit: '#ffffff' }, shift = 0, drift = 0;
+  let mode = 'static', amt = 0.8, custom = { low: '#ff2266', high: '#00d4ff', hit: '#ffffff' }, shift = 0, bright = 0.5;
   try {
     const L = global.localStorage, m = L.getItem('eravos.reactive.mode');
     if (MODES.includes(m)) mode = m; else if (L.getItem('eravos.reactive') === '0') mode = 'off';
@@ -226,8 +226,12 @@
     if (!calm() && L - prevLow > 0.12) pulse = 1; prevLow = L; pulse *= 0.82;
     const target = 280 - clamp((c - 6) / 6, 0, 1) * 110;   // bass-weighted → 280° (violet/red) … bright → 170° (teal)
     hue += (target - hue) * 0.1;
-    // Changing: where the colours turn — the sound's weight (warm low end ↔ cool top), a kick on each hit, a slow drift while it plays
-    drift += 0.012; shift = mode === 'changing' ? clamp((hue - 225) * 1.1 + Math.sin(drift) * 40 + pulse * 35, -150, 150) * amt : 0; set('--snd-shift', q(shift, 0.25).toFixed(0) + 'deg');
+    // Changing: where the colours turn — the sound's weight (warm low end ↔ cool top), a kick on each hit
+    // 3.84 "the changing setting is supposed to change the color based on the sound": no clock in it any more (it had a ±40° sine drift
+    // that moved with nothing playing). The turn is where the sound sits — deep low end ≈ −150°, bright top ≈ +150° — plus a kick on each
+    // hit; steps of 6° (fewer page writes, more repeats of the same colour)
+    bright = bright + (clamp((c - 7) / 5, 0, 1) - bright) * 0.3;   // log2 Hz: 7 = 128 Hz … 12 = 4 kHz
+    shift = mode === 'changing' ? q(clamp((bright - 0.5) * 300 + pulse * 35, -160, 160) * amt, 1 / 6) : 0; set('--snd-shift', q(shift, 0.25).toFixed(0) + 'deg');
     set('--snd-low', q(low, 25).toFixed(2)); set('--snd-high', q(high, 25).toFixed(2)); set('--snd-level', q(level, 25).toFixed(2)); set('--snd-pulse', q(pulse, 10).toFixed(1)); set('--snd-hue', q(hue, 0.2).toFixed(0));
     // the app's accents: the mix lights them, each hit flashes them
     if (!base) { const cs = global.getComputedStyle(root); base = {}; PALETTE.concat(Object.keys(SURFACES)).forEach(k => { base[k] = cs.getPropertyValue(k).trim(); }); }
@@ -249,14 +253,16 @@
       const before = t.lv || 0; t.lv = before + (v - before) * (v > before ? 0.6 : 0.12); lvSet(w, t.lv);
       lvOf.set(w.dataset.instance, t.lv);
       // 3.77 "changing … each sound": this tool's own colour turn — from where ITS sound sits (its own spectrum), its own hits and
-      // its own slow drift (each window starts at its own phase), so every tool moves with what it plays, not all together
+      // (3.84: no slow drift — only the sound), so every tool moves with what it plays, not all together
       const S = settingsOf(w), o = Object.assign(G(), S); w.dataset.react = o.mode;
       if (o.mode === 'changing' && t.lv > 0.02) {
-        if (!t.fb) t.fb = new Uint8Array(t.an.frequencyBinCount); t.an.getByteFrequencyData(t.fb); let wsum = 0, tsum = 0; for (let i = 2; i < t.fb.length; i++) { wsum += t.fb[i]; tsum += t.fb[i] * i; }
-        const cen = wsum ? Math.log2(1 + tsum / wsum) / Math.log2(t.fb.length) : 0.5;   // 0 dark … 1 bright
-        t.hue = (t.hue === undefined ? cen : t.hue + (cen - t.hue) * 0.15); t.ph = (t.ph === undefined ? (hashOf(w.dataset.instance) % 628) / 100 : t.ph + 0.012 + t.lv * 0.02);
+        // 3.84 weighted by energy (the byte spectrum's floor counted every empty bin and pulled every tool toward the top)
+        if (!t.ff) t.ff = new Float32Array(t.an.frequencyBinCount); t.an.getFloatFrequencyData(t.ff); let wsum = 0, tsum = 0; for (let i = 1; i < t.ff.length; i++) { const pw = Math.pow(10, t.ff[i] / 10); wsum += pw; tsum += pw * i; }
+        // 3.84 where this tool's sound sits, in Hz on the ear's scale: 128 Hz → 0 (dark) … 4 kHz → 1 (bright) — the same scale as the mix
+        const cen = wsum ? clamp((Math.log2(Math.max(1, (tsum / wsum) * K.audio.ctx.sampleRate / t.an.fftSize)) - 7) / 5, 0, 1) : 0.5;
+        t.hue = (t.hue === undefined ? cen : t.hue + (cen - t.hue) * 0.3);   // 3.84 its own sound only: no drift
         t.pu = Math.max((v - before > 0.18 ? 1 : 0), (t.pu || 0) * 0.82);
-        w._shift = q(clamp((t.hue - 0.5) * 220 + Math.sin(t.ph) * 45 + t.pu * 40, -160, 160) * o.amt, 0.25); if (writing && w._shS !== w._shift) { w._shS = w._shift; w.style.setProperty('--win-shift', w._shift.toFixed(0) + 'deg'); }
+        w._shift = q(clamp((t.hue - 0.5) * 300 + t.pu * 40, -160, 160) * o.amt, 1 / 6); if (writing && w._shS !== w._shift) { w._shS = w._shift; w.style.setProperty('--win-shift', w._shift.toFixed(0) + 'deg'); }
       }
       o.shift = w._shift || 0; o.pulse = t.pu || 0;
       if (lit) lit.push([w, t.lv, o]);
@@ -268,10 +274,10 @@
         const id = w.dataset.instance, outs = wires.filter(x => x.src && x.src.instanceId === id).map(x => lvOf.get(x.dst.instanceId)).filter(v => v !== undefined);
         const v = outs.length ? Math.max(...outs) : clamp(level * 0.6 + pulse * 0.25, 0, 1), prev = +w.dataset.lv || 0, lv = prev + (v - prev) * 0.4;
         w.dataset.lv = lv.toFixed(3); lvSet(w, lv);
-        // its colour turn: the tool it plays (its first wired destination that has one), else its own drift over the mix
+        // its colour turn: the tool it plays (its first wired destination that has one), else the mix's (3.84: no drift)
         const S = settingsOf(w), o = Object.assign(G(), S); w.dataset.react = o.mode;
         const dst = wires.filter(x => x.src && x.src.instanceId === id).map(x => CanvasWin(x.dst.instanceId)).find(x => x && x._shift !== undefined);
-        if (o.mode === 'changing') { w._ph = (w._ph === undefined ? (hashOf(id) % 628) / 100 : w._ph + 0.012); w._shift = dst ? dst._shift : clamp((hue - 225) * 0.8 + Math.sin(w._ph) * 50 + pulse * 30, -160, 160) * o.amt; if (writing) w.style.setProperty('--win-shift', w._shift.toFixed(1) + 'deg'); }
+        if (o.mode === 'changing') { w._shift = dst ? dst._shift : shift * (o.amt / (amt || 1)); if (writing) w.style.setProperty('--win-shift', w._shift.toFixed(1) + 'deg'); }
         o.shift = w._shift || 0;
         if (lit) lit.push([w, lv, o]);
         if (lv > 0.02) liveAcc(w, lv, ts, o); else restoreAcc(w);
