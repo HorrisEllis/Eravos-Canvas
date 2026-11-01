@@ -160,6 +160,7 @@ OrganismFactory.reg('eravos.wobble-bass', function (view) {
     ['keyTrack', 'filterMode', (v) => v !== 'formant', 'Key track works in the LP / HP / BP / notch filters'],
     ['decay', 'sustain', (v) => v < 1, 'lower Sustain first'], ['ceiling', 'clipOn', (v) => !!v, 'turn the Clipper on'],
     ['lfo2Shape', 'lfo2Dest', (v) => v !== 'off', 'pick where LFO 2 goes'], ['lfo2Depth', 'lfo2Dest', (v) => v !== 'off', 'pick where LFO 2 goes'],
+    ['wtTable', 'wtMix', (v) => v > 0, 'turn Wavetable up first'], ['wtPos', 'wtMix', (v) => v > 0, 'turn Wavetable up first'],
     ['lfo2Div', 'lfo2Sync', (v) => !!v, 'LFO 2 rate works with its Sync on'], ['lfo2Hz', 'lfo2Sync', (v) => !v, 'LFO 2 free works with its Sync off'],
   ];
   // ---- PERFORM: one hand on the wobble — sideways bends its speed (×¼ … ×4, glided), up/down opens the mouth
@@ -200,10 +201,11 @@ OrganismFactory.reg('eravos.wobble-bass', function (view) {
     group('GROWL+ — FM fine, ring, voices, sub', ['fmFine', 'ring', 'voices', 'subWave']),
     group('ENVELOPE+ — decay and sustain', ['decay', 'sustain']),
     group('LFO 2 — a second motion', ['lfo2Dest', 'lfo2Shape', 'lfo2Sync', 'lfo2Div', 'lfo2Hz', 'lfo2Depth']),
-    group('OUTPUT — clipper', ['clipOn', 'ceiling']),
+    group('WAVETABLE — a third voice', ['wtMix', 'wtTable', 'wtPos']),
+    group('OUTPUT — mono low end, clipper', ['monoBelow', 'clipOn', 'ceiling']),
   ];
   const deepBox = h('div', { class: 'wb-deep', hidden: true }, deep.map(gEl => { Object.assign(gEl.style, { margin: '0 0 8px', breakInside: 'avoid' }); return gEl; }));
-  const deepB = UI.Button({ label: 'More depth ▸', hint: 'slope, key tracking, a filter envelope, ADSR, ring mod, unison voices, a second LFO, a clipper', onClick: () => { deepBox.hidden = !deepBox.hidden; deepB.set(deepBox.hidden ? 'More depth ▸' : 'More depth ▾'); } });
+  const deepB = UI.Button({ label: 'More depth ▸', hint: 'slope, key tracking, a filter envelope, ADSR, ring mod, unison voices, a wavetable, a second LFO, mono low end, a clipper', onClick: () => { deepBox.hidden = !deepBox.hidden; deepB.set(deepBox.hidden ? 'More depth ▸' : 'More depth ▾'); } });
   deepB.el.classList.add('wb-deep-btn');
   const ctlOf = (k) => view.root.querySelector(`[data-key="${k}"]`);
   function dim() {

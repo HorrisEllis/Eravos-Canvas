@@ -111,7 +111,9 @@
                           "formant",
                           "highpass",
                           "bandpass",
-                          "notch"
+                          "notch",
+                          "comb",
+                          "comb-"
                         ]
                       },
                       "vowelA": {
@@ -218,6 +220,25 @@
                           "6",
                           "8"
                         ]
+                      },
+                      "wtMix": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "wtTable": {
+                        "enum": [
+                          "growl",
+                          "vowel",
+                          "metal",
+                          "digital",
+                          "organ"
+                        ]
+                      },
+                      "wtPos": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
                       },
                       "subWave": {
                         "enum": [
@@ -396,6 +417,11 @@
                         "type": "number",
                         "minimum": 0,
                         "maximum": 1
+                      },
+                      "monoBelow": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 400
                       },
                       "clipOn": {
                         "type": "boolean"

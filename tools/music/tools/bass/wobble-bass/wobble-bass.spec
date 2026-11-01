@@ -238,3 +238,17 @@ rate glide, fold grit) stay; their tests now use a plain dancehall growl patch.
   clipper broken on purpose → their tests fail).
   Not in this step (next in D1): wavetable source, comb/phaser/ladder filter, a second filter, FM feedback, hard sync,
   oversampling choice, mono-below, true-peak meter.
+
+## ADDENDUM 2026-11-01 — 4.1 FULL DEPTH step 2
+  WAVETABLE  wtMix (0 = off: its oscillators are only made when first turned up) · wtTable growl · vowel · metal · digital · organ
+             (8 frames each, 32 harmonics, a sine series so every frame stays in tune) · wtPos crossfades the two nearest frames
+             (equal power). It goes through the same filter, wobble and grit, and follows pitch, FM, the pitch input and Pitch wub.
+  COMB       filterMode comb / comb−: x + g·x[n−D] + g²·x[n−2D], D = 1/cutoff, g from Reso (0.3…0.95, negative for comb−); the
+             wobble shortens D by up to Depth octaves. Feed-forward (a WebAudio feedback loop cannot go under 128 samples, which
+             would cap a feedback comb at ~375 Hz).
+  MONO BELOW monoBelow 0–400 Hz (0 = off, its switch at exactly 1): mid + the side high-passed (2 × 12 dB) at the frequency,
+             L/R rebuilt. The port is now finalOut (outNode → straight or mono-low → finalOut).
+  Proof: 38 factory presets against 4.0 on main: worst −69.4 dB (the render noise floor). Tests: 3 more (wavetable position
+  and frames, comb + vs − at the cutoff, mono below keeps the high side and removes the low side).
+  Still open: a second filter, FM feedback, hard sync, oversampling choice, a true-peak meter (WebAudio has no native hard sync
+  or sub-block feedback: these need an AudioWorklet voice — D1 step 3).
