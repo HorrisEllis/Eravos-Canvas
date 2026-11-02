@@ -795,3 +795,10 @@ html[data-theme="dusk"] .uk-seg button.on:hover, html[data-theme="dusk"] .uk-btn
    the window every frame (the same cost measured on the glass layer, 3.82). Its gradients are faint (8–16 %), so over the dark chassis
    plain transparency reads the same light. */
 html[data-theme="dusk"] .wm-dusk { mix-blend-mode: normal; }
+/* S1 button styles in the theme panel (canvas/runtime/themes.js, buttons.css) */
+.thm-sub { display: flex; gap: 10px; align-items: baseline; margin-top: 14px; } .thm-sub b { font: 700 11px var(--mono); letter-spacing: .14em; } .thm-sub span { color: var(--dim); font-size: 12px; }
+.thm-btns { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.thm-bcard { text-align: left; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 12px; border: 1px solid var(--line2); background: var(--panel); color: var(--text); cursor: pointer; min-width: 0; }
+.thm-bcard.on { border-color: var(--acc); box-shadow: 0 0 0 1px var(--acc); } .thm-bcard small { color: var(--dim); font-size: 11px; line-height: 1.35; }
+.thm-bdemo { display: flex; gap: 6px; padding: 10px 8px; border-radius: 8px; background: radial-gradient(60% 80% at 20% 30%, color-mix(in srgb, var(--acc) 30%, transparent), transparent), #0a0e14; pointer-events: none; }
+@media (max-width: 760px) { .thm-btns { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
