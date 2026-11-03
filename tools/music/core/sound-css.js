@@ -251,7 +251,7 @@
   const q = (v, n) => Math.round(v * n) / n;   // a visible step: n per unit
   function zero() {
     const w0 = writing; writing = true;   // 3.78 putting colours back is never skipped
-    ['--snd-low', '--snd-high', '--snd-level', '--snd-pulse'].forEach(k => set(k, '0')); doc.querySelectorAll('.wm-win[style*="--tool-level"]').forEach(w => { w.style.setProperty('--tool-level', '0'); w._lvS = '0.00'; });
+    ['--snd-low', '--snd-high', '--snd-level', '--snd-pulse'].forEach(k => set(k, '0')); ['--snd-hn', '--snd-lv'].forEach(k => setPal(k, '0')); doc.querySelectorAll('.wm-win[style*="--tool-level"]').forEach(w => { w.style.setProperty('--tool-level', '0'); w._lvS = '0.00'; });
     PALETTE.concat(Object.keys(SURFACES)).forEach(k => { root.style.removeProperty(k); delete rootV[k]; }); lastPal = -1e9;
     Array.from(live).forEach(unlight); live.clear(); set('--snd-shift', '0deg');
     writing = w0; glassRest();
@@ -300,7 +300,10 @@
     set('--snd-low', q(low, 25).toFixed(2)); set('--snd-high', q(high, 25).toFixed(2)); set('--snd-level', q(level, 25).toFixed(2)); set('--snd-pulse', q(pulse, 10).toFixed(1)); set('--snd-hue', q(hue, 0.2).toFixed(0));
     // the app's accents: the mix lights them, each hit flashes them
     if (!base) { const cs = global.getComputedStyle(root); base = {}; PALETTE.concat(Object.keys(SURFACES)).forEach(k => { base[k] = cs.getPropertyValue(k).trim(); }); }
-    const kMix = q(clamp((level * 0.55 + pulse * 0.5) * amt * 1.25, 0, 1), 20); if (on && ts - lastPal >= 100) { lastPal = ts; PALETTE.forEach(k => { if (base[k]) setPal(k, colourFor(base[k], kMix, G())); }); surfaces(kMix); }
+    const kMix = q(clamp((level * 0.55 + pulse * 0.5) * amt * 1.25, 0, 1), 20);
+    // 3.98 the Field theme: one turn (degrees, a plain number) and one light (0…1) for every colour at once — written in both ways of
+    // drawing, so every accent on the page moves together ("changing to sync them all, and change with the sounds")
+    if (on) { setPal('--snd-hn', String(Math.round(shift))); setPal('--snd-lv', kMix.toFixed(2)); } if (on && ts - lastPal >= 100) { lastPal = ts; PALETTE.forEach(k => { if (base[k]) setPal(k, colourFor(base[k], kMix, G())); }); surfaces(kMix); }
     if (G2 && on) glassMix(kMix);
     // a tool shown on its page (or a suite's page) lights with the mix
     if (on) doc.querySelectorAll('.tp-overlay').forEach(o => { o._rk = kMix; o._ro = G(); light(o, kMix, G()); accented(o, ts).forEach(el => light(el, kMix, G())); });
@@ -351,7 +354,7 @@
     if (lit) glassWindows(lit);
   }
   // ---- 3.82 the glass layer: one wash for the mix, one glow per window. Same colours as the page way (colourFor, tintNow).
-  const accBase = (w) => (w._cb && w._cb['--acc']) || w.dataset.acc0 || w.style.getPropertyValue('--acc').trim() || (base && base['--acc']) || '#00d4ff';
+  const accBase = (w) => w.style.getPropertyValue('--facc').trim() || (w._cb && w._cb['--acc']) || w.dataset.acc0 || w.style.getPropertyValue('--acc').trim() || (base && base['--acc']) || '#00d4ff';
   function glassMix(kMix) {
     const L = GL().layer('reactive', { depth: 99990, cover: coverWins });
     GL().vars.set('react.tint', tintNow()); GL().vars.set('react.mix', +(kMix * 0.2).toFixed(3));   // the surfaces' shares in the page way are 10–16 %; a wash over text needs a touch more

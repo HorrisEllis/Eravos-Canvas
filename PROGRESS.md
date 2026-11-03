@@ -2,6 +2,38 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.100 The Field flows (2026-11-03)
+Asked: "can you have the gradient like slowly moving slowly with that theme?"
+- The Field's colours travel along it, one pass in 48 s, then back (a mirrored run: no seam). Still when reduced motion is asked.
+- Positions are measured only when something moves; the flow just recolours from them ~10×/s: 1.0 ms a step for 339 accents.
+- p91 checks it. 1355/1355.
+
+## Done — 3.99 An installer, and an update service that checks GitHub and asks with a toast (2026-11-03)
+Asked: "an installer for eravos with an update service to check GitHub for updates with a toast asking to update it".
+- Install ERAVOS.bat → packaging/windows/install.ps1: the newest GitHub release (or the local dist build) into
+  %LOCALAPPDATA%\Programs\ERAVOS, no admin; Start menu + desktop shortcuts; Settings › Apps entry; uninstall.ps1 (asks before deleting
+  your work). Your folders (projects, exports, drop, packs, .appdata) are never replaced.
+- desktop/updater.js: GitHub's latest release at start + every 6 h; newer than the app → the page's toast (canvas/runtime/updates.js):
+  Update now · What's new · Later (remembered per version); ⋯ Options › Check for updates. Update now downloads ERAVOS_<v>.zip, waits
+  for ERAVOS to close, swaps the app files (not yours) and restarts it. No zip or not Windows → the release page.
+- .github/workflows/release.yml: a tag vX.Y.Z (matching desktop/package.json) builds the Windows zip and attaches it to the release.
+  make-exe.ps1 gained -NoStart and ships updater.js and uninstall.ps1.
+- Not run here: the PowerShell scripts and the workflow need Windows/GitHub (this machine is Linux) — the page side is tested (p99).
+  No release has a zip yet: the first one appears when a v0.2.0 tag is pushed. 1355/1355.
+
+## Done — 3.98 The Field theme: clear buttons, one gradient under the canvas seen only through the accents (2026-11-03)
+Asked: "a layer above the canvas is a gradient that's invisible except for where the accents are … if you drag the tools around, it
+changes the colors in relation to where it's at" · "I want this a theme. Like they're clear" · "The canvas gradient is stationary so
+moving the tool shows the gradient" · "I want changing to sync them all, and change with the sounds" · "darker so it contrasts".
+- Themes → Field: deep black surfaces; buttons are clear (a border and a label only).
+- canvas/runtime/colour-field.js: one gradient (violet → magenta → rose → ember → gold) pinned to the canvas. Every accent takes the
+  colours under its left, middle and right; a window's drawn colour is the one under its middle. Measured: dragging the Wobble Bass
+  took it from rose (#ff714f) to gold (#ffb749).
+- Synced: the reactive colours turn and light the whole field at once (--snd-hn, --snd-lv), in both ways of drawing; Off keeps it still.
+- A CSS fixed background cannot do this: inside the canvas's transform it is measured from each element (tested).
+- Tests p91 (Field) and p82 follow. 1353/1353.
+- Next asked: an installer for ERAVOS with an update service that checks GitHub and asks with a toast.
+
 ## Done — 3.97 A window's glow stays behind the windows in front of it (2026-11-03)
 Asked: "the border should not be showing above tools that are above them". The reactive glow on each window's edge is drawn on one GPU
 layer over the whole page, so a lower window's edge was drawn straight through the window in front of it (and under the dock).

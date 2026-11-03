@@ -5,6 +5,7 @@
 # 2. assembles dist\ERAVOS: ERAVOS.exe + canvas\ tools\ schemas\ + resources\app (main.js, preload.js, package.json)
 #    your folders (projects, exports, drop, packs, .appdata) are kept across rebuilds
 # 3. writes dist\ERAVOS_<version>.zip (without your folders) and starts ERAVOS
+param([switch]$NoStart)   # -NoStart: build only (the release workflow)
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -36,9 +37,11 @@ $app = Join-Path $out 'resources\app'
 New-Item -ItemType Directory -Force -Path $app | Out-Null
 Copy-Item (Join-Path $repo 'desktop\main.js') $app -Force
 Copy-Item (Join-Path $repo 'desktop\preload.js') $app -Force
+Copy-Item (Join-Path $repo 'desktop\updater.js') $app -Force   # 3.99 the update service
 $appPkg = [ordered]@{ name = $pkg.name; productName = $pkg.productName; version = $pkg.version; description = $pkg.description; author = $pkg.author; main = 'main.js'; private = $true }
 [IO.File]::WriteAllText((Join-Path $app 'package.json'), ($appPkg | ConvertTo-Json), $utf8)
 foreach ($s in $ship) { Copy-Item (Join-Path $repo $s) (Join-Path $out $s) -Recurse -Force }
+Copy-Item (Join-Path $repo 'packaging\windows\uninstall.ps1') $out -Force   # 3.99 the installer's uninstaller travels with the app
 $junk = @(Get-ChildItem -Recurse -Force -Directory (Join-Path $out 'tools') | Where-Object { $_.Name -eq 'node_modules' -or $_.Name.StartsWith('.') })
 $junk | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 $domains = (Get-ChildItem -Directory (Join-Path $out 'tools') | Where-Object { Test-Path (Join-Path $_.FullName 'index.js') } | ForEach-Object { $_.Name }) -join ', '
@@ -70,5 +73,6 @@ New-Item -ItemType Directory -Force -Path $stage | Out-Null
 Get-ChildItem -Force $out | Where-Object { $keep -notcontains $_.Name } | Copy-Item -Destination $stage -Recurse -Force
 Compress-Archive -Path $stage -DestinationPath $zip -CompressionLevel Optimal
 Remove-Item (Split-Path $stage) -Recurse -Force
+if ($NoStart) { Write-Host 'Done.'; exit 0 }
 Write-Host 'Done. Starting ERAVOS...'
 Start-Process (Join-Path $out 'ERAVOS.exe')

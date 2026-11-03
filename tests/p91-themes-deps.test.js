@@ -6,14 +6,14 @@ describe('P91 · themes · the dependency graph · Clear takes the dependencies'
   it('three themes; set() puts it on <html>, tells listeners, and each says how far the reactive colours may tint a surface', () => {
     const was = Themes.get(), seen = []; const on = (e) => seen.push(e.detail.id); window.addEventListener('eravos:theme', on);
     try {
-      assert.deepEqual(Themes.list().map(t => t.id), ['dusk', 'studio', 'midnight']);
+      assert.deepEqual(Themes.list().map(t => t.id), ['dusk', 'studio', 'field', 'midnight']);
       const sc = {}; ['dusk', 'studio', 'midnight'].forEach(t => { Themes.set(t); assert.equal(R.dataset.theme, t); sc[t] = parseFloat(getComputedStyle(R).getPropertyValue('--react-surface')); });
       assert.deepEqual(seen, ['dusk', 'studio', 'midnight'], 'the reactive colours hear each switch');
       assert.ok(sc.dusk < 1 && sc.midnight < sc.dusk && sc.studio === 1, JSON.stringify(sc));
       assert.equal(Themes.set('nope'), false, 'an unknown theme is refused');
       Themes.set('dusk'); const btn = document.createElement('button'); btn.className = 'uk-btn'; document.body.appendChild(btn);
       assert.equal(getComputedStyle(btn).borderTopLeftRadius, '10px', 'Dusk: a soft rectangle, not a pill'); assert.ok(parseFloat(getComputedStyle(btn).borderTopWidth) >= 1, 'Dusk buttons keep their border'); btn.remove();
-      const p = Themes.panel(); assert.equal(p.querySelectorAll('.thm-card').length, 3, 'the section: a card per theme');
+      const p = Themes.panel(); assert.equal(p.querySelectorAll('.thm-card').length, 4, 'the section: a card per theme');
     } finally { window.removeEventListener('eravos:theme', on); Themes.set(was === 'dusk' ? 'studio' : was); R.dataset.theme = 'studio'; }
   });
   it('the shell remembers what each part added: reset() takes every part, mode and key away; prune() keeps what the tools need; graph() draws it', () => {
@@ -43,5 +43,23 @@ describe('P91 · themes · the dependency graph · Clear takes the dependencies'
       val.dispatchEvent(ev('pointerdown', y)); k.el.dispatchEvent(ev('pointermove', y - 40)); k.el.dispatchEvent(ev('pointerup', y - 40));
       assert.ok(got > 0.5, 'a drag that starts on the value turns the knob: ' + got);
     } finally { k.el.remove(); }
+  });
+  it('3.98 Field: one gradient across the canvas; an accent takes the colour under it, and moving it changes them', async () => {
+    const R = document.documentElement, was = R.dataset.theme, F = ColourField;
+    assert.ok(F.at(0, 0) !== F.at(2000, 1200), 'the field runs across the canvas');
+    const host = document.createElement('div'); host.className = 'wm-win'; host.style.cssText = 'position:fixed;left:0;top:0;width:300px;height:80px';
+    const b = document.createElement('button'); b.className = 'uk-btn'; b.textContent = 'x'; b.style.width = '200px'; host.appendChild(b); document.body.appendChild(host);
+    try {
+      Themes.set('field'); F.sweep();
+      assert.ok(b.hasAttribute('data-f') && /^#/.test(b.style.getPropertyValue('--fl')), 'the button is painted from the field');
+      assert.ok(b.style.getPropertyValue('--fl') !== b.style.getPropertyValue('--fr'), 'its left and right differ — the field runs across it');
+      const c0 = b.style.getPropertyValue('--fc'); host.style.left = '900px'; host.style.top = '500px'; F.sweep();
+      assert.ok(b.style.getPropertyValue('--fc') !== c0, 'moved, it shows another part of the field');
+      assert.equal(getComputedStyle(b).backgroundColor, 'rgba(0, 0, 0, 0)', 'clear: a border and a label only');
+      const c1 = b.style.getPropertyValue('--fc'); F.phase = F.phase + 0.3; F.flow();
+      assert.ok(b.style.getPropertyValue('--fc') !== c1, '3.100 the field flows: the colours move with nothing moved');
+      assert.ok(F.at(500, 500, 0.4) === F.at(500, 500, 2.4), 'it comes round again (a mirrored run, no seam)');
+      Themes.set('studio'); await TH.sleep(0); assert.ok(!b.hasAttribute('data-f'), 'another theme takes the field away');
+    } finally { host.remove(); Themes.set(was === 'field' ? 'studio' : was); R.dataset.theme = 'studio'; }
   });
 });
