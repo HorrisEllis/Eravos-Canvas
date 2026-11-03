@@ -24,7 +24,7 @@ describe('🔮 Glass layer: Looking Glass inside the canvas (3.82)', () => {
   function host() { const h = document.getElementById('wmhost'); if (!CanvasWM.world) { CanvasWM.init(h, Kernel); WireSystem.init(Kernel); OrganismFactory.boot(Kernel); } Kernel.audio.boot(); }
   // 3.83 James, 2026-11-01: "i want the colors in the tools to use the reactive colors" — in glass mode the page palette is still the
   // glass layer's (nothing written on <html>), but the windows' own colours now answer (they did not: only the overlay moved)
-  it('Draw with GPU layer: the drums glow on the layer in their colour; the page palette is not written, the window\'s own colours answer', async () => {
+  it('Draw with GPU layer: the drums glow on the layer in their colour; the accents are written but not the surfaces, the window\'s own colours answer', async () => {
     host(); const K = Kernel; await K.audio.ctx.resume(); SoundCSS.init(K); const was = [SoundCSS.mode, SoundCSS.draw];
     SoundCSS.setMode('static'); SoundCSS.setDraw('glass'); await GLy().use('2d');
     const pads = OrganismFactory.spawn('eravos.pads', { x: 40, y: 40 }); await TH.sleep(40); const w = CanvasWM.windowOf(pads);
@@ -38,7 +38,11 @@ describe('🔮 Glass layer: Looking Glass inside the canvas (3.82)', () => {
       let winWrites = 0; const mw = new MutationObserver(ms => { winWrites += ms.length; }); mw.observe(w, { attributes: true, attributeFilter: ['style'], subtree: true });
       for (let i = 0; i < 14; i++) { K.bus.publish('note:trigger', { target: pads, note: 36, velocity: 1, time: K.audio.ctx.currentTime + 0.01, duration: 0.2 }); await TH.sleep(40); SoundCSS.step(); }
       await TH.sleep(0); mo.disconnect(); mw.disconnect();
-      assert.equal(writes, 0, 'no style written on the page: ' + seen.join(' | '));
+      // 3.96 "All the colors are meant to be reactive … the button contents and their border": the accents ARE written now (the toolbar's
+      // buttons and the tool pages take them); the surfaces stay the glass layer's
+      const others = seen.map(x => x.split(': ')[1].split(',').filter(k => !['--cyan', '--green', '--pink', '--violet', '--amber', '--red', '--acc'].includes(k))).flat();
+      assert.equal(others.length, 0, 'only the accents are written on the page: ' + others.join(','));
+      assert.gt(writes, 0, 'the accents answer the drums outside the windows too');
       assert.gt(winWrites, 0, 'the window\'s own colours answer the drums');
       const L = GLy().layer('reactive'), e = L.items.get('win:' + pads); assert.ok(e, 'the drums have a glow'); assert.gt(e.def.intensity, 0.1, 'lit by their own sound');
       assert.equal(e.def.anchor, w, 'placed on their window'); assert.ok(L.items.has('mix'), 'and the mix wash');

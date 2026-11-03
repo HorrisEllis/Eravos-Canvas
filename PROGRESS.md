@@ -2,6 +2,16 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.96 Buttons: less round, a reactive border, reactive labels — everywhere (2026-11-03)
+Asked: "The buttons are horrible looking. Less round and the border" · "All the colors are meant to be reactive. The UIs. The tools. The
+button contents and their border. The tool pages."
+- Dusk buttons, segments and fields are soft rectangles (10 px, 8 px fields) instead of pills, with a visible gradient border.
+- The border, the label and the icon come from the reactive accent: --dk2…4 now lean 40–45 % on --acc (were 18–25 %), the label is the
+  accent mixed into the text. In a window it is the window's own accent; outside (toolbar, tool pages) the page's.
+- Glass mode (the default way of drawing) no longer stops the page accents: before, the toolbar and tool pages never moved. The glass
+  layer still owns the surfaces. Measured while the suite plays: toolbar text and the Wobble Bass button text change every 0.45 s.
+- p82 and p91 follow. 1351/1351.
+
 ## Done — 3.93–3.95 The roll opens on your notes · knobs turn from anywhere · the Wobble Bass Suite, all wired · windows fit what they hold (2026-11-03)
 Asked: "editing per note on the timeline isn't working" · "they all need to be able to adjust knobs and dials, in real time, also on
 the sequencer, the knobs need to work" · "i like the wobble bass … maybe make it a suite. with all of the enhancements you did" · "all the

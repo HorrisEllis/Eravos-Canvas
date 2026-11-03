@@ -185,6 +185,10 @@
   const WRITE_MS = 80; let writing = true, lastW = -1e9;
   let pageOff = false;   // 3.83 glass mode: the page palette is the glass layer's; the windows still answer
   const set = (k, v) => { if (!writing || pageOff || rootV[k] === v) return; rootV[k] = v; root.style.setProperty(k, v); };
+  // 3.96 "All the colors are meant to be reactive … the button contents and their border": the accents are written in glass mode too.
+  // The glass layer still owns the surfaces (its wash); but the toolbar's buttons, a tool page and anything else outside a window take
+  // their border, text and icons from the page accents, and with pageOff those never moved.
+  const setPal = (k, v) => { if (!writing || rootV[k] === v) return; rootV[k] = v; root.style.setProperty(k, v); };
   const q = (v, n) => Math.round(v * n) / n;   // a visible step: n per unit
   function zero() {
     const w0 = writing; writing = true;   // 3.78 putting colours back is never skipped
@@ -237,7 +241,7 @@
     set('--snd-low', q(low, 25).toFixed(2)); set('--snd-high', q(high, 25).toFixed(2)); set('--snd-level', q(level, 25).toFixed(2)); set('--snd-pulse', q(pulse, 10).toFixed(1)); set('--snd-hue', q(hue, 0.2).toFixed(0));
     // the app's accents: the mix lights them, each hit flashes them
     if (!base) { const cs = global.getComputedStyle(root); base = {}; PALETTE.concat(Object.keys(SURFACES)).forEach(k => { base[k] = cs.getPropertyValue(k).trim(); }); }
-    const kMix = q(clamp((level * 0.55 + pulse * 0.5) * amt * 1.25, 0, 1), 20); if (on && ts - lastPal >= 100) { lastPal = ts; PALETTE.forEach(k => { if (base[k]) set(k, colourFor(base[k], kMix, G())); }); surfaces(kMix); }
+    const kMix = q(clamp((level * 0.55 + pulse * 0.5) * amt * 1.25, 0, 1), 20); if (on && ts - lastPal >= 100) { lastPal = ts; PALETTE.forEach(k => { if (base[k]) setPal(k, colourFor(base[k], kMix, G())); }); surfaces(kMix); }
     if (G2 && on) glassMix(kMix);
     // a tool shown on its page (or a suite's page) lights with the mix
     if (on) doc.querySelectorAll('.tp-overlay').forEach(o => { o._rk = kMix; o._ro = G(); light(o, kMix, G()); accented(o, ts).forEach(el => light(el, kMix, G())); });

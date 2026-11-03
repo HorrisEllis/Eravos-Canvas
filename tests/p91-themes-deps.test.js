@@ -12,7 +12,7 @@ describe('P91 · themes · the dependency graph · Clear takes the dependencies'
       assert.ok(sc.dusk < 1 && sc.midnight < sc.dusk && sc.studio === 1, JSON.stringify(sc));
       assert.equal(Themes.set('nope'), false, 'an unknown theme is refused');
       Themes.set('dusk'); const btn = document.createElement('button'); btn.className = 'uk-btn'; document.body.appendChild(btn);
-      assert.equal(getComputedStyle(btn).borderTopLeftRadius, '999px', 'Dusk dresses a button as a pill'); btn.remove();
+      assert.equal(getComputedStyle(btn).borderTopLeftRadius, '10px', 'Dusk: a soft rectangle, not a pill'); assert.ok(parseFloat(getComputedStyle(btn).borderTopWidth) >= 1, 'Dusk buttons keep their border'); btn.remove();
       const p = Themes.panel(); assert.equal(p.querySelectorAll('.thm-card').length, 3, 'the section: a card per theme');
     } finally { window.removeEventListener('eravos:theme', on); Themes.set(was === 'dusk' ? 'studio' : was); R.dataset.theme = 'studio'; }
   });
