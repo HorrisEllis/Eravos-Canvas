@@ -45,7 +45,8 @@ describe('🔮 Glass layer: Looking Glass inside the canvas (3.82)', () => {
       assert.gt(writes, 0, 'the accents answer the drums outside the windows too');
       assert.gt(winWrites, 0, 'the window\'s own colours answer the drums');
       const L = GLy().layer('reactive'), e = L.items.get('win:' + pads); assert.ok(e, 'the drums have a glow'); assert.gt(e.def.intensity, 0.1, 'lit by their own sound');
-      assert.equal(e.def.anchor, w, 'placed on their window'); assert.ok(L.items.has('mix'), 'and the mix wash');
+      assert.equal(e.def.anchor, w, 'placed on their window'); assert.ok(!L.items.has('mix'), 'no wash: only what has colour (3.95)'); assert.equal(e.def.fill, 0, 'nothing laid over the controls');
+      SoundCSS.setLight(true); SoundCSS.step(); assert.ok(GLy().layer('reactive').items.has('mix'), 'Light over the tools: the wash'); SoundCSS.setLight(false);
       SoundCSS.setDraw('page'); assert.ok(!GLy().has('reactive'), 'Page: the layer is gone');
       SoundCSS.setDraw('glass'); SoundCSS.setMode('off'); assert.ok(!GLy().has('reactive'), 'Off: nothing on the layer');
     } finally { mo.disconnect(); OrganismFactory.close(pads); SoundCSS.setMode(was[0] === 'off' ? 'static' : was[0]); SoundCSS.setDraw(was[1]); }
@@ -64,5 +65,23 @@ describe('🔮 Glass layer: Looking Glass inside the canvas (3.82)', () => {
       assert.gt(at(60, 60), 100, 'the light is drawn where nothing covers it');
       assert.equal(at(150, 150), 0, 'and not where the window in front covers it');
     } finally { L.clear(); }
+  });
+});
+describe('🔮 Glass layer: the rim element (3.96)', () => {
+  it('a rim draws a ring on its box edge (not inside), travels when it has a speed, and lets the loop rest when removed', async () => {
+    const G = GlassLayer; await G.ready; const was = G.renderer; await G.use('2d');
+    const box = document.createElement('div'); Object.assign(box.style, { position: 'fixed', left: '100px', top: '100px', width: '120px', height: '60px' }); document.body.appendChild(box);
+    try {
+      const L = G.layer('p82-rim', { depth: 5 }); L.set('r', { type: 'rim', anchor: box, rainbow: true, width: 3, radius: 8, intensity: 1, speed: 90 });
+      for (let i = 0; i < 6; i++) G.frame(performance.now() + i * 100);
+      const g = L.el.getContext('2d'), s = L.dpr || 1, px = (x, y) => g.getImageData(Math.round(x * s), Math.round(y * s), 1, 1).data;
+      assert.gt(px(160, 100)[3], 60, 'the top edge is lit'); assert.lt(px(160, 130)[3], 10, 'the middle is clear');
+      const a = Array.from(px(160, 100)).slice(0, 3).join(); for (let i = 0; i < 8; i++) G.frame(performance.now() + 1000 + i * 120); const b = Array.from(px(160, 100)).slice(0, 3).join();
+      assert.ok(a !== b, 'the rainbow travelled: ' + a + ' → ' + b); assert.ok(G.stats().running, 'a moving rim keeps the loop running');
+      L.remove('r'); assert.ok(!G.has('p82-rim'), 'an empty layer is removed');
+    } finally { box.remove(); await G.use(was || '2d'); }
+  });
+  it('the WGSL takes a rim too (kind, width, phase, rainbow per instance)', () => {
+    assert.ok(/@location\(3\) ex: vec4f/.test(GlassLayer.WGSL) && /o\.ex\.x > 0\.5/.test(GlassLayer.WGSL), 'rim path in the shader');
   });
 });

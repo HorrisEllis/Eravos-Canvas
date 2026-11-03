@@ -4,7 +4,9 @@
  * none). Here the colours are variables the GPU reads every frame — nothing on the page is restyled.
  * The model, in Looking Glass's words:
  *   UI is typed data (2.1)        an element is { type, ...props }: 'wash' (the whole layer tinted) · 'glow' (a lit rounded box: rim,
- *                                 halo and a little light inside, placed on a page element — its anchor — or at a rect)
+ *                                 halo and a little light inside, placed on a page element — its anchor — or at a rect) · 'rim' (3.96:
+ *                                 a ring of colour round a box — a gradient of colours, or the whole rainbow — with a soft halo; it can
+ *                                 travel round on its own, like RGB lighting: speed in degrees a second)
  *   variables (2.6)               GlassLayer.vars.set(name, value); any prop may be { var: name } instead of a literal
  *   layers at runtime (2.2)       GlassLayer.layer(id, { depth, blend }) makes one on first use; a layer with no elements is removed.
  *                                 blend is a CSS mix-blend-mode; leave it 'normal' unless it is needed: measured, 'screen' makes the
@@ -65,13 +67,18 @@
     let clip = null; if (d.clip && d.clip.isConnected) { const c = d.clip.getBoundingClientRect(); clip = [c.left, c.top, c.width, c.height]; }
     return { box, z: +val(typeof d.z === 'function' ? d.z() : d.z, 0) || 0, clip, col: n.col, amt: n.amt, settling: Math.abs(tgt.amt - n.amt) > 0.002,
       radius: +val(d.radius, d.type === 'wash' ? 0 : 6), spread: d.type === 'wash' ? 0 : +val(d.spread, 18), fill: d.type === 'wash' ? 1 : +val(d.fill, 0.06) };
+    if (d.type === 'rim') {   // 3.96: the ring's own motion lives here (eased amount, travelling phase)
+      const speed = +val(d.speed, 0) || 0; e.phase = ((e.phase || 0) + speed * dt / 1000) % 360;
+      Object.assign(out, { kind: 1, width: +val(d.width, 2), phase: (+val(d.spin, 0) || 0) + e.phase, rainbow: !!val(d.rainbow, false), colors: val(d.colors, null), moving: speed !== 0 && n.amt > 0.003, spread: +val(d.spread, 10), fill: 0 });
+    }
+    return out;
   }
   // ---- the frame loop (the motion budget: runs only while something is lit or still easing)
   function wake() { if (!raf && LAYERS.size) raf = global.requestAnimationFrame(frame); }
   function frame(t) {
     raf = 0; const dt = lastT ? clamp(t - lastT, 1, 100) : 16; lastT = t; let any = false;
     LAYERS.forEach(L => {
-      const list = []; L.items.forEach(e => { const r = resolve(e, dt, L.tau); if (r && (r.amt > 0.003 || r.settling)) list.push(r); if (r && r.settling) any = true; });
+      const list = []; L.items.forEach(e => { const r = resolve(e, dt, L.tau); if (r && (r.amt > 0.003 || r.settling)) list.push(r); if (r && (r.settling || r.moving)) any = true; });
       const lit = list.some(r => r.amt > 0.003); if (lit) any = true;
       if (!lit && !L.lit) { skipped++; return; }   // at rest and already clear: nothing to draw
       if (R) { size(L); R.draw(L, list); drawn++; } L.lit = lit;
@@ -86,20 +93,28 @@
   const WGSL = `
 struct U { vp: vec2f, dpr: f32, pad: f32 };
 @group(0) @binding(0) var<uniform> u: U;
-struct I { @location(0) rect: vec4f, @location(1) col: vec4f, @location(2) shape: vec4f };   // shape: radius, spread, fill, amount
-struct O { @builtin(position) pos: vec4f, @location(0) p: vec2f, @location(1) half: vec2f, @location(2) col: vec4f, @location(3) shape: vec4f };
+struct I { @location(0) rect: vec4f, @location(1) col: vec4f, @location(2) shape: vec4f, @location(3) ex: vec4f };   // shape: radius, spread, fill, amount · ex: kind (0 glow, 1 rim), width, phase°, rainbow
+struct O { @builtin(position) pos: vec4f, @location(0) p: vec2f, @location(1) half: vec2f, @location(2) col: vec4f, @location(3) shape: vec4f, @location(4) ex: vec4f };
 @vertex fn vs(@builtin(vertex_index) vi: u32, i: I) -> O {
   var c = array<vec2f, 6>(vec2f(0.0, 0.0), vec2f(1.0, 0.0), vec2f(0.0, 1.0), vec2f(0.0, 1.0), vec2f(1.0, 0.0), vec2f(1.0, 1.0));
   let pad = i.shape.y * 3.0 + 2.0;
   let px = i.rect.xy - vec2f(pad) + c[vi] * (i.rect.zw + vec2f(pad * 2.0));
   var o: O;
   o.pos = vec4f(px.x / u.vp.x * 2.0 - 1.0, 1.0 - px.y / u.vp.y * 2.0, 0.0, 1.0);
-  o.half = i.rect.zw * 0.5; o.p = px - (i.rect.xy + o.half); o.col = i.col; o.shape = i.shape;
+  o.half = i.rect.zw * 0.5; o.p = px - (i.rect.xy + o.half); o.col = i.col; o.shape = i.shape; o.ex = i.ex;
   return o;
 }
 fn box(p: vec2f, b: vec2f, r: f32) -> f32 { let q = abs(p) - b + vec2f(r); return length(max(q, vec2f(0.0))) + min(max(q.x, q.y), 0.0) - r; }
 @fragment fn fs(o: O) -> @location(0) vec4f {
   let d = box(o.p, o.half, o.shape.x);
+  if (o.ex.x > 0.5) {   // a rim: a ring on the box's edge, its colour round the angle (the rainbow, travelling by phase), a soft halo outside
+    let t = fract(atan2(o.p.y, o.p.x) / 6.2831853 + o.ex.z / 360.0);
+    let rgb = select(o.col.rgb, vec3f(0.5) + vec3f(0.5) * cos(6.2831853 * (vec3f(t) + vec3f(0.0, 0.333, 0.667))), o.ex.w > 0.5);
+    let ring = exp(-max(abs(d) - o.ex.y * 0.5, 0.0) / 0.8);
+    let halo = select(exp(-d / max(o.shape.y, 0.001)) * 0.35, 0.0, d < 0.0);
+    let ar = clamp((ring + halo) * o.shape.w * o.col.a, 0.0, 1.0);
+    return vec4f(rgb * ar, ar);
+  }
   let edged = step(0.0001, o.shape.y);
   let halo = select(pow(exp(-d / max(o.shape.y, 0.001)), 0.8), 0.0, d < 0.0) * 0.9;
   let rim = exp(-abs(d) / 2.0);
@@ -113,7 +128,7 @@ fn box(p: vec2f, b: vec2f, r: f32) -> f32 { let q = abs(p) - b + vec2f(r); retur
     dev.addEventListener('uncapturederror', (e) => console.error('[ERAVOS] glass layer GPU:', e.error && e.error.message));
     const mod = dev.createShaderModule({ code: WGSL });
     const pipe = dev.createRenderPipeline({ layout: 'auto',
-      vertex: { module: mod, entryPoint: 'vs', buffers: [{ arrayStride: 48, stepMode: 'instance', attributes: [{ shaderLocation: 0, offset: 0, format: 'float32x4' }, { shaderLocation: 1, offset: 16, format: 'float32x4' }, { shaderLocation: 2, offset: 32, format: 'float32x4' }] }] },
+      vertex: { module: mod, entryPoint: 'vs', buffers: [{ arrayStride: 64, stepMode: 'instance', attributes: [{ shaderLocation: 0, offset: 0, format: 'float32x4' }, { shaderLocation: 1, offset: 16, format: 'float32x4' }, { shaderLocation: 2, offset: 32, format: 'float32x4' }, { shaderLocation: 3, offset: 48, format: 'float32x4' }] }] },
       fragment: { module: mod, entryPoint: 'fs', targets: [{ format: fmt, blend: { color: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha' }, alpha: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha' } } }] },
       primitive: { topology: 'triangle-list' } });
     const ubuf = dev.createBuffer({ size: 16, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
@@ -122,9 +137,9 @@ fn box(p: vec2f, b: vec2f, r: f32) -> f32 { let q = abs(p) - b + vec2f(r); retur
     return { name: 'webgpu',
       draw(L, list) {
         if (!L.gpu) { L.gpu = L.el.getContext('webgpu'); L.gpu.configure({ device: dev, format: fmt, alphaMode: 'premultiplied' }); }
-        const n = list.length; if (n > cap) { cap = Math.max(16, n * 2); if (ibuf) ibuf.destroy(); ibuf = dev.createBuffer({ size: cap * 48, usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }); }
-        const f = new Float32Array(Math.max(1, n) * 12);
-        list.forEach((r, i) => { f.set(r.box, i * 12); f.set(r.col, i * 12 + 4); f.set([r.radius, r.spread, r.fill, r.amt], i * 12 + 8); });
+        const n = list.length; if (n > cap) { cap = Math.max(16, n * 2); if (ibuf) ibuf.destroy(); ibuf = dev.createBuffer({ size: cap * 64, usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }); }
+        const f = new Float32Array(Math.max(1, n) * 16);
+        list.forEach((r, i) => { f.set(r.box, i * 16); f.set(r.col, i * 16 + 4); f.set([r.radius, r.spread, r.fill, r.amt], i * 16 + 8); f.set([r.kind || 0, r.width || 0, r.phase || 0, r.rainbow ? 1 : 0], i * 16 + 12); });
         dev.queue.writeBuffer(ubuf, 0, new Float32Array([global.innerWidth, global.innerHeight, L.dpr, 0]));
         if (n) dev.queue.writeBuffer(ibuf, 0, f);
         const enc = dev.createCommandEncoder(), pass = enc.beginRenderPass({ colorAttachments: [{ view: L.gpu.getCurrentTexture().createView(), loadOp: 'clear', clearValue: { r: 0, g: 0, b: 0, a: 0 }, storeOp: 'store' }] });
