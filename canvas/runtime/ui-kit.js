@@ -157,18 +157,20 @@
       const nv = reset ? (o.default !== undefined ? o.default : o.min) : m.fromN(n);
       if (nv !== value) { value = nv; draw(); o.onChange && o.onChange(value); }
     });
+    // 3.94 the whole knob is the handle — its ring, its value and its name all drag (it used to be only the ring, so a grab a few
+    // pixels off it did nothing, which read as a knob that does not work)
     let startY = 0, startN = 0, dragging = false, kDone = null;
-    svg.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); dragging = true; startY = e.clientY; startN = m.toN(value); try { svg.setPointerCapture(e.pointerId); } catch (_) {} el.classList.add('active'); kDone = drag.begin(end); });
-    svg.addEventListener('pointermove', (e) => {
+    el.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); dragging = true; startY = e.clientY; startN = m.toN(value); try { el.setPointerCapture(e.pointerId); } catch (_) {} el.classList.add('active'); kDone = drag.begin(end); });
+    el.addEventListener('pointermove', (e) => {
       if (!dragging) return;
       const dy = (startY - e.clientY) / (e.shiftKey ? 1500 : 160);
       const nv = m.fromN(startN + dy);
       if (nv !== value) { value = nv; draw(); o.onChange && o.onChange(value); }
     });
     const end = () => { dragging = false; el.classList.remove('active'); if (kDone) { kDone(); kDone = null; } };
-    svg.addEventListener('pointerup', end); svg.addEventListener('pointercancel', end); svg.addEventListener('lostpointercapture', end);
-    svg.addEventListener('wheel', (e) => { if (!wheelStartedOn(svg)) return; e.preventDefault(); e.stopPropagation(); const nv = m.fromN(m.toN(value) - Math.sign(e.deltaY) * (e.shiftKey ? 0.002 : 0.01)); if (nv !== value) { value = nv; draw(); o.onChange && o.onChange(value); } }, { passive: false });
-    svg.addEventListener('dblclick', () => { value = o.default !== undefined ? o.default : o.min; draw(); o.onChange && o.onChange(value); });
+    el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end); el.addEventListener('lostpointercapture', end);
+    el.addEventListener('wheel', (e) => { if (!wheelStartedOn(el)) return; e.preventDefault(); e.stopPropagation(); const nv = m.fromN(m.toN(value) - Math.sign(e.deltaY) * (e.shiftKey ? 0.002 : 0.01)); if (nv !== value) { value = nv; draw(); o.onChange && o.onChange(value); } }, { passive: false });
+    el.addEventListener('dblclick', () => { value = o.default !== undefined ? o.default : o.min; draw(); o.onChange && o.onChange(value); });
     draw();
     // a moving knob: a dot where it is now, and the range it has swung through lately (it eases back as the movement narrows)
     let lo = null, hi = null;

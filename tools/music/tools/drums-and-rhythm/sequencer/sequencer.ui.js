@@ -114,7 +114,7 @@ OrganismFactory.reg('eravos.sequencer', function (view) {
       extra.push(ps.el, gl);
     } else {
       const evK = UI.Knob({ label: '', min: 0, max: 1, step: 0.01, value: t.evolve || 0, default: 0, size: 18, accent: t.color, onChange: (v) => view.emit('track_edit', { track: ti, patch: { evolve: v } }) });
-      evK.el.title = 'evolve: from the 2nd pass ' + (t.kind === 'melodic' ? 'notes wander in key, a few rest' : 'ghost notes grow on the offbeats') + ' (repeatable — Evolve seed in ⚙)'; const kv = evK.el.querySelector('.uk-knob-val'); if (kv) kv.style.display = 'none';
+      evK.el.title = 'evolve: from the 2nd pass ' + (t.kind === 'melodic' ? 'notes wander in key, a few rest' : 'ghost notes grow on the offbeats') + ' (repeatable — Evolve seed in ⚙)'; evK.el.setAttribute('aria-label', 'Evolve'); const kv = evK.el.querySelector('.uk-knob-val'); if (kv) kv.style.display = 'none';
       extra.push(evK.el);
     }
     return h('div', { style: { display: 'flex', alignItems: 'center', gap: '3px', width: (G && G.tracks.some(x => x.kind === 'auto') ? 324 : 280) + 'px', flex: 'none' } }, [h('div', { style: { width: '8px', height: '8px', borderRadius: '50%', background: t.color } }), nm, tgt.el, ...extra, ...(vk ? [vk.el] : []), mb, sb, x]);

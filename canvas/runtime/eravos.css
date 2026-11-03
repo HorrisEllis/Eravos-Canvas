@@ -91,7 +91,7 @@ svg.wires { position: absolute; pointer-events: none; overflow: visible; z-index
 .uk-row { display: flex; flex-wrap: wrap; gap: 6px 4px; align-items: flex-end; }
 .uk-knob { display: flex; flex-direction: column; align-items: center; width: 50px; user-select: none; }
 .uk-knob.big { width: 74px; }
-.uk-knob svg { cursor: ns-resize; }
+.uk-knob { cursor: ns-resize; touch-action: none; }
 .uk-knob-track { fill: none; stroke: #243244; stroke-width: 4; stroke-linecap: round; }
 .uk-knob-arc { fill: none; stroke: var(--acc); stroke-width: 4; stroke-linecap: round; filter: drop-shadow(0 0 3px var(--acc)); }
 .uk-knob-dot { fill: #e8f4ff; }

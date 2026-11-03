@@ -35,4 +35,13 @@ describe('P91 · themes · the dependency graph · Clear takes the dependencies'
     if (!document.getElementById('slot-options')) return;   // only on the full canvas page
     assert.ok(document.getElementById('themeBtn')); assert.ok(document.getElementById('depsBtn'));
   });
+  it('3.94 a knob drags from anywhere on it — its value and its name too, not only the ring', () => {
+    let got = null; const k = UIKit.Knob({ label: 'Grab', min: 0, max: 1, value: 0.5, default: 0.5, onChange: (v) => { got = v; } }); document.body.appendChild(k.el);
+    try {
+      const val = k.el.querySelector('.uk-knob-val'), r = val.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+      const ev = (t, yy) => new PointerEvent(t, { bubbles: true, clientX: x, clientY: yy, pointerId: 1, buttons: t === 'pointerup' ? 0 : 1 });
+      val.dispatchEvent(ev('pointerdown', y)); k.el.dispatchEvent(ev('pointermove', y - 40)); k.el.dispatchEvent(ev('pointerup', y - 40));
+      assert.ok(got > 0.5, 'a drag that starts on the value turns the knob: ' + got);
+    } finally { k.el.remove(); }
+  });
 });
