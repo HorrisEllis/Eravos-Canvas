@@ -11,7 +11,7 @@ const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-requ
 const out = [];
 for (const mode of modes) {
   const p = await b.newPage({ viewport: { width: 1600, height: 1000 } });
-  await p.addInitScript((m) => { window.ERAVOS_CATALOG_ALL = true; const [md, dr, x] = m.split(':'); try { localStorage.setItem('eravos.reactive.mode', md); if (dr) localStorage.setItem('eravos.reactive.draw', dr); } catch (e) {} }, mode);
+  await p.addInitScript((m) => { window.ERAVOS_CATALOG_ALL = true; const [md, dr, th] = m.split(':'); try { localStorage.setItem('eravos.reactive.mode', md); if (dr) localStorage.setItem('eravos.reactive.draw', dr); if (th) localStorage.setItem('eravos.theme', th); } catch (e) {} }, mode);
   await p.goto('file://' + path.join(ROOT, 'canvas', 'index.html'));
   await p.waitForFunction(() => window.SongEngine && window.Kernel && window.OrganismFactory, null, { timeout: 30000 });
   await p.waitForTimeout(1500);
