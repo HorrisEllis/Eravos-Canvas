@@ -820,3 +820,8 @@ html[data-theme="midnight"] .uk-knob-arc { filter: none; }
 .dg-empty { font: 13px var(--font); fill: var(--dim); }
 .dg-note { margin: 8px 0 0; color: var(--faint); font-size: 11.5px; }
 
+/* ---- 3.99 an update is out: a toast that stays until answered */
+.toast.upd-toast { position: fixed; top: 64px; right: 14px; z-index: 300001; max-width: 380px; border-left-color: var(--acc); display: flex; flex-direction: column; gap: 8px; pointer-events: auto; }
+.upd-head { display: flex; align-items: baseline; gap: 10px; } .upd-head b { font-size: 13px; } .upd-cur { color: var(--dim); font-size: 11px; }
+.upd-notes { color: var(--dim); font-size: 11.5px; line-height: 1.4; max-height: 4.2em; overflow: hidden; }
+.upd-row { display: flex; gap: 8px; } .upd-row .tb-btn { padding: 5px 12px; }

@@ -1,0 +1,36 @@
+# 3.99 the release the update service looks for. Push a tag vX.Y.Z (with desktop/package.json "version" set to X.Y.Z):
+# this builds ERAVOS for Windows and attaches dist/ERAVOS_X.Y.Z.zip to the GitHub release of that tag. The app (desktop/updater.js)
+# and the installer (Install ERAVOS.bat) both download that zip.
+name: release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the tag matches the app's version
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          $v = (Get-Content desktop/package.json -Raw | ConvertFrom-Json).version
+          if ("v$v" -ne "${{ github.ref_name }}") { throw "tag ${{ github.ref_name }} but desktop/package.json says $v" }
+      - name: Build ERAVOS.exe
+        shell: powershell
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File packaging/windows/make-exe.ps1 -NoStart
+      - name: Attach to the release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/ERAVOS_*.zip
+          generate_release_notes: true
+      - name: Keep the build (a run by hand)
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ERAVOS-windows
+          path: dist/ERAVOS_*.zip

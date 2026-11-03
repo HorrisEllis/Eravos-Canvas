@@ -47,6 +47,17 @@ It needs [Node.js](https://nodejs.org) (the LTS version) installed once.
 Why not just open `index.html`? Browsers only allow MIDI controllers, the microphone and dependable saving for pages served
 from an address like `localhost`. Firefox in particular refuses MIDI for pages opened straight from a file.
 
+## Install and update (Windows)
+
+- **Install:** double-click **Install ERAVOS**. It installs the newest release from GitHub for your Windows user (or the build that
+  **Build ERAVOS.exe** made, if there is one) into `%LOCALAPPDATA%\Programs\ERAVOS`, and adds it to the Start menu, the desktop and
+  Settings › Apps (with an uninstaller that asks before deleting your work).
+- **Updates:** ERAVOS checks GitHub at start and every 6 hours. When a newer release is out, a toast asks: **Update now** downloads it,
+  puts it in place and restarts (your projects, exports, drop, packs and settings stay), **What's new** opens the release, **Later**
+  doesn't ask again for that version. ⋯ Options › **Check for updates** asks now.
+- **Publishing a release:** set `"version"` in `desktop/package.json` (e.g. `0.2.0`), then push the tag `v0.2.0`. The `release`
+  workflow builds ERAVOS for Windows and attaches `ERAVOS_0.2.0.zip` to the release. That zip is what the installer and the updater fetch.
+
 ## MIDI controller (pads, keys, knobs)
 
 1. Plug the controller in by USB **before** opening the browser (Firefox only sees devices present when it starts).
