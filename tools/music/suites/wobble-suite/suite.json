@@ -1,0 +1,353 @@
+{
+  "schema": "eravos.suite/1",
+  "id": "music.wobble-suite",
+  "label": "Wobble Bass Suite",
+  "icon": "〰",
+  "accent": "#ff6fa8",
+  "version": "1.0.0",
+  "blurb": "The Wobble Bass with every enhanced tool around it, all wired. Groove plays the Drum Forge kit and tells the Bassline where the kick is; Chords set the key; the Bassline (1.1, with its feel and steps) sends one line to three voices at once: the Wobble Bass, a Bass Forge growl layered over it, and a clean Sub Engine under both. Wub Rate opens the wobble and pumps the Bass Forge on the same beat, an Envelope opens the FM growl on every note, a slow LFO bends the wobble rate, and a Destroyer and a squash live inside the growl so the sub stays clean. WOBBLE, GROWL, GRIT and WEIGHT turn all of it.",
+  "hub": "eravos.suite-hub",
+  "parts": [
+    {
+      "tool": "eravos.groove-gen",
+      "role": "rhythm",
+      "required": true,
+      "preset": "Dubstep Half-time",
+      "notes": false,
+      "why": "the half-time groove: plays the Drum Forge and tells the Bassline where the kick is"
+    },
+    {
+      "tool": "eravos.drum-forge",
+      "role": "drums",
+      "required": true,
+      "preset": "Dubstep · Heavy",
+      "notes": false,
+      "why": "the kit the Groove plays: kick, snare, clap and hats on the pads Groove expects"
+    },
+    {
+      "tool": "eravos.chord-gen",
+      "role": "key",
+      "required": true,
+      "preset": "Dark Minor",
+      "notes": false,
+      "why": "the progression every bass voice follows"
+    },
+    {
+      "tool": "eravos.bass-gen",
+      "role": "bassline",
+      "required": true,
+      "preset": "On the Kick",
+      "notes": false,
+      "why": "one line, sent to the wobble, the growl and the sub at once"
+    },
+    {
+      "tool": "eravos.wobble-bass",
+      "role": "wobble",
+      "required": true,
+      "preset": "Classic Wub 1/8",
+      "why": "the wobble: its rate, its vowel, its growl"
+    },
+    {
+      "tool": "eravos.bass-forge",
+      "role": "growl",
+      "required": true,
+      "preset": "Brostep Growl",
+      "why": "a talking growl layered over the wobble, pumping on the same beat"
+    },
+    {
+      "tool": "eravos.sub-engine",
+      "role": "sub",
+      "required": true,
+      "preset": "Deep Sine",
+      "why": "the clean floor under both"
+    },
+    {
+      "tool": "eravos.wub-rate",
+      "role": "wub rhythm",
+      "required": true,
+      "preset": "Brostep Switch-up",
+      "why": "opens the wobble and pumps the growl: one rhythm for both"
+    },
+    {
+      "tool": "eravos.syn-env",
+      "role": "shape",
+      "preset": "Pluck Sweep",
+      "why": "every note opens the FM growl, then it settles",
+      "required": true
+    },
+    {
+      "tool": "eravos.lfo",
+      "role": "drift",
+      "preset": "Slow Filter Sweep 2 bars",
+      "why": "bends the wobble rate slowly over two bars",
+      "required": true
+    },
+    {
+      "tool": "eravos.fx-destroyer",
+      "role": "grit",
+      "required": true,
+      "as": "mod",
+      "slot": "growl",
+      "in": "eravos.wobble-bass",
+      "preset": "Fold Growl",
+      "why": "teeth on the wub only — the sub stays clean"
+    },
+    {
+      "tool": "eravos.fx-squash",
+      "role": "squash",
+      "as": "mod",
+      "slot": "growl",
+      "in": "eravos.wobble-bass",
+      "preset": "OTT Growl",
+      "why": "squash after the Destroyer, still inside the growl",
+      "required": true
+    }
+  ],
+  "wiring": [
+    {
+      "from": [
+        "eravos.groove-gen",
+        "groove.hook.note_out"
+      ],
+      "to": [
+        "eravos.drum-forge",
+        "df.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.groove-gen",
+        "groove.hook.step_out"
+      ],
+      "to": [
+        "eravos.bass-gen",
+        "bassg.hook.groove_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.chord-gen",
+        "chordg.hook.chord_out"
+      ],
+      "to": [
+        "eravos.bass-gen",
+        "bassg.hook.chord_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.bass-gen",
+        "bassg.hook.note_out"
+      ],
+      "to": [
+        "eravos.wobble-bass",
+        "wobble.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.bass-gen",
+        "bassg.hook.note_out"
+      ],
+      "to": [
+        "eravos.bass-forge",
+        "bf.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.bass-gen",
+        "bassg.hook.note_out"
+      ],
+      "to": [
+        "eravos.sub-engine",
+        "sub.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.wub-rate",
+        "wubrate.hook.mod_out"
+      ],
+      "to": [
+        "eravos.wobble-bass",
+        "wobble.hook.mod_depth"
+      ]
+    },
+    {
+      "from": [
+        "eravos.wub-rate",
+        "wubrate.hook.mod_out"
+      ],
+      "to": [
+        "eravos.bass-forge",
+        "bf.hook.mod_level"
+      ]
+    },
+    {
+      "from": [
+        "eravos.syn-env",
+        "env.hook.mod_out"
+      ],
+      "to": [
+        "eravos.wobble-bass",
+        "wobble.hook.mod_fm"
+      ]
+    },
+    {
+      "from": [
+        "eravos.lfo",
+        "lfo.hook.mod_out"
+      ],
+      "to": [
+        "eravos.wobble-bass",
+        "wobble.hook.mod_rate"
+      ]
+    }
+  ],
+  "output": [
+    "eravos.drum-forge",
+    "eravos.wobble-bass",
+    "eravos.bass-forge",
+    "eravos.sub-engine"
+  ],
+  "starter": "Classic Wub",
+  "scenes": {
+    "Classic Wub": {
+      "eravos.wobble-bass": {
+        "preset": "Classic Wub 1/8"
+      },
+      "eravos.bass-forge": {
+        "preset": "Brostep Growl"
+      },
+      "eravos.groove-gen": {
+        "preset": "Dubstep Half-time"
+      },
+      "eravos.bass-gen": {
+        "preset": "On the Kick"
+      },
+      "eravos.sub-engine": {
+        "preset": "Deep Sine"
+      }
+    },
+    "Yoi Talker": {
+      "eravos.wobble-bass": {
+        "preset": "Yoi Talker"
+      },
+      "eravos.bass-forge": {
+        "preset": "Yoi Talker"
+      },
+      "eravos.groove-gen": {
+        "preset": "Dubstep Half-time"
+      },
+      "eravos.bass-gen": {
+        "preset": "Half-time Sub"
+      }
+    },
+    "Half-time Growl": {
+      "eravos.wobble-bass": {
+        "preset": "Half-time Growl 1/4t"
+      },
+      "eravos.bass-forge": {
+        "preset": "Brostep Growl"
+      },
+      "eravos.bass-gen": {
+        "preset": "Half-time Sub"
+      },
+      "eravos.sub-engine": {
+        "preset": "808 Long Slide"
+      }
+    },
+    "Riddim": {
+      "eravos.drum-forge": {
+        "preset": "Riddim · Stripped"
+      },
+      "eravos.bass-forge": {
+        "preset": "Riddim Stair"
+      },
+      "eravos.bass-gen": {
+        "preset": "On the Kick"
+      }
+    },
+    "Neuro Roll": {
+      "eravos.groove-gen": {
+        "preset": "Neuro Roll"
+      },
+      "eravos.bass-gen": {
+        "preset": "Rolling Eighths"
+      },
+      "eravos.bass-forge": {
+        "preset": "Neuro Reese-FM"
+      },
+      "eravos.chord-gen": {
+        "preset": "Cluster Drop"
+      }
+    }
+  },
+  "macros": [
+    {
+      "label": "WOBBLE",
+      "default": 0.7,
+      "hint": "how far the wub rhythm opens the wobble",
+      "targets": [
+        {
+          "tool": "eravos.wobble-bass",
+          "key": "depth",
+          "min": 0,
+          "max": 6
+        }
+      ]
+    },
+    {
+      "label": "GROWL",
+      "default": 0.5,
+      "hint": "the Bass Forge growl: its FM and its vowel",
+      "targets": [
+        {
+          "tool": "eravos.bass-forge",
+          "key": "fm",
+          "min": 0,
+          "max": 4
+        },
+        {
+          "tool": "eravos.bass-forge",
+          "key": "formant"
+        }
+      ]
+    },
+    {
+      "label": "GRIT",
+      "default": 0.45,
+      "hint": "teeth and drive: the Destroyer, the wobble's drive and the growl's drive together",
+      "targets": [
+        {
+          "tool": "eravos.fx-destroyer",
+          "key": "drive"
+        },
+        {
+          "tool": "eravos.wobble-bass",
+          "key": "drive"
+        },
+        {
+          "tool": "eravos.bass-forge",
+          "key": "drive"
+        }
+      ]
+    },
+    {
+      "label": "WEIGHT",
+      "default": 0.6,
+      "hint": "the sub under it all, and the groove's energy",
+      "targets": [
+        {
+          "tool": "eravos.sub-engine",
+          "key": "level"
+        },
+        {
+          "tool": "eravos.groove-gen",
+          "key": "energy"
+        }
+      ]
+    }
+  ]
+}

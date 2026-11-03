@@ -279,8 +279,10 @@
     o = o || {};
     const win = world.querySelector(`.wm-win[data-instance="${CSS.escape(instanceId)}"]`); if (!win || win.classList.contains('collapsed') || win.classList.contains('docked')) return false;
     const body = win.querySelector('.wm-body'); if (!body) return false;
-    const z = (WM.view && WM.view.z) || 1, vis = canvas.getBoundingClientRect();
-    const MAX_W = Math.max(320, Math.min(1400, (vis.width - 24) / z)), MAX_H = Math.max(240, Math.min(1100, (vis.height - 24) / z));
+    // 3.95 sizing: a window opens big enough for what it holds (up to 1400 × 1200), whatever the screen shows at the moment. It used
+    // to stop at the visible canvas, so with the dock open or a suite opening many windows every tall tool came out squeezed and
+    // scrolling. The canvas pans, so a tall window is reached by panning, not by scrolling inside it.
+    const MAX_W = 1400, MAX_H = 1200;
     let w = win.offsetWidth, hh = win.offsetHeight;
     const dx = body.scrollWidth - body.clientWidth, dy = body.scrollHeight - body.clientHeight;
     if (dx > 2) w = Math.min(MAX_W, w + dx + 2);

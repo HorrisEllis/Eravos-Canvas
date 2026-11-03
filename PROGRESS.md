@@ -2,6 +2,22 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.93–3.95 The roll opens on your notes · knobs turn from anywhere · the Wobble Bass Suite, all wired · windows fit what they hold (2026-11-03)
+Asked: "editing per note on the timeline isn't working" · "they all need to be able to adjust knobs and dials, in real time, also on
+the sequencer, the knobs need to work" · "i like the wobble bass … maybe make it a suite. with all of the enhancements you did" · "all the
+pieces of the wobble base wire together." · "Also the sizing".
+- 3.93 The Timeline's piano roll opens centred on its notes and is never a sliver (min 320 px); it keeps them in view until you scroll.
+- 3.94 A knob drags from anywhere on it (ring, value, name). Before, only the ring listened, so a grab on the value or a few pixels off an
+  18 px lane knob did nothing. Measured in the Sequencer: Lane volume 1 → 0.96, Evolve 0 → 0.04, Swing 0 → 0.22, each live. The lane's
+  evolve knob is named "Evolve".
+- 3.95 Wobble Bass Suite (tools/music/suites/wobble-suite): Groove → Drum Forge (Dubstep · Heavy) and → Bassline; Chords → Bassline; one
+  Bassline line plays the Wobble Bass, a Bass Forge growl and a Sub Engine. Wub Rate opens the wobble and pumps the growl; an Envelope
+  opens the FM; a slow LFO bends the wobble rate; Destroyer + squash inside the growl. 12 parts, 10 wires, 5 scenes, macros WOBBLE ·
+  GROWL · GRIT · WEIGHT. Test p94.
+- 3.95 Sizing: a window opens big enough for its content, up to 1400 × 1200, whatever the screen shows. It used to stop at the visible
+  canvas, so with the dock open every tall tool came out about 600 px tall and scrolling (Wobble Bass 588 for 1131 of content).
+- 1351/1351.
+
 ## Done — 3.92 Your songs back in Songs · every pattern novel · the Patterns tool list fixed (2026-11-01)
 Asked (on screenshots of the Patterns page and the old Songs cards "Floor Falls Out", "Sub Dive City"): "this looks bad. can you recover
 those? those are my rythme. can you make sure all the patterns are novel. also fix the catagories".
