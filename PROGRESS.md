@@ -2,33 +2,39 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
-## Done — 3.95 💡 Light over the tools: a setting, off by default (2026-11-01)
-His words: "i dont want the layer of light over the tools, only the buttons, knobs, anything that already has color, make that an option
-in the settings. accent around the border and the font is colored like the rest of the ui and tools" · "show me previews. all the color in
-eravos can be animated".
-- ⋯ Options › Reactive colours › Light: "Only what has colour" (default) · "Light over the tools too" (remembered).
-- Only what has colour: buttons, knobs, keys, displays and accents react; a dark surface or a grey keeps its own (3.83's 12 %/30 % leans
-  are off); no glass wash, no light inside a window (the glow is the edge only); the surfaces (backgrounds, panels, lines) do not lean;
-  Dusk's window sky is hidden. Each window wears its accent on its border and its title — the accent reacts, so both follow the sound.
-- Light over the tools too: everything as 3.80–3.83 had it.
-- Preview: a side-by-side recording of both, Changing, a lead climbing, Wobble Bass and drums (sent to him).
-- Mistake, third time today: a comment placed mid-line swallowed code (surfaces' tint). Caught by P77/P82; from now every inserted
-  comment goes on its own line.
-- Tests: p84 +1 (default: accent title and border, attribute); p82 (no wash by default, wash with the setting); p77 and p83 run their
-  every-colour checks with Light over the tools on.
+## Done — 3.97 A window's glow stays behind the windows in front of it (2026-11-03)
+Asked: "the border should not be showing above tools that are above them". The reactive glow on each window's edge is drawn on one GPU
+layer over the whole page, so a lower window's edge was drawn straight through the window in front of it (and under the dock).
+- GlassLayer: a light has a z and a clip; a layer's cover() names what sits in front. Lights are drawn back to front and what covers each
+  is cut out of it. The washes are drawn behind.
+- Reactive colours: each window's glow has its window's z and stays inside the canvas; every window is a cover.
+- Test in p82. 1352/1352.
 
-## Done — 3.94 Branches merged · Dusk at four times the frame rate, same look (2026-11-01)
-His words: "Do it. Merge any branched. Get the newest version. The reactive color".
-- Merged: claude/modest-dijkstra-sqa0gg (3.93 the piano roll opens on your notes) into main; every branch is now in main. Reactive
-  colours checked on the merged code: Changing still follows the sound (Supersaw low −138°, mid −6°, high +126°); P77/82/83/84 pass.
-- Found while checking: everything had slowed since the morning (colours Off 55 → 32 fps). Bisected to the default theme, Dusk
-  (colours Off: Dusk 10 fps · Studio 48 · Midnight 45). Two costs, both kept as looks:
-  (1) its flowing gradients repainted every window's edge, title and lit button each frame → the flow now runs only on the focused
-      window and under the pointer (a paused animation costs nothing; the gradients stay);
-  (2) each window's dusk sky was a full-window 'screen' blend, re-blended every frame while its meters move → plain transparency
-      (its gradients are 8–16 %: side by side the window reads the same).
-- Measured (build/perf-ui.mjs, Dusk): colours Off 10 → 41.5 fps · GPU layer Static 27 → 37 · Changing 18.8 → 25.2 · Page 19.
-- build/perf-ui.mjs takes a theme: mode:draw:theme.
+## Done — 3.96 Buttons: less round, a reactive border, reactive labels — everywhere (2026-11-03)
+Asked: "The buttons are horrible looking. Less round and the border" · "All the colors are meant to be reactive. The UIs. The tools. The
+button contents and their border. The tool pages."
+- Dusk buttons, segments and fields are soft rectangles (10 px, 8 px fields) instead of pills, with a visible gradient border.
+- The border, the label and the icon come from the reactive accent: --dk2…4 now lean 40–45 % on --acc (were 18–25 %), the label is the
+  accent mixed into the text. In a window it is the window's own accent; outside (toolbar, tool pages) the page's.
+- Glass mode (the default way of drawing) no longer stops the page accents: before, the toolbar and tool pages never moved. The glass
+  layer still owns the surfaces. Measured while the suite plays: toolbar text and the Wobble Bass button text change every 0.45 s.
+- p82 and p91 follow. 1351/1351.
+
+## Done — 3.93–3.95 The roll opens on your notes · knobs turn from anywhere · the Wobble Bass Suite, all wired · windows fit what they hold (2026-11-03)
+Asked: "editing per note on the timeline isn't working" · "they all need to be able to adjust knobs and dials, in real time, also on
+the sequencer, the knobs need to work" · "i like the wobble bass … maybe make it a suite. with all of the enhancements you did" · "all the
+pieces of the wobble base wire together." · "Also the sizing".
+- 3.93 The Timeline's piano roll opens centred on its notes and is never a sliver (min 320 px); it keeps them in view until you scroll.
+- 3.94 A knob drags from anywhere on it (ring, value, name). Before, only the ring listened, so a grab on the value or a few pixels off an
+  18 px lane knob did nothing. Measured in the Sequencer: Lane volume 1 → 0.96, Evolve 0 → 0.04, Swing 0 → 0.22, each live. The lane's
+  evolve knob is named "Evolve".
+- 3.95 Wobble Bass Suite (tools/music/suites/wobble-suite): Groove → Drum Forge (Dubstep · Heavy) and → Bassline; Chords → Bassline; one
+  Bassline line plays the Wobble Bass, a Bass Forge growl and a Sub Engine. Wub Rate opens the wobble and pumps the growl; an Envelope
+  opens the FM; a slow LFO bends the wobble rate; Destroyer + squash inside the growl. 12 parts, 10 wires, 5 scenes, macros WOBBLE ·
+  GROWL · GRIT · WEIGHT. Test p94.
+- 3.95 Sizing: a window opens big enough for its content, up to 1400 × 1200, whatever the screen shows. It used to stop at the visible
+  canvas, so with the dock open every tall tool came out about 600 px tall and scrolling (Wobble Bass 588 for 1131 of content).
+- 1351/1351.
 
 ## Done — 3.92 Your songs back in Songs · every pattern novel · the Patterns tool list fixed (2026-11-01)
 Asked (on screenshots of the Patterns page and the old Songs cards "Floor Falls Out", "Sub Dive City"): "this looks bad. can you recover

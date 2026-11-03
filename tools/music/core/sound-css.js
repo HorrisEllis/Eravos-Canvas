@@ -244,6 +244,10 @@
   const WRITE_MS = 80; let writing = true, lastW = -1e9;
   let pageOff = false;   // 3.83 glass mode: the page palette is the glass layer's; the windows still answer
   const set = (k, v) => { if (!writing || pageOff || rootV[k] === v) return; rootV[k] = v; root.style.setProperty(k, v); };
+  // 3.96 "All the colors are meant to be reactive … the button contents and their border": the accents are written in glass mode too.
+  // The glass layer still owns the surfaces (its wash); but the toolbar's buttons, a tool page and anything else outside a window take
+  // their border, text and icons from the page accents, and with pageOff those never moved.
+  const setPal = (k, v) => { if (!writing || rootV[k] === v) return; rootV[k] = v; root.style.setProperty(k, v); };
   const q = (v, n) => Math.round(v * n) / n;   // a visible step: n per unit
   function zero() {
     const w0 = writing; writing = true;   // 3.78 putting colours back is never skipped
@@ -296,7 +300,7 @@
     set('--snd-low', q(low, 25).toFixed(2)); set('--snd-high', q(high, 25).toFixed(2)); set('--snd-level', q(level, 25).toFixed(2)); set('--snd-pulse', q(pulse, 10).toFixed(1)); set('--snd-hue', q(hue, 0.2).toFixed(0));
     // the app's accents: the mix lights them, each hit flashes them
     if (!base) { const cs = global.getComputedStyle(root); base = {}; PALETTE.concat(Object.keys(SURFACES)).forEach(k => { base[k] = cs.getPropertyValue(k).trim(); }); }
-    const kMix = q(clamp((level * 0.55 + pulse * 0.5) * amt * 1.25, 0, 1), 20); if (on && ts - lastPal >= 100) { lastPal = ts; PALETTE.forEach(k => { if (base[k]) set(k, colourFor(base[k], kMix, G())); }); surfaces(kMix); }
+    const kMix = q(clamp((level * 0.55 + pulse * 0.5) * amt * 1.25, 0, 1), 20); if (on && ts - lastPal >= 100) { lastPal = ts; PALETTE.forEach(k => { if (base[k]) setPal(k, colourFor(base[k], kMix, G())); }); surfaces(kMix); }
     if (G2 && on) glassMix(kMix);
     // a tool shown on its page (or a suite's page) lights with the mix
     if (on) doc.querySelectorAll('.tp-overlay').forEach(o => { o._rk = kMix; o._ro = G(); light(o, kMix, G()); accented(o, ts).forEach(el => light(el, kMix, G())); });
@@ -349,17 +353,22 @@
   // ---- 3.82 the glass layer: one wash for the mix, one glow per window. Same colours as the page way (colourFor, tintNow).
   const accBase = (w) => (w._cb && w._cb['--acc']) || w.dataset.acc0 || w.style.getPropertyValue('--acc').trim() || (base && base['--acc']) || '#00d4ff';
   function glassMix(kMix) {
-    const L = GL().layer('reactive', { depth: 99990 });
+    const L = GL().layer('reactive', { depth: 99990, cover: coverWins });
     GL().vars.set('react.tint', tintNow()); GL().vars.set('react.mix', +(kMix * 0.2).toFixed(3));   // the surfaces' shares in the page way are 10–16 %; a wash over text needs a touch more
     if (!overLight) { if (L.items.has('mix')) L.remove('mix'); return; }   // 3.95 the wash is light over the tools
     if (!L.items.has('mix')) L.set('mix', { type: 'wash', color: { var: 'react.tint' }, alpha: { var: 'react.mix' } });
   }
   const glowed = new Set();
+  // 3.97 "the border should not be showing above tools that are above them": each glow knows its window's place in the stack and stays
+  // inside the canvas; the windows in front cut it out (GlassLayer cover)
+  const zOf = (w) => parseInt(w.style.zIndex || global.getComputedStyle(w).zIndex, 10) || 0;
+  const coverWins = () => Array.from(doc.querySelectorAll('.wm-win')).filter(w => !w.classList.contains('docked') && w.offsetParent !== null).map(w => {
+    const r = w.getBoundingClientRect(); return { box: [r.left, r.top, r.width, r.height], z: zOf(w), radius: parseFloat(global.getComputedStyle(w).borderTopLeftRadius) || 0 }; });
   function glassWindows(list) {
-    const L = GL().layer('reactive', { depth: 99990 }), seen = new Set();
+    const L = GL().layer('reactive', { depth: 99990, cover: coverWins }), seen = new Set();
     list.forEach(([w, lv, o]) => { const id = 'win:' + (w.dataset.instance || ''); seen.add(id);
       const k = o.mode === 'off' ? 0 : clamp((lv * 0.85 + (o.pulse || 0) * 0.25 * lv) * o.amt * 1.25, 0, 1);
-      L.set(id, { type: 'glow', anchor: w, color: colourFor(accBase(w), k * 0.45, o), intensity: +Math.min(1, 0.15 + k * 1.3).toFixed(3) * (k > 0.02 ? 1 : 0), radius: 6, spread: overLight ? 18 + 34 * k : 6 + 12 * k, fill: overLight ? 0.035 : 0 }); });   // 3.95 without Light over the tools: the edge only, nothing over the controls   // the tool's own hue, only a little lit (lit fully, it washes to white)
+      L.set(id, { type: 'glow', anchor: w, z: () => zOf(w), clip: w.closest('#canvas, .wm-canvas, .canvas') || null, color: colourFor(accBase(w), k * 0.45, o), intensity: +Math.min(1, 0.15 + k * 1.3).toFixed(3) * (k > 0.02 ? 1 : 0), radius: 6, spread: 18 + 34 * k, fill: 0.035 }); });   // the tool's own hue, only a little lit (lit fully, it washes to white)
     glowed.forEach(id => { if (!seen.has(id)) L.remove(id); }); glowed.clear(); seen.forEach(id => glowed.add(id));
   }
   function glassRest() { const G0 = GL(); if (G0 && G0.has('reactive')) G0.layer('reactive').clear(); glowed.clear(); }

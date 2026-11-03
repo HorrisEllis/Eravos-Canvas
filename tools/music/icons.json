@@ -20,7 +20,7 @@
     "eravos.fx-squash": "chevrons-down-up"
   },
   "suites": {
-    "music.wub-lab": "boom-box", "music.synthesis-lab": "test-tube-diagonal", "music.edm-lab": "party-popper", "music.heavy-drops": "flame-kindling",
+    "music.wub-lab": "boom-box", "music.wobble-suite": "waves", "music.synthesis-lab": "test-tube-diagonal", "music.edm-lab": "party-popper", "music.heavy-drops": "flame-kindling",
     "music.synthwave": "sun", "music.gothic": "castle", "music.sound-system": "radio-tower", "music.xen": "gem"
   },
   "categories": {

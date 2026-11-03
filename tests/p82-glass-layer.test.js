@@ -24,8 +24,8 @@ describe('🔮 Glass layer: Looking Glass inside the canvas (3.82)', () => {
   function host() { const h = document.getElementById('wmhost'); if (!CanvasWM.world) { CanvasWM.init(h, Kernel); WireSystem.init(Kernel); OrganismFactory.boot(Kernel); } Kernel.audio.boot(); }
   // 3.83 James, 2026-11-01: "i want the colors in the tools to use the reactive colors" — in glass mode the page palette is still the
   // glass layer's (nothing written on <html>), but the windows' own colours now answer (they did not: only the overlay moved)
-  it('Draw with GPU layer: the drums glow on the layer in their colour; the page palette is not written, the window\'s own colours answer', async () => {
-    host(); const K = Kernel; await K.audio.ctx.resume(); SoundCSS.init(K); const was = [SoundCSS.mode, SoundCSS.draw]; if (SoundCSS.setLight) SoundCSS.setLight(false);
+  it('Draw with GPU layer: the drums glow on the layer in their colour; the accents are written but not the surfaces, the window\'s own colours answer', async () => {
+    host(); const K = Kernel; await K.audio.ctx.resume(); SoundCSS.init(K); const was = [SoundCSS.mode, SoundCSS.draw];
     SoundCSS.setMode('static'); SoundCSS.setDraw('glass'); await GLy().use('2d');
     const pads = OrganismFactory.spawn('eravos.pads', { x: 40, y: 40 }); await TH.sleep(40); const w = CanvasWM.windowOf(pads);
     let writes = 0; // a colour or a level written by the reactive colours (a tool's own animation, like a pad's --hit flash, is the tool's, not this)
@@ -38,7 +38,11 @@ describe('🔮 Glass layer: Looking Glass inside the canvas (3.82)', () => {
       let winWrites = 0; const mw = new MutationObserver(ms => { winWrites += ms.length; }); mw.observe(w, { attributes: true, attributeFilter: ['style'], subtree: true });
       for (let i = 0; i < 14; i++) { K.bus.publish('note:trigger', { target: pads, note: 36, velocity: 1, time: K.audio.ctx.currentTime + 0.01, duration: 0.2 }); await TH.sleep(40); SoundCSS.step(); }
       await TH.sleep(0); mo.disconnect(); mw.disconnect();
-      assert.equal(writes, 0, 'no style written on the page: ' + seen.join(' | '));
+      // 3.96 "All the colors are meant to be reactive … the button contents and their border": the accents ARE written now (the toolbar's
+      // buttons and the tool pages take them); the surfaces stay the glass layer's
+      const others = seen.map(x => x.split(': ')[1].split(',').filter(k => !['--cyan', '--green', '--pink', '--violet', '--amber', '--red', '--acc'].includes(k))).flat();
+      assert.equal(others.length, 0, 'only the accents are written on the page: ' + others.join(','));
+      assert.gt(writes, 0, 'the accents answer the drums outside the windows too');
       assert.gt(winWrites, 0, 'the window\'s own colours answer the drums');
       const L = GLy().layer('reactive'), e = L.items.get('win:' + pads); assert.ok(e, 'the drums have a glow'); assert.gt(e.def.intensity, 0.1, 'lit by their own sound');
       assert.equal(e.def.anchor, w, 'placed on their window'); assert.ok(!L.items.has('mix'), 'no wash: only what has colour (3.95)'); assert.equal(e.def.fill, 0, 'nothing laid over the controls');
@@ -51,6 +55,16 @@ describe('🔮 Glass layer: Looking Glass inside the canvas (3.82)', () => {
     const src = window.__SOURCES && window.__SOURCES.skeleton && window.__SOURCES.skeleton['canvas/runtime/glass-layer.js'];
     if (src) ['audio', 'music', 'synth', 'drum', 'song'].forEach(t => assert.ok(!new RegExp('\\b' + t + '\\b', 'i').test(src), 'no "' + t + '"'));
     assert.ok(/@vertex fn vs/.test(GLy().WGSL) && /@fragment fn fs/.test(GLy().WGSL), 'vertex and fragment entry points');
+  });
+  it('3.97 a light behind a window stays behind it: what covers it (a higher z) cuts it out; a light is kept inside its clip', async () => {
+    await GLy().use('2d'); const L = GLy().layer('p97', { depth: 5, cover: () => [{ box: [100, 100, 200, 200], z: 2 }] });
+    try {
+      L.set('back', { type: 'glow', rect: [20, 20, 200, 200], z: 1, color: '#ff0000', intensity: 1, spread: 10, fill: 1 });
+      for (let i = 0; i < 30; i++) GLy().frame(performance.now() + i * 50);
+      const g = L.el.getContext('2d'), d = L.dpr || 1, at = (x, y) => g.getImageData(Math.round(x * d), Math.round(y * d), 1, 1).data[3];
+      assert.gt(at(60, 60), 100, 'the light is drawn where nothing covers it');
+      assert.equal(at(150, 150), 0, 'and not where the window in front covers it');
+    } finally { L.clear(); }
   });
 });
 describe('🔮 Glass layer: the rim element (3.96)', () => {

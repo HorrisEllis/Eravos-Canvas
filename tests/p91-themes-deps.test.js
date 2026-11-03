@@ -12,7 +12,7 @@ describe('P91 · themes · the dependency graph · Clear takes the dependencies'
       assert.ok(sc.dusk < 1 && sc.midnight < sc.dusk && sc.studio === 1, JSON.stringify(sc));
       assert.equal(Themes.set('nope'), false, 'an unknown theme is refused');
       Themes.set('dusk'); const btn = document.createElement('button'); btn.className = 'uk-btn'; document.body.appendChild(btn);
-      assert.equal(getComputedStyle(btn).borderTopLeftRadius, '999px', 'Dusk dresses a button as a pill'); btn.remove();
+      assert.equal(getComputedStyle(btn).borderTopLeftRadius, '10px', 'Dusk: a soft rectangle, not a pill'); assert.ok(parseFloat(getComputedStyle(btn).borderTopWidth) >= 1, 'Dusk buttons keep their border'); btn.remove();
       const p = Themes.panel(); assert.equal(p.querySelectorAll('.thm-card').length, 3, 'the section: a card per theme');
     } finally { window.removeEventListener('eravos:theme', on); Themes.set(was === 'dusk' ? 'studio' : was); R.dataset.theme = 'studio'; }
   });
@@ -34,5 +34,14 @@ describe('P91 · themes · the dependency graph · Clear takes the dependencies'
   it('⋯ Options carries Theme and Dependencies; the graph page draws the canvas', () => {
     if (!document.getElementById('slot-options')) return;   // only on the full canvas page
     assert.ok(document.getElementById('themeBtn')); assert.ok(document.getElementById('depsBtn'));
+  });
+  it('3.94 a knob drags from anywhere on it — its value and its name too, not only the ring', () => {
+    let got = null; const k = UIKit.Knob({ label: 'Grab', min: 0, max: 1, value: 0.5, default: 0.5, onChange: (v) => { got = v; } }); document.body.appendChild(k.el);
+    try {
+      const val = k.el.querySelector('.uk-knob-val'), r = val.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+      const ev = (t, yy) => new PointerEvent(t, { bubbles: true, clientX: x, clientY: yy, pointerId: 1, buttons: t === 'pointerup' ? 0 : 1 });
+      val.dispatchEvent(ev('pointerdown', y)); k.el.dispatchEvent(ev('pointermove', y - 40)); k.el.dispatchEvent(ev('pointerup', y - 40));
+      assert.ok(got > 0.5, 'a drag that starts on the value turns the knob: ' + got);
+    } finally { k.el.remove(); }
   });
 });

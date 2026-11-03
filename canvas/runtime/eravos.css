@@ -91,7 +91,7 @@ svg.wires { position: absolute; pointer-events: none; overflow: visible; z-index
 .uk-row { display: flex; flex-wrap: wrap; gap: 6px 4px; align-items: flex-end; }
 .uk-knob { display: flex; flex-direction: column; align-items: center; width: 50px; user-select: none; }
 .uk-knob.big { width: 74px; }
-.uk-knob svg { cursor: ns-resize; }
+.uk-knob { cursor: ns-resize; touch-action: none; }
 .uk-knob-track { fill: none; stroke: #243244; stroke-width: 4; stroke-linecap: round; }
 .uk-knob-arc { fill: none; stroke: var(--acc); stroke-width: 4; stroke-linecap: round; filter: drop-shadow(0 0 3px var(--acc)); }
 .uk-knob-dot { fill: #e8f4ff; }
@@ -663,7 +663,7 @@ table.tp-tab { width: 100%; }
 :root, .wm-win, .tp-overlay { --dk1: var(--acc); --dk2: var(--acc); --dk3: var(--acc); --dk4: var(--acc); --dusk: var(--acc); }
 :root { --react-surface: 1; }
 .wm-dusk { display: none; } html[data-theme="dusk"] .wm-dusk { display: block; }
-html[data-theme="dusk"], html[data-theme="dusk"] .wm-win, html[data-theme="dusk"] .tp-overlay { --dk1: var(--acc); --dk2: color-mix(in oklab, var(--acc) 22%, #ff6fa8); --dk3: color-mix(in oklab, var(--acc) 18%, #ffb36b); --dk4: color-mix(in oklab, var(--acc) 25%, #b06bff);
+html[data-theme="dusk"], html[data-theme="dusk"] .wm-win, html[data-theme="dusk"] .tp-overlay { --dk1: var(--acc); --dk2: color-mix(in oklab, var(--acc) 45%, #ff6fa8); --dk3: color-mix(in oklab, var(--acc) 40%, #ffb36b); --dk4: color-mix(in oklab, var(--acc) 45%, #b06bff);
   --dusk: linear-gradient(100deg, var(--dk1), var(--dk2) 25%, var(--dk3) 45%, var(--dk4) 70%, var(--dk1)); }
 @keyframes dusk-flow { from { background-position: 0% 50%; } to { background-position: 300% 50%; } }
 html[data-theme="dusk"] .wm-win::before { height: 3px; background: var(--dusk); background-size: 300% 100%; animation: dusk-flow 14s linear infinite; box-shadow: 0 0 12px color-mix(in srgb, var(--dk2) 60%, transparent); }
@@ -694,17 +694,25 @@ html[data-theme="dusk"] .wm-win::before { display: none; }
 html[data-theme="dusk"] .wm-head { border-bottom: 0; padding-left: 14px; background: linear-gradient(90deg, rgba(7,9,13,.94) 0%, rgba(7,9,13,.6) 45%, rgba(7,9,13,.2)), var(--art, linear-gradient(90deg, color-mix(in srgb, var(--dk4) 30%, #0b1016), color-mix(in srgb, var(--dk2) 30%, #0b1016))) center 35% / cover; }
 html[data-theme="dusk"] .wm-title { font-size: 12.5px; letter-spacing: 2.2px; }
 html[data-theme="dusk"] .wm-body canvas { border-radius: 10px; }
-html[data-theme="dusk"] :is(.uk-btn, .tb-btn, .sbk-alt, .sbk-chip, .tp-btn, .ap-btn, .fl-btn, .uk-toggle) { border-radius: 999px; border: 1px solid transparent;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--panel2) 92%, #fff), var(--bg2)) padding-box, linear-gradient(110deg, color-mix(in srgb, var(--dk2) 55%, var(--line2)), var(--line2) 45%, color-mix(in srgb, var(--dk4) 55%, var(--line2))) border-box;
-  box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 2px 8px rgba(0,0,0,.25); transition: box-shadow .15s, transform .15s, filter .15s; }
-html[data-theme="dusk"] :is(.uk-btn, .tb-btn, .sbk-alt, .sbk-chip, .tp-btn, .ap-btn, .fl-btn, .uk-toggle):hover { box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, 0 0 14px color-mix(in srgb, var(--dk2) 35%, transparent); transform: translateY(-1px); }
-html[data-theme="dusk"] :is(.uk-btn, .tb-btn, .sbk-alt, .tp-btn, .ap-btn, .fl-btn, .uk-toggle):active { transform: translateY(0); filter: brightness(.95); }
-html[data-theme="dusk"] :is(.uk-btn.primary, .tb-btn.pri, .tp-btn.pri, .sbk-go, .uk-toggle.on, .sbk-chip.on) { color: #fff; border-color: transparent; text-shadow: 0 1px 2px rgba(60,10,40,.45);
-  background: linear-gradient(110deg, var(--dk1), var(--dk2) 50%, var(--dk4)) padding-box, linear-gradient(110deg, var(--dk1), var(--dk4)) border-box; box-shadow: 0 4px 16px color-mix(in srgb, var(--dk2) 40%, transparent), 0 1px 0 rgba(255,255,255,.3) inset; }
-html[data-theme="dusk"] .uk-seg { border-radius: 999px; padding: 2px; gap: 2px; border: 1px solid var(--line2); background: var(--bg2); }
-html[data-theme="dusk"] .uk-seg button { border-radius: 999px; }
+/* 3.96 asked: "Less round and the border" · "All the colors are meant to be reactive. The UIs. The tools. The button contents and their
+ * border. The tool pages." Buttons are soft rectangles (10 px, not pills) with a visible gradient border; the border, the label and the
+ * icon all come from the reactive accent (--dk1…4 lean on --acc, which the sound moves — in a window its own, outside it the page's). */
+html[data-theme="dusk"] :is(.uk-btn, .tb-btn, .sbk-alt, .sbk-chip, .tp-btn, .ap-btn, .fl-btn, .uk-toggle) { border-radius: 10px; border: 1.5px solid transparent;
+  color: color-mix(in oklab, var(--dk1) 40%, var(--text));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--panel2) 90%, var(--dk1)), color-mix(in srgb, var(--bg2) 92%, var(--dk4))) padding-box,
+    linear-gradient(110deg, var(--dk1), var(--dk2) 50%, var(--dk4)) border-box;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25); transition: box-shadow .15s, filter .15s; }
+html[data-theme="dusk"] :is(.uk-btn, .tb-btn, .sbk-alt, .sbk-chip, .tp-btn, .ap-btn, .fl-btn, .uk-toggle) svg { color: inherit; stroke: currentColor; }
+html[data-theme="dusk"] :is(.uk-btn, .tb-btn, .sbk-alt, .sbk-chip, .tp-btn, .ap-btn, .fl-btn, .uk-toggle):hover { color: #fff; box-shadow: 0 0 14px color-mix(in srgb, var(--dk2) 40%, transparent); }
+html[data-theme="dusk"] :is(.uk-btn, .tb-btn, .sbk-alt, .tp-btn, .ap-btn, .fl-btn, .uk-toggle):active { filter: brightness(.92); }
+html[data-theme="dusk"] :is(.uk-btn.primary, .tb-btn.pri, .tp-btn.pri, .sbk-go, .uk-toggle.on, .sbk-chip.on) { color: #fff; text-shadow: 0 1px 2px rgba(60,10,40,.45);
+  background: linear-gradient(110deg, var(--dk1), var(--dk2) 50%, var(--dk4)) padding-box, linear-gradient(110deg, color-mix(in srgb, var(--dk1) 70%, #fff), var(--dk4)) border-box;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--dk2) 40%, transparent); }
+html[data-theme="dusk"] .uk-seg { border-radius: 10px; padding: 2px; gap: 2px; border: 1.5px solid transparent;
+  background: linear-gradient(var(--bg2), var(--bg2)) padding-box, linear-gradient(110deg, var(--dk1), var(--dk2) 50%, var(--dk4)) border-box; }
+html[data-theme="dusk"] .uk-seg button { border-radius: 7px; color: color-mix(in oklab, var(--dk1) 40%, var(--text)); }
 html[data-theme="dusk"] .uk-seg button.on { color: #fff; background: linear-gradient(110deg, var(--dk1), var(--dk2) 55%, var(--dk4)); text-shadow: 0 1px 2px rgba(60,10,40,.45); }
-html[data-theme="dusk"] :is(.uk-select, .uk-text, .sbk-q, .tp-target) { border-radius: 999px; }
+html[data-theme="dusk"] :is(.uk-select, .uk-text, .sbk-q, .tp-target) { border-radius: 8px; border-color: color-mix(in oklab, var(--dk2) 60%, var(--line2)); }
 html[data-theme="dusk"] .wm-body :is([class$="-card"], [class*="-card "], .gg-sec, section) { border-radius: 14px; }
 
 /* ---- MIDNIGHT: calm graphite; soft rounded buttons, the accent only on what is on; gentle reactions */
@@ -750,8 +758,8 @@ html[data-theme="midnight"] .uk-knob-arc { filter: none; }
 [data-theme-preview="dusk"] { background: linear-gradient(160deg, #1a1030, #0c1118 60%, #1a0e24); }
 [data-theme-preview="dusk"] .thm-mhead { color: #ffb3d0; background: linear-gradient(90deg, rgba(7,9,13,.9), rgba(7,9,13,.3)), linear-gradient(110deg, #4a1f6e, #c4547e, #ffb36b); }
 [data-theme-preview="dusk"] .thm-mhead i { background: #ff6fa8; box-shadow: 0 0 6px #ff6fa8; }
-[data-theme-preview="dusk"] .thm-mbtn { border-radius: 999px; color: #d6e4f0; border: 1px solid #3a2f55; background: #16202d; }
-[data-theme-preview="dusk"] .thm-mbtn.on, [data-theme-preview="dusk"] .thm-mpri { border-radius: 999px; color: #fff; border: 0; background: linear-gradient(110deg, #ff2266, #ff6fa8 55%, #b06bff); }
+[data-theme-preview="dusk"] .thm-mbtn { border-radius: 6px; color: #ffd6e6; border: 1px solid #ff6fa8; background: #16202d; }
+[data-theme-preview="dusk"] .thm-mbtn.on, [data-theme-preview="dusk"] .thm-mpri { border-radius: 6px; color: #fff; border: 0; background: linear-gradient(110deg, #ff2266, #ff6fa8 55%, #b06bff); }
 [data-theme-preview="dusk"] .thm-mknob { --mk: #ff6fa8; }
 [data-theme-preview="studio"] { background: linear-gradient(180deg, #121a23, #0b1016); }
 [data-theme-preview="studio"] .thm-mhead { color: #00d4ff; border-bottom: 1px solid #000; box-shadow: 0 -2px 0 #00d4ff inset; }
