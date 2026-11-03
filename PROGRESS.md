@@ -2,6 +2,12 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.100 The Field flows (2026-11-03)
+Asked: "can you have the gradient like slowly moving slowly with that theme?"
+- The Field's colours travel along it, one pass in 48 s, then back (a mirrored run: no seam). Still when reduced motion is asked.
+- Positions are measured only when something moves; the flow just recolours from them ~10×/s: 1.0 ms a step for 339 accents.
+- p91 checks it. 1355/1355.
+
 ## Done — 3.99 An installer, and an update service that checks GitHub and asks with a toast (2026-11-03)
 Asked: "an installer for eravos with an update service to check GitHub for updates with a toast asking to update it".
 - Install ERAVOS.bat → packaging/windows/install.ps1: the newest GitHub release (or the local dist build) into

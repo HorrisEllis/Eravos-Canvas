@@ -56,6 +56,9 @@ describe('P91 · themes · the dependency graph · Clear takes the dependencies'
       const c0 = b.style.getPropertyValue('--fc'); host.style.left = '900px'; host.style.top = '500px'; F.sweep();
       assert.ok(b.style.getPropertyValue('--fc') !== c0, 'moved, it shows another part of the field');
       assert.equal(getComputedStyle(b).backgroundColor, 'rgba(0, 0, 0, 0)', 'clear: a border and a label only');
+      const c1 = b.style.getPropertyValue('--fc'); F.phase = F.phase + 0.3; F.flow();
+      assert.ok(b.style.getPropertyValue('--fc') !== c1, '3.100 the field flows: the colours move with nothing moved');
+      assert.ok(F.at(500, 500, 0.4) === F.at(500, 500, 2.4), 'it comes round again (a mirrored run, no seam)');
       Themes.set('studio'); await TH.sleep(0); assert.ok(!b.hasAttribute('data-f'), 'another theme takes the field away');
     } finally { host.remove(); Themes.set(was === 'field' ? 'studio' : was); R.dataset.theme = 'studio'; }
   });
