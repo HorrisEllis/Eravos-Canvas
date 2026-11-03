@@ -38,7 +38,10 @@
   function makeLayer(id, o) {
     o = o || {}; const cv = doc.createElement('canvas'); cv.className = 'glass-layer'; cv.dataset.layer = id; cv.setAttribute('aria-hidden', 'true');
     Object.assign(cv.style, { position: 'fixed', left: '0', top: '0', width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: String(o.depth || 50), mixBlendMode: o.blend || 'normal' });
-    const L = { id, el: cv, items: new Map(), tau: o.tau || 70, dirty: true, lit: false, gpu: null,
+    // 3.97 o.cover() → [{ box: [x, y, w, h], z, radius }]: what sits on the page in front of the lights (a window above another). A
+    // light is hidden wherever something with a higher z covers it — the layer is over the whole page, so without this a lower window's
+    // edge was drawn over the window in front of it
+    const L = { id, el: cv, items: new Map(), tau: o.tau || 70, dirty: true, lit: false, gpu: null, cover: o.cover || null,
       set(eid, e) { const cur = L.items.get(eid); L.items.set(eid, { def: e, now: cur ? cur.now : null }); if (!cv.isConnected) doc.body.appendChild(cv); wake(); return L; },
       remove(eid) { L.items.delete(eid); if (!L.items.size) drop(L); else wake(); return L; },
       clear() { L.items.clear(); drop(L); return L; },
@@ -58,7 +61,9 @@
     if (!e.now) e.now = { col: tgt.col.slice(), amt: 0 };
     const n = e.now; for (let i = 0; i < 4; i++) n.col[i] += (tgt.col[i] - n.col[i]) * k; n.amt += (tgt.amt - n.amt) * k;
     if (Math.abs(tgt.amt - n.amt) < 0.002) n.amt = tgt.amt;
-    return { box, col: n.col, amt: n.amt, settling: Math.abs(tgt.amt - n.amt) > 0.002,
+    // 3.97 depth: z (which of the anchors is in front) and clip (an element whose box the light stays inside)
+    let clip = null; if (d.clip && d.clip.isConnected) { const c = d.clip.getBoundingClientRect(); clip = [c.left, c.top, c.width, c.height]; }
+    return { box, z: +val(typeof d.z === 'function' ? d.z() : d.z, 0) || 0, clip, col: n.col, amt: n.amt, settling: Math.abs(tgt.amt - n.amt) > 0.002,
       radius: +val(d.radius, d.type === 'wash' ? 0 : 6), spread: d.type === 'wash' ? 0 : +val(d.spread, 18), fill: d.type === 'wash' ? 1 : +val(d.fill, 0.06) };
   }
   // ---- the frame loop (the motion budget: runs only while something is lit or still easing)
@@ -144,11 +149,23 @@ fn box(p: vec2f, b: vec2f, r: f32) -> f32 { let q = abs(p) - b + vec2f(r); retur
     return { name: '2d', cache,
       draw(L, list) {
         const g = L.el.getContext('2d'), s = L.dpr; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, L.el.width, L.el.height); g.setTransform(s, 0, 0, s, 0, 0);
-        list.forEach(r => {
-          const [x, y, w, h] = r.box, a = clamp(r.amt * r.col[3], 0, 1);
-          if (!r.spread) { g.globalAlpha = 1; g.fillStyle = `rgba(${Math.round(r.col[0] * 255)},${Math.round(r.col[1] * 255)},${Math.round(r.col[2] * 255)},${(r.fill * a).toFixed(3)})`; g.fillRect(x, y, w, h); return; }
-          const sp = sprite(w, h, r.radius, r.spread, r.col, r.fill); g.globalAlpha = a; g.drawImage(sp, x - sp.pad, y - sp.pad, w + sp.pad * 2, h + sp.pad * 2);
+        // 3.97 lights back to front; after each, what covers it (a higher z, up to the next light's) is cut out of all drawn so far;
+        // the washes go in last, behind (they tint everything, covered or not)
+        const lights = list.filter(r => r.spread).sort((a, b) => a.z - b.z), washes = list.filter(r => !r.spread);
+        const cover = L.cover ? (L.cover() || []).slice().sort((a, b) => a.z - b.z) : [];
+        lights.forEach((r, i) => {
+          const [x, y, w, h] = r.box, a = clamp(r.amt * r.col[3], 0, 1), sp = sprite(w, h, r.radius, r.spread, r.col, r.fill);
+          g.save(); if (r.clip) { g.beginPath(); g.rect(r.clip[0], r.clip[1], r.clip[2], r.clip[3]); g.clip(); }
+          g.globalAlpha = a; g.drawImage(sp, x - sp.pad, y - sp.pad, w + sp.pad * 2, h + sp.pad * 2); g.restore();
+          const zNext = i + 1 < lights.length ? lights[i + 1].z : Infinity;
+          const over = cover.filter(c => c.z > r.z && c.z <= zNext); if (!over.length) return;
+          g.save(); g.globalCompositeOperation = 'destination-out'; g.globalAlpha = 1; g.fillStyle = '#000';
+          over.forEach(c => { const [cx, cy, cw, ch] = c.box; g.beginPath(); if (g.roundRect) g.roundRect(cx, cy, cw, ch, c.radius || 0); else g.rect(cx, cy, cw, ch); g.fill(); });
+          g.restore();
         });
+        if (washes.length) { g.save(); g.globalCompositeOperation = 'destination-over';
+          washes.forEach(r => { const [x, y, w, h] = r.box, a = clamp(r.amt * r.col[3], 0, 1); g.fillStyle = `rgba(${Math.round(r.col[0] * 255)},${Math.round(r.col[1] * 255)},${Math.round(r.col[2] * 255)},${(r.fill * a).toFixed(3)})`; g.fillRect(x, y, w, h); });
+          g.restore(); }
         g.globalAlpha = 1;
       } };
   }

@@ -2,6 +2,14 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.97 A window's glow stays behind the windows in front of it (2026-11-03)
+Asked: "the border should not be showing above tools that are above them". The reactive glow on each window's edge is drawn on one GPU
+layer over the whole page, so a lower window's edge was drawn straight through the window in front of it (and under the dock).
+- GlassLayer: a light has a z and a clip; a layer's cover() names what sits in front. Lights are drawn back to front and what covers each
+  is cut out of it. The washes are drawn behind.
+- Reactive colours: each window's glow has its window's z and stays inside the canvas; every window is a cover.
+- Test in p82. 1352/1352.
+
 ## Done — 3.96 Buttons: less round, a reactive border, reactive labels — everywhere (2026-11-03)
 Asked: "The buttons are horrible looking. Less round and the border" · "All the colors are meant to be reactive. The UIs. The tools. The
 button contents and their border. The tool pages."

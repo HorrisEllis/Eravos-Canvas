@@ -294,16 +294,21 @@
   // ---- 3.82 the glass layer: one wash for the mix, one glow per window. Same colours as the page way (colourFor, tintNow).
   const accBase = (w) => (w._cb && w._cb['--acc']) || w.dataset.acc0 || w.style.getPropertyValue('--acc').trim() || (base && base['--acc']) || '#00d4ff';
   function glassMix(kMix) {
-    const L = GL().layer('reactive', { depth: 99990 });
+    const L = GL().layer('reactive', { depth: 99990, cover: coverWins });
     GL().vars.set('react.tint', tintNow()); GL().vars.set('react.mix', +(kMix * 0.2).toFixed(3));   // the surfaces' shares in the page way are 10–16 %; a wash over text needs a touch more
     if (!L.items.has('mix')) L.set('mix', { type: 'wash', color: { var: 'react.tint' }, alpha: { var: 'react.mix' } });
   }
   const glowed = new Set();
+  // 3.97 "the border should not be showing above tools that are above them": each glow knows its window's place in the stack and stays
+  // inside the canvas; the windows in front cut it out (GlassLayer cover)
+  const zOf = (w) => parseInt(w.style.zIndex || global.getComputedStyle(w).zIndex, 10) || 0;
+  const coverWins = () => Array.from(doc.querySelectorAll('.wm-win')).filter(w => !w.classList.contains('docked') && w.offsetParent !== null).map(w => {
+    const r = w.getBoundingClientRect(); return { box: [r.left, r.top, r.width, r.height], z: zOf(w), radius: parseFloat(global.getComputedStyle(w).borderTopLeftRadius) || 0 }; });
   function glassWindows(list) {
-    const L = GL().layer('reactive', { depth: 99990 }), seen = new Set();
+    const L = GL().layer('reactive', { depth: 99990, cover: coverWins }), seen = new Set();
     list.forEach(([w, lv, o]) => { const id = 'win:' + (w.dataset.instance || ''); seen.add(id);
       const k = o.mode === 'off' ? 0 : clamp((lv * 0.85 + (o.pulse || 0) * 0.25 * lv) * o.amt * 1.25, 0, 1);
-      L.set(id, { type: 'glow', anchor: w, color: colourFor(accBase(w), k * 0.45, o), intensity: +Math.min(1, 0.15 + k * 1.3).toFixed(3) * (k > 0.02 ? 1 : 0), radius: 6, spread: 18 + 34 * k, fill: 0.035 }); });   // the tool's own hue, only a little lit (lit fully, it washes to white)
+      L.set(id, { type: 'glow', anchor: w, z: () => zOf(w), clip: w.closest('#canvas, .wm-canvas, .canvas') || null, color: colourFor(accBase(w), k * 0.45, o), intensity: +Math.min(1, 0.15 + k * 1.3).toFixed(3) * (k > 0.02 ? 1 : 0), radius: 6, spread: 18 + 34 * k, fill: 0.035 }); });   // the tool's own hue, only a little lit (lit fully, it washes to white)
     glowed.forEach(id => { if (!seen.has(id)) L.remove(id); }); glowed.clear(); seen.forEach(id => glowed.add(id));
   }
   function glassRest() { const G0 = GL(); if (G0 && G0.has('reactive')) G0.layer('reactive').clear(); glowed.clear(); }

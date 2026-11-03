@@ -55,4 +55,14 @@ describe('🔮 Glass layer: Looking Glass inside the canvas (3.82)', () => {
     if (src) ['audio', 'music', 'synth', 'drum', 'song'].forEach(t => assert.ok(!new RegExp('\\b' + t + '\\b', 'i').test(src), 'no "' + t + '"'));
     assert.ok(/@vertex fn vs/.test(GLy().WGSL) && /@fragment fn fs/.test(GLy().WGSL), 'vertex and fragment entry points');
   });
+  it('3.97 a light behind a window stays behind it: what covers it (a higher z) cuts it out; a light is kept inside its clip', async () => {
+    await GLy().use('2d'); const L = GLy().layer('p97', { depth: 5, cover: () => [{ box: [100, 100, 200, 200], z: 2 }] });
+    try {
+      L.set('back', { type: 'glow', rect: [20, 20, 200, 200], z: 1, color: '#ff0000', intensity: 1, spread: 10, fill: 1 });
+      for (let i = 0; i < 30; i++) GLy().frame(performance.now() + i * 50);
+      const g = L.el.getContext('2d'), d = L.dpr || 1, at = (x, y) => g.getImageData(Math.round(x * d), Math.round(y * d), 1, 1).data[3];
+      assert.gt(at(60, 60), 100, 'the light is drawn where nothing covers it');
+      assert.equal(at(150, 150), 0, 'and not where the window in front covers it');
+    } finally { L.clear(); }
+  });
 });
