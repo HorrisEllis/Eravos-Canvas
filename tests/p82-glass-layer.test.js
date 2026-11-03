@@ -40,7 +40,7 @@ describe('🔮 Glass layer: Looking Glass inside the canvas (3.82)', () => {
       await TH.sleep(0); mo.disconnect(); mw.disconnect();
       // 3.96 "All the colors are meant to be reactive … the button contents and their border": the accents ARE written now (the toolbar's
       // buttons and the tool pages take them); the surfaces stay the glass layer's
-      const others = seen.map(x => x.split(': ')[1].split(',').filter(k => !['--cyan', '--green', '--pink', '--violet', '--amber', '--red', '--acc'].includes(k))).flat();
+      const others = seen.map(x => x.split(': ')[1].split(',').filter(k => !['--cyan', '--green', '--pink', '--violet', '--amber', '--red', '--acc', '--snd-hn', '--snd-lv'].includes(k))).flat();
       assert.equal(others.length, 0, 'only the accents are written on the page: ' + others.join(','));
       assert.gt(writes, 0, 'the accents answer the drums outside the windows too');
       assert.gt(winWrites, 0, 'the window\'s own colours answer the drums');

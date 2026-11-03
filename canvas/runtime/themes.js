@@ -7,6 +7,7 @@
  *   studio    the device look (3.72): sharp, dark, each tool in its own colour
  *   dusk      sunset gradients, round pill buttons, the tool's painting in its title bar, soft rounded panels
  *   midnight  calm graphite: quiet panels, the accent only where it means something, gentle reactions
+ *   field     (3.98) clear buttons on deep black; one gradient under the canvas, seen only through the accents (colour-field.js)
  * HOOKED INTO THE REACTIVE COLOURS: a theme gives the palette they light (they read it again on a switch, the 'eravos:theme' event) and
  * --react-surface, how far they may tint a surface (1 = as asked, below 1 = calmer).
  *   Themes.list() · get() · set(id) · onChange(fn) · panel() → the Options section (cards with a live picture of each theme) */
@@ -16,6 +17,7 @@
   const LIST = [
     { id: 'dusk', label: 'Dusk', blurb: 'Sunset gradients, round pill buttons, each tool’s painting in its title bar.', swatch: ['#ff2266', '#ff6fa8', '#ffb36b', '#b06bff'] },
     { id: 'studio', label: 'Studio', blurb: 'The device look: sharp, dark, every tool in its own colour.', swatch: ['#00d4ff', '#0d1218', '#223044', '#7f93a8'] },
+    { id: 'field', label: 'Field', blurb: 'Clear buttons on deep black. One gradient lies under the canvas and shows only through the accents — drag a tool and its colours change with where it sits.', swatch: ['#6f5cff', '#b04dff', '#ff3d8b', '#ffc24a'] },
     { id: 'midnight', label: 'Midnight', blurb: 'Calm graphite. The accent only where it means something; gentle reactions.', swatch: ['#8fa8ff', '#11141b', '#2a3142', '#c9d2e3'] },
   ];
   const DEFAULT = 'dusk';

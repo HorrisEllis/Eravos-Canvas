@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.98 The Field theme: clear buttons, one gradient under the canvas seen only through the accents (2026-11-03)
+Asked: "a layer above the canvas is a gradient that's invisible except for where the accents are … if you drag the tools around, it
+changes the colors in relation to where it's at" · "I want this a theme. Like they're clear" · "The canvas gradient is stationary so
+moving the tool shows the gradient" · "I want changing to sync them all, and change with the sounds" · "darker so it contrasts".
+- Themes → Field: deep black surfaces; buttons are clear (a border and a label only).
+- canvas/runtime/colour-field.js: one gradient (violet → magenta → rose → ember → gold) pinned to the canvas. Every accent takes the
+  colours under its left, middle and right; a window's drawn colour is the one under its middle. Measured: dragging the Wobble Bass
+  took it from rose (#ff714f) to gold (#ffb749).
+- Synced: the reactive colours turn and light the whole field at once (--snd-hn, --snd-lv), in both ways of drawing; Off keeps it still.
+- A CSS fixed background cannot do this: inside the canvas's transform it is measured from each element (tested).
+- Tests p91 (Field) and p82 follow. 1353/1353.
+- Next asked: an installer for ERAVOS with an update service that checks GitHub and asks with a toast.
+
 ## Done — 3.97 A window's glow stays behind the windows in front of it (2026-11-03)
 Asked: "the border should not be showing above tools that are above them". The reactive glow on each window's edge is drawn on one GPU
 layer over the whole page, so a lower window's edge was drawn straight through the window in front of it (and under the dock).
