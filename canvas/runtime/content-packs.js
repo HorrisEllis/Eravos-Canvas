@@ -11,6 +11,17 @@
   const STORE = 'eravos.contentpacks.v1', packs = new Map(), kinds = new Map(), listeners = new Set();
   const off = (() => { try { return JSON.parse(global.localStorage.getItem(STORE)) || {}; } catch (e) { return {}; } })();
   const keep = () => { try { global.localStorage.setItem(STORE, JSON.stringify(off)); } catch (e) {} };
+  // deleted for good: shipped packs, and single shipped presets ("some of them suck … some don't sound good, or are blown").
+  // No way back in the app — a pack you deleted never loads again on this machine (it lives in .appdata, so a reinstall keeps it).
+  const GONE = 'eravos.contentpacks.deleted.v1';   // { packs: { id: when }, items: { packId: { toolId: { kind: [names] } } } }
+  const gone = (() => { try { const g = JSON.parse(global.localStorage.getItem(GONE)) || {}; return { packs: g.packs || {}, items: g.items || {} }; } catch (e) { return { packs: {}, items: {} }; } })();
+  const keepGone = () => { try { global.localStorage.setItem(GONE, JSON.stringify(gone)); } catch (e) {} };
+  const itemName = (x, i) => (x && (x.name || x.label)) || String(i + 1);   // how a list kind (kits, patterns …) names its items
+  function strip(id, items) {   // a pack's items without the ones you deleted from it
+    const g = gone.items[id]; if (!g) return items;
+    const out = {}; Object.keys(items).forEach(t => { const by = Object.assign({}, items[t]); Object.keys(g[t] || {}).forEach(k => { const v = by[k], del = new Set(g[t][k]); if (!v) return;
+      if (Array.isArray(v)) by[k] = v.filter((x, i) => !del.has(itemName(x, i))); else { by[k] = Object.assign({}, v); del.forEach(n => { delete by[k][n]; }); } }); out[t] = by; }); return out;
+  }
   const F = () => global.OrganismFactory;
   const tagOf = (pk) => pk.prefix !== undefined ? pk.prefix : pk.label;
   const enabled = (id) => { const pk = packs.get(id); return !!pk && (off[id] !== undefined ? !off[id] : pk.enabled !== false); };
@@ -25,8 +36,8 @@
   function changed(id) { listeners.forEach(fn => { try { fn(id); } catch (e) {} }); }
   const CP = global.ContentPacks = {
     add(pk) {
-      if (!pk || !pk.id || !pk.items) return false; if (packs.has(pk.id)) CP.remove(pk.id);
-      const p = Object.assign({ schema: 'eravos.pack/1', version: '1.0.0', tags: [], enabled: true }, pk); p.for = [].concat(p.for || Object.keys(p.items));
+      if (!pk || !pk.id || !pk.items || gone.packs[pk.id]) return false; if (packs.has(pk.id)) CP.remove(pk.id);
+      const p = Object.assign({ schema: 'eravos.pack/1', version: '1.0.0', tags: [], enabled: true }, pk, { items: strip(pk.id, pk.items) }); p.for = [].concat(p.for || Object.keys(p.items));
       packs.set(p.id, p); if (enabled(p.id)) apply(p, true); changed(p.id); return true;
     },
     remove(id) { const pk = packs.get(id); if (!pk) return false; if (enabled(id)) apply(pk, false); packs.delete(id); changed(id); return true; },
@@ -42,6 +53,17 @@
     items(toolId, kind) { const out = []; packs.forEach(p => { if (!enabled(p.id)) return; const x = p.items[toolId] && p.items[toolId][kind]; if (x) Object.keys(x).forEach(n => out.push({ pack: p.id, packLabel: p.label, name: n, value: x[n] })); }); return out; },
     kind(name, handler) { kinds.set(name, handler); packs.forEach(p => { if (enabled(p.id)) p.for.forEach(t => { const x = p.items[t] && p.items[t][name]; if (x) try { handler.add(p, t, x); } catch (e) {} }); }); },
     onChange(fn) { listeners.add(fn); return () => listeners.delete(fn); },
+    // delete for good: your own pack is removed; a shipped one is removed and never loads again
+    discard(id) { if (CP.user && CP.user.is(id)) return CP.user.remove(id); if (!packs.has(id)) return false; gone.packs[id] = new Date().toISOString(); keepGone(); return CP.remove(id); },
+    discardItem(id, toolId, kind, name) {
+      if (kind === 'presets' && CP.user && CP.user.is(id)) return CP.user.removePreset(id, toolId, name);
+      const pk = packs.get(id), v = pk && pk.items[toolId] && pk.items[toolId][kind]; if (!v) return false;
+      if (!(Array.isArray(v) ? v.some((x, i) => itemName(x, i) === name) : name in v)) return false;
+      const g = gone.items[id] = gone.items[id] || {}, gt = g[toolId] = g[toolId] || {}; gt[kind] = (gt[kind] || []).concat(name); keepGone();
+      CP.add(Object.assign({}, pk, { items: pk.items })); return true;   // registered again without it (the rest stay where they are)
+    },
+    discardPreset: (id, toolId, name) => CP.discardItem(id, toolId, 'presets', name),
+    deleted: () => JSON.parse(JSON.stringify(gone)),   // what you deleted — e.g. to remove it from the project's source too
   };
   // ---- 3.34 the schema of ONE tool's packs: generated from that tool's own settings (define() is the truth, R6) —
   // a preset may only name that tool's parameters, with values its parameters accept.

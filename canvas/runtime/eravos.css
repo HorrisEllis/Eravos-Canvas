@@ -825,3 +825,4 @@ html[data-theme="midnight"] .uk-knob-arc { filter: none; }
 .upd-head { display: flex; align-items: baseline; gap: 10px; } .upd-head b { font-size: 13px; } .upd-cur { color: var(--dim); font-size: 11px; }
 .upd-notes { color: var(--dim); font-size: 11.5px; line-height: 1.4; max-height: 4.2em; overflow: hidden; }
 .upd-row { display: flex; gap: 8px; } .upd-row .tb-btn { padding: 5px 12px; }
+.tp-btn.tp-ico.bad { opacity: .55; } .tp-btn.tp-ico.bad:hover { opacity: 1; color: #ff5470; }

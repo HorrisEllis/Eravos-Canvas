@@ -1,5 +1,6 @@
 /* ERAVOS runtime — pack-editor.js (3.34) — ⚙ Settings → “Packs & presets” for ONE tool (each tool is its own world):
- *  · every pack that has something for this tool: switch on/off, open, export; yours: rename, delete
+ *  · every pack that has something for this tool: switch on/off, open, export, delete (shipped ones too — for good); yours: rename
+ *  · every preset can be deleted, shipped ones too (for good: ContentPacks.discardPreset)
  *  · My presets (the tool's own store) and your packs are editable: save the current sound, edit values in a table
  *    checked against the tool's schema (ContentPacks.toolSchema — generated from the tool's settings), rename, delete
  *  · shipped presets are read-only: copy one into My presets or one of your packs to change it
@@ -51,7 +52,7 @@
         h('span', { class: 'uk-hint', text: names.length + ' preset' + (names.length === 1 ? '' : 's') }), h('span', { class: 'wm-spacer' }),
         isMine ? null : h('button', { class: 'pe-act', text: '⤓', title: 'export this pack (.json)', onclick: () => download(p.id + '.pack.json', CP().user.export(p.id)) }),
         user ? h('button', { class: 'pe-act', text: '✎', title: 'rename pack', onclick: () => UI.ask('Pack name', p.label).then((l) => { if (l) { CP().user.rename(p.id, l); paint(); } }) }) : null,
-        user ? h('button', { class: 'pe-act bad', text: '🗑', title: 'delete this pack', onclick: () => { if (confirm('Delete the pack “' + p.label + '” and its presets?')) { CP().user.remove(p.id); paint(); } } }) : null,
+        isMine ? null : h('button', { class: 'pe-act bad', text: '🗑', title: 'delete this pack for good', onclick: () => { if (confirm('Delete the pack “' + p.label + '” and its ' + names.length + ' preset' + (names.length === 1 ? '' : 's') + ' for good?' + (user ? '' : '\n\nIt is a shipped pack: it will not come back.'))) { CP().discard(p.id); paint(); say('Deleted “' + p.label + '”.'); } } }),
       ]);
       const c = h('div', { class: 'pe-pack' + (on ? '' : ' off') }, [head]);
       if (open) {
@@ -65,7 +66,7 @@
             h('button', { class: 'pe-act', text: editable ? '✎' : '👁', title: editable ? 'edit values' : 'see values', onclick: () => { editing = { pack: p.id, name: n, key, editable }; paintEdit(); } }),
             h('button', { class: 'pe-act', text: '⧉', title: 'copy into My presets', onclick: () => { const v = valueOf(p.id, n, key); view.emit('preset_put', { name: uniq(n), value: { params: v } }); setTimeout(paint, 60); say('Copied “' + n + '” into My presets.'); } }),
             editable ? h('button', { class: 'pe-act', text: 'Aa', title: 'rename', onclick: () => UI.ask('Preset name', n).then((t) => { if (!t || t === n) return; if (isMine) view.emit('preset_rename', { from: n, to: t }); else CP().user.renamePreset(p.id, tool, n, t); setTimeout(paint, 60); }) }) : null,
-            editable ? h('button', { class: 'pe-act bad', text: '×', title: 'delete', onclick: () => { if (!confirm('Delete “' + n + '”?')) return; if (isMine) view.emit('preset_delete', { name: n }); else CP().user.removePreset(p.id, tool, n); if (editing && editing.name === n) { editing = null; paintEdit(); } setTimeout(paint, 60); } }) : null,
+            h('button', { class: 'pe-act bad', text: '×', title: editable ? 'delete' : 'delete for good — a shipped preset that does not come back', onclick: () => { if (!confirm('Delete “' + n + '” for good?')) return; if (isMine) view.emit('preset_delete', { name: n }); else CP().discardPreset(p.id, tool, n); if (editing && editing.name === n) { editing = null; paintEdit(); } setTimeout(paint, 60); say('Deleted “' + n + '”.'); } }),
           ]));
         });
         c.appendChild(body);

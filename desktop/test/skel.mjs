@@ -1,4 +1,4 @@
-import { _electron as electron } from 'playwright';
+import { electron } from '../../host/driver/glass.js';   // Clear Glass's driver in app mode — not Playwright
 import fs from 'fs';
 const LIB = process.env.LIB, R = {};
 const app = await electron.launch({ executablePath: process.env.ELECTRON, args: ['--no-sandbox', process.env.APP], env: Object.assign({}, process.env, { ERAVOS_LIBRARY: LIB }) });
@@ -9,7 +9,7 @@ R.state = await p.evaluate(() => ({ domains: Kernel.domains.list().map(d => d.id
   faults: Kernel.faults.list().map(f => f.code + ' ' + (f.message || '')).slice(0, 5), bootCards: Array.from(document.querySelectorAll('.overlay .hero-card h2, .overlay .card b')).map(e => e.textContent),
   toolbar: Array.from(document.querySelectorAll('#slot-bar > *, #slot-bar button')).length, bpm: !!document.querySelector('input[title*="BPM" i], .bpm, #bpm') }));
 if (process.env.PLAY) {
-  await p.getByText('Future Bass song').click(); await p.waitForTimeout(2500);
+  await p.click('text=Future Bass song'); await p.waitForTimeout(2500);
   R.recipe = await p.evaluate(async () => {
     const ac = Kernel.audio.ctx, an = ac.createAnalyser(); an.fftSize = 2048; Kernel.audio.chain.out.connect(an);
     Kernel.bus.publish('ui:transport_play', {}); document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space', key: ' ', bubbles: true }));

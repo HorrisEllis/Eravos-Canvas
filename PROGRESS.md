@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — delete packs, presets and patterns for good; Playwright gone (2026-11-04)
+Asked: "i want to be able to delete packs, patterns" · "I don't need them brought back. some of them suck … dont sound good, or are blown"
+· "remove playwright from eravos. thats what clearglass was for".
+- ContentPacks.discard(id) / discardItem(id, tool, kind, name) (discardPreset): shipped packs and single items too, kept in
+  localStorage `eravos.contentpacks.deleted.v1` (the app's .appdata, in the library) — a deleted pack is refused when it registers again.
+  🗑 on every pack and × on every preset in ⚙ Packs & presets; 🗑 on packs and items (presets, kits …) on the tool page.
+- PatternLibrary.discard(p) by content signature (ids move), `eravos.patterns.deleted.v1`; 🗑 on every pattern card (takes its curved twin).
+- tests/p100-delete.test.js (3/3). P21 24/24 · P71 10/10 · P73 11/11 · P76 4/4 · P74 8/8 (its "completely different" audio check is
+  flaky both before and after this change).
+- host/driver/glass.js app mode: electron.launch({ executablePath, args, env }) → firstWindow() → page; dialogs (pg.on('dialog')).
+  desktop/test/bare.mjs + skel.mjs and build/sound-audit.mjs use the driver; tests/no-playwright.mjs has no exceptions left.
+- Open (asked, not done): songs as a rhythm-exploring tool only; per-tool patterns with presets, depth, curves and per-note editing.
+
 ## Done — install to the system in one run; your library is Documents\ERAVOS (2026-11-04)
 Asked: "make the installer for installing to the system. also the projects should save to the … folder. same with the packs and
 tools. like documents/eravos" · "this is on windows, one run install … make it a batch".
