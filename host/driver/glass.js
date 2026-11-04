@@ -61,6 +61,8 @@ function electronBinary() {
 function chromiumBinary() {
   for (const v of ['GLASS_CHROMIUM', 'PW_CHROMIUM', 'PLAYWRIGHT_CHROMIUM']) if (process.env[v] && fs.existsSync(process.env[v])) return process.env[v];
   const cands = ['/usr/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'];
+  for (const base of [process.env['ProgramFiles(x86)'], process.env.ProgramFiles, process.env.LOCALAPPDATA]) if (base) cands.push(path.join(base, 'Microsoft', 'Edge', 'Application', 'msedge.exe'), path.join(base, 'Google', 'Chrome', 'Application', 'chrome.exe'));   // Windows: Edge ships with it
+  cands.push('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge');
   try { for (const d of fs.readdirSync('/opt/pw-browsers')) if (/^chromium-\d+$/.test(d)) cands.unshift(path.join('/opt/pw-browsers', d, 'chrome-linux', 'chrome')); } catch (_) {}
   return cands.find(c => fs.existsSync(c)) || null;
 }

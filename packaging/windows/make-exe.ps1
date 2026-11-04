@@ -16,7 +16,7 @@ $pkg = Get-Content (Join-Path $repo 'desktop\package.json') -Raw | ConvertFrom-J
 $v = $pkg.electronVersion
 $utf8 = New-Object System.Text.UTF8Encoding($false)   # no BOM
 $cache = Join-Path $env:TEMP "electron-v$v-win32-x64.zip"
-$ship = @('canvas', 'tools', 'schemas', 'README.md')                                      # the project's app folders
+$ship = @('canvas', 'tools', 'schemas', 'host', 'tests', 'README.md')                                      # the project's app folders
 $keep = @('projects', 'exports', 'drop', 'packs', '.appdata', 'ERAVOS Library')           # yours - never deleted here
 Write-Host "ERAVOS $($pkg.version): building $out"
 if (-not (Test-Path $cache)) {
@@ -42,6 +42,7 @@ $appPkg = [ordered]@{ name = $pkg.name; productName = $pkg.productName; version 
 [IO.File]::WriteAllText((Join-Path $app 'package.json'), ($appPkg | ConvertTo-Json), $utf8)
 foreach ($s in $ship) { Copy-Item (Join-Path $repo $s) (Join-Path $out $s) -Recurse -Force }
 Copy-Item (Join-Path $repo 'packaging\windows\uninstall.ps1') $out -Force   # 3.99 the installer's uninstaller travels with the app
+Remove-Item (Join-Path $out 'tests\null-baseline'), (Join-Path $out 'tests\out') -Recurse -Force -ErrorAction SilentlyContinue   # recorded on a machine, never shipped
 $junk = @(Get-ChildItem -Recurse -Force -Directory (Join-Path $out 'tools') | Where-Object { $_.Name -eq 'node_modules' -or $_.Name.StartsWith('.') })
 $junk | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 $domains = (Get-ChildItem -Directory (Join-Path $out 'tools') | Where-Object { Test-Path (Join-Path $_.FullName 'index.js') } | ForEach-Object { $_.Name }) -join ', '

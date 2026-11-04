@@ -170,7 +170,7 @@
         ctx.emitUI('voices', { active: voices.filter(x => !x.released).map(x => x.note) });
         return v;
       }
-      function noteOff(note, t) { t = Math.max(t || ac.currentTime, ac.currentTime); voices.filter(v => v.note === note && !v.released).forEach(v => release(v, t)); }
+      function noteOff(note, t) { MusicParts.releaseVoices(ac, voices, note, t, release); }   // the shared part (components/note-release)
       ctx.onNote((p) => noteOn(p.note, p.velocity, p.time, p.duration === undefined ? 0.25 : p.duration));
       ctx.onMidi((p) => { if (p.on) noteOn(p.note, p.velocity, ac.currentTime); else noteOff(p.note); });
       ctx.audition = (p) => noteOn(p.note || 57, p.velocity || 0.85, ac.currentTime, p.duration || 0.6);

@@ -9,7 +9,7 @@ $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $repoSlug = 'HorrisEllis/Eravos-Canvas'
-$keep = @('projects', 'exports', 'drop', 'packs', '.appdata', 'ERAVOS Library')
+$keep = @('projects', 'exports', 'drop', 'packs', '.appdata', 'ERAVOS Library')   # (tests\null-baseline sits inside tests\, which an update replaces: record again after updating)
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $repo = Split-Path -Parent (Split-Path -Parent $here)
 

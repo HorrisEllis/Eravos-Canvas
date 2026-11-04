@@ -6,7 +6,7 @@
 (function () {
   'use strict';
   const S = OrganismSDK.STD;
-  const PROG = { 'i-VI-III-VII': [1, 6, 3, 7], 'i-iv-v-i': [1, 4, 5, 1], 'vi-IV-I-V': [6, 4, 1, 5], 'i-i-VI-VII': [1, 1, 6, 7], 'i-v-VI-iv': [1, 5, 6, 4] };
+  const PROG = MusicParts.PROGRESSIONS;   // the shared table (components/progression)
   const CHORD = { type: 'object', required: ['degree', 'notes', 'time'] };
   OrganismFactory.define({
     id: 'eravos.chord-gen', domain: 'music', version: '1.0.0', label: 'Chords', icon: '🎹', accent: '#b066ff',
@@ -40,7 +40,7 @@
         if (ten < 0.75) { const s = MT.chord(degree, k.root, k.scale, 'sus4', o); return [s[0], s[1], s[2], MT.degreeToMidi(degree + 6, o, k.root, k.scale)]; }   // 7sus4
         return [r, r + 6, r + 13, tri[2] + 12];                                                                                  // cluster
       }
-      const chordAt = (bar) => { const pr = PROG[P.get('progression')]; return pr[Math.floor(bar / +P.get('chordBars')) % pr.length]; };
+      const chordAt = (bar) => MusicParts.degreeAt(PROG, P.get('progression'), bar, P.get('chordBars'));
       ctx.voicing = voicing; ctx.chordAt = chordAt;
       let last = null;
       ctx.onTick((tk) => {

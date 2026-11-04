@@ -2,6 +2,68 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — P0.3 note-release and progression (2026-11-04)
+Asked: "Boring shit first I guess" → the repeated bookkeeping. Two more components, five + three tools rewired, nothing in sound changed.
+- tools/music/components/note-release/: `MusicParts.releaseHeld` (wobble-bass = wub-osc = wub-sub, one held note) and `releaseVoices`
+  (syn-osc = syn-partials, a voice pool). 102 checks: the recorded AudioParam calls equal the five original noteOff()s, with and without
+  cancelAndHoldAtTime, for held / other / no note, t undefined..9.25, three release times.
+- tools/music/components/progression/: `PROGRESSIONS` (the five), `pickProgressions`, `degreeAt` — the table and lookup that bass-gen,
+  chord-gen and edm-lab each carried (EDM Lab offers four of the five, so it takes `pickProgressions` and its menu is unchanged).
+  13,826 checks: every progression × bars 0–255 × chordBars {1,2,4} as number and string equals the originals.
+- `node tests/components.mjs` runs every component's node test (+ the null-render maths); release.yml runs it before building.
+- Loader order: tools/music/index.js loads the three components before any tool. Tool versions unchanged.
+- Null render (needs the browser, not run here): same method as P0.1 — the originals of the eight engine files + index.js, `--record`,
+  then these, check. Expect every preset of wobble-bass, wub-osc, wub-sub, syn-osc, syn-partials, bass-gen, chord-gen, edm-lab to PASS.
+- Next: the scan was crude. A proper duplicate finder (normalised token windows across ALL engine/ui files) before P0.4, then pick the
+  biggest identical blocks, not the ones that happened to be named alike.
+
+## Done — P0.2 survey: there is no SVF to extract; phaseWave joined wave-table (2026-11-04)
+Asked: "Yes" (to P0.2 filter-svf). The survey (tools/music/tools/**/*.engine.js) found NO state-variable filter code: every filter is a
+native BiquadFilterNode (125 createBiquadFilter calls); fx-filter and wub-filter each cascade two for 12/24 dB, but with different Q
+laws (fx-filter's 3.37 RCA fix) and different wiring, so there is nothing identical to move "with no change in sound". The spec's
+filter-svf (12/24/36 dB, key-track, env/velocity inputs, stable to self-oscillation) is NEW DSP: it belongs to phase 1 as a build with
+its own tests, not a phase 0 extraction. Same likely for osc-va (polyBLEP/minBLEP) — check before promising it.
+- What IS duplicated, byte for byte (crude scan of engine files, so a floor, not a census): phaseWave (fx-moddelay = fx-phaser) → now
+  MusicParts.phaseWave in components/wave-table (83 checks, bit-identical to the original). Still to do: noteOff in wobble-bass = wub-osc
+  = wub-sub (318 chars, closes over each tool's voices — needs a voice-table part first), noteOff in syn-osc = syn-partials, ownDegree
+  in bass-gen = chord-gen.
+- Next: P0.3 the voice table (noteOn/noteOff bookkeeping the wub tools and syn tools repeat) — look at all of them before cutting.
+
+## Done — P0.1 the first component: wave-table (2026-11-04)
+Asked: "Okay next". The LFO and Wub Rate each carried the same makeWave(); it is now ONE component, tools/music/components/wave-table/
+(wave-table.js · .spec · .test.mjs), loaded by tools/music/index.js before any tool (it also lands in the core pack of desktop/packs.mjs,
+which reads that list). `MusicParts.periodicWave(ac, fn, { phase, harmonics })`.
+- Each tool keeps what is its own: the LFO its 33 harmonics and degrees, Wub Rate its 40 and a fractional phase; their shape functions
+  differ on purpose (sine vs −cos) and stay in the tools. Same arithmetic, same order → no change in sound.
+- PROVED in plain node (73 checks): the component's re/im/dc equal the two original inline functions bit for bit for 6 shapes × 7 LFO
+  phases and 5 Wub Rate phases. `node tools/music/components/wave-table/wave-table.test.mjs` (also in release.yml).
+- NOT yet proved at the audio level (no browser here): to run the null render, copy lfo.engine.js, wub-rate.engine.js and
+  tools/music/index.js from your ORIGINAL Eravos-Canvas-main.zip over this tree, `node tests/null-render.mjs --record`, put these three
+  files back, then `node tests/null-render.mjs`. Expect every eravos.lfo / eravos.wub-rate preset PASS. Tool versions unchanged.
+- Left alone on purpose: eravos.wobble-bass (Lanczos-windowed, 64 harmonics) and eravos.bass-forge compute their waves differently;
+  merging them would change sound, so each waits for its own null proof (listed in wave-table.spec `not_used_by_yet`).
+- Next: P0.2 filter-svf (find every tool that carries its own state-variable filter first), then osc-va.
+
+## Done — Phase 0 start: the null-render harness (2026-11-04)
+Asked: "What first?" → "Do it". The ecosystem plan (eravos.music-ecosystem, phase 0) moves shared parts into components with no change in
+sound, each move proved by null renders. That proof needed a tool; this is it.
+- `node tests/null-render.mjs --record` (BEFORE a change) renders every music tool × preset with a seeded stimulus (Math.random seeded
+  in the page; effects get a fixed saw + noise; instruments a fixed note/chord run; drums their four pads; beat tools one bar), twice,
+  and keeps it in tests/null-baseline/ (gitignored). `node tests/null-render.mjs` (AFTER) subtracts: PASS under −60 dB re the baseline
+  RMS (`--db -70` stricter). Length change, NaN, a missing baseline all FAIL. Renders that differ from themselves are UNSTABLE and are
+  listed, never passed; tools it cannot stimulate (drop, sampler, one-shots, containers, clip) are listed as NOT COVERED.
+- The maths is tests/null-render-core.mjs, checked in plain node without a browser: `node tests/null-render-core.test.mjs` → 17 checks
+  (round trip at −50 dBFS, 0.2 % gain = −54 dB fails, 0.05 % = −66 dB passes, a one-sample shift fails, NaN, silence, unstable).
+- NOT YET RUN against the real tools: the build sandbox had no Chromium/Electron. First run on your machine: `--record` on this commit,
+  read the UNSTABLE / NOT COVERED lists, then start extraction (LFO first, then filter-svf, osc-va).
+- IN THE INSTALL (same day, "Add it to the install"): `Null Render.bat` (record / check menu) beside Start ERAVOS; both builders ship
+  `tests/` (860 KB; `null-baseline/` and `out/` are never shipped) and make-exe.ps1 now ships `host/` too (the driver lives there;
+  desktop/build.mjs already did). host/driver/glass.js finds Edge/Chrome on Windows and Chrome/Edge on macOS when there is no
+  Electron beside it. release.yml runs `node tests/null-render-core.test.mjs` before building. README has a Null Render section.
+  NOT TESTED on Windows (no Windows/browser here): the Edge path through the Chromium engine of host/driver/glass.js is the part to
+  watch on first run — if it fails, set GLASS_CHROMIUM to a Chrome/Edge .exe and send the message.
+- Next: P0.1 LFO → tools/music/components/lfo/ (spec, test, null-proven), then filter-svf, osc-va; perf gate in CI after.
+
 ## Done — 3.100 The Field flows (2026-11-03)
 Asked: "can you have the gradient like slowly moving slowly with that theme?"
 - The Field's colours travel along it, one pass in 48 s, then back (a mirrored run: no seam). Still when reduced motion is asked.
