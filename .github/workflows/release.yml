@@ -5,7 +5,12 @@ name: release
 on:
   push:
     tags: ['v*']
-  workflow_dispatch:
+  workflow_dispatch:   # by hand: a build to download; with "release" on, it also makes the release v<desktop/package.json version>
+    inputs:
+      release:
+        description: 'Publish the release v<version> (makes the tag) instead of only keeping the build'
+        type: boolean
+        default: false
 permissions:
   contents: write
 jobs:
@@ -13,12 +18,17 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      - name: The app's version
+        id: ver
+        shell: pwsh
+        run: |
+          $v = (Get-Content desktop/package.json -Raw | ConvertFrom-Json).version
+          "version=$v" >> $env:GITHUB_OUTPUT
       - name: Check the tag matches the app's version
         if: startsWith(github.ref, 'refs/tags/v')
         shell: pwsh
         run: |
-          $v = (Get-Content desktop/package.json -Raw | ConvertFrom-Json).version
-          if ("v$v" -ne "${{ github.ref_name }}") { throw "tag ${{ github.ref_name }} but desktop/package.json says $v" }
+          if ("v${{ steps.ver.outputs.version }}" -ne "${{ github.ref_name }}") { throw "tag ${{ github.ref_name }} but desktop/package.json says ${{ steps.ver.outputs.version }}" }
       - name: Component and null-render maths (plain node, no browser)
         shell: pwsh
         run: |
@@ -33,16 +43,19 @@ jobs:
           powershell -NoProfile -ExecutionPolicy Bypass -File packaging/windows/make-exe.ps1 -NoStart
           if (-not (Get-ChildItem dist -Filter 'ERAVOS-Setup-*.exe')) { throw 'no ERAVOS-Setup exe was made' }
       - name: Attach to the release
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: v${{ steps.ver.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          name: ERAVOS ${{ steps.ver.outputs.version }}
           files: |
             dist/ERAVOS-Setup-*.exe
             dist/ERAVOS_*.zip
           fail_on_unmatched_files: true
           generate_release_notes: true
       - name: Keep the build (a run by hand)
-        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') && !inputs.release }}
         uses: actions/upload-artifact@v4
         with:
           name: ERAVOS-windows
