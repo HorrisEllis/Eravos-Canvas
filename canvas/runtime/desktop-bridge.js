@@ -66,7 +66,7 @@
     // toolbar: open the ERAVOS folder
     const bar = global.document.querySelector('#topbar, .topbar, header');
     const b = global.document.createElement('button'); b.className = 'tb-btn'; b.textContent = '📁 Folder';
-    b.title = 'Open the ERAVOS folder — put sounds, packs or projects in “drop”'; b.onclick = () => D.openLibrary();
+    b.title = 'Open your ERAVOS library (Documents › ERAVOS): projects, exports, packs, tools — put sounds, packs or projects in “drop”'; b.onclick = () => D.openLibrary();
     if (S.slot) { try { (S.slot('options') || S.slot('bar')).appendChild(b); } catch (e) { if (bar) bar.appendChild(b); } } else if (bar) bar.appendChild(b);
     D.ready();
   });
