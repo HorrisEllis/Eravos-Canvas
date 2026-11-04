@@ -40,7 +40,7 @@ function copyDir(src, dst, skip) {
 // The exe folder has the project's layout: canvas/ tools/ schemas/ README.md beside ERAVOS.exe, the same folders as the
 // repo, so the exe loads every domain from tools/ exactly like the dev build. Your folders sit next to them and survive a rebuild.
 const SHIP = ['canvas', 'tools', 'schemas', 'host', 'tests', 'README.md'];   // host/: ERAVOS Glass + COS (run by main.js, never served to the page) · tests/: the checks, incl. Null Render.bat's tests/null-render.mjs (860 KB)
-const KEEP = ['projects', 'exports', 'drop', 'packs', 'voice', '.appdata', 'ERAVOS Library'];   // yours — never deleted by a rebuild
+const KEEP = ['projects', 'exports', 'drop', 'packs', 'voice', '.appdata', 'ERAVOS Library', 'portable'];   // older builds kept your work here — never deleted by a rebuild (the app moves it to Documents\\ERAVOS)
 const OVERLAY = process.argv.includes('--no-electron');
 
 say('assembling ' + APP);
@@ -63,16 +63,20 @@ fs.writeFileSync(path.join(APP, 'READ ME FIRST.txt'), [
   'Double-click ERAVOS.exe - no install, no browser, nothing else needed.', '',
   'First launch: Windows may say "Windows protected your PC" because this build is not code-signed yet.',
   'Click "More info" then "Run anyway". It only asks once.', '',
-  'This folder has the same layout as the ERAVOS project:',
+  'Install it for everyone on this PC: run ERAVOS-Setup-<version>.exe (Program Files, Start menu, Settings > Apps).',
+  'Or just double-click ERAVOS.exe here - it runs from any folder.', '',
+  'This folder is the app, with the same layout as the ERAVOS project:',
   '  canvas\\    the canvas (kernel, runtime)',
   '  tools\\     every tool, one folder per domain (tools\\music, tools\\image, tools\\video, ...)',
-  '  schemas\\   the formats tools and packs follow',
-  'Your folders appear next to them on first run, and a rebuild never touches them:',
-  '  projects\\  Session > Save writes here      exports\\  bounced WAVs and other exports',
+  '  schemas\\   the formats tools and packs follow', '',
+  'YOUR LIBRARY is Documents\\ERAVOS - everything you make goes there, and installing, updating or uninstalling never touches it:',
+  '  projects\\  Session > Save writes here      exports\\  bounced WAVs, renders and other exports',
+  '  packs\\     preset packs and .zip packs - loaded every start; packs dropped on the canvas are kept here',
+  '  tools\\     extra tool packs (.zip) - loaded every start',
   '  drop\\      put sounds, .mid files, packs or projects here; they appear on the canvas',
-  '  packs\\     extra tool packs (.zip) - loaded every start; packs dropped on the canvas are kept here',
-  '  .appdata\\  ERAVOS\'s own storage (autosave, presets)', '',
-  'Coming from an older build? Your old "ERAVOS Library" projects, exports and autosave move across on first start.', '',
+  '  .appdata\\  ERAVOS\'s own storage (autosave, presets)',
+  'Want it all in this folder instead (a USB stick)? Put an empty file named  portable  next to ERAVOS.exe.', '',
+  'Coming from an older build? Your projects, exports, packs and autosave move into Documents\\ERAVOS on first start.', '',
   'MIDI pads/keys: plug in, then MIDI Map > Connect MIDI. Close other music apps first - Windows lets only one app use a MIDI device at a time.',
-  'Move or back up everything: copy this whole ERAVOS folder.', ''].join('\r\n'));
+  'Back up everything you made: copy Documents\\ERAVOS.', ''].join('\r\n'));
 say('done → ' + (OVERLAY ? APP + ' (overlay — packaging/windows/make-exe.ps1 adds Electron)' : path.join(APP, 'ERAVOS.exe')));

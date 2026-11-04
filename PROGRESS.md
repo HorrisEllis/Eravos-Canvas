@@ -2,6 +2,20 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — install to the system in one run; your library is Documents\ERAVOS (2026-11-04)
+Asked: "make the installer for installing to the system. also the projects should save to the … folder. same with the packs and
+tools. like documents/eravos" · "this is on windows, one run install … make it a batch".
+- **Install ERAVOS.bat** = one run: elevates, builds from the checkout (make-exe.ps1 -NoSetup), copies to Program Files\ERAVOS,
+  all-users Start menu + desktop shortcuts, HKLM Settings › Apps entry (uninstall.ps1), starts ERAVOS un-elevated (via Explorer).
+  Outside a checkout: the release's ERAVOS-Setup exe, else its zip. Tidies the old %LOCALAPPDATA% per-user copy.
+- **ERAVOS-Setup-<version>.exe** (packaging/windows/eravos.nsi, NSIS): made by make-exe.ps1 when NSIS is present; release.yml installs
+  NSIS and attaches it next to the zip. Compiles with makensis 3.09 here (not run on Windows here).
+- **Library** (desktop/main.js): Documents\ERAVOS\{projects, exports, packs, tools, drop, .appdata}. Downloads route: *.pack.json →
+  packs, other .json → projects, the rest → exports. packs\*.zip and tools\*.zip load every start. Old folders beside the exe or in
+  %LOCALAPPDATA%\Programs\ERAVOS (and "ERAVOS Library") move in once, only into empty folders. ERAVOS_LIBRARY or a `portable` file override.
+- **Updater**: an installed copy downloads the new Setup and runs it /S elevated; a Program Files copy without one swaps the zip elevated.
+- Not run on Windows here: the scripts parse (PowerShell 7 parser), the library move was exercised with a stubbed Electron.
+
 ## Done — P0.3 note-release and progression (2026-11-04)
 Asked: "Boring shit first I guess" → the repeated bookkeeping. Two more components, five + three tools rewired, nothing in sound changed.
 - tools/music/components/note-release/: `MusicParts.releaseHeld` (wobble-bass = wub-osc = wub-sub, one held note) and `releaseVoices`

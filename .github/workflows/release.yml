@@ -1,6 +1,6 @@
 # 3.99 the release the update service looks for. Push a tag vX.Y.Z (with desktop/package.json "version" set to X.Y.Z):
-# this builds ERAVOS for Windows and attaches dist/ERAVOS_X.Y.Z.zip to the GitHub release of that tag. The app (desktop/updater.js)
-# and the installer (Install ERAVOS.bat) both download that zip.
+# this builds ERAVOS for Windows and attaches the installer dist/ERAVOS-Setup-X.Y.Z.exe and the portable dist/ERAVOS_X.Y.Z.zip to the
+# GitHub release of that tag. The app (desktop/updater.js) and Install ERAVOS.bat download the Setup (the zip for a portable copy).
 name: release
 on:
   push:
@@ -23,18 +23,29 @@ jobs:
         shell: pwsh
         run: |
           node tests/components.mjs
-      - name: Build ERAVOS.exe
+      - name: NSIS (makes ERAVOS-Setup.exe)
+        shell: pwsh
+        run: |
+          if (-not (Get-Command makensis.exe -ErrorAction SilentlyContinue) -and -not (Test-Path "${env:ProgramFiles(x86)}\NSIS\makensis.exe")) { choco install nsis -y --no-progress }
+      - name: Build ERAVOS.exe + ERAVOS-Setup.exe
         shell: powershell
-        run: powershell -NoProfile -ExecutionPolicy Bypass -File packaging/windows/make-exe.ps1 -NoStart
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File packaging/windows/make-exe.ps1 -NoStart
+          if (-not (Get-ChildItem dist -Filter 'ERAVOS-Setup-*.exe')) { throw 'no ERAVOS-Setup exe was made' }
       - name: Attach to the release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/ERAVOS_*.zip
+          files: |
+            dist/ERAVOS-Setup-*.exe
+            dist/ERAVOS_*.zip
+          fail_on_unmatched_files: true
           generate_release_notes: true
       - name: Keep the build (a run by hand)
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v4
         with:
           name: ERAVOS-windows
-          path: dist/ERAVOS_*.zip
+          path: |
+            dist/ERAVOS-Setup-*.exe
+            dist/ERAVOS_*.zip
