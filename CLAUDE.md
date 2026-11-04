@@ -19,6 +19,7 @@ Read this first, then `PROGRESS.md` (the detailed log, newest first) and the spe
 - No Playwright. Pages are driven by Clear Glass's driver, `host/driver/glass.js` (also app mode: `electron.launch`). `node tests/no-playwright.mjs`.
 - Refactors prove "no change in sound": `node tests/components.mjs` (plain node) and the null render (`Null Render.bat`, needs a browser).
 - Tests: `node tests/run.mjs <phase or name>` (the in-page suite, through the driver). New behaviour gets a `tests/pNN-*.test.js`.
+- Releasing: set `"version"` in `desktop/package.json`, merge, then Actions › release › Run workflow with **release** on (or push tag vX.Y.Z).
 - Commit messages and PRs carry no model names. Do not push to `main` directly: branch, PR, merge.
 
 ## Ledger — completed work
@@ -27,6 +28,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-04 | Release v0.1.0: Actions › release › Run workflow with "release" on makes the tag + release (a session cannot push tags) | `.github/workflows/release.yml` | the run's Setup exe + zip on the release |
 | 2026-11-04 | Plan: ERAVOS onto Emerge + Looking Glass, bottom up (phases EL0–EL9, decisions open) | `docs/emerge-looking-glass-migration.md`, `docs/looking-glass/` | — (a plan) |
 | 2026-11-04 | Delete packs, presets, kits and patterns for good (shipped ones too), remembered across restarts | `canvas/runtime/content-packs.js`, `pack-editor.js`, `tool-page.js`, `tools/music/data/pattern-library.js` | `tests/p100-delete.test.js` 3/3; P21, P71, P73, P76 green · PR #72 |
 | 2026-11-04 | Playwright removed: the driver gained app mode (`electron.launch`, `firstWindow`, dialogs); desktop tests + sound audit moved to it | `host/driver/glass.js`, `desktop/test/*.mjs`, `build/sound-audit.mjs` | `tests/no-playwright.mjs` 0 exceptions · PR #72 |
