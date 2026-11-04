@@ -1,6 +1,7 @@
-# Desktop integration tests (Electron + Playwright)
+# Desktop integration tests (Electron + Clear Glass's driver)
 
-Drive the real ERAVOS.exe app layout. Build first (`node desktop/build.mjs`), then, from a folder with `playwright` and `electron` installed:
+Drive the real ERAVOS.exe app layout with the driver's app mode (`host/driver/glass.js` → `electron.launch`, no Playwright).
+Build first (`node desktop/build.mjs`), then (ELECTRON = ERAVOS.exe, or an `electron` binary with APP = <ERAVOS>/resources/app):
 
     # the exe layout (canvas/ + tools/ beside resources/app): grows, plays the Future Bass song
     ELECTRON=<electron binary> APP=<ERAVOS>/resources/app LIB=<empty folder> PLAY=1 node desktop/test/skel.mjs

@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /* Sound audit — every tool that makes or changes sound, measured the way the Destroyer was (3.77, his ask: "can you run tests like that
  * on all of them"). node build/sound-audit.mjs [--out docs/sound-audit.md] [--only id,id]
- * Runs in the test page (headless Chromium), offline renders, default settings:
+ * Runs in the test page (Clear Glass's driver, host/driver/glass.js), offline renders, default settings:
  *   EFFECTS (audio in → out): a loud 50 Hz + a quiet 1 kHz → INTERMODULATION (what the bass does to the music: the blown-speaker
  *     test, dB under the 1 kHz), level change (out vs in, a −18 dBFS 220 Hz tone), DC, peak, NaN, CPU (one instance, 10 s).
  *   INSTRUMENTS (notes in → out): A1, A3 and A5 notes and a C-major chord → peak (clipping), DC, the share of energy under 20 Hz (sub
  *     you cannot hear), whether it goes quiet within 2 s of the release, NaN, CPU (a note every beat, 10 s).
  * Writes a table (worst first) and exits 0 — it reports, the tests guard (tests/p77-audit.test.js). */
 import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
-import { chromium } from 'playwright';
+import { chromium } from '../host/driver/glass.js';   // Clear Glass's driver, not Playwright
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (k) => { const i = process.argv.indexOf(k); return i >= 0 ? process.argv[i + 1] : null; };
 const OUT = path.resolve(ROOT, arg('--out') || 'docs/sound-audit.md'), ONLY = arg('--only') ? arg('--only').split(',') : null;

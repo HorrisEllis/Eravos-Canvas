@@ -300,6 +300,11 @@
       ])))], 'links', 'link-2'));
     }
 
+    // delete for good — a pack, or one thing in it (shipped ones too: "some of them suck … don't sound good, or are blown")
+    const CPx = global.ContentPacks;
+    const delPack = (g) => g.pack && CPx && CPx.discard ? btn('🗑', 'delete this pack for good — everything in it', () => { if (global.confirm(`Delete the pack “${g.label}” for good? It will not come back.`)) { CPx.discard(g.pack); toast(`Deleted “${g.label}”`, 'good', 2000); } }, 'tp-ico bad') : null;
+    const delItem = (g, kind, name) => g.pack && CPx && CPx.discardItem ? btn('🗑', 'delete it for good', () => { if (global.confirm(`Delete “${name}” for good? It will not come back.`)) { CPx.discardItem(g.pack, d.id, kind, name); toast(`Deleted “${name}”`, 'good', 2000); } }, 'tp-ico bad') : null;
+
     // sound packs
     const groups = presetGroups(d);
     if (groups.length) {
@@ -309,11 +314,12 @@
         const on = g.enabled !== false;
         const tog = g.pack && global.ContentPacks ? btn(on ? 'on' : 'off', on ? 'this pack is on — click to switch it off' : 'switch this pack on', () => global.ContentPacks.setEnabled(g.pack, !on), on ? 'on' : '') : null;
         return h('div', { class: 'tp-pack' + (on ? '' : ' off') }, [
-          h('div', { class: 'tp-sh' }, [h('b', { text: g.label }), h('small', { text: ` · ${g.items.length}` + (g.author ? ' · ' + g.author : '') }), h('span', { class: 'wm-spacer' }), tog]),
+          h('div', { class: 'tp-sh' }, [h('b', { text: g.label }), h('small', { text: ` · ${g.items.length}` + (g.author ? ' · ' + g.author : '') }), h('span', { class: 'wm-spacer' }), tog, delPack(g)]),
           h('div', { class: 'tp-presets' }, g.items.map(x => h('div', { class: 'tp-pre' }, [
             on && global.Preview ? global.Preview.button(d.id, x.key) : null,
             h('span', { class: 'tp-pn', text: x.name, title: x.key }),
             on ? btn('Load', st.target ? 'put it on the window this page works on' : 'open one with this preset', () => { const id = ensureHost(st); presetLoad(K, id, x.key); toast(`${d.label}: ${x.name}`, 'good', 1500); }) : null,
+            delItem(g, 'presets', x.name),
           ]))),
         ]);
       }), 'packs', 'package'));
@@ -327,10 +333,11 @@
         const on = g.enabled !== false;
         const tog = g.pack && global.ContentPacks ? btn(on ? 'on' : 'off', on ? 'this pack is on — click to switch it off' : 'switch this pack on', () => global.ContentPacks.setEnabled(g.pack, !on), on ? 'on' : '') : null;
         return h('div', { class: 'tp-pack' + (on ? '' : ' off'), 'data-kind': kind }, [
-          h('div', { class: 'tp-sh' }, [h('b', { text: g.label }), h('small', { text: ` · ${g.items.length}` + (g.author ? ' · ' + g.author : '') }), h('span', { class: 'wm-spacer' }), tog]),
+          h('div', { class: 'tp-sh' }, [h('b', { text: g.label }), h('small', { text: ` · ${g.items.length}` + (g.author ? ' · ' + g.author : '') }), h('span', { class: 'wm-spacer' }), tog, delPack(g)]),
           h('div', { class: 'tp-presets' }, g.items.map(x => h('div', { class: 'tp-pre' }, [
             h('span', { class: 'tp-pn', text: x.name }),
             on && act ? btn(act.label || 'Load', act.title || 'put it on the window this page works on', () => { const id = ensureHost(st); if (id) { act.apply(K, id, x); toast(`${d.label}: ${x.name}`, 'good', 1500); } }) : null,
+            delItem(g, kind, x.name),
           ]))),
         ]);
       }), 'kind-' + kind, 'package'));

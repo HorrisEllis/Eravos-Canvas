@@ -349,6 +349,7 @@ html:not(.snd-off) #logo { filter: drop-shadow(0 0 calc(var(--snd-pulse) * 10px)
 .plib-top b { flex: 1; min-width: 0; }
 .plib-star { background: none; border: 0; color: var(--dim); cursor: pointer; font-size: 14px; line-height: 1; padding: 0 2px; flex: none; }
 .plib-star.on { color: #ffd24a; }
+.plib-del { opacity: .45; font-size: 12px; } .plib-del:hover { opacity: 1; color: #ff5470; }
 
 .gg-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
 .gg-tools { display: flex; gap: 6px; align-items: center; }
