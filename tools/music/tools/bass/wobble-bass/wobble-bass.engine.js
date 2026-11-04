@@ -591,12 +591,7 @@
         }
         ctx.lastNote = { note, n, f, t, slide };
       }
-      function noteOff(note, t) {
-        if (!held || held.note !== note) return;
-        t = Math.max(t || ac.currentTime, ac.currentTime);
-        if (typeof amp.gain.cancelAndHoldAtTime === 'function') amp.gain.cancelAndHoldAtTime(t); else amp.gain.cancelScheduledValues(t);
-        amp.gain.setTargetAtTime(0, t, P.get('release') / 4); held.off = t;
-      }
+      function noteOff(note, t) { MusicParts.releaseHeld(ac, amp.gain, held, note, t, P.get('release')); }   // the shared part (components/note-release)
       P.onChange('sqOct', () => { sq.frequency.setTargetAtTime(curF * (P.get('sqOct') === '-1' ? 0.5 : 1), ac.currentTime, 0.01); });
       P.onChange('subOct', () => { sub.frequency.setTargetAtTime(curF * (SUBK[P.get('subOct')] || 1), ac.currentTime, 0.01); });
       ['octave', 'transpose'].forEach(k => P.onChange(k, () => { if (held && held.off > ac.currentTime) setFreq(noteHz(held.note), ac.currentTime, 0.03); }));   // retune a held note live

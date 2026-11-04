@@ -25,7 +25,8 @@ A canvas of living instruments for making music — everything in key, everythin
     schemas/       the formats both sides agree on (tool, pack, mode, category, domain)
     templates/     copy-to-start folders for a new tool, pack, mode, category, domain
     build/         new-tool · index-tools · validate · structure-map · specs · planned-deps · shots · perf
-    tests/         cross-cutting tests (node tests/run.mjs); a tool's own tests live in its folder
+    tests/         cross-cutting tests (node tests/run.mjs); a tool's own tests live in its folder. Ships with the install
+                   (Null Render.bat uses it)
     specs/         cross-cutting specs (kernel, structure, phase maps); a tool's spec lives in its folder
     desktop/       the exe shell (Electron main/preload) + its builder; ships canvas/ only, tools become packs
     packaging/     packaging/windows/make-exe.ps1 — run by Build ERAVOS.exe.bat: Electron + canvas/ = ERAVOS.exe
@@ -57,6 +58,14 @@ from an address like `localhost`. Firefox in particular refuses MIDI for pages o
   doesn't ask again for that version. ⋯ Options › **Check for updates** asks now.
 - **Publishing a release:** set `"version"` in `desktop/package.json` (e.g. `0.2.0`), then push the tag `v0.2.0`. The `release`
   workflow builds ERAVOS for Windows and attaches `ERAVOS_0.2.0.zip` to the release. That zip is what the installer and the updater fetch.
+
+## Null Render — prove a change did not alter any sound
+Double-click **Null Render** (needs Node.js, and Edge or Chrome on the machine; a dev checkout with Electron uses that instead).
+**1 = record** before you change anything: every music tool and preset is rendered with a fixed, seeded input and kept in
+`tests\null-baseline\` (this machine only). **2 = check** after: it renders again and subtracts; a preset passes when what is
+left is more than 60 dB under the original. Renders that differ from themselves are listed as *unstable* and tools it cannot
+drive as *not covered* — never passed. From a terminal: `node tests/null-render.mjs --record`, `node tests/null-render.mjs [tool]`,
+`--db -70` to be stricter. An update replaces `tests\`, so record again after updating.
 
 ## MIDI controller (pads, keys, knobs)
 

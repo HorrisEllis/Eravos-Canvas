@@ -33,13 +33,9 @@
       default: return () => -1;
     }
   }
-  // the drawn shape as a PeriodicWave (+ its DC, which WebAudio drops and we add back as an offset)
-  function makeWave(ac, fn, phase) {
-    const M = 1024, N = 40, re = new Float32Array(N), im = new Float32Array(N), y = new Float32Array(M);
-    for (let i = 0; i < M; i++) y[i] = fn(((i / M) + phase) % 1);
-    for (let n = 0; n < N; n++) { let a = 0, b = 0; for (let i = 0; i < M; i++) { const w = 2 * Math.PI * n * i / M; a += y[i] * Math.cos(w); b += y[i] * Math.sin(w); } re[n] = (n ? 2 : 1) * a / M; im[n] = 2 * b / M; }
-    return { wave: ac.createPeriodicWave(re, im, { disableNormalization: true }), dc: re[0] };
-  }
+  // the drawn shape as a PeriodicWave (+ its DC, which WebAudio drops and we add back as an offset): the shared part
+  // (components/wave-table); this tool keeps its own 40 harmonics and a phase that is already a fraction of a cycle
+  function makeWave(ac, fn, phase) { return MusicParts.periodicWave(ac, fn, { phase, harmonics: 40 }); }
   const POL = { 'unipolar+': { c: 0.5, k: 0.5 }, 'unipolar−': { c: -0.5, k: -0.5 }, 'bipolar': { c: 0, k: 1 }, 'bipolar inverted': { c: 0, k: -1 } };
   const DEFAULT_STEPS = ['1/8', '1/8', '1/8', '1/8', '1/16', '1/16', '1/8t', '1/4', '1/8', '1/8', '1/8', '1/8', '1/16', '1/32', '1/16', 'off'];
   const cleanSteps = (a) => Array.from({ length: MAX_STEPS }, (_, i) => STEP_OPTS.includes(a && a[i]) ? a[i] : '1/8');
