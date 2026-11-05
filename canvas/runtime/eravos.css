@@ -909,3 +909,14 @@ html[data-theme="dusk"][data-theme] :is(.uk-btn, .tb-btn, .sbk-alt, .sbk-chip, .
 html[data-theme][data-theme] .uk-toggle.on { background: color-mix(in srgb, var(--acc) 26%, #000); }
 html[data-theme][data-theme] .tp-btn.pri { background: color-mix(in srgb, var(--acc) 22%, #000); }
 html[data-theme][data-theme] :is(.uk-select, .uk-text, .sbk-q, .tp-target, .uk-num) { background-color: #000; }
+
+/* 3.104 Dusk gradients from the tool's OWN colour (his words, 2026-11-05: "the buttons in the tape echo look bad. the color i mean. bad
+ * gradient"). The stops were the accent mixed with fixed pink, orange and violet: a sunset on a pink tool, mud on a green one (Tape Echo's
+ * Throw: green → beige → grey). Now each stop is the accent turned a little round the wheel (lighter one way, deeper the other), so a
+ * pink tool still runs rose → coral → magenta and a green one stays green (a shade either side). */
+html[data-theme="dusk"][data-theme], html[data-theme="dusk"][data-theme] .wm-win, html[data-theme="dusk"][data-theme] .tp-overlay {
+  --dk2: oklch(from var(--acc) calc(l + .04) c calc(h + 9)); --dk3: oklch(from var(--acc) calc(l + .08) calc(c * .9) calc(h + 18));
+  --dk4: oklch(from var(--acc) calc(l - .04) c calc(h - 14)); }
+
+/* 3.105 the kit's small size (lane-style controls: mute, solo, arm, remove) — one size, not each tool's own inline padding */
+.uk-btn.sm, .uk-toggle.sm { padding: 1px 5px; font-size: 10px; line-height: 1.25; min-height: 0; }

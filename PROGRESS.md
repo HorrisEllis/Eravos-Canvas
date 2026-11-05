@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.104–3.105 consistency: the design guide, the design check, gradients in the tool's family (2026-11-05)
+Asked: "the buttons in the tape echo look bad. the color i mean. bad gradient" · "i want consistency across all of them. and a template
+or schema for a design guide or philospophy to maintain consistency."
+- Dusk --dk2…4: the accent turned +9° / +18° / −14° in OKLCH (was the accent mixed with fixed pink / orange / violet → mud on green).
+- docs/DESIGN-GUIDE.md (philosophy; rules S1–S4, C1–C5, K1–K5, W1–W4, N1–N2), docs/templates/TOOL-UI.md (the new-tool UI write-up).
+- tests/design-check.mjs: every tool on the served build; D1–D6; tests/design-baseline.json can only improve; docs/design-check.md.
+  .github/workflows/checks.yml runs it (and components, no-toys, no-playwright) on every PR.
+- Fixed to the rules: kit `sm` size (Timeline, Sequencer lane controls), Tape Echo's Clear/Throw at kit size, one primary per window
+  (MIDI Map, Clip Maker, Lyrics → Rhythm, Session), MIDI Map / piano-roll separator / Session progress on tokens and the accent family,
+  BlackSurfaces reads `background` shorthands with variables and treats the old blue-grey #223044 as a surface (chroma ≤ 36).
+- Tool page In / out words now come from the music domain (ToolPage.ioWords) — the page stays domain-free (boundary test 10/10).
+- 45 → 52 of 69 tools pass every rule. D4 (119 one-off buttons, nearly all play surfaces) waits for a kit Pad part.
+
 ## Done — 3.103 Black surfaces (2026-11-05)
 Asked: "i dont like the tint. everything but the colors should be what they are. make them darker even. like black".
 - Surface tokens neutral near-black in every theme (--bg #000 … --panel2 #0f0f0f, lines #1c1c1c/#282828, text greys neutral);

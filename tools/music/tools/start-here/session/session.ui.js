@@ -46,14 +46,14 @@ OrganismFactory.reg('eravos.session', function (view) {
     const name = (view.state.songName || 'untitled').trim(); const ok = await window.Workspace.projects.save(name);
     if (window.Shell) window.Shell.toast(ok ? `Kept “${name}” in your projects (Start → PROJECTS).` : 'Couldn’t keep the project — your browser storage may be full or blocked.', ok ? 'good' : 'bad', 4000);
   } });
-  const prog = h('div', { style: { height: '6px', background: '#1a2533', borderRadius: '3px', overflow: 'hidden' } }, [h('div', { style: { height: '100%', width: '0%', background: 'linear-gradient(90deg,#ff2266,#b066ff)' } })]);
+  const prog = h('div', { style: { height: '6px', background: '#1a2533', borderRadius: '3px', overflow: 'hidden' } }, [h('div', { style: { height: '100%', width: '0%', background: 'linear-gradient(90deg, var(--acc), color-mix(in oklab, var(--acc) 65%, #fff))' } })]);
   view.on('progress', (p) => { if (p.state === 'progress') prog.firstChild.style.width = (p.progress * 100) + '%'; if (p.state === 'done') prog.firstChild.style.width = '100%'; if (p.state === 'start') prog.firstChild.style.width = '0%'; });
   const bars = UI.paramControl(view, cfg('bounceBars'), { size: 30 }), bits = UI.paramControl(view, cfg('bitDepth')), autoL = UI.paramControl(view, cfg('autoLength'));
   view.root.append(
     h('div', { class: 'org-row' }, [name.el]),
     h('div', { class: 'org-row' }, [bpm.el, tap.el, metro.el, cin.el]),
     h('div', { style: { display: 'flex', gap: '10px', alignItems: 'center' } }, [wheel, h('div', { class: 'org-col' }, [h('span', { class: 'org-label', text: 'Scale' }), scale.el, hint])]),
-    h('div', { class: 'uk-group', style: { marginTop: '6px' } }, [h('div', { class: 'uk-group-title', text: 'PROJECT' }), h('div', { class: 'org-row' }, [UI.Button({ label: 'New', onClick: () => { if (confirm('Start a new song? (the current one stays in autosave)')) view.emit('new', {}); } }).el, UI.Button({ label: 'Open…', onClick: () => fileIn.click() }).el, UI.Button({ label: 'Save', kind: 'primary', hint: 'download a .eravos.json file (your clips are inside it)', onClick: () => view.emit('save', {}) }).el, projBtn.el, fileIn]), auto]),
+    h('div', { class: 'uk-group', style: { marginTop: '6px' } }, [h('div', { class: 'uk-group-title', text: 'PROJECT' }), h('div', { class: 'org-row' }, [UI.Button({ label: 'New', onClick: () => { if (confirm('Start a new song? (the current one stays in autosave)')) view.emit('new', {}); } }).el, UI.Button({ label: 'Open…', onClick: () => fileIn.click() }).el, UI.Button({ label: 'Save', hint: 'download a .eravos.json file (your clips are inside it)', onClick: () => view.emit('save', {}) }).el, projBtn.el, fileIn]), auto]),
     h('div', { class: 'uk-group', style: { marginTop: '6px' } }, [h('div', { class: 'uk-group-title', text: 'EXPORT' }), h('div', { class: 'org-row' }, [bars.el, bits.el, autoL.el]), h('div', { class: 'org-row' }, [UI.Button({ label: '⤓ BOUNCE WAV', kind: 'primary big', onClick: () => view.emit('bounce', {}) }).el, UI.Button({ label: '⏺ Record', onClick: () => view.emit('record', {}) }).el]), prog, status]),
   );
 });

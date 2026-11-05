@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
   const doc = global.document;
-  const MAX = 80, CHROMA = 26, DARKEN = 0.72;   // a surface: brightest channel ≤ 80, channels within 26 of each other
+  const MAX = 80, CHROMA = 36, DARKEN = 0.72;   // a surface: brightest of r/g/b ≤ 80, all three within 36 of each other (the old blue-grey #223044 is one; a dim red pad #3a1020 is a colour)
   const LIT = /#[0-9a-fA-F]{8}\b|#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b|rgba?\([^)]*\)/g;
   function parse(c) {
     c = String(c).trim(); let m = /^#([0-9a-f]{3})$/i.exec(c); if (m) c = '#' + m[1].split('').map(x => x + x).join('');
@@ -39,6 +39,9 @@
     if (!s || done.has(s)) return; let list; try { list = s.cssRules; } catch (e) { return; }   // another origin's sheet: not ours
     done.add(s);
     rules(list, (st) => {
+      // a shorthand that mixes a variable and a literal (background: linear-gradient(var(--x), #18130e)) hides the literal from its
+      // longhands (they read '' until the variable is filled in): read and write the shorthand itself
+      const sh = st.getPropertyValue('background'); if (sh && /var\(/.test(sh) && /#|rgb/.test(sh)) { const s2 = inText(sh); if (s2 !== sh) st.setProperty('background', s2, st.getPropertyPriority('background')); }
       for (let i = 0; i < st.length; i++) {
         const p = st[i]; if (!/^background|^--/.test(p)) continue;
         const v = st.getPropertyValue(p); if (!v || !/#|rgb/.test(v)) continue;

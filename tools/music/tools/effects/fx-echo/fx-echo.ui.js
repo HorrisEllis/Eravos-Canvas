@@ -20,9 +20,7 @@ OrganismFactory.reg('eravos.fx-echo', function (view) {
   }, 30);
   view.on('thrown', () => { flash = 0.35; });
   const thr = UI.Button({ label: 'THROW', kind: 'primary', hint: 'send one division into the echo (dub throw)', onClick: () => view.emit('throw', {}) });
-  thr.el.style.minWidth = '90px'; thr.el.style.height = '40px';
   const clr = UI.Button({ label: '■ CLEAR', hint: 'empty the tape now — stops a frozen or runaway echo', onClick: () => view.emit('clear', {}) });
-  clr.el.style.height = '40px';
   view.on('cleared', () => { flash = 0; });
   const div = UI.divisionLadder(view, 'div'); view.bind('div', v => div.set(v));
   const free = UI.paramControl(view, cfg('timeFree'), { size: 30 });

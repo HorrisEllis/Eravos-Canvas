@@ -39,8 +39,8 @@ OrganismFactory.reg('eravos.lyric-rhythm', function (view) {
   view.root.append(
     h('div', { class: 'org-row', style: { justifyContent: 'space-between' } }, [UI.presetBar(view), h('div', { class: 'org-row', style: { margin: 0 } }, [
       UI.Button({ label: '▶ Hear it', hint: 'play it once now', onClick: () => view.emit('preview', {}) }).el,
-      UI.Button({ label: '⇢ Timeline', kind: 'primary', hint: 'put it on the Timeline as a clip you can edit', onClick: () => view.emit('send_timeline', {}) }).el,
-      UI.Button({ label: '⇢ Sequencer', kind: 'primary', hint: 'your words as Sequencer lanes (4 bars per slot, chained) + a her-voice lane on every line start — then automate it', onClick: () => view.emit('send_sequencer', {}) }).el,
+      UI.Button({ label: '⇢ Timeline', hint: 'put it on the Timeline as a clip you can edit', onClick: () => view.emit('send_timeline', {}) }).el,
+      UI.Button({ label: '⇢ Sequencer', hint: 'your words as Sequencer lanes (4 bars per slot, chained) + a her-voice lane on every line start — then automate it', onClick: () => view.emit('send_sequencer', {}) }).el,
       UI.Button({ label: '↺', hint: 'undo your weight/nudge edits', onClick: () => view.emit('reset_edits', {}) }).el])]),
     ta, h('div', { class: 'org-row lyr-ctl' }, [seg('flow')]),
     h('div', { class: 'org-row lyr-ctl' }, [UI.Button({ label: '♫ Make a song', kind: 'primary', hint: 'grow this rhythm into a whole song, written below on the Timeline', onClick: () => view.emit('expand_song', {}) }).el, UI.paramControl(view, cfg('songGenre'), { segMax: 4 }).el]), h('div', { class: 'org-row lyr-ctl' }, [seg('mode'), tgt]),
