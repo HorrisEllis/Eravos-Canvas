@@ -32,9 +32,10 @@ describe('P91 · themes · the dependency graph · Clear takes the dependencies'
       assert.equal(X.built().length + X.active().length, 0, 'agnostic again'); assert.equal(slot.children.length, 0, 'what they added is gone'); assert.ok(!keys.has('KeyQ'), 'their keys too');
     } finally { slot.remove(); }
   });
-  it('⋯ Options carries Theme and Dependencies; the graph page draws the canvas', () => {
+  it('⚙ Settings carries the Look (themes); ⋯ Options carries Dependencies', () => {
+    assert.ok(AppSettings.sections().some(s => s.id === 'look'), 'Look is a section of Settings');
     if (!document.getElementById('slot-options')) return;   // only on the full canvas page
-    assert.ok(document.getElementById('themeBtn')); assert.ok(document.getElementById('depsBtn'));
+    assert.ok(document.getElementById('depsBtn')); assert.ok(!document.getElementById('themeBtn'), 'no longer in the dropdown');
   });
   it('3.94 a knob drags from anywhere on it — its value and its name too, not only the ring', () => {
     let got = null; const k = UIKit.Knob({ label: 'Grab', min: 0, max: 1, value: 0.5, default: 0.5, onChange: (v) => { got = v; } }); document.body.appendChild(k.el);

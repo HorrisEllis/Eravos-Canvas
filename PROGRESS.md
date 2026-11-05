@@ -2,6 +2,16 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.110 ⚙ Settings is a page, not a dropdown (2026-11-05)
+Asked: "also need a actual settings built not a drop down". Screenshots of every tab shown; "MERGE AND push".
+- canvas/runtime/app-settings.js → window.AppSettings: addSection({ id, label, order, sub, make(close) }), open(id), close(), toggle().
+  The page reuses the tool-page look (tp-overlay / tp-page / tp-nav tabs). Entry: ⚙ Settings in the toolbar beside ⋯ Options, and Ctrl+,.
+- Sections: Look (Themes.panel — theme, buttons, material; canvas) · Reactive colours (ReactPanel.build, app scope; music) · Sound (Hear
+  by place; music) · About & updates (version from the app, Check for updates, releases; canvas). A section that throws shows a line, not
+  a broken page.
+- ⋯ Options keeps only actions: Undo, Redo, Dependencies, Stop all, Ports, Fit all, Tidy up, Clear canvas.
+- Tests: tests/p110-settings.test.js 2/2; P77 (reactive panel), P91 (themes), P99 (updates) now drive the page; boundary 10/10.
+
 ## Done — 3.108 Sketch draws smooth and connected; 3.109 the piano roll fills its width, and its own borderless window (2026-11-05)
 Asked: "can you start with the timeline? make it easier and the drawing more smooth and connects to each other" · "also split the
 timeline. maybe. it doesn't scale well, also i want them to be seperate or an option to be seperate" → chose "Piano roll its own window"

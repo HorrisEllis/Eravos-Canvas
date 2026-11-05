@@ -108,23 +108,17 @@
         h('span', { class: 'thm-mat', 'data-material-demo': m.id }), h('b', { text: m.label + (on ? '  ✓' : '') }), h('small', { text: m.blurb })]);
       c.onclick = () => { setMaterial(m.id); paintM(); }; mcards.appendChild(c); }); };
     paintM();
-    const react = h('button', { class: 'thm-link', type: 'button', text: 'Reactive colours — how every colour answers the sound →', onclick: () => { if (onClose) onClose(); const b = doc.getElementById('reactBtn'); if (b) b.click(); } });
+    const react = h('button', { class: 'thm-link', type: 'button', text: 'Reactive colours — how every colour answers the sound →', onclick: () => { if (global.AppSettings && global.AppSettings.isOpen) { global.AppSettings.open('reactive'); return; } if (onClose) onClose(); const b = doc.getElementById('reactBtn'); if (b) b.click(); } });
     return h('div', { class: 'thm-panel', role: 'dialog', 'aria-label': 'Themes' }, [
       h('div', { class: 'thm-headr' }, [h('b', { text: 'THEMES' }), h('span', { text: 'the whole look in one choice — remembered on this computer' }), h('button', { class: 'thm-x', type: 'button', text: '×', 'aria-label': 'close', onclick: () => onClose && onClose() })]),
       cards, h('div', { class: 'thm-sub' }, [h('b', { text: 'BUTTONS' }), h('span', { text: 'with any theme' })]), bcards,
       h('div', { class: 'thm-sub' }, [h('b', { text: 'MATERIAL' }), h('span', { text: 'a texture on the black, with any theme' })]), mcards, react]);
   }
-  // the entry in ⋯ Options (the shell's options slot), opening the section as a popover
+  // 3.110 the look is a section of ⚙ Settings (it was an entry in the ⋯ Options dropdown, opening a popover)
   function entry() {
-    const slot = doc && doc.getElementById('slot-options'); if (!slot || doc.getElementById('themeBtn') || !global.UIKit) return !!(doc && doc.getElementById('themeBtn'));
-    const b = doc.createElement('button'); b.id = 'themeBtn'; b.type = 'button'; b.className = 'tb-btn thm-entry'; b.title = 'Themes — the whole look in one choice';
-    const tag = doc.createElement('span'); tag.className = 'thm-tag'; const name = () => { tag.textContent = (LIST.find(t => t.id === get()) || {}).label || ''; };
-    b.append(doc.createTextNode('Theme '), tag); name(); listeners.push(name);
-    let pop = null; const close = () => { if (pop) { pop.remove(); pop = null; } doc.removeEventListener('keydown', key, true); };
-    const key = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
-    b.onclick = () => { if (pop) return close(); const m = doc.getElementById('optMenu'); if (m) m.hidden = true; pop = h0('div', 'thm-pop'); pop.appendChild(panel(close)); doc.body.appendChild(pop); doc.addEventListener('keydown', key, true);
-      pop.addEventListener('mousedown', (e) => { if (e.target === pop) close(); }); };
-    slot.insertBefore(b, slot.firstChild); return true;
+    if (!global.AppSettings) return false;
+    global.AppSettings.addSection({ id: 'look', label: 'Look', order: 10, sub: 'The whole look in one choice: a theme, a button style and a material, with any theme.', make: (close) => panel(close) });
+    return true;
   }
   const h0 = (tag, cls) => { const e = doc.createElement(tag); e.className = cls; return e; };
   function boot() { if (!entry()) setTimeout(boot, 300); }

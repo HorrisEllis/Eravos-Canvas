@@ -131,24 +131,13 @@
     return box;
   }
 
-  // ⋯ Options: one line that says the mode; it opens the panel beside the menu
+  // 3.110 a section of ⚙ Settings (it was a line in the ⋯ Options dropdown, opening a popover)
   function optionsEntry() {
-    const slot = doc.getElementById('slot-options'); if (!slot || doc.getElementById('reactBtn')) return false;
-    const b = el('button', 'tb-btn rcp-entry'); b.id = 'reactBtn'; b.type = 'button'; b.title = 'Reactive colours — how every colour answers the sound';
-    const say = () => { const m = S().mode; b.innerHTML = ''; b.append(el('span', 'rcp-entry-l', '◐ Reactive colours'), el('span', 'rcp-entry-m rcp-m-' + m, ({ off: 'Off', static: 'Static', changing: 'Changing', custom: 'Custom', beat: 'Beat' })[m])); };
-    let pop = null;
-    const close = () => { if (pop) { pop.remove(); pop = null; doc.removeEventListener('pointerdown', away, true); } };
-    const away = (e) => { if (pop && !pop.contains(e.target) && e.target !== b && !b.contains(e.target)) close(); };
-    b.addEventListener('click', (e) => { e.stopPropagation(); if (pop) { close(); return; }
-      pop = el('div', 'rcp-pop'); pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', 'Reactive colours'); pop.appendChild(build({ scope: 'app' }));
-      const x = el('button', 'rcp-x', '✕'); x.title = 'close (Esc)'; x.addEventListener('click', (e2) => { e2.stopPropagation(); close(); }); pop.appendChild(x);
-      const esc = (e2) => { if (e2.key === 'Escape' && pop) { e2.stopPropagation(); close(); doc.removeEventListener('keydown', esc, true); } }; doc.addEventListener('keydown', esc, true);
-      doc.body.appendChild(pop); const r = b.getBoundingClientRect(), W = global.innerWidth;
-      pop.style.top = Math.max(8, r.top) + 'px'; pop.style.left = Math.max(8, Math.min(W - pop.offsetWidth - 8, r.left - pop.offsetWidth - 10)) + 'px';
-      setTimeout(() => doc.addEventListener('pointerdown', away, true), 0); });
-    if (S().onChange) S().onChange(say); say(); slot.appendChild(b); return true;
+    if (!global.AppSettings) return false; if (optionsEntry.done) return true; optionsEntry.done = true;
+    global.AppSettings.addSection({ id: 'reactive', label: 'Reactive colours', order: 20, sub: 'How every colour answers the sound. Each tool can follow this or have its own (its ⚙ → Reactive colours).', make: () => build({ scope: 'app' }) });
+    return true;
   }
-  function boot() { if (!S()) return setTimeout(boot, 200); if (!optionsEntry() && !doc.getElementById('reactBtn')) setTimeout(boot, 400);
+  function boot() { if (!S()) return setTimeout(boot, 200); if (!optionsEntry()) setTimeout(boot, 400);
     if (global.ToolSettings && !boot._ts) { boot._ts = true; global.ToolSettings.addSection({ id: 'reactive', label: 'Reactive colours', order: 40,
       when: (d) => d.domain === 'music' && (d.config || []).some(c => c.key === '_react'), make: (rec, K, view) => build({ scope: 'tool', view }) }); } }
   global.ReactPanel = { build, PALETTES };

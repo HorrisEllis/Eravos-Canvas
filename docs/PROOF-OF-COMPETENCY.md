@@ -71,6 +71,16 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-05 · Settings as a real page — PR #88
+- **His words (2026-11-05):** "also need a actual settings built not a drop down".
+- **His call:** saw every tab as screenshots, then "MERGE AND push".
+- **Built:** one Settings page in the look of the tool pages, a tab per section, where each part of the app contributes its own section
+  (the host its look and updates, the music domain its colours and sound) — so the host stays free of domain words; the dropdown left
+  with actions only.
+- **Proof:** a new in-app test opens every tab and checks its controls, that a broken section cannot break the page, Esc and Ctrl+,;
+  three older tests moved from the dropdown to the page; canvas/content boundary 10/10; design check no worse.
+- **Check:** `node tests/run.mjs P110` · https://github.com/HorrisEllis/Eravos-Canvas/pull/88
+
 ### 2026-11-05 · A timeline you can draw on, and that scales — PR #87
 - **His words (2026-11-05):** "can you start with the timeline? make it easier and the drawing more smooth and connects to each other" ·
   "also split the timeline. maybe. it doesn't scale well, also i want them to be seperate or an option to be seperate" · "oh and make it
