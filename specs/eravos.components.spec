@@ -22,3 +22,4 @@
 ## Applies now to
   eravos.tool-depth.spec K1–K5 (the bass tools' depth is built as components first) · every new tool and feature after this date.
   Existing code is moved into components as it is touched, each move proved to change nothing (null renders / same tests).
+  The proof tool: tests/null-render.mjs (--record before, check after; gate −60 dB; maths in tests/null-render-core.mjs).

@@ -1,0 +1,29 @@
+# spec_id: eravos.dub-siren · version 0.1.0 · status mapped · template eravos.tool/1
+identity:
+  id: eravos.dub-siren ; label: Dub Siren ; domain: music ; category: dub (shown as Dub)
+  purpose: the hand-played dub siren: hold to wail, let go to fall — a pitch that rises, sweeps and decays, as its own instrument.
+  related: the SIREN part of Dub Station (sirenPitch 120..2000 Hz, rate, depth, shape, rise) taken out as a tool · curve-synth (a siren sound among curve voices) · fx-echo (the siren's echo is a separate tool, wired after)
+ports:
+  in:  note_in (note:trigger: note = base pitch, duration = hold) · hold (event: pad:trigger / key down-up) · midi_in · mod.rate (±1 → ±1 octave) · mod.depth (±1 → ±12 st) · mod.pitch (±1 → ±1200 c)
+  out: out (audio, mono → stereo) · pitch (modulation: the siren's current pitch in cents from base)
+params: pitch 120..2000 Hz · wave [sine, square, saw up, saw down, triangle] · rate 0.1..16 Hz (or tempo division) · depth 0..24 st · rise 0..24 st (and −12..0) · riseTime 0.1..8 s · fallTime 0.1..12 s · hold [latch, gate] · curve [linear, exp, log] · lfoShape [sine, triangle, square] · lfoPhase 0..1 · glide · filter 400..12000 Hz · drive 0..1 · level
+behaviour:
+  - one pitch ConstantSource drives the oscillator: while held it climbs by Rise over Rise time, with the LFO (Rate × Depth) added on top; on release it falls to the base pitch (or below) over Fall time and fades — the classic wail then slow fall
+  - gate hold: sounds while the key is down; latch: toggles. A new hold during the fall catches the pitch where it is (no jump) and climbs again
+  - rate can be free Hz or a tempo division; tempo-sync resets the LFO phase to LFO phase at hold-on so repeated blasts start the same way
+  - the lowpass follows pitch (Filter × pitch ratio), so the siren darkens as it falls, like a real unit; Drive is a tanh before it
+  - Dub Station's siren is the reference for sound: the preset "Sound System Siren" must null against it within −30 dB at the defaults
+  - echo, spring and filter are NOT inside: wire Echo, Spring Tank or Dub Filter after it
+needs: units [music.engine, music.transport, music.tempo, music.key] · tools [] · permissions [audio_out, midi_in, bus_publish, bus_subscribe]
+packs: ships [factory] — Classic Wail · Fall Away · Air Raid · Short Blast · Triplet Chop · Zap Down · Rising Sweep · Sound System Siren
+hooks: STD.note_in ; STD.midi_in ; trigger_in (hold) ; STD.transport_in ; STD.audio_out ; mod_in (rate ; depth ; pitch) ; mod_out (pitch)
+acceptance (dub-siren.test.js):
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - p42 audio survey (node tests/tool-audio.mjs dub-siren): every preset rendered — timing to the sample, pitch to the cent, level never over full scale, Stop all silences it
+  - pitch at hold-on = base ± 5 c; after riseTime it equals base + rise ± 10 c
+  - LFO at rate 3.2 Hz, depth 7 st: pitch swing peak-to-peak = 14 st ± 0.3 st
+  - release: reaches base within fallTime ± 5 %, fades out, Stop all silences it
+  - a hold during the fall continues from the current pitch (no step larger than 20 c in 5 ms)
+  - preset Sound System Siren vs Dub Station siren: null difference ≤ −30 dB
+
+# dependencies: run node build/planned-deps.mjs — it reads the hooks line above and writes the generated block here (needs the Clear Glass driver; not written by hand)

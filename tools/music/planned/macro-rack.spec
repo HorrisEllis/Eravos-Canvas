@@ -1,3 +1,38 @@
+# spec_id: eravos.macro-rack · version 0.1.0 · status planned:macro-rack.spec; extends:macro-automation · template eravos.tool/1
+# generated from eravos.music-ecosystem.spec v0.2.0 §4 (performance_and_control) — that file stays the index; this file is the tool's own spec
+identity:
+  id: eravos.macro-rack ; label: Macro Rack ; domain: music ; family: performance_and_control
+  lineage: macro knobs of instrument racks
+  family_from: live electronic performance: clip launching, looping, controllers, MPE
+assembles (components, tools/music/components/<id>/ — never re-implemented here):
+  macro · mod-ops · relationship-graph
+adds (behaviour only this tool has):
+  - 16 macros, each to any parameters on the canvas with curves
+  - macro snapshots
+  - macro-to-macro relationships
+modes: macro · snapshot
+ports: TO WRITE in the depth audit — typed in/out per §5 tool_contract; every assembled component reachable by wiring (Open as components)
+params: TO WRITE in the depth audit — every component control exposed, full range (eravos.tool-depth.spec), each a modulation destination
+packs (names unique across the ecosystem; ≥ 6 presets each; novelty test §6):
+  - Drop Controls — macros for drop moments
+  - Filter Ride — macros for filter performance
+  - Space Throw — macros for reverb and delay throws
+  - Energy Knob — one knob for whole-mix energy
+  - Texture Mix — macros blending textures
+  - Chaos Knob — one knob for randomness
+acceptance:
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - open-as-components: the wired components render the same as the tool (≤ −60 dB difference)
+  - novelty: every preset's nearest neighbour in this tool ≥ 0.15, pack centroids ≥ 0.25 apart (§6)
+  - p42 audio survey: timing to the sample, pitch to the cent, never over full scale
+  - cpu per instance and per voice measured (build/perf.mjs) and inside §8 budgets
+  - depth audit written above; open gaps listed, none hidden
+
+# dependencies: run node build/planned-deps.mjs once the hooks line is written (generated block, not by hand)
+
+# ============================================================
+# ORIGINAL SPEC (kept verbatim — the detail; the generated entry above widens it, per the index: "planned:<spec> … that spec stays the detail")
+# ============================================================
 # spec_id: eravos.organism.macro-rack · version 1.0.0 · phase P38 · status planned · category modulation
 identity:
   id: eravos.macro-rack ; label: Macros ; icon: 🎛 ; accent: "#ffd23f"

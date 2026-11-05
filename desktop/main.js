@@ -1,9 +1,8 @@
 /* ERAVOS desktop — the canvas as an app (spec eravos.phase12-desktop).
  * One window, served from eravos://app/ (privileged secure scheme: stable origin, secure context, no port).
- * The app grants MIDI + microphone to its own origin only. The exe folder has the project's own layout:
- *   canvas/ tools/ schemas/ README.md   — the same folders as the repo, served as the app (tools/ = every domain)
- *   projects/ (saves) · exports/ (bounces) · drop/ (anything → canvas) · packs/ (extra .zip packs, loaded every start)
- *   .appdata/ (ERAVOS's own storage). One folder holds everything: copy it to move or back up ERAVOS. */
+ * The app grants MIDI + microphone to its own origin only. The app folder (Program Files\ERAVOS when installed) has the
+ * project's own layout — canvas/ tools/ schemas/ README.md, served as the app — and is never written to.
+ * Your work lives in the library, Documents\ERAVOS: projects/ exports/ packs/ tools/ drop/ .appdata/ (see pickHome). */
 'use strict';
 const { app, BrowserWindow, protocol, net, session, shell, ipcMain, Menu, dialog } = require('electron');
 const path = require('path'), fs = require('fs'), { pathToFileURL } = require('url');
@@ -15,22 +14,35 @@ const APP_DIR = [path.dirname(process.execPath), path.resolve(__dirname, '..', '
 const SERVED = new Set(['canvas', 'tools', 'schemas', 'voice', 'README.md']);   // the only top-level names the app serves (voice/: her recordings — the web build serves it too)
 protocol.registerSchemesAsPrivileged([{ scheme: SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true, corsEnabled: true, codeCache: true } }]);
 
-// ---------------------------------------------------------------- your folders (beside canvas/ and tools/)
+// ---------------------------------------------------------------- your library: Documents\ERAVOS
+// Everything you make lives in ONE folder in Documents, never inside the app's own folder — so ERAVOS can be installed to
+// Program Files, updated and uninstalled without touching your work:
+//   Documents\ERAVOS\ projects\ (Save) · exports\ (bounces, renders) · packs\ (preset packs + .zip packs) · tools\ (extra tool
+//   packs, .zip) · drop\ (anything → canvas) · .appdata\ (autosave, presets, window)
+// ERAVOS_LIBRARY=<folder> moves it; a file named "portable" beside ERAVOS.exe keeps it all in the app's folder (a USB stick).
 function writable(dir) { try { fs.mkdirSync(dir, { recursive: true }); const t = path.join(dir, '.write-test'); fs.writeFileSync(t, ''); fs.unlinkSync(t); return true; } catch (e) { return false; } }
 function pickHome() {
   if (process.env.ERAVOS_LIBRARY) return path.resolve(process.env.ERAVOS_LIBRARY);
-  if (writable(path.join(APP_DIR, 'projects'))) return APP_DIR;
-  return path.join(app.getPath('documents'), 'ERAVOS');   // e.g. installed under Program Files: keep your work in Documents
+  if (fs.existsSync(path.join(APP_DIR, 'portable')) && writable(APP_DIR)) return APP_DIR;
+  return path.join(app.getPath('documents'), 'ERAVOS');
 }
 const HOME = pickHome();
-const DIRS = { drop: path.join(HOME, 'drop'), packs: path.join(HOME, 'packs'), projects: path.join(HOME, 'projects'), exports: path.join(HOME, 'exports'), appdata: path.join(HOME, '.appdata') };
-// older builds kept these in "ERAVOS Library" — move your saves, bounces, dropped files and autosave across once.
+const DIRS = { projects: path.join(HOME, 'projects'), exports: path.join(HOME, 'exports'), packs: path.join(HOME, 'packs'), tools: path.join(HOME, 'tools'), drop: path.join(HOME, 'drop'), appdata: path.join(HOME, '.appdata') };
+// Earlier builds kept your folders beside ERAVOS.exe (the build folder, or %LOCALAPPDATA%\Programs\ERAVOS from the old installer),
+// and before that in "ERAVOS Library". Move them into the library once — only into a folder that is still empty, never over your work.
+function adopt(src, dst) {
+  try {
+    if (!fs.existsSync(src) || path.resolve(src) === path.resolve(dst) || !fs.readdirSync(src).some(n => !n.startsWith('.write-test'))) return;
+    if (fs.existsSync(dst) && fs.readdirSync(dst).length) return;
+    fs.mkdirSync(path.dirname(dst), { recursive: true }); fs.rmSync(dst, { recursive: true, force: true });
+    try { fs.renameSync(src, dst); } catch (e) { fs.cpSync(src, dst, { recursive: true }); fs.rmSync(src, { recursive: true, force: true }); }   // another drive
+  } catch (e) { console.error('moving', src, '→', dst, e.message); }
+}
+const OLD_HOMES = [APP_DIR, process.env.LOCALAPPDATA && path.join(process.env.LOCALAPPDATA, 'Programs', 'ERAVOS')].filter(Boolean);
+for (const old of OLD_HOMES) ['projects', 'exports', 'packs', 'drop', '.appdata'].forEach(n => adopt(path.join(old, n), DIRS[n === '.appdata' ? 'appdata' : n]));
 // Its Mods/Packs are left behind: the tools now ship in tools/, and the old music packs would load them twice.
 const OLD = [path.join(HOME, 'ERAVOS Library'), path.join(app.getPath('documents'), 'ERAVOS Library')].find(d => fs.existsSync(d));
-if (OLD) [['Projects', 'projects'], ['Exports', 'exports'], ['Drop Here', 'drop'], ['.appdata', 'appdata']].forEach(([from, to]) => {
-  const src = path.join(OLD, from), dst = DIRS[to];
-  try { if (fs.existsSync(src) && (!fs.existsSync(dst) || !fs.readdirSync(dst).length)) { fs.rmSync(dst, { recursive: true, force: true }); fs.renameSync(src, dst); } } catch (e) { console.error('moving', src, e.message); }
-});
+if (OLD) [['Projects', 'projects'], ['Exports', 'exports'], ['Drop Here', 'drop'], ['.appdata', 'appdata']].forEach(([from, to]) => adopt(path.join(OLD, from), DIRS[to]));
 Object.values(DIRS).forEach(d => fs.mkdirSync(d, { recursive: true }));
 app.setPath('userData', DIRS.appdata);
 
@@ -72,9 +84,8 @@ let watching = false;
 // them before the start screen appears; the drop folder follows once the page says the packs are done.
 function sendPacks() {
   const list = [];
-  // packs/*.zip — extras on top of tools/ (packs dropped on the canvas are kept here)
-  for (const n of fs.readdirSync(DIRS.packs).filter(n => /\.zip$/i.test(n) && !skip(n)).sort()) {
-    const dir = DIRS.packs;
+  // library packs/*.zip and tools/*.zip — extras on top of the app's own tools/ (packs dropped on the canvas are kept in packs/)
+  for (const dir of [DIRS.packs, DIRS.tools]) for (const n of fs.readdirSync(dir).filter(n => /\.zip$/i.test(n) && !skip(n)).sort()) {
     try { const b = fs.readFileSync(path.join(dir, n)); list.push({ name: n, data: new Uint8Array(b.buffer, b.byteOffset, b.byteLength) }); } catch (e) { console.error('pack read failed', n, e.message); }
   }
   win.webContents.send('eravos:packs', list);
@@ -98,7 +109,7 @@ ipcMain.on('eravos:packs-done', () => startLibrary());
 ipcMain.on('eravos:file-done', (e, r) => { const p = pending.get(r.id); if (!p) return; pending.delete(r.id); if (r.ok && p.source === 'drop') markImported(p.key); });
 let UPDATER = null;
 ipcMain.handle('eravos:update-check', () => UPDATER ? UPDATER.check(true) : null);
-// 3.101 in the background: download + unpack while ERAVOS runs; then Restart now (apply) or When I close ERAVOS (later)
+// 3.111 in the background: download + unpack while ERAVOS runs; then Restart now (apply) or When I close ERAVOS (later)
 ipcMain.handle('eravos:update-download', () => UPDATER ? UPDATER.download() : false);
 ipcMain.handle('eravos:update-apply', () => UPDATER ? UPDATER.apply() : false);
 ipcMain.handle('eravos:update-later', () => UPDATER ? UPDATER.later() : false);
@@ -158,7 +169,8 @@ app.whenReady().then(async () => {
   });
   ses.setPermissionCheckHandler((wc, perm, origin) => ALLOWED.has(perm) && ours(origin));
   ses.on('will-download', (e, item) => {
-    const name = item.getFilename(), dir = /\.json$/i.test(name) ? DIRS.projects : DIRS.exports, dst = uniquePath(dir, name);
+    // every save lands in the library: preset packs → packs, projects (.json) → projects, everything else (audio, video, images) → exports
+    const name = item.getFilename(), dir = /\.(pack|pack\.schema)\.json$/i.test(name) ? DIRS.packs : /\.json$/i.test(name) ? DIRS.projects : DIRS.exports, dst = uniquePath(dir, name);
     item.setSavePath(dst);
     item.once('done', (ev, state) => { if (win && !win.isDestroyed()) win.webContents.send('eravos:saved', { path: dst, folder: path.basename(dir), name: path.basename(dst), ok: state === 'completed' }); });
   });
@@ -188,7 +200,8 @@ app.whenReady().then(async () => {
   });
   Menu.setApplicationMenu(Menu.buildFromTemplate([
     { label: 'ERAVOS', submenu: [
-      { label: 'Open the ERAVOS folder', click: () => shell.openPath(HOME) },
+      { label: 'Open the ERAVOS library (Documents)', click: () => shell.openPath(HOME) },
+      { label: 'Open projects', click: () => shell.openPath(DIRS.projects) },
       { label: 'Open the drop folder', click: () => shell.openPath(DIRS.drop) },
       { type: 'separator' }, { role: 'reload' }, { role: 'togglefullscreen' }, { role: 'toggleDevTools' }, { type: 'separator' }, { role: 'quit' } ] },
     { role: 'editMenu' },

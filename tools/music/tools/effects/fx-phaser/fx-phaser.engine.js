@@ -30,7 +30,7 @@
       up.channelCount = 2; up.channelCountMode = 'explicit'; up.channelInterpretation = 'speakers';
       fx.wetIn.connect(up); up.connect(split); merge.connect(fx.wetOut);
       const rateMod = ctx.modBus('rate', { min: -4, max: 4 }), fbMod = ctx.modBus('feedback', { min: -0.9, max: 0.9 });
-      const phaseWave = (deg) => { const r = deg * Math.PI / 180; return ac.createPeriodicWave(new Float32Array([0, Math.sin(r)]), new Float32Array([0, Math.cos(r)]), { disableNormalization: true }); };
+      const phaseWave = (deg) => MusicParts.phaseWave(ac, deg);   // the shared part (components/wave-table)
       const chans = [0, 1].map((c) => {
         const sum = ac.createGain(), fb = ac.createGain(), lfo = ac.createOscillator(), dep = ac.createGain();
         const stages = Array.from({ length: 12 }, () => { const a = ac.createBiquadFilter(); a.type = 'allpass'; dep.connect(a.detune); ctx.track(a); return a; });

@@ -1,0 +1,34 @@
+# spec_id: eravos.echo-architecture · version 0.1.0 · status extends:fx-echo (fx-dub-echo stays its own tool) · template eravos.tool/1
+# generated from eravos.music-ecosystem.spec v0.2.0 §4 (space_and_transformation) — that file stays the index; this file is the tool's own spec
+identity:
+  id: eravos.echo-architecture ; label: Echo Architecture ; domain: music ; family: space_and_transformation
+  lineage: tape echo, multi-head echo, ping-pong and digital delays
+  family_from: tape echo and spring tanks (dub), plates and halls (studio era), digital reverbs (1980s on), spectral processing
+assembles (components, tools/music/components/<id>/ — never re-implemented here):
+  delay-line · saturator-tape · filter-svf · stereo-tools · pitch-shifter · ducker · lfo
+adds (behaviour only this tool has):
+  - topologies: single, multi-tap, multi-head, ping-pong, cross-feed, diffused
+  - rhythmic throws (send-on-event)
+  - feedback filter + pitch in loop
+modes: tape · digital · multi-head · diffused
+engines_0_1_0 (the original list, kept verbatim; each is covered by the components above or by adds):
+  multi-topology-delay · tape-delay · feedback-filtering · ping-pong · rhythmic-throws · pitch-modulation
+ports: TO WRITE in the depth audit — typed in/out per §5 tool_contract; every assembled component reachable by wiring (Open as components)
+params: TO WRITE in the depth audit — every component control exposed, full range (eravos.tool-depth.spec), each a modulation destination
+packs (names unique across the ecosystem; ≥ 6 presets each; novelty test §6):
+  - Dub Chamber — dark filtered tape repeats
+  - Tape Decay — repeats that degrade each pass
+  - Infinite Delay — freeze and build loops
+  - Rhythmic Throw — single words or hits thrown into echoes
+  - Dark Echo — low-passed echoes behind the mix
+  - Stereo Spiral — ping-pong spiralling outwards
+  - Broken Machine — glitchy, modulated, misbehaving echo
+acceptance:
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - open-as-components: the wired components render the same as the tool (≤ −60 dB difference)
+  - novelty: every preset's nearest neighbour in this tool ≥ 0.15, pack centroids ≥ 0.25 apart (§6)
+  - p42 audio survey: timing to the sample, pitch to the cent, never over full scale
+  - cpu per instance and per voice measured (build/perf.mjs) and inside §8 budgets
+  - depth audit written above; open gaps listed, none hidden
+
+# dependencies: run node build/planned-deps.mjs once the hooks line is written (generated block, not by hand)

@@ -1,4 +1,4 @@
-import { _electron as electron } from 'playwright';
+import { electron } from '../../host/driver/glass.js';   // Clear Glass's driver in app mode — not Playwright
 import fs from 'fs';
 const R = {};
 const app = await electron.launch({ executablePath: process.env.ELECTRON, args: ['--no-sandbox', process.env.APP], env: Object.assign({}, process.env, { ERAVOS_LIBRARY: process.env.LIB }) });

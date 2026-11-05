@@ -14,13 +14,41 @@
   const doc = global.document;
 
   // 3.83 a literal colour written inline (#hex, rgb(), rgba()) becomes its own variable (--rc-<prop>-<n>) the element carries, so
-  // whatever lights a window's colour variables lights these too. At rest the element looks exactly the same.
-  const COLOUR_PROPS = /^(color|background|backgroundColor|border|borderColor|borderTop|borderRight|borderBottom|borderLeft|borderLeftColor|borderTopColor|outline|outlineColor|boxShadow|textShadow|fill|stroke|caretColor)$/;
+  // whatever lights a window's colour variables lights these too. At rest the element looks exactly the same. It is done where any
+  // inline colour is set (el.style.border = …, style.setProperty('color', …), h()), not only when an element is made: a tool that
+  // recolours a pad later is caught too (his check: "did you test it? like all the colors in each tool react?").
+  const COLOUR_PROPS = /^(color|background(?:Color|I[a-z]+)?|border|borderColor|borderTop|borderRight|borderBottom|borderLeft|borderTopColor|borderRightColor|borderBottomColor|borderLeftColor|outline|outlineColor|boxShadow|textShadow|fill|stroke|caretColor|textDecorationColor|columnRuleColor)$/;
   const COLOUR_LIT = /#[0-9a-fA-F]{8}\b|#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b|rgba?\([^)]*\)/g;
-  function colourVars(el, sk, val) {
-    if (typeof val !== 'string' || !COLOUR_PROPS.test(sk) || val.indexOf('var(') >= 0) return val;
-    let i = 0; return val.replace(COLOUR_LIT, (m) => { const n = '--rc-' + sk.toLowerCase() + '-' + (i++); el.style.setProperty(n, m); return 'var(' + n + ')'; });
+  const camel = (p) => p.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+  function colourVarsOn(st, sk, val) {
+    if (typeof val !== 'string' || !COLOUR_PROPS.test(sk) || val.indexOf('var(') >= 0 || !st || !st.setProperty) return val;
+    // a colour the tool sets again every frame (a pad's border redrawn) keeps the lit value it has now, if it is the same colour
+    // (whatever lights it leaves st._rcB = { name: its own colour } and st._rcL = { name: lit } on the declaration): no flicker
+    const BS = global.BlackSurfaces; if (BS && /^(background|border|outline|boxShadow)/i.test(sk)) val = BS.surface(sk, val);   // 3.103 a dark tinted fill → neutral black
+    let i = 0; return val.replace(COLOUR_LIT, (m) => { const n = '--rc-' + sk.toLowerCase() + '-' + (i++); SET.call(st, n, st._rcB && st._rcB[n] === m && st._rcL[n] ? st._rcL[n] : m); return 'var(' + n + ')'; });
   }
+  const colourVars = (el, sk, val) => colourVarsOn(el.style, sk, val);
+  const SD = global.CSSStyleDeclaration && global.CSSStyleDeclaration.prototype, SET = SD && SD.setProperty;
+  if (SD && !SD._eravosRC) { SD._eravosRC = true;
+    SD.setProperty = function (p, v, pr) { return SET.call(this, p, typeof p === 'string' && p.charCodeAt(0) !== 45 ? colourVarsOn(this, camel(p), v) : v, pr); };
+  }
+  // el.style.border = '…', cssText, setAttribute('style'), innerHTML with style="…": the browser gives no hook for these, so a watcher
+  // converts any inline literal colour it finds (before the next frame is painted: mutation records run first), the same way
+  const LONG = /^(color|background-(?:color|i[a-z]+)|border-(top|right|bottom|left)-color|outline-color|box-shadow|text-shadow|fill|stroke|caret-color|text-decoration-color|column-rule-color)$/;
+  function convertInline(el) {
+    const st = el.style; if (!st || !st.length) return;
+    for (let i = 0; i < st.length; i++) { const p = st[i]; if (p.charCodeAt(0) === 45 || !LONG.test(p)) continue; const v = st.getPropertyValue(p); if (!v || v.indexOf('var(') >= 0) continue;
+      COLOUR_LIT.lastIndex = 0; if (!COLOUR_LIT.test(v)) continue; COLOUR_LIT.lastIndex = 0;
+      const k = camel(p); let j = 0; const BS = global.BlackSurfaces; const v1 = BS && /^(background|border|outline|box-shadow)/.test(p) ? BS.surface(p, v) : v; const v2 = v1.replace(COLOUR_LIT, (m) => { const n = '--rc-' + k.toLowerCase() + '-' + (j++); SET.call(st, n, st._rcB && st._rcB[n] === m && st._rcL[n] ? st._rcL[n] : m); return 'var(' + n + ')'; });
+      SET.call(st, p, v2, st.getPropertyPriority(p)); }
+  }
+  if (global.MutationObserver && doc0()) {
+    const scan = (n) => { if (n.nodeType !== 1) return; if (n.hasAttribute('style')) convertInline(n); if (n.querySelectorAll) n.querySelectorAll('[style]').forEach(convertInline); };
+    const mo = new global.MutationObserver((recs) => { for (const r of recs) { if (r.type === 'attributes') convertInline(r.target); else r.addedNodes.forEach(scan); } });
+    const start = () => { mo.observe(global.document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['style'] }); scan(global.document.body || global.document.documentElement); };
+    if (global.document.readyState === 'loading') global.document.addEventListener('DOMContentLoaded', start); else start();
+  }
+  function doc0() { return !!global.document; }
   function h(tag, attrs, children) {
     const el = doc.createElement(tag);
     if (attrs) Object.keys(attrs).forEach(k => {

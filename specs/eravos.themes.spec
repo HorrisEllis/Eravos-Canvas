@@ -126,3 +126,17 @@ Before any theme ships: move those onto the tokens, then a theme is one file. Th
   wall of green); on a switch ('eravos:theme') sound-css puts every colour back and reads the palette again. UI.dusk / the spectrum draw
   the moving sunset only in Dusk. ⋯ Options → Theme: a card per theme with a live picture, and the way to Reactive colours.
 
+
+## ADDENDUM 2026-11-01 (3.83b) — tested tool by tool (asked: "did you test it? like all the colors in each tool react?")
+  Measured every music tool (64), served over http as the app runs: open it, capture every coloured element and every coloured
+  canvas pixel quiet, light it in Changing, compare. First pass: 52/64 fully reacting. Causes found and fixed, all in shared code:
+    STYLESHEETS  a literal colour in a CSS rule becomes --rcs-<n> (its own colour on :root, so nothing changes at rest); a sounding
+                 window lights the ones its elements use, and the app palette (--cyan … --red) inside it
+    SET LATER    any inline colour, however it is set (style.x = …, cssText, innerHTML), is converted by a watcher before paint; a
+                 colour repainted every frame keeps its lit value (no flicker)
+    GRADIENTS    canvas gradient colour stops pass through the reactive colour too
+    ALPHA        8-digit hex colours are recognised; a mostly see-through colour leans like a surface
+    LIT TWICE    the stylesheet variables were being lit again by the older pass (colours drifted brighter each frame) — fixed
+    WHITES       whites and near-whites (piano keys, text) stay white
+  Result: 59/64 fully reacting; the other five are 79–97 % (a few one-off colours: Dub Station's ripples drawn with color-mix, Pad
+  Forge's select text, Embodiment's chip border). Tests: tests/p83-reactive-tools.test.js (5).

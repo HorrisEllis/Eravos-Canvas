@@ -1,0 +1,49 @@
+# spec_id: eravos.acid-line · version 0.1.0 · status audited · extends:acid-synth · template eravos.tool/1
+# generated from eravos.music-ecosystem.spec v0.2.0 §4 (rave_and_trance) — that file stays the index; this file is the tool's own spec
+identity:
+  id: eravos.acid-line ; label: Acid Line ; domain: music ; family: rave_and_trance
+  lineage: the 1980s bass-line box: diode filter, accent and slide; acid house onward
+  family_from: acid house (1987 on), hardcore and rave (early 1990s), trance (1990s–2000s), uplifting and psy
+assembles (components, tools/music/components/<id>/ — never re-implemented here):
+  osc-va · filter-diode · env-adsr · slew-lag · waveshaper · pattern-store · delay-line
+adds (behaviour only this tool has):
+  - step sequencer with accent and slide like the original grammar
+  - accent-to-resonance coupling
+  - random pattern generator in key
+modes: classic · modern · overdriven
+built_today (read from tools/music/tools/bass/acid-synth/acid-synth.engine.js, eravos.acid-synth 2.0.0 — the code is the source of truth; re-run the extract when it changes):
+  ports: audio_out · note_in · midi_in · theory_in · mod_in(cutoff) · mod_in(res) · event(out,seq:pattern_suggest,1.0.0)
+  params (10):
+    FILTER: cutoff 20..14000 Hz · res 0..1 · envMod 0..1
+    CIRCUIT: decay 0.02..6 s · accent 0..1 · drive 0..1 · level 0..1.5 · wave [saw, square] · octave -3..3 · tune -12..12 st
+component_mapping (where each group's code moves — phase 0; the move changes nothing: every factory preset nulls ≤ −60 dB):
+  FILTER → today three cascaded biquad lowpass stages (18 dB): moved as a filter-svf configuration first (null test), then filter-diode added as a character choice
+  CIRCUIT → slide (per-note articulation, 60 ms) → slew-lag · env-adsr (decay) · accent → env + filter (filter-diode accent input) · waveshaper (drive) · osc-va (wave) · tune/octave (note handling)
+depth_audit — gaps to full range (each new control defaults to the value that reproduces today's sound):
+  - slide TIME as a control (slew-lag): slide exists today as a per-note articulation, gate held, but its glide is fixed at 60 ms
+  - step sequencer with accent and slide in the original grammar (pattern-store) — today the tool emits seq:pattern_suggest for another sequencer
+  - accent → resonance coupling amount (relationship), not only accent → level/env
+  - square/saw blend and sub (osc-va, osc-sub)
+  - built-in echo (delay-line), bypassable
+  - random pattern generator in key, seeded (markov-chain, seed-registry, scale-key)
+  - a true diode-ladder character (filter-diode) beside the current 3-stage lowpass, and self-oscillation at full res
+ports_target (added to today's ports; nothing removed):
+  - transport_in (for its own sequencer)
+  - mod_in for envMod, decay, accent, drive (today: cutoff, res)
+params_target: today's params unchanged + one control per gap above, named in the component that owns it (no duplicate controls across components)
+packs (names unique across the ecosystem; ≥ 6 presets each; novelty test §6):
+  - Squelch Protocol — classic resonant acid lines
+  - Overdriven Acid — distorted acid for techno
+  - Acid Trance — fast acid under trance
+  - Psychedelic Acid — acid through delay and phaser
+  - Slow Acid Dub — slow, spacey acid
+  - Acid Riddim — acid lines in bass-music tempo
+acceptance:
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - open-as-components: the wired components render the same as the tool (≤ −60 dB difference)
+  - novelty: every preset's nearest neighbour in this tool ≥ 0.15, pack centroids ≥ 0.25 apart (§6)
+  - p42 audio survey: timing to the sample, pitch to the cent, never over full scale
+  - cpu per instance and per voice measured (build/perf.mjs) and inside §8 budgets
+  - depth audit written above; open gaps listed, none hidden
+
+# dependencies: run node build/planned-deps.mjs once the hooks line is written (generated block, not by hand)

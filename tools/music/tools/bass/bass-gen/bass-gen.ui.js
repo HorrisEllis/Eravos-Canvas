@@ -49,7 +49,7 @@ OrganismFactory.reg('eravos.bass-gen', function (view) {
 
   // ---- the window
   const play = h('div', { class: 'gg-play' }, [
-    h('div', { class: 'gg-top' }, [UI.presetBar(view), h('div', { class: 'gg-tools' }, [UI.Button({ label: '🎲', hint: 'a new seed: the same settings, other ghosts, jumps and slides', onClick: () => view.emit('reseed', {}) }).el])]),
+    h('div', { class: 'gg-top' }, [UI.presetBar(view), h('div', { class: 'gg-tools' }, [UI.Button({ label: 'Reseed', hint: 'a new seed: the same settings, other ghosts, jumps and slides', onClick: () => view.emit('reseed', {}) }).el])]),
     h('section', { class: 'gg-sec' }, [head('Line', [ctl('rhythm', { noLabel: true }).el]),
       h('div', { class: 'bl-read' }, [now, src]), cv,
       h('div', { class: 'gg-bank' }, [

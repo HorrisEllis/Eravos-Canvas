@@ -1,0 +1,34 @@
+# spec_id: eravos.arrangement-organism · version 0.1.0 · status extends:timeline, bass-drop-builder · template eravos.tool/1
+# generated from eravos.music-ecosystem.spec v0.2.0 §4 (musical_intelligence) — that file stays the index; this file is the tool's own spec
+identity:
+  id: eravos.arrangement-organism ; label: Arrangement Organism ; domain: music ; family: musical_intelligence
+  lineage: song forms of dance music: intro, build, drop, break, outro
+  family_from: harmony, voice leading and counterpoint traditions; arpeggiators; generative composition
+assembles (components, tools/music/components/<id>/ — never re-implemented here):
+  structure-segmenter · energy-curve · motif-store · pattern-store · state-machine-core
+adds (behaviour only this tool has):
+  - section templates with energy curves
+  - motif recurrence tracking
+  - transition generation between sections
+modes: template · analyse · generate
+engines_0_1_0 (the original list, kept verbatim; each is covered by the components above or by adds):
+  section-management · energy-trajectories · motif-recurrence · transition-generation · arrangement-variation
+ports: TO WRITE in the depth audit — typed in/out per §5 tool_contract; every assembled component reachable by wiring (Open as components)
+params: TO WRITE in the depth audit — every component control exposed, full range (eravos.tool-depth.spec), each a modulation destination
+packs (names unique across the ecosystem; ≥ 6 presets each; novelty test §6):
+  - Festival Arc — big-room build–drop structure
+  - Progressive Journey — long, slow evolution
+  - Dub Journey — versions and breakdowns
+  - Cinematic Build — one long build to a climax
+  - Minimal Evolution — tiny changes over long time
+  - DnB Energy Curve — two-drop DnB structure
+  - Experimental Structure — non-standard forms
+acceptance:
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - open-as-components: the wired components render the same as the tool (≤ −60 dB difference)
+  - novelty: every preset's nearest neighbour in this tool ≥ 0.15, pack centroids ≥ 0.25 apart (§6)
+  - p42 audio survey: timing to the sample, pitch to the cent, never over full scale
+  - cpu per instance and per voice measured (build/perf.mjs) and inside §8 budgets
+  - depth audit written above; open gaps listed, none hidden
+
+# dependencies: run node build/planned-deps.mjs once the hooks line is written (generated block, not by hand)

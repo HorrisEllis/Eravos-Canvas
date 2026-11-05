@@ -827,3 +827,155 @@ html[data-theme="midnight"] .uk-knob-arc { filter: none; }
 .upd-row { display: flex; gap: 8px; } .upd-row .tb-btn { padding: 5px 12px; }
 .upd-sub { color: var(--dim); font-size: 11px; }
 .upd-bar { height: 6px; border-radius: 6px; background: var(--bg2); overflow: hidden; } .upd-bar i { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--dk1, var(--acc)), var(--dk4, var(--acc))); transition: width .35s; }
+.tp-btn.tp-ico.bad { opacity: .55; } .tp-btn.tp-ico.bad:hover { opacity: 1; color: #ff5470; }
+
+/* ===================== 3.101 tool pages, cleaned up (2026-11-05: "the ui is how i want it. except it the tool pages look horrible.")
+ * The canvas look stays; only the page around a tool changes: one fixed size for every tab (the canvas no longer shows through on
+ * short tabs), an opaque backdrop, a compact header, no scroll boxes inside the page, dark scrollbars, packs without the wall of
+ * buttons, a real controls table, and in/out in words. Knob labels no longer run into each other (anywhere). */
+.tp-overlay { background: color-mix(in srgb, var(--bg, #07090d) 90%, transparent); backdrop-filter: blur(6px); padding: 18px 20px; align-items: stretch; overflow: hidden; }
+.tp-page { width: min(1280px, 100%); height: 100%; margin: 0 auto; overflow-y: auto; overflow-x: hidden; padding: 0 22px 32px; scrollbar-width: thin; scrollbar-color: var(--line2, #2d3f57) transparent; }
+.tp-page::-webkit-scrollbar, .tp-panel::-webkit-scrollbar, .tp-grid::-webkit-scrollbar { width: 8px; height: 8px; }
+.tp-page::-webkit-scrollbar-thumb, .tp-panel::-webkit-scrollbar-thumb, .tp-grid::-webkit-scrollbar-thumb { background: var(--line2, #2d3f57); border-radius: 8px; }
+.tp-page::-webkit-scrollbar-track { background: transparent; }
+/* header: one compact band, then the "works on" picker and the suite chips on one line, then the tabs (which stay on screen) */
+.tp-head { padding-top: 18px; align-items: center; gap: 16px; }
+.tp-head .tp-art { width: 112px; height: 64px; object-fit: cover; border-radius: 6px; flex: none; }
+.tp-ht h2 { font-size: 17px; letter-spacing: 3px; }
+.tp-ht p { margin-top: 4px; font-size: 13px; }
+.tp-on { display: inline-flex; flex-wrap: wrap; margin: 12px 12px 0 0; vertical-align: middle; font: 600 10px var(--mono); letter-spacing: 1.4px; text-transform: uppercase; }
+.tp-on .tp-target { font: 12px var(--mono); letter-spacing: 0; text-transform: none; max-width: 340px; }
+.tp-on.tp-parts { gap: 6px; text-transform: none; letter-spacing: 0; font: inherit; }
+.tp-nav { position: sticky; top: 0; margin: 14px -22px 0; padding: 0 22px; background: var(--bg2, #0c1118); border-bottom: 1px solid var(--line, #223044); z-index: 3; }
+.tp-sec { margin-top: 16px; }
+/* the panel tab: the tool itself, at its own height (no second scroll box inside the page) */
+.tp-panel { max-height: none; overflow: visible; background: transparent; border-color: var(--line, #223044); border-radius: 10px; padding: 14px; }
+.tp-grid { max-height: none; overflow: visible; }
+/* packs: names in full, Load and delete on hover / focus (the row itself is the target) */
+.tp-presets { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px; }
+.tp-pre { min-height: 34px; padding: 4px 6px 4px 8px; background: var(--panel, #111823); border: 1px solid var(--line, #223044); border-radius: 7px; }
+.tp-pre:hover, .tp-pre:focus-within { border-color: color-mix(in srgb, var(--acc, #00d4ff) 55%, var(--line2)); }
+.tp-pn { white-space: normal; overflow-wrap: anywhere; line-height: 1.25; font-size: 12.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.tp-pre > .tp-btn { opacity: 0; transition: opacity .12s; } .tp-pre:hover > .tp-btn, .tp-pre:focus-within > .tp-btn { opacity: 1; }
+@media (hover: none) { .tp-pre > .tp-btn { opacity: 1; } }
+.tp-pack, .tp-cg { margin-bottom: 18px; }
+.tp-sh { padding-bottom: 6px; border-bottom: 1px solid var(--line, #223044); margin-bottom: 8px; }
+.tp-sh b { font: 700 11px var(--mono); letter-spacing: 1.8px; text-transform: uppercase; }
+/* controls: each group a card, columns that line up */
+.tp-cg { background: var(--panel, #111823); border: 1px solid var(--line, #223044); border-radius: 10px; padding: 10px 12px 4px; }
+table.tp-tab { border-collapse: collapse; table-layout: fixed; }
+table.tp-tab td { padding: 7px 8px; border-bottom: 1px solid color-mix(in srgb, var(--line, #223044) 70%, transparent); vertical-align: baseline; }
+table.tp-tab tr:last-child td { border-bottom: 0; }
+table.tp-tab .tp-cl { width: 24%; font-weight: 600; white-space: normal; }
+table.tp-tab .tp-cr { width: 28%; font: 11.5px var(--mono); overflow-wrap: anywhere; }
+table.tp-tab .tp-cd { width: 12%; font: 600 12px var(--mono); color: var(--acc, #00d4ff); text-align: right; padding-right: 16px; }
+table.tp-tab .tp-ch { color: var(--dim, #7f93a8); line-height: 1.45; }
+/* in / out: the kind as a tag, its name in words */
+.tp-row { padding: 8px 10px; background: var(--panel, #111823); border-color: var(--line, #223044); border-radius: 8px; }
+.tp-io .tp-rt b { font-weight: 600; } .tp-io .tp-rt small { margin-top: 2px; }
+.tp-tag.kind { background: transparent; border: 1px solid var(--line2, #2d3f57); color: var(--dim, #7f93a8); font: 10px var(--mono); letter-spacing: .5px; }
+@media (max-width: 700px) { .tp-page { padding: 0 14px 24px; } .tp-nav { margin: 14px -14px 0; padding: 0 14px; } table.tp-tab .tp-ch { display: none; } table.tp-tab .tp-cl { width: 38%; } table.tp-tab .tp-cr { width: 42%; } }
+/* knob labels: as wide as the knob, and the knob as wide as its label (up to 76 px) — wrapped at spaces, never run into the next one */
+.uk-knob { width: max-content; min-width: 50px; max-width: 76px; flex: none; }
+.uk-knob.big { min-width: 74px; }
+.uk-knob .uk-knob-label { width: 100%; max-width: 76px; overflow-wrap: normal; word-break: normal; }
+
+/* 3.102 Reactive colours › Beat: one colour for everything that has a colour, moving on the beat (sound-css.js writes --beat-col).
+ * The page palette and every window's and tool page's accent ARE that colour; nothing else about the look changes. */
+html[data-react="beat"] { --cyan: var(--beat-col, #00d4ff) !important; --green: var(--beat-col, #00ff88) !important; --pink: var(--beat-col, #ff2266) !important;
+  --violet: var(--beat-col, #b066ff) !important; --amber: var(--beat-col, #ffaa00) !important; --red: var(--beat-col, #ff3355) !important; --acc: var(--beat-col, #00d4ff) !important; }
+html[data-react="beat"] .wm-win, html[data-react="beat"] .wm-win [style*="--acc"], html[data-react="beat"] .tp-overlay, html[data-react="beat"] .tp-overlay [style*="--acc"],
+html[data-react="beat"] .tp-page { --acc: var(--beat-col, #00d4ff) !important; --facc: var(--beat-col, #00d4ff) !important; }
+html[data-react="beat"][data-theme="field"] [data-f] { --Fl: var(--beat-col) !important; --Fc: var(--beat-col) !important; --Fr: var(--beat-col) !important; }
+html[data-react="beat"] .wm-win, html[data-react="beat"] .tp-page { transition: border-color .12s; }
+
+/* 3.103 BLACK SURFACES (his words, 2026-11-05: "i dont like the tint. everything but the colors should be what they are. make them darker
+ * even. like black"). Only what IS a colour carries colour — borders, labels, knob rings, steps, titles, glows, displays. Every surface
+ * (page, canvas, window, panel, card, well, button and toggle fills) is a neutral near-black: no tool colour mixed in, no blue cast, no
+ * dusk sky over the controls, and surfaces never lean toward the reactive colour. Every theme; their colours and shapes are kept. */
+html[data-theme][data-theme], html:not([data-theme]) {
+  --bg: #000000; --bg2: #050505; --panel: #0a0a0a; --panel2: #0f0f0f; --chassis: #070707; --chassis2: #0b0b0b; --well: #000000; --grid: #111111;
+  --line: #1c1c1c; --line2: #282828; --edge: #2a2a2a; --dim: #8c8c8c; --faint: #4f4f4f; --text: #e2e2e2; --react-surface: 0; }
+html[data-theme][data-theme] body, html[data-theme][data-theme] #canvas, html[data-theme][data-theme] .wm-canvas { background-color: #000; }
+/* no colour washed over a window's controls */
+html[data-theme][data-theme] .wm-dusk { display: none; }
+/* a window, its head and its cards: neutral black (the head keeps a tool's painting, darkened) */
+html[data-theme][data-theme] .wm-win { background: var(--panel); }
+html[data-theme][data-theme] .wm-head { background-color: var(--bg2); }
+html[data-theme="dusk"][data-theme] .wm-head { background: linear-gradient(90deg, rgba(0,0,0,.96) 0%, rgba(0,0,0,.75) 45%, rgba(0,0,0,.45)), var(--art, #050505) center / cover no-repeat; }
+/* buttons and toggles: the colour is their border, label and icon; the fill is black */
+html[data-theme]:not([data-theme="field"]) :is(.uk-btn, .tb-btn, .sbk-alt, .sbk-chip, .tp-btn, .ap-btn, .fl-btn, .uk-toggle):not(.primary):not(.pri):not(.on) {
+  background-color: #050505; }   /* Field's buttons stay clear (a border and a label only) */
+html[data-theme="dusk"][data-theme] :is(.uk-btn, .tb-btn, .sbk-alt, .sbk-chip, .tp-btn, .ap-btn, .fl-btn, .uk-toggle):not(.primary):not(.pri):not(.on) {
+  background: linear-gradient(#050505, #050505) padding-box, linear-gradient(110deg, var(--dk1), var(--dk2) 50%, var(--dk4)) border-box; }
+html[data-theme][data-theme] .uk-toggle.on { background: color-mix(in srgb, var(--acc) 26%, #000); }
+html[data-theme][data-theme] .tp-btn.pri { background: color-mix(in srgb, var(--acc) 22%, #000); }
+html[data-theme][data-theme] :is(.uk-select, .uk-text, .sbk-q, .tp-target, .uk-num) { background-color: #000; }
+
+/* 3.104 Dusk gradients from the tool's OWN colour (his words, 2026-11-05: "the buttons in the tape echo look bad. the color i mean. bad
+ * gradient"). The stops were the accent mixed with fixed pink, orange and violet: a sunset on a pink tool, mud on a green one (Tape Echo's
+ * Throw: green → beige → grey). Now each stop is the accent turned a little round the wheel (lighter one way, deeper the other), so a
+ * pink tool still runs rose → coral → magenta and a green one stays green (a shade either side). */
+html[data-theme="dusk"][data-theme], html[data-theme="dusk"][data-theme] .wm-win, html[data-theme="dusk"][data-theme] .tp-overlay {
+  --dk2: oklch(from var(--acc) calc(l + .04) c calc(h + 9)); --dk3: oklch(from var(--acc) calc(l + .08) calc(c * .9) calc(h + 18));
+  --dk4: oklch(from var(--acc) calc(l - .04) c calc(h - 14)); }
+
+/* 3.105 the kit's small size (lane-style controls: mute, solo, arm, remove) — one size, not each tool's own inline padding */
+.uk-btn.sm, .uk-toggle.sm { padding: 1px 5px; font-size: 10px; line-height: 1.25; min-height: 0; }
+
+/* 3.107 MATERIAL — a texture on the black, with any theme (Themes › Material; 'none' = as it is). Only surfaces get it: windows, cards,
+ * panels. Colours, text and displays are untouched; the textures are neutral (white or grey at a few percent) so S1–S2 hold.
+ * --mat-grain is painted by themes.js (a noise tile made in code). */
+:root { --mat-brushed: repeating-linear-gradient(0deg, rgba(255,255,255,.024) 0 1px, transparent 1px 2px, rgba(255,255,255,.013) 2px 3px, transparent 3px 5px), linear-gradient(100deg, rgba(255,255,255,0) 20%, rgba(255,255,255,.04) 45%, rgba(255,255,255,0) 70%);
+  --mat-carbon: linear-gradient(115deg, rgba(255,255,255,0) 25%, rgba(255,255,255,.035) 50%, rgba(255,255,255,0) 75%), repeating-conic-gradient(#131313 0 25%, #080808 0 50%); }
+html[data-material="grain"] { --mat: var(--mat-grain, none); --mat-size: 160px 160px; } html[data-material="brushed"] { --mat: var(--mat-brushed); --mat-size: auto; }
+html[data-material="carbon"] { --mat: var(--mat-carbon); --mat-size: auto, 6px 6px; }
+html[data-theme][data-material][data-material] :is(.wm-win, .tp-page) { background: var(--mat), var(--panel); background-size: var(--mat-size), auto; }
+html[data-theme][data-material][data-material] .wm-body :is([class$="-card"], [class*="-card "], .uk-group, .gg-sec, section) { background: var(--mat), var(--bg2);
+  background-size: var(--mat-size), auto; box-shadow: inset 0 1px 0 rgba(255,255,255,.05), inset 0 -1px 0 rgba(0,0,0,.6); }
+.thm-mat { display: block; height: 46px; border-radius: 8px; border: 1px solid var(--line2); background-color: var(--panel); }
+.thm-mat[data-material-demo="grain"] { background: var(--mat-grain, none), var(--panel); background-size: 160px 160px, auto; }
+.thm-mat[data-material-demo="brushed"] { background: var(--mat-brushed), var(--panel); }
+.thm-mat[data-material-demo="carbon"] { background: var(--mat-carbon), var(--panel); background-size: auto, 6px 6px; }
+/* 3.107 the Themes panel's BUTTONS and MATERIAL rows: styled like the theme cards above them (the Buttons row had no styles at all) */
+.thm-sub { display: flex; align-items: baseline; gap: 12px; margin: 16px 0 10px; }
+.thm-sub b { font: 700 12px var(--mono); letter-spacing: 2px; } .thm-sub span { color: var(--dim); font-size: 12px; }
+.thm-btns { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+.thm-bcard { text-align: left; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 12px; border: 1px solid var(--line2); background: var(--bg2); color: var(--text); cursor: pointer; font: inherit; }
+.thm-bcard:hover { border-color: var(--dim); }
+.thm-bcard.on { border-color: var(--acc); box-shadow: 0 0 14px color-mix(in srgb, var(--acc) 25%, transparent); }
+.thm-bcard b { font-size: 13px; } .thm-bcard small { color: var(--dim); font-size: 11.5px; line-height: 1.35; }
+.thm-bdemo { display: flex; gap: 6px; padding: 8px; border-radius: 8px; background: var(--panel); }
+
+/* ---------- 3.109 panel: a borderless window holding part of a window (CanvasWM.openPanel) — no frame, no border, no shadow ring;
+   a slim strip on top to move it (its title and controls show on hover), the corner sizes it ---------- */
+.wm-panel { position: absolute; display: flex; flex-direction: column; background: var(--bg, #000); border: 0; border-radius: 0; box-shadow: none; }
+.wm-pstrip { display: flex; align-items: center; gap: 6px; height: 18px; padding: 0 2px 0 6px; flex: none; cursor: move; user-select: none; }
+.wm-ptitle { font: 600 10px var(--mono, monospace); letter-spacing: .08em; text-transform: uppercase; color: var(--faint, #555); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wm-panel:hover .wm-ptitle { color: var(--acc, #00d4ff); }
+.wm-pstrip .wm-x, .wm-pstrip .wm-min { height: 16px; min-width: 18px; line-height: 14px; font-size: 11px; padding: 0; opacity: 0; transition: opacity .15s; }
+.wm-panel:hover .wm-pstrip .wm-x, .wm-panel:hover .wm-pstrip .wm-min, .wm-pstrip button:focus-visible { opacity: 1; }
+.wm-pbody { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+.wm-pbody > * { flex: 1; min-height: 0; }
+.wm-pgrip { position: absolute; right: 0; bottom: 0; width: 14px; height: 14px; cursor: nwse-resize; opacity: 0; background: linear-gradient(135deg, transparent 50%, var(--line2) 50%); transition: opacity .15s; }
+.wm-panel:hover .wm-pgrip { opacity: 1; }
+.wm-panel.maximized .wm-pgrip { display: none; }
+.wm-panel.maximized .wm-pstrip { cursor: default; }
+
+/* ---------- 3.110 ⚙ Settings: one page like the tool pages, a tab per section (AppSettings) ---------- */
+.as-page { max-width: 1080px; }
+.as-head { padding-top: 18px; }
+.as-head h2 { margin: 0 0 4px; }
+.as-head p { margin: 0; color: var(--dim); }
+.as-sec { padding-top: 14px; }
+.as-sub { margin: 0 0 14px; color: var(--dim); }
+.as-card { background: var(--panel2); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; max-width: 760px; }
+.as-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.as-k { font: 600 10.5px var(--mono, monospace); letter-spacing: 1.4px; text-transform: uppercase; color: var(--dim); min-width: 70px; }
+.as-say { margin: 0; color: var(--dim); flex: 1; min-width: 240px; line-height: 1.5; }
+.as-link { color: var(--acc, #00d4ff); text-decoration: none; } .as-link:hover { text-decoration: underline; }
+/* a panel that used to be a popover sits in the page as it is: its own title bar and × are the page's */
+.as-sec .thm-panel { position: static; width: auto; max-width: none; max-height: none; box-shadow: none; border: 0; background: transparent; padding: 0; }
+.as-sec .thm-headr { display: none; }
+.as-sec .rcp-x { display: none; }
+.as-sec .rcp { max-width: 760px; }

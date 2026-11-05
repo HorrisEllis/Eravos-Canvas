@@ -29,7 +29,7 @@
       fx.wetIn.connect(mono);
       const rateMod = ctx.modBus('rate', { min: -5, max: 5 }), depthMod = ctx.modBus('depth', { min: -1, max: 1 });
       const fbG = ac.createGain(); ctx.track(mono); ctx.track(fbG);
-      const phaseWave = (deg) => { const r = deg * Math.PI / 180; return ac.createPeriodicWave(new Float32Array([0, Math.sin(r)]), new Float32Array([0, Math.cos(r)]), { disableNormalization: true }); };
+      const phaseWave = (deg) => MusicParts.phaseWave(ac, deg);   // the shared part (components/wave-table)
       const voices = [0, 120, 240].map((deg, i) => {
         const d = ac.createDelay(0.1), lfo = ac.createOscillator(), dep = ac.createGain(), pan = ac.createStereoPanner(), vg = ac.createGain(), depScale = ac.createGain();
         lfo.setPeriodicWave(phaseWave(deg)); lfo.connect(dep); dep.connect(d.delayTime); rateMod.connect(lfo.frequency);

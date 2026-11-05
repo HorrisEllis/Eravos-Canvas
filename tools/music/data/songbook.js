@@ -340,7 +340,7 @@
         h('button', { class: 'sbk-go', text: '🧠 Go to that lesson', onclick: () => { close(); window.Learn && window.Learn.open(s.lock); } }));
       else detail.append(shiftBox(h, s, paint), h('div', { class: 'sbk-actions' }, [
         h('button', { class: 'sbk-go', text: '▶ Write this song', title: 'replaces what is on the canvas (Ctrl+Z brings it back)', onclick: () => { if (write(s, false, shift)) close(); } }),
-        s.recipe ? h('span') : h('button', { class: 'sbk-alt', text: '🎲 Another like it', onclick: () => { if (write(s, true, shift)) close(); } })]),
+        s.recipe ? h('span') : h('button', { class: 'sbk-alt', text: 'Another like it', onclick: () => { if (write(s, true, shift)) close(); } })]),
         h('p', { class: 'sbk-note', text: 'It replaces the canvas. Press Space to play. Every clip opens in the piano roll.' }));
     }
     async function paintMine() {

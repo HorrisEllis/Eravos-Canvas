@@ -77,7 +77,11 @@
     transforms.forEach(fn => { try { (fn(out.slice()) || []).forEach(add); } catch (e) { console.error('[ERAVOS] pattern transform failed', e); } });   // 3.74
     return out;
   }
-  const all = () => { if (!LIB) LIB = build(); return LIB; };
+  // deleted for good (by what they are, not their place in the list, which moves): never built again on this machine
+  const GONE = 'eravos.patterns.deleted.v1';
+  const gone = new Set((() => { try { return JSON.parse(global.localStorage.getItem(GONE)) || []; } catch (e) { return []; } })());
+  function discard(p) { [].concat(p).forEach(x => x && gone.add(sig(x))); try { global.localStorage.setItem(GONE, JSON.stringify([...gone])); } catch (e) {} LIB = null; }
+  const all = () => { if (!LIB) { LIB = build().filter(p => !gone.has(sig(p))); } return LIB; };
   function novel(list) {
     const buckets = new Map(), keep = [];
     list.forEach(p => {
@@ -297,8 +301,10 @@
       if (editB) editB.onclick = () => { const r = edit(p); if (r) close(); else status.textContent = 'could not open it'; };
       const star = h('button', { class: 'plib-star' + (favs.has(p.id) ? ' on' : ''), text: favs.has(p.id) ? '★' : '☆', title: 'keep it in ★ Favourites', 'aria-label': 'favourite' });
       star.onclick = () => { tog(favs, p.id); store.set({ favs: [...favs] }); star.classList.toggle('on', favs.has(p.id)); star.textContent = favs.has(p.id) ? '★' : '☆'; if (pick.fav) paint(); };
+      const del = h('button', { class: 'plib-star plib-del', text: '🗑', title: 'delete this pattern for good (and its curved version)', 'aria-label': 'delete' });
+      del.onclick = () => { if (!global.confirm('Delete “' + p0.name + '” for good?')) return; if (playing) stop(); discard([p0, twin]); lib = lib.filter(x => x !== p0); status.textContent = 'Deleted “' + p0.name + '”.'; paint(); };
       return h('div', { class: 'plib-card', style: { '--acc': p.type === 'drop' ? '#ff2266' : !!p.curve ? '#ffd24a' : '#00d4ff' } }, [
-        h('div', { class: 'plib-top' }, [h('b', { text: p.song ? p.name.slice(p.song.title.length + 3) : p.name }), star]), p.song ? h('small', { class: 'plib-song', text: '♪ ' + p.song.title }) : null, h('small', { text: typeLabel(p.type) + ' · ' + p.genreLabel + ' · ' + p.bars + (p.bars > 1 ? ' bars' : ' bar') + ' · ' + p.bpm + ' BPM' }),
+        h('div', { class: 'plib-top' }, [h('b', { text: p.song ? p.name.slice(p.song.title.length + 3) : p.name }), star, del]), p.song ? h('small', { class: 'plib-song', text: '♪ ' + p.song.title }) : null, h('small', { text: typeLabel(p.type) + ' · ' + p.genreLabel + ' · ' + p.bars + (p.bars > 1 ? ' bars' : ' bar') + ' · ' + p.bpm + ' BPM' }),
         cv, h('div', { class: 'plib-actions' }, [hear, sendB].concat(curveB ? [curveB] : []).concat(editB ? [editB] : []).concat([h('span', { class: 'plib-tool', text: pick.tool ? (p.preset || '') : ((F().def(p.tool) || {}).label || p.tool) + (p.preset ? ' · ' + p.preset : '') })]))]);
     }
     function paint() {
@@ -423,5 +429,5 @@
   }
   // tests: the page as on a fresh start (nothing picked, no tool chosen yet)
   function forget() { pick.types.clear(); pick.genres.clear(); Object.assign(pick, { fav: false, q: '', lo: '', hi: '', sort: 'genre', group: 'type', tool: null }); }
-  global.PatternLibrary = { forTool, kindsFor, about: ABOUT, draw: drawCard, forget, edit, addTransform: (fn) => { if (typeof fn === 'function') { transforms.push(fn); LIB = null; } }, addSource: (fn) => { if (typeof fn === 'function') { sources.push(fn); LIB = null; } }, all, types: TYPES.map(t => ({ id: t[0], label: t[1] })), get: (id) => all().find(p => p.id === id) || null, send, render, play, stop, open, rebuild: () => { LIB = null; return all(); }, fromGenre, families: FAMILIES.map(f => ({ id: f[0], label: f[1] })), familyOf, matches };
+  global.PatternLibrary = { forTool, discard, deleted: () => [...gone], kindsFor, about: ABOUT, draw: drawCard, forget, edit, addTransform: (fn) => { if (typeof fn === 'function') { transforms.push(fn); LIB = null; } }, addSource: (fn) => { if (typeof fn === 'function') { sources.push(fn); LIB = null; } }, all, types: TYPES.map(t => ({ id: t[0], label: t[1] })), get: (id) => all().find(p => p.id === id) || null, send, render, play, stop, open, rebuild: () => { LIB = null; return all(); }, fromGenre, families: FAMILIES.map(f => ({ id: f[0], label: f[1] })), familyOf, matches };
 })(typeof window !== 'undefined' ? window : globalThis);

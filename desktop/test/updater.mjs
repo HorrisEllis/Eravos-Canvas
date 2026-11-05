@@ -1,4 +1,4 @@
-// node desktop/test/updater.mjs — the update service without Electron or GitHub (3.101): a fake GitHub, a fake app, a temp folder.
+// node desktop/test/updater.mjs — the update service without Electron or GitHub (3.111): a fake GitHub, a fake app, a temp folder.
 // Checks: a newer release is told as 'available'; the download streams to disk while 'downloading' reports progress; a project
 // folder (a git checkout) is never updated in place; a missing helper or unpack failure is an error, not a closed ERAVOS; the
 // result of the last update is read back once at the next start (applied / failed) and the leftovers are tidied.

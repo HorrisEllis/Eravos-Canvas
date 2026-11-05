@@ -25,7 +25,8 @@ A canvas of living instruments for making music — everything in key, everythin
     schemas/       the formats both sides agree on (tool, pack, mode, category, domain)
     templates/     copy-to-start folders for a new tool, pack, mode, category, domain
     build/         new-tool · index-tools · validate · structure-map · specs · planned-deps · shots · perf
-    tests/         cross-cutting tests (node tests/run.mjs); a tool's own tests live in its folder
+    tests/         cross-cutting tests (node tests/run.mjs); a tool's own tests live in its folder. Ships with the install
+                   (Null Render.bat uses it)
     specs/         cross-cutting specs (kernel, structure, phase maps); a tool's spec lives in its folder
     desktop/       the exe shell (Electron main/preload) + its builder; ships canvas/ only, tools become packs
     packaging/     packaging/windows/make-exe.ps1 — run by Build ERAVOS.exe.bat: Electron + canvas/ = ERAVOS.exe
@@ -49,16 +50,34 @@ from an address like `localhost`. Firefox in particular refuses MIDI for pages o
 
 ## Install and update (Windows)
 
-- **Install:** double-click **Install ERAVOS**. It installs the newest release from GitHub for your Windows user (or the build that
-  **Build ERAVOS.exe** made, if there is one) into `%LOCALAPPDATA%\Programs\ERAVOS`, and adds it to the Start menu, the desktop and
-  Settings › Apps (with an uninstaller that asks before deleting your work).
-- **Updates:** ERAVOS checks GitHub at start and every 6 hours. When a newer release is out, a card asks: **Update** downloads and
-  unpacks it in the background while you keep working; then **Restart now**, or **When I close ERAVOS** (it goes in by itself then).
-  **ERAVOS Update** (a small helper of its own) waits for every ERAVOS process to close, backs up the app, puts the new files in, puts
-  the backup back if anything fails, and starts ERAVOS again; the next start tells you how it went (the log is in
-  `.appdata\update\update.log`). Your projects, exports, drop, packs and settings are never touched. ⋯ Options › **Check for updates**.
+- **Install (one run):** double-click **Install ERAVOS.bat** in the project folder. Windows asks for admin once; it builds ERAVOS
+  from this folder (the first time downloads Electron, ~110 MB — no Node, no NSIS needed), installs it to the system —
+  `Program Files\ERAVOS`, for everyone on this PC — adds it to the Start menu, the desktop and Settings › Apps (with an uninstaller),
+  and starts it. Run it again to install a newer checkout. Outside a project folder it installs the newest GitHub release instead.
+  An older per-user copy in `%LOCALAPPDATA%\Programs\ERAVOS` is tidied away; its work moves into your library.
+- **Your library is `Documents\ERAVOS`.** Everything you make goes there, never into the app's folder, and installing, updating or
+  uninstalling never touches it:
+  **projects** (Save), **exports** (bounces, renders, stems), **packs** (preset packs you export and `.zip` packs — loaded every
+  start; packs dropped on the canvas are kept here), **tools** (extra tool packs, `.zip`, loaded every start), **drop** (sounds,
+  `.mid`, packs or projects put there appear on the canvas) and **.appdata** (autosave, presets). Back up = copy that folder.
+  Set `ERAVOS_LIBRARY` to move it; an empty file named `portable` beside ERAVOS.exe keeps everything in the app folder instead.
+- **Updates:** ERAVOS checks GitHub at start and every 6 hours. When a newer release is out, a card asks: **Update** downloads it in
+  the background while you keep working (a portable copy also unpacks it); then **Restart now**, or **When I close ERAVOS** (it goes in
+  by itself then). **ERAVOS Update**, a small helper of its own, waits for every ERAVOS process to close, then puts the update in — an
+  installed ERAVOS runs the new Setup silently; a portable copy is backed up, the new files copied in, and the backup put back if
+  anything fails — and starts ERAVOS again. The next start tells you how it went (the log: `.appdata\update\update.log` in your
+  library). Your library is never touched. ⚙ Settings › About & updates › **Check for updates** asks now.
 - **Publishing a release:** set `"version"` in `desktop/package.json` (e.g. `0.2.0`), then push the tag `v0.2.0`. The `release`
-  workflow builds ERAVOS for Windows and attaches `ERAVOS_0.2.0.zip` to the release. That zip is what the installer and the updater fetch.
+  workflow builds ERAVOS for Windows and attaches `ERAVOS-Setup-0.2.0.exe` (the installer) and `ERAVOS_0.2.0.zip` (portable) to the
+  release. Those are what Install ERAVOS and the updater fetch.
+
+## Null Render — prove a change did not alter any sound
+Double-click **Null Render** (needs Node.js, and Edge or Chrome on the machine; a dev checkout with Electron uses that instead).
+**1 = record** before you change anything: every music tool and preset is rendered with a fixed, seeded input and kept in
+`tests\null-baseline\` (this machine only). **2 = check** after: it renders again and subtracts; a preset passes when what is
+left is more than 60 dB under the original. Renders that differ from themselves are listed as *unstable* and tools it cannot
+drive as *not covered* — never passed. From a terminal: `node tests/null-render.mjs --record`, `node tests/null-render.mjs [tool]`,
+`--db -70` to be stricter. An update replaces `tests\`, so record again after updating.
 
 ## MIDI controller (pads, keys, knobs)
 
@@ -297,9 +316,8 @@ drag the ⇢ plug in a window's title bar onto another window to connect them, p
 
 The Windows build is a portable folder with the same layout as this project: double-click **ERAVOS.exe** — no browser,
 no Node, no install. Next to it are `canvas/`, `tools/` (every domain) and `schemas/`, the same folders as here, and the
-exe loads its tools from `tools/` exactly like the dev build. Your own folders sit beside them: **projects** (Save),
-**exports** (Bounce), **drop** (sounds, `.mid`, packs or projects put there appear on the canvas), **packs** (extra tool
-packs, loaded every start; packs dropped on the canvas are kept there) and **.appdata** (autosave, presets). A rebuild
-never touches them, and an older build's **ERAVOS Library** projects, exports and autosave move across on first start.
-**Build ERAVOS.exe.bat** (repo root, Windows, no Node) → `dist/ERAVOS/ERAVOS.exe` and `dist/ERAVOS_<version>.zip`;
+exe loads its tools from `tools/` exactly like the dev build. Your work is not in it: it goes to the library,
+`Documents\ERAVOS` (above), and an older build's folders beside the exe (or its **ERAVOS Library**) move there on first start.
+**Build ERAVOS.exe.bat** (repo root, Windows, no Node) → `dist/ERAVOS/ERAVOS.exe`, `dist/ERAVOS_<version>.zip` and, with
+[NSIS](https://nsis.sourceforge.io) installed (`winget install NSIS.NSIS`), the installer `dist/ERAVOS-Setup-<version>.exe`;
 `node desktop/build.mjs` does the same anywhere with Node. `dist/` is build output and is not committed.

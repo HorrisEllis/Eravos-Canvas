@@ -17,13 +17,8 @@
       default: return () => 0;
     }
   }
-  function makeWave(ac, fn, phaseDeg) {
-    const M = 1024, N = 33, re = new Float32Array(N), im = new Float32Array(N), ph = (phaseDeg || 0) / 360;
-    const y = new Float32Array(M); for (let i = 0; i < M; i++) y[i] = fn(((i / M) + ph) % 1);
-    for (let n = 0; n < N; n++) { let a = 0, b = 0; for (let i = 0; i < M; i++) { const w = 2 * Math.PI * n * i / M; a += y[i] * Math.cos(w); b += y[i] * Math.sin(w); } re[n] = (n ? 2 : 1) * a / M; im[n] = 2 * b / M; }
-    // PeriodicWave uses −? convention: value(t) = Σ re·cos + im·sin ; DC (n=0) is ignored by WebAudio → added via offset source
-    return { wave: ac.createPeriodicWave(re, im, { disableNormalization: true }), dc: re[0] };
-  }
+  // the drawn cycle → PeriodicWave + DC: the shared part (components/wave-table); this tool keeps its own 33 harmonics and degrees
+  function makeWave(ac, fn, phaseDeg) { return MusicParts.periodicWave(ac, fn, { phase: (phaseDeg || 0) / 360, harmonics: 33 }); }
   OrganismFactory.define({
     id: 'eravos.lfo', domain: 'music', version: '2.0.0', label: 'LFO', icon: '〰', accent: '#aa44ff', phase: 'P5',
     category: 'Modulation', blurb: 'Makes any knob move in time with the beat — drag its violet dot onto a violet input.',

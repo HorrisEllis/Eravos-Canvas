@@ -10,7 +10,7 @@
 (function () {
   'use strict';
   const S = OrganismSDK.STD;
-  const PROG = { 'i-VI-III-VII': [1, 6, 3, 7], 'i-iv-v-i': [1, 4, 5, 1], 'vi-IV-I-V': [6, 4, 1, 5], 'i-i-VI-VII': [1, 1, 6, 7], 'i-v-VI-iv': [1, 5, 6, 4] };
+  const PROG = MusicParts.PROGRESSIONS;   // the shared table (components/progression)
   // its own rhythm when no Groove is wired in: steps of a 16-step bar
   const PATTERNS = { 'groove kick': [0, 10], 'every beat': [0, 4, 8, 12], 'offbeats': [2, 6, 10, 14], 'eighths': [0, 2, 4, 6, 8, 10, 12, 14], 'half-time': [0] };
   // the step lanes: level −1…1 (× 1 + level/2), octave −1 / 0 / +1, slide 0 auto · 1 on · −1 off
@@ -71,7 +71,7 @@
         const old = pending.filter(x => x.t < p.time - 1e-6); old.forEach(x => play(x.t, x.bar, x.step, x.stepDur, true, x.ghost));
         heard = p; const now = pending.filter(x => x.t >= p.time - 1e-6); pending = []; now.forEach(x => play(x.t, x.bar, x.step, x.stepDur, true, x.ghost));
       });
-      const ownDegree = (bar) => { const pr = PROG[P.get('progression')]; return pr[Math.floor(bar / +P.get('chordBars')) % pr.length]; };
+      const ownDegree = (bar) => MusicParts.degreeAt(PROG, P.get('progression'), bar, P.get('chordBars'));
       const degree = (bar) => (heard && ctx.wiredIn('bassg.hook.chord_in').length ? heard.degree : ownDegree(bar));
       let lastNote = null;
       const rnd = (bar, step, k) => ctx.dsp.mulberry32((P.get('seed') * 104729 + bar * 977 + step * 61 + k * 13) >>> 0)();

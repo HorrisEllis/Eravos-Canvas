@@ -49,7 +49,10 @@
   function rgbOf(c) {
     c = String(c || '').trim(); let m = /^#([0-9a-f]{3})$/i.exec(c); if (m) c = '#' + m[1].split('').map(x => x + x).join('');
     m = /^#([0-9a-f]{6})/i.exec(c); if (m) { const n = parseInt(m[1], 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
-    m = /rgba?\(([\d.]+)[ ,]+([\d.]+)[ ,]+([\d.]+)/.exec(c); return m ? [+m[1], +m[2], +m[3]] : null;
+    m = /rgba?\(([\d.]+)[ ,]+([\d.]+)[ ,]+([\d.]+)/.exec(c); if (m) return [+m[1], +m[2], +m[3]];
+    m = /hsla?\(\s*([\d.]+)(?:deg)?[ ,]+([\d.]+)%[ ,]+([\d.]+)%/.exec(c); if (!m) return null;   // 3.83c hsl() too (5 tools draw with it)
+    const H = (+m[1] % 360) / 60, S2 = +m[2] / 100, L2 = +m[3] / 100, C2 = (1 - Math.abs(2 * L2 - 1)) * S2, X2 = C2 * (1 - Math.abs(H % 2 - 1)), M2 = L2 - C2 / 2;
+    const t = H < 1 ? [C2, X2, 0] : H < 2 ? [X2, C2, 0] : H < 3 ? [0, C2, X2] : H < 4 ? [0, X2, C2] : H < 5 ? [X2, 0, C2] : [C2, 0, X2]; return t.map(v => Math.round((v + M2) * 255));
   }
   // the same colour, lit up by k (0…1): lighter and a touch more vivid, the hue never moves
   function lit(c, k) {
@@ -62,8 +65,15 @@
     const hx = (v) => Math.round(clamp(v + M, 0, 1) * 255).toString(16).padStart(2, '0'); return '#' + hx(a) + hx(bb) + hx(cc);
   }
   // ---- 3.77 modes: how a colour answers the sound (k 0…1 already scaled by Amount)
-  const MODES = ['off', 'static', 'changing', 'custom'], DRAWS = ['glass', 'page'];
+  const MODES = ['off', 'static', 'changing', 'custom', 'beat'], DRAWS = ['glass', 'page'];
   let draw = 'glass'; try { const d = global.localStorage.getItem('eravos.reactive.draw'); if (DRAWS.includes(d)) draw = d; } catch (e) {}
+  // 3.95 LIGHT OVER THE TOOLS (his words: "i dont want the layer of light over the tools, only the buttons, knobs, anything that already has
+  // color, make that an option in the settings"): off (the default) — only what already has a colour reacts (buttons, knobs, keys,
+  // displays, accents), and each window's border and title take its accent; on — also the light over everything: the glass wash, the
+  // light inside each window, the surfaces leaning (backgrounds, panels, lines) and a theme's window light (Dusk's sky)
+  let overLight = false; try { overLight = global.localStorage.getItem('eravos.reactive.light') === 'over'; } catch (e) {}
+  const lightAttr = () => { root.dataset.reactLight = overLight ? 'over' : 'colour'; };
+  lightAttr();
   const GL = () => global.GlassLayer, glass = () => draw === 'glass' && !!GL();
   let mode = 'static', amt = 0.8, custom = { low: '#ff2266', high: '#00d4ff', hit: '#ffffff' }, shift = 0, bright = 0.5;
   try {
@@ -72,6 +82,13 @@
     const a = parseFloat(L.getItem('eravos.reactive.amount')); if (a >= 0 && a <= 1) amt = a;
     const c = JSON.parse(L.getItem('eravos.reactive.colors') || 'null'); if (c && c.low && c.high && c.hit) custom = c;
   } catch (e) {}
+  // 3.102 BEAT (his words, 2026-11-05: "i like the reactive but its still not what i want for the changing setting, like i want them to be
+  // the same color and change to the beat" · "Everything turns the same colour and changes on the beat … with no restyle"): every colour
+  // that is a colour (accents, knobs, keys, steps, titles, drawn displays — not the dark surfaces or greys) is ONE colour, the same in every
+  // tool, the toolbar and the tool pages; on the transport's beat it moves to the next of the theme's own accent colours and flashes, then
+  // settles. Stopped, it holds. "Changes on" every beat · 2 beats · bar (eravos.reactive.beat.every); Amount sets the flash.
+  let beatEvery = 1, beatIdx = 0, beatHit = 0, beatCol = null, beatNow = null, beatList = null;
+  try { const e = +global.localStorage.getItem('eravos.reactive.beat.every'); if ([1, 2, 4].includes(e)) beatEvery = e; } catch (e) {}
   const hueDeg = (rgb) => { const [r, g, b] = rgb.map(x => x / 255), mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; if (!d) return 0; const h = mx === r ? ((g - b) / d + 6) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; return h * 60; };
   const hex = (rgb) => '#' + rgb.map(v => Math.round(clamp(v, 0, 255)).toString(16).padStart(2, '0')).join('');
   const mixRGB = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
@@ -85,7 +102,8 @@
   }
   // o (per window, 3.77): { mode, shift, colors, low, high, pulse } — each tool can have its own; the app's when it follows the app
   function colourFor(c, k, o) {
-    o = o || G(); const md = o.mode; if (k < 0.005 || md === 'off') return c;
+    o = o || G(); const md = o.mode; if (md === 'beat') { const r0 = rgbOf(c); return r0 && shareOf(r0) >= 1 ? (o.beat || beatNow || c) : c; }
+    if (k < 0.005 || md === 'off') return c;
     if (md === 'changing') return lit(rotate(c, o.shift * Math.min(1, k * 1.6)), k * 0.6);
     if (md === 'custom') {   // each colour leans toward the one of yours nearest its own hue (a palette reads boldly), and flashes toward your hit colour
       const rgb = rgbOf(c), C = o.colors; if (!rgb) return c; const h0 = hueDeg(rgb), dist = (x) => { const d = Math.abs(hueDeg(rgbOf(x)) - h0) % 360; return d > 180 ? 360 - d : d; };
@@ -102,7 +120,8 @@
     return lit(acc, 0.3);
   }
   function surfaces(k) {
-    if (!base) return; const tint = rgbOf(tintNow()); if (!tint) return;
+    // 3.95 the surfaces lean only with Light over the tools
+    if (!base || !overLight) return; const tint = rgbOf(tintNow()); if (!tint) return;
     // 3.91 the theme says how far a surface may lean (--react-surface: Dusk .55, Midnight .3, Studio 1)
     const sc = surfScale === null ? (surfScale = parseFloat(global.getComputedStyle(root).getPropertyValue('--react-surface')) || 1) : surfScale;
     Object.keys(SURFACES).forEach(n => { const b = rgbOf(base[n]); if (b) set(n, k < 0.005 ? base[n] : hex(mixRGB(b, tint, k * SURFACES[n] * sc))); });
@@ -110,17 +129,18 @@
   const hashOf = (str) => { let x = 2166136261; for (const ch of String(str || '')) x = Math.imul(x ^ ch.charCodeAt(0), 16777619); return x >>> 0; };
   const CanvasWin = (id) => global.CanvasWM && global.CanvasWM.windowOf ? global.CanvasWM.windowOf(id) : null;
   // every inline colour variable an element carries (--acc, --pc, --c …): lit from its own base; a base the tool changes is taken up
-  const isCol = (v) => /^#[0-9a-f]{3}([0-9a-f]{3})?$/i.test(v) || /^rgba?\(/i.test(v);
+  const isCol = (v) => /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(v) || /^(rgba?|hsla?)\(/i.test(v);   // 3.83b 8-digit (with alpha) too
   function light(el, k, o) {
     if (!writing) { live.add(el); return; }
     const st = el.style; el._cb = el._cb || {}; el._cs = el._cs || {};
-    for (let i = 0; i < st.length; i++) { const n = st[i]; if (n.charCodeAt(0) !== 45 || n.charCodeAt(1) !== 45 || n === '--tool-level' || n === '--lvl') continue;
+    for (let i = 0; i < st.length; i++) { const n = st[i]; if (n.charCodeAt(0) !== 45 || n.charCodeAt(1) !== 45 || n === '--tool-level' || n === '--lvl' || (el._rcsSet && el._rcsSet.has(n))) continue;   // 3.83b lightSheets owns those: never lit twice
       const v = st.getPropertyValue(n).trim(); if (!isCol(v)) continue; if (el._cs[n] !== v) el._cb[n] = v;
-      const c = n.startsWith('--rc-') ? colourIn0(el._cb[n], k, o) : colourFor(el._cb[n], k, o); if (c !== v) st.setProperty(n, c); el._cs[n] = c;
+      const rc = n.startsWith('--rc-'), c = rc ? colourIn0(el._cb[n], k, o) : colourFor(el._cb[n], k, o); if (c !== v) st.setProperty(n, c); el._cs[n] = c;
+      if (rc) { (st._rcB = st._rcB || {})[n] = el._cb[n]; (st._rcL = st._rcL || {})[n] = c; }   // 3.83b a redraw with the same colour keeps this
       if (n === '--acc') { el.dataset.accLive = c; if (el.dataset.acc0 === undefined) el.dataset.acc0 = el._cb[n]; } }
     live.add(el);
   }
-  function unlight(el) { if (!writing) return; if (el._cb) Object.keys(el._cb).forEach(n => el.style.setProperty(n, el._cb[n])); el._cs = {}; delete el.dataset.accLive; live.delete(el); }
+  function unlight(el) { if (!writing) return; if (el.style._rcL) el.style._rcL = {}; if (el._cb) Object.keys(el._cb).forEach(n => el.style.setProperty(n, el._cb[n])); el._cs = {}; delete el.dataset.accLive; live.delete(el); }
   // a sounding window (and everything in it that carries a colour) lit by its level lv 0…1; restoreAcc = its own colours again
   // a window's own settings (its ⚙ → Reactive colours): 'follow' = the app's; else its own mode, amount and colours
   function settingsOf(w) {
@@ -132,25 +152,70 @@
     o = o || Object.assign(G(), settingsOf(w), { shift: w._shift !== undefined ? w._shift : shift });
     if (o.mode === 'off') { restoreAcc(w); return; }
     // 3.78 k in steps of 5 %, so the same colour strings repeat and are not written again
-    if (!w._acc0) w._acc0 = w.style.getPropertyValue('--acc').trim() || (w.dataset && w.dataset.acc0) || global.getComputedStyle(w).getPropertyValue('--acc').trim() || '#00d4ff';
-    if (!o.acc) o = Object.assign({}, o, { acc: (w._cb && w._cb['--acc']) || w._acc0 });   // the window's own accent: the hue its dark colours follow
-    const k = q(clamp((lv * 0.85 + (o.pulse || 0) * 0.25 * lv) * o.amt * 1.25, 0, 1), 20); w._rk = k; w._ro = o; light(w, k, o); accented(w, ts || performance.now()).forEach(el => light(el, k, o));
+    // the window's own accent (the tool's, never a value something has already lit): the hue its dark colours follow
+    if (!w._acc0) { const r = w.dataset && w.dataset.instance && global.OrganismFactory && global.OrganismFactory.handle(w.dataset.instance);
+      w._acc0 = (r && r.def && r.def.accent) || (w.dataset && w.dataset.acc0) || w.style.getPropertyValue('--acc').trim() || '#00d4ff'; }
+    if (!o.acc) o = Object.assign({}, o, { acc: w._acc0 });
+    const k = q(clamp((lv * 0.85 + (o.pulse || 0) * 0.25 * lv) * o.amt * 1.25, 0, 1), 20); w._rk = k; w._ro = o; light(w, k, o); lightSheets(w, k, o, ts); accented(w, ts || performance.now()).forEach(el => light(el, k, o));
   }
   function lvSet(w, v) { if (!writing) return; const s2 = q(v, 25).toFixed(2); if (w._lvS !== s2) { w._lvS = s2; w.style.setProperty('--tool-level', s2); } }   // 3.78
-  function restoreAcc(w) { w._rk = 0; [w].concat(w._accEls || []).forEach(el => { if (el._cb) unlight(el); }); }
+  function restoreAcc(w) { w._rk = 0; unlightSheets(w); [w].concat(w._accEls || []).forEach(el => { if (el._cb) unlight(el); }); }
+  // ---- 3.83b the colours in the STYLESHEETS (a record button, a pad's border, a ripple): each literal colour in a rule becomes a
+  // variable --rcs-<n> whose value at rest (on :root) is exactly that colour; a sounding window lights the ones its elements use (set
+  // on the window, they flow down to everything inside it), and the app palette too (--cyan … --red: the title bar's plug dot).
+  // Rules on :root/html (where themes set their tokens) and @keyframes are left alone. Sheets added later (a tool installed) are taken
+  // up on the next frame.
+  const SHEET_PROPS = /^(color|background-color|background-image|border-(top|right|bottom|left)-color|outline-color|box-shadow|text-shadow|fill|stroke|caret-color|text-decoration-color|column-rule-color)$/;
+  const LIT = /#[0-9a-fA-F]{8}\b|#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b|rgba?\([^)]*\)/g;
+  const sheetVars = [];   // n → { base, sel }
+  let sheetsSeen = 0, rootSheet = null;
+  function takeSheets() {
+    const all = doc.styleSheets; if (all.length === sheetsSeen) return; sheetsSeen = all.length; let added = '';
+    const walk = (rules) => { for (const r of Array.from(rules || [])) {
+      if (r.cssRules && !r.selectorText && r.type !== 7) { walk(r.cssRules); continue; }   // @media, @container, @supports, @layer
+      if (!r.style || !r.selectorText || r._rcs || /(^|[\s,]):root\b|(^|[\s,])html(?![\w-])/.test(r.selectorText) && !/\s/.test(r.selectorText.trim())) continue;
+      r._rcs = true; const st = r.style;
+      for (let i = 0; i < st.length; i++) { const p = st[i]; if (!SHEET_PROPS.test(p)) continue; const v = st.getPropertyValue(p); if (!v || v.indexOf('var(') >= 0 || !LIT.test(v)) continue; LIT.lastIndex = 0;
+        const v2 = v.replace(LIT, (m) => { const n = sheetVars.length; sheetVars.push({ base: m, sel: r.selectorText }); added += '--rcs-' + n + ':' + m + ';'; return 'var(--rcs-' + n + ')'; });
+        st.setProperty(p, v2, st.getPropertyPriority(p)); }
+    } };
+    for (const sh of Array.from(all)) { if (sh === rootSheet) continue; let rules = null; try { rules = sh.cssRules; } catch (e) { continue; } walk(rules); }
+    if (added) { if (!rootSheet) { const el = doc.createElement('style'); el.dataset.rcs = '1'; doc.head.appendChild(el); rootSheet = el.sheet; sheetsSeen++; } rootSheet.insertRule(':root{' + added + '}', rootSheet.cssRules.length); }
+  }
+  // which stylesheet colours a window uses: looked up again about once a second
+  function sheetVarsOf(w, ts) {
+    if (w._rcsAt && ts - w._rcsAt < 1000 && w._rcsN === sheetVars.length) return w._rcsList;
+    w._rcsAt = ts; w._rcsN = sheetVars.length; const hit = new Map(), list = [];
+    sheetVars.forEach((x, n) => { let ok = hit.get(x.sel); if (ok === undefined) { const sel = x.sel.replace(/::?[a-z-]+(\([^)]*\))?/gi, (m) => /^:(not|is|where|has)\(/i.test(m) ? m : '').trim() || '*';
+      try { ok = w.matches(sel) || !!w.querySelector(sel); } catch (e) { ok = false; } hit.set(x.sel, ok); } if (ok) list.push(n); });
+    w._rcsList = list; return list;
+  }
+  function lightSheets(w, k, o, ts) {
+    if (!writing) return; takeSheets(); const st = w.style; w._rcsSet = w._rcsSet || new Set();
+    if (!base) { const cs = global.getComputedStyle(root); base = {}; PALETTE.concat(Object.keys(SURFACES)).forEach(p => { base[p] = cs.getPropertyValue(p).trim(); }); }
+    sheetVarsOf(w, ts || performance.now()).forEach(n => { const c = colourIn0(sheetVars[n].base, k, o); if (w._rcsV && w._rcsV[n] === c) return; (w._rcsV = w._rcsV || {})[n] = c; st.setProperty('--rcs-' + n, c); w._rcsSet.add('--rcs-' + n); });
+    if (base) PALETTE.forEach(p => { if (p === '--acc' || !base[p]) return; const c = colourIn0(base[p], k, o); if (w._rcsV && w._rcsV[p] === c) return; (w._rcsV = w._rcsV || {})[p] = c; st.setProperty(p, c); w._rcsSet.add(p); });
+  }
+  function unlightSheets(w) { if (!w._rcsSet || !w._rcsSet.size) return; w._rcsSet.forEach(p => w.style.removeProperty(p)); w._rcsSet.clear(); w._rcsV = {}; }
+
   // ---- 3.83 colours a tool draws or writes: by its share (a dark surface leans a little, a grey more, an accent fully), alpha kept
-  function shareOf(rgb) { const mx = Math.max(...rgb) / 255, mn = Math.min(...rgb) / 255, l = (mx + mn) / 2, sa = mx === mn ? 0 : (mx - mn) / (1 - Math.abs(2 * l - 1)); return l < 0.3 ? 0.12 : sa < 0.35 ? 0.3 : 1; }
+  function shareOf(rgb) { const mx = Math.max(...rgb) / 255, mn = Math.min(...rgb) / 255, l = (mx + mn) / 2, sa = mx === mn ? 0 : (mx - mn) / (1 - Math.abs(2 * l - 1)); return l > 0.85 && mx - mn < 0.2 ? 0 : l < 0.3 ? 0.12 : sa < 0.35 ? 0.3 : 1; }   // whites and near-whites (keys, text) stay white
   const memo = new Map();
   function colourIn0(c, k, o) {
     if (!(k >= 0.005) || !o || o.mode === 'off' || typeof c !== 'string') return c;
+    if (o.mode === 'beat') { const r0 = rgbOf(c); if (!r0 || shareOf(r0) < 1 || !o.beat) return c; const t = c.trim(), m = /^(?:rgba|hsla)\([^)]*,\s*([\d.]+)\s*\)$/i.exec(t), m8 = /^#[0-9a-f]{6}([0-9a-f]{2})$/i.exec(t), a = m ? +m[1] : m8 ? parseInt(m8[1], 16) / 255 : null;
+      if (a === null) return o.beat; const r2 = rgbOf(o.beat); return 'rgba(' + r2[0] + ',' + r2[1] + ',' + r2[2] + ',' + (+a.toFixed(3)) + ')'; }
+    // 3.95 without Light over the tools, only a colour reacts: a dark surface or a grey keeps its own
+    { const r0 = rgbOf(c); if (r0 && (shareOf(r0) === 0 || (!overLight && shareOf(r0) < 1))) return c; }
     const key = c + '|' + k + '|' + o.mode + '|' + (o.shift || 0) + '|' + (o.acc || '') + '|' + (o.mode === 'custom' ? q(o.pulse || 0, 10) + JSON.stringify(o.colors) : ''), hit = memo.get(key); if (hit !== undefined) return hit;
     const rgb = rgbOf(c); let out = c;
-    if (rgb) { let a = null; const t = c.trim(), m = /^rgba\([^)]*,\s*([\d.]+)\s*\)$/i.exec(t), m8 = /^#[0-9a-f]{6}([0-9a-f]{2})$/i.exec(t); if (m) a = +m[1]; else if (m8) a = parseInt(m8[1], 16) / 255;
+    if (rgb) { let a = null; const t = c.trim(), m = /^(?:rgba|hsla)\([^)]*,\s*([\d.]+)\s*\)$/i.exec(t), m8 = /^#[0-9a-f]{6}([0-9a-f]{2})$/i.exec(t); if (m) a = +m[1]; else if (m8) a = parseInt(m8[1], 16) / 255;
       // Changing turns EVERY colour's hue by the full amount (a dark pink background that stayed pink under green accents read as a red
       // cast — his note on the Shape and Perform screens); only how much it brightens follows its share
       // Changing: an accent turns round the wheel (the palette keeps its variety); a dark or grey colour takes the hue the window's
       // accent has turned to (turning it by the same amount made blue-grey grids pink under a green accent: his "red tint")
-      const sh = shareOf(rgb), f = Math.min(1, k * 1.6); let lit2;
+      // a mostly see-through colour (a faint tint over a dark panel) reads as a surface: it leans like one
+      const sh = a !== null && a < 0.35 ? Math.min(shareOf(rgb), 0.3) : shareOf(rgb), f = Math.min(1, k * 1.6); let lit2;
       if (o.mode === 'changing') { if (sh >= 1 || !o.acc) lit2 = lit(rotate(hex(rgb), (o.shift || 0) * f), k * sh * 0.6);
         else { const th = hueDeg(rgbOf(rotate(o.acc, o.shift || 0))), d = ((th - hueDeg(rgb) + 540) % 360) - 180; lit2 = lit(rotate(hex(rgb), d * f), k * sh * 0.6); } }
       else lit2 = colourFor(hex(rgb), k * sh, o);
@@ -167,6 +232,10 @@
   // every 2D canvas: what it is told to draw with passes through colourIn (a canvas outside any window gets its colour back unchanged)
   (function patchCanvas() {
     const P = global.CanvasRenderingContext2D && global.CanvasRenderingContext2D.prototype; if (!P || P._eravosRC) return; P._eravosRC = true;
+    // gradients: each colour stop passes through colourIn too (the gradient remembers the canvas it was made for)
+    const GP = global.CanvasGradient && global.CanvasGradient.prototype, stop = GP && GP.addColorStop;
+    if (stop) GP.addColorStop = function (off, c) { return stop.call(this, off, typeof c === 'string' && this._cv ? colourIn(this._cv, c) : c); };
+    ['createLinearGradient', 'createRadialGradient', 'createConicGradient'].forEach(m => { const f = P[m]; if (f) P[m] = function () { const g = f.apply(this, arguments); if (g && this.canvas && this.canvas.closest) g._cv = this.canvas; return g; }; });
     ['fillStyle', 'strokeStyle', 'shadowColor'].forEach(name => { const d = Object.getOwnPropertyDescriptor(P, name); if (!d || !d.set) return;
       Object.defineProperty(P, name, { configurable: true, enumerable: d.enumerable, get: d.get, set(v) { d.set.call(this, typeof v === 'string' && this.canvas && this.canvas.closest ? colourIn(this.canvas, v) : v); } }); });
   })();
@@ -195,7 +264,12 @@
     ['--snd-low', '--snd-high', '--snd-level', '--snd-pulse'].forEach(k => set(k, '0')); ['--snd-hn', '--snd-lv'].forEach(k => setPal(k, '0')); doc.querySelectorAll('.wm-win[style*="--tool-level"]').forEach(w => { w.style.setProperty('--tool-level', '0'); w._lvS = '0.00'; });
     PALETTE.concat(Object.keys(SURFACES)).forEach(k => { root.style.removeProperty(k); delete rootV[k]; }); lastPal = -1e9;
     Array.from(live).forEach(unlight); live.clear(); set('--snd-shift', '0deg');
-    writing = w0; glassRest();
+    // 3.106 the palette a sounding window had lit on itself (lightSheets: --amber … the plug, --rcs-*) is put back too. It was left on
+    // the window when the mode changed or the colours went off, and the next lighting took the lit value as its base: every change of
+    // mode, every stop, the colours crept further (his "compounding errors … white border around tool ui"; tests/p106-reactive-drift.test.js)
+    doc.querySelectorAll('.wm-win, .tp-overlay').forEach(w => { unlightSheets(w); w._rk = 0; });
+    writing = w0; glassRest(); delete rootV.__glass; root.style.removeProperty('--beat-col'); delete rootV['--beat-col'];
+    if (mode !== 'beat') doc.querySelectorAll('.wm-win, .tp-overlay').forEach(w => { if (w._ro && w._ro.mode === 'beat') { w._rk = 0; w._ro = null; } });
   }
   function ensure() {
     if (an || !K || !K.audio || !K.audio.ctx || !K.audio.output) return !!an;
@@ -218,6 +292,7 @@
     // the app is Off: only windows with their own reactive setting (⚙ → Reactive colours) still answer — looked for once a second
     if (!on) { if (ts - ownScan > 1000) { ownScan = ts; ownAny = Array.from(doc.querySelectorAll('.wm-win')).some(w => { const x = settingsOf(w); return x.own && x.mode !== 'off'; }); } if (!ownAny) return; }
     last = ts; writing = ts - lastW >= WRITE_MS; if (writing) lastW = ts;
+    if (mode === 'beat') { beatFrame(ts); return; }
     const G2 = glass(); pageOff = G2;   // 3.82 drawn on the glass layer: the page is not written; 3.83 the windows still are
     const lit = G2 ? [] : null;
     if (!ensure()) return;
@@ -294,11 +369,35 @@
     }
     if (lit) glassWindows(lit);
   }
+  // ---- 3.102 Beat: the colours to step through are the theme's own accents (nothing restyled), in a fixed order
+  function beatColours() {
+    if (beatList) return beatList; const cs = global.getComputedStyle(root);
+    beatList = ['--cyan', '--pink', '--green', '--violet', '--amber'].map(k => (base && base[k]) || cs.getPropertyValue(k).trim()).filter(v => rgbOf(v));
+    if (!beatList.length) beatList = ['#00d4ff', '#ff2266', '#00ff88', '#b066ff', '#ffaa00']; return beatList;
+  }
+  function beatStep() { const L = beatColours(); beatIdx = (beatIdx + 1) % L.length; beatCol = L[beatIdx]; beatHit = 1; }
+  function onTick(t) {
+    if (mode !== 'beat' || !t || typeof t.step16 !== 'number' || t.step16 % 4) return;
+    const n = Math.floor(t.step16 / 4); if (n % beatEvery) return;
+    const ac = K && K.audio && K.audio.ctx, wait = ac && typeof t.time === 'number' ? Math.max(0, (t.time - ac.currentTime) * 1000) : 0;   // the tick is scheduled ahead: change when it is HEARD
+    setTimeout(beatStep, wait);
+  }
+  function beatFrame(ts) {
+    if (!beatCol) beatCol = beatColours()[beatIdx % beatColours().length];
+    beatHit *= calm() ? 0 : 0.82;
+    const col = q(beatHit, 20) > 0 ? lit(beatCol, beatHit * 0.55 * amt) : beatCol;
+    if (!writing) return;
+    beatNow = col; setPal('--beat-col', col); root.dataset.react = 'beat';
+    if (rootV.__glass !== 'rest') { rootV.__glass = 'rest'; glassRest(); }
+    const o = { mode: 'beat', beat: col, amt };
+    doc.querySelectorAll('.wm-win, .tp-overlay').forEach(w => { w._rk = 1; w._ro = o; accented(w, ts).forEach(el => light(el, 1, o)); });
+  }
   // ---- 3.82 the glass layer: one wash for the mix, one glow per window. Same colours as the page way (colourFor, tintNow).
   const accBase = (w) => w.style.getPropertyValue('--facc').trim() || (w._cb && w._cb['--acc']) || w.dataset.acc0 || w.style.getPropertyValue('--acc').trim() || (base && base['--acc']) || '#00d4ff';
   function glassMix(kMix) {
     const L = GL().layer('reactive', { depth: 99990, cover: coverWins });
     GL().vars.set('react.tint', tintNow()); GL().vars.set('react.mix', +(kMix * 0.2).toFixed(3));   // the surfaces' shares in the page way are 10–16 %; a wash over text needs a touch more
+    if (!overLight) { if (L.items.has('mix')) L.remove('mix'); return; }   // 3.95 the wash is light over the tools
     if (!L.items.has('mix')) L.set('mix', { type: 'wash', color: { var: 'react.tint' }, alpha: { var: 'react.mix' } });
   }
   const glowed = new Set();
@@ -317,17 +416,21 @@
   function glassRest() { const G0 = GL(); if (G0 && G0.has('reactive')) G0.layer('reactive').clear(); glowed.clear(); }
   const listeners = [];
   const fire = () => listeners.forEach(fn => { try { fn(SoundCSS); } catch (e) {} });
-  function save() { try { const L = global.localStorage; L.setItem('eravos.reactive', on ? '1' : '0'); L.setItem('eravos.reactive.mode', mode); L.setItem('eravos.reactive.amount', String(amt)); L.setItem('eravos.reactive.colors', JSON.stringify(custom)); L.setItem('eravos.reactive.draw', draw); } catch (e) {} }
+  function save() { try { const L = global.localStorage; L.setItem('eravos.reactive', on ? '1' : '0'); L.setItem('eravos.reactive.mode', mode); L.setItem('eravos.reactive.amount', String(amt)); L.setItem('eravos.reactive.colors', JSON.stringify(custom)); L.setItem('eravos.reactive.draw', draw); L.setItem('eravos.reactive.light', overLight ? 'over' : 'colour'); } catch (e) {} }
   const SoundCSS = {
-    init(kernel) { K = kernel; if (!raf) raf = global.requestAnimationFrame(frame); root.classList.toggle('snd-off', !on); root.dataset.react = mode; return SoundCSS; },
+    init(kernel) { K = kernel; if (!raf) raf = global.requestAnimationFrame(frame); if (!SoundCSS._tick && K.bus) SoundCSS._tick = K.bus.subscribe('transport:tick', onTick, 'sound-css'); root.classList.toggle('snd-off', !on); root.dataset.react = mode; return SoundCSS; },
     get on() { return on; },
     set(v) { SoundCSS.setMode(v ? (mode === 'off' ? 'static' : mode) : 'off'); },
     get mode() { return mode; }, get amount() { return amt; }, get colors() { return Object.assign({}, custom); }, MODES,
     setMode(m) { if (!MODES.includes(m)) return; mode = m; on = m !== 'off'; ownScan = -1e9; save(); root.classList.toggle('snd-off', !on); root.dataset.react = m; zero(); fire(); },
     rescan() { ownScan = -1e9; },
     get draw() { return draw; }, DRAWS, get renderer() { return GL() ? GL().renderer : null; },
+    get light() { return overLight; },
+    setLight(v) { overLight = !!v; save(); lightAttr(); zero(); fire(); },   // 3.95 Light over the tools
     setDraw(d) { if (!DRAWS.includes(d) || d === draw) return; draw = d; save(); zero(); fire(); },   // 3.82 glass · page
     setAmount(a) { amt = clamp(+a || 0, 0, 1); save(); fire(); },
+    get beatEvery() { return beatEvery; }, setBeatEvery(n) { if (![1, 2, 4].includes(+n)) return; beatEvery = +n; try { global.localStorage.setItem('eravos.reactive.beat.every', String(beatEvery)); } catch (e) {} fire(); },
+    get beatColour() { return beatNow; }, get beatBase() { return beatCol; }, beatStep,   // tests: one beat by hand
     setColors(c) { custom = Object.assign({}, custom, c || {}); save(); fire(); },
     onChange(fn) { listeners.push(fn); },
     // tests: one analysis step on demand (offline pages have no running clock)
@@ -337,7 +440,7 @@
     _taps: taps, lit, colourFor, rotate, settingsOf, SURFACES, tintNow,
   };
   // 3.91 a new theme is a new palette: put every colour back, read the palette (and how far surfaces may lean) again
-  global.addEventListener && global.addEventListener('eravos:theme', () => { zero(); base = null; surfScale = null; });
+  global.addEventListener && global.addEventListener('eravos:theme', () => { zero(); base = null; surfScale = null; beatList = null; beatCol = null; });
   global.SoundCSS = SoundCSS;
   // ⋯ Options → Reactive colours: core/react-panel.js (the panel, and the same panel in every tool's ⚙ settings)
   // ⊞ Tidy up order for music: the timeline, then the song tools, drums, instruments, effects, the rest

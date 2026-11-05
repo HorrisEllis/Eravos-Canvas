@@ -2,6 +2,8 @@
 dist/
 node_modules
 tests/out/
+# null-render baselines (tests/null-render.mjs --record): recorded on your machine from the code before a refactor
+tests/null-baseline/
 # the desktop app run from this repo (electron desktop/) keeps your folders here, as the exe does beside ERAVOS.exe
 /projects/
 /exports/

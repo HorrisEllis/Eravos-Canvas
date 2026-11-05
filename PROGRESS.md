@@ -2,7 +2,7 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
-## Done — 3.101 Updates in the background, with ERAVOS Update to put them in place (2026-11-05)
+## Done — 3.111 Updates in the background, with ERAVOS Update to put them in place (2026-11-05)
 Asked: "fix the update tool. It needs to run in the background? Like maybe an update tool. It closes the canvas and then doesn't apply
 the update".
 - Why it failed (3.99): it closed ERAVOS first, then a hidden script waited only for the main process. Electron's helper processes keep
@@ -17,6 +17,190 @@ the update".
   tidied), p99 (the card through every state), packaging/windows/test-update.ps1 (the release workflow runs ERAVOS Update on the built
   app on Windows: new files in, your projects untouched). Not run here: Windows-only steps (no PowerShell on this machine).
 - 1355/1355; updater.mjs all passed.
+- Merged with main's Setup updates (3.99 → Program Files): a Setup install downloads the new ERAVOS-Setup in the background and
+  ERAVOS Update runs it silently (admin once); ERAVOS restarts through Explorer, as you.
+
+## Done — 3.110 ⚙ Settings is a page, not a dropdown (2026-11-05)
+Asked: "also need a actual settings built not a drop down". Screenshots of every tab shown; "MERGE AND push".
+- canvas/runtime/app-settings.js → window.AppSettings: addSection({ id, label, order, sub, make(close) }), open(id), close(), toggle().
+  The page reuses the tool-page look (tp-overlay / tp-page / tp-nav tabs). Entry: ⚙ Settings in the toolbar beside ⋯ Options, and Ctrl+,.
+- Sections: Look (Themes.panel — theme, buttons, material; canvas) · Reactive colours (ReactPanel.build, app scope; music) · Sound (Hear
+  by place; music) · About & updates (version from the app, Check for updates, releases; canvas). A section that throws shows a line, not
+  a broken page.
+- ⋯ Options keeps only actions: Undo, Redo, Dependencies, Stop all, Ports, Fit all, Tidy up, Clear canvas.
+- Tests: tests/p110-settings.test.js 2/2; P77 (reactive panel), P91 (themes), P99 (updates) now drive the page; boundary 10/10.
+
+## Done — 3.108 Sketch draws smooth and connected; 3.109 the piano roll fills its width, and its own borderless window (2026-11-05)
+Asked: "can you start with the timeline? make it easier and the drawing more smooth and connects to each other" · "also split the
+timeline. maybe. it doesn't scale well, also i want them to be seperate or an option to be seperate" → chose "Piano roll its own window"
+→ "oh and make it borderless". Before/after shown; "merge and push and release".
+- 3.108: component pitch-path (MusicParts.pathAt — monotone cubic, Fritsch–Carlson; smoothLine — local line fit, so stroke ends have no
+  hook; simplifyPath ≤ 48 points within 0.08 st). Sketch › curves: one stroke = one note, b = { shape: 'path', path }; engine cleanB keeps
+  ≤ 64 points; sdk-music bendNote plays the path (48–256 ramps). Fixed: a path starting and ending at 0 was played flat. A drawn wave:
+  11 notes with corners → 1 note, worst 0.09 st from the line, largest slope jump 99 → 3.4.
+- 3.109: the roll's notes fill its width (2-bar clip 448 → 1,131 px) until a zoom is picked by hand. VIEW › Piano roll in its own window
+  (default off) / the roll's ⧉ Own window: one borderless panel (canvas: CanvasWM.openPanel — no frame, a slim strip whose controls show
+  on hover, corner sizing, expand, opens on screen, goes with its owner); × closes the clip; off / Timeline closed puts it back.
+- Tests: tests/p108-sketch-path.test.js 2/2, tests/p109-roll-window.test.js 2/2; Timeline 84/84, piano 27/27, bend 16/16, P20 33/33,
+  boundary 10/10, P103 3/3; design check 52/69, none worse. Note: a test driving a canvas drag through CDP must send button 'left' on
+  moves, or Chrome drops the capture (it looked like the drag ending at once).
+
+## Done — 3.106 reactive colours no longer compound; 3.107 Material; dice gone (2026-11-05)
+Asked: "also the canvas reactive colors keep compounding errors. test it. maybe white border around tool ui. can you remove the dice icon.
+what about adding more texture to the tools? like how the retro poly" · "always show me or add more themes before change."
+- Measured: every colour of 5 tools snapshotted, the reactive colours driven 300 frames per mode with redraws, switched off, compared
+  as drawn (each colour painted on one pixel, ±3): 221 of 2,714 did not come back.
+- Causes, fixed: (1) switching mode / off (zero()) never put back the palette a sounding window had lit on itself (lightSheets: --amber
+  for the plug, --rcs-*); the next lighting took the lit value as its base, so colours crept further with every change. (2) BlackSurfaces
+  darkened an already neutral colour again on every pass. (3) dark borders, outlines, shadows and the reactive engine's own colour copies
+  were neutralised only after a reactive cycle (now from the start / never for its copies).
+- After: synthetic 0 visible; the real playback path (the song loaded, every mode, stop, off) 0 of 3,017. tests/p106-reactive-drift.test.js
+  fails on the old code (the plug's amber crept; darkening twice) and passes now.
+- Dice: 🎲 gone from Groove, Bass Gen, Acid Synth (Reseed), EDM Lab (Reseed), Arp (Random), Wobble Bass (Tear), Songs (Another like it),
+  the random-preset menu, a library card (≋).
+- Themes › MATERIAL: None (default — the look as it is) · Grain · Brushed · Carbon: neutral texture on windows, cards and tool pages. The
+  Themes panel's BUTTONS row had no styles at all — now styled like the theme cards (MATERIAL beside it).
+
+## Done — 3.104–3.105 consistency: the design guide, the design check, gradients in the tool's family (2026-11-05)
+Asked: "the buttons in the tape echo look bad. the color i mean. bad gradient" · "i want consistency across all of them. and a template
+or schema for a design guide or philospophy to maintain consistency."
+- Dusk --dk2…4: the accent turned +9° / +18° / −14° in OKLCH (was the accent mixed with fixed pink / orange / violet → mud on green).
+- docs/DESIGN-GUIDE.md (philosophy; rules S1–S4, C1–C5, K1–K5, W1–W4, N1–N2), docs/templates/TOOL-UI.md (the new-tool UI write-up).
+- tests/design-check.mjs: every tool on the served build; D1–D6; tests/design-baseline.json can only improve; docs/design-check.md.
+  .github/workflows/checks.yml runs it (and components, no-toys, no-playwright) on every PR.
+- Fixed to the rules: kit `sm` size (Timeline, Sequencer lane controls), Tape Echo's Clear/Throw at kit size, one primary per window
+  (MIDI Map, Clip Maker, Lyrics → Rhythm, Session), MIDI Map / piano-roll separator / Session progress on tokens and the accent family,
+  BlackSurfaces reads `background` shorthands with variables and treats the old blue-grey #223044 as a surface (chroma ≤ 36).
+- Tool page In / out words now come from the music domain (ToolPage.ioWords) — the page stays domain-free (boundary test 10/10).
+- 45 → 52 of 69 tools pass every rule. D4 (119 one-off buttons, nearly all play surfaces) waits for a kit Pad part.
+
+## Done — 3.103 Black surfaces (2026-11-05)
+Asked: "i dont like the tint. everything but the colors should be what they are. make them darker even. like black".
+- Surface tokens neutral near-black in every theme (--bg #000 … --panel2 #0f0f0f, lines #1c1c1c/#282828, text greys neutral);
+  --react-surface 0 (surfaces never lean); the Dusk sky overlay (.wm-dusk) off; button/toggle fills black (Field keeps clear buttons).
+- canvas/runtime/black-surfaces.js: a surface = dark (max channel ≤ 80) and barely coloured (channels within 26) → neutral grey × 0.72.
+  Applied to every stylesheet's backgrounds as it loads (same-origin: the app and the web build; file:// pages cannot read sheets),
+  to inline backgrounds tools write (ui-kit hook), and to 2D-canvas fills/strokes/gradient stops inside windows and tool pages.
+  Colours (bright, or dark but clearly coloured) are untouched. With Light over the tools on, drawings are left to the reactive colours.
+- Measured (served build, every tool spawned): elements with a tinted dark background 1,000+ → 30. P103 3/3; P91 and P83 updated
+  (they asserted the tint he asked to remove).
+
+## Done — 3.102 Beat colour; phase 1 starts with filter-svf; tool pages; the dependency graph (2026-11-05)
+Asked: "the ui is how i want it. except it the tool pages look horrible" · "that looks nice as hell. can you start on the phases" ·
+"Everything turns the same colour and changes on the beat, built into the reactive colours you already have, with no restyle".
+- Tool pages (PR #81): fixed size, compact head, no nested scroll, packs/controls/in-out readable; knob labels as wide as the knob needs.
+- build/eco-graph.mjs → docs/eco-graph.md: the phases' dependency graph from the specs. filter-svf 35 · lfo 24 · pattern-store 23 · osc-va 20.
+- components/filter-svf 1.0.0: Simper ZDF SVF kernel (modes LP HP BP notch peak bell low/high shelf all-pass; 1–3 stages), AudioWorklet
+  'eravos-svf' built from the kernel's own text; MusicParts.svf(ac). Not used by any tool yet — its own canvas window waits for his OK.
+- Reactive colours › Beat (sound-css.js 3.102): one colour (the theme's accents in turn) for every colour that IS a colour, stepped by
+  transport:tick at the time it is heard; Changes on every beat / 2 beats / bar; Amount = the flash. Known leftover: colours a tool
+  hard-codes outside the reactive variables (Wobble Bass's "Keep in range" button) keep their own.
+- Tests: P101 2/2, P102 1/1, P77 updated for the new mode (7/7); P82's two failures exist on main before this change.
+- Next: lfo (24 tools) as a component — extracted from the LFO tool, nulling — then osc-va, waveshaper, env-adsr.
+
+## Done — P0.4 duplicate finder; P0.5 filter-formant (one mouth for Wobble Bass and Wub Filter) (2026-11-05)
+Asked: "Begin. I was thinking of having tool groups as suites. Like how each system has its components … fluid and dynamic, deep and professional".
+- build/duplicates.mjs: tokenises every tool's code (names/numbers normalised), finds windows shared across tools, grows them into
+  blocks, splits code vs settings (repeated knob groups mark repeated parts) → docs/duplicates.md. ~9 % of tool code repeats.
+- components/filter-formant: MusicParts.VOWELS (one table: OO OH AH EH EE UH AE IH ER YOI) · vowels(over) · formantBands · formantMorph ·
+  formantSet. Wobble Bass and Wub Filter both use it. The copies had drifted (UH IH ER only in Wobble Bass, YOI only in Wub Filter, AE's
+  third band −14 vs −12 dB). Wub Filter keeps its AE as an override so nothing it played changes — which AE is right is his call.
+- Proof: filter-formant.test.mjs 5,220 checks (same graph, same connection order, same values for every vowel pair × shift × Q;
+  mutation-checked: a Q law off by 1 % and a misrouted morph both fail it). Null render: Wobble Bass 38/38 PASS (−87.6 … −94.2 dB),
+  Wub Filter 8/8 PASS (7 presets render differently from themselves even unchanged: unproven, listed). In-page: Wobble 39/39,
+  Wub 59/59, P94 suite 2/2. tests/null-render.mjs: --record <tool> keeps every other tool's baseline (it used to wipe them).
+- specs/eravos.suites.spec ADDENDUM 2026-11-05: systems all the way down, fluid not boxes (F1–F5).
+- Next: Coven's vowels (its own 6-vowel table, gains not per band) · the grit shaper (Wobble Bass ⇄ Wub Sub) · the FM operator
+  (Syn Osc ⇄ Wobble Bass) · Wub Osc ⇄ Wub Sub voice code · then Wobble Bass "Open as components".
+
+## Done — delete packs, presets and patterns for good; Playwright gone (2026-11-04)
+Asked: "i want to be able to delete packs, patterns" · "I don't need them brought back. some of them suck … dont sound good, or are blown"
+· "remove playwright from eravos. thats what clearglass was for".
+- ContentPacks.discard(id) / discardItem(id, tool, kind, name) (discardPreset): shipped packs and single items too, kept in
+  localStorage `eravos.contentpacks.deleted.v1` (the app's .appdata, in the library) — a deleted pack is refused when it registers again.
+  🗑 on every pack and × on every preset in ⚙ Packs & presets; 🗑 on packs and items (presets, kits …) on the tool page.
+- PatternLibrary.discard(p) by content signature (ids move), `eravos.patterns.deleted.v1`; 🗑 on every pattern card (takes its curved twin).
+- tests/p100-delete.test.js (3/3). P21 24/24 · P71 10/10 · P73 11/11 · P76 4/4 · P74 8/8 (its "completely different" audio check is
+  flaky both before and after this change).
+- host/driver/glass.js app mode: electron.launch({ executablePath, args, env }) → firstWindow() → page; dialogs (pg.on('dialog')).
+  desktop/test/bare.mjs + skel.mjs and build/sound-audit.mjs use the driver; tests/no-playwright.mjs has no exceptions left.
+- Open (asked, not done): songs as a rhythm-exploring tool only; per-tool patterns with presets, depth, curves and per-note editing.
+
+## Done — install to the system in one run; your library is Documents\ERAVOS (2026-11-04)
+Asked: "make the installer for installing to the system. also the projects should save to the … folder. same with the packs and
+tools. like documents/eravos" · "this is on windows, one run install … make it a batch".
+- **Install ERAVOS.bat** = one run: elevates, builds from the checkout (make-exe.ps1 -NoSetup), copies to Program Files\ERAVOS,
+  all-users Start menu + desktop shortcuts, HKLM Settings › Apps entry (uninstall.ps1), starts ERAVOS un-elevated (via Explorer).
+  Outside a checkout: the release's ERAVOS-Setup exe, else its zip. Tidies the old %LOCALAPPDATA% per-user copy.
+- **ERAVOS-Setup-<version>.exe** (packaging/windows/eravos.nsi, NSIS): made by make-exe.ps1 when NSIS is present; release.yml installs
+  NSIS and attaches it next to the zip. Compiles with makensis 3.09 here (not run on Windows here).
+- **Library** (desktop/main.js): Documents\ERAVOS\{projects, exports, packs, tools, drop, .appdata}. Downloads route: *.pack.json →
+  packs, other .json → projects, the rest → exports. packs\*.zip and tools\*.zip load every start. Old folders beside the exe or in
+  %LOCALAPPDATA%\Programs\ERAVOS (and "ERAVOS Library") move in once, only into empty folders. ERAVOS_LIBRARY or a `portable` file override.
+- **Updater**: an installed copy downloads the new Setup and runs it /S elevated; a Program Files copy without one swaps the zip elevated.
+- Not run on Windows here: the scripts parse (PowerShell 7 parser), the library move was exercised with a stubbed Electron.
+
+## Done — P0.3 note-release and progression (2026-11-04)
+Asked: "Boring shit first I guess" → the repeated bookkeeping. Two more components, five + three tools rewired, nothing in sound changed.
+- tools/music/components/note-release/: `MusicParts.releaseHeld` (wobble-bass = wub-osc = wub-sub, one held note) and `releaseVoices`
+  (syn-osc = syn-partials, a voice pool). 102 checks: the recorded AudioParam calls equal the five original noteOff()s, with and without
+  cancelAndHoldAtTime, for held / other / no note, t undefined..9.25, three release times.
+- tools/music/components/progression/: `PROGRESSIONS` (the five), `pickProgressions`, `degreeAt` — the table and lookup that bass-gen,
+  chord-gen and edm-lab each carried (EDM Lab offers four of the five, so it takes `pickProgressions` and its menu is unchanged).
+  13,826 checks: every progression × bars 0–255 × chordBars {1,2,4} as number and string equals the originals.
+- `node tests/components.mjs` runs every component's node test (+ the null-render maths); release.yml runs it before building.
+- Loader order: tools/music/index.js loads the three components before any tool. Tool versions unchanged.
+- Null render (needs the browser, not run here): same method as P0.1 — the originals of the eight engine files + index.js, `--record`,
+  then these, check. Expect every preset of wobble-bass, wub-osc, wub-sub, syn-osc, syn-partials, bass-gen, chord-gen, edm-lab to PASS.
+- Next: the scan was crude. A proper duplicate finder (normalised token windows across ALL engine/ui files) before P0.4, then pick the
+  biggest identical blocks, not the ones that happened to be named alike.
+
+## Done — P0.2 survey: there is no SVF to extract; phaseWave joined wave-table (2026-11-04)
+Asked: "Yes" (to P0.2 filter-svf). The survey (tools/music/tools/**/*.engine.js) found NO state-variable filter code: every filter is a
+native BiquadFilterNode (125 createBiquadFilter calls); fx-filter and wub-filter each cascade two for 12/24 dB, but with different Q
+laws (fx-filter's 3.37 RCA fix) and different wiring, so there is nothing identical to move "with no change in sound". The spec's
+filter-svf (12/24/36 dB, key-track, env/velocity inputs, stable to self-oscillation) is NEW DSP: it belongs to phase 1 as a build with
+its own tests, not a phase 0 extraction. Same likely for osc-va (polyBLEP/minBLEP) — check before promising it.
+- What IS duplicated, byte for byte (crude scan of engine files, so a floor, not a census): phaseWave (fx-moddelay = fx-phaser) → now
+  MusicParts.phaseWave in components/wave-table (83 checks, bit-identical to the original). Still to do: noteOff in wobble-bass = wub-osc
+  = wub-sub (318 chars, closes over each tool's voices — needs a voice-table part first), noteOff in syn-osc = syn-partials, ownDegree
+  in bass-gen = chord-gen.
+- Next: P0.3 the voice table (noteOn/noteOff bookkeeping the wub tools and syn tools repeat) — look at all of them before cutting.
+
+## Done — P0.1 the first component: wave-table (2026-11-04)
+Asked: "Okay next". The LFO and Wub Rate each carried the same makeWave(); it is now ONE component, tools/music/components/wave-table/
+(wave-table.js · .spec · .test.mjs), loaded by tools/music/index.js before any tool (it also lands in the core pack of desktop/packs.mjs,
+which reads that list). `MusicParts.periodicWave(ac, fn, { phase, harmonics })`.
+- Each tool keeps what is its own: the LFO its 33 harmonics and degrees, Wub Rate its 40 and a fractional phase; their shape functions
+  differ on purpose (sine vs −cos) and stay in the tools. Same arithmetic, same order → no change in sound.
+- PROVED in plain node (73 checks): the component's re/im/dc equal the two original inline functions bit for bit for 6 shapes × 7 LFO
+  phases and 5 Wub Rate phases. `node tools/music/components/wave-table/wave-table.test.mjs` (also in release.yml).
+- NOT yet proved at the audio level (no browser here): to run the null render, copy lfo.engine.js, wub-rate.engine.js and
+  tools/music/index.js from your ORIGINAL Eravos-Canvas-main.zip over this tree, `node tests/null-render.mjs --record`, put these three
+  files back, then `node tests/null-render.mjs`. Expect every eravos.lfo / eravos.wub-rate preset PASS. Tool versions unchanged.
+- Left alone on purpose: eravos.wobble-bass (Lanczos-windowed, 64 harmonics) and eravos.bass-forge compute their waves differently;
+  merging them would change sound, so each waits for its own null proof (listed in wave-table.spec `not_used_by_yet`).
+- Next: P0.2 filter-svf (find every tool that carries its own state-variable filter first), then osc-va.
+
+## Done — Phase 0 start: the null-render harness (2026-11-04)
+Asked: "What first?" → "Do it". The ecosystem plan (eravos.music-ecosystem, phase 0) moves shared parts into components with no change in
+sound, each move proved by null renders. That proof needed a tool; this is it.
+- `node tests/null-render.mjs --record` (BEFORE a change) renders every music tool × preset with a seeded stimulus (Math.random seeded
+  in the page; effects get a fixed saw + noise; instruments a fixed note/chord run; drums their four pads; beat tools one bar), twice,
+  and keeps it in tests/null-baseline/ (gitignored). `node tests/null-render.mjs` (AFTER) subtracts: PASS under −60 dB re the baseline
+  RMS (`--db -70` stricter). Length change, NaN, a missing baseline all FAIL. Renders that differ from themselves are UNSTABLE and are
+  listed, never passed; tools it cannot stimulate (drop, sampler, one-shots, containers, clip) are listed as NOT COVERED.
+- The maths is tests/null-render-core.mjs, checked in plain node without a browser: `node tests/null-render-core.test.mjs` → 17 checks
+  (round trip at −50 dBFS, 0.2 % gain = −54 dB fails, 0.05 % = −66 dB passes, a one-sample shift fails, NaN, silence, unstable).
+- NOT YET RUN against the real tools: the build sandbox had no Chromium/Electron. First run on your machine: `--record` on this commit,
+  read the UNSTABLE / NOT COVERED lists, then start extraction (LFO first, then filter-svf, osc-va).
+- IN THE INSTALL (same day, "Add it to the install"): `Null Render.bat` (record / check menu) beside Start ERAVOS; both builders ship
+  `tests/` (860 KB; `null-baseline/` and `out/` are never shipped) and make-exe.ps1 now ships `host/` too (the driver lives there;
+  desktop/build.mjs already did). host/driver/glass.js finds Edge/Chrome on Windows and Chrome/Edge on macOS when there is no
+  Electron beside it. release.yml runs `node tests/null-render-core.test.mjs` before building. README has a Null Render section.
+  NOT TESTED on Windows (no Windows/browser here): the Edge path through the Chromium engine of host/driver/glass.js is the part to
+  watch on first run — if it fails, set GLASS_CHROMIUM to a Chrome/Edge .exe and send the message.
+- Next: P0.1 LFO → tools/music/components/lfo/ (spec, test, null-proven), then filter-svf, osc-va; perf gate in CI after.
 
 ## Done — 3.100 The Field flows (2026-11-03)
 Asked: "can you have the gradient like slowly moving slowly with that theme?"

@@ -58,7 +58,7 @@ OrganismFactory.reg('eravos.edm-lab', function (view) {
   const brushStr = UI.Knob({ label: 'Strength', min: 0.1, max: 1, step: 0.05, value: 1, default: 1, size: 26, onChange: (v) => { brush.strength = v; } });
   const erase = UI.Toggle({ label: 'Erase', onChange: (v) => { brush.erase = v; } });
   view.root.append(
-    h('div', { class: 'org-row', style: { justifyContent: 'space-between' } }, [UI.presetBar(view), h('div', { class: 'org-row', style: { margin: 0 } }, [brushSize.el, brushStr.el, erase.el, UI.Button({ label: 'Clear', onClick: () => view.emit('clear', {}) }).el, UI.Button({ label: '🎲 Reseed', onClick: () => view.emit('reseed', {}) }).el])]),
+    h('div', { class: 'org-row', style: { justifyContent: 'space-between' } }, [UI.presetBar(view), h('div', { class: 'org-row', style: { margin: 0 } }, [brushSize.el, brushStr.el, erase.el, UI.Button({ label: 'Clear', onClick: () => view.emit('clear', {}) }).el, UI.Button({ label: 'Reseed', onClick: () => view.emit('reseed', {}) }).el])]),
     h('div', { style: { display: 'flex', gap: '8px' } }, [h('div', { style: { flex: '1' } }, [cv, h('div', { style: { height: '6px' } }), rib]), h('div', { class: 'org-col', style: { alignItems: 'center' } }, [wheel, UI.paramControl(view, cfg('progression')).el])]),
     h('div', { class: 'org-row', style: { marginTop: '6px', alignItems: 'flex-end' } }, [energy.el, dropB.el, tgt.el, printB.el, UI.paramPanel(view, ['swing', 'chordBars', 'rhythmLevel', 'bassLevel', 'harmonyLevel'], { flat: true, noTitles: true, size: 28 })]),
     UI.hint('Paint where the drums are busy (right-click erases). The bass follows the kick, the chords follow TENSION. Everything is in the song key.'),

@@ -7,7 +7,7 @@
   const S = OrganismSDK.STD;
   const ROWS = ['kick', 'snare', 'ghost', 'hat', 'openhat', 'clap', 'perc', 'shaker'];
   const PAD_OF = { kick: 0, snare: 1, ghost: 1, hat: 3, openhat: 4, clap: 2, perc: 9, shaker: 10 };
-  const PROG = { 'i-VI-III-VII': [1, 6, 3, 7], 'i-iv-v-i': [1, 4, 5, 1], 'vi-IV-I-V': [6, 4, 1, 5], 'i-i-VI-VII': [1, 1, 6, 7] };
+  const PROG = MusicParts.pickProgressions(['i-VI-III-VII', 'i-iv-v-i', 'vi-IV-I-V', 'i-i-VI-VII']);   // four of the shared five (components/progression): its menu is unchanged
   function blank() { return ROWS.map(() => new Array(32).fill(0)); }
   function presetMap(kind) {
     const m = blank(); const set = (r, steps, v) => steps.forEach(s => { m[ROWS.indexOf(r)][s] = v; });
@@ -110,7 +110,7 @@
       }
       ctx.voicing = voicing;
       let lastChord = null;
-      function chordAt(bar) { const prog = PROG[P.get('progression')]; return prog[Math.floor(bar / P.get('chordBars')) % prog.length]; }
+      function chordAt(bar) { return MusicParts.degreeAt(PROG, P.get('progression'), bar, P.get('chordBars')); }
       ctx.chordAt = chordAt;
       function playChord(t, degree) {
         const v = voicing(degree, tension()); const e = energy();

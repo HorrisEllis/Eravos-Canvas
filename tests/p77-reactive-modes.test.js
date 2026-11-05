@@ -35,7 +35,7 @@ describe('P77 · reactive colours: Off · Static · Changing · Custom', () => {
     } finally { OrganismFactory.close(id); SoundCSS.setMode(was === 'off' ? 'static' : was); }
   });
   it('3.80 the surfaces react too (background, grid, panels, chassis, lines, dim text) with the mix, toward the mode’s colour; back exactly in silence; Off leaves them', async () => {
-    host(); const K = Kernel; K.audio.boot(); await K.audio.ctx.resume(); SoundCSS.init(K); if (SoundCSS.setDraw) SoundCSS.setDraw('page');
+    host(); const K = Kernel; K.audio.boot(); await K.audio.ctx.resume(); SoundCSS.init(K); if (SoundCSS.setDraw) SoundCSS.setDraw('page'); if (SoundCSS.setLight) SoundCSS.setLight(true);
     const id = OrganismFactory.spawn('eravos.pad-forge', { x: 40, y: 40 }); await TH.sleep(60); const was = SoundCSS.mode, amt = SoundCSS.amount, R = document.documentElement;
     // at rest first (an earlier test's sound may still be lighting the page): Off puts every colour back
     SoundCSS.setMode('off'); const v = (k) => getComputedStyle(R).getPropertyValue(k).trim(), keys = Object.keys(SoundCSS.SURFACES), base = {}; keys.forEach(k => { base[k] = v(k); });
@@ -45,20 +45,19 @@ describe('P77 · reactive colours: Off · Static · Changing · Custom', () => {
       SoundCSS.setAmount(1); SoundCSS.setMode('changing'); await play();
       const moved = keys.filter(k => v(k) !== base[k]); assert.ok(moved.length >= keys.length - 1, 'surfaces moved: ' + moved.join(' '));
       SoundCSS.setMode('off'); keys.forEach(k => assert.equal(v(k), base[k], k + ' back exactly when switched off')); await play(); keys.forEach(k => assert.equal(v(k), base[k], k + ' Off leaves it'));
-    } finally { OrganismFactory.close(id); SoundCSS.setAmount(amt); SoundCSS.setMode(was === 'off' ? 'static' : was); }
+    } finally { OrganismFactory.close(id); SoundCSS.setAmount(amt); if (SoundCSS.setLight) SoundCSS.setLight(false); SoundCSS.setMode(was === 'off' ? 'static' : was); }
   });
-  it('⋯ Options → Reactive colours opens the panel: four mode cards with live previews, Amount, and (Custom) your colours + palettes', async () => {
-    const entry = document.getElementById('reactBtn'); if (!entry) return;   // the options slot exists only on the full canvas page
+  it('⚙ Settings → Reactive colours: the mode cards with live previews, Amount, and (Custom) your colours + palettes', async () => {
     const was = SoundCSS.mode;
     try {
-      entry.click(); await TH.sleep(80); const pop = document.querySelector('.rcp-pop'); assert.ok(pop, 'the panel opens');
-      assert.deepEqual([...pop.querySelectorAll('.rcp-card .rcp-name')].map(b => b.textContent), ['Off', 'Static', 'Changing', 'Custom']);
-      assert.equal(pop.querySelectorAll('canvas.rcp-pv').length, 4, 'a live preview on each');
+      AppSettings.open('reactive'); await TH.sleep(80); const pop = document.querySelector('.as-sec[data-sec="reactive"]'); assert.ok(pop, 'the section opens');
+      assert.deepEqual([...pop.querySelectorAll('.rcp-card .rcp-name')].map(b => b.textContent), ['Off', 'Static', 'Changing', 'Custom', 'Beat']);
+      assert.equal(pop.querySelectorAll('canvas.rcp-pv').length, 5, 'a live preview on each');
       pop.querySelector('.rcp-card[data-mode="custom"]').click(); assert.equal(SoundCSS.mode, 'custom'); assert.ok(!pop.querySelector('.rcp-custom').hidden, 'your colours show');
       pop.querySelector('.rcp-pal').click(); assert.equal(SoundCSS.colors.low, ReactPanel.PALETTES[0][1].low, 'a palette sets your colours');
       pop.querySelector('.rcp-card[data-mode="off"]').click(); assert.equal(SoundCSS.mode, 'off'); assert.ok(pop.querySelector('.rcp-range').disabled);
-      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await TH.sleep(20); assert.ok(!document.querySelector('.rcp-pop'), 'Esc closes it');
-    } finally { SoundCSS.setMode(was === 'off' ? 'static' : was); const p2 = document.querySelector('.rcp-pop'); if (p2) p2.remove(); }
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await TH.sleep(20); assert.ok(!document.querySelector('.as-overlay'), 'Esc closes Settings');
+    } finally { SoundCSS.setMode(was === 'off' ? 'static' : was); AppSettings.close(); }
   });
   it('each tool has its own in ⚙ settings: Follow the app, or its own mode — saved with the tool, and it wins over the app’s', async () => {
     host(); const id = OrganismFactory.spawn('eravos.pads', { x: 40, y: 40 }), w = CanvasWM.windowOf(id), c = OrganismFactory.handle(id).ctx, was = SoundCSS.mode;
@@ -66,7 +65,7 @@ describe('P77 · reactive colours: Off · Static · Changing · Custom', () => {
       assert.equal(SoundCSS.settingsOf(w).own, false, 'follows the app by default');
       ToolSettings.open(OrganismFactory.handle(id)); await TH.sleep(80);
       const sec = w.querySelector('.ts-sec[data-section="reactive"]') || document.querySelector('.ts-sec[data-section="reactive"]'); assert.ok(sec, 'a Reactive colours section in its settings');
-      assert.deepEqual([...sec.querySelectorAll('.rcp-card')].map(b => b.dataset.mode), ['follow', 'off', 'static', 'changing', 'custom']);
+      assert.deepEqual([...sec.querySelectorAll('.rcp-card')].map(b => b.dataset.mode), ['follow', 'off', 'static', 'changing', 'custom', 'beat']);
       sec.querySelector('.rcp-card[data-mode="changing"]').click(); await TH.sleep(30);
       assert.equal(c.params.get('_react').mode, 'changing', 'saved on the tool'); assert.equal(c.serialize().params._react.mode, 'changing', 'and in its save');
       SoundCSS.setMode('static'); const S = SoundCSS.settingsOf(w); assert.ok(S.own && S.mode === 'changing', 'its own wins over the app’s');

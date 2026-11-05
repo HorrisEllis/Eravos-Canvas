@@ -2,9 +2,9 @@
 // (host/driver/glass.js). James, 2026-10-21: "not playright. isn't clearglass in this project". Spec: eravos.phase48-map P48.0.
 import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-// known exceptions, said out loud: they launch the packaged Electron app (Playwright's _electron); the driver has no app mode yet
-const KNOWN = new Set(['desktop/test/bare.mjs', 'desktop/test/skel.mjs']);
-const SKIP = /(^|\/)(node_modules|\.git|dist|\.eravos|host\/driver)(\/|$)/;
+// no exceptions left: the desktop app tests use the driver's app mode (electron.launch), 2026-11-04 "remove playwright from eravos"
+const KNOWN = new Set();
+const SKIP = /(^|\/)(node_modules|\.git|dist|\.eravos|host\/driver)(\/|$)/;   // (the driver's own comments name Playwright: it replaces it)
 const hits = [], known = [];
 (function walk(dir) {
   for (const n of fs.readdirSync(path.join(ROOT, dir))) {

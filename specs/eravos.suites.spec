@@ -106,3 +106,21 @@
   is the drop rig (music.drop-rig above). Each has macros (3–4) so its suite window opens on a PANEL you play — the "synthesis tool of
   the respective tools" of the 2026-10-21 addendum. music.wub-lab and music.synthesis-lab gained macros (they had none).
   Every suite has a page (ToolPage.openSuite, 3.63): parts, scenes, macros, wiring. Tests: tests/p63-suite-page.test.js.
+
+## ADDENDUM 2026-11-05 — systems all the way down: fluid, not boxes
+  James, 2026-11-05: "I was thinking of having tool groups as suites. Like how each system has its components. I don't want this to
+  become a rigid, project of boxes. I want it fluid and dynamic, deep and professional."
+  One mechanism at every scale, so nothing is a box:
+    component → tool → suite → project. Each level is a set of parts joined by wires; each level opens as a canvas
+    (eravos.canvas-family: Instrument Canvas = a tool's components wired; a suite window = its tools; the Project Canvas = everything).
+  Rules that keep it fluid:
+    F1 membership is wiring, never a folder: a tool belongs to a suite while it is wired in (already true, Suites.members); a
+       component belongs to a tool the same way once tools are assembled (eravos.components "Open as components").
+    F2 overlap is normal: a tool can be in many suites; a component is in many tools (filter-formant: Wobble Bass, Wub Filter).
+       Depth added to a component reaches every tool and suite that holds it — the opposite of copies drifting apart (found
+       2026-11-05: the two vowel tables had drifted, three vowels and one band gain apart).
+    F3 any part can be lifted out and played on its own, or swapped for another that takes the same signals (typed ports).
+    F4 a suite adds what only a system has — scenes, macros, its control panel — never a copy of its parts' engines.
+    F5 no fixed list: suites are data (suite.json), grown by wiring on the canvas and saved like a song.
+  First link (P0.5): Wub Filter and Wobble Bass speak through ONE mouth (components/filter-formant). The Wub Lab parts become views of
+  Wobble Bass's components one by one — the suite and the instrument are the same system seen at two scales.

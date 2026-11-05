@@ -1,11 +1,16 @@
 # 3.99 the release the update service looks for. Push a tag vX.Y.Z (with desktop/package.json "version" set to X.Y.Z):
-# this builds ERAVOS for Windows and attaches dist/ERAVOS_X.Y.Z.zip to the GitHub release of that tag. The app (desktop/updater.js)
-# and the installer (Install ERAVOS.bat) both download that zip.
+# this builds ERAVOS for Windows and attaches the installer dist/ERAVOS-Setup-X.Y.Z.exe and the portable dist/ERAVOS_X.Y.Z.zip to the
+# GitHub release of that tag. The app (desktop/updater.js) and Install ERAVOS.bat download the Setup (the zip for a portable copy).
 name: release
 on:
   push:
     tags: ['v*']
-  workflow_dispatch:
+  workflow_dispatch:   # by hand: a build to download; with "release" on, it also makes the release v<desktop/package.json version>
+    inputs:
+      release:
+        description: 'Publish the release v<version> (makes the tag) instead of only keeping the build'
+        type: boolean
+        default: false
 permissions:
   contents: write
 jobs:
@@ -13,29 +18,54 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      - name: The app's version
+        id: ver
+        shell: pwsh
+        run: |
+          $v = (Get-Content desktop/package.json -Raw | ConvertFrom-Json).version
+          "version=$v" >> $env:GITHUB_OUTPUT
       - name: Check the tag matches the app's version
         if: startsWith(github.ref, 'refs/tags/v')
         shell: pwsh
         run: |
-          $v = (Get-Content desktop/package.json -Raw | ConvertFrom-Json).version
-          if ("v$v" -ne "${{ github.ref_name }}") { throw "tag ${{ github.ref_name }} but desktop/package.json says $v" }
+          if ("v${{ steps.ver.outputs.version }}" -ne "${{ github.ref_name }}") { throw "tag ${{ github.ref_name }} but desktop/package.json says ${{ steps.ver.outputs.version }}" }
+      - name: Component and null-render maths (plain node, no browser)
+        shell: pwsh
+        run: |
+          node tests/components.mjs
+          node tests/no-toys.mjs
+          node tests/no-playwright.mjs
       - name: Test the update service (no Electron, no network)
         run: node desktop/test/updater.mjs
-      - name: Build ERAVOS.exe
+      - name: NSIS (makes ERAVOS-Setup.exe)
+        shell: pwsh
+        run: |
+          if (-not (Get-Command makensis.exe -ErrorAction SilentlyContinue) -and -not (Test-Path "${env:ProgramFiles(x86)}\NSIS\makensis.exe")) { choco install nsis -y --no-progress }
+      - name: Build ERAVOS.exe + ERAVOS-Setup.exe
         shell: powershell
-        run: powershell -NoProfile -ExecutionPolicy Bypass -File packaging/windows/make-exe.ps1 -NoStart
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File packaging/windows/make-exe.ps1 -NoStart
+          if (-not (Get-ChildItem dist -Filter 'ERAVOS-Setup-*.exe')) { throw 'no ERAVOS-Setup exe was made' }
       - name: Test ERAVOS Update on the built app (it must put an update in place and keep your folders)
         shell: powershell
         run: powershell -NoProfile -ExecutionPolicy Bypass -File packaging/windows/test-update.ps1
       - name: Attach to the release
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/ERAVOS_*.zip
+          tag_name: v${{ steps.ver.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          name: ERAVOS ${{ steps.ver.outputs.version }}
+          files: |
+            dist/ERAVOS-Setup-*.exe
+            dist/ERAVOS_*.zip
+          fail_on_unmatched_files: true
           generate_release_notes: true
       - name: Keep the build (a run by hand)
-        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') && !inputs.release }}
         uses: actions/upload-artifact@v4
         with:
           name: ERAVOS-windows
-          path: dist/ERAVOS_*.zip
+          path: |
+            dist/ERAVOS-Setup-*.exe
+            dist/ERAVOS_*.zip

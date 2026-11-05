@@ -14,9 +14,9 @@ OrganismFactory.reg('eravos.acid-synth', function (view) {
   tgt.select.addEventListener('pointerdown', refresh); refresh();
   const g = { density: 0.65, accentRate: 0.3, slideRate: 0.2, range: 1, seed: 303 };
   const kn = (k, label, min, max, step) => UI.Knob({ label, min, max, step, value: g[k], default: g[k], size: 30, accent: '#00ff88', onChange: (v) => { g[k] = v; } }).el;
-  const seedN = UI.NumberDrag({ min: 1, max: 99999, step: 1, value: g.seed, label: 'seed', prefix: '🎲 ', onChange: (v) => { g.seed = v; } });
+  const seedN = UI.NumberDrag({ min: 1, max: 99999, step: 1, value: g.seed, label: 'seed', prefix: '', onChange: (v) => { g.seed = v; } });
   const gen = UI.Button({ label: 'GENERATE', kind: 'primary', hint: 'writes an in-key acid line into the chosen sequencer', onClick: () => { refresh(); const t = tgt.select.value; if (!t) { window.Shell && Shell.toast('Add a Sequencer first — the line is written into it.', 'bad'); return; } view.emit('generate', Object.assign({ target: t, track: 'acid', length: 16 }, g)); } });
-  const dice = UI.Button({ label: '🎲', hint: 'new random seed', onClick: () => { g.seed = Math.floor(Math.random() * 99999) + 1; seedN.set(g.seed); gen.el.click(); } });
+  const dice = UI.Button({ label: 'Reseed', hint: 'new random seed', onClick: () => { g.seed = Math.floor(Math.random() * 99999) + 1; seedN.set(g.seed); gen.el.click(); } });
   const preview = h('div', { style: { display: 'flex', gap: '2px', height: '24px', alignItems: 'flex-end' } });
   view.on('generated', (r) => { preview.innerHTML = ''; r.steps.forEach(s => preview.appendChild(h('div', { style: { flex: 1, height: s.on ? (20 + s.degree * 8) + '%' : '6%', background: s.on ? (s.accent ? '#ffdd00' : '#00ff88') : '#1a2533', borderRight: s.slide ? '3px solid #00d4ff' : '' } }))); });
   const genBox = h('div', { class: 'uk-group' }, [h('div', { class: 'uk-group-title', text: 'LINE GENERATOR — always in key' }), h('div', { class: 'org-row' }, [kn('density', 'Density', 0, 1, 0.01), kn('accentRate', 'Accents', 0, 1, 0.01), kn('slideRate', 'Slides', 0, 1, 0.01), kn('range', 'Octaves', 1, 3, 1), tgt.el]), h('div', { class: 'org-row' }, [gen.el, dice.el, seedN.el]), preview]);

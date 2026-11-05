@@ -1,0 +1,35 @@
+# spec_id: eravos.harmony-architect · version 0.1.0 · status planned:chord-assistant.spec; extends:chord-gen · template eravos.tool/1
+# generated from eravos.music-ecosystem.spec v0.2.0 §4 (musical_intelligence) — that file stays the index; this file is the tool's own spec
+identity:
+  id: eravos.harmony-architect ; label: Harmony Architect ; domain: music ; family: musical_intelligence
+  lineage: functional, modal and jazz harmony; the chord pads of trance, house and cinematic music
+  family_from: harmony, voice leading and counterpoint traditions; arpeggiators; generative composition
+assembles (components, tools/music/components/<id>/ — never re-implemented here):
+  chord-engine · voice-leader · scale-key · tension-meter · pattern-store
+adds (behaviour only this tool has):
+  - progressions as editable chord clips
+  - modal interchange and secondary dominants on request
+  - tension-to-resolution target per bar
+modes: progression · voicing · reharmonise
+engines_0_1_0 (the original list, kept verbatim; each is covered by the components above or by adds):
+  chord-generation · voice-leading · modal-interchange · harmonic-tension · harmonic-resolution
+ports: TO WRITE in the depth audit — typed in/out per §5 tool_contract; every assembled component reachable by wiring (Open as components)
+params: TO WRITE in the depth audit — every component control exposed, full range (eravos.tool-depth.spec), each a modulation destination
+packs (names unique across the ecosystem; ≥ 6 presets each; novelty test §6):
+  - Dream Pop — major 7ths, add9s, gentle movement
+  - Dark Cinematic — minor modes, pedal tones, sudden majors
+  - Jazz Fusion — extended chords, tritone subs
+  - Emotional Trance — minor-key uplifting progressions
+  - Dissonant Techno — cluster chords and stabs
+  - Neo-Classical — voice-led classical progressions
+  - Suspended Harmony — sus chords that never quite resolve
+  - Deep House — minor 9ths and 11ths, soft
+acceptance:
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - open-as-components: the wired components render the same as the tool (≤ −60 dB difference)
+  - novelty: every preset's nearest neighbour in this tool ≥ 0.15, pack centroids ≥ 0.25 apart (§6)
+  - p42 audio survey: timing to the sample, pitch to the cent, never over full scale
+  - cpu per instance and per voice measured (build/perf.mjs) and inside §8 budgets
+  - depth audit written above; open gaps listed, none hidden
+
+# dependencies: run node build/planned-deps.mjs once the hooks line is written (generated block, not by hand)

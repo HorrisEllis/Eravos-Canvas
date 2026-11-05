@@ -68,12 +68,7 @@
         if (off !== Infinity) { amp.gain.setValueAtTime(peak(vel), off); amp.gain.setTargetAtTime(0, off, P.get('release') / 4); }
         ctx.lastNote = { note, f, t };
       }
-      function noteOff(note, t) {
-        if (!held || held.note !== note) return;
-        t = Math.max(t || ac.currentTime, ac.currentTime);
-        if (typeof amp.gain.cancelAndHoldAtTime === 'function') amp.gain.cancelAndHoldAtTime(t); else amp.gain.cancelScheduledValues(t);
-        amp.gain.setTargetAtTime(0, t, P.get('release') / 4); held.off = t;
-      }
+      function noteOff(note, t) { MusicParts.releaseHeld(ac, amp.gain, held, note, t, P.get('release')); }   // the shared part (components/note-release)
       const play = (p) => noteOn(p.note, p.velocity, typeof p.time === 'number' ? p.time : ac.currentTime, { duration: p.duration, slide: p.slide });
       ['octave', 'transpose'].forEach(k => P.onChange(k, () => { if (held && held.off > ac.currentTime) { hz.offset.cancelScheduledValues(ac.currentTime); hz.offset.setValueAtTime(curF, ac.currentTime); curF = noteHz(held.note); hz.offset.exponentialRampToValueAtTime(curF, ac.currentTime + 0.03); } }));   // retune a held note live
       ctx.onNote(play);

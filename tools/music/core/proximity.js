@@ -42,13 +42,16 @@
     step, placeOf, FLOOR,
   };
   global.Proximity = Proximity;
-  // ⋯ Options: one switch
-  let btn = null; const say = () => { if (btn) btn.textContent = '🎧 Hear by place: ' + (on ? 'on' : 'off'); };
+  // 3.110 a section of ⚙ Settings: Sound (it was a switch in the ⋯ Options dropdown)
+  let btn = null; const say = () => { if (btn && btn.set) btn.set(on); };
   function optionButton() {
-    const slot = doc.getElementById('slot-options'); if (!slot) return false; if (doc.getElementById('placeBtn')) return true;
-    btn = doc.createElement('button'); btn.className = 'tb-btn'; btn.id = 'placeBtn'; btn.type = 'button';
-    btn.title = 'Hear by place — a tool is as loud as its window is near the middle of your view, and pans with where it sits; zooming out makes everything quieter. Effects follow what feeds them.';
-    btn.onclick = () => Proximity.set(!on); say(); slot.appendChild(btn); return true;
+    if (!global.AppSettings || !global.UIKit) return false; if (optionButton.done) return true; optionButton.done = true;
+    global.AppSettings.addSection({ id: 'sound', label: 'Sound', order: 30, make: () => {
+      const UI = global.UIKit, h = UI.h;
+      btn = UI.Toggle({ label: 'Hear by place', value: on, hint: 'a tool is as loud as its window is near the middle of your view', onChange: (v) => Proximity.set(v) });
+      return h('div', { class: 'as-card' }, [h('div', { class: 'as-row' }, [btn.el, h('p', { class: 'as-say', text: 'A tool is as loud as its window is near the middle of your view, and pans with where it sits; zooming out makes everything quieter. Effects follow what feeds them. Off: every tool at its own level.' })])]);
+    } });
+    return true;
   }
   const boot = () => { if (global.Kernel && global.Kernel.audio && global.Kernel.audio.ctx !== undefined) Proximity.init(global.Kernel); if (!optionButton() || !K) setTimeout(boot, 500); };
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', boot); else boot();

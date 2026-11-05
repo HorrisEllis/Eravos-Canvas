@@ -368,4 +368,12 @@
     prepare(K) { if (K.audio) K.audio.boot(); },
     shell(S) { shell(S); },
   });
+  // 3.101 a tool page's "In / out" in music's words (the page itself is domain-free)
+  if (global.ToolPage && global.ToolPage.ioWords) global.ToolPage.ioWords({
+    kinds: { audio: 'audio', event_bus: 'notes & events', modulation: 'modulation', control: 'control', data: 'data', midi: 'MIDI' },
+    named: { out: 'Sound out', audio_out: 'Sound out', in: 'Sound in', audio_in: 'Sound in', note_in: 'Notes', midi_in: 'MIDI', theory_in: 'Key and scale',
+      transport_in: 'Transport', note_out: 'Notes out', control_out: 'Control out', data_out: 'Data out', data_in: 'Data in' },
+    upper: ['fm', 'lfo', 'am', 'bpm'],
+    quiet: ['audio signal out', 'play notes', 'play midi', 'follow'],   // intents that only repeat the name: not shown under it
+  });
 })(typeof window !== 'undefined' ? window : globalThis);

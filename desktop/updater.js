@@ -1,4 +1,4 @@
-/* ERAVOS desktop — updater.js (3.99, rebuilt 3.101). Asked: "an update service to check GitHub for updates with a toast asking to
+/* ERAVOS desktop — updater.js (3.99, rebuilt 3.111). Asked: "an update service to check GitHub for updates with a toast asking to
  * update it" · then "It needs to run in the background? Like maybe an update tool. It closes the canvas and then doesn't apply the update".
  * What went wrong before (3.99): it closed ERAVOS first and then did everything in a hidden script that only waited for the main process
  * — Electron's helper processes keep the files locked a moment longer, the script stopped half way, nothing restarted, nothing was logged.
@@ -9,7 +9,8 @@
  *   apply     ERAVOS Update (desktop/apply-update.ps1), its own process: waits for EVERY ERAVOS process from this folder to close,
  *             backs up the app, copies the new files (retrying locked ones), restores the backup on any failure, logs, restarts ERAVOS
  *   report    at the next start: update-result.json → 'applied' or 'failed' (with the log)
- * Never in the project folder itself (a git checkout updates with git).
+ * Installed by ERAVOS-Setup (Program Files): the update is the new Setup, downloaded in the background, run silently by ERAVOS Update
+ * (Windows asks for admin once). Never in the project folder itself (a git checkout updates with git).
  *   create({ app, net, shell, appDir, workDir, send }) → { start, check(manual), download(), apply(), onQuit(), status } */
 'use strict';
 const path = require('path'), fs = require('fs'), { spawn } = require('child_process');
@@ -36,14 +37,20 @@ function create(o) {
   let latest = null, timer = null, state = 'idle', staged = null, applyOnQuit = false, busy = null;
   const tell = (m) => { state = m.state || state; try { send(m); } catch (e) {} };
   const canApply = () => process.platform === 'win32' && fs.existsSync(path.join(appDir, 'ERAVOS.exe')) && !fs.existsSync(path.join(appDir, '.git'));
+  // installed by ERAVOS-Setup (Program Files — "Uninstall ERAVOS.exe" beside ERAVOS.exe): the update is the new Setup, run silently;
+  // a portable copy: the zip, unpacked and copied in. Either way ERAVOS Update needs admin where ERAVOS cannot write (Program Files).
+  const viaSetup = () => fs.existsSync(path.join(appDir, 'Uninstall ERAVOS.exe'));
+  const canWrite = () => { try { const t = path.join(appDir, '.update-test'); fs.writeFileSync(t, ''); fs.unlinkSync(t); return true; } catch (e) { return false; } };
 
   async function check(manual) {
     try {
       const r = await net.fetch(API, { headers: Object.assign({ Accept: 'application/vnd.github+json' }, UA) });
       if (!r.ok) { if (manual) tell({ state: 'error', message: r.status === 404 ? 'no release is published yet' : 'GitHub said ' + r.status }); return null; }
       const rel = await r.json(), version = String(rel.tag_name || '').replace(/^v/i, '');
-      const asset = (rel.assets || []).find(a => /^ERAVOS_.*\.zip$/i.test(a.name));
-      latest = { version, current: app.getVersion(), name: rel.name || ('ERAVOS ' + version), notes: String(rel.body || '').slice(0, 1200), page: rel.html_url, zip: asset ? asset.browser_download_url : null, size: asset ? asset.size : 0, canInstall: canApply() && !!asset };
+      const asset = (rel.assets || []).find(a => /^ERAVOS_.*\.zip$/i.test(a.name)), setup = (rel.assets || []).find(a => /^ERAVOS-Setup-.*\.exe$/i.test(a.name));
+      latest = { version, current: app.getVersion(), name: rel.name || ('ERAVOS ' + version), notes: String(rel.body || '').slice(0, 1200), page: rel.html_url,
+        zip: asset ? asset.browser_download_url : null, size: asset ? asset.size : 0, setup: setup ? setup.browser_download_url : null, setupSize: setup ? setup.size : 0 };
+      latest.canInstall = canApply() && (viaSetup() ? !!latest.setup : !!latest.zip);
       if (newer(version, app.getVersion())) { if (state === 'ready' && staged) tell(Object.assign({ state: 'ready' }, latest)); else tell(Object.assign({ state: 'available', manual: !!manual }, latest)); return latest; }
       if (manual) tell({ state: 'current', version: app.getVersion() });
       return null;
@@ -59,10 +66,11 @@ function create(o) {
         if (!latest || !newer(latest.version, app.getVersion())) return false;
         if (!latest.canInstall) { shell.openExternal(latest.page); return false; }
         fs.mkdirSync(work, { recursive: true });
-        const zip = path.join(work, `ERAVOS_${latest.version}.zip`), part = zip + '.part', into = path.join(work, 'staged-' + latest.version);
+        const setup = viaSetup(), url = setup ? latest.setup : latest.zip, size = setup ? latest.setupSize : latest.size;
+        const zip = path.join(work, setup ? `ERAVOS-Setup-${latest.version}.exe` : `ERAVOS_${latest.version}.zip`), part = zip + '.part', into = path.join(work, 'staged-' + latest.version);
         if (!fs.existsSync(zip)) {
-          const r = await net.fetch(latest.zip, { headers: UA }); if (!r.ok || !r.body) throw new Error('download: GitHub said ' + r.status);
-          const total = +r.headers.get('content-length') || latest.size || 0, out = fs.createWriteStream(part), rd = r.body.getReader();
+          const r = await net.fetch(url, { headers: UA }); if (!r.ok || !r.body) throw new Error('download: GitHub said ' + r.status);
+          const total = +r.headers.get('content-length') || size || 0, out = fs.createWriteStream(part), rd = r.body.getReader();
           let got = 0, lastTold = 0;
           for (;;) { const { done, value } = await rd.read(); if (done) break; got += value.length; if (!out.write(Buffer.from(value))) await new Promise(res => out.once('drain', res));
             const now = Date.now(); if (now - lastTold > 400) { lastTold = now; tell({ state: 'downloading', version: latest.version, got, total }); } }
@@ -70,6 +78,7 @@ function create(o) {
           if (total && got !== total) throw new Error(`download stopped at ${got} of ${total} bytes`);
           fs.renameSync(part, zip);
         }
+        if (setup) { staged = { setup: zip, version: latest.version }; tell(Object.assign({ state: 'ready' }, latest)); return true; }   // the Setup unpacks itself
         tell({ state: 'unpacking', version: latest.version });
         if (fs.existsSync(into)) fs.rmSync(into, { recursive: true, force: true });
         const lit = (s) => "'" + s.replace(/'/g, "''") + "'";
@@ -83,28 +92,33 @@ function create(o) {
     return busy;
   }
 
-  // hand over to ERAVOS Update (its own process), then close; it starts ERAVOS again when it is done
-  function apply() {
-    if (!staged) return false;
+  // ERAVOS Update, its own process; Windows asks for admin once where ERAVOS cannot write its own folder (Program Files)
+  function launch(st) {
     const script = path.join(__dirname, 'apply-update.ps1'); if (!fs.existsSync(script)) { tell({ state: 'error', message: 'ERAVOS Update (apply-update.ps1) is missing from this build' }); return false; }
     try { fs.rmSync(RESULT, { force: true }); } catch (e) {}
-    const p = spawn('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden', '-File', script, '-Staged', staged.root, '-Dest', appDir, '-Version', staged.version, '-Work', work],
-      { detached: true, stdio: 'ignore', windowsHide: true });
-    p.unref(); staged = null; applyOnQuit = false;
+    const args = ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden', '-File', script, '-Dest', appDir, '-Version', st.version, '-Work', work].concat(st.setup ? ['-Setup', st.setup] : ['-Staged', st.root]);
+    const q = (a) => String(a).replace(/'/g, "''");
+    if (st.setup || !canWrite()) spawn('powershell.exe', ['-NoProfile', '-WindowStyle', 'Hidden', '-Command', `Start-Process powershell.exe -Verb RunAs -WindowStyle Hidden -ArgumentList '${args.map(a => `"${q(a)}"`).join(' ')}'`], { detached: true, stdio: 'ignore', windowsHide: true }).unref();
+    else spawn('powershell.exe', args, { detached: true, stdio: 'ignore', windowsHide: true }).unref();
+    return true;
+  }
+  // Restart now: hand over, then close; ERAVOS Update starts ERAVOS again when it is done
+  function apply() {
+    if (!staged || !launch(staged)) return false;
+    staged = null; applyOnQuit = false;
     tell({ state: 'restarting', version: latest && latest.version });
     setTimeout(() => app.quit(), 300);
     return true;
   }
   function later() { if (staged) { applyOnQuit = true; tell({ state: 'on-close', version: staged.version }); } return applyOnQuit; }
   // ERAVOS is closing with an update waiting to go in
-  function onQuit() { if (applyOnQuit && staged) { const s = staged; applyOnQuit = false; try { fs.rmSync(RESULT, { force: true }); } catch (e) {}
-    spawn('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden', '-File', path.join(__dirname, 'apply-update.ps1'), '-Staged', s.root, '-Dest', appDir, '-Version', s.version, '-Work', work], { detached: true, stdio: 'ignore', windowsHide: true }).unref(); } }
+  function onQuit() { if (applyOnQuit && staged) { const s = staged; applyOnQuit = false; staged = null; launch(s); } }
 
   // what the last update did (read once, at start)
   function report() {
     try { if (!fs.existsSync(RESULT)) return null; const r = JSON.parse(fs.readFileSync(RESULT, 'utf8').replace(/^﻿/, '')); fs.rmSync(RESULT, { force: true });
       // tidy: the zip and unpacked copy of a version now running are no longer needed
-      if (r.ok) fs.readdirSync(work).filter(n => /^(ERAVOS_.*\.zip|staged-.*|backup)$/.test(n)).forEach(n => { try { fs.rmSync(path.join(work, n), { recursive: true, force: true }); } catch (e) {} });
+      if (r.ok) fs.readdirSync(work).filter(n => /^(ERAVOS_.*\.zip|ERAVOS-Setup-.*\.exe|staged-.*|backup)$/.test(n)).forEach(n => { try { fs.rmSync(path.join(work, n), { recursive: true, force: true }); } catch (e) {} });
       return Object.assign({ state: r.ok && app.getVersion() === r.version ? 'applied' : 'failed' }, r);
     } catch (e) { return null; }
   }

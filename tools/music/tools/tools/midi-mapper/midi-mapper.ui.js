@@ -3,7 +3,7 @@
 OrganismFactory.reg('eravos.midi-mapper', function (view) {
   const UI = view.ui, h = UI.h, cfg = (k) => view.descriptor.config.find(c => c.key === k);
   let st = {};
-  const status = h('div', { class: 'mm-status', style: { padding: '6px 8px', borderRadius: '4px', background: '#10161f', color: '#9fb3c8', fontSize: '12px', minHeight: '18px' } });
+  const status = h('div', { class: 'mm-status', style: { padding: '6px 8px', borderRadius: '4px', background: 'var(--bg2)', color: 'var(--dim)', fontSize: '12px', minHeight: '18px' } });
   const setStatus = (s) => {
     status.innerHTML = '';
     status.appendChild(h('div', { style: { fontWeight: s.error || s.warn ? '600' : '400' }, text: s.error || s.warn || s.info || '' }));
@@ -23,7 +23,7 @@ OrganismFactory.reg('eravos.midi-mapper', function (view) {
   const cells = [];
   for (let r = 3; r >= 0; r--) for (let c = 0; c < 4; c++) { // pad 1 bottom-left, like the hardware
     const i = r * 4 + c;
-    const cell = h('div', { title: 'click to test pad ' + (i + 1), style: { aspectRatio: '1', borderRadius: '6px', background: '#1a2230', border: '2px solid #26324a', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', userSelect: 'none', transition: 'background 90ms' } }, [
+    const cell = h('div', { title: 'click to test pad ' + (i + 1), style: { aspectRatio: '1', borderRadius: '6px', background: 'var(--panel2)', border: '2px solid var(--line2)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', userSelect: 'none', transition: 'background 90ms' } }, [
       h('div', { text: String(i + 1), style: { fontWeight: '700', fontSize: '15px', color: '#dfe8f2' } }),
       h('div', { class: 'mm-note', text: '', style: { fontSize: '9px', color: '#7f93a8', fontFamily: 'monospace' } }),
       h('div', { class: 'mm-role', text: '', style: { fontSize: '10px', color: '#9fe8ff', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }),
@@ -40,11 +40,11 @@ OrganismFactory.reg('eravos.midi-mapper', function (view) {
       const r = roles[i]; c.querySelector('.mm-role').textContent = labels[i] || ''; c.querySelector('.mm-role').style.color = !r ? '#7f93a8' : r.kind === 'action' ? '#ffd166' : r.kind === 'drum' ? '#ff9a4d' : '#9fe8ff';
       const learning = st.padLearn === i;
       c.style.border = editing && editPad === i ? '2px solid #9fe8ff' : learning ? '2px solid #ffaa00' : n ? (st.learnedPads ? '2px solid #ff6b00' : '2px dashed #ff6b00') : '2px solid #26324a';
-      c.style.background = learning ? '#3a2a00' : '#1a2230';
+      c.style.background = learning ? '#3a2a00' : 'var(--panel2)';
       c.style.boxShadow = learning ? '0 0 12px #ffaa00' : 'none';
     });
   }
-  const learnPadsB = UI.Button({ label: '① Learn pads', kind: 'primary', hint: 'then hit pads 1 → 16 on your controller, one at a time', onClick: () => view.emit('learn_pads', {}) });
+  const learnPadsB = UI.Button({ label: '① Learn pads', hint: 'then hit pads 1 → 16 on your controller, one at a time', onClick: () => view.emit('learn_pads', {}) });
   const cancelB = UI.Button({ label: 'Stop learning', onClick: () => view.emit('learn_cancel', {}) });
   const factoryB = UI.Button({ label: 'Factory map', hint: 'forget learned pads; use the controller’s factory notes', onClick: () => view.emit('pads_factory', {}) });
   const tgtSel = UI.Select({ label: 'Pads play', options: [{ value: 'auto', label: 'Auto' }], onChange: (v) => view.emit('config_change', { key: 'padTarget', value: v }) });
@@ -56,7 +56,7 @@ OrganismFactory.reg('eravos.midi-mapper', function (view) {
   const octCtl = UI.paramControl(view, cfg('padOctave')), chordCtl = UI.paramControl(view, cfg('chordType'), { segMax: 1 }), lenCtl = UI.paramControl(view, cfg('noteLength'), { size: 26 });
   let editing = false, editPad = 0;
   const editB = UI.Button({ label: '✎ Edit pads', hint: 'click a pad in the grid, then choose what it does', onClick: () => { editing = !editing; editB.set(editing ? '✓ Done editing' : '✎ Edit pads'); editor.style.display = editing ? '' : 'none'; paint(); paintEditor(); } });
-  const editor = h('div', { class: 'org-row', style: { display: 'none', flexWrap: 'wrap', gap: '6px', alignItems: 'center', padding: '6px', border: '1px solid #26324a', borderRadius: '6px', background: '#0d131c' } });
+  const editor = h('div', { class: 'org-row', style: { display: 'none', flexWrap: 'wrap', gap: '6px', alignItems: 'center', padding: '6px', border: '1px solid var(--line2)', borderRadius: '6px', background: 'var(--bg2)' } });
   const KINDS = [{ value: 'default', label: 'Drum (pad tool)' }, { value: 'drum', label: 'Drum on…' }, { value: 'note', label: 'Note in key' }, { value: 'chord', label: 'Chord in key' }, { value: 'action', label: 'Action' }];
   function paintEditor() {
     editor.innerHTML = ''; if (!editing) return;
@@ -77,7 +77,7 @@ OrganismFactory.reg('eravos.midi-mapper', function (view) {
   }
 
   // --- mappings
-  const learnMapB = UI.Button({ label: '② LEARN a knob', kind: 'primary', hint: 'move a knob/fader on your controller, then touch the ERAVOS knob it should control', onClick: () => view.emit('learn_map', {}) });
+  const learnMapB = UI.Button({ label: '② LEARN a knob', hint: 'move a knob/fader on your controller, then touch the ERAVOS knob it should control', onClick: () => view.emit('learn_map', {}) });
   const bankCtl = UI.paramControl(view, cfg('bank'));
   const table = h('div', { style: { display: 'flex', flexDirection: 'column', gap: '3px', maxHeight: '130px', overflowY: 'auto' } });
   function paintMaps() {

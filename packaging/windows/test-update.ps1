@@ -1,4 +1,4 @@
-# Tests ERAVOS Update (desktop\apply-update.ps1) on Windows (3.101) - run by the release workflow after the build.
+# Tests ERAVOS Update (desktop\apply-update.ps1) on Windows (3.111) - run by the release workflow after the build.
 # An "installed" copy of the built app (with your folders in it and an old marker file) is updated from the freshly built one:
 # the new files must be in place, your folders untouched, the result file must say ok, and it must start ERAVOS.
 $ErrorActionPreference = 'Stop'

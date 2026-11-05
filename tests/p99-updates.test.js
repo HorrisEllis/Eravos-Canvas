@@ -10,7 +10,7 @@ describe('P99 · an update is out: the toast asks', () => {
       const btns = Array.from(card.querySelectorAll('button')).map(b => b.textContent); assert.deepEqual(btns, ['Update', 'What’s new', 'Later']);
       Array.from(card.querySelectorAll('button')).find(b => b.textContent === 'Later').click();
       assert.ok(!card.isConnected, 'Later closes it'); assert.equal(localStorage.getItem('eravos.update.skip'), '9.9.9', 'and that version is not asked again');
-      // 3.101 in the background: Update downloads (ERAVOS stays open), the card follows it, then Restart now / When I close ERAVOS
+      // 3.111 in the background: Update downloads (ERAVOS stays open), the card follows it, then Restart now / When I close ERAVOS
       const calls = []; window.eravosDesktop = { downloadUpdate: async () => { calls.push('download'); return true; }, applyUpdate: async () => { calls.push('apply'); return true; }, updateLater: async () => { calls.push('later'); return true; } };
       const c2 = Updates.show({ version: '9.9.10', current: '0.1.0' }); c2.querySelector('button').click(); await TH.sleep(0);
       assert.deepEqual(calls, ['download'], 'Update starts the download, nothing closes');
@@ -24,5 +24,8 @@ describe('P99 · an update is out: the toast asks', () => {
       Updates.close();
     } finally { window.eravosDesktop = was; localStorage.removeItem('eravos.update.skip'); }
   });
-  it('⋯ Options carries Check for updates', () => { if (!document.getElementById('slot-options')) return; assert.ok(document.getElementById('updBtn')); });
+  it('⚙ Settings → About & updates carries Check for updates', async () => {
+    AppSettings.open('about'); await TH.sleep(30);
+    try { const sec = document.querySelector('.as-sec[data-sec="about"]'); assert.ok(sec); assert.ok([...sec.querySelectorAll('button')].some(b => /Check for updates/.test(b.textContent))); } finally { AppSettings.close(); }
+  });
 });

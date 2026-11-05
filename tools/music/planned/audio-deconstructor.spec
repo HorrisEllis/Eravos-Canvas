@@ -1,0 +1,34 @@
+# spec_id: eravos.audio-deconstructor · version 0.1.0 · status planned:stem-split.spec · template eravos.tool/1
+# generated from eravos.music-ecosystem.spec v0.2.0 §4 (sampling_and_reconstruction) — that file stays the index; this file is the tool's own spec
+identity:
+  id: eravos.audio-deconstructor ; label: Audio Deconstructor ; domain: music ; family: sampling_and_reconstruction
+  lineage: stem separation and music information retrieval
+  family_from: samplers (1980s on), hip-hop sampling, resynthesis research, stem separation
+assembles (components, tools/music/components/<id>/ — never re-implemented here):
+  source-separator · beat-tracker · key-detector · chord-recognizer · pitch-tracker · spectral-features · structure-segmenter · modulation-estimator
+adds (behaviour only this tool has):
+  - production hypothesis report: tempo, key, sections, likely bass technique — each with confidence
+  - never claims exact reconstruction (§14)
+  - results stay with the user's file
+modes: stems · analysis · hypothesis
+engines_0_1_0 (the original list, kept verbatim; each is covered by the components above or by adds):
+  source-separation · rhythm-analysis · pitch-analysis · spectral-analysis · arrangement-analysis · production-hypothesis
+ports: TO WRITE in the depth audit — typed in/out per §5 tool_contract; every assembled component reachable by wiring (Open as components)
+params: TO WRITE in the depth audit — every component control exposed, full range (eravos.tool-depth.spec), each a modulation destination
+packs (names unique across the ecosystem; ≥ 6 presets each; novelty test §6):
+  - Dubstep Breakdown — analysis presets tuned for 140 half-time
+  - Synthwave Breakdown — tuned for 80s-style arrangements
+  - Techno Breakdown — loop-based structure analysis
+  - DnB Breakdown — 174 and break analysis
+  - Ambient Breakdown — texture and slow change
+  - House Breakdown — four-on-the-floor sections
+  - Cinematic Breakdown — dynamic range and orchestration
+acceptance:
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - open-as-components: the wired components render the same as the tool (≤ −60 dB difference)
+  - novelty: every preset's nearest neighbour in this tool ≥ 0.15, pack centroids ≥ 0.25 apart (§6)
+  - p42 audio survey: timing to the sample, pitch to the cent, never over full scale
+  - cpu per instance and per voice measured (build/perf.mjs) and inside §8 budgets
+  - depth audit written above; open gaps listed, none hidden
+
+# dependencies: run node build/planned-deps.mjs once the hooks line is written (generated block, not by hand)

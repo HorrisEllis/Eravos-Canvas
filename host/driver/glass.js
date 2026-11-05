@@ -33,6 +33,8 @@
  *   pg.locator(sel).{count,isVisible,isHidden,textContent,innerText,click,fill,…}  pg.screenshot({path,fullPage})  pg.close()
  *   pg.route(glob|RegExp|fn, (route) => route.fulfill({status,contentType,body}) | route.continue())
  *   pg.exposeFunction(name, fn)  pg.waitForLoadState()  pg.innerText(sel)  pg.textContent(sel)
+ * App mode (packaged Electron app, e.g. ERAVOS.exe): electron.launch({ executablePath, args, env }) → app.firstWindow() → a page
+ * as above · app.close(). pg.on('dialog', d => d.accept()) answers alert/confirm/prompt (unanswered ones are dismissed).
  * Selectors: CSS, plus `text=foo` (case-insensitive, the innermost element holding it),
  * `:has-text("foo")` on any compound, and `a >> b` chaining, as in Playwright.
  */
@@ -61,6 +63,8 @@ function electronBinary() {
 function chromiumBinary() {
   for (const v of ['GLASS_CHROMIUM', 'PW_CHROMIUM', 'PLAYWRIGHT_CHROMIUM']) if (process.env[v] && fs.existsSync(process.env[v])) return process.env[v];
   const cands = ['/usr/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'];
+  for (const base of [process.env['ProgramFiles(x86)'], process.env.ProgramFiles, process.env.LOCALAPPDATA]) if (base) cands.push(path.join(base, 'Microsoft', 'Edge', 'Application', 'msedge.exe'), path.join(base, 'Google', 'Chrome', 'Application', 'chrome.exe'));   // Windows: Edge ships with it
+  cands.push('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge');
   try { for (const d of fs.readdirSync('/opt/pw-browsers')) if (/^chromium-\d+$/.test(d)) cands.unshift(path.join('/opt/pw-browsers', d, 'chrome-linux', 'chrome')); } catch (_) {}
   return cands.find(c => fs.existsSync(c)) || null;
 }
@@ -116,11 +120,13 @@ function glassTransport(bin, extra) {
   };
 }
 
-function chromiumTransport(bin, extra) {
+function chromiumTransport(bin, extra, app) {
   const events = new EventEmitter();
   // (os: required at the top since 0.60.158)
-  const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'glass-chromium-'));
-  const child = spawn(bin, ['--headless=new', '--no-sandbox', '--disable-gpu', '--remote-debugging-port=0', `--user-data-dir=${profile}`, ...(extra || []), 'about:blank'], { stdio: ['ignore', 'ignore', 'pipe'] });
+  // app mode (electron.launch): the app itself — its own windows, profile and environment — with a DevTools port to drive it
+  const profile = app ? null : fs.mkdtempSync(path.join(os.tmpdir(), 'glass-chromium-'));
+  const argv = app ? ['--remote-debugging-port=0', ...(extra || [])] : ['--headless=new', '--no-sandbox', '--disable-gpu', '--remote-debugging-port=0', `--user-data-dir=${profile}`, ...(extra || []), 'about:blank'];
+  const child = spawn(bin, argv, { stdio: ['ignore', 'ignore', 'pipe'], env: (app && app.env) || process.env });
   let ws, seq = 0; const pending = new Map(); const sessions = new Map();
   const ready = new Promise((resolve, reject) => {
     let err = '';
@@ -137,8 +143,9 @@ function chromiumTransport(bin, extra) {
         };
       }
     });
-    child.on('exit', (code) => reject(new Error(`chromium exited (${code}): ${err.slice(-400)}`)));
+    child.on('exit', (code) => { exited = true; reject(new Error(`chromium exited (${code}): ${err.slice(-400)}`)); });
   });
+  let exited = false;
   const raw = (method, params = {}, sessionId) => new Promise((resolve, reject) => { const id = ++seq; pending.set(id, { resolve, reject }); ws.send(JSON.stringify({ id, method, params, ...(sessionId ? { sessionId } : {}) })); });
   const pageSession = new Map();
   return {
@@ -156,7 +163,21 @@ function chromiumTransport(bin, extra) {
     },
     send: (page, method, params) => method === 'Glass.setSize' ? Promise.resolve({}) : raw(method, params, pageSession.get(page)),
     close: (page) => raw('Target.closeTarget', { targetId: page }).catch(() => {}),
-    quit: async () => { try { await raw('Browser.close'); } catch (_) {} try { child.kill(); } catch (_) {} try { fs.rmSync(profile, { recursive: true, force: true }); } catch (_) {} },
+    // app mode: the app's own first window (waits for it to open)
+    first: async (timeout = 30000) => {
+      for (const t0 = Date.now(); Date.now() - t0 < timeout; await new Promise(r => setTimeout(r, 200))) {
+        const { targetInfos } = await raw('Target.getTargets'); const t = targetInfos.find(x => x.type === 'page' && !/^devtools:/.test(x.url)); if (!t) continue;
+        const { sessionId } = await raw('Target.attachToTarget', { targetId: t.targetId, flatten: true });
+        sessions.set(sessionId, t.targetId); pageSession.set(t.targetId, sessionId); return t.targetId;
+      }
+      throw new Error('the app opened no window in ' + timeout + ' ms');
+    },
+    quit: async () => {
+      try { await raw('Browser.close'); } catch (_) {}
+      if (app) await new Promise(r => { if (exited) return r(); child.once('exit', r); setTimeout(() => { try { child.kill(); } catch (_) {} r(); }, 5000).unref(); });
+      else try { child.kill(); } catch (_) {}
+      if (profile) try { fs.rmSync(profile, { recursive: true, force: true }); } catch (_) {}
+    },
   };
 }
 
@@ -218,12 +239,18 @@ class Page extends EventEmitter {
     await Promise.all([this._send('Page.enable'), this._send('Runtime.enable'), this._send('Network.enable'), this._send('Inspector.enable').catch(() => {})]);
     if (viewport) await this.setViewportSize(viewport);
   }
+  setDefaultTimeout(ms) { this._defaultTimeout = ms; }   // Playwright's name; the driver's waits take their own timeout, evaluate() has none
   async setViewportSize({ width, height }) {
     await this._send('Glass.setSize', { width, height });
     await this._send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: false });
   }
   _event(method, p) {
     if (method === 'Inspector.targetCrashed') this.emit('crash', this);
+    else if (method === 'Page.javascriptDialogOpening') {   // as Playwright: a listener answers it; with none it is dismissed
+      const answer = (accept, promptText) => this._send('Page.handleJavaScriptDialog', Object.assign({ accept }, promptText !== undefined ? { promptText } : {})).catch(() => {});
+      if (!this.listenerCount('dialog')) answer(false);
+      else this.emit('dialog', { type: () => p.type, message: () => p.message || '', defaultValue: () => p.defaultPrompt || '', accept: (t) => answer(true, t), dismiss: () => answer(false) });
+    }
     else if (method === 'Page.loadEventFired') { const w = this._loadWaiters; this._loadWaiters = []; w.forEach(f => f()); }
     else if (method === 'Runtime.exceptionThrown') {
       const d = p.exceptionDetails || {}; const ex = d.exception || {};
@@ -477,4 +504,17 @@ async function launch({ executablePath, args } = {}) {
 }
 
 const chromium = { launch };
-module.exports = { chromium, launch, engine, Browser, Page, PAGE_LIB };
+// app mode — drive a packaged Electron app (ERAVOS.exe, or electron + resources/app) as it really runs:
+//   const app = await electron.launch({ executablePath, args, env }); const pg = await app.firstWindow(); … await app.close();
+class App {
+  constructor(t) { this._t = t; this._page = null; }
+  async firstWindow({ timeout } = {}) { if (this._page) return this._page; const id = await this._t.first(timeout); const pg = new Page(this._t, id); await pg._init(null); return (this._page = pg); }
+  async close() { if (this._page) { this._t.events.off('event', this._page._onEvent); this._page._closed = true; } await this._t.quit(); }
+}
+const electron = {
+  async launch({ executablePath, args, env } = {}) {
+    if (!executablePath) throw new Error('electron.launch: executablePath (ERAVOS.exe, or the electron binary with the app folder in args)');
+    const t = chromiumTransport(executablePath, args, { env }); await t.ready; return new App(t);
+  },
+};
+module.exports = { chromium, electron, launch, engine, Browser, Page, App, PAGE_LIB };
