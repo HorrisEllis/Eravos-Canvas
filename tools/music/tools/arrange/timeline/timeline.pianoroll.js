@@ -789,7 +789,11 @@
     // the notes' menu (right-click with a selection)
     function noteMenu(x, y) {
       const CM = window.ContextMenu; if (!CM) return; const n = S.size;
+      const first = Array.from(S).sort((a, b) => a - b)[0];
       CM.show(x, y, [
+        // 3.116 the note editor (it opened only on a double-click): pitch, bend, oscillation and the instrument's knobs for this note
+        { label: '✎ Edit note…', hint: 'the note editor: pitch, length, velocity, bend, oscillation and the instrument’s own knobs for this note only (or double-click a note)', disabled: first === undefined, run: () => openEditor(first) },
+        { sep: true },
         { label: '⌒ Connect edges', hint: 'one note that glides through them — the edges meet, the pitch slides from each into the next', disabled: n < 2 || drums, run: () => connectEdges() },
         { label: '⟷ Close the gaps (legato)', hint: 'each note lasts until the next one starts (L)', disabled: n < 2, run: () => legato() },
         { section: 'curve' },
