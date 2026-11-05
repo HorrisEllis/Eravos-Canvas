@@ -78,11 +78,14 @@ let p = await page();
 const ids = await p.evaluate((F) => { const a = []; OrganismFactory.onDefine(d => { if (d.domain === 'music' && (!F || d.id.includes(F))) a.push(d.id); }); return a; }, FILTER);
 const rows = []; let seen = 0;
 if (RECORD) fs.mkdirSync(BASE, { recursive: true });
-const index = RECORD ? {} : (fs.existsSync(path.join(BASE, 'index.json')) ? JSON.parse(fs.readFileSync(path.join(BASE, 'index.json'), 'utf8')) : null);
+const prior = fs.existsSync(path.join(BASE, 'index.json')) ? JSON.parse(fs.readFileSync(path.join(BASE, 'index.json'), 'utf8')) : null;
+// recording one tool keeps every other tool's baseline (it used to start the index empty, so --record <tool> wiped the rest)
+const index = RECORD ? Object.assign({}, prior || {}) : prior;
 if (!RECORD && !index) { console.error('No baseline. On the code BEFORE your change: node tests/null-render.mjs --record'); process.exit(1); }
 
 for (const id of ids) {
   if (seen++ && seen % 5 === 0) { await p.close(); p = await page(); }   // fresh page: offline universes pile up
+  if (RECORD) Object.keys(index).forEach(k => { if (k.startsWith(id + '|')) delete index[k]; });   // this tool's old entries go; its new ones follow
   let names; try { names = await p.evaluate(presetsOf, id); } catch (e) { rows.push({ id, preset: '—', verdict: 'FAIL', note: 'error: ' + String(e.message).slice(0, 100) }); continue; }
   for (const name of names) {
     const row = { id, preset: name || '(default)' };
