@@ -69,19 +69,13 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 > "show the the ui before any tools get built. they should be consistent. also reactive … like i want them to be the same color and
 > change to the beat. just contirnue. start bottom up, then the highest leverage. use a dependancy graph"
+> Then: "i meant for the work one the next phases. hell no on that ui. i like what it is now."
 
-Dependency graph (bottom up; among steps that are ready, the one reaching most of ERAVOS first):
-```
-UI tokens ──┬─> UI kit ──────┐
-            └─> Beat colour ─┴─> HE APPROVES THE UI (gate) ─> 69 tools on the kit ─┬─> patterns per tool ─┐
-object + time model ─────────────────────────────────────────────────────────────┴─> songs as rhythm explorer │
-shared components (grit, FM, osc) ─> Wobble Bass open as components                share your music (pinned) <┘
-```
-1. UI tokens (one colour, type and spacing scale) · 2. UI kit (one button, segment, knob, toggle, label, window) · 3. Beat colour mode
-(one shared colour for everything, moving on the transport's beat: changes on beat / 2 beats / bar, snap or glide, flash amount,
-palettes) — **previewed for him, not built yet**: https://claude.ai/artifact/GZan48SdWz1bgzRconv359 · 4. **gate: he approves the UI;
-no tool is changed before** · 5. the 69 tools moved onto the kit, with their tests · 6. object + time model · 7. shared components ·
-8. patterns per tool, songs as a rhythm explorer · 9. share your music (pinned: "put a pin in it. i just want this made so i can share music").
+- **The UI stays as it is.** No restyle, no new kit. (A unified-kit preview was shown and rejected, 2026-11-05.)
+- **Every NEW tool's UI is shown to him before the tool is built** (a preview he approves), consistent with the tools as they are.
+- **Beat colour** goes into the existing reactive colours: every tool the same colour, changing on the beat.
+- **Next phases, bottom up, highest leverage first, from a dependency graph built from the specs**: `node build/eco-graph.mjs` →
+  `docs/eco-graph.md` (which components the planned tools stand on, how many each reaches, what is ready to build).
 
 ## Open (asked, not done)
 
