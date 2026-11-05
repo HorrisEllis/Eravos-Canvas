@@ -1,3 +1,17 @@
+ERAVOS v0.2.1 (2026-11-05)
+
+Install: ERAVOS-Setup-0.2.1.exe, or unzip ERAVOS_0.2.1.zip. On 0.2.0 or 0.1.0, ERAVOS offers this update by itself.
+
+Fixed
+- Reactive colours no longer creep: switching mode or turning them off now puts every colour back exactly (the white edge that built
+  up around tools over a session is gone).
+- Surfaces are darkened once, not again on every pass.
+
+New
+- Themes > Material: None (as before), Grain, Brushed or Carbon, a texture on the black panels with any theme.
+- Dice icons replaced with words (Reseed, Random, Tear, Another like it).
+- The Themes panel's Buttons row is styled like the rest of the panel.
+
 ERAVOS v0.2.0 (2026-11-05)
 
 Install: run ERAVOS-Setup-0.2.0.exe (Program Files, Start menu, Settings > Apps), or unzip ERAVOS_0.2.0.zip and run ERAVOS.exe.
