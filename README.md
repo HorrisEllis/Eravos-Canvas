@@ -52,9 +52,11 @@ from an address like `localhost`. Firefox in particular refuses MIDI for pages o
 - **Install:** double-click **Install ERAVOS**. It installs the newest release from GitHub for your Windows user (or the build that
   **Build ERAVOS.exe** made, if there is one) into `%LOCALAPPDATA%\Programs\ERAVOS`, and adds it to the Start menu, the desktop and
   Settings › Apps (with an uninstaller that asks before deleting your work).
-- **Updates:** ERAVOS checks GitHub at start and every 6 hours. When a newer release is out, a toast asks: **Update now** downloads it,
-  puts it in place and restarts (your projects, exports, drop, packs and settings stay), **What's new** opens the release, **Later**
-  doesn't ask again for that version. ⋯ Options › **Check for updates** asks now.
+- **Updates:** ERAVOS checks GitHub at start and every 6 hours. When a newer release is out, a card asks: **Update** downloads and
+  unpacks it in the background while you keep working; then **Restart now**, or **When I close ERAVOS** (it goes in by itself then).
+  **ERAVOS Update** (a small helper of its own) waits for every ERAVOS process to close, backs up the app, puts the new files in, puts
+  the backup back if anything fails, and starts ERAVOS again; the next start tells you how it went (the log is in
+  `.appdata\update\update.log`). Your projects, exports, drop, packs and settings are never touched. ⋯ Options › **Check for updates**.
 - **Publishing a release:** set `"version"` in `desktop/package.json` (e.g. `0.2.0`), then push the tag `v0.2.0`. The `release`
   workflow builds ERAVOS for Windows and attaches `ERAVOS_0.2.0.zip` to the release. That zip is what the installer and the updater fetch.
 
