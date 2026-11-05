@@ -1085,7 +1085,7 @@ window.ERAVOS_DATA.library = [
 "cat": "DRUMS",
 "s": "hat",
 "c": "#996633",
-"i": "🎲",
+"i": "≋",
 "bpm": 126,
 "key": "C",
 "genre": "Minimal",

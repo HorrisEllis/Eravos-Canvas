@@ -25,6 +25,9 @@ Read this first, then `PROGRESS.md` (the detailed log, newest first) and the spe
 
 ## Rules that hold
 
+- **Show him first, or add — never change the look over him** (2026-11-05: "always show me or add more themes before change"): a visual
+  change is shown to him (screenshots / a preview) before it merges, or it arrives as a new choice (a theme, a button style, a material)
+  with today's look as the default. Bug fixes that put a look back to what it was are not changes.
 - **Canvas and content stay separate** (2026-11-05: "i want to keep the canvas and content seperate"): `canvas/` is the host — windows,
   wires, kit, themes, reactive surfaces, tool pages — and names no tool, topic or domain word; `tools/<domain>/` is the content — tools,
   components, packs, suites, data, and the words a domain gives the canvas (e.g. ToolPage.ioWords). `tests/boundary.test.js` enforces it.
@@ -58,6 +61,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-05 | **Reactive colours no longer compound**: mode changes / switching off left each window's lit palette (the plug, --rcs-*) behind and the next lighting took it as its base; black-surface darkening was applied again on already-neutral colours. Both fixed; borders, outlines and shadows treated as surfaces from the start. Dice icons removed (words instead). **Material** (None · Grain · Brushed · Carbon) added beside the theme, default None | `tools/music/core/sound-css.js`, `canvas/runtime/black-surfaces.js`, `themes.js`, `eravos.css` | `tests/p106-reactive-drift.test.js` 2/2 (fails on the old code: the plug's amber crept, darkening applied twice); real playback path 0 of 3,017 colours changed (was 6+), synthetic 221 → 0 visible |
 | 2026-11-05 | **Release v0.2.0** (black surfaces, Beat colour, tool pages, consistency, design guide); canvas/content separation made a standing rule | `desktop/package.json`, `docs/release-notes.txt`, CLAUDE.md | the release run's Setup exe + zip |
 | 2026-11-05 | **Design guide + design check**: philosophy, rules S/C/K/W/N each with his words; the new-tool UI template; every tool opened and measured (D1 surfaces · D2 kit sizes · D3 labels · D4 kit buttons · D5 one primary · D6 colour family), baseline can only improve, runs on every PR. Fixed: Dusk gradients from the tool's own colour family (Tape Echo's Throw), kit `sm` size (Timeline/Sequencer), one primary per window, MIDI Map / Session / piano roll on tokens | `docs/DESIGN-GUIDE.md`, `docs/templates/TOOL-UI.md`, `tests/design-check.mjs`, `.github/workflows/checks.yml` | 45 → 52 of 69 tools pass every rule; D1 D2 D3 D5 D6 at 0; D4 119 (play surfaces, baseline); full suite 1,367/1,371 (the 4: P82 ×2 and P74 on main too; boundary fixed) |
 | 2026-11-05 | **Black surfaces**: every surface (page, canvas, windows, cards, wells, button fills, drawn display backgrounds) is neutral near-black — no tool colour, no blue cast, no dusk sky; colours untouched. Stylesheets, inline styles and canvas drawing all pass through BlackSurfaces (new tools too). "Light over the tools" (opt-in) still washes | `canvas/runtime/black-surfaces.js`, `eravos.css`, `ui-kit.js` | `tests/p103-black-surfaces.test.js` 3/3; tinted surfaces across all tools 1,000+ → 30 (served build); P91/P83 updated to the new rule |

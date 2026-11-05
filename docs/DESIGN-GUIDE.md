@@ -62,6 +62,8 @@ Each rule: what it says · his words · how it is checked.
 | W2 | A tool's face is grouped in cards, each with a dot and a mono title; depth beyond the face sits behind "More depth ▸" | — | review |
 | W3 | Tool pages: one fixed size for every tab, a compact head, no scroll inside the page, words not ids | "the ui is how i want it. except it the tool pages look horrible" → "that looks nice as hell" (2026-11-05) | P21, P45 |
 | W4 | The look of the canvas as it is now is the reference. No restyle without his OK on a preview | "hell no on that ui. i like what it is now." (2026-11-05) | process |
+| W5 | A visual change is shown to him before it merges, or it arrives as a new choice (theme, button style, material) with today's look as the default | "always show me or add more themes before change" (2026-11-05) | process |
+| W6 | Materials (Themes › Material: Grain, Brushed, Carbon) texture only the surfaces, in neutral white or grey at a few percent | "what about adding more texture to the tools? like how the retro poly" (2026-11-05) | review |
 
 ### New tools
 
