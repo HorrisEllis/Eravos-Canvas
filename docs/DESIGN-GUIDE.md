@@ -16,7 +16,10 @@ is written up with [`docs/templates/TOOL-UI.md`](templates/TOOL-UI.md) and shown
    A tool is different in what it does, never in how a button looks.
 4. **Everything with colour answers the music; nothing else does.** The reactive colours move the colours (and, in Beat, make them one).
 5. **Deep, not cluttered.** Every control is reachable; the face shows what matters and the rest folds away ("More depth ▸").
-6. **It's an instrument, not a toy.** It looks like what it is: live sound you shape (CLAUDE.md, No toys).
+6. **The canvas and the content stay separate.** The canvas (`canvas/`) is the host and its look; the tools (`tools/`) are the
+   content. The canvas decides how everything looks and names no tool; a tool brings what it does, never its own version of the look
+   ("i want to keep the canvas and content seperate", 2026-11-05 — `tests/boundary.test.js`).
+7. **It's an instrument, not a toy.** It looks like what it is: live sound you shape (CLAUDE.md, No toys).
 
 ## Rules
 
