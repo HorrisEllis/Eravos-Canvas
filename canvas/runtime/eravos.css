@@ -920,3 +920,27 @@ html[data-theme="dusk"][data-theme], html[data-theme="dusk"][data-theme] .wm-win
 
 /* 3.105 the kit's small size (lane-style controls: mute, solo, arm, remove) — one size, not each tool's own inline padding */
 .uk-btn.sm, .uk-toggle.sm { padding: 1px 5px; font-size: 10px; line-height: 1.25; min-height: 0; }
+
+/* 3.107 MATERIAL — a texture on the black, with any theme (Themes › Material; 'none' = as it is). Only surfaces get it: windows, cards,
+ * panels. Colours, text and displays are untouched; the textures are neutral (white or grey at a few percent) so S1–S2 hold.
+ * --mat-grain is painted by themes.js (a noise tile made in code). */
+:root { --mat-brushed: repeating-linear-gradient(0deg, rgba(255,255,255,.024) 0 1px, transparent 1px 2px, rgba(255,255,255,.013) 2px 3px, transparent 3px 5px), linear-gradient(100deg, rgba(255,255,255,0) 20%, rgba(255,255,255,.04) 45%, rgba(255,255,255,0) 70%);
+  --mat-carbon: linear-gradient(115deg, rgba(255,255,255,0) 25%, rgba(255,255,255,.035) 50%, rgba(255,255,255,0) 75%), repeating-conic-gradient(#131313 0 25%, #080808 0 50%); }
+html[data-material="grain"] { --mat: var(--mat-grain, none); --mat-size: 160px 160px; } html[data-material="brushed"] { --mat: var(--mat-brushed); --mat-size: auto; }
+html[data-material="carbon"] { --mat: var(--mat-carbon); --mat-size: auto, 6px 6px; }
+html[data-theme][data-material][data-material] :is(.wm-win, .tp-page) { background: var(--mat), var(--panel); background-size: var(--mat-size), auto; }
+html[data-theme][data-material][data-material] .wm-body :is([class$="-card"], [class*="-card "], .uk-group, .gg-sec, section) { background: var(--mat), var(--bg2);
+  background-size: var(--mat-size), auto; box-shadow: inset 0 1px 0 rgba(255,255,255,.05), inset 0 -1px 0 rgba(0,0,0,.6); }
+.thm-mat { display: block; height: 46px; border-radius: 8px; border: 1px solid var(--line2); background-color: var(--panel); }
+.thm-mat[data-material-demo="grain"] { background: var(--mat-grain, none), var(--panel); background-size: 160px 160px, auto; }
+.thm-mat[data-material-demo="brushed"] { background: var(--mat-brushed), var(--panel); }
+.thm-mat[data-material-demo="carbon"] { background: var(--mat-carbon), var(--panel); background-size: auto, 6px 6px; }
+/* 3.107 the Themes panel's BUTTONS and MATERIAL rows: styled like the theme cards above them (the Buttons row had no styles at all) */
+.thm-sub { display: flex; align-items: baseline; gap: 12px; margin: 16px 0 10px; }
+.thm-sub b { font: 700 12px var(--mono); letter-spacing: 2px; } .thm-sub span { color: var(--dim); font-size: 12px; }
+.thm-btns { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+.thm-bcard { text-align: left; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 12px; border: 1px solid var(--line2); background: var(--bg2); color: var(--text); cursor: pointer; font: inherit; }
+.thm-bcard:hover { border-color: var(--dim); }
+.thm-bcard.on { border-color: var(--acc); box-shadow: 0 0 14px color-mix(in srgb, var(--acc) 25%, transparent); }
+.thm-bcard b { font-size: 13px; } .thm-bcard small { color: var(--dim); font-size: 11.5px; line-height: 1.35; }
+.thm-bdemo { display: flex; gap: 6px; padding: 8px; border-radius: 8px; background: var(--panel); }

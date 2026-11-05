@@ -135,7 +135,7 @@ OrganismFactory.reg('eravos.wobble-bass', function (view) {
   };
   const fill = (a) => { const c = a.concat(Array(16 - a.length).fill('')); view.emit('wub_seq', { cells: c, on: true }); };
   const seqBtns = h('div', { class: 'org-row', style: { flexWrap: 'wrap', gap: '4px', margin: '4px 0 0' } }, Object.keys(FILLS).map(n => UI.Button({ label: n, hint: 'write the ' + n + ' wub rhythm (and turn the sequence on)', onClick: () => fill(FILLS[n]) }).el).concat([
-    UI.Button({ label: '🎲 Tear', hint: 'a new seeded tearout rhythm — press again for another', onClick: () => { seed = (seed * 7 + 13) % 997 + 1; const R = ['1/4', '1/8', '1/8t', '1/16', '1/16t', '1/32', 'x', '']; fill(Array.from({ length: 8 }, () => { const r = R[Math.floor(rnd() * R.length)], sh = rnd() < 0.3 ? ':' + ['yoy', 'square', 'draw'][Math.floor(rnd() * 3)] : ''; return r && r !== 'x' ? r + sh : r; })); } }).el,
+    UI.Button({ label: 'Tear', hint: 'a new seeded tearout rhythm — press again for another', onClick: () => { seed = (seed * 7 + 13) % 997 + 1; const R = ['1/4', '1/8', '1/8t', '1/16', '1/16t', '1/32', 'x', '']; fill(Array.from({ length: 8 }, () => { const r = R[Math.floor(rnd() * R.length)], sh = rnd() < 0.3 ? ':' + ['yoy', 'square', 'draw'][Math.floor(rnd() * 3)] : ''; return r && r !== 'x' ? r + sh : r; })); } }).el,
     UI.Button({ label: 'Faster', hint: 'every step one rate faster', onClick: () => shift(1) }).el,
     UI.Button({ label: 'Slower', hint: 'every step one rate slower', onClick: () => shift(-1) }).el,
     UI.Button({ label: '1–8 → 9–16', hint: 'copy the first 8 steps onto steps 9–16', onClick: () => { const C = cells(); view.emit('wub_seq', { cells: C.slice(0, 8).concat(C.slice(0, 8)) }); } }).el,

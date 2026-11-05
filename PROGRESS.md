@@ -2,6 +2,22 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.106 reactive colours no longer compound; 3.107 Material; dice gone (2026-11-05)
+Asked: "also the canvas reactive colors keep compounding errors. test it. maybe white border around tool ui. can you remove the dice icon.
+what about adding more texture to the tools? like how the retro poly" · "always show me or add more themes before change."
+- Measured: every colour of 5 tools snapshotted, the reactive colours driven 300 frames per mode with redraws, switched off, compared
+  as drawn (each colour painted on one pixel, ±3): 221 of 2,714 did not come back.
+- Causes, fixed: (1) switching mode / off (zero()) never put back the palette a sounding window had lit on itself (lightSheets: --amber
+  for the plug, --rcs-*); the next lighting took the lit value as its base, so colours crept further with every change. (2) BlackSurfaces
+  darkened an already neutral colour again on every pass. (3) dark borders, outlines, shadows and the reactive engine's own colour copies
+  were neutralised only after a reactive cycle (now from the start / never for its copies).
+- After: synthetic 0 visible; the real playback path (the song loaded, every mode, stop, off) 0 of 3,017. tests/p106-reactive-drift.test.js
+  fails on the old code (the plug's amber crept; darkening twice) and passes now.
+- Dice: 🎲 gone from Groove, Bass Gen, Acid Synth (Reseed), EDM Lab (Reseed), Arp (Random), Wobble Bass (Tear), Songs (Another like it),
+  the random-preset menu, a library card (≋).
+- Themes › MATERIAL: None (default — the look as it is) · Grain · Brushed · Carbon: neutral texture on windows, cards and tool pages. The
+  Themes panel's BUTTONS row had no styles at all — now styled like the theme cards (MATERIAL beside it).
+
 ## Done — 3.104–3.105 consistency: the design guide, the design check, gradients in the tool's family (2026-11-05)
 Asked: "the buttons in the tape echo look bad. the color i mean. bad gradient" · "i want consistency across all of them. and a template
 or schema for a design guide or philospophy to maintain consistency."

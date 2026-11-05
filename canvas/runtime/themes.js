@@ -29,6 +29,30 @@
     { id: 'c', label: 'Frosted pill', blurb: 'Round, deep frost, a soft inner glow and a sheen on hover.' },
     { id: 'd', label: 'RGB edge', blurb: 'A rainbow rim travelling like RGB lighting; the text and icons the same rainbow.' },
   ];
+  // 3.107 MATERIAL (his words, 2026-11-05: "what about adding more texture to the tools? like how the retro poly" · "always show me or add
+  // more themes before change"): a surface finish beside the theme — 'none' is the look as it is; the others add a texture to the black.
+  const MATERIALS = [
+    { id: 'none', label: 'None', blurb: 'The black as it is: no texture.' },
+    { id: 'grain', label: 'Grain', blurb: 'A fine film grain over the black panels, like a printed or analog surface.' },
+    { id: 'brushed', label: 'Brushed', blurb: 'Brushed metal: fine horizontal lines and a soft sheen, like a hardware face plate.' },
+    { id: 'carbon', label: 'Carbon', blurb: 'A tight carbon-fibre weave in the panels, with a soft sheen.' },
+  ];
+  const MKEY = 'eravos.material';
+  // the grain tile: neutral noise made once in code (white at a few percent, so it only lightens the black a touch)
+  (function grainTile() {
+    if (!doc || !doc.createElement || !root) return; try {
+      const cv = doc.createElement('canvas'); cv.width = cv.height = 160; const g = cv.getContext('2d'), d = g.createImageData(160, 160); let x = 0x2545F491;
+      for (let i = 0; i < d.data.length; i += 4) { x ^= x << 13; x ^= x >>> 17; x ^= x << 5; const v = (x >>> 0) / 4294967296; d.data[i] = d.data[i + 1] = d.data[i + 2] = 255; d.data[i + 3] = Math.round(v * v * 34); }
+      g.putImageData(d, 0, 0); root.style.setProperty('--mat-grain', 'url(' + cv.toDataURL() + ')');
+    } catch (e) {} })();
+  function getMaterial() { const v = root && root.dataset.material; return MATERIALS.some(m => m.id === v) ? v : 'none'; }
+  function setMaterial(id) {
+    if (!MATERIALS.some(m => m.id === id) || !root) return false;
+    if (id === 'none') delete root.dataset.material; else root.dataset.material = id;
+    try { global.localStorage.setItem(MKEY, id); } catch (e) {}
+    listeners.forEach(fn => { try { fn(get()); } catch (e) {} }); return true;
+  }
+  if (root && !root.dataset.material) { let v = null; try { v = global.localStorage.getItem(MKEY); } catch (e) {} if (v && v !== 'none' && MATERIALS.some(m => m.id === v)) root.dataset.material = v; }
   const BKEY = 'eravos.buttons';
   function getButtons() { const v = root && root.dataset.buttons; return BUTTONS.some(b => b.id === v) ? v : 'theme'; }
   function setButtons(id) {
@@ -77,10 +101,18 @@
         h('b', { text: b.label + (on ? '  ✓' : '') }), h('small', { text: b.blurb })]);
       c.onclick = () => { setButtons(b.id); paintB(); }; bcards.appendChild(c); }); };
     paintB();
+    // 3.107 materials: each card a small panel in that finish (data-material on the card itself)
+    const mcards = h('div', { class: 'thm-btns' });
+    const paintM = () => { mcards.innerHTML = ''; MATERIALS.forEach(m => {
+      const on = getMaterial() === m.id, c = h('button', { class: 'thm-bcard' + (on ? ' on' : ''), type: 'button', 'aria-pressed': on ? 'true' : 'false', title: m.blurb }, [
+        h('span', { class: 'thm-mat', 'data-material-demo': m.id }), h('b', { text: m.label + (on ? '  ✓' : '') }), h('small', { text: m.blurb })]);
+      c.onclick = () => { setMaterial(m.id); paintM(); }; mcards.appendChild(c); }); };
+    paintM();
     const react = h('button', { class: 'thm-link', type: 'button', text: 'Reactive colours — how every colour answers the sound →', onclick: () => { if (onClose) onClose(); const b = doc.getElementById('reactBtn'); if (b) b.click(); } });
     return h('div', { class: 'thm-panel', role: 'dialog', 'aria-label': 'Themes' }, [
       h('div', { class: 'thm-headr' }, [h('b', { text: 'THEMES' }), h('span', { text: 'the whole look in one choice — remembered on this computer' }), h('button', { class: 'thm-x', type: 'button', text: '×', 'aria-label': 'close', onclick: () => onClose && onClose() })]),
-      cards, h('div', { class: 'thm-sub' }, [h('b', { text: 'BUTTONS' }), h('span', { text: 'with any theme' })]), bcards, react]);
+      cards, h('div', { class: 'thm-sub' }, [h('b', { text: 'BUTTONS' }), h('span', { text: 'with any theme' })]), bcards,
+      h('div', { class: 'thm-sub' }, [h('b', { text: 'MATERIAL' }), h('span', { text: 'a texture on the black, with any theme' })]), mcards, react]);
   }
   // the entry in ⋯ Options (the shell's options slot), opening the section as a popover
   function entry() {
@@ -98,5 +130,6 @@
   function boot() { if (!entry()) setTimeout(boot, 300); }
   if (doc) { if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', boot); else boot(); }
   global.Themes = { list: () => LIST.map(t => Object.assign({}, t)), get, set, onChange(fn) { listeners.push(fn); }, panel, DEFAULT,
-    buttons: () => BUTTONS.map(b => Object.assign({}, b)), getButtons, setButtons };
+    buttons: () => BUTTONS.map(b => Object.assign({}, b)), getButtons, setButtons,
+    materials: () => MATERIALS.map(m => Object.assign({}, m)), getMaterial, setMaterial };
 })(typeof window !== 'undefined' ? window : globalThis);

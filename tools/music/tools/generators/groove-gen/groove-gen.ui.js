@@ -57,7 +57,7 @@ OrganismFactory.reg('eravos.groove-gen', function (view) {
   const head = (title, right) => h('div', { class: 'mo-head' }, [h('span', { class: 'mo-dot' }), h('span', { class: 'mo-cap', text: title }), h('span', { class: 'mo-rule' })].concat(right || []));
   const strip = (k, label) => { const c = ctl(k, { noLabel: true, segMax: 9 }); return h('div', { class: 'gg-strip' }, [h('div', { class: 'mo-lab', text: label }), c ? c.el : null]); };
   const play = h('div', { class: 'gg-play' }, [
-    h('div', { class: 'gg-top' }, [UI.presetBar(view), h('div', { class: 'gg-tools' }, [size.el, UI.Button({ label: '🎲', hint: 'a new seed: the same painting, other hits', onClick: () => view.emit('reseed', {}) }).el, UI.Button({ label: 'Clear', hint: 'clear the painting', onClick: () => view.emit('clear', {}) }).el])]),
+    h('div', { class: 'gg-top' }, [UI.presetBar(view), h('div', { class: 'gg-tools' }, [size.el, UI.Button({ label: 'Reseed', hint: 'a new seed: the same painting, other hits', onClick: () => view.emit('reseed', {}) }).el, UI.Button({ label: 'Clear', hint: 'clear the painting', onClick: () => view.emit('clear', {}) }).el])]),
     h('section', { class: 'gg-sec' }, [head('Pattern', [ctl('style', { noLabel: true }).el]), cv,
       h('div', { class: 'gg-bank' }, [
         h('div', { class: 'gg-knobs' }, [ctl('energy', { big: true, size: 64 }).el, ctl('swing', { size: 44 }).el, ctl('humanize', { size: 44 }).el, ctl('accent', { size: 44 }).el, ctl('rolls', { size: 44 }).el, ctl('seed', { size: 44 }).el]),

@@ -24,7 +24,7 @@
     if (typeof val !== 'string' || !COLOUR_PROPS.test(sk) || val.indexOf('var(') >= 0 || !st || !st.setProperty) return val;
     // a colour the tool sets again every frame (a pad's border redrawn) keeps the lit value it has now, if it is the same colour
     // (whatever lights it leaves st._rcB = { name: its own colour } and st._rcL = { name: lit } on the declaration): no flicker
-    const BS = global.BlackSurfaces; if (BS && /^background/.test(sk)) val = BS.surface(sk, val);   // 3.103 a dark tinted fill → neutral black
+    const BS = global.BlackSurfaces; if (BS && /^(background|border|outline|boxShadow)/i.test(sk)) val = BS.surface(sk, val);   // 3.103 a dark tinted fill → neutral black
     let i = 0; return val.replace(COLOUR_LIT, (m) => { const n = '--rc-' + sk.toLowerCase() + '-' + (i++); SET.call(st, n, st._rcB && st._rcB[n] === m && st._rcL[n] ? st._rcL[n] : m); return 'var(' + n + ')'; });
   }
   const colourVars = (el, sk, val) => colourVarsOn(el.style, sk, val);
@@ -39,7 +39,7 @@
     const st = el.style; if (!st || !st.length) return;
     for (let i = 0; i < st.length; i++) { const p = st[i]; if (p.charCodeAt(0) === 45 || !LONG.test(p)) continue; const v = st.getPropertyValue(p); if (!v || v.indexOf('var(') >= 0) continue;
       COLOUR_LIT.lastIndex = 0; if (!COLOUR_LIT.test(v)) continue; COLOUR_LIT.lastIndex = 0;
-      const k = camel(p); let j = 0; const BS = global.BlackSurfaces; const v1 = BS && /^background/.test(p) ? BS.surface(p, v) : v; const v2 = v1.replace(COLOUR_LIT, (m) => { const n = '--rc-' + k.toLowerCase() + '-' + (j++); SET.call(st, n, st._rcB && st._rcB[n] === m && st._rcL[n] ? st._rcL[n] : m); return 'var(' + n + ')'; });
+      const k = camel(p); let j = 0; const BS = global.BlackSurfaces; const v1 = BS && /^(background|border|outline|box-shadow)/.test(p) ? BS.surface(p, v) : v; const v2 = v1.replace(COLOUR_LIT, (m) => { const n = '--rc-' + k.toLowerCase() + '-' + (j++); SET.call(st, n, st._rcB && st._rcB[n] === m && st._rcL[n] ? st._rcL[n] : m); return 'var(' + n + ')'; });
       SET.call(st, p, v2, st.getPropertyPriority(p)); }
   }
   if (global.MutationObserver && doc0()) {

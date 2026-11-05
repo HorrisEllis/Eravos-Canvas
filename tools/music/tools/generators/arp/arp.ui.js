@@ -37,7 +37,7 @@ OrganismFactory.reg('eravos.arp', function (view) {
   cv.addEventListener('pointermove', (e) => { if (drag) level(e); });
   ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => cv.addEventListener(t, () => { if (drag) { drag = null; send(); } }));
   const shapeRow = h('div', { class: 'org-row', style: { flexWrap: 'wrap', gap: '4px', margin: '4px 0 0' } });
-  const NAMES = { all: 'All on', offbeats: 'Offbeats', gallop: 'Gallop', accents: 'Accents', trance: 'Trance gate', ramp: 'Ramp', octaves: 'Octave jumps', flat: 'No octaves / slides', random: '🎲 Random' };
+  const NAMES = { all: 'All on', offbeats: 'Offbeats', gallop: 'Gallop', accents: 'Accents', trance: 'Trance gate', ramp: 'Ramp', octaves: 'Octave jumps', flat: 'No octaves / slides', random: 'Random' };
   function drawShapes() { shapeRow.innerHTML = ''; shapes.forEach(sh => shapeRow.appendChild(UI.Button({ label: NAMES[sh] || sh, onClick: () => view.emit('lane_shape', { shape: sh }) }).el)); }
   // ---- the controls, grouped side by side
   const card = (title, keys) => h('div', { class: 'arp-card', style: { breakInside: 'avoid', marginBottom: '8px', background: '#0a121b', border: '1px solid #1c2c3c', borderRadius: '8px', padding: '6px 8px' } },

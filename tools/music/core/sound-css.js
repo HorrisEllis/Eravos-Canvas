@@ -264,6 +264,10 @@
     ['--snd-low', '--snd-high', '--snd-level', '--snd-pulse'].forEach(k => set(k, '0')); ['--snd-hn', '--snd-lv'].forEach(k => setPal(k, '0')); doc.querySelectorAll('.wm-win[style*="--tool-level"]').forEach(w => { w.style.setProperty('--tool-level', '0'); w._lvS = '0.00'; });
     PALETTE.concat(Object.keys(SURFACES)).forEach(k => { root.style.removeProperty(k); delete rootV[k]; }); lastPal = -1e9;
     Array.from(live).forEach(unlight); live.clear(); set('--snd-shift', '0deg');
+    // 3.106 the palette a sounding window had lit on itself (lightSheets: --amber … the plug, --rcs-*) is put back too. It was left on
+    // the window when the mode changed or the colours went off, and the next lighting took the lit value as its base: every change of
+    // mode, every stop, the colours crept further (his "compounding errors … white border around tool ui"; tests/p106-reactive-drift.test.js)
+    doc.querySelectorAll('.wm-win, .tp-overlay').forEach(w => { unlightSheets(w); w._rk = 0; });
     writing = w0; glassRest(); delete rootV.__glass; root.style.removeProperty('--beat-col'); delete rootV['--beat-col'];
     if (mode !== 'beat') doc.querySelectorAll('.wm-win, .tp-overlay').forEach(w => { if (w._ro && w._ro.mode === 'beat') { w._rk = 0; w._ro = null; } });
   }

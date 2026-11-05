@@ -22,6 +22,9 @@
   const isSurfaceRGB = (rgb) => { const mx = Math.max(...rgb), mn = Math.min(...rgb); return mx <= MAX && mx - mn <= CHROMA && mx - mn >= 0; };
   function neutral(c) {
     if (typeof c !== 'string') return c; const p = parse(c); if (!p || !isSurfaceRGB(p.rgb)) return c;
+    // already neutral → left as it is: neutral(neutral(x)) === neutral(x). Without this every pass (a sheet written again, a colour lit
+    // and put back) darkened it once more — the compounding he saw (3.106, tests/p106-reactive-drift.test.js)
+    if (Math.max(...p.rgb) - Math.min(...p.rgb) <= 1) return c;
     const [r, g, b] = p.rgb, y = Math.round((0.2126 * r + 0.7152 * g + 0.0722 * b) * DARKEN);
     if (p.hex && p.a === null) { const h = ('0' + y.toString(16)).slice(-2); return '#' + h + h + h; }
     return p.a === null ? `rgb(${y}, ${y}, ${y})` : `rgba(${y}, ${y}, ${y}, ${+p.a.toFixed(3)})`;
@@ -29,7 +32,7 @@
   const isSurface = (c) => { const p = parse(c); return !!p && isSurfaceRGB(p.rgb); };
   const inText = (v) => typeof v === 'string' ? v.replace(LIT, neutral) : v;
   // a background property (camelCase or kebab-case)
-  const BG = /^background|^--/;
+  const BG = /^background|^border|^outline|^box-?shadow|^--/i;   // surfaces, and the lines around them (guide S3)
   const surface = (prop, v) => BG.test(prop) ? inText(v) : v;
 
   // ---- stylesheets: every rule's backgrounds and dark custom properties
@@ -41,9 +44,10 @@
     rules(list, (st) => {
       // a shorthand that mixes a variable and a literal (background: linear-gradient(var(--x), #18130e)) hides the literal from its
       // longhands (they read '' until the variable is filled in): read and write the shorthand itself
-      const sh = st.getPropertyValue('background'); if (sh && /var\(/.test(sh) && /#|rgb/.test(sh)) { const s2 = inText(sh); if (s2 !== sh) st.setProperty('background', s2, st.getPropertyPriority('background')); }
+      ['background', 'border', 'border-top', 'border-right', 'border-bottom', 'border-left', 'outline'].forEach(n => { const sh = st.getPropertyValue(n); if (sh && /var\(/.test(sh) && /#|rgb/.test(sh)) { const s2 = inText(sh); if (s2 !== sh) st.setProperty(n, s2, st.getPropertyPriority(n)); } });
       for (let i = 0; i < st.length; i++) {
-        const p = st[i]; if (!/^background|^--/.test(p)) continue;
+        const p = st[i]; if (!/^background|^border|^outline|^box-shadow|^--/.test(p)) continue;
+        if (/^--rcs?-/.test(p)) continue;   // the reactive colours' own copies of a rule's colours: theirs to keep exact (they may be text)   // a shadow's dark edge is a surface too; its glow is a colour (left)
         const v = st.getPropertyValue(p); if (!v || !/#|rgb/.test(v)) continue;
         const v2 = p.startsWith('--') ? (isSurface(v.trim()) ? neutral(v.trim()) : v) : inText(v);
         if (v2 !== v) st.setProperty(p, v2, st.getPropertyPriority(p));
