@@ -1,3 +1,14 @@
+ERAVOS v0.2.6 (2026-11-05)
+
+Install: ERAVOS-Setup-0.2.6.exe, or unzip ERAVOS_0.2.6.zip. On an earlier version, ERAVOS offers this update by itself.
+
+Piano roll
+- You hear the notes as you draw them, even on a track with no instrument yet (a small preview voice), and on every new pitch while
+  you drag one.
+- Shape a note with points (〰 Bend tool, one note selected): click the middle of a note to add a point and drag it; drag any point
+  (Shift: whole semitones); double-click a point to remove it. The ends still dive / rise as before.
+- Zoom in much further for precision: Zoom up to 8XL, Rows up to 4XL (Ctrl+wheel / Ctrl+Shift+wheel go there too).
+
 ERAVOS v0.2.5 (2026-11-05)
 
 Install: ERAVOS-Setup-0.2.5.exe, or unzip ERAVOS_0.2.5.zip. On an earlier version, ERAVOS offers this update by itself.

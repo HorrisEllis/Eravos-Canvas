@@ -2,6 +2,16 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.115 Hear what you draw · points on a note · zoom in further · v0.2.6 (2026-11-05)
+Asked: "I want sound playing when I draw notes. I also want to be able to manipulate notes. The size, also the edges. Make it thinner, or
+wider, edit the shape completely." His answers: thinner/wider = "Zoom in for more precision"; shape = "Points on the note".
+- A lane with no instrument was silent: the Timeline's own preview voice (saw + sine an octave down, soft low-pass, live) plays then,
+  following a note's bend. A note dragged to a new pitch sounds there.
+- Points (Bend tool, one note selected): drawn on its pitch line; click the middle third adds one and drags it; drag a point (between
+  its neighbours; ends stay at the ends; 0.05 st steps, Shift whole); double-click removes. A bend becomes a 'path' when edited.
+- Zoom: PPS_MAX 96 → 480 (2XL, 4XL, 8XL), rows 40 → 120 px (2XL, 4XL).
+- Tests p112 7/7 (points, preview voice). 1388/1393: P82, rim, P70 (main's), P102 (passes alone ×2: order-dependent).
+
 ## Done — 3.113 piano roll easier · 3.114 Timeline right-click · 3.115 Clip look + Canvas zoom (2026-11-05)
 Asked: "make it easier" → "yes, and i dont like the fill options, replace it with pattern selection. also easier to manipulate notes,
 like size and moving" · "also remove the split button from the timeline?, and let me select where and right click" · "what about a
