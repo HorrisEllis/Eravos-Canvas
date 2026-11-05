@@ -25,6 +25,9 @@ Read this first, then `PROGRESS.md` (the detailed log, newest first) and the spe
 
 ## Rules that hold
 
+- **Black surfaces, colours as they are** (2026-11-05: "i dont like the tint. everything but the colors should be what they are. make
+  them darker even. like black"): no surface carries a tool's colour or a cast; only what is a colour has colour. BlackSurfaces enforces it.
+
 - **Systems all the way down, fluid, not boxes** (2026-11-05): component → tool → suite → project, one mechanism (wires) at every
   scale, each level opens as a canvas; membership is wiring, overlap is normal, depth added to a component reaches everything
   holding it. `specs/eravos.suites.spec` ADDENDUM 2026-11-05 (F1–F5).
@@ -49,6 +52,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-05 | **Black surfaces**: every surface (page, canvas, windows, cards, wells, button fills, drawn display backgrounds) is neutral near-black — no tool colour, no blue cast, no dusk sky; colours untouched. Stylesheets, inline styles and canvas drawing all pass through BlackSurfaces (new tools too). "Light over the tools" (opt-in) still washes | `canvas/runtime/black-surfaces.js`, `eravos.css`, `ui-kit.js` | `tests/p103-black-surfaces.test.js` 3/3; tinted surfaces across all tools 1,000+ → 30 (served build); P91/P83 updated to the new rule |
 | 2026-11-05 | Reactive colours › **Beat**: every tool, the toolbar and tool pages share one colour (the theme's own accents, in turn), moving on the transport's beat (when heard), every beat / 2 beats / bar, flash = Amount; surfaces and greys keep theirs; no restyle | `tools/music/core/sound-css.js`, `react-panel.js`, `eravos.css` | `tests/p102-beat-colour.test.js` 1/1 (13 checks); P48c P58 P73 P77 P83 P84 green; P82's 2 failures are on main too |
 | 2026-11-05 | Phase 1 begins: **filter-svf** (35 planned tools stand on it) — Simper's zero-delay-feedback SVF, 9 modes, 12/24/36 dB, detune input, AudioWorklet = the tested kernel | `tools/music/components/filter-svf/` | 29 measured checks (−3.01 dB at cutoff, slopes ±1.2 dB, notch < −60 dB, bell/shelves, 20 s self-oscillation bounded, denormals, no allocation); worklet = kernel in the engine (< −60 dB); 193 ns/stereo sample |
 | 2026-11-05 | Tool pages cleaned up (fixed size, compact head, no nested scroll, packs, controls, in/out in words); knob labels no longer collide (89 → 17) | `canvas/runtime/eravos.css`, `tool-page.js` | before/after shown, approved ("that looks nice as hell"); P21 P45 P48 P49 P58 P63 P70 P91 green · PR #81 |

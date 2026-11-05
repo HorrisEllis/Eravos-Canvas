@@ -2,6 +2,17 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.103 Black surfaces (2026-11-05)
+Asked: "i dont like the tint. everything but the colors should be what they are. make them darker even. like black".
+- Surface tokens neutral near-black in every theme (--bg #000 … --panel2 #0f0f0f, lines #1c1c1c/#282828, text greys neutral);
+  --react-surface 0 (surfaces never lean); the Dusk sky overlay (.wm-dusk) off; button/toggle fills black (Field keeps clear buttons).
+- canvas/runtime/black-surfaces.js: a surface = dark (max channel ≤ 80) and barely coloured (channels within 26) → neutral grey × 0.72.
+  Applied to every stylesheet's backgrounds as it loads (same-origin: the app and the web build; file:// pages cannot read sheets),
+  to inline backgrounds tools write (ui-kit hook), and to 2D-canvas fills/strokes/gradient stops inside windows and tool pages.
+  Colours (bright, or dark but clearly coloured) are untouched. With Light over the tools on, drawings are left to the reactive colours.
+- Measured (served build, every tool spawned): elements with a tinted dark background 1,000+ → 30. P103 3/3; P91 and P83 updated
+  (they asserted the tint he asked to remove).
+
 ## Done — 3.102 Beat colour; phase 1 starts with filter-svf; tool pages; the dependency graph (2026-11-05)
 Asked: "the ui is how i want it. except it the tool pages look horrible" · "that looks nice as hell. can you start on the phases" ·
 "Everything turns the same colour and changes on the beat, built into the reactive colours you already have, with no restyle".
