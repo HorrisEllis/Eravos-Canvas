@@ -826,3 +826,54 @@ html[data-theme="midnight"] .uk-knob-arc { filter: none; }
 .upd-notes { color: var(--dim); font-size: 11.5px; line-height: 1.4; max-height: 4.2em; overflow: hidden; }
 .upd-row { display: flex; gap: 8px; } .upd-row .tb-btn { padding: 5px 12px; }
 .tp-btn.tp-ico.bad { opacity: .55; } .tp-btn.tp-ico.bad:hover { opacity: 1; color: #ff5470; }
+
+/* ===================== 3.101 tool pages, cleaned up (2026-11-05: "the ui is how i want it. except it the tool pages look horrible.")
+ * The canvas look stays; only the page around a tool changes: one fixed size for every tab (the canvas no longer shows through on
+ * short tabs), an opaque backdrop, a compact header, no scroll boxes inside the page, dark scrollbars, packs without the wall of
+ * buttons, a real controls table, and in/out in words. Knob labels no longer run into each other (anywhere). */
+.tp-overlay { background: color-mix(in srgb, var(--bg, #07090d) 90%, transparent); backdrop-filter: blur(6px); padding: 18px 20px; align-items: stretch; overflow: hidden; }
+.tp-page { width: min(1280px, 100%); height: 100%; margin: 0 auto; overflow-y: auto; overflow-x: hidden; padding: 0 22px 32px; scrollbar-width: thin; scrollbar-color: var(--line2, #2d3f57) transparent; }
+.tp-page::-webkit-scrollbar, .tp-panel::-webkit-scrollbar, .tp-grid::-webkit-scrollbar { width: 8px; height: 8px; }
+.tp-page::-webkit-scrollbar-thumb, .tp-panel::-webkit-scrollbar-thumb, .tp-grid::-webkit-scrollbar-thumb { background: var(--line2, #2d3f57); border-radius: 8px; }
+.tp-page::-webkit-scrollbar-track { background: transparent; }
+/* header: one compact band, then the "works on" picker and the suite chips on one line, then the tabs (which stay on screen) */
+.tp-head { padding-top: 18px; align-items: center; gap: 16px; }
+.tp-head .tp-art { width: 112px; height: 64px; object-fit: cover; border-radius: 6px; flex: none; }
+.tp-ht h2 { font-size: 17px; letter-spacing: 3px; }
+.tp-ht p { margin-top: 4px; font-size: 13px; }
+.tp-on { display: inline-flex; flex-wrap: wrap; margin: 12px 12px 0 0; vertical-align: middle; font: 600 10px var(--mono); letter-spacing: 1.4px; text-transform: uppercase; }
+.tp-on .tp-target { font: 12px var(--mono); letter-spacing: 0; text-transform: none; max-width: 340px; }
+.tp-on.tp-parts { gap: 6px; text-transform: none; letter-spacing: 0; font: inherit; }
+.tp-nav { position: sticky; top: 0; margin: 14px -22px 0; padding: 0 22px; background: var(--bg2, #0c1118); border-bottom: 1px solid var(--line, #223044); z-index: 3; }
+.tp-sec { margin-top: 16px; }
+/* the panel tab: the tool itself, at its own height (no second scroll box inside the page) */
+.tp-panel { max-height: none; overflow: visible; background: transparent; border-color: var(--line, #223044); border-radius: 10px; padding: 14px; }
+.tp-grid { max-height: none; overflow: visible; }
+/* packs: names in full, Load and delete on hover / focus (the row itself is the target) */
+.tp-presets { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px; }
+.tp-pre { min-height: 34px; padding: 4px 6px 4px 8px; background: var(--panel, #111823); border: 1px solid var(--line, #223044); border-radius: 7px; }
+.tp-pre:hover, .tp-pre:focus-within { border-color: color-mix(in srgb, var(--acc, #00d4ff) 55%, var(--line2)); }
+.tp-pn { white-space: normal; overflow-wrap: anywhere; line-height: 1.25; font-size: 12.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.tp-pre > .tp-btn { opacity: 0; transition: opacity .12s; } .tp-pre:hover > .tp-btn, .tp-pre:focus-within > .tp-btn { opacity: 1; }
+@media (hover: none) { .tp-pre > .tp-btn { opacity: 1; } }
+.tp-pack, .tp-cg { margin-bottom: 18px; }
+.tp-sh { padding-bottom: 6px; border-bottom: 1px solid var(--line, #223044); margin-bottom: 8px; }
+.tp-sh b { font: 700 11px var(--mono); letter-spacing: 1.8px; text-transform: uppercase; }
+/* controls: each group a card, columns that line up */
+.tp-cg { background: var(--panel, #111823); border: 1px solid var(--line, #223044); border-radius: 10px; padding: 10px 12px 4px; }
+table.tp-tab { border-collapse: collapse; table-layout: fixed; }
+table.tp-tab td { padding: 7px 8px; border-bottom: 1px solid color-mix(in srgb, var(--line, #223044) 70%, transparent); vertical-align: baseline; }
+table.tp-tab tr:last-child td { border-bottom: 0; }
+table.tp-tab .tp-cl { width: 24%; font-weight: 600; white-space: normal; }
+table.tp-tab .tp-cr { width: 28%; font: 11.5px var(--mono); overflow-wrap: anywhere; }
+table.tp-tab .tp-cd { width: 12%; font: 600 12px var(--mono); color: var(--acc, #00d4ff); text-align: right; padding-right: 16px; }
+table.tp-tab .tp-ch { color: var(--dim, #7f93a8); line-height: 1.45; }
+/* in / out: the kind as a tag, its name in words */
+.tp-row { padding: 8px 10px; background: var(--panel, #111823); border-color: var(--line, #223044); border-radius: 8px; }
+.tp-io .tp-rt b { font-weight: 600; } .tp-io .tp-rt small { margin-top: 2px; }
+.tp-tag.kind { background: transparent; border: 1px solid var(--line2, #2d3f57); color: var(--dim, #7f93a8); font: 10px var(--mono); letter-spacing: .5px; }
+@media (max-width: 700px) { .tp-page { padding: 0 14px 24px; } .tp-nav { margin: 14px -14px 0; padding: 0 14px; } table.tp-tab .tp-ch { display: none; } table.tp-tab .tp-cl { width: 38%; } table.tp-tab .tp-cr { width: 42%; } }
+/* knob labels: as wide as the knob, and the knob as wide as its label (up to 76 px) — wrapped at spaces, never run into the next one */
+.uk-knob { width: max-content; min-width: 50px; max-width: 76px; flex: none; }
+.uk-knob.big { min-width: 74px; }
+.uk-knob .uk-knob-label { width: 100%; max-width: 76px; overflow-wrap: normal; word-break: normal; }

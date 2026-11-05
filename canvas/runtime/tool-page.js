@@ -364,10 +364,20 @@
     const io = (d.hooks || []).filter(x => !x.internal && !/^slot\./.test(x.hook_id) && x.wire_type !== 'ui');
     if (io.length) {
       navTo('io', 'In / out', 'arrow-left-right');
-      page.appendChild(sec('Inputs and outputs', `· ${io.length}`, [h('div', { class: 'tp-list' }, io.map(x => h('div', { class: 'tp-row' }, [
+      // 3.101 in words: "Cutoff" (a modulation input) — not "mod.cutoff · modulation"
+      const KIND = { audio: 'audio', event_bus: 'notes & events', modulation: 'modulation', control: 'control', data: 'data', midi: 'MIDI' };
+      const NAMED = { out: 'Sound out', audio_out: 'Sound out', in: 'Sound in', audio_in: 'Sound in', note_in: 'Notes', midi_in: 'MIDI', theory_in: 'Key and scale', transport_in: 'Transport', note_out: 'Notes out', control_out: 'Control out', data_out: 'Data out', data_in: 'Data in' };
+      const cfgLabel = (k) => { const c = (d.config || []).find(c => c.key === k); return c && (c.label || c.key); };
+      const nameOf = (x) => { const port = String(x.port || x.hook_id.split('.').pop()), m = /^(?:mod[._])?(?:knob[._])?(.+)$/.exec(port.replace(/^mod\./, '')); const key = /^mod/.test(x.hook_id.split('.').slice(-2).join('.')) || /^mod/.test(port) ? m[1] : null;
+        const words = (t) => { t = String(t).replace(/[_.]/g, ' ').trim(); return /^(fm|lfo|am|bpm)$/i.test(t) ? t.toUpperCase() : t.replace(/^\w/, ch => ch.toUpperCase()); };
+        return NAMED[port] || (key && (cfgLabel(key) || words(key))) || cfgLabel(port) || words(port); };
+      const ins = io.filter(x => x.direction !== 'out'), outs = io.filter(x => x.direction === 'out');
+      const row = (x) => h('div', { class: 'tp-row' }, [
         h('span', { class: 'tp-tag ' + (x.direction === 'out' ? 'lnk' : 'mod'), text: x.direction === 'out' ? 'out ⇢' : '⇠ in' }),
-        h('div', { class: 'tp-rt' }, [h('b', { text: (x.port || x.hook_id.split('.').pop()) + ' · ' + x.wire_type }), h('small', { text: x.intent || x.hook_id })]),
-      ])))], 'io', 'arrow-left-right'));
+        h('div', { class: 'tp-rt' }, [h('b', { text: nameOf(x) }), x.intent && !/^(audio signal out|play notes|play midi|follow)/i.test(x.intent) ? h('small', { text: x.intent }) : null]),
+        h('span', { class: 'tp-tag kind', title: x.hook_id, text: KIND[x.wire_type] || x.wire_type }),
+      ]);
+      page.appendChild(sec('Inputs and outputs', `· ${outs.length} out · ${ins.length} in`, [h('div', { class: 'tp-list tp-io' }, outs.concat(ins).map(row))], 'io', 'arrow-left-right'));
     }
     showTab(st, page); page.scrollTop = keepY;
   }
