@@ -10,6 +10,8 @@ Read this first, then `PROGRESS.md` (the detailed log, newest first) and the spe
   (Linux x86-64 ELF) builds itself; the Windows target is the next step in its own spec (`cie-eg.spec`, `native_windows`).
 - **Looking Glass**: his own UI renderer and app host (not Chromium): UI as typed data, layers as a runtime operation, variables,
   motion as data, GPU. Spec v0.3 + phase map, **nothing built yet**. Kept here as `docs/looking-glass/` (SPEC.md, PHASEMAP.md).
+- **Decided 2026-11-05:** Looking Glass replaces Electron and is written **all in Emerge**; Emerge is finished first, bottom up
+  ("Emerge needs to get finished to the point of being able to have you code with it"). The road: E1–E4, LG1+, C1 in the plan below.
 - The plan from today's ERAVOS (Electron + 52 k lines of JS + Web Audio) to that: `docs/emerge-looking-glass-migration.md`.
   Bottom up, one proven layer at a time; the sound must not change (the null render) at any step.
 
@@ -37,6 +39,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-05 | Decided: Looking Glass in Emerge, Emerge first; the road E1 (native_lang F5) · E2 (native_windows) · E3 calling Windows (multi-DLL imports, Win64 calls, memory, callbacks, COM) · E4 axiom · LG1 window + rect from data (software, then GPU) · C1 canvas | `docs/emerge-looking-glass-migration.md` | — (a plan, measured against Emerge f023240) |
 | 2026-11-05 | P0.5 filter-formant: one vowel table (10 vowels) + one formant bank for Wobble Bass and Wub Filter (they had drifted: UH IH ER / YOI / AE −14 vs −12 dB). Wobble Bass gains YOI; Wub Filter gains UH, IH, ER (its AE kept −12 so nothing changes — his call) | `tools/music/components/filter-formant/` | 5,220 checks bit-identical; null render Wobble Bass 38/38 (worst −87.6 dB), Wub Filter 8/8 (7 presets unstable, unproven); Wobble 39/39, Wub 59/59, P94 2/2 |
 | 2026-11-05 | P0.4 duplicate finder: every tool's code tokenised, shared blocks code vs settings, report | `build/duplicates.mjs` → `docs/duplicates.md` | ~9 % of tool code repeats another tool (40-token windows) |
 | 2026-11-05 | Null render: `--record <tool>` no longer wipes other tools' baselines | `tests/null-render.mjs` | recorded two tools, both checked |
@@ -65,4 +68,5 @@ Note §11/§7: Emerge describes graphs and never runs per sample; DSP goes to a 
 - Songs as a rhythm-exploring tool only (not usable for making music).
 - Patterns for each tool with variety: presets, depth, curves, per-note editing — everything the timeline can do.
 - Delete the merged branch `claude/nice-dirac-t64qeo` (a session could not: deleting a remote branch needs his permission).
-- The migration's open decisions (EL0 in the plan).
+- Emerge work (E1–E3) needs a session with push access to `HorrisEllis/Emerge`. E4: widen Emerge's "only kernel32" axiom for the UI host? (his call)
+- AE vowel: Wub Filter's third band −12 dB vs the table's −14 dB (his call).
