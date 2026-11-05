@@ -398,6 +398,8 @@
       e.stopPropagation(); cv.focus({ preventScroll: true }); if (!clip) return;
       const { x, y } = local(e); const i = hit(x, y), g = g0(e), st = steps();
       if (e.button === 2 && tool === 'bend') { if (i >= 0 && notes[i].b) { const next = notes.slice(), sel = S.has(i) ? Array.from(S) : [i]; sel.forEach(j => { if (next[j]) { next[j] = Object.assign({}, next[j]); delete next[j].b; } }); commit(next); say(notes[i].s, notes[i].n, 'bend: flat'); } return; }
+      // 3.112 right-click with notes selected: the notes' menu (Connect edges, …); with nothing selected it still erases the note under it
+      if (e.button === 2 && S.size) { if (i >= 0 && !S.has(i)) { S.clear(); S.add(i); draw(); } noteMenu(e.clientX, e.clientY); return; }
       if (e.button === 2) { if (i >= 0) { S.clear(); commit(notes.filter((_, j) => j !== i)); } return; }
       if (i < 0 || tool === 'erase') closeEditor();
       try { cv.setPointerCapture(e.pointerId); } catch (_) {}
@@ -609,6 +611,47 @@
       const list = chosen(); if (!list.length) return; const next = notes.slice(), st = steps(), r = () => Math.random() * 2 - 1;
       list.forEach(i => { const a = next[i], s1 = q(clampN(a.s + r() * 10 / 120, 0, st - FREE)); next[i] = Object.assign({}, a, { s: s1, l: q(Math.min(a.l, st - s1)), v: clampN(Math.round((a.v + r() * 0.08) * 100) / 100, 0.05, 1) }); });
       commit(next); readout.textContent = `humanized ${list.length}`;
+    }
+    // 3.112 CONNECT EDGES ("select notes and right click and have a connect edges in the context menu"): the selected notes become ONE
+    // note whose pitch glides through each of theirs — the edges meet and the sound runs on, like a line drawn with Sketch (3.108). Where
+    // two notes touch, the slide takes the last part of the first and the start of the next; across a gap, the slide fills the gap.
+    function connectEdges() {
+      if (drums) { readout.textContent = 'drum hits do not connect'; return; }
+      let list = Array.from(S).sort((a, b) => notes[a].s - notes[b].s || notes[b].n - notes[a].n);
+      list = list.filter((i, k) => k === 0 || notes[i].s > notes[list[k - 1]].s + 1e-6);   // a chord: its top note carries the line
+      if (list.length < 2) { readout.textContent = 'select two or more notes to connect'; return; }
+      const ns = list.map(i => notes[i]), S0 = ns[0].s, E = Math.max(...ns.map(a => a.s + a.l)), L = q(E - S0), base = ns[0].n;
+      const T = (st) => Math.max(0, Math.min(1, (st - S0) / L)), lo = (a) => a.n - base + (a.b ? +a.b.from || 0 : 0), hi = (a) => a.n - base + (a.b ? +a.b.to || 0 : 0);
+      const pts = [[0, lo(ns[0])]];
+      ns.forEach((a, k) => {
+        const nx = ns[k + 1], end = a.s + a.l;
+        if (!nx) { pts.push([T(end), hi(a)]); return; }
+        const gap = nx.s - end;
+        if (gap > 1e-6) { pts.push([T(end), hi(a)], [T(nx.s), lo(nx)]); return; }   // across the gap
+        const w = Math.max(FREE, Math.min(a.l, nx.l) * 0.35), at = Math.min(end, nx.s);   // touching or overlapping: a short slide over the edge
+        pts.push([T(Math.max(a.s, at - w / 2)), hi(a)], [T(Math.min(nx.s + nx.l, at + w / 2)), lo(nx)]);
+      });
+      const path = []; pts.forEach(([t, v]) => { t = Math.round(t * 10000) / 10000; v = Math.round(v * 1000) / 1000; const last = path[path.length - 1]; if (last && t <= last[0]) { if (t === last[0]) last[1] = v; return; } path.push([t, v]); });
+      if (path[path.length - 1][0] < 1) path.push([1, path[path.length - 1][1]]);
+      const one = Object.assign({}, ns[0], { s: S0, l: L, n: base, v: Math.round(ns.reduce((m, a) => m + a.v, 0) / ns.length * 100) / 100 });
+      if (path.some(p => Math.abs(p[1]) >= 0.05)) one.b = { from: path[0][1], to: path[path.length - 1][1], shape: 'path', path, at: 0 }; else delete one.b;
+      const gone = new Set(Array.from(S)), keep = notes.filter((_, j) => !gone.has(j));
+      selOnly([keep.length]); commit(keep.concat([one])); audition([base]);
+      readout.textContent = `connected ${ns.length} notes into one gliding note`;
+    }
+    // the notes' menu (right-click with a selection)
+    function noteMenu(x, y) {
+      const CM = window.ContextMenu; if (!CM) return; const n = S.size;
+      CM.show(x, y, [
+        { label: '⌒ Connect edges', hint: 'one note that glides through them — the edges meet, the pitch slides from each into the next', disabled: n < 2 || drums, run: () => connectEdges() },
+        { label: '⟷ Close the gaps (legato)', hint: 'each note lasts until the next one starts (L)', disabled: n < 2, run: () => legato() },
+        { sep: true },
+        { label: 'Q Quantize', hint: 'note starts onto the grid (Q)', run: () => quantize() },
+        { label: '≈ Humanize', hint: 'a little looseness in time and velocity (H)', run: () => humanize() },
+        { label: '⧉ Duplicate', hint: 'a copy right after them (Ctrl+D)', run: () => duplicate() },
+        { sep: true },
+        { label: '× Delete', danger: true, hint: 'Delete', run: () => removeSel() },
+      ], n + ' note' + (n === 1 ? '' : 's'));
     }
     function legato() {
       const list = chosen().sort((a, b) => notes[a].s - notes[b].s); if (list.length < 2) return; const next = notes.slice();
@@ -998,7 +1041,8 @@
     return { el, show, hide, playhead, setFull, setWindowed, get title() { return title.textContent; }, get full() { return !!full; }, get open() { return !!clip; }, get clipId() { return clip && clip.id; }, get drums() { return drums; },
       // for tests and the timeline's own keys: the grid/tool/zoom the roll is in, and what it holds
       get state() { return { tool, grid, len, lastLen, pps, row: ROW, step: stepOn, cursor, notes: notes.map(n => Object.assign({}, n)) }; }, setTool, zoomTo: (p, at) => { userZoom = true; zoomTo(p, at); }, setRow,
-      setGrid: (v) => { gridSel.set(v); grid = GRIDS.find(g => g[0] === String(v))[2]; draw(); }, canvas: cv, ruler, vel, openEditor, setLane, sketch: (pts, as, replace) => sketchToNotes({ pts, replace }, as), get lane() { return xk ? xk.key : ''; }, setStep, get selected() { return Array.from(S).sort((a, b) => a - b); } };
+      setGrid: (v) => { gridSel.set(v); grid = GRIDS.find(g => g[0] === String(v))[2]; draw(); }, canvas: cv, ruler, vel, openEditor, setLane, sketch: (pts, as, replace) => sketchToNotes({ pts, replace }, as), get lane() { return xk ? xk.key : ''; }, setStep, get selected() { return Array.from(S).sort((a, b) => a - b); },
+      select: (idx) => { selOnly(idx); draw(); }, connectEdges, noteMenu };
   }
   global.EravosTimelinePianoRoll = { create, mapPoint, toContent, GRIDS };
 })(window);

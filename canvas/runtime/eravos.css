@@ -950,14 +950,14 @@ html[data-theme][data-material][data-material] .wm-body :is([class$="-card"], [c
 /* ---------- 3.109 panel: a borderless window holding part of a window (CanvasWM.openPanel) — no frame, no border, no shadow ring;
    a slim strip on top to move it (its title and controls show on hover), the corner sizes it ---------- */
 .wm-panel { position: absolute; display: flex; flex-direction: column; background: var(--bg, #000); border: 0; border-radius: 0; box-shadow: none; }
-.wm-pstrip { display: flex; align-items: center; gap: 6px; height: 18px; padding: 0 2px 0 6px; flex: none; cursor: move; user-select: none; }
-.wm-ptitle { font: 600 10px var(--mono, monospace); letter-spacing: .08em; text-transform: uppercase; color: var(--faint, #555); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.wm-panel:hover .wm-ptitle { color: var(--acc, #00d4ff); }
-.wm-pstrip .wm-x, .wm-pstrip .wm-min { height: 16px; min-width: 18px; line-height: 14px; font-size: 11px; padding: 0; opacity: 0; transition: opacity .15s; }
-.wm-panel:hover .wm-pstrip .wm-x, .wm-panel:hover .wm-pstrip .wm-min, .wm-pstrip button:focus-visible { opacity: 1; }
+/* 3.112 the panel's title bar is always there (it was an 18 px strip whose controls showed only on hover: it did not read as a window) */
+.wm-pstrip { display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 6px 0 12px; flex: none; cursor: move; user-select: none;
+  background: var(--bg2, #0b0f15); border-bottom: 1px solid var(--line, #1c2633); }
+.wm-ptitle { font: 700 11px var(--mono, monospace); letter-spacing: .14em; text-transform: uppercase; color: var(--acc, #00d4ff); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wm-pstrip .wm-x, .wm-pstrip .wm-min { height: 22px; min-width: 24px; line-height: 20px; font-size: 13px; padding: 0 4px; }
 .wm-pbody { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
 .wm-pbody > * { flex: 1; min-height: 0; }
-.wm-pgrip { position: absolute; right: 0; bottom: 0; width: 14px; height: 14px; cursor: nwse-resize; opacity: 0; background: linear-gradient(135deg, transparent 50%, var(--line2) 50%); transition: opacity .15s; }
+.wm-pgrip { position: absolute; right: 0; bottom: 0; width: 16px; height: 16px; cursor: nwse-resize; opacity: .5; background: linear-gradient(135deg, transparent 50%, var(--line2) 50%); transition: opacity .15s; }
 .wm-panel:hover .wm-pgrip { opacity: 1; }
 .wm-panel.maximized .wm-pgrip { display: none; }
 .wm-panel.maximized .wm-pstrip { cursor: default; }
