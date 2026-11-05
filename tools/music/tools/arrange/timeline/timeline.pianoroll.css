@@ -89,3 +89,5 @@ select.tlpr-toolsel, .tlpr-toolsel select { font-weight: 600; color: var(--tool-
 .tlpr-bar .tlpr-spacer { flex: 1; }
 .tlpr-more { border-top: 0; padding-top: 0; }
 .tlpr-more[hidden] { display: none; }
+.tlpr-bar > .tlpr-pos { flex: 1 1 40px; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.tlpr-bar .uk-field select.uk-select { max-width: 190px; }

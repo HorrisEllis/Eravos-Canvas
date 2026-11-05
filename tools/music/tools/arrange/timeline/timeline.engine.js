@@ -55,6 +55,7 @@
       { key: 'follow', type: 'boolean', default: true, label: 'Follow', group: 'VIEW' },
       { key: 'laneH', type: 'integer', default: 48, min: 28, max: 160, label: 'Lane height', group: 'VIEW', hint: 'taller lanes = bigger clips (Alt + wheel over the lanes)' },
       { key: 'songBars', type: 'integer', default: 64, min: 1, max: 512, label: 'Song bars', group: 'VIEW' },
+      { key: 'rollMore', type: 'boolean', default: false, label: 'Piano roll: More controls open', group: 'VIEW', hidden: true },
       { key: 'rollWindow', type: 'boolean', default: true, label: 'Piano roll in its own window', group: 'VIEW', hint: '3.112 on by default: the piano roll opens as its own window under the Timeline, sized and placed as you like (off: under the tracks)' },
     ],
     ui_hooks: ['transport_play', 'restart', 'seek', 'loop_set', 'lane_add', 'lane_edit', 'lane_remove', 'auto_points', 'rec_knobs', 'clip_add', 'clip_edit', 'clip_remove', 'clip_split', 'clip_split_at', 'clip_duplicate', 'clip_repeat', 'lane_split', 'marker_edit', 'bounce', 'drop_file', 'export', 'note_audition', 'clip_fill', 'export_midi', 'export_stems', 'tool_set', 'tool_preset', 'behaviour_save', 'behaviour_remove'],

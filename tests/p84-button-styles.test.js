@@ -19,7 +19,7 @@ describe('P84 · button styles in the themes', () => {
   it('the theme panel shows every style as a live card, each drawn in its own style whatever is chosen', () => {
     const st = still(), was = Themes.getButtons(); Themes.setButtons('d'); const p = Themes.panel(() => {}); document.body.appendChild(p);
     try {
-      const cards = p.querySelectorAll('.thm-bcard'); assert.equal(cards.length, 5);
+      const cards = p.querySelectorAll('.thm-btns:not(.thm-mats) .thm-bcard'); assert.equal(cards.length, 5);
       const bg = (id) => getComputedStyle(p.querySelector(`[data-buttons-demo="${id}"] .uk-btn`)).backgroundImage;
       assert.ok(!/conic/.test(bg('a')) && /conic/.test(bg('d')), 'card A is not drawn in D although D is chosen');
       cards[2].click(); assert.equal(Themes.getButtons(), 'b');
