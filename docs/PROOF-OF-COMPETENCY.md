@@ -71,6 +71,31 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-05 · Beat colour, and phase 1's first component — PR #82
+- **His words (2026-11-05):** "i like the reactive but its still not what i want for the changing setting, like i want them to be the same
+  color and change to the beat" · "that looks nice as hell. can you start on the phases." · "start bottom up, then the highest leverage.
+  use a dependancy graph"
+- **His call:** the look stays; the reactive colours gain a mode where everything is one colour that moves on the beat. The next phases are
+  built bottom up, highest leverage first, from a dependency graph.
+- **Built:** Reactive colours › Beat (one shared colour from the theme's own accents, stepping on the transport's beat as it is heard,
+  every beat / 2 beats / bar). The dependency graph read from the specs (`build/eco-graph.mjs`): of 107 components, filter-svf carries
+  the most planned tools (35), so it came first — a zero-delay-feedback state-variable filter (Simper's method), 9 responses, 12/24/36 dB,
+  running as an AudioWorklet that is the same code the tests measure.
+- **Proof:** `tests/p102-beat-colour.test.js` (one colour across tools and page, steps on the beat, "every bar" waits for the bar, surfaces
+  and greys untouched, each tool's colour back when switched off). filter-svf: 29 measured checks — −3.01 dB at the cutoff, 12/24/36 dB
+  per octave within 1.2 dB, notch deeper than −60 dB, bell and shelves on target, 20 s of self-oscillation under audio-rate sweeps
+  bounded, decays to exact zero, nothing allocated in the audio loop; the worklet equals the tested kernel in the real engine (< −60 dB);
+  193 ns per stereo sample (≈ 0.9 % of a core).
+- **Check:** `node tools/music/components/filter-svf/filter-svf.test.mjs` · `node build/eco-graph.mjs` · `node tests/run.mjs P102` ·
+  https://github.com/HorrisEllis/Eravos-Canvas/pull/82
+
+### 2026-11-05 · Tool pages, cleaned up — PR #81
+- **His words (2026-11-05):** "the ui is how i want it. except it the tool pages look horrible." Then, on the before/after: "that looks nice as hell."
+- **His call:** the canvas look stays; only the tool page changes; he sees it before it merges.
+- **Built:** a fixed-size page with an opaque backdrop, a compact header, no scroll boxes inside it, preset names in full with actions on
+  hover, the controls as aligned cards, inputs and outputs in words; knobs as wide as their labels (89 colliding labels → 17).
+- **Check:** merge `00c0fc8685dca479bc33d05406e8e837254d898c` · https://github.com/HorrisEllis/Eravos-Canvas/pull/81
+
 ### 2026-11-04 19:32 −0800 · Looking Glass replaces Electron, written in Emerge — PR #78
 - **His words (2026-11-05):** "I want to replace electron with this. Emerge rebuild the canvas." · on the core's language: "All Emerge" ·
   "I'm building bottom up. Emerge needs to get finished to the point of being able to have you code with it. I am trying to reduce as much friction."

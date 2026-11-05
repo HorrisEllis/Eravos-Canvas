@@ -877,3 +877,12 @@ table.tp-tab .tp-ch { color: var(--dim, #7f93a8); line-height: 1.45; }
 .uk-knob { width: max-content; min-width: 50px; max-width: 76px; flex: none; }
 .uk-knob.big { min-width: 74px; }
 .uk-knob .uk-knob-label { width: 100%; max-width: 76px; overflow-wrap: normal; word-break: normal; }
+
+/* 3.102 Reactive colours › Beat: one colour for everything that has a colour, moving on the beat (sound-css.js writes --beat-col).
+ * The page palette and every window's and tool page's accent ARE that colour; nothing else about the look changes. */
+html[data-react="beat"] { --cyan: var(--beat-col, #00d4ff) !important; --green: var(--beat-col, #00ff88) !important; --pink: var(--beat-col, #ff2266) !important;
+  --violet: var(--beat-col, #b066ff) !important; --amber: var(--beat-col, #ffaa00) !important; --red: var(--beat-col, #ff3355) !important; --acc: var(--beat-col, #00d4ff) !important; }
+html[data-react="beat"] .wm-win, html[data-react="beat"] .wm-win [style*="--acc"], html[data-react="beat"] .tp-overlay, html[data-react="beat"] .tp-overlay [style*="--acc"],
+html[data-react="beat"] .tp-page { --acc: var(--beat-col, #00d4ff) !important; --facc: var(--beat-col, #00d4ff) !important; }
+html[data-react="beat"][data-theme="field"] [data-f] { --Fl: var(--beat-col) !important; --Fc: var(--beat-col) !important; --Fr: var(--beat-col) !important; }
+html[data-react="beat"] .wm-win, html[data-react="beat"] .tp-page { transition: border-color .12s; }

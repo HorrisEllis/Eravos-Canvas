@@ -49,6 +49,10 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-05 | Reactive colours › **Beat**: every tool, the toolbar and tool pages share one colour (the theme's own accents, in turn), moving on the transport's beat (when heard), every beat / 2 beats / bar, flash = Amount; surfaces and greys keep theirs; no restyle | `tools/music/core/sound-css.js`, `react-panel.js`, `eravos.css` | `tests/p102-beat-colour.test.js` 1/1 (13 checks); P48c P58 P73 P77 P83 P84 green; P82's 2 failures are on main too |
+| 2026-11-05 | Phase 1 begins: **filter-svf** (35 planned tools stand on it) — Simper's zero-delay-feedback SVF, 9 modes, 12/24/36 dB, detune input, AudioWorklet = the tested kernel | `tools/music/components/filter-svf/` | 29 measured checks (−3.01 dB at cutoff, slopes ±1.2 dB, notch < −60 dB, bell/shelves, 20 s self-oscillation bounded, denormals, no allocation); worklet = kernel in the engine (< −60 dB); 193 ns/stereo sample |
+| 2026-11-05 | Tool pages cleaned up (fixed size, compact head, no nested scroll, packs, controls, in/out in words); knob labels no longer collide (89 → 17) | `canvas/runtime/eravos.css`, `tool-page.js` | before/after shown, approved ("that looks nice as hell"); P21 P45 P48 P49 P58 P63 P70 P91 green · PR #81 |
+| 2026-11-05 | The next phases as a dependency graph from the specs | `build/eco-graph.mjs` → `docs/eco-graph.md` | 107 components, 107 tools; leverage computed |
 | 2026-11-05 | Proof-of-competency record: credit stated plainly, checkable numbers, resume lines, a timestamped ledger with provenance (merge times, his dated words, proof, where to check), every merged PR since 2026-10-15 | `docs/PROOF-OF-COMPETENCY.md` | every figure has the command that counts it |
 | 2026-11-05 | Decided: Looking Glass in Emerge, Emerge first; the road E1 (native_lang F5) · E2 (native_windows) · E3 calling Windows (multi-DLL imports, Win64 calls, memory, callbacks, COM) · E4 axiom · LG1 window + rect from data (software, then GPU) · C1 canvas | `docs/eravos-v2-emerge-looking-glass.md` | — (a plan, measured against Emerge f023240) |
 | 2026-11-05 | P0.5 filter-formant: one vowel table (10 vowels) + one formant bank for Wobble Bass and Wub Filter (they had drifted: UH IH ER / YOI / AE −14 vs −12 dB). Wobble Bass gains YOI; Wub Filter gains UH, IH, ER (its AE kept −12 so nothing changes — his call) | `tools/music/components/filter-formant/` | 5,220 checks bit-identical; null render Wobble Bass 38/38 (worst −87.6 dB), Wub Filter 8/8 (7 presets unstable, unproven); Wobble 39/39, Wub 59/59, P94 2/2 |
@@ -73,7 +77,8 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 - **The UI stays as it is.** No restyle, no new kit. (A unified-kit preview was shown and rejected, 2026-11-05.)
 - **Every NEW tool's UI is shown to him before the tool is built** (a preview he approves), consistent with the tools as they are.
-- **Beat colour** goes into the existing reactive colours: every tool the same colour, changing on the beat.
+- **Beat colour** — built (3.102, Reactive colours › Beat).
+- **Phase 1 order** (docs/eco-graph.md): filter-svf ✓ → lfo (24) → osc-va (20) → waveshaper (19) → env-adsr (17) → env-msseg (14) → … then its 7 tools, each shown to him as a UI preview first.
 - **Next phases, bottom up, highest leverage first, from a dependency graph built from the specs**: `node build/eco-graph.mjs` →
   `docs/eco-graph.md` (which components the planned tools stand on, how many each reaches, what is ready to build).
 
