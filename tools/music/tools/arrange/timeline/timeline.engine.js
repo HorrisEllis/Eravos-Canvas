@@ -190,10 +190,13 @@
       ];
       let behaviours = [];
       // 3.56 a note's pitch curve: { from, to } semitones (±48), shape, at (where in the note the bend starts) — null if flat
-      const BEND_SHAPES = ['smooth', 'linear', 'early', 'late'];
+      const BEND_SHAPES = ['smooth', 'linear', 'early', 'late', 'path'];
       function cleanB(b) {
         if (!b || typeof b !== 'object') return null; const r2 = (v) => Math.round(clamp(+v || 0, -48, 48) * 100) / 100;
         const o = { from: r2(b.from), to: r2(b.to), shape: BEND_SHAPES.includes(b.shape) ? b.shape : 'smooth', at: Math.round(clamp(+b.at || 0, 0, 0.95) * 100) / 100 };
+        // 3.108 a drawn path: up to 64 points [f 0…1 ascending, semitones ±48]; from / to are its ends
+        if (o.shape === 'path') { const P = (Array.isArray(b.path) ? b.path : []).filter(q => Array.isArray(q) && isFinite(q[0]) && isFinite(q[1])).map(q => [Math.round(clamp(+q[0], 0, 1) * 1e4) / 1e4, r2(q[1])]).sort((a, c) => a[0] - c[0]).slice(0, 64);
+          if (P.length >= 2) { P[0][0] = 0; P[P.length - 1][0] = 1; o.path = P; o.from = P[0][1]; o.to = P[P.length - 1][1]; o.at = 0; if (P.some(q => q[1])) { const os0 = cleanNoteOsc(b.osc); if (os0) o.osc = os0; return o; } } else o.shape = 'smooth'; }
         const os = cleanNoteOsc(b.osc); if (os) o.osc = os;
         return o.from || o.to || o.osc ? o : null;
       }

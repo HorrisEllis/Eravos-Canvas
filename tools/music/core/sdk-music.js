@@ -538,16 +538,18 @@ registerProcessor('eravos-pitch', EravosPitch);`;
       }
       /** schedule the bus for a note from t to end: its bend (and oscillation), or back to 0 if an earlier note left it bent */
       function bendNote(t, end, b) {
-        const from = b ? Math.max(-BEND_MAX, Math.min(BEND_MAX, +b.from || 0)) : 0, to = b ? Math.max(-BEND_MAX, Math.min(BEND_MAX, +b.to || 0)) : 0, osc = b && b.osc && +b.osc.depth > 0 ? b.osc : null, has = !!(from || to);
+        const from = b ? Math.max(-BEND_MAX, Math.min(BEND_MAX, +b.from || 0)) : 0, to = b ? Math.max(-BEND_MAX, Math.min(BEND_MAX, +b.to || 0)) : 0, osc = b && b.osc && +b.osc.depth > 0 ? b.osc : null, has = !!(from || to) || !!(b && b.shape === 'path' && Array.isArray(b.path) && b.path.some(q => q && +q[1]));   // a drawn wave can start and end at 0
         if (osc) { wake(); oscNote(t, end, osc); }
         if (!has && (!bent || Math.abs(t - lastBendT) < 0.002)) return;   // a chord note without a bend never cancels its neighbour's
         const o = wheelNode().offset;
         try { if (o.cancelAndHoldAtTime) o.cancelAndHoldAtTime(t); else o.cancelScheduledValues(t); } catch (e) {}
         if (!has) { o.setValueAtTime(0, t); bent = false; return; }
         wake();
-        const f = BEND_SHAPES[b.shape] || BEND_SHAPES.smooth, at = Math.max(0, Math.min(0.95, +b.at || 0)), t1 = t + (end - t) * at, dur = Math.max(0.01, end - t1), N = 24;
-        o.setValueAtTime(from * 100, t); if (t1 > t) o.setValueAtTime(from * 100, t1);
-        for (let i = 1; i <= N; i++) o.linearRampToValueAtTime((from + (to - from) * f(i / N)) * 100, t1 + dur * i / N);
+        const MP = global.MusicParts, path = b.shape === 'path' && Array.isArray(b.path) && b.path.length > 1 && MP && MP.pathAt ? b.path : null;   // 3.108 a drawn path
+        const f = BEND_SHAPES[b.shape] || BEND_SHAPES.smooth, at = path ? 0 : Math.max(0, Math.min(0.95, +b.at || 0)), t1 = t + (end - t) * at, dur = Math.max(0.01, end - t1), N = path ? Math.min(256, Math.max(48, Math.round(dur * 120))) : 24;
+        const val = (x) => Math.max(-BEND_MAX, Math.min(BEND_MAX, path ? MP.pathAt(path, x) : from + (to - from) * f(x)));
+        o.setValueAtTime(val(0) * 100, t); if (t1 > t) o.setValueAtTime(val(0) * 100, t1);
+        for (let i = 1; i <= N; i++) o.linearRampToValueAtTime(val(i / N) * 100, t1 + dur * i / N);
         bent = true; lastBendT = t;
       }
       /** a Timeline Pitch lane: semitones at an audio time, glided (never stepped), null = back to 0 */
