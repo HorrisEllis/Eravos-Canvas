@@ -2,7 +2,7 @@
  * Asked: "an update service to check GitHub for updates with a toast asking to update it".
  * In the app (desktop/updater.js does the checking and the swap): when a newer release is out, a toast stays until answered —
  *   Update now (downloads it, puts it in place, ERAVOS restarts — your projects and exports stay) · What's new · Later (this version
- *   is not asked again). ⋯ Options → Check for updates asks now.
+ *   is not asked again). ⚙ Settings → About & updates → Check for updates asks now.
  * In a browser (no app around it) the same check runs against GitHub; Update now opens the release page.
  *   Updates.show(info) · check() · REPO */
 (function (global) {
@@ -51,11 +51,22 @@
     if (D() && D().checkUpdate) { const u = await D().checkUpdate(); if (u) onMessage(Object.assign({ state: 'available', manual: true }, u)); return u; }
     return webCheck(true);
   }
+  // 3.110 About & updates: a section of ⚙ Settings (Check for updates was an entry in the ⋯ Options dropdown)
   function entry() {
-    const slot = doc.getElementById('slot-options'); if (!slot) return false; if (doc.getElementById('updBtn')) return true;
-    const b = el('button', 'tb-btn', 'Check for updates'); b.id = 'updBtn'; b.type = 'button'; b.title = 'ask GitHub for a newer ERAVOS';
-    b.onclick = () => { const m = doc.getElementById('optMenu'); if (m) m.hidden = true; check(); };
-    slot.appendChild(b); return true;
+    if (!global.AppSettings || !global.UIKit) return false; if (entry.done) return true; entry.done = true;
+    global.AppSettings.addSection({ id: 'about', label: 'About & updates', order: 90, make: () => {
+      const UI = global.UIKit, h = UI.h, ver = h('b', { text: '…' }), st = h('span', { class: 'as-say', text: '' });
+      const vOf = async () => { try { if (D() && D().info) { const i = await D().info(); if (i && i.version) return i.version; } } catch (e) {} let seen = null; try { seen = global.localStorage.getItem('eravos.update.seen'); } catch (e) {} return seen || 'in the browser'; };
+      vOf().then(v => { ver.textContent = v; });
+      const go = UI.Button({ label: 'Check for updates', kind: 'primary', hint: 'ask GitHub for a newer ERAVOS', onClick: async () => { st.textContent = 'asking GitHub…'; try { const r = await check(); st.textContent = r === null ? '' : ''; } catch (e) { st.textContent = e.message; } } });
+      return h('div', { class: 'as-card' }, [
+        h('div', { class: 'as-row' }, [h('span', { class: 'as-k', text: 'ERAVOS' }), ver]),
+        h('div', { class: 'as-row' }, [go.el, st]),
+        h('p', { class: 'as-say', text: 'When a newer release is out, ERAVOS asks you once (Update now · What’s new · Later). Your work in Documents\\ERAVOS is never touched by an update.' }),
+        h('div', { class: 'as-row' }, [h('a', { class: 'as-link', href: 'https://github.com/' + REPO + '/releases', target: '_blank', rel: 'noopener', text: 'All releases →' })]),
+      ]);
+    } });
+    return true;
   }
   function boot() {
     if (!entry()) { setTimeout(boot, 300); return; }

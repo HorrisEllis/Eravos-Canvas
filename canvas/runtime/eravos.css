@@ -959,3 +959,21 @@ html[data-theme][data-material][data-material] .wm-body :is([class$="-card"], [c
 .wm-panel:hover .wm-pgrip { opacity: 1; }
 .wm-panel.maximized .wm-pgrip { display: none; }
 .wm-panel.maximized .wm-pstrip { cursor: default; }
+
+/* ---------- 3.110 ⚙ Settings: one page like the tool pages, a tab per section (AppSettings) ---------- */
+.as-page { max-width: 1080px; }
+.as-head { padding-top: 18px; }
+.as-head h2 { margin: 0 0 4px; }
+.as-head p { margin: 0; color: var(--dim); }
+.as-sec { padding-top: 14px; }
+.as-sub { margin: 0 0 14px; color: var(--dim); }
+.as-card { background: var(--panel2); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; max-width: 760px; }
+.as-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.as-k { font: 600 10.5px var(--mono, monospace); letter-spacing: 1.4px; text-transform: uppercase; color: var(--dim); min-width: 70px; }
+.as-say { margin: 0; color: var(--dim); flex: 1; min-width: 240px; line-height: 1.5; }
+.as-link { color: var(--acc, #00d4ff); text-decoration: none; } .as-link:hover { text-decoration: underline; }
+/* a panel that used to be a popover sits in the page as it is: its own title bar and × are the page's */
+.as-sec .thm-panel { position: static; width: auto; max-width: none; max-height: none; box-shadow: none; border: 0; background: transparent; padding: 0; }
+.as-sec .thm-headr { display: none; }
+.as-sec .rcp-x { display: none; }
+.as-sec .rcp { max-width: 760px; }

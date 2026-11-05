@@ -16,5 +16,8 @@ describe('P99 · an update is out: the toast asks', () => {
       Updates.close();
     } finally { window.eravosDesktop = was; localStorage.removeItem('eravos.update.skip'); }
   });
-  it('⋯ Options carries Check for updates', () => { if (!document.getElementById('slot-options')) return; assert.ok(document.getElementById('updBtn')); });
+  it('⚙ Settings → About & updates carries Check for updates', async () => {
+    AppSettings.open('about'); await TH.sleep(30);
+    try { const sec = document.querySelector('.as-sec[data-sec="about"]'); assert.ok(sec); assert.ok([...sec.querySelectorAll('button')].some(b => /Check for updates/.test(b.textContent))); } finally { AppSettings.close(); }
+  });
 });
