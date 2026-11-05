@@ -1,3 +1,24 @@
+ERAVOS v0.2.0 (2026-11-05)
+
+Install: run ERAVOS-Setup-0.2.0.exe (Program Files, Start menu, Settings > Apps), or unzip ERAVOS_0.2.0.zip and run ERAVOS.exe.
+Already on 0.1.0? ERAVOS offers this update by itself; your work in Documents\ERAVOS is not touched.
+
+What is new
+- Black surfaces: every surface is neutral black; only colour is colour. No tint, no cast, in every theme.
+- Reactive colours > Beat: every tool, the toolbar and tool pages share one colour that moves on the beat (every beat, 2 beats or bar).
+- Tool pages cleaned up: one size for every tab, a compact head, presets in full, the controls as cards, inputs and outputs in words.
+- Consistency across every tool: one kit (button, toggle, knob, segment) at the kit's sizes, one main action per window, each tool's
+  gradients in its own colour (Tape Echo's Throw), knob labels that never run together.
+- Your library is Documents\ERAVOS (projects, exports, packs, tools, drop); the installer puts ERAVOS in Program Files.
+- Delete packs, presets, kits and patterns for good.
+- Wobble Bass and Wub Filter share one vowel filter: Wobble Bass gains YOI, Wub Filter gains UH, IH and ER.
+- A new state-variable filter in the engine (for the tools to come), proved on its own.
+
+Under the hood
+- A design guide (docs/DESIGN-GUIDE.md) and a design check that measures every tool on every change.
+- No toys: a check that every instrument makes its sound live, with no shipped recordings.
+- The canvas and the content stay separate: canvas/ is the host and knows no tool; tools/ holds the tools, packs and suites.
+
 ERAVOS v0.1.0 — first tagged release (2026-10-24)
 
 The first numbered release. (Builds before this were named by their map phase, e.g. 3.36.0-alpha; from here on
