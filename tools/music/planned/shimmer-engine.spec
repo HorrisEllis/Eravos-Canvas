@@ -1,0 +1,31 @@
+# spec_id: eravos.shimmer-engine · version 0.1.0 · status new · template eravos.tool/1
+# generated from eravos.music-ecosystem.spec v0.2.0 §4 (space_and_transformation) — that file stays the index; this file is the tool's own spec
+identity:
+  id: eravos.shimmer-engine ; label: Shimmer Engine ; domain: music ; family: space_and_transformation
+  lineage: pitch-shifted feedback reverb of 1980s–90s ambient and post-rock
+  family_from: tape echo and spring tanks (dub), plates and halls (studio era), digital reverbs (1980s on), spectral processing
+assembles (components, tools/music/components/<id>/ — never re-implemented here):
+  reverb-fdn · pitch-shifter · filter-svf · delay-line · lfo
+adds (behaviour only this tool has):
+  - shift intervals in the feedback (+12, +7, −12, any)
+  - shimmer only on sustained notes (transient bypass)
+  - bloom amount over time
+modes: octave · fifth · chord
+ports: TO WRITE in the depth audit — typed in/out per §5 tool_contract; every assembled component reachable by wiring (Open as components)
+params: TO WRITE in the depth audit — every component control exposed, full range (eravos.tool-depth.spec), each a modulation destination
+packs (names unique across the ecosystem; ≥ 6 presets each; novelty test §6):
+  - Angel Octave — classic +12 shimmer wash
+  - Fifth Heaven — +7 and +12 together
+  - Downward Shimmer — −12 shimmer for dark ambient
+  - Chord Halo — shimmer in a major-7 chord
+  - Glacial Bloom — very slow bloom over minutes
+  - Bright Mist — subtle shimmer behind vocals
+acceptance:
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - open-as-components: the wired components render the same as the tool (≤ −60 dB difference)
+  - novelty: every preset's nearest neighbour in this tool ≥ 0.15, pack centroids ≥ 0.25 apart (§6)
+  - p42 audio survey: timing to the sample, pitch to the cent, never over full scale
+  - cpu per instance and per voice measured (build/perf.mjs) and inside §8 budgets
+  - depth audit written above; open gaps listed, none hidden
+
+# dependencies: run node build/planned-deps.mjs once the hooks line is written (generated block, not by hand)

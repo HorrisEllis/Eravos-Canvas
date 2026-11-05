@@ -1,0 +1,28 @@
+# spec_id: eravos.fx-rewind · version 0.1.0 · status mapped · template eravos.tool/1 (STD.fx)
+identity:
+  id: eravos.fx-rewind ; label: Rewind ; domain: music ; category: dub (shown as Dub)
+  purpose: the selector's "wheel up": grab the last seconds, spin them backwards faster and faster, stop the riddim — and drop it back in from the top.
+  related: the PULL UP part of Dub Station · planned tape-deck (tape stop / start among many things) · planned time-warp · technique only
+ports:
+  in:  in (audio: the master or a bus) · trigger (event: pad:trigger / key — pull up) · transport (ticks, play, stop) · mod.length (±1 → ±1 on length)
+  out: out (audio) · spin (modulation 0..1: how far into the rewind) · drop (event: rewind:drop {bar} — fired when the riddim returns, for Rise, Rumble, Drop Builder)
+params: length 0.5..8 s (or 1/2/4 bars) · curve [accelerating, linear, brake] · direction [reverse, stop, both] · restart [from bar 1, from here, none] · restartAt [bar 1..16] · scratch 0..1 (a vinyl chop at the end) · pitchDepth 0..24 st · filter [off, sweep] · tail 0..1 · hornOnDrop [off, on] · level
+behaviour:
+  - a ring buffer records the input continuously (float32, 8 s per channel); on trigger the last Length seconds are read backwards at a speed that follows the curve (accelerating = 0 → 4× over Length), pitch rises with speed, and the live signal is muted
+  - at the end: stop (silence for a beat), "from bar 1" jumps the transport to the chosen bar and un-mutes — the drop that follows a rewind; "none" just cuts back to live
+  - the "drop" event is emitted at the exact audio time the live signal returns so other tools (a Rumble, an Air Horn) can fire on it
+  - tempo-aware: Length in bars follows the BPM at trigger time; a BPM change during a rewind is ignored until it ends
+  - one trigger per rewind: a second trigger inside it is queued, never layered; Stop all aborts it and restores live audio within 5 ms
+needs: units [music.engine, music.transport, music.tempo, music.meter] · tools [] · permissions [audio_out, audio_in, bus_publish, bus_subscribe]
+packs: ships [factory] — Pull Up 3s · Wheel Up Bar 1 · Brake · Reverse Fast · Scratch Out · Both Ways · One Bar Rewind · Long Dub Rewind
+hooks: STD.audio_in ; STD.audio_out ; trigger_in ; STD.transport_in ; mod_in (length) ; mod_out (spin) ; data_out (drop)
+acceptance (fx-rewind.test.js):
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - p42 audio survey (node tests/tool-audio.mjs fx-rewind): every preset rendered — timing to the sample, pitch to the cent, level never over full scale, Stop all silences it
+  - a 3 s accelerating rewind at 120 BPM: the audio is the last 3 s reversed, speed 0 → 4× ± 5 %
+  - restart from bar 1: the transport position after the drop equals bar 1 ± 1 sample, drop event within 1 sample
+  - trigger during a rewind: no overlap, the second queues
+  - Stop all restores live audio, no click larger than −50 dBFS
+  - ring buffer holds ≥ 8 s with no dropout at 48 kHz
+
+# dependencies: run node build/planned-deps.mjs — it reads the hooks line above and writes the generated block here (needs the Clear Glass driver; not written by hand)

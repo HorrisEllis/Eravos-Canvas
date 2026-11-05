@@ -1,0 +1,31 @@
+# spec_id: eravos.filter-house · version 0.1.0 · status new · template eravos.tool/1
+# generated from eravos.music-ecosystem.spec v0.2.0 §4 (house_garage_techno) — that file stays the index; this file is the tool's own spec
+identity:
+  id: eravos.filter-house ; label: Filter House ; domain: music ; family: house_garage_techno
+  lineage: French touch filter house: loops through a swept filter, phaser and pump
+  family_from: Chicago house and Detroit techno (1980s), UK garage (late 1990s), minimal and dub techno, French filter house
+assembles (components, tools/music/components/<id>/ — never re-implemented here):
+  filter-svf · filter-allpass-chain · ducker · compressor · lfo · sampler-voice
+adds (behaviour only this tool has):
+  - one big filter sweep macro across a loop
+  - phaser + pump as one move
+  - loop source from any canvas audio
+modes: sweep · phaser · pump
+ports: TO WRITE in the depth audit — typed in/out per §5 tool_contract; every assembled component reachable by wiring (Open as components)
+params: TO WRITE in the depth audit — every component control exposed, full range (eravos.tool-depth.spec), each a modulation destination
+packs (names unique across the ecosystem; ≥ 6 presets each; novelty test §6):
+  - Disco Sweep — 8-bar lowpass open on disco loops
+  - Phased Groove — slow phaser on chord loops
+  - Filtered Funk — funky loops pumping under a filter
+  - Night Club Filter — dark filter pumping in a club
+  - Highpass Tease — highpass build before drops
+  - Robot Disco — talkbox-like filter on loops
+acceptance:
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - open-as-components: the wired components render the same as the tool (≤ −60 dB difference)
+  - novelty: every preset's nearest neighbour in this tool ≥ 0.15, pack centroids ≥ 0.25 apart (§6)
+  - p42 audio survey: timing to the sample, pitch to the cent, never over full scale
+  - cpu per instance and per voice measured (build/perf.mjs) and inside §8 budgets
+  - depth audit written above; open gaps listed, none hidden
+
+# dependencies: run node build/planned-deps.mjs once the hooks line is written (generated block, not by hand)

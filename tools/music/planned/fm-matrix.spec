@@ -1,0 +1,35 @@
+# spec_id: eravos.fm-matrix · version 0.1.0 · status new · template eravos.tool/1
+# generated from eravos.music-ecosystem.spec v0.2.0 §4 (synthwave_retro) — that file stays the index; this file is the tool's own spec
+identity:
+  id: eravos.fm-matrix ; label: FM Matrix ; domain: music ; family: synthwave_retro
+  lineage: 6-operator digital FM of the early 1980s (electric pianos, bells, slap bass); later FM bass in house, neuro and riddim
+  family_from: late-1970s–80s analog and FM polysynths, film and game scores; revived as synthwave, outrun, darksynth, coldwave, vaporwave
+assembles (components, tools/music/components/<id>/ — never re-implemented here):
+  osc-fm-operator · ring-mod · env-msseg · env-adsr · lfo · filter-svf · unison-stack · voice-allocator
+adds (behaviour only this tool has):
+  - 2–8 operators with a drawable algorithm matrix (any op → any op, incl. feedback loops via explicit feedback nodes)
+  - ratio/fixed per op, per-op key scaling and velocity curves
+  - import of classic 6-op patch banks as editable presets (format only, no factory sounds copied)
+modes: classic-6op · matrix · fm-bass · percussion
+engines_0_1_0 (the original list, kept verbatim; each is covered by the components above or by adds):
+  multi-operator-fm · phase-modulation · operator-feedback · ratio-and-fixed-frequency · operator-envelopes
+ports: TO WRITE in the depth audit — typed in/out per §5 tool_contract; every assembled component reachable by wiring (Open as components)
+params: TO WRITE in the depth audit — every component control exposed, full range (eravos.tool-depth.spec), each a modulation destination
+packs (names unique across the ecosystem; ≥ 6 presets each; novelty test §6):
+  - Tine Electric — bell-struck electric pianos with velocity-shaped bark
+  - Glass Cathedral — long inharmonic bells over slow pads
+  - Metallic Percussion — fixed-frequency hits: cowbells, clanks, struck tubes
+  - FM Reese — two detuned FM stacks beating like a reese
+  - Digital Brass — bright operator brass with feedback rasp
+  - Crystal Plucks — fast-decay high-ratio plucks for arps
+  - Industrial Bells — clangorous ratios, feedback grit, cold decay
+  - Sideband Choir — low-index FM vowel-like pads sung by operator envelopes
+acceptance:
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - open-as-components: the wired components render the same as the tool (≤ −60 dB difference)
+  - novelty: every preset's nearest neighbour in this tool ≥ 0.15, pack centroids ≥ 0.25 apart (§6)
+  - p42 audio survey: timing to the sample, pitch to the cent, never over full scale
+  - cpu per instance and per voice measured (build/perf.mjs) and inside §8 budgets
+  - depth audit written above; open gaps listed, none hidden
+
+# dependencies: run node build/planned-deps.mjs once the hooks line is written (generated block, not by hand)

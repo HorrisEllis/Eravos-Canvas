@@ -1,0 +1,31 @@
+# spec_id: eravos.drop-compiler · version 0.1.0 · status new (widens bass-drop-builder) · template eravos.tool/1
+# generated from eravos.music-ecosystem.spec v0.2.0 §4 (signature_innovations) — that file stays the index; this file is the tool's own spec
+identity:
+  id: eravos.drop-compiler ; label: Drop Compiler ; domain: music ; family: signature_innovations ; signature: true
+  lineage: ERAVOS: describe the drop's energy curve; it compiles the transitions across the canvas
+  family_from: ERAVOS's own ideas — the reason to choose it over any DAW
+assembles (components, tools/music/components/<id>/ — never re-implemented here):
+  energy-curve · state-machine-core · pattern-store · tension-meter · structure-segmenter
+adds (behaviour only this tool has):
+  - draw energy for build → drop → break; it writes risers, fills, gaps, filter rides and pumps as ordinary clips
+  - every compiled event lists which tool it targets
+  - recompile keeps manual edits
+modes: compile · assist
+ports: TO WRITE in the depth audit — typed in/out per §5 tool_contract; every assembled component reachable by wiring (Open as components)
+params: TO WRITE in the depth audit — every component control exposed, full range (eravos.tool-depth.spec), each a modulation destination
+packs (names unique across the ecosystem; ≥ 6 presets each; novelty test §6):
+  - Classic Build Drop — 16-bar build into a full drop
+  - Silent Drop — a gap before the drop
+  - Double Drop — two drops back to back
+  - Switch-Up Drop — second half of the drop changes genre
+  - Anti-Climax — the drop goes sparse instead
+  - Slow Burn Drop — energy rises inside the drop
+acceptance:
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - open-as-components: the wired components render the same as the tool (≤ −60 dB difference)
+  - novelty: every preset's nearest neighbour in this tool ≥ 0.15, pack centroids ≥ 0.25 apart (§6)
+  - p42 audio survey: timing to the sample, pitch to the cent, never over full scale
+  - cpu per instance and per voice measured (build/perf.mjs) and inside §8 budgets
+  - depth audit written above; open gaps listed, none hidden
+
+# dependencies: run node build/planned-deps.mjs once the hooks line is written (generated block, not by hand)
