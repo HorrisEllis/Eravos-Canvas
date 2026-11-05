@@ -19,6 +19,20 @@ like clips". Each shown as screenshots first; "merge and push".
   Shift+wheel scroll, middle-drag pans.
 - P84 counts only button-style cards (Material cards share the style). Full suite on main before this: 1379/1382 (P84 fixed; P82 ×2 known).
 
+## Done — 3.113–3.114 Ctrl-click, curves for a selection, art 404s fixed, Ctrl+A, bigger menus, tool borders, more Settings · v0.2.5 (2026-11-05)
+Asked: "Holding control selects each node when left clicking" · curves · connect edges from selecting them · "that needs to be fixed,
+the art svg … the context menu for the timeline is way smaller, expand it … the cut in half button …, split at playhead button,
+duplicate buttons need to go, also control a needs to work again, also the settings menu is still gone. a lot missing … can you make a
+colored border around each tool, including the piano … merge, push and release".
+- art.svg: a relative url() in a window's --art resolves against canvas/runtime/eravos.css → /canvas/tools/…/art.svg 404 per window,
+  every paint (754 in his console). Now an absolute URL. Measured: 0 misses spawning tools in Dusk.
+- Piano roll: Ctrl-click toggles a note (Ctrl-drag still copies); Ctrl+A anywhere in the roll; menu › curve (dive, deep drop, rise, glide
+  in, vibrato, flat) for every selected note; J = Connect edges.
+- Timeline: In half / Split at playhead / Duplicate buttons gone (still in the right-click menu). Context menus: 14 px, 38 px rows.
+- Coloured border on every tool and on a tool's own windows (outline in --acc): Settings › Canvas (on). Snap windows (on).
+  Settings › Keys (shortcuts + search; the music side adds its own) and Library (the app).
+- Tests: p112 5/5. 1387/1391: P82, the rim, P70's Timeline menu (fail on main too) and P74b (flaky).
+
 ## Done — 3.112 Connect edges in the piano roll's menu · the piano roll as a proper window of its own (2026-11-05)
 Asked: "I want to be able to select notes and right click and have a connect edges in the context menu. Also make the piano roll
 popout its own window. It's badly impl[e]mented."

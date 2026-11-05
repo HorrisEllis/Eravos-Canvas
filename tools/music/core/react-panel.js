@@ -134,6 +134,12 @@
   // 3.110 a section of ⚙ Settings (it was a line in the ⋯ Options dropdown, opening a popover)
   function optionsEntry() {
     if (!global.AppSettings) return false; if (optionsEntry.done) return true; optionsEntry.done = true;
+    // 3.114 the music tools' shortcuts in Settings › Keys (the canvas lists only its own)
+    if (global.CanvasPrefs && global.CanvasPrefs.addKeys && !boot._keys) { boot._keys = true;
+      global.CanvasPrefs.addKeys('Piano roll', [['1 2 3 4 5', 'draw · paint · split · erase · select'], ['Ctrl + A', 'every note'], ['Shift / Ctrl + click', 'add a note to the selection or take it out'], ['Ctrl + drag', 'copy'],
+        ['Right-click (notes selected)', 'Connect edges, curves, quantize…'], ['J', 'connect edges'], ['L', 'legato'], ['Q', 'quantize'], ['H', 'humanize'], ['Ctrl + D', 'duplicate'], ['Ctrl + C / X / V', 'copy · cut · paste'],
+        ['Delete', 'delete'], ['← → ↑ ↓ (Shift: bigger)', 'move the selection'], ['Esc', 'close full screen']]);
+      global.CanvasPrefs.addKeys('Timeline', [['Right-click a clip or a stretch', 'split, in half, duplicate, delete…'], ['S', 'split'], ['F', 'fit'], ['Delete', 'delete the clip'], ['Home', 'back to the start']]); }
     global.AppSettings.addSection({ id: 'reactive', label: 'Reactive colours', order: 20, sub: 'How every colour answers the sound. Each tool can follow this or have its own (its ⚙ → Reactive colours).', make: () => build({ scope: 'app' }) });
     return true;
   }

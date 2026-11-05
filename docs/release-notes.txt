@@ -1,3 +1,24 @@
+ERAVOS v0.2.5 (2026-11-05)
+
+Install: ERAVOS-Setup-0.2.5.exe, or unzip ERAVOS_0.2.5.zip. On an earlier version, ERAVOS offers this update by itself.
+
+Fixed
+- The hundreds of "art.svg 404" errors: every window asked for its painting at the wrong address.
+- Ctrl+A selects every note again wherever the piano roll has focus or the pointer (it only worked with the grid focused).
+
+Piano roll
+- Ctrl+click picks notes one by one (again to take one out); Ctrl+drag still copies.
+- Right-click selected notes: curves for all of them at once (dive, deep drop, rise, glide in, vibrato, flat); J connects edges.
+
+Timeline
+- The clip bar loses In half, Split at playhead and Duplicate (they are in the right-click menu).
+- Right-click menus are bigger and easier to hit.
+
+Canvas and Settings
+- A coloured border on every tool, the piano roll's own window too, so windows never run into each other (Settings > Canvas, on).
+- Settings > Canvas (borders, snapping), Keys (every shortcut, with a search), Library in the app (open your folders).
+- Updates download in the background; ERAVOS Update puts them in place, keeps a backup, and restarts.
+
 ERAVOS v0.2.4 (2026-11-05)
 
 Install: ERAVOS-Setup-0.2.4.exe, or unzip ERAVOS_0.2.4.zip. On an earlier version, ERAVOS offers this update by itself.

@@ -979,3 +979,18 @@ html[data-theme][data-material][data-material] .wm-body :is([class$="-card"], [c
 .as-sec .thm-headr { display: none; }
 .as-sec .rcp-x { display: none; }
 .as-sec .rcp { max-width: 760px; }
+/* 3.114 the context menus, bigger and easier to hit (his words: "the context menu … is way smaller, expand it as much as
+ * you can to make it easier"): larger text, taller rows, wider */
+.cm { min-width: 280px; max-width: 420px; padding: 6px; font-size: 14px; border-radius: 10px; }
+.cm-h { padding: 8px 12px 6px; font-size: 13px; letter-spacing: .04em; }
+.cm-s { padding: 9px 12px 3px; font-size: 11px; }
+.cm-item { padding: 10px 14px; font-size: 14px; border-radius: 7px; min-height: 38px; }
+.cm-sep { margin: 5px 8px; }
+/* 3.114 a coloured border on every tool (Settings › Canvas, on by default): each window and a tool's own windows (the piano roll)
+ * outlined in the window's own colour, so neighbours — a tool's own window and the docked window below it — never run together */
+html[data-tool-borders="on"] .wm-win, html[data-tool-borders="on"] .wm-panel { outline: 2px solid color-mix(in srgb, var(--acc, #00d4ff) 80%, transparent); outline-offset: 0; }
+html[data-tool-borders="on"] .wm-win.wm-snap { outline-color: var(--acc, #00d4ff); }
+.as-keys { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+.as-kh { display: block; margin-bottom: 6px; color: var(--acc, #00d4ff); letter-spacing: .08em; text-transform: uppercase; font-size: 11px; }
+.as-krow { display: flex; gap: 10px; align-items: baseline; padding: 3px 0; font-size: 12.5px; } .as-krow kbd { min-width: 150px; font: 600 11.5px var(--mono, monospace); color: var(--text, #e7eaf3); }
+.as-krow span { color: var(--dim, #8b93a7); }
