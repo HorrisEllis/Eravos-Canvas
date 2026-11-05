@@ -109,7 +109,13 @@ ipcMain.on('eravos:packs-done', () => startLibrary());
 ipcMain.on('eravos:file-done', (e, r) => { const p = pending.get(r.id); if (!p) return; pending.delete(r.id); if (r.ok && p.source === 'drop') markImported(p.key); });
 let UPDATER = null;
 ipcMain.handle('eravos:update-check', () => UPDATER ? UPDATER.check(true) : null);
-ipcMain.handle('eravos:update-install', () => UPDATER ? UPDATER.install() : false);
+// 3.111 in the background: download + unpack while ERAVOS runs; then Restart now (apply) or When I close ERAVOS (later)
+ipcMain.handle('eravos:update-download', () => UPDATER ? UPDATER.download() : false);
+ipcMain.handle('eravos:update-apply', () => UPDATER ? UPDATER.apply() : false);
+ipcMain.handle('eravos:update-later', () => UPDATER ? UPDATER.later() : false);
+ipcMain.handle('eravos:update-status', () => UPDATER ? UPDATER.status : null);
+ipcMain.on('eravos:update-log', () => shell.openPath(path.join(DIRS.appdata, 'update', 'update.log')));
+app.on('will-quit', () => { if (UPDATER) UPDATER.onQuit(); });
 ipcMain.handle('eravos:info', () => ({ library: HOME, dirs: DIRS, version: app.getVersion(), desktop: true }));
 ipcMain.handle('eravos:keep-pack', (e, { name, data }) => {
   const safe = path.basename(String(name || 'pack.zip')).replace(/[^\w.\- ]+/g, '_'); const dst = path.join(DIRS.packs, /\.zip$/i.test(safe) ? safe : safe + '.zip');
@@ -202,7 +208,7 @@ app.whenReady().then(async () => {
   ]));
   win.loadURL(ORIGIN + '/canvas/index.html');   // the canvas; its tools load from /tools/ — the tools/ folder beside it
   // 3.99 updates: GitHub's latest release, at start and every 6 hours (a built app only — not `electron desktop/` from the repo)
-  UPDATER = require('./updater').create({ app, net, shell, appDir: APP_DIR, send: (m) => { if (win && !win.isDestroyed()) win.webContents.send('eravos:update', m); } });
+  UPDATER = require('./updater').create({ app, net, shell, appDir: APP_DIR, workDir: path.join(DIRS.appdata, 'update'), send: (m) => { if (win && !win.isDestroyed()) win.webContents.send('eravos:update', m); } });
   if (app.isPackaged || fs.existsSync(path.join(APP_DIR, 'ERAVOS.exe'))) UPDATER.start();
   win.on('closed', () => { win = null; });
 });

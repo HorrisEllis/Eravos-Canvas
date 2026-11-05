@@ -1,54 +1,83 @@
-/* ERAVOS runtime — updates.js (3.99) → window.Updates. Domain-free.
- * Asked: "an update service to check GitHub for updates with a toast asking to update it".
- * In the app (desktop/updater.js does the checking and the swap): when a newer release is out, a toast stays until answered —
- *   Update now (downloads it, puts it in place, ERAVOS restarts — your projects and exports stay) · What's new · Later (this version
- *   is not asked again). ⚙ Settings → About & updates → Check for updates asks now.
- * In a browser (no app around it) the same check runs against GitHub; Update now opens the release page.
- *   Updates.show(info) · check() · REPO */
+/* ERAVOS runtime — updates.js (3.99, rebuilt 3.111) → window.Updates. Domain-free.
+ * Asked: "an update service to check GitHub for updates with a toast asking to update it" · then "It needs to run in the background?
+ * … It closes the canvas and then doesn't apply the update". One card (top right) follows the update through, and nothing closes
+ * until you say so:
+ *   available    ERAVOS X is out          Update · What's new · Later (not asked again for X)
+ *   downloading  a bar, while you keep working          unpacking   getting it ready
+ *   ready        ERAVOS X is ready        Restart now · When I close ERAVOS
+ *   failed       what went wrong          Open the log      (applied: a toast "Updated to X")
+ * The app (desktop/updater.js) does the work; in a browser, Update opens the release page. ⚙ Settings → About & updates → Check for updates.
+ *   Updates.show(info) · on(message) · check() · close() · REPO */
 (function (global) {
   'use strict';
   const doc = global.document; if (!doc) return;
   const REPO = 'HorrisEllis/Eravos-Canvas', D = () => global.eravosDesktop, SKIP = 'eravos.update.skip';
-  let card = null;
+  let card = null, info = {};
   const say = (m, k, ms) => { if (global.Shell && global.Shell.toast) global.Shell.toast(m, k || '', ms || 4000); };
   const el = (tag, cls, text) => { const e = doc.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
+  const mb = (n) => (n / 1048576).toFixed(n > 104857600 ? 0 : 1) + ' MB';
   function close() { if (card) { card.remove(); card = null; } }
-  function show(u) {
-    if (!u || !u.version) return null; close();
-    const box = doc.body;   // its own place (top right): the toasts list drops its oldest, and this one stays until answered
-    card = el('div', 'toast upd-toast'); card.setAttribute('role', 'alertdialog'); card.setAttribute('aria-label', 'Update available');
-    const head = el('div', 'upd-head'); head.append(el('b', '', 'ERAVOS ' + u.version + ' is out'), el('span', 'upd-cur', u.current ? 'you have ' + u.current : ''));
-    const notes = el('div', 'upd-notes', (u.notes || '').split('\n').filter(Boolean).slice(0, 4).join(' · ')); notes.hidden = !u.notes;
-    const row = el('div', 'upd-row'), go = el('button', 'tb-btn pri', 'Update now'), what = el('button', 'tb-btn', 'What’s new'), later = el('button', 'tb-btn', 'Later');
-    [go, what, later].forEach(b => { b.type = 'button'; row.appendChild(b); });
-    go.onclick = async () => {
-      if (D() && D().installUpdate) { go.disabled = true; go.textContent = 'Downloading…'; const ok = await D().installUpdate(); if (!ok) { go.disabled = false; go.textContent = 'Update now'; } }
-      else if (u.page) global.open(u.page, '_blank');
-    };
-    what.onclick = () => { if (u.page) global.open(u.page, '_blank'); };
-    later.onclick = () => { try { global.localStorage.setItem(SKIP, u.version); } catch (e) {} close(); };
-    card.append(head, notes, row); box.appendChild(card); return card;
+  function btn(text, cls, fn) { const b = el('button', 'tb-btn' + (cls ? ' ' + cls : ''), text); b.type = 'button'; b.onclick = fn; return b; }
+  // the one card, drawn for a state
+  function draw(state, u) {
+    info = Object.assign({}, info, u || {});
+    if (!card) { card = el('div', 'toast upd-toast'); card.setAttribute('role', 'alertdialog'); card.setAttribute('aria-label', 'ERAVOS update'); doc.body.appendChild(card); }
+    card.innerHTML = ''; card.dataset.state = state;
+    const head = el('div', 'upd-head'), row = el('div', 'upd-row'); card.append(head);
+    const v = info.version || '';
+    if (state === 'available') {
+      head.append(el('b', '', 'ERAVOS ' + v + ' is out'), el('span', 'upd-cur', info.current ? 'you have ' + info.current : ''));
+      if (info.notes) card.append(el('div', 'upd-notes', String(info.notes).split('\n').map(s => s.replace(/^[#*\-\s]+/, '')).filter(Boolean).slice(0, 4).join(' · ')));
+      row.append(btn('Update', 'pri', () => {
+        if (D() && D().downloadUpdate) { draw('downloading', {}); D().downloadUpdate(); }
+        else if (D() && D().installUpdate) D().installUpdate();
+        else if (info.page) global.open(info.page, '_blank');
+      }), btn('What’s new', '', () => { if (info.page) global.open(info.page, '_blank'); }),
+      btn('Later', '', () => { try { global.localStorage.setItem(SKIP, v); } catch (e) {} close(); }));
+      card.append(el('div', 'upd-sub', D() && D().downloadUpdate ? 'It downloads in the background — keep working.' : ''));
+    } else if (state === 'downloading' || state === 'unpacking') {
+      const pct = info.total ? Math.round(100 * info.got / info.total) : 0;
+      head.append(el('b', '', state === 'unpacking' ? 'Getting ERAVOS ' + v + ' ready…' : 'Downloading ERAVOS ' + v + '…'),
+        el('span', 'upd-cur', state === 'downloading' && info.total ? mb(info.got) + ' of ' + mb(info.total) : ''));
+      const bar = el('div', 'upd-bar'), fill = el('i'); fill.style.width = (state === 'unpacking' ? 100 : pct) + '%'; bar.appendChild(fill); card.append(bar, el('div', 'upd-sub', 'Keep working — ERAVOS stays open.'));
+      row.append(btn('Hide', '', close));
+    } else if (state === 'ready') {
+      head.append(el('b', '', 'ERAVOS ' + v + ' is ready'));
+      card.append(el('div', 'upd-sub', 'Restart now, or it goes in by itself when you next close ERAVOS. Your projects, exports and settings stay.'));
+      row.append(btn('Restart now', 'pri', () => { draw('restarting', {}); D() && D().applyUpdate && D().applyUpdate(); }),
+        btn('When I close ERAVOS', '', () => { D() && D().updateLater && D().updateLater(); close(); say('ERAVOS ' + v + ' goes in when you close ERAVOS.', 'good'); }));
+    } else if (state === 'restarting') {
+      head.append(el('b', '', 'Restarting into ERAVOS ' + v + '…')); card.append(el('div', 'upd-sub', 'ERAVOS Update puts it in place and starts ERAVOS again.'));
+    } else if (state === 'failed') {
+      head.append(el('b', '', 'The update to ' + v + ' did not go in')); card.append(el('div', 'upd-notes', info.message || ''));
+      row.append(btn('Open the log', '', () => { D() && D().openUpdateLog && D().openUpdateLog(); }), btn('Try again', 'pri', () => { draw('downloading', {}); D() && D().downloadUpdate && D().downloadUpdate(); }), btn('Close', '', close));
+    }
+    if (row.children.length) card.append(row);
+    return card;
   }
-  function onMessage(m) {
+  function show(u) { if (!u || !u.version) return null; return draw('available', u); }
+  function on(m) {
     if (!m) return;
-    if (m.state === 'available') { let skip = null; try { skip = global.localStorage.getItem(SKIP); } catch (e) {} if (skip !== m.version || m.manual) show(m); }
+    if (m.state === 'available') { let skip = null; try { skip = global.localStorage.getItem(SKIP); } catch (e) {} if (skip !== m.version || m.manual) draw('available', m); }
+    else if (m.state === 'downloading' || m.state === 'unpacking') { if (card) draw(m.state, m); }
+    else if (m.state === 'ready' || m.state === 'restarting' || m.state === 'failed') draw(m.state, m);
+    else if (m.state === 'applied') { close(); say('Updated to ERAVOS ' + m.version + '.', 'good', 6000); }
+    else if (m.state === 'on-close') say('ERAVOS ' + m.version + ' goes in when you close ERAVOS.', 'good');
     else if (m.state === 'current') say('ERAVOS ' + m.version + ' is the newest.', 'good');
-    else if (m.state === 'downloading') say('Downloading ERAVOS ' + m.version + '…', '', 6000);
-    else if (m.state === 'restarting') say('ERAVOS ' + m.version + ' is ready — restarting…', 'good', 6000);
-    else if (m.state === 'error') say('Could not check for updates: ' + m.message, 'bad');
+    else if (m.state === 'error') { if (card && card.dataset.state !== 'available') close(); say('Update: ' + m.message, 'bad', 7000); }
   }
-  // a browser: ask GitHub directly (the page's own version is the app's when it runs inside it; here, the newest release seen before)
+  // a browser: ask GitHub directly
   async function webCheck(manual) {
     try {
-      const r = await global.fetch(`https://api.github.com/repos/${REPO}/releases/latest`, { headers: { Accept: 'application/vnd.github+json' } }); if (!r.ok) throw new Error('GitHub said ' + r.status);
+      const r = await global.fetch(`https://api.github.com/repos/${REPO}/releases/latest`, { headers: { Accept: 'application/vnd.github+json' } }); if (!r.ok) throw new Error(r.status === 404 ? 'no release is published yet' : 'GitHub said ' + r.status);
       const rel = await r.json(), v = String(rel.tag_name || '').replace(/^v/i, ''); let seen = null; try { seen = global.localStorage.getItem('eravos.update.seen'); } catch (e) {}
-      if (!seen) { try { global.localStorage.setItem('eravos.update.seen', v); } catch (e) {} if (manual) onMessage({ state: 'current', version: v }); return; }
-      if (seen !== v) onMessage({ state: 'available', version: v, current: seen, notes: rel.body, page: rel.html_url, manual });
-      else if (manual) onMessage({ state: 'current', version: v });
-    } catch (e) { if (manual) onMessage({ state: 'error', message: e.message }); }
+      if (!seen) { try { global.localStorage.setItem('eravos.update.seen', v); } catch (e) {} if (manual) on({ state: 'current', version: v }); return; }
+      if (seen !== v) on({ state: 'available', version: v, current: seen, notes: rel.body, page: rel.html_url, manual });
+      else if (manual) on({ state: 'current', version: v });
+    } catch (e) { if (manual) on({ state: 'error', message: e.message }); }
   }
   async function check() {
-    if (D() && D().checkUpdate) { const u = await D().checkUpdate(); if (u) onMessage(Object.assign({ state: 'available', manual: true }, u)); return u; }
+    if (D() && D().checkUpdate) { const u = await D().checkUpdate(); return u; }
     return webCheck(true);
   }
   // 3.110 About & updates: a section of ⚙ Settings (Check for updates was an entry in the ⋯ Options dropdown)
@@ -62,7 +91,7 @@
       return h('div', { class: 'as-card' }, [
         h('div', { class: 'as-row' }, [h('span', { class: 'as-k', text: 'ERAVOS' }), ver]),
         h('div', { class: 'as-row' }, [go.el, st]),
-        h('p', { class: 'as-say', text: 'When a newer release is out, ERAVOS asks you once (Update now · What’s new · Later). Your work in Documents\\ERAVOS is never touched by an update.' }),
+        h('p', { class: 'as-say', text: 'When a newer release is out, ERAVOS asks you once; it downloads in the background, then Restart now or When I close ERAVOS. Your work in Documents\\ERAVOS is never touched by an update.' }),
         h('div', { class: 'as-row' }, [h('a', { class: 'as-link', href: 'https://github.com/' + REPO + '/releases', target: '_blank', rel: 'noopener', text: 'All releases →' })]),
       ]);
     } });
@@ -70,9 +99,9 @@
   }
   function boot() {
     if (!entry()) { setTimeout(boot, 300); return; }
-    if (D() && D().onUpdate) D().onUpdate(onMessage);
+    if (D() && D().onUpdate) D().onUpdate(on);
     else if (/^https?:$/.test(global.location.protocol) && !global.ERAVOS_NO_UPDATE_CHECK) setTimeout(() => webCheck(false), 20000);
   }
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', boot); else boot();
-  global.Updates = { show, check, close, REPO };
+  global.Updates = { show, on, check, close, REPO };
 })(typeof window !== 'undefined' ? window : globalThis);

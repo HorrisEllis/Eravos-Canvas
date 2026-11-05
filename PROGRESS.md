@@ -2,6 +2,24 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.111 Updates in the background, with ERAVOS Update to put them in place (2026-11-05)
+Asked: "fix the update tool. It needs to run in the background? Like maybe an update tool. It closes the canvas and then doesn't apply
+the update".
+- Why it failed (3.99): it closed ERAVOS first, then a hidden script waited only for the main process. Electron's helper processes keep
+  the files locked a moment longer, so it stopped half way, with no restart and no log. It was also written without a BOM, which
+  Windows PowerShell misreads.
+- Now: Update downloads (streamed, with progress) and unpacks in the background while ERAVOS stays open → "ready" → Restart now · When
+  I close ERAVOS. desktop/apply-update.ps1 (ERAVOS Update, its own process, ASCII-only): waits for every ERAVOS process from the
+  folder (ends them after 60 s), backs up the app, robocopy with retries for locked files, restores the backup on any failure, writes
+  update.log + update-result.json, always starts ERAVOS again. The next start tells you: applied, or failed with Open the log / Try again.
+- Never updates a git checkout in place (it opens the release page there).
+- Tests: desktop/test/updater.mjs (node: check, streamed download with progress, never closes before ready, results read once and
+  tidied), p99 (the card through every state), packaging/windows/test-update.ps1 (the release workflow runs ERAVOS Update on the built
+  app on Windows: new files in, your projects untouched). Not run here: Windows-only steps (no PowerShell on this machine).
+- 1355/1355; updater.mjs all passed.
+- Merged with main's Setup updates (3.99 → Program Files): a Setup install downloads the new ERAVOS-Setup in the background and
+  ERAVOS Update runs it silently (admin once); ERAVOS restarts through Explorer, as you.
+
 ## Done — 3.110 ⚙ Settings is a page, not a dropdown (2026-11-05)
 Asked: "also need a actual settings built not a drop down". Screenshots of every tab shown; "MERGE AND push".
 - canvas/runtime/app-settings.js → window.AppSettings: addSection({ id, label, order, sub, make(close) }), open(id), close(), toggle().

@@ -53,7 +53,7 @@ if (!OVERLAY) {
   const loc = path.join(APP, 'locales'); if (fs.existsSync(loc)) for (const f of fs.readdirSync(loc)) if (!/^en-(US|GB)\.pak$/.test(f)) fs.rmSync(path.join(loc, f));
 }
 const res = path.join(APP, 'resources', 'app'); fs.mkdirSync(res, { recursive: true });
-['main.js', 'preload.js', 'updater.js'].forEach(f => fs.copyFileSync(path.join(HERE, f), path.join(res, f)));
+['main.js', 'preload.js', 'updater.js', 'apply-update.ps1'].forEach(f => fs.copyFileSync(path.join(HERE, f), path.join(res, f)));
 fs.writeFileSync(path.join(res, 'package.json'), JSON.stringify({ name: pkg.name, productName: pkg.productName, version: pkg.version, description: pkg.description, author: pkg.author, main: 'main.js', private: true }, null, 2));
 for (const s of SHIP) { const src = path.join(ROOT, s), dst = path.join(APP, s); if (fs.statSync(src).isDirectory()) copyDir(src, dst, (rel, n) => n === 'node_modules' || n.startsWith('.') || n === 'null-baseline' || n === 'out'); else fs.copyFileSync(src, dst); }
 if (fs.existsSync(path.join(ROOT, 'voice')) && !fs.existsSync(path.join(APP, 'voice'))) copyDir(path.join(ROOT, 'voice'), path.join(APP, 'voice'));   // her recordings travel with the exe

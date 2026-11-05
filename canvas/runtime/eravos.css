@@ -825,6 +825,8 @@ html[data-theme="midnight"] .uk-knob-arc { filter: none; }
 .upd-head { display: flex; align-items: baseline; gap: 10px; } .upd-head b { font-size: 13px; } .upd-cur { color: var(--dim); font-size: 11px; }
 .upd-notes { color: var(--dim); font-size: 11.5px; line-height: 1.4; max-height: 4.2em; overflow: hidden; }
 .upd-row { display: flex; gap: 8px; } .upd-row .tb-btn { padding: 5px 12px; }
+.upd-sub { color: var(--dim); font-size: 11px; }
+.upd-bar { height: 6px; border-radius: 6px; background: var(--bg2); overflow: hidden; } .upd-bar i { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--dk1, var(--acc)), var(--dk4, var(--acc))); transition: width .35s; }
 .tp-btn.tp-ico.bad { opacity: .55; } .tp-btn.tp-ico.bad:hover { opacity: 1; color: #ff5470; }
 
 /* ===================== 3.101 tool pages, cleaned up (2026-11-05: "the ui is how i want it. except it the tool pages look horrible.")

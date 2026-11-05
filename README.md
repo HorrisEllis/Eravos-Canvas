@@ -61,9 +61,12 @@ from an address like `localhost`. Firefox in particular refuses MIDI for pages o
   start; packs dropped on the canvas are kept here), **tools** (extra tool packs, `.zip`, loaded every start), **drop** (sounds,
   `.mid`, packs or projects put there appear on the canvas) and **.appdata** (autosave, presets). Back up = copy that folder.
   Set `ERAVOS_LIBRARY` to move it; an empty file named `portable` beside ERAVOS.exe keeps everything in the app folder instead.
-- **Updates:** ERAVOS checks GitHub at start and every 6 hours. When a newer release is out, a toast asks: **Update now** downloads it,
-  puts it in place (an installed ERAVOS runs the new Setup silently) and restarts — your library is untouched, **What's new** opens the release, **Later**
-  doesn't ask again for that version. ⋯ Options › **Check for updates** asks now.
+- **Updates:** ERAVOS checks GitHub at start and every 6 hours. When a newer release is out, a card asks: **Update** downloads it in
+  the background while you keep working (a portable copy also unpacks it); then **Restart now**, or **When I close ERAVOS** (it goes in
+  by itself then). **ERAVOS Update**, a small helper of its own, waits for every ERAVOS process to close, then puts the update in — an
+  installed ERAVOS runs the new Setup silently; a portable copy is backed up, the new files copied in, and the backup put back if
+  anything fails — and starts ERAVOS again. The next start tells you how it went (the log: `.appdata\update\update.log` in your
+  library). Your library is never touched. ⚙ Settings › About & updates › **Check for updates** asks now.
 - **Publishing a release:** set `"version"` in `desktop/package.json` (e.g. `0.2.0`), then push the tag `v0.2.0`. The `release`
   workflow builds ERAVOS for Windows and attaches `ERAVOS-Setup-0.2.0.exe` (the installer) and `ERAVOS_0.2.0.zip` (portable) to the
   release. Those are what Install ERAVOS and the updater fetch.

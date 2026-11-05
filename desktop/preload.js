@@ -14,7 +14,12 @@ contextBridge.exposeInMainWorld('eravosDesktop', {
   // 3.99 updates (desktop/updater.js): { state: 'available' | 'current' | 'downloading' | 'restarting' | 'error', version, notes, page }
   onUpdate: (cb) => ipcRenderer.on('eravos:update', (e, m) => cb(m)),
   checkUpdate: () => ipcRenderer.invoke('eravos:update-check'),
-  installUpdate: () => ipcRenderer.invoke('eravos:update-install'),
+  // 3.111 states also: 'unpacking' · 'ready' · 'on-close' · 'applied' · 'failed' (with log)
+  downloadUpdate: () => ipcRenderer.invoke('eravos:update-download'),
+  applyUpdate: () => ipcRenderer.invoke('eravos:update-apply'),
+  updateLater: () => ipcRenderer.invoke('eravos:update-later'),
+  updateStatus: () => ipcRenderer.invoke('eravos:update-status'),
+  openUpdateLog: () => ipcRenderer.send('eravos:update-log'),
 });
 // ERAVOS Glass (host/glass.js) runs inside the app: tell the page before its scripts run (canvas/runtime/glass-link.js)
 { const g = ipcRenderer.sendSync('eravos:glass'); if (g) contextBridge.exposeInMainWorld('ERAVOS_GLASS', g); }
