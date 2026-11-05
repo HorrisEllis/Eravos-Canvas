@@ -71,6 +71,21 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-05 · A timeline you can draw on, and that scales — PR #87
+- **His words (2026-11-05):** "can you start with the timeline? make it easier and the drawing more smooth and connects to each other" ·
+  "also split the timeline. maybe. it doesn't scale well, also i want them to be seperate or an option to be seperate" · "oh and make it
+  borderless".
+- **His call:** the piano roll as its own window (chosen from three options shown as layouts), borderless, as an option with today's
+  layout the default; before/after screenshots seen, then "merge and push and release".
+- **Built:** a pitch-path component (monotone cubic through a drawn line, jitter removed, reduced to ≤ 48 points) so one drawn stroke
+  is one note that glides along the line — in the editor and in the sound, by the same function; the piano roll filling its width; a
+  borderless panel window in the canvas host that any tool can use, and the Timeline's roll in it as an option.
+- **Proof:** a drawn wave went from 11 cornered notes to 1 note within 0.09 semitones of the line (largest slope jump 99 → 3.4); the
+  grid for a 2-bar clip 448 → 1,131 px; 4 new in-app tests and 214 component checks pass; Timeline 84/84, piano roll 27/27, bends 16/16,
+  canvas/content boundary 10/10; design check no worse.
+- **Check:** `node tests/run.mjs P108` · `node tests/run.mjs P109` · `node tools/music/components/pitch-path/pitch-path.test.mjs` ·
+  https://github.com/HorrisEllis/Eravos-Canvas/pull/87
+
 ### 2026-11-05 · A design system that enforces itself — PR #83
 - **His words (2026-11-05):** "i dont like the tint. everything but the colors should be what they are. make them darker even. like black" ·
   "the buttons in the tape echo look bad. the color i mean. bad gradient" · "i want consistency across all of them. and a template or
