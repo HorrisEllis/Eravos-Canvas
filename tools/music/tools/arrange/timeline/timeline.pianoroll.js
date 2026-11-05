@@ -134,7 +134,13 @@
     const legBtn = ebtn('⟷', 'Legato (L) — each note lasts until the next one starts', () => legato());
     const stepBtn = ebtn('⏎', 'Step input — type notes on Z S X D C V G B H N J M (an octave up: Q 2 W 3 E R 5 T 6 Y 7 U); Space = rest; Backspace = back', () => setStep(!stepOn));
     const edBox = h('span', { class: 'tlpr-tools', role: 'group', 'aria-label': 'edit' }, [qSel.el, qBtn, huBtn, legBtn, stepBtn]);
-    const bar = h('div', { class: 'tlpr-bar' }, [toolSel.el, title, bars.el, toolBtn, h('span', { class: 'tlpr-sep' }), toolBox, gridSel.el, lenSel.el, stampSel.el, lockT.el, sketchSel.el, zoomSel.el, rowSel.el, laneSel.el, edBox, readout, h('span', { class: 'tlpr-sep' }), progSel.el, styleSel.el, voiceSel.el, fillBtn.el, clearBtn.el, winBtn.el, fullBtn.el, closeBtn.el]);
+    // 3.113 "make it easier": one row of what you reach for every time; the rest folds behind More ▾ (remembered on this computer)
+    const more = h('div', { class: 'tlpr-bar tlpr-more' }, [lenSel.el, stampSel.el, sketchSel.el, rowSel.el, edBox, h('span', { class: 'tlpr-sep' }), progSel.el, styleSel.el, voiceSel.el, fillBtn.el, clearBtn.el]);
+    let moreOn = false; try { moreOn = global.localStorage.getItem('eravos.roll.more') === '1'; } catch (e) {}
+    const moreBtn = UI.Button({ label: 'More ▾', hint: 'the rest: length, click adds, sketch makes, rows, quantize · humanize · legato · step input, fill chords, clear', onClick: () => setMore(!moreOn) });
+    function setMore(on) { moreOn = !!on; more.hidden = !moreOn; moreBtn.set(moreOn ? 'Less ▴' : 'More ▾'); moreBtn.el.classList.toggle('on', moreOn); try { global.localStorage.setItem('eravos.roll.more', moreOn ? '1' : '0'); } catch (e) {} if (clip) requestAnimationFrame(() => draw()); }
+    const bar = h('div', { class: 'tlpr-bar' }, [toolSel.el, title, bars.el, toolBtn, h('span', { class: 'tlpr-sep' }), toolBox, gridSel.el, lockT.el, zoomSel.el, laneSel.el, readout, h('span', { class: 'tlpr-spacer' }), moreBtn.el, winBtn.el, fullBtn.el, closeBtn.el]);
+    setMore(moreOn);
     const keys = document.createElement('canvas'); keys.className = 'tlpr-keys';
     const ruler = document.createElement('canvas'); ruler.className = 'tlpr-ruler';
     const cv = document.createElement('canvas'); cv.className = 'tlpr-grid'; cv.tabIndex = 0; cv.setAttribute('role', 'application'); cv.setAttribute('aria-label', 'Note grid — 1 draw, 2 paint, 3 split, 4 erase, 5 select; click to add, drag to move, drag an edge to stretch, Shift-click or drag a box to select, Ctrl+C / V / D, arrow keys nudge, Q quantize, double-click for the note knobs; hold Alt for no snap');
@@ -146,7 +152,7 @@
     const scroll = h('div', { class: 'tlpr-scroll' }, [keyCol, gridCol]);
     let userScrolled = false, centreRO = null, centreNow = () => {};   // 3.93 the roll keeps its notes in view until you scroll it
     const main = h('div', { class: 'tlpr-main' }, [scroll, editor]);   // 3.58 the note inspector docks beside the notes
-    const el = h('div', { class: 'tlpr' }, [bar, main]);
+    const el = h('div', { class: 'tlpr' }, [bar, more, main]);
 
     const Hh = () => rowNotes.length * ROW;
     const steps = () => clip ? clip.bars * 16 : 64;
