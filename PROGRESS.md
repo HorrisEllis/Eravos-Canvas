@@ -2,6 +2,21 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.108 Sketch draws smooth and connected; 3.109 the piano roll fills its width, and its own borderless window (2026-11-05)
+Asked: "can you start with the timeline? make it easier and the drawing more smooth and connects to each other" · "also split the
+timeline. maybe. it doesn't scale well, also i want them to be seperate or an option to be seperate" → chose "Piano roll its own window"
+→ "oh and make it borderless". Before/after shown; "merge and push and release".
+- 3.108: component pitch-path (MusicParts.pathAt — monotone cubic, Fritsch–Carlson; smoothLine — local line fit, so stroke ends have no
+  hook; simplifyPath ≤ 48 points within 0.08 st). Sketch › curves: one stroke = one note, b = { shape: 'path', path }; engine cleanB keeps
+  ≤ 64 points; sdk-music bendNote plays the path (48–256 ramps). Fixed: a path starting and ending at 0 was played flat. A drawn wave:
+  11 notes with corners → 1 note, worst 0.09 st from the line, largest slope jump 99 → 3.4.
+- 3.109: the roll's notes fill its width (2-bar clip 448 → 1,131 px) until a zoom is picked by hand. VIEW › Piano roll in its own window
+  (default off) / the roll's ⧉ Own window: one borderless panel (canvas: CanvasWM.openPanel — no frame, a slim strip whose controls show
+  on hover, corner sizing, expand, opens on screen, goes with its owner); × closes the clip; off / Timeline closed puts it back.
+- Tests: tests/p108-sketch-path.test.js 2/2, tests/p109-roll-window.test.js 2/2; Timeline 84/84, piano 27/27, bend 16/16, P20 33/33,
+  boundary 10/10, P103 3/3; design check 52/69, none worse. Note: a test driving a canvas drag through CDP must send button 'left' on
+  moves, or Chrome drops the capture (it looked like the drag ending at once).
+
 ## Done — 3.106 reactive colours no longer compound; 3.107 Material; dice gone (2026-11-05)
 Asked: "also the canvas reactive colors keep compounding errors. test it. maybe white border around tool ui. can you remove the dice icon.
 what about adding more texture to the tools? like how the retro poly" · "always show me or add more themes before change."

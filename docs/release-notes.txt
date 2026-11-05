@@ -1,3 +1,14 @@
+ERAVOS v0.2.2 (2026-11-05)
+
+Install: ERAVOS-Setup-0.2.2.exe, or unzip ERAVOS_0.2.2.zip. On an earlier version, ERAVOS offers this update by itself.
+
+Timeline
+- Sketch draws smooth and connected: a line you draw (curves) is one note that glides along your line, with no corners and no restarts
+  (it used to be many short notes with straight pieces between them).
+- The piano roll uses its full width: a short clip's notes fill the roll instead of a small strip.
+- New option: the piano roll in its own borderless window (Timeline settings > Piano roll in its own window, or the roll's
+  "Own window" button). Size it and put it anywhere; under the tracks stays the default.
+
 ERAVOS v0.2.1 (2026-11-05)
 
 Install: ERAVOS-Setup-0.2.1.exe, or unzip ERAVOS_0.2.1.zip. On 0.2.0 or 0.1.0, ERAVOS offers this update by itself.

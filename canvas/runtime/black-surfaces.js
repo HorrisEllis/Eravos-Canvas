@@ -68,7 +68,7 @@
   (function patchCanvas() {
     const P = global.CanvasRenderingContext2D && global.CanvasRenderingContext2D.prototype; if (!P || P._eravosBS) return; P._eravosBS = true;
     // with Light over the tools on (his opt-in: the colour washes over everything), drawn surfaces are left to the reactive colours
-    const inside = (cv) => cv && cv.closest && doc.documentElement.dataset.reactLight !== 'over' && cv.closest('.wm-win, .tp-overlay');
+    const inside = (cv) => cv && cv.closest && doc.documentElement.dataset.reactLight !== 'over' && cv.closest('.wm-win, .wm-panel, .tp-overlay');
     ['fillStyle', 'strokeStyle'].forEach(name => { const d = Object.getOwnPropertyDescriptor(P, name); if (!d || !d.set) return;
       Object.defineProperty(P, name, { configurable: true, enumerable: d.enumerable, get: d.get, set(v) { d.set.call(this, typeof v === 'string' && inside(this.canvas) ? neutral(v) : v); } }); });
     const GP = global.CanvasGradient && global.CanvasGradient.prototype, stop = GP && GP.addColorStop;

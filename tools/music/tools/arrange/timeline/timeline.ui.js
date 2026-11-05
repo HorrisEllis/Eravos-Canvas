@@ -46,7 +46,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
   const scroller = h('div', { style: { flex: '1', overflowX: 'auto', overflowY: 'hidden', position: 'relative', minWidth: '0' } }, [inner]);
   const body = h('div', { style: { display: 'flex', flex: '1', minHeight: '0', overflowY: 'auto', border: '1px solid #223044', borderRadius: '6px', background: '#0a0f15' } }, [heads, scroller]);
   const insp = h('div', { class: 'org-row', style: { minHeight: '34px', marginTop: '4px' } });
-  const roll = window.EravosTimelinePianoRoll.create(view, { onClose: () => { sel = null; drawInsp(); draw(); } });
+  const roll = window.EravosTimelinePianoRoll.create(view, { onClose: () => { sel = null; drawInsp(); draw(); placeRoll(); }, onWindow: () => view.emit('config_change', { key: 'rollWindow', value: !view.state.rollWindow }) });
   // 3.35: drag the bar between the lanes and the piano roll to give either one the room (shown only while the roll is open)
   const split = h('div', { class: 'tl-split', title: 'drag: lanes ↕ piano roll · double-click: half and half', role: 'separator', 'aria-orientation': 'horizontal' });
   let rollH = 0;
@@ -409,7 +409,27 @@ OrganismFactory.reg('eravos.timeline', function (view) {
   function syncRoll() {
     const c = A && A.clips.find(x => x.id === sel);
     if (c && c.kind === 'notes') roll.show(c, A.lanes.find(l => l.id === c.lane), A); else if (roll.open) roll.hide();
+    placeRoll();
   }
+  // 3.109 the piano roll in its own borderless window (VIEW › Piano roll in its own window; off = under the tracks, as before).
+  // "it doesn't scale well … i want them to be seperate or an option to be seperate" (2026-11-05). One roll window: opening another clip
+  // switches it; closing it closes the clip; the roll goes back to its place under the tracks whenever it is not in a window.
+  let rollWin = null;
+  function rollHome() { if (roll.el.parentNode !== view.root) view.root.insertBefore(roll.el, insp); roll.setWindowed(false); }
+  function placeRoll() {
+    const want = !!view.state.rollWindow && roll.open && window.CanvasWM && CanvasWM.openPanel && !tlFull;
+    if (want && !rollWin) {
+      if (roll.full) roll.setFull(false);
+      const W = view.root.closest && view.root.closest('.wm-win'), w = Math.max(900, (W && W.offsetWidth) || 1000);
+      rollWin = CanvasWM.openPanel({ owner: view.instanceId, el: roll.el, title: 'piano roll · ' + roll.title, w, h: 440,
+        onClose: (why) => { rollWin = null; rollHome(); if (why === 'close_button' && roll.open) { sel = null; roll.hide(); drawInsp(); draw(); } } });
+      roll.setWindowed(true);
+    } else if (!want && rollWin) { const pw = rollWin; rollWin = null; rollHome(); pw.close(); }
+    if (rollWin) rollWin.setTitle('piano roll · ' + roll.title);
+    else roll.setWindowed(false);
+  }
+  view.bind('rollWindow', () => placeRoll());
+  view.onDispose && view.onDispose(() => { if (rollWin) { const pw = rollWin; rollWin = null; pw.close(); } });
   // 3.89 open a clip in the piano roll from outside (Patterns › ✎ Edit notes): its notes, each note's own knobs and curves
   view.openClip = (id) => { if (!A || !A.clips.some(c => c.id === id && c.kind === 'notes')) return false; sel = id; drawInsp(); syncRoll(); draw(); return true; };
   view.on('playhead_update', (p) => {

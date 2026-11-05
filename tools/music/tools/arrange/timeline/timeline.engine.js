@@ -55,6 +55,7 @@
       { key: 'follow', type: 'boolean', default: true, label: 'Follow', group: 'VIEW' },
       { key: 'laneH', type: 'integer', default: 48, min: 28, max: 160, label: 'Lane height', group: 'VIEW', hint: 'taller lanes = bigger clips (Alt + wheel over the lanes)' },
       { key: 'songBars', type: 'integer', default: 64, min: 1, max: 512, label: 'Song bars', group: 'VIEW' },
+      { key: 'rollWindow', type: 'boolean', default: false, label: 'Piano roll in its own window', group: 'VIEW', hint: 'the piano roll opens as its own borderless window you can size and place (off: under the tracks, as before)' },
     ],
     ui_hooks: ['transport_play', 'restart', 'seek', 'loop_set', 'lane_add', 'lane_edit', 'lane_remove', 'auto_points', 'rec_knobs', 'clip_add', 'clip_edit', 'clip_remove', 'clip_split', 'clip_split_at', 'clip_duplicate', 'clip_repeat', 'lane_split', 'marker_edit', 'bounce', 'drop_file', 'export', 'note_audition', 'clip_fill', 'export_midi', 'export_stems', 'tool_set', 'tool_preset', 'behaviour_save', 'behaviour_remove'],
     ui_hook_labels: { behaviour_save: 'save note behaviour', behaviour_remove: 'remove note behaviour', clip_add: 'new clip', clip_edit: 'edit clip / notes', clip_remove: 'delete clip', clip_split: 'split clip', clip_split_at: 'split at the frame', clip_duplicate: 'duplicate clip', clip_repeat: 'repeat clip', lane_split: 'split lane',
@@ -190,10 +191,13 @@
       ];
       let behaviours = [];
       // 3.56 a note's pitch curve: { from, to } semitones (±48), shape, at (where in the note the bend starts) — null if flat
-      const BEND_SHAPES = ['smooth', 'linear', 'early', 'late'];
+      const BEND_SHAPES = ['smooth', 'linear', 'early', 'late', 'path'];
       function cleanB(b) {
         if (!b || typeof b !== 'object') return null; const r2 = (v) => Math.round(clamp(+v || 0, -48, 48) * 100) / 100;
         const o = { from: r2(b.from), to: r2(b.to), shape: BEND_SHAPES.includes(b.shape) ? b.shape : 'smooth', at: Math.round(clamp(+b.at || 0, 0, 0.95) * 100) / 100 };
+        // 3.108 a drawn path: up to 64 points [f 0…1 ascending, semitones ±48]; from / to are its ends
+        if (o.shape === 'path') { const P = (Array.isArray(b.path) ? b.path : []).filter(q => Array.isArray(q) && isFinite(q[0]) && isFinite(q[1])).map(q => [Math.round(clamp(+q[0], 0, 1) * 1e4) / 1e4, r2(q[1])]).sort((a, c) => a[0] - c[0]).slice(0, 64);
+          if (P.length >= 2) { P[0][0] = 0; P[P.length - 1][0] = 1; o.path = P; o.from = P[0][1]; o.to = P[P.length - 1][1]; o.at = 0; if (P.some(q => q[1])) { const os0 = cleanNoteOsc(b.osc); if (os0) o.osc = os0; return o; } } else o.shape = 'smooth'; }
         const os = cleanNoteOsc(b.osc); if (os) o.osc = os;
         return o.from || o.to || o.osc ? o : null;
       }

@@ -78,7 +78,7 @@
       ['split', '✂', 'Split (3) — click a note to cut it at the grid line'], ['erase', '⌫', 'Erase (4) — click or drag across notes to delete them'],
       ['select', '⬚', 'Select (5) — drag a box; Shift adds; drag a selected note to move them all (Ctrl+drag copies)'],
       ['bend', '〰', 'Bend (6) — drag a note up or down: its pitch curves there (grab its start: it slides in from there) · Alt fine · right-click flattens'],
-      ['sketch', '✍', 'Sketch (7) — draw a line anywhere: it becomes notes (curves: they glide along your line · notes: stepped on the scale) · Shift replaces what is under it']];
+      ['sketch', '✍', 'Sketch (7) — draw a line anywhere: it becomes notes (curves: one smooth note that follows your line · notes: stepped on the scale) · Shift replaces what is under it']];
     const toolBtns = tools.map(([id, icon, hint]) => { const b = h('button', { class: 'tlpr-tool', title: hint, 'aria-label': hint, 'data-tool': id, text: icon }); b.addEventListener('click', (e) => { e.stopPropagation(); setTool(id); }); return b; });
     const toolBox = h('span', { class: 'tlpr-tools', role: 'group', 'aria-label': 'note tools' }, toolBtns);
     function setTool(t) { tool = t; toolBtns.forEach(b => b.classList.toggle('on', b.dataset.tool === t)); cv.dataset.tool = t; ghost = null; draw(); }
@@ -88,7 +88,7 @@
     const lockT = UI.Toggle({ label: 'Scale lock', value: true, onChange: (v) => { lock = v; } });
     let sketchAs = 'curves';
     const sketchSel = UI.Select({ label: 'Sketch makes', hint: 'curves: notes that glide along the line you draw · notes: stepped notes on the scale', options: [{ value: 'curves', label: 'curves' }, { value: 'notes', label: 'notes' }], value: 'curves', onChange: (v) => { sketchAs = v; } });
-    const zoomSel = UI.Select({ label: 'Zoom', hint: 'Ctrl+wheel zooms smoothly', options: [{ value: '8', label: 'S' }, { value: '14', label: 'M' }, { value: '22', label: 'L' }, { value: '40', label: 'XL' }, { value: 'fit', label: 'fit clip' }], value: '14', onChange: (v) => { if (v === 'fit') fit(); else zoomTo(+v); } });
+    const zoomSel = UI.Select({ label: 'Zoom', hint: 'Ctrl+wheel zooms smoothly', options: [{ value: '8', label: 'S' }, { value: '14', label: 'M' }, { value: '22', label: 'L' }, { value: '40', label: 'XL' }, { value: 'fit', label: 'fit clip' }], value: '14', onChange: (v) => { if (v === 'fit') { userZoom = false; fit(); } else { userZoom = true; zoomTo(+v); } } });
     // 3.53 EXPRESSION LANE — the lane under the notes draws velocity, or ANY knob of this track's tool, per note (note.p[knob]):
     // that note plays with that value (the tool takes it for the note's length, then hands back to its own knob — sdk-music
     // ctx.onNote). Drag draws, Ctrl-drag ramps, right-click hands a note back to the knob (a faint ghost = "uses the knob").
@@ -122,6 +122,10 @@
       fullBtn.set(full ? '⤡ Back to the timeline' : '⛶ Full screen'); fullBtn.el.classList.toggle('on', !!full);
       if (clip) requestAnimationFrame(() => { draw(); cv.focus({ preventScroll: true }); });
     }
+    // 3.109 ⧉ the roll in its own borderless window (the timeline places it; the roll only asks)
+    const winBtn = UI.Button({ label: '⧉ Own window', hint: 'the piano roll in its own window — size it and place it anywhere on the canvas (⧉ again: back under the tracks)', onClick: () => { if (opts && opts.onWindow) opts.onWindow(); } });
+    if (!(opts && opts.onWindow)) winBtn.el.style.display = 'none';
+    const setWindowed = (on) => { winBtn.set(on ? '⧉ Back inside' : '⧉ Own window'); winBtn.el.classList.toggle('on', !!on); el.classList.toggle('tlpr-win', !!on); };
     const readout = h('span', { class: 'tlpr-pos', 'aria-live': 'polite', text: '' });
     const qSel = UI.Select({ label: 'Quantize', hint: 'how far Q pulls note starts onto the grid', options: [{ value: '1', label: '100 %' }, { value: '0.75', label: '75 %' }, { value: '0.5', label: '50 %' }, { value: '0.25', label: '25 %' }], value: '1', onChange: (v) => { qStrength = +v; } });
     const ebtn = (text, hint, fn) => { const b = h('button', { class: 'tlpr-tool tlpr-ed', title: hint, 'aria-label': hint, text }); b.addEventListener('click', (e) => { e.stopPropagation(); fn(); cv.focus({ preventScroll: true }); }); return b; };
@@ -130,7 +134,7 @@
     const legBtn = ebtn('⟷', 'Legato (L) — each note lasts until the next one starts', () => legato());
     const stepBtn = ebtn('⏎', 'Step input — type notes on Z S X D C V G B H N J M (an octave up: Q 2 W 3 E R 5 T 6 Y 7 U); Space = rest; Backspace = back', () => setStep(!stepOn));
     const edBox = h('span', { class: 'tlpr-tools', role: 'group', 'aria-label': 'edit' }, [qSel.el, qBtn, huBtn, legBtn, stepBtn]);
-    const bar = h('div', { class: 'tlpr-bar' }, [toolSel.el, title, bars.el, toolBtn, h('span', { class: 'tlpr-sep' }), toolBox, gridSel.el, lenSel.el, stampSel.el, lockT.el, sketchSel.el, zoomSel.el, rowSel.el, laneSel.el, edBox, readout, h('span', { class: 'tlpr-sep' }), progSel.el, styleSel.el, voiceSel.el, fillBtn.el, clearBtn.el, fullBtn.el, closeBtn.el]);
+    const bar = h('div', { class: 'tlpr-bar' }, [toolSel.el, title, bars.el, toolBtn, h('span', { class: 'tlpr-sep' }), toolBox, gridSel.el, lenSel.el, stampSel.el, lockT.el, sketchSel.el, zoomSel.el, rowSel.el, laneSel.el, edBox, readout, h('span', { class: 'tlpr-sep' }), progSel.el, styleSel.el, voiceSel.el, fillBtn.el, clearBtn.el, winBtn.el, fullBtn.el, closeBtn.el]);
     const keys = document.createElement('canvas'); keys.className = 'tlpr-keys';
     const ruler = document.createElement('canvas'); ruler.className = 'tlpr-ruler';
     const cv = document.createElement('canvas'); cv.className = 'tlpr-grid'; cv.tabIndex = 0; cv.setAttribute('role', 'application'); cv.setAttribute('aria-label', 'Note grid — 1 draw, 2 paint, 3 split, 4 erase, 5 select; click to add, drag to move, drag an edge to stretch, Shift-click or drag a box to select, Ctrl+C / V / D, arrow keys nudge, Q quantize, double-click for the note knobs; hold Alt for no snap');
@@ -233,7 +237,9 @@
     const cyc = (r, beats) => typeof r === 'number' ? r * beats * 0.5 : (ODIV[r] || 0) * beats;   // Hz drawn at 120 bpm (½ s a beat)
     const owave = (sh, ph) => { const f = ph - Math.floor(ph); if (sh === 'triangle') return 1 - 4 * Math.abs(f - 0.5); if (sh === 'saw') return 2 * f - 1; if (sh === 'square') return f < 0.5 ? 1 : -1; if (sh === 'random') { const x = Math.sin(Math.floor(ph) * 12.9898 + 78.233) * 43758.5453; return 2 * (x - Math.floor(x)) - 1; } return Math.sin(2 * Math.PI * f); };
     function bendY(nt, f) {
-      const b = nt.b, at = b.at || 0, k = f <= at ? 0 : (SHAPES[b.shape] || SHAPES.smooth)((f - at) / (1 - at)); let st = b.from + (b.to - b.from) * k;
+      const b = nt.b, at = b.at || 0; let st;
+      if (b.shape === 'path' && Array.isArray(b.path) && window.MusicParts && MusicParts.pathAt) st = MusicParts.pathAt(b.path, f);   // 3.108 a drawn path, smooth
+      else { const k = f <= at ? 0 : (SHAPES[b.shape] || SHAPES.smooth)((f - at) / (1 - at)); st = b.from + (b.to - b.from) * k; }
       const o = b.osc; if (o && o.depth > 0) { const beats = nt.l / 4, c0 = cyc(o.rate, beats), c1 = o.rateTo ? cyc(o.rateTo, beats) : c0, ph = c0 * f + (c1 - c0) * f * f / 2, fd = o.fade > 0 ? Math.min(1, f / o.fade) : 1; st += o.depth * fd * owave(o.shape, ph); }
       return yOf(nt.n) + ROW / 2 - st * ROW;
     }
@@ -277,7 +283,7 @@
     function drawBend(g, nt, on) {
       const x0 = nt.s * pps + 1, w = Math.max(3, nt.l * pps - 2), col = lane ? lane.color : '#ff66cc';
       g.save(); g.lineJoin = 'round';
-      const o = nt.b.osc, NS = o && o.depth > 0 ? Math.min(600, Math.max(48, Math.ceil(Math.max(cyc(o.rate, nt.l / 4), o.rateTo ? cyc(o.rateTo, nt.l / 4) : 0) * 16))) : 32;
+      const o = nt.b.osc, NS = o && o.depth > 0 ? Math.min(600, Math.max(48, Math.ceil(Math.max(cyc(o.rate, nt.l / 4), o.rateTo ? cyc(o.rateTo, nt.l / 4) : 0) * 16))) : nt.b.shape === 'path' ? Math.min(400, Math.max(64, Math.round(nt.l * pps / 3))) : 32;
       // where the note is written: a faint outline on its own row (drag it there to move it)
       g.globalAlpha = 0.22; g.strokeStyle = col; g.setLineDash([3, 3]); g.strokeRect(x0 + 0.5, yOf(nt.n) + 1.5, w - 1, ROW - 3); g.setLineDash([]);
       // the block itself, bent along the pitch it plays: a ribbon one row thick (edge, then body)
@@ -286,7 +292,7 @@
       g.globalAlpha = 0.35 + 0.65 * nt.v; g.strokeStyle = col; g.lineWidth = Math.max(2, ROW - 3); path(); g.stroke();
       if (o && o.depth > 0) { g.globalAlpha = 0.9; g.strokeStyle = '#7cf7ff'; g.lineWidth = 1; path(); g.stroke(); }   // ∿ a thin cyan spine on an oscillating note
       g.globalAlpha = 1; g.fillStyle = on ? '#ffffff' : '#ffe08a'; g.beginPath(); g.arc(x0 + w, bendY(nt, 1), 3, 0, 7); g.fill();
-      if (ROW >= 9 && w >= 36) { g.font = '9px monospace'; g.fillText((nt.b.from || nt.b.to ? (nt.b.to > 0 ? '+' : '') + (+nt.b.to.toFixed(1)) + ' st' : '') + (o && o.depth > 0 ? ' ∿' : ''), x0 + w + 5, bendY(nt, 1) + 3); }
+      if (ROW >= 9 && w >= 36 && nt.b.shape !== 'path') { g.font = '9px monospace'; g.fillText((nt.b.from || nt.b.to ? (nt.b.to > 0 ? '+' : '') + (+nt.b.to.toFixed(1)) + ' st' : '') + (o && o.depth > 0 ? ' ∿' : ''), x0 + w + 5, bendY(nt, 1) + 3); }
       g.restore();
     }
     const bendSay = (b) => !b ? 'flat' : (b.from ? 'from ' + (b.from > 0 ? '+' : '') + b.from + ' st ' : '') + 'to ' + (b.to > 0 ? '+' : '') + b.to + ' st';
@@ -327,23 +333,22 @@
       if (as === 'notes') {
         for (let c = s0; c < s1 - 1e-9; c = q(c + g)) { const n = clampN(pitchFor(Math.round(at(c + g / 2))), LO, HI), last = add[add.length - 1]; if (last && last.n === n && Math.abs(last.s + last.l - c) < 1e-6) last.l = q(last.l + g); else add.push({ s: c, l: q(g), n, v: 0.85 }); }
       } else {
-        // the line's corners, on the grid; each straight run → notes that glide along it (a note at most a bar, at least a grid cell)
-        const corners = rdp(pts, 1 / 3).map(([ss]) => q(clampN(Math.round(ss / g) * g, s0, s1)));
-        const cuts = Array.from(new Set([s0].concat(corners, [s1]))).sort((a, b) => a - b);
-        for (let k = 0; k + 1 < cuts.length; k++) {
-          for (let a = cuts[k]; a < cuts[k + 1] - 1e-9;) {
-            const b = q(Math.min(cuts[k + 1], a + 16)); if (b - a < g * 0.99 && add.length) { add[add.length - 1].l = q(add[add.length - 1].l + (b - a)); a = b; continue; }
-            const pa = at(a), pb = at(b), n = clampN(lock ? pitchFor(Math.round(pa)) : Math.round(pa), LO, HI), nt = { s: a, l: q(b - a), n, v: 0.85 };
-            const from = Math.round((pa - n) * 100) / 100, to = Math.round((pb - n) * 100) / 100;
-            if (Math.abs(from) >= 0.05 || Math.abs(to) >= 0.05) nt.b = { from, to, shape: 'linear', at: 0 };
-            add.push(nt); a = b;
-          }
-        }
+        // 3.108 one stroke = ONE note that glides along the line you drew ("make the drawing more smooth and connects to each other"):
+        // the hand's jitter smoothed out, kept as a path of points (MusicParts.pitch-path: a monotone cubic through them — no corners, no
+        // overshoot), on the grid at its start and end. The sound does not restart along the line, and the picture is the line itself.
+        const MP = window.MusicParts, len = q(Math.max(g, s1 - s0));
+        const pAt = (c) => at(c), base = clampN(lock ? pitchFor(Math.round(pAt(s0 + Math.min(len, g) / 2))) : Math.round(pAt(s0)), LO, HI);
+        const samples = []; const N = Math.max(8, Math.min(240, Math.round(len * 4)));
+        for (let k = 0; k <= N; k++) { const c = s0 + len * k / N; samples.push([k / N, Math.round((pAt(Math.min(c, pts[pts.length - 1][0])) - base) * 1000) / 1000]); }
+        const path = MP && MP.simplifyPath ? MP.simplifyPath(MP.smoothLine(samples, 3), 0.08, 48) : [[0, samples[0][1]], [1, samples[samples.length - 1][1]]];
+        const nt = { s: s0, l: len, n: base, v: 0.85 };
+        if (path.some(p => Math.abs(p[1]) >= 0.05)) nt.b = { from: path[0][1], to: path[path.length - 1][1], shape: 'path', path, at: 0 };
+        add.push(nt);
       }
       if (!add.length) { draw(); return []; }
       const keep = d.replace ? notes.filter(nt => nt.s + nt.l <= s0 + 1e-6 || nt.s >= s1 - 1e-6) : notes;
       const base = keep.length; selOnly(add.map((_, k) => base + k)); commit(keep.concat(add)); audition([add[0].n]);
-      readout.textContent = `✍ ${add.length} notes${as === 'curves' ? ' along your line' : ''}`; return add;
+      readout.textContent = `✍ ${as === 'curves' && add.length === 1 ? '1 smooth note along your line' : add.length + ' notes' + (as === 'curves' ? ' along your line' : '')}`; return add;
     }
     // ---- 3.58 the track's curve, in the lane under the notes: the same points as the timeline's lane, for this clip's bars
     const curveK = () => autoL && lane ? ((knobsRaw[lane.target] || []).find(k => k.key === autoL.key) || { min: 0, max: 1, type: 'number' }) : null;
@@ -470,7 +475,8 @@
       if (drag.mode === 'sketch') { const s2 = clampN(x / pps, 0, st), p2 = pOf(y), l2 = drag.pts[drag.pts.length - 1]; if (Math.abs(s2 - l2[0]) * pps + Math.abs(p2 - l2[1]) * ROW > 1.5) drag.pts.push([s2, p2]); say(s2, Math.round(p2), 'sketch'); draw(); return; }
       if (drag.mode === 'bend') {   // the pointer's height from the note's own row = semitones (Alt: tenths)
         const raw = (drag.row0 - y) / ROW, st2 = clampN(e.altKey ? Math.round(raw * 10) / 10 : Math.round(raw), -48, 48);
-        drag.idx.forEach(j => { const o = drag.orig[j]; if (!o) return; const b = Object.assign({ from: 0, to: 0, shape: 'smooth', at: 0 }, o.b || {}); b[drag.end] = st2; const nt = Object.assign({}, o); if (b.from || b.to) nt.b = b; else delete nt.b; notes[j] = nt; });
+        drag.idx.forEach(j => { const o = drag.orig[j]; if (!o) return; const b = Object.assign({ from: 0, to: 0, shape: 'smooth', at: 0 }, o.b || {}); b[drag.end] = st2;
+          if (b.shape === 'path' && Array.isArray(b.path) && b.path.length) { b.path = b.path.map(q => q.slice()); b.path[drag.end === 'from' ? 0 : b.path.length - 1][1] = st2; } const nt = Object.assign({}, o); if (b.from || b.to) nt.b = b; else delete nt.b; notes[j] = nt; });
         drag.changed = true; const a = notes[drag.grab]; say(a.s, a.n, 'bend ' + bendSay(a.b)); draw(); return;
       }
       const gs = g || FREE;
@@ -531,6 +537,10 @@
       scroll.scrollLeft = Math.max(0, t * pps - (ax - scroll.scrollLeft));
       zoomSel.set([8, 14, 22, 40].reduce((a, b) => Math.abs(b - pps) < Math.abs(a - pps) ? b : a));   // the nearest preset
     }
+    // 3.109 the notes fill the width the roll has ("it doesn't scale well": a 2-bar clip drew 450 px of grid in a 1500 px roll) — never
+    // narrower than M, until you pick a zoom yourself (S/M/L/XL or Ctrl+wheel; "fit clip" hands it back)
+    let userZoom = false;
+    function autoFill() { if (userZoom || !clip || !scroll.clientWidth) return; const want = clampN((scroll.clientWidth - KW - 4) / steps(), 14, PPS_MAX); if (Math.abs(want - pps) > 0.5) { pps = want; draw(); zoomSel.set([8, 14, 22, 40].reduce((a, b) => Math.abs(b - pps) < Math.abs(a - pps) ? b : a)); } }
     function fit() { if (!clip) return; zoomTo(Math.max(PPS_MIN, (scroll.clientWidth - KW - 4) / steps())); scroll.scrollLeft = 0; }
     function setRow(r, atY) {
       if (drums) return; const ay = atY === undefined ? scroll.scrollTop + scroll.clientHeight / 2 : atY, row = ay / ROW;
@@ -540,7 +550,7 @@
     cv.addEventListener('wheel', (e) => {
       const { x, y } = local(e);
       if (e.ctrlKey && e.shiftKey) { e.preventDefault(); e.stopPropagation(); setRow(ROW * (e.deltaY < 0 ? 1.15 : 1 / 1.15), y); return; }
-      if (e.ctrlKey || e.metaKey) { e.preventDefault(); e.stopPropagation(); zoomTo(pps * (e.deltaY < 0 ? 1.15 : 1 / 1.15), x); return; }
+      if (e.ctrlKey || e.metaKey) { e.preventDefault(); e.stopPropagation(); userZoom = true; zoomTo(pps * (e.deltaY < 0 ? 1.15 : 1 / 1.15), x); return; }
       const i = hit(x, y); if (i < 0) return;
       e.preventDefault(); e.stopPropagation();
       const next = notes.slice(); next[i] = Object.assign({}, next[i], { v: Math.max(0.05, Math.min(1, next[i].v + (e.deltaY < 0 ? 0.05 : -0.05))) });
@@ -977,17 +987,17 @@
       // 3.93 the notes in view: centred on them when it opens AND again whenever the roll changes size (it opened as a sliver, centred
       // on nothing, and a bass line sat out of sight under C3 — "editing per note on the timeline isn't working") — until you scroll it yourself
       const centre = () => { if (drums) { scroll.scrollTop = 0; scroll.scrollLeft = 0; return; } const ps = notes.map(n => n.n); const tl0 = ln && toolsAll[ln.target], low = tl0 && /bass|sub|wub|reese|808/i.test(tl0.id + ' ' + tl0.label + ' ' + tl0.category); const mid = ps.length ? ps.reduce((a, b) => a + b, 0) / ps.length : (low ? 36 : 60) + key.root; scroll.scrollTop = Math.max(0, yOf(Math.round(mid)) - scroll.clientHeight / 2); };
-      if (first) { userScrolled = false; requestAnimationFrame(() => { centre(); scroll.scrollLeft = 0; }); }
-      if (!centreRO && 'ResizeObserver' in window) { centreRO = new ResizeObserver(() => { if (!userScrolled) centreNow(); }); centreRO.observe(scroll);
+      if (first) { userScrolled = false; requestAnimationFrame(() => { autoFill(); centre(); scroll.scrollLeft = 0; }); }
+      if (!centreRO && 'ResizeObserver' in window) { centreRO = new ResizeObserver(() => { autoFill(); if (!userScrolled) centreNow(); }); centreRO.observe(scroll);
         ['wheel', 'pointerdown', 'keydown'].forEach(t => scroll.addEventListener(t, () => { userScrolled = true; }, { passive: true })); }
       centreNow = centre;
     }
     function hide() { setFull(false); clip = null; openedId = null; closeEditor(); setStep(false); el.classList.remove('open'); }
     function playhead(barPos) { if (!clip) return; const p = barPos === null ? null : (barPos - clip.startBar) * 16; if (p !== playStep) { playStep = p; draw(); } }
     setMode(null); setTool('draw');
-    return { el, show, hide, playhead, setFull, get full() { return !!full; }, get open() { return !!clip; }, get clipId() { return clip && clip.id; }, get drums() { return drums; },
+    return { el, show, hide, playhead, setFull, setWindowed, get title() { return title.textContent; }, get full() { return !!full; }, get open() { return !!clip; }, get clipId() { return clip && clip.id; }, get drums() { return drums; },
       // for tests and the timeline's own keys: the grid/tool/zoom the roll is in, and what it holds
-      get state() { return { tool, grid, len, lastLen, pps, row: ROW, step: stepOn, cursor, notes: notes.map(n => Object.assign({}, n)) }; }, setTool, zoomTo, setRow,
+      get state() { return { tool, grid, len, lastLen, pps, row: ROW, step: stepOn, cursor, notes: notes.map(n => Object.assign({}, n)) }; }, setTool, zoomTo: (p, at) => { userZoom = true; zoomTo(p, at); }, setRow,
       setGrid: (v) => { gridSel.set(v); grid = GRIDS.find(g => g[0] === String(v))[2]; draw(); }, canvas: cv, ruler, vel, openEditor, setLane, sketch: (pts, as, replace) => sketchToNotes({ pts, replace }, as), get lane() { return xk ? xk.key : ''; }, setStep, get selected() { return Array.from(S).sort((a, b) => a - b); } };
   }
   global.EravosTimelinePianoRoll = { create, mapPoint, toContent, GRIDS };
