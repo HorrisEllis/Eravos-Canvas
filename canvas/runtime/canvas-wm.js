@@ -309,8 +309,8 @@
   }
   // 3.109 a PANEL: a borderless window on the canvas that holds part of a window (an editor pulled out of it so it gets the room it
   // needs). It belongs to its owner window (it takes the owner's colour and goes when the owner goes) and is not a tool: no ports, no
-  // page. Moved by its slim top strip, sized from its corner; the strip's controls show on hover.
-  //   CanvasWM.openPanel({ owner, el, title, w, h, x, y, onClose }) → { win, body, setTitle(text), close() }
+  // page. Moved by its title bar (3.112: always shown, snaps like a window), sized from its corner.
+  //   CanvasWM.openPanel({ owner, el, title, w, h, x, y, onClose }) → { win, body, setTitle(text), close(), maximize(on), show(), placeUnder() }
   function openPanel(o) {
     const UI = global.UIKit, h = UI.h, owner = o.owner ? windowOf(o.owner) : null;
     const title = h('span', { class: 'wm-ptitle', text: o.title || '' });
@@ -319,17 +319,21 @@
     const strip = h('div', { class: 'wm-pstrip' }, [title, h('span', { class: 'wm-spacer' }), maxBtn, closeBtn]);
     const body = h('div', { class: 'wm-pbody' }), grip = h('div', { class: 'wm-pgrip' });
     let x = o.x, y = o.y, hh = o.h || 420; const w = o.w || 1000;
-    if (x === undefined) { if (owner) { x = parseFloat(owner.style.left) || 0; y = (parseFloat(owner.style.top) || 0) + owner.offsetHeight + 12; } else { const p = nextPos(w, hh); x = p.x; y = p.y; } }
-    // it opens where you can see it: shorter to fit above the screen's bottom, or (no room) over the lower part of its owner
-    { const cr = canvas.getBoundingClientRect(), bot = toWorld(0, cr.bottom - 8).y, top = toWorld(0, cr.top + 8).y; if (y + hh > bot) { if (bot - y >= 300) hh = Math.round(bot - y); else { hh = Math.min(hh, Math.round(bot - top)); y = Math.max(top, Math.round(bot - hh)); } } }
+    // 3.112 it opens under its owner and never over it (it used to be pushed up over the owner's tracks to stay on screen); the view
+    // moves to show it instead (show())
+    const under = () => ({ x: owner ? parseFloat(owner.style.left) || 0 : 0, y: owner ? (parseFloat(owner.style.top) || 0) + owner.offsetHeight + SNAP_GAP : 0 });
+    if (x === undefined) { if (owner) { const u = under(); x = u.x; y = u.y; } else { const p = nextPos(w, hh); x = p.x; y = p.y; } }
     const win = h('div', { class: 'wm-panel', role: 'group', 'aria-label': o.title || 'panel', 'data-owner': o.owner || '', style: { left: x + 'px', top: y + 'px', width: w + 'px', height: hh + 'px', '--acc': (owner && owner.style.getPropertyValue('--acc')) || '#00d4ff' } }, [strip, body, grip]);
     win.style.zIndex = ++zTop; world.appendChild(win);
     if (o.el) body.appendChild(o.el);
     win.addEventListener('pointerdown', () => raise(win), true);
     let mv = null; const endMv = () => { if (!mv) return; mv.done(); mv = null; doc.body.classList.remove('wm-dragging'); };
     strip.addEventListener('pointerdown', (e) => { if (e.button !== 0 || e.target.closest('button') || win._restore) return; mv = { x: e.clientX, y: e.clientY, l: parseFloat(win.style.left), t: parseFloat(win.style.top), done: guard(endMv) }; try { strip.setPointerCapture(e.pointerId); } catch (_) {} doc.body.classList.add('wm-dragging'); });
-    strip.addEventListener('pointermove', (e) => { if (!mv) return; const z = WM.view.z; win.style.left = Math.round(mv.l + (e.clientX - mv.x) / z) + 'px'; win.style.top = Math.round(mv.t + (e.clientY - mv.y) / z) + 'px'; });
-    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => strip.addEventListener(t, endMv));
+    // 3.112 it snaps to the windows near it, like every window (Alt: free)
+    strip.addEventListener('pointermove', (e) => { if (!mv) return; const z = WM.view.z; let L = Math.round(mv.l + (e.clientX - mv.x) / z), T = Math.round(mv.t + (e.clientY - mv.y) / z);
+      if (!e.altKey) { const sn = snapMove(win, L, T, win.offsetWidth, win.offsetHeight, z); L = sn.l; T = sn.t; showSnap(sn.to); } else showSnap([]);
+      win.style.left = L + 'px'; win.style.top = T + 'px'; });
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => strip.addEventListener(t, () => { showSnap([]); endMv(); }));
     let rs = null; const endRs = () => { if (!rs) return; rs.done(); rs = null; doc.body.classList.remove('wm-dragging'); };
     grip.addEventListener('pointerdown', (e) => { e.stopPropagation(); if (win._restore) return; rs = { x: e.clientX, y: e.clientY, w: win.offsetWidth, h: win.offsetHeight, done: guard(endRs) }; try { grip.setPointerCapture(e.pointerId); } catch (_) {} doc.body.classList.add('wm-dragging'); });
     grip.addEventListener('pointermove', (e) => { if (!rs) return; const z = WM.view.z; win.style.width = Math.max(360, Math.round(rs.w + (e.clientX - rs.x) / z)) + 'px'; win.style.height = Math.max(200, Math.round(rs.h + (e.clientY - rs.y) / z)) + 'px'; });
@@ -343,7 +347,22 @@
     const close = (why) => { if (closed) return; closed = true; endMv(); endRs(); offOwner(); if (win.parentNode) win.parentNode.removeChild(win); if (o.onClose) o.onClose(why || 'close'); };
     closeBtn.addEventListener('click', () => close('close_button'));
     const offOwner = o.owner ? K.bus.subscribe('canvas:window-closed', (p) => { if (p && p.instanceId === o.owner) close('owner_closed'); }, 'wm-panel') : () => {};
-    return { win, body, setTitle: (t) => { title.textContent = t || ''; win.setAttribute('aria-label', t || 'panel'); }, close: () => close('api'), maximize: max };
+    // in view, never over its owner: pan only as far as keeps the owner's title bar on screen, then make the panel shorter to fit
+    // (down to 360 px), and only then pan further. Sideways: just into view.
+    function show() {
+      const cr = canvas.getBoundingClientRect(), z = WM.view.z || 1; let r = win.getBoundingClientRect(), dy = 0, dx = 0;
+      const bot = cr.bottom - 8, ownTop = owner ? owner.getBoundingClientRect().top : r.top;
+      if (r.bottom > bot) {
+        const need = r.bottom - bot, room = Math.max(0, ownTop - (cr.top + 8)); dy = -Math.min(need, room);
+        const over = r.bottom + dy - bot; if (over > 0 && !win._restore) { const H0 = win.offsetHeight, H1 = Math.max(360, Math.round(H0 - over / z)); win.style.height = H1 + 'px'; r = win.getBoundingClientRect(); }
+        if (r.bottom + dy > bot) dy = bot - r.bottom;
+      }
+      if (r.top + dy < cr.top + 8 && !owner) dy = (cr.top + 8) - r.top;
+      if (r.right > cr.right - 8) dx = (cr.right - 8) - r.right; if (r.left + dx < cr.left + 8) dx = (cr.left + 8) - r.left;
+      if (dx || dy) { WM.view.x += dx; WM.view.y += dy; applyView(); }
+    }
+    const placeUnder = () => { if (!owner || win._restore) return; const u = under(); win.style.left = u.x + 'px'; win.style.top = u.y + 'px'; show(); };
+    return { win, body, setTitle: (t) => { title.textContent = t || ''; win.setAttribute('aria-label', t || 'panel'); }, close: () => close('api'), maximize: max, show, placeUnder };
   }
   WM.openPanel = openPanel;
   function windowOf(instanceId) { return world ? world.querySelector(`.wm-win[data-instance="${instanceId}"]`) || doc.querySelector(`#dock .wm-win[data-instance="${instanceId}"]`) : null; }

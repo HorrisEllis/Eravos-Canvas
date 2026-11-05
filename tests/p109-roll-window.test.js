@@ -17,6 +17,7 @@ describe('P109 · piano roll: fills its width, and its own borderless window as 
   it('the notes fill the roll’s width; a zoom picked by hand is kept', async () => {
     const t = await make();
     try {
+      t.pub('config_change', { key: 'rollWindow', value: false }); await TH.sleep(60);   // 3.112 its own window is the default now
       t.H.view.openClip(t.clips[0].id); await TH.sleep(250);
       const sc = t.win().querySelector('.tlpr-scroll'), g = t.win().querySelector('.tlpr-grid');
       assert.ok(g.getBoundingClientRect().width > sc.getBoundingClientRect().width * 0.85, `grid ${Math.round(g.getBoundingClientRect().width)} px of ${Math.round(sc.getBoundingClientRect().width)} px`);
@@ -26,11 +27,12 @@ describe('P109 · piano roll: fills its width, and its own borderless window as 
       assert.near(g.getBoundingClientRect().width, w8, 2, 'a hand-picked zoom stays when the window changes size');
     } finally { OrganismFactory.close(t.id); }
   });
-  it('own window: off by default; on → one borderless panel with the roll, follows the clip, × closes the clip, off / closing the Timeline puts it back', async () => {
+  it('own window: on by default (3.112); on → one borderless panel with the roll, follows the clip, × closes the clip, off / closing the Timeline puts it back', async () => {
     const t = await make();
     try {
-      t.H.view.openClip(t.clips[0].id); await TH.sleep(150);
-      assert.equal(t.panel(), null, 'default: under the tracks, as before'); assert.ok(t.win().querySelector('.tlpr.open'));
+      t.H.view.openClip(t.clips[0].id); await TH.sleep(200);
+      assert.ok(t.panel(), '3.112 default: its own window');
+      t.pub('config_change', { key: 'rollWindow', value: false }); await TH.sleep(150); assert.equal(t.panel(), null, 'off: under the tracks'); assert.ok(t.win().querySelector('.tlpr.open'));
       t.pub('config_change', { key: 'rollWindow', value: true }); await TH.sleep(200);
       const p = t.panel(); assert.ok(p, 'a panel'); assert.ok(p.querySelector('.tlpr.open'), 'the roll is in it'); assert.equal(t.win().querySelector('.tlpr'), null, 'and not in the Timeline');
       const cs = getComputedStyle(p); assert.equal(parseFloat(cs.borderTopWidth) || 0, 0, 'borderless'); assert.equal(cs.boxShadow, 'none', 'no frame');

@@ -65,9 +65,11 @@ describe('✎ A pattern opens in the piano roll (3.89)', () => {
       const before = new Set(Kernel.registry.list().map(r => r.instance_id));
       const r = PatternLibrary.edit(p); made = Kernel.registry.list().map(r => r.instance_id).filter(id => !before.has(id));
       assert.ok(r && r.clip, 'a clip on the Timeline'); await TH.sleep(120);
-      const H = OrganismFactory.handle(tl), grid = H.view.root.querySelector('canvas[aria-label^="Note grid"]');
+      // 3.112 the roll may be in its own window (the default): look in the roll itself
+      const H = OrganismFactory.handle(tl), grid = H.view.roll.el.querySelector('canvas[aria-label^="Note grid"]');
       assert.ok(grid && grid.offsetParent, 'the piano roll is open');
-      assert.ok(/note/i.test(H.view.root.textContent) && H.view.root.textContent.includes(p.name.split(' · ')[0]), 'on that pattern');
+      const txt = H.view.root.textContent + ' ' + H.view.roll.el.textContent + ' ' + (H.view.roll.title || '');
+      assert.ok(/note/i.test(txt) && txt.includes(p.name.split(' · ')[0]), 'on that pattern');
       const c = H.ctx.internals.clips.find(x => x.id === r.clip); assert.equal(c.notes.length, p.notes.length, 'all its notes');
       const knob = (OrganismFactory.def(p.tool).config || []).find(k => k.type === 'number').key;   // any of the tool's knobs
       Kernel.bus.publish('ui:clip_edit:' + tl, { id: c.id, patch: { notes: c.notes.map((n, i) => i === 1 ? Object.assign({}, n, { p: { [knob]: 0.5 } }) : n) } });

@@ -2,6 +2,22 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.112 Connect edges in the piano roll's menu · the piano roll as a proper window of its own (2026-11-05)
+Asked: "I want to be able to select notes and right click and have a connect edges in the context menu. Also make the piano roll
+popout its own window. It's badly impl[e]mented."
+- Right-click with notes selected opens the notes' menu: ⌒ Connect edges · ⟷ Close the gaps (legato) · Q Quantize · ≈ Humanize ·
+  ⧉ Duplicate · × Delete. With nothing selected, right-click still erases the note under it.
+- Connect edges: the selected notes become ONE note that glides through each of their pitches (a 'path' bend, like a Sketch line).
+  Where notes touch, a short slide over the edge; across a gap, the slide fills it. In a chord, the top note carries the line.
+- The roll's own window (on by default now; ⧉ Back inside puts it under the tracks):
+  - What was wrong: it opened over the Timeline's tracks (pushed up to fit the screen); an 18 px strip whose controls showed only on
+    hover, so it didn't read as a window; it didn't snap; the Timeline kept the height the roll had used.
+  - Now: always-visible title bar in the tool's colour; snaps to the windows near it (Alt: free); opens UNDER the Timeline, never
+    over it; the view moves (keeping the Timeline's title bar on screen first, then the roll shorter down to 360 px) to show it; the
+    Timeline shrinks to its lanes while the roll is out and gets its height back when it returns; 1180 × 560 to start.
+- Tests p112 (menu → Connect edges, the path through each pitch, the window under the Timeline with a title bar); p109 and p76 follow the
+  new default. 1379/1382: the 3 failing are main's own (they fail on main alone: theme cards, p82 glass, a rim).
+
 ## Done — 3.111 Updates in the background, with ERAVOS Update to put them in place (2026-11-05)
 Asked: "fix the update tool. It needs to run in the background? Like maybe an update tool. It closes the canvas and then doesn't apply
 the update".
