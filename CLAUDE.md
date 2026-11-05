@@ -15,6 +15,11 @@ Read this first, then `PROGRESS.md` (the detailed log, newest first) and the spe
 
 ## Rules that hold
 
+- **No toys** (his words, 2026-11-05: "It's not a toy replaying sounds … I want it to stay that way. No toys."). Every instrument makes
+  its sound live — oscillators, filters, shapers, modulation — like Wobble Bass: no shipped recordings, no sample playback dressed up
+  as an instrument, every preset is settings the engine rebuilds. Samplers work only on the user's own audio. Full depth, nothing
+  outside the user's control. `node tests/no-toys.mjs` guards it (in the release build).
+
 - Windows is the real target; one-run install (`Install ERAVOS.bat`). Your work lives in `Documents\ERAVOS`, never in the app folder.
 - No Playwright. Pages are driven by Clear Glass's driver, `host/driver/glass.js` (also app mode: `electron.launch`). `node tests/no-playwright.mjs`.
 - Refactors prove "no change in sound": `node tests/components.mjs` (plain node) and the null render (`Null Render.bat`, needs a browser).
@@ -28,6 +33,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-05 | No toys: the rule, and a guard — no recordings shipped or baked into code, no instrument loads recorded audio (5 samplers work on your own audio only) | `tests/no-toys.mjs`, release build, CLAUDE.md | passes today; a planted `decodeAudioData` in Wobble Bass fails it |
 | 2026-11-05 | Specs: ecosystem v0.2.0 + object model, temporal, timeline depth, canvas family, product vision; 113 tool specs, 104 component specs (targets, not built). scene-morph, macro-rack, contrast-engine: new entry on top, the original kept verbatim below | `specs/`, `tools/music/planned/`, `tools/music/components/*/`, `docs/specs/README-ecosystem-0.2.0.md` | `node build/validate.mjs` 234 valid; `node tests/components.mjs` pass |
 | 2026-11-04 | Release v0.1.0: Actions › release › Run workflow with "release" on makes the tag + release (a session cannot push tags) | `.github/workflows/release.yml` | the run's Setup exe + zip on the release |
 | 2026-11-04 | Plan: ERAVOS onto Emerge + Looking Glass, bottom up (phases EL0–EL9, decisions open) | `docs/emerge-looking-glass-migration.md`, `docs/looking-glass/` | — (a plan) |

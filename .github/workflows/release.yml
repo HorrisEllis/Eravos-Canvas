@@ -33,6 +33,8 @@ jobs:
         shell: pwsh
         run: |
           node tests/components.mjs
+          node tests/no-toys.mjs
+          node tests/no-playwright.mjs
       - name: NSIS (makes ERAVOS-Setup.exe)
         shell: pwsh
         run: |
