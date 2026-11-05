@@ -15,7 +15,7 @@
 (function (global) {
   'use strict';
   const doc = global.document;
-  const TP = { addKind, kindGroups, open, openSuite, close, isOpen: () => !!cur, load, loadSuite, addMod, addLinked, presetGroups, partners, current: () => cur && (cur.suite ? { suiteId: cur.suite.id, target: cur.target } : { defId: cur.d.id, target: cur.target }) };
+  const TP = { addKind, ioWords, kindGroups, open, openSuite, close, isOpen: () => !!cur, load, loadSuite, addMod, addLinked, presetGroups, partners, current: () => cur && (cur.suite ? { suiteId: cur.suite.id, target: cur.target } : { defId: cur.d.id, target: cur.target }) };
   let cur = null;   // { d, target, el, K, made: Map(tool → instanceId) }
 
   const F = () => global.OrganismFactory;
@@ -105,6 +105,8 @@
   // 3.48.3 packs carry more than presets (kits, patterns, anything a tool takes): a domain says how this page loads
   // a kind — ToolPage.addKind(kind, { label, noun, apply(K, instanceId, item), extra?(descriptor) → [{ label, items }] })
   const KINDS = new Map();
+  let IOW = {};   // 3.101 in/out in words, given by the domains: { kinds: { wire_type: word }, named: { port: name }, upper: [abbreviations] }
+  function ioWords(w) { if (!w) return; IOW = { kinds: Object.assign({}, IOW.kinds, w.kinds), named: Object.assign({}, IOW.named, w.named), upper: (IOW.upper || []).concat(w.upper || []), quiet: (IOW.quiet || []).concat(w.quiet || []) }; }
   function addKind(kind, o) { if (kind && o && typeof o.apply === 'function') KINDS.set(kind, o); }
   // every non-preset kind this tool's packs hold, grouped by pack (+ what the domain adds, e.g. your own saved ones)
   function kindGroups(d) {
@@ -364,18 +366,18 @@
     const io = (d.hooks || []).filter(x => !x.internal && !/^slot\./.test(x.hook_id) && x.wire_type !== 'ui');
     if (io.length) {
       navTo('io', 'In / out', 'arrow-left-right');
-      // 3.101 in words: "Cutoff" (a modulation input) — not "mod.cutoff · modulation"
-      const KIND = { audio: 'audio', event_bus: 'notes & events', modulation: 'modulation', control: 'control', data: 'data', midi: 'MIDI' };
-      const NAMED = { out: 'Sound out', audio_out: 'Sound out', in: 'Sound in', audio_in: 'Sound in', note_in: 'Notes', midi_in: 'MIDI', theory_in: 'Key and scale', transport_in: 'Transport', note_out: 'Notes out', control_out: 'Control out', data_out: 'Data out', data_in: 'Data in' };
+      // 3.101 in words: "Cutoff" (an input that moves a knob) — not its hook id
+      // the words come from the domain (ToolPage.ioWords): the page itself knows no domain's terms (tests/boundary.test.js)
+      const KIND = IOW.kinds || {}, NAMED = IOW.named || {}, UPPER = new Set(IOW.upper || []);
       const cfgLabel = (k) => { const c = (d.config || []).find(c => c.key === k); return c && (c.label || c.key); };
       const nameOf = (x) => { const port = String(x.port || x.hook_id.split('.').pop()), m = /^(?:mod[._])?(?:knob[._])?(.+)$/.exec(port.replace(/^mod\./, '')); const key = /^mod/.test(x.hook_id.split('.').slice(-2).join('.')) || /^mod/.test(port) ? m[1] : null;
-        const words = (t) => { t = String(t).replace(/[_.]/g, ' ').trim(); return /^(fm|lfo|am|bpm)$/i.test(t) ? t.toUpperCase() : t.replace(/^\w/, ch => ch.toUpperCase()); };
+        const words = (t) => { t = String(t).replace(/[_.]/g, ' ').trim(); return UPPER.has(t.toLowerCase()) ? t.toUpperCase() : t.replace(/^\w/, ch => ch.toUpperCase()); };
         return NAMED[port] || (key && (cfgLabel(key) || words(key))) || cfgLabel(port) || words(port); };
       const ins = io.filter(x => x.direction !== 'out'), outs = io.filter(x => x.direction === 'out');
       const row = (x) => h('div', { class: 'tp-row' }, [
         h('span', { class: 'tp-tag ' + (x.direction === 'out' ? 'lnk' : 'mod'), text: x.direction === 'out' ? 'out ⇢' : '⇠ in' }),
-        h('div', { class: 'tp-rt' }, [h('b', { text: nameOf(x) }), x.intent && !/^(audio signal out|play notes|play midi|follow)/i.test(x.intent) ? h('small', { text: x.intent }) : null]),
-        h('span', { class: 'tp-tag kind', title: x.hook_id, text: KIND[x.wire_type] || x.wire_type }),
+        h('div', { class: 'tp-rt' }, [h('b', { text: nameOf(x) }), x.intent && !(IOW.quiet || []).some(q => String(x.intent).toLowerCase().startsWith(q)) ? h('small', { text: x.intent }) : null]),
+        h('span', { class: 'tp-tag kind', title: x.hook_id, text: KIND[x.wire_type] || String(x.wire_type).replace(/_/g, ' ') }),
       ]);
       page.appendChild(sec('Inputs and outputs', `· ${outs.length} out · ${ins.length} in`, [h('div', { class: 'tp-list tp-io' }, outs.concat(ins).map(row))], 'io', 'arrow-left-right'));
     }

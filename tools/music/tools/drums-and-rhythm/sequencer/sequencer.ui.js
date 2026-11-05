@@ -98,12 +98,12 @@ OrganismFactory.reg('eravos.sequencer', function (view) {
     tgt.select.style.maxWidth = '92px'; tgt.select.style.fontSize = '10px';
     tgt.select.addEventListener('pointerdown', () => tgt.setOptions([{ value: '', label: t.kind === 'auto' ? '— tool —' : '— target —' }].concat(view.targets(cap))));
     if (t.missing) tgt.select.style.borderColor = '#ff2266';
-    const mb = h('button', { class: 'uk-toggle' + (t.mute ? ' on' : ''), text: 'M', style: { padding: '1px 5px' }, onclick: (e) => { e.stopPropagation(); view.emit('track_edit', { track: ti, patch: { mute: !t.mute } }); } });
-    const sb = h('button', { class: 'uk-toggle' + (t.solo ? ' on' : ''), text: 'S', style: { padding: '1px 5px' }, onclick: (e) => { e.stopPropagation(); view.emit('track_edit', { track: ti, patch: { solo: !t.solo } }); } });
+    const mb = h('button', { class: 'uk-toggle sm' + (t.mute ? ' on' : ''), text: 'M', onclick: (e) => { e.stopPropagation(); view.emit('track_edit', { track: ti, patch: { mute: !t.mute } }); } });
+    const sb = h('button', { class: 'uk-toggle sm' + (t.solo ? ' on' : ''), text: 'S', onclick: (e) => { e.stopPropagation(); view.emit('track_edit', { track: ti, patch: { solo: !t.solo } }); } });
     // 3.37: the lane's own volume (its notes' velocity × this), next to M / S — auto lanes move knobs, so they have none
     const vk = t.kind === 'auto' ? null : UI.Knob({ label: '', min: 0, max: 1, step: 0.01, value: t.vol === undefined ? 1 : t.vol, default: 1, size: 18, accent: t.color, hint: 'lane volume', onChange: (v) => view.emit('track_edit', { track: ti, patch: { vol: v } }) });
     if (vk) { vk.el.title = `lane volume ${Math.round(100 * (t.vol === undefined ? 1 : t.vol))} % (drag · double-click resets)`; vk.el.setAttribute('aria-label', 'Lane volume'); const kv = vk.el.querySelector('.uk-knob-val'); if (kv) kv.style.display = 'none'; }
-    const x = h('button', { class: 'uk-btn', text: '×', title: 'remove lane', style: { padding: '1px 5px' }, onclick: (e) => { e.stopPropagation(); if (confirm('Remove lane ' + t.name + '?')) view.emit('track_remove', { track: ti }); } });
+    const x = h('button', { class: 'uk-btn sm', text: '×', title: 'remove lane', onclick: (e) => { e.stopPropagation(); if (confirm('Remove lane ' + t.name + '?')) view.emit('track_remove', { track: ti }); } });
     const nm = h('span', { style: { font: '600 11px var(--font)', color: t.color, width: '62px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'text' }, title: (t.kind === 'melodic' ? 'melodic lane (scale degrees)' : t.kind === 'auto' ? 'automation lane → ' + (t.paramLabel || 'pick a knob') : 'drum lane → pad ' + (t.drumNote - 35)) + ' · dbl-click to rename', text: (t.kind === 'melodic' ? '♪ ' : t.kind === 'auto' ? '∿ ' : '') + t.name });
     nm.addEventListener('dblclick', () => UI.ask('Lane name', t.name).then((n) => { if (n) view.emit('track_edit', { track: ti, patch: { name: n } }); }));
     const extra = [];

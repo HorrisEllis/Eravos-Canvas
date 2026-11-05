@@ -23,7 +23,8 @@ describe('P83 · the colours inside the tools react', () => {
   it('a literal colour a tool writes inline becomes its own variable: the same colour at rest, lit with the window', async () => {
     const el = UIKit.h('div', { style: { background: '#0c0910', border: '1px solid #2a1d33', color: 'rgba(255, 34, 102, 0.5)', width: '10px' } }); document.body.appendChild(el);
     try {
-      assert.equal(el.style.getPropertyValue('--rc-background-0'), '#0c0910'); assert.equal(getComputedStyle(el).backgroundColor, 'rgb(12, 9, 16)', 'looks the same');
+      // 3.103 a dark tinted surface is written neutral black (the colours — its border, its text — keep theirs)
+      const bg0 = BlackSurfaces.neutral('#0c0910'); assert.equal(el.style.getPropertyValue('--rc-background-0'), bg0); assert.ok(/^#(..)\1\1$/.test(bg0), 'neutral');
       assert.ok(/var\(--rc-border-0\)/.test(el.style.border), 'border through its variable'); assert.equal(getComputedStyle(el).color, 'rgba(255, 34, 102, 0.5)');
     } finally { el.remove(); }
     host(); const m0 = mode0(); if (SoundCSS.setLight) SoundCSS.setLight(true); SoundCSS.setMode('static'); const id = OrganismFactory.spawn('eravos.wobble-bass', { x: 40, y: 40 }); await TH.sleep(60);

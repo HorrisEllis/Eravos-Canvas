@@ -886,3 +886,37 @@ html[data-react="beat"] .wm-win, html[data-react="beat"] .wm-win [style*="--acc"
 html[data-react="beat"] .tp-page { --acc: var(--beat-col, #00d4ff) !important; --facc: var(--beat-col, #00d4ff) !important; }
 html[data-react="beat"][data-theme="field"] [data-f] { --Fl: var(--beat-col) !important; --Fc: var(--beat-col) !important; --Fr: var(--beat-col) !important; }
 html[data-react="beat"] .wm-win, html[data-react="beat"] .tp-page { transition: border-color .12s; }
+
+/* 3.103 BLACK SURFACES (his words, 2026-11-05: "i dont like the tint. everything but the colors should be what they are. make them darker
+ * even. like black"). Only what IS a colour carries colour — borders, labels, knob rings, steps, titles, glows, displays. Every surface
+ * (page, canvas, window, panel, card, well, button and toggle fills) is a neutral near-black: no tool colour mixed in, no blue cast, no
+ * dusk sky over the controls, and surfaces never lean toward the reactive colour. Every theme; their colours and shapes are kept. */
+html[data-theme][data-theme], html:not([data-theme]) {
+  --bg: #000000; --bg2: #050505; --panel: #0a0a0a; --panel2: #0f0f0f; --chassis: #070707; --chassis2: #0b0b0b; --well: #000000; --grid: #111111;
+  --line: #1c1c1c; --line2: #282828; --edge: #2a2a2a; --dim: #8c8c8c; --faint: #4f4f4f; --text: #e2e2e2; --react-surface: 0; }
+html[data-theme][data-theme] body, html[data-theme][data-theme] #canvas, html[data-theme][data-theme] .wm-canvas { background-color: #000; }
+/* no colour washed over a window's controls */
+html[data-theme][data-theme] .wm-dusk { display: none; }
+/* a window, its head and its cards: neutral black (the head keeps a tool's painting, darkened) */
+html[data-theme][data-theme] .wm-win { background: var(--panel); }
+html[data-theme][data-theme] .wm-head { background-color: var(--bg2); }
+html[data-theme="dusk"][data-theme] .wm-head { background: linear-gradient(90deg, rgba(0,0,0,.96) 0%, rgba(0,0,0,.75) 45%, rgba(0,0,0,.45)), var(--art, #050505) center / cover no-repeat; }
+/* buttons and toggles: the colour is their border, label and icon; the fill is black */
+html[data-theme]:not([data-theme="field"]) :is(.uk-btn, .tb-btn, .sbk-alt, .sbk-chip, .tp-btn, .ap-btn, .fl-btn, .uk-toggle):not(.primary):not(.pri):not(.on) {
+  background-color: #050505; }   /* Field's buttons stay clear (a border and a label only) */
+html[data-theme="dusk"][data-theme] :is(.uk-btn, .tb-btn, .sbk-alt, .sbk-chip, .tp-btn, .ap-btn, .fl-btn, .uk-toggle):not(.primary):not(.pri):not(.on) {
+  background: linear-gradient(#050505, #050505) padding-box, linear-gradient(110deg, var(--dk1), var(--dk2) 50%, var(--dk4)) border-box; }
+html[data-theme][data-theme] .uk-toggle.on { background: color-mix(in srgb, var(--acc) 26%, #000); }
+html[data-theme][data-theme] .tp-btn.pri { background: color-mix(in srgb, var(--acc) 22%, #000); }
+html[data-theme][data-theme] :is(.uk-select, .uk-text, .sbk-q, .tp-target, .uk-num) { background-color: #000; }
+
+/* 3.104 Dusk gradients from the tool's OWN colour (his words, 2026-11-05: "the buttons in the tape echo look bad. the color i mean. bad
+ * gradient"). The stops were the accent mixed with fixed pink, orange and violet: a sunset on a pink tool, mud on a green one (Tape Echo's
+ * Throw: green → beige → grey). Now each stop is the accent turned a little round the wheel (lighter one way, deeper the other), so a
+ * pink tool still runs rose → coral → magenta and a green one stays green (a shade either side). */
+html[data-theme="dusk"][data-theme], html[data-theme="dusk"][data-theme] .wm-win, html[data-theme="dusk"][data-theme] .tp-overlay {
+  --dk2: oklch(from var(--acc) calc(l + .04) c calc(h + 9)); --dk3: oklch(from var(--acc) calc(l + .08) calc(c * .9) calc(h + 18));
+  --dk4: oklch(from var(--acc) calc(l - .04) c calc(h - 14)); }
+
+/* 3.105 the kit's small size (lane-style controls: mute, solo, arm, remove) — one size, not each tool's own inline padding */
+.uk-btn.sm, .uk-toggle.sm { padding: 1px 5px; font-size: 10px; line-height: 1.25; min-height: 0; }

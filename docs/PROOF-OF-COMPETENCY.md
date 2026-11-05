@@ -71,6 +71,19 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-05 · A design system that enforces itself — PR #83
+- **His words (2026-11-05):** "i dont like the tint. everything but the colors should be what they are. make them darker even. like black" ·
+  "the buttons in the tape echo look bad. the color i mean. bad gradient" · "i want consistency across all of them. and a template or
+  schema for a design guide or philospophy to maintain consistency."
+- **His call:** surfaces black and neutral, colours untouched; every tool consistent; a written philosophy, and a way to keep it.
+- **Built:** a design guide (philosophy + rules, each tied to his words), a template every new tool's UI is written in before it is
+  built, and an automated design check that opens all 69 tools and measures six rules, with a baseline that can only improve, on every
+  pull request. Black surfaces enforced at runtime (stylesheets, inline styles, drawn displays). Dusk gradients rebuilt from each tool's
+  own colour family. The kit gained a small size; tools moved off their own inline sizes and onto one primary action each.
+- **Proof:** tools passing every rule 45 → 52 of 69; surfaces, kit sizes, label collisions, primaries and colour families at zero breaks
+  across all tools; tinted surfaces 1,000+ → 0; full in-app suite 1,367 / 1,371 (the four failures exist on main before this work).
+- **Check:** `node tests/design-check.mjs` · `docs/design-check.md` · `docs/DESIGN-GUIDE.md` · https://github.com/HorrisEllis/Eravos-Canvas/pull/83
+
 ### 2026-11-05 · Beat colour, and phase 1's first component — PR #82
 - **His words (2026-11-05):** "i like the reactive but its still not what i want for the changing setting, like i want them to be the same
   color and change to the beat" · "that looks nice as hell. can you start on the phases." · "start bottom up, then the highest leverage.

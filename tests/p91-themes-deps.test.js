@@ -9,7 +9,8 @@ describe('P91 · themes · the dependency graph · Clear takes the dependencies'
       assert.deepEqual(Themes.list().map(t => t.id), ['dusk', 'studio', 'field', 'midnight']);
       const sc = {}; ['dusk', 'studio', 'midnight'].forEach(t => { Themes.set(t); assert.equal(R.dataset.theme, t); sc[t] = parseFloat(getComputedStyle(R).getPropertyValue('--react-surface')); });
       assert.deepEqual(seen, ['dusk', 'studio', 'midnight'], 'the reactive colours hear each switch');
-      assert.ok(sc.dusk < 1 && sc.midnight < sc.dusk && sc.studio === 1, JSON.stringify(sc));
+      // 3.103 "i dont like the tint … like black": no theme lets a surface lean toward the reactive colour any more
+      assert.ok(sc.dusk === 0 && sc.midnight === 0 && sc.studio === 0, JSON.stringify(sc));
       assert.equal(Themes.set('nope'), false, 'an unknown theme is refused');
       Themes.set('dusk'); const btn = document.createElement('button'); btn.className = 'uk-btn'; document.body.appendChild(btn);
       assert.equal(getComputedStyle(btn).borderTopLeftRadius, '10px', 'Dusk: a soft rectangle, not a pill'); assert.ok(parseFloat(getComputedStyle(btn).borderTopWidth) >= 1, 'Dusk buttons keep their border'); btn.remove();
