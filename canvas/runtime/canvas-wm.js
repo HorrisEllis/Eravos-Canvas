@@ -93,12 +93,12 @@
     const m = Array.from(world.querySelectorAll('.wm-win.maximized')).sort((a, b) => (+b.style.zIndex || 0) - (+a.style.zIndex || 0))[0];
     if (m) maximize(m.dataset.instance, false);
   });
-  global.addEventListener('resize', () => { if (world) world.querySelectorAll('.wm-win.maximized').forEach(fitMax); });
+  global.addEventListener('resize', () => { if (world) world.querySelectorAll('.wm-win.maximized, .wm-panel.maximized').forEach(fitMax); });
   function applyView() {
     world.style.transform = `translate(${WM.view.x}px, ${WM.view.y}px) scale(${WM.view.z})`;
     canvas.style.backgroundPosition = `${WM.view.x}px ${WM.view.y}px`;
     canvas.style.backgroundSize = `${24 * WM.view.z}px ${24 * WM.view.z}px`;
-    if (world) world.querySelectorAll('.wm-win.maximized').forEach(fitMax); // 3.35: a maximized window stays 1:1 on the screen
+    if (world) world.querySelectorAll('.wm-win.maximized, .wm-panel.maximized').forEach(fitMax); // 3.35: a maximized window stays 1:1 on the screen
     K && layoutSoon();
   }
   function toWorld(cx, cy) { const r = canvas.getBoundingClientRect(); return { x: (cx - r.left - WM.view.x) / WM.view.z, y: (cy - r.top - WM.view.y) / WM.view.z }; }
@@ -307,6 +307,45 @@
     K.bus.publish('canvas:layout', {});
     if (!fromFactory) K.bus.publish('canvas:window-closed', { instanceId: win.dataset.instance });
   }
+  // 3.109 a PANEL: a borderless window on the canvas that holds part of a window (an editor pulled out of it so it gets the room it
+  // needs). It belongs to its owner window (it takes the owner's colour and goes when the owner goes) and is not a tool: no ports, no
+  // page. Moved by its slim top strip, sized from its corner; the strip's controls show on hover.
+  //   CanvasWM.openPanel({ owner, el, title, w, h, x, y, onClose }) → { win, body, setTitle(text), close() }
+  function openPanel(o) {
+    const UI = global.UIKit, h = UI.h, owner = o.owner ? windowOf(o.owner) : null;
+    const title = h('span', { class: 'wm-ptitle', text: o.title || '' });
+    const maxBtn = h('button', { class: 'wm-min wm-max', title: 'expand to fill the screen / back', 'aria-label': 'Expand', text: '⤢' });
+    const closeBtn = h('button', { class: 'wm-x', title: 'close (it goes back where it came from)', 'aria-label': 'Close', text: '×' });
+    const strip = h('div', { class: 'wm-pstrip' }, [title, h('span', { class: 'wm-spacer' }), maxBtn, closeBtn]);
+    const body = h('div', { class: 'wm-pbody' }), grip = h('div', { class: 'wm-pgrip' });
+    let x = o.x, y = o.y, hh = o.h || 420; const w = o.w || 1000;
+    if (x === undefined) { if (owner) { x = parseFloat(owner.style.left) || 0; y = (parseFloat(owner.style.top) || 0) + owner.offsetHeight + 12; } else { const p = nextPos(w, hh); x = p.x; y = p.y; } }
+    // it opens where you can see it: shorter to fit above the screen's bottom, or (no room) over the lower part of its owner
+    { const cr = canvas.getBoundingClientRect(), bot = toWorld(0, cr.bottom - 8).y, top = toWorld(0, cr.top + 8).y; if (y + hh > bot) { if (bot - y >= 300) hh = Math.round(bot - y); else { hh = Math.min(hh, Math.round(bot - top)); y = Math.max(top, Math.round(bot - hh)); } } }
+    const win = h('div', { class: 'wm-panel', role: 'group', 'aria-label': o.title || 'panel', 'data-owner': o.owner || '', style: { left: x + 'px', top: y + 'px', width: w + 'px', height: hh + 'px', '--acc': (owner && owner.style.getPropertyValue('--acc')) || '#00d4ff' } }, [strip, body, grip]);
+    win.style.zIndex = ++zTop; world.appendChild(win);
+    if (o.el) body.appendChild(o.el);
+    win.addEventListener('pointerdown', () => raise(win), true);
+    let mv = null; const endMv = () => { if (!mv) return; mv.done(); mv = null; doc.body.classList.remove('wm-dragging'); };
+    strip.addEventListener('pointerdown', (e) => { if (e.button !== 0 || e.target.closest('button') || win._restore) return; mv = { x: e.clientX, y: e.clientY, l: parseFloat(win.style.left), t: parseFloat(win.style.top), done: guard(endMv) }; try { strip.setPointerCapture(e.pointerId); } catch (_) {} doc.body.classList.add('wm-dragging'); });
+    strip.addEventListener('pointermove', (e) => { if (!mv) return; const z = WM.view.z; win.style.left = Math.round(mv.l + (e.clientX - mv.x) / z) + 'px'; win.style.top = Math.round(mv.t + (e.clientY - mv.y) / z) + 'px'; });
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => strip.addEventListener(t, endMv));
+    let rs = null; const endRs = () => { if (!rs) return; rs.done(); rs = null; doc.body.classList.remove('wm-dragging'); };
+    grip.addEventListener('pointerdown', (e) => { e.stopPropagation(); if (win._restore) return; rs = { x: e.clientX, y: e.clientY, w: win.offsetWidth, h: win.offsetHeight, done: guard(endRs) }; try { grip.setPointerCapture(e.pointerId); } catch (_) {} doc.body.classList.add('wm-dragging'); });
+    grip.addEventListener('pointermove', (e) => { if (!rs) return; const z = WM.view.z; win.style.width = Math.max(360, Math.round(rs.w + (e.clientX - rs.x) / z)) + 'px'; win.style.height = Math.max(200, Math.round(rs.h + (e.clientY - rs.y) / z)) + 'px'; });
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => grip.addEventListener(t, endRs));
+    const max = (on) => { if (on === undefined) on = !win._restore; if (on === !!win._restore) return;
+      if (on) { win._restore = { left: win.style.left, top: win.style.top, width: win.style.width, height: win.style.height, transform: win.style.transform, transformOrigin: win.style.transformOrigin }; win.classList.add('maximized'); fitMax(win); raise(win); }
+      else { Object.assign(win.style, win._restore); win._restore = null; win.classList.remove('maximized'); } };
+    maxBtn.addEventListener('click', () => max());
+    strip.addEventListener('dblclick', (e) => { if (!e.target.closest('button')) max(); });
+    let closed = false;
+    const close = (why) => { if (closed) return; closed = true; endMv(); endRs(); offOwner(); if (win.parentNode) win.parentNode.removeChild(win); if (o.onClose) o.onClose(why || 'close'); };
+    closeBtn.addEventListener('click', () => close('close_button'));
+    const offOwner = o.owner ? K.bus.subscribe('canvas:window-closed', (p) => { if (p && p.instanceId === o.owner) close('owner_closed'); }, 'wm-panel') : () => {};
+    return { win, body, setTitle: (t) => { title.textContent = t || ''; win.setAttribute('aria-label', t || 'panel'); }, close: () => close('api'), maximize: max };
+  }
+  WM.openPanel = openPanel;
   function windowOf(instanceId) { return world ? world.querySelector(`.wm-win[data-instance="${instanceId}"]`) || doc.querySelector(`#dock .wm-win[data-instance="${instanceId}"]`) : null; }
   function rectOf(instanceId) {
     const w = windowOf(instanceId); if (!w) return null;

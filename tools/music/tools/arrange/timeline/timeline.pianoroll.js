@@ -88,7 +88,7 @@
     const lockT = UI.Toggle({ label: 'Scale lock', value: true, onChange: (v) => { lock = v; } });
     let sketchAs = 'curves';
     const sketchSel = UI.Select({ label: 'Sketch makes', hint: 'curves: notes that glide along the line you draw · notes: stepped notes on the scale', options: [{ value: 'curves', label: 'curves' }, { value: 'notes', label: 'notes' }], value: 'curves', onChange: (v) => { sketchAs = v; } });
-    const zoomSel = UI.Select({ label: 'Zoom', hint: 'Ctrl+wheel zooms smoothly', options: [{ value: '8', label: 'S' }, { value: '14', label: 'M' }, { value: '22', label: 'L' }, { value: '40', label: 'XL' }, { value: 'fit', label: 'fit clip' }], value: '14', onChange: (v) => { if (v === 'fit') fit(); else zoomTo(+v); } });
+    const zoomSel = UI.Select({ label: 'Zoom', hint: 'Ctrl+wheel zooms smoothly', options: [{ value: '8', label: 'S' }, { value: '14', label: 'M' }, { value: '22', label: 'L' }, { value: '40', label: 'XL' }, { value: 'fit', label: 'fit clip' }], value: '14', onChange: (v) => { if (v === 'fit') { userZoom = false; fit(); } else { userZoom = true; zoomTo(+v); } } });
     // 3.53 EXPRESSION LANE — the lane under the notes draws velocity, or ANY knob of this track's tool, per note (note.p[knob]):
     // that note plays with that value (the tool takes it for the note's length, then hands back to its own knob — sdk-music
     // ctx.onNote). Drag draws, Ctrl-drag ramps, right-click hands a note back to the knob (a faint ghost = "uses the knob").
@@ -122,6 +122,10 @@
       fullBtn.set(full ? '⤡ Back to the timeline' : '⛶ Full screen'); fullBtn.el.classList.toggle('on', !!full);
       if (clip) requestAnimationFrame(() => { draw(); cv.focus({ preventScroll: true }); });
     }
+    // 3.109 ⧉ the roll in its own borderless window (the timeline places it; the roll only asks)
+    const winBtn = UI.Button({ label: '⧉ Own window', hint: 'the piano roll in its own window — size it and place it anywhere on the canvas (⧉ again: back under the tracks)', onClick: () => { if (opts && opts.onWindow) opts.onWindow(); } });
+    if (!(opts && opts.onWindow)) winBtn.el.style.display = 'none';
+    const setWindowed = (on) => { winBtn.set(on ? '⧉ Back inside' : '⧉ Own window'); winBtn.el.classList.toggle('on', !!on); el.classList.toggle('tlpr-win', !!on); };
     const readout = h('span', { class: 'tlpr-pos', 'aria-live': 'polite', text: '' });
     const qSel = UI.Select({ label: 'Quantize', hint: 'how far Q pulls note starts onto the grid', options: [{ value: '1', label: '100 %' }, { value: '0.75', label: '75 %' }, { value: '0.5', label: '50 %' }, { value: '0.25', label: '25 %' }], value: '1', onChange: (v) => { qStrength = +v; } });
     const ebtn = (text, hint, fn) => { const b = h('button', { class: 'tlpr-tool tlpr-ed', title: hint, 'aria-label': hint, text }); b.addEventListener('click', (e) => { e.stopPropagation(); fn(); cv.focus({ preventScroll: true }); }); return b; };
@@ -130,7 +134,7 @@
     const legBtn = ebtn('⟷', 'Legato (L) — each note lasts until the next one starts', () => legato());
     const stepBtn = ebtn('⏎', 'Step input — type notes on Z S X D C V G B H N J M (an octave up: Q 2 W 3 E R 5 T 6 Y 7 U); Space = rest; Backspace = back', () => setStep(!stepOn));
     const edBox = h('span', { class: 'tlpr-tools', role: 'group', 'aria-label': 'edit' }, [qSel.el, qBtn, huBtn, legBtn, stepBtn]);
-    const bar = h('div', { class: 'tlpr-bar' }, [toolSel.el, title, bars.el, toolBtn, h('span', { class: 'tlpr-sep' }), toolBox, gridSel.el, lenSel.el, stampSel.el, lockT.el, sketchSel.el, zoomSel.el, rowSel.el, laneSel.el, edBox, readout, h('span', { class: 'tlpr-sep' }), progSel.el, styleSel.el, voiceSel.el, fillBtn.el, clearBtn.el, fullBtn.el, closeBtn.el]);
+    const bar = h('div', { class: 'tlpr-bar' }, [toolSel.el, title, bars.el, toolBtn, h('span', { class: 'tlpr-sep' }), toolBox, gridSel.el, lenSel.el, stampSel.el, lockT.el, sketchSel.el, zoomSel.el, rowSel.el, laneSel.el, edBox, readout, h('span', { class: 'tlpr-sep' }), progSel.el, styleSel.el, voiceSel.el, fillBtn.el, clearBtn.el, winBtn.el, fullBtn.el, closeBtn.el]);
     const keys = document.createElement('canvas'); keys.className = 'tlpr-keys';
     const ruler = document.createElement('canvas'); ruler.className = 'tlpr-ruler';
     const cv = document.createElement('canvas'); cv.className = 'tlpr-grid'; cv.tabIndex = 0; cv.setAttribute('role', 'application'); cv.setAttribute('aria-label', 'Note grid — 1 draw, 2 paint, 3 split, 4 erase, 5 select; click to add, drag to move, drag an edge to stretch, Shift-click or drag a box to select, Ctrl+C / V / D, arrow keys nudge, Q quantize, double-click for the note knobs; hold Alt for no snap');
@@ -533,6 +537,10 @@
       scroll.scrollLeft = Math.max(0, t * pps - (ax - scroll.scrollLeft));
       zoomSel.set([8, 14, 22, 40].reduce((a, b) => Math.abs(b - pps) < Math.abs(a - pps) ? b : a));   // the nearest preset
     }
+    // 3.109 the notes fill the width the roll has ("it doesn't scale well": a 2-bar clip drew 450 px of grid in a 1500 px roll) — never
+    // narrower than M, until you pick a zoom yourself (S/M/L/XL or Ctrl+wheel; "fit clip" hands it back)
+    let userZoom = false;
+    function autoFill() { if (userZoom || !clip || !scroll.clientWidth) return; const want = clampN((scroll.clientWidth - KW - 4) / steps(), 14, PPS_MAX); if (Math.abs(want - pps) > 0.5) { pps = want; draw(); zoomSel.set([8, 14, 22, 40].reduce((a, b) => Math.abs(b - pps) < Math.abs(a - pps) ? b : a)); } }
     function fit() { if (!clip) return; zoomTo(Math.max(PPS_MIN, (scroll.clientWidth - KW - 4) / steps())); scroll.scrollLeft = 0; }
     function setRow(r, atY) {
       if (drums) return; const ay = atY === undefined ? scroll.scrollTop + scroll.clientHeight / 2 : atY, row = ay / ROW;
@@ -542,7 +550,7 @@
     cv.addEventListener('wheel', (e) => {
       const { x, y } = local(e);
       if (e.ctrlKey && e.shiftKey) { e.preventDefault(); e.stopPropagation(); setRow(ROW * (e.deltaY < 0 ? 1.15 : 1 / 1.15), y); return; }
-      if (e.ctrlKey || e.metaKey) { e.preventDefault(); e.stopPropagation(); zoomTo(pps * (e.deltaY < 0 ? 1.15 : 1 / 1.15), x); return; }
+      if (e.ctrlKey || e.metaKey) { e.preventDefault(); e.stopPropagation(); userZoom = true; zoomTo(pps * (e.deltaY < 0 ? 1.15 : 1 / 1.15), x); return; }
       const i = hit(x, y); if (i < 0) return;
       e.preventDefault(); e.stopPropagation();
       const next = notes.slice(); next[i] = Object.assign({}, next[i], { v: Math.max(0.05, Math.min(1, next[i].v + (e.deltaY < 0 ? 0.05 : -0.05))) });
@@ -979,17 +987,17 @@
       // 3.93 the notes in view: centred on them when it opens AND again whenever the roll changes size (it opened as a sliver, centred
       // on nothing, and a bass line sat out of sight under C3 — "editing per note on the timeline isn't working") — until you scroll it yourself
       const centre = () => { if (drums) { scroll.scrollTop = 0; scroll.scrollLeft = 0; return; } const ps = notes.map(n => n.n); const tl0 = ln && toolsAll[ln.target], low = tl0 && /bass|sub|wub|reese|808/i.test(tl0.id + ' ' + tl0.label + ' ' + tl0.category); const mid = ps.length ? ps.reduce((a, b) => a + b, 0) / ps.length : (low ? 36 : 60) + key.root; scroll.scrollTop = Math.max(0, yOf(Math.round(mid)) - scroll.clientHeight / 2); };
-      if (first) { userScrolled = false; requestAnimationFrame(() => { centre(); scroll.scrollLeft = 0; }); }
-      if (!centreRO && 'ResizeObserver' in window) { centreRO = new ResizeObserver(() => { if (!userScrolled) centreNow(); }); centreRO.observe(scroll);
+      if (first) { userScrolled = false; requestAnimationFrame(() => { autoFill(); centre(); scroll.scrollLeft = 0; }); }
+      if (!centreRO && 'ResizeObserver' in window) { centreRO = new ResizeObserver(() => { autoFill(); if (!userScrolled) centreNow(); }); centreRO.observe(scroll);
         ['wheel', 'pointerdown', 'keydown'].forEach(t => scroll.addEventListener(t, () => { userScrolled = true; }, { passive: true })); }
       centreNow = centre;
     }
     function hide() { setFull(false); clip = null; openedId = null; closeEditor(); setStep(false); el.classList.remove('open'); }
     function playhead(barPos) { if (!clip) return; const p = barPos === null ? null : (barPos - clip.startBar) * 16; if (p !== playStep) { playStep = p; draw(); } }
     setMode(null); setTool('draw');
-    return { el, show, hide, playhead, setFull, get full() { return !!full; }, get open() { return !!clip; }, get clipId() { return clip && clip.id; }, get drums() { return drums; },
+    return { el, show, hide, playhead, setFull, setWindowed, get title() { return title.textContent; }, get full() { return !!full; }, get open() { return !!clip; }, get clipId() { return clip && clip.id; }, get drums() { return drums; },
       // for tests and the timeline's own keys: the grid/tool/zoom the roll is in, and what it holds
-      get state() { return { tool, grid, len, lastLen, pps, row: ROW, step: stepOn, cursor, notes: notes.map(n => Object.assign({}, n)) }; }, setTool, zoomTo, setRow,
+      get state() { return { tool, grid, len, lastLen, pps, row: ROW, step: stepOn, cursor, notes: notes.map(n => Object.assign({}, n)) }; }, setTool, zoomTo: (p, at) => { userZoom = true; zoomTo(p, at); }, setRow,
       setGrid: (v) => { gridSel.set(v); grid = GRIDS.find(g => g[0] === String(v))[2]; draw(); }, canvas: cv, ruler, vel, openEditor, setLane, sketch: (pts, as, replace) => sketchToNotes({ pts, replace }, as), get lane() { return xk ? xk.key : ''; }, setStep, get selected() { return Array.from(S).sort((a, b) => a - b); } };
   }
   global.EravosTimelinePianoRoll = { create, mapPoint, toContent, GRIDS };
