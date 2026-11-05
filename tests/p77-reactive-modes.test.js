@@ -66,7 +66,7 @@ describe('P77 · reactive colours: Off · Static · Changing · Custom', () => {
       assert.equal(SoundCSS.settingsOf(w).own, false, 'follows the app by default');
       ToolSettings.open(OrganismFactory.handle(id)); await TH.sleep(80);
       const sec = w.querySelector('.ts-sec[data-section="reactive"]') || document.querySelector('.ts-sec[data-section="reactive"]'); assert.ok(sec, 'a Reactive colours section in its settings');
-      assert.deepEqual([...sec.querySelectorAll('.rcp-card')].map(b => b.dataset.mode), ['follow', 'off', 'static', 'changing', 'custom']);
+      assert.deepEqual([...sec.querySelectorAll('.rcp-card')].map(b => b.dataset.mode), ['follow', 'off', 'static', 'changing', 'custom', 'beat']);
       sec.querySelector('.rcp-card[data-mode="changing"]').click(); await TH.sleep(30);
       assert.equal(c.params.get('_react').mode, 'changing', 'saved on the tool'); assert.equal(c.serialize().params._react.mode, 'changing', 'and in its save');
       SoundCSS.setMode('static'); const S = SoundCSS.settingsOf(w); assert.ok(S.own && S.mode === 'changing', 'its own wins over the app’s');

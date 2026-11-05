@@ -14,6 +14,7 @@
     ['static', 'Static', 'each colour keeps its hue — its light follows the sound'],
     ['changing', 'Changing', 'colours travel round the wheel with what it plays'],
     ['custom', 'Custom', 'colours lean toward your three with the sound'],
+    ['beat', 'Beat', 'every colour the same one, moving to the next on the beat'],
   ];
   const PALETTES = [
     ['Neon', { low: '#ff2266', high: '#00d4ff', hit: '#ffffff' }], ['Sunset', { low: '#ff3b00', high: '#ff9ad5', hit: '#ffe066' }],
@@ -73,6 +74,11 @@
     PALETTES.forEach(([n, c]) => { const b = el('button', 'rcp-pal'); b.type = 'button'; b.title = n; b.style.setProperty('--a', c.low); b.style.setProperty('--b', c.high); b.style.setProperty('--c', c.hit);
       b.append(el('i'), el('span', '', n)); b.addEventListener('click', () => { put({ mode: 'custom', colors: c }); paint(); }); pals.appendChild(b); });
     cust.append(el('span', 'rcp-lab', 'Your colours'), sws, el('span', 'rcp-lab', 'Or a palette'), pals);
+    // 3.102 Beat: how often the one colour moves on (Amount sets how bright the flash on the beat is)
+    const beatRow = el('div', 'rcp-draw rcp-beat'), beatBtns = el('div', 'rcp-drawb');
+    [[1, 'Every beat'], [2, 'Every 2 beats'], [4, 'Every bar']].forEach(([n, t]) => { const b = el('button', 'rcp-dbtn', t); b.type = 'button'; b.dataset.every = String(n);
+      b.addEventListener('click', () => { S().setBeatEvery(n); paint(); }); beatBtns.appendChild(b); });
+    beatRow.append(el('span', 'rcp-lab', 'Changes on'), beatBtns, el('span', 'rcp-drawn'));
     // 3.82 Draw with: the GPU (a Looking Glass layer over the page — nothing on the page is restyled) or the page itself (3.80)
     const drawRow = el('div', 'rcp-draw'), drawBtns = el('div', 'rcp-drawb'), drawNote = el('span', 'rcp-drawn');
     [['glass', 'GPU layer', 'drawn by the graphics card over the page: smooth, and light on the computer'], ['page', 'Page', 'every colour on the page moves by its own share — the most detail, the heaviest']].forEach(([d, t, h]) => {
@@ -84,7 +90,7 @@
       const b = el('button', 'rcp-dbtn', t); b.type = 'button'; b.dataset.light = v ? 'over' : 'colour'; b.title = hh; b.addEventListener('click', () => { S().setLight(v); paint(); }); lightBtns.appendChild(b); });
     lightRow.append(el('span', 'rcp-lab', 'Light'), lightBtns, el('span', 'rcp-drawn'));
     const foot = el('div', 'rcp-foot', tool ? 'Saved with this tool. “Follow the app” uses ⋯ Options → Reactive colours.' : 'Remembered on this computer. Any tool can have its own: ⚙ → Reactive colours.');
-    box.append(head, cards, amtRow, cust); if (!tool && S().setDraw) box.append(drawRow); if (!tool && S().setLight) box.append(lightRow); box.append(foot);
+    box.append(head, cards, amtRow, cust); if (!tool && S().setBeatEvery) box.append(beatRow); if (!tool && S().setDraw) box.append(drawRow); if (!tool && S().setLight) box.append(lightRow); box.append(foot);
 
     function paint() {
       const g = get(), eff = g.mode === 'follow' ? S().mode : g.mode;
@@ -96,7 +102,8 @@
           t.type = 'button'; t.title = gpu ? 'draw with the 2D canvas (the tested way)' : 'draw the layer with WebGPU on your graphics card — new; if the glows vanish, come back to 2D';
           t.addEventListener('click', () => global.GlassLayer.use(gpu ? '2d' : 'webgpu').then(() => paint())); drawNote.appendChild(t); } }
       if (S().setLight) lightBtns.querySelectorAll('.rcp-dbtn').forEach(b => { const on = (b.dataset.light === 'over') === S().light; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
-      cust.hidden = eff !== 'custom'; sws.querySelectorAll('input').forEach(i => { i.value = g.colors[i.dataset.k]; i.previousSibling.style.background = i.value; });
+      cust.hidden = eff !== 'custom'; beatRow.hidden = eff !== 'beat';
+      beatBtns.querySelectorAll('.rcp-dbtn').forEach(b => { const on = +b.dataset.every === S().beatEvery; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); }); sws.querySelectorAll('input').forEach(i => { i.value = g.colors[i.dataset.k]; i.previousSibling.style.background = i.value; });
     }
     // the previews: one loop for all of them while the panel is on screen
     let raf = 0, t0 = performance.now();
@@ -107,7 +114,8 @@
       previews.forEach(([cv, m]) => {
         const g = cv.getContext('2d'), W = cv.width, H = cv.height, md = m === 'follow' ? S().mode : m; g.clearRect(0, 0, W, H);
         const shift = (B.bright - 0.5) * 200 + Math.sin(t * 0.8) * 40 + B.pulse * 40;
-        const opt = { mode: md, amt: amtNow, shift: shift * amtNow, colors: g0.colors, low: B.low, high: B.high, pulse: B.pulse };
+        const BL = ['#00d4ff', '#ff2266', '#00ff88', '#b066ff', '#ffaa00'], bc = BL[Math.floor(t / 0.5) % BL.length];
+        const opt = { mode: md, amt: amtNow, shift: shift * amtNow, colors: g0.colors, low: B.low, high: B.high, pulse: B.pulse, beat: md === 'beat' ? S().lit(bc, B.pulse * 0.55 * amtNow) : undefined };
         const k = Math.max(0, Math.min(1, (B.level * 0.85 + B.pulse * 0.25) * amtNow * 1.25)), n = SW.length, bw = (W - 16) / n;
         SW.forEach((c, i) => {
           const col = md === 'off' ? c : S().colourFor(c, k, opt), hgt = (md === 'off' ? 0.55 : 0.35 + 0.6 * Math.min(1, B.level * (0.7 + 0.3 * Math.sin(i * 1.7 + t * 3)))) * (H - 12);
@@ -127,7 +135,7 @@
   function optionsEntry() {
     const slot = doc.getElementById('slot-options'); if (!slot || doc.getElementById('reactBtn')) return false;
     const b = el('button', 'tb-btn rcp-entry'); b.id = 'reactBtn'; b.type = 'button'; b.title = 'Reactive colours — how every colour answers the sound';
-    const say = () => { const m = S().mode; b.innerHTML = ''; b.append(el('span', 'rcp-entry-l', '◐ Reactive colours'), el('span', 'rcp-entry-m rcp-m-' + m, ({ off: 'Off', static: 'Static', changing: 'Changing', custom: 'Custom' })[m])); };
+    const say = () => { const m = S().mode; b.innerHTML = ''; b.append(el('span', 'rcp-entry-l', '◐ Reactive colours'), el('span', 'rcp-entry-m rcp-m-' + m, ({ off: 'Off', static: 'Static', changing: 'Changing', custom: 'Custom', beat: 'Beat' })[m])); };
     let pop = null;
     const close = () => { if (pop) { pop.remove(); pop = null; doc.removeEventListener('pointerdown', away, true); } };
     const away = (e) => { if (pop && !pop.contains(e.target) && e.target !== b && !b.contains(e.target)) close(); };

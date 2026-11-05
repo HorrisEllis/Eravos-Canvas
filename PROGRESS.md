@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.102 Beat colour; phase 1 starts with filter-svf; tool pages; the dependency graph (2026-11-05)
+Asked: "the ui is how i want it. except it the tool pages look horrible" · "that looks nice as hell. can you start on the phases" ·
+"Everything turns the same colour and changes on the beat, built into the reactive colours you already have, with no restyle".
+- Tool pages (PR #81): fixed size, compact head, no nested scroll, packs/controls/in-out readable; knob labels as wide as the knob needs.
+- build/eco-graph.mjs → docs/eco-graph.md: the phases' dependency graph from the specs. filter-svf 35 · lfo 24 · pattern-store 23 · osc-va 20.
+- components/filter-svf 1.0.0: Simper ZDF SVF kernel (modes LP HP BP notch peak bell low/high shelf all-pass; 1–3 stages), AudioWorklet
+  'eravos-svf' built from the kernel's own text; MusicParts.svf(ac). Not used by any tool yet — its own canvas window waits for his OK.
+- Reactive colours › Beat (sound-css.js 3.102): one colour (the theme's accents in turn) for every colour that IS a colour, stepped by
+  transport:tick at the time it is heard; Changes on every beat / 2 beats / bar; Amount = the flash. Known leftover: colours a tool
+  hard-codes outside the reactive variables (Wobble Bass's "Keep in range" button) keep their own.
+- Tests: P101 2/2, P102 1/1, P77 updated for the new mode (7/7); P82's two failures exist on main before this change.
+- Next: lfo (24 tools) as a component — extracted from the LFO tool, nulling — then osc-va, waveshaper, env-adsr.
+
 ## Done — P0.4 duplicate finder; P0.5 filter-formant (one mouth for Wobble Bass and Wub Filter) (2026-11-05)
 Asked: "Begin. I was thinking of having tool groups as suites. Like how each system has its components … fluid and dynamic, deep and professional".
 - build/duplicates.mjs: tokenises every tool's code (names/numbers normalised), finds windows shared across tools, grows them into
