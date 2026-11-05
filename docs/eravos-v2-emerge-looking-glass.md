@@ -1,3 +1,7 @@
+> **ERAVOS v2 — kept as a note (2026-11-05).** James: "i feel like we should build this. then keep note for eravos v2. i want to
+> cotinue and build something that i can connect with people with. thats the point of it also. creative canvas to create creatively"
+> v1 (today's stack: Electron + JS + Web Audio) is what gets built now. Everything below is the v2 plan, ready when Emerge is.
+
 # ERAVOS on Emerge + Looking Glass — migration plan (v0.1, draft)
 
 Asked 2026-11-04: *"replace all the js with emerge and looking glass to make a full bottom up fully integrated program for eravos to

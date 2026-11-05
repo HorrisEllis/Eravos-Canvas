@@ -78,7 +78,7 @@ direction) · **proof** (what was measured or tested) · **check** (where a stra
   written in his own language, Emerge; Emerge is finished first.
 - **Built:** the road measured against Emerge's own build plan (Emerge at `f023240`): native language → Windows target (a PE writer
   already produces a runnable .exe) → calling Windows (multi-DLL imports, callbacks, COM) → Looking Glass phase 1 → the canvas.
-- **Check:** `docs/emerge-looking-glass-migration.md` · merge `618e6998aa34fe4946edfb947b4f378d08590e93` · https://github.com/HorrisEllis/Eravos-Canvas/pull/78
+- **Check:** `docs/eravos-v2-emerge-looking-glass.md` · merge `618e6998aa34fe4946edfb947b4f378d08590e93` · https://github.com/HorrisEllis/Eravos-Canvas/pull/78
 
 ### 2026-11-04 19:27 −0800 · One "mouth" for two instruments, proved unchanged — PR #77
 - **His words (2026-11-05):** "I was thinking of having tool groups as suites. Like how each system has its components. I don't want

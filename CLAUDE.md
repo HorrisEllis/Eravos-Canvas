@@ -2,7 +2,15 @@
 
 Read this first, then `PROGRESS.md` (the detailed log, newest first) and the spec of whatever you touch (`specs/`, each tool's `.spec`).
 
-## Direction (his words, 2026-11-04)
+## Direction
+
+**Now (2026-11-05): build ERAVOS v1 — a creative canvas to create creatively, and to connect with people.**
+> "i feel like we should build this. then keep note for eravos v2. i want to cotinue and build something that i can connect with
+> people with. thats the point of it also. creative canvas to create creatively"
+- v1 = today's stack (Electron + JS + Web Audio), shipped and updated through releases. All new work goes here.
+- v2 = ERAVOS on Emerge + Looking Glass — **a note, not the current work**: `docs/eravos-v2-emerge-looking-glass.md`.
+
+### ERAVOS v2 (kept as a note) — his words, 2026-11-04
 
 > "i want to replace all the js with emerge and looking glass to make a full bottom up fully integrated program for eravos to beat ableton."
 
@@ -12,7 +20,7 @@ Read this first, then `PROGRESS.md` (the detailed log, newest first) and the spe
   motion as data, GPU. Spec v0.3 + phase map, **nothing built yet**. Kept here as `docs/looking-glass/` (SPEC.md, PHASEMAP.md).
 - **Decided 2026-11-05:** Looking Glass replaces Electron and is written **all in Emerge**; Emerge is finished first, bottom up
   ("Emerge needs to get finished to the point of being able to have you code with it"). The road: E1–E4, LG1+, C1 in the plan below.
-- The plan from today's ERAVOS (Electron + 52 k lines of JS + Web Audio) to that: `docs/emerge-looking-glass-migration.md`.
+- The plan from today's ERAVOS (Electron + 52 k lines of JS + Web Audio) to that: `docs/eravos-v2-emerge-looking-glass.md`.
   Bottom up, one proven layer at a time; the sound must not change (the null render) at any step.
 
 ## Rules that hold
@@ -42,14 +50,14 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 | Date | Work | Where | Proof |
 |---|---|---|---|
 | 2026-11-05 | Proof-of-competency record: credit stated plainly, checkable numbers, resume lines, a timestamped ledger with provenance (merge times, his dated words, proof, where to check), every merged PR since 2026-10-15 | `docs/PROOF-OF-COMPETENCY.md` | every figure has the command that counts it |
-| 2026-11-05 | Decided: Looking Glass in Emerge, Emerge first; the road E1 (native_lang F5) · E2 (native_windows) · E3 calling Windows (multi-DLL imports, Win64 calls, memory, callbacks, COM) · E4 axiom · LG1 window + rect from data (software, then GPU) · C1 canvas | `docs/emerge-looking-glass-migration.md` | — (a plan, measured against Emerge f023240) |
+| 2026-11-05 | Decided: Looking Glass in Emerge, Emerge first; the road E1 (native_lang F5) · E2 (native_windows) · E3 calling Windows (multi-DLL imports, Win64 calls, memory, callbacks, COM) · E4 axiom · LG1 window + rect from data (software, then GPU) · C1 canvas | `docs/eravos-v2-emerge-looking-glass.md` | — (a plan, measured against Emerge f023240) |
 | 2026-11-05 | P0.5 filter-formant: one vowel table (10 vowels) + one formant bank for Wobble Bass and Wub Filter (they had drifted: UH IH ER / YOI / AE −14 vs −12 dB). Wobble Bass gains YOI; Wub Filter gains UH, IH, ER (its AE kept −12 so nothing changes — his call) | `tools/music/components/filter-formant/` | 5,220 checks bit-identical; null render Wobble Bass 38/38 (worst −87.6 dB), Wub Filter 8/8 (7 presets unstable, unproven); Wobble 39/39, Wub 59/59, P94 2/2 |
 | 2026-11-05 | P0.4 duplicate finder: every tool's code tokenised, shared blocks code vs settings, report | `build/duplicates.mjs` → `docs/duplicates.md` | ~9 % of tool code repeats another tool (40-token windows) |
 | 2026-11-05 | Null render: `--record <tool>` no longer wipes other tools' baselines | `tests/null-render.mjs` | recorded two tools, both checked |
 | 2026-11-05 | No toys: the rule, and a guard — no recordings shipped or baked into code, no instrument loads recorded audio (5 samplers work on your own audio only) | `tests/no-toys.mjs`, release build, CLAUDE.md | passes today; a planted `decodeAudioData` in Wobble Bass fails it |
 | 2026-11-05 | Specs: ecosystem v0.2.0 + object model, temporal, timeline depth, canvas family, product vision; 113 tool specs, 104 component specs (targets, not built). scene-morph, macro-rack, contrast-engine: new entry on top, the original kept verbatim below | `specs/`, `tools/music/planned/`, `tools/music/components/*/`, `docs/specs/README-ecosystem-0.2.0.md` | `node build/validate.mjs` 234 valid; `node tests/components.mjs` pass |
 | 2026-11-04 | Release v0.1.0: Actions › release › Run workflow with "release" on makes the tag + release (a session cannot push tags) | `.github/workflows/release.yml` | the run's Setup exe + zip on the release |
-| 2026-11-04 | Plan: ERAVOS onto Emerge + Looking Glass, bottom up (phases EL0–EL9, decisions open) | `docs/emerge-looking-glass-migration.md`, `docs/looking-glass/` | — (a plan) |
+| 2026-11-04 | Plan: ERAVOS onto Emerge + Looking Glass, bottom up (phases EL0–EL9, decisions open) | `docs/eravos-v2-emerge-looking-glass.md`, `docs/looking-glass/` | — (a plan) |
 | 2026-11-04 | Delete packs, presets, kits and patterns for good (shipped ones too), remembered across restarts | `canvas/runtime/content-packs.js`, `pack-editor.js`, `tool-page.js`, `tools/music/data/pattern-library.js` | `tests/p100-delete.test.js` 3/3; P21, P71, P73, P76 green · PR #72 |
 | 2026-11-04 | Playwright removed: the driver gained app mode (`electron.launch`, `firstWindow`, dialogs); desktop tests + sound audit moved to it | `host/driver/glass.js`, `desktop/test/*.mjs`, `build/sound-audit.mjs` | `tests/no-playwright.mjs` 0 exceptions · PR #72 |
 | 2026-11-04 | One-run system install: `Install ERAVOS.bat` elevates, builds, installs to Program Files, shortcuts, Settings › Apps, starts | `Install ERAVOS.bat`, `packaging/windows/install.ps1`, `uninstall.ps1` | PowerShell parser clean; not yet run on Windows · PR #71 |
@@ -57,17 +65,27 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 | 2026-11-04 | Library = `Documents\ERAVOS` (projects, exports, packs, tools, drop, .appdata); old folders move in once | `desktop/main.js` | exercised with a stubbed Electron · PR #71 |
 | 2026-11-04 | P0.1–P0.3 shared music components (wave-table, note-release, progression) + null-render harness | `tools/music/components/`, `tests/null-render*.mjs` | `node tests/components.mjs` all pass · PR #70 |
 
-## Next (the build order)
+## Next (the build order) — 2026-11-05
 
-From `docs/specs/README-ecosystem-0.2.0.md` and `specs/eravos.music-ecosystem.spec` §13:
-1. `specs/eravos.object-model.spec` + `specs/eravos.temporal.spec` — one store, one time model — before anything is built on them.
-2. Components phase 0: extract the shared parts with no sound change. Exit: Wobble Bass, Reese, Supersaw, Retro Poly, Acid, Sub
-   re-assembled from components and nulling; a 20-tool scene ≤ 50 % CPU. P0.1–P0.3 done; P0.4 = a real duplicate finder first.
-3. Then phases 1–7 of §13 (foundation, rhythm, signature, scenes, space, environment, inventions).
-Note §11/§7: Emerge describes graphs and never runs per sample; DSP goes to a WASM worklet tier. The migration plan's EL7 follows that.
+> "show the the ui before any tools get built. they should be consistent. also reactive … like i want them to be the same color and
+> change to the beat. just contirnue. start bottom up, then the highest leverage. use a dependancy graph"
+
+Dependency graph (bottom up; among steps that are ready, the one reaching most of ERAVOS first):
+```
+UI tokens ──┬─> UI kit ──────┐
+            └─> Beat colour ─┴─> HE APPROVES THE UI (gate) ─> 69 tools on the kit ─┬─> patterns per tool ─┐
+object + time model ─────────────────────────────────────────────────────────────┴─> songs as rhythm explorer │
+shared components (grit, FM, osc) ─> Wobble Bass open as components                share your music (pinned) <┘
+```
+1. UI tokens (one colour, type and spacing scale) · 2. UI kit (one button, segment, knob, toggle, label, window) · 3. Beat colour mode
+(one shared colour for everything, moving on the transport's beat: changes on beat / 2 beats / bar, snap or glide, flash amount,
+palettes) — **previewed for him, not built yet**: https://claude.ai/artifact/GZan48SdWz1bgzRconv359 · 4. **gate: he approves the UI;
+no tool is changed before** · 5. the 69 tools moved onto the kit, with their tests · 6. object + time model · 7. shared components ·
+8. patterns per tool, songs as a rhythm explorer · 9. share your music (pinned: "put a pin in it. i just want this made so i can share music").
 
 ## Open (asked, not done)
 
+- Connecting with people (share as a link, remix with credit, play together, share packs) — pinned 2026-11-05.
 - Songs as a rhythm-exploring tool only (not usable for making music).
 - Patterns for each tool with variety: presets, depth, curves, per-note editing — everything the timeline can do.
 - Delete the merged branch `claude/nice-dirac-t64qeo` (a session could not: deleting a remote branch needs his permission).
