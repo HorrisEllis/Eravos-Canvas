@@ -113,19 +113,19 @@
     // position:fixed would stay inside it) — full screen MOVES the roll onto the page over everything, and back to the same
     // spot after. Every hit test maps by the live rect (toContent), so nothing else changes. ⛶ again, Esc or closing the clip.
     let full = null;
-    const fullBtn = UI.Button({ label: '⛶ Full screen', hint: 'the notes fill the whole screen — ⛶ again or Esc puts it back', onClick: () => setFull(!full) });
+    const fullBtn = UI.Button({ label: '⛶', hint: 'Full screen — the notes fill the whole screen (⛶ again or Esc)', onClick: () => setFull(!full) });
     function fullKey(e) { if (e.key !== 'Escape' || !full) return; if (S.size || stepOn || editor.classList.contains('open')) return; e.preventDefault(); e.stopPropagation(); setFull(false); }
     function setFull(on) {
       if (!!on === !!full) return;
       if (on) { full = { parent: el.parentNode, next: el.nextSibling }; document.body.appendChild(el); el.classList.add('tlpr-full'); document.addEventListener('keydown', fullKey, true); }
       else { const f = full; full = null; el.classList.remove('tlpr-full'); document.removeEventListener('keydown', fullKey, true); if (f.parent) f.parent.insertBefore(el, f.next && f.next.parentNode === f.parent ? f.next : null); }
-      fullBtn.set(full ? '⤡ Back to the timeline' : '⛶ Full screen'); fullBtn.el.classList.toggle('on', !!full);
+      fullBtn.set(full ? '⤡' : '⛶'); fullBtn.el.title = full ? 'Back to the timeline (Esc)' : 'Full screen — the notes fill the whole screen (⛶ again or Esc)'; fullBtn.el.classList.toggle('on', !!full);
       if (clip) requestAnimationFrame(() => { draw(); cv.focus({ preventScroll: true }); });
     }
     // 3.109 ⧉ the roll in its own borderless window (the timeline places it; the roll only asks)
-    const winBtn = UI.Button({ label: '⧉ Own window', hint: 'the piano roll in its own window — size it and place it anywhere on the canvas (⧉ again: back under the tracks)', onClick: () => { if (opts && opts.onWindow) opts.onWindow(); } });
+    const winBtn = UI.Button({ label: '⧉', hint: 'the piano roll in its own window — size it and place it anywhere on the canvas (⧉ again: back under the tracks)', onClick: () => { if (opts && opts.onWindow) opts.onWindow(); } });
     if (!(opts && opts.onWindow)) winBtn.el.style.display = 'none';
-    const setWindowed = (on) => { winBtn.set(on ? '⧉ Back inside' : '⧉ Own window'); winBtn.el.classList.toggle('on', !!on); el.classList.toggle('tlpr-win', !!on); };
+    const setWindowed = (on) => { winBtn.set('⧉'); winBtn.el.title = on ? 'Back inside — the piano roll under the tracks' : 'Own window — the piano roll in a window of its own'; winBtn.el.classList.toggle('on', !!on); el.classList.toggle('tlpr-win', !!on); };
     const readout = h('span', { class: 'tlpr-pos', 'aria-live': 'polite', text: '' });
     const qSel = UI.Select({ label: 'Quantize', hint: 'how far Q pulls note starts onto the grid', options: [{ value: '1', label: '100 %' }, { value: '0.75', label: '75 %' }, { value: '0.5', label: '50 %' }, { value: '0.25', label: '25 %' }], value: '1', onChange: (v) => { qStrength = +v; } });
     const ebtn = (text, hint, fn) => { const b = h('button', { class: 'tlpr-tool tlpr-ed', title: hint, 'aria-label': hint, text }); b.addEventListener('click', (e) => { e.stopPropagation(); fn(); cv.focus({ preventScroll: true }); }); return b; };
@@ -134,7 +134,35 @@
     const legBtn = ebtn('⟷', 'Legato (L) — each note lasts until the next one starts', () => legato());
     const stepBtn = ebtn('⏎', 'Step input — type notes on Z S X D C V G B H N J M (an octave up: Q 2 W 3 E R 5 T 6 Y 7 U); Space = rest; Backspace = back', () => setStep(!stepOn));
     const edBox = h('span', { class: 'tlpr-tools', role: 'group', 'aria-label': 'edit' }, [qSel.el, qBtn, huBtn, legBtn, stepBtn]);
-    const bar = h('div', { class: 'tlpr-bar' }, [toolSel.el, title, bars.el, toolBtn, h('span', { class: 'tlpr-sep' }), toolBox, gridSel.el, lenSel.el, stampSel.el, lockT.el, sketchSel.el, zoomSel.el, rowSel.el, laneSel.el, edBox, readout, h('span', { class: 'tlpr-sep' }), progSel.el, styleSel.el, voiceSel.el, fillBtn.el, clearBtn.el, winBtn.el, fullBtn.el, closeBtn.el]);
+    // 3.113 "make it easier": one row of what you reach for every time; the rest folds behind More ▾ (kept with the Timeline: VIEW › rollMore)
+    // 3.115 "a canvas mode with a zoom in so it can be smaller or thinner" · "like the song recorder, where theyre like clips" (2026-11-05):
+    // two looks/ways, both his choice, today's the default — kept with the Timeline (rollClips, rollCanvasZoom)
+    let clipLook = !!(view.state && view.state.rollClips), canvasZoom = !!(view.state && view.state.rollCanvasZoom);
+    const clipT = UI.Toggle({ label: 'Clip look', value: clipLook, hint: 'each note drawn like a Song Recorder clip: see-through, outlined, a waveform inside', onChange: (v) => { clipLook = v; draw(); view.emit('config_change', { key: 'rollClips', value: v }); } });
+    const zoomT = UI.Toggle({ label: 'Canvas zoom', value: canvasZoom, hint: 'the wheel zooms time and pitch together around the pointer, notes down to thin strips (Alt+wheel: a note’s velocity) · middle-drag pans', onChange: (v) => { canvasZoom = v; view.emit('config_change', { key: 'rollCanvasZoom', value: v }); } });
+    if (view.bind) { view.bind('rollClips', (v) => { if (!!v !== clipLook) { clipLook = !!v; clipT.set(clipLook); if (clip) draw(); } }); view.bind('rollCanvasZoom', (v) => { canvasZoom = !!v; zoomT.set(canvasZoom); }); }
+    const more = h('div', { class: 'tlpr-bar tlpr-more' }, [lenSel.el, stampSel.el, sketchSel.el, rowSel.el, edBox, h('span', { class: 'tlpr-sep' }), clipT.el, zoomT.el, h('span', { class: 'tlpr-sep' }), clearBtn.el]);
+    let moreOn = !!(view.state && view.state.rollMore);
+    const moreBtn = UI.Button({ label: 'More ▾', hint: 'the rest: length, click adds, sketch makes, rows, quantize · humanize · legato · step input, clear', onClick: () => { setMore(!moreOn); view.emit('config_change', { key: 'rollMore', value: moreOn }); } });
+    function setMore(on) { moreOn = !!on; more.hidden = !moreOn; moreBtn.set(moreOn ? 'Less ▴' : 'More ▾'); moreBtn.el.classList.toggle('on', moreOn); if (clip) requestAnimationFrame(() => draw()); }
+    // 3.113 "i dont like the fill options, replace it with pattern selection": pick one of this track's patterns (the tool's own, else the
+    // kinds it can play — PatternLibrary.forTool) and it becomes the clip's notes, repeated to the clip's length (Ctrl+Z undoes)
+    let patList = [], patSig = '';
+    const patSel = UI.Select({ label: 'Pattern', hint: 'pick a pattern for this track — it replaces the notes in this clip (Ctrl+Z undoes)', options: [{ value: '', label: '— pick —' }], value: '', onChange: (v) => { if (v !== '') usePattern(patList[+v]); patSel.set(''); } });
+    function patterns() {
+      const PL = global.PatternLibrary; if (!PL || !PL.forTool || !lane) { patList = []; patSel.setOptions([{ value: '', label: '— none —' }]); return; }
+      const F = PL.forTool(lane.target || '', { drums: !!drums }), sig = (lane.target || '') + '|' + !!drums + '|' + F.list().length; if (sig === patSig) return; patSig = sig;
+      const lab = (k) => ((F.kinds.find(x => x.id === k) || {}).label || k);
+      patList = F.list().filter(p => p.notes && p.notes.length).slice(0, 150);
+      patSel.setOptions([{ value: '', label: patList.length ? '— pick —' : '— none for this track —' }].concat(patList.map((p, ix) => ({ value: String(ix), label: lab(p.type) + ' · ' + p.name }))));
+    }
+    function usePattern(p) {
+      if (!p || !clip) return; const st = steps(), len = Math.max(1, (p.bars || 1) * 16), out = [];
+      for (let o = 0; o < st; o += len) p.notes.forEach(n => { const s0 = n.s + o; if (s0 >= st) return; const nn = Object.assign({ s: q(s0), l: q(Math.min(n.l, st - s0)), n: drums ? n.n : clampN(n.r + (key.root || 0), LO, HI), v: n.v }, n.p ? { p: n.p } : {}, n.b ? { b: n.b } : {}); out.push(nn); });
+      S.clear(); commit(out); readout.textContent = '♪ ' + p.name + ' · Ctrl+Z undoes';
+    }
+    const bar = h('div', { class: 'tlpr-bar' }, [toolSel.el, title, bars.el, toolBtn, h('span', { class: 'tlpr-sep' }), toolBox, gridSel.el, lockT.el, zoomSel.el, laneSel.el, patSel.el, readout, moreBtn.el, winBtn.el, fullBtn.el, closeBtn.el]);
+    setMore(moreOn); if (view.bind) view.bind('rollMore', (v) => { if (!!v !== moreOn) setMore(!!v); });
     const keys = document.createElement('canvas'); keys.className = 'tlpr-keys';
     const ruler = document.createElement('canvas'); ruler.className = 'tlpr-ruler';
     const cv = document.createElement('canvas'); cv.className = 'tlpr-grid'; cv.tabIndex = 0; cv.setAttribute('role', 'application'); cv.setAttribute('aria-label', 'Note grid — 1 draw, 2 paint, 3 split, 4 erase, 5 select; click to add, drag to move, drag an edge to stretch, Shift-click or drag a box to select, Ctrl+C / V / D, arrow keys nudge, Q quantize, double-click for the note knobs; hold Alt for no snap');
@@ -146,7 +174,7 @@
     const scroll = h('div', { class: 'tlpr-scroll' }, [keyCol, gridCol]);
     let userScrolled = false, centreRO = null, centreNow = () => {};   // 3.93 the roll keeps its notes in view until you scroll it
     const main = h('div', { class: 'tlpr-main' }, [scroll, editor]);   // 3.58 the note inspector docks beside the notes
-    const el = h('div', { class: 'tlpr' }, [bar, main]);
+    const el = h('div', { class: 'tlpr' }, [bar, more, main]);
 
     const Hh = () => rowNotes.length * ROW;
     const steps = () => clip ? clip.bars * 16 : 64;
@@ -187,6 +215,19 @@
       }
       if (playStep !== null && playStep >= 0 && playStep <= st) { g.fillStyle = '#fff'; g.beginPath(); g.moveTo(playStep * pps - 5, 0); g.lineTo(playStep * pps + 5, 0); g.lineTo(playStep * pps, 7); g.fill(); }
     }
+    // 3.115 a note drawn like a Song Recorder clip: see-through body in the track's colour, outlined, a waveform inside (denser for higher
+    // notes, taller for louder ones, settling after its attack), and its name when there is room
+    function clipNote(g, nt, x, y, w, col, on) {
+      g.globalAlpha = 0.16 + 0.22 * nt.v; g.fillStyle = col; g.fillRect(x + 1, y + 1, w - 1, ROW - 2); g.globalAlpha = 1;
+      g.strokeStyle = on ? '#fff' : col; g.lineWidth = on ? 1.5 : 1; g.strokeRect(x + 1.5, y + 1.5, w - 2, ROW - 3);
+      if (ROW >= 6 && w >= 8) {
+        const mid = y + ROW / 2, amp = Math.max(0.6, (ROW / 2 - 2.5) * (0.45 + 0.55 * nt.v)), per = clampN(12 / Math.pow(2, (nt.n - 60) / 24), 3, 18);
+        g.strokeStyle = col; g.globalAlpha = 0.95; g.lineWidth = 1; g.beginPath();
+        for (let px = 2; px <= w - 2; px++) { const env = Math.min(1, px / 4) * (0.6 + 0.4 * Math.exp(-px / Math.max(8, w * 0.25))); const yy = mid - Math.sin(px / per * 2 * Math.PI) * amp * env; if (px === 2) g.moveTo(x + px, yy); else g.lineTo(x + px, yy); }
+        g.stroke(); g.globalAlpha = 1;
+      }
+      if (ROW >= 11 && w >= 34) { g.fillStyle = '#d6e4f0'; g.font = '9px ui-sans-serif, system-ui'; g.fillText(NAMES[mod(nt.n, 12)] + (Math.floor(nt.n / 12) - 1), x + 4, y + 9); }
+    }
     function draw() {
       if (!clip) return;
       const st = steps(), W = Math.max(200, st * pps), H = Hh();
@@ -207,9 +248,18 @@
         const x = nt.s * pps, y = yOf(nt.n), w = Math.max(3, nt.l * pps - 1);
         const c2 = drums ? ((drums[rowNotes.indexOf(nt.n)] || {}).color || col) : col;
         if (!drums && nt.b) { drawBend(g, nt, S.has(i)); curveMark(g, nt, x, y, w); return; }   // 3.58 a bent note IS its curve: the block bends
+        if (clipLook && !drums) clipNote(g, nt, x, y, w, c2, S.has(i));
+        else {
         g.globalAlpha = 0.35 + 0.65 * nt.v; g.fillStyle = c2; g.fillRect(x + 1, y + 1, w - 1, ROW - 2); g.globalAlpha = 1;
         g.strokeStyle = S.has(i) ? '#fff' : '#000'; g.lineWidth = 1; g.strokeRect(x + 1.5, y + 1.5, w - 2, ROW - 3);
+        }
         curveMark(g, nt, x, y, w);
+        // 3.113 grips on the ends of the note under the pointer (and the selected ones): what sizes it is visible; the side you would grab is lit
+        if ((i === hoverNote || S.has(i)) && (tool === 'draw' || tool === 'select') && w >= 10 && ROW >= 7) {
+          const gh = Math.max(3, ROW - 6), gy = y + (ROW - gh) / 2, lit = i === hoverNote ? hoverZone : null;
+          g.fillStyle = lit === 'R' ? '#fff' : 'rgba(255,255,255,.55)'; g.fillRect(x + w - 4, gy, 2, gh);
+          if (w >= 24) { g.fillStyle = lit === 'L' ? '#fff' : 'rgba(255,255,255,.55)'; g.fillRect(x + 3, gy, 2, gh); }
+        }
       });
       // 3.62 a repeating clip: past its repeat point the notes are the first bars again — shaded, drawn faint, not editable there
       const L = clip.loop || 0;
@@ -392,10 +442,16 @@
     function hit(x, y) { const n = nOf(y), st = x / pps; for (let i = notes.length - 1; i >= 0; i--) { const a = notes[i]; if (st < a.s || st > a.s + a.l) continue; if (a.n === n) return i;
       if (a.b && !drums && Math.abs(y - bendY(a, (st - a.s) / Math.max(a.l, 1e-6))) <= ROW / 2 + 1) return i; } return -1; }   // a bent note is grabbed on its curve too
     // which part of a note the pointer is on: 'L' / 'R' edge (max 4 px, 25 % of the note) or the body
-    function zone(i, x) { const a = notes[i], x0 = a.s * pps, x1 = (a.s + a.l) * pps, z = Math.max(4, (x1 - x0) * 0.25); return x1 - x < z ? 'R' : x - x0 < z && a.l > (grid || FREE) ? 'L' : 'B'; }
+    // 3.113 "easier to manipulate notes, like size and moving": the ends grab over 6–12 px (was 4); a short note's right half sizes it and its
+    // left half moves it; the left end sizes only on notes wide enough to keep a body to move
+    function zone(i, x) { const a = notes[i], x0 = a.s * pps, x1 = (a.s + a.l) * pps, w = x1 - x0; if (w < 16) return x - x0 > w / 2 ? 'R' : 'B'; const z = clampN(w * 0.3, 6, 12); return x1 - x < z ? 'R' : x - x0 < z && w >= 24 && a.l > (grid || FREE) ? 'L' : 'B'; }
+    let hoverNote = -1, hoverZone = null;
 
+    let pan = null;   // 3.115 middle-drag pans (like the canvas)
+    let rowF = 11;   // the row zoom between whole pixels, so small steps add up (4 px × 1.12 still rounds to 4)
     cv.addEventListener('pointerdown', (e) => {
       e.stopPropagation(); cv.focus({ preventScroll: true }); if (!clip) return;
+      if (e.button === 1) { e.preventDefault(); pan = { x: e.clientX, y: e.clientY, l: scroll.scrollLeft, t: scroll.scrollTop, k: (cv.getBoundingClientRect().width / cv.offsetWidth) || 1 }; try { cv.setPointerCapture(e.pointerId); } catch (_) {} return; }
       const { x, y } = local(e); const i = hit(x, y), g = g0(e), st = steps();
       if (e.button === 2 && tool === 'bend') { if (i >= 0 && notes[i].b) { const next = notes.slice(), sel = S.has(i) ? Array.from(S) : [i]; sel.forEach(j => { if (next[j]) { next[j] = Object.assign({}, next[j]); delete next[j].b; } }); commit(next); say(notes[i].s, notes[i].n, 'bend: flat'); } return; }
       // 3.112 right-click with notes selected: the notes' menu (Connect edges, …); with nothing selected it still erases the note under it
@@ -428,7 +484,7 @@
       }
       if (i >= 0) {
         if (!S.has(i)) selOnly(i); const z = zone(i, x);
-        drag = { mode: z === 'R' ? 'resize' : z === 'L' ? 'resizeL' : 'move', grab: i, idx: Array.from(S), orig: notes.map(n => Object.assign({}, n)), x0: x, y0: y, armed: false, changed: false, copy: (e.ctrlKey || e.metaKey) && z === 'B' };
+        drag = { mode: z === 'R' ? 'resize' : z === 'L' ? 'resizeL' : 'move', off: z === 'R' ? notes[i].s + notes[i].l - x / pps : z === 'L' ? notes[i].s - x / pps : 0, grab: i, idx: Array.from(S), orig: notes.map(n => Object.assign({}, n)), x0: x, y0: y, armed: false, changed: false, copy: (e.ctrlKey || e.metaKey) && z === 'B' };
         if (z === 'B') audition([notes[i].n]);
       } else if (tool === 'select') { return;
       } else {
@@ -450,6 +506,7 @@
       notes = notes.concat([{ s: cell, l, n, v: 0.85 }]); drag.changed = true; audition([n]);
     }
     cv.addEventListener('pointermove', (e) => {
+      if (pan) { if (!(e.buttons & 4)) { pan = null; return; } scroll.scrollLeft = pan.l - (e.clientX - pan.x) / pan.k; scroll.scrollTop = pan.t - (e.clientY - pan.y) / pan.k; return; }
       if (!clip) return;
       const { x, y } = local(e);
       if (drag && e.buttons === 0 && e.pointerType === 'mouse') endDrag(); // the button came up somewhere we never heard about
@@ -491,11 +548,11 @@
         if (ds || dn) drag.changed = true;
         const a = notes[drag.grab !== undefined && !drag.copied ? drag.grab : drag.idx[0]] || notes[drag.idx[0]]; say(a.s, a.n);
       } else if (drag.mode === 'resize') {   // the grabbed note's end snaps; every selected note's end moves by the same amount
-        const go = drag.orig[drag.grab], end = q(clampN(snapTo(x / pps, g), go.s + gs, st)), d = end - (go.s + go.l);
+        const go = drag.orig[drag.grab], end = q(clampN(snapTo(x / pps + (drag.off || 0), g), go.s + gs, st)), d = end - (go.s + go.l);
         drag.idx.forEach(i => { const o = drag.orig[i]; notes[i] = Object.assign({}, o, { l: q(clampN(o.l + d, Math.min(gs, FREE * 2), st - o.s)) }); });
         drag.changed = true; const a = notes[drag.grab]; say(a.s + a.l, a.n, 'end');
       } else {   // resizeL: the starts move, every end stays put
-        const go = drag.orig[drag.grab], s1 = q(clampN(snapTo(x / pps, g), 0, go.s + go.l - gs)), d = s1 - go.s;
+        const go = drag.orig[drag.grab], s1 = q(clampN(snapTo(x / pps + (drag.off || 0), g), 0, go.s + go.l - gs)), d = s1 - go.s;
         drag.idx.forEach(i => { const o = drag.orig[i], end = o.s + o.l; const s = q(clampN(o.s + d, 0, end - Math.min(gs, FREE * 2))); notes[i] = Object.assign({}, o, { s, l: q(end - s) }); });
         drag.changed = true; const a = notes[drag.grab]; say(a.s, a.n, 'start');
       }
@@ -507,15 +564,15 @@
       if (tool === 'erase') gh = i >= 0 ? Object.assign({}, notes[i]) : null;
       else if (tool === 'split') gh = i >= 0 ? { s: notes[i].s, l: notes[i].l, n: notes[i].n, split: q(snapTo(x / pps, g)) } : null;
       else if (i < 0) { const s = q(clampN(cellOf(x / pps, g), 0, st - (g || FREE))); gh = { s, l: q(Math.min(tool === 'paint' ? (g || FREE) : newLen(), st - s)), n }; }
-      const z = i >= 0 && tool === 'draw' ? zone(i, x) : null;
+      const z = i >= 0 && (tool === 'draw' || tool === 'select') ? zone(i, x) : null; hoverNote = i; hoverZone = z;
       cv.classList.toggle('edge', z === 'R' || z === 'L');
       const keyChanged = (ghost && ghost.n) !== (gh && gh.n);
       ghost = gh; hoverS = gh ? gh.s : q(cellOf(x / pps, g)); draw(); if (keyChanged) drawKeys();
       if (tool === 'sketch') { ghost = null; cv.classList.toggle('edge', false); say(x / pps, Math.round(pOf(y)), '✍ draw a line — it becomes ' + sketchAs); draw(); return; }
       if (tool === 'bend') { ghost = null; cv.classList.toggle('edge', false); if (i >= 0) say(notes[i].s, notes[i].n, (notes[i].b ? 'bend ' + bendSay(notes[i].b) + ' · ' : '') + ((x / pps - notes[i].s) / notes[i].l < 0.33 ? 'drag: slide in from…' : 'drag: bend to…')); else readout.textContent = '〰 drag a note up or down'; draw(); return; }
-      if (i >= 0) say(notes[i].s, notes[i].n, `len ${+(notes[i].l / 4).toFixed(3)} beat · click: edit it`); else say(gh ? gh.s : x / pps, n);
+      if (i >= 0) say(notes[i].s, notes[i].n, `len ${+(notes[i].l / 4).toFixed(3)} beat · ` + (z === 'R' || z === 'L' ? 'drag: size it (Alt: free)' : 'drag: move it · its ends: size it · click: edit it')); else say(gh ? gh.s : x / pps, n);
     }
-    cv.addEventListener('pointerleave', () => { hoverS = null; if (!drag && ghost) { ghost = null; draw(); drawKeys(); } readout.textContent = ''; });
+    cv.addEventListener('pointerleave', () => { hoverS = null; if (hoverNote >= 0) { hoverNote = -1; hoverZone = null; if (!drag) draw(); } if (!drag && ghost) { ghost = null; draw(); drawKeys(); } readout.textContent = ''; });
     const endDrag = () => {
       cv.classList.remove('move'); if (!drag) return; const d = drag; drag = null;
       if ((d.mode === 'resize' || d.mode === 'resizeL') && d.changed) lastLen = notes[d.grab].l;   // new notes take this length
@@ -527,7 +584,8 @@
       if (d.changed) commit(notes.slice()); else draw();
     };
     cv.addEventListener('pointerdown', () => { if (drag && !drag.done) drag.done = global.UIKit.drag.begin(endDrag); }); // 3.34 guard
-    cv.addEventListener('pointerup', endDrag);
+    cv.addEventListener('pointerup', (e) => { if (pan) { pan = null; return; } endDrag(e); });
+    cv.addEventListener('mousedown', (e) => { if (e.button === 1) e.preventDefault(); });   // no browser autoscroll on a middle press
     // a lost capture / cancelled pointer (alt-tab, touch cancel, window torn down mid-drag) must never leave a drag armed
     cv.addEventListener('pointercancel', endDrag); cv.addEventListener('lostpointercapture', endDrag);
     cv.addEventListener('dblclick', (e) => { const { x, y } = local(e); const i = hit(x, y); if (i >= 0) openEditor(i); });   // 3.48: exact fields (right-click deletes)
@@ -546,13 +604,18 @@
     function fit() { if (!clip) return; zoomTo(Math.max(PPS_MIN, (scroll.clientWidth - KW - 4) / steps())); scroll.scrollLeft = 0; }
     function setRow(r, atY) {
       if (drums) return; const ay = atY === undefined ? scroll.scrollTop + scroll.clientHeight / 2 : atY, row = ay / ROW;
-      prow = clampN(Math.round(r), 6, 28); ROW = prow; drawKeys(); draw();
-      scroll.scrollTop = Math.max(0, row * ROW - (ay - scroll.scrollTop)); rowSel.set([7, 11, 16, 24].reduce((a, b) => Math.abs(b - prow) < Math.abs(a - prow) ? b : a));
+      prow = clampN(Math.round(r), 4, 40); ROW = prow; drawKeys(); draw();
+      const tgt = Math.max(0, row * ROW - (ay - scroll.scrollTop)); scroll.scrollTop = tgt; if (scroll.scrollTop !== tgt) requestAnimationFrame(() => { scroll.scrollTop = tgt; });   // the grid may grow a frame later
+      rowSel.set([7, 11, 16, 24].reduce((a, b) => Math.abs(b - prow) < Math.abs(a - prow) ? b : a));
     }
     cv.addEventListener('wheel', (e) => {
       const { x, y } = local(e);
       if (e.ctrlKey && e.shiftKey) { e.preventDefault(); e.stopPropagation(); setRow(ROW * (e.deltaY < 0 ? 1.15 : 1 / 1.15), y); return; }
       if (e.ctrlKey || e.metaKey) { e.preventDefault(); e.stopPropagation(); userZoom = true; zoomTo(pps * (e.deltaY < 0 ? 1.15 : 1 / 1.15), x); return; }
+      if (canvasZoom && !e.altKey && !e.shiftKey) {   // 3.115 like the canvas: time and pitch together, around the pointer
+        e.preventDefault(); e.stopPropagation(); const f = e.deltaY < 0 ? 1.12 : 1 / 1.12, fill = (scroll.clientWidth - KW - 4) / steps(); userZoom = true; zoomTo(Math.max(fill, pps * f), x); rowF = clampN((Math.abs(rowF - ROW) < 1 ? rowF : ROW) * f, 4, 40); setRow(rowF, y); return;   // time never shrinks past filling the roll
+      }
+      if (canvasZoom && !e.altKey) return;   // Shift+wheel: scroll
       const i = hit(x, y); if (i < 0) return;
       e.preventDefault(); e.stopPropagation();
       const next = notes.slice(); next[i] = Object.assign({}, next[i], { v: Math.max(0.05, Math.min(1, next[i].v + (e.deltaY < 0 ? 0.05 : -0.05))) });
@@ -574,6 +637,11 @@
       const sel = Array.from(S).filter(i => notes[i]);
       if (!sel.length) return;
       if (k === 'Delete' || k === 'Backspace') { eat(); removeSel(); return; }
+      if (mod && (k === 'ArrowLeft' || k === 'ArrowRight')) {   // 3.113 size: Ctrl+← shorter, Ctrl+→ longer, by a grid step (Shift: a bar)
+        eat(); const d = (k === 'ArrowLeft' ? -1 : 1) * (e.shiftKey ? 16 : (grid || FREE)), st = steps(), next = notes.slice();
+        sel.forEach(i => { const a = next[i]; next[i] = Object.assign({}, a, { l: q(clampN(a.l + d, grid || FREE, st - a.s)) }); });
+        lastLen = next[sel[0]].l; commit(next); say(next[sel[0]].s, next[sel[0]].n, `len ${+(next[sel[0]].l / 4).toFixed(3)} beat`); return;
+      }
       if (k === 'ArrowLeft' || k === 'ArrowRight') {   // nudge in time: one grid step, Shift = a bar
         eat(); const d = (k === 'ArrowLeft' ? -1 : 1) * (e.shiftKey ? 16 : (grid || FREE)), st = steps();
         const lo = Math.min(...sel.map(i => notes[i].s)), hi = Math.max(...sel.map(i => notes[i].s + notes[i].l)), dd = clampN(d, -lo, st - hi);
@@ -1025,6 +1093,7 @@
       toolBtn.classList.toggle('on', toolOn);
       if (edMode !== 'note') { if (toolOn && ln && ln.target && toolsAll[ln.target]) openTool(); else if (edMode === 'tool') closeEditor(); }
       if (bars.set) bars.set(c.bars);
+      patterns();
       el.classList.add('open'); drawKeys(); draw();
       // 3.59: an empty bass track opens down where basses live
       // 3.93 the notes in view: centred on them when it opens AND again whenever the roll changes size (it opened as a sliver, centred

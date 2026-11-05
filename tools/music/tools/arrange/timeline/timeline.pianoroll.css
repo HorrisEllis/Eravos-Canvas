@@ -85,3 +85,9 @@ select.tlpr-toolsel, .tlpr-toolsel select { font-weight: 600; color: var(--tool-
 /* 3.109 the roll in its own borderless window: it fills it, no frame of its own */
 .tlpr.tlpr-win { margin: 0; border: 0; border-radius: 0; }
 .tlpr.tlpr-win.open { flex: 1 1 auto; }
+/* 3.113 one row of what you reach for every time; the rest under More ▾ */
+.tlpr-bar .tlpr-spacer { flex: 1; }
+.tlpr-more { border-top: 0; padding-top: 0; }
+.tlpr-more[hidden] { display: none; }
+.tlpr-bar > .tlpr-pos { flex: 1 1 40px; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.tlpr-bar .uk-field select.uk-select { max-width: 190px; }

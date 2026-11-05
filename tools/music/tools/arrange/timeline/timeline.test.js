@@ -45,7 +45,7 @@ describe('tool · Timeline — piano roll precision (3.48)', () => {
   it('⛶ full screen: the roll fills the window, clicks still land on their cell, Esc puts it back where it was', () => {
     const r = roll({ z: 0.6 }), home = r.pr.el.parentNode;
     try {
-      const btn = [...r.pr.el.querySelectorAll('button')].find(b => /Full screen/.test(b.textContent)); assert.ok(btn, 'a ⛶ button in the roll'); btn.click();
+      const btn = [...r.pr.el.querySelectorAll('button')].find(b => /Full screen/.test(b.textContent + ' ' + b.title)); assert.ok(btn, 'a ⛶ button in the roll'); btn.click();
       assert.ok(r.pr.full, 'full'); assert.equal(r.pr.el.parentNode, document.body, 'moved out of the zoomed canvas');
       const rc = r.pr.el.getBoundingClientRect(); assert.near(rc.width, innerWidth, 2); assert.near(rc.height, innerHeight, 2);
       r.click(6, 65); assert.equal(r.notes().length, 1); assert.equal(r.notes()[0].s, 6); assert.equal(r.notes()[0].n, 65);

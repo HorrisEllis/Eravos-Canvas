@@ -102,7 +102,7 @@
       c.onclick = () => { setButtons(b.id); paintB(); }; bcards.appendChild(c); }); };
     paintB();
     // 3.107 materials: each card a small panel in that finish (data-material on the card itself)
-    const mcards = h('div', { class: 'thm-btns' });
+    const mcards = h('div', { class: 'thm-btns thm-mats' });
     const paintM = () => { mcards.innerHTML = ''; MATERIALS.forEach(m => {
       const on = getMaterial() === m.id, c = h('button', { class: 'thm-bcard' + (on ? ' on' : ''), type: 'button', 'aria-pressed': on ? 'true' : 'false', title: m.blurb }, [
         h('span', { class: 'thm-mat', 'data-material-demo': m.id }), h('b', { text: m.label + (on ? '  ✓' : '') }), h('small', { text: m.blurb })]);

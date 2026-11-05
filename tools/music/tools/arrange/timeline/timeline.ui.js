@@ -93,7 +93,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
   // 3.53 record what you play: while this is on and the song plays, any knob you turn on a track's tool is written into its
   // own automation lane (a lane is made for it the first time)
   const recK = UI.Toggle({ label: '⏺ knobs', hint: 'record what you play — while the song plays, every knob you turn on a track’s tool is written into an automation lane', onChange: (v) => view.emit('rec_knobs', { on: v }) });
-  view.root.append(h('div', { class: 'org-row', style: { flexWrap: 'wrap' } }, [UI.presetBar(view), restart.el, play.el, pos, addT.el, recK.el, snap.el, zoom.el, h('span', { class: 'org-label', text: 'lanes' }), laneDn.el, laneUp.el, fitB.el, fullT.el, splitB.el, loop.el, addL.el, expM.el, expSt]), body, split, roll.el, insp,
+  view.root.append(h('div', { class: 'org-row', style: { flexWrap: 'wrap' } }, [UI.presetBar(view), restart.el, play.el, pos, addT.el, recK.el, snap.el, zoom.el, h('span', { class: 'org-label', text: 'lanes' }), laneDn.el, laneUp.el, fitB.el, fullT.el, loop.el, addL.el, expM.el, expSt]), body, split, roll.el, insp,
     UI.hint('＋ Track adds an instrument with a clip · dbl-click an instrument lane for a new clip, click a clip to open its piano roll · drop audio onto a lane · drag clips (alt = copy) · drag edges to trim · dbl-click a pattern lane for a pattern block · click the ruler to jump, drag it to loop · ⏮ / Home restart · S split · Del delete · wheel / Shift+wheel scroll, Ctrl+wheel zooms · + / − zoom · F fit · ⤢ fills the screen (Esc back)'));
   const ppb = () => view.state.pxPerBar || 64;
   const xOf = (bar) => (bar - 1) * ppb();
@@ -493,6 +493,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     const { x, y } = local(e);
     if (y < rulerY() + RULER) { drag = { kind: 'ruler', x0: x }; return; }
     const li = Math.floor((y - RULER) / laneH()), lane = A.lanes[li];
+    if (e.button === 2 && lane && lane.kind !== 'auto' && lane.kind !== 'marker') return;   // 3.114 right-click: the menu (contextmenu below)
     if (lane && lane.kind === 'auto') {   // 3.53 points: click adds, drag moves, right-click removes
       const k = knobOf(lane); if (!k) return;
       const pts = (lane.points || []).map(q => q.slice()), near = pts.findIndex(q => Math.abs(xOf(q[0]) - x) < 7 && Math.abs(aY(li, aFrac(k, q[1])) - y) < 8);
@@ -561,7 +562,47 @@ OrganismFactory.reg('eravos.timeline', function (view) {
   });
   // 3.70: right-click deletes on a curve lane and a marker lane (its own job there); anywhere else the right-click menu opens with the
   // timeline's own items (view.contextMenu below) — the clip under the pointer, the frame, the song
-  cv.addEventListener('contextmenu', (e) => { if (!A) return e.preventDefault(); const { y } = local(e); const ln = A.lanes[Math.floor((y - RULER) / laneH())]; if (y < rulerY() + RULER || (ln && (ln.kind === 'auto' || ln.kind === 'marker'))) e.preventDefault(); });
+  cv.addEventListener('contextmenu', (e) => {
+    if (!A) return e.preventDefault(); const { x, y } = local(e); const li = Math.floor((y - RULER) / laneH()), ln = A.lanes[li];
+    if (y < rulerY() + RULER || (ln && (ln.kind === 'auto' || ln.kind === 'marker'))) { e.preventDefault(); return; }
+    if (!ln || !window.ContextMenu) return;
+    e.preventDefault(); e.stopPropagation(); trackMenu(e, x, y, li, ln);
+  });
+  // 3.114 "let me select where and right click" (2026-11-05): a selected stretch, a clip, or a spot on a track — each has its menu
+  function trackMenu(e, x, y, li, ln) {
+    const CM = window.ContextMenu, at = snapB(barOf(x)), bs = (v) => { const bar = Math.floor(v + 1e-9), beat = Math.round((v - bar) * 4) + 1; return beat === 1 ? 'bar ' + bar : bar + '.' + beat; };
+    const inFrame = frame && frame.b > frame.a && li >= frame.l0 && li <= frame.l1 && at >= frame.a - 1e-6 && at <= frame.b + 1e-6;
+    if (inFrame) {
+      const ids = A.lanes.slice(frame.l0, frame.l1 + 1).map(l => l.id), f = frame;
+      CM.show(e.clientX, e.clientY, [
+        { label: '✂ Split here', hint: 'cut every clip at the edges of this stretch', run: () => doSplit() },
+        { label: '⟳ Loop this stretch', hint: 'the song loops these bars', run: () => { view.emit('loop_set', { start: Math.floor(f.a), end: Math.max(Math.floor(f.a) + 1, Math.ceil(f.b)), on: true }); } },
+        { sep: true },
+        { label: '× Delete what is in it', danger: true, hint: 'cut at its edges, then remove every clip inside (Ctrl+Z undoes)', run: () => { view.emit('clip_clear_at', { lanes: ids, a: f.a, b: f.b }); frame = null; splitB.el.classList.remove('on'); draw(); } },
+        { label: 'Clear the selection', run: () => { frame = null; splitB.el.classList.remove('on'); draw(); } },
+      ], bs(f.a) + ' – ' + bs(f.b) + (f.l1 > f.l0 ? ' · ' + (f.l1 - f.l0 + 1) + ' tracks' : ''));
+      return;
+    }
+    const hc = hit(x, y);
+    if (hc) {
+      const c = hc.c; sel = c.id; frame = null; drawInsp(); syncRoll(); draw();
+      CM.show(e.clientX, e.clientY, [
+        c.kind === 'notes' ? { label: '✎ Edit notes', run: () => { sel = c.id; drawInsp(); syncRoll(); draw(); } } : null,
+        { label: '✂ Split here', hint: 'cut this clip at ' + bs(at), run: () => view.emit('clip_split_at', { lanes: [c.lane], bars: [at] }) },
+        { label: '⧉ Duplicate', run: () => view.emit('clip_duplicate', { id: c.id }) },
+        { sep: true },
+        { label: '× Delete', danger: true, run: () => { view.emit('clip_remove', { id: c.id }); if (sel === c.id) { sel = null; drawInsp(); syncRoll(); } } },
+      ], c.name || ln.name);
+      return;
+    }
+    frame = null; splitB.el.classList.remove('on'); draw();
+    CM.show(e.clientX, e.clientY, [
+      { label: '✂ Split here', hint: 'cut the clips on this track at ' + bs(at), run: () => view.emit('clip_split_at', { lanes: [ln.id], bars: [at] }) },
+      ln.kind === 'inst' ? { label: '＋ New clip here', run: () => { const b0 = Math.floor(barOf(x)); pendingSel = { lane: ln.id, startBar: b0 }; view.emit('clip_add', { kind: 'notes', lane: ln.id, startBar: b0, bars: 4 }); } } : null,
+      ln.kind === 'pattern' ? { label: '＋ New pattern block here', run: () => view.emit('clip_add', { kind: 'pattern', lane: ln.id, startBar: Math.floor(barOf(x)), bars: 4, slot: 'A' }) } : null,
+      { label: 'Tip: drag across a track to select a stretch, then right-click it', disabled: true },
+    ], ln.name + ' · ' + bs(at));
+  }
   view.contextMenu = (e) => {
     if (!A) return [];
     const items = [], p = e && e.target === cv ? local(e) : null, hc = p ? hit(p.x, p.y) : null, c = hc ? hc.c : A.clips.find(x => x.id === sel);

@@ -71,6 +71,18 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-05 · A piano roll you can work in — piano roll easier, Timeline right-click, Clip look, Canvas zoom
+- **His words (2026-11-05):** "make it easier" · "i dont like the fill options, replace it with pattern selection. also easier to manipulate
+  notes, like size and moving" · "remove the split button from the timeline?, and let me select where and right click" · "like the song
+  recorder, where theyre like clips".
+- **His call:** each change shown to him as screenshots before merging; the new looks are options with today's look the default.
+- **Built:** a one-row toolbar with the rest folded away; a pattern picker that writes a track's patterns into a clip in the song's key;
+  bigger, visible note handles that keep where you grabbed; right-click menus on a selected stretch, a clip and a spot, with a one-step
+  "delete what is in it" in the engine; notes drawn like recorder clips with a waveform; canvas-style zoom of time and pitch together.
+- **Proof:** three new in-app tests (7 checks of behaviour, including real pointer drags and right-clicks); Timeline 86/86, piano roll
+  35/35, canvas/content boundary 10/10; the full suite on main beforehand 1,379/1,382 with the cause of each failure named.
+- **Check:** `node tests/run.mjs P113` · `P114` · `P115`
+
 ### 2026-11-05 · Settings as a real page — PR #88
 - **His words (2026-11-05):** "also need a actual settings built not a drop down".
 - **His call:** saw every tab as screenshots, then "MERGE AND push".
