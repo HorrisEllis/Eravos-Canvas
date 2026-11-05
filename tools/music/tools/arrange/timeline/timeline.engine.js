@@ -58,8 +58,8 @@
       { key: 'rollMore', type: 'boolean', default: false, label: 'Piano roll: More controls open', group: 'VIEW', hidden: true },
       { key: 'rollWindow', type: 'boolean', default: true, label: 'Piano roll in its own window', group: 'VIEW', hint: '3.112 on by default: the piano roll opens as its own window under the Timeline, sized and placed as you like (off: under the tracks)' },
     ],
-    ui_hooks: ['transport_play', 'restart', 'seek', 'loop_set', 'lane_add', 'lane_edit', 'lane_remove', 'auto_points', 'rec_knobs', 'clip_add', 'clip_edit', 'clip_remove', 'clip_split', 'clip_split_at', 'clip_duplicate', 'clip_repeat', 'lane_split', 'marker_edit', 'bounce', 'drop_file', 'export', 'note_audition', 'clip_fill', 'export_midi', 'export_stems', 'tool_set', 'tool_preset', 'behaviour_save', 'behaviour_remove'],
-    ui_hook_labels: { behaviour_save: 'save note behaviour', behaviour_remove: 'remove note behaviour', clip_add: 'new clip', clip_edit: 'edit clip / notes', clip_remove: 'delete clip', clip_split: 'split clip', clip_split_at: 'split at the frame', clip_duplicate: 'duplicate clip', clip_repeat: 'repeat clip', lane_split: 'split lane',
+    ui_hooks: ['transport_play', 'restart', 'seek', 'loop_set', 'lane_add', 'lane_edit', 'lane_remove', 'auto_points', 'rec_knobs', 'clip_add', 'clip_edit', 'clip_remove', 'clip_split', 'clip_split_at', 'clip_clear_at', 'clip_duplicate', 'clip_repeat', 'lane_split', 'marker_edit', 'bounce', 'drop_file', 'export', 'note_audition', 'clip_fill', 'export_midi', 'export_stems', 'tool_set', 'tool_preset', 'behaviour_save', 'behaviour_remove'],
+    ui_hook_labels: { behaviour_save: 'save note behaviour', behaviour_remove: 'remove note behaviour', clip_add: 'new clip', clip_edit: 'edit clip / notes', clip_remove: 'delete clip', clip_split: 'split clip', clip_clear_at: 'delete a stretch', clip_split_at: 'split at the frame', clip_duplicate: 'duplicate clip', clip_repeat: 'repeat clip', lane_split: 'split lane',
       clip_fill: 'fill chords', lane_add: 'new track', lane_edit: 'track settings', lane_remove: 'remove track', marker_edit: 'marker', drop_file: 'drop audio', loop_set: 'loop' },
     restoreTwice: true,
     engine(ctx) {
@@ -565,17 +565,28 @@
       // 3.62 FRAME SPLIT — James, 2026-10-23: "you select a frame in the timine and clit split to cut a pattern in half". Every clip on
       // the given lanes that a cut line falls inside is cut there (a frame = two lines: its start and its end; a click = one line).
       // Note and pattern clips cut on whole bars (their length is in bars); audio cuts where the line is. One undo step.
-      function splitAt(laneIds, bars) {
+      function splitAt(laneIds, bars, quiet) {
         const ids = new Set(laneIds || []), cuts = Array.from(new Set((bars || []).map(Number).filter(isFinite))).sort((a, b) => a - b), made = [];
         cuts.forEach(bar => clips.filter(c => ids.has(c.lane)).forEach(c => {
           const len = c.kind === 'audio' ? c.lengthSec / barSec() : c.bars, at = c.kind === 'audio' ? bar : Math.round(bar);
           if (at > c.startBar + 1e-6 && at < c.startBar + len - 1e-6) { const r = split(c.id, at); if (r) made.push(r[1].id); }
         }));
-        if (!made.length) ctx.emitUI('export_state', { error: 'Split: no clip crosses that line' + (cuts.length > 1 ? 's' : '') + ' (note and pattern clips cut on whole bars).' });
+        if (!made.length && !quiet) ctx.emitUI('export_state', { error: 'Split: no clip crosses that line' + (cuts.length > 1 ? 's' : '') + ' (note and pattern clips cut on whole bars).' });
         return made;
       }
       ctx.splitAt = splitAt;
       ctx.onUI('clip_split_at', { type: 'object', required: ['lanes', 'bars'] }, (p) => splitAt(p.lanes, p.bars));
+      // 3.114 "let me select where and right click": a selected stretch (bars a…b over some lanes) emptied — cut at its edges, then every clip
+      // inside it removed (note and pattern clips cut on whole bars, so a stretch inside one bar removes nothing of those)
+      ctx.onUI('clip_clear_at', { type: 'object', required: ['lanes', 'a', 'b'] }, (p) => {
+        const ids = new Set(p.lanes || []), a = +p.a, b = +p.b; if (!(b > a)) return;
+        const cutA = (c) => c.kind === 'audio' ? a : Math.round(a), cutB = (c) => c.kind === 'audio' ? b : Math.round(b);
+        splitAt(p.lanes, [a, b], true);
+        const len = (c) => c.kind === 'audio' ? c.lengthSec / barSec() : c.bars;
+        const gone = clips.filter(c => ids.has(c.lane) && c.startBar >= cutA(c) - 1e-6 && c.startBar + len(c) <= cutB(c) + 1e-6);
+        if (!gone.length) { ctx.emitUI('export_state', { error: 'Nothing to delete in that stretch (note and pattern clips go by whole bars).' }); return; }
+        const set = new Set(gone.map(c => c.id)); clips = clips.filter(c => !set.has(c.id)); sync();
+      });
       ctx.onUI('clip_duplicate', { type: 'object', required: ['id'] }, (p) => {
         const c = clips.find(x => x.id === p.id); if (!c) return ctx.fault('RUNTIME_002', 'clip ' + p.id);
         const len = c.kind === 'audio' ? c.lengthSec / barSec() : c.bars;
