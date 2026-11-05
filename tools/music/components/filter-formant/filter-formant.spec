@@ -1,4 +1,4 @@
-# spec_id: eravos.component.filter-formant · version 0.1.0 · status planned · template eravos.component/1
+# spec_id: eravos.component.filter-formant · version 1.0.0 · status built (P0.5, 2026-11-05: filter-formant.js + .test.mjs; used by wobble-bass, wub-filter) · template eravos.component/1
 # generated from eravos.music-ecosystem.spec v0.2.0 §3 — rule: eravos.components.spec (small, on its own, documented, shared)
 identity:
   id: filter-formant ; group: filters ; component tool: yes (yes = also on the canvas with a window and typed ports)

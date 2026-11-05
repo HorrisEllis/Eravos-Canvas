@@ -49,18 +49,8 @@
     return ac.createPeriodicWave(re, im);
   }
   const SUBK = { '0': 1, '-1': 0.5, '-2': 0.25 };   // 3.1: sub against the wub's pitch (0 = same; was −1 by default → 27.5 Hz under A2)
-  // vowel formants F1/F2/F3 (Hz) + band gains (dB)
-  const VOWELS = {
-    OO: { f: [300, 870, 2240], g: [0, -10, -24] },
-    OH: { f: [450, 800, 2830], g: [0, -6, -20] },
-    AH: { f: [730, 1090, 2440], g: [0, -4, -14] },
-    EH: { f: [530, 1840, 2480], g: [0, -8, -12] },
-    EE: { f: [270, 2290, 3010], g: [0, -12, -10] },
-    UH: { f: [640, 1190, 2390], g: [0, -5, -18] },
-    AE: { f: [660, 1720, 2410], g: [0, -6, -14] },
-    IH: { f: [390, 1990, 2550], g: [0, -10, -12] },
-    ER: { f: [490, 1350, 1690], g: [0, -6, -10] },
-  };
+  // the mouth's vowels (F1/F2/F3 Hz + band gains dB): the one table, components/filter-formant (P0.5) — every tool speaks every vowel
+  const VOWELS = MusicParts.vowels();
   const SHAPES = ['sine', 'sawdown', 'square', 'yoy', 'draw'];
   const STEPS = { '1/16': 1, '1/8': 2, '1/4': 4, '1/2': 8, '1/1': 16 };   // wub-seq step length in 16ths
   const MAXPTS = 32;
@@ -257,7 +247,7 @@
       [keyBus, envBus, velBus].forEach(c => { c.offset.value = 0; c.connect(fDet); c.start(); ctx.track(c); });
       // formant path
       const formIn = ac.createGain(), formOut = ac.createGain(); preSh.connect(formIn);
-      const bands = [0, 1, 2].map(() => { const b = ac.createBiquadFilter(); b.type = 'bandpass'; const g = ac.createGain(); formIn.connect(b); b.connect(g); g.connect(formOut); return { b, g }; });
+      const bands = MusicParts.formantBands(ac, formIn, formOut, 3);   // components/filter-formant
       const formMakeup = ac.createGain(); formOut.connect(formMakeup);
       const filtSel = ac.createGain(); lpOut.connect(filtSel); formMakeup.connect(filtSel);
       // 4.1 comb (+ / −): x + g·x[n−D] + g²·x[n−2D], D = 1/cutoff; the wobble shortens D (raises the comb) by up to Depth octaves
@@ -374,7 +364,7 @@
       // 2.1: tremolo + vibrato ride the same LFO
       const tremDepth = ac.createGain(), tremAl = ac.createDelay(0.05); tremDepth.gain.value = 0; tremAl.delayTime.value = FILT_LAT; uni.connect(tremDepth); tremDepth.connect(tremAl); tremAl.connect(trem.gain); ctx.track(tremAl);
       const vibG = ac.createGain(); vibG.gain.value = 0; lfoBus.connect(vibG); [saw, saw2, sq].forEach(o => vibG.connect(o.detune)); vibG.connect(pitchBus);
-      const bandScale = bands.map(bd => { const f = ac.createGain(), gg = ac.createGain(); uni.connect(f); f.connect(bd.b.frequency); uni.connect(gg); gg.connect(bd.g.gain); return { f, gg }; });
+      MusicParts.formantMorph(ac, bands, uni);   // the wobble talks: vowel A → B
       let lfo = null;
       const waves = {};
       // drawn shapes carry a DC term the oscillator cannot (PeriodicWave drops n = 0) → a ConstantSource adds it back
@@ -452,13 +442,7 @@
         lp1.frequency.setTargetAtTime(c, ac.currentTime, 0.01); lp2.frequency.setTargetAtTime(c, ac.currentTime, 0.01);
         lp1.Q.value = q; lp2.Q.value = Math.min(q, 3) * 0.5;
         depthG.gain.setTargetAtTime(d * 1200, ac.currentTime, 0.01);
-        const A = VOWELS[P.get('vowelA')], B = VOWELS[P.get('vowelB')], fs = Math.pow(2, P.get('formantShift') / 12);
-        bands.forEach((bd, i) => {
-          bd.b.frequency.value = Math.min(18000, A.f[i] * fs); bd.b.Q.value = 4 + q * 0.9;
-          bandScale[i].f.gain.value = (B.f[i] - A.f[i]) * fs;
-          const ga = dsp.dbToGain(A.g[i]), gb = dsp.dbToGain(B.g[i]);
-          bd.g.gain.value = ga; bandScale[i].gg.gain.value = gb - ga;
-        });
+        MusicParts.formantSet(bands, VOWELS[P.get('vowelA')], VOWELS[P.get('vowelB')], { shift: P.get('formantShift'), q, maxHz: 18000, dbToGain: dsp.dbToGain });
         formMakeup.gain.value = 2.2 + q * 0.12;
         const ft = FTYPE[mode] || 'lowpass'; [lp1, lp2, lp3].forEach(b => { if (b.type !== ft) b.type = ft; });
         lp3.frequency.setTargetAtTime(c, ac.currentTime, 0.01); lp3.Q.value = 0.5;

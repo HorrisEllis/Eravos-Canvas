@@ -10,15 +10,9 @@
 (function () {
   'use strict';
   const S = OrganismSDK.STD, SDK = OrganismSDK;
-  const VOWELS = {
-    OO: { f: [300, 870, 2240], g: [0, -10, -24] },
-    OH: { f: [450, 800, 2830], g: [0, -6, -20] },
-    AH: { f: [730, 1090, 2440], g: [0, -4, -14] },
-    AE: { f: [660, 1720, 2410], g: [0, -6, -12] },
-    EH: { f: [530, 1840, 2480], g: [0, -8, -12] },
-    EE: { f: [270, 2290, 3010], g: [0, -12, -10] },
-    YOI: { f: [380, 1400, 2600], g: [0, -5, -12] },
-  };
+  // the one vowel table (components/filter-formant, P0.5). Wub Filter's AE kept its own third band (−12 dB; the table says −14) so
+  // nothing it played changes — the two had drifted; which is right is his call. It now also speaks UH, IH and ER.
+  const VOWELS = MusicParts.vowels({ AE: { f: [660, 1720, 2410], g: [0, -6, -12] } });
   const MODES = ['lowpass', 'bandpass', 'notch', 'vowel', 'comb'];
   OrganismFactory.define({
     id: 'eravos.wub-filter', domain: 'music', version: '1.0.0', label: 'Wub Filter', icon: '👄', accent: '#ff2266',
@@ -71,11 +65,8 @@
       const one = ac.createGain(); f1.connect(one);                  // 12 dB tap
       // ---- vowel bank: band freq = A + pos·(B−A), band gain = gA + pos·(gB−gA)
       const vIn = ac.createGain(), vOut = ac.createGain(); sh.connect(vIn);
-      const bands = [0, 1, 2].map(() => {
-        const b = ac.createBiquadFilter(); b.type = 'bandpass'; const g = ac.createGain(); vIn.connect(b); b.connect(g); g.connect(vOut);
-        const fScale = ac.createGain(), gScale = ac.createGain(); pos.connect(fScale); fScale.connect(b.frequency); pos.connect(gScale); gScale.connect(g.gain);
-        cutMod.connect(b.detune); return { b, g, fScale, gScale };
-      });
+      const bands = MusicParts.formantBands(ac, vIn, vOut, 3);   // components/filter-formant
+      MusicParts.formantMorph(ac, bands, pos); bands.forEach(bd => cutMod.connect(bd.b.detune));
       // ---- comb: y = x + a·x(t − d), d tuned to Cutoff and swept up by Range (delay shrinks as the mouth opens)
       const cIn = ac.createGain(), delay = ac.createDelay(0.05), fb = ac.createGain(), damp = ac.createBiquadFilter(), cOut = ac.createGain();
       damp.type = 'lowpass'; damp.frequency.value = 9000;
@@ -103,12 +94,7 @@
         f1.Q.value = mode === 'lowpass' ? q : Math.max(0.7, q * 0.8); f2.Q.value = mode === 'lowpass' ? Math.min(q, 3) * 0.5 : Math.max(0.7, q * 0.5);
         cents.gain.setTargetAtTime(rng * 1200, now, 0.01);
         // vowels (formant shift scales every band)
-        const A = VOWELS[P.get('vowelA')] || VOWELS.OO, B = VOWELS[P.get('vowelB')] || VOWELS.AH, fs = Math.pow(2, P.get('formant') / 12);
-        bands.forEach((bd, i) => {
-          bd.b.frequency.value = A.f[i] * fs; bd.b.Q.value = 4 + q * 0.9;
-          bd.fScale.gain.value = (B.f[i] - A.f[i]) * fs;
-          const ga = dsp.dbToGain(A.g[i]), gb = dsp.dbToGain(B.g[i]); bd.g.gain.value = ga; bd.gScale.gain.value = gb - ga;
-        });
+        MusicParts.formantSet(bands, VOWELS[P.get('vowelA')] || VOWELS.OO, VOWELS[P.get('vowelB')] || VOWELS.AH, { shift: P.get('formant'), q, dbToGain: dsp.dbToGain });
         // comb: delay = 1/cutoff at closed, 1/(cutoff·2^range) at open (linear in delay between them)
         const d0 = 1 / c, d1 = 1 / Math.min(ac.sampleRate / 4, c * Math.pow(2, rng));
         delay.delayTime.setTargetAtTime(Math.min(0.049, d0), now, 0.005); delayScale.gain.setTargetAtTime(d1 - d0, now, 0.005);

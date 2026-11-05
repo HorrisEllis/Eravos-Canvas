@@ -2,6 +2,21 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — P0.4 duplicate finder; P0.5 filter-formant (one mouth for Wobble Bass and Wub Filter) (2026-11-05)
+Asked: "Begin. I was thinking of having tool groups as suites. Like how each system has its components … fluid and dynamic, deep and professional".
+- build/duplicates.mjs: tokenises every tool's code (names/numbers normalised), finds windows shared across tools, grows them into
+  blocks, splits code vs settings (repeated knob groups mark repeated parts) → docs/duplicates.md. ~9 % of tool code repeats.
+- components/filter-formant: MusicParts.VOWELS (one table: OO OH AH EH EE UH AE IH ER YOI) · vowels(over) · formantBands · formantMorph ·
+  formantSet. Wobble Bass and Wub Filter both use it. The copies had drifted (UH IH ER only in Wobble Bass, YOI only in Wub Filter, AE's
+  third band −14 vs −12 dB). Wub Filter keeps its AE as an override so nothing it played changes — which AE is right is his call.
+- Proof: filter-formant.test.mjs 5,220 checks (same graph, same connection order, same values for every vowel pair × shift × Q;
+  mutation-checked: a Q law off by 1 % and a misrouted morph both fail it). Null render: Wobble Bass 38/38 PASS (−87.6 … −94.2 dB),
+  Wub Filter 8/8 PASS (7 presets render differently from themselves even unchanged: unproven, listed). In-page: Wobble 39/39,
+  Wub 59/59, P94 suite 2/2. tests/null-render.mjs: --record <tool> keeps every other tool's baseline (it used to wipe them).
+- specs/eravos.suites.spec ADDENDUM 2026-11-05: systems all the way down, fluid not boxes (F1–F5).
+- Next: Coven's vowels (its own 6-vowel table, gains not per band) · the grit shaper (Wobble Bass ⇄ Wub Sub) · the FM operator
+  (Syn Osc ⇄ Wobble Bass) · Wub Osc ⇄ Wub Sub voice code · then Wobble Bass "Open as components".
+
 ## Done — delete packs, presets and patterns for good; Playwright gone (2026-11-04)
 Asked: "i want to be able to delete packs, patterns" · "I don't need them brought back. some of them suck … dont sound good, or are blown"
 · "remove playwright from eravos. thats what clearglass was for".
