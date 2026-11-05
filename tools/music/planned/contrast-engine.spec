@@ -1,3 +1,41 @@
+# spec_id: eravos.contrast-engine · version 0.1.0 · status planned:contrast-engine.spec (v2: moves, rivalry, Tap-Map) · template eravos.tool/1
+# generated from eravos.music-ecosystem.spec v0.2.0 §4 (rhythm_and_contrast) — that file stays the index; this file is the tool's own spec
+identity:
+  id: eravos.contrast-engine ; label: Contrast Engine ; domain: music ; family: rhythm_and_contrast
+  lineage: rhythm that fights the grid and snaps back: complextro chops, half-time switches, dembow, footwork
+  family_from: drum machines (1980s on), breakbeat culture, UK garage, jungle, footwork, dembow, techno, polyrhythm traditions worldwide
+assembles (components, tools/music/components/<id>/ — never re-implemented here):
+  pattern-store · polymeter-cycle · probability-gate · spectral-features · onset-detector · energy-curve · seed-registry
+adds (behaviour only this tool has):
+  - the contrast-engine.spec grammar: DISPLACE · CROSS · SYNCOPATE · HEMIOLA · METRIC MOD · SWITCH · GAP · FLIP · STUTTER · REGISTER · CALL/ANSWER · SNAP-BACK
+  - contrast score per bar vs target curve
+  - silence as an instrument
+modes: director · rivalry · tap-map
+engines_0_1_0 (the original list, kept verbatim; each is covered by the components above or by adds):
+  density-analysis · spectral-contrast · dynamic-contrast · rhythmic-contrast · harmonic-contrast · silence-and-interruption
+ports: TO WRITE in the depth audit — typed in/out per §5 tool_contract; every assembled component reachable by wiring (Open as components)
+params: TO WRITE in the depth audit — every component control exposed, full range (eravos.tool-depth.spec), each a modulation destination
+packs (names unique across the ecosystem; ≥ 6 presets each; novelty test §6):
+  - Drop Contrast — everything-at-once drop after a starved build
+  - Minimal Tension — two elements, maximum push-pull
+  - Maximum Density — switch every 16th between sources
+  - Sparse Impact — single hits after long gaps
+  - Dynamic Collapse — full mix collapsing to one sound
+  - Rhythmic Interruption — gaps that cut riffs mid-phrase
+  - Silence as Instrument — silences placed like notes
+acceptance:
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - open-as-components: the wired components render the same as the tool (≤ −60 dB difference)
+  - novelty: every preset's nearest neighbour in this tool ≥ 0.15, pack centroids ≥ 0.25 apart (§6)
+  - p42 audio survey: timing to the sample, pitch to the cent, never over full scale
+  - cpu per instance and per voice measured (build/perf.mjs) and inside §8 budgets
+  - depth audit written above; open gaps listed, none hidden
+
+# dependencies: run node build/planned-deps.mjs once the hooks line is written (generated block, not by hand)
+
+# ============================================================
+# ORIGINAL SPEC (kept verbatim — the detail; the generated entry above widens it, per the index: "planned:<spec> … that spec stays the detail")
+# ============================================================
 # spec_id: eravos.organism.contrast-engine · version 2.0.0 · phase P39 (was P38 v1) · status planned · category arrange
 # R7 "tranki by skrillex, look into how it was made, the way it fights the rhythm, i want tools for that."
 # v2 supersedes v1 (same intent, kept: SWITCH · GAP · FLIP · STUTTER · score · GENERATE) and adds the rhythm-fighting

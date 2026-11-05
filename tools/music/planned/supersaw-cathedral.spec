@@ -1,0 +1,55 @@
+# spec_id: eravos.supersaw-cathedral · version 0.1.0 · status audited · extends:supersaw · template eravos.tool/1
+# generated from eravos.music-ecosystem.spec v0.2.0 §4 (rave_and_trance) — that file stays the index; this file is the tool's own spec
+identity:
+  id: eravos.supersaw-cathedral ; label: Supersaw Cathedral ; domain: music ; family: rave_and_trance
+  lineage: the late-1990s supersaw: seven detuned saws, the trance and EDM anthem sound
+  family_from: acid house (1987 on), hardcore and rave (early 1990s), trance (1990s–2000s), uplifting and psy
+assembles (components, tools/music/components/<id>/ — never re-implemented here):
+  osc-va · unison-stack · filter-svf · ensemble-core · reverb-fdn · ducker · stereo-tools · env-adsr
+adds (behaviour only this tool has):
+  - detune curve that matches the classic non-linear spread, plus user curves
+  - centre-voice level
+  - stereo per voice with mono-below
+modes: lead · chord · pad · pluck
+built_today (read from tools/music/tools/sound-sources/supersaw/supersaw.engine.js, eravos.supersaw 2.1.0 — the code is the source of truth; re-run the extract when it changes):
+  ports: audio_out · note_in · midi_in · theory_in · mod_in(cutoff) · mod_in(detune)
+  params (18):
+    OSC: unison 1..9 · detune 0..1 · mix 0..1 · spread 0..1
+    FILTER: cutoff 200..18000 Hz · res 0.5..20 · fEnv 0..4 oct · fA 0.001..4 s · fD 0.01..4 s · fS 0..1 · fR 0.01..12 s
+    AMP: aA 0.001..10 s · aD 0.01..4 s · aS 0..1 · aR 0.01..12 s
+    CHORD: chordMode [off, triad, seventh, add9, sus2, sus4, power] · octave -4..4 · level 0..1
+component_mapping (where each group's code moves — phase 0; the move changes nothing: every factory preset nulls ≤ −60 dB):
+  OSC → osc-va · unison-stack (unison, detune) · stereo-tools (spread) · mix → unison-stack blend
+  FILTER → filter-svf · env-adsr (filter ADSR)
+  AMP → env-adsr
+  CHORD → chord-engine (chordMode) · scale-key
+depth_audit — gaps to full range (each new control defaults to the value that reproduces today's sound):
+  - unison 1–9 → 1–16 (unison-stack)
+  - detune CURVE choice: the classic non-linear spread (the reference) + linear + user-drawn
+  - independent centre-voice level: today `mix` sets the side voices and the centre falls with it (centre = 1 − 0.4·mix); a new `centre` control defaults to that coupling
+  - mono-below and stereo per voice (stereo-tools) — today spread only
+  - built-in ensemble (ensemble-core) and space (reverb-fdn) stages, each bypassable and replaceable by wiring
+  - pump (ducker) synced to transport — needs transport_in, which Supersaw does not have today
+  - filter types and slopes (filter-svf), key track, velocity routing
+  - movement: LFO and drift (lfo, random-source) — none today besides mod inputs
+  - mono / legato / glide mode for leads (voice-allocator, slew-lag)
+ports_target (added to today's ports; nothing removed):
+  - transport_in (for synced pump and LFO)
+  - mod_in for res, mix, spread, fEnv (today: cutoff, detune)
+params_target: today's params unchanged + one control per gap above, named in the component that owns it (no duplicate controls across components)
+packs (names unique across the ecosystem; ≥ 6 presets each; novelty test §6):
+  - Uplift Anthem — huge bright trance chords
+  - Festival Lead — big-room lead with pitch drop
+  - Future Bass Wall — wide chord stacks with pump
+  - Hands Up Pluck — short supersaw plucks
+  - Darkened Saws — low-passed minor supersaws
+  - Seven Voices Clean — pure, no-chorus supersaw
+acceptance:
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - open-as-components: the wired components render the same as the tool (≤ −60 dB difference)
+  - novelty: every preset's nearest neighbour in this tool ≥ 0.15, pack centroids ≥ 0.25 apart (§6)
+  - p42 audio survey: timing to the sample, pitch to the cent, never over full scale
+  - cpu per instance and per voice measured (build/perf.mjs) and inside §8 budgets
+  - depth audit written above; open gaps listed, none hidden
+
+# dependencies: run node build/planned-deps.mjs once the hooks line is written (generated block, not by hand)

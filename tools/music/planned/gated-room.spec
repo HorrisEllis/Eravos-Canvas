@@ -1,0 +1,31 @@
+# spec_id: eravos.gated-room · version 0.1.0 · status new · template eravos.tool/1
+# generated from eravos.music-ecosystem.spec v0.2.0 §4 (synthwave_retro) — that file stays the index; this file is the tool's own spec
+identity:
+  id: eravos.gated-room ; label: Gated Room ; domain: music ; family: synthwave_retro
+  lineage: 1980s gated reverb on drums: big room cut off hard by a gate
+  family_from: late-1970s–80s analog and FM polysynths, film and game scores; revived as synthwave, outrun, darksynth, coldwave, vaporwave
+assembles (components, tools/music/components/<id>/ — never re-implemented here):
+  reverb-fdn · early-reflections · gate-expander · compressor · eq-parametric · ducker
+adds (behaviour only this tool has):
+  - gate keyed from the dry hit with tempo-synced hold
+  - reverse-gate shape
+  - room tone before gate (compressed room mics)
+modes: snare · toms · full-kit · reverse
+ports: TO WRITE in the depth audit — typed in/out per §5 tool_contract; every assembled component reachable by wiring (Open as components)
+params: TO WRITE in the depth audit — every component control exposed, full range (eravos.tool-depth.spec), each a modulation destination
+packs (names unique across the ecosystem; ≥ 6 presets each; novelty test §6):
+  - Chrome Snare Wall — huge snare room chopped at an eighth
+  - Tom Thunder Gate — booming toms with short, dense gated tails
+  - Reverse Bloom Gate — swelling backwards room into each hit
+  - Stadium Clap — claps in a massive bright gated hall
+  - Night Drive Kit — synthwave kit space: gated, wide, dark top
+  - Tight Box Gate — small, punchy gated room for modern pop drums
+acceptance:
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - open-as-components: the wired components render the same as the tool (≤ −60 dB difference)
+  - novelty: every preset's nearest neighbour in this tool ≥ 0.15, pack centroids ≥ 0.25 apart (§6)
+  - p42 audio survey: timing to the sample, pitch to the cent, never over full scale
+  - cpu per instance and per voice measured (build/perf.mjs) and inside §8 budgets
+  - depth audit written above; open gaps listed, none hidden
+
+# dependencies: run node build/planned-deps.mjs once the hooks line is written (generated block, not by hand)

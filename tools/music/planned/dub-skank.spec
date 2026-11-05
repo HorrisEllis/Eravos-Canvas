@@ -1,0 +1,28 @@
+# spec_id: eravos.dub-skank · version 0.1.0 · status mapped · template eravos.tool/1
+identity:
+  id: eravos.dub-skank ; label: Skank ; domain: music ; category: dub (shown as Dub)
+  purpose: the offbeat chord chop of reggae and dub: pick a style, feed it chords, and it plays the "and" of every beat — drums, one-drop, steppers and rockers feel included.
+  related: the SKANK part of Dub Station (one-drop chop, organ bubble, dancehall stab, built-in progressions) · chord-memory (one key → a chord) · arp · groove-gen
+ports:
+  in:  chord (event: chord:state from Chord Memory, Chord Gen or any chord source) · theory_in (song key & scale) · transport (ticks) · note_in (a single note → built-in diatonic chord) · mod.tone (±1 → ±2 oct) · mod.swing (±1 → ±1 on Swing)
+  out: note_out (note:trigger, scheduled on the offbeats, with the chop envelope as note durations) · gate (modulation 0..1: the chop envelope — for a Poly Filter or a Pump)
+params: style [one-drop chop, organ bubble, dancehall stab, rockers, steppers-offbeat, ska up-stroke, custom] · pattern 16 steps × [off, chop, stab, bubble, mute] (hidden; the style fills it) · chordSource [wired, built-in prog] · prog [i–iv, i–VII, i–VI–VII, I–IV–V, i–v, one chord] · voicing [close, drop2, spread] · chopLength 10..400 ms · humanize 0..1 · swing 50..75 % · velocity 0..1 · accent 0..1 · rest-on-3 [yes, no] · octave · bubbleRate [1/8, 1/16] · level
+behaviour:
+  - it is a note-stream tool: chords in, scheduled notes out, no sound of its own; wire any voice after it (Retro Poly, Organ, Wub Osc, FM Keys)
+  - one drop: no chop on beat 1, the chop on beat 2 and 4 "and"s, with a slight late push; organ bubble: a steady 1/8 or 1/16 "bubble" on the offbeats with ghost velocity; dancehall stab: a short hard stab and a rest; rockers / steppers: the chord follows the kick pattern implied by the style
+  - every note carries a scheduled audio time (sample-accurate), the chop envelope as its duration, and a velocity from the pattern + accent + humanize (seeded)
+  - swing and rest-on-3 move offbeats late by the chosen amount, never early; this is Feel's job but is built in so a Skank works alone
+  - chordSource wired: a chord change at a bar line takes effect on the next offbeat; no chord for 1 bar → holds the last
+  - built-in prog uses the song key; changing key updates it at the next bar
+needs: units [music.transport, music.key, music.tempo] · tools [] · permissions [bus_publish, bus_subscribe]
+packs: ships [factory] — One Drop Chop · Roots Organ Bubble · Dancehall Stab · Rockers Skank · Steppers Skank · Ska Up-Stroke · Minor Dub Skank · Half-time Chop
+hooks: STD.transport_in ; STD.theory_in ; STD.note_in ; data_in (chord) ; note_out ; mod_in (tone ; swing) ; mod_out (gate)
+acceptance (dub-skank.test.js):
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - one-drop at 4/4: no note on beat 1 or the offbeat of beat 1; offbeats of beats 2 and 4 present
+  - every note lands at its scheduled step ± 1 sample (swing 50 %)
+  - swing 66 %: offbeat delay = (0.66 − 0.5) × the beat pair ± 1 ms
+  - chord change on bar 5 plays the new chord from the next offbeat, not mid-bar
+  - seed S twice → identical notes and velocities
+
+# dependencies: run node build/planned-deps.mjs — it reads the hooks line above and writes the generated block here (needs the Clear Glass driver; not written by hand)

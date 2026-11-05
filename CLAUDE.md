@@ -28,6 +28,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-05 | Specs: ecosystem v0.2.0 + object model, temporal, timeline depth, canvas family, product vision; 113 tool specs, 104 component specs (targets, not built). scene-morph, macro-rack, contrast-engine: new entry on top, the original kept verbatim below | `specs/`, `tools/music/planned/`, `tools/music/components/*/`, `docs/specs/README-ecosystem-0.2.0.md` | `node build/validate.mjs` 234 valid; `node tests/components.mjs` pass |
 | 2026-11-04 | Release v0.1.0: Actions › release › Run workflow with "release" on makes the tag + release (a session cannot push tags) | `.github/workflows/release.yml` | the run's Setup exe + zip on the release |
 | 2026-11-04 | Plan: ERAVOS onto Emerge + Looking Glass, bottom up (phases EL0–EL9, decisions open) | `docs/emerge-looking-glass-migration.md`, `docs/looking-glass/` | — (a plan) |
 | 2026-11-04 | Delete packs, presets, kits and patterns for good (shipped ones too), remembered across restarts | `canvas/runtime/content-packs.js`, `pack-editor.js`, `tool-page.js`, `tools/music/data/pattern-library.js` | `tests/p100-delete.test.js` 3/3; P21, P71, P73, P76 green · PR #72 |
@@ -36,6 +37,15 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 | 2026-11-04 | `ERAVOS-Setup-<version>.exe` (NSIS), built by `make-exe.ps1`, attached to releases; updater runs it elevated | `packaging/windows/eravos.nsi`, `.github/workflows/release.yml`, `desktop/updater.js` | compiles with makensis 3.09 · PR #71 |
 | 2026-11-04 | Library = `Documents\ERAVOS` (projects, exports, packs, tools, drop, .appdata); old folders move in once | `desktop/main.js` | exercised with a stubbed Electron · PR #71 |
 | 2026-11-04 | P0.1–P0.3 shared music components (wave-table, note-release, progression) + null-render harness | `tools/music/components/`, `tests/null-render*.mjs` | `node tests/components.mjs` all pass · PR #70 |
+
+## Next (the build order)
+
+From `docs/specs/README-ecosystem-0.2.0.md` and `specs/eravos.music-ecosystem.spec` §13:
+1. `specs/eravos.object-model.spec` + `specs/eravos.temporal.spec` — one store, one time model — before anything is built on them.
+2. Components phase 0: extract the shared parts with no sound change. Exit: Wobble Bass, Reese, Supersaw, Retro Poly, Acid, Sub
+   re-assembled from components and nulling; a 20-tool scene ≤ 50 % CPU. P0.1–P0.3 done; P0.4 = a real duplicate finder first.
+3. Then phases 1–7 of §13 (foundation, rhythm, signature, scenes, space, environment, inventions).
+Note §11/§7: Emerge describes graphs and never runs per sample; DSP goes to a WASM worklet tier. The migration plan's EL7 follows that.
 
 ## Open (asked, not done)
 

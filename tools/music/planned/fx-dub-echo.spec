@@ -1,0 +1,28 @@
+# spec_id: eravos.fx-dub-echo · version 0.1.0 · status mapped · template eravos.tool/1 (STD.fx)
+identity:
+  id: eravos.fx-dub-echo ; label: Dub Echo ; domain: music ; category: dub (shown as Dub)
+  purpose: the dub echo: feedback that runs through a sweepable resonant band-pass, with a throw button that sends a hit around and around.
+  related: the DUB ECHO part of Dub Station (echoDiv, feedback to 1.08, sweep 150..6000 Hz) · fx-echo (a tape echo: no filter in the loop, no throw) · fx-moddelay
+ports:
+  in:  in (audio) · throw (event: hold to send the input into the loop, release to stop sending) · mod.time (±1 → ±1 octave on delay time) · mod.feedback (±1 → ±0.3) · mod.sweep (±1 → ±2 oct on the loop band-pass) · mod.mix (STD.fx)
+  out: out (audio, stereo) · loop (modulation 0..1: the loop's level — for ducking the dry)
+params: time [1/4, 1/8., 3/16, 1/2, 1/8, free ms] · free 20..1500 ms · feedback 0..1.08 · sweep 150..6000 Hz · q 0.5..12 · sweepType [bandpass, lowpass, highpass] · sat 0..1 · wow 0..1 · stereo [mono, ping-pong, wide] · throwSend 0..1 · throwLen [hold, 1 bar, 2 bars] · freeze [off, on] · limiter [on] · STD.fx
+behaviour:
+  - one delay line (tempo-synced or free ms); inside the loop: the sweepable filter, a soft saturator (Sat) and an optional wow (a slow pitch wobble of the delay time) — every repeat gets darker or thinner by the filter, as in a real dub echo
+  - feedback above 1.0 self-oscillates; a limiter in the loop (soft knee, −1 dBFS) keeps it from running away, and Freeze holds the loop at unity with the input muted
+  - throw: while held, the input feeds the loop at ThrowSend (default 1.0) regardless of Mix; release stops feeding but the loop keeps going; "1 bar" sends for one bar
+  - delay time changes are glided (a short tape-like swoop) rather than clicked; tempo changes follow the same glide
+  - dry/wet delay-compensated; level-matched at feedback 0.4
+needs: units [music.engine, music.transport, music.tempo, music.meter] · tools [] · permissions [audio_out, audio_in, bus_publish, bus_subscribe]
+packs: ships [factory] — Tubby Chamber · Roots Echo 1/8. · Dub Throw · Self-Osc Drone (feedback 1.08) · Dark Sweep Down · Wide Ping-Pong · Slap Dub · Freeze Loop
+hooks: STD.audio_in ; STD.audio_out ; trigger_in (throw) ; STD.transport_in ; mod_in (time ; feedback ; sweep ; mix) ; mod_out (loop)
+acceptance (fx-dub-echo.test.js):
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - p42 audio survey (node tests/tool-audio.mjs fx-dub-echo): every preset rendered — timing to the sample, pitch to the cent, level never over full scale, Stop all silences it
+  - a click at time 1/8. and 120 BPM: first repeat at 375 ms ± 0.05 ms
+  - sweep 600 Hz, q 6: repeat spectrum peak at 600 Hz ± 10 %; each repeat's level falls by feedback × filter loss
+  - feedback 1.08: loop peak never exceeds −1 dBFS over 60 s (limiter)
+  - throw held 1 beat then released: exactly that beat of input enters the loop
+  - Freeze: loop level constant within 0.1 dB over 30 s
+
+# dependencies: run node build/planned-deps.mjs — it reads the hooks line above and writes the generated block here (needs the Clear Glass driver; not written by hand)

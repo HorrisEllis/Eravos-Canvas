@@ -1,0 +1,31 @@
+# spec_id: eravos.sound-match · version 0.1.0 · status new (parked idea in PROGRESS.md: the offline matcher as a tool) · template eravos.tool/1
+# generated from eravos.music-ecosystem.spec v0.2.0 §4 (sampling_and_reconstruction) — that file stays the index; this file is the tool's own spec
+identity:
+  id: eravos.sound-match ; label: Sound Match ; domain: music ; family: sampling_and_reconstruction
+  lineage: ERAVOS: automatic patch search against a reference the user supplies
+  family_from: samplers (1980s on), hip-hop sampling, resynthesis research, stem separation
+assembles (components, tools/music/components/<id>/ — never re-implemented here):
+  spectral-features · loudness-meter · pitch-tracker · onset-detector · modulation-estimator · seed-registry
+adds (behaviour only this tool has):
+  - choose any tool, give it a reference clip; an offline search finds the closest settings (cost shown)
+  - result is an ordinary preset; reference audio stays out of the project unless the user keeps it
+  - multi-objective: spectrum, envelope, motion
+modes: match · nearest · explore-around
+ports: TO WRITE in the depth audit — typed in/out per §5 tool_contract; every assembled component reachable by wiring (Open as components)
+params: TO WRITE in the depth audit — every component control exposed, full range (eravos.tool-depth.spec), each a modulation destination
+packs (names unique across the ecosystem; ≥ 6 presets each; novelty test §6):
+  - Match Strict — low tolerance, slow, closest result
+  - Match Quick — fast rough match for sketching
+  - Motion First — matches movement over tone
+  - Tone First — matches spectrum over movement
+  - Neighbourhood Walk — variations around a match
+  - Opposite Of — finds the most different settings on purpose
+acceptance:
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - open-as-components: the wired components render the same as the tool (≤ −60 dB difference)
+  - novelty: every preset's nearest neighbour in this tool ≥ 0.15, pack centroids ≥ 0.25 apart (§6)
+  - p42 audio survey: timing to the sample, pitch to the cent, never over full scale
+  - cpu per instance and per voice measured (build/perf.mjs) and inside §8 budgets
+  - depth audit written above; open gaps listed, none hidden
+
+# dependencies: run node build/planned-deps.mjs once the hooks line is written (generated block, not by hand)

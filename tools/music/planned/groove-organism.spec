@@ -1,0 +1,35 @@
+# spec_id: eravos.groove-organism · version 0.1.0 · status planned:groove.spec; extends:groove-gen · template eravos.tool/1
+# generated from eravos.music-ecosystem.spec v0.2.0 §4 (rhythm_and_contrast) — that file stays the index; this file is the tool's own spec
+identity:
+  id: eravos.groove-organism ; label: Groove Organism ; domain: music ; family: rhythm_and_contrast
+  lineage: swing and microtiming of drum machines, MPC-era hip-hop, UKG and live drummers
+  family_from: drum machines (1980s on), breakbeat culture, UK garage, jungle, footwork, dembow, techno, polyrhythm traditions worldwide
+assembles (components, tools/music/components/<id>/ — never re-implemented here):
+  groove-template · humanizer · onset-detector · clock-div · seed-registry
+adds (behaviour only this tool has):
+  - groove extraction from any audio or MIDI clip into a template
+  - groove applied to notes, modulation and audio slices alike
+  - velocity–timing relationships (late notes softer, or louder)
+modes: swing · template · human
+engines_0_1_0 (the original list, kept verbatim; each is covered by the components above or by adds):
+  swing · microtiming · velocity-relationships · timing-displacement · groove-extraction · humanization
+ports: TO WRITE in the depth audit — typed in/out per §5 tool_contract; every assembled component reachable by wiring (Open as components)
+params: TO WRITE in the depth audit — every component control exposed, full range (eravos.tool-depth.spec), each a modulation destination
+packs (names unique across the ecosystem; ≥ 6 presets each; novelty test §6):
+  - UK Garage Swing — 2-step skip with late hats and pushed snares
+  - Shuffle — triplet shuffle from 50 to 75 percent
+  - Broken Beat — West London broken beat displacement
+  - Loose Funk — behind-the-beat snare, ghost notes alive
+  - Mechanical Precision — dead-straight with velocity accent only
+  - Human DnB — break-drummer feel at 174
+  - Dub Pocket — lazy one-drop pocket, late rim and hats
+  - Afro Groove — lilting swing from West African bell patterns
+acceptance:
+  - the tool contract (TH.toolContract): spawns clean · every shipped preset loads in range · save → load is exact · closing leaves no subscribers, ports or wires · Stop all is obeyed
+  - open-as-components: the wired components render the same as the tool (≤ −60 dB difference)
+  - novelty: every preset's nearest neighbour in this tool ≥ 0.15, pack centroids ≥ 0.25 apart (§6)
+  - p42 audio survey: timing to the sample, pitch to the cent, never over full scale
+  - cpu per instance and per voice measured (build/perf.mjs) and inside §8 budgets
+  - depth audit written above; open gaps listed, none hidden
+
+# dependencies: run node build/planned-deps.mjs once the hooks line is written (generated block, not by hand)
