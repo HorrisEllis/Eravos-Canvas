@@ -31,6 +31,8 @@ Read this first, then `PROGRESS.md` (the detailed log, newest first) and the spe
 - Refactors prove "no change in sound": `node tests/components.mjs` (plain node) and the null render (`Null Render.bat`, needs a browser).
 - Tests: `node tests/run.mjs <phase or name>` (the in-page suite, through the driver). New behaviour gets a `tests/pNN-*.test.js`.
 - Releasing: set `"version"` in `desktop/package.json`, merge, then Actions › release › Run workflow with **release** on (or push tag vX.Y.Z).
+- **Proof of competency** (his ask, 2026-11-05): every finished piece adds an entry to `docs/PROOF-OF-COMPETENCY.md` — merge time,
+  his words dated, his call, what was built (by the AI coder to his direction), the proof measured, where to check. No claim without a pointer.
 - Commit messages and PRs carry no model names. Do not push to `main` directly: branch, PR, merge.
 
 ## Ledger — completed work
@@ -39,6 +41,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-05 | Proof-of-competency record: credit stated plainly, checkable numbers, resume lines, a timestamped ledger with provenance (merge times, his dated words, proof, where to check), every merged PR since 2026-10-15 | `docs/PROOF-OF-COMPETENCY.md` | every figure has the command that counts it |
 | 2026-11-05 | Decided: Looking Glass in Emerge, Emerge first; the road E1 (native_lang F5) · E2 (native_windows) · E3 calling Windows (multi-DLL imports, Win64 calls, memory, callbacks, COM) · E4 axiom · LG1 window + rect from data (software, then GPU) · C1 canvas | `docs/emerge-looking-glass-migration.md` | — (a plan, measured against Emerge f023240) |
 | 2026-11-05 | P0.5 filter-formant: one vowel table (10 vowels) + one formant bank for Wobble Bass and Wub Filter (they had drifted: UH IH ER / YOI / AE −14 vs −12 dB). Wobble Bass gains YOI; Wub Filter gains UH, IH, ER (its AE kept −12 so nothing changes — his call) | `tools/music/components/filter-formant/` | 5,220 checks bit-identical; null render Wobble Bass 38/38 (worst −87.6 dB), Wub Filter 8/8 (7 presets unstable, unproven); Wobble 39/39, Wub 59/59, P94 2/2 |
 | 2026-11-05 | P0.4 duplicate finder: every tool's code tokenised, shared blocks code vs settings, report | `build/duplicates.mjs` → `docs/duplicates.md` | ~9 % of tool code repeats another tool (40-token windows) |
