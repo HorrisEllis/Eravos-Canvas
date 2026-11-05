@@ -422,13 +422,17 @@
         paintAt(cell, n, l); draw(); return;
       }
       if (i >= 0 && e.shiftKey) { if (S.has(i)) S.delete(i); else S.add(i); draw(); return; }   // Shift-click: add / remove
-      if (i < 0 && (tool === 'select' || e.shiftKey)) {   // a box: notes it touches are selected (Shift: added)
-        drag = { mode: 'box', base: e.shiftKey ? new Set(S) : new Set(), x0: x, y0: y, x1: x, y1: y, armed: false, changed: false };
-        if (!e.shiftKey) S.clear(); draw(); return;
+      // 3.113 Ctrl-click (⌘ on a Mac) picks notes one by one too: a click adds or removes it; a Ctrl-drag still copies (endDrag)
+      const ctl = e.ctrlKey || e.metaKey;
+      if (i < 0 && (tool === 'select' || e.shiftKey || ctl)) {   // a box: notes it touches are selected (Shift / Ctrl: added)
+        const add = e.shiftKey || ctl;
+        drag = { mode: 'box', base: add ? new Set(S) : new Set(), x0: x, y0: y, x1: x, y1: y, armed: false, changed: false };
+        if (!add) S.clear(); draw(); return;
       }
       if (i >= 0) {
-        if (!S.has(i)) selOnly(i); const z = zone(i, x);
-        drag = { mode: z === 'R' ? 'resize' : z === 'L' ? 'resizeL' : 'move', grab: i, idx: Array.from(S), orig: notes.map(n => Object.assign({}, n)), x0: x, y0: y, armed: false, changed: false, copy: (e.ctrlKey || e.metaKey) && z === 'B' };
+        const z = zone(i, x), toggle = ctl && z === 'B' ? { i, was: S.has(i) } : null;
+        if (toggle) { if (!S.has(i)) S.add(i); } else if (!S.has(i)) selOnly(i);
+        drag = { mode: z === 'R' ? 'resize' : z === 'L' ? 'resizeL' : 'move', grab: i, idx: Array.from(S), orig: notes.map(n => Object.assign({}, n)), x0: x, y0: y, armed: false, changed: false, copy: ctl && z === 'B', toggle };
         if (z === 'B') audition([notes[i].n]);
       } else if (tool === 'select') { return;
       } else {
@@ -521,6 +525,8 @@
       if ((d.mode === 'resize' || d.mode === 'resizeL') && d.changed) lastLen = notes[d.grab].l;   // new notes take this length
       if (d.mode === 'box') { draw(); return; }
       if (d.mode === 'sketch') { sketchToNotes(d); return; }
+      // 3.113 a Ctrl-click that did not move: the note joins the selection, or leaves it if it was already in
+      if (d.toggle && !d.changed && !d.copied) { if (d.toggle.was) S.delete(d.toggle.i); draw(); readout.textContent = S.size + ' selected' + (S.size > 1 ? ' · right-click: Connect edges, Curve…' : ''); return; }
       // 3.58 a click on a note (no drag) opens it in the inspector; after a move the open inspector follows the note
       if ((d.mode === 'move' || d.mode === 'resize' || d.mode === 'resizeL' || d.mode === 'bend') && d.grab !== undefined && !d.copied && (!d.changed || editor.classList.contains('open'))) { const g2 = d.grab; if (d.changed) commit(notes.slice()); if (notes[g2]) openEditor(g2); return; }
       if (d.mode === 'bend' && d.changed && notes[d.grab] && notes[d.grab].b && lane) view.emit('note_audition', { lane: lane.id, note: notes[d.grab].n, bend: notes[d.grab].b, duration: 0.9 });
@@ -571,6 +577,7 @@
       if (!mod && lower === 'q') { eat(); quantize(); return; }
       if (!mod && lower === 'h') { eat(); humanize(); return; }
       if (!mod && lower === 'l') { eat(); legato(); return; }
+      if (!mod && lower === 'j') { eat(); connectEdges(); return; }   // 3.113 J joins: Connect edges
       const sel = Array.from(S).filter(i => notes[i]);
       if (!sel.length) return;
       if (k === 'Delete' || k === 'Backspace') { eat(); removeSel(); return; }
@@ -639,12 +646,39 @@
       selOnly([keep.length]); commit(keep.concat([one])); audition([base]);
       readout.textContent = `connected ${ns.length} notes into one gliding note`;
     }
+    // 3.113 CURVES for every selected note at once (the inspector does one note): the same shapes as its 〰 Bend and Oscillate quick
+    // picks. A note keeps its oscillation when its bend changes, and its bend when it gets a vibrato.
+    const CURVES = { dive: { from: 0, to: -12, shape: 'late', at: 0.2 }, drop: { from: 0, to: -24, shape: 'late', at: 0.1 }, rise: { from: 0, to: 12, shape: 'smooth', at: 0 } };
+    function curveSel(kind) {
+      if (drums) { readout.textContent = 'drum hits have no pitch curve'; return; }
+      const list = Array.from(S).sort((a, b) => notes[a].s - notes[b].s); if (!list.length) return; const next = notes.slice();
+      list.forEach((i, k) => {
+        const a = Object.assign({}, next[i]), osc = a.b && a.b.osc;
+        if (kind === 'flat') { if (a.b) { if (osc) a.b = { from: 0, to: 0, shape: 'smooth', at: 0, osc }; else delete a.b; } }
+        else if (kind === 'vibrato') a.b = Object.assign({ from: 0, to: 0, shape: 'smooth', at: 0 }, a.b || {}, { osc: { rate: 5.5, depth: 0.35, shape: 'sine', fade: 0.4 } });
+        else if (kind === 'glide') {
+          // from the note before it: the selected one before, else the nearest note that ends before it starts
+          const pv = k > 0 ? next[list[k - 1]] : notes.filter(o => o !== notes[i] && o.s + o.l <= a.s + 1e-6).sort((x, y) => (y.s + y.l) - (x.s + x.l))[0];
+          if (!pv) return; a.b = { from: Math.max(-48, Math.min(48, pv.n + (pv.b ? +pv.b.to || 0 : 0) - a.n)), to: 0, shape: 'early', at: 0 }; if (osc) a.b.osc = osc;
+        } else { a.b = Object.assign({}, CURVES[kind]); if (osc) a.b.osc = osc; }
+        next[i] = a;
+      });
+      commit(next); readout.textContent = `${kind === 'flat' ? 'flattened' : kind + ' on'} ${list.length} note${list.length === 1 ? '' : 's'}`;
+      const f = next[list[0]]; if (lane && f && f.b) view.emit('note_audition', { lane: lane.id, note: f.n, bend: f.b, duration: 0.9 });
+    }
     // the notes' menu (right-click with a selection)
     function noteMenu(x, y) {
       const CM = window.ContextMenu; if (!CM) return; const n = S.size;
       CM.show(x, y, [
         { label: '⌒ Connect edges', hint: 'one note that glides through them — the edges meet, the pitch slides from each into the next', disabled: n < 2 || drums, run: () => connectEdges() },
         { label: '⟷ Close the gaps (legato)', hint: 'each note lasts until the next one starts (L)', disabled: n < 2, run: () => legato() },
+        { section: 'curve' },
+        { label: '↘ Dive', hint: 'down an octave, late — a drop', disabled: drums, run: () => curveSel('dive') },
+        { label: '⤓ Deep drop', hint: 'two octaves down: the floor falls out', disabled: drums, run: () => curveSel('drop') },
+        { label: '↗ Rise', hint: 'up an octave', disabled: drums, run: () => curveSel('rise') },
+        { label: '⤳ Glide in', hint: 'each slides in from the note before it', disabled: drums, run: () => curveSel('glide') },
+        { label: '∿ Vibrato', hint: 'a singer’s vibrato that blooms', disabled: drums, run: () => curveSel('vibrato') },
+        { label: '— Flat', hint: 'no bend', disabled: drums, run: () => curveSel('flat') },
         { sep: true },
         { label: 'Q Quantize', hint: 'note starts onto the grid (Q)', run: () => quantize() },
         { label: '≈ Humanize', hint: 'a little looseness in time and velocity (H)', run: () => humanize() },
@@ -1042,7 +1076,10 @@
       // for tests and the timeline's own keys: the grid/tool/zoom the roll is in, and what it holds
       get state() { return { tool, grid, len, lastLen, pps, row: ROW, step: stepOn, cursor, notes: notes.map(n => Object.assign({}, n)) }; }, setTool, zoomTo: (p, at) => { userZoom = true; zoomTo(p, at); }, setRow,
       setGrid: (v) => { gridSel.set(v); grid = GRIDS.find(g => g[0] === String(v))[2]; draw(); }, canvas: cv, ruler, vel, openEditor, setLane, sketch: (pts, as, replace) => sketchToNotes({ pts, replace }, as), get lane() { return xk ? xk.key : ''; }, setStep, get selected() { return Array.from(S).sort((a, b) => a - b); },
-      select: (idx) => { selOnly(idx); draw(); }, connectEdges, noteMenu };
+      select: (idx) => { selOnly(idx); draw(); }, connectEdges, noteMenu, curveSel,
+      // where note k's middle is on screen (for tests: the same mapping every hit test inverts)
+      pointOf: (k) => { const a = notes[k]; if (!a) return null; const r = cv.getBoundingClientRect(), sx = r.width / (cv.offsetWidth || r.width || 1), sy = r.height / (cv.offsetHeight || r.height || 1);
+        return { x: r.left + (a.s + a.l / 2) * pps * sx, y: r.top + (yOf(a.n) + ROW / 2) * sy }; } };
   }
   global.EravosTimelinePianoRoll = { create, mapPoint, toContent, GRIDS };
 })(window);
