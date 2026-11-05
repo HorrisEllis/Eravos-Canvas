@@ -197,7 +197,7 @@
     const body = h('div', { class: 'wm-body' });
     const grip = h('div', { class: 'wm-grip' });
     const win = h('div', { class: 'wm-win', role: 'group', 'aria-label': d.label, 'data-instance': rec.instanceId, 'data-organism': d.id, style: { left: pos.x + 'px', top: pos.y + 'px', width: w + 'px', height: hgt + 'px', '--acc': d.accent || '#00d4ff' } }, [header, body, h('div', { class: 'wm-dusk', 'aria-hidden': 'true' }), grip]);
-    { const m = global.Catalog && global.Catalog.meta && global.Catalog.meta(d.id); if (m && m.art) win.style.setProperty('--art', 'url("' + m.art + '")'); }   // 3.91 its painting (the Dusk theme's title bar)
+    { const m = global.Catalog && global.Catalog.meta && global.Catalog.meta(d.id); if (m && m.art) { let u = m.art; try { u = new URL(m.art, doc.baseURI).href; } catch (e) {} win.style.setProperty('--art', 'url("' + u + '")'); } }   // 3.91 its painting (the Dusk theme's title bar) · 3.114 an absolute URL: a relative one in a custom property resolves against the stylesheet that uses it (canvas/runtime/), not the page — every window asked for /canvas/tools/…/art.svg (404)
     win.classList.add('wm-new'); global.setTimeout(() => win.classList.remove('wm-new'), 320);   // 3.73 fluid: it grows into place
     win.style.zIndex = ++zTop;
     world.appendChild(win);
@@ -377,7 +377,10 @@
   const SNAP_GAP = 10;
   const rectsBut = (self) => Array.from(world.querySelectorAll('.wm-win')).filter(w => w !== self && !w.classList.contains('maximized') && w.offsetParent !== null)
     .map(w => ({ el: w, l: parseFloat(w.style.left) || 0, t: parseFloat(w.style.top) || 0, w: w.offsetWidth, h: w.offsetHeight }));
+  // 3.114 Settings › Canvas › Snap windows to each other (on by default; Alt still places freely)
+  const snapOff = () => doc.documentElement.dataset.snap === 'off';
   function snapMove(self, l, t, w, h, z) {
+    if (snapOff()) return { l, t, to: [] };
     const T = 14 / z, near = 60 / z; let bx = null, by = null, dx = T, dy = T, gx = null, gy = null;
     rectsBut(self).forEach(o => {
       const vNear = t < o.t + o.h + near && t + h > o.t - near, hNear = l < o.l + o.w + near && l + w > o.l - near;
@@ -387,6 +390,7 @@
     return { l: bx !== null ? Math.round(bx) : l, t: by !== null ? Math.round(by) : t, to: [gx, gy].filter(Boolean) };
   }
   function snapSize(self, l, t, w, h, z) {
+    if (snapOff()) return { w, h, to: [] };
     const T = 14 / z, near = 60 / z; let bw = null, bh = null, dw = T, dh = T, gx = null, gy = null;
     rectsBut(self).forEach(o => {
       const vNear = t < o.t + o.h + near && t + h > o.t - near, hNear = l < o.l + o.w + near && l + w > o.l - near;

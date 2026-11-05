@@ -389,8 +389,8 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     repSel.el.title = 'copies laid end to end after this clip — each its own clip (to keep them in step, use ⟳ Repeat every instead)';
     insp.append(repSel.el);
     const lenC = c.kind === 'audio' ? c.lengthSec / A.barSec : c.bars;
-    insp.append(UI.Button({ label: '✂ In half', hint: 'cut this clip in the middle (note and pattern clips: on a whole bar)', onClick: () => { const mid = c.kind === 'audio' ? c.startBar + lenC / 2 : c.startBar + Math.max(1, Math.round(lenC / 2)); if (c.kind !== 'audio' && lenC < 2) { expSt.textContent = 'This clip is 1 bar long — make it longer to cut it on a bar'; return; } view.emit('clip_split', { id: c.id, bar: mid }); } }).el);
-    insp.append(UI.Button({ label: 'Split at playhead', onClick: () => playBar && view.emit('clip_split', { id: c.id, bar: playBar }) }).el, UI.Button({ label: 'Duplicate', onClick: () => view.emit('clip_duplicate', { id: c.id }) }).el, UI.Button({ label: 'Delete', kind: 'danger', onClick: () => { view.emit('clip_remove', { id: c.id }); sel = null; } }).el);
+    // 3.114 In half · Split at playhead · Duplicate are no longer buttons here (his call): right-click the clip for them
+    insp.append(UI.Button({ label: 'Delete', kind: 'danger', onClick: () => { view.emit('clip_remove', { id: c.id }); sel = null; } }).el);
   }
   view.on('auto_live', (p) => { const l = A && A.lanes.find(x => x.id === p.id); if (l) { l.points = p.points; draw(); } });
   function posSay(t) { pos.textContent = t; }   // the value under the pointer while a point is placed or dragged (the playhead takes the readout back)

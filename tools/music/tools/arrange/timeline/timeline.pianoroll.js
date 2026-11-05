@@ -627,6 +627,14 @@
       const next = notes.slice(); next[i] = Object.assign({}, next[i], { v: Math.max(0.05, Math.min(1, next[i].v + (e.deltaY < 0 ? 0.05 : -0.05))) });
       notes = next; selOnly(i); draw(); say(next[i].s, next[i].n, 'vel ' + Math.round(next[i].v * 127)); clearTimeout(cv._wt); cv._wt = setTimeout(() => commit(notes.slice()), 250);
     }, { passive: false });
+    // 3.114 Ctrl+A ("control a needs to work again"): every note, whenever the roll has focus anywhere in it or the pointer is over it —
+    // it worked only with the grid itself focused, so after a click on the roll's bar Ctrl+A selected the page's text instead
+    document.addEventListener('keydown', (e) => {
+      if (!clip || !(e.ctrlKey || e.metaKey) || e.altKey || String(e.key).toLowerCase() !== 'a' || !el.isConnected) return;
+      const t = e.target; if (t && t.closest && t.closest('input, textarea, select, [contenteditable="true"]')) return;
+      if (!(el.contains(document.activeElement) || el.matches(':hover'))) return;
+      e.preventDefault(); e.stopPropagation(); selOnly(notes.map((_, i) => i)); draw(); readout.textContent = `${S.size} selected`; cv.focus({ preventScroll: true });
+    }, true);
     cv.addEventListener('keydown', (e) => {
       const k = e.key, lower = k.length === 1 ? k.toLowerCase() : k, mod = e.ctrlKey || e.metaKey, eat = () => { e.preventDefault(); e.stopPropagation(); };
       if (!clip) return;
