@@ -87,7 +87,7 @@ describe('P112 · piano roll: Connect edges · its own window', () => {
       const R = t.roll, cv = R.canvas; R.setTool('bend'); R.select([0]); await TH.sleep(20);
       const r = cv.getBoundingClientRect(), p0 = R.pointOf(0), sc = r.width / cv.offsetWidth, row = R.state.row * (r.height / cv.offsetHeight);
       const pe = (type, x, y, o) => new PointerEvent(type, Object.assign({ bubbles: true, button: 0, buttons: type === 'pointerup' ? 0 : 1, clientX: x, clientY: y, pointerId: 1 }, o || {}));
-      // a click in the middle of the note, dragged up 3 rows: a new point at +3
+      // a click in the middle of the note, dragged up 3 rows: a new point at +3 (the middle fifth adds points)
       cv.dispatchEvent(pe('pointerdown', p0.x, p0.y)); cv.dispatchEvent(pe('pointermove', p0.x, p0.y - 3 * row, { shiftKey: true })); cv.dispatchEvent(pe('pointerup', p0.x, p0.y - 3 * row)); await TH.sleep(20);
       let P = R.pathOf(0); assert.equal(P.length, 3, 'a point was added: ' + JSON.stringify(P)); assert.near(P[1][0], 0.5, 0.05, 'in the middle'); assert.equal(P[1][1], 3, '+3 semitones (Shift: whole)');
       assert.equal(R.state.notes[0].b.shape, 'path', 'the note is its shape now');
@@ -108,5 +108,29 @@ describe('P112 · piano roll: Connect edges · its own window', () => {
       try { t.pub('note_audition', { lane: t.H.ctx.internals.lanes[0].id, note: 64, notes: [64] }); } finally { A.createOscillator = orig; }
       assert.ok(made.length >= 2, 'it plays: ' + made.length + ' oscillators');
     } finally { OrganismFactory.close(t.id); restoreView(); }
+  });
+  it('3.117 event depth: chance, ratchet and nudge are kept on a note (and only when not the default); the editor has them', async () => {
+    const t = await make([{ s: 0, l: 4, n: 60, v: 0.8, pr: 0.5, rt: 3, mt: -0.2 }, { s: 4, l: 4, n: 62, v: 0.8, pr: 1, rt: 1, mt: 0 }]);
+    try {
+      const ns = t.clip().notes; assert.equal(ns[0].pr, 0.5); assert.equal(ns[0].rt, 3); assert.equal(ns[0].mt, -0.2);
+      assert.ok(!('pr' in ns[1]) && !('rt' in ns[1]) && !('mt' in ns[1]), 'defaults are not stored: songs from before stay the same');
+      t.roll.select([0]); const menu = () => document.querySelector('.cm');
+      t.roll.noteMenu(100, 100); Array.from(menu().querySelectorAll('.cm-item')).find(b => /Edit note/.test(b.textContent)).click(); await TH.sleep(40);
+      const txt = t.roll.el.textContent; ['Chance', 'Ratchet', 'Nudge'].forEach(w => assert.ok(txt.includes(w), w + ' in the note editor'));
+    } finally { if (window.ContextMenu) ContextMenu.close(); OrganismFactory.close(t.id); restoreView(); }
+  });
+  it('3.117 the Timeline plays them: a ratchet is several hits, a nudge moves it, a chance skips the same passes every time', () => {
+    const play = (notes, steps, extra) => { const ctx = new OfflineAudioContext(1, 8000, 8000), K = Kernel.create({ ctx, quiet: true, syncIR: true }), T = MasterTransport.create(K, { offline: true, bpm: 120 }); T.boot();
+      const tl = OrganismFactory.spawn('eravos.timeline', { K, headless: true }), wb = OrganismFactory.spawn('eravos.wobble-bass', { K, headless: true });
+      K.bus.publish('ui:lane_add:' + tl, { kind: 'inst', target: wb, name: 'Bass' }); K.bus.publish('ui:clip_add:' + tl, Object.assign({ kind: 'notes', target: wb, startBar: 1, bars: 1, notes }, extra || {}));
+      const sent = []; K.bus.subscribe('note:trigger', (p) => { if (p.target === wb) sent.push(p); }); T.renderTicks(0, steps, 0.1);
+      if (extra && extra.again) { const n1 = sent.length; T.renderTicks(0, steps, 0.1); sent.again = sent.length - n1; } return sent; };
+    const r = play([{ s: 0, l: 4, n: 40, v: 0.9, rt: 4 }], 16); assert.equal(r.length, 4, 'ratchet ×4 = 4 hits');
+    assert.ok(r[1].time > r[0].time && Math.abs((r[1].time - r[0].time) - (r[2].time - r[1].time)) < 1e-6, 'evenly spaced');
+    const a = play([{ s: 4, l: 2, n: 40, v: 0.9 }], 16)[0].time, b = play([{ s: 4, l: 2, n: 40, v: 0.9, mt: 0.5 }], 16)[0].time;
+    assert.near(b - a, 0.5 * 60 / 120 / 4, 1e-6, 'a nudge of +50 % = half a step later');
+    const rep = { bars: 16, loop: 16, again: true };   // 16 bars repeating its first bar: 16 passes, played twice
+    const r2 = play([{ s: 0, l: 1, n: 40, v: 0.9, pr: 0.5 }], 16 * 16, rep), c1 = r2.length - r2.again, c2 = r2.again;
+    assert.ok(c1 > 3 && c1 < 13, 'half the time over 16 passes: ' + c1); assert.equal(c1, c2, 'the same every time it is played');
   });
 });

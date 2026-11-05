@@ -1,3 +1,13 @@
+ERAVOS v0.2.7 (2026-11-05)
+
+Install: ERAVOS-Setup-0.2.7.exe, or unzip ERAVOS_0.2.7.zip. On an earlier version, ERAVOS offers this update by itself.
+
+Piano roll
+- Right-click selected notes › ✎ Edit note… opens the note editor (it opened only on a double-click).
+- The note editor gains Chance (how often it plays; the same passes every time, so a song stays the same), Ratchet (2–8 fast hits)
+  and Nudge (push it early or late, up to half a step). A note that plays by chance is drawn paler; a ratchet shows its hits.
+- Fixed: the Bend tool's dive / rise drag on a note's end did nothing in 0.2.6.
+
 ERAVOS v0.2.6 (2026-11-05)
 
 Install: ERAVOS-Setup-0.2.6.exe, or unzip ERAVOS_0.2.6.zip. On an earlier version, ERAVOS offers this update by itself.

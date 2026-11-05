@@ -2,6 +2,17 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.116–3.117 Edit note in the menu · event depth: chance, ratchet, nudge · v0.2.7 (2026-11-05)
+Asked: "also editing a note has a whole editor? note editor?" · "then all the timeline improvements and phases next".
+- 3.116 notes menu › ✎ Edit note… opens the note editor.
+- 3.117 timeline-depth.spec "Clip depth", first step: per note pr (chance 5–100 %), rt (ratchet 2–8 hits, velocity eases), mt (nudge
+  ±50 % of a step). Chance is a hash of clip id, note and pass — no Math.random: a song plays the same way every time. Defaults are not
+  stored, so every song from before plays exactly as it did. Drawn: paler by chance, ratchet ticks. Note editor: Chance · Ratchet ·
+  Nudge (their own row).
+- Fixed: 3.115 dropped the selection line before the Bend tool's end drag (dive/rise did nothing); the point zone is the middle fifth.
+- Tests p112 9/9 (stored only when not default; editor has them; ratchet ×4 = 4 even hits; nudge +50 % = half a step; chance ≈ half of 16
+  passes, identical when replayed). 1392/1395: P82, rim, P70 (main's).
+
 ## Done — 3.115 Hear what you draw · points on a note · zoom in further · v0.2.6 (2026-11-05)
 Asked: "I want sound playing when I draw notes. I also want to be able to manipulate notes. The size, also the edges. Make it thinner, or
 wider, edit the shape completely." His answers: thinner/wider = "Zoom in for more precision"; shape = "Points on the note".

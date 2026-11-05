@@ -250,7 +250,8 @@
         if (!drums && nt.b) { drawBend(g, nt, S.has(i)); curveMark(g, nt, x, y, w); return; }   // 3.58 a bent note IS its curve: the block bends
         if (clipLook && !drums) clipNote(g, nt, x, y, w, c2, S.has(i));
         else {
-        g.globalAlpha = 0.35 + 0.65 * nt.v; g.fillStyle = c2; g.fillRect(x + 1, y + 1, w - 1, ROW - 2); g.globalAlpha = 1;
+        g.globalAlpha = (0.35 + 0.65 * nt.v) * (nt.pr ? 0.35 + 0.65 * nt.pr : 1); g.fillStyle = c2; g.fillRect(x + 1, y + 1, w - 1, ROW - 2); g.globalAlpha = 1;
+        if (nt.rt > 1 && w > nt.rt * 3) { g.fillStyle = 'rgba(0,0,0,.55)'; for (let k = 1; k < nt.rt; k++) g.fillRect(x + Math.round(w * k / nt.rt), y + 2, 1, ROW - 4); }   // 3.117 ratchet hits
         g.strokeStyle = S.has(i) ? '#fff' : '#000'; g.lineWidth = 1; g.strokeRect(x + 1.5, y + 1.5, w - 2, ROW - 3);
         }
         curveMark(g, nt, x, y, w);
@@ -490,16 +491,17 @@
           drag = { mode: 'node', grab: hn.i, k: hn.k, P: hn.P, orig: notes.map(n => Object.assign({}, n)), x0: x, y0: y, armed: false, changed: false }; draw(); return;
         }
         if (i < 0) return;
-        // one note: a click in its middle third adds a point there (and drags it); in its first / last third it drags that end, as
+        // one note: a click in its middle fifth adds a point there (and drags it); in its first / last third it drags that end, as
         // before (a dive, a rise); several selected: both ends of them all
         const fr = (x / pps - notes[i].s) / Math.max(notes[i].l, 1e-6);
-        if ((S.size <= 1 || !S.has(i)) && fr > 0.33 && fr < 0.67) {
+        if ((S.size <= 1 || !S.has(i)) && fr > 0.4 && fr < 0.6) {
           selOnly(i); const a = notes[i], P = pathOf(a), t = clampN(fr, 0.01, 0.99);
           const k = P.findIndex(q => q[0] > t), MP = window.MusicParts, at = (MP && MP.pathAt) ? MP.pathAt(P, t) : P[k - 1][1];
           P.splice(k, 0, [Math.round(t * 1000) / 1000, Math.round(at * 100) / 100]);
           drag = { mode: 'node', grab: i, k, P, orig: notes.map(n => Object.assign({}, n)), x0: x, y0: y, armed: false, changed: true };
           notes[i] = withPath(a, P); draw(); return;
         }
+        if (!S.has(i)) selOnly(i);
         const a = notes[i], end = (x / pps - a.s) / Math.max(a.l, 1e-6) < 0.33 ? 'from' : 'to';
         drag = { mode: 'bend', grab: i, end, idx: Array.from(S), orig: notes.map(n => Object.assign({}, n)), x0: x, y0: y, row0: yOf(a.n) + ROW / 2, armed: false, changed: false };
         draw(); return;
@@ -872,6 +874,7 @@
         if (cur.b && !cur.b.from && !cur.b.to && !(cur.b.osc && cur.b.osc.depth > 0)) delete cur.b;
         if (cur.p && !Object.keys(cur.p).length) delete cur.p;
         if (!cur.c || !Object.keys(cur.c).length) delete cur.c;
+        if (!(cur.pr < 1)) delete cur.pr; if (!(cur.rt > 1)) delete cur.rt; if (!cur.mt) delete cur.mt;   // 3.117 the defaults are not stored
         notes[ed.i] = Object.assign({}, cur); draw(); say(cur.s, cur.n, lenName(cur.l) + ' · vel ' + Math.round(cur.v * 127) + (cur.b ? ' · bend ' + bendSay(cur.b) : ''));
         clearTimeout(timer); timer = setTimeout(() => { timer = null; commit(notes.slice()); }, 250);   // one commit after the knob settles
       };
@@ -881,8 +884,12 @@
       const kP = drums ? knob('Pad', { min: 0, max: rowNotes.length - 1, value: Math.max(0, rowNotes.indexOf(cur.n)), format: (v) => nameOf(rowNotes[Math.round(v)]) }, (v) => apply({ n: rowNotes[Math.round(v)] }))
         : knob('Pitch', { min: LO, max: HI, value: cur.n, format: (v) => nameOf(Math.round(lock ? pitchFor(Math.round(v)) : v)) }, (v) => { const n = lock ? pitchFor(Math.round(v)) : Math.round(v); if (n !== cur.n) audition([n]); apply({ n }); });
       const kV = knob('Velocity', { min: 1, max: 127, value: Math.round(cur.v * 127), format: (v) => String(Math.round(v)) }, (v) => apply({ v: Math.round(v) / 127 }));
+      // 3.117 event depth: how often it plays, ratchet hits, and a push off the grid (timeline-depth.spec "Clip depth")
+      const kPr = knob('Chance', { min: 5, max: 100, step: 1, value: Math.round((cur.pr || 1) * 100), default: 100, format: (v) => Math.round(v) + ' %' }, (v) => apply({ pr: Math.round(v) / 100 }));
+      const kRt = knob('Ratchet', { min: 1, max: 8, step: 1, value: cur.rt || 1, default: 1, format: (v) => Math.round(v) === 1 ? 'off' : '×' + Math.round(v) }, (v) => apply({ rt: Math.round(v) }));
+      const kMt = knob('Nudge', { min: -50, max: 50, step: 1, value: Math.round((cur.mt || 0) * 100), default: 0, format: (v) => (v > 0 ? '+' : '') + Math.round(v) + ' %' }, (v) => apply({ mt: Math.round(v) / 100 }));
       const done = h('button', { class: 'tlpr-tool', title: 'done (Esc)', text: '✓' });
-      editor.append(h('div', { class: 'tlpr-eh tlpr-ihead' }, [h('b', { text: '🎹 ' + toolName(), style: { color: lane ? lane.color : '' } }), h('span', { class: 'tlpr-hint', text: ' · note ' + nameOf(cur.n) }), h('span', { class: 'wm-spacer' }), done]), h('div', { class: 'tlpr-knobs' }, [kS.el, kL.el, kP.el, kV.el]));
+      editor.append(h('div', { class: 'tlpr-eh tlpr-ihead' }, [h('b', { text: '🎹 ' + toolName(), style: { color: lane ? lane.color : '' } }), h('span', { class: 'tlpr-hint', text: ' · note ' + nameOf(cur.n) }), h('span', { class: 'wm-spacer' }), done]), h('div', { class: 'tlpr-knobs' }, [kS.el, kL.el, kP.el, kV.el]), h('div', { class: 'tlpr-knobs' }, [kPr.el, kRt.el, kMt.el]));
       // 3.56 BEND — the note's pitch curve, with knobs; you hear it as you turn them
       const noteSec = () => clampN(cur.l / 4 * 60 / ((window.Kernel && Kernel.music && Kernel.music.bpm) || 120), 0.3, 4);
       let hearT = null; const hear = (always) => { clearTimeout(hearT); hearT = setTimeout(() => { if (lane && (cur.b || cur.c || always)) view.emit('note_audition', Object.assign({ lane: lane.id, note: cur.n, duration: cur.c ? noteSec() : 0.9 }, cur.b ? { bend: cur.b } : {}, cur.c ? { curves: cur.c } : {}, cur.p ? { params: cur.p } : {})); }, 280); };
