@@ -645,9 +645,26 @@
         sync(); ctx.emitUI('export_state', { message: 'Saved the behaviour “' + b.name + '” — it is in every note’s ◈ Behaviours now' });
       });
       ctx.onUI('behaviour_remove', { type: 'object', required: ['id'] }, (p) => { const n = behaviours.length; behaviours = behaviours.filter(x => x.id !== p.id); if (behaviours.length !== n) sync(); });
+      // 3.115 "I want sound playing when I draw notes": a lane with no instrument was silent while you drew. A small voice of the
+      // Timeline's own — two oscillators and a soft filter, made live (no recordings) — plays the notes then; it follows a note's bend.
+      function preview(p) {
+        const dest = (K.audio && K.audio.masterIn) || out; if (!dest) return;
+        const t0 = ac.currentTime + 0.005, b = cleanB(p.bend), dur = b ? clamp(+p.duration || 0.9, 0.1, 4) : 0.28, f = (n) => 440 * Math.pow(2, (n - 69) / 12);
+        const ns = (Array.isArray(p.notes) ? p.notes : [p.note]).slice(0, 8), lvl = 0.16 / Math.sqrt(ns.length);
+        ns.forEach(n => {
+          n = clamp(Math.round(n), 0, 127);
+          const o1 = ac.createOscillator(), o2 = ac.createOscillator(), lp = ac.createBiquadFilter(), g = ac.createGain();
+          o1.type = 'sawtooth'; o2.type = 'sine'; lp.type = 'lowpass'; lp.frequency.value = Math.min(9000, f(n) * 5); lp.Q.value = 0.7;
+          [o1, o2].forEach(o => { o.frequency.setValueAtTime(f(n + (b ? +b.from || 0 : 0)), t0); if (b) o.frequency.linearRampToValueAtTime(f(n + (+b.to || 0)), t0 + dur * 0.9); o.connect(lp); });
+          o2.detune.value = -1200;
+          g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(lvl, t0 + 0.008); g.gain.setTargetAtTime(lvl * 0.6, t0 + 0.05, 0.08); g.gain.setTargetAtTime(0, t0 + dur, 0.05);
+          lp.connect(g); g.connect(dest); o1.start(t0); o2.start(t0); o1.stop(t0 + dur + 0.4); o2.stop(t0 + dur + 0.4);
+          o1.onended = () => { try { g.disconnect(); } catch (e) {} };
+        });
+      }
       ctx.onUI('note_audition', { type: 'object', required: ['note'] }, (p) => {
         const lane = lanes.find(l => l.id === p.lane); const target = (lane && lane.target) || p.target;
-        if (!target || !K.registry.has(target)) return;
+        if (!target || !K.registry.has(target)) { preview(p); return; }   // 3.115 no instrument on the lane: still hear what you draw
         const b = cleanB(p.bend), cv = cleanC(p.curves), pp = cleanP(p.params), dur = b || cv ? clamp(+p.duration || 0.9, 0.1, 4) : 0.3;   // 3.56/3.65: hear the curves while you shape them
         (Array.isArray(p.notes) ? p.notes : [p.note]).forEach(n => ctx.emit('note:trigger', Object.assign({ target, note: clamp(Math.round(n), 0, 127), velocity: 0.8, time: ac.currentTime + 0.01, duration: dur }, b ? { bend: b } : {}, cv ? { curves: cv } : {}, pp ? { params: pp } : {})));
       });

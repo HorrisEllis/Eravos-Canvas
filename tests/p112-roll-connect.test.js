@@ -81,4 +81,32 @@ describe('P112 · piano roll: Connect edges · its own window', () => {
       assert.equal(R.state.notes.length, 2, 'J connects the selected notes too (3 → 2: the first two became one)');
     } finally { OrganismFactory.close(t.id); restoreView(); }
   });
+  it('3.115 points on the note (Bend tool): a click on it adds a point and drags it; the ends move up and down; a double-click removes a point', async () => {
+    const t = await make([{ s: 0, l: 8, n: 60, v: 0.8 }]);
+    try {
+      const R = t.roll, cv = R.canvas; R.setTool('bend'); R.select([0]); await TH.sleep(20);
+      const r = cv.getBoundingClientRect(), p0 = R.pointOf(0), sc = r.width / cv.offsetWidth, row = R.state.row * (r.height / cv.offsetHeight);
+      const pe = (type, x, y, o) => new PointerEvent(type, Object.assign({ bubbles: true, button: 0, buttons: type === 'pointerup' ? 0 : 1, clientX: x, clientY: y, pointerId: 1 }, o || {}));
+      // a click in the middle of the note, dragged up 3 rows: a new point at +3
+      cv.dispatchEvent(pe('pointerdown', p0.x, p0.y)); cv.dispatchEvent(pe('pointermove', p0.x, p0.y - 3 * row, { shiftKey: true })); cv.dispatchEvent(pe('pointerup', p0.x, p0.y - 3 * row)); await TH.sleep(20);
+      let P = R.pathOf(0); assert.equal(P.length, 3, 'a point was added: ' + JSON.stringify(P)); assert.near(P[1][0], 0.5, 0.05, 'in the middle'); assert.equal(P[1][1], 3, '+3 semitones (Shift: whole)');
+      assert.equal(R.state.notes[0].b.shape, 'path', 'the note is its shape now');
+      // the end point: drag it down 2 rows
+      const ex = r.left + (0 + 8) * R.state.pps * sc, ey = p0.y;
+      cv.dispatchEvent(pe('pointerdown', ex - 1, ey)); cv.dispatchEvent(pe('pointermove', ex + 40, ey + 2 * row, { shiftKey: true })); cv.dispatchEvent(pe('pointerup', ex + 40, ey + 2 * row)); await TH.sleep(20);
+      P = R.pathOf(0); assert.equal(P[P.length - 1][0], 1, 'the end stays at the end'); assert.equal(P[P.length - 1][1], -2, 'and went down 2');
+      // double-click the middle point: gone
+      const mx = r.left + (0 + P[1][0] * 8) * R.state.pps * sc, my = p0.y - P[1][1] * row;
+      cv.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, buttons: 1, detail: 2, clientX: mx, clientY: my, pointerId: 1 })); cv.dispatchEvent(pe('pointerup', mx, my)); await TH.sleep(20);
+      assert.equal(R.pathOf(0).length, 2, 'a double-click removes a point');
+    } finally { OrganismFactory.close(t.id); restoreView(); }
+  });
+  it('3.115 a lane with no instrument still sounds while you draw (the Timeline’s own preview voice)', async () => {
+    const t = await make([{ s: 0, l: 4, n: 60, v: 0.8 }]);
+    try {
+      const A = Kernel.audio.ctx, made = []; const orig = A.createOscillator.bind(A); A.createOscillator = () => { const o = orig(); made.push(o); return o; };
+      try { t.pub('note_audition', { lane: t.H.ctx.internals.lanes[0].id, note: 64, notes: [64] }); } finally { A.createOscillator = orig; }
+      assert.ok(made.length >= 2, 'it plays: ' + made.length + ' oscillators');
+    } finally { OrganismFactory.close(t.id); restoreView(); }
+  });
 });
