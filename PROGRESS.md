@@ -2,6 +2,23 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.113 piano roll easier · 3.114 Timeline right-click · 3.115 Clip look + Canvas zoom (2026-11-05)
+Asked: "make it easier" → "yes, and i dont like the fill options, replace it with pattern selection. also easier to manipulate notes,
+like size and moving" · "also remove the split button from the timeline?, and let me select where and right click" · "what about a
+canvas mode with a zoom in so it can be smaller or thinner wave forms?" → "im saying the piano roll … like the song recorder, where theyre
+like clips". Each shown as screenshots first; "merge and push".
+- 3.113: one row (tool, clip, bars, note tools, Grid, Scale lock, Zoom, Lane, Pattern, More, ⧉, ⛶, ×); More ▾ (kept as rollMore): Length,
+  Click adds, Sketch makes, Rows, Quantize Q ≈ ⟷ ⏎, Clip look, Canvas zoom, Clear. Pattern = PatternLibrary.forTool, repeated to the clip,
+  in the key, Ctrl+Z undoes; the chord Fill row gone (engine clip_fill kept). Sizing: ends grab 6–12 px, short notes' right half sizes,
+  grips drawn (the side you would grab lit), the grab offset kept, Ctrl+←/→ sizes by a grid step (Shift: bar).
+- 3.114: ✂ Split button gone (S and menus split). Right-click a selected stretch: Split here · Loop this stretch · Delete what is in it
+  (engine clip_clear_at: cut at the edges, remove inside, one step) · Clear the selection; a clip: Edit notes · Split here · Duplicate ·
+  Delete; a spot: Split here · New clip / pattern block here. A right press no longer starts a selection.
+- 3.115: Clip look (rollClips): see-through note, outline, a waveform inside (denser = higher, taller = louder), its name. Canvas zoom
+  (rollCanvasZoom): wheel zooms time + pitch around the pointer (rows 4–40 px, time never past filling the roll), Alt+wheel velocity,
+  Shift+wheel scroll, middle-drag pans.
+- P84 counts only button-style cards (Material cards share the style). Full suite on main before this: 1379/1382 (P84 fixed; P82 ×2 known).
+
 ## Done — 3.112 Connect edges in the piano roll's menu · the piano roll as a proper window of its own (2026-11-05)
 Asked: "I want to be able to select notes and right click and have a connect edges in the context menu. Also make the piano roll
 popout its own window. It's badly impl[e]mented."

@@ -1,3 +1,32 @@
+ERAVOS v0.2.4 (2026-11-05)
+
+Install: ERAVOS-Setup-0.2.4.exe, or unzip ERAVOS_0.2.4.zip. On an earlier version, ERAVOS offers this update by itself.
+
+Piano roll
+- One row of controls; the rest under More.
+- Pattern: pick one of the track's patterns and it becomes the clip's notes, in the song's key (Ctrl+Z undoes). Replaces Fill.
+- Easier sizing and moving: bigger grab edges, grips on the note's ends, the end follows from where you grabbed it,
+  Ctrl+Left / Ctrl+Right make the selected notes shorter or longer.
+- New options under More: Clip look (notes drawn like Song Recorder clips, with a waveform inside) and Canvas zoom (the wheel
+  zooms time and pitch together, down to thin strips; middle-drag pans).
+
+Timeline
+- The Split button is gone. Drag across a track to select a stretch, then right-click it: Split here, Loop this stretch,
+  Delete what is in it. Right-click a clip or an empty spot for their own menus. S still splits.
+
+ERAVOS v0.2.3 (2026-11-05)
+
+Install: ERAVOS-Setup-0.2.3.exe, or unzip ERAVOS_0.2.3.zip. On an earlier version, ERAVOS offers this update by itself.
+
+New
+- Settings is a page, not a dropdown: the Settings button in the toolbar (or Ctrl+,) opens one page with a tab for each part:
+  Look (theme, buttons, material), Reactive colours, Sound, About & updates. The ... menu keeps the actions.
+- Piano roll: select notes, right-click, Connect edges: they become one note that glides through each pitch. The same menu has
+  Close the gaps, Quantize, Humanize, Duplicate and Delete.
+- The piano roll opens as a proper window of its own, under the Timeline, with a title bar; it snaps to the windows near it.
+  "Back inside" puts it under the tracks.
+- Updates download in the background; ERAVOS Update puts them in place and restarts.
+
 ERAVOS v0.2.2 (2026-11-05)
 
 Install: ERAVOS-Setup-0.2.2.exe, or unzip ERAVOS_0.2.2.zip. On an earlier version, ERAVOS offers this update by itself.
