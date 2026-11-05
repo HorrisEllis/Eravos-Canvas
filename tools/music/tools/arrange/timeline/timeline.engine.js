@@ -55,6 +55,8 @@
       { key: 'follow', type: 'boolean', default: true, label: 'Follow', group: 'VIEW' },
       { key: 'laneH', type: 'integer', default: 48, min: 28, max: 160, label: 'Lane height', group: 'VIEW', hint: 'taller lanes = bigger clips (Alt + wheel over the lanes)' },
       { key: 'songBars', type: 'integer', default: 64, min: 1, max: 512, label: 'Song bars', group: 'VIEW' },
+      { key: 'rollClips', type: 'boolean', default: false, label: 'Piano roll: notes look like clips', group: 'VIEW', hint: 'each note drawn like a Song Recorder clip: see-through, outlined, a waveform inside' },
+      { key: 'rollCanvasZoom', type: 'boolean', default: false, label: 'Piano roll: canvas zoom', group: 'VIEW', hint: 'the wheel zooms time and pitch together around the pointer (Alt+wheel: a note’s velocity); middle-drag pans' },
       { key: 'rollMore', type: 'boolean', default: false, label: 'Piano roll: More controls open', group: 'VIEW', hidden: true },
       { key: 'rollWindow', type: 'boolean', default: true, label: 'Piano roll in its own window', group: 'VIEW', hint: '3.112 on by default: the piano roll opens as its own window under the Timeline, sized and placed as you like (off: under the tracks)' },
     ],

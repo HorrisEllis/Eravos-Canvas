@@ -135,7 +135,13 @@
     const stepBtn = ebtn('⏎', 'Step input — type notes on Z S X D C V G B H N J M (an octave up: Q 2 W 3 E R 5 T 6 Y 7 U); Space = rest; Backspace = back', () => setStep(!stepOn));
     const edBox = h('span', { class: 'tlpr-tools', role: 'group', 'aria-label': 'edit' }, [qSel.el, qBtn, huBtn, legBtn, stepBtn]);
     // 3.113 "make it easier": one row of what you reach for every time; the rest folds behind More ▾ (kept with the Timeline: VIEW › rollMore)
-    const more = h('div', { class: 'tlpr-bar tlpr-more' }, [lenSel.el, stampSel.el, sketchSel.el, rowSel.el, edBox, h('span', { class: 'tlpr-sep' }), clearBtn.el]);
+    // 3.115 "a canvas mode with a zoom in so it can be smaller or thinner" · "like the song recorder, where theyre like clips" (2026-11-05):
+    // two looks/ways, both his choice, today's the default — kept with the Timeline (rollClips, rollCanvasZoom)
+    let clipLook = !!(view.state && view.state.rollClips), canvasZoom = !!(view.state && view.state.rollCanvasZoom);
+    const clipT = UI.Toggle({ label: 'Clip look', value: clipLook, hint: 'each note drawn like a Song Recorder clip: see-through, outlined, a waveform inside', onChange: (v) => { clipLook = v; draw(); view.emit('config_change', { key: 'rollClips', value: v }); } });
+    const zoomT = UI.Toggle({ label: 'Canvas zoom', value: canvasZoom, hint: 'the wheel zooms time and pitch together around the pointer, notes down to thin strips (Alt+wheel: a note’s velocity) · middle-drag pans', onChange: (v) => { canvasZoom = v; view.emit('config_change', { key: 'rollCanvasZoom', value: v }); } });
+    if (view.bind) { view.bind('rollClips', (v) => { if (!!v !== clipLook) { clipLook = !!v; clipT.set(clipLook); if (clip) draw(); } }); view.bind('rollCanvasZoom', (v) => { canvasZoom = !!v; zoomT.set(canvasZoom); }); }
+    const more = h('div', { class: 'tlpr-bar tlpr-more' }, [lenSel.el, stampSel.el, sketchSel.el, rowSel.el, edBox, h('span', { class: 'tlpr-sep' }), clipT.el, zoomT.el, h('span', { class: 'tlpr-sep' }), clearBtn.el]);
     let moreOn = !!(view.state && view.state.rollMore);
     const moreBtn = UI.Button({ label: 'More ▾', hint: 'the rest: length, click adds, sketch makes, rows, quantize · humanize · legato · step input, clear', onClick: () => { setMore(!moreOn); view.emit('config_change', { key: 'rollMore', value: moreOn }); } });
     function setMore(on) { moreOn = !!on; more.hidden = !moreOn; moreBtn.set(moreOn ? 'Less ▴' : 'More ▾'); moreBtn.el.classList.toggle('on', moreOn); if (clip) requestAnimationFrame(() => draw()); }
@@ -209,6 +215,19 @@
       }
       if (playStep !== null && playStep >= 0 && playStep <= st) { g.fillStyle = '#fff'; g.beginPath(); g.moveTo(playStep * pps - 5, 0); g.lineTo(playStep * pps + 5, 0); g.lineTo(playStep * pps, 7); g.fill(); }
     }
+    // 3.115 a note drawn like a Song Recorder clip: see-through body in the track's colour, outlined, a waveform inside (denser for higher
+    // notes, taller for louder ones, settling after its attack), and its name when there is room
+    function clipNote(g, nt, x, y, w, col, on) {
+      g.globalAlpha = 0.16 + 0.22 * nt.v; g.fillStyle = col; g.fillRect(x + 1, y + 1, w - 1, ROW - 2); g.globalAlpha = 1;
+      g.strokeStyle = on ? '#fff' : col; g.lineWidth = on ? 1.5 : 1; g.strokeRect(x + 1.5, y + 1.5, w - 2, ROW - 3);
+      if (ROW >= 6 && w >= 8) {
+        const mid = y + ROW / 2, amp = Math.max(0.6, (ROW / 2 - 2.5) * (0.45 + 0.55 * nt.v)), per = clampN(12 / Math.pow(2, (nt.n - 60) / 24), 3, 18);
+        g.strokeStyle = col; g.globalAlpha = 0.95; g.lineWidth = 1; g.beginPath();
+        for (let px = 2; px <= w - 2; px++) { const env = Math.min(1, px / 4) * (0.6 + 0.4 * Math.exp(-px / Math.max(8, w * 0.25))); const yy = mid - Math.sin(px / per * 2 * Math.PI) * amp * env; if (px === 2) g.moveTo(x + px, yy); else g.lineTo(x + px, yy); }
+        g.stroke(); g.globalAlpha = 1;
+      }
+      if (ROW >= 11 && w >= 34) { g.fillStyle = '#d6e4f0'; g.font = '9px ui-sans-serif, system-ui'; g.fillText(NAMES[mod(nt.n, 12)] + (Math.floor(nt.n / 12) - 1), x + 4, y + 9); }
+    }
     function draw() {
       if (!clip) return;
       const st = steps(), W = Math.max(200, st * pps), H = Hh();
@@ -229,8 +248,11 @@
         const x = nt.s * pps, y = yOf(nt.n), w = Math.max(3, nt.l * pps - 1);
         const c2 = drums ? ((drums[rowNotes.indexOf(nt.n)] || {}).color || col) : col;
         if (!drums && nt.b) { drawBend(g, nt, S.has(i)); curveMark(g, nt, x, y, w); return; }   // 3.58 a bent note IS its curve: the block bends
+        if (clipLook && !drums) clipNote(g, nt, x, y, w, c2, S.has(i));
+        else {
         g.globalAlpha = 0.35 + 0.65 * nt.v; g.fillStyle = c2; g.fillRect(x + 1, y + 1, w - 1, ROW - 2); g.globalAlpha = 1;
         g.strokeStyle = S.has(i) ? '#fff' : '#000'; g.lineWidth = 1; g.strokeRect(x + 1.5, y + 1.5, w - 2, ROW - 3);
+        }
         curveMark(g, nt, x, y, w);
         // 3.113 grips on the ends of the note under the pointer (and the selected ones): what sizes it is visible; the side you would grab is lit
         if ((i === hoverNote || S.has(i)) && (tool === 'draw' || tool === 'select') && w >= 10 && ROW >= 7) {
@@ -425,8 +447,11 @@
     function zone(i, x) { const a = notes[i], x0 = a.s * pps, x1 = (a.s + a.l) * pps, w = x1 - x0; if (w < 16) return x - x0 > w / 2 ? 'R' : 'B'; const z = clampN(w * 0.3, 6, 12); return x1 - x < z ? 'R' : x - x0 < z && w >= 24 && a.l > (grid || FREE) ? 'L' : 'B'; }
     let hoverNote = -1, hoverZone = null;
 
+    let pan = null;   // 3.115 middle-drag pans (like the canvas)
+    let rowF = 11;   // the row zoom between whole pixels, so small steps add up (4 px × 1.12 still rounds to 4)
     cv.addEventListener('pointerdown', (e) => {
       e.stopPropagation(); cv.focus({ preventScroll: true }); if (!clip) return;
+      if (e.button === 1) { e.preventDefault(); pan = { x: e.clientX, y: e.clientY, l: scroll.scrollLeft, t: scroll.scrollTop, k: (cv.getBoundingClientRect().width / cv.offsetWidth) || 1 }; try { cv.setPointerCapture(e.pointerId); } catch (_) {} return; }
       const { x, y } = local(e); const i = hit(x, y), g = g0(e), st = steps();
       if (e.button === 2 && tool === 'bend') { if (i >= 0 && notes[i].b) { const next = notes.slice(), sel = S.has(i) ? Array.from(S) : [i]; sel.forEach(j => { if (next[j]) { next[j] = Object.assign({}, next[j]); delete next[j].b; } }); commit(next); say(notes[i].s, notes[i].n, 'bend: flat'); } return; }
       // 3.112 right-click with notes selected: the notes' menu (Connect edges, …); with nothing selected it still erases the note under it
@@ -481,6 +506,7 @@
       notes = notes.concat([{ s: cell, l, n, v: 0.85 }]); drag.changed = true; audition([n]);
     }
     cv.addEventListener('pointermove', (e) => {
+      if (pan) { if (!(e.buttons & 4)) { pan = null; return; } scroll.scrollLeft = pan.l - (e.clientX - pan.x) / pan.k; scroll.scrollTop = pan.t - (e.clientY - pan.y) / pan.k; return; }
       if (!clip) return;
       const { x, y } = local(e);
       if (drag && e.buttons === 0 && e.pointerType === 'mouse') endDrag(); // the button came up somewhere we never heard about
@@ -558,7 +584,8 @@
       if (d.changed) commit(notes.slice()); else draw();
     };
     cv.addEventListener('pointerdown', () => { if (drag && !drag.done) drag.done = global.UIKit.drag.begin(endDrag); }); // 3.34 guard
-    cv.addEventListener('pointerup', endDrag);
+    cv.addEventListener('pointerup', (e) => { if (pan) { pan = null; return; } endDrag(e); });
+    cv.addEventListener('mousedown', (e) => { if (e.button === 1) e.preventDefault(); });   // no browser autoscroll on a middle press
     // a lost capture / cancelled pointer (alt-tab, touch cancel, window torn down mid-drag) must never leave a drag armed
     cv.addEventListener('pointercancel', endDrag); cv.addEventListener('lostpointercapture', endDrag);
     cv.addEventListener('dblclick', (e) => { const { x, y } = local(e); const i = hit(x, y); if (i >= 0) openEditor(i); });   // 3.48: exact fields (right-click deletes)
@@ -577,13 +604,18 @@
     function fit() { if (!clip) return; zoomTo(Math.max(PPS_MIN, (scroll.clientWidth - KW - 4) / steps())); scroll.scrollLeft = 0; }
     function setRow(r, atY) {
       if (drums) return; const ay = atY === undefined ? scroll.scrollTop + scroll.clientHeight / 2 : atY, row = ay / ROW;
-      prow = clampN(Math.round(r), 6, 28); ROW = prow; drawKeys(); draw();
-      scroll.scrollTop = Math.max(0, row * ROW - (ay - scroll.scrollTop)); rowSel.set([7, 11, 16, 24].reduce((a, b) => Math.abs(b - prow) < Math.abs(a - prow) ? b : a));
+      prow = clampN(Math.round(r), 4, 40); ROW = prow; drawKeys(); draw();
+      const tgt = Math.max(0, row * ROW - (ay - scroll.scrollTop)); scroll.scrollTop = tgt; if (scroll.scrollTop !== tgt) requestAnimationFrame(() => { scroll.scrollTop = tgt; });   // the grid may grow a frame later
+      rowSel.set([7, 11, 16, 24].reduce((a, b) => Math.abs(b - prow) < Math.abs(a - prow) ? b : a));
     }
     cv.addEventListener('wheel', (e) => {
       const { x, y } = local(e);
       if (e.ctrlKey && e.shiftKey) { e.preventDefault(); e.stopPropagation(); setRow(ROW * (e.deltaY < 0 ? 1.15 : 1 / 1.15), y); return; }
       if (e.ctrlKey || e.metaKey) { e.preventDefault(); e.stopPropagation(); userZoom = true; zoomTo(pps * (e.deltaY < 0 ? 1.15 : 1 / 1.15), x); return; }
+      if (canvasZoom && !e.altKey && !e.shiftKey) {   // 3.115 like the canvas: time and pitch together, around the pointer
+        e.preventDefault(); e.stopPropagation(); const f = e.deltaY < 0 ? 1.12 : 1 / 1.12, fill = (scroll.clientWidth - KW - 4) / steps(); userZoom = true; zoomTo(Math.max(fill, pps * f), x); rowF = clampN((Math.abs(rowF - ROW) < 1 ? rowF : ROW) * f, 4, 40); setRow(rowF, y); return;   // time never shrinks past filling the roll
+      }
+      if (canvasZoom && !e.altKey) return;   // Shift+wheel: scroll
       const i = hit(x, y); if (i < 0) return;
       e.preventDefault(); e.stopPropagation();
       const next = notes.slice(); next[i] = Object.assign({}, next[i], { v: Math.max(0.05, Math.min(1, next[i].v + (e.deltaY < 0 ? 0.05 : -0.05))) });
