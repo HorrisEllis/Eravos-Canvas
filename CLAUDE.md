@@ -61,6 +61,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-05 | **Release v0.2.3** — Settings page, Connect edges + the roll as a proper window (3.112, from the other session's unmerged branch), background updates (3.111) | `desktop/package.json`, `docs/release-notes.txt` | P112 3/3, P109 2/2, P76 4/4, P110 2/2, boundary 10/10; the release run's Setup exe + zip |
 | 2026-11-05 | **Settings is a page, not a dropdown**: ⚙ Settings (toolbar, Ctrl+,) — one page like the tool pages, a tab per section (Look, Reactive colours, Sound, About & updates); sections contributed (AppSettings.addSection); ⋯ Options keeps only actions | `canvas/runtime/app-settings.js`, `themes.js`, `updates.js`, `tools/music/core/react-panel.js`, `proximity.js` | `tests/p110-settings.test.js` 2/2; P77 P91 P99 moved to the page; boundary 10/10; design check no worse · PR #88 |
 | 2026-11-05 | **Release v0.2.2** — Timeline: Sketch draws one smooth connected note (pitch-path component); the piano roll fills its width; option: the roll in its own borderless window (CanvasWM.openPanel) | `tools/music/components/pitch-path/`, `timeline.pianoroll.js`, `timeline.ui.js`, `canvas/runtime/canvas-wm.js` | P108 2/2, P109 2/2, pitch-path 214 checks; Timeline 84/84, piano 27/27, bend 16/16, boundary 10/10; design check no worse · PR #87 |
 | 2026-11-05 | **Release v0.2.1** (the colour fix, Material, dice gone) | `desktop/package.json`, `docs/release-notes.txt` | the release run's Setup exe + zip |
