@@ -2,6 +2,21 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.132 the Lofi setup (2026-11-06)
+Asked: "i also want to be able to make lofi" → "nope look at the claude.md" → specs → "yes" · "suites are tools and its components."
+- Lofi is a SETUP (Axiom 3), not a tool or a suite: tools/music/suites/lofi/suite.json — Groove (boom bap) → Drum Machine (Lo-fi Dust) →
+  Destroyer (12-bit); Chords (jazz) → Retro Poly (Lofi Keys) → Filter (Lofi Low) → Echo (Lofi Warm Echo) → Sidechain; Bassline → Deep
+  Sub → Sidechain. 82 BPM (steps: a setup may carry its domain's recipe steps; suites.js passes them through). Macros DUST WARMTH SWING PUMP;
+  scenes Study / Rainy / Late Night.
+- Chords: Voicing [tension (today's rule, unchanged), 7th, 9th, rootless 9]; TENSION dims with a jazz voicing. components/progression:
+  JAZZ_PROGRESSIONS (six) + ALL_PROGRESSIONS (the five, then the six) — the five untouched; Chords and Bassline offer ALL.
+- Groove: "boom bap" style (kick 1 and the and-of-2, snare 2 and 4, softer offbeat hats, ghosts); the five styles unchanged.
+- Lofi packs (data only): Groove, Chords, Bassline, Retro Poly, Filter, Deep Sub, Echo, Sidechain. build/tool-kit.mjs regenerated the
+  pack schemas (also XY Pad's posX/posY from 3.131 and Retro Poly's Hold from 3.130, which were stale).
+- Played in the app: no faults; −7…−10 dB RMS; the master compressor pulls 3–5 dB (open: the parts' levels could come down).
+- Tests: p132 3/3; P119 now 8 setups (and "the last step opens the suite"); Chords 12/12; Bassline 16/16; Groove; Echo; Filter; Sidechain;
+  Deep Sub; Retro Poly; Drum Machine; Destroyer; P63 11/11; P14 142/142; boundary 10/10; design check no worse.
+
 ## Done — 3.131 Bind on the lane (2026-11-06)
 Asked: "“Automate this”: an empty lane with a bind button to bind a tool or component, or interaction object?" → plan shown → "yes".
 - Automation: ＋ Add lane (ui:lane_add with no target) = an unbound lane — drawn, drives nothing, never "target gone". Each lane: ⊕ Bind

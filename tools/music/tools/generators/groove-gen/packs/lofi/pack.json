@@ -1,0 +1,59 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "groove-gen.lofi",
+ "version": "1.0.0",
+ "label": "Lofi",
+ "prefix": "",
+ "author": "ERAVOS",
+ "tags": [
+  "lofi",
+  "chill"
+ ],
+ "for": "eravos.groove-gen",
+ "enabled": true,
+ "items": {
+  "eravos.groove-gen": {
+   "presets": {
+    "Lofi Study": {
+     "params": {
+      "style": "boom bap",
+      "energy": 0.45,
+      "swing": 0.5,
+      "humanize": 0.45,
+      "accent": 0.25,
+      "rolls": 0,
+      "fill": "8",
+      "evolve": "off",
+      "loop": "2 bars"
+     }
+    },
+    "Lofi Rainy": {
+     "params": {
+      "style": "boom bap",
+      "energy": 0.35,
+      "swing": 0.55,
+      "humanize": 0.55,
+      "accent": 0.15,
+      "rolls": 0,
+      "fill": "off",
+      "evolve": "4",
+      "loop": "2 bars"
+     }
+    },
+    "Lofi Late Night": {
+     "params": {
+      "style": "boom bap",
+      "energy": 0.28,
+      "swing": 0.58,
+      "humanize": 0.6,
+      "accent": 0.1,
+      "rolls": 0.1,
+      "fill": "off",
+      "evolve": "8",
+      "loop": "2 bars"
+     }
+    }
+   }
+  }
+ }
+}

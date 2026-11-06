@@ -71,6 +71,18 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-06 · Lofi, made of parts — the Lofi setup
+- **His words:** "i also want to be able to make lofi" (2026-11-05) · "nope look at the claude.md" · "yes" · "suites are tools and its
+  components." (2026-11-06).
+- **His call:** lofi as parts, not one tool — corrected by him against his own Axioms; specs and previews first; then "yes".
+- **Built:** a setup of eleven existing tools wired into a lofi system with four knobs and three scenes and its own tempo; jazz voicings and
+  six jazz progressions added to the shared progression part and the chord tool without changing a single existing chord; a boom bap
+  rhythm; eight packs of settings, data only; a generic way for a setup to carry its domain's steps without the host knowing them.
+- **Proof:** a new in-app test (builds with every part and wire and no faults, sets 82 BPM; every preset and macro target real and in
+  range; jazz chords and the boom bap where they should be); the default chord voicing proved identical to the old rule for every degree
+  and tension; 14,884 component checks; 244 manifests valid; played in the app with no faults.
+- **Check:** `node tests/run.mjs P132` · `node tools/music/components/progression/progression.test.mjs` · Start › SETUPS › Lofi
+
 ### 2026-11-06 · Automation you point at anything — Bind on the lane
 - **His words (2026-11-06):** "“Automate this”: an empty lane with a bind button to bind a tool or component, or interaction object?" · "yes".
 - **His call:** the plan shown in words, then "yes"; the window shown as a screenshot.

@@ -13,7 +13,7 @@
   const S = OrganismSDK.STD;
   const ROWS = ['kick', 'snare', 'ghost', 'hat', 'openhat', 'clap', 'perc', 'shaker'];
   const PAD_OF = { kick: 0, snare: 1, ghost: 1, hat: 3, openhat: 4, clap: 2, perc: 9, shaker: 10 };   // as EDM Lab prints to a Sequencer
-  const STYLES = ['dubstep', 'ukg', 'house', 'neuro', 'breaks'];
+  const STYLES = ['dubstep', 'ukg', 'house', 'neuro', 'breaks', 'boom bap'];   // 3.132 boom bap (lofi, hip-hop)
   const ROLLERS = [3, 4, 6, 7];   // hat, open hat, perc, shaker: the rows that roll
   const FILLERS = [1, 2, 6];      // snare, ghost, perc: the rows a fill adds to
   const ROWS0 = () => ({ mute: ROWS.map(() => false), solo: ROWS.map(() => false), level: ROWS.map(() => 1), chance: ROWS.map(() => 0), pad: ROWS.map(r => PAD_OF[r]) });
@@ -34,6 +34,7 @@
     if (kind === 'ukg') { set('kick', [0, 10, 16, 26], 1); set('snare', [4, 12, 20, 28], 0.95); set('hat', every(4, 2), 0.9); set('ghost', [7, 15, 23, 30], 0.5); set('shaker', every(2, 1), 0.4); set('perc', [3, 19], 0.5); }
     else if (kind === 'dubstep') { set('kick', [0, 10, 16, 22, 26], 1); set('snare', [8, 24], 1); set('clap', [8, 24], 0.8); set('hat', every(4, 2), 0.85); set('ghost', [14, 30], 0.45); set('openhat', [30], 0.5); }
     else if (kind === 'house') { set('kick', every(4), 1); set('clap', [4, 12, 20, 28], 0.9); set('openhat', every(4, 2), 0.85); set('hat', every(2, 1), 0.5); set('shaker', every(1), 0.3); }
+    else if (kind === 'boom bap') { set('kick', [0, 6, 10, 16, 22, 26, 27], 1); m[0][27] = 0.55; set('snare', [4, 12, 20, 28], 1); set('hat', every(2), 0.75); [2, 6, 10, 14, 18, 22, 26, 30].forEach(s => { m[3][s] = 0.5; }); set('ghost', [3, 11, 19, 27, 31], 0.35); set('openhat', [30], 0.45); }
     else if (kind === 'neuro') { set('kick', [0, 10, 16, 26], 1); set('snare', [4, 12, 20, 28], 1); set('hat', every(2), 0.7); set('ghost', [6, 14, 18, 22, 30], 0.5); set('perc', [11, 27], 0.4); }
     else { set('kick', [0, 7, 10, 16, 23], 0.9); set('snare', [4, 12, 20, 28], 0.85); set('hat', every(2), 0.55); set('ghost', [15, 31], 0.35); set('shaker', every(4, 3), 0.3); }
     return m;

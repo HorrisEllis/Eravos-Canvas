@@ -1,0 +1,56 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "fx-filter.lofi",
+ "version": "1.0.0",
+ "label": "Lofi",
+ "prefix": "",
+ "author": "ERAVOS",
+ "tags": [
+  "lofi",
+  "chill"
+ ],
+ "for": "eravos.fx-filter",
+ "enabled": true,
+ "items": {
+  "eravos.fx-filter": {
+   "presets": {
+    "Lofi Low": {
+     "params": {
+      "type": "LP",
+      "slope": 12,
+      "cutoff": 3200,
+      "res": 0.9,
+      "drive": 0.12,
+      "lfoAmt": 0,
+      "envAmt": 0
+     }
+    },
+    "Lofi Underwater": {
+     "params": {
+      "type": "LP",
+      "slope": 24,
+      "cutoff": 1400,
+      "res": 1.2,
+      "drive": 0.08,
+      "lfoAmt": 0.25,
+      "lfoShape": "sine",
+      "lfoSync": true,
+      "lfoDiv": "1/1",
+      "envAmt": 0
+     }
+    },
+    "Lofi Radio": {
+     "params": {
+      "type": "BP",
+      "slope": 12,
+      "cutoff": 1800,
+      "res": 1.4,
+      "drive": 0.3,
+      "lfoAmt": 0,
+      "envAmt": 0
+     }
+    }
+   }
+  }
+ }
+}

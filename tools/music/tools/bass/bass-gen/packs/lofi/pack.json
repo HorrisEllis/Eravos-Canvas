@@ -1,0 +1,65 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "bass-gen.lofi",
+ "version": "1.0.0",
+ "label": "Lofi",
+ "prefix": "",
+ "author": "ERAVOS",
+ "tags": [
+  "lofi",
+  "chill"
+ ],
+ "for": "eravos.bass-gen",
+ "enabled": true,
+ "items": {
+  "eravos.bass-gen": {
+   "presets": {
+    "Lofi Study": {
+     "params": {
+      "rhythm": "groove kick",
+      "energy": 0.45,
+      "octave": 2,
+      "length": 3.5,
+      "slides": 0.4,
+      "ghosts": 0.15,
+      "jumps": 0,
+      "move": 0.35,
+      "humanize": 0.4,
+      "accent": 0.1,
+      "follow": 1
+     }
+    },
+    "Lofi Rainy": {
+     "params": {
+      "rhythm": "half-time",
+      "energy": 0.4,
+      "octave": 2,
+      "length": 6,
+      "slides": 0.6,
+      "ghosts": 0.05,
+      "jumps": 0,
+      "move": 0.2,
+      "humanize": 0.5,
+      "accent": 0,
+      "follow": 1
+     }
+    },
+    "Lofi Late Night": {
+     "params": {
+      "rhythm": "groove kick",
+      "energy": 0.3,
+      "octave": 2,
+      "length": 4,
+      "slides": 0.7,
+      "ghosts": 0.2,
+      "jumps": 0,
+      "move": 0.45,
+      "humanize": 0.6,
+      "accent": 0,
+      "follow": 0.8
+     }
+    }
+   }
+  }
+ }
+}

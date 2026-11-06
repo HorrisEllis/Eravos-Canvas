@@ -1,4 +1,4 @@
-# spec_id: music.lofi · kind setup · version 0.1.0 · status planned (spec first — Axiom 8; not built, waiting for his yes)
+# spec_id: music.lofi · kind setup · version 1.0.0 · status built 2026-11-06 (3.132, his "yes") → tools/music/suites/lofi/suite.json
 # his words: "i also want to be able to make lofi" (2026-11-05) · "Lofi tools: UI previews first." · "those are lofi tools?" ·
 #   "nope look at the claude.md" (2026-11-06) — lofi is not one tool (Axiom 1, parts, not monoliths): it is a SETUP (a system of whole tools,
 #   Start › SETUPS, tools/music/suites/<id>/suite.json — Axiom 3) plus PACKS (data beside each tool), and two tools it lacks (Piano, Tape Memory)
@@ -34,3 +34,16 @@ open gaps (none hidden):
   - Chords: jazzy progressions need 7th/9th voicings in chord-gen (today: triads + tension); a component or a chord-gen change — spec first
   - packs to write (data only): groove-gen Lofi, chord-gen Lofi, bass-gen Lofi, fx-filter Lofi Low (+ gentle sub, echo, sidechain if missing)
   - Piano and Tape Memory: specs written 2026-11-06 (tools/music/planned/piano.spec, tape-memory.spec), UI previews shown, his yes pending
+
+# ---- ADDENDUM 2026-11-06 · built (3.132) — everything above kept
+built:
+  - tools/music/suites/lofi/suite.json: the parts above with Lofi presets; wiring; output Destroyer + Sidechain; macros DUST WARMTH SWING
+    PUMP; scenes Study (starter) · Rainy · Late Night; steps: tempo 82 BPM first (a setup may now carry its domain's steps — the canvas
+    passes them through unread, canvas/runtime/suites.js)
+  - Chords: Voicing [tension, 7th, 9th, rootless 9] (default unchanged) + the jazz six (components/progression JAZZ_PROGRESSIONS); Bassline
+    offers the jazz six too; Groove: the "boom bap" style; Lofi packs (data) for Groove, Chords, Bassline, Retro Poly, Filter, Deep Sub,
+    Echo, Sidechain
+  - played in the app: no faults, output −7…−10 dB RMS, peaks held under 0 dB by the master (the master compressor pulls 3–5 dB: the
+    parts' levels could come down — open)
+proof: tests/p132-lofi-setup.test.js 3/3; P119 (8 setups), Chords 12/12, Bassline 16/16, Groove, Echo, Filter, Sidechain, Deep Sub,
+  Retro Poly, Drum Machine, Destroyer, boundary 10/10; progression component 14,884 checks; validate 244 manifests

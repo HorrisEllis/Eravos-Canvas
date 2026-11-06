@@ -9,9 +9,9 @@ describe('P119 · suites, setups, your own suites, the Components and Suites tab
     assert.ok(Suites.list().every(s => s.kind === 'suite'), 'only suites listed');
     assert.ok(Suites.get('music.wub-lab') && Suites.list().includes(Suites.get('music.wub-lab')), 'Wub Lab (Wobble Bass as parts) is a suite');
     const set = Suites.setups().map(s => s.id).sort();
-    assert.deepEqual(set, ['music.edm-lab', 'music.gothic', 'music.heavy-drops', 'music.sound-system', 'music.synthwave', 'music.wobble-suite', 'music.xen']);
+    assert.deepEqual(set, ['music.edm-lab', 'music.gothic', 'music.heavy-drops', 'music.lofi', 'music.sound-system', 'music.synthwave', 'music.wobble-suite', 'music.xen']);   // + Lofi (3.132)
     await TH.sleep(60);
-    set.forEach(id => { const r = Recipes.get('setup:' + id); assert.ok(r && r.section === 'SETUPS' && r.steps[0].op === 'suite', id + ' is a Start card'); });
+    set.forEach(id => { const r = Recipes.get('setup:' + id); assert.ok(r && r.section === 'SETUPS' && r.steps[r.steps.length - 1].op === 'suite', id + ' is a Start card'); });   // (3.132: a setup may run its own steps first — Lofi sets its tempo)
     assert.ok(Recipes.list().some(r => r.id === 'setup:music.synthwave'), 'offered on Start');
     const U = TH.universe(0.2), rep = await Recipes.run('setup:music.xen', { K: U.K, headless: true });
     const hub = U.K.registry.byOrganism('eravos.suite-hub')[0]; assert.ok(hub, 'its suite window opened');

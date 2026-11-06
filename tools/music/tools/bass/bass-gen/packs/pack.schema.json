@@ -49,7 +49,13 @@
                           "i-iv-v-i",
                           "vi-IV-I-V",
                           "i-i-VI-VII",
-                          "i-v-VI-iv"
+                          "i-v-VI-iv",
+                          "ii-V-I-I",
+                          "ii-V-I-vi",
+                          "I-vi-ii-V",
+                          "IV-iii-vi-ii",
+                          "i-iv-VII-III",
+                          "vi-ii-V-I"
                         ]
                       },
                       "chordBars": {

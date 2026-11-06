@@ -1,0 +1,32 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "sidechain-compressor.lofi",
+ "version": "1.0.0",
+ "label": "Lofi",
+ "prefix": "",
+ "author": "ERAVOS",
+ "tags": [
+  "lofi",
+  "chill"
+ ],
+ "for": "eravos.sidechain-compressor",
+ "enabled": true,
+ "items": {
+  "eravos.sidechain-compressor": {
+   "presets": {
+    "Lofi Gentle Pump": {
+     "params": {
+      "mode": "duck",
+      "triggerMode": "tempo",
+      "division": "1/4",
+      "depth": 0.35,
+      "attack": 8,
+      "hold": 20,
+      "release": 320,
+      "curve": 0.4
+     }
+    }
+   }
+  }
+ }
+}
