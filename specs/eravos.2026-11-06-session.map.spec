@@ -98,3 +98,7 @@
   > Tell me what’s the highest leverage? The pattern and note editor are the same. That plus tools that give what Eravos doesn’t have right now.
   - DECIDED (his): the pattern editor and the note editor are ONE editor
   - answered: the highest leverage, with the gaps ERAVOS has today (see the answer; docs/eco-graph.md)
+
+## 13:30:25Z (2026-11-06T13:30:25.486Z) — verbatim:
+  > First.
+  - DECIDED (his): the editor track first — its spec and DAG, then pattern-store, seed-registry, scale-key, then the editor's UI preview

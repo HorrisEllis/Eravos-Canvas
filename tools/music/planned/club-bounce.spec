@@ -36,4 +36,4 @@ dag:
   layer 0: groove-template · pattern-store · probability-gate · ratchet · sampler-voice
   tool: eravos.club-bounce ← pattern-store + groove-template + sampler-voice + probability-gate + ratchet
   build order: groove-template → pattern-store → probability-gate → ratchet → sampler-voice → club-bounce
-  shared with: groove-template 6 · pattern-store 23 · probability-gate 9 · ratchet 5 · sampler-voice 14  (other tools on each)
+  shared with: groove-template 6 · pattern-store 24 · probability-gate 9 · ratchet 5 · sampler-voice 14  (other tools on each)

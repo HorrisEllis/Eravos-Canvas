@@ -36,4 +36,4 @@ dag:
   layer 0: ducker · groove-template · pattern-store · pitch-shifter · sampler-voice
   tool: eravos.garage-skip ← pattern-store + groove-template + sampler-voice + pitch-shifter + ducker
   build order: ducker → groove-template → pattern-store → pitch-shifter → sampler-voice → garage-skip
-  shared with: ducker 15 · groove-template 6 · pattern-store 23 · pitch-shifter 11 · sampler-voice 14  (other tools on each)
+  shared with: ducker 15 · groove-template 6 · pattern-store 24 · pitch-shifter 11 · sampler-voice 14  (other tools on each)

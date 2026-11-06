@@ -39,4 +39,4 @@ dag:
   layer 0: contour-generator · markov-chain · motif-store · pattern-store · scale-key · seed-registry
   tool: eravos.melody-organism ← motif-store + contour-generator + scale-key + markov-chain + pattern-store + seed-registry
   build order: contour-generator → markov-chain → motif-store → pattern-store → scale-key → seed-registry → melody-organism
-  shared with: contour-generator 3 · markov-chain 3 · motif-store 2 · pattern-store 23 · scale-key 12 · seed-registry 12  (other tools on each)
+  shared with: contour-generator 3 · markov-chain 3 · motif-store 2 · pattern-store 24 · scale-key 13 · seed-registry 13  (other tools on each)

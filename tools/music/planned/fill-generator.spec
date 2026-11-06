@@ -36,4 +36,4 @@ dag:
   layer 0: energy-curve · pattern-store · probability-gate · ratchet · seed-registry
   tool: eravos.fill-generator ← ratchet + pattern-store + probability-gate + energy-curve + seed-registry
   build order: energy-curve → pattern-store → probability-gate → ratchet → seed-registry → fill-generator
-  shared with: energy-curve 8 · pattern-store 23 · probability-gate 9 · ratchet 5 · seed-registry 12  (other tools on each)
+  shared with: energy-curve 8 · pattern-store 24 · probability-gate 9 · ratchet 5 · seed-registry 13  (other tools on each)

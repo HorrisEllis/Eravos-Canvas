@@ -40,4 +40,4 @@ dag:
   layer 0: clock-div · groove-template · humanizer · onset-detector · seed-registry
   tool: eravos.groove-organism ← groove-template + humanizer + onset-detector + clock-div + seed-registry
   build order: clock-div → groove-template → humanizer → onset-detector → seed-registry → groove-organism
-  shared with: clock-div 6 · groove-template 6 · humanizer 0 · onset-detector 12 · seed-registry 12  (other tools on each)
+  shared with: clock-div 6 · groove-template 6 · humanizer 0 · onset-detector 12 · seed-registry 13  (other tools on each)

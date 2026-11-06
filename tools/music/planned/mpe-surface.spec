@@ -36,4 +36,4 @@ dag:
   layer 0: mpe-expression · pattern-store · scale-key
   tool: eravos.mpe-surface ← mpe-expression + scale-key + pattern-store
   build order: mpe-expression → pattern-store → scale-key → mpe-surface
-  shared with: mpe-expression 3 · pattern-store 23 · scale-key 12  (other tools on each)
+  shared with: mpe-expression 3 · pattern-store 24 · scale-key 13  (other tools on each)

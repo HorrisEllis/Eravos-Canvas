@@ -36,4 +36,4 @@ dag:
   layer 0: clipper · ducker · groove-template · pattern-store · sampler-voice · waveshaper
   tool: eravos.baile-engine ← pattern-store + sampler-voice + waveshaper + clipper + groove-template + ducker
   build order: clipper → ducker → groove-template → pattern-store → sampler-voice → waveshaper → baile-engine
-  shared with: clipper 9 · ducker 15 · groove-template 6 · pattern-store 23 · sampler-voice 14 · waveshaper 22  (other tools on each)
+  shared with: clipper 9 · ducker 15 · groove-template 6 · pattern-store 24 · sampler-voice 14 · waveshaper 22  (other tools on each)

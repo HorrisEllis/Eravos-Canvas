@@ -39,4 +39,4 @@ dag:
   layer 0: energy-curve · motif-store · pattern-store · state-machine-core · structure-segmenter
   tool: eravos.arrangement-organism ← structure-segmenter + energy-curve + motif-store + pattern-store + state-machine-core
   build order: energy-curve → motif-store → pattern-store → state-machine-core → structure-segmenter → arrangement-organism
-  shared with: energy-curve 8 · motif-store 2 · pattern-store 23 · state-machine-core 4 · structure-segmenter 3  (other tools on each)
+  shared with: energy-curve 8 · motif-store 2 · pattern-store 24 · state-machine-core 4 · structure-segmenter 3  (other tools on each)

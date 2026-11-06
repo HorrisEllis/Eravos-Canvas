@@ -36,4 +36,4 @@ dag:
   layer 0: bitcrusher · filter-svf ✓ · groove-template · pattern-store · sampler-voice · time-stretch · transient-slicer
   tool: eravos.chop-station ← transient-slicer + sampler-voice + groove-template + filter-svf + time-stretch + pattern-store + bitcrusher
   build order: bitcrusher → filter-svf ✓ → groove-template → pattern-store → sampler-voice → time-stretch → transient-slicer → chop-station
-  shared with: bitcrusher 3 · filter-svf 40 · groove-template 6 · pattern-store 23 · sampler-voice 14 · time-stretch 6 · transient-slicer 5  (other tools on each)
+  shared with: bitcrusher 3 · filter-svf 40 · groove-template 6 · pattern-store 24 · sampler-voice 14 · time-stretch 6 · transient-slicer 5  (other tools on each)

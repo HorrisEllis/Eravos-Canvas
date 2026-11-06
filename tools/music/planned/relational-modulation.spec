@@ -44,4 +44,4 @@ dag:
   layer 0: envelope-follower · mod-ops · onset-detector · relationship-graph · seed-registry · spectral-features
   tool: eravos.relational-modulation ← relationship-graph + mod-ops + envelope-follower + spectral-features + onset-detector + seed-registry
   build order: envelope-follower → mod-ops → onset-detector → relationship-graph → seed-registry → spectral-features → relational-modulation
-  shared with: envelope-follower 7 · mod-ops 6 · onset-detector 12 · relationship-graph 12 · seed-registry 12 · spectral-features 14  (other tools on each)
+  shared with: envelope-follower 7 · mod-ops 6 · onset-detector 12 · relationship-graph 12 · seed-registry 13 · spectral-features 14  (other tools on each)

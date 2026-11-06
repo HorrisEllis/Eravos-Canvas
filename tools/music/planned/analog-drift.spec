@@ -38,4 +38,4 @@ dag:
   layer 0: osc-noise · random-source · seed-registry · slew-lag
   tool: eravos.analog-drift ← random-source + osc-noise + slew-lag + seed-registry
   build order: osc-noise → random-source → seed-registry → slew-lag → analog-drift
-  shared with: osc-noise 7 · random-source 6 · seed-registry 12 · slew-lag 10  (other tools on each)
+  shared with: osc-noise 7 · random-source 6 · seed-registry 13 · slew-lag 10  (other tools on each)

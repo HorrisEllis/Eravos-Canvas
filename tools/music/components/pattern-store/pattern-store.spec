@@ -4,7 +4,9 @@ identity:
   id: pattern-store ; group: events ; component tool: no (yes = also on the canvas with a window and typed ports)
   job: patterns as data: notes, steps, lanes; versioned, diffable
 used by: acid-line · arpeggio-evolution · arrangement-organism · baile-engine · bassline-writer · break-architect · chop-station · club-bounce · contrast-engine · counterpoint-engine · drop-compiler · dub-skank · elastic-arrangement · fill-generator · garage-skip · gesture-capture · harmony-architect · hat-roller · melody-organism · mpe-surface · polyrhythm-engine · psy-roller · rhythmic-tension-mapper · sonic-gravity
-inputs / outputs / limits: TO WRITE — signal types, control ranges, latency, cpu per instance
+inputs / outputs / limits (written 2026-11-06 for the Pattern Editor; was "TO WRITE — signal types, control ranges, latency, cpu per instance"): pattern { id, name, len (sixteenths), key?, notes [{ s, l, n | r, v, b?, k? }] (the Timeline's clip notes, unchanged), places [{ ref, at, xf { transpose, steps?, stretch, reverse, invert, every, chance, seed } }], tags, v }; Store() { put (a new version each save; old ones kept), get(id, v?), versions(id), list(filter), remove } · flatten(p, store, { depth ≤ 6, key?, rng? }) → notes (cycles refused) · grow(base, rule, depth) → pattern · diff(a, b) → { added, removed, changed } · toJSON/fromJSON (text, diffable)
+  stands on: —
+  status: building 2026-11-06 — proved on its own (pattern-store.test.mjs); new code
 rules:
   - never imports a tool; tools import it
   - every numeric control is a modulation destination unless marked fixed

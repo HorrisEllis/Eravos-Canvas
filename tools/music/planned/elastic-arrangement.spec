@@ -36,4 +36,4 @@ dag:
   layer 0: energy-curve · pattern-store · structure-segmenter · time-stretch
   tool: eravos.elastic-arrangement ← structure-segmenter + pattern-store + energy-curve + time-stretch
   build order: energy-curve → pattern-store → structure-segmenter → time-stretch → elastic-arrangement
-  shared with: energy-curve 8 · pattern-store 23 · structure-segmenter 3 · time-stretch 6  (other tools on each)
+  shared with: energy-curve 8 · pattern-store 24 · structure-segmenter 3 · time-stretch 6  (other tools on each)

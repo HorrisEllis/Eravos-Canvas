@@ -126,4 +126,4 @@ dag:
   layer 0: energy-curve · onset-detector · pattern-store · polymeter-cycle · probability-gate · seed-registry · spectral-features
   tool: eravos.contrast-engine ← pattern-store + polymeter-cycle + probability-gate + spectral-features + onset-detector + energy-curve + seed-registry
   build order: energy-curve → onset-detector → pattern-store → polymeter-cycle → probability-gate → seed-registry → spectral-features → contrast-engine
-  shared with: energy-curve 8 · onset-detector 12 · pattern-store 23 · polymeter-cycle 2 · probability-gate 9 · seed-registry 12 · spectral-features 14  (other tools on each)
+  shared with: energy-curve 8 · onset-detector 12 · pattern-store 24 · polymeter-cycle 2 · probability-gate 9 · seed-registry 13 · spectral-features 14  (other tools on each)

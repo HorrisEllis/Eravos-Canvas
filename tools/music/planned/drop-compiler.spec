@@ -36,4 +36,4 @@ dag:
   layer 0: energy-curve · pattern-store · state-machine-core · structure-segmenter · tension-meter
   tool: eravos.drop-compiler ← energy-curve + state-machine-core + pattern-store + tension-meter + structure-segmenter
   build order: energy-curve → pattern-store → state-machine-core → structure-segmenter → tension-meter → drop-compiler
-  shared with: energy-curve 8 · pattern-store 23 · state-machine-core 4 · structure-segmenter 3 · tension-meter 5  (other tools on each)
+  shared with: energy-curve 8 · pattern-store 24 · state-machine-core 4 · structure-segmenter 3 · tension-meter 5  (other tools on each)

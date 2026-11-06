@@ -36,4 +36,4 @@ dag:
   layer 0: preset-morph · random-source · seed-registry · spectral-features
   tool: eravos.timbre-genome ← preset-morph + seed-registry + spectral-features + random-source
   build order: preset-morph → random-source → seed-registry → spectral-features → timbre-genome
-  shared with: preset-morph 7 · random-source 6 · seed-registry 12 · spectral-features 14  (other tools on each)
+  shared with: preset-morph 7 · random-source 6 · seed-registry 13 · spectral-features 14  (other tools on each)

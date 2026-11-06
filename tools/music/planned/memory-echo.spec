@@ -36,4 +36,4 @@ dag:
   layer 0: delay-line · looper-buffer · markov-chain · pitch-shifter · seed-registry · transient-slicer
   tool: eravos.memory-echo ← delay-line + looper-buffer + transient-slicer + pitch-shifter + markov-chain + seed-registry
   build order: delay-line → looper-buffer → markov-chain → pitch-shifter → seed-registry → transient-slicer → memory-echo
-  shared with: delay-line 15 · looper-buffer 3 · markov-chain 3 · pitch-shifter 11 · seed-registry 12 · transient-slicer 5  (other tools on each)
+  shared with: delay-line 15 · looper-buffer 3 · markov-chain 3 · pitch-shifter 11 · seed-registry 13 · transient-slicer 5  (other tools on each)

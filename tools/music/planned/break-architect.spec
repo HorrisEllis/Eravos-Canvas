@@ -39,4 +39,4 @@ dag:
   layer 0: groove-template · onset-detector · pattern-store · ratchet · reverse-buffer · sampler-voice · time-stretch · transient-slicer
   tool: eravos.break-architect ← transient-slicer + onset-detector + sampler-voice + time-stretch + ratchet + reverse-buffer + pattern-store + groove-template
   build order: groove-template → onset-detector → pattern-store → ratchet → reverse-buffer → sampler-voice → time-stretch → transient-slicer → break-architect
-  shared with: groove-template 6 · onset-detector 12 · pattern-store 23 · ratchet 5 · reverse-buffer 2 · sampler-voice 14 · time-stretch 6 · transient-slicer 5  (other tools on each)
+  shared with: groove-template 6 · onset-detector 12 · pattern-store 24 · ratchet 5 · reverse-buffer 2 · sampler-voice 14 · time-stretch 6 · transient-slicer 5  (other tools on each)

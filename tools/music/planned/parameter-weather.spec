@@ -36,4 +36,4 @@ dag:
   layer 0: chaos-attractor · random-source · relationship-graph · seed-registry · slew-lag
   tool: eravos.parameter-weather ← chaos-attractor + random-source + slew-lag + relationship-graph + seed-registry
   build order: chaos-attractor → random-source → relationship-graph → seed-registry → slew-lag → parameter-weather
-  shared with: chaos-attractor 4 · random-source 6 · relationship-graph 12 · seed-registry 12 · slew-lag 10  (other tools on each)
+  shared with: chaos-attractor 4 · random-source 6 · relationship-graph 12 · seed-registry 13 · slew-lag 10  (other tools on each)

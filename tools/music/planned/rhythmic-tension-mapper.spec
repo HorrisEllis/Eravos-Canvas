@@ -40,4 +40,4 @@ dag:
   layer 0: energy-curve · onset-detector · pattern-store · probability-gate · tension-meter
   tool: eravos.rhythmic-tension-mapper ← onset-detector + pattern-store + tension-meter + probability-gate + energy-curve
   build order: energy-curve → onset-detector → pattern-store → probability-gate → tension-meter → rhythmic-tension-mapper
-  shared with: energy-curve 8 · onset-detector 12 · pattern-store 23 · probability-gate 9 · tension-meter 5  (other tools on each)
+  shared with: energy-curve 8 · onset-detector 12 · pattern-store 24 · probability-gate 9 · tension-meter 5  (other tools on each)

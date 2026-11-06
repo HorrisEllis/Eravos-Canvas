@@ -36,4 +36,4 @@ dag:
   layer 0: clipper · env-msseg · filter-svf ✓ · osc-sub · osc-va ✓ · scale-key · slew-lag · waveshaper
   tool: eravos.glide-808 ← osc-sub + osc-va + env-msseg + slew-lag + waveshaper + clipper + filter-svf + scale-key
   build order: clipper → env-msseg → filter-svf ✓ → osc-sub → osc-va ✓ → scale-key → slew-lag → waveshaper → glide-808
-  shared with: clipper 9 · env-msseg 14 · filter-svf 40 · osc-sub 10 · osc-va 26 · scale-key 12 · slew-lag 10 · waveshaper 22  (other tools on each)
+  shared with: clipper 9 · env-msseg 14 · filter-svf 40 · osc-sub 10 · osc-va 26 · scale-key 13 · slew-lag 10 · waveshaper 22  (other tools on each)

@@ -40,4 +40,4 @@ dag:
   layer 0: chord-engine · pattern-store · scale-key · tension-meter · voice-leader
   tool: eravos.harmony-architect ← chord-engine + voice-leader + scale-key + tension-meter + pattern-store
   build order: chord-engine → pattern-store → scale-key → tension-meter → voice-leader → harmony-architect
-  shared with: chord-engine 4 · pattern-store 23 · scale-key 12 · tension-meter 5 · voice-leader 1  (other tools on each)
+  shared with: chord-engine 4 · pattern-store 24 · scale-key 13 · tension-meter 5 · voice-leader 1  (other tools on each)

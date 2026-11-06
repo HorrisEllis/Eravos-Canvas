@@ -36,4 +36,4 @@ dag:
   layer 0: chord-engine · groove-template · markov-chain · onset-detector · pattern-store · scale-key
   tool: eravos.bassline-writer ← chord-engine + scale-key + pattern-store + onset-detector + groove-template + markov-chain
   build order: chord-engine → groove-template → markov-chain → onset-detector → pattern-store → scale-key → bassline-writer
-  shared with: chord-engine 4 · groove-template 6 · markov-chain 3 · onset-detector 12 · pattern-store 23 · scale-key 12  (other tools on each)
+  shared with: chord-engine 4 · groove-template 6 · markov-chain 3 · onset-detector 12 · pattern-store 24 · scale-key 13  (other tools on each)

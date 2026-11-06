@@ -39,4 +39,4 @@ dag:
   layer 0: clock-div · note-follow · pattern-store · probability-gate · ratchet · scale-key
   tool: eravos.arpeggio-evolution ← pattern-store + probability-gate + ratchet + clock-div + scale-key + note-follow
   build order: clock-div → note-follow → pattern-store → probability-gate → ratchet → scale-key → arpeggio-evolution
-  shared with: clock-div 6 · note-follow 1 · pattern-store 23 · probability-gate 9 · ratchet 5 · scale-key 12  (other tools on each)
+  shared with: clock-div 6 · note-follow 1 · pattern-store 24 · probability-gate 9 · ratchet 5 · scale-key 13  (other tools on each)

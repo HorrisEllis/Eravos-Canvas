@@ -36,4 +36,4 @@ dag:
   layer 0: clock-div · env-adsr ✓ · pattern-store · probability-gate · ratchet · sampler-voice
   tool: eravos.hat-roller ← ratchet + probability-gate + pattern-store + sampler-voice + env-adsr + clock-div
   build order: clock-div → env-adsr ✓ → pattern-store → probability-gate → ratchet → sampler-voice → hat-roller
-  shared with: clock-div 6 · env-adsr 20 · pattern-store 23 · probability-gate 9 · ratchet 5 · sampler-voice 14  (other tools on each)
+  shared with: clock-div 6 · env-adsr 20 · pattern-store 24 · probability-gate 9 · ratchet 5 · sampler-voice 14  (other tools on each)

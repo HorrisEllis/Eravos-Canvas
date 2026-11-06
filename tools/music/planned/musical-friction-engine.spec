@@ -40,4 +40,4 @@ dag:
   layer 0: contour-generator · filter-allpass-chain · polymeter-cycle · scale-key · tension-meter
   tool: eravos.musical-friction-engine ← polymeter-cycle + contour-generator + scale-key + filter-allpass-chain + tension-meter
   build order: contour-generator → filter-allpass-chain → polymeter-cycle → scale-key → tension-meter → musical-friction-engine
-  shared with: contour-generator 3 · filter-allpass-chain 5 · polymeter-cycle 2 · scale-key 12 · tension-meter 5  (other tools on each)
+  shared with: contour-generator 3 · filter-allpass-chain 5 · polymeter-cycle 2 · scale-key 13 · tension-meter 5  (other tools on each)

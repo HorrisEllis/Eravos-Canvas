@@ -39,4 +39,4 @@ dag:
   layer 0: clock-div · euclid-generator · pattern-store · polymeter-cycle · probability-gate · ratchet
   tool: eravos.polyrhythm-engine ← euclid-generator + polymeter-cycle + clock-div + probability-gate + pattern-store + ratchet
   build order: clock-div → euclid-generator → pattern-store → polymeter-cycle → probability-gate → ratchet → polyrhythm-engine
-  shared with: clock-div 6 · euclid-generator 0 · pattern-store 23 · polymeter-cycle 2 · probability-gate 9 · ratchet 5  (other tools on each)
+  shared with: clock-div 6 · euclid-generator 0 · pattern-store 24 · polymeter-cycle 2 · probability-gate 9 · ratchet 5  (other tools on each)

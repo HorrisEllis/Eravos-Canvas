@@ -36,4 +36,4 @@ dag:
   layer 0: latency-compensator · looper-buffer · seed-registry
   tool: eravos.live-commit ← looper-buffer + latency-compensator + seed-registry
   build order: latency-compensator → looper-buffer → seed-registry → live-commit
-  shared with: latency-compensator 0 · looper-buffer 3 · seed-registry 12  (other tools on each)
+  shared with: latency-compensator 0 · looper-buffer 3 · seed-registry 13  (other tools on each)

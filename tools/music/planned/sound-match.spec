@@ -36,4 +36,4 @@ dag:
   layer 0: loudness-meter · modulation-estimator · onset-detector · pitch-tracker · seed-registry · spectral-features
   tool: eravos.sound-match ← spectral-features + loudness-meter + pitch-tracker + onset-detector + modulation-estimator + seed-registry
   build order: loudness-meter → modulation-estimator → onset-detector → pitch-tracker → seed-registry → spectral-features → sound-match
-  shared with: loudness-meter 5 · modulation-estimator 2 · onset-detector 12 · pitch-tracker 5 · seed-registry 12 · spectral-features 14  (other tools on each)
+  shared with: loudness-meter 5 · modulation-estimator 2 · onset-detector 12 · pitch-tracker 5 · seed-registry 13 · spectral-features 14  (other tools on each)

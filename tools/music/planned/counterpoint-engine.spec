@@ -36,4 +36,4 @@ dag:
   layer 0: contour-generator · motif-store · pattern-store · scale-key · voice-leader
   tool: eravos.counterpoint-engine ← voice-leader + motif-store + scale-key + contour-generator + pattern-store
   build order: contour-generator → motif-store → pattern-store → scale-key → voice-leader → counterpoint-engine
-  shared with: contour-generator 3 · motif-store 2 · pattern-store 23 · scale-key 12 · voice-leader 1  (other tools on each)
+  shared with: contour-generator 3 · motif-store 2 · pattern-store 24 · scale-key 13 · voice-leader 1  (other tools on each)

@@ -36,4 +36,4 @@ dag:
   layer 0: energy-curve · random-source · relationship-graph · seed-registry
   tool: eravos.entropy-budget ← seed-registry + energy-curve + random-source + relationship-graph
   build order: energy-curve → random-source → relationship-graph → seed-registry → entropy-budget
-  shared with: energy-curve 8 · random-source 6 · relationship-graph 12 · seed-registry 12  (other tools on each)
+  shared with: energy-curve 8 · random-source 6 · relationship-graph 12 · seed-registry 13  (other tools on each)
