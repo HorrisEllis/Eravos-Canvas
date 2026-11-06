@@ -28,7 +28,7 @@ if (!items.length) { console.error('no fingerprints in ' + src + ' (run tests/to
 const D = items[0].v.length, lo = new Array(D).fill(Infinity), hi = new Array(D).fill(-Infinity);
 items.forEach(it => it.v.forEach((x, i) => { lo[i] = Math.min(lo[i], x); hi[i] = Math.max(hi[i], x); }));
 items.forEach(it => { it.n = it.v.map((x, i) => hi[i] > lo[i] ? (x - lo[i]) / (hi[i] - lo[i]) : 0); });
-const groups = [[0, NB], [NB, NB + 5], [NB + 5, D]];
+const groups = [[0, NB], [NB, NB + 5], [NB + 5, NB + 9], [NB + 9, D]];   // tone colour · tone shape · envelope · motion (3.144)
 function dist(a, b) { let s = 0; for (const [g0, g1] of groups) { let q = 0; for (let i = g0; i < g1; i++) q += (a.n[i] - b.n[i]) ** 2; s += q / (g1 - g0) / groups.length; } return Math.sqrt(s); }
 // calibration: CLOSE = as close as two DIFFERENT presets of ONE tool usually are (the median, over every tool, of each preset's nearest
 // preset in its own tool) — "this sound is no further from that one than a tool's presets are from each other"; TWIN = half of it

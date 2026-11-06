@@ -133,6 +133,26 @@
                         "minimum": -1,
                         "maximum": 1
                       },
+                      "restless": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "form": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 4
+                      },
+                      "fieldFm": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "cohTone": {
+                        "type": "number",
+                        "minimum": -1,
+                        "maximum": 1
+                      },
                       "width": {
                         "type": "number",
                         "minimum": 0,

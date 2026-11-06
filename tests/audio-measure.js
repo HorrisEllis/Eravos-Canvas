@@ -153,9 +153,17 @@
     // the envelope: 10 ms RMS steps
     const step = Math.max(1, Math.round(sr * 0.01)), env = []; for (let a = s0; a + step <= s1; a += step) { let q = 0; for (let i = a; i < a + step; i++) q += d[i] * d[i]; env.push(Math.sqrt(q / step)); }
     const pk = Math.max(1e-9, ...env), ip = env.findIndex(x => x >= 0.9 * pk), envDb = env.map(x => db(Math.max(x, pk * 1e-5)) - db(pk));
+    // motion (3.144, N2): how FAST the tone and the level move — swings a second apart vs beating many times a second. Each series
+    // (the centroid per frame, the level per 10 ms after the attack) loses its straight-line trend; a swing is counted when it
+    // crosses back past ±(a quarter of its spread), so noise in a still sound counts nothing; log10 of swings a second (0.1…30)
+    const rate = (a, dt) => { const n = a.length; if (n < 8) return -1; let sx = 0, sy = 0, sxy = 0, sxx = 0; for (let i = 0; i < n; i++) { sx += i; sy += a[i]; sxy += i * a[i]; sxx += i * i; }
+      const b1 = (n * sxy - sx * sy) / Math.max(1e-12, n * sxx - sx * sx), b0 = (sy - b1 * sx) / n, r = a.map((y, i) => y - b0 - b1 * i), th = Math.max(1e-9, sd(r) * 0.25);
+      let side = 0, sw = 0; for (const x of r) { const s2 = x > th ? 1 : x < -th ? -1 : 0; if (s2 && s2 !== side) { if (side) sw++; side = s2; } } return Math.log10(Math.min(30, Math.max(0.1, sw / 2 / (n * dt)))); };
+    const still = (a, eps) => sd(a) < eps;
+    const cRate = still(cents, 0.01) ? -1 : rate(cents, hop / sr), sus = envDb.slice(ip > 0 ? ip : 0), lRate = still(sus, 0.25) ? -1 : rate(sus, step / sr);
     const v = [].concat(Array.from(band, x => db(Math.max(1e-6, x / Math.max(1, frames)))),
-      [mu(cents), sd(cents), mu(flats), sd(flats), mu(fluxes), Math.log10(Math.max(0.001, ip * 0.01)), envDb[Math.floor(envDb.length / 2)] || 0, envDb[envDb.length - 1] || 0, sd(envDb.slice(ip > 0 ? ip : 0))]);
-    return { v, frames, names: Array.from({ length: FP_BANDS }, (_, b) => 'band' + b).concat(['centroid', 'centroidMove', 'flatness', 'flatnessMove', 'flux', 'attack', 'midDb', 'endDb', 'levelMove']) };
+      [mu(cents), sd(cents), mu(flats), sd(flats), mu(fluxes), Math.log10(Math.max(0.001, ip * 0.01)), envDb[Math.floor(envDb.length / 2)] || 0, envDb[envDb.length - 1] || 0, sd(envDb.slice(ip > 0 ? ip : 0)), cRate, lRate]);
+    return { v, frames, names: Array.from({ length: FP_BANDS }, (_, b) => 'band' + b).concat(['centroid', 'centroidMove', 'flatness', 'flatnessMove', 'flux', 'attack', 'midDb', 'endDb', 'levelMove', 'centroidRate', 'levelRate']) };
   }
   global.AudioMeasure = { db, scan, rms, mean, pitch, cents, foldCents, midiHz, onsets, gridError, modRate, correlation, fingerprint };
 })(typeof window !== 'undefined' ? window : globalThis);

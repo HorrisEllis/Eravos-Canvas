@@ -1,4 +1,4 @@
-# spec_id: eravos.component.oscillator-population · version 0.1.0 · status planned · template eravos.component/1
+# spec_id: eravos.component.oscillator-population · version 1.1.0 · status built (1.1 2026-11-06; was 0.1.0 planned) · template eravos.component/1
 # generated from eravos.music-ecosystem.spec v0.2.0 §3 — rule: eravos.components.spec (small, on its own, documented, shared)
 identity:
   id: oscillator-population ; group: sources ; component tool: yes (yes = also on the canvas with a window and typed ports)
@@ -15,3 +15,15 @@ acceptance:
   - its numbers proved on its own (frequency response, ranges, timing) in <id>.test.js
   - every tool that assembles it still nulls after any change to it
   - cpu measured and recorded in eravos.performance.spec
+
+# ---- ADDENDUM 2026-11-06 — kernel 1.1 (N2, Swarm made new; nothing above is changed)
+#   his words: "The swarm doesn't seem like anything new sound wise." · "Lets focus on getting tools more novel from each other"
+#   set() gains three behaviours, each 0 by default — at 0 the kernel is bit-identical to 1.0 (fixtures/oscillator-population-1.0.js,
+#   checked sample for sample in the test):
+#     restless 0…1  locked (R > 0.92) → a seeded kick in pitch (±90 cents × restless, never a phase jump: it clicks); for the first half
+#                   of a cool-down (0.5…3 s, shorter when higher) the coupling rests at 12 %, then draws the swarm back — it breathes
+#     form ≥ 0 s    harmonic mode: the ratios glide to their cluster target (one-pole, `form` seconds); configure() starts them at 1, so
+#                   each note blooms from one pitch into its chord
+#     fm 0…1        phase(i) is modulated by the swarm's mean sine (my), up to 0.3 cycle × ratio — feedback-FM brightness when locked,
+#                   cross-modulation when apart; the pitch is kept (dt is the unmodulated step)
+#   proof: oscillator-population.test.mjs 24 checks (bit-identical at defaults; restless cycles; form glide; fm brightens > 2×, bounded)

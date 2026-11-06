@@ -10,7 +10,7 @@ OrganismFactory.reg('eravos.swarm-oscillator', function (view) {
   // silent: the population component itself, here, with the current settings (a slow f0 so the motion is visible)
   const sim = MP.POP(32); let simKey = '';
   const simSync = () => { const s = st(), k = [s.voices, s.spread, s.mode, s.coupling, s.pull, s.drift, s.cluster].join(); if (k === simKey) return; simKey = k;
-    sim.configure(s.voices || 9, (s.spread === undefined ? 0.35 : s.spread) * 50, 5); sim.set({ mode: Math.max(0, MODES.indexOf(s.mode)), coupling: s.coupling, pull: s.pull, drift: s.drift, cluster: s.cluster }); };
+    sim.configure(s.voices || 9, (s.spread === undefined ? 0.35 : s.spread) * 50, 5); sim.set({ mode: Math.max(0, MODES.indexOf(s.mode)), coupling: s.coupling, pull: s.pull, drift: s.drift, cluster: s.cluster, restless: s.restless || 0, form: s.form || 0, fm: s.fieldFm || 0 }); };
   const cv = UI.Canvas(520, 120);
   UI.loop(cv, () => {
     const g = cv.g; cv.fit(); const W = cv.W, H = 120;
@@ -37,8 +37,8 @@ OrganismFactory.reg('eravos.swarm-oscillator', function (view) {
   const card = (title, keys) => h('div', { class: 'uk-group' }, [h('div', { class: 'uk-group-title', text: title }), h('div', { class: 'uk-row' }, keys.map(ctl))]);
   const face = h('div', { class: 'uk-panel' }, [card('SWARM', ['voices', 'spread', 'coupling', 'cluster']), card('TONE', ['cutoff', 'res', 'attack', 'release']), card('OUT', ['width', 'level'])]);
   const deepBox = h('div', { class: 'uk-panel', style: { display: 'none' } }, [   // display, not [hidden]: .uk-panel's own display wins over the attribute
-   card('SWARM+', ['pull', 'drift']), card('OSC+', ['table', 'sub', 'octave']), card('FILTER+ / AMP+', ['envAmt', 'decay', 'sustain']), card('MOVE', ['lfoRate', 'lfoCouple']), card('OUT+', ['monoBelow'])]);
-  const deepB = UI.Button({ label: 'More depth ▸', hint: 'pull, drift, wavetable, sub, octave, filter envelope, decay / sustain, a movement on the pull, mono low end', onClick: () => { const open = deepBox.style.display === 'none'; deepBox.style.display = open ? '' : 'none'; deepB.set(open ? 'More depth ▾' : 'More depth ▸'); } });
+   card('SWARM+', ['pull', 'drift']), card('OSC+', ['table', 'sub', 'octave']), card('FILTER+ / AMP+', ['envAmt', 'decay', 'sustain']), card('MOVE', ['lfoRate', 'lfoCouple']), card('LIFE', ['restless', 'form', 'fieldFm', 'cohTone']), card('OUT+', ['monoBelow'])]);
+  const deepB = UI.Button({ label: 'More depth ▸', hint: 'pull, drift, restless, form glide, field FM, lock → tone, wavetable, sub, octave, filter envelope, decay / sustain, a movement on the pull, mono low end', onClick: () => { const open = deepBox.style.display === 'none'; deepBox.style.display = open ? '' : 'none'; deepB.set(open ? 'More depth ▾' : 'More depth ▸'); } });
   UI.instrumentPanel(view, { color: '#8a5cff', low: 48, high: 72, height: 56,
     header: [sel('mode')],
     top: [cv, h('div', { class: 'org-row', style: { gap: '6px', flexWrap: 'wrap' } }, [h('span', { class: 'org-label', text: 'OSC' }), sel('shape'), h('span', { class: 'org-label', text: 'LOCK' }), sel('sync')])],
@@ -47,7 +47,7 @@ OrganismFactory.reg('eravos.swarm-oscillator', function (view) {
     hint: 'Coupling pulls the voices together: low = a loose supersaw, high = one locked wave. Cluster settles them on 3rds, 5ths and octaves. Lock on beat snaps them in phase on the grid. Coherence out moves any knob.' });
   // dynamic: a control that does nothing in this state dims and says why
   const RULES = [['coupling', 'mode', (v) => v !== 'free', 'free: the voices do not pull on each other'], ['pull', 'mode', (v) => v !== 'free', 'free: no pull'], ['lfoCouple', 'mode', (v) => v !== 'free', 'free: no pull to move'],
-    ['cluster', 'mode', (v) => v === 'harmonic', 'Cluster works in harmonic mode'], ['table', 'shape', (v) => v === 'table', 'Table works with the table shape']];
+    ['cluster', 'mode', (v) => v === 'harmonic', 'Cluster works in harmonic mode'], ['table', 'shape', (v) => v === 'table', 'Table works with the table shape'], ['form', 'mode', (v) => v === 'harmonic', 'Form glide works in harmonic mode'], ['restless', 'mode', (v) => v !== 'free', 'free: nothing locks, so nothing bursts']];
   const dim = () => RULES.forEach(([k, sw, ok, why]) => { const el = view.root.querySelector(`[data-key="${k}"]`); if (!el) return; const v = st()[sw] !== undefined ? st()[sw] : cfg(sw).default, on = ok(v); el.style.opacity = on ? '' : '0.35'; el.title = on ? '' : '⏸ ' + why; });
   [...new Set(RULES.map(r => r[1]))].forEach(sw => view.bind && view.bind(sw, () => setTimeout(dim, 0))); setTimeout(dim, 0);
 });

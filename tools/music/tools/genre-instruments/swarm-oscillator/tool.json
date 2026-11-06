@@ -40,7 +40,8 @@
       "presets"
     ],
     "shipped": [
-      "factory"
+      "factory",
+      "living"
     ]
   },
   "works_with": [

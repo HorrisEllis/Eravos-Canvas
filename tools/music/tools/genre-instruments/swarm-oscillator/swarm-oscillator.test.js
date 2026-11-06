@@ -42,8 +42,34 @@ describe('Swarm Oscillator — the swarm plays, locks, and says how locked it is
     assert.ok(Array.from(rec.hooks.values()).some(hk => hk.direction === 'in' && hk.event_type === 'note:trigger'), 'an instrument (the Timeline lists it)');
     const d = OrganismFactory.def('eravos.swarm-oscillator'); assert.ok(d.hooks.some(h => h.hook_id === 'so.hook.coherence' && h.direction === 'out'), 'Coherence out');
     const own = new Set(['coupling', 'cutoff']), moved = (k) => own.has(k) || d.hooks.some(h => h.hook_id === 'knob.' + k);   // coupling and cutoff have their own audio-rate inputs
-    const mine = ['mode', 'voices', 'spread', 'coupling', 'pull', 'drift', 'cluster', 'sync', 'shape', 'table', 'sub', 'octave', 'cutoff', 'res', 'envAmt', 'attack', 'decay', 'sustain', 'release', 'lfoRate', 'lfoCouple', 'width', 'monoBelow', 'level'];
+    const mine = ['mode', 'voices', 'spread', 'coupling', 'pull', 'drift', 'cluster', 'sync', 'shape', 'table', 'sub', 'octave', 'cutoff', 'res', 'envAmt', 'attack', 'decay', 'sustain', 'release', 'lfoRate', 'lfoCouple', 'width', 'monoBelow', 'level', 'restless', 'form', 'fieldFm', 'cohTone'];
     assert.deepEqual(mine.filter(k => !moved(k)), [], 'every one of its controls can be moved by another tool');
+  });
+});
+describe('Swarm Oscillator — Life (1.1): it moves on its own, and sounds like no stack', () => {
+  async function play(params, sec) {
+    const sr = 22050, ctx = new OfflineAudioContext(2, Math.ceil(sec * sr), sr);
+    const K = Kernel.create({ ctx, quiet: true, syncIR: true }); MasterTransport.create(K, { offline: true, bpm: 120 }).boot();
+    const a = OrganismFactory.spawn('eravos.swarm-oscillator', { K, headless: true }), c = OrganismFactory.handle(a).ctx;
+    Object.entries(params).forEach(([k, v]) => c.params.set(k, v)); await c.internals.ready; K.audio.chain.out.gain.value = 0;
+    const ps = K.audio.ports(a), au = ps.find(x => x.kind === 'audio' && x.direction === 'out'), cp = ps.find(x => x.kind === 'mod' && x.label === 'coherence');
+    const dst = ctx.createChannelMerger(2); au.node.connect(dst, 0, 0); cp.node.connect(dst, 0, 1); dst.connect(ctx.destination);
+    c.internals.on(57, 0.9, 0.02, sec - 0.3); const b = await ctx.startRendering(); return { audio: b.getChannelData(0), coh: b.getChannelData(1), sr };
+  }
+  const base = { mode: 'coupled', voices: 12, spread: 0.5, coupling: 0.9, pull: 0.4, drift: 0.1, cutoff: 16000, res: 0, envAmt: 0, sustain: 1 };
+  it('Restless: once locked it bursts apart and comes back — the coherence swings again and again (still without it)', async () => {
+    const swing = (r) => { let lo = 1, hi = 0; for (let i = Math.floor(1.5 * r.sr); i < Math.floor(5.5 * r.sr); i += 64) { lo = Math.min(lo, r.coh[i]); hi = Math.max(hi, r.coh[i]); } return hi - lo; };
+    const calm = await play(base, 6), live = await play(Object.assign({}, base, { restless: 0.8 }), 6);
+    assert.lt(swing(calm), 0.15, 'without Restless, once locked it stays: swing ' + swing(calm).toFixed(2)); assert.gt(swing(live), 0.3, 'Restless: swing ' + swing(live).toFixed(2));
+  });
+  it('Field FM: the swarm’s own sum bends its voices — brighter (more high-frequency energy), the pitch kept', async () => {
+    const tri = Object.assign({}, base, { shape: 'tri' }), bright = (r) => { const a = Math.floor(1 * r.sr), b = Math.floor(2 * r.sr); let s = 0, d = 0; for (let i = a; i < b; i++) { s += r.audio[i] ** 2; d += (r.audio[i] - r.audio[i - 1]) ** 2; } return Math.sqrt(d / s); };
+    const off = await play(tri, 2.3), on = await play(Object.assign({}, tri, { fieldFm: 1 }), 2.3);
+    assert.gt(bright(on), bright(off) * 1.5, 'brightness ' + bright(off).toFixed(3) + ' → ' + bright(on).toFixed(3));
+  });
+  it('the Living presets play clean', async () => {
+    const d = OrganismFactory.def('eravos.swarm-oscillator'), names = ['Breathing Swarm', 'Blooming Chord', 'Metal Swarm', 'Growl Cloud', 'Tide Lock', 'Shatter Bloom'];
+    for (const n of names) { assert.ok(d.presets[n], n + ' is shipped'); }
   });
 });
 describe('Swarm Oscillator — headroom', () => {

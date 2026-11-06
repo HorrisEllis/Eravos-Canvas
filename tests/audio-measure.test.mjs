@@ -63,4 +63,14 @@ for (const [div, hz] of [['1/4', 140 / 60], ['1/8', 140 / 60 * 2], ['1/16', 140 
   check(f0.every((x, i) => Math.abs(x - fq[i]) < 1e-6), 'the fingerprint does not depend on the level');
   const am = gen(2, t => 0.5 * (1 + 0.9 * Math.sin(2 * Math.PI * 4 * t)) * Math.sin(2 * Math.PI * 440 * t)), fa = F(am);
   check(fa.levelMove > fs.levelMove + 3, `loudness movement: a 4 Hz tremolo ${fa.levelMove.toFixed(1)} dB, a steady note ${fs.levelMove.toFixed(1)}`); }
+// motion (3.144): how fast it moves, not only how much — a slow swell vs fast beating; a still note counts as still
+{ const F = (d) => { const f = M.fingerprint(d, SR, 0, 4); return Object.fromEntries(f.names.map((n, i) => [n, f.v[i]])); };
+  const still = F(gen(4, t => 0.5 * Math.sin(2 * Math.PI * 440 * t)));
+  const slow = F(gen(4, t => 0.5 * (1 + 0.8 * Math.sin(2 * Math.PI * 0.75 * t)) * Math.sin(2 * Math.PI * 440 * t)));
+  const fast = F(gen(4, t => 0.5 * (1 + 0.8 * Math.sin(2 * Math.PI * 7 * t)) * Math.sin(2 * Math.PI * 440 * t)));
+  check(still.levelRate === -1 && still.centroidRate === -1, `a still note: no motion (level ${still.levelRate}, tone ${still.centroidRate})`);
+  check(Math.abs(slow.levelRate - Math.log10(0.75)) < 0.15 && Math.abs(fast.levelRate - Math.log10(7)) < 0.15, `level rate: a 0.75 Hz swell reads ${(10 ** slow.levelRate).toFixed(2)} Hz, a 7 Hz beat ${(10 ** fast.levelRate).toFixed(2)} Hz`);
+  const sweep = (r) => { let ph = 0; return gen(4, t => { const f = 600 * Math.pow(2, 1.5 * Math.sin(2 * Math.PI * r * t)); ph += f / SR; return 0.5 * Math.sin(2 * Math.PI * ph); }); };
+  const s1 = F(sweep(0.5)), s2 = F(sweep(3));
+  check(Math.abs(s1.centroidRate - Math.log10(0.5)) < 0.2 && Math.abs(s2.centroidRate - Math.log10(3)) < 0.2, `tone rate: a 0.5 Hz sweep reads ${(10 ** s1.centroidRate).toFixed(2)} Hz, a 3 Hz one ${(10 ** s2.centroidRate).toFixed(2)} Hz`); }
 console.log(`${pass}/${pass + fail} instrument checks passed`); process.exit(fail ? 1 : 0);
