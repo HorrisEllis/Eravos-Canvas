@@ -71,6 +71,16 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-06 · Tape Memory — a lofi tape effect built from its parts
+- **His words:** "i also want to be able to make lofi" (2026-11-05) · "Lofi tools: UI previews first." · "yes" (2026-11-06).
+- **His call:** spec and UI preview approved first; the tool built from its seven components, each already proven.
+- **Built:** an effect that puts the whole sound on worn tape — four machines, wear and copies of copies, wow, flutter, varispeed, hiss,
+  crackle, dropouts, tape stop — wired from shared parts with every timed value an audio parameter, its approved face, two packs, and a
+  place over the whole mix in the Lofi setup.
+- **Proof:** 8 in-app tests measuring the audio (latency, pitch, level, pitch movement, varispeed, silence vs. dust, tape stop, dropouts, every
+  preset under full scale); the design check clean on all six rules; played in the app with no faults.
+- **Check:** `node tests/run.mjs "Tape Memory"` · Start › SETUPS › Lofi
+
 ### 2026-11-06 · The parts of worn tape, proved on their own — random-source, tape-transport, bitcrusher, saturator-tape
 - **His words:** "i also want to be able to make lofi" (2026-11-05) · "yes" (2026-11-06, to Tape Memory).
 - **His call:** Tape Memory built bottom up — its missing components first, each proving its own numbers (Axioms 2, 8).

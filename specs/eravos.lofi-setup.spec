@@ -47,3 +47,7 @@ built:
     parts' levels could come down — open)
 proof: tests/p132-lofi-setup.test.js 3/3; P119 (8 setups), Chords 12/12, Bassline 16/16, Groove, Echo, Filter, Sidechain, Deep Sub,
   Retro Poly, Drum Machine, Destroyer, boundary 10/10; progression component 14,884 checks; validate 244 manifests
+
+# ---- ADDENDUM 2026-11-06 · Tape Memory joins (3.135) — everything above kept
+tape: eravos.tape-memory over the whole mix (Destroyer and Sidechain → Tape Memory → out); DUST also moves its Wear (0.15–0.8); scenes use its
+  Lofi pack (Lofi Study / Rainy / Late Night). The Piano still to come (replaces Retro Poly as keys).

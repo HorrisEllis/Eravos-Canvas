@@ -88,6 +88,7 @@
     "eravos.syn-env",
     "eravos.syn-osc",
     "eravos.syn-partials",
+    "eravos.tape-memory",
     "eravos.wobble-bass",
     "eravos.wub-filter",
     "eravos.wub-osc",

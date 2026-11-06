@@ -98,6 +98,7 @@
     "eravos.swarm-oscillator",
     "eravos.syn-env",
     "eravos.syn-partials",
+    "eravos.tape-memory",
     "eravos.timeline",
     "eravos.wobble-bass",
     "eravos.wub-filter",

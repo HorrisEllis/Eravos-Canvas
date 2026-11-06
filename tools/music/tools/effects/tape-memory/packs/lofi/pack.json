@@ -1,0 +1,69 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "tape-memory.lofi",
+ "version": "1.0.0",
+ "label": "Lofi",
+ "prefix": "",
+ "author": "ERAVOS",
+ "tags": [
+  "lofi",
+  "chill"
+ ],
+ "for": "eravos.tape-memory",
+ "enabled": true,
+ "items": {
+  "eravos.tape-memory": {
+   "presets": {
+    "Lofi Study": {
+     "params": {
+      "mode": "cassette",
+      "wear": 0.3,
+      "generation": 2,
+      "wow": 0.25,
+      "flutter": 0.15,
+      "hiss": 0.18,
+      "crackle": 0.15,
+      "dropouts": 0.03,
+      "lowCut": 50,
+      "highCut": 8000,
+      "drive": 0.3,
+      "mix": 1
+     }
+    },
+    "Lofi Rainy": {
+     "params": {
+      "mode": "cassette",
+      "wear": 0.45,
+      "generation": 3,
+      "wow": 0.35,
+      "flutter": 0.2,
+      "hiss": 0.25,
+      "crackle": 0.25,
+      "dropouts": 0.05,
+      "lowCut": 60,
+      "highCut": 6000,
+      "drive": 0.35,
+      "mix": 1
+     }
+    },
+    "Lofi Late Night": {
+     "params": {
+      "mode": "reel",
+      "wear": 0.4,
+      "generation": 2,
+      "wow": 0.4,
+      "flutter": 0.12,
+      "speed": 0.97,
+      "hiss": 0.2,
+      "crackle": 0.2,
+      "dropouts": 0.04,
+      "lowCut": 40,
+      "highCut": 6500,
+      "drive": 0.35,
+      "mix": 1
+     }
+    }
+   }
+  }
+ }
+}
