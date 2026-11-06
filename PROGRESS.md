@@ -2,6 +2,17 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.122 Suites on the Timeline · slide across keys · zoomed-out draws less · 3 px borders · v0.2.9 (2026-11-06)
+Asked: "some tools can't be added to the timeline. Like the suites … dragging down the piano keys for tools. Like lazy loading. Zooming
+out decreases resolution … the button border width … a couple of pixels wider". Per-tool skins: a preview first (not built).
+- suite-hub: note_in + note_out; a note goes to its member voices (parts not notes: false, not mods, that take notes). It forwarded
+  nothing at first: a tool may only send through a declared out hook (RUNTIME_002). MIDI forwarding left out (no midi_out: held keys
+  would not sustain).
+- UI.Keyboard: pointermove while held plays each key reached (the one before lets go).
+- UI.loop: inside #world, under 60 % zoom ≤ 24 fps, under 35 % ≤ 8 (docked windows not).
+- Borders 3 px on every button/switch; box-sizing border-box and a :where margin −1.5 px keep every footprint (P23 caught the rows wrapping).
+- Tests P122, P122b. Full 1400/1403 (P82, rim, P70: main's).
+
 ## Done — 3.121 WASD · middle-drag works on Windows · Graphics levels · v0.2.8 (2026-11-06)
 Asked: "wasd to navigate. Hold middle mouse and drag to move. Having major performance issues. Like with bassline or arp. Maybe add a
 graphic settings for low end hardware."

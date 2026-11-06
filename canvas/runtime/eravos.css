@@ -998,3 +998,8 @@ html[data-tool-borders="on"] .wm-win.wm-snap { outline-color: var(--acc, #00d4ff
 /* 3.121 Settings › Graphics (canvas-prefs.js): what the screen draws on slower machines. High = as designed (the default). */
 html[data-gfx="balanced"] *, html[data-gfx="low"] * { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
 html[data-gfx="low"] * { box-shadow: none !important; text-shadow: none !important; filter: none !important; transition: none !important; animation: none !important; }
+/* 3.122 "the button border width … just a couple of pixels wider, because it looks bad": every button's and switch's border is 3 px
+ * in every theme and button style (a style with no border stays without one: only the width changes) */
+:is(.uk-btn, .tb-btn, .uk-toggle, .tp-btn, .ap-btn, .sbk-chip, .sbk-alt, .fl-btn, .uk-seg, .uk-select) { border-width: 3px !important; box-sizing: border-box; }
+/* the thicker border takes no extra room: rows keep their height */
+:where(.uk-btn, .uk-toggle, .tp-btn, .ap-btn, .sbk-chip, .sbk-alt, .fl-btn, .uk-seg, .uk-select) { margin: -1.5px; }   /* :where — a button with its own margin keeps it */

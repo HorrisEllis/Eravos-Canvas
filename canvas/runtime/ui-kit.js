@@ -348,7 +348,9 @@
     let last = 0, alive = true, observed = false;
     // reduced motion (OS setting): displays still update, but calmly — at most 8 redraws a second
     // 3.121 Settings › Graphics: Balanced = at most 30 redraws a second, Low = 15 (read each frame, so a change applies at once)
-    const gfxDt = () => { const g = doc.documentElement.dataset.gfx; return g === 'low' ? 1000 / 15 : g === 'balanced' ? 1000 / 30 : 0; };
+    // 3.122 zoomed out the windows are small, so their displays need less: under 60 % zoom at most 24 redraws a second, under 35 % 8
+    const zoomDt = () => { const z = global.CanvasWM && global.CanvasWM.view ? global.CanvasWM.view.z || 1 : 1; return z < 0.35 ? 1000 / 8 : z < 0.6 ? 1000 / 24 : 0; };
+    const gfxDt = () => { const g = doc.documentElement.dataset.gfx; return Math.max(g === 'low' ? 1000 / 15 : g === 'balanced' ? 1000 / 30 : 0, el.closest && el.closest('#world') ? zoomDt() : 0); };
     const baseDt = Math.max(fps ? 1000 / fps : 0, reduceMotion() ? 125 : 0);
     function frame(t) {
       if (!alive) return;
