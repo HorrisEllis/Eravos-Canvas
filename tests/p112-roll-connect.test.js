@@ -133,4 +133,16 @@ describe('P112 · piano roll: Connect edges · its own window', () => {
     const r2 = play([{ s: 0, l: 1, n: 40, v: 0.9, pr: 0.5 }], 16 * 16, rep), c1 = r2.length - r2.again, c2 = r2.again;
     assert.ok(c1 > 3 && c1 < 13, 'half the time over 16 passes: ' + c1); assert.equal(c1, c2, 'the same every time it is played');
   });
+  it('3.119 Sketch plays the line while you draw it, a note per semitone crossed', async () => {
+    const t = await make([]);
+    try {
+      const R = t.roll, cv = R.canvas, heard = []; const off = Kernel.bus.subscribe('ui:note_audition:' + t.id, (p) => heard.push(p.note));
+      R.setTool('sketch'); const r = cv.getBoundingClientRect(), row = R.state.row * (r.height / cv.offsetHeight), x0 = r.left + 40, y0 = r.top + r.height / 2;
+      const pe = (type, dx, dy) => new PointerEvent(type, { bubbles: true, button: 0, buttons: type === 'pointerup' ? 0 : 1, clientX: x0 + dx, clientY: y0 + dy, pointerId: 1 });
+      cv.dispatchEvent(pe('pointerdown', 0, 0));
+      for (let k = 1; k <= 6; k++) { cv.dispatchEvent(pe('pointermove', k * 30, -k * row)); await TH.sleep(70); }
+      cv.dispatchEvent(pe('pointerup', 180, -6 * row)); await TH.sleep(30); if (off) off();
+      assert.ok(heard.length >= 4, 'heard while drawing: ' + heard.join(' '));
+    } finally { OrganismFactory.close(t.id); restoreView(); }
+  });
 });

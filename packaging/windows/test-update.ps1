@@ -18,6 +18,8 @@ if ($perr -and $perr.Count) { $perr | ForEach-Object { Write-Host "PARSE: line $
 $ErrorActionPreference = 'Continue'
 & powershell -NoProfile -ExecutionPolicy Bypass -File $helper -Staged $built -Dest $inst -Version '9.9.9' -Work $work *>&1 | ForEach-Object { Write-Host "HELPER: $_" }
 Write-Host "helper exit code: $LASTEXITCODE"
+Write-Host "work folder: $work exists=$(Test-Path $work)"; if (Test-Path $work) { Get-ChildItem -Force $work | ForEach-Object { Write-Host "  $($_.Name)" } }
+Write-Host "installed folder has: $((Get-ChildItem -Force $inst | ForEach-Object { $_.Name }) -join ', ')"
 $ErrorActionPreference = 'Stop'
 Start-Sleep 3
 $logf = Join-Path $work 'update.log'; if (Test-Path $logf) { Get-Content $logf | ForEach-Object { Write-Host "LOG: $_" } } else { Write-Host 'no update.log was written' }

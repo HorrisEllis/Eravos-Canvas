@@ -8,9 +8,10 @@
 # -Setup <ERAVOS-Setup-x.exe>: installed by Setup (Program Files) - it runs the new Setup silently into the same folder instead of 2-4
 param([string]$Staged = '', [string]$Setup = '', [Parameter(Mandatory)][string]$Dest, [Parameter(Mandatory)][string]$Version, [Parameter(Mandatory)][string]$Work)
 $ErrorActionPreference = 'Stop'
+Write-Host "ERAVOS Update starting: Dest=$Dest Work=$Work Staged=$Staged Setup=$Setup Version=$Version"
 $log = Join-Path $Work 'update.log'; $result = Join-Path $Work 'update-result.json'
 $keep = @('projects', 'exports', 'drop', 'packs', '.appdata', 'ERAVOS Library', 'portable')
-function Say($m) { $line = (Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + '  ' + $m; Add-Content -LiteralPath $log -Value $line -Encoding UTF8 }
+function Say($m) { $line = (Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + '  ' + $m; Write-Host $line; Add-Content -LiteralPath $log -Value $line -Encoding UTF8 }
 function Done($ok, $msg) {
   $o = [ordered]@{ ok = $ok; version = $Version; message = $msg; log = $log; at = (Get-Date).ToString('o') }
   [IO.File]::WriteAllText($result, ($o | ConvertTo-Json), (New-Object System.Text.UTF8Encoding($false)))
@@ -53,8 +54,8 @@ try {
   }
   }
 } catch {
-  Say "failed: $($_.Exception.Message)"
-  Done $false $_.Exception.Message
+  Write-Host "ERAVOS Update failed: $($_.Exception.Message) at $($_.InvocationInfo.PositionMessage)"
+  try { Say "failed: $($_.Exception.Message)"; Done $false $_.Exception.Message } catch { Write-Host "could not write the log: $($_.Exception.Message)" }
 }
 Say 'starting ERAVOS'
 # through Explorer: ERAVOS starts as you, not as admin (ERAVOS Update may have needed admin for Program Files)
