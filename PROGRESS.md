@@ -2,6 +2,17 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.138 The last two Retro DCO parts: osc-sub, voice-allocator (2026-11-06)
+Asked: "1, 2" (the synthwave parts, then the Retro DCO preview).
+- osc-sub: the sub oscillator — 0 / −1 / −2 octaves; sine, triangle, square (polyBLEP), rounded square (tanh 2 of a sine: a square's
+  weight without its fizz); reset per note (phase 0, rising), align to a kick; phase kept through glides.
+- voice-allocator: which voice plays which note (logic, no audio) — poly / mono (last-note priority) / legato (glide without retrigger);
+  steal a releasing voice first, then oldest / quietest / same-note / lowest / highest; release timing; budget.
+- Proof: osc-sub 31 checks (exact octaves, harmonic laws per shape, polyBLEP aliases 13.5 dB under a naive square at 3.7 kHz, 42 ns);
+  voice-allocator 25 checks (every policy, mono / legato, a 20,000-event random performance never puts two held notes on one voice).
+  Found while proving: the rounded square at tanh 4 was nearly a square (7th −25.7 dB) — tanh 2 sits between triangle and square.
+- Retro DCO: all 11 of its components are built. Next: its UI preview, shown to him before it is built.
+
 ## Done — 3.137 The Juno chorus parts: bbd-line, ensemble-core (2026-11-06)
 Asked: "1, 2" (release 0.2.13; then the synthwave parts and the Retro DCO preview). random-source and saturator-tape were built by the other
 session (3.134) — so this step is the chorus pair.
