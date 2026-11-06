@@ -148,7 +148,7 @@ registerProcessor('eravos-retro-dco', EravosRetroDCO);`;
   const it = (key, label, group, def, min, max, hint) => ({ key, type: 'integer', default: def, min, max, label, group, hint });
 
   OrganismFactory.define({
-    id: 'eravos.retro-dco', domain: 'music', version: '1.0.0', label: 'Retro DCO', icon: '🌃', accent: '#3be8ff', phase: 'P139',
+    id: 'eravos.retro-dco', domain: 'music', version: '1.0.0', label: 'Retro DCO', icon: '🌃', accent: '#ff2bd6', phase: 'P139',
     category: 'Genre instruments', blurb: '80s DCO poly, rebuilt from parts: voice cards, ladder or SVF, poly-mod, the Juno chorus with its bucket brigade.',
     size: { w: 600, h: 780 }, minSize: { w: 460, h: 560 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
