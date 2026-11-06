@@ -71,6 +71,16 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-06 · Automation you point at anything — Bind on the lane
+- **His words (2026-11-06):** "“Automate this”: an empty lane with a bind button to bind a tool or component, or interaction object?" · "yes".
+- **His call:** the plan shown in words, then "yes"; the window shown as a screenshot.
+- **Built:** an automation lane that exists before it is bound (draw first), its own Bind that catches the next control touched on anything on
+  the canvas — tools, components, interaction objects — a list to pick from, Rebind that keeps the drawn shape, Unbind, saved and loaded as
+  it was; the XY Pad's position made into two controls so a hand on it binds and a lane can move it.
+- **Proof:** a new in-app test (3 cases: an empty lane drives nothing and binds on a touch; the XY Pad binds and is moved by a lane;
+  rebind / unbind / pick / save–load); the existing Bind test, the Automation tool's own tests (8/8), the XY Pad's, canvas/content boundary.
+- **Check:** `node tests/run.mjs P131` · `node tests/run.mjs Automation`
+
 ### 2026-11-06 · A delay and noise, proved on their own — delay-line, osc-noise
 - **His words (2026-11-06):** "Next." (continuing "Which components, like what overlap can we focus on to speed this up?")
 - **His call:** the next shared parts by overlap, from the dependency graph.

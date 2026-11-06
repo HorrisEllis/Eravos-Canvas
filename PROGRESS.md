@@ -2,6 +2,15 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.131 Bind on the lane (2026-11-06)
+Asked: "“Automate this”: an empty lane with a bind button to bind a tool or component, or interaction object?" → plan shown → "yes".
+- Automation: ＋ Add lane (ui:lane_add with no target) = an unbound lane — drawn, drives nothing, never "target gone". Each lane: ⊕ Bind
+  (ui:lane_bind {id}) → the next control touched anywhere on the canvas; "or pick ▾" (ui:lane_bind_to); right-click › Unbind (ui:lane_unbind).
+  A lane with nothing drawn starts at the control's value; a drawn shape is kept; one control, one lane. The old ui:bind still works (P118).
+- XY Pad: posX / posY (group PAD) — a hand on the pad publishes them (hook xy.hook.touch_out, ≤ 60/s), anything moving them moves the puck.
+- Open: keyboard pitch bend / mod wheel are not controls yet; components' own windows only where Open as components exists.
+- tests/p131-bind-on-the-lane.test.js 3/3; P118, Automation 8/8, XY Pad, boundary green. Specs: macro-automation + xy-pad ADDENDUM 2026-11-06.
+
 ## Done — 3.130 A key let go stops; Retro Poly Hold (2026-11-06)
 Asked: "Retro poly plays a key like your holding it. How do I turn that off. Same with the midi, options to make it hold or single note?"
 - Cause: the on-screen keyboard (ui-music Keyboard and the tools' own) plays a key as a 30-second note and sends "let go" on key-up. Seven
