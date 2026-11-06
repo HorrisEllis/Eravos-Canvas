@@ -596,7 +596,7 @@
         // clicked never moves it — the old round(distance) moved it a step or a semitone on a half-cell slide
         const ds = cellOf(x / pps, gs) - cellOf(drag.x0 / pps, gs), dn = Math.floor(drag.y0 / ROW) - Math.floor(y / ROW);
         const moveN = (n) => { if (!drums) return Math.max(LO, Math.min(HI, pitchFor(n + dn))); const r = rowNotes.indexOf(n); return r < 0 ? n : rowNotes[Math.max(0, Math.min(rowNotes.length - 1, r - dn))]; };
-        drag.idx.forEach(i => { const o = drag.orig[i]; const s = q(clampN(o.s + ds, 0, st - FREE)); notes[i] = Object.assign({}, o, { s, l: q(Math.min(o.l, st - s)), n: moveN(o.n) }); });
+        drag.idx.forEach(i => { const o = drag.orig[i]; const s = q(clampN(o.s + ds, 0, st - FREE)); notes[i] = Object.assign({}, o, { s, l: q(Math.min(o.l, st - s)), n: moveN(o.n) }); if (ds) delete notes[i].qs; });   // moved by hand: its new place is the played one
         if (ds || dn) drag.changed = true;
         const a = notes[drag.grab !== undefined && !drag.copied ? drag.grab : drag.idx[0]] || notes[drag.idx[0]]; say(a.s, a.n);
         if (a && drag.heard !== a.n) { if (drag.heard !== undefined) audition([a.n]); drag.heard = a.n; }   // 3.115 hear it land on each new pitch
@@ -736,8 +736,14 @@
     }
     function quantize() {
       const g = grid || 1, list = chosen(); if (!list.length) return; const next = notes.slice(), st = steps();
-      list.forEach(i => { const a = next[i], t = Math.round(a.s / g) * g, s1 = q(clampN(a.s + (t - a.s) * qStrength, 0, st - FREE)); next[i] = Object.assign({}, a, { s: s1, l: q(Math.min(a.l, st - s1)) }); });
+      // 3.120 non-destructive (timeline-depth.spec acceptance: "quantize at 60 % … re-opening the quantize op edits its strength"): a
+      // note remembers where it was played (qs); quantize always works from there, so another strength replaces the last one
+      list.forEach(i => { const a = next[i], o = a.qs !== undefined ? a.qs : a.s, t = Math.round(o / g) * g, s1 = q(clampN(o + (t - o) * qStrength, 0, st - FREE)); next[i] = Object.assign({}, a, { s: s1, l: q(Math.min(a.l, st - s1)), qs: o }); });
       commit(next); readout.textContent = `quantized ${list.length} · ${Math.round(qStrength * 100)} %`;
+    }
+    function unquantize() {
+      const next = notes.slice(); let n = 0; Array.from(S).forEach(i => { const a = next[i]; if (!a || a.qs === undefined) return; const b = Object.assign({}, a, { s: a.qs }); delete b.qs; next[i] = b; n++; });
+      if (n) { commit(next); readout.textContent = n + ' back to their original timing'; }
     }
     function humanize() {
       const list = chosen(); if (!list.length) return; const next = notes.slice(), st = steps(), r = () => Math.random() * 2 - 1;
@@ -799,6 +805,10 @@
         // 3.116 the note editor (it opened only on a double-click): pitch, bend, oscillation and the instrument's knobs for this note
         { label: '✎ Edit note…', hint: 'the note editor: pitch, length, velocity, bend, oscillation and the instrument’s own knobs for this note only (or double-click a note)', disabled: first === undefined, run: () => openEditor(first) },
         { sep: true },
+        // 3.120 select by what a note is (timeline-depth.spec "Editing": select by pitch, velocity) — then edit them all at once
+        { label: '◎ Select every ' + (first !== undefined ? nameOf(notes[first].n) : 'such') + ' in the clip', hint: 'every note of this pitch', disabled: first === undefined, run: () => { const n = notes[first].n; selOnly(notes.map((a, i) => a.n === n ? i : -1).filter(i => i >= 0)); draw(); readout.textContent = S.size + ' selected'; } },
+        { label: '◎ Select every note about this loud', hint: 'velocity within ±10 of this one', disabled: first === undefined, run: () => { const v = notes[first].v; selOnly(notes.map((a, i) => Math.abs(a.v - v) <= 10 / 127 ? i : -1).filter(i => i >= 0)); draw(); readout.textContent = S.size + ' selected'; } },
+        { sep: true },
         { label: '⌒ Connect edges', hint: 'one note that glides through them — the edges meet, the pitch slides from each into the next', disabled: n < 2 || drums, run: () => connectEdges() },
         { label: '⟷ Close the gaps (legato)', hint: 'each note lasts until the next one starts (L)', disabled: n < 2, run: () => legato() },
         { section: 'curve' },
@@ -809,7 +819,8 @@
         { label: '∿ Vibrato', hint: 'a singer’s vibrato that blooms', disabled: drums, run: () => curveSel('vibrato') },
         { label: '— Flat', hint: 'no bend', disabled: drums, run: () => curveSel('flat') },
         { sep: true },
-        { label: 'Q Quantize', hint: 'note starts onto the grid (Q)', run: () => quantize() },
+        { label: 'Q Quantize', hint: 'note starts onto the grid (Q) — again at another strength (More ▾ › Quantize) replaces the last', run: () => quantize() },
+        { label: '↺ Back to the original timing', hint: 'where these notes were before any quantize', disabled: !Array.from(S).some(i => notes[i] && notes[i].qs !== undefined), run: () => unquantize() },
         { label: '≈ Humanize', hint: 'a little looseness in time and velocity (H)', run: () => humanize() },
         { label: '⧉ Duplicate', hint: 'a copy right after them (Ctrl+D)', run: () => duplicate() },
         { sep: true },
@@ -1211,7 +1222,7 @@
       // for tests and the timeline's own keys: the grid/tool/zoom the roll is in, and what it holds
       get state() { return { tool, grid, len, lastLen, pps, row: ROW, step: stepOn, cursor, notes: notes.map(n => Object.assign({}, n)) }; }, setTool, zoomTo: (p, at) => { userZoom = true; zoomTo(p, at); }, setRow,
       setGrid: (v) => { gridSel.set(v); grid = GRIDS.find(g => g[0] === String(v))[2]; draw(); }, canvas: cv, ruler, vel, openEditor, setLane, sketch: (pts, as, replace) => sketchToNotes({ pts, replace }, as), get lane() { return xk ? xk.key : ''; }, setStep, get selected() { return Array.from(S).sort((a, b) => a - b); },
-      select: (idx) => { selOnly(idx); draw(); }, connectEdges, noteMenu, curveSel, pathOf: (k) => notes[k] ? pathOf(notes[k]) : null,
+      select: (idx) => { selOnly(idx); draw(); }, connectEdges, noteMenu, curveSel, quantize, unquantize, setStrength: (v) => { qStrength = v; }, pathOf: (k) => notes[k] ? pathOf(notes[k]) : null,
       // where note k's middle is on screen (for tests: the same mapping every hit test inverts)
       pointOf: (k) => { const a = notes[k]; if (!a) return null; const r = cv.getBoundingClientRect(), sx = r.width / (cv.offsetWidth || r.width || 1), sy = r.height / (cv.offsetHeight || r.height || 1);
         return { x: r.left + (a.s + a.l / 2) * pps * sx, y: r.top + (yOf(a.n) + ROW / 2) * sy }; } };

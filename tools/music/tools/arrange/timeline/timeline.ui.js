@@ -505,6 +505,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
     if (lane && lane.kind === 'marker') {
       const mi = A.markers.findIndex(m => Math.abs(xOf(m.bar) - x) < 8);
       if (e.button === 2 && mi >= 0) { view.emit('marker_edit', { op: 'remove', index: mi }); return; }
+      if (e.button === 2 && window.ContextMenu) { sectionMenu(e, barOf(x)); return; }   // 3.120 between markers: the section's menu
       if (mi >= 0) drag = { kind: 'marker', index: mi };
       return;
     }
@@ -562,6 +563,24 @@ OrganismFactory.reg('eravos.timeline', function (view) {
   });
   // 3.70: right-click deletes on a curve lane and a marker lane (its own job there); anywhere else the right-click menu opens with the
   // timeline's own items (view.contextMenu below) — the clip under the pointer, the frame, the song
+  // 3.120 SECTIONS: the stretch from a marker to the next (or to the end of the song). Right-click it on the marker lane.
+  function sectionAt(bar) {
+    const ms = (A.markers || []).slice().sort((p, q) => p.bar - q.bar), end = Math.max(Math.ceil(A.songEnd || 1), ...ms.map(m => m.bar + 1));
+    let i = -1; ms.forEach((m, k) => { if (m.bar <= bar + 1e-6) i = k; });
+    const a = i >= 0 ? Math.round(ms[i].bar) : 1, b = i + 1 < ms.length ? Math.round(ms[i + 1].bar) : Math.max(a + 1, Math.round(end));
+    return { a, b, name: i >= 0 ? ms[i].name : 'start' };
+  }
+  function sectionMenu(e, bar) {
+    const sc = sectionAt(bar), all = A.lanes.map(l => l.id), what = '“' + sc.name + '” (bars ' + sc.a + '–' + (sc.b - 1) + ')';
+    window.ContextMenu.show(e.clientX, e.clientY, [
+      { label: '▭ Select the section', hint: 'every track from ' + sc.a + ' to ' + sc.b + ' — then right-click it for split, loop, delete', run: () => { frame = { a: sc.a, b: sc.b, l0: 0, l1: A.lanes.length - 1 }; sel = null; drawInsp(); syncRoll(); draw(); } },
+      { label: '⟳ Loop the section', run: () => view.emit('loop_set', { start: sc.a, end: sc.b, on: true }) },
+      { sep: true },
+      { label: '⧉ Duplicate the section', hint: 'a copy right after it; everything after moves on by ' + (sc.b - sc.a) + ' bars', run: () => view.emit('section_op', { op: 'duplicate', a: sc.a, b: sc.b }) },
+      { label: '× Delete the section', danger: true, hint: 'taken out of the song and the gap closed (Ctrl+Z brings it back)', run: () => view.emit('section_op', { op: 'delete', a: sc.a, b: sc.b }) },
+    ], 'Section ' + what);
+  }
+  view.sectionAt = (bar) => A ? sectionAt(bar) : null;
   cv.addEventListener('contextmenu', (e) => {
     if (!A) return e.preventDefault(); const { x, y } = local(e); const li = Math.floor((y - RULER) / laneH()), ln = A.lanes[li];
     if (y < rulerY() + RULER || (ln && (ln.kind === 'auto' || ln.kind === 'marker'))) { e.preventDefault(); return; }

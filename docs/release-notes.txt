@@ -2,7 +2,14 @@ ERAVOS v0.2.7 (2026-11-05)
 
 Install: ERAVOS-Setup-0.2.7.exe, or unzip ERAVOS_0.2.7.zip. On an earlier version, ERAVOS offers this update by itself.
 
+Timeline
+- Sections: right-click between markers on the marker lane — select, loop, duplicate (a copy right after) or delete (gap closed)
+  the section, with every track, marker and automation point moving with it.
+- Sketch plays the line as you draw it.
+
 Piano roll
+- Right-click selected notes: select every note of this pitch, or about this loud; Back to the original timing after a quantize
+  (quantizing again at another strength now works from where the notes were played).
 - Right-click selected notes › ✎ Edit note… opens the note editor (it opened only on a double-click).
 - The note editor gains Chance (how often it plays; the same passes every time, so a song stays the same), Ratchet (2–8 fast hits)
   and Nudge (push it early or late, up to half a step). A note that plays by chance is drawn paler; a ratchet shows its hits.

@@ -60,7 +60,7 @@
       { key: 'rollMore', type: 'boolean', default: false, label: 'Piano roll: More controls open', group: 'VIEW', hidden: true },
       { key: 'rollWindow', type: 'boolean', default: true, label: 'Piano roll in its own window', group: 'VIEW', hint: '3.112 on by default: the piano roll opens as its own window under the Timeline, sized and placed as you like (off: under the tracks)' },
     ],
-    ui_hooks: ['transport_play', 'restart', 'seek', 'loop_set', 'lane_add', 'lane_edit', 'lane_remove', 'auto_points', 'rec_knobs', 'clip_add', 'clip_edit', 'clip_remove', 'clip_split', 'clip_split_at', 'clip_clear_at', 'clip_duplicate', 'clip_repeat', 'lane_split', 'marker_edit', 'bounce', 'drop_file', 'export', 'note_audition', 'clip_fill', 'export_midi', 'export_stems', 'tool_set', 'tool_preset', 'behaviour_save', 'behaviour_remove'],
+    ui_hooks: ['transport_play', 'restart', 'seek', 'loop_set', 'section_op', 'lane_add', 'lane_edit', 'lane_remove', 'auto_points', 'rec_knobs', 'clip_add', 'clip_edit', 'clip_remove', 'clip_split', 'clip_split_at', 'clip_clear_at', 'clip_duplicate', 'clip_repeat', 'lane_split', 'marker_edit', 'bounce', 'drop_file', 'export', 'note_audition', 'clip_fill', 'export_midi', 'export_stems', 'tool_set', 'tool_preset', 'behaviour_save', 'behaviour_remove'],
     ui_hook_labels: { behaviour_save: 'save note behaviour', behaviour_remove: 'remove note behaviour', clip_add: 'new clip', clip_edit: 'edit clip / notes', clip_remove: 'delete clip', clip_split: 'split clip', clip_clear_at: 'delete a stretch', clip_split_at: 'split at the frame', clip_duplicate: 'duplicate clip', clip_repeat: 'repeat clip', lane_split: 'split lane',
       clip_fill: 'fill chords', lane_add: 'new track', lane_edit: 'track settings', lane_remove: 'remove track', marker_edit: 'marker', drop_file: 'drop audio', loop_set: 'loop' },
     restoreTwice: true,
@@ -220,9 +220,9 @@
         const pr = (x) => { const v = clamp(+x, 0.05, 1); return isFinite(+x) && v < 1 ? Math.round(v * 100) / 100 : null; };
         const rt = (x) => { const v = Math.round(clamp(+x, 1, 8)); return isFinite(+x) && v > 1 ? v : null; };
         const mt = (x) => { const v = Math.round(clamp(+x, -0.5, 0.5) * 100) / 100; return isFinite(+x) && v !== 0 ? v : null; };
-        return (Array.isArray(arr) ? arr : []).map(n => ({ s: +n.s, l: +n.l, n: Math.round(+n.n), v: n.v === undefined ? 0.85 : +n.v, p: cleanP(n.p), b: cleanB(n.b), c: cleanC(n.c), pr: pr(n.pr), rt: rt(n.rt), mt: mt(n.mt) }))
+        return (Array.isArray(arr) ? arr : []).map(n => ({ s: +n.s, l: +n.l, n: Math.round(+n.n), v: n.v === undefined ? 0.85 : +n.v, p: cleanP(n.p), b: cleanB(n.b), c: cleanC(n.c), pr: pr(n.pr), rt: rt(n.rt), mt: mt(n.mt), qs: isFinite(+n.qs) && n.qs !== null && n.qs !== undefined ? Math.round(+n.qs * 192) / 192 : null }))
           .filter(n => isFinite(n.s) && isFinite(n.l) && isFinite(n.n) && isFinite(n.v) && n.s >= 0 && n.s < max)
-          .map(n => Object.assign({ s: Math.round(n.s * 192) / 192, l: clamp(Math.round(n.l * 192) / 192, 0.125, max - n.s), n: clamp(n.n, 0, 127), v: clamp(n.v, 0.05, 1) }, n.p ? { p: n.p } : {}, n.b ? { b: n.b } : {}, n.c ? { c: n.c } : {}, n.pr ? { pr: n.pr } : {}, n.rt ? { rt: n.rt } : {}, n.mt ? { mt: n.mt } : {}))   // 3.48: 1/192 step — exact for 1/64 and every triplet; 1/128-note minimum
+          .map(n => Object.assign({ s: Math.round(n.s * 192) / 192, l: clamp(Math.round(n.l * 192) / 192, 0.125, max - n.s), n: clamp(n.n, 0, 127), v: clamp(n.v, 0.05, 1) }, n.p ? { p: n.p } : {}, n.b ? { b: n.b } : {}, n.c ? { c: n.c } : {}, n.pr ? { pr: n.pr } : {}, n.rt ? { rt: n.rt } : {}, n.mt ? { mt: n.mt } : {}, n.qs !== null && n.qs >= 0 && n.qs !== n.s ? { qs: n.qs } : {}))   // 3.48: 1/192 step — exact for 1/64 and every triplet; 1/128-note minimum
           .sort((a, b) => a.s - b.s || a.n - b.n);
       }
       const snap16 = (b) => Math.max(1, 1 + Math.round((b - 1) * 16) / 16);
@@ -597,6 +597,31 @@
         const gone = clips.filter(c => ids.has(c.lane) && c.startBar >= cutA(c) - 1e-6 && c.startBar + len(c) <= cutB(c) + 1e-6);
         if (!gone.length) { ctx.emitUI('export_state', { error: 'Nothing to delete in that stretch (note and pattern clips go by whole bars).' }); return; }
         const set = new Set(gone.map(c => c.id)); clips = clips.filter(c => !set.has(c.id)); sync();
+      });
+      // 3.120 SECTIONS (timeline-depth.spec "Resolution levels": project › sections › tracks…): a section is the stretch from a marker to
+      // the next (or to the end). Whole-song edits on it, every track at once, everything after it moving with it — clips, markers and
+      // automation points:  duplicate (a copy right after it) · delete (taken out, the gap closed). One undo step each.
+      ctx.onUI('section_op', { type: 'object', required: ['op', 'a', 'b'] }, (p) => {
+        const a = Math.round(+p.a), b = Math.round(+p.b), span = b - a; if (!(span >= 1) || a < 1) return;
+        const all = lanes.map(l => l.id), len = (c) => c.kind === 'audio' ? c.lengthSec / barSec() : c.bars;
+        splitAt(all, [a, b], true);
+        const inside = (c) => c.startBar >= a - 1e-6 && c.startBar + len(c) <= b + 1e-6, after = (x) => x >= b - 1e-6;
+        const autos = lanes.filter(l => l.kind === 'auto' && Array.isArray(l.points));
+        if (p.op === 'duplicate') {
+          const copies = clips.filter(inside).map(c => Object.assign(JSON.parse(JSON.stringify(c)), { id: uid('C'), startBar: c.startBar + span }));
+          clips.forEach(c => { if (after(c.startBar)) c.startBar += span; });
+          clips = clips.concat(copies);
+          const mk = markers.filter(m => m.bar >= a - 1e-6 && m.bar < b - 1e-6).map(m => Object.assign({}, m, { bar: m.bar + span }));
+          markers.forEach(m => { if (after(m.bar)) m.bar += span; }); markers = markers.concat(mk);
+          autos.forEach(l => { const cp = l.points.filter(q => q[0] >= a - 1e-6 && q[0] < b - 1e-6).map(q => [q[0] + span].concat(q.slice(1)));
+            l.points = l.points.map(q => after(q[0]) ? [q[0] + span].concat(q.slice(1)) : q).concat(cp).sort((x, y) => x[0] - y[0]); });
+        } else if (p.op === 'delete') {
+          clips = clips.filter(c => !inside(c)); clips.forEach(c => { if (after(c.startBar)) c.startBar -= span; });
+          markers = markers.filter(m => !(m.bar >= a - 1e-6 && m.bar < b - 1e-6)); markers.forEach(m => { if (after(m.bar)) m.bar -= span; });   // its own marker goes with it
+          const seen = new Set(); markers = markers.filter(m => { const k = m.bar; if (seen.has(k)) return false; seen.add(k); return true; });
+          autos.forEach(l => { l.points = l.points.filter(q => !(q[0] >= a - 1e-6 && q[0] < b - 1e-6)).map(q => after(q[0]) ? [q[0] - span].concat(q.slice(1)) : q); });
+        } else return;
+        markers.sort((x, y) => x.bar - y.bar); sync();
       });
       ctx.onUI('clip_duplicate', { type: 'object', required: ['id'] }, (p) => {
         const c = clips.find(x => x.id === p.id); if (!c) return ctx.fault('RUNTIME_002', 'clip ' + p.id);
