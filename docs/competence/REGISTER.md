@@ -6,7 +6,7 @@
 
 **How to read it.** Each entry is one contribution: the exact words (checked word for word against their source by `node build/competence.mjs --check`), when, who it came from, what kind of thing it was, how it developed, what came of it, and the evidence a stranger can check. **Confidence is three separate levels, never one score**: *proposed* (an idea) · *demonstrated* (built and tested here — built by the AI coder to his direction: the idea and the call are his, the code is not claimed as his) · *independently verified* (validated outside this project — none yet). **Append-only**: an entry is never edited; a correction is a new entry that amends it. Generated from `docs/competence/register.jsonl` — do not edit this page. The record before this register (merged work since 2026-10-15, with merge times): `docs/PROOF-OF-COMPETENCY.md`.
 
-**32 entries** · his: 29 (11 proposed · 18 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
+**33 entries** · his: 30 (12 proposed · 18 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
 
 ## Ideas
 _what he originated, proposed or identified_
@@ -34,6 +34,7 @@ _what he originated, proposed or identified_
 | R-2026-11-06-29 | 2026-11-06 09:23:29 UTC | “I keep envisioning like a whole ass extremely detailed note and pattern editor. Like fractals. Then can save for later. I’m struggling with the complicated patterns.” | idea | Names the difficulty and a model for it (self-similar patterns, saved). | Open; stands on pattern-store, the highest-leverage unbuilt component. | `specs/eravos.2026-11-06-session.map.spec` | proposed |
 | R-2026-11-06-30 | 2026-11-06 09:23:29 UTC | “I externalize, adjust or manipulate like remove the noise focus on signal, integrate or reintegrate then embody. That’s my feedback loop.” | principle | His own account of how he learns and builds, in his words. | Recorded; the map/spec/register are its externalize and model steps. | `specs/eravos.2026-11-06-session.map.spec` | proposed |
 | R-2026-11-06-31 | 2026-11-06 09:23:29 UTC | “Constrain my imagination in what’s been verified/invariant. Build models to maintain consistency and reduce wasted effort with redundancy from rote memorization.” | principle | His method: imagination bounded by what is verified; models instead of memorization. | Recorded. | `specs/eravos.2026-11-06-session.map.spec` | proposed |
+| R-2026-11-06-33 | 2026-11-06 14:09:18 UTC | “Agnostic. I was thinking it could be the beginning of photo manipulation tools. If possible.” | idea | Generalised the note workshop into a domain-agnostic work surface, and named a second domain for it (photo manipulation). | specs/eravos.workshop.spec — the canvas part; music is its first content. | `specs/eravos.workshop.spec` | proposed |
 
 ## Choices and direction
 _decisions, the alternatives in front of him, and the way he set_
@@ -52,7 +53,7 @@ _decisions, the alternatives in front of him, and the way he set_
 ## Competence
 _what is shown, at its own level — an idea, a built and tested idea, and outside validation are not the same thing_
 
-**proposed** (11)
+**proposed** (12)
 
 - R-2026-11-06-02 · 2026-11-06 06:28:35 UTC · direction — “Also love the synthwave tool.” → The highest-leverage phase-1 tool turned out to be in that family (Swarm Oscillator) — chosen by the graph, not by the preference. · evidence: `docs/eco-graph.md`
 - R-2026-11-06-06 · 2026-11-06 07:06:21 UTC · principle — “Just want to make sure the tools don’t become monolith with packs or mods hard wired in.” → Rule in CLAUDE.md › Axioms; no guard test yet (open). · evidence: `CLAUDE.md › Axioms 1` · `tools/music/tools/genre-instruments/swarm-oscillator/packs/factory/pack.json`
@@ -65,6 +66,7 @@ _what is shown, at its own level — an idea, a built and tested idea, and outsi
 - R-2026-11-06-30 · 2026-11-06 09:23:29 UTC · principle — “I externalize, adjust or manipulate like remove the noise focus on signal, integrate or reintegrate then embody. That’s my feedback loop.” → Recorded; the map/spec/register are its externalize and model steps. · evidence: `specs/eravos.2026-11-06-session.map.spec`
 - R-2026-11-06-31 · 2026-11-06 09:23:29 UTC · principle — “Constrain my imagination in what’s been verified/invariant. Build models to maintain consistency and reduce wasted effort with redundancy from rote memorization.” → Recorded. · evidence: `specs/eravos.2026-11-06-session.map.spec`
 - R-2026-11-06-32 · 2026-11-06 13:38:50 UTC · decision — “Absolutely not. Like I’m talking a full workshop. Editing one note completely like it’s in the center of a work surface or operating table or like photosyop” → Preview rejected; the face to be redesigned. · evidence: `specs/eravos.2026-11-06-session.map.spec` · `tools/music/planned/pattern-editor.spec`
+- R-2026-11-06-33 · 2026-11-06 14:09:18 UTC · idea — “Agnostic. I was thinking it could be the beginning of photo manipulation tools. If possible.” → specs/eravos.workshop.spec — the canvas part; music is its first content. · evidence: `specs/eravos.workshop.spec`
 
 **demonstrated** (18)
 
@@ -128,6 +130,7 @@ _whose each contribution is: his, the AI coder’s, or from outside_
 | R-2026-11-06-30 | 2026-11-06 09:23:29 UTC | user | James Brooks | principle |
 | R-2026-11-06-31 | 2026-11-06 09:23:29 UTC | user | James Brooks | principle |
 | R-2026-11-06-32 | 2026-11-06 13:38:50 UTC | user | James Brooks | decision — chosen from: the previewed editor (roll + tree + grow strip) · a full workshop |
+| R-2026-11-06-33 | 2026-11-06 14:09:18 UTC | user | James Brooks | idea |
 
 ## Outcomes
 _what came of each_
@@ -166,4 +169,5 @@ _what came of each_
 | R-2026-11-06-30 | 2026-11-06 09:23:29 UTC | “I externalize, adjust or manipulate like remove the noise focus on signal, integrate or reintegrate then embody. That’s my feedback loop.” | principle | His own account of how he learns and builds, in his words. | Recorded; the map/spec/register are its externalize and model steps. | `specs/eravos.2026-11-06-session.map.spec` | proposed |
 | R-2026-11-06-31 | 2026-11-06 09:23:29 UTC | “Constrain my imagination in what’s been verified/invariant. Build models to maintain consistency and reduce wasted effort with redundancy from rote memorization.” | principle | His method: imagination bounded by what is verified; models instead of memorization. | Recorded. | `specs/eravos.2026-11-06-session.map.spec` | proposed |
 | R-2026-11-06-32 | 2026-11-06 13:38:50 UTC | “Absolutely not. Like I’m talking a full workshop. Editing one note completely like it’s in the center of a work surface or operating table or like photosyop” | decision<br>from: the previewed editor (roll + tree + grow strip) · a full workshop | Rejected the preview and named the model he means by analogy: an operating table, Photoshop — one note at the centre of a work surface, edited completely. | Preview rejected; the face to be redesigned. | `specs/eravos.2026-11-06-session.map.spec` · `tools/music/planned/pattern-editor.spec` | proposed |
+| R-2026-11-06-33 | 2026-11-06 14:09:18 UTC | “Agnostic. I was thinking it could be the beginning of photo manipulation tools. If possible.” | idea | Generalised the note workshop into a domain-agnostic work surface, and named a second domain for it (photo manipulation). | specs/eravos.workshop.spec — the canvas part; music is its first content. | `specs/eravos.workshop.spec` | proposed |
 

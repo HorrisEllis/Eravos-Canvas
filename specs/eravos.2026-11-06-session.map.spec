@@ -107,3 +107,9 @@
 ## 13:38:50Z (2026-11-06T13:38:50.190Z) — verbatim:
   > Absolutely not. Like I’m talking a full workshop. Editing one note completely like it’s in the center of a work surface or operating table or like photosyop
   - DECIDED (his): the Pattern Editor preview is REJECTED. Direction: a full workshop — one note on a work surface, edited completely (operating table / Photoshop)
+
+## 14:09:18Z (2026-11-06T14:09:18.846Z) — verbatim:
+  > Agnostic. I was thinking it could be the beginning of photo manipulation tools. If possible.
+  - DECIDED (his): the workshop is AGNOSTIC — not a music editor: a canvas work surface any domain puts an object on (a note, a pattern, an image); the beginning of photo manipulation tools, if possible
+  - spec: specs/eravos.workshop.spec (the canvas part) · music's content for it: tools/music/planned/pattern-editor.spec
+  - DONE after 14:09:18Z: specs/eravos.workshop.spec (agnostic: surface, layer types, the kind contract, phases W1–W4); a preview of ONE surface with two kinds — a note and a picture (docs/previews/workshop-note.png, workshop-photo.png) — waiting for his yes
