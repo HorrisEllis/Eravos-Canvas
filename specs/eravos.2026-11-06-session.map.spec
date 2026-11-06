@@ -51,3 +51,71 @@
   - axioms: CLAUDE.md › Axioms
   - the register: docs/competence/register.jsonl (append-only) → REGISTER.md + LOG.md (node build/competence.mjs; --check fails if an
     earlier entry was changed)
+
+## 09:23:29Z (2026-11-06T09:23:29.966Z) — verbatim ("Okay. I need to externalize. Stop and stay with me for a minute." — notes only, nothing built from this message yet):
+  > Okay. I need to externalize. Stop and stay with me for a minute. 
+  > 
+  > These are all raw. I don’t take notes, this is how they come out synthesisn end state first emergence. Reverse engineering. 
+  > 
+  > Don’t the wubs belong to the wobble bass? I still can’t get it to sound like make it bun dem. Like the highs and lows aren’t it. I’m not sure if he modified it after the fact. 
+  > 
+  > What can eravos do right now? I want to be able to have the canvas seperate from the rest. I want the sound to be deep and studio quality. Can we use yaml to save songs like a psd file. Like so it has layers? Like it saves what’s on the canvas? 
+  > 
+  > Brain storming here. 
+  > 
+  > Also. I don’t think the note editor works and it would be nice to open in a popout window windows.  Or the option. Even a window separate like from the canvas but still connected. That way I can alt tab. 
+  > 
+  > What’s the next highest leverage?
+  > Also maybe full, I keep envisioning like a whole ass extremely detailed note and pattern editor. Like fractals. Then can save for later. I’m struggling with the complicated patterns. 
+  > 
+  > I love to explore. Open loops drive me. I need you to start taking note like I said. I externalize, adjust or manipulate like remove the noise focus on signal, integrate or reintegrate then embody. That’s my feedback loop. I use cross domain synthesis, analogies, mental simulations to simulate hands on learning. Constrain my imagination in what’s been verified/invariant. Build models to maintain consistency and reduce wasted effort with redundancy from rote memorization.
+  - WUBS / WOBBLE BASS: yes — Wub Lab is Wobble Bass as parts (suite allInOne: eravos.wobble-bass; Wub Osc · Wub Filter · Wub Rate · Wub Sub).
+    OPEN: fold the wub tools into Wobble Bass's own components (the suite is the tool seen as parts; F1–F5, axiom 3).
+  - "MAKE IT BUN DEM" sound: OPEN — the highs and lows "aren't it". Likely missing: resampling passes, multiband (separate highs and lows),
+    heavy upward/downward compression, layered sub; planned: resample-forge, multiband-crush, growl-forge, spectral-creature, sub-architect.
+    Next step: measure the reference vs Wobble Bass (spectrum by band, as done for his first song 2026-10-30) — needs his reference audio.
+  - WHAT ERAVOS CAN DO NOW: answered in the session (and to be kept as a page: OPEN).
+  - CANVAS SEPARATE FROM THE REST: OPEN — read as: the canvas (host) shippable/usable on its own, content as packs (already the rule:
+    canvas/ vs tools/<domain>/; boundary test). Clarify with him: separate app? separate window? separate repo?
+  - DEEP, STUDIO-QUALITY SOUND: OPEN (direction) — the component path (filter-svf, osc-va polyBLEP, oversampling, true-peak limiting, 24-bit export).
+  - SONG FILE LIKE A PSD (YAML, LAYERS, SAVES WHAT IS ON THE CANVAS): OPEN (idea) — a project file in layers (canvas · tools + settings ·
+    wires · timeline · audio refs), text so it diffs and merges. Today projects save as JSON in the app's store; a YAML layered export/import
+    is the idea.
+  - NOTE EDITOR "DOESN'T WORK": OPEN (bug report — not yet reproduced; ask what fails).
+  - NOTE EDITOR IN ITS OWN OS WINDOW (alt-tab), connected to the canvas: OPEN (idea) — today: in-canvas borderless panel (3.109); an
+    Electron BrowserWindow sharing the same engine is the path.
+  - NEXT HIGHEST LEVERAGE: pattern-store (23 planned tools) — also the base of the pattern editor below.
+  - A WHOLE DETAILED NOTE AND PATTERN EDITOR, LIKE FRACTALS, SAVE FOR LATER: OPEN (idea) — "I'm struggling with the complicated patterns."
+  - HOW HE WORKS (his own model, recorded as his words): externalize → remove the noise / focus on signal → integrate or reintegrate →
+    embody; cross-domain synthesis, analogies, mental simulation; constrain imagination to what is verified / invariant; build models so
+    nothing is relearned by rote. Applied here: these notes are the externalize step; the map, specs and register are the models.
+
+## 13:23:41Z (2026-11-06T13:23:41.893Z) — verbatim:
+  > Already built.
+  - in reply to the answer to 09:23:29Z; which thing is already built is not yet known — asked him (not assumed)
+
+## 13:28:34Z (2026-11-06T13:28:34.547Z) — verbatim:
+  > Tell me what’s the highest leverage? The pattern and note editor are the same. That plus tools that give what Eravos doesn’t have right now.
+  - DECIDED (his): the pattern editor and the note editor are ONE editor
+  - answered: the highest leverage, with the gaps ERAVOS has today (see the answer; docs/eco-graph.md)
+
+## 13:30:25Z (2026-11-06T13:30:25.486Z) — verbatim:
+  > First.
+  - DECIDED (his): the editor track first — its spec and DAG, then pattern-store, seed-registry, scale-key, then the editor's UI preview
+  - DONE after 13:30:25Z: the Pattern Editor spec (tools/music/planned/pattern-editor.spec, its DAG), pattern-store + seed-registry + scale-key built and proved, the UI preview made (docs/previews/pattern-editor-preview.png) — waiting for his yes
+
+## 13:38:50Z (2026-11-06T13:38:50.190Z) — verbatim:
+  > Absolutely not. Like I’m talking a full workshop. Editing one note completely like it’s in the center of a work surface or operating table or like photosyop
+  - DECIDED (his): the Pattern Editor preview is REJECTED. Direction: a full workshop — one note on a work surface, edited completely (operating table / Photoshop)
+
+## 14:09:18Z (2026-11-06T14:09:18.846Z) — verbatim:
+  > Agnostic. I was thinking it could be the beginning of photo manipulation tools. If possible.
+  - DECIDED (his): the workshop is AGNOSTIC — not a music editor: a canvas work surface any domain puts an object on (a note, a pattern, an image); the beginning of photo manipulation tools, if possible
+  - spec: specs/eravos.workshop.spec (the canvas part) · music's content for it: tools/music/planned/pattern-editor.spec
+  - DONE after 14:09:18Z: specs/eravos.workshop.spec (agnostic: surface, layer types, the kind contract, phases W1–W4); a preview of ONE surface with two kinds — a note and a picture (docs/previews/workshop-note.png, workshop-photo.png) — waiting for his yes
+
+## 15:55:01Z (2026-11-06T15:55:01.373Z) — verbatim:
+  > Nice. That's exactly it. And then the PSD style YAML, maybe ERV as an extension for that.
+  - APPROVED (his): the Workshop preview — "exactly it" (specs/eravos.workshop.spec W1–W4)
+  - NEXT (his): the PSD-style layered song file in YAML, extension .erv — specs/eravos.erv-format.spec
+  - BUILT after 15:55:01Z: .erv — canvas/runtime/erv.js (+ js-yaml 4.1.0, CORE schema); Start › Save as .erv (Ctrl+Shift+S) · Open .erv… (its layers first, switch any off) · drop a .erv to open; tests/p120-erv.test.js 3/3; an example: docs/previews/example.erv

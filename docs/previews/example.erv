@@ -1,0 +1,242 @@
+# Night Drive — an ERAVOS project (.erv: YAML in layers, like a PSD). Each layer: on / locked / note. Open it in ERAVOS (drop it on the canvas).
+erv: 1
+name: Night Drive
+saved: 2026-11-06T16:01:02.972Z
+app: ERAVOS
+workspace: 1.0.0
+layers:
+  - id: view
+    kind: canvas
+    label: Canvas view
+    on: true
+    locked: false
+    data:
+      x: 0
+      y: 0
+      z: 1
+  - id: tools
+    kind: group
+    label: Tools
+    on: true
+    locked: false
+    layers:
+      - id: swarm-oscillator-1-j3f
+        kind: tool
+        tool: eravos.swarm-oscillator
+        label: Swarm Oscillator
+        on: true
+        locked: false
+        at:
+          x: 40
+          y: 40
+          w: 580
+          h: 706
+        extra:
+          collapsed: false
+        preset: Locked Unison
+        state:
+          params:
+            mode: coupled
+            voices: 16
+            spread: 0.6
+            coupling: 1
+            pull: 0.2
+            drift: 0.2
+            cluster: 0
+            sync: 1/4
+            shape: saw
+            table: 0
+            sub: 0.2
+            octave: 0
+            cutoff: 7000
+            res: 0.2
+            envAmt: 0.4
+            attack: 0.005
+            decay: 0.4
+            sustain: 0.8
+            release: 0.4
+            lfoRate: 0.3
+            lfoCouple: 0
+            width: 0.9
+            monoBelow: 120
+            level: 0.7
+            _react:
+              mode: follow
+            tempoX: '1'
+            tempoBpm: 120
+          userPresets: {}
+      - id: fx-echo-1-ozc
+        kind: tool
+        tool: eravos.fx-echo
+        label: Tape Echo
+        on: true
+        locked: false
+        at:
+          x: 700
+          y: 40
+          w: 460
+          h: 484
+        extra:
+          collapsed: false
+        preset: Ping-pong 1/8.
+        state:
+          params:
+            div: 1/8.
+            sync: true
+            timeFree: 300
+            stereo: pingpong
+            offsetRatio: 1.5
+            feedback: 0.45
+            age: 0.25
+            wow: 0.05
+            flutter: 0.02
+            sat: 0.15
+            throwMode: false
+            freeze: false
+            mix: 0.35
+            inGain: 0
+            outGain: 0
+            bypass: false
+            _react:
+              mode: follow
+          userPresets: {}
+      - id: retro-poly-1-jgb
+        kind: tool
+        tool: eravos.retro-poly
+        label: Retro Poly
+        on: true
+        locked: false
+        at:
+          x: 40
+          y: 760
+          w: 580
+          h: 869
+        extra:
+          collapsed: false
+        preset: Outrun Lead
+        state:
+          params:
+            saw: 0.9
+            pulse: 0.4
+            width: 0.3
+            pwm: 0.2
+            pwmRate: 0.6
+            sub: 0.2
+            noise: 0
+            drift: 0.35
+            octave: 0
+            cutoff: 3400
+            res: 4
+            envAmt: 0.4
+            keytrack: 0.5
+            hpf: 0
+            fA: 0.005
+            fD: 0.35
+            fS: 0.3
+            attack: 0.005
+            decay: 0.5
+            sustain: 0.8
+            release: 0.3
+            chorus: I
+            unison: 3
+            mono: true
+            glide: 0.06
+            arp: off
+            arpDiv: 1/16
+            arpOct: 1
+            arpGate: 0.55
+            arpHold: false
+            level: 0.6
+            _react:
+              mode: follow
+            tempoX: '1'
+            tempoBpm: 120
+          userPresets: {}
+      - id: song-recorder-1-5yj
+        kind: tool
+        tool: eravos.song-recorder
+        label: Song Recorder
+        on: true
+        locked: false
+        at:
+          x: null
+          y: null
+          w: 1200
+          h: 263
+        extra:
+          collapsed: false
+        state:
+          params:
+            source: master
+            snap: beat
+            zoom: 26
+            follow: true
+            format: wav24
+            range: song
+            stems: false
+            tail: 2
+            songName: my song
+            meta: {}
+            autoCover: true
+            level: 1
+            withSong: false
+            _react:
+              mode: follow
+          userPresets: {}
+          extra:
+            lanes: []
+            clips: []
+            sel: []
+            nextId: 1
+            armed: null
+  - id: wires
+    kind: wires
+    label: Wires
+    on: true
+    locked: false
+    data:
+      - from:
+          - swarm-oscillator-1-j3f
+          - so.hook.audio_out
+        to:
+          - fx-echo-1-ozc
+          - fx.hook.audio_in
+        type: audio
+      - from:
+          - swarm-oscillator-1-j3f
+          - so.hook.coherence
+        to:
+          - retro-poly-1-jgb
+          - rp.hook.mod_cutoff
+        type: modulation
+  - id: domain:music
+    kind: domain
+    label: music
+    on: true
+    locked: false
+    data:
+      bpm: 140
+      key: 9
+      scale: minor
+      trims: []
+      mix:
+        strips: []
+        lines: []
+        seq: 1
+  - id: domain:shell
+    kind: domain
+    label: shell
+    on: true
+    locked: false
+    data:
+      modes:
+        - music
+      units:
+        - music.engine
+        - music.transport
+        - music.tempo
+        - music.key
+        - music.meter
+        - music.dock
+        - music.midi
+        - music.studio

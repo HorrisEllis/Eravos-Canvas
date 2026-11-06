@@ -85,6 +85,12 @@
 
     I.file = async function (name, ab, mime, pos) {
       if (isZip(ab)) return I.installZip(ab, name, pos);
+      if (/\.erv$/i.test(name)) {   // a project in layers (canvas/runtime/erv.js claims it); text, not JSON
+        const ev = { name, mime: 'application/yaml', arrayBuffer: ab, text: new TextDecoder().decode(ab), claimed: false };
+        bus.publish('intake:file', ev);
+        if (!ev.claimed) K.fault('ASSET_004', { message: `${name}: nothing here opens .erv files` });
+        return { kind: 'erv', claimed: ev.claimed };
+      }
       if (/\.json$/i.test(name) || /json/.test(mime || '')) {
         let json = null;
         try { json = JSON.parse(new TextDecoder().decode(ab)); } catch (e) { K.fault('ASSET_001', { message: `${name}: invalid JSON` }); return null; }

@@ -48,7 +48,7 @@
   WireSystem.init(K);
   Links.init(K);
   Mods.init(K);
-  Workspace.boot(K);
+  Workspace.boot(K); if (window.Erv) Erv.attach(K);   // a dropped .erv opens (specs/eravos.erv-format.spec)
   Recipes.attach(K);
   const intake = window.ShellIntake = Intake.create(K);
   intake.attach(document.getElementById('canvas'));
@@ -221,6 +221,8 @@
       const tools = h('div', { class: 'row', style: { marginTop: '8px', gap: '8px', flexWrap: 'wrap' } }, [
         ...(older.length ? [h('select', { class: 'uk-select', 'aria-label': 'Restore an earlier autosave', onchange: async (e) => { const i = +e.target.value; if (!(i >= 0)) return; S.activate(); close(); await Workspace.restore(older[i].snap); setTimeout(() => CanvasWM.fitAll(), 80); } },
           [h('option', { value: '', text: `⟲ Earlier autosaves (${older.length})…` })].concat(older.map((x, i) => h('option', { value: String(i), text: `${new Date(x.time).toLocaleString()} · ${x.snap.organisms.length} tools` }))))] : []),
+        h('button', { class: 'tb-btn', title: 'everything on the canvas as one readable file in layers, like a PSD (.erv) — Ctrl+Shift+S', onclick: () => { const n = prompt('Name', 'My project'); if (n) { Erv.save(n); toast(`Saved “${n}.erv”.`, 'good', 3000); } } }, ['⤓ Save as .erv']),
+        h('button', { class: 'tb-btn', title: 'open an .erv — see its layers first, switch off what you do not want', onclick: () => { S.activate(); close(); Erv.pick(); } }, ['⤒ Open .erv…']),
         h('button', { class: 'tb-btn', title: 'download one file with every project, autosave and saved preset from this address — open it in ERAVOS anywhere else (drop it on the canvas)', onclick: async () => { const b = await Workspace.backup(); Workspace.download('eravos-backup-' + new Date().toISOString().slice(0, 10) + '.eravos.json', JSON.stringify(b), 'application/json'); toast(`Backed up ${b.projects.length} project(s)${b.latest ? ' + your latest autosave' : ''}. Drop that file onto ERAVOS anywhere to bring them in.`, 'good', 6000); } }, ['⤓ Back up all my saves']),
       ]);
       sec.appendChild(tools);
@@ -258,6 +260,8 @@
     el.addEventListener('wheel', (e) => { if (el.scrollWidth <= el.clientWidth || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return; e.preventDefault(); el.scrollLeft += e.deltaY; }, { passive: false });
     const mark = () => el.classList.toggle('scrolls', el.scrollWidth > el.clientWidth + 1); new ResizeObserver(mark).observe(el); new MutationObserver(mark).observe(el, { childList: true, subtree: true }); mark(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && e.shiftKey) { e.preventDefault(); stopAll(); } });
+  // .erv (specs/eravos.erv-format.spec): Ctrl+Shift+S saves the canvas as a layered file
+  document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'S' || e.key === 's') && window.Erv) { e.preventDefault(); const n = prompt('Save as .erv — name', 'My project'); if (n) { Erv.save(n); toast(`Saved “${n}.erv”.`, 'good', 3000); } } });
   function doHist(dir) { const l = dir === 'undo' ? history.undo() : history.redo(); if (l) toast(`${dir === 'undo' ? 'Undid' : 'Redid'}: ${l}`, '', 1500); }
   document.addEventListener('keydown', (e) => {
     if (e.defaultPrevented || !(e.ctrlKey || e.metaKey) || e.altKey) return;
