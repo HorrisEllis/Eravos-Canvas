@@ -71,6 +71,16 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-06 · A delay and noise, proved on their own — delay-line, osc-noise
+- **His words (2026-11-06):** "Next." (continuing "Which components, like what overlap can we focus on to speed this up?")
+- **His call:** the next shared parts by overlap, from the dependency graph.
+- **Built:** a delay line (to 20 s, tempo sync, tape-style pitch bend or digital cross-fade, filtered and saturated feedback, freeze,
+  modulation) and a noise source (six colours, tilt, stereo width, reproducible seeds), each an AudioWorklet of its tested kernel.
+- **Proof:** 19 + 32 measured checks — fractional delay exact to < −80 dB, freeze held to 0.01 dB over 9 s, noise slopes 0 / −3 / −6 dB per
+  octave by Welch's method, tilt equal to its transfer function; a defect found by the tests (a "fully open" loop filter still darkened
+  echoes) fixed before merging.
+- **Check:** `node tools/music/components/delay-line/delay-line.test.mjs` · `node tools/music/components/osc-noise/osc-noise.test.mjs`
+
 ### 2026-11-06 · Shared synth parts, proved on their own — unison-stack, filter-ladder
 - **His words (2026-11-06):** "I want more synthwave. Is there more coming?" · "Which components, like what overlap can we focus on to speed
   this up?" · "Do it."
