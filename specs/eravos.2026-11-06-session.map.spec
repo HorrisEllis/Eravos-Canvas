@@ -102,3 +102,4 @@
 ## 13:30:25Z (2026-11-06T13:30:25.486Z) — verbatim:
   > First.
   - DECIDED (his): the editor track first — its spec and DAG, then pattern-store, seed-registry, scale-key, then the editor's UI preview
+  - DONE after 13:30:25Z: the Pattern Editor spec (tools/music/planned/pattern-editor.spec, its DAG), pattern-store + seed-registry + scale-key built and proved, the UI preview made (docs/previews/pattern-editor-preview.png) — waiting for his yes
