@@ -6,7 +6,7 @@
   "icon": "📼",
   "accent": "#d6b37a",
   "version": "1.0.0",
-  "blurb": "Lofi as a system. The Groove plays a lazy boom bap on the dusty kit (through a little bit-crush); Chords plays jazz sevenths and ninths on soft keys, low-passed, with a warm tape echo; the Bassline and a soft sub follow the chords; a gentle pump ties it together. DUST, WARMTH, SWING and PUMP turn all of it. (Spec: specs/eravos.lofi-setup.spec — Piano and Tape Memory join it once built.)",
+  "blurb": "Lofi as a system. The Groove plays a lazy boom bap on the dusty kit (through a little bit-crush); Chords plays jazz sevenths and ninths on soft keys, low-passed, with a warm tape echo; the Bassline and a soft sub follow the chords; a gentle pump ties it together. DUST, WARMTH, SWING and PUMP turn all of it. Everything then runs through Tape Memory, a worn cassette. (Spec: specs/eravos.lofi-setup.spec — the Piano joins it once built.)",
   "hub": "eravos.suite-hub",
   "steps": [
     {
@@ -89,6 +89,13 @@
       "required": true,
       "preset": "Lofi Gentle Pump",
       "why": "a gentle duck on every beat: keys and bass breathe with the kick"
+    },
+    {
+      "tool": "eravos.tape-memory",
+      "role": "tape",
+      "required": true,
+      "preset": "Lofi Study",
+      "why": "the whole mix on a worn cassette: wow, flutter, hiss, crackle"
     }
   ],
   "wiring": [
@@ -191,17 +198,36 @@
         "eravos.sidechain-compressor",
         "sc.hook.audio_in"
       ]
+    },
+    {
+      "from": [
+        "eravos.fx-destroyer",
+        "fx.hook.audio_out"
+      ],
+      "to": [
+        "eravos.tape-memory",
+        "fx.hook.audio_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.sidechain-compressor",
+        "sc.hook.audio_out"
+      ],
+      "to": [
+        "eravos.tape-memory",
+        "fx.hook.audio_in"
+      ]
     }
   ],
   "output": [
-    "eravos.fx-destroyer",
-    "eravos.sidechain-compressor"
+    "eravos.tape-memory"
   ],
   "macros": [
     {
       "label": "DUST",
       "default": 0.4,
-      "hint": "how worn: fewer bits, more of the crushed drums",
+      "hint": "how worn: the tape's wear, fewer bits, more of the crushed drums",
       "targets": [
         {
           "tool": "eravos.fx-destroyer",
@@ -214,6 +240,12 @@
           "key": "mix",
           "min": 0.3,
           "max": 1
+        },
+        {
+          "tool": "eravos.tape-memory",
+          "key": "wear",
+          "min": 0.15,
+          "max": 0.8
         }
       ]
     },
@@ -283,6 +315,9 @@
       },
       "eravos.fx-echo": {
         "preset": "Lofi Warm Echo"
+      },
+      "eravos.tape-memory": {
+        "preset": "Lofi Study"
       }
     },
     "Rainy": {
@@ -303,6 +338,9 @@
       },
       "eravos.fx-echo": {
         "preset": "Lofi Long Night"
+      },
+      "eravos.tape-memory": {
+        "preset": "Lofi Rainy"
       }
     },
     "Late Night": {
@@ -323,6 +361,9 @@
       },
       "eravos.fx-echo": {
         "preset": "Lofi Long Night"
+      },
+      "eravos.tape-memory": {
+        "preset": "Lofi Late Night"
       }
     }
   }

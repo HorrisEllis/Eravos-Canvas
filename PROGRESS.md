@@ -2,6 +2,21 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.135 Tape Memory, the tool (2026-11-06)
+His "yes" to the spec and the UI preview. tools/music/tools/effects/tape-memory/ (scaffolded by build/new-tool.mjs).
+- Engine: in → saturator-tape → bitcrusher → delay-line L / R (time = 15 ms + the transport's lag + wow + flutter; R + drift) → svf high-pass →
+  svf low-pass (copies and wear lower it; VHS head tilt sweeps its detune) → dropout gain → + hiss (osc-noise pink, tilt) + crackle (osc-noise
+  crackle → svf band-pass) → out; five random-sources (wow, flutter, drift, head, dropout events → the dropout port); tape-transport (Speed,
+  Tape stop on its curve). Machines set character (top end, wow / flutter, hiss, bump, low floor). Wear and Copies scale it together.
+  The shell delays the dry 15 ms; settings before the sound starts land at once, while it plays glide 20 ms; the saturator is trimmed as
+  drive comes in (a peak at the very start came from defaults gliding to a preset — found by measuring, not by more trim).
+- UI: the approved preview's face (Out = the shell's outGain). Tape stop the primary; More depth folded; dims say why.
+- Packs: factory (Lofi Cassette + one per planned pack name — the ≥ 6 per pack not met, listed open) · lofi (the setup's three scenes).
+- The Lofi setup: Destroyer and Sidechain → Tape Memory → out; DUST also moves Wear.
+- Tests: tape-memory.test.js 8/8 (contract 4; clean = 15 ms late, pitch and level kept; wow moves pitch; speed 0.8 → 352 Hz; silence stays
+  silence, hiss and crackle add theirs; tape stop; dropouts; every preset under full scale). Design check clean (D1–D6 0). P132 P119 boundary
+  no-toys green; 247 manifests valid. Played in the app (the Lofi setup): no faults, −7 dB RMS, peaks −1.6 dB.
+
 ## Done — 3.134 Tape Memory's four components (2026-11-06)
 His "yes" to Tape Memory → bottom up: the four parts it lacked, each NEW code proving its own numbers, the worklet = the kernel text.
 - random-source: rate / smooth (S&H … cosine glide), dist uniform · gaussian (σ ⅓, clipped) · beta (Marsaglia–Tsang) · histogram (≤ 32 bins),
