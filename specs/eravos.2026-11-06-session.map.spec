@@ -103,3 +103,7 @@
   > First.
   - DECIDED (his): the editor track first — its spec and DAG, then pattern-store, seed-registry, scale-key, then the editor's UI preview
   - DONE after 13:30:25Z: the Pattern Editor spec (tools/music/planned/pattern-editor.spec, its DAG), pattern-store + seed-registry + scale-key built and proved, the UI preview made (docs/previews/pattern-editor-preview.png) — waiting for his yes
+
+## 13:38:50Z (2026-11-06T13:38:50.190Z) — verbatim:
+  > Absolutely not. Like I’m talking a full workshop. Editing one note completely like it’s in the center of a work surface or operating table or like photosyop
+  - DECIDED (his): the Pattern Editor preview is REJECTED. Direction: a full workshop — one note on a work surface, edited completely (operating table / Photoshop)
