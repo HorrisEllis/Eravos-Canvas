@@ -50,4 +50,17 @@ for (const [div, hz] of [['1/4', 140 / 60], ['1/8', 140 / 60 * 2], ['1/16', 140 
 { const a = gen(0.5, () => rnd() - 0.5), b = a.map(v => -v), c = gen(0.5, () => rnd() - 0.5);
   check(Math.abs(M.correlation(buf([a, a])) - 1) < 1e-9 && Math.abs(M.correlation(buf([a, b])) + 1) < 1e-9 && Math.abs(M.correlation(buf([a, c]))) < 0.05, 'correlation'); }
 
+
+// fingerprint (3.143): tone vs noise, bright vs dark, a hit vs a held note, level does not change it
+{ const sine = gen(2, t => 0.5 * Math.sin(2 * Math.PI * 440 * t)), noise = gen(2, () => rnd() * 2 - 1), dark = gen(2, t => 0.5 * Math.sin(2 * Math.PI * 110 * t)), bright = gen(2, t => 0.5 * Math.sin(2 * Math.PI * 3520 * t));
+  const F = (d) => { const f = M.fingerprint(d, SR, 0, 2); return Object.fromEntries(f.names.map((n, i) => [n, f.v[i]])); };
+  const fs = F(sine), fn = F(noise), fd = F(dark), fb = F(bright);
+  check(fs.flatness < 0.05 && fn.flatness > 0.5, `flatness: a sine ${fs.flatness.toFixed(3)}, noise ${fn.flatness.toFixed(3)}`);
+  check(fb.centroid > fd.centroid + 4.5, `centroid: 3.5 kHz ${fb.centroid.toFixed(2)} octaves over 40 Hz, 110 Hz ${fd.centroid.toFixed(2)} (5 octaves apart)`);
+  const hit = gen(2, (t) => Math.exp(-t * 8) * Math.sin(2 * Math.PI * 440 * t)), fh = F(hit);
+  check(fh.endDb < -40 && fs.endDb > -1, `envelope: a hit ends ${fh.endDb.toFixed(1)} dB down, a held note ${fs.endDb.toFixed(1)}`);
+  const quiet = gen(2, t => 0.05 * Math.sin(2 * Math.PI * 440 * t)), fq = M.fingerprint(quiet, SR, 0, 2).v, f0 = M.fingerprint(sine, SR, 0, 2).v;
+  check(f0.every((x, i) => Math.abs(x - fq[i]) < 1e-6), 'the fingerprint does not depend on the level');
+  const am = gen(2, t => 0.5 * (1 + 0.9 * Math.sin(2 * Math.PI * 4 * t)) * Math.sin(2 * Math.PI * 440 * t)), fa = F(am);
+  check(fa.levelMove > fs.levelMove + 3, `loudness movement: a 4 Hz tremolo ${fa.levelMove.toFixed(1)} dB, a steady note ${fs.levelMove.toFixed(1)}`); }
 console.log(`${pass}/${pass + fail} instrument checks passed`); process.exit(fail ? 1 : 0);
