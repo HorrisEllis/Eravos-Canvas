@@ -71,6 +71,15 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-06 · An updater proved end to end on Windows — ERAVOS Update.exe
+- **His words (2026-11-06):** "it never closes, or does anything else to update." · "why not make it another exe?"
+- **His call:** the updater as its own program.
+- **Built:** a small NSIS program that takes over from ERAVOS, asks Windows for permission from its own window, runs the installer
+  silently, verifies the installed version and restarts ERAVOS; a fallback that reports its own failure; a status card with a way out.
+- **Proof:** unit tests of every path without Windows, and a CI step on a Windows runner running the whole chain with the real built
+  programs; the first run caught a registry-view bug, the second passed.
+- **Check:** `node desktop/test/updater.mjs` · the release workflow's step "Test ERAVOS Update.exe end to end"
+
 ### 2026-11-06 · A synth assembled from proved parts — Retro DCO
 - **His words (2026-11-06):** "Retro poly is buggy. I love it though. Like I want more synthwave." · "Which components, like what overlap
   can we focus on to speed this up?" · "Do it." · "1, 2" · "Build it."
