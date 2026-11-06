@@ -5,6 +5,7 @@
   "label": "Lofi",
   "icon": "📼",
   "accent": "#d6b37a",
+  "art": "music/art/start/setup-lofi.svg",
   "version": "1.0.0",
   "blurb": "Lofi as a system. The Groove plays a lazy boom bap on the dusty kit (through a little bit-crush); Chords plays jazz sevenths and ninths on soft keys, low-passed, with a warm tape echo; the Bassline and a soft sub follow the chords; a gentle pump ties it together. DUST, WARMTH, SWING and PUMP turn all of it. Everything then runs through Tape Memory, a worn cassette. (Spec: specs/eravos.lofi-setup.spec — the Piano joins it once built.)",
   "hub": "eravos.suite-hub",

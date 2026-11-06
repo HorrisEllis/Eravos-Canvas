@@ -5,6 +5,7 @@
   "label": "Synthwave",
   "icon": "🌆",
   "accent": "#ff3cac",
+  "art": "music/art/start/setup-synthwave.svg",
   "version": "1.0.0",
   "blurb": "Night drive as a system. Chords play the Supersaw's wide pad through a Phaser; the same chords feed the Arp, which plays Retro Poly through a Juno chorus and a dotted tape delay. A four-on-the-floor Groove plays gated 80s drums through Dynamics. NEON, BRIGHT, ECHO and DRIVE turn all of it.",
   "hub": "eravos.suite-hub",

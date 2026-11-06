@@ -5,6 +5,7 @@
   "label": "Sound System",
   "icon": "🔊",
   "accent": "#ffd24a",
+  "art": "music/art/start/setup-sound-system.svg",
   "version": "1.0.0",
   "blurb": "A dub sound system as a system. The Groove plays a one-drop on the drums; Chords and the Bassline put a reggae sub under it. Dub Station skanks, sirens and rides the big knob, with your sample through a Filter going into it, then the Sidechain pumps it and the tape Echo throws it. SIREN, ECHO, KNOB and PUMP turn all of it.",
   "hub": "eravos.suite-hub",

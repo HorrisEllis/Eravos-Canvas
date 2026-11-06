@@ -5,6 +5,7 @@
   "label": "Heavy Drops",
   "icon": "💥",
   "accent": "#ff2266",
+  "art": "music/art/start/setup-heavy-drops.svg",
   "version": "1.0.0",
   "blurb": "The Floor Falls Out sound as a system. A half-time Groove plays the Pads; Chords set the key and the Bassline puts the root on the kick, played twice: by the Wobble Bass (with a Destroyer inside its growl, so the sub underneath stays clean) and by the Sub Engine that dives on every drop. The Drop Builder makes the build, the pause where the floor falls out, and the room that opens on the drop. WOBBLE, WEIGHT, GRIT and SPACE turn all of it.",
   "hub": "eravos.suite-hub",
