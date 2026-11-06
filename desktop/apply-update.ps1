@@ -6,7 +6,8 @@
 #   4. on any failure puts the backup back, so ERAVOS still starts as it was
 #   5. writes what happened to update.log and update-result.json (ERAVOS reads it at its next start and tells you), and starts ERAVOS
 # -Setup <ERAVOS-Setup-x.exe>: installed by Setup (Program Files) - it runs the new Setup silently into the same folder instead of 2-4
-param([string]$Staged = '', [string]$Setup = '', [Parameter(Mandatory)][string]$Dest, [Parameter(Mandatory)][string]$Version, [Parameter(Mandatory)][string]$Work)
+# -NoStart: the release check only (ERAVOS would start and move the test folders into its library)
+param([string]$Staged = '', [string]$Setup = '', [Parameter(Mandatory)][string]$Dest, [Parameter(Mandatory)][string]$Version, [Parameter(Mandatory)][string]$Work, [switch]$NoStart)
 $ErrorActionPreference = 'Stop'
 Write-Host "ERAVOS Update starting: Dest=$Dest Work=$Work Staged=$Staged Setup=$Setup Version=$Version"
 $log = Join-Path $Work 'update.log'; $result = Join-Path $Work 'update-result.json'
@@ -57,6 +58,7 @@ try {
   Write-Host "ERAVOS Update failed: $($_.Exception.Message) at $($_.InvocationInfo.PositionMessage)"
   try { Say "failed: $($_.Exception.Message)"; Done $false $_.Exception.Message } catch { Write-Host "could not write the log: $($_.Exception.Message)" }
 }
+if ($NoStart) { Say 'done (not starting ERAVOS: -NoStart)'; exit 0 }
 Say 'starting ERAVOS'
 # through Explorer: ERAVOS starts as you, not as admin (ERAVOS Update may have needed admin for Program Files)
 Start-Process explorer.exe -ArgumentList "`"$exe`""

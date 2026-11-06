@@ -145,4 +145,39 @@ describe('P112 · piano roll: Connect edges · its own window', () => {
       assert.ok(heard.length >= 4, 'heard while drawing: ' + heard.join(' '));
     } finally { OrganismFactory.close(t.id); restoreView(); }
   });
+  it('3.120 sections: duplicate puts a copy right after and moves the rest on; delete takes it out and closes the gap (clips, markers, automation)', () => {
+    const ctx = new OfflineAudioContext(1, 8000, 8000), K = Kernel.create({ ctx, quiet: true, syncIR: true }), T = MasterTransport.create(K, { offline: true, bpm: 120 }); T.boot();
+    const tl = OrganismFactory.spawn('eravos.timeline', { K, headless: true }), wb = OrganismFactory.spawn('eravos.wobble-bass', { K, headless: true }), pub = (t, p) => K.bus.publish('ui:' + t + ':' + tl, p);
+    const c = OrganismFactory.handle(tl).ctx, st = () => c.serialize().extra;
+    pub('lane_add', { kind: 'inst', target: wb, name: 'Bass' });
+    pub('clip_add', { kind: 'notes', target: wb, startBar: 1, bars: 4, notes: [{ s: 0, l: 4, n: 40, v: 0.9 }] });   // intro 1–5
+    pub('clip_add', { kind: 'notes', target: wb, startBar: 5, bars: 4, notes: [{ s: 0, l: 4, n: 45, v: 0.9 }] });   // drop 5–9
+    pub('marker_edit', { op: 'add', bar: 1, name: 'INTRO' }); pub('marker_edit', { op: 'add', bar: 5, name: 'DROP' });
+    pub('section_op', { op: 'duplicate', a: 1, b: 5 });
+    let x = st(), notes = x.clips.filter(k => k.kind === 'notes').sort((p, q) => p.startBar - q.startBar);
+    assert.deepEqual(notes.map(k => [k.startBar, k.notes[0].n]), [[1, 40], [5, 40], [9, 45]], 'intro, its copy, then the drop moved on by 4 bars');
+    assert.deepEqual(x.markers.map(m => [m.bar, m.name]), [[1, 'INTRO'], [5, 'INTRO'], [9, 'DROP']], 'markers too');
+    pub('section_op', { op: 'delete', a: 5, b: 9 });
+    x = st(); notes = x.clips.filter(k => k.kind === 'notes').sort((p, q) => p.startBar - q.startBar);
+    assert.deepEqual(notes.map(k => [k.startBar, k.notes[0].n]), [[1, 40], [5, 45]], 'the copy gone, the drop back at 5');
+    assert.deepEqual(x.markers.map(m => [m.bar, m.name]), [[1, 'INTRO'], [5, 'DROP']], 'and its marker');
+  });
+  it('3.120 select by pitch and by loudness from the notes menu', async () => {
+    const t = await make([{ s: 0, l: 2, n: 60, v: 0.8 }, { s: 2, l: 2, n: 62, v: 0.3 }, { s: 4, l: 2, n: 60, v: 0.3 }, { s: 6, l: 2, n: 64, v: 0.82 }]);
+    try {
+      const R = t.roll, pick = (re) => { R.noteMenu(100, 100); Array.from(document.querySelectorAll('.cm .cm-item')).find(b => re.test(b.textContent)).click(); };
+      R.select([0]); pick(/Select every C4/); assert.deepEqual(R.selected, [0, 2], 'every C4');
+      R.select([0]); pick(/about this loud/); assert.deepEqual(R.selected, [0, 3], 'every note near velocity 0.8');
+    } finally { if (window.ContextMenu) ContextMenu.close(); OrganismFactory.close(t.id); restoreView(); }
+  });
+  it('3.120 quantize remembers where notes were played: another strength replaces the last; Back to the original timing restores them exactly', async () => {
+    const t = await make([{ s: 0.3, l: 2, n: 60, v: 0.8 }, { s: 4.6, l: 2, n: 62, v: 0.8 }]);
+    try {
+      const R = t.roll, played = R.state.notes.map(a => a.s); R.select([0, 1]); R.setStrength(1); R.quantize();
+      assert.deepEqual(R.state.notes.map(a => a.s), [0, 5], '100 %: on the grid');
+      R.setStrength(0.5); R.quantize(); const half = R.state.notes.map(a => a.s);
+      assert.ok(Math.abs(half[0] - 0.15) < 0.01 && Math.abs(half[1] - 4.8) < 0.01, '50 % from where they were played, not from the grid: ' + half);
+      R.unquantize(); assert.deepEqual(R.state.notes.map(a => a.s), played, 'exactly back to where they were'); assert.ok(R.state.notes.every(a => a.qs === undefined), 'nothing left over');
+    } finally { OrganismFactory.close(t.id); restoreView(); }
+  });
 });

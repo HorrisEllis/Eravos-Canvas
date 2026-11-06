@@ -2,6 +2,17 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.120 Sections · select by pitch / loudness · quantize you can change · the release check fixed (2026-11-06)
+- The release blocker, found: ERAVOS Update worked all along (run 11: closed → backed up → new files in → result + log written →
+  ERAVOS started). The check read the result 3 s later — by then the started ERAVOS had moved the test's folders into its library
+  (Documents\ERAVOS, the 3.110 migration). Fixed in the check: -NoStart, and the work folder outside the app as in the real app.
+- Sections (timeline-depth.spec resolution levels): the stretch from a marker to the next. Right-click it on the marker lane: Select,
+  Loop, Duplicate (copy right after; the rest moves on), Delete (out, gap closed) — clips, markers and automation points move with it.
+- Notes menu: select every note of this pitch / about this loud.
+- Quantize is non-destructive: a note keeps where it was played (qs); another strength works from there; "Back to the original timing";
+  a hand move makes the new place the played one.
+- p112 13/13; desktop/test/updater.mjs passes. Full 1395/1399: P82, rim, P70 (main's), P74b (flaky).
+
 ## Done — 3.118–3.119 The release check says why · Sketch plays as you draw (2026-11-06)
 - 3.118 Releases v0.2.4–v0.2.7 were never published: the release workflow's ERAVOS Update check (3.111) found no update-result.json, and
   it runs before the upload. Its log now shows a parse check, the helper's output and folders. Run 10: helper exit 0, no output, no log

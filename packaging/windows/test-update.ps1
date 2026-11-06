@@ -5,7 +5,7 @@ $ErrorActionPreference = 'Stop'
 $repo = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path))
 $built = Join-Path $repo 'dist\ERAVOS'
 $root = Join-Path $env:TEMP ('eravos-update-test-' + [guid]::NewGuid().ToString('N'))
-$inst = Join-Path $root 'installed'; $work = Join-Path $inst '.appdata\update'
+$inst = Join-Path $root 'installed'; $work = Join-Path $root 'library\.appdata\update'   # as in the app: the work folder is in your library, not the app's
 New-Item -ItemType Directory -Force -Path $inst | Out-Null
 robocopy $built $inst /E /NFL /NDL /NJH /NJS /NP | Out-Null
 # what an older install has: a file the new one changes, and your own work
@@ -16,7 +16,7 @@ $helper = Join-Path $repo 'desktop\apply-update.ps1'; $tok = $null; $perr = $nul
 [void][System.Management.Automation.Language.Parser]::ParseFile($helper, [ref]$tok, [ref]$perr)
 if ($perr -and $perr.Count) { $perr | ForEach-Object { Write-Host "PARSE: line $($_.Extent.StartLineNumber): $($_.Message)" }; throw 'apply-update.ps1 does not parse' }
 $ErrorActionPreference = 'Continue'
-& powershell -NoProfile -ExecutionPolicy Bypass -File $helper -Staged $built -Dest $inst -Version '9.9.9' -Work $work *>&1 | ForEach-Object { Write-Host "HELPER: $_" }
+& powershell -NoProfile -ExecutionPolicy Bypass -File $helper -Staged $built -Dest $inst -Version '9.9.9' -Work $work -NoStart *>&1 | ForEach-Object { Write-Host "HELPER: $_" }
 Write-Host "helper exit code: $LASTEXITCODE"
 Write-Host "work folder: $work exists=$(Test-Path $work)"; if (Test-Path $work) { Get-ChildItem -Force $work | ForEach-Object { Write-Host "  $($_.Name)" } }
 Write-Host "installed folder has: $((Get-ChildItem -Force $inst | ForEach-Object { $_.Name }) -join ', ')"
