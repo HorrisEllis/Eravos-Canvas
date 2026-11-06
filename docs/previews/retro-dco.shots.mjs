@@ -1,0 +1,20 @@
+// node docs/previews/retro-dco.shots.mjs — pictures of the Retro DCO preview in the real canvas, silent. Not built.
+import { chromium } from '../../host/driver/glass.js'; import path from 'path'; import { fileURLToPath } from 'url'; import fs from 'fs';
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'), OUT = ROOT + '/docs/previews';
+const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1400, height: 1100 }, deviceScaleFactor: 2 });
+await p.addInitScript(() => { window.ERAVOS_CATALOG_ALL = true; });
+p.on('pageerror', e => console.log('ERR', e.message));
+await p.goto('file://' + ROOT + '/canvas/index.html?noboot'); await p.waitForFunction(() => window.Shell && window.Shell.X);
+await p.evaluate(() => { Shell.activate(); Shell.X.enterMode('music'); });
+await p.evaluate(fs.readFileSync(`${OUT}/retro-dco.preview.js`, 'utf8'));
+const ids = await p.evaluate(() => { CanvasWM.world.querySelectorAll('.wm-win').forEach(w => { if (!w.closest('#dock')) w.remove(); }); CanvasWM.view = { x: 0, y: 0, z: 1 }; CanvasWM.applyView();
+  return [OrganismFactory.spawn('eravos.retro-poly', { x: 20, y: 20 }), OrganismFactory.spawn('eravos.retro-dco', { x: 660, y: 20 })]; });
+await p.evaluate(() => { const d = document.getElementById('dock'); if (d) d.style.display = 'none'; });
+const win = (i) => p.$(`.wm-win[data-instance="${ids[i]}"]`);
+await p.waitForTimeout(1800);
+await (await win(1)).screenshot({ path: `${OUT}/retro-dco-preview.png` });
+await p.screenshot({ path: `${OUT}/retro-dco-beside-retro-poly.png` });
+await p.evaluate((id) => { [...CanvasWM.windowOf(id).querySelectorAll('button')].find(b => /More depth/.test(b.textContent)).click(); const c = OrganismFactory.handle(id).ctx.params; c.set('filter', 'ladder'); c.set('voice', 'unison'); }, ids[1]); await p.waitForTimeout(700);
+await (await win(1)).screenshot({ path: `${OUT}/retro-dco-more-depth.png` });
+console.log('faults', JSON.stringify(await p.evaluate(() => Kernel.faults.list().slice(-3).map(f => f.code + ' ' + (f.message || '').slice(0, 80)))));
+await b.close(); console.log('ok');
