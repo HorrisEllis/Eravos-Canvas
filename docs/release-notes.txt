@@ -1,3 +1,12 @@
+ERAVOS v0.2.12 (2026-11-06)
+
+Install: on 0.2.10 or later, ERAVOS offers this update by itself (or ERAVOS-Setup-0.2.12.exe).
+
+- The plan for the store is written (specs/eravos.store.spec): ERAVOS itself installs on the system; tools, components, packs and
+  domains live in Documents\ERAVOS as whole zips from a store, and the canvas checks what each one needs before it loads. No change
+  in how ERAVOS works yet.
+- Everything in 0.2.11: a key let go stops in every tool; Retro Poly Hold; the new shared synth parts.
+
 ERAVOS v0.2.11 (2026-11-06)
 
 Install: on 0.2.10, ERAVOS offers this update by itself (or ERAVOS-Setup-0.2.11.exe).
