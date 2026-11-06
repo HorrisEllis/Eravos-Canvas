@@ -20,7 +20,7 @@ const comps = {};
 for (const id of fs.readdirSync(CDIR).sort()) {
   const spec = path.join(CDIR, id, id + '.spec'); if (!fs.existsSync(spec)) { if (fs.existsSync(path.join(CDIR, id, id + '.js'))) comps[id] = { built: true, on: [] }; continue; }
   const s = read(spec), m = /^\s*stands on:\s*(.+)$/m.exec(s);
-  comps[id] = { built: fs.existsSync(path.join(CDIR, id, id + '.js')), on: m ? m[1].split(/[·,]/).map(x => x.trim()).filter(x => x && x !== '—' && x !== 'nothing') : [] };
+  comps[id] = { built: fs.existsSync(path.join(CDIR, id, id + '.js')), on: m ? m[1].replace(/\(.*\)/g, '').split(/[·,]/).map(x => x.trim()).filter(x => /^[a-z][a-z0-9-]*$/.test(x) && x !== 'nothing') : [] };
 }
 const label = (c) => c + (comps[c] && comps[c].built ? ' ✓' : '');
 // the closure of what a set of components stands on, as layers (0 = stands on nothing)
