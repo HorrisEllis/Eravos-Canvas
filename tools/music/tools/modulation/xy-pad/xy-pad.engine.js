@@ -9,7 +9,8 @@
     size: { w: 420, h: 520 }, minSize: { w: 320, h: 420 },
     permissions: ['audio_out', 'bus_publish', 'bus_subscribe', 'registry_read'],
     provides: ['capability.external_automation'],
-    hooks: [S.mod_out('xy.hook.mod_x', 'x'), S.mod_out('xy.hook.mod_y', 'y'), S.transport_in('xy.hook.transport_in')],
+    hooks: [S.mod_out('xy.hook.mod_x', 'x'), S.mod_out('xy.hook.mod_y', 'y'), S.transport_in('xy.hook.transport_in'),
+      Object.assign(S.event('xy.hook.touch_out', 'out', 'ui:config_change', { type: 'object', required: ['key', 'value'] }, '1.0.0'), { rail: false, intent: 'the hand on the pad, as its X and Y (Bind and write mode hear it)' })],
     config: [
       { key: 'smoothing', type: 'number', default: 0.02, min: 0.001, max: 0.3, step: 0.001, unit: 's', label: 'Smooth', group: 'FEEL' },
       { key: 'curveX', type: 'enum', options: ['lin', 'exp', 'log'], default: 'lin', label: 'Curve X', group: 'X' },
@@ -27,6 +28,10 @@
       { key: 'returnTime', type: 'number', default: 0.3, min: 0, max: 2, step: 0.01, unit: 's', label: 'Return', group: 'FEEL' },
       { key: 'inertia', type: 'boolean', default: false, label: 'Inertia', group: 'FEEL' },
       { key: 'friction', type: 'number', default: 0.85, min: 0, max: 1, step: 0.01, label: 'Friction', group: 'FEEL' },
+      // 3.131 where the puck is, as two controls (his words, 2026-11-06: "bind a tool or component, or interaction object"): a hand on the
+      // pad moves them (so Automation's ⊕ Bind and write mode hear it); a lane, a MIDI knob or a preset moving them moves the puck
+      { key: 'posX', type: 'number', default: 0.5, min: 0, max: 1, step: 0.001, label: 'X', group: 'PAD' },
+      { key: 'posY', type: 'number', default: 0.5, min: 0, max: 1, step: 0.001, label: 'Y', group: 'PAD' },
     ],
     ui_hooks: ['xy_move', 'xy_release', 'loop_arm', 'loop_play', 'loop_clear'],
     engine(ctx) {
@@ -62,7 +67,14 @@
         ctx.emitUI('pos', { x, y, live: true });
       }
       ctx.move = move;
-      ctx.onUI('xy_move', { type: 'object', required: ['x', 'y'], properties: { x: { type: 'number', minimum: 0, maximum: 1 }, y: { type: 'number', minimum: 0, maximum: 1 } } }, (p) => move(p.x, p.y));
+      let byHand = false, saidAt = 0;
+      ctx.onUI('xy_move', { type: 'object', required: ['x', 'y'], properties: { x: { type: 'number', minimum: 0, maximum: 1 }, y: { type: 'number', minimum: 0, maximum: 1 } } }, (p) => {
+        move(p.x, p.y);
+        const now = Date.now(); if (now - saidAt < 16) return; saidAt = now;   // the hand, as the two controls (≤ 60 a second)
+        byHand = true; try { ctx.emit('ui:config_change:' + ctx.id, { key: 'posX', value: p.x }); ctx.emit('ui:config_change:' + ctx.id, { key: 'posY', value: p.y }); } finally { byHand = false; }
+      });
+      // anything else moving X or Y (a lane, a MIDI knob, a preset) moves the puck
+      ['posX', 'posY'].forEach(k => P.onChange(k, () => { if (byHand) return; const x = P.get('posX'), y = P.get('posY'); pos = { x, y }; out(x, y); ctx.emitUI('pos', { x, y, live: false }); }));
       ctx.onUI('xy_release', null, () => {
         touching = false;
         if (P.get('inertia') && (Math.abs(vel.x) + Math.abs(vel.y)) > 0.05) { coast(); return; }

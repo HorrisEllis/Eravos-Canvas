@@ -2,18 +2,16 @@
 OrganismFactory.reg('eravos.macro-automation', function (view) {
   const UI = view.ui, h = UI.h, cfg = (k) => view.descriptor.config.find(c => c.key === k);
   let S = { lanes: [], length: 16, params: [] }, playBar = null;
-  const orgSel = UI.Select({ options: [{ value: '', label: 'Organism…' }], onChange: () => fillKeys() });
-  const keySel = UI.Select({ options: [{ value: '', label: 'Parameter…' }] });
-  function fillOrgs() { orgSel.setOptions([{ value: '', label: 'Organism…' }].concat(S.params.map(p => ({ value: p.id, label: p.label })))); }
-  function fillKeys() { const o = S.params.find(p => p.id === orgSel.select.value); keySel.setOptions([{ value: '', label: 'Parameter…' }].concat(o ? o.keys.map(k => ({ value: k.key, label: (k.group ? k.group + ' · ' : '') + k.label })) : [])); }
-  const add = UI.Button({ label: '＋ Add lane', kind: 'primary', onClick: () => { if (orgSel.select.value && keySel.select.value) view.emit('lane_add', { target: orgSel.select.value, key: keySel.select.value }); } });
-  const bindB = UI.Button({ label: '⊕ Bind', hint: 'press, then touch any knob on any tool: it gets a lane here (like MIDI Mapper’s learn)', onClick: () => view.emit('bind', {}) });
+  // 3.131 ＋ Add lane = an empty lane (draw now, bind when you like); each lane has its own ⊕ Bind (his words, 2026-11-06: "an empty lane
+  // with a bind button to bind a tool or component, or interaction object" · "yes")
+  const add = UI.Button({ label: '＋ Add lane', kind: 'primary', hint: 'an empty lane: draw on it now, then press its ⊕ Bind and touch what it should move', onClick: () => view.emit('lane_add', {}) });
+  const fillOrgs = () => {};
   const status = h('span', { class: 'uk-hint', style: { margin: 0 } });
   view.on('status', (s) => { status.textContent = (s && (s.warn || s.info)) || ''; });
   const list = h('div', { style: { display: 'flex', flexDirection: 'column', gap: '6px', overflow: 'auto', flex: '1' } });
   view.root.style.display = 'flex'; view.root.style.flexDirection = 'column';
-  view.root.append(h('div', { class: 'org-row' }, [bindB.el, orgSel.el, keySel.el, add.el, UI.paramControl(view, cfg('mode')).el, UI.paramControl(view, cfg('quantize'), { segMax: 5 }).el, UI.paramControl(view, cfg('lengthBars'), { size: 28 }).el]), status, list,
-    UI.hint('⊕ Bind, then touch any knob = a lane for it · Click = add point · drag = move · alt-drag = bend the curve · right-click = delete. Mode “write” records your knob moves while the song plays.'));
+  view.root.append(h('div', { class: 'org-row' }, [add.el, UI.paramControl(view, cfg('mode')).el, UI.paramControl(view, cfg('quantize'), { segMax: 5 }).el, UI.paramControl(view, cfg('lengthBars'), { size: 28 }).el]), status, list,
+    UI.hint('＋ Add lane, then its ⊕ Bind and touch any control — on a tool, a component or an interaction object (XY Pad, Breath…) · Click = add point · drag = move · alt-drag = bend the curve · right-click = delete. Mode “write” records your knob moves while the song plays.'));
   view.on('play_bar', (p) => { playBar = p.bar; });
   const store = {}; const els = {};
   function laneEl(l0) {
@@ -24,7 +22,7 @@ OrganismFactory.reg('eravos.macro-automation', function (view) {
     UI.loop(cv, () => {
       cv.fit(); const g = cv.g, W = cv.W; g.fillStyle = '#080b10'; g.fillRect(0, 0, W, H);
       for (let b = 1; b <= S.length; b++) { g.fillStyle = b % 4 === 1 ? '#223044' : '#141c27'; g.fillRect(X(b), 0, 1, H); }
-      const pts = L().points; g.strokeStyle = L().missing ? '#555' : '#ffaa00'; g.lineWidth = 2; g.beginPath();
+      const pts = L().points; g.strokeStyle = L().missing ? '#555' : L().unbound ? '#8a7a5a' : '#ffaa00'; g.lineWidth = 2; g.beginPath();
       for (let x = 0; x <= W; x += 2) { const b = B(x); let v = pts[0].value; if (b >= pts[0].bar) { v = pts[pts.length - 1].value; for (let i = 1; i < pts.length; i++) if (b < pts[i].bar) { const a = pts[i - 1], c = pts[i]; let u = (b - a.bar) / (c.bar - a.bar); if (L().hold) u = 0; else if (a.curve > 0) u = Math.pow(u, 1 + a.curve * 3); else if (a.curve < 0) u = 1 - Math.pow(1 - u, 1 - a.curve * 3); v = a.value + (c.value - a.value) * u; break; } } x ? g.lineTo(x, Y(v)) : g.moveTo(x, Y(v)); }
       g.stroke(); g.fillStyle = '#fff'; pts.forEach(p => { g.beginPath(); g.arc(X(p.bar), Y(p.value), 4, 0, 7); g.fill(); });
       if (playBar) { g.fillStyle = '#00d4ff'; g.fillRect(X(playBar), 0, 2, H); }
@@ -46,7 +44,18 @@ OrganismFactory.reg('eravos.macro-automation', function (view) {
     });
     ['pointerup', 'pointercancel'].forEach(t => cv.addEventListener(t, () => { drag = null; }));
     const en = UI.Toggle({ label: L().enabled ? 'On' : 'Off', value: L().enabled, onChange: (v) => view.emit('lane_mode', { id: L().id, enabled: v }) });
-    const head = h('div', { class: 'org-row', style: { margin: 0 } }, [h('span', { style: { font: '600 11px var(--font)', color: L().missing ? '#ff5577' : '#ffaa00' }, text: L().label + (L().missing ? ' — target gone' : '') + (L().recording ? ' ● rec' : '') }), h('span', { class: 'uk-hint', text: L().output === 'audio' ? 'audio-rate' : 'event-rate' }), en.el, UI.Button({ label: 'Clear', onClick: () => view.emit('point_edit', { lane: L().id, op: 'clear' }) }).el, UI.Button({ label: '×', onClick: () => view.emit('lane_remove', { id: L().id }) }).el]);
+    const bindingMe = S.binding === L().id;
+    const lb = UI.Button({ label: bindingMe ? '… touch a control' : L().unbound ? '⊕ Bind' : '⊕ Rebind', kind: L().unbound && !bindingMe ? 'primary' : '', hint: 'press, then touch the control this lane should move — on any tool, component or interaction object (again: cancel)', onClick: () => view.emit('lane_bind', { id: L().id }) });
+    if (bindingMe) lb.el.classList.add('danger');
+    // the list, for when touching is not handy (everything on the canvas that has controls)
+    const opts = [{ value: '', label: 'or pick ▾' }]; S.params.forEach(o => o.keys.forEach(k => opts.push({ value: o.id + '|' + k.key, label: o.label + ' · ' + (k.group ? k.group + ' · ' : '') + k.label })));
+    const pick = UI.Select({ options: opts, value: '', hint: 'pick what this lane moves from a list', onChange: (v) => { if (!v) return; const [target, key] = v.split('|'); view.emit('lane_bind_to', { id: L().id, target, key }); } });
+    const name = h('span', { style: { font: '600 11px var(--font)', color: L().missing ? '#ff5577' : L().unbound ? 'var(--dim)' : '#ffaa00' }, text: L().unbound ? 'Unbound lane' : L().label + (L().missing ? ' — target gone' : '') + (L().recording ? ' ● rec' : '') });
+    const head = h('div', { class: 'org-row', style: { margin: 0 } }, [name, lb.el, pick.el, h('span', { class: 'uk-hint', text: L().unbound ? 'drives nothing yet' : L().output === 'audio' ? 'audio-rate' : 'event-rate' }), en.el, UI.Button({ label: 'Clear', onClick: () => view.emit('point_edit', { lane: L().id, op: 'clear' }) }).el, UI.Button({ label: '×', onClick: () => view.emit('lane_remove', { id: L().id }) }).el]);
+    head.addEventListener('contextmenu', (e) => { e.preventDefault(); e.stopPropagation(); if (!window.ContextMenu) return; window.ContextMenu.show(e.clientX, e.clientY, [
+      { label: L().unbound ? '⊕ Bind…' : '⊕ Rebind…', run: () => view.emit('lane_bind', { id: L().id }) },
+      L().unbound ? null : { label: 'Unbind (keep the shape)', run: () => view.emit('lane_unbind', { id: L().id }) },
+      { sep: true }, { label: '× Remove the lane', danger: true, run: () => view.emit('lane_remove', { id: L().id }) }], L().label); });
     return h('div', { class: 'uk-group' }, [head, cv]);
   }
   // 3.27 empty state: a drawn example of what a lane does + one-click lanes for the moves people actually automate
@@ -70,8 +79,7 @@ OrganismFactory.reg('eravos.macro-automation', function (view) {
   }
   view.on('state_sync', (s) => {
     if (!s.lanes) return; S = s; fillOrgs();
-    bindB.set(s.binding ? '… touch a knob' : '⊕ Bind'); bindB.el.classList.toggle('danger', !!s.binding);
-    const ids = S.lanes.map(l => l.id + (l.enabled ? 1 : 0) + (l.missing ? 1 : 0) + (l.recording ? 1 : 0)).join(',') + (S.lanes.length ? '' : '|' + S.params.map(p => p.id).join(','));
+    const ids = String(s.binding) + '|' + S.lanes.map(l => l.id + (l.enabled ? 1 : 0) + (l.missing ? 1 : 0) + (l.recording ? 1 : 0) + (l.unbound ? 'u' : '') + (l.label || '')).join(',') + '|' + S.params.map(p => p.id).join(',') + (S.lanes.length ? '' : '|' + S.params.map(p => p.id).join(','));
     S.lanes.forEach(l => { store[l.id] = l; });
     if (ids === list.dataset.ids) return;
     list.dataset.ids = ids;
