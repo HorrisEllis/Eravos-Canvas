@@ -150,6 +150,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 ## Open (asked, not done)
 
+- **The store** (2026-11-06): the canvas installs on the system, everything else (domains, tools, components, packs, suites) lives in Documents\ERAVOS as whole zips from a store, the graph says what each needs (UI elements included) — `specs/eravos.store.spec`, S0 written; decisions D1–D4 his.
 - Connecting with people (share as a link, remix with credit, play together, share packs) — pinned 2026-11-05.
 - Songs as a rhythm-exploring tool only (not usable for making music).
 - Patterns for each tool with variety: presets, depth, curves, per-note editing — everything the timeline can do.
