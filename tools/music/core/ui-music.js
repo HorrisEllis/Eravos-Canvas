@@ -130,6 +130,14 @@
     };
     const up = (e) => { const n = held.get(e.pointerId); if (n !== undefined) { held.delete(e.pointerId); o.onUp && o.onUp(n); mark(n, false); } };
     el.addEventListener('pointerup', up); el.addEventListener('pointerleave', up); el.addEventListener('pointercancel', up);
+    // 3.122 "dragging down the piano keys": hold and slide — each key you slide onto plays (the one before lets go), a glissando
+    el.addEventListener('pointermove', (e) => {
+      if (!held.has(e.pointerId)) return;
+      const k = doc.elementFromPoint(e.clientX, e.clientY), kk = k && k.closest && k.closest('.uk-key'); if (!kk || !el.contains(kk)) return;
+      const MT = global.MusicTheory, n0 = +kk.dataset.n, n = lock && !MT.inScale(n0, root, scale) ? MT.quantize(n0, root, scale) : n0, was = held.get(e.pointerId);
+      if (n === was) return;
+      o.onUp && o.onUp(was); mark(was, false); held.set(e.pointerId, n); o.onDown && o.onDown(n, 0.8); mark(n, true);
+    });
     function mark(n, on) { keys.forEach(([m, k]) => { if (m === n) k.classList.toggle('down', on); }); }
     // P11.4 (gate A): playable from the keyboard — Tab to it, ←/→ pick a note (in key), Space or Enter plays it
     el.setAttribute('tabindex', '0'); el.setAttribute('role', 'group');

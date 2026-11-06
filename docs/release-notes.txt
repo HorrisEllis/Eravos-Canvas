@@ -1,3 +1,13 @@
+ERAVOS v0.2.9 (2026-11-06)
+
+Install: ERAVOS-Setup-0.2.9.exe, or unzip ERAVOS_0.2.9.zip. On 0.2.7 or later, ERAVOS offers this update by itself.
+
+- Suites can be played from the Timeline: a suite's window takes notes and plays its voices (in Wobble Bass Suite: the wobble, the
+  growl and the sub — not the drums, the bassline or the chords, which play themselves).
+- Slide across a tool's piano keys while holding: each key you reach plays.
+- Zoomed out, tools draw less (at most 24 frames a second under 60 % zoom, 8 under 35 %) — smoother with many tools open.
+- Button and switch borders are 3 px, in every theme, without moving anything.
+
 ERAVOS v0.2.8 (2026-11-06)
 
 Install: ERAVOS-Setup-0.2.8.exe, or unzip ERAVOS_0.2.8.zip. On 0.2.7, ERAVOS offers this update by itself.
