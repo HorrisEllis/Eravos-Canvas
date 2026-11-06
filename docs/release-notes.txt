@@ -10,6 +10,9 @@ Install: on 0.2.10 or later, ERAVOS offers this update by itself (or ERAVOS-Setu
 - Automation: ＋ Add lane makes an empty lane; each lane has its own Bind (touch the next control, or pick from a list); Rebind keeps the
   shape. The XY Pad's X and Y are controls a lane can move.
 - New shared parts for the Pattern Editor: pattern store, seed registry, scale and key.
+- Tape Memory (effects): cassette, VHS and reel character — saturation, wow and flutter, hiss, crackle, dropouts, wear and copies,
+  Tape stop. It joins the Lofi setup (DUST also moves Wear). Built on the new shared parts (tape saturator, tape transport, bitcrusher,
+  random source, delay line, noise, filter).
 
 ERAVOS v0.2.12 (2026-11-06)
 
