@@ -5,6 +5,7 @@
   "label": "Gothic",
   "icon": "🕯",
   "accent": "#8a5cff",
+  "art": "music/art/start/setup-gothic.svg",
   "version": "1.0.0",
   "blurb": "A cathedral after dark, as a system. Chords play the Gothic Organ, the Coven choir and a dark Pad Forge at once. The choir sings through Haunt (screwed tape, ghosts), and the organ and the choir share one long Echo. A slow stomp is there if you want drums. DARK, HAUNT, BREATH and SPACE turn all of it.",
   "hub": "eravos.suite-hub",

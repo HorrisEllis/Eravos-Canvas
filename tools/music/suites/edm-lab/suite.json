@@ -5,6 +5,7 @@
   "label": "EDM Lab",
   "icon": "⚗",
   "accent": "#ff2266",
+  "art": "music/art/start/setup-edm-lab.svg",
   "version": "4.0.0",
   "blurb": "Groove paints the rhythm and plays Pads; Chords voices the progression by TENSION and plays Pad Forge; Bassline puts the root on the kick and plays Reese Bass. ENERGY and TENSION here turn all of them. Swap any instrument for another and it still plays.",
   "hub": "eravos.suite-hub",

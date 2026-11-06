@@ -173,7 +173,9 @@
     const listed = Recipes.list().filter(r => !r.featured && !r.hidden && visible(r));
     const cards = listed.filter(r => !r.section).map(card);
     // recipes may name a section of their own (3.27) — each becomes its own block on the start screen
-    const sections = []; listed.filter(r => r.section).forEach(r => { let s = sections.find(x => x.name === r.section); if (!s) sections.push(s = { name: r.section, items: [] }); s.items.push(r); });
+    // 3.144 one section (his: "consolidate the start from and setups into one section"): the setups lead START FROM, each with its painting
+    const setupCards = listed.filter(r => r.section === 'SETUPS').map(card);
+    const sections = []; listed.filter(r => r.section && r.section !== 'SETUPS').forEach(r => { let s = sections.find(x => x.name === r.section); if (!s) sections.push(s = { name: r.section, items: [] }); s.items.push(r); });
     const sectionEls = sections.flatMap(s => [h('div', { class: 'boot-sec', text: s.name }), h('div', { class: 'grid' }, s.items.map(card))]);
     // 3.37 domains first: one big card per installed domain (its first mode) — "what are you making?" — then any other
     // modes a domain offers (Lab…) as smaller cards. Domains arrive as packs; this lists whatever is installed.
@@ -197,8 +199,8 @@
       ...(featured.length ? [h('div', { class: 'hero-row' }, featured.map(r => h('div', { class: 'hero-card', role: 'button', tabindex: '0', onclick: () => start(r.id), onkeydown: (e) => { if (e.key === 'Enter') e.currentTarget.click(); } }, [heroPic(r), h('div', {}, [h('h2', { text: r.featured.title || r.label }), h('p', { text: r.featured.text || r.tagline || '' })]), h('span', { class: 'hero-go', text: 'Start ▸' })])))] : []),
       ...sectionEls,
       ...(OrganismFactory.defined().length ? [] : [h('div', { class: 'hero-card', style: { cursor: 'default' } }, [h('div', { class: 'big', text: '⧉' }), h('div', {}, [h('h2', { text: 'This canvas has no tools yet' }), h('p', { text: window.ERAVOS_DESKTOP ? 'Drop a pack (.zip) onto the canvas, or put it in ERAVOS Library › Packs and it loads every start. 📁 Library opens the folder.' : 'Drop a pack (.zip) anywhere onto the canvas to add its tools.' })])])]),
-      ...(cards.length || X.active().length ? [h('div', { class: 'boot-sec', text: 'START FROM' })] : []),
-      h('div', { class: 'grid' }, cards.concat([
+      ...(setupCards.length || cards.length || X.active().length ? [h('div', { class: 'boot-sec', text: 'START FROM' })] : []),
+      h('div', { class: 'grid' }, setupCards.concat(cards).concat([
         h('div', { class: 'card has-art', onclick: () => start(null) }, [pic('runtime/art/blank-canvas.svg'), h('b', { text: 'Empty canvas' }), h('small', { text: 'Agnostic — add tools yourself (＋ Add)' })]),
         h('div', { class: 'card has-art', onclick: () => { start(null); setTimeout(() => AddMenu.show(S, X), 30); } }, [pic('runtime/art/chest.svg'), h('b', { text: 'Browse every tool' }), h('small', { text: 'See what each one needs before you add it' })]),
       ])),

@@ -95,7 +95,7 @@
   });
   // ---- 3.37: the Wub rig — a dancehall-style dubstep drop built from the separate Wubs tools, already wired
   R.register({
-    id: 'eravos.recipe.wub-drop', art: ART('wub-drop'), label: 'Wub Drop (dancehall style)', icon: '🔊', accent: '#ff2266', genome: 'eravos.genome.music',
+    id: 'eravos.recipe.wub-drop', hidden: true,   /* 3.144 his: "remove vegal, and wub drop" — off the Start page, kept */ art: ART('wub-drop'), label: 'Wub Drop (dancehall style)', icon: '🔊', accent: '#ff2266', genome: 'eravos.genome.music',
     tagline: 'Wub Osc → Wub Filter (talking mouth) → Destroyer, Wub Rate opening it, Wub Sub under it, a half-time beat at 140',
     steps: [
       { op: 'mount', organism: 'eravos.pads', as: 'pads', at: [0, 0] },
@@ -186,7 +186,7 @@
     ],
   });
   R.register({
-    id: 'eravos.recipe.vagal', art: ART('vagal'), label: 'Vagal', icon: '◎', accent: '#8844ff', genome: 'eravos.genome.vagal', tagline: 'BREATH · EMOTION · RESONANCE — breathe with the music',
+    id: 'eravos.recipe.vagal', hidden: true,   /* 3.144 his: "remove vegal, and wub drop" — off the Start page, kept */ art: ART('vagal'), label: 'Vagal', icon: '◎', accent: '#8844ff', genome: 'eravos.genome.vagal', tagline: 'BREATH · EMOTION · RESONANCE — breathe with the music',
     steps: [
       { op: 'mount', organism: 'eravos.breath', as: 'breath', at: [40, 40] },
       { op: 'configure', target: 'breath', params: { pattern: 'COHERENCE' } },

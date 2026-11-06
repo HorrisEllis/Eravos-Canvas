@@ -2,6 +2,21 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.144 Start: one section, a painting per setup; σ in the novelty report (2026-11-06)
+Asked: "can you make the art for each genre of music and consolidate the start from and setups into one section and remove vegal, and wub
+drop, then make the animated artwork for the setups" · "could always use sigmas to measure deviations between sounds and tools?"
+- Eight animated paintings (240 × 110 SVG, CSS motion, still under reduced motion): EDM Lab (a festival stage, lasers sweeping, the crowd
+  bobbing), Gothic (a cathedral, its rose window and candles flickering, bats), Heavy Drops (speaker stacks throwing shockwaves),
+  Lofi (a rainy window, the lamp, steam, a cassette), Sound System (a yard at sunset, the stack pushing waves, a palm), Synthwave (the
+  striped sun, a scrolling grid, mountains, palms), Wobble Bass Suite (a waveform wobbling over a pumping cone), Xen (a turning lattice).
+  Each suite.json names its own painting ("art"); suites.js passes it on (the canvas still names no genre).
+- Start page: SETUPS lead START FROM — one section. Vagal and Wub Drop hidden (kept in recipes.js).
+- build/novelty.mjs: every distance also in σ from ERAVOS's usual preset spacing.
+- The Sequencer ("isn't working"): reproduced in the real app inside the built Lofi setup — steps clicked, notes reach the Drum Machine,
+  no faults. Asked him what he sees.
+- Proof: P119 3/3, P132 3/3, P63 11/11, P38 37/37, P41 15/15, P42 23/23, boundary 10/10; 252 manifests valid; P11 91/92 (P11.S Tape Memory
+  after Stop, failing on main too).
+
 ## Done — 3.143 N1: the novelty report across ERAVOS (2026-11-06)
 Asked: "The sworm and other tools need to be checked for novelty, like I need to be able to make more with this." (and "Need to make sure
 it's all novel").

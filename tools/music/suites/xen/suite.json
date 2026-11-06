@@ -5,6 +5,7 @@
   "label": "Xen",
   "icon": "🔮",
   "accent": "#33e0c0",
+  "art": "music/art/start/setup-xen.svg",
   "version": "1.0.0",
   "blurb": "Music between the keys, as a system. Ratio Lattice plays pure ratios and hands its tuning and its notes to Xen Synth; Recursive Spectra plays the same notes and hands its spectrum to Xen Synth too, so the timbre fits the tuning. A long Echo holds it all. SHIMMER, MORPH, BRIGHT and SPREAD turn all of it.",
   "hub": "eravos.suite-hub",

@@ -5,6 +5,7 @@
   "label": "Wobble Bass Suite",
   "icon": "〰",
   "accent": "#ff6fa8",
+  "art": "music/art/start/setup-wobble-suite.svg",
   "version": "1.0.0",
   "blurb": "The Wobble Bass with every enhanced tool around it, all wired. Groove plays the Drum Forge kit and tells the Bassline where the kick is; Chords set the key; the Bassline (1.1, with its feel and steps) sends one line to three voices at once: the Wobble Bass, a Bass Forge growl layered over it, and a clean Sub Engine under both. Wub Rate opens the wobble and pumps the Bass Forge on the same beat, an Envelope opens the FM growl on every note, a slow LFO bends the wobble rate, and a Destroyer and a squash live inside the growl so the sub stays clean. WOBBLE, GROWL, GRIT and WEIGHT turn all of it.",
   "hub": "eravos.suite-hub",
