@@ -36,7 +36,7 @@
       { key: 'quantize', type: 'enum', options: ['off', '1/16', '1/8', '1/4', '1 bar'], default: '1/16', label: 'Grid', group: 'LANES' },
       { key: 'mode', type: 'enum', options: ['read', 'write', 'latch', 'off'], default: 'read', label: 'Mode', group: 'LANES' },
     ],
-    ui_hooks: ['lane_add', 'lane_remove', 'point_edit', 'lane_mode'],
+    ui_hooks: ['lane_add', 'lane_remove', 'point_edit', 'lane_mode', 'bind'],
     restoreTwice: true,
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, K = ctx.K;
@@ -145,6 +145,20 @@
       // UI
       function snapBar(b) { const q = { off: 0, '1/16': 1 / 16, '1/8': 1 / 8, '1/4': 1 / 4, '1 bar': 1 }[P.get('quantize')]; return q ? 1 + Math.round((b - 1) / q) * q : b; }
       ctx.onUI('lane_add', { type: 'object', required: ['target', 'key'] }, (p) => addLane(p.target, p.key));
+      // 3.125 BIND (like MIDI Mapper's learn — his words, 2026-11-06: "the automation tool needs to have a bind button to bind a tool
+      // aspect to the automation tool"): press Bind, then touch any knob, switch or choice on any tool — it gets a lane here
+      let binding = false;
+      ctx.onUI('bind', null, (p) => { binding = p && p.on !== undefined ? !!p.on : !binding; ctx.emitUI('status', binding ? { info: 'Touch any knob on any tool to bind it here.' } : { info: '' }); ctx.syncUI(); });
+      ctx.on('ui:config_change:*', { type: 'object', required: ['key'] }, (p, topic) => {
+        if (!binding || p._auto || p._midi || p._from === ctx.id) return;
+        const target = topic.slice('ui:config_change:'.length); if (target === ctx.id || !K.registry.has(target)) return;
+        const c = cfgOf(target, p.key); if (!c || c.hidden || !['number', 'integer', 'enum', 'boolean'].includes(c.type)) return;
+        binding = false;
+        const had = lanes.find(l => l.target === target && l.key === p.key);
+        const l = had || addLane(target, p.key);
+        ctx.emitUI('status', l ? { info: (had ? 'Already bound: ' : 'Bound ✔ ') + l.label } : { warn: 'All 8 lanes are in use — remove one first.' }); ctx.syncUI();
+      });
+      ctx.binding = () => binding;
       ctx.onUI('lane_remove', { type: 'object', required: ['id'] }, (p) => { const l = lanes.find(x => x.id === p.id); if (!l) return; if (l.wire) K.wires.remove(l.wire, 'lane_removed'); srcs[l.slot].offset.cancelScheduledValues(ac.currentTime); srcs[l.slot].offset.setValueAtTime(0, ac.currentTime); lanes = lanes.filter(x => x !== l); ctx.syncUI(); });
       ctx.onUI('lane_mode', { type: 'object', required: ['id'] }, (p) => { const l = lanes.find(x => x.id === p.id); if (!l) return; if (p.enabled !== undefined) { l.enabled = !!p.enabled; if (l.enabled) { l.missing = !K.registry.has(l.target); logged.delete(l.id); } } ctx.syncUI(); });
       ctx.onUI('point_edit', { type: 'object', required: ['lane', 'op'] }, (p) => {
@@ -160,7 +174,7 @@
       });
       ctx.stateExtra = () => ({
         lanes: lanes.map(l => ({ id: l.id, label: l.label, points: l.points, enabled: l.enabled, missing: !!l.missing, output: l.output, hold: l.hold, recording: !!l.recording })),
-        length: lengthBars(),
+        length: lengthBars(), binding,
         params: K.registry.list().filter(r => !r.descriptor.system && r.instance_id !== ctx.id).map(r => ({ id: r.instance_id, label: (r.descriptor.icon || '') + ' ' + r.descriptor.label, keys: (r.descriptor.config || []).filter(c => ['number', 'integer', 'enum', 'boolean'].includes(c.type) && !c.hidden).map(c => ({ key: c.key, label: c.label || c.key, group: c.group || '' })) })),
       });
       ctx.on('kernel:organism-mounted', null, () => ctx.syncUI());

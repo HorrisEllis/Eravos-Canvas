@@ -124,9 +124,9 @@
     const held = new Map();
     const down = (e, n) => {
       e.preventDefault(); e.stopPropagation();
-      const MT = global.MusicTheory;
-      const play = lock && !MT.inScale(n, root, scale) ? MT.quantize(n, root, scale) : n;
-      held.set(e.pointerId, play); o.onDown && o.onDown(play, 0.8); mark(play, true);
+      // 3.125 every key plays its own note (his words, 2026-11-06: "each key needs to play its relative note"); keys outside the
+      // key stay shaded so the key is still seen — they no longer snap to a neighbour (that made a slide repeat or skip notes)
+      held.set(e.pointerId, n); o.onDown && o.onDown(n, 0.8); mark(n, true);
     };
     const up = (e) => { const n = held.get(e.pointerId); if (n !== undefined) { held.delete(e.pointerId); o.onUp && o.onUp(n); mark(n, false); } };
     el.addEventListener('pointerup', up); el.addEventListener('pointerleave', up); el.addEventListener('pointercancel', up);
@@ -134,7 +134,7 @@
     el.addEventListener('pointermove', (e) => {
       if (!held.has(e.pointerId)) return;
       const k = doc.elementFromPoint(e.clientX, e.clientY), kk = k && k.closest && k.closest('.uk-key'); if (!kk || !el.contains(kk)) return;
-      const MT = global.MusicTheory, n0 = +kk.dataset.n, n = lock && !MT.inScale(n0, root, scale) ? MT.quantize(n0, root, scale) : n0, was = held.get(e.pointerId);
+      const n = +kk.dataset.n, was = held.get(e.pointerId);
       if (n === was) return;
       o.onUp && o.onUp(was); mark(was, false); held.set(e.pointerId, n); o.onDown && o.onDown(n, 0.8); mark(n, true);
     });

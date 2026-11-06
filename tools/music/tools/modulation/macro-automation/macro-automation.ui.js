@@ -7,10 +7,13 @@ OrganismFactory.reg('eravos.macro-automation', function (view) {
   function fillOrgs() { orgSel.setOptions([{ value: '', label: 'Organism…' }].concat(S.params.map(p => ({ value: p.id, label: p.label })))); }
   function fillKeys() { const o = S.params.find(p => p.id === orgSel.select.value); keySel.setOptions([{ value: '', label: 'Parameter…' }].concat(o ? o.keys.map(k => ({ value: k.key, label: (k.group ? k.group + ' · ' : '') + k.label })) : [])); }
   const add = UI.Button({ label: '＋ Add lane', kind: 'primary', onClick: () => { if (orgSel.select.value && keySel.select.value) view.emit('lane_add', { target: orgSel.select.value, key: keySel.select.value }); } });
+  const bindB = UI.Button({ label: '⊕ Bind', hint: 'press, then touch any knob on any tool: it gets a lane here (like MIDI Mapper’s learn)', onClick: () => view.emit('bind', {}) });
+  const status = h('span', { class: 'uk-hint', style: { margin: 0 } });
+  view.on('status', (s) => { status.textContent = (s && (s.warn || s.info)) || ''; });
   const list = h('div', { style: { display: 'flex', flexDirection: 'column', gap: '6px', overflow: 'auto', flex: '1' } });
   view.root.style.display = 'flex'; view.root.style.flexDirection = 'column';
-  view.root.append(h('div', { class: 'org-row' }, [orgSel.el, keySel.el, add.el, UI.paramControl(view, cfg('mode')).el, UI.paramControl(view, cfg('quantize'), { segMax: 5 }).el, UI.paramControl(view, cfg('lengthBars'), { size: 28 }).el]), list,
-    UI.hint('Click = add point · drag = move · alt-drag = bend the curve · right-click = delete. Mode “write” records your knob moves while the song plays.'));
+  view.root.append(h('div', { class: 'org-row' }, [bindB.el, orgSel.el, keySel.el, add.el, UI.paramControl(view, cfg('mode')).el, UI.paramControl(view, cfg('quantize'), { segMax: 5 }).el, UI.paramControl(view, cfg('lengthBars'), { size: 28 }).el]), status, list,
+    UI.hint('⊕ Bind, then touch any knob = a lane for it · Click = add point · drag = move · alt-drag = bend the curve · right-click = delete. Mode “write” records your knob moves while the song plays.'));
   view.on('play_bar', (p) => { playBar = p.bar; });
   const store = {}; const els = {};
   function laneEl(l0) {
@@ -67,6 +70,7 @@ OrganismFactory.reg('eravos.macro-automation', function (view) {
   }
   view.on('state_sync', (s) => {
     if (!s.lanes) return; S = s; fillOrgs();
+    bindB.set(s.binding ? '… touch a knob' : '⊕ Bind'); bindB.el.classList.toggle('danger', !!s.binding);
     const ids = S.lanes.map(l => l.id + (l.enabled ? 1 : 0) + (l.missing ? 1 : 0) + (l.recording ? 1 : 0)).join(',') + (S.lanes.length ? '' : '|' + S.params.map(p => p.id).join(','));
     S.lanes.forEach(l => { store[l.id] = l; });
     if (ids === list.dataset.ids) return;
