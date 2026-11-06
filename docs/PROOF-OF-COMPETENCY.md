@@ -71,6 +71,16 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-06 · A synth assembled from proved parts — Retro DCO
+- **His words (2026-11-06):** "Retro poly is buggy. I love it though. Like I want more synthwave." · "Which components, like what overlap
+  can we focus on to speed this up?" · "Do it." · "1, 2" · "Build it."
+- **His call:** the shared parts first by overlap, the UI shown as a preview, then built; the new tool beside Retro Poly until he has heard it.
+- **Built:** a polyphonic synth whose whole sound is one AudioWorklet made from eleven components' own tested code, sixteen voice cards
+  with seeded per-voice character, a voice allocator, two filter models, the bucket-brigade chorus, and twelve presets kept as data.
+- **Proof:** the shared tool contract 4/4 and seven of its own measured checks (pitch within 5 cents, both filters and every voice mode
+  clean, stereo chorus, voice stealing, key release, loudness matched to Retro Poly within 2 dB and under full scale at its loudest).
+- **Check:** `node tests/run.mjs P139` · `node tests/run.mjs retro-dco`
+
 ### 2026-11-06 · The Juno chorus, modelled and proved — bbd-line, ensemble-core
 - **His words (2026-11-06):** "1, 2" (release, then the synthwave parts).
 - **His call:** the parts the synthwave tools share first, then Retro DCO, its UI shown before it is built.

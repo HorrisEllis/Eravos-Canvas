@@ -7,7 +7,8 @@
  *   steal    when every voice is busy (poly): a voice in its release goes first (the one released longest ago); then by policy:
  *            oldest (started first) · quietest (lowest level the tool reported with level(v, x)) · same-note (that note's own voice,
  *            else oldest) · lowest (lowest note) · highest (highest note)
- *   release  a voice let go stays "releasing" until free(v) — or, when release(seconds) is set, until that long after its note-off
+ *   release  a voice let go stays "releasing" until free(v) — or, when release(seconds) is set, until that long after its note-off.
+ *            A note-off may be booked ahead (a sequenced note's length): until then the voice still counts as sounding.
  *   budget   budget() → { voices, active, releasing, free, stolen } (stolen counts every steal since reset)
  * noteOn / noteOff return ONE result object, reused (no allocation per note): { voice, note, retrigger, stolen, stolenNote, glide }
  *   voice −1 = nothing to do (a note-off for a key not held, or mono with keys still down)
@@ -26,9 +27,10 @@
     function settle(t) { if (relSec > 0) for (let v = 0; v < voices; v++) if (state[v] === REL && t >= offAt[v] + relSec) { state[v] = FREE; note[v] = -1; } }
     function pushHeld(n, vel) { removeHeld(n); held[heldN] = n; heldVel[heldN] = vel; heldN++; }
     function removeHeld(n) { for (let i = 0; i < heldN; i++) if (held[i] === n) { for (let k = i; k < heldN - 1; k++) { held[k] = held[k + 1]; heldVel[k] = heldVel[k + 1]; } heldN--; return true; } return false; }
-    function victim(n) {
+    function victim(n, t) {
       let best = -1;
-      for (let v = 0; v < voices; v++) if (state[v] === REL && (best < 0 || offAt[v] < offAt[best])) best = v;   // the longest-released first
+      // the longest-released first — a note-off booked AFTER t (a sequenced note's length) is still sounding at t, so it does not count
+      for (let v = 0; v < voices; v++) if (state[v] === REL && offAt[v] <= t && (best < 0 || offAt[v] < offAt[best])) best = v;
       if (best >= 0) return best;
       const pol = STEAL[steal];
       if (pol === 'same-note') for (let v = 0; v < voices; v++) if (note[v] === n) return v;
@@ -57,7 +59,7 @@
           return out(0, n, re, -1, -1, gl);
         }
         for (let v = 0; v < voices; v++) if (state[v] === FREE) { note[v] = n; state[v] = ON; start[v] = t + seq * 1e-9; lvl[v] = 1; return out(v, n, true, -1, -1, false); }
-        const v = victim(n), sn = note[v]; stolenCount++;
+        const v = victim(n, t), sn = note[v]; stolenCount++;
         note[v] = n; state[v] = ON; start[v] = t + seq * 1e-9; lvl[v] = 1;
         return out(v, n, true, v, sn, false);
       },

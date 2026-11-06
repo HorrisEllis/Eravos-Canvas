@@ -1,4 +1,4 @@
-# spec_id: eravos.retro-dco · version 0.1.0 · status audited · extends:retro-poly · template eravos.tool/1
+# spec_id: eravos.retro-dco · version 0.1.0 · status built 2026-11-06 (see ADDENDUM) · extends:retro-poly · template eravos.tool/1
 # generated from eravos.music-ecosystem.spec v0.2.0 §4 (synthwave_retro) — that file stays the index; this file is the tool's own spec
 identity:
   id: eravos.retro-dco ; label: Retro DCO ; domain: music ; family: synthwave_retro
