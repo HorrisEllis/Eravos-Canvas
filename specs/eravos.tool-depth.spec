@@ -91,3 +91,16 @@
     tempo follow / ratio, output) — one shared kit part; a tool shows the rows that apply to it.
   Built tool by tool; the face changes are shown to him first; defaults keep today's sound (null render where provable).
 
+## ADDENDUM 2026-11-06 (2) — as many ways to shape the sound as possible, per tool (his words)
+  "I like the new retro tool. What about the shapes and modularity. Like the supersaw amp or like the wobble base"
+  "Like as much ways to manipulate sound as possible. Especially per tool."
+  RULE: every tool gets as many ways to manipulate its sound as its kind can have — not one route per idea, but shapes you draw, curves you
+  bend, sources you route to destinations, parts you open and rewire. Each way is built ONCE as a shared part and taken by every tool it
+  fits (axiom 2), and each still earns its place (NO NOISE, the addendum above).
+  The shared parts this asks for (first used by Retro DCO, preview: tools/music/planned/retro-dco-depth.ui.md):
+    env-adsr      segment curves (a bend per segment) + a kit envelope editor (drag the shape)
+    lfo           a drawn shape (points, smooth) — Wobble Bass's drawing moves here; every tool's LFO can be drawn
+    osc-wavetable a drawn cycle, morphed against the classic waves
+    mod-matrix    NEW: rows of source → destination × amount; the tool names its sources and destinations
+    open as parts every tool can open as its wired components on the canvas
+
