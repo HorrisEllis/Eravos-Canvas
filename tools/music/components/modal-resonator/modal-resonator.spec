@@ -1,4 +1,4 @@
-# spec_id: eravos.component.modal-resonator · version 0.1.0 · status building (2026-11-06, for Piano — his "yes") · template eravos.component/1
+# spec_id: eravos.component.modal-resonator · version 0.1.0 · status built (2026-11-06, for Piano — his "yes") · template eravos.component/1
 # generated from eravos.music-ecosystem.spec v0.2.0 §3 — rule: eravos.components.spec (small, on its own, documented, shared)
 identity:
   id: modal-resonator ; group: sources ; component tool: yes (yes = also on the canvas with a window and typed ports)
