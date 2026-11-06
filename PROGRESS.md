@@ -2,6 +2,15 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.124 Empty canvas: every tool starts blank, no preset (2026-11-06)
+Asked: "Can you when picking empty canvas have every tool empty of presets?"
+- Start › Empty canvas (and Browse every tool) turns on a blank start: every tool added opens on its own plain settings — no preset
+  loaded (27 tools had a default preset). Picking a preset from the tool's list works as before. Kept across restarts.
+- Any other start (a recipe, a mode, installing a domain) turns it off: tools open on their default preset as before.
+- Saved tools (projects, autosave, undo, duplicate) keep their state; previews (ephemeral) still load their preset.
+- `canvas/runtime/organism-factory.js` (OrganismFactory.blankStart), `canvas/index.html`. Proof: `tests/p116-blank-start.test.js` 2/2;
+  P21 P71 P73 P76 P100 green, boundary 10/10. P70 (1, Timeline split label) and p16-ui fail on main too.
+
 ## Done — 3.123 Restart now waits until ERAVOS Update really runs · v0.2.10 (2026-11-06)
 Asked: "The update helper doesn't work. I hit restart and it closes eravos and does nothing after."
 - apply() closed ERAVOS 0.3 s after spawning a hidden PowerShell that, for a Setup install, must itself start an elevated PowerShell
