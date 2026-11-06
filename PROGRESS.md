@@ -2,6 +2,18 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.129 Shared components: delay-line, osc-noise (2026-11-06)
+Asked: "Next." (after 3.128: next by overlap, delay-line and osc-noise).
+- delay-line (15 planned tools: echoes, dub, shimmer, tape memory, choruses …): up to 20 s or tempo sync, Hermite fractional read, TAPE
+  (time changes glide, the pitch bends) or DIGITAL (time changes cross-fade, no pitch), feedback to 1.2 through low cut / damp / drive,
+  freeze, mix, an LFO for chorus and flutter; an AudioWorklet from the same kernel text.
+- osc-noise (7 planned tools, retro-dco among them): white, pink, brown, velvet, crackle, band-limited; tilt; stereo width; seeded.
+- Proof: delay-line 19 checks (fractional delay exact to < −80 dB, freeze holds 9 s to 0.01 dB, tape bends / digital keeps 1000 Hz with
+  no click, 151 ns per stereo sample); osc-noise 32 checks (spectra measured by Welch's method: 0 / −3 / −6 dB per octave, tilt equal to
+  its own transfer function, seeds reproducible, 143 ns). Found while proving: a loop filter left "fully open" still darkened every
+  echo, so the ends of damp and low cut now mean off. `node tests/components.mjs` all pass; 21 tool DAGs regenerated.
+- Next, by overlap: ensemble-core / bbd-line (the Juno chorus), saturator-tape, random-source; then Retro DCO on them, UI shown first.
+
 ## Done — 3.128 Shared components for the synthwave tools: unison-stack, filter-ladder (2026-11-06)
 Asked: "Retro poly is buggy. I love it though. Like I want more synthwave. Is there more coming?" · "Which components, like what overlap can
 we focus on to speed this up?" · "Do it." (after: merge the other branch, then unison-stack and filter-ladder).
