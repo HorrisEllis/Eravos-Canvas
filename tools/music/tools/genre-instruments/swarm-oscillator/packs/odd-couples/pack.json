@@ -1,0 +1,93 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "swarm-oscillator.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.swarm-oscillator",
+ "items": {
+  "eravos.swarm-oscillator": {
+   "presets": {
+    "Cathedral Swarm": {
+     "params": {
+      "mode": "harmonic",
+      "voices": 12,
+      "spread": 0.1,
+      "coupling": 0.75,
+      "cluster": 1,
+      "shape": "table",
+      "cutoff": 3200,
+      "envAmt": 0.2,
+      "attack": 0.4,
+      "release": 2.5,
+      "width": 1,
+      "sub": 0,
+      "table": 0.92,
+      "level": 0.5
+     }
+    },
+    "Séance Fracture": {
+     "params": {
+      "mode": "chaotic",
+      "voices": 10,
+      "spread": 0.4,
+      "coupling": 0.9,
+      "drift": 0.8,
+      "shape": "saw",
+      "cutoff": 2200,
+      "res": 0.5,
+      "attack": 0.2,
+      "release": 1.5,
+      "width": 1,
+      "sub": 0,
+      "level": 0.45
+     }
+    },
+    "Golden Swarm": {
+     "params": {
+      "mode": "free",
+      "voices": 13,
+      "spread": 0.618,
+      "coupling": 0.382,
+      "drift": 0.618,
+      "shape": "saw",
+      "cutoff": 6180,
+      "res": 0.15,
+      "attack": 0.04,
+      "release": 1.2,
+      "width": 1,
+      "sub": 0.15,
+      "pull": 0.382,
+      "lfoRate": 0.618,
+      "lfoCouple": 0.382,
+      "level": 0.5
+     }
+    },
+    "Lullaby Lock": {
+     "params": {
+      "mode": "coupled",
+      "voices": 8,
+      "spread": 0.6,
+      "coupling": 1,
+      "pull": 0.2,
+      "drift": 0.2,
+      "sync": "bar",
+      "shape": "tri",
+      "cutoff": 2400,
+      "res": 0.2,
+      "attack": 0.05,
+      "release": 0.8,
+      "width": 0.7,
+      "level": 0.5
+     }
+    }
+   }
+  }
+ }
+}

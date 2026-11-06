@@ -119,6 +119,22 @@ direction) · **proof** (what was measured or tested) · **check** (where a stra
   when clean, bounded under abuse); `node tests/components.mjs` all pass.
 - **Check:** `node tests/components.mjs random-source` · `tape-transport` · `bitcrusher` · `saturator-tape`
 
+### 2026-11-06 08:14 −0800 · A song file in layers, and a workshop for any object — .erv, the Workshop — PR #112
+- **His words (2026-11-06, UTC):** "Can we use yaml to save songs like a psd file. Like so it has layers? Like it saves what’s on the canvas?"
+  (09:23:29) · "The pattern and note editor are the same." (13:28:34) · "Absolutely not. Like I’m talking a full workshop. Editing one note
+  completely like it’s in the center of a work surface or operating table or like photosyop" (13:38:50) · "Agnostic. I was thinking it could be
+  the beginning of photo manipulation tools. If possible." (14:09:18) · "Nice. That's exactly it. And then the PSD style YAML, maybe ERV as an
+  extension for that." (15:55:01)
+- **His call:** the format's name (.erv) and its shape (PSD-style layers, YAML); one editor for notes and patterns; a first editor preview
+  rejected and redirected to an agnostic workshop, which he approved.
+- **Built:** .erv — the whole canvas as one readable YAML file in layers (canvas view, a Tools group with one layer per tool, wires, each
+  domain's state, files), open in part, drop to open, safe parsing (no code from a file); the Workshop's spec (W1–W4) and approved preview;
+  pattern-store, seed-registry and scale-key components; his brainstorm mapped verbatim with timestamps.
+- **Proof:** `tests/p120-erv.test.js` 3/3 (round trip exact, a layer off is left out with its wires, a hand edit opens as edited, a broken file
+  names its line and column); pattern-store 29 checks (a Timeline clip round-trips bit for bit), seed-registry 12 (equal to the SDK's
+  generator output for output), scale-key equal to MusicTheory on 45,540 inputs; CI green on the merge.
+- **Check:** `node tests/run.mjs P120` · `node tests/components.mjs` · `docs/previews/workshop-note.png`, `workshop-photo.png`
+
 ### 2026-11-06 · Lofi, made of parts — the Lofi setup
 - **His words:** "i also want to be able to make lofi" (2026-11-05) · "nope look at the claude.md" · "yes" · "suites are tools and its
   components." (2026-11-06).
@@ -161,6 +177,22 @@ direction) · **proof** (what was measured or tested) · **check** (where a stra
 - **Proof:** 95 + 36 measured checks — the ladder's −12.04 dB at cutoff, slopes, bandpass equal to its formula, self-oscillation bounded for
   20 s near its cutoff, 148 ns per stereo sample; every component test passes.
 - **Check:** `node tools/music/components/unison-stack/unison-stack.test.mjs` · `node tools/music/components/filter-ladder/filter-ladder.test.mjs`
+
+### 2026-11-06 01:53 −0800 · An instrument from proved parts, the map first, and an evidence register — PR #103
+- **His words (2026-11-06, UTC):** "Can you when picking empty canvas have every tool empty of presets?" (06:28:35) · "Suites are tools with
+  each component wired in." (07:06:21) · "Move along the piano to change the keys, each key needs to play its relative note." (07:06:21) ·
+  "Map, spec first / Each tool needs a spec with a dag. / Make the swarm oscillator first. Since you were ready to." (07:27:37) · "Also ideas,
+  choices and direction. All of me and what’s proof of competence and ownership, I want logged to a compotenxe and log. Timestamped and what
+  came from it. The date and quotes exactly." (07:27:37)
+- **His call:** the axioms (parts not monoliths, a suite = a tool and its components, every key its own note, spec and DAG first, nothing lost,
+  everything mapped, evidence never rewritten); the 7 genre suites moved to Start › Setups; Swarm Oscillator first.
+- **Built:** a blank Empty canvas; every piano key its own note; Automation Bind; suites as a tool and its components, setups, save what is
+  wired as a suite, Components and Suites tabs; a DAG in every tool spec (226); Swarm Oscillator on six new components (osc-va,
+  osc-wavetable, oscillator-population, env-adsr, lfo, stereo-tools) in one worklet made of their tested code; the axioms in CLAUDE.md; the
+  append-only competence register with a CI check.
+- **Proof:** Swarm 10/10 and design check clean; the components' own checks (polyBLEP saw aliasing −25 dB against −9.6 for a naive saw;
+  Kuramoto coherence free 0.29, locked 0.99, chaotic 0.08); P116–P119 green; a tampered register entry fails `build/competence.mjs --check`.
+- **Check:** `node tests/run.mjs "Swarm Oscillator"` · `node tests/components.mjs` · `node build/spec-dag.mjs` · `node build/competence.mjs --check`
 
 ### 2026-11-05 · A piano roll you can work in — piano roll easier, Timeline right-click, Clip look, Canvas zoom
 - **His words (2026-11-05):** "make it easier" · "i dont like the fill options, replace it with pattern selection. also easier to manipulate

@@ -6,7 +6,7 @@
 
 **How to read it.** Each entry is one contribution: the exact words (checked word for word against their source by `node build/competence.mjs --check`), when, who it came from, what kind of thing it was, how it developed, what came of it, and the evidence a stranger can check. **Confidence is three separate levels, never one score**: *proposed* (an idea) · *demonstrated* (built and tested here — built by the AI coder to his direction: the idea and the call are his, the code is not claimed as his) · *independently verified* (validated outside this project — none yet). **Append-only**: an entry is never edited; a correction is a new entry that amends it. Generated from `docs/competence/register.jsonl` — do not edit this page. The record before this register (merged work since 2026-10-15, with merge times): `docs/PROOF-OF-COMPETENCY.md`.
 
-**38 entries** · his: 35 (16 proposed · 19 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
+**42 entries** · his: 37 (16 proposed · 21 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
 
 ## Ideas
 _what he originated, proposed or identified_
@@ -54,6 +54,8 @@ _decisions, the alternatives in front of him, and the way he set_
 | R-2026-11-06-27 | 2026-11-06 09:23:29 UTC | “I want to be able to have the canvas seperate from the rest.” | direction | Consistent with the canvas/content rule (2026-11-05). | Open: what “separate” means. | `specs/eravos.2026-11-06-session.map.spec` | proposed |
 | R-2026-11-06-32 | 2026-11-06 13:38:50 UTC | “Absolutely not. Like I’m talking a full workshop. Editing one note completely like it’s in the center of a work surface or operating table or like photosyop” | decision<br>from: the previewed editor (roll + tree + grow strip) · a full workshop | Rejected the preview and named the model he means by analogy: an operating table, Photoshop — one note at the centre of a work surface, edited completely. | Preview rejected; the face to be redesigned. | `specs/eravos.2026-11-06-session.map.spec` · `tools/music/planned/pattern-editor.spec` | proposed |
 | R-2026-11-06-34 | 2026-11-06 15:55:01 UTC | “Nice. That's exactly it. And then the PSD style YAML, maybe ERV as an extension for that.” | decision | Approved the agnostic Workshop preview; set the next piece: a layered, PSD-style project file in YAML with its own extension (.erv). | Workshop approved (W1–W4); specs/eravos.erv-format.spec written. | `specs/eravos.workshop.spec` · `specs/eravos.erv-format.spec` | proposed |
+| R-2026-11-06-39 | 2026-11-06 16:05:42 UTC | “Merge and push.” | decision | Merged through a pull request (the house rule: no pushes to main). | PR #112 merged 2026-11-06T16:14:37Z after CI passed. | `git log origin/main --merges (6adc22a)` | demonstrated |
+| R-2026-11-06-40 | 2026-11-06 18:58:31 UTC | “Yes follow up and entry” | direction | The follow-up: a test fixed, Swarm in the Odd Couples set, the proof-of-competency entries. | A follow-up pull request; entries for PR #103 and PR #112 in docs/PROOF-OF-COMPETENCY.md. | `docs/PROOF-OF-COMPETENCY.md` · `tests/p43-odd-couples.test.js` | demonstrated |
 
 ## Competence
 _what is shown, at its own level — an idea, a built and tested idea, and outside validation are not the same thing_
@@ -77,7 +79,7 @@ _what is shown, at its own level — an idea, a built and tested idea, and outsi
 - R-2026-11-06-33 · 2026-11-06 14:09:18 UTC · idea — “Agnostic. I was thinking it could be the beginning of photo manipulation tools. If possible.” → specs/eravos.workshop.spec — the canvas part; music is its first content. · evidence: `specs/eravos.workshop.spec`
 - R-2026-11-06-34 · 2026-11-06 15:55:01 UTC · decision — “Nice. That's exactly it. And then the PSD style YAML, maybe ERV as an extension for that.” → Workshop approved (W1–W4); specs/eravos.erv-format.spec written. · evidence: `specs/eravos.workshop.spec` · `specs/eravos.erv-format.spec`
 
-**demonstrated** (19)
+**demonstrated** (21)
 
 - R-2026-11-06-01 · 2026-11-06 06:28:35 UTC · idea — “Can you when picking empty canvas have every tool empty of presets?” → 3.124 built: OrganismFactory.blankStart — 27 tools that loaded a default preset now open plain on an empty canvas. · evidence: `tests/p116-blank-start.test.js (2/2)` · `commit faaccca (branch claude/empty-canvas-blank-tools (commit ids change if squash-merged; the merge is logged as its own entry))`
 - R-2026-11-06-03 · 2026-11-06 06:56:30 UTC · direction — “Ui preview. What’s the highest leverage?” → Swarm Oscillator ranked first (6 components to build, 14.5 other tools each); its UI previewed before any code. · evidence: `docs/eco-graph.md` · `docs/previews/swarm-oscillator-preview.png` · `tools/music/planned/swarm-oscillator.ui.md`
@@ -98,6 +100,8 @@ _what is shown, at its own level — an idea, a built and tested idea, and outsi
 - R-2026-11-06-20 · 2026-11-06 07:27:37 UTC · idea — “Also ideas, choices and direction. All of me and what’s proof of competence and ownership, I want logged to a compotenxe and log. Timestamped and what came from it. The date and quotes exactly.” → docs/competence/ · evidence: `build/competence.mjs --check`
 - R-2026-11-06-L4 · 2026-11-06 13:05:53 UTC · principle — “suites are tools and its components.” → Lofi built as a setup (kind: setup), not a suite; Tape Memory and Piano specified as tools made of their components, each opening as its own suite. · evidence: `tools/music/suites/lofi/suite.json` · `specs/eravos.lofi-setup.spec`
 - R-2026-11-06-24 · 2026-11-06 09:23:29 UTC · observation — “Don’t the wubs belong to the wobble bass?” → Confirmed in the code; folding them into its components is open. · evidence: `specs/eravos.2026-11-06-session.map.spec`
+- R-2026-11-06-39 · 2026-11-06 16:05:42 UTC · decision — “Merge and push.” → PR #112 merged 2026-11-06T16:14:37Z after CI passed. · evidence: `git log origin/main --merges (6adc22a)`
+- R-2026-11-06-40 · 2026-11-06 18:58:31 UTC · direction — “Yes follow up and entry” → A follow-up pull request; entries for PR #103 and PR #112 in docs/PROOF-OF-COMPETENCY.md. · evidence: `docs/PROOF-OF-COMPETENCY.md` · `tests/p43-odd-couples.test.js`
 
 **independently verified** (0)
 
@@ -146,6 +150,10 @@ _whose each contribution is: his, the AI coder’s, or from outside_
 | R-2026-11-06-32 | 2026-11-06 13:38:50 UTC | user | James Brooks | decision — chosen from: the previewed editor (roll + tree + grow strip) · a full workshop |
 | R-2026-11-06-33 | 2026-11-06 14:09:18 UTC | user | James Brooks | idea |
 | R-2026-11-06-34 | 2026-11-06 15:55:01 UTC | user | James Brooks | decision |
+| R-2026-11-06-39 | 2026-11-06 16:05:42 UTC | user | James Brooks | decision |
+| R-2026-11-06-40 | 2026-11-06 18:58:31 UTC | user | James Brooks | direction |
+| R-2026-11-06-41 | 2026-11-06 09:53:24 UTC | collaborative | record: git (the merge commit on main) | outcome |
+| R-2026-11-06-42 | 2026-11-06 16:14:37 UTC | collaborative | record: git (the merge commit on main) | outcome |
 
 ## Outcomes
 _what came of each_
@@ -190,4 +198,8 @@ _what came of each_
 | R-2026-11-06-32 | 2026-11-06 13:38:50 UTC | “Absolutely not. Like I’m talking a full workshop. Editing one note completely like it’s in the center of a work surface or operating table or like photosyop” | decision<br>from: the previewed editor (roll + tree + grow strip) · a full workshop | Rejected the preview and named the model he means by analogy: an operating table, Photoshop — one note at the centre of a work surface, edited completely. | Preview rejected; the face to be redesigned. | `specs/eravos.2026-11-06-session.map.spec` · `tools/music/planned/pattern-editor.spec` | proposed |
 | R-2026-11-06-33 | 2026-11-06 14:09:18 UTC | “Agnostic. I was thinking it could be the beginning of photo manipulation tools. If possible.” | idea | Generalised the note workshop into a domain-agnostic work surface, and named a second domain for it (photo manipulation). | specs/eravos.workshop.spec — the canvas part; music is its first content. | `specs/eravos.workshop.spec` | proposed |
 | R-2026-11-06-34 | 2026-11-06 15:55:01 UTC | “Nice. That's exactly it. And then the PSD style YAML, maybe ERV as an extension for that.” | decision | Approved the agnostic Workshop preview; set the next piece: a layered, PSD-style project file in YAML with its own extension (.erv). | Workshop approved (W1–W4); specs/eravos.erv-format.spec written. | `specs/eravos.workshop.spec` · `specs/eravos.erv-format.spec` | proposed |
+| R-2026-11-06-39 | 2026-11-06 16:05:42 UTC | “Merge and push.” | decision | Merged through a pull request (the house rule: no pushes to main). | PR #112 merged 2026-11-06T16:14:37Z after CI passed. | `git log origin/main --merges (6adc22a)` | demonstrated |
+| R-2026-11-06-40 | 2026-11-06 18:58:31 UTC | “Yes follow up and entry” | direction | The follow-up: a test fixed, Swarm in the Odd Couples set, the proof-of-competency entries. | A follow-up pull request; entries for PR #103 and PR #112 in docs/PROOF-OF-COMPETENCY.md. | `docs/PROOF-OF-COMPETENCY.md` · `tests/p43-odd-couples.test.js` | demonstrated |
+| R-2026-11-06-41 | 2026-11-06 09:53:24 UTC | “Merge pull request #103 from HorrisEllis/claude/empty-canvas-blank-tools” | outcome | His direction, built by the AI coder; merged into main. | merge commit 3b64004 on main | `git show 3b64004` · `docs/PROOF-OF-COMPETENCY.md` | demonstrated |
+| R-2026-11-06-42 | 2026-11-06 16:14:37 UTC | “Merge pull request #112 from HorrisEllis/claude/empty-canvas-blank-tools” | outcome | His direction, built by the AI coder; merged into main. | merge commit 6adc22a on main | `git show 6adc22a` · `docs/PROOF-OF-COMPETENCY.md` | demonstrated |
 

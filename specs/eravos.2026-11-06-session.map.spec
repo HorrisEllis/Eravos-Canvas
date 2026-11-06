@@ -119,3 +119,11 @@
   - APPROVED (his): the Workshop preview — "exactly it" (specs/eravos.workshop.spec W1–W4)
   - NEXT (his): the PSD-style layered song file in YAML, extension .erv — specs/eravos.erv-format.spec
   - BUILT after 15:55:01Z: .erv — canvas/runtime/erv.js (+ js-yaml 4.1.0, CORE schema); Start › Save as .erv (Ctrl+Shift+S) · Open .erv… (its layers first, switch any off) · drop a .erv to open; tests/p120-erv.test.js 3/3; an example: docs/previews/example.erv
+
+## 16:05:42Z (2026-11-06T16:05:42.880Z) — verbatim:
+  > Merge and push.
+  - DONE: PR #112 opened, CI green, merged 2026-11-06T16:14:37Z (08:14:37 −0800); main merged into the branch first, both sessions kept
+
+## 18:58:31Z (2026-11-06T18:58:31.251Z) — verbatim:
+  > Yes follow up and entry
+  - DONE: the P120 test fixed (looks only at this canvas's tool); Swarm Oscillator's Odd Couples pack (4 presets, each with a job) and its part in four Odd Couples genres; PROOF-OF-COMPETENCY entries for PR #103 and PR #112 with their merge times
