@@ -39,4 +39,4 @@ dag:
   layer 0: chaos-attractor · lfo ✓ · mod-ops · oscillator-population ✓ · relationship-graph
   tool: eravos.oscillation-matrix ← lfo + oscillator-population + chaos-attractor + mod-ops + relationship-graph
   build order: chaos-attractor → lfo ✓ → mod-ops → oscillator-population ✓ → relationship-graph → oscillation-matrix
-  shared with: chaos-attractor 4 · lfo 27 · mod-ops 6 · oscillator-population 3 · relationship-graph 12  (other tools on each)
+  shared with: chaos-attractor 4 · lfo 28 · mod-ops 6 · oscillator-population 3 · relationship-graph 12  (other tools on each)

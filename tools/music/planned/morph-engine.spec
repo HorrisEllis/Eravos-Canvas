@@ -40,4 +40,4 @@ dag:
   layer 0: env-msseg · filter-comb · filter-svf ✓ · lfo ✓ · osc-additive · osc-wavetable ✓ · preset-morph · unison-stack ✓
   tool: eravos.morph-engine ← osc-wavetable + osc-additive + unison-stack + filter-svf + filter-comb + env-msseg + lfo + preset-morph
   build order: env-msseg → filter-comb → filter-svf ✓ → lfo ✓ → osc-additive → osc-wavetable ✓ → preset-morph → unison-stack ✓ → morph-engine
-  shared with: env-msseg 14 · filter-comb 5 · filter-svf 40 · lfo 27 · osc-additive 7 · osc-wavetable 11 · preset-morph 7 · unison-stack 15  (other tools on each)
+  shared with: env-msseg 14 · filter-comb 5 · filter-svf 41 · lfo 28 · osc-additive 7 · osc-wavetable 11 · preset-morph 7 · unison-stack 15  (other tools on each)

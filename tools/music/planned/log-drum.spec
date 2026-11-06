@@ -36,4 +36,4 @@ dag:
   layer 0: env-msseg · filter-svf ✓ · modal-resonator · osc-sub · scale-key · slew-lag · waveshaper
   tool: eravos.log-drum ← modal-resonator + osc-sub + env-msseg + filter-svf + waveshaper + slew-lag + scale-key
   build order: env-msseg → filter-svf ✓ → modal-resonator → osc-sub → scale-key → slew-lag → waveshaper → log-drum
-  shared with: env-msseg 14 · filter-svf 40 · modal-resonator 3 · osc-sub 10 · scale-key 12 · slew-lag 10 · waveshaper 22  (other tools on each)
+  shared with: env-msseg 14 · filter-svf 41 · modal-resonator 4 · osc-sub 10 · scale-key 12 · slew-lag 10 · waveshaper 22  (other tools on each)

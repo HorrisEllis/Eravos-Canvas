@@ -40,4 +40,4 @@ dag:
   layer 0: env-adsr ✓ · filter-comb · filter-diode · filter-formant ✓ · filter-ladder ✓ · filter-sallen-key · filter-svf ✓ · oversampler · waveshaper
   tool: eravos.poly-filter-matrix ← filter-svf + filter-ladder + filter-diode + filter-sallen-key + filter-comb + filter-formant + env-adsr + waveshaper + oversampler
   build order: env-adsr ✓ → filter-comb → filter-diode → filter-formant ✓ → filter-ladder ✓ → filter-sallen-key → filter-svf ✓ → oversampler → waveshaper → poly-filter-matrix
-  shared with: env-adsr 20 · filter-comb 5 · filter-diode 2 · filter-formant 7 · filter-ladder 3 · filter-sallen-key 0 · filter-svf 40 · oversampler 2 · waveshaper 22  (other tools on each)
+  shared with: env-adsr 21 · filter-comb 5 · filter-diode 2 · filter-formant 7 · filter-ladder 3 · filter-sallen-key 0 · filter-svf 41 · oversampler 2 · waveshaper 22  (other tools on each)

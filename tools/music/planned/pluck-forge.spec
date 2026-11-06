@@ -36,4 +36,4 @@ dag:
   layer 0: delay-line ✓ · env-adsr ✓ · filter-svf ✓ · karplus-string · osc-va ✓ · osc-wavetable ✓ · transient-shaper · unison-stack ✓
   tool: eravos.pluck-forge ← osc-va + osc-wavetable + karplus-string + env-adsr + filter-svf + transient-shaper + delay-line + unison-stack
   build order: delay-line ✓ → env-adsr ✓ → filter-svf ✓ → karplus-string → osc-va ✓ → osc-wavetable ✓ → transient-shaper → unison-stack ✓ → pluck-forge
-  shared with: delay-line 15 · env-adsr 20 · filter-svf 40 · karplus-string 1 · osc-va 26 · osc-wavetable 11 · transient-shaper 2 · unison-stack 15  (other tools on each)
+  shared with: delay-line 15 · env-adsr 21 · filter-svf 41 · karplus-string 2 · osc-va 26 · osc-wavetable 11 · transient-shaper 2 · unison-stack 15  (other tools on each)

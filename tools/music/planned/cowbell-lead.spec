@@ -36,4 +36,4 @@ dag:
   layer 0: clipper · env-adsr ✓ · filter-svf ✓ · osc-va ✓ · reverb-fdn · scale-key · waveshaper
   tool: eravos.cowbell-lead ← osc-va + filter-svf + waveshaper + clipper + env-adsr + scale-key + reverb-fdn
   build order: clipper → env-adsr ✓ → filter-svf ✓ → osc-va ✓ → reverb-fdn → scale-key → waveshaper → cowbell-lead
-  shared with: clipper 9 · env-adsr 20 · filter-svf 40 · osc-va 26 · reverb-fdn 11 · scale-key 12 · waveshaper 22  (other tools on each)
+  shared with: clipper 9 · env-adsr 21 · filter-svf 41 · osc-va 26 · reverb-fdn 11 · scale-key 12 · waveshaper 22  (other tools on each)

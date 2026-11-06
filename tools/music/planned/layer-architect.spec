@@ -39,4 +39,4 @@ dag:
   layer 0: env-adsr ✓ · macro · multiband-splitter · phase-correlation · stereo-tools ✓ · voice-allocator
   tool: eravos.layer-architect ← multiband-splitter + env-adsr + macro + phase-correlation + stereo-tools + voice-allocator
   build order: env-adsr ✓ → macro → multiband-splitter → phase-correlation → stereo-tools ✓ → voice-allocator → layer-architect
-  shared with: env-adsr 20 · macro 3 · multiband-splitter 10 · phase-correlation 8 · stereo-tools 16 · voice-allocator 4  (other tools on each)
+  shared with: env-adsr 21 · macro 3 · multiband-splitter 10 · phase-correlation 8 · stereo-tools 17 · voice-allocator 4  (other tools on each)

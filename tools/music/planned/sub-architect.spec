@@ -58,4 +58,4 @@ dag:
   layer 0: ducker · envelope-follower · filter-svf ✓ · osc-sub · osc-va ✓ · phase-correlation · stereo-tools ✓ · waveshaper
   tool: eravos.sub-architect ← osc-sub + osc-va + waveshaper + filter-svf + stereo-tools + phase-correlation + ducker + envelope-follower
   build order: ducker → envelope-follower → filter-svf ✓ → osc-sub → osc-va ✓ → phase-correlation → stereo-tools ✓ → waveshaper → sub-architect
-  shared with: ducker 15 · envelope-follower 7 · filter-svf 40 · osc-sub 10 · osc-va 26 · phase-correlation 8 · stereo-tools 16 · waveshaper 22  (other tools on each)
+  shared with: ducker 15 · envelope-follower 7 · filter-svf 41 · osc-sub 10 · osc-va 26 · phase-correlation 8 · stereo-tools 17 · waveshaper 22  (other tools on each)

@@ -39,4 +39,4 @@ dag:
   layer 0: ducker · early-reflections · eq-parametric · lfo ✓ · plate-model · reverb-convolution · reverb-fdn · spring-model
   tool: eravos.space-sculptor ← reverb-fdn + reverb-convolution + plate-model + spring-model + early-reflections + eq-parametric + ducker + lfo
   build order: ducker → early-reflections → eq-parametric → lfo ✓ → plate-model → reverb-convolution → reverb-fdn → spring-model → space-sculptor
-  shared with: ducker 15 · early-reflections 3 · eq-parametric 13 · lfo 27 · plate-model 0 · reverb-convolution 2 · reverb-fdn 11 · spring-model 1  (other tools on each)
+  shared with: ducker 15 · early-reflections 3 · eq-parametric 13 · lfo 28 · plate-model 0 · reverb-convolution 2 · reverb-fdn 11 · spring-model 1  (other tools on each)

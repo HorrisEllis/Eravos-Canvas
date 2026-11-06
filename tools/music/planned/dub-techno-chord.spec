@@ -36,4 +36,4 @@ dag:
   layer 0: chord-engine · delay-line ✓ · filter-svf ✓ · lfo ✓ · osc-va ✓ · reverb-fdn
   tool: eravos.dub-techno-chord ← chord-engine + osc-va + filter-svf + delay-line + reverb-fdn + lfo
   build order: chord-engine → delay-line ✓ → filter-svf ✓ → lfo ✓ → osc-va ✓ → reverb-fdn → dub-techno-chord
-  shared with: chord-engine 4 · delay-line 15 · filter-svf 40 · lfo 27 · osc-va 26 · reverb-fdn 11  (other tools on each)
+  shared with: chord-engine 4 · delay-line 15 · filter-svf 41 · lfo 28 · osc-va 26 · reverb-fdn 11  (other tools on each)

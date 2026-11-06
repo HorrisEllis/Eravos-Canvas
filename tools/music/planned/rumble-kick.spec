@@ -36,4 +36,4 @@ dag:
   layer 0: delay-line ✓ · ducker · eq-parametric · filter-svf ✓ · reverb-fdn · waveshaper
   tool: eravos.rumble-kick ← reverb-fdn + filter-svf + ducker + waveshaper + delay-line + eq-parametric
   build order: delay-line ✓ → ducker → eq-parametric → filter-svf ✓ → reverb-fdn → waveshaper → rumble-kick
-  shared with: delay-line 15 · ducker 15 · eq-parametric 13 · filter-svf 40 · reverb-fdn 11 · waveshaper 22  (other tools on each)
+  shared with: delay-line 15 · ducker 15 · eq-parametric 13 · filter-svf 41 · reverb-fdn 11 · waveshaper 22  (other tools on each)

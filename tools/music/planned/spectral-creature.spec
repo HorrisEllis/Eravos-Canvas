@@ -39,4 +39,4 @@ dag:
   layer 0: filter-formant ✓ · freq-shifter · lfo ✓ · multiband-splitter · osc-sub · osc-wavetable ✓ · spectral-features · step-mod · stereo-tools ✓ · waveshaper
   tool: eravos.spectral-creature ← multiband-splitter + osc-wavetable + osc-sub + filter-formant + freq-shifter + waveshaper + lfo + step-mod + stereo-tools + spectral-features
   build order: filter-formant ✓ → freq-shifter → lfo ✓ → multiband-splitter → osc-sub → osc-wavetable ✓ → spectral-features → step-mod → stereo-tools ✓ → waveshaper → spectral-creature
-  shared with: filter-formant 7 · freq-shifter 1 · lfo 27 · multiband-splitter 10 · osc-sub 10 · osc-wavetable 11 · spectral-features 14 · step-mod 7 · stereo-tools 16 · waveshaper 22  (other tools on each)
+  shared with: filter-formant 7 · freq-shifter 1 · lfo 28 · multiband-splitter 10 · osc-sub 10 · osc-wavetable 11 · spectral-features 14 · step-mod 7 · stereo-tools 17 · waveshaper 22  (other tools on each)

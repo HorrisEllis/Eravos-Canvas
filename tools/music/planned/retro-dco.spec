@@ -66,4 +66,4 @@ dag:
   layer 0: bbd-line · ensemble-core · env-adsr ✓ · filter-ladder ✓ · filter-svf ✓ · lfo ✓ · osc-noise ✓ · osc-sub · osc-va ✓ · unison-stack ✓ · voice-allocator
   tool: eravos.retro-dco ← osc-va + osc-sub + osc-noise + unison-stack + filter-svf + filter-ladder + env-adsr + lfo + ensemble-core + bbd-line + voice-allocator
   build order: bbd-line → ensemble-core → env-adsr ✓ → filter-ladder ✓ → filter-svf ✓ → lfo ✓ → osc-noise ✓ → osc-sub → osc-va ✓ → unison-stack ✓ → voice-allocator → retro-dco
-  shared with: bbd-line 2 · ensemble-core 5 · env-adsr 20 · filter-ladder 3 · filter-svf 40 · lfo 27 · osc-noise 7 · osc-sub 10 · osc-va 26 · unison-stack 15 · voice-allocator 4  (other tools on each)
+  shared with: bbd-line 2 · ensemble-core 5 · env-adsr 21 · filter-ladder 3 · filter-svf 41 · lfo 28 · osc-noise 7 · osc-sub 10 · osc-va 26 · unison-stack 15 · voice-allocator 4  (other tools on each)

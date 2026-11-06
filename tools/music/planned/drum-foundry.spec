@@ -40,4 +40,4 @@ dag:
   layer 0: clipper · env-msseg · eq-parametric · filter-svf ✓ · modal-resonator · osc-noise ✓ · osc-va ✓ · sampler-voice · transient-shaper · waveshaper
   tool: eravos.drum-foundry ← osc-va + osc-noise + modal-resonator + env-msseg + filter-svf + waveshaper + clipper + transient-shaper + sampler-voice + eq-parametric
   build order: clipper → env-msseg → eq-parametric → filter-svf ✓ → modal-resonator → osc-noise ✓ → osc-va ✓ → sampler-voice → transient-shaper → waveshaper → drum-foundry
-  shared with: clipper 9 · env-msseg 14 · eq-parametric 13 · filter-svf 40 · modal-resonator 3 · osc-noise 7 · osc-va 26 · sampler-voice 14 · transient-shaper 2 · waveshaper 22  (other tools on each)
+  shared with: clipper 9 · env-msseg 14 · eq-parametric 13 · filter-svf 41 · modal-resonator 4 · osc-noise 7 · osc-va 26 · sampler-voice 14 · transient-shaper 2 · waveshaper 22  (other tools on each)

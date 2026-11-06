@@ -40,4 +40,4 @@ dag:
   layer 0: env-adsr ✓ · env-msseg · filter-svf ✓ · lfo ✓ · osc-fm-operator · ring-mod · unison-stack ✓ · voice-allocator
   tool: eravos.fm-matrix ← osc-fm-operator + ring-mod + env-msseg + env-adsr + lfo + filter-svf + unison-stack + voice-allocator
   build order: env-adsr ✓ → env-msseg → filter-svf ✓ → lfo ✓ → osc-fm-operator → ring-mod → unison-stack ✓ → voice-allocator → fm-matrix
-  shared with: env-adsr 20 · env-msseg 14 · filter-svf 40 · lfo 27 · osc-fm-operator 6 · ring-mod 2 · unison-stack 15 · voice-allocator 4  (other tools on each)
+  shared with: env-adsr 21 · env-msseg 14 · filter-svf 41 · lfo 28 · osc-fm-operator 6 · ring-mod 2 · unison-stack 15 · voice-allocator 4  (other tools on each)

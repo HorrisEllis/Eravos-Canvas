@@ -40,4 +40,4 @@ dag:
   layer 0: filter-svf ✓ · grain-cloud · lfo ✓ · pitch-shifter · random-source · sampler-voice · step-mod
   tool: eravos.granular-mutation ← grain-cloud + sampler-voice + filter-svf + random-source + lfo + step-mod + pitch-shifter
   build order: filter-svf ✓ → grain-cloud → lfo ✓ → pitch-shifter → random-source → sampler-voice → step-mod → granular-mutation
-  shared with: filter-svf 40 · grain-cloud 7 · lfo 27 · pitch-shifter 11 · random-source 6 · sampler-voice 14 · step-mod 7  (other tools on each)
+  shared with: filter-svf 41 · grain-cloud 7 · lfo 28 · pitch-shifter 11 · random-source 6 · sampler-voice 14 · step-mod 7  (other tools on each)
