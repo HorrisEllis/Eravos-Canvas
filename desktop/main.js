@@ -112,6 +112,8 @@ ipcMain.handle('eravos:update-check', () => UPDATER ? UPDATER.check(true) : null
 // 3.111 in the background: download + unpack while ERAVOS runs; then Restart now (apply) or When I close ERAVOS (later)
 ipcMain.handle('eravos:update-download', () => UPDATER ? UPDATER.download() : false);
 ipcMain.handle('eravos:update-apply', () => UPDATER ? UPDATER.apply() : false);
+ipcMain.handle('eravos:update-cancel', () => UPDATER ? UPDATER.cancel() : false);
+ipcMain.handle('eravos:update-manual', () => UPDATER ? UPDATER.manual() : false);
 ipcMain.handle('eravos:update-later', () => UPDATER ? UPDATER.later() : false);
 ipcMain.handle('eravos:update-status', () => UPDATER ? UPDATER.status : null);
 ipcMain.on('eravos:update-log', () => shell.openPath(path.join(DIRS.appdata, 'update', 'update.log')));

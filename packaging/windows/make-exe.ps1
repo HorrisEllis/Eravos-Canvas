@@ -73,6 +73,14 @@ Write-Host "  tools: $domains"
   'MIDI pads/keys: plug in, then MIDI Map > Connect MIDI. Close other music apps first - Windows lets only one app use a MIDI device at a time.',
   'Back up everything you made: copy Documents\ERAVOS.', '') -join "`r`n"), $utf8)
 
+# 3.141 ERAVOS Update.exe - the updater as its own small program (his: "why not make it another exe?"), beside ERAVOS.exe, so the zip
+# and the Setup both carry it. Without NSIS the app falls back to apply-update.ps1.
+$nsisU = @((Get-Command makensis.exe -ErrorAction SilentlyContinue | ForEach-Object { $_.Source }), (Join-Path ${env:ProgramFiles(x86)} 'NSIS\makensis.exe'), (Join-Path $env:ProgramFiles 'NSIS\makensis.exe')) | Where-Object { $_ -and (Test-Path $_) } | Select-Object -First 1
+if ($nsisU) {
+  Write-Host 'Writing ERAVOS Update.exe'
+  & $nsisU /V2 "/DOUT=$(Join-Path $out 'ERAVOS Update.exe')" (Join-Path $repo 'packaging\windows\eravos-update.nsi')
+  if ($LASTEXITCODE -ne 0) { throw "makensis (ERAVOS Update.exe) failed ($LASTEXITCODE)" }
+}
 $zip = Join-Path $dist "ERAVOS_$($pkg.version).zip"
 Write-Host "Writing $zip"
 if (Test-Path $zip) { Remove-Item $zip -Force }
