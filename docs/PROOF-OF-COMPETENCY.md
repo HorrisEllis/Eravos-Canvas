@@ -79,6 +79,15 @@ direction) · **proof** (what was measured or tested) · **check** (where a stra
 - **Proof:** 20 + 20 measured checks — delay equal to the set time by phase, bandwidth following the clock, compander unity ±0.6 dB with
   the hiss > 20 dB lower in silence, pitch wobble equal to 2π·rate·depth·f within 12 %; a filter corner corrected by measurement.
 - **Check:** `node tools/music/components/bbd-line/bbd-line.test.mjs` · `node tools/music/components/ensemble-core/ensemble-core.test.mjs`
+### 2026-11-06 · A string, a tine and a tube, proved on their own — karplus-string, modal-resonator, saturator-tube
+- **His words:** "yes" (2026-11-06, to Piano).
+- **His call:** Piano built bottom up — its missing components first, each proving its own numbers (Axioms 2, 8).
+- **Built:** a physical string whose tuning is exact by construction (every filter's phase delay in the loop worked out and taken off), with
+  stiffness that stretches the partials like a real piano; a bank of resonant modes exact in frequency, level and decay; a tube-style saturator
+  whose asymmetry gives even harmonics, with its DC offset blocked.
+- **Proof:** 66 measured checks (loop delay = sr / f0 to 1e-6 samples; < 0.5 cent measured; 12th partial of A4 sharp by a piano's 10–30 cents
+  at some stretch; 60 dB decay on time; drive 0 = the signal exactly; no DC); `node tests/components.mjs` all pass.
+- **Check:** `node tests/components.mjs karplus-string` · `modal-resonator` · `saturator-tube`
 
 ### 2026-11-06 · Tape Memory — a lofi tape effect built from its parts
 - **His words:** "i also want to be able to make lofi" (2026-11-05) · "Lofi tools: UI previews first." · "yes" (2026-11-06).
