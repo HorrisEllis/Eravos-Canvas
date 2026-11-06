@@ -41,3 +41,8 @@ kept), or **open** (not done yet, and what is missing). Newest at the bottom. Ad
 | 32 | "What’s the next highest leverage?" (09:23:29Z) | answered: pattern-store (23 tools) | `specs/eravos.2026-11-06-session.map.spec` |
 | 33 | "I keep envisioning like a whole ass extremely detailed note and pattern editor. Like fractals. Then can save for later. I’m struggling with the complicated patterns." (09:23:29Z) | **open** (idea) — stands on pattern-store | `specs/eravos.2026-11-06-session.map.spec` |
 | 34 | "I need you to start taking note like I said." (09:23:29Z) | **done** — this map, the session spec, the register; every message from now on | `specs/eravos.2026-11-06-session.map.spec` |
+| 35 | "The pattern and note editor are the same." (13:28:34Z) | **decided** — one editor; then the Workshop | `tools/music/planned/pattern-editor.spec` |
+| 36 | "First." (13:30:25Z) | **done** — the editor spec, pattern-store / seed-registry / scale-key built | specs + `tools/music/components/` |
+| 37 | "Absolutely not. Like I’m talking a full workshop. Editing one note completely like it’s in the center of a work surface or operating table or like photosyop" (13:38:50Z) | **decided** — the preview rejected; a workshop | `tools/music/planned/pattern-editor.spec` addendum |
+| 38 | "Agnostic. I was thinking it could be the beginning of photo manipulation tools. If possible." (14:09:18Z) | **spec** — the Workshop is the canvas’s; music and image are contents | `specs/eravos.workshop.spec` |
+| 39 | "Nice. That's exactly it. And then the PSD style YAML, maybe ERV as an extension for that." (15:55:01Z) | **approved** the Workshop (W1–W4 to build) · **done** `.erv` 3.128 | `specs/eravos.erv-format.spec`, P120 |

@@ -57,3 +57,5 @@ object is — a note, a pattern, an image — is a domain's. Music is the first 
   - boundary test: canvas/runtime/workshop.js names no domain word; two kinds (note, photo) on the same surface, unchanged code
   - every edit is one undo step; Apply writes back exactly (a note round-trips bit for bit when nothing changed)
   - shown to him as a preview and approved before W1 is built
+
+## ADDENDUM 2026-11-06T15:55:01.373Z — approved: "Nice. That's exactly it." (the preview, docs/previews/workshop-note.png + workshop-photo.png)

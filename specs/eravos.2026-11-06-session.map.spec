@@ -113,3 +113,9 @@
   - DECIDED (his): the workshop is AGNOSTIC — not a music editor: a canvas work surface any domain puts an object on (a note, a pattern, an image); the beginning of photo manipulation tools, if possible
   - spec: specs/eravos.workshop.spec (the canvas part) · music's content for it: tools/music/planned/pattern-editor.spec
   - DONE after 14:09:18Z: specs/eravos.workshop.spec (agnostic: surface, layer types, the kind contract, phases W1–W4); a preview of ONE surface with two kinds — a note and a picture (docs/previews/workshop-note.png, workshop-photo.png) — waiting for his yes
+
+## 15:55:01Z (2026-11-06T15:55:01.373Z) — verbatim:
+  > Nice. That's exactly it. And then the PSD style YAML, maybe ERV as an extension for that.
+  - APPROVED (his): the Workshop preview — "exactly it" (specs/eravos.workshop.spec W1–W4)
+  - NEXT (his): the PSD-style layered song file in YAML, extension .erv — specs/eravos.erv-format.spec
+  - BUILT after 15:55:01Z: .erv — canvas/runtime/erv.js (+ js-yaml 4.1.0, CORE schema); Start › Save as .erv (Ctrl+Shift+S) · Open .erv… (its layers first, switch any off) · drop a .erv to open; tests/p120-erv.test.js 3/3; an example: docs/previews/example.erv

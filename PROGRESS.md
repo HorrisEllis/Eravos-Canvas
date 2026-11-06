@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.128 .erv; the Workshop approved; the Pattern Editor's components (2026-11-06)
+His words: "Can we use yaml to save songs like a psd file…" (09:23:29Z) · "The pattern and note editor are the same." (13:28:34Z) · "First."
+(13:30:25Z) · "Absolutely not. Like I’m talking a full workshop…" (13:38:50Z) · "Agnostic. I was thinking it could be the beginning of photo
+manipulation tools. If possible." (14:09:18Z) · "Nice. That's exactly it. And then the PSD style YAML, maybe ERV as an extension for that." (15:55:01Z)
+- Pattern Editor spec + components: pattern-store (nesting, flatten, grow, versions, diff; a clip round-trips bit for bit), seed-registry
+  (named seeds, reroll history; equal to dsp.mulberry32), scale-key (equal to MusicTheory on 45,540 inputs). Its preview was REJECTED.
+- The Workshop (specs/eravos.workshop.spec): one object on a work surface — layers, tools, properties, history, zoom path — agnostic:
+  music's note first, an image domain (photo manipulation) second. Preview approved ("exactly it"). Not built yet: W1 next.
+- .erv (specs/eravos.erv-format.spec, canvas/runtime/erv.js): Workspace.snapshot ↔ layered YAML (js-yaml 4.1.0 vendored, CORE schema,
+  noCompatMode so `on:`/`y:` read plainly); the kernel's intake hands a dropped .erv over as text; Start › Save as .erv · Open .erv… (the
+  layers first, switch any off; a tool left out takes its wires). "Your audio" became "Your files" (the canvas says no domain word).
+  P120 3/3. Open: "locked" kept in the file, not enforced; a sidecar folder for big audio; Workshop objects as layers inside tools.
+
 ## Done — 3.127 Swarm Oscillator; spec DAGs; axioms; the competence register (2026-11-06)
 Asked (07:27:37Z): "Map, spec first / Each tool needs a spec with a dag. / Make the swarm oscillator first. Since you were ready to. /
 Update the specs so nothing is lost. / And then Add those axioms to a claude.md. / Also ideas, choices and direction. All of me and what’s
