@@ -160,6 +160,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 ## Open (asked, not done)
 
 - **The store** (2026-11-06): the canvas installs on the system, everything else (domains, tools, components, packs, suites) lives in Documents\ERAVOS as whole zips from a store, the graph says what each needs (UI elements included) — `specs/eravos.store.spec`, S0 written; decisions D1–D4 his.
+- **Novel, full depth, no noise** (2026-11-06): every preset, pad sound, unit and mod novel against ALL of ERAVOS (measured); every tool full depth in pitch · tone · wave · modulation · speed · tempo · rhythm (and what its kind has), each control earning its place; a Tuning & settings tab per tool. Order N1 (the report) → N2 Swarm made new → N3 settings tab → N4 per tool. `specs/eravos.music-ecosystem.spec` + `eravos.tool-depth.spec` ADDENDA 2026-11-06.
 - Connecting with people (share as a link, remix with credit, play together, share packs) — pinned 2026-11-05.
 - Songs as a rhythm-exploring tool only (not usable for making music).
 - Patterns for each tool with variety: presets, depth, curves, per-note editing — everything the timeline can do.

@@ -2731,3 +2731,26 @@ engines_0_1_0:
   sound-state-machine: [named-sound-states, state-transition-graphs, event-driven-transition, audio-driven-transition, state-specific-processing, state-specific-modulation, transition-curves]
 
 # END SPEC
+
+# ============================================================
+# ADDENDUM 2026-11-06 — §6 novelty, across ALL of ERAVOS; packs are four kinds (his words)
+# ============================================================
+#   "Need to make sure it’s all novel. Full depth in pitch, tone, wavelength, modulation, etc. like I want unique (in relation to Eravos) packs for each tool. Mods. Complete settings for adjusting and tuning each tool." · "The swarm doesn’t seem like anything new sound wise."
+#   "Expand wave, modulation, wave, tone, pitch, maybe: Speed, tempo, rhythm, not just limited to those but no noise either" · "Packs aren’t just presets. They’re drum pad sounds. Like units or additional capabilities like mods also. Also need to be novel"
+pack_kinds (a pack may carry any of them, each judged as its kind):
+  presets     settings for a tool's engine
+  pad sounds  drum / one-shot recipes a drum tool plays (the synthwave pack's own sounds — built from synthesis, never recordings)
+  units       new capabilities a tool takes in: an oscillator model, a filter model, a rhythm engine, a wavetable set …
+  mods        behaviour that goes in and comes out of a tool (Mods), never wired into its engine
+novelty_across_eravos (replaces "inside the same tool" — the original rules above stay, this widens them):
+  - the fingerprint (the method above, plus pitch movement, harmonicity, rhythm onsets for rhythmic material) is taken for every
+    preset and pad sound of EVERY tool; each new one is ≥ the threshold from its nearest neighbour anywhere in ERAVOS, not just in its tool
+  - units and mods: novel by capability (a dimension of control or behaviour no installed unit / mod already gives) AND by sound
+    (what they make passes the rule above)
+  - a tool as a whole: its factory sound set must not sit inside another tool's (the report names any tool whose presets all fall
+    near another's — Swarm Oscillator ↔ Supersaw is the first suspect, his ear: "doesn't seem like anything new sound wise")
+  - a failing item is reported with its nearest neighbour and changed, merged or dropped — never shipped as a duplicate
+  order: N1 the fingerprint + the report across ERAVOS (no changes) · N2 Swarm made audibly new (locking heard, intervals formed,
+    voices cross-modulating, coherence driving timbre), proved against Supersaw · N3 Tuning & settings tab · N4 depth + packs per tool,
+    worst duplicates first
+
