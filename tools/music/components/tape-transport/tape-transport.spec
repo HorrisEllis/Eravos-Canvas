@@ -1,4 +1,4 @@
-# spec_id: eravos.component.tape-transport · version 0.1.0 · status building (2026-11-06, for Tape Memory — his "yes") · template eravos.component/1
+# spec_id: eravos.component.tape-transport · version 0.1.0 · status built 2026-11-06 (for Tape Memory — his "yes") · template eravos.component/1
 # generated from eravos.music-ecosystem.spec v0.2.0 §3 — rule: eravos.components.spec (small, on its own, documented, shared)
 identity:
   id: tape-transport ; group: time ; component tool: yes (yes = also on the canvas with a window and typed ports)
@@ -17,3 +17,7 @@ acceptance:
   - its numbers proved on its own (frequency response, ranges, timing) in <id>.test.js
   - every tool that assembles it still nulls after any change to it
   - cpu measured and recorded in eravos.performance.spec
+
+# ---- built 2026-11-06 (everything above kept)
+built: NEW code proved on its own — tape-transport.test.mjs, 18 checks: at rest exactly 1× and no lag; a straight stop at half speed at half time, stopped on time, monotone, lag = the area it fell behind; the curve both ways; spin-up; let go mid-stop continuous; varispeed; never reads ahead; rewind 3 s/s to maxLag; a minute finite; the worklet = the kernel. Loaded in the page by the tool that first uses it (Tape Memory).
+

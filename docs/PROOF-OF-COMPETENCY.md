@@ -71,6 +71,16 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-06 · The parts of worn tape, proved on their own — random-source, tape-transport, bitcrusher, saturator-tape
+- **His words:** "i also want to be able to make lofi" (2026-11-05) · "yes" (2026-11-06, to Tape Memory).
+- **His call:** Tape Memory built bottom up — its missing components first, each proving its own numbers (Axioms 2, 8).
+- **Built:** four shared signal parts, each a plain kernel tested in node and run unchanged as an AudioWorklet: seeded randomness with four
+  distributions and Poisson events; a tape transport whose lag drives a delay line (stops, spin-ups, rewinds); a bitcrusher with anti-alias,
+  jitter and dither; a tape saturator with emphasis, bias, hysteresis, head bump and gap loss.
+- **Proof:** 62 measured checks (statistics within tolerance, timing to the sample, filters to the dB, harmonics, transparency < −90 dB
+  when clean, bounded under abuse); `node tests/components.mjs` all pass.
+- **Check:** `node tests/components.mjs random-source` · `tape-transport` · `bitcrusher` · `saturator-tape`
+
 ### 2026-11-06 · Lofi, made of parts — the Lofi setup
 - **His words:** "i also want to be able to make lofi" (2026-11-05) · "nope look at the claude.md" · "yes" · "suites are tools and its
   components." (2026-11-06).

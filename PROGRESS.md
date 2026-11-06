@@ -2,6 +2,18 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.133 Tape Memory's four components (2026-11-06)
+His "yes" to Tape Memory → bottom up: the four parts it lacked, each NEW code proving its own numbers, the worklet = the kernel text.
+- random-source: rate / smooth (S&H … cosine glide), dist uniform · gaussian (σ ⅓, clipped) · beta (Marsaglia–Tsang) · histogram (≤ 32 bins),
+  seed (sample-exact repeat), depth / offset / unipolar; ch1 Poisson events (density, eventLen). Also MusicParts.rng(seed). 18 checks.
+- tape-transport: ch0 speed (varispeed 20 ms glide × motor), ch1 lag = ∫(1 − speed) clamped 0…maxLag; stop / start on one motor position
+  (continuous), curve both ways, rewind −2×. 18 checks.
+- bitcrusher: mid-tread 1–24 bits (24 = untouched), hold on a fractional phase, 4-pole Butterworth anti-alias at 0.45 × rate, seeded jitter,
+  TPDF dither, mix. 13 checks.
+- saturator-tape: +6 dB high-shelf pre-emphasis and its exact inverse (numerator / denominator swapped), tanh with bias and a lagging
+  magnetisation (hysteresis), faded in over 6 dB (drive 0 = the signal exactly), level kept near full scale, head bump, gap loss, out, mix. 13 checks.
+- Specs: the four "inputs / outputs / limits" lines written (the TO WRITE quoted), status built with the proof. Tape Memory's DAG: 7 of 7.
+
 ## Done — 3.132 the Lofi setup (2026-11-06)
 Asked: "i also want to be able to make lofi" → "nope look at the claude.md" → specs → "yes" · "suites are tools and its components."
 - Lofi is a SETUP (Axiom 3), not a tool or a suite: tools/music/suites/lofi/suite.json — Groove (boom bap) → Drum Machine (Lo-fi Dust) →

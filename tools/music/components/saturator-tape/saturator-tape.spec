@@ -1,4 +1,4 @@
-# spec_id: eravos.component.saturator-tape · version 0.1.0 · status building (2026-11-06, for Tape Memory — his "yes") · template eravos.component/1
+# spec_id: eravos.component.saturator-tape · version 0.1.0 · status built 2026-11-06 (for Tape Memory — his "yes") · template eravos.component/1
 # generated from eravos.music-ecosystem.spec v0.2.0 §3 — rule: eravos.components.spec (small, on its own, documented, shared)
 identity:
   id: saturator-tape ; group: shapers ; component tool: yes (yes = also on the canvas with a window and typed ports)
@@ -18,3 +18,7 @@ acceptance:
   - its numbers proved on its own (frequency response, ranges, timing) in <id>.test.js
   - every tool that assembles it still nulls after any change to it
   - cpu measured and recorded in eravos.performance.spec
+
+# ---- built 2026-11-06 (everything above kept)
+built: NEW code proved on its own — saturator-tape.test.mjs, 13 checks: clean = transparent (< −90 dB); the 3rd harmonic rises with drive, no 2nd without bias, a 2nd with it; full scale stays near full scale, quiet parts come up; bump +6 dB at 80 Hz; gap loss; hysteresis; out, mix; a minute of noise bounded; the worklet = the kernel. Loaded in the page by the tool that first uses it (Tape Memory).
+

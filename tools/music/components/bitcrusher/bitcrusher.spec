@@ -1,4 +1,4 @@
-# spec_id: eravos.component.bitcrusher · version 0.1.0 · status building (2026-11-06, for Tape Memory — his "yes") · template eravos.component/1
+# spec_id: eravos.component.bitcrusher · version 0.1.0 · status built 2026-11-06 (for Tape Memory — his "yes") · template eravos.component/1
 # generated from eravos.music-ecosystem.spec v0.2.0 §3 — rule: eravos.components.spec (small, on its own, documented, shared)
 identity:
   id: bitcrusher ; group: shapers ; component tool: yes (yes = also on the canvas with a window and typed ports)
@@ -17,3 +17,7 @@ acceptance:
   - its numbers proved on its own (frequency response, ranges, timing) in <id>.test.js
   - every tool that assembles it still nulls after any change to it
   - cpu measured and recorded in eravos.performance.spec
+
+# ---- built 2026-11-06 (everything above kept)
+built: NEW code proved on its own — bitcrusher.test.mjs, 13 checks: 24 bits at full rate untouched; 8 bits error = step/√12, every sample on the grid; 1 bit ≤ 3 levels; holds exactly on time; the anti-alias filter takes the alias ≥ 30 dB down and passes 300 Hz; jitter; dither keeps a tone below half a step; mix 0 exact; a minute bounded; the worklet = the kernel. Loaded in the page by the tool that first uses it (Tape Memory).
+
