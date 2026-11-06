@@ -124,3 +124,22 @@
     F5 no fixed list: suites are data (suite.json), grown by wiring on the canvas and saved like a song.
   First link (P0.5): Wub Filter and Wobble Bass speak through ONE mouth (components/filter-formant). The Wub Lab parts become views of
   Wobble Bass's components one by one — the suite and the instrument are the same system seen at two scales.
+
+## ADDENDUM 2026-11-06 — a suite is a tool and its components wired; systems of whole tools are setups; make your own
+  James, 2026-11-06: "Suites are tools with each component wired in." · "can you clear out suites and make them the tool and its
+  components wired together? But also the ability to create them?" — asked how: "That or setups on the screen. Like what’s wired
+  together. This is meant to be a way to explore creatively. Like connecting things to things and seeing what can be made from it.
+  Across domains." — and the 7 genre suites: "Move to Start From".
+  - suite.json gains "kind": "suite" (default) | "setup". suite = a tool and its components wired (Wub Lab = Wobble Bass as parts,
+    Synthesis Lab). setup = a system of whole tools (EDM Lab, Gothic, Heavy Drops, Sound System, Synthwave, Wobble Suite, Xen): not
+    listed as suites; each is a Start › SETUPS card (recipe "setup:<id>", op "suite": opens its window, builds every part it needs,
+    starter scene) — opening and building exactly as before (suite window, scenes, macros kept). Suites.list() = suites only;
+    Suites.setups() = setups; Suites.get(id) either.
+  - Your own suites (F5 made real): right-click any window › "Save what is wired here as a suite…" — Suites.capture(K, id) follows the
+    wires from that window (any domain), keeps one of each tool, its wires and every setting as the scene "As saved"; saveUser() keeps
+    it (localStorage eravos.userSuites), it lists with the suites (＋ Add), opens and builds like any suite, Delete on its page.
+    The suite window is the domain's (Suites.setDefaultHub, music: eravos.suite-hub) — the canvas names no domain's tools.
+  - The tool page: a Suites tab (Open as suite · a part of · setups) and the domain's Components tab; the old "Suite" tab (a tool's
+    companion set: mods inside, tools wired in) is "Setup", its button "Load the whole setup".
+  - Proof: tests/p119-suites-rework.test.js 3/3; P48 P49 P63 P94 updated to the new rule and green.
+  - Open: a domain-free suite window once a second domain has tools; Components on the suite page.

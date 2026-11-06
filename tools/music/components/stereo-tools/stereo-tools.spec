@@ -5,7 +5,9 @@ identity:
   job: M/S balance, width, Haas, mono-below crossover, correlation output
   extract from: wobble-bass (the move must change nothing: null renders ≤ −60 dB on every touched factory preset)
 used by: echo-architecture · ensemble-organism · fx-dub-echo · layer-architect · low-end-anchor · phase-weaver · reese-architecture · spatial-organism · spectral-creature · sub-architect · supersaw-cathedral · swarm-oscillator · translation-check · wub-organism
-inputs / outputs / limits: TO WRITE — signal types, control ranges, latency, cpu per instance
+inputs / outputs / limits (written 2026-11-06 for Swarm Oscillator; was "TO WRITE — signal types, control ranges, latency, cpu per instance"): kernel: pan(x) equal-power gains for x −1…1 · spread(i, n, width) the i-th of n voices across the field · MonoBelow(): below 20–400 Hz the side is high-passed out (two one-poles, 12 dB/oct), the mid never filtered (mono passes exactly) · width 0…2 on M/S · correlation of a block −1…1
+  stands on: —
+  status: building 2026-11-06 — NEW code proved on its own (stereo-tools.test.mjs); extraction from wobble-bass (width, mono below) — extraction must null-render
 rules:
   - never imports a tool; tools import it
   - every numeric control is a modulation destination unless marked fixed

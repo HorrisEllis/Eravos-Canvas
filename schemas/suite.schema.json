@@ -200,6 +200,12 @@
         }
       }
     },
+    "kind": {
+      "type": "string",
+      "enum": ["suite", "setup"],
+      "description": "3.126: suite (default) = a tool and its components wired together; setup = a system of whole tools, offered under Start › SETUPS"
+    },
+    "user": { "type": "boolean", "description": "3.126: saved from the canvas by its user (deletable)" },
     "allInOne": {
       "type": "string",
       "description": "P49.4: the all-in-one tool these parts rebuild (its 📘 page offers 'As parts: <suite>')"

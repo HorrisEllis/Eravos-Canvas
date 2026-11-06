@@ -1,6 +1,7 @@
 {
   "schema": "eravos.suite/1",
   "id": "music.edm-lab",
+  "kind": "setup",
   "label": "EDM Lab",
   "icon": "⚗",
   "accent": "#ff2266",

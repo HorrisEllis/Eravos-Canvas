@@ -1,6 +1,7 @@
 {
   "schema": "eravos.suite/1",
   "id": "music.wobble-suite",
+  "kind": "setup",
   "label": "Wobble Bass Suite",
   "icon": "〰",
   "accent": "#ff6fa8",

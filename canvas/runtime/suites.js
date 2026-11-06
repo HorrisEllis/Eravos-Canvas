@@ -22,13 +22,26 @@
   const toast = (m, k, ms) => { if (global.Shell && global.Shell.toast) global.Shell.toast(m, k || '', ms || 2200); };
   const live = (id) => { const r = id && F().handle(id); return r && !r.unmounted ? r : null; };
 
+  // 3.126 (his words, 2026-11-06: "Suites are tools with each component wired in" · "can you clear out suites and make them the tool
+  // and its components wired together? But also the ability to create them?"): a SUITE (kind "suite", the default) is a tool and its
+  // components wired together. A system of whole tools (kind "setup") is not a suite: it is offered under Start › SETUPS, opening
+  // and building exactly as before (its suite window, scenes and macros are kept). Suites are also made from the canvas: what is
+  // wired together is saved as a suite of your own (capture → saveUser), across domains.
   function add(s) {
     if (!s || !s.id || !Array.isArray(s.parts) || !s.parts.length) { console.warn('Suites.add: id and parts[] required', s && s.id); return false; }
-    s.wiring = s.wiring || []; s.scenes = s.scenes || {};
-    suites.set(s.id, s); return true;
+    s.wiring = s.wiring || []; s.scenes = s.scenes || {}; s.kind = s.kind || 'suite';
+    suites.set(s.id, s); if (s.kind === 'setup') asSetup(s); return true;
   }
   const get = (id) => suites.get(id) || null;
-  const list = () => Array.from(suites.values());
+  const list = () => Array.from(suites.values()).filter(s => s.kind !== 'setup');
+  const setups = () => Array.from(suites.values()).filter(s => s.kind === 'setup');
+  const short = (t) => { t = String(t || '').split('. ')[0]; t = t.split('; ')[0]; return t.length > 90 ? t.slice(0, 88).replace(/\s+\S*$/, '') + '…' : t + (t && !/[.!?…]$/.test(t) ? '.' : ''); };
+  // a setup is a Start card: the recipe op "suite" opens its window and builds every part, wired, on its starter scene
+  function asSetup(s, n) {
+    const R = global.Recipes; if (!R) { if ((n || 0) < 400) global.setTimeout(() => asSetup(s, (n || 0) + 1), 25); return; }
+    if (!asSetup.op) { asSetup.op = true; R.defineOp('suite', async (st, { K }) => { const hub = await openAsync(st.suite, { K, x: st.x, y: st.y }); if (hub) build(K, hub); }); }
+    R.register({ id: 'setup:' + s.id, label: s.label, icon: s.icon, accent: s.accent, tagline: short(s.blurb), section: 'SETUPS', setup: s.id, steps: [{ op: 'suite', suite: s.id, x: 30, y: 20 }] });
+  }
   const forTool = (toolId) => list().filter(s => s.parts.some(p => p.tool === toolId));
   const partOf = (s, toolId) => s.parts.find(p => p.tool === toolId) || null;
   // the parts whose sound ends in the suite window: as named, else every linked part whose signal (the kind the suite window
@@ -233,5 +246,35 @@
     return n;
   }
 
-  global.Suites = { add, get, list, forTool, outputs, mixable, open, openAsync, members, status, wiring, addPart, build, scene, macro, fold, instanceOf: (K, hubId, t) => instanceOf(K, hubId, t) };
+  // ---------------------------------------------------------------- 3.126 your own suites, from what is wired on the canvas
+  // capture(K, fromId): every window joined to fromId by wires (and through each other) — any domain — becomes a suite: its parts,
+  // its wires, and a scene "As saved" that puts every part's settings back. Nothing is copied but settings; each part stays a tool.
+  const USER_KEY = 'eravos.userSuites';
+  const readUser = () => { try { return JSON.parse((global.localStorage && global.localStorage.getItem(USER_KEY)) || '[]') || []; } catch (e) { return []; } };
+  const writeUser = (a) => { try { if (global.localStorage) global.localStorage.setItem(USER_KEY, JSON.stringify(a)); } catch (e) {} };
+  let defaultHub = null;
+  function wiredGroup(K, fromId) {
+    const seen = new Set([fromId]), todo = [fromId], ws = K.wires.list();
+    while (todo.length) { const id = todo.pop(); ws.forEach(w => { const o = w.src.instanceId === id ? w.dst.instanceId : w.dst.instanceId === id ? w.src.instanceId : null; if (o && !seen.has(o) && live(o) && !live(o).def.system && !live(o).service) { seen.add(o); todo.push(o); } }); }
+    return Array.from(seen).filter(id => live(id) && !live(id).def.system && !(live(id).def.id === defaultHub));
+  }
+  function capture(K, fromId, o) {
+    o = o || {}; const ids = wiredGroup(K, fromId); if (ids.length < 2) return null;
+    const byTool = new Map(); ids.forEach(id => { const t = live(id).def.id; if (!byTool.has(t)) byTool.set(t, id); });   // one of each tool (a suite names tools)
+    const inst = new Map(Array.from(byTool).map(([t, id]) => [id, t]));
+    const parts = Array.from(byTool).map(([t, id]) => { const r = live(id), pr = r.ctx.currentPreset; return Object.assign({ tool: t, required: true, role: (r.def.label || t).toLowerCase() }, pr && !/^user:/.test(pr) ? { preset: pr } : {}); });
+    const wiring = K.wires.list().filter(w => inst.has(w.src.instanceId) && inst.has(w.dst.instanceId)).map(w => ({ from: [inst.get(w.src.instanceId), w.src.hookId], to: [inst.get(w.dst.instanceId), w.dst.hookId] }));
+    const scene = {}; byTool.forEach((id, t) => { const r = live(id), cfg = r.def.config || [], all = r.ctx.params.all ? r.ctx.params.all() : {}, ps = {};
+      cfg.forEach(c => { if (!c.hidden && c.type !== 'object' && all[c.key] !== undefined) ps[c.key] = all[c.key]; }); scene[t] = { params: ps }; });
+    const first = live(fromId) || live(ids[0]), label = String(o.label || 'My suite').trim() || 'My suite';
+    const id = 'user.' + label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Date.now().toString(36);
+    return { schema: 'eravos.suite/1', id, label, icon: '◈', accent: first.def.accent || '#00d4ff', version: '1.0.0', kind: 'suite', user: true, hub: defaultHub,
+      blurb: 'Saved from the canvas: ' + parts.map(p => (F().def(p.tool) || {}).label || p.tool).join(' · ') + '.', parts, wiring, starter: 'As saved', scenes: { 'As saved': scene } };
+  }
+  function saveUser(s) { if (!s) return false; const a = readUser().filter(x => x.id !== s.id).concat([s]); writeUser(a); return add(s); }
+  function removeUser(id) { const s = get(id); if (!s || !s.user) return false; writeUser(readUser().filter(x => x.id !== id)); suites.delete(id); return true; }
+  readUser().forEach(s => add(s));
+
+  global.Suites = { add, get, list, setups, forTool, outputs, mixable, open, openAsync, members, status, wiring, addPart, build, scene, macro, fold, instanceOf: (K, hubId, t) => instanceOf(K, hubId, t),
+    capture, saveUser, removeUser, wiredGroup, setDefaultHub: (id) => { defaultHub = id; suites.forEach(s => { if (s.user && !s.hub) s.hub = id; }); }, defaultHub: () => defaultHub };
 })(typeof window !== 'undefined' ? window : globalThis);

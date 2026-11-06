@@ -11,6 +11,15 @@
   const listeners = new Set();
   const defineHooks = [], viewExts = [], beforeSpawnHooks = [];
   const observable = ['kernel:wire', 'kernel:organism', 'factory:', 'canvas:focus'];
+  // 3.124 a blank start (Start › Empty canvas): every tool added opens on its own plain settings — no preset loaded.
+  // Kept across restarts until a non-empty start (a recipe, a mode) turns it off. Previews still sound like the tool.
+  const BLANK_KEY = 'eravos.blankStart';
+  let blank = false; try { blank = global.localStorage && global.localStorage.getItem(BLANK_KEY) === '1'; } catch (e) {}
+  function blankStart(on) {
+    if (on === undefined) return blank;
+    blank = !!on; try { if (global.localStorage) { if (blank) global.localStorage.setItem(BLANK_KEY, '1'); else global.localStorage.removeItem(BLANK_KEY); } } catch (e) {}
+    return blank;
+  }
 
   function define(desc) {
     if (!desc || !desc.id || typeof desc.engine !== 'function') throw new Error('OrganismFactory.define: id + engine required');
@@ -90,7 +99,7 @@
     const rec = { instanceId, id, def: d, ctx, handle, K, win: null, service: !!o.service, ephemeral: !!o.ephemeral, uiDisposers: [], unmounted: false, unmountCalls: 0 };
     handles.set(instanceId, rec);
     if (o.state) ctx.deserialize(o.state);
-    else if (d.defaultPreset && d.presets && d.presets[d.defaultPreset]) ctx.presets.load(d.defaultPreset);
+    else if (d.defaultPreset && d.presets && d.presets[d.defaultPreset] && !(blank && !o.ephemeral && o.preset !== true)) ctx.presets.load(d.defaultPreset);
     if (!o.headless && !o.service && global.CanvasWM && K === global.Kernel) {
       try { rec.win = global.CanvasWM.open(rec, o); } catch (e) { K.fault('RUNTIME_003', { organism_id: id, instance_id: instanceId, message: 'ui: ' + e.message, error: e }); }
     }
@@ -175,7 +184,7 @@
   }
 
   global.OrganismFactory = {
-    define, reg, spawn, spawnAsync, boot, mountUI, makeView,
+    define, reg, spawn, spawnAsync, boot, mountUI, makeView, blankStart,
     onDefine(fn) { defineHooks.push(fn); defs.forEach(d => fn(d)); },
     extendView(fn) { viewExts.push(fn); },
     onBeforeSpawn(fn) { beforeSpawnHooks.push(fn); return () => { const i = beforeSpawnHooks.indexOf(fn); if (i >= 0) beforeSpawnHooks.splice(i, 1); }; },

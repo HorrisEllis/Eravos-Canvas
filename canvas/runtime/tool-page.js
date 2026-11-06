@@ -15,7 +15,8 @@
 (function (global) {
   'use strict';
   const doc = global.document;
-  const TP = { addKind, ioWords, kindGroups, open, openSuite, close, isOpen: () => !!cur, load, loadSuite, addMod, addLinked, presetGroups, partners, current: () => cur && (cur.suite ? { suiteId: cur.suite.id, target: cur.target } : { defId: cur.d.id, target: cur.target }) };
+  const extraTabs = [];
+  const TP = { addTab: (fn) => { extraTabs.push(fn); }, addKind, ioWords, kindGroups, open, openSuite, close, isOpen: () => !!cur, load, loadSuite, addMod, addLinked, presetGroups, partners, current: () => cur && (cur.suite ? { suiteId: cur.suite.id, target: cur.target } : { defId: cur.d.id, target: cur.target }) };
   let cur = null;   // { d, target, el, K, made: Map(tool → instanceId) }
 
   const F = () => global.OrganismFactory;
@@ -211,7 +212,7 @@
       h('div', { class: 'tp-ht' }, [h('h2', { text: d.label }), h('div', { class: 'tp-meta', text: [d.category, 'v' + d.version].filter(Boolean).join(' · ') }), h('p', { text: d.blurb || '' })]),
       h('div', { class: 'tp-act' }, [
         btn(st.target ? 'Go to it' : 'Add to canvas', st.target ? 'show its window' : 'open one on the canvas', () => { if (st.target) { K.bus.publish('canvas:focus-request', { instanceId: st.target }); close(); } else ensureHost(st); }, 'pri', st.target ? 'arrow-up-right' : 'plus'),
-        suite ? btn('Load the whole suite', 'the tool and every tool in its suite, wired up and set — one click (Ctrl+Z takes it back)', () => loadSuite(st), 'pri tp-suite-all', 'layers') : null,
+        suite ? btn('Load the whole setup', 'the tool and every tool in its setup (its mods inside, the tools wired into it), wired up and set — one click (Ctrl+Z takes it back)', () => loadSuite(st), 'pri tp-suite-all', 'layers') : null,
         backBtn(btn), btn('', 'close (Esc)', close, 'tp-x tp-ico', 'x'),
       ]),
     ]));
@@ -247,8 +248,8 @@
 
     // the suite
     if (suite) {
-      navTo('suite', 'Suite', 'blocks');
-      page.appendChild(sec(suite.label || 'The suite', `· ${suite.members.length} tools`, [
+      navTo('suite', 'Setup', 'layers');   // 3.126 a tool with whole tools around it is a setup; a suite is a tool and its components
+      page.appendChild(sec(suite.label || 'Its setup', `· ${suite.members.length} tools`, [
         suite.blurb ? h('p', { class: 'tp-p', text: suite.blurb }) : null,
         h('div', { class: 'tp-list' }, suite.members.map(m => {
           const ok = !!F().def(m.tool), slot = m.as === 'mod' && (d.slots || []).find(s => s.id === m.slot);
@@ -381,6 +382,26 @@
       ]);
       page.appendChild(sec('Inputs and outputs', `· ${outs.length} out · ${ins.length} in`, [h('div', { class: 'tp-list tp-io' }, outs.concat(ins).map(row))], 'io', 'arrow-left-right'));
     }
+
+    // 3.126 SUITES — its own tab (his words, 2026-11-06: "each component/ui/packs/mod/suite/etc all with a clear line of seperation"):
+    // the suite that is this tool and its components wired (open it as a suite), the suites it is a part of, the setups it plays in
+    if (SU) {
+      const setups = (SU.setups ? SU.setups() : []).filter(x => x.parts.some(p => p.tool === d.id));
+      const sRow = (x, tag, title, run, ic) => h('div', { class: 'tp-row' }, [tileOf({ id: 'suite:' + x.id, accent: x.accent, icon: x.icon }, 30, x.icon || '◈'),
+        h('div', { class: 'tp-rt' }, [h('b', { text: x.label }), h('small', { text: x.blurb ? x.blurb.split('. ')[0] + '.' : '' })]), h('span', { class: 'tp-tag lnk', text: tag }), btn(title, '', run, '', ic)]);
+      const rows = [].concat(
+        asParts.map(x => sRow(x, 'this tool as a suite', 'Open as suite', () => { close(); SU.openAsync(x.id, { K }).then(hub => { if (hub) SU.build(K, hub); }); }, 'blocks')),
+        partOf.filter(x => !asParts.includes(x)).map(x => sRow(x, 'a part of it', 'Its page', () => openSuite(x.id, { K, back: () => open(d.id, { K, instanceId: st.target, back: st.back }) }), 'book-open')),
+        setups.map(x => sRow(x, 'setup', 'Start it', () => { close(); global.Recipes && global.Recipes.run('setup:' + x.id, { K }); }, 'play')));
+      navTo('suites', 'Suites', 'blocks');
+      page.appendChild(sec('Suites', `· ${rows.length ? rows.length + ' — a suite is a tool and its components, wired' : 'none yet'}`, [
+        rows.length ? h('div', { class: 'tp-list' }, rows) : null,
+        h('p', { class: 'tp-p tp-dim', text: 'Make your own: wire tools together on the canvas, right-click any of them › Save what is wired here as a suite.' }),
+      ].filter(Boolean), 'suites', 'blocks'));
+    }
+    // 3.126 what a domain adds to every tool's page, each in its own tab (ToolPage.addTab) — e.g. the components a tool is made of
+    extraTabs.forEach(fn => { let t = null; try { t = fn({ def: d, K, target: st.target, h, btn }); } catch (e) { console.error('[ERAVOS] page tab failed', e); }
+      (Array.isArray(t) ? t : t ? [t] : []).forEach(x => { navTo(x.id, x.label, x.ic || 'blocks'); page.appendChild(sec(x.title || x.label, x.sub || '', [x.el], x.id, x.ic || 'blocks')); }); });
     showTab(st, page); page.scrollTop = keepY;
   }
   const backBtn = (btn) => cur && cur.back ? btn('Back', 'back to where you were', () => { const b = cur.back; close(); b(); }, 'tp-back', 'arrow-left') : null;
@@ -424,8 +445,9 @@
       h('div', { class: 'tp-act' }, [
         btn('Build the whole suite', 'every part it needs, wired up, on its starter scene' + (s.starter ? ' (' + s.starter + ')' : '') + ' — one click (Ctrl+Z takes it back)', () => buildSuite(st), 'pri tp-suite-all', 'layers'),
         btn(hub ? 'Go to it' : 'Just the suite window', hub ? 'show the suite window' : 'open the suite window and add the parts yourself', () => { if (hub) { K.bus.publish('canvas:focus-request', { instanceId: hub }); close(); } else ensureSuite(st); }, '', hub ? 'arrow-up-right' : 'box'),
+        s.user ? btn('Delete this suite', 'one you saved from the canvas — removed for good (the tools on the canvas stay)', () => { if (SU.removeUser(s.id)) { toast(`Deleted “${s.label}”.`, '', 2500); close(); } }, 'tp-del', 'trash-2') : null,
         backBtn(btn), btn('', 'close (Esc)', close, 'tp-x tp-ico', 'x'),
-      ]),
+      ].filter(Boolean)),
     ]));
     page.appendChild(h('div', { class: 'tp-on' }, [h('span', { text: 'Works on: ' }), pick]));
     if (s.allInOne && F().def(s.allInOne)) page.appendChild(h('div', { class: 'tp-on tp-parts' }, [btn('All in one: ' + defOf(s.allInOne).label, 'the same thing in one window — its page', () => open(s.allInOne, { K, back: () => openSuite(s.id, { K, back: st.back }) }), 'tp-allinone', s.allInOne)]));

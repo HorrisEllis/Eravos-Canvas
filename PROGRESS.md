@@ -2,6 +2,50 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.127 Swarm Oscillator; spec DAGs; axioms; the competence register (2026-11-06)
+Asked (07:27:37Z): "Map, spec first / Each tool needs a spec with a dag. / Make the swarm oscillator first. Since you were ready to. /
+Update the specs so nothing is lost. / And then Add those axioms to a claude.md. / Also ideas, choices and direction. All of me and what’s
+proof of competence and ownership, I want logged to a compotenxe and log. Timestamped and what came from it. The date and quotes exactly."
+- Spec DAG: build/spec-dag.mjs → every tool spec (built and planned, 226) ends with its components layer by layer, build order, sharing;
+  built tools: in it now / comes out of it / planned. A hand-written signal_dag: is checked against the components.
+- Swarm Oscillator: the spec written first (ports, params, signal DAG, decisions, open gaps); six components built as new code, each with its
+  own node test; the tool runs one AudioWorklet built from their kernel text. Found: messages to a worklet arrive after an offline render
+  has run past them (silence) — every timed thing is now an AudioParam (settings k-rate, 8 voice slots, Lock on beat a count); the tables go
+  in at construction. Headroom: output gain 0.17 × level (an 8-note chord on every preset at full level stays under full scale). More depth
+  used [hidden], which .uk-panel's display overrode — now display toggled. Tests 10/10; design check clean.
+- Specs: session map (every message verbatim, curly apostrophes and all, with its time), addenda to suites / components / macro-automation.
+- CLAUDE.md › Axioms (11), each with his exact words and time.
+- docs/competence/: register.jsonl (23 entries: 20 his, 2 the AI coder's discoveries, 1 the pasted reply as outside input) → REGISTER.md,
+  LOG.md; --check runs in CI against the target branch.
+- Open: packs ≥ 6 per pack for Swarm; LFO tempo sync; guards for "no monoliths" and "adjusted while playing"; Components on the suite page.
+
+## Done — 3.125 / 3.126 Piano keys, Automation Bind, suites rework (2026-11-06)
+Asked: "Move along the piano to change the keys, each key needs to play its relative note. Also the automation tool needs to have a
+bind button … similar to the midi mapper. … can you clear out suites and make them the tool and its components wired together? But
+also the ability to create them?" — then: the 7 genre suites → Start From; create from "setups on the screen. Like what’s wired
+together … Across domains. Make sure you’re mapping all of what I’ve said."
+- Keyboard (every tool): with the key lock on, a key outside the key snapped to a neighbour — a slide repeated or skipped notes.
+  Every key plays itself; out-of-key keys stay shaded. P117.
+- Automation › ⊕ Bind: then touch any knob, switch or choice on any tool → a lane; one touch, then it lets go; again cancels. P118.
+- Suites: kind "suite" (default) = a tool and its components wired (Wub Lab, Synthesis Lab); kind "setup" = the 7 systems of whole
+  tools, now Start › SETUPS cards (recipe op "suite": opens its window, builds, starter scene — as before). Suites.list() = suites only.
+- Your own suites: right-click a window › Save what is wired here as a suite… — the wired group (any domain), its wires, its settings as
+  the scene "As saved"; kept in localStorage (eravos.userSuites); Delete on its page.
+- Tool page: Suites tab (Open as suite · a part of · setups) and Components tab (domain-contributed via ToolPage.addTab: in it now /
+  comes out of it / planned, from build/components-map.mjs → tools/music/data/components-map.js); the old "Suite" tab is "Setup".
+- docs/HIS-WORDS-MAP.md: all 19 things he said this session, each done / rule / open. DESIGN-GUIDE W7 (power without overwhelm), W8.
+- Open: a guard for "no monoliths" (no tool names another's preset or builds in a mod); a guard for "adjusted while playing" (hold a
+  note, move every knob); Components on the suite page; a UI tab; a domain-free suite window for a second domain.
+
+## Done — 3.124 Empty canvas: every tool starts blank, no preset (2026-11-06)
+Asked: "Can you when picking empty canvas have every tool empty of presets?"
+- Start › Empty canvas (and Browse every tool) turns on a blank start: every tool added opens on its own plain settings — no preset
+  loaded (27 tools had a default preset). Picking a preset from the tool's list works as before. Kept across restarts.
+- Any other start (a recipe, a mode, installing a domain) turns it off: tools open on their default preset as before.
+- Saved tools (projects, autosave, undo, duplicate) keep their state; previews (ephemeral) still load their preset.
+- `canvas/runtime/organism-factory.js` (OrganismFactory.blankStart), `canvas/index.html`. Proof: `tests/p116-blank-start.test.js` 2/2;
+  P21 P71 P73 P76 P100 green, boundary 10/10. P70 (1, Timeline split label) and p16-ui fail on main too.
+
 ## Done — 3.123 Restart now waits until ERAVOS Update really runs · v0.2.10 (2026-11-06)
 Asked: "The update helper doesn't work. I hit restart and it closes eravos and does nothing after."
 - apply() closed ERAVOS 0.3 s after spawning a hidden PowerShell that, for a Setup install, must itself start an elevated PowerShell
