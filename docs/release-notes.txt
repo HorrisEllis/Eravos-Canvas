@@ -1,3 +1,11 @@
+ERAVOS v0.2.10 (2026-11-06)
+
+Install: ERAVOS-Setup-0.2.10.exe. This one install by hand: an older ERAVOS's Restart now could close without updating.
+
+- Fixed: Restart now closed ERAVOS and then nothing happened. ERAVOS now waits until ERAVOS Update has really started (and
+  Windows' permission prompt has been answered) before it closes; if it never starts, ERAVOS stays open, says why, and the update
+  stays ready to try again.
+
 ERAVOS v0.2.9 (2026-11-06)
 
 Install: ERAVOS-Setup-0.2.9.exe, or unzip ERAVOS_0.2.9.zip. On 0.2.7 or later, ERAVOS offers this update by itself.

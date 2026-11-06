@@ -94,19 +94,32 @@ function create(o) {
 
   // ERAVOS Update, its own process; Windows asks for admin once where ERAVOS cannot write its own folder (Program Files)
   function launch(st) {
-    const script = path.join(__dirname, 'apply-update.ps1'); if (!fs.existsSync(script)) { tell({ state: 'error', message: 'ERAVOS Update (apply-update.ps1) is missing from this build' }); return false; }
+    const script = path.join(__dirname, 'apply-update.ps1'); if (!fs.existsSync(script)) { tell({ state: 'error', message: 'ERAVOS Update (apply-update.ps1) is missing from this build' }); return null; }
     try { fs.rmSync(RESULT, { force: true }); } catch (e) {}
-    const args = ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden', '-File', script, '-Dest', appDir, '-Version', st.version, '-Work', work].concat(st.setup ? ['-Setup', st.setup] : ['-Staged', st.root]);
-    const q = (a) => String(a).replace(/'/g, "''");
-    if (st.setup || !canWrite()) spawn('powershell.exe', ['-NoProfile', '-WindowStyle', 'Hidden', '-Command', `Start-Process powershell.exe -Verb RunAs -WindowStyle Hidden -ArgumentList '${args.map(a => `"${q(a)}"`).join(' ')}'`], { detached: true, stdio: 'ignore', windowsHide: true }).unref();
-    else spawn('powershell.exe', args, { detached: true, stdio: 'ignore', windowsHide: true }).unref();
-    return true;
+    // 3.123 the helper writes this file the moment it really runs; ERAVOS closes only then ("I hit restart and it closes eravos and does
+    // nothing after": it closed 0.3 s after asking, before PowerShell — or the admin prompt — had got going, and nothing was left)
+    const started = path.join(work, 'update-started.txt'); try { fs.mkdirSync(work, { recursive: true }); fs.rmSync(started, { force: true }); } catch (e) {}
+    const args = ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden', '-File', script, '-Dest', appDir, '-Version', st.version, '-Work', work, '-Started', started].concat(st.setup ? ['-Setup', st.setup] : ['-Staged', st.root]);
+    const q = (a) => String(a).replace(/'/g, "''"), opts = { detached: true, stdio: 'ignore', windowsHide: true };
+    let p;
+    try {
+      if (st.setup || !canWrite()) p = spawn('powershell.exe', ['-NoProfile', '-WindowStyle', 'Hidden', '-Command', `Start-Process powershell.exe -Verb RunAs -WindowStyle Hidden -ArgumentList '${args.map(a => `"${q(a)}"`).join(' ')}'`], opts);
+      else p = spawn('powershell.exe', args, opts);
+      p.on('error', (e) => tell({ state: 'error', message: 'ERAVOS Update could not start: ' + e.message })); p.unref();
+    } catch (e) { tell({ state: 'error', message: 'ERAVOS Update could not start: ' + e.message }); return null; }
+    return started;
   }
-  // Restart now: hand over, then close; ERAVOS Update starts ERAVOS again when it is done
-  function apply() {
-    if (!staged || !launch(staged)) return false;
+  // wait (up to `ms`) until the helper says it runs
+  const waitStarted = (file, ms) => new Promise((res) => { const t0 = Date.now(); const tick = () => { if (fs.existsSync(file)) return res(true); if (Date.now() - t0 > ms) return res(false); setTimeout(tick, 300); }; tick(); });
+  // Restart now: hand over; close once ERAVOS Update is running (it starts ERAVOS again when it is done). If it never starts — the admin
+  // prompt declined, PowerShell blocked — ERAVOS stays open and says so, with the update still ready.
+  async function apply() {
+    if (!staged) return false; const st = staged, started = launch(st); if (!started) return false;
+    tell({ state: 'starting', version: st.version, admin: !!(st.setup || !canWrite()) });
+    const ok = await waitStarted(started, 90000);
+    if (!ok) { tell({ state: 'error', message: 'ERAVOS Update did not start' + (st.setup || !canWrite() ? ' — Windows asks for permission to update ERAVOS in Program Files; if the prompt was declined or did not show, try again' : '') + '. ERAVOS stays open; the update is still ready.' }); tell(Object.assign({ state: 'ready' }, latest || { version: st.version })); return false; }
     staged = null; applyOnQuit = false;
-    tell({ state: 'restarting', version: latest && latest.version });
+    tell({ state: 'restarting', version: st.version });
     setTimeout(() => app.quit(), 300);
     return true;
   }

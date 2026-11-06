@@ -39,7 +39,7 @@ ok(U.newer('v0.2.0', '0.1.0') && !U.newer('0.1.0', '0.1.0') && U.newer('1.2.10',
   ok(told.some(m => m.state === 'unpacking'), 'then it unpacks, in the background');
   ok(res === false && told.some(m => m.state === 'error' && /unpacked/.test(m.message)), 'an unpack that fails is an error the page shows');
   ok(quits === 0, 'and ERAVOS was never closed');
-  ok(u.apply() === false, 'with nothing ready, Restart now does nothing');
+  ok((await u.apply()) === false, 'with nothing ready, Restart now does nothing');
 
   // 3. the next start: the helper's result is read once and told; a success tidies the download away
   fs.writeFileSync(path.join(work, 'update-result.json'), '﻿' + JSON.stringify({ ok: true, version: '0.1.0', message: 'ERAVOS 0.1.0 is installed', log: path.join(work, 'update.log') }));
