@@ -2,6 +2,16 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.121 WASD · middle-drag works on Windows · Graphics levels · v0.2.8 (2026-11-06)
+Asked: "wasd to navigate. Hold middle mouse and drag to move. Having major performance issues. Like with bassline or arp. Maybe add a
+graphic settings for low end hardware."
+- WASD pan while held (rAF, 700 px/s, Shift 1800), not while typing or when a tool used the key (defaultPrevented).
+- Middle drag already panned, but a middle press on Windows starts Chromium's autoscroll: stopped at mousedown.
+- Graphics (root data-gfx, Settings › Canvas & graphics): Balanced = UI.loop ≤ 30 fps, no backdrop blur; Low = ≤ 15 fps, canvases and
+  the glass layer at 1×, no blur/shadows/filters/transitions/animations, no reactive glow layer, colour writes ¼, the Field still.
+  Profiled (5 tools playing, CDP CPU profile): busy 35.5 % → 22.5 %. Most of the work was the browser drawing, not ERAVOS's scripts.
+- Tests p121 2/2. Full 1396/1399 (P82, rim, P70: main's).
+
 ## Done — 3.120 Sections · select by pitch / loudness · quantize you can change · the release check fixed (2026-11-06)
 - The release blocker, found: ERAVOS Update worked all along (run 11: closed → backed up → new files in → result + log written →
   ERAVOS started). The check read the result 3 s later — by then the started ERAVOS had moved the test's folders into its library

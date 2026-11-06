@@ -86,7 +86,7 @@
     if (any) raf = global.requestAnimationFrame(frame); else lastT = 0;
   }
   function size(L) {
-    const dpr = Math.min(2, global.devicePixelRatio || 1), w = Math.max(1, Math.round(global.innerWidth * dpr)), h = Math.max(1, Math.round(global.innerHeight * dpr));
+    const dpr = doc.documentElement.dataset.gfx === 'low' ? 1 : Math.min(2, global.devicePixelRatio || 1), w = Math.max(1, Math.round(global.innerWidth * dpr)), h = Math.max(1, Math.round(global.innerHeight * dpr));
     if (L.el.width !== w || L.el.height !== h) { L.el.width = w; L.el.height = h; L.resized = true; } L.dpr = dpr;
   }
   // ---- WebGPU (WGSL: one instanced quad per element; a rounded box as a signed distance field — crisp at any scale)

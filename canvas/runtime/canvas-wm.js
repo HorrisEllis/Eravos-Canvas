@@ -37,6 +37,28 @@
     const endPan = () => { if (pan && pan.done) pan.done(); pan = null; canvas.classList.remove('panning'); };
     canvas.addEventListener('pointerup', endPan); canvas.addEventListener('pointercancel', endPan); canvas.addEventListener('lostpointercapture', endPan);
     canvas.addEventListener('auxclick', (e) => { if (e.button === 1) e.preventDefault(); });
+    // 3.121 "hold middle mouse and drag to move": on Windows a middle press starts the browser's own autoscroll (the round cursor),
+    // which takes the drag over — it is stopped at mousedown, so the middle drag always pans
+    canvas.addEventListener('mousedown', (e) => { if (e.button === 1) e.preventDefault(); }, true);
+    // 3.121 "wasd to navigate": W A S D move the view while held (smoothly; Shift faster) — not while typing, and not when a tool used
+    // the key itself (it said so: preventDefault)
+    const held = new Set(); let wRaf = 0, wLast = 0;
+    const DIR = { KeyW: [0, 1], KeyS: [0, -1], KeyA: [1, 0], KeyD: [-1, 0] };
+    const typing = (t) => t && t.closest && t.closest('input, textarea, select, [contenteditable="true"]');
+    function wStep(t) {
+      wRaf = 0; if (!held.size) { wLast = 0; return; }
+      const dt = wLast ? Math.min(0.05, (t - wLast) / 1000) : 0.016; wLast = t; let dx = 0, dy = 0;
+      held.forEach(k => { if (k === 'Shift') return; const d = DIR[k]; if (d) { dx += d[0]; dy += d[1]; } });
+      const v = (held.has('Shift') ? 1800 : 700) * dt; if (dx || dy) { WM.view.x += dx * v; WM.view.y += dy * v; applyView(); }
+      wRaf = global.requestAnimationFrame(wStep);
+    }
+    doc.addEventListener('keydown', (e) => {
+      if (e.key === 'Shift') { if (held.size) held.add('Shift'); return; }
+      if (!DIR[e.code] || e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented || typing(e.target)) return;
+      e.preventDefault(); held.add(e.code); if (e.shiftKey) held.add('Shift'); if (!wRaf) wRaf = global.requestAnimationFrame(wStep);
+    });
+    doc.addEventListener('keyup', (e) => { if (e.key === 'Shift') held.delete('Shift'); else held.delete(e.code); });
+    global.addEventListener('blur', () => held.clear());
     // the canvas never scrolls as a box (a focused input in an off-screen window would make the browser scroll it, shifting everything)
     canvas.addEventListener('scroll', () => { if (canvas.scrollTop || canvas.scrollLeft) { canvas.scrollTop = 0; canvas.scrollLeft = 0; } });
     function scrollsInWindow(el, dy) {

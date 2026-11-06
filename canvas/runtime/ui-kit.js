@@ -331,7 +331,7 @@
   // ---------------------------------------------------------------- canvases
   function Canvas(w, hgt, cls) {
     const c = h('canvas', { class: 'uk-canvas ' + (cls || ''), role: 'img', 'aria-label': 'live display' });
-    const dpr = Math.min(2, global.devicePixelRatio || 1);
+    const dpr = doc.documentElement.dataset.gfx === 'low' ? 1 : Math.min(2, global.devicePixelRatio || 1);   // 3.121 Low: 1×
     c.width = w * dpr; c.height = hgt * dpr; c.style.width = '100%'; c.style.height = hgt + 'px';
     c.dpr = dpr;
     const g = c.getContext('2d'); g.scale(dpr, dpr);
@@ -347,13 +347,15 @@
   function loop(el, fn, fps) {
     let last = 0, alive = true, observed = false;
     // reduced motion (OS setting): displays still update, but calmly — at most 8 redraws a second
-    const minDt = Math.max(fps ? 1000 / fps : 0, reduceMotion() ? 125 : 0);
+    // 3.121 Settings › Graphics: Balanced = at most 30 redraws a second, Low = 15 (read each frame, so a change applies at once)
+    const gfxDt = () => { const g = doc.documentElement.dataset.gfx; return g === 'low' ? 1000 / 15 : g === 'balanced' ? 1000 / 30 : 0; };
+    const baseDt = Math.max(fps ? 1000 / fps : 0, reduceMotion() ? 125 : 0);
     function frame(t) {
       if (!alive) return;
       if (!el.isConnected && el._wasConnected) { alive = false; if (io) io.unobserve(el); return; }
       if (el.isConnected) { el._wasConnected = true; if (io && !observed) { io.observe(el); observed = true; } }
       const show = !doc.hidden && (!io || visible.get(el) !== false) && !(el.closest && el.closest('.wm-win.collapsed, #dock.folded'));
-      if (show && t - last >= minDt) { last = t; try { fn(t); } catch (e) { console.error(e); alive = false; } }
+      if (show && t - last >= Math.max(baseDt, gfxDt()) - 1) { last = t; try { fn(t); } catch (e) { console.error(e); alive = false; } }
       global.requestAnimationFrame(frame);
     }
     global.requestAnimationFrame(frame);

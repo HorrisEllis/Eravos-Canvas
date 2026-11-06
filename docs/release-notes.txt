@@ -1,3 +1,13 @@
+ERAVOS v0.2.8 (2026-11-06)
+
+Install: ERAVOS-Setup-0.2.8.exe, or unzip ERAVOS_0.2.8.zip. On 0.2.7, ERAVOS offers this update by itself.
+
+- W A S D move around the canvas while held (Shift: faster).
+- Hold the middle mouse button and drag to move — it no longer starts Windows' autoscroll circle.
+- Settings › Canvas & graphics › Graphics: High (as before) · Balanced (displays at 30 fps, no blur) · Low for low-end hardware
+  (displays at 15 fps and 1× resolution, no blur, shadows or transitions, no glow layer). Measured with five tools playing: Low does
+  about a third less drawing work. The sound is never touched.
+
 ERAVOS v0.2.7 (2026-11-05)
 
 Install: ERAVOS-Setup-0.2.7.exe, or unzip ERAVOS_0.2.7.zip. On an earlier version, ERAVOS offers this update by itself.
