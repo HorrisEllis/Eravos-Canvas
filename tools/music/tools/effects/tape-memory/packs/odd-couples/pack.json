@@ -1,0 +1,53 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "tape-memory.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.tape-memory",
+ "items": {
+  "eravos.tape-memory": {
+   "presets": {
+    "Steppers Cassette": {
+     "params": {
+      "mode": "cassette",
+      "wear": 0.3,
+      "generation": 2,
+      "wow": 0.3,
+      "flutter": 0.2,
+      "speed": 1,
+      "hiss": 0.15,
+      "crackle": 0.05,
+      "dropouts": 0.05,
+      "lowCut": 60,
+      "highCut": 7000,
+      "drive": 0.35,
+      "mix": 0.7
+     }
+    },
+    "Hanging Tree Copy": {
+     "params": {
+      "mode": "cassette",
+      "wear": 0.6,
+      "generation": 4,
+      "wow": 0.4,
+      "flutter": 0.25,
+      "hiss": 0.35,
+      "crackle": 0.1,
+      "dropouts": 0.08,
+      "lowCut": 50,
+      "highCut": 4200,
+      "drive": 0.45,
+      "mix": 0.8
+     }
+    }
+   }
+  }
+ }
+}

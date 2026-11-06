@@ -121,8 +121,9 @@
         sub: { role: 'bass', organism: 'eravos.sub-engine', preset: O('Steppers Sub'), style: 'onedrop', name: 'Sub' },
         bubble: { role: 'chords', organism: 'eravos.retro-poly', preset: O('Dub Juno Bubble'), style: 'bubble', voicing: 'triad', octave: 4, name: 'Bubble' },
         brass: { role: 'lead', organism: 'eravos.retro-poly', preset: O('Steppers Brass'), octave: 5, name: 'Brass' },
-        pad: { role: 'chords', organism: 'eravos.supersaw', preset: O('Steppers Pluck'), style: 'stab', voicing: 'triad', octave: 5, name: 'Pluck' } },
-      fx: [{ organism: 'eravos.dub-station', preset: O('Synthwave Steppers'), on: 'bubble' }, { organism: 'eravos.fx-echo', preset: O('Steppers Tape'), on: 'brass' }, { organism: 'eravos.fx-moddelay', preset: O('Steppers Flange'), on: 'drums' }, { organism: 'eravos.sidechain-compressor', preset: O('Steppers Pump 1/4'), on: 'pad' }],
+        pad: { role: 'chords', organism: 'eravos.supersaw', preset: O('Steppers Pluck'), style: 'stab', voicing: 'triad', octave: 5, name: 'Pluck' },
+        cards: { role: 'chords', organism: 'eravos.retro-dco', preset: O('Steppers Juno Cards'), style: 'stab', voicing: 'triad', octave: 4, name: 'Cards' } },
+      fx: [{ organism: 'eravos.dub-station', preset: O('Synthwave Steppers'), on: 'bubble' }, { organism: 'eravos.tape-memory', preset: O('Steppers Cassette'), on: 'cards' }, { organism: 'eravos.fx-echo', preset: O('Steppers Tape'), on: 'brass' }, { organism: 'eravos.fx-moddelay', preset: O('Steppers Flange'), on: 'drums' }, { organism: 'eravos.sidechain-compressor', preset: O('Steppers Pump 1/4'), on: 'pad' }],
       mods: HER(O('Steppers Pull-up')).concat([{ organism: 'eravos.wub-rate', preset: O('Steppers Switch') }]),   // 3.64: no EDM Lab all-in-one (the suite is EDM Lab)
       master: { compThresh: -11, compRatio: 2.5, reverbMix: 0.2 } },
 
@@ -213,8 +214,9 @@
       parts: { drums: Object.assign(KIT('Breaks & World', O('Steppers Machine')), { configure: { volume: 0.5 } }), forge: FORGE(O('Golden Steppers')), bass: { role: 'bass', organism: 'eravos.reese-bass', preset: O('Chapel Reese'), style: 'onedrop', name: 'Bass' },
         wub: { role: 'bass', organism: 'eravos.wub-osc', preset: O('Acid Saw Wub'), style: 'half', name: 'Wub' },
         organ: { role: 'chords', organism: 'eravos.organ', preset: ['Hanging Tree', O('Synthwave Chapel')], configure: { level: 0.45 }, style: 'sustain', voicing: 'triad', octave: 3, name: 'Organ' },   // held notes sustain since the organ fix: ≈4 dB down keeps the master clear
-        chapel: { role: 'lead', organism: 'eravos.retro-poly', preset: O('Wobble Pad Glow'), octave: 5, name: 'Chapel' } },
-      fx: [{ organism: 'eravos.dub-station', preset: O('Cathedral Sound System'), on: 'organ' }, { organism: 'eravos.fx-echo', preset: O('Cathedral Throw'), on: 'chapel' }, { organism: 'eravos.fx-eq', preset: O('Church Low Cut'), on: 'organ' }],
+        chapel: { role: 'lead', organism: 'eravos.retro-poly', preset: O('Wobble Pad Glow'), octave: 5, name: 'Chapel' },
+        ladder: { role: 'chords', organism: 'eravos.retro-dco', preset: O('Chapel Ladder Pad'), style: 'sustain', voicing: 'triad', octave: 4, name: 'Ladder' } },
+      fx: [{ organism: 'eravos.dub-station', preset: O('Cathedral Sound System'), on: 'organ' }, { organism: 'eravos.tape-memory', preset: O('Hanging Tree Copy'), on: 'ladder' }, { organism: 'eravos.fx-echo', preset: O('Cathedral Throw'), on: 'chapel' }, { organism: 'eravos.fx-eq', preset: O('Church Low Cut'), on: 'organ' }],
       mods: HER(O('Golden Gap')).concat([{ organism: 'eravos.wub-sub', preset: O('Cathedral Sub') }, { organism: 'eravos.embodiment-lab', preset: O('Hold Her Voice') }, { organism: 'eravos.master-fx', preset: O('Cathedral Master') }]),
       master: { compThresh: -16, compRatio: 3, reverbMix: 0.22 } },   // measured: −12 / 2 / 0.3 drove the master soft-clipper (≈400 samples a song) → ≈40
   ];

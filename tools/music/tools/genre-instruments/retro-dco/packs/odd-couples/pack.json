@@ -1,0 +1,62 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "retro-dco.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre",
+  "3.41"
+ ],
+ "for": "eravos.retro-dco",
+ "items": {
+  "eravos.retro-dco": {
+   "presets": {
+    "Steppers Juno Cards": {
+     "params": {
+      "voice": "poly",
+      "saw": 0.2,
+      "pulse": 0.9,
+      "width": 0.42,
+      "pwm": 0.55,
+      "pwmRate": 0.4,
+      "cutoff": 3000,
+      "res": 0.2,
+      "envAmt": 0.3,
+      "attack": 0.01,
+      "decay": 0.4,
+      "sustain": 0.5,
+      "release": 0.3,
+      "chorus": "I",
+      "chorusMix": 0.6,
+      "cards": 0.5,
+      "voices": 6,
+      "level": 0.5
+     }
+    },
+    "Chapel Ladder Pad": {
+     "params": {
+      "voice": "poly",
+      "voices": 8,
+      "saw": 0.6,
+      "pulse": 0.6,
+      "pwm": 0.4,
+      "cards": 0.9,
+      "cardSeed": 77,
+      "drift": 0.6,
+      "cutoff": 1400,
+      "res": 0.4,
+      "attack": 0.8,
+      "release": 2.5,
+      "chorus": "I+II",
+      "filter": "ladder",
+      "drive": 6,
+      "level": 0.45
+     }
+    }
+   }
+  }
+ }
+}
