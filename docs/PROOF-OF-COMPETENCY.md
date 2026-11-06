@@ -71,6 +71,17 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-06 · Shared synth parts, proved on their own — unison-stack, filter-ladder
+- **His words (2026-11-06):** "I want more synthwave. Is there more coming?" · "Which components, like what overlap can we focus on to speed
+  this up?" · "Do it."
+- **His call:** build the parts the most synthwave tools share first (by overlap, from the dependency graph), then the tools on them.
+- **Built:** a unison stack (1–16 voices, three detune curves, equal-power spread, blend, reproducible seeded phase) matching Supersaw's
+  layout exactly; a transistor-ladder filter (zero-delay feedback, saturation inside the loop, bass compensation, five taps) whose
+  AudioWorklet is the tested kernel text.
+- **Proof:** 95 + 36 measured checks — the ladder's −12.04 dB at cutoff, slopes, bandpass equal to its formula, self-oscillation bounded for
+  20 s near its cutoff, 148 ns per stereo sample; every component test passes.
+- **Check:** `node tools/music/components/unison-stack/unison-stack.test.mjs` · `node tools/music/components/filter-ladder/filter-ladder.test.mjs`
+
 ### 2026-11-05 · A piano roll you can work in — piano roll easier, Timeline right-click, Clip look, Canvas zoom
 - **His words (2026-11-05):** "make it easier" · "i dont like the fill options, replace it with pattern selection. also easier to manipulate
   notes, like size and moving" · "remove the split button from the timeline?, and let me select where and right click" · "like the song

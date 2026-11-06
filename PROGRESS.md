@@ -2,6 +2,22 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.128 Shared components for the synthwave tools: unison-stack, filter-ladder (2026-11-06)
+Asked: "Retro poly is buggy. I love it though. Like I want more synthwave. Is there more coming?" · "Which components, like what overlap can
+we focus on to speed this up?" · "Do it." (after: merge the other branch, then unison-stack and filter-ladder).
+- The other branch (claude/empty-canvas-blank-tools: Swarm Oscillator, spec DAGs, axioms, competence register) merged (PR #103); the
+  Swarm Oscillator's missing drawn icon added (orbit).
+- unison-stack (11 planned tools: retro-dco, supersaw-cathedral, hoover-engine, pad-forge …): 1–16 voices of any source — detune curve
+  (linear, exp, supersaw), spread (equal-power pan), blend, phase (free, reset, seeded random — no Math.random). Its layout is Supersaw's own,
+  voice for voice (the test writes Supersaw's arithmetic out and compares), so moving Supersaw onto it can null-render later.
+- filter-ladder (lead-glide, poly-filter-matrix, retro-dco — Retro Poly's rebuild): 4 ZDF one-poles in a loop solved in the same sample,
+  tanh drive inside the loop, bass compensation, LP24 / LP12 / BP12 / HP12 / HP24 taps; an AudioWorklet from the same kernel text.
+- Proof: unison-stack 95 checks; filter-ladder 36 checks (−12.04 dB at the cutoff, 24 / 12 dB per octave, the bandpass equal to theory,
+  resonance peak at the cutoff, 1/(1+k) bass loss and its compensation, drive harmonics, self-oscillation bounded 20 s at ~800 Hz, audio-rate
+  cutoff FM bounded, 148 ns per stereo sample); `node tests/components.mjs` all pass; specs' inputs/outputs written, 16 tool DAGs regenerated.
+- Next, by overlap: delay-line + osc-noise (3 synthwave tools each), then ensemble-core / bbd-line (the Juno chorus), saturator-tape,
+  random-source; then Retro DCO on them, its UI shown first.
+
 ## Done — 3.127 Swarm Oscillator; spec DAGs; axioms; the competence register (2026-11-06)
 Asked (07:27:37Z): "Map, spec first / Each tool needs a spec with a dag. / Make the swarm oscillator first. Since you were ready to. /
 Update the specs so nothing is lost. / And then Add those axioms to a claude.md. / Also ideas, choices and direction. All of me and what’s
