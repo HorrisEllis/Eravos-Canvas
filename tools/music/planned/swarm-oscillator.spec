@@ -1,4 +1,4 @@
-# spec_id: eravos.swarm-oscillator · version 1.0.0 · status building (2026-11-06, his go: "Make the swarm oscillator first. Since you were ready to.") · template eravos.tool/1
+# spec_id: eravos.swarm-oscillator · version 1.0.0 · status built 2026-11-06 → tools/music/tools/genre-instruments/swarm-oscillator/ (his go: "Make the swarm oscillator first. Since you were ready to.") · template eravos.tool/1
 # built in: tools/music/tools/genre-instruments/swarm-oscillator/ (that folder's spec is generated from the code; this file stays the design)
 # generated from eravos.music-ecosystem.spec v0.2.0 §4 (synthwave_retro) — that file stays the index; this file is the tool's own spec
 identity:

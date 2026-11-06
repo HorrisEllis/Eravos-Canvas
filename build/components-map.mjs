@@ -30,7 +30,7 @@ const add = (t, k, c) => { const o = tools[t] = tools[t] || { uses: [], becomes:
 for (const cat of fs.readdirSync(TDIR)) { const cd = path.join(TDIR, cat); if (!fs.statSync(cd).isDirectory()) continue;
   for (const t of fs.readdirSync(cd)) { const td = path.join(cd, t); if (!fs.existsSync(path.join(td, 'tool.json'))) continue;
     const id = JSON.parse(read(path.join(td, 'tool.json'))).id;
-    fs.readdirSync(td).filter(f => f.endsWith('.js') && !f.endsWith('.test.js')).forEach(f => { for (const m of read(path.join(td, f)).matchAll(/MusicParts\.(\w+)/g)) if (fnOf[m[1]]) add(id, 'uses', fnOf[m[1]]); });
+    fs.readdirSync(td).filter(f => f.endsWith('.js') && !f.endsWith('.test.js')).forEach(f => { for (const m of read(path.join(td, f)).matchAll(/\b(?:MusicParts|MP)\.(\w+)/g)) if (fnOf[m[1]]) add(id, 'uses', fnOf[m[1]]); });
   } }
 Object.entries(comps).forEach(([c, x]) => { if (x.from) add(x.from, 'becomes', c); });
 // planned specs that extend a built tool: the components they assemble

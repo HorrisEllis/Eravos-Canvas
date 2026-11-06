@@ -13,7 +13,7 @@
  *   snap()  every phase to the mean phase at once (Lock on beat)
  *   R       coherence 0…1: 1 = all in phase, ~1/√N = scattered
  *   MusicParts.POP(max = 32) → { configure(n, spreadCents, seed), set({ coupling, mode, pull, drift, cluster }), step(f0, sr),
- *                               phase(i), dt(i), R, psi, n, snap(), reset(seed) }
+ *                               phase(i), eff(i) (the phase the coupling sees: θᵢ/rᵢ kept continuous), dt(i), R, psi, n, snap(), reset(seed) }
  * Coupling strength K = coupling × 8 % of the note's frequency (Hz): at 1 it locks a spread of about ±70 cents.
  * Allocation-free after construction; self-contained (stringified into worklets). A component imports no tool. */
 (function (root) {
@@ -63,7 +63,7 @@
     function snap() { field(); let p = Math.atan2(my, mx) / TAU; p -= Math.floor(p); for (let i = 0; i < n; i++) { phi[i] = p; let v = p * rat[i]; v -= Math.floor(v); th[i] = v; } field(); }
     for (let i = 0; i < MAX; i++) { rat[i] = 1; fac[i] = 0; }
     reset(1); configure(1, 0);
-    return { configure, reset, set, step, snap, phase: (i) => th[i], dt: (i) => dts[i], ratio: (i) => rat[i], cents: (i) => base[i] + drift[i] + adapt[i],
+    return { configure, reset, set, step, snap, phase: (i) => th[i], eff: (i) => phi[i], dt: (i) => dts[i], ratio: (i) => rat[i], cents: (i) => base[i] + drift[i] + adapt[i],
       get R() { return R; }, get psi() { return Math.atan2(my, mx); }, get n() { return n; }, MAX };
   }
   root.MusicParts = root.MusicParts || {};
