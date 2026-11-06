@@ -166,7 +166,13 @@ Section "Update"
   ${EndIf}
 
   ; 4. did it go in? The Setup writes its version into the uninstall entry
+  SetRegView 64                     ; the Setup writes its entry in the 64-bit view (eravos.nsi: SetRegView 64)
   ReadRegStr $R5 HKLM "${UNINST_KEY}" "DisplayVersion"
+  ${If} $R5 == ""
+    SetRegView 32
+    ReadRegStr $R5 HKLM "${UNINST_KEY}" "DisplayVersion"
+  ${EndIf}
+  SetRegView default
   ${If} $R5 == $VERSION
   ${AndIf} ${FileExists} "$DEST\ERAVOS.exe"
     StrCpy $OK "true"
