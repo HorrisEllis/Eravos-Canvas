@@ -573,7 +573,10 @@
         for (let c = cellOf(a / pps, gg); c <= cellOf(b / pps, gg) + 1e-9; c += gg) { const cell = q(c); if (cell >= 0 && cell < st) paintAt(cell, pitchFor(nOf(y)), q(Math.min(gg, st - cell))); }
         drag.lastX = x; draw(); say(cellOf(x / pps, gg), pitchFor(nOf(y)), 'paint'); return;
       }
-      if (drag.mode === 'sketch') { const s2 = clampN(x / pps, 0, st), p2 = pOf(y), l2 = drag.pts[drag.pts.length - 1]; if (Math.abs(s2 - l2[0]) * pps + Math.abs(p2 - l2[1]) * ROW > 1.5) drag.pts.push([s2, p2]); say(s2, Math.round(p2), 'sketch'); draw(); return; }
+      if (drag.mode === 'sketch') { const s2 = clampN(x / pps, 0, st), p2 = pOf(y), l2 = drag.pts[drag.pts.length - 1]; if (Math.abs(s2 - l2[0]) * pps + Math.abs(p2 - l2[1]) * ROW > 1.5) drag.pts.push([s2, p2]); say(s2, Math.round(p2), 'sketch');
+        // 3.119 hear the line while you draw it: each new semitone it crosses (at most ~16 a second)
+        { const pn = clampN(lock ? pitchFor(Math.round(p2)) : Math.round(p2), LO, HI), now = performance.now(); if (pn !== drag.heard && (!drag.heardAt || now - drag.heardAt > 60)) { drag.heard = pn; drag.heardAt = now; audition([pn]); } }
+        draw(); return; }
       if (drag.mode === 'node') {   // 3.115 a point: along the note (between its neighbours; the ends stay at the ends) and up / down
         const a = drag.orig[drag.grab], P = drag.P.map(q => q.slice()), k = drag.k, last = P.length - 1;
         const t = k === 0 ? 0 : k === last ? 1 : clampN((x / pps - a.s) / Math.max(a.l, 1e-6), P[k - 1][0] + 0.004, P[k + 1][0] - 0.004);

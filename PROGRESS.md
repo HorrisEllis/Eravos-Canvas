@@ -2,6 +2,14 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.118–3.119 The release check says why · Sketch plays as you draw (2026-11-06)
+- 3.118 Releases v0.2.4–v0.2.7 were never published: the release workflow's ERAVOS Update check (3.111) found no update-result.json, and
+  it runs before the upload. Its log now shows a parse check, the helper's output and folders. Run 10: helper exit 0, no output, no log
+  — it stops before its first step. 3.119: the helper now prints its arguments and every step (Write-Host), so the next run says where.
+- 3.119 Sketch plays the line while you draw it: each semitone it crosses (≤ ~16/s). (Click / paint / drag already did, since 3.115 —
+  not yet in his installed build, which is v0.2.3 because the releases above were blocked.)
+- p112 10/10. Full 1391/1396: P82, rim, P70 (main's), P102 (order), P74b (flaky).
+
 ## Done — 3.116–3.117 Edit note in the menu · event depth: chance, ratchet, nudge · v0.2.7 (2026-11-05)
 Asked: "also editing a note has a whole editor? note editor?" · "then all the timeline improvements and phases next".
 - 3.116 notes menu › ✎ Edit note… opens the note editor.
