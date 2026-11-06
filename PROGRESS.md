@@ -2,7 +2,7 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
-## Done — 3.133 Tape Memory's four components (2026-11-06)
+## Done — 3.134 Tape Memory's four components (2026-11-06)
 His "yes" to Tape Memory → bottom up: the four parts it lacked, each NEW code proving its own numbers, the worklet = the kernel text.
 - random-source: rate / smooth (S&H … cosine glide), dist uniform · gaussian (σ ⅓, clipped) · beta (Marsaglia–Tsang) · histogram (≤ 32 bins),
   seed (sample-exact repeat), depth / offset / unipolar; ch1 Poisson events (density, eventLen). Also MusicParts.rng(seed). 18 checks.
