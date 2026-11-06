@@ -2,6 +2,13 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.140 Retro DCO and Tape Memory in the Odd Couples set (2026-11-06)
+Asked: "Continue". P43 listed both as without an Odd Couples pack or a part (Swarm's was done in #122 by the other session, the same way).
+- Retro DCO: Steppers Juno Cards (a part in Synthwave Steppers) · Chapel Ladder Pad (a part in Hanging Tree Dub). Tape Memory: Steppers
+  Cassette (on the Cards) · Hanging Tree Copy (on the Ladder). Each preset = a factory preset + the knobs for its job; the same entries in
+  build/odd-couples.mjs so a regeneration writes them.
+- Proof: P43 6/6 (was 4/6; every genre writes without a fault); 252 manifests valid. Not re-measured: the two songs' levels (build/gain-stage.mjs).
+
 ## Done — 3.139 Retro DCO, the tool (2026-11-06)
 Asked: "Build it." (after the UI preview). tools/music/tools/genre-instruments/retro-dco/ — the approved face, playing.
 - Decision A for now: a new tool beside Retro Poly; Retro Poly is untouched. B (Retro Poly rebuilt on it) waits for his ear: Retro Poly's

@@ -39,6 +39,14 @@ const DESIGN = {
     "Golden Swarm": P("Loose Constellation", {"voices": 13, "spread": 0.618, "coupling": 0.382, "pull": 0.382, "drift": 0.618, "lfoRate": 0.618, "lfoCouple": 0.382, "cutoff": 6180, "level": 0.5}, "every knob on the golden ratio (13 voices: a Fibonacci number) for the xen dub"),
     "Lullaby Lock": P("Locked Unison", {"voices": 8, "coupling": 1, "sync": "bar", "shape": "tri", "cutoff": 2400, "attack": 0.05, "release": 0.8, "width": 0.7, "level": 0.5}, "a music box that snaps into one wave on every bar, above a tearout"),
   },
+  'eravos.retro-dco': {
+    "Steppers Juno Cards": P("Chorus Glass Poly", {"voices": 6, "cards": 0.5, "cutoff": 3000, "attack": 0.01, "decay": 0.4, "sustain": 0.5, "release": 0.3, "chorus": "I", "level": 0.5}, "Juno cards answering the brass, each voice its own tilt, for the synthwave steppers"),
+    "Chapel Ladder Pad": P("Voice-Card Motion", {"filter": "ladder", "drive": 6, "cutoff": 1400, "res": 0.4, "attack": 0.8, "release": 2.5, "chorus": "I+II", "level": 0.45}, "a ladder pad drifting card by card under a desert-goth organ"),
+  },
+  'eravos.tape-memory': {
+    "Steppers Cassette": P("Lofi Cassette", {"wear": 0.3, "hiss": 0.15, "crackle": 0.05, "mix": 0.7}, "a worn cassette over the reggae bubble: steppers from a tape found in a car"),
+    "Hanging Tree Copy": P("Third Generation Dub", {"generation": 4, "wear": 0.6, "highCut": 4200, "mix": 0.8}, "the organ as a fourth-generation dub copy at the sound system"),
+  },
   'eravos.retro-poly': {
     'Steppers Brass': P("Brass Stab '84", { chorus: 'I+II', release: 0.15, cutoff: 3600, envAmt: 0.6, level: 0.55 }, 'eighties brass that answers dub sirens'),
     'Acid Arp Chapel': P('80s · Stranger Arp', { arp: 'up-down', arpDiv: '1/16', arpOct: 2, arpGate: 0.4, cutoff: 1800, res: 6, level: 0.5 }, 'the Stranger Things arp, but in a chapel next to a 303'),

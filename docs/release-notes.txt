@@ -1,3 +1,14 @@
+ERAVOS v0.2.14 (2026-11-06)
+
+Install: on 0.2.10 or later, ERAVOS offers this update by itself (or ERAVOS-Setup-0.2.14.exe).
+
+- Retro DCO (genre instruments): Retro Poly's face, rebuilt from shared parts with the depth of the 80s DCO polys — Voice (poly · mono ·
+  legato · unison), Filter (the SVF or a ladder with drive), the Juno chorus with its bucket brigade, and under More depth: 16 voice cards
+  each with its own small offsets, poly-mod and hard sync, an LFO with delay, velocity, unison, sub and noise shapes. 12 presets. It sits
+  beside Retro Poly (nothing about Retro Poly changes).
+- Odd Couples: Swarm Oscillator, Retro DCO and Tape Memory now have their packs and play parts in the songbook.
+- New shared parts: the bucket-brigade line and the ensemble chorus, the sub oscillator, the voice allocator.
+
 ERAVOS v0.2.13 (2026-11-06)
 
 Install: on 0.2.10 or later, ERAVOS offers this update by itself (or ERAVOS-Setup-0.2.13.exe).
