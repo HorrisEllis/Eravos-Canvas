@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.130 A key let go stops; Retro Poly Hold (2026-11-06)
+Asked: "Retro poly plays a key like your holding it. How do I turn that off. Same with the midi, options to make it hold or single note?"
+- Cause: the on-screen keyboard (ui-music Keyboard and the tools' own) plays a key as a 30-second note and sends "let go" on key-up. Seven
+  tools only let go of a note that had no end booked, so key-up did nothing and the note held for 30 s: Retro Poly, Coven, Organ, Pad
+  Forge, Syn Osc, Syn Partials (and the shared note-release component). Each now brings a booked end forward. Retro Poly mono: the voice a
+  legato note takes over now belongs to the new note (letting that key go stopped nothing before).
+- Retro Poly › Hold (header, beside Mono; off by default): keys and MIDI you let go keep sounding; the next key you press lets them go
+  (the same key alone just stops it). Timeline and sequencer notes keep their own lengths. Single note = Mono (already there).
+- Proof: tests/p130-note-hold.test.js 4/4 — on-screen key, MIDI poly and mono, Hold, and every tool with a keyboard (15) silent 3 s after
+  letting go (7 failed before). Retro Poly 12/12, Coven 13/13, Organ 43/43, Pad Forge 12/12, Syn Osc 4/4, Syn Partials 4/4, P53 88/88,
+  boundary 10/10; null render Syn Osc 11/11 PASS (the others' presets are random-seeded: unproven, 0 FAIL).
+- Open: Wobble Bass sounds before any note in an offline headless render (−4 dB, no key pressed) — left out of the P130 guard, to look at.
+
 ## Done — 3.129 Shared components: delay-line, osc-noise (2026-11-06)
 Asked: "Next." (after 3.128: next by overlap, delay-line and osc-noise).
 - delay-line (15 planned tools: echoes, dub, shimmer, tape memory, choruses …): up to 20 s or tempo sync, Hermite fractional read, TAPE

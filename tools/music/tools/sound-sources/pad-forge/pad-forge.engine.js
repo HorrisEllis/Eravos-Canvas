@@ -154,7 +154,7 @@
         if (dur !== undefined && !P.get('hold')) release(v, t + dur);
         return v;
       }
-      function release(v, t) { if (v.off !== Infinity) return; v.off = t; const R = P.get('release'); v.envs.forEach(e => dsp.release(e.gain, t, R)); v.nodes.forEach(n => { if (n.stop) try { n.stop(t + R * 1.7 + 0.1); } catch (e) {} }); const last = v.nodes.filter(n => n.stop).pop(); const done = () => { v.nodes.forEach(n => { try { n.disconnect(); } catch (e) {} }); const i = voices.indexOf(v); if (i >= 0) voices.splice(i, 1); }; if (last) last.onended = done; else done(); }
+      function release(v, t) { if (v.off !== Infinity && v.off <= t) return;   /* 3.130 a booked end can be brought forward */ v.off = t; const R = P.get('release'); v.envs.forEach(e => dsp.release(e.gain, t, R)); v.nodes.forEach(n => { if (n.stop) try { n.stop(t + R * 1.7 + 0.1); } catch (e) {} }); const last = v.nodes.filter(n => n.stop).pop(); const done = () => { v.nodes.forEach(n => { try { n.disconnect(); } catch (e) {} }); const i = voices.indexOf(v); if (i >= 0) voices.splice(i, 1); }; if (last) last.onended = done; else done(); }
       function kill(v, t) { const i = voices.indexOf(v); if (i >= 0) voices.splice(i, 1); v.envs.forEach(e => { e.gain.cancelScheduledValues(t); e.gain.setTargetAtTime(0, t, 0.02); }); v.nodes.forEach(n => { if (n.stop) try { n.stop(t + 0.12); } catch (e) {} }); }
       ctx.onNote((p) => noteOn(p.note, p.velocity, p.time, p.duration));
       ctx.sleepWhen(() => !voices.length);   // 3.62: silent (held chords count as sounding) → unplugged after its 14 s tail

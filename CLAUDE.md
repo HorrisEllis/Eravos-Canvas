@@ -97,6 +97,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-06 | **A key let go stops; Retro Poly Hold** (3.130): seven tools held an on-screen key / MIDI note for 30 s (key-up only released notes with no end booked) — fixed in each and the note-release component; Retro Poly mono legato key-up; **Hold** option (off by default) | `retro-poly`, `coven`, `organ`, `pad-forge`, `syn-osc`, `syn-partials`, `components/note-release` | `tests/p130-note-hold.test.js` 4/4 (all 15 keyboard tools) |
 | 2026-11-06 | **delay-line + osc-noise** (3.129): a 20 s delay (sync, tape bend or digital cross-fade, filtered/driven feedback, freeze, mod) and every colour of noise (white, pink, brown, velvet, crackle, band-limited; tilt, width, seed), worklet = kernel | `tools/music/components/delay-line/`, `osc-noise/` | 19 + 32 checks; `node tests/components.mjs` |
 | 2026-11-06 | **unison-stack + filter-ladder** (3.128): the two shared parts most synthwave tools stand on — 1–16 voices with Supersaw's own layout (detune curves, spread, blend, seeded phase); a 4-pole ZDF ladder with drive inside the loop, bass compensation, five taps, worklet = kernel | `tools/music/components/unison-stack/`, `filter-ladder/` | 95 + 36 checks; `node tests/components.mjs` |
 | 2026-11-06 | **Swarm Oscillator (3.127)** built from seven components (six new, each proving its own numbers: osc-va, osc-wavetable, oscillator-population, env-adsr, lfo, stereo-tools) in one worklet from their kernel text; everything timed is an AudioParam (offline renders were silent with messages); presets in packs/ | `tools/music/tools/genre-instruments/swarm-oscillator/`, `tools/music/components/*` | `swarm-oscillator.test.js` 10/10, design check D1–D6 0, `node tests/components.mjs` |
@@ -154,4 +155,5 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 - Patterns for each tool with variety: presets, depth, curves, per-note editing — everything the timeline can do.
 - Delete the merged branch `claude/nice-dirac-t64qeo` (a session could not: deleting a remote branch needs his permission).
 - Emerge work (E1–E3) needs a session with push access to `HorrisEllis/Emerge`. E4: widen Emerge's "only kernel32" axiom for the UI host? (his call)
+- Wobble Bass sounds before any note in an offline headless render (found 3.130; left out of the P130 guard).
 - AE vowel: Wub Filter's third band −12 dB vs the table's −14 dB (his call).
