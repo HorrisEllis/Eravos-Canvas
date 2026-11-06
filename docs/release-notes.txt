@@ -1,3 +1,12 @@
+ERAVOS v0.2.11 (2026-11-06)
+
+Install: on 0.2.10, ERAVOS offers this update by itself (or ERAVOS-Setup-0.2.11.exe).
+
+- Fixed: a key let go kept playing (for 30 seconds) in Retro Poly, Coven, Organ, Pad Forge, Syn Osc and Syn Partials — on the
+  on-screen keys and, in Retro Poly's mono mode, from MIDI. Every tool with a keyboard now stops when you let go.
+- Retro Poly: Hold (beside Mono, off by default) — keys you let go keep sounding until you play the next one. Mono = one note at a time.
+- New shared parts for the synthwave tools coming next: unison stack, ladder filter, delay line, noise (each proved on its own).
+
 ERAVOS v0.2.10 (2026-11-06)
 
 Install: ERAVOS-Setup-0.2.10.exe. This one install by hand: an older ERAVOS's Restart now could close without updating.

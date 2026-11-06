@@ -17,7 +17,7 @@ OrganismFactory.reg('eravos.retro-poly', function (view) {
   }, 30);
   const sel = (k) => UI.paramControl(view, cfg(k), { segMax: 6 }).el;
   UI.instrumentPanel(view, { color: '#ff2bd6', low: 48, high: 72, height: 56,
-    header: [sel('chorus'), UI.paramControl(view, cfg('mono')).el],
+    header: [sel('chorus'), UI.paramControl(view, cfg('mono')).el, UI.paramControl(view, cfg('hold')).el],
     top: [sun, h('div', { class: 'org-row', style: { gap: '6px', flexWrap: 'wrap' } }, [h('span', { class: 'org-label', text: 'ARP' }), sel('arp'), sel('arpDiv'), UI.paramControl(view, cfg('arpHold')).el])],
     keys: ['saw', 'pulse', 'width', 'pwm', 'pwmRate', 'sub', 'noise', 'drift', 'octave', 'cutoff', 'res', 'envAmt', 'keytrack', 'hpf', 'fA', 'fD', 'fS', 'attack', 'decay', 'sustain', 'release', 'unison', 'glide', 'arpOct', 'arpGate', 'level'],
     hint: 'Arp needs the transport playing: hold keys (or Latch) and it steps through them on the grid. Mono + Unison + Glide = the outrun lead.' });
