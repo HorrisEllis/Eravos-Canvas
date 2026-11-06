@@ -249,9 +249,12 @@
   // Same look, fewer writes: a value is written only when it changed by a visible step, the page palette at most 10× a second,
   // and every window is read before any is written (no layout between writes).
   const rootV = {};
-  // and the sound is still read 30× a second, but colours are written on one frame in every ~80 ms (WRITE_MS): the frames between
+  // and the sound is still read 30× a second, but colours are written on one frame in every ~80 ms (WRITE_MS_NOW()): the frames between
   // restyle nothing. `writing` is that frame.
-  const WRITE_MS = 80; let writing = true, lastW = -1e9;
+  // 3.121 Settings › Graphics › Low: colours written 4× less often, no glow layer (Balanced: 2×)
+  const gfx = () => doc.documentElement.dataset.gfx || 'high';
+  const WRITE_MS_BASE = 80; let writing = true, lastW = -1e9;
+  const WRITE_MS_NOW = () => WRITE_MS_BASE * (gfx() === 'low' ? 4 : gfx() === 'balanced' ? 2 : 1);
   let pageOff = false;   // 3.83 glass mode: the page palette is the glass layer's; the windows still answer
   const set = (k, v) => { if (!writing || pageOff || rootV[k] === v) return; rootV[k] = v; root.style.setProperty(k, v); };
   // 3.96 "All the colors are meant to be reactive … the button contents and their border": the accents are written in glass mode too.
@@ -291,7 +294,7 @@
     if (doc.hidden || ts - last < 33) return;
     // the app is Off: only windows with their own reactive setting (⚙ → Reactive colours) still answer — looked for once a second
     if (!on) { if (ts - ownScan > 1000) { ownScan = ts; ownAny = Array.from(doc.querySelectorAll('.wm-win')).some(w => { const x = settingsOf(w); return x.own && x.mode !== 'off'; }); } if (!ownAny) return; }
-    last = ts; writing = ts - lastW >= WRITE_MS; if (writing) lastW = ts;
+    last = ts; writing = ts - lastW >= WRITE_MS_NOW(); if (writing) lastW = ts;
     if (mode === 'beat') { beatFrame(ts); return; }
     const G2 = glass(); pageOff = G2;   // 3.82 drawn on the glass layer: the page is not written; 3.83 the windows still are
     const lit = G2 ? [] : null;
@@ -320,7 +323,7 @@
     // 3.98 the Field theme: one turn (degrees, a plain number) and one light (0…1) for every colour at once — written in both ways of
     // drawing, so every accent on the page moves together ("changing to sync them all, and change with the sounds")
     if (on) { setPal('--snd-hn', String(Math.round(shift))); setPal('--snd-lv', kMix.toFixed(2)); } if (on && ts - lastPal >= 100) { lastPal = ts; PALETTE.forEach(k => { if (base[k]) setPal(k, colourFor(base[k], kMix, G())); }); surfaces(kMix); }
-    if (G2 && on) glassMix(kMix);
+    if (G2 && on && gfx() !== 'low') glassMix(kMix); else if (G2 && gfx() === 'low') glassRest();   // 3.121 Low: no glow layer
     // a tool shown on its page (or a suite's page) lights with the mix
     if (on) doc.querySelectorAll('.tp-overlay').forEach(o => { o._rk = kMix; o._ro = G(); light(o, kMix, G()); accented(o, ts).forEach(el => light(el, kMix, G())); });
     if (Math.random() < 0.05) lastScan++;   // 3.83 a canvas looks up its window again now and then (it may have moved)
@@ -367,7 +370,7 @@
         if (lv > 0.02) liveAcc(w, lv, ts, o); else restoreAcc(w);
       });
     }
-    if (lit) glassWindows(lit);
+    if (lit && gfx() !== 'low') glassWindows(lit);
   }
   // ---- 3.102 Beat: the colours to step through are the theme's own accents (nothing restyled), in a fixed order
   function beatColours() {

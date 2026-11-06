@@ -17,18 +17,32 @@
   const get = (p) => { let v = null; try { v = global.localStorage.getItem('eravos.' + p.key); } catch (e) {} return v === 'on' || v === 'off' ? v : p.def; };
   const set = (p, v) => { try { global.localStorage.setItem('eravos.' + p.key, v); } catch (e) {} root.dataset[p.attr] = v; };
   PREFS.forEach(p => { root.dataset[p.attr] = get(p); });
+  // 3.121 GRAPHICS ("having major performance issues … maybe add a graphic settings for low end hardware"): how much drawing the page
+  // does. High = as it is (the default). Balanced: displays at 30 frames a second, no blur behind panels. Low: displays at 15, drawn at
+  // 1× resolution, no blur, shadows or transitions, the reactive colours' glow layer off and their colours written 4× less often, the
+  // Field theme's gradient still. Read through root.dataset.gfx by ui-kit, glass-layer, colour-field and the reactive colours.
+  const GFX = [['high', 'High', 'everything, as designed'], ['balanced', 'Balanced', 'displays at 30 fps, no blur behind panels'], ['low', 'Low (low-end hardware)', 'displays at 15 fps and 1× resolution, no blur / shadows / transitions, no glow layer']];
+  const gfxGet = () => { let v = null; try { v = global.localStorage.getItem('eravos.gfx'); } catch (e) {} return GFX.some(g => g[0] === v) ? v : 'high'; };
+  const gfxSet = (v) => { try { global.localStorage.setItem('eravos.gfx', v); } catch (e) {} root.dataset.gfx = v; try { global.dispatchEvent(new CustomEvent('eravos:gfx', { detail: { level: v } })); } catch (e) {} };
+  root.dataset.gfx = gfxGet();
 
   const KEYS = [
     ['Canvas', [['Space', 'play / stop'], ['Ctrl + Z · Ctrl + Shift + Z', 'undo · redo'], ['Shift + Esc', 'stop everything'], ['Ctrl + ,', 'Settings'], ['Alt while dragging', 'place a window freely (no snapping)'], ['Wheel · Ctrl + wheel', 'scroll · zoom the canvas'], ['Right-click', 'a menu for what is under the pointer']]],
   ];
   const addKeys = (group, rows) => { if (!group || !Array.isArray(rows)) return; const g = KEYS.find(k => k[0] === group); if (g) g[1].push(...rows); else KEYS.push([group, rows.slice()]); };
+  function graphics() {
+    const h = global.UIKit.h, cur = gfxGet();
+    const seg = global.UIKit.Segmented({ label: 'Graphics', options: GFX.map(g => ({ value: g[0], label: g[1] })), value: cur, onChange: (v) => { gfxSet(v); say.textContent = (GFX.find(g => g[0] === v) || [])[2] || ''; } });
+    const say = h('span', { class: 'as-say', text: (GFX.find(g => g[0] === cur) || [])[2] });
+    return h('div', { class: 'as-card' }, [h('div', { class: 'as-row' }, [seg.el, say]), h('p', { class: 'as-say', text: 'Slow or stuttering while tools play? Try Balanced, then Low. The sound is never touched — only how much the screen draws.' })]);
+  }
   function make() {
     const h = global.UIKit.h;
-    return h('div', { class: 'as-card' }, PREFS.map(p => {
+    return h('div', {}, [graphics(), h('div', { class: 'as-card' }, PREFS.map(p => {
       const on = get(p) === 'on', b = h('button', { class: 'uk-toggle' + (on ? ' on' : ''), type: 'button', 'aria-pressed': on ? 'true' : 'false', text: p.label, title: p.hint });
       b.onclick = () => { const v = get(p) === 'on' ? 'off' : 'on'; set(p, v); b.classList.toggle('on', v === 'on'); b.setAttribute('aria-pressed', v === 'on' ? 'true' : 'false'); };
       return h('div', { class: 'as-row' }, [b, h('span', { class: 'as-say', text: p.hint })]);
-    }));
+    }))]);
   }
   function keys() {
     const h = global.UIKit.h, q = h('input', { class: 'uk-text as-ksearch', type: 'search', placeholder: 'find a shortcut…', 'aria-label': 'find a shortcut' }), grid = h('div', { class: 'as-keys' });
@@ -49,10 +63,10 @@
   }
   function boot() {
     const AS = global.AppSettings; if (!AS || !global.UIKit) { setTimeout(boot, 300); return; }
-    AS.addSection({ id: 'canvas', label: 'Canvas', order: 15, sub: 'How the windows sit on the canvas.', make });
+    AS.addSection({ id: 'canvas', label: 'Canvas & graphics', order: 15, sub: 'How much the screen draws, and how the windows sit on the canvas.', make });
     AS.addSection({ id: 'keys', label: 'Keys', order: 80, sub: 'Every keyboard shortcut in one place.', make: keys });
     if (global.eravosDesktop) AS.addSection({ id: 'library', label: 'Library', order: 85, sub: 'Where your work lives.', make: library });
   }
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', boot); else boot();
-  global.CanvasPrefs = { addKeys, get: (k) => { const p = PREFS.find(x => x.key === k); return p ? get(p) : null; }, set: (k, v) => { const p = PREFS.find(x => x.key === k); if (p) set(p, v); }, PREFS };
+  global.CanvasPrefs = { gfx: gfxGet, setGfx: gfxSet, addKeys, get: (k) => { const p = PREFS.find(x => x.key === k); return p ? get(p) : null; }, set: (k, v) => { const p = PREFS.find(x => x.key === k); if (p) set(p, v); }, PREFS };
 })(typeof window !== 'undefined' ? window : globalThis);

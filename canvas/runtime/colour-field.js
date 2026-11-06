@@ -25,7 +25,7 @@
   // come back the other way (a mirrored run, so there is never a seam). Still when the system asks for reduced motion.
   const DRIFT = 48;
   let phase = 0;
-  const still = () => !!(global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const still = () => doc.documentElement.dataset.gfx === 'low' || !!(global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches);
   function at(x, y, ph) {
     let t = Math.max(0, Math.min(1, ((x - CX) * DX + (y - CY) * DY) / SPAN + 0.5));
     const p = ph === undefined ? phase : ph; if (p) { t = (t + p) % 2; if (t > 1) t = 2 - t; }
