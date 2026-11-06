@@ -2,6 +2,17 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.136 Piano's three components (2026-11-06)
+His "yes" to Piano → bottom up: the three parts it lacked, each NEW code proving its own numbers.
+- modal-resonator: a bank of two-pole modes (≤ 64); a unit impulse rings at exactly g · rⁿ · sin((n+1)w) — frequency, decay (T60) and level
+  exact; modes over 0.45 × rate skipped; scale(k) for a new note; MODAL_SHAPES beam (tine, reed) · bar · body (soundboard) as data. 11 checks.
+- karplus-string: delay → Thiran fraction → four stiffness allpasses (stretch) → one-pole damping (bright) → loss. Tuning exact: the loop's
+  phase delay at f0 is sr / f0 to 1e-6 samples (worked out) and < 0.5 cent measured at 55–1760 Hz; stretch puts the 12th partial of A4 up to
+  ~20+ cents sharp (a piano's 10–30), t60 on time (30 dB a second at 2 s), stable always (loss never above 1). 41 checks.
+- saturator-tube: a triode-like curve (tanh up, harder down by 1 + 3·bias: even harmonics from the asymmetry, none at bias 0), a 5 Hz DC
+  blocker on what the tube adds (the dry signal untouched by it), tilt about 1 kHz, faded in over 6 dB (drive 0 = the signal exactly). 14 checks.
+- Specs: status built; loaded in tools/music/index.js; the planned specs' DAGs regenerated (piano, pluck forge, drum foundry …).
+
 ## Done — 3.135 Tape Memory, the tool (2026-11-06)
 His "yes" to the spec and the UI preview. tools/music/tools/effects/tape-memory/ (scaffolded by build/new-tool.mjs).
 - Engine: in → saturator-tape → bitcrusher → delay-line L / R (time = 15 ms + the transport's lag + wow + flutter; R + drift) → svf high-pass →
