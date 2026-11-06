@@ -34,7 +34,7 @@ describe('P120 · .erv: the canvas as a layered YAML file', () => {
       assert.ok(offText !== text, 'the switch is in the text'); assert.ok(!Erv.fromErv(offText).snap.organisms.some(o => o.instanceId === b), 'on: false = left out');
       // a knob edited by hand
       const edited = text.replace('cutoff: 1234', 'cutoff: 777'); await Erv.open(edited);
-      const rp = OrganismFactory.handles().find(r => r.id === 'eravos.retro-poly'); assert.equal(rp.ctx.params.get('cutoff'), 777, 'opens as edited');
+      const rp = OrganismFactory.handles().find(r => r.id === 'eravos.retro-poly' && r.K === Kernel && !r.unmounted);   // this canvas's, not another test's assert.equal(rp.ctx.params.get('cutoff'), 777, 'opens as edited');
       // unknown keys (a newer ERAVOS, or a person's note) come back out
       const plus = text.replace(/^layers:/m, 'mood: late night\nlayers:').replace(/^(\s*)label: Wires$/m, (m, sp) => m + '\n' + sp + 'note: keep these'), d = Erv.fromErv(plus);
       assert.equal(d.snap.mood, undefined, 'a top-level key is not a snapshot key'); assert.ok(Erv.parse(plus).mood === 'late night' && Erv.layers(plus).find(l => l.kind === 'wires').note === 'keep these', 'kept in the file');

@@ -33,6 +33,12 @@ const DESIGN = {
     'Acid Rewind': P('Bun Dem (dancehall)', { rewindLen: 2, rewindRestart: true, hornLevel: 0.55, sirenLevel: 0.25, bigKnob: 260 }, 'pull-up and horns for the acid séance (big knob already half way)'),
     'Lullaby Dub': P('Roots One Drop', { skankStyle: 'organ bubble', skankTone: 1400, skankLevel: 0.35, spring: 0.4, echo: 0.45, echoFeedback: 0.6, echoSweep: 700, level: 0.7 }, 'a soft bubble and a dark echo under a music box'),
   },
+  'eravos.swarm-oscillator': {
+    "Cathedral Swarm": P("Harmonic Swarm", {"voices": 12, "coupling": 0.75, "cluster": 1, "shape": "table", "table": 0.92, "cutoff": 3200, "attack": 0.4, "release": 2.5, "width": 1, "level": 0.5}, "a choir of voices settling on a chord over a dancehall riddim in a cathedral"),
+    "Séance Fracture": P("Fractured Cluster", {"voices": 10, "cutoff": 2200, "res": 0.5, "attack": 0.2, "release": 1.5, "level": 0.45}, "voices that never settle, pushing apart under the 303 and the coven"),
+    "Golden Swarm": P("Loose Constellation", {"voices": 13, "spread": 0.618, "coupling": 0.382, "pull": 0.382, "drift": 0.618, "lfoRate": 0.618, "lfoCouple": 0.382, "cutoff": 6180, "level": 0.5}, "every knob on the golden ratio (13 voices: a Fibonacci number) for the xen dub"),
+    "Lullaby Lock": P("Locked Unison", {"voices": 8, "coupling": 1, "sync": "bar", "shape": "tri", "cutoff": 2400, "attack": 0.05, "release": 0.8, "width": 0.7, "level": 0.5}, "a music box that snaps into one wave on every bar, above a tearout"),
+  },
   'eravos.retro-poly': {
     'Steppers Brass': P("Brass Stab '84", { chorus: 'I+II', release: 0.15, cutoff: 3600, envAmt: 0.6, level: 0.55 }, 'eighties brass that answers dub sirens'),
     'Acid Arp Chapel': P('80s · Stranger Arp', { arp: 'up-down', arpDiv: '1/16', arpOct: 2, arpGate: 0.4, cutoff: 1800, res: 6, level: 0.5 }, 'the Stranger Things arp, but in a chapel next to a 303'),
