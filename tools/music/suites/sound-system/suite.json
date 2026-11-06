@@ -1,6 +1,7 @@
 {
   "schema": "eravos.suite/1",
   "id": "music.sound-system",
+  "kind": "setup",
   "label": "Sound System",
   "icon": "🔊",
   "accent": "#ffd24a",

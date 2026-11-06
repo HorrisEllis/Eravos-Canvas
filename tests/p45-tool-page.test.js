@@ -24,7 +24,7 @@ describe('P45 · tool pages — suites, mods one by one, sound packs', () => {
       });
     }
   });
-  it('“Load the whole suite” on Wobble Bass: two mods inside the growl with their presets, three tools wired into it', async () => {
+  it('“Load the whole setup” on Wobble Bass: two mods inside the growl with their presets, three tools wired into it', async () => {
     const U = TH.universe(1.2, { bpm: 140 }), w = TH.spawn(U, 'eravos.wobble-bass'), st = page(U, 'eravos.wobble-bass', w);
     const out = ToolPage.loadSuite(st);
     assert.equal(out.filter(Boolean).length, 5, 'every member loaded');

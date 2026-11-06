@@ -1,6 +1,7 @@
 {
   "schema": "eravos.suite/1",
   "id": "music.heavy-drops",
+  "kind": "setup",
   "label": "Heavy Drops",
   "icon": "💥",
   "accent": "#ff2266",

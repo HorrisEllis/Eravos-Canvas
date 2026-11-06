@@ -41,6 +41,14 @@ Read this first, then `PROGRESS.md` (the detailed log, newest first) and the spe
   scale, each level opens as a canvas; membership is wiring, overlap is normal, depth added to a component reaches everything
   holding it. `specs/eravos.suites.spec` ADDENDUM 2026-11-05 (F1–F5).
 
+- **Parts, not monoliths** (his words, 2026-11-06: "Just want to make sure the tools don't become monolith with packs or mods hard
+  wired in. Themes and ui, components are any parts that other tools can use. Suites are tools with each component wired in. Tools,
+  keys and values can be adjusted while playing them."): packs are data beside a tool, mods go in and come out (Mods), components are
+  shared code any tool holds (`tools/music/components/`), themes and UI are the canvas's. A **suite** = a tool and its components wired;
+  a system of whole tools is a **setup** (Start › SETUPS). Suites are made from what is wired on the canvas (right-click › Save what is
+  wired here as a suite), across domains — "a way to explore creatively … connecting things to things". Everything changes while it
+  plays. Every thing he says is mapped in `docs/HIS-WORDS-MAP.md` (done / rule / open) — add to it every session.
+
 - **No toys** (his words, 2026-11-05: "It's not a toy replaying sounds … I want it to stay that way. No toys."). Every instrument makes
   its sound live — oscillators, filters, shapers, modulation — like Wobble Bass: no shipped recordings, no sample playback dressed up
   as an instrument, every preset is settings the engine rebuilds. Samplers work only on the user's own audio. Full depth, nothing
@@ -61,7 +69,9 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
-| 2026-11-06 | **Empty canvas = tools start blank**: Start › Empty canvas → every tool added opens with no preset loaded (kept across restarts); any other start brings presets back; saved tools and previews untouched | `canvas/runtime/organism-factory.js`, `canvas/index.html` | `tests/p116-blank-start.test.js` 2/2; P21 P71 P73 P76 P100, boundary 10/10 |
+| 2026-11-06 | **Suites = a tool and its components wired; setups; make your own**: the 7 systems of whole tools are setups (Start › SETUPS, open and build as before); right-click › Save what is wired here as a suite (parts, wires, settings; kept, deletable); tool page tabs **Suites** (open as suite, part of, setups) and **Components** (in it now / comes out of it / planned, from `build/components-map.mjs`); the old Suite tab is Setup | `canvas/runtime/suites.js`, `tool-page.js`, `context-menu.js`, `tools/music/core/components-tab.js`, `build/components-map.mjs` | `tests/p119-suites-rework.test.js` 3/3; P48 P49 P63 P94 boundary green |
+| 2026-11-06 | **Every piano key plays its own note; Automation › Bind**: a slide plays each key (out-of-key keys no longer snap to a neighbour); Bind, then touch any knob → a lane (like MIDI Mapper learn) | `tools/music/core/ui-music.js`, `macro-automation.*` | `tests/p117` 1/1, `tests/p118` 1/1; P14 P48 P122b, macro-automation 8/8 |
+| 2026-11-06 | **Empty canvas = tools start blank** (no preset loaded; kept across restarts) · Swarm Oscillator UI preview (not built) | `organism-factory.js`, `canvas/index.html`, `docs/previews/`, `tools/music/planned/swarm-oscillator.ui.md` | `tests/p116` 2/2; preview checks in `docs/previews/swarm-oscillator.check.mjs` |
 | 2026-11-05 | **Release v0.2.4** — piano roll easier (one row, Pattern, sizing), Clip look + Canvas zoom, Timeline right-click (PR #91) | `desktop/package.json`, `docs/release-notes.txt` | the release run's Setup exe + zip |
 | 2026-11-05 | **Piano roll easier + Timeline right-click**: one row of controls (rest under More ▾); Pattern picker replaces Fill; easier sizing (6–12 px ends, grips, offset kept, Ctrl+←/→); options Clip look (notes like Song Recorder clips, waveform inside) and Canvas zoom (wheel zooms time + pitch, 4–40 px rows, middle-drag pans); Timeline: ✂ Split button removed, right-click a selected stretch / clip / spot (Split here, Loop this stretch, Delete what is in it — clip_clear_at) | `timeline.pianoroll.js`, `timeline.ui.js`, `timeline.engine.js` | P113 3/3, P114 2/2, P115 2/2; Timeline 86/86, piano 35/35, boundary 10/10; full suite on main before: 1379/1382 (P84 fixed here; P82 ×2 known) |
 | 2026-11-05 | **Release v0.2.3** — Settings page, Connect edges + the roll as a proper window (3.112, from the other session's unmerged branch), background updates (3.111) | `desktop/package.json`, `docs/release-notes.txt` | P112 3/3, P109 2/2, P76 4/4, P110 2/2, boundary 10/10; the release run's Setup exe + zip |

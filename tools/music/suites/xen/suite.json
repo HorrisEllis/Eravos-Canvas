@@ -1,6 +1,7 @@
 {
   "schema": "eravos.suite/1",
   "id": "music.xen",
+  "kind": "setup",
   "label": "Xen",
   "icon": "🔮",
   "accent": "#33e0c0",

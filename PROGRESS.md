@@ -2,6 +2,24 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.125 / 3.126 Piano keys, Automation Bind, suites rework (2026-11-06)
+Asked: "Move along the piano to change the keys, each key needs to play its relative note. Also the automation tool needs to have a
+bind button … similar to the midi mapper. … can you clear out suites and make them the tool and its components wired together? But
+also the ability to create them?" — then: the 7 genre suites → Start From; create from "setups on the screen. Like what's wired
+together … Across domains. Make sure you're mapping all of what I've said."
+- Keyboard (every tool): with the key lock on, a key outside the key snapped to a neighbour — a slide repeated or skipped notes.
+  Every key plays itself; out-of-key keys stay shaded. P117.
+- Automation › ⊕ Bind: then touch any knob, switch or choice on any tool → a lane; one touch, then it lets go; again cancels. P118.
+- Suites: kind "suite" (default) = a tool and its components wired (Wub Lab, Synthesis Lab); kind "setup" = the 7 systems of whole
+  tools, now Start › SETUPS cards (recipe op "suite": opens its window, builds, starter scene — as before). Suites.list() = suites only.
+- Your own suites: right-click a window › Save what is wired here as a suite… — the wired group (any domain), its wires, its settings as
+  the scene "As saved"; kept in localStorage (eravos.userSuites); Delete on its page.
+- Tool page: Suites tab (Open as suite · a part of · setups) and Components tab (domain-contributed via ToolPage.addTab: in it now /
+  comes out of it / planned, from build/components-map.mjs → tools/music/data/components-map.js); the old "Suite" tab is "Setup".
+- docs/HIS-WORDS-MAP.md: all 19 things he said this session, each done / rule / open. DESIGN-GUIDE W7 (power without overwhelm), W8.
+- Open: a guard for "no monoliths" (no tool names another's preset or builds in a mod); a guard for "adjusted while playing" (hold a
+  note, move every knob); Components on the suite page; a UI tab; a domain-free suite window for a second domain.
+
 ## Done — 3.124 Empty canvas: every tool starts blank, no preset (2026-11-06)
 Asked: "Can you when picking empty canvas have every tool empty of presets?"
 - Start › Empty canvas (and Browse every tool) turns on a blank start: every tool added opens on its own plain settings — no preset

@@ -61,8 +61,8 @@ describe('P63 · Heavy Drops suite · a page for every suite · a click opens th
       btnText(/Back/).click(); await TH.sleep(30);
       assert.ok(AddMenu.isOpen() && !ToolPage.isOpen(), 'back in ＋ Add');
       assert.ok(document.querySelector('.ap-card.sel[data-id="eravos.sub-engine"]'), 'on the same tool');
-      document.querySelector('.ap-card[data-id="suite:music.heavy-drops"]').click(); await TH.sleep(10);
-      assert.equal(ToolPage.current().suiteId, 'music.heavy-drops', 'a suite card → the suite page');
+      document.querySelector('.ap-card[data-id="suite:music.wub-lab"]').click(); await TH.sleep(10);
+      assert.equal(ToolPage.current().suiteId, 'music.wub-lab', 'a suite card → the suite page');
     } finally { ToolPage.close(); AddMenu.close(); }
   });
 });
@@ -119,10 +119,10 @@ describe('P63 · drawn icons everywhere · EDM Lab is the suite only', () => {
     try {
       AddMenu.show(S, X, { view: 'all' }); await TH.sleep(30);
       assert.ok(!document.querySelector('.ap-card[data-id="eravos.edm-lab"]'), 'no all-in-one card');
-      assert.ok(document.querySelector('.ap-card[data-id="suite:music.edm-lab"]'), 'the EDM Lab suite card');
-      const suiteCard = document.querySelector('.ap-card[data-id="suite:music.gothic"]');
+      assert.ok(!document.querySelector('.ap-card[data-id="suite:music.edm-lab"]'), '3.126: EDM Lab is a setup (Start › SETUPS), not a suite');
+      const suiteCard = document.querySelector('.ap-card[data-id="suite:music.wub-lab"]');
       assert.ok(suiteCard.querySelector('.ap-art-tile svg'), 'a suite card: its icon tile');
-      assert.equal(suiteCard.querySelectorAll('.ap-art-part svg').length, Suites.get('music.gothic').parts.length, 'and the icon of every part it is made of');
+      assert.equal(suiteCard.querySelectorAll('.ap-art-part svg').length, Suites.get('music.wub-lab').parts.length, 'and the icon of every part it is made of');
       assert.ok(document.querySelector('.ap-card[data-id="eravos.fx-echo"] .ap-card-glyph svg'), 'a tool card: a drawn glyph by its name');
       assert.ok(document.querySelectorAll('.ap-rail-item svg').length >= 10, 'the rail: one per category');
       assert.ok(!Suites.get('music.edm-lab').allInOne, 'the suite points at no all-in-one');

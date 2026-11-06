@@ -64,6 +64,8 @@ Each rule: what it says · his words · how it is checked.
 | W4 | The look of the canvas as it is now is the reference. No restyle without his OK on a preview | "hell no on that ui. i like what it is now." (2026-11-05) | process |
 | W5 | A visual change is shown to him before it merges, or it arrives as a new choice (theme, button style, material) with today's look as the default | "always show me or add more themes before change" (2026-11-05) | process |
 | W6 | Materials (Themes › Material: Grain, Brushed, Carbon) texture only the surfaces, in neutral white or grey at a few percent | "what about adding more texture to the tools? like how the retro poly" (2026-11-05) | review |
+| W7 | Power without overwhelm: the face holds what matters, the rest behind More depth ▸ (nothing outside his control); a control that does nothing in the current state dims and says why; a fixed list earns its place only when each item is a different thing (a mode) or a musical value | "Dynamic as possible. As much power and control as possible wothout making it overwhelming. Hardcoded or static earns its place." (2026-11-06) | review |
+| W8 | Each tool's page keeps its parts apart, one tab each: its panel, setup, mods, packs, controls, in/out, suites, components | "Each tool with each component/ui/packs/mod/suite/etc all with a clear line of seperation all added to the tool page, suite page" (2026-11-06) | P119 |
 
 ### New tools
 

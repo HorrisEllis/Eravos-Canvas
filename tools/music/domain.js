@@ -50,6 +50,9 @@
   });
   F.allowObserve(['transport:', 'theory:', 'master:', 'pad:bank-change']);
 
+  // 3.126 a suite saved from the canvas opens in this domain's suite window (the canvas names no domain's tools)
+  if (global.Suites && global.Suites.setDefaultHub) global.Suites.setDefaultHub('eravos.suite-hub');
+
   // ---------------------------------------------------------------- recipes
   global.Recipes.defineOp('bpm', (st, { K }) => K.bus.publish('ui:transport-bpm', { bpm: st.bpm }));
   global.Recipes.defineOp('key', (st, { K, alias }) => {

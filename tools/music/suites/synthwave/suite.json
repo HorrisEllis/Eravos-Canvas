@@ -1,6 +1,7 @@
 {
   "schema": "eravos.suite/1",
   "id": "music.synthwave",
+  "kind": "setup",
   "label": "Synthwave",
   "icon": "🌆",
   "accent": "#ff3cac",

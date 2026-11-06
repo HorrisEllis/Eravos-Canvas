@@ -41,7 +41,8 @@ describe('P49.4b · an all-in-one tool points at its parts', () => {
     try {
       let el = ToolPage.open('eravos.wobble-bass', { K: Kernel }); assert.ok(/As parts: Wub Lab/.test(el.querySelector('.tp-asparts').textContent));
       el = ToolPage.open('eravos.wub-filter', { K: Kernel }); assert.ok(Array.from(el.querySelectorAll('.tp-partof')).some(b => /Wub Lab/.test(b.textContent)), 'Wub Filter: Part of Wub Lab');
-      el = ToolPage.open('eravos.chord-gen', { K: Kernel }); assert.ok(Array.from(el.querySelectorAll('.tp-partof')).some(b => /EDM Lab/.test(b.textContent)));
+      el = ToolPage.open('eravos.chord-gen', { K: Kernel }); const tab = el.querySelector('.tp-sec[data-sec="suites"]');   // 3.126 EDM Lab is a setup now
+      assert.ok(tab && /EDM Lab/.test(tab.textContent) && /setup/.test(tab.textContent), 'Chord Gen’s Suites tab: it plays in the EDM Lab setup');
     } finally { ToolPage.close(); }
   });
 });

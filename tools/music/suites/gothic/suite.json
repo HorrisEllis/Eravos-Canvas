@@ -1,6 +1,7 @@
 {
   "schema": "eravos.suite/1",
   "id": "music.gothic",
+  "kind": "setup",
   "label": "Gothic",
   "icon": "🕯",
   "accent": "#8a5cff",
