@@ -6,7 +6,7 @@
 
 **How to read it.** Each entry is one contribution: the exact words (checked word for word against their source by `node build/competence.mjs --check`), when, who it came from, what kind of thing it was, how it developed, what came of it, and the evidence a stranger can check. **Confidence is three separate levels, never one score**: *proposed* (an idea) · *demonstrated* (built and tested here — built by the AI coder to his direction: the idea and the call are his, the code is not claimed as his) · *independently verified* (validated outside this project — none yet). **Append-only**: an entry is never edited; a correction is a new entry that amends it. Generated from `docs/competence/register.jsonl` — do not edit this page. The record before this register (merged work since 2026-10-15, with merge times): `docs/PROOF-OF-COMPETENCY.md`.
 
-**26 entries** · his: 23 (6 proposed · 17 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
+**27 entries** · his: 24 (6 proposed · 18 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
 
 ## Ideas
 _what he originated, proposed or identified_
@@ -27,6 +27,7 @@ _what he originated, proposed or identified_
 | R-2026-11-06-17 | 2026-11-06 07:27:37 UTC | “Each tool needs a spec with a dag.” | principle | A generated DAG block in every tool spec; a hand-written signal_dag checked against the components. | 226 tool specs carry their DAG. | `build/spec-dag.mjs` · `commit 35cba7e (branch claude/empty-canvas-blank-tools (commit ids change if squash-merged; the merge is logged as its own entry))` | demonstrated |
 | R-2026-11-06-19 | 2026-11-06 07:27:37 UTC | “Update the specs so nothing is lost.” | principle | Dated addenda; originals kept verbatim. | Session map spec; addenda to suites, components, macro-automation. | `specs/eravos.2026-11-06-session.map.spec` | demonstrated |
 | R-2026-11-06-20 | 2026-11-06 07:27:37 UTC | “Also ideas, choices and direction. All of me and what’s proof of competence and ownership, I want logged to a compotenxe and log. Timestamped and what came from it. The date and quotes exactly.” | idea | This register: append-only, exact quotes checked against the source, provenance per entry, three confidence levels kept apart. | docs/competence/ | `build/competence.mjs --check` | demonstrated |
+| R-2026-11-06-L4 | 2026-11-06 13:05:53 UTC | “suites are tools and its components.” | principle | Said while the Lofi setup was being built: a reminder of Axiom 3 — a suite is a tool and its components; a system of whole tools is a setup. | Lofi built as a setup (kind: setup), not a suite; Tape Memory and Piano specified as tools made of their components, each opening as its own suite. | `tools/music/suites/lofi/suite.json` · `specs/eravos.lofi-setup.spec` | demonstrated |
 
 ## Choices and direction
 _decisions, the alternatives in front of him, and the way he set_
@@ -55,7 +56,7 @@ _what is shown, at its own level — an idea, a built and tested idea, and outsi
 - R-2026-11-06-L2 · 2026-11-06 12:37:52 UTC · decision — “nope look at the claude.md” → Lofi kept as parts: packs beside tools, a setup, two tools made of components. · evidence: `specs/eravos.lofi-setup.spec` · `CLAUDE.md`
 - R-2026-11-06-L3 · 2026-11-06 12:47:50 UTC · decision — “yes” → Built bottom up in that order, each piece merged when its tests pass. · evidence: `specs/eravos.lofi-setup.spec` · `tools/music/planned/tape-memory.ui.md` · `tools/music/planned/piano.ui.md`
 
-**demonstrated** (17)
+**demonstrated** (18)
 
 - R-2026-11-06-01 · 2026-11-06 06:28:35 UTC · idea — “Can you when picking empty canvas have every tool empty of presets?” → 3.124 built: OrganismFactory.blankStart — 27 tools that loaded a default preset now open plain on an empty canvas. · evidence: `tests/p116-blank-start.test.js (2/2)` · `commit faaccca (branch claude/empty-canvas-blank-tools (commit ids change if squash-merged; the merge is logged as its own entry))`
 - R-2026-11-06-03 · 2026-11-06 06:56:30 UTC · direction — “Ui preview. What’s the highest leverage?” → Swarm Oscillator ranked first (6 components to build, 14.5 other tools each); its UI previewed before any code. · evidence: `docs/eco-graph.md` · `docs/previews/swarm-oscillator-preview.png` · `tools/music/planned/swarm-oscillator.ui.md`
@@ -74,6 +75,7 @@ _what is shown, at its own level — an idea, a built and tested idea, and outsi
 - R-2026-11-06-18 · 2026-11-06 07:27:37 UTC · decision — “Make the swarm oscillator first. Since you were ready to.” → 3.127 built: Swarm Oscillator, 10/10 tests, design check clean. · evidence: `tools/music/tools/genre-instruments/swarm-oscillator/` · `node tests/components.mjs` · `commit 0a11d3e (branch claude/empty-canvas-blank-tools (commit ids change if squash-merged; the merge is logged as its own entry))`
 - R-2026-11-06-19 · 2026-11-06 07:27:37 UTC · principle — “Update the specs so nothing is lost.” → Session map spec; addenda to suites, components, macro-automation. · evidence: `specs/eravos.2026-11-06-session.map.spec`
 - R-2026-11-06-20 · 2026-11-06 07:27:37 UTC · idea — “Also ideas, choices and direction. All of me and what’s proof of competence and ownership, I want logged to a compotenxe and log. Timestamped and what came from it. The date and quotes exactly.” → docs/competence/ · evidence: `build/competence.mjs --check`
+- R-2026-11-06-L4 · 2026-11-06 13:05:53 UTC · principle — “suites are tools and its components.” → Lofi built as a setup (kind: setup), not a suite; Tape Memory and Piano specified as tools made of their components, each opening as its own suite. · evidence: `tools/music/suites/lofi/suite.json` · `specs/eravos.lofi-setup.spec`
 
 **independently verified** (0)
 
@@ -110,6 +112,7 @@ _whose each contribution is: his, the AI coder’s, or from outside_
 | R-2026-11-06-L1 | 2026-11-06 12:37:52 UTC | user | James Brooks | direction |
 | R-2026-11-06-L2 | 2026-11-06 12:37:52 UTC | user | James Brooks | decision |
 | R-2026-11-06-L3 | 2026-11-06 12:47:50 UTC | user | James Brooks | decision |
+| R-2026-11-06-L4 | 2026-11-06 13:05:53 UTC | user | James Brooks | principle |
 
 ## Outcomes
 _what came of each_
@@ -142,4 +145,5 @@ _what came of each_
 | R-2026-11-06-L1 | 2026-11-06 12:37:52 UTC | “i also want to be able to make lofi” | direction | Read through the Axioms: lofi is not one tool but a setup of whole tools plus packs, and the two tools it lacks (an electric/acoustic piano, a tape-wear effect). | Specs with DAGs written for Piano and Tape Memory, a setup spec for Lofi, UI previews of both tools; nothing built yet. | `specs/eravos.lofi-setup.spec` · `tools/music/planned/piano.spec` · `tools/music/planned/tape-memory.spec` · `docs/previews/lofi.shots.mjs` | proposed |
 | R-2026-11-06-L2 | 2026-11-06 12:37:52 UTC | “nope look at the claude.md” | decision | A correction: an all-in-one 'Lofi Lab' had been offered, which the Axioms rule out (parts, not monoliths; spec first with a DAG). Withdrawn; the specs were written before any code. | Lofi kept as parts: packs beside tools, a setup, two tools made of components. | `specs/eravos.lofi-setup.spec` · `CLAUDE.md` | proposed |
 | R-2026-11-06-L3 | 2026-11-06 12:47:50 UTC | “yes” | decision | His go on four proposals at once: the Lofi setup (a setup of whole tools + packs), Tape Memory and Piano (specs with DAGs, UI previews), and Bind on each Automation lane. | Built bottom up in that order, each piece merged when its tests pass. | `specs/eravos.lofi-setup.spec` · `tools/music/planned/tape-memory.ui.md` · `tools/music/planned/piano.ui.md` | proposed |
+| R-2026-11-06-L4 | 2026-11-06 13:05:53 UTC | “suites are tools and its components.” | principle | Said while the Lofi setup was being built: a reminder of Axiom 3 — a suite is a tool and its components; a system of whole tools is a setup. | Lofi built as a setup (kind: setup), not a suite; Tape Memory and Piano specified as tools made of their components, each opening as its own suite. | `tools/music/suites/lofi/suite.json` · `specs/eravos.lofi-setup.spec` | demonstrated |
 

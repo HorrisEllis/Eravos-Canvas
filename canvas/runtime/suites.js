@@ -40,7 +40,8 @@
   function asSetup(s, n) {
     const R = global.Recipes; if (!R) { if ((n || 0) < 400) global.setTimeout(() => asSetup(s, (n || 0) + 1), 25); return; }
     if (!asSetup.op) { asSetup.op = true; R.defineOp('suite', async (st, { K }) => { const hub = await openAsync(st.suite, { K, x: st.x, y: st.y }); if (hub) build(K, hub); }); }
-    R.register({ id: 'setup:' + s.id, label: s.label, icon: s.icon, accent: s.accent, tagline: short(s.blurb), section: 'SETUPS', setup: s.id, steps: [{ op: 'suite', suite: s.id, x: 30, y: 20 }] });
+    // 3.132 a setup may carry steps of its own (its domain's recipe ops), run before it opens — the canvas passes them through, unread
+    R.register({ id: 'setup:' + s.id, label: s.label, icon: s.icon, accent: s.accent, tagline: short(s.blurb), section: 'SETUPS', setup: s.id, steps: (Array.isArray(s.steps) ? s.steps : []).concat([{ op: 'suite', suite: s.id, x: 30, y: 20 }]) });
   }
   const forTool = (toolId) => list().filter(s => s.parts.some(p => p.tool === toolId));
   const partOf = (s, toolId) => s.parts.find(p => p.tool === toolId) || null;

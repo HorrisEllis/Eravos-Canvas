@@ -1,0 +1,50 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "chord-gen.lofi",
+ "version": "1.0.0",
+ "label": "Lofi",
+ "prefix": "",
+ "author": "ERAVOS",
+ "tags": [
+  "lofi",
+  "chill"
+ ],
+ "for": "eravos.chord-gen",
+ "enabled": true,
+ "items": {
+  "eravos.chord-gen": {
+   "presets": {
+    "Lofi Study": {
+     "params": {
+      "progression": "IV-iii-vi-ii",
+      "voicing": "7th",
+      "chordBars": 1,
+      "energy": 0.35,
+      "octave": 3,
+      "gate": 0.9
+     }
+    },
+    "Lofi Rainy": {
+     "params": {
+      "progression": "ii-V-I-vi",
+      "voicing": "rootless 9",
+      "chordBars": 1,
+      "energy": 0.3,
+      "octave": 3,
+      "gate": 0.95
+     }
+    },
+    "Lofi Late Night": {
+     "params": {
+      "progression": "i-iv-VII-III",
+      "voicing": "9th",
+      "chordBars": 2,
+      "energy": 0.25,
+      "octave": 3,
+      "gate": 0.85
+     }
+    }
+   }
+  }
+ }
+}

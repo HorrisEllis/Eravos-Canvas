@@ -1,0 +1,37 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "sub-engine.lofi",
+ "version": "1.0.0",
+ "label": "Lofi",
+ "prefix": "",
+ "author": "ERAVOS",
+ "tags": [
+  "lofi",
+  "chill"
+ ],
+ "for": "eravos.sub-engine",
+ "enabled": true,
+ "items": {
+  "eravos.sub-engine": {
+   "presets": {
+    "Lofi Soft Sub": {
+     "params": {
+      "shape": 0.05,
+      "octave": -1,
+      "drive": 0.08,
+      "click": 0.02,
+      "tone": 500,
+      "attack": 0.012,
+      "decay": 1.2,
+      "sustain": 0.75,
+      "release": 0.3,
+      "glide": 0.06,
+      "phantom": 0.25,
+      "drop": 0,
+      "level": 0.65
+     }
+    }
+   }
+  }
+ }
+}

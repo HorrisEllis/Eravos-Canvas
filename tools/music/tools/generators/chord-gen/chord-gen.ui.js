@@ -9,6 +9,9 @@ OrganismFactory.reg('eravos.chord-gen', function (view) {
     h('div', { class: 'org-row', style: { justifyContent: 'space-between' } }, [UI.presetBar(view)]),
     h('div', { class: 'cg-box' }, [now, notes]),
     UI.paramPanel(view, null, { size: 34 }),
-    UI.hint('Wire its note out into a poly tool (Pad Forge, Supersaw, Retro Poly), and its chord out into a Bassline. TENSION: triad → add9 → 7sus4 → cluster.'),
+    UI.hint('Wire its note out into a poly tool (Pad Forge, Supersaw, Retro Poly), and its chord out into a Bassline. Voicing “tension”: TENSION goes triad → add9 → 7sus4 → cluster · 7th, 9th, rootless 9: jazz chords (lofi, neo-soul).'),
   );
+  // 3.132 TENSION shapes only the "tension" voicing: with a jazz voicing it dims and says why (DESIGN-GUIDE W7)
+  const dim = () => { const el = [...view.root.querySelectorAll('.uk-knob, .uk-field, [data-key]')].find(e => /TENSION/.test(e.textContent || '') && e.querySelector && !e.querySelector('select')); if (!el) return; const v = view.state && view.state.voicing, on = !v || v === 'tension'; el.style.opacity = on ? '' : '0.35'; el.title = on ? '' : 'TENSION shapes the “tension” voicing only'; };
+  view.bind && view.bind('voicing', () => setTimeout(dim, 0)); setTimeout(dim, 0);
 });

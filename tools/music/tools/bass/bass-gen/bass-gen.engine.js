@@ -10,7 +10,7 @@
 (function () {
   'use strict';
   const S = OrganismSDK.STD;
-  const PROG = MusicParts.PROGRESSIONS;   // the shared table (components/progression)
+  const PROG = MusicParts.ALL_PROGRESSIONS;   // the shared tables (components/progression): the five, then the jazz six (3.132)
   // its own rhythm when no Groove is wired in: steps of a 16-step bar
   const PATTERNS = { 'groove kick': [0, 10], 'every beat': [0, 4, 8, 12], 'offbeats': [2, 6, 10, 14], 'eighths': [0, 2, 4, 6, 8, 10, 12, 14], 'half-time': [0] };
   // the step lanes: level −1…1 (× 1 + level/2), octave −1 / 0 / +1, slide 0 auto · 1 on · −1 off

@@ -177,6 +177,9 @@
                       "arpHold": {
                         "type": "boolean"
                       },
+                      "hold": {
+                        "type": "boolean"
+                      },
                       "level": {
                         "type": "number",
                         "minimum": 0,
