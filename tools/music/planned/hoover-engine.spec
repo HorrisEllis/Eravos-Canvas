@@ -36,4 +36,4 @@ dag:
   layer 0: ensemble-core · env-msseg · filter-svf ✓ · osc-va ✓ · slew-lag · unison-stack ✓ · waveshaper
   tool: eravos.hoover-engine ← osc-va + unison-stack + ensemble-core + env-msseg + slew-lag + filter-svf + waveshaper
   build order: ensemble-core → env-msseg → filter-svf ✓ → osc-va ✓ → slew-lag → unison-stack ✓ → waveshaper → hoover-engine
-  shared with: ensemble-core 5 · env-msseg 14 · filter-svf 40 · osc-va 26 · slew-lag 10 · unison-stack 15 · waveshaper 22  (other tools on each)
+  shared with: ensemble-core 5 · env-msseg 14 · filter-svf 41 · osc-va 26 · slew-lag 10 · unison-stack 15 · waveshaper 22  (other tools on each)

@@ -36,4 +36,4 @@ dag:
   layer 0: env-adsr ✓ · filter-svf ✓ · osc-additive · osc-fm-operator · waveshaper
   tool: eravos.organ-bass ← osc-additive + osc-fm-operator + filter-svf + env-adsr + waveshaper
   build order: env-adsr ✓ → filter-svf ✓ → osc-additive → osc-fm-operator → waveshaper → organ-bass
-  shared with: env-adsr 20 · filter-svf 40 · osc-additive 7 · osc-fm-operator 6 · waveshaper 22  (other tools on each)
+  shared with: env-adsr 21 · filter-svf 41 · osc-additive 7 · osc-fm-operator 6 · waveshaper 22  (other tools on each)

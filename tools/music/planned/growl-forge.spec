@@ -39,4 +39,4 @@ dag:
   layer 0: env-msseg · filter-formant ✓ · filter-svf ✓ · lfo ✓ · osc-fm-operator · preset-morph · step-mod · wavefolder · waveshaper
   tool: eravos.growl-forge ← osc-fm-operator + filter-formant + filter-svf + waveshaper + wavefolder + env-msseg + lfo + step-mod + preset-morph
   build order: env-msseg → filter-formant ✓ → filter-svf ✓ → lfo ✓ → osc-fm-operator → preset-morph → step-mod → wavefolder → waveshaper → growl-forge
-  shared with: env-msseg 14 · filter-formant 7 · filter-svf 40 · lfo 27 · osc-fm-operator 6 · preset-morph 7 · step-mod 7 · wavefolder 1 · waveshaper 22  (other tools on each)
+  shared with: env-msseg 14 · filter-formant 7 · filter-svf 41 · lfo 28 · osc-fm-operator 6 · preset-morph 7 · step-mod 7 · wavefolder 1 · waveshaper 22  (other tools on each)

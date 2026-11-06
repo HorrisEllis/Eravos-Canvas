@@ -39,4 +39,4 @@ dag:
   layer 0: clock-div · ducker · env-msseg · lfo ✓ · probability-gate · step-mod
   tool: eravos.rhythmic-modulator ← step-mod + lfo + env-msseg + probability-gate + clock-div + ducker
   build order: clock-div → ducker → env-msseg → lfo ✓ → probability-gate → step-mod → rhythmic-modulator
-  shared with: clock-div 6 · ducker 15 · env-msseg 14 · lfo 27 · probability-gate 9 · step-mod 7  (other tools on each)
+  shared with: clock-div 6 · ducker 15 · env-msseg 14 · lfo 28 · probability-gate 9 · step-mod 7  (other tools on each)

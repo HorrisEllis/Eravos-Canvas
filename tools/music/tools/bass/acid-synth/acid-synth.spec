@@ -99,7 +99,7 @@ dag:
   layer 0: delay-line ✓ · env-adsr ✓ · filter-diode · osc-va ✓ · pattern-store · slew-lag · waveshaper
   tool: eravos.acid-synth ← osc-va + filter-diode + env-adsr + slew-lag + waveshaper + pattern-store + delay-line
   build order: delay-line ✓ → env-adsr ✓ → filter-diode → osc-va ✓ → pattern-store → slew-lag → waveshaper → acid-synth
-  shared with: delay-line 15 · env-adsr 20 · filter-diode 2 · osc-va 26 · pattern-store 23 · slew-lag 10 · waveshaper 22  (other tools on each)
+  shared with: delay-line 15 · env-adsr 21 · filter-diode 2 · osc-va 26 · pattern-store 23 · slew-lag 10 · waveshaper 22  (other tools on each)
   in it now: —
   comes out of it: —
   planned: osc-va · filter-diode · env-adsr · slew-lag · waveshaper · pattern-store · delay-line

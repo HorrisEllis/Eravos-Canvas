@@ -36,4 +36,4 @@ dag:
   layer 0: ducker · env-adsr ✓ · filter-svf ✓ · osc-va ✓ · pattern-store · phase-correlation
   tool: eravos.psy-roller ← osc-va + filter-svf + env-adsr + ducker + pattern-store + phase-correlation
   build order: ducker → env-adsr ✓ → filter-svf ✓ → osc-va ✓ → pattern-store → phase-correlation → psy-roller
-  shared with: ducker 15 · env-adsr 20 · filter-svf 40 · osc-va 26 · pattern-store 23 · phase-correlation 8  (other tools on each)
+  shared with: ducker 15 · env-adsr 21 · filter-svf 41 · osc-va 26 · pattern-store 23 · phase-correlation 8  (other tools on each)

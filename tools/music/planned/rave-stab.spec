@@ -36,4 +36,4 @@ dag:
   layer 0: chord-engine · env-adsr ✓ · filter-svf ✓ · osc-fm-operator · osc-va ✓ · reverb-fdn · sampler-voice
   tool: eravos.rave-stab ← chord-engine + osc-va + osc-fm-operator + sampler-voice + filter-svf + env-adsr + reverb-fdn
   build order: chord-engine → env-adsr ✓ → filter-svf ✓ → osc-fm-operator → osc-va ✓ → reverb-fdn → sampler-voice → rave-stab
-  shared with: chord-engine 4 · env-adsr 20 · filter-svf 40 · osc-fm-operator 6 · osc-va 26 · reverb-fdn 11 · sampler-voice 14  (other tools on each)
+  shared with: chord-engine 4 · env-adsr 21 · filter-svf 41 · osc-fm-operator 6 · osc-va 26 · reverb-fdn 11 · sampler-voice 14  (other tools on each)

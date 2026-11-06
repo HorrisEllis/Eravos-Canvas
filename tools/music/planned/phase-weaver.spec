@@ -39,4 +39,4 @@ dag:
   layer 0: delay-line ✓ · filter-allpass-chain · lfo ✓ · phase-correlation · stereo-tools ✓
   tool: eravos.phase-weaver ← filter-allpass-chain + delay-line + phase-correlation + stereo-tools + lfo
   build order: delay-line ✓ → filter-allpass-chain → lfo ✓ → phase-correlation → stereo-tools ✓ → phase-weaver
-  shared with: delay-line 15 · filter-allpass-chain 5 · lfo 27 · phase-correlation 8 · stereo-tools 16  (other tools on each)
+  shared with: delay-line 15 · filter-allpass-chain 5 · lfo 28 · phase-correlation 8 · stereo-tools 17  (other tools on each)

@@ -1,4 +1,4 @@
-# Tool UI — Piano (tine · reed · felt · upright · grand)
+# Tool UI — Piano (tine · reed · felt · upright · honky · grand)
 
 Written with `docs/templates/TOOL-UI.md`. **A preview, not built** — waiting for his yes.
 Preview: `docs/previews/piano.preview.js` (the real kit, in the real canvas, silent) · pictures: `node docs/previews/lofi.shots.mjs`.
@@ -18,7 +18,7 @@ The keys of lofi and soul — the electric piano's ring and tremolo, the soft fe
 
 | Card | Controls (kit parts) | Component |
 |---|---|---|
-| header | preset bar · **Model** segment tine / reed / felt / upright / grand | all |
+| header | preset bar · **Model** segment tine / reed / felt / upright / honky / grand | all |
 | display | the hammer striking what sounds (tine and tonebar, reed, strings), ringing down; its stretched partials; the tremolo L↔R | modal-resonator, karplus-string |
 | PLAY | Sustain pedal (also from MIDI CC64) | — |
 | STRIKE | Hammer · Bright · Bell | modal-resonator |

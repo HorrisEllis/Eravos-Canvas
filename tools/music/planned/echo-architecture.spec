@@ -39,4 +39,4 @@ dag:
   layer 0: delay-line ✓ · ducker · filter-svf ✓ · lfo ✓ · pitch-shifter · saturator-tape · stereo-tools ✓
   tool: eravos.echo-architecture ← delay-line + saturator-tape + filter-svf + stereo-tools + pitch-shifter + ducker + lfo
   build order: delay-line ✓ → ducker → filter-svf ✓ → lfo ✓ → pitch-shifter → saturator-tape → stereo-tools ✓ → echo-architecture
-  shared with: delay-line 15 · ducker 15 · filter-svf 40 · lfo 27 · pitch-shifter 11 · saturator-tape 4 · stereo-tools 16  (other tools on each)
+  shared with: delay-line 15 · ducker 15 · filter-svf 41 · lfo 28 · pitch-shifter 11 · saturator-tape 4 · stereo-tools 17  (other tools on each)

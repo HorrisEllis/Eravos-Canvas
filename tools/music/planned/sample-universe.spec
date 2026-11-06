@@ -39,4 +39,4 @@ dag:
   layer 0: env-adsr ✓ · filter-svf ✓ · grain-cloud · preset-morph · sampler-voice · voice-allocator
   tool: eravos.sample-universe ← sampler-voice + grain-cloud + preset-morph + env-adsr + filter-svf + voice-allocator
   build order: env-adsr ✓ → filter-svf ✓ → grain-cloud → preset-morph → sampler-voice → voice-allocator → sample-universe
-  shared with: env-adsr 20 · filter-svf 40 · grain-cloud 7 · preset-morph 7 · sampler-voice 14 · voice-allocator 4  (other tools on each)
+  shared with: env-adsr 21 · filter-svf 41 · grain-cloud 7 · preset-morph 7 · sampler-voice 14 · voice-allocator 4  (other tools on each)

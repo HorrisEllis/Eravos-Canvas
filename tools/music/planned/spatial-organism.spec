@@ -39,4 +39,4 @@ dag:
   layer 0: delay-line ✓ · early-reflections · lfo ✓ · panner · phase-correlation · stereo-tools ✓
   tool: eravos.spatial-organism ← panner + stereo-tools + early-reflections + delay-line + lfo + phase-correlation
   build order: delay-line ✓ → early-reflections → lfo ✓ → panner → phase-correlation → stereo-tools ✓ → spatial-organism
-  shared with: delay-line 15 · early-reflections 3 · lfo 27 · panner 0 · phase-correlation 8 · stereo-tools 16  (other tools on each)
+  shared with: delay-line 15 · early-reflections 3 · lfo 28 · panner 0 · phase-correlation 8 · stereo-tools 17  (other tools on each)

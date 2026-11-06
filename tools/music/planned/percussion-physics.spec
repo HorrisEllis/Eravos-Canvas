@@ -36,4 +36,4 @@ dag:
   layer 0: env-adsr ✓ · filter-svf ✓ · karplus-string · modal-resonator · mpe-expression · osc-noise ✓
   tool: eravos.percussion-physics ← modal-resonator + karplus-string + osc-noise + env-adsr + filter-svf + mpe-expression
   build order: env-adsr ✓ → filter-svf ✓ → karplus-string → modal-resonator → mpe-expression → osc-noise ✓ → percussion-physics
-  shared with: env-adsr 20 · filter-svf 40 · karplus-string 1 · modal-resonator 3 · mpe-expression 3 · osc-noise 7  (other tools on each)
+  shared with: env-adsr 21 · filter-svf 41 · karplus-string 2 · modal-resonator 4 · mpe-expression 3 · osc-noise 7  (other tools on each)

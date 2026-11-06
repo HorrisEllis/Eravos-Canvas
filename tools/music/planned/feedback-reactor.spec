@@ -39,4 +39,4 @@ dag:
   layer 0: delay-line ✓ · envelope-follower · filter-comb · filter-svf ✓ · freq-shifter · limiter-true-peak · relationship-graph · waveshaper
   tool: eravos.feedback-reactor ← delay-line + filter-svf + filter-comb + freq-shifter + waveshaper + limiter-true-peak + envelope-follower + relationship-graph
   build order: delay-line ✓ → envelope-follower → filter-comb → filter-svf ✓ → freq-shifter → limiter-true-peak → relationship-graph → waveshaper → feedback-reactor
-  shared with: delay-line 15 · envelope-follower 7 · filter-comb 5 · filter-svf 40 · freq-shifter 1 · limiter-true-peak 2 · relationship-graph 12 · waveshaper 22  (other tools on each)
+  shared with: delay-line 15 · envelope-follower 7 · filter-comb 5 · filter-svf 41 · freq-shifter 1 · limiter-true-peak 2 · relationship-graph 12 · waveshaper 22  (other tools on each)

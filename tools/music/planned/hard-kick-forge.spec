@@ -36,4 +36,4 @@ dag:
   layer 0: clipper · env-msseg · eq-parametric · filter-svf ✓ · osc-sub · osc-va ✓ · reverse-buffer · transient-shaper · waveshaper
   tool: eravos.hard-kick-forge ← osc-sub + osc-va + env-msseg + waveshaper + clipper + filter-svf + eq-parametric + reverse-buffer + transient-shaper
   build order: clipper → env-msseg → eq-parametric → filter-svf ✓ → osc-sub → osc-va ✓ → reverse-buffer → transient-shaper → waveshaper → hard-kick-forge
-  shared with: clipper 9 · env-msseg 14 · eq-parametric 13 · filter-svf 40 · osc-sub 10 · osc-va 26 · reverse-buffer 2 · transient-shaper 2 · waveshaper 22  (other tools on each)
+  shared with: clipper 9 · env-msseg 14 · eq-parametric 13 · filter-svf 41 · osc-sub 10 · osc-va 26 · reverse-buffer 2 · transient-shaper 2 · waveshaper 22  (other tools on each)

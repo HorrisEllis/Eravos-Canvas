@@ -11,7 +11,7 @@
     hooks: [S.audio_out('pia.hook.audio_out'), S.note_in('pia.hook.note_in'), S.midi_in('pia.hook.midi_in'), S.transport_in('pia.hook.transport_in'),
       S.mod_in('pia.hook.mod_bright', 'brightness'), S.mod_in('pia.hook.mod_trem', 'tremolo')],
     config: [
-      { key: 'model', type: 'enum', default: 'tine', options: ['tine', 'reed', 'felt', 'upright', 'grand'], label: 'Model', group: 'BODY' },
+      { key: 'model', type: 'enum', default: 'tine', options: ['tine', 'reed', 'felt', 'upright', 'honky', 'grand'], label: 'Model', group: 'BODY' },
       n('hardness', 'Hammer', 'STRIKE', 0.45, 0, 1), n('brightness', 'Bright', 'STRIKE', 0.5, 0, 1), n('bell', 'Bell', 'STRIKE', 0.35, 0, 1),
       n('decay', 'Decay', 'BODY', 3.5, 0.3, 20, 0.01, 's'), n('release', 'Release', 'BODY', 0.4, 0.02, 4, 0.01, 's'), n('resonance', 'Resonance', 'BODY', 0.3, 0, 1),
       n('trem', 'Tremolo', 'MOVE', 0.25, 0, 1), n('tremRate', 'Trem rate', 'MOVE', 4.5, 0.5, 12, 0.01, 'Hz'),
@@ -63,7 +63,7 @@
       keys: [],
       hint: 'Tine is the electric piano of soul and lofi, reed is the barkier one, felt is the soft muted upright. Bell brings out the tine’s ring; Tremolo moves it left and right.' });
     const RULES = [['bell', 'model', (v) => v === 'tine' || v === 'reed', 'Bell is the tine’s or reed’s ring'], ['trem', 'model', (v) => v === 'tine' || v === 'reed', 'Tremolo is the electric pianos’'], ['tremRate', 'model', (v) => v === 'tine' || v === 'reed', 'Tremolo is the electric pianos’'],
-      ['sympathetic', 'model', (v) => v === 'grand' || v === 'upright' || v === 'felt', 'strings only'], ['lid', 'model', (v) => v === 'grand', 'only the grand has a lid']];
+      ['sympathetic', 'model', (v) => v === 'grand' || v === 'upright' || v === 'felt' || v === 'honky', 'strings only'], ['lid', 'model', (v) => v === 'grand', 'only the grand has a lid']];
     const dim = () => RULES.forEach(([k, sw, ok, why]) => { const el = view.root.querySelector(`[data-key="${k}"]`); if (!el) return; const on = ok(P(sw)); el.style.opacity = on ? '' : '0.35'; el.title = on ? '' : why; });
     [...new Set(RULES.map(r => r[1]))].forEach(sw => view.bind && view.bind(sw, () => setTimeout(dim, 0))); setTimeout(dim, 0);
   });

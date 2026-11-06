@@ -36,4 +36,4 @@ dag:
   layer 0: filter-svf ✓ · grain-cloud · looper-buffer · pitch-shifter · sampler-voice · time-stretch · transient-slicer · waveshaper
   tool: eravos.resample-forge ← sampler-voice + transient-slicer + time-stretch + pitch-shifter + waveshaper + filter-svf + grain-cloud + looper-buffer
   build order: filter-svf ✓ → grain-cloud → looper-buffer → pitch-shifter → sampler-voice → time-stretch → transient-slicer → waveshaper → resample-forge
-  shared with: filter-svf 40 · grain-cloud 7 · looper-buffer 3 · pitch-shifter 11 · sampler-voice 14 · time-stretch 6 · transient-slicer 5 · waveshaper 22  (other tools on each)
+  shared with: filter-svf 41 · grain-cloud 7 · looper-buffer 3 · pitch-shifter 11 · sampler-voice 14 · time-stretch 6 · transient-slicer 5 · waveshaper 22  (other tools on each)

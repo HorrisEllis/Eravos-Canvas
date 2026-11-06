@@ -36,4 +36,4 @@ dag:
   layer 0: env-adsr ✓ · filter-svf ✓ · modal-resonator · osc-noise ✓ · osc-va ✓ · probability-gate
   tool: eravos.micro-percussion ← osc-va + osc-noise + modal-resonator + env-adsr + filter-svf + probability-gate
   build order: env-adsr ✓ → filter-svf ✓ → modal-resonator → osc-noise ✓ → osc-va ✓ → probability-gate → micro-percussion
-  shared with: env-adsr 20 · filter-svf 40 · modal-resonator 3 · osc-noise 7 · osc-va 26 · probability-gate 9  (other tools on each)
+  shared with: env-adsr 21 · filter-svf 41 · modal-resonator 4 · osc-noise 7 · osc-va 26 · probability-gate 9  (other tools on each)

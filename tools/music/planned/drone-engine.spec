@@ -36,4 +36,4 @@ dag:
   layer 0: chaos-attractor · filter-bank · lfo ✓ · osc-additive · oscillator-population ✓ · reverb-fdn
   tool: eravos.drone-engine ← oscillator-population + osc-additive + filter-bank + reverb-fdn + chaos-attractor + lfo
   build order: chaos-attractor → filter-bank → lfo ✓ → osc-additive → oscillator-population ✓ → reverb-fdn → drone-engine
-  shared with: chaos-attractor 4 · filter-bank 4 · lfo 27 · osc-additive 7 · oscillator-population 3 · reverb-fdn 11  (other tools on each)
+  shared with: chaos-attractor 4 · filter-bank 4 · lfo 28 · osc-additive 7 · oscillator-population 3 · reverb-fdn 11  (other tools on each)
