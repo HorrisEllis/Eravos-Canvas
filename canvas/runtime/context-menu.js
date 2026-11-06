@@ -73,7 +73,7 @@
       out.push({ sep: true });
     }
     out.push({ label: '⧉ Duplicate', hint: 'a second one with the same settings, beside it (not wired)', run: () => duplicate(rec) });
-    // 3.126 a suite of your own from what is wired here (his words, 2026-11-06: "setups on the screen. Like what's wired together")
+    // 3.126 a suite of your own from what is wired here (his words, 2026-11-06: "setups on the screen. Like what’s wired together")
     const SU = global.Suites; if (SU && SU.capture && SU.wiredGroup(K, id).length > 1) out.push({ label: '◈ Save what is wired here as a suite…', hint: 'every window joined to this one by wires — its parts, wires and settings — saved as a suite of your own (Add › Suites)',
       run: () => global.UIKit.ask('Suite name', 'My suite').then(n => { if (!n) return; const s = SU.capture(K, id, { label: n }); if (s && SU.saveUser(s) && global.Shell) global.Shell.toast(`Saved “${s.label}” — ${s.parts.length} parts, ${s.wiring.length} wires. Find it under ＋ Add › Suites.`, 'good', 5000); }) });
     if (global.ToolPage && !d.system) out.push({ label: '📖 Its page', hint: 'mods, packs, every control', run: () => global.ToolPage.open(rec.id, { instanceId: id, K }) });

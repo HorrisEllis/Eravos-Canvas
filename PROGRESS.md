@@ -2,11 +2,28 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.127 Swarm Oscillator; spec DAGs; axioms; the competence register (2026-11-06)
+Asked (07:27:37Z): "Map, spec first / Each tool needs a spec with a dag. / Make the swarm oscillator first. Since you were ready to. /
+Update the specs so nothing is lost. / And then Add those axioms to a claude.md. / Also ideas, choices and direction. All of me and what’s
+proof of competence and ownership, I want logged to a compotenxe and log. Timestamped and what came from it. The date and quotes exactly."
+- Spec DAG: build/spec-dag.mjs → every tool spec (built and planned, 226) ends with its components layer by layer, build order, sharing;
+  built tools: in it now / comes out of it / planned. A hand-written signal_dag: is checked against the components.
+- Swarm Oscillator: the spec written first (ports, params, signal DAG, decisions, open gaps); six components built as new code, each with its
+  own node test; the tool runs one AudioWorklet built from their kernel text. Found: messages to a worklet arrive after an offline render
+  has run past them (silence) — every timed thing is now an AudioParam (settings k-rate, 8 voice slots, Lock on beat a count); the tables go
+  in at construction. Headroom: output gain 0.17 × level (an 8-note chord on every preset at full level stays under full scale). More depth
+  used [hidden], which .uk-panel's display overrode — now display toggled. Tests 10/10; design check clean.
+- Specs: session map (every message verbatim, curly apostrophes and all, with its time), addenda to suites / components / macro-automation.
+- CLAUDE.md › Axioms (11), each with his exact words and time.
+- docs/competence/: register.jsonl (23 entries: 20 his, 2 the AI coder's discoveries, 1 the pasted reply as outside input) → REGISTER.md,
+  LOG.md; --check runs in CI against the target branch.
+- Open: packs ≥ 6 per pack for Swarm; LFO tempo sync; guards for "no monoliths" and "adjusted while playing"; Components on the suite page.
+
 ## Done — 3.125 / 3.126 Piano keys, Automation Bind, suites rework (2026-11-06)
 Asked: "Move along the piano to change the keys, each key needs to play its relative note. Also the automation tool needs to have a
 bind button … similar to the midi mapper. … can you clear out suites and make them the tool and its components wired together? But
-also the ability to create them?" — then: the 7 genre suites → Start From; create from "setups on the screen. Like what's wired
-together … Across domains. Make sure you're mapping all of what I've said."
+also the ability to create them?" — then: the 7 genre suites → Start From; create from "setups on the screen. Like what’s wired
+together … Across domains. Make sure you’re mapping all of what I’ve said."
 - Keyboard (every tool): with the key lock on, a key outside the key snapped to a neighbour — a slide repeated or skipped notes.
   Every key plays itself; out-of-key keys stay shaded. P117.
 - Automation › ⊕ Bind: then touch any knob, switch or choice on any tool → a lane; one touch, then it lets go; again cancels. P118.

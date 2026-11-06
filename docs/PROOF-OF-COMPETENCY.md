@@ -266,3 +266,11 @@ The full list: `git log main --merges --format='%ad %h %s' --date=iso`.
 - Every finished piece of work adds one entry here (newest first) and one line to `CLAUDE.md`'s ledger, with: the merge time, his words
   with their date, his call, what was built and by whom, the proof (numbers measured, tests run), and where to check.
 - A claim without a pointer is not added. Numbers are re-counted when the table above is updated, with the command that counts them.
+
+---
+
+## 2026-11-06 — the evidence register (added; nothing above is changed)
+
+> His words (2026-11-06T07:27:37Z): "Also ideas, choices and direction. All of me and what’s proof of competence and ownership, I want logged to a compotenxe and log. Timestamped and what came from it. The date and quotes exactly."
+
+From this date every contribution is also logged, one entry each, in **`docs/competence/register.jsonl`** (append-only) → `docs/competence/REGISTER.md` (by ideas · choices and direction · competence · ownership and provenance · outcomes) and `docs/competence/LOG.md` (by time). Each entry: his exact words (checked word for word against their source), the time to the millisecond from the session transcript, who it came from (his / the AI coder's / outside), what came of it, the evidence, and its level — proposed · demonstrated · independently verified, never one score. `node build/competence.mjs --check` fails if an entry already merged is changed or a quote is not exact; it runs on every pull request. The merge of this work will be logged there as its own entry.

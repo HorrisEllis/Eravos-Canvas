@@ -9,7 +9,7 @@ pictures: `node docs/previews/swarm-oscillator.shots.mjs` · checks: `node docs/
 - **Components it assembles:** oscillator-population · osc-va · osc-wavetable · filter-svf (built) · env-adsr · lfo · stereo-tools
 - **Why this one first:** the highest-leverage tool of phase 1 — 6 components still to build (the fewest but one), and those six reach
   the most other planned tools (14.5 each on average; LFO alone reaches 24). Built, it unlocks most of phase 1.
-- **His words** (2026-11-06): "UI preview. What's the highest leverage?" · "Need to make sure the ui is consistent, supports reactive
+- **His words** (2026-11-06): "UI preview. What’s the highest leverage?" · "Need to make sure the ui is consistent, supports reactive
   colors and can be added to the timeline and connected as mods or other tools when applicable. Dynamic as possible. As much power and
   control as possible without making it overwhelming. Hardcoded or static earns its place."
 

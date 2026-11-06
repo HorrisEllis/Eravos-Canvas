@@ -1,6 +1,6 @@
 /* P119 · suites are a tool and its components wired; systems of whole tools are setups; make your own from the canvas
  * His words, 2026-11-06: "Suites are tools with each component wired in." · "can you clear out suites and make them the tool and its
- * components wired together? But also the ability to create them?" · (asked how) "That or setups on the screen. Like what's wired
+ * components wired together? But also the ability to create them?" · (asked how) "That or setups on the screen. Like what’s wired
  * together. This is meant to be a way to explore creatively. Like connecting things to things and seeing what can be made from it.
  * Across domains." · "Each tool with each component/ui/packs/mod/suite/etc all with a clear line of seperation all added to the tool page" */
 window.__phase = 'P119';

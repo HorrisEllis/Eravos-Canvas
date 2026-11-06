@@ -23,3 +23,21 @@
   eravos.tool-depth.spec K1–K5 (the bass tools' depth is built as components first) · every new tool and feature after this date.
   Existing code is moved into components as it is touched, each move proved to change nothing (null renders / same tests).
   The proof tool: tests/null-render.mjs (--record before, check after; gate −60 dB; maths in tests/null-render-core.mjs).
+
+## ADDENDUM 2026-11-06 — the first phase-1 components; every tool spec carries its DAG; timing travels as AudioParams
+  James, 2026-11-06: "Map, spec first. Each tool needs a spec with a dag." · "Make the swarm oscillator first." · "Themes and ui,
+  components are any parts that other tools can use." · "Just want to make sure the tools don’t become monolith with packs or mods
+  hard wired in."
+  - Built (new code, each proving its own numbers in <id>.test.mjs): osc-va (polyBLEP; saw aliasing −25 dB vs naive −9.6) ·
+    osc-wavetable (mip-mapped, nothing above Nyquist at any pitch; tables built on the main thread, load() in a worklet) ·
+    oscillator-population (Kuramoto; free R 0.29, locked 0.99, chaotic 0.08; harmonic n:m locking) · env-adsr · lfo · stereo-tools.
+    Extraction out of today's tools (lfo, syn-env, syn-osc, wobble-bass) is a separate step that must null-render — listed in each
+    component spec, not hidden.
+  - Every tool spec (226: built and planned) ends with a generated "dag:" block — components layer by layer (a component's own
+    "stands on:" line), build order, how many other tools share each — and, for built tools, in it now / comes out of it / planned.
+    A hand-written "signal_dag:" (what feeds what) is checked against the components. node build/spec-dag.mjs; the data behind the
+    tool page's Components tab: node build/components-map.mjs → tools/music/data/components-map.js.
+  - Found building Swarm Oscillator: a worklet told about notes and settings by messages plays nothing in an offline render (the
+    render runs ahead of the messages). Rule: everything timed reaches a worklet as AudioParams (settings k-rate, notes as slots of
+    trigger/gate/note/velocity); only bulk data (tables) and panic travel as messages / processorOptions.
+  - Presets are data beside a tool (packs/), never in its engine (Swarm's 8 moved out of the engine before it shipped).

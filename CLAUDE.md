@@ -23,6 +23,34 @@ Read this first, then `PROGRESS.md` (the detailed log, newest first) and the spe
 - The plan from today's ERAVOS (Electron + 52 k lines of JS + Web Audio) to that: `docs/eravos-v2-emerge-looking-glass.md`.
   Bottom up, one proven layer at a time; the sound must not change (the null render) at any step.
 
+## Axioms (2026-11-06, his words verbatim, times UTC — "And then Add those axioms to a claude.md.")
+
+Each holds for every tool and every change. How each is kept is said with it. The times and the whole messages: `specs/eravos.2026-11-06-session.map.spec`.
+
+1. **Parts, not monoliths.** "Just want to make sure the tools don’t become monolith with packs or mods hard wired in." (07:06:21) — packs are
+   data beside a tool (`packs/`), never in its engine; mods go in and come out (Mods). Open: a guard test.
+2. **Components are any parts other tools can use.** "Themes and ui, components are any parts that other tools can use." (07:06:21) — shared code
+   in `tools/<d>/components/`, never copied; themes and the UI kit are the canvas's; each tool's page lists its components.
+3. **A suite is a tool with each component wired in.** "Suites are tools with each component wired in." (07:06:21) — a system of whole tools is a
+   setup; suites are made from what is wired: "This is meant to be a way to explore creatively. Like connecting things to things and seeing what
+   can be made from it. Across domains." (07:15:19)
+4. **Everything changes while it plays.** "Tools, keys and values can be adjusted while playing them." (07:06:21) — settings reach the sound live
+   (a worklet's as AudioParams). Open: a guard test.
+5. **Every key plays its own note.** "Move along the piano to change the keys, each key needs to play its relative note." (07:06:21) — P117.
+6. **Each part apart, on the page.** "Each tool with each component/ui/packs/mod/suite/etc all with a clear line of seperation all added to the tool
+   page, suite page." (07:06:21) — one tab each (DESIGN-GUIDE W8).
+7. **Power without overwhelm; static earns its place.** "Dynamic as possible. As much power and control as possible wothout making it
+   overwhelming. Hardcoded or static earns its place." (07:00:07) — DESIGN-GUIDE W7.
+8. **Map and spec first, with a DAG.** "Map, spec first" · "Each tool needs a spec with a dag." (07:27:37) — `node build/spec-dag.mjs`; a new
+   tool's spec (ports, params, signal_dag, decisions, open gaps) is written before its code.
+9. **Nothing is lost.** "Update the specs so nothing is lost." (07:27:37) — specs gain dated addenda; originals are kept verbatim.
+10. **Everything he says is mapped.** "Make sure you’re mapping all of what I’ve said." (07:15:19) — `docs/HIS-WORDS-MAP.md` (done / rule / open).
+11. **Evidence, with provenance, never rewritten.** "Also ideas, choices and direction. All of me and what’s proof of competence and ownership, I
+    want logged to a compotenxe and log. Timestamped and what came from it. The date and quotes exactly." (07:27:37) — `docs/competence/`
+    (append-only; `node build/competence.mjs --check`). Adopted with it, from the reply he pasted (not his words): "The ledger records
+    evidence. It doesn’t manufacture worth." — an idea, an implemented and tested idea, and outside validation are kept as different levels,
+    never one score; a correction is a new entry, the original stays.
+
 ## Rules that hold
 
 - **Show him first, or add — never change the look over him** (2026-11-05: "always show me or add more themes before change"): a visual
@@ -41,7 +69,7 @@ Read this first, then `PROGRESS.md` (the detailed log, newest first) and the spe
   scale, each level opens as a canvas; membership is wiring, overlap is normal, depth added to a component reaches everything
   holding it. `specs/eravos.suites.spec` ADDENDUM 2026-11-05 (F1–F5).
 
-- **Parts, not monoliths** (his words, 2026-11-06: "Just want to make sure the tools don't become monolith with packs or mods hard
+- **Parts, not monoliths** (his words, 2026-11-06: "Just want to make sure the tools don’t become monolith with packs or mods hard
   wired in. Themes and ui, components are any parts that other tools can use. Suites are tools with each component wired in. Tools,
   keys and values can be adjusted while playing them."): packs are data beside a tool, mods go in and come out (Mods), components are
   shared code any tool holds (`tools/music/components/`), themes and UI are the canvas's. A **suite** = a tool and its components wired;
@@ -69,6 +97,8 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-06 | **Swarm Oscillator (3.127)** built from seven components (six new, each proving its own numbers: osc-va, osc-wavetable, oscillator-population, env-adsr, lfo, stereo-tools) in one worklet from their kernel text; everything timed is an AudioParam (offline renders were silent with messages); presets in packs/ | `tools/music/tools/genre-instruments/swarm-oscillator/`, `tools/music/components/*` | `swarm-oscillator.test.js` 10/10, design check D1–D6 0, `node tests/components.mjs` |
+| 2026-11-06 | **Spec first, with a DAG**: every tool spec (226) carries a generated `dag:` block; the session's words mapped verbatim with times; addenda (suites, components, macro-automation); **Axioms** in CLAUDE.md; the **competence register** (append-only, quotes checked, CI) | `build/spec-dag.mjs`, `specs/eravos.2026-11-06-session.map.spec`, `docs/competence/`, `build/competence.mjs` | `node build/spec-dag.mjs` · `node build/competence.mjs --check` (a tampered entry fails) |
 | 2026-11-06 | **Suites = a tool and its components wired; setups; make your own**: the 7 systems of whole tools are setups (Start › SETUPS, open and build as before); right-click › Save what is wired here as a suite (parts, wires, settings; kept, deletable); tool page tabs **Suites** (open as suite, part of, setups) and **Components** (in it now / comes out of it / planned, from `build/components-map.mjs`); the old Suite tab is Setup | `canvas/runtime/suites.js`, `tool-page.js`, `context-menu.js`, `tools/music/core/components-tab.js`, `build/components-map.mjs` | `tests/p119-suites-rework.test.js` 3/3; P48 P49 P63 P94 boundary green |
 | 2026-11-06 | **Every piano key plays its own note; Automation › Bind**: a slide plays each key (out-of-key keys no longer snap to a neighbour); Bind, then touch any knob → a lane (like MIDI Mapper learn) | `tools/music/core/ui-music.js`, `macro-automation.*` | `tests/p117` 1/1, `tests/p118` 1/1; P14 P48 P122b, macro-automation 8/8 |
 | 2026-11-06 | **Empty canvas = tools start blank** (no preset loaded; kept across restarts) · Swarm Oscillator UI preview (not built) | `organism-factory.js`, `canvas/index.html`, `docs/previews/`, `tools/music/planned/swarm-oscillator.ui.md` | `tests/p116` 2/2; preview checks in `docs/previews/swarm-oscillator.check.mjs` |
