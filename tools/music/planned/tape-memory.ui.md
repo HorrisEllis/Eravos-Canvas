@@ -52,5 +52,6 @@ Head tilt dims unless VHS; Dropout length dims with no dropouts; Crackle size di
 ## Checklist
 
 - [x] Surfaces are tokens only · [x] one accent, tans only · [x] kit parts at kit sizes · [x] one primary (Tape stop) · [x] knob labels fit
-- [ ] The preview was shown to him, and his answer is quoted here
+- [x] The preview was shown to him, and his answer is quoted here:
+  > "yes" (2026-11-06, to the lofi previews and specs — Tape Memory, Piano, the Lofi setup, Bind on the lane)
 - [ ] After it is built: `node tests/design-check.mjs` reports it clean
