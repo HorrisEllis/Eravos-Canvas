@@ -4,7 +4,9 @@ identity:
   id: oscillator-population ; group: sources ; component tool: yes (yes = also on the canvas with a window and typed ports)
   job: N coupled oscillators (Kuramoto-style): coupling strength, topology (all, ring, small-world, user), drift, group-coherence output
 used by: drone-engine · oscillation-ecology · oscillation-matrix · swarm-oscillator
-inputs / outputs / limits: TO WRITE — signal types, control ranges, latency, cpu per instance
+inputs / outputs / limits (written 2026-11-06 for Swarm Oscillator; was "TO WRITE — signal types, control ranges, latency, cpu per instance"): kernel POP(): up to 32 phases; natural frequencies from a spread in cents (even, deterministic) + drift (bounded random walk, cents); coupling K 0…1 by mean field (Kuramoto: dθᵢ = ωᵢ + K·R·sin(ψ − θᵢ)); modes free (K = 0) · coupled · harmonic (n:m locking on ratios 1, 3/2, 2, 5/4, 3, 5/2, 4, 7/4 by Cluster) · chaotic (repulsive K); pull (adaptive frequency toward the mean while coupled); snap() sets every phase to the mean phase; coherence R = |mean e^(iθ)| 0…1
+  stands on: — (phases only; the tool renders them through osc-va or osc-wavetable)
+  status: building 2026-11-06 — NEW code proved on its own (oscillator-population.test.mjs); extraction from new (no tool today has coupled oscillators)
 rules:
   - never imports a tool; tools import it
   - every numeric control is a modulation destination unless marked fixed

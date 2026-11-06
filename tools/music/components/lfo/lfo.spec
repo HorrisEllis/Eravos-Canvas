@@ -5,7 +5,9 @@ identity:
   job: shapes + drawn, sync incl. dotted/triplet/1/64, phase, fade-in, smoothing, retrigger modes, stereo phase offset
   extract from: lfo (the move must change nothing: null renders ≤ −60 dB on every touched factory preset)
 used by: bend-lab · drone-engine · dub-siren · dub-techno-chord · echo-architecture · ensemble-organism · filter-house · fm-matrix · granular-mutation · growl-forge · lead-glide · morph-engine · oscillation-matrix · pad-forge · phase-weaver · reese-architecture · retro-dco · rhythmic-modulator · screech-engine · shimmer-engine · space-sculptor · spatial-organism · spectral-creature · swarm-oscillator · wub-organism
-inputs / outputs / limits: TO WRITE — signal types, control ranges, latency, cpu per instance
+inputs / outputs / limits (written 2026-11-06 for Swarm Oscillator; was "TO WRITE — signal types, control ranges, latency, cpu per instance"): kernel LFO(): shapes sine · triangle · saw up · saw down · square · sample&hold (seeded) · smooth random; rate 0.01–50 Hz; phase 0–1; fade-in 0–10 s from (re)start; output −1…1 (bipolar) or 0…1 (unipolar); one value per sample, no allocation
+  stands on: —
+  status: building 2026-11-06 — NEW code proved on its own (lfo.test.mjs); extraction from lfo (today's LFO tool: 9 shapes incl. drawn, tempo sync, retrigger) — extraction must null-render; tempo sync and drawn shapes come with it
 rules:
   - never imports a tool; tools import it
   - every numeric control is a modulation destination unless marked fixed
