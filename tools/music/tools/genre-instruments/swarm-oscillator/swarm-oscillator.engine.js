@@ -19,7 +19,7 @@
   // Everything timed travels as AudioParams (scheduled to the sample, and in step with an offline render — messages are not: a
   // render runs ahead of them). Settings are k-rate params; notes play through 8 voice slots, each a trigger (a count that changes
   // when a note starts), a gate, a note and a velocity; Lock on beat is a count too. The tables come in with the node.
-  const SET = ['mode', 'shape', 'voices', 'spread', 'coupling', 'pull', 'drift', 'cluster', 'table', 'sub', 'octave', 'cutoff', 'res', 'envAmt', 'attack', 'decay', 'sustain', 'release', 'lfoRate', 'lfoCouple', 'width', 'monoBelow', 'level'];
+  const SET = ['mode', 'shape', 'voices', 'spread', 'coupling', 'pull', 'drift', 'cluster', 'table', 'sub', 'octave', 'cutoff', 'res', 'envAmt', 'attack', 'decay', 'sustain', 'release', 'lfoRate', 'lfoCouple', 'width', 'monoBelow', 'level', 'restless', 'form', 'fieldFm', 'cohTone'];
   const SLOTS = 8;
   const DESC = SET.map(k => ({ name: k, defaultValue: 0, minValue: -1e6, maxValue: 1e6, automationRate: 'k-rate' }))
     .concat([{ name: 'couplingMod', defaultValue: 0, minValue: -1, maxValue: 1, automationRate: 'a-rate' }, { name: 'cutoffMod', defaultValue: 0, minValue: -9600, maxValue: 9600, automationRate: 'a-rate' },
@@ -52,7 +52,7 @@ class EravosSwarm extends AudioWorkletProcessor {
     this.lfo.set({ shape: 0, rate: s.lfoRate }, sr); this.mono.set(s.monoBelow, sr); this.P.resonance[0] = Math.min(0.97, s.res);
     for (const sl of this.slots) {
       sl.amp.set(s.attack, s.decay, s.sustain, s.release, sr); sl.fenv.set(s.attack * 0.5, s.decay, s.sustain * 0.5, s.release, sr);
-      sl.pop.set({ mode: s.mode | 0, pull: s.pull, drift: s.drift, cluster: s.cluster });
+      sl.pop.set({ mode: s.mode | 0, pull: s.pull, drift: s.drift, cluster: s.cluster, restless: s.restless, form: s.form, fm: s.fieldFm });
       if (!sl.amp.done) { sl.pop.configure(s.voices | 0, s.spread * 50); this.pans(sl); }
     }
   }
@@ -60,7 +60,7 @@ class EravosSwarm extends AudioWorkletProcessor {
     sl.f0 = 440 * Math.pow(2, (note - 69) / 12 + (this.s.octave | 0)); sl.vel = vel; sl.born = ++this.count; sl.sub = 0;
     if (sl.amp.done) sl.svf.reset();
     sl.pop.configure(this.s.voices | 0, this.s.spread * 50, (note * 7919 + sl.born * 104729) >>> 0);
-    sl.pop.set({ mode: this.s.mode | 0, pull: this.s.pull, drift: this.s.drift, cluster: this.s.cluster }); this.pans(sl);
+    sl.pop.set({ mode: this.s.mode | 0, pull: this.s.pull, drift: this.s.drift, cluster: this.s.cluster, restless: this.s.restless, form: this.s.form, fm: this.s.fieldFm }); this.pans(sl);
   }
   process(inputs, outputs, params) {
     const out = outputs[0], cohOut = outputs[1] && outputs[1][0], L = out[0], R = out[1] || out[0], B = L.length, sr = this.sr, s = this.s;
@@ -90,9 +90,9 @@ class EravosSwarm extends AudioWorkletProcessor {
         }
         const subDt = sl.f0 * 0.5 / sr; sl.sub += subDt; if (sl.sub >= 1) sl.sub -= 1; const sb = sub ? sub * va.square(sl.sub, subDt) * 0.7 : 0;
         sl.L[j] = l * norm + sb; sl.R[j] = r * norm + sb;
-        const a = sl.amp.next(), fe = sl.fenv.next();
+        const a = sl.amp.next(), fe = sl.fenv.next();   // cutoff below: Lock → tone moves it ±2 octaves by how locked the swarm is
         sl.A[j] = a * (0.25 + 0.75 * sl.vel);
-        const c = s.cutoff * Math.pow(2, s.envAmt * fe * 5 + (fm.length > 1 ? fm[j] : fm[0]) / 1200); sl.F[j] = c < 20 ? 20 : c > 20000 ? 20000 : c;
+        const c = s.cutoff * Math.pow(2, s.envAmt * fe * 5 + (fm.length > 1 ? fm[j] : fm[0]) / 1200 + s.cohTone * (pop.R - 0.5) * 4); sl.F[j] = c < 20 ? 20 : c > 20000 ? 20000 : c;
       }
       this.P.frequency = sl.F; sl.svf.process([sl.L, sl.R], [sl.L, sl.R], B, this.P);
       for (let j = 0; j < B; j++) { L[j] += sl.L[j] * sl.A[j]; if (R !== L) R[j] += sl.R[j] * sl.A[j]; }
@@ -140,6 +140,11 @@ registerProcessor('eravos-swarm', EravosSwarm);`;
       n('attack', 'Attack', 'TONE', 0.01, 0.001, 10, 0.001, 's'), n('decay', 'Decay', 'AMP+', 0.4, 0.01, 4, 0.01, 's'), n('sustain', 'Sustain', 'AMP+', 0.8, 0, 1),
       n('release', 'Release', 'TONE', 0.6, 0.01, 12, 0.01, 's'),
       n('lfoRate', 'LFO rate', 'MOVE', 0.3, 0.01, 20, 0.01, 'Hz'), n('lfoCouple', 'LFO→Pull', 'MOVE', 0, -1, 1, 0.01, '', 'the LFO moves Coupling'),
+      // 1.1 (N2, 2026-11-06: "The swarm doesn't seem like anything new sound wise") — all off by default: the presets keep their sound
+      n('restless', 'Restless', 'LIFE', 0, 0, 1, 0.01, '', 'once locked, the swarm bursts apart and is drawn back in — a breathing cycle, faster when higher'),
+      n('form', 'Form glide', 'LIFE', 0, 0, 4, 0.01, 's', 'harmonic mode: each note blooms from one pitch into its chord, and a new Cluster is reached this slowly'),
+      n('fieldFm', 'Field FM', 'LIFE', 0, 0, 1, 0.01, '', 'the swarm’s own sum bends every voice — locked it brightens, apart it growls'),
+      n('cohTone', 'Lock → tone', 'LIFE', 0, -1, 1, 0.01, '', 'how locked the swarm is opens (+) or closes (−) the filter, up to 2 octaves'),
       n('width', 'Width', 'OUT', 0.8, 0, 1), n('monoBelow', 'Mono <', 'OUT+', 120, 20, 400, 1, 'Hz'), n('level', 'Level', 'OUT', 0.7, 0, 1),
     ],
     // presets are data beside the tool (packs/factory/pack.json) — never in the engine (his rule, 2026-11-06: no packs hard-wired in)

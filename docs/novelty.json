@@ -1,121 +1,121 @@
 {
- "close": 0.04535356744799475,
- "twin": 0.022676783723997375,
+ "close": 0.05726065749951272,
+ "twin": 0.02863032874975636,
  "items": [
   {
    "tool": "eravos.acid-synth",
    "preset": "Phuture Squelch",
    "kind": "sound",
-   "nn": "eravos.retro-dco · Outrun Lead",
-   "d": 0.056,
-   "nnOther": "eravos.retro-dco · Outrun Lead",
-   "dOther": 0.056
+   "nn": "eravos.curve-synth · Laser Pluck",
+   "d": 0.077,
+   "nnOther": "eravos.curve-synth · Laser Pluck",
+   "dOther": 0.077
   },
   {
    "tool": "eravos.acid-synth",
    "preset": "Hardfloor Growl",
    "kind": "sound",
    "nn": "eravos.acid-synth · Odd · Séance Squelch",
-   "d": 0.08,
-   "nnOther": "eravos.retro-dco · Coldwave Lead",
-   "dOther": 0.098
+   "d": 0.071,
+   "nnOther": "eravos.curve-synth · Laser Pluck",
+   "dOther": 0.094
   },
   {
    "tool": "eravos.acid-synth",
    "preset": "Rubber Square",
    "kind": "sound",
-   "nn": "eravos.acid-synth · Odd · Dancehall Acid Stab",
-   "d": 0.027,
+   "nn": "eravos.acid-synth · Odd · Séance Squelch",
+   "d": 0.096,
    "nnOther": "eravos.retro-dco · Coldwave Lead",
-   "dOther": 0.097
+   "dOther": 0.119
   },
   {
    "tool": "eravos.acid-synth",
    "preset": "Deep Minimal",
    "kind": "sound",
-   "nn": "eravos.reese-bass · Warm Future Sub",
-   "d": 0.075,
-   "nnOther": "eravos.reese-bass · Warm Future Sub",
-   "dOther": 0.075
+   "nn": "eravos.retro-dco · Sub Growl",
+   "d": 0.092,
+   "nnOther": "eravos.retro-dco · Sub Growl",
+   "dOther": 0.092
   },
   {
    "tool": "eravos.acid-synth",
    "preset": "Rolling Bassline",
    "kind": "sound",
-   "nn": "eravos.reese-bass · Odd · Breathing Reese",
-   "d": 0.077,
-   "nnOther": "eravos.reese-bass · Odd · Breathing Reese",
-   "dOther": 0.077
+   "nn": "eravos.supersaw · Melodic Saw Bass",
+   "d": 0.075,
+   "nnOther": "eravos.supersaw · Melodic Saw Bass",
+   "dOther": 0.075
   },
   {
    "tool": "eravos.acid-synth",
    "preset": "Screamer",
    "kind": "sound",
    "nn": "eravos.acid-synth · Club · Warehouse 303",
-   "d": 0.077,
-   "nnOther": "eravos.clip-maker · Odd · Her words (tight)",
-   "dOther": 0.133
+   "d": 0.099,
+   "nnOther": "eravos.retro-dco · Coldwave Lead",
+   "dOther": 0.13
   },
   {
    "tool": "eravos.acid-synth",
    "preset": "80s · Electro Funk Bass",
    "kind": "sound",
    "nn": "eravos.acid-synth · Odd · Golden Acid",
-   "d": 0.032,
+   "d": 0.028,
    "nnOther": "eravos.reese-bass · 80s · Tron Grid Bass",
-   "dOther": 0.101
+   "dOther": 0.094
   },
   {
    "tool": "eravos.acid-synth",
    "preset": "Club · Warehouse 303",
    "kind": "sound",
    "nn": "eravos.acid-synth · Odd · Séance Squelch",
-   "d": 0.021,
-   "nnOther": "eravos.retro-dco · Coldwave Lead",
-   "dOther": 0.103
+   "d": 0.018,
+   "nnOther": "eravos.retro-dco · Outrun Lead",
+   "dOther": 0.098
   },
   {
    "tool": "eravos.acid-synth",
    "preset": "Club · Minimal Pluck Bass",
    "kind": "sound",
    "nn": "eravos.reese-bass · 80s · Tron Grid Bass",
-   "d": 0.057,
+   "d": 0.06,
    "nnOther": "eravos.reese-bass · 80s · Tron Grid Bass",
-   "dOther": 0.057
+   "dOther": 0.06
   },
   {
    "tool": "eravos.acid-synth",
    "preset": "Odd · Séance Squelch",
    "kind": "sound",
    "nn": "eravos.acid-synth · Club · Warehouse 303",
-   "d": 0.021,
-   "nnOther": "eravos.retro-dco · Coldwave Lead",
-   "dOther": 0.087
+   "d": 0.018,
+   "nnOther": "eravos.retro-dco · Outrun Lead",
+   "dOther": 0.092
   },
   {
    "tool": "eravos.acid-synth",
    "preset": "Odd · Golden Acid",
    "kind": "sound",
    "nn": "eravos.acid-synth · 80s · Electro Funk Bass",
-   "d": 0.032,
+   "d": 0.028,
    "nnOther": "eravos.reese-bass · 80s · Tron Grid Bass",
-   "dOther": 0.093
+   "dOther": 0.088
   },
   {
    "tool": "eravos.acid-synth",
    "preset": "Odd · Acid Under Organ",
    "kind": "sound",
-   "nn": "eravos.acid-synth · Odd · Golden Acid",
-   "d": 0.07,
+   "nn": "eravos.reese-bass · 80s · Tron Grid Bass",
+   "d": 0.076,
    "nnOther": "eravos.reese-bass · 80s · Tron Grid Bass",
-   "dOther": 0.083
+   "dOther": 0.076
   },
   {
    "tool": "eravos.acid-synth",
    "preset": "Odd · Dancehall Acid Stab",
    "kind": "sound",
-   "nn": "eravos.acid-synth · Rubber Square",
-   "d": 0.027,
+   "nn": "eravos.retro-dco · Coldwave Lead",
+   "d": 0.094,
    "nnOther": "eravos.retro-dco · Coldwave Lead",
    "dOther": 0.094
   },
@@ -124,243 +124,234 @@
    "preset": "Brostep Growl",
    "kind": "sound",
    "nn": "eravos.bass-forge · Golden Growl (φ)",
-   "d": 0.029,
-   "nnOther": "eravos.retro-poly · Darksynth Saw",
-   "dOther": 0.114
+   "d": 0.028,
+   "nnOther": "eravos.swarm-oscillator · Shatter Bloom",
+   "dOther": 0.087
   },
   {
    "tool": "eravos.bass-forge",
    "preset": "Riddim Stair",
    "kind": "sound",
    "nn": "eravos.bass-forge · Odd · Organ Grinder",
-   "d": 0.036,
-   "nnOther": "eravos.wub-osc · Classic Wub Saw",
-   "dOther": 0.068
+   "d": 0.044,
+   "nnOther": "eravos.wub-osc · Init Saw",
+   "dOther": 0.089
   },
   {
    "tool": "eravos.bass-forge",
    "preset": "Yoi Talker",
    "kind": "sound",
-   "nn": "eravos.bass-forge · Brostep Growl",
-   "d": 0.103,
-   "nnOther": "eravos.reese-bass · Hoover-ish",
-   "dOther": 0.108
+   "nn": "eravos.swarm-oscillator · Tide Lock",
+   "d": 0.105,
+   "nnOther": "eravos.swarm-oscillator · Tide Lock",
+   "dOther": 0.105
   },
   {
    "tool": "eravos.bass-forge",
    "preset": "Neuro Reese-FM",
    "kind": "sound",
-   "nn": "eravos.bass-forge · Odd · Golden Dub Growl",
-   "d": 0.05,
-   "nnOther": "eravos.curve-synth · Laser Pluck",
-   "dOther": 0.079
+   "nn": "eravos.bass-forge · Odd · Organ Grinder",
+   "d": 0.044,
+   "nnOther": "eravos.swarm-oscillator · Shatter Bloom",
+   "dOther": 0.08
   },
   {
    "tool": "eravos.bass-forge",
    "preset": "Screech",
    "kind": "sound",
    "nn": "eravos.bass-forge · Tearout Metal",
-   "d": 0.158,
-   "nnOther": "eravos.acid-synth · Screamer",
-   "dOther": 0.217
+   "d": 0.148,
+   "nnOther": "eravos.retro-poly · Darksynth Saw",
+   "dOther": 0.204
   },
   {
    "tool": "eravos.bass-forge",
    "preset": "Tearout Metal",
    "kind": "sound",
    "nn": "eravos.bass-forge · Golden Growl (φ)",
-   "d": 0.098,
-   "nnOther": "eravos.retro-poly · Darksynth Saw",
-   "dOther": 0.133
+   "d": 0.086,
+   "nnOther": "eravos.swarm-oscillator · Shatter Bloom",
+   "dOther": 0.115
   },
   {
    "tool": "eravos.bass-forge",
    "preset": "Laser Zap",
    "kind": "sound",
-   "nn": "eravos.bass-forge · Brostep Growl",
-   "d": 0.088,
-   "nnOther": "eravos.swarm-oscillator · Odd · Golden Swarm",
-   "dOther": 0.101
+   "nn": "eravos.bass-forge · Machine Gun 1/32",
+   "d": 0.085,
+   "nnOther": "eravos.coven · Crystal Coven",
+   "dOther": 0.103
   },
   {
    "tool": "eravos.bass-forge",
    "preset": "Machine Gun 1/32",
    "kind": "sound",
    "nn": "eravos.bass-forge · Odd · Organ Grinder",
-   "d": 0.042,
-   "nnOther": "eravos.wub-osc · Classic Wub Saw",
-   "dOther": 0.08
+   "d": 0.063,
+   "nnOther": "eravos.coven · Crystal Coven",
+   "dOther": 0.096
   },
   {
    "tool": "eravos.bass-forge",
    "preset": "Golden Growl (φ)",
    "kind": "sound",
    "nn": "eravos.bass-forge · Brostep Growl",
-   "d": 0.029,
-   "nnOther": "eravos.retro-poly · Darksynth Saw",
-   "dOther": 0.102
+   "d": 0.028,
+   "nnOther": "eravos.swarm-oscillator · Shatter Bloom",
+   "dOther": 0.073
   },
   {
    "tool": "eravos.bass-forge",
    "preset": "Dub Wobble (soft)",
    "kind": "sound",
-   "nn": "eravos.reese-bass · Colour Bass",
-   "d": 0.043,
-   "nnOther": "eravos.reese-bass · Colour Bass",
-   "dOther": 0.043
+   "nn": "eravos.reese-bass · Classic Reese",
+   "d": 0.071,
+   "nnOther": "eravos.reese-bass · Classic Reese",
+   "dOther": 0.071
   },
   {
    "tool": "eravos.bass-forge",
    "preset": "Odd · Tearout Lullaby",
    "kind": "sound",
    "nn": "eravos.bass-forge · Brostep Growl",
-   "d": 0.076,
+   "d": 0.067,
    "nnOther": "eravos.swarm-oscillator · Odd · Golden Swarm",
-   "dOther": 0.135
+   "dOther": 0.12
   },
   {
    "tool": "eravos.bass-forge",
    "preset": "Odd · Golden Dub Growl",
    "kind": "sound",
    "nn": "eravos.bass-forge · Neuro Reese-FM",
-   "d": 0.05,
-   "nnOther": "eravos.retro-poly · Darksynth Saw",
-   "dOther": 0.074
+   "d": 0.047,
+   "nnOther": "eravos.swarm-oscillator · Shatter Bloom",
+   "dOther": 0.051
   },
   {
    "tool": "eravos.bass-forge",
    "preset": "Odd · Organ Grinder",
    "kind": "sound",
-   "nn": "eravos.bass-forge · Riddim Stair",
-   "d": 0.036,
-   "nnOther": "eravos.wub-osc · Classic Wub Saw",
-   "dOther": 0.065
+   "nn": "eravos.bass-forge · Neuro Reese-FM",
+   "d": 0.044,
+   "nnOther": "eravos.swarm-oscillator · Shatter Bloom",
+   "dOther": 0.099
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Classic Reese",
    "kind": "sound",
    "nn": "eravos.reese-bass · Odd · Golden Reese",
-   "d": 0.015,
+   "d": 0.034,
    "nnOther": "eravos.bass-forge · Dub Wobble (soft)",
-   "dOther": 0.062
+   "dOther": 0.071
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Neuro Flange",
    "kind": "sound",
-   "nn": "eravos.reese-bass · Odd · Breathing Reese",
-   "d": 0.019,
-   "nnOther": "eravos.acid-synth · Rolling Bassline",
-   "dOther": 0.085
+   "nn": "eravos.reese-bass · Melodic Growl",
+   "d": 0.026,
+   "nnOther": "eravos.swarm-oscillator · Growl Cloud",
+   "dOther": 0.065
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Wide Rumble",
    "kind": "sound",
-   "nn": "eravos.reese-bass · Deep Reese",
-   "d": 0.044,
-   "nnOther": "eravos.embodiment-lab · Feelings · Held",
-   "dOther": 0.075
+   "nn": "eravos.embodiment-lab · Feelings · Heavy Heart",
+   "d": 0.09,
+   "nnOther": "eravos.embodiment-lab · Feelings · Heavy Heart",
+   "dOther": 0.09
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Hoover-ish",
    "kind": "sound",
-   "nn": "eravos.reese-bass · Melodic Growl",
-   "d": 0.059,
-   "nnOther": "eravos.bass-forge · Yoi Talker",
-   "dOther": 0.108
+   "nn": "eravos.reese-bass · Neuro Flange",
+   "d": 0.055,
+   "nnOther": "eravos.swarm-oscillator · Growl Cloud",
+   "dOther": 0.062
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Sub Only",
    "kind": "sound",
    "nn": "eravos.sub-engine · Club · Deep House Sub",
-   "d": 0.021,
+   "d": 0.018,
    "nnOther": "eravos.sub-engine · Club · Deep House Sub",
-   "dOther": 0.021
+   "dOther": 0.018
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Colour Bass",
    "kind": "sound",
    "nn": "eravos.bass-forge · Dub Wobble (soft)",
-   "d": 0.043,
+   "d": 0.081,
    "nnOther": "eravos.bass-forge · Dub Wobble (soft)",
-   "dOther": 0.043
+   "dOther": 0.081
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Melodic Growl",
    "kind": "sound",
-   "nn": "eravos.reese-bass · Odd · Breathing Reese",
-   "d": 0.019,
-   "nnOther": "eravos.acid-synth · Rolling Bassline",
-   "dOther": 0.084
+   "nn": "eravos.reese-bass · Neuro Flange",
+   "d": 0.026,
+   "nnOther": "eravos.swarm-oscillator · Growl Cloud",
+   "dOther": 0.054
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Her Drop (dubstep reese)",
    "kind": "sound",
-   "nn": "eravos.reese-bass · Odd · Breathing Reese",
-   "d": 0.039,
-   "nnOther": "eravos.bass-forge · Dub Wobble (soft)",
-   "dOther": 0.081
+   "nn": "eravos.reese-bass · Neuro Flange",
+   "d": 0.032,
+   "nnOther": "eravos.organ · Funeral Pulse",
+   "dOther": 0.079
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Warm Future Sub",
    "kind": "sound",
    "nn": "eravos.wub-osc · FM Clang 3:1",
-   "d": 0.068,
+   "d": 0.066,
    "nnOther": "eravos.wub-osc · FM Clang 3:1",
-   "dOther": 0.068
+   "dOther": 0.066
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "80s · Tron Grid Bass",
    "kind": "sound",
    "nn": "eravos.acid-synth · Club · Minimal Pluck Bass",
-   "d": 0.057,
+   "d": 0.06,
    "nnOther": "eravos.acid-synth · Club · Minimal Pluck Bass",
-   "dOther": 0.057
-  },
-  {
-   "tool": "eravos.reese-bass",
-   "preset": "Deep Reese",
-   "kind": "sound",
-   "nn": "eravos.reese-bass · Wide Rumble",
-   "d": 0.044,
-   "nnOther": "eravos.embodiment-lab · Feelings · Heavy Heart",
-   "dOther": 0.085
+   "dOther": 0.06
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Odd · Chapel Reese",
    "kind": "sound",
-   "nn": "eravos.reese-bass · Wide Rumble",
-   "d": 0.066,
-   "nnOther": "eravos.recursive-spectra · Odd · Trap Spectrum Drone",
-   "dOther": 0.072
+   "nn": "eravos.sub-engine · Earthquake Drop",
+   "d": 0.109,
+   "nnOther": "eravos.sub-engine · Earthquake Drop",
+   "dOther": 0.109
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Odd · Breathing Reese",
    "kind": "sound",
    "nn": "eravos.reese-bass · Melodic Growl",
-   "d": 0.019,
-   "nnOther": "eravos.acid-synth · Rolling Bassline",
-   "dOther": 0.077
+   "d": 0.041,
+   "nnOther": "eravos.swarm-oscillator · Growl Cloud",
+   "dOther": 0.07
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Odd · Golden Reese",
    "kind": "sound",
    "nn": "eravos.reese-bass · Classic Reese",
-   "d": 0.015,
+   "d": 0.034,
    "nnOther": "eravos.bass-forge · Dub Wobble (soft)",
-   "dOther": 0.066
+   "dOther": 0.086
   },
   {
    "tool": "eravos.sub-engine",
@@ -369,7 +360,7 @@
    "nn": "eravos.sub-engine · Lofi Soft Sub",
    "d": 0.003,
    "nnOther": "eravos.reese-bass · Sub Only",
-   "dOther": 0.027
+   "dOther": 0.023
   },
   {
    "tool": "eravos.sub-engine",
@@ -378,43 +369,43 @@
    "nn": "eravos.sub-engine · Odd · Cathedral Floor",
    "d": 0.004,
    "nnOther": "eravos.reese-bass · Sub Only",
-   "dOther": 0.035
+   "dOther": 0.03
   },
   {
    "tool": "eravos.sub-engine",
    "preset": "808 Boom",
    "kind": "sound",
    "nn": "eravos.sub-engine · Garage Punch",
-   "d": 0.043,
+   "d": 0.038,
    "nnOther": "eravos.reese-bass · Sub Only",
-   "dOther": 0.062
+   "dOther": 0.054
   },
   {
    "tool": "eravos.sub-engine",
    "preset": "808 Long Slide",
    "kind": "sound",
    "nn": "eravos.sub-engine · Odd · Cathedral Floor",
-   "d": 0.011,
+   "d": 0.009,
    "nnOther": "eravos.reese-bass · Sub Only",
-   "dOther": 0.039
+   "dOther": 0.034
   },
   {
    "tool": "eravos.sub-engine",
    "preset": "Earthquake Drop",
    "kind": "sound",
-   "nn": "eravos.reese-bass · Wide Rumble",
-   "d": 0.092,
-   "nnOther": "eravos.reese-bass · Wide Rumble",
-   "dOther": 0.092
+   "nn": "eravos.reese-bass · Odd · Chapel Reese",
+   "d": 0.109,
+   "nnOther": "eravos.reese-bass · Odd · Chapel Reese",
+   "dOther": 0.109
   },
   {
    "tool": "eravos.sub-engine",
    "preset": "Phone-Speaker Sub",
    "kind": "sound",
    "nn": "eravos.sub-engine · Odd · Cathedral Floor",
-   "d": 0.012,
+   "d": 0.011,
    "nnOther": "eravos.reese-bass · Sub Only",
-   "dOther": 0.047
+   "dOther": 0.041
   },
   {
    "tool": "eravos.sub-engine",
@@ -423,34 +414,34 @@
    "nn": "eravos.sub-engine · Deep Sine",
    "d": 0.006,
    "nnOther": "eravos.reese-bass · Sub Only",
-   "dOther": 0.032
+   "dOther": 0.028
   },
   {
    "tool": "eravos.sub-engine",
    "preset": "Garage Punch",
    "kind": "sound",
    "nn": "eravos.sub-engine · Odd · Séance 808",
-   "d": 0.023,
+   "d": 0.02,
    "nnOther": "eravos.reese-bass · Sub Only",
-   "dOther": 0.05
+   "dOther": 0.043
   },
   {
    "tool": "eravos.sub-engine",
    "preset": "80s · Linn Bass Drum Sub",
    "kind": "sound",
    "nn": "eravos.sub-engine · 808 Boom",
-   "d": 0.259,
-   "nnOther": "eravos.xen-synth · Silver-Mean Membrane",
-   "dOther": 0.259
+   "d": 0.23,
+   "nnOther": "eravos.reese-bass · Sub Only",
+   "dOther": 0.266
   },
   {
    "tool": "eravos.sub-engine",
    "preset": "Club · Deep House Sub",
    "kind": "sound",
    "nn": "eravos.sub-engine · Lofi Soft Sub",
-   "d": 0.011,
+   "d": 0.009,
    "nnOther": "eravos.reese-bass · Sub Only",
-   "dOther": 0.021
+   "dOther": 0.018
   },
   {
    "tool": "eravos.sub-engine",
@@ -459,7 +450,7 @@
    "nn": "eravos.sub-engine · Deep Sine",
    "d": 0.003,
    "nnOther": "eravos.reese-bass · Sub Only",
-   "dOther": 0.027
+   "dOther": 0.023
   },
   {
    "tool": "eravos.sub-engine",
@@ -468,133 +459,133 @@
    "nn": "eravos.sub-engine · Sound-System Sub (reggae)",
    "d": 0.004,
    "nnOther": "eravos.reese-bass · Sub Only",
-   "dOther": 0.037
+   "dOther": 0.032
   },
   {
    "tool": "eravos.sub-engine",
    "preset": "Odd · Séance 808",
    "kind": "sound",
    "nn": "eravos.sub-engine · 808 Long Slide",
-   "d": 0.021,
+   "d": 0.018,
    "nnOther": "eravos.reese-bass · Sub Only",
-   "dOther": 0.037
+   "dOther": 0.032
   },
   {
    "tool": "eravos.sub-engine",
    "preset": "Odd · Steppers Sub",
    "kind": "sound",
    "nn": "eravos.sub-engine · Odd · Cathedral Floor",
-   "d": 0.01,
+   "d": 0.009,
    "nnOther": "eravos.reese-bass · Sub Only",
-   "dOther": 0.043
+   "dOther": 0.037
   },
   {
    "tool": "eravos.sub-engine",
    "preset": "Odd · Breath Sub",
    "kind": "sound",
    "nn": "eravos.sub-engine · Odd · Steppers Sub",
-   "d": 0.032,
+   "d": 0.028,
    "nnOther": "eravos.reese-bass · Sub Only",
-   "dOther": 0.06
+   "dOther": 0.052
   },
   {
    "tool": "eravos.fx-destroyer",
    "preset": "Grit",
    "kind": "effect",
    "nn": "eravos.fx-destroyer · Odd · Golden Fold",
-   "d": 0.025,
+   "d": 0.021,
    "nnOther": "eravos.fx-dynamics · Tight Gate",
-   "dOther": 0.032
+   "dOther": 0.028
   },
   {
    "tool": "eravos.fx-destroyer",
    "preset": "Fold Growl",
    "kind": "effect",
    "nn": "eravos.fx-destroyer · Growl Fold · sub stays clean",
-   "d": 0.031,
-   "nnOther": "eravos.fx-filter · Lofi Low",
-   "dOther": 0.054
+   "d": 0.027,
+   "nnOther": "eravos.channel · Bass",
+   "dOther": 0.061
   },
   {
    "tool": "eravos.fx-destroyer",
    "preset": "Lo-fi 12-bit 22k",
    "kind": "effect",
    "nn": "eravos.fx-destroyer · Cassette 8-bit (smooth)",
-   "d": 0.044,
+   "d": 0.038,
    "nnOther": "eravos.fx-phaser · Vocal Air",
-   "dOther": 0.123
+   "dOther": 0.109
   },
   {
    "tool": "eravos.fx-destroyer",
    "preset": "Total Destruction",
    "kind": "effect",
    "nn": "eravos.fx-destroyer · 80s · SP-1200 Grit (12-bit)",
-   "d": 0.103,
-   "nnOther": "eravos.fx-filter · Wobble 1/8 LP",
-   "dOther": 0.152
+   "d": 0.089,
+   "nnOther": "eravos.fx-filter · Tremble 1/16",
+   "dOther": 0.144
   },
   {
    "tool": "eravos.fx-destroyer",
    "preset": "80s · SP-1200 Grit (12-bit)",
    "kind": "effect",
    "nn": "eravos.fx-destroyer · Lo-fi 12-bit 22k",
-   "d": 0.058,
+   "d": 0.05,
    "nnOther": "eravos.fx-phaser · Vocal Air",
-   "dOther": 0.139
+   "dOther": 0.123
   },
   {
    "tool": "eravos.fx-destroyer",
    "preset": "Fuzz Box",
    "kind": "effect",
    "nn": "eravos.fx-destroyer · Wub Grit · sub stays clean",
-   "d": 0.033,
+   "d": 0.028,
    "nnOther": "eravos.channel · Bass",
-   "dOther": 0.055
+   "dOther": 0.048
   },
   {
    "tool": "eravos.fx-destroyer",
    "preset": "Wub Grit · sub stays clean",
    "kind": "effect",
    "nn": "eravos.fx-destroyer · Grit",
-   "d": 0.028,
+   "d": 0.024,
    "nnOther": "eravos.channel · Bass",
-   "dOther": 0.034
+   "dOther": 0.029
   },
   {
    "tool": "eravos.fx-destroyer",
    "preset": "Growl Fold · sub stays clean",
    "kind": "effect",
    "nn": "eravos.fx-destroyer · Fold Growl",
-   "d": 0.031,
+   "d": 0.027,
    "nnOther": "eravos.channel · Bass",
-   "dOther": 0.055
+   "dOther": 0.048
   },
   {
    "tool": "eravos.fx-destroyer",
    "preset": "Cassette 8-bit (smooth)",
    "kind": "effect",
    "nn": "eravos.fx-destroyer · Lo-fi 12-bit 22k",
-   "d": 0.044,
+   "d": 0.038,
    "nnOther": "eravos.fx-filter · Lofi Low",
-   "dOther": 0.137
+   "dOther": 0.121
   },
   {
    "tool": "eravos.fx-destroyer",
    "preset": "Odd · Golden Fold",
    "kind": "effect",
    "nn": "eravos.fx-destroyer · Grit",
-   "d": 0.025,
+   "d": 0.021,
    "nnOther": "eravos.fx-squash · Parallel Smash",
-   "dOther": 0.048
+   "dOther": 0.041
   },
   {
    "tool": "eravos.fx-dynamics",
    "preset": "Punchy Drums",
    "kind": "effect",
    "nn": "eravos.fx-dynamics · Vocal Level",
-   "d": 0.012,
+   "d": 0.01,
    "nnOther": "eravos.fx-moddelay · 80s · Dimension D Wide",
-   "dOther": 0.044
+   "dOther": 0.038
   },
   {
    "tool": "eravos.fx-dynamics",
@@ -603,16 +594,16 @@
    "nn": "eravos.fx-dynamics · Odd · Choir Leveller",
    "d": 0,
    "nnOther": "eravos.fx-moddelay · 80s · Dimension D Wide",
-   "dOther": 0.038
+   "dOther": 0.033
   },
   {
    "tool": "eravos.fx-dynamics",
    "preset": "Bass Glue",
    "kind": "effect",
    "nn": "eravos.fx-dynamics · 80s Gated Snare",
-   "d": 0.002,
+   "d": 0.001,
    "nnOther": "eravos.fx-moddelay · 80s · Dimension D Wide",
-   "dOther": 0.036
+   "dOther": 0.031
   },
   {
    "tool": "eravos.fx-dynamics",
@@ -628,9 +619,9 @@
    "preset": "NY Parallel Smash",
    "kind": "effect",
    "nn": "eravos.fx-dynamics · Bass Glue",
-   "d": 0.013,
+   "d": 0.011,
    "nnOther": "eravos.fx-moddelay · 80s · Dimension D Wide",
-   "dOther": 0.035
+   "dOther": 0.03
   },
   {
    "tool": "eravos.fx-dynamics",
@@ -646,9 +637,9 @@
    "preset": "80s Gated Snare",
    "kind": "effect",
    "nn": "eravos.fx-dynamics · Bass Glue",
-   "d": 0.002,
+   "d": 0.001,
    "nnOther": "eravos.fx-moddelay · 80s · Dimension D Wide",
-   "dOther": 0.037
+   "dOther": 0.032
   },
   {
    "tool": "eravos.fx-dynamics",
@@ -657,7 +648,7 @@
    "nn": "eravos.fx-dynamics · Vocal Level",
    "d": 0,
    "nnOther": "eravos.fx-moddelay · 80s · Dimension D Wide",
-   "dOther": 0.038
+   "dOther": 0.033
   },
   {
    "tool": "eravos.fx-dynamics",
@@ -681,28 +672,28 @@
    "tool": "eravos.fx-echo",
    "preset": "Slapback",
    "kind": "effect",
-   "nn": "eravos.fx-echo · Lofi Warm Echo",
-   "d": 0.068,
-   "nnOther": "eravos.dub-station · Organ Bubble",
-   "dOther": 0.078
+   "nn": "eravos.fx-phaser · 80s · Small Stone Swirl",
+   "d": 0.071,
+   "nnOther": "eravos.fx-phaser · 80s · Small Stone Swirl",
+   "dOther": 0.071
   },
   {
    "tool": "eravos.fx-echo",
    "preset": "Ping-pong 1/8.",
    "kind": "effect",
-   "nn": "eravos.fx-echo · 80s · Gated Slap '84",
-   "d": 0.011,
+   "nn": "eravos.fx-echo · 80s · Dotted Synthwave Delay",
+   "d": 0.014,
    "nnOther": "eravos.dub-station · Odd · Lullaby Dub",
-   "dOther": 0.07
+   "dOther": 0.083
   },
   {
    "tool": "eravos.fx-echo",
    "preset": "Worn Tape",
    "kind": "effect",
    "nn": "eravos.fx-echo · Odd · Golden Echo",
-   "d": 0.014,
-   "nnOther": "eravos.granular · Voice Cloud",
-   "dOther": 0.03
+   "d": 0.017,
+   "nnOther": "eravos.granular · Reverse Swell",
+   "dOther": 0.036
   },
   {
    "tool": "eravos.fx-echo",
@@ -718,45 +709,45 @@
    "preset": "Future Pluck Echo",
    "kind": "effect",
    "nn": "eravos.fx-echo · 80s · Dotted Synthwave Delay",
-   "d": 0.005,
+   "d": 0.004,
    "nnOther": "eravos.dub-station · Organ Bubble",
-   "dOther": 0.073
+   "dOther": 0.085
   },
   {
    "tool": "eravos.fx-echo",
    "preset": "80s · Gated Slap '84",
    "kind": "effect",
    "nn": "eravos.fx-echo · Ping-pong 1/8.",
-   "d": 0.011,
+   "d": 0.048,
    "nnOther": "eravos.dub-station · Odd · Lullaby Dub",
-   "dOther": 0.067
+   "dOther": 0.059
   },
   {
    "tool": "eravos.fx-echo",
    "preset": "80s · Dotted Synthwave Delay",
    "kind": "effect",
    "nn": "eravos.fx-echo · Future Pluck Echo",
-   "d": 0.005,
+   "d": 0.004,
    "nnOther": "eravos.dub-station · Organ Bubble",
-   "dOther": 0.073
+   "dOther": 0.085
   },
   {
    "tool": "eravos.fx-echo",
    "preset": "Lofi Warm Echo",
    "kind": "effect",
-   "nn": "eravos.fx-echo · 80s · Gated Slap '84",
-   "d": 0.035,
-   "nnOther": "eravos.dub-station · Organ Bubble",
-   "dOther": 0.047
+   "nn": "eravos.fx-echo · Ping-pong 1/8.",
+   "d": 0.041,
+   "nnOther": "eravos.dub-station · Tubby Echo Chamber",
+   "dOther": 0.072
   },
   {
    "tool": "eravos.fx-echo",
    "preset": "Lofi Long Night",
    "kind": "effect",
    "nn": "eravos.fx-echo · Odd · Golden Echo",
-   "d": 0.02,
-   "nnOther": "eravos.granular · Voice Cloud",
-   "dOther": 0.036
+   "d": 0.023,
+   "nnOther": "eravos.granular · Reverse Swell",
+   "dOther": 0.063
   },
   {
    "tool": "eravos.fx-echo",
@@ -771,19 +762,19 @@
    "tool": "eravos.fx-echo",
    "preset": "Odd · Steppers Tape",
    "kind": "effect",
-   "nn": "eravos.granular · Voice Cloud",
-   "d": 0.029,
-   "nnOther": "eravos.granular · Voice Cloud",
-   "dOther": 0.029
+   "nn": "eravos.granular · Octave Down Smear",
+   "d": 0.083,
+   "nnOther": "eravos.granular · Octave Down Smear",
+   "dOther": 0.083
   },
   {
    "tool": "eravos.fx-echo",
    "preset": "Odd · Golden Echo",
    "kind": "effect",
    "nn": "eravos.fx-echo · Worn Tape",
-   "d": 0.014,
-   "nnOther": "eravos.granular · Voice Cloud",
-   "dOther": 0.032
+   "d": 0.017,
+   "nnOther": "eravos.granular · Reverse Swell",
+   "dOther": 0.045
   },
   {
    "tool": "eravos.fx-eq",
@@ -799,62 +790,62 @@
    "preset": "Vocal Clarity",
    "kind": "effect",
    "nn": "eravos.channel · Odd · Her Voice (on top)",
-   "d": 0.014,
+   "d": 0.012,
    "nnOther": "eravos.channel · Odd · Her Voice (on top)",
-   "dOther": 0.014
+   "dOther": 0.012
   },
   {
    "tool": "eravos.fx-eq",
    "preset": "Kick Tighten",
    "kind": "effect",
    "nn": "eravos.fx-eq · Odd · Make Room for Her",
-   "d": 0.021,
-   "nnOther": "eravos.fx-moddelay · Supersaw Widener",
-   "dOther": 0.021
+   "d": 0.018,
+   "nnOther": "eravos.sidechain-compressor · Lofi Gentle Pump",
+   "dOther": 0.022
   },
   {
    "tool": "eravos.fx-eq",
    "preset": "Bass Mud Cut",
    "kind": "effect",
-   "nn": "eravos.fx-moddelay · Supersaw Widener",
-   "d": 0.037,
-   "nnOther": "eravos.fx-moddelay · Supersaw Widener",
-   "dOther": 0.037
+   "nn": "eravos.fx-eq · Odd · Make Room for Her",
+   "d": 0.057,
+   "nnOther": "eravos.sidechain-compressor · Lofi Gentle Pump",
+   "dOther": 0.058
   },
   {
    "tool": "eravos.fx-eq",
    "preset": "Air Lift",
    "kind": "effect",
    "nn": "eravos.sidechain-compressor · Subtle Glue",
-   "d": 0.014,
+   "d": 0.012,
    "nnOther": "eravos.sidechain-compressor · Subtle Glue",
-   "dOther": 0.014
+   "dOther": 0.012
   },
   {
    "tool": "eravos.fx-eq",
    "preset": "Telephone",
    "kind": "effect",
-   "nn": "eravos.fx-filter · Telephone",
-   "d": 0.093,
-   "nnOther": "eravos.fx-filter · Telephone",
-   "dOther": 0.093
+   "nn": "eravos.fx-filter · Lofi Radio",
+   "d": 0.14,
+   "nnOther": "eravos.fx-filter · Lofi Radio",
+   "dOther": 0.14
   },
   {
    "tool": "eravos.fx-eq",
    "preset": "80s Snare Snap",
    "kind": "effect",
    "nn": "eravos.channel · Odd · Her Voice (on top)",
-   "d": 0.018,
+   "d": 0.015,
    "nnOther": "eravos.channel · Odd · Her Voice (on top)",
-   "dOther": 0.018
+   "dOther": 0.015
   },
   {
    "tool": "eravos.fx-eq",
    "preset": "Odd · Make Room for Her",
    "kind": "effect",
-   "nn": "eravos.fx-moddelay · Supersaw Widener",
-   "d": 0.019,
-   "nnOther": "eravos.fx-moddelay · Supersaw Widener",
+   "nn": "eravos.fx-eq · Kick Tighten",
+   "d": 0.018,
+   "nnOther": "eravos.sidechain-compressor · Lofi Gentle Pump",
    "dOther": 0.019
   },
   {
@@ -862,117 +853,117 @@
    "preset": "Odd · Church Low Cut",
    "kind": "effect",
    "nn": "eravos.channel · Odd · Organ Under",
-   "d": 0.032,
+   "d": 0.028,
    "nnOther": "eravos.channel · Odd · Organ Under",
-   "dOther": 0.032
+   "dOther": 0.028
   },
   {
    "tool": "eravos.fx-filter",
    "preset": "Auto-Wah",
    "kind": "effect",
    "nn": "eravos.fx-moddelay · 80s · Dimension D Wide",
-   "d": 0.168,
+   "d": 0.145,
    "nnOther": "eravos.fx-moddelay · 80s · Dimension D Wide",
-   "dOther": 0.168
+   "dOther": 0.145
   },
   {
    "tool": "eravos.fx-filter",
    "preset": "Build HP 1/1",
    "kind": "effect",
-   "nn": "eravos.fx-moddelay · Juno Wide",
-   "d": 0.124,
-   "nnOther": "eravos.fx-moddelay · Juno Wide",
-   "dOther": 0.124
+   "nn": "eravos.fx-pitch · Fifth Harmony",
+   "d": 0.118,
+   "nnOther": "eravos.fx-pitch · Fifth Harmony",
+   "dOther": 0.118
   },
   {
    "tool": "eravos.fx-filter",
    "preset": "Wobble 1/8 LP",
    "kind": "effect",
-   "nn": "eravos.fx-pitch · Octave Down Demon",
-   "d": 0.11,
-   "nnOther": "eravos.fx-pitch · Octave Down Demon",
-   "dOther": 0.11
+   "nn": "eravos.fx-pitch · Screwed (-5 st)",
+   "d": 0.124,
+   "nnOther": "eravos.fx-pitch · Screwed (-5 st)",
+   "dOther": 0.124
   },
   {
    "tool": "eravos.fx-filter",
    "preset": "Tremble 1/16",
    "kind": "effect",
-   "nn": "eravos.fx-eq · Bass Mud Cut",
-   "d": 0.094,
-   "nnOther": "eravos.fx-eq · Bass Mud Cut",
-   "dOther": 0.094
+   "nn": "eravos.fx-squash · Mids Only",
+   "d": 0.091,
+   "nnOther": "eravos.fx-squash · Mids Only",
+   "dOther": 0.091
   },
   {
    "tool": "eravos.fx-filter",
    "preset": "Telephone",
    "kind": "effect",
-   "nn": "eravos.fx-eq · Telephone",
-   "d": 0.093,
+   "nn": "eravos.fx-filter · 80s · Cassette Lo-cut",
+   "d": 0.154,
    "nnOther": "eravos.fx-eq · Telephone",
-   "dOther": 0.093
+   "dOther": 0.163
   },
   {
    "tool": "eravos.fx-filter",
    "preset": "Muffled Intro",
    "kind": "effect",
    "nn": "eravos.fx-filter · Odd · Choir Behind Glass",
-   "d": 0.105,
+   "d": 0.091,
    "nnOther": "eravos.wub-filter · Bandpass Yap",
-   "dOther": 0.165
+   "dOther": 0.143
   },
   {
    "tool": "eravos.fx-filter",
    "preset": "80s · Cassette Lo-cut",
    "kind": "effect",
-   "nn": "eravos.fx-filter · Lofi Radio",
-   "d": 0.037,
-   "nnOther": "eravos.fx-eq · Odd · Church Low Cut",
-   "dOther": 0.073
+   "nn": "eravos.fx-eq · Bass Mud Cut",
+   "d": 0.144,
+   "nnOther": "eravos.fx-eq · Bass Mud Cut",
+   "dOther": 0.144
   },
   {
    "tool": "eravos.fx-filter",
    "preset": "Lofi Low",
    "kind": "effect",
    "nn": "eravos.fx-destroyer · Fold Growl",
-   "d": 0.054,
+   "d": 0.066,
    "nnOther": "eravos.fx-destroyer · Fold Growl",
-   "dOther": 0.054
+   "dOther": 0.066
   },
   {
    "tool": "eravos.fx-filter",
    "preset": "Lofi Underwater",
    "kind": "effect",
-   "nn": "eravos.wub-filter · Yoi Yoi (OO → YOI)",
-   "d": 0.064,
-   "nnOther": "eravos.wub-filter · Yoi Yoi (OO → YOI)",
-   "dOther": 0.064
+   "nn": "eravos.fx-filter · Lofi Low",
+   "d": 0.117,
+   "nnOther": "eravos.channel · Drums",
+   "dOther": 0.117
   },
   {
    "tool": "eravos.fx-filter",
    "preset": "Lofi Radio",
    "kind": "effect",
-   "nn": "eravos.fx-filter · 80s · Cassette Lo-cut",
-   "d": 0.037,
+   "nn": "eravos.fx-eq · Odd · Church Low Cut",
+   "d": 0.091,
    "nnOther": "eravos.fx-eq · Odd · Church Low Cut",
-   "dOther": 0.104
+   "dOther": 0.091
   },
   {
    "tool": "eravos.fx-filter",
    "preset": "Odd · Choir Behind Glass",
    "kind": "effect",
-   "nn": "eravos.fx-filter · Lofi Underwater",
-   "d": 0.102,
+   "nn": "eravos.fx-filter · Muffled Intro",
+   "d": 0.091,
    "nnOther": "eravos.wub-filter · Yoi Yoi (OO → YOI)",
-   "dOther": 0.116
+   "dOther": 0.1
   },
   {
    "tool": "eravos.fx-filter",
    "preset": "Odd · Acid Auto-Wah",
    "kind": "effect",
-   "nn": "eravos.fx-filter · Build HP 1/1",
-   "d": 0.149,
-   "nnOther": "eravos.fx-eq · Odd · Church Low Cut",
-   "dOther": 0.184
+   "nn": "eravos.fx-phaser · Dubstep Sweep 1/8",
+   "d": 0.167,
+   "nnOther": "eravos.fx-phaser · Dubstep Sweep 1/8",
+   "dOther": 0.167
   },
   {
    "tool": "eravos.fx-glitch",
@@ -987,10 +978,10 @@
    "tool": "eravos.fx-glitch",
    "preset": "Build Roll",
    "kind": "effect",
-   "nn": "eravos.fx-echo · 80s · Dotted Synthwave Delay",
-   "d": 0.082,
-   "nnOther": "eravos.fx-echo · 80s · Dotted Synthwave Delay",
-   "dOther": 0.082
+   "nn": "eravos.fx-dynamics · Tight Gate",
+   "d": 0,
+   "nnOther": "eravos.fx-dynamics · Tight Gate",
+   "dOther": 0
   },
   {
    "tool": "eravos.fx-glitch",
@@ -1005,19 +996,19 @@
    "tool": "eravos.fx-glitch",
    "preset": "Reverse Tails",
    "kind": "effect",
-   "nn": "eravos.sidechain-compressor · Hard Gate 1/8",
-   "d": 0.018,
-   "nnOther": "eravos.sidechain-compressor · Hard Gate 1/8",
-   "dOther": 0.018
+   "nn": "eravos.fx-dynamics · Tight Gate",
+   "d": 0,
+   "nnOther": "eravos.fx-dynamics · Tight Gate",
+   "dOther": 0
   },
   {
    "tool": "eravos.fx-glitch",
    "preset": "Chaos 50",
    "kind": "effect",
-   "nn": "eravos.sidechain-compressor · Lofi Gentle Pump",
-   "d": 0.017,
-   "nnOther": "eravos.sidechain-compressor · Lofi Gentle Pump",
-   "dOther": 0.017
+   "nn": "eravos.channel · Flat",
+   "d": 0.005,
+   "nnOther": "eravos.channel · Flat",
+   "dOther": 0.005
   },
   {
    "tool": "eravos.fx-glitch",
@@ -1050,225 +1041,225 @@
    "tool": "eravos.fx-haunt",
    "preset": "Chopped & Screwed",
    "kind": "effect",
-   "nn": "eravos.fx-haunt · Reverse Ghost",
-   "d": 0.021,
+   "nn": "eravos.fx-haunt · Odd · Chapel Tape",
+   "d": 0.033,
    "nnOther": "eravos.fx-echo · Slapback",
-   "dOther": 0.08
+   "dOther": 0.105
   },
   {
    "tool": "eravos.fx-haunt",
    "preset": "Haunted Cassette",
    "kind": "effect",
    "nn": "eravos.fx-haunt · Chopped & Screwed",
-   "d": 0.043,
-   "nnOther": "eravos.fx-phaser · Deep 12-stage",
-   "dOther": 0.086
+   "d": 0.045,
+   "nnOther": "eravos.fx-echo · Slapback",
+   "dOther": 0.105
   },
   {
    "tool": "eravos.fx-haunt",
    "preset": "Witch Fog",
    "kind": "effect",
    "nn": "eravos.fx-haunt · Chopped & Screwed",
-   "d": 0.152,
+   "d": 0.136,
    "nnOther": "eravos.fx-phaser · 80s · Small Stone Swirl",
-   "dOther": 0.158
+   "dOther": 0.154
   },
   {
    "tool": "eravos.fx-haunt",
    "preset": "Séance Radio",
    "kind": "effect",
-   "nn": "eravos.fx-haunt · Odd · Séance Phone",
-   "d": 0.125,
-   "nnOther": "eravos.dub-station · Odd · Acid Rewind",
-   "dOther": 0.152
+   "nn": "eravos.fx-haunt · Telephone From Below",
+   "d": 0.13,
+   "nnOther": "eravos.fx-phaser · Dubstep Sweep 1/8",
+   "dOther": 0.179
   },
   {
    "tool": "eravos.fx-haunt",
    "preset": "Reverse Ghost",
    "kind": "effect",
    "nn": "eravos.fx-haunt · Odd · Chapel Tape",
-   "d": 0.019,
+   "d": 0.022,
    "nnOther": "eravos.fx-echo · Slapback",
-   "dOther": 0.092
+   "dOther": 0.128
   },
   {
    "tool": "eravos.fx-haunt",
    "preset": "Telephone From Below",
    "kind": "effect",
    "nn": "eravos.fx-haunt · Séance Radio",
-   "d": 0.15,
-   "nnOther": "eravos.fx-filter · Telephone",
-   "dOther": 0.199
+   "d": 0.13,
+   "nnOther": "eravos.fx-eq · Telephone",
+   "dOther": 0.227
   },
   {
    "tool": "eravos.fx-haunt",
    "preset": "Odd · Chapel Tape",
    "kind": "effect",
    "nn": "eravos.fx-haunt · Reverse Ghost",
-   "d": 0.019,
+   "d": 0.022,
    "nnOther": "eravos.fx-echo · Slapback",
-   "dOther": 0.096
+   "dOther": 0.121
   },
   {
    "tool": "eravos.fx-haunt",
    "preset": "Odd · Séance Phone",
    "kind": "effect",
-   "nn": "eravos.dub-station · Bun Dem (dancehall)",
-   "d": 0.117,
-   "nnOther": "eravos.dub-station · Bun Dem (dancehall)",
-   "dOther": 0.117
+   "nn": "eravos.fx-haunt · Haunted Cassette",
+   "d": 0.134,
+   "nnOther": "eravos.fx-phaser · Deep 12-stage",
+   "dOther": 0.154
   },
   {
    "tool": "eravos.fx-moddelay",
    "preset": "Juno Wide",
    "kind": "effect",
    "nn": "eravos.fx-pitch · Fifth Harmony",
-   "d": 0.081,
+   "d": 0.086,
    "nnOther": "eravos.fx-pitch · Fifth Harmony",
-   "dOther": 0.081
+   "dOther": 0.086
   },
   {
    "tool": "eravos.fx-moddelay",
    "preset": "Slow Shimmer",
    "kind": "effect",
-   "nn": "eravos.fx-eq · Air Lift",
-   "d": 0.016,
-   "nnOther": "eravos.fx-eq · Air Lift",
-   "dOther": 0.016
+   "nn": "eravos.fx-moddelay · Odd · Chapel Chorus",
+   "d": 0.019,
+   "nnOther": "eravos.fx-pitch · Vocal Double (+7 c)",
+   "dOther": 0.028
   },
   {
    "tool": "eravos.fx-moddelay",
    "preset": "Jet Flange",
    "kind": "effect",
-   "nn": "eravos.fx-moddelay · Odd · Steppers Flange",
-   "d": 0.036,
+   "nn": "eravos.fx-moddelay · Tempo Sweep 1/2",
+   "d": 0.08,
    "nnOther": "eravos.fx-phaser · Stereo Spin",
-   "dOther": 0.089
+   "dOther": 0.096
   },
   {
    "tool": "eravos.fx-moddelay",
    "preset": "Metallic Neg",
    "kind": "effect",
    "nn": "eravos.fx-phaser · Stereo Spin",
-   "d": 0.09,
+   "d": 0.078,
    "nnOther": "eravos.fx-phaser · Stereo Spin",
-   "dOther": 0.09
+   "dOther": 0.078
   },
   {
    "tool": "eravos.fx-moddelay",
    "preset": "Tempo Sweep 1/2",
    "kind": "effect",
    "nn": "eravos.fx-moddelay · Odd · Steppers Flange",
-   "d": 0.045,
-   "nnOther": "eravos.fx-phaser · Odd · Wobble Phase",
-   "dOther": 0.067
+   "d": 0.065,
+   "nnOther": "eravos.fx-phaser · Stereo Spin",
+   "dOther": 0.078
   },
   {
    "tool": "eravos.fx-moddelay",
    "preset": "Supersaw Widener",
    "kind": "effect",
-   "nn": "eravos.sidechain-compressor · Lofi Gentle Pump",
-   "d": 0.018,
-   "nnOther": "eravos.sidechain-compressor · Lofi Gentle Pump",
-   "dOther": 0.018
+   "nn": "eravos.fx-moddelay · 80s · Juno Chorus II",
+   "d": 0.026,
+   "nnOther": "eravos.fx-pitch · Vocal Double (+7 c)",
+   "dOther": 0.082
   },
   {
    "tool": "eravos.fx-moddelay",
    "preset": "80s · Juno Chorus II",
    "kind": "effect",
-   "nn": "eravos.channel · Odd · Her Voice (on top)",
+   "nn": "eravos.fx-moddelay · Supersaw Widener",
    "d": 0.026,
-   "nnOther": "eravos.channel · Odd · Her Voice (on top)",
-   "dOther": 0.026
+   "nnOther": "eravos.fx-pitch · Vocal Double (+7 c)",
+   "dOther": 0.078
   },
   {
    "tool": "eravos.fx-moddelay",
    "preset": "80s · Dimension D Wide",
    "kind": "effect",
    "nn": "eravos.fx-dynamics · NY Parallel Smash",
-   "d": 0.035,
+   "d": 0.03,
    "nnOther": "eravos.fx-dynamics · NY Parallel Smash",
-   "dOther": 0.035
+   "dOther": 0.03
   },
   {
    "tool": "eravos.fx-moddelay",
    "preset": "Odd · Chapel Chorus",
    "kind": "effect",
-   "nn": "eravos.sidechain-compressor · Classic 1/4 Pump",
-   "d": 0.009,
+   "nn": "eravos.fx-moddelay · Slow Shimmer",
+   "d": 0.019,
    "nnOther": "eravos.sidechain-compressor · Classic 1/4 Pump",
-   "dOther": 0.009
+   "dOther": 0.027
   },
   {
    "tool": "eravos.fx-moddelay",
    "preset": "Odd · Steppers Flange",
    "kind": "effect",
-   "nn": "eravos.fx-moddelay · Jet Flange",
-   "d": 0.036,
+   "nn": "eravos.fx-moddelay · Tempo Sweep 1/2",
+   "d": 0.065,
    "nnOther": "eravos.fx-phaser · Stereo Spin",
-   "dOther": 0.071
+   "dOther": 0.088
   },
   {
    "tool": "eravos.fx-phaser",
    "preset": "70s Swirl",
    "kind": "effect",
    "nn": "eravos.fx-pitch · Odd · Golden Fifth",
-   "d": 0.06,
+   "d": 0.054,
    "nnOther": "eravos.fx-pitch · Odd · Golden Fifth",
-   "dOther": 0.06
+   "dOther": 0.054
   },
   {
    "tool": "eravos.fx-phaser",
    "preset": "Deep 12-stage",
    "kind": "effect",
    "nn": "eravos.fx-phaser · 80s · Small Stone Swirl",
-   "d": 0.047,
+   "d": 0.048,
    "nnOther": "eravos.fx-echo · Slapback",
-   "dOther": 0.079
+   "dOther": 0.082
   },
   {
    "tool": "eravos.fx-phaser",
    "preset": "Dubstep Sweep 1/8",
    "kind": "effect",
    "nn": "eravos.fx-phaser · Odd · Wobble Phase",
-   "d": 0.01,
-   "nnOther": "eravos.fx-moddelay · Tempo Sweep 1/2",
-   "dOther": 0.07
+   "d": 0.026,
+   "nnOther": "eravos.fx-moddelay · Jet Flange",
+   "dOther": 0.108
   },
   {
    "tool": "eravos.fx-phaser",
    "preset": "Vocal Air",
    "kind": "effect",
    "nn": "eravos.fx-pitch · Odd · Golden Fifth",
-   "d": 0.042,
+   "d": 0.037,
    "nnOther": "eravos.fx-pitch · Odd · Golden Fifth",
-   "dOther": 0.042
+   "dOther": 0.037
   },
   {
    "tool": "eravos.fx-phaser",
    "preset": "Stereo Spin",
    "kind": "effect",
-   "nn": "eravos.fx-moddelay · Tempo Sweep 1/2",
-   "d": 0.069,
-   "nnOther": "eravos.fx-moddelay · Tempo Sweep 1/2",
-   "dOther": 0.069
+   "nn": "eravos.fx-phaser · 80s · Small Stone Swirl",
+   "d": 0.07,
+   "nnOther": "eravos.fx-moddelay · Metallic Neg",
+   "dOther": 0.078
   },
   {
    "tool": "eravos.fx-phaser",
    "preset": "80s · Small Stone Swirl",
    "kind": "effect",
    "nn": "eravos.fx-phaser · Deep 12-stage",
-   "d": 0.047,
+   "d": 0.048,
    "nnOther": "eravos.fx-echo · Slapback",
-   "dOther": 0.079
+   "dOther": 0.071
   },
   {
    "tool": "eravos.fx-phaser",
    "preset": "Odd · Lullaby Phase",
    "kind": "effect",
-   "nn": "eravos.fx-moddelay · Jet Flange",
+   "nn": "eravos.fx-moddelay · Odd · Steppers Flange",
    "d": 0.116,
-   "nnOther": "eravos.fx-moddelay · Jet Flange",
+   "nnOther": "eravos.fx-moddelay · Odd · Steppers Flange",
    "dOther": 0.116
   },
   {
@@ -1276,575 +1267,575 @@
    "preset": "Odd · Wobble Phase",
    "kind": "effect",
    "nn": "eravos.fx-phaser · Dubstep Sweep 1/8",
-   "d": 0.01,
-   "nnOther": "eravos.fx-moddelay · Tempo Sweep 1/2",
-   "dOther": 0.067
+   "d": 0.026,
+   "nnOther": "eravos.fx-moddelay · Jet Flange",
+   "dOther": 0.103
   },
   {
    "tool": "eravos.fx-pitch",
    "preset": "Octave Down Demon",
    "kind": "effect",
    "nn": "eravos.fx-pitch · Screwed (-5 st)",
-   "d": 0.06,
-   "nnOther": "eravos.granular · Glitch Dust",
-   "dOther": 0.099
+   "d": 0.067,
+   "nnOther": "eravos.fx-filter · Wobble 1/8 LP",
+   "dOther": 0.124
   },
   {
    "tool": "eravos.fx-pitch",
    "preset": "Chipmunk",
    "kind": "effect",
-   "nn": "eravos.channel · Odd · Organ Under",
-   "d": 0.076,
-   "nnOther": "eravos.channel · Odd · Organ Under",
-   "dOther": 0.076
+   "nn": "eravos.fx-moddelay · 80s · Juno Chorus II",
+   "d": 0.096,
+   "nnOther": "eravos.fx-moddelay · 80s · Juno Chorus II",
+   "dOther": 0.096
   },
   {
    "tool": "eravos.fx-pitch",
    "preset": "Vocal Double (+7 c)",
    "kind": "effect",
    "nn": "eravos.fx-moddelay · Slow Shimmer",
-   "d": 0.033,
+   "d": 0.028,
    "nnOther": "eravos.fx-moddelay · Slow Shimmer",
-   "dOther": 0.033
+   "dOther": 0.028
   },
   {
    "tool": "eravos.fx-pitch",
    "preset": "Fifth Harmony",
    "kind": "effect",
-   "nn": "eravos.fx-pitch · Thirds Choir",
-   "d": 0.045,
-   "nnOther": "eravos.granular · Stutter 1/8",
-   "dOther": 0.077
+   "nn": "eravos.fx-moddelay · Juno Wide",
+   "d": 0.086,
+   "nnOther": "eravos.fx-moddelay · Juno Wide",
+   "dOther": 0.086
   },
   {
    "tool": "eravos.fx-pitch",
    "preset": "Octave Stack",
    "kind": "effect",
-   "nn": "eravos.fx-glitch · Chaos 50",
-   "d": 0.031,
-   "nnOther": "eravos.fx-glitch · Chaos 50",
-   "dOther": 0.031
+   "nn": "eravos.fx-pitch · Odd · Octave Under the Choir",
+   "d": 0.029,
+   "nnOther": "eravos.fx-moddelay · Supersaw Widener",
+   "dOther": 0.086
   },
   {
    "tool": "eravos.fx-pitch",
    "preset": "Thirds Choir",
    "kind": "effect",
-   "nn": "eravos.granular · Odd · Riddim Grain Stutter",
-   "d": 0.041,
-   "nnOther": "eravos.granular · Odd · Riddim Grain Stutter",
-   "dOther": 0.041
+   "nn": "eravos.fx-moddelay · Juno Wide",
+   "d": 0.094,
+   "nnOther": "eravos.fx-moddelay · Juno Wide",
+   "dOther": 0.094
   },
   {
    "tool": "eravos.fx-pitch",
    "preset": "Screwed (-5 st)",
    "kind": "effect",
    "nn": "eravos.fx-pitch · Odd · Octave Under the Choir",
-   "d": 0.049,
-   "nnOther": "eravos.sidechain-compressor · Half-time 1/2",
-   "dOther": 0.064
+   "d": 0.046,
+   "nnOther": "eravos.fx-moddelay · Supersaw Widener",
+   "dOther": 0.087
   },
   {
    "tool": "eravos.fx-pitch",
    "preset": "Odd · Octave Under the Choir",
    "kind": "effect",
    "nn": "eravos.fx-pitch · Octave Stack",
-   "d": 0.033,
-   "nnOther": "eravos.fx-glitch · Chaos 50",
-   "dOther": 0.044
+   "d": 0.029,
+   "nnOther": "eravos.fx-moddelay · Supersaw Widener",
+   "dOther": 0.091
   },
   {
    "tool": "eravos.fx-pitch",
    "preset": "Odd · Golden Fifth",
    "kind": "effect",
    "nn": "eravos.sidechain-compressor · Classic 1/4 Pump",
-   "d": 0.022,
+   "d": 0.019,
    "nnOther": "eravos.sidechain-compressor · Classic 1/4 Pump",
-   "dOther": 0.022
+   "dOther": 0.019
   },
   {
    "tool": "eravos.fx-squash",
    "preset": "OTT Growl",
    "kind": "effect",
    "nn": "eravos.fx-squash · Odd · Cathedral Squash",
-   "d": 0.01,
+   "d": 0.009,
    "nnOther": "eravos.fx-eq · Odd · Make Room for Her",
-   "dOther": 0.026
+   "dOther": 0.022
   },
   {
    "tool": "eravos.fx-squash",
    "preset": "Riddim Wall",
    "kind": "effect",
    "nn": "eravos.fx-squash · OTT Growl",
-   "d": 0.018,
+   "d": 0.016,
    "nnOther": "eravos.fx-eq · Odd · Make Room for Her",
-   "dOther": 0.027
+   "dOther": 0.024
   },
   {
    "tool": "eravos.fx-squash",
    "preset": "Mids Only",
    "kind": "effect",
    "nn": "eravos.channel · 80s · 80s Snare Room",
-   "d": 0.043,
+   "d": 0.038,
    "nnOther": "eravos.channel · 80s · 80s Snare Room",
-   "dOther": 0.043
+   "dOther": 0.038
   },
   {
    "tool": "eravos.fx-squash",
    "preset": "Parallel Smash",
    "kind": "effect",
    "nn": "eravos.fx-dynamics · Tight Gate",
-   "d": 0.026,
+   "d": 0.022,
    "nnOther": "eravos.fx-dynamics · Tight Gate",
-   "dOther": 0.026
+   "dOther": 0.022
   },
   {
    "tool": "eravos.fx-squash",
    "preset": "Odd · Cathedral Squash",
    "kind": "effect",
    "nn": "eravos.fx-squash · OTT Growl",
-   "d": 0.01,
+   "d": 0.009,
    "nnOther": "eravos.fx-eq · Odd · Make Room for Her",
-   "dOther": 0.029
+   "dOther": 0.025
   },
   {
    "tool": "eravos.tape-memory",
    "preset": "Lofi Cassette",
    "kind": "effect",
-   "nn": "eravos.tape-memory · Lofi Rainy",
-   "d": 0.007,
-   "nnOther": "eravos.fx-haunt · Reverse Ghost",
-   "dOther": 0.173
+   "nn": "eravos.tape-memory · Lofi Study",
+   "d": 0.008,
+   "nnOther": "eravos.fx-haunt · Haunted Cassette",
+   "dOther": 0.16
   },
   {
    "tool": "eravos.tape-memory",
    "preset": "Third Generation Dub",
    "kind": "effect",
    "nn": "eravos.tape-memory · Tracking Error",
-   "d": 0.009,
-   "nnOther": "eravos.fx-haunt · Reverse Ghost",
-   "dOther": 0.178
+   "d": 0.008,
+   "nnOther": "eravos.fx-haunt · Haunted Cassette",
+   "dOther": 0.157
   },
   {
    "tool": "eravos.tape-memory",
    "preset": "Mall Ghost",
    "kind": "effect",
-   "nn": "eravos.tape-memory · Tracking Error",
-   "d": 0.125,
+   "nn": "eravos.fx-echo · Lofi Warm Echo",
+   "d": 0.148,
    "nnOther": "eravos.fx-echo · Lofi Warm Echo",
-   "dOther": 0.168
+   "dOther": 0.148
   },
   {
    "tool": "eravos.tape-memory",
    "preset": "Tracking Error",
    "kind": "effect",
    "nn": "eravos.tape-memory · Third Generation Dub",
-   "d": 0.009,
-   "nnOther": "eravos.fx-haunt · Reverse Ghost",
-   "dOther": 0.175
+   "d": 0.008,
+   "nnOther": "eravos.fx-haunt · Haunted Cassette",
+   "dOther": 0.155
   },
   {
    "tool": "eravos.tape-memory",
    "preset": "Pocket Recorder",
    "kind": "effect",
-   "nn": "eravos.tape-memory · Tracking Error",
-   "d": 0.117,
-   "nnOther": "eravos.fx-haunt · Haunted Cassette",
-   "dOther": 0.196
+   "nn": "eravos.tape-memory · Mall Ghost",
+   "d": 0.176,
+   "nnOther": "eravos.granular · Odd · Choir Grain Halo",
+   "dOther": 0.181
   },
   {
    "tool": "eravos.tape-memory",
    "preset": "Sunbleached Reel",
    "kind": "effect",
    "nn": "eravos.tape-memory · Odd · Steppers Cassette",
-   "d": 0.02,
-   "nnOther": "eravos.fx-haunt · Reverse Ghost",
-   "dOther": 0.18
+   "d": 0.017,
+   "nnOther": "eravos.fx-haunt · Haunted Cassette",
+   "dOther": 0.165
   },
   {
    "tool": "eravos.tape-memory",
    "preset": "Lofi Study",
    "kind": "effect",
    "nn": "eravos.tape-memory · Lofi Cassette",
-   "d": 0.009,
-   "nnOther": "eravos.fx-haunt · Reverse Ghost",
-   "dOther": 0.173
+   "d": 0.008,
+   "nnOther": "eravos.fx-haunt · Haunted Cassette",
+   "dOther": 0.16
   },
   {
    "tool": "eravos.tape-memory",
    "preset": "Lofi Rainy",
    "kind": "effect",
-   "nn": "eravos.tape-memory · Lofi Cassette",
-   "d": 0.007,
-   "nnOther": "eravos.fx-haunt · Reverse Ghost",
-   "dOther": 0.174
+   "nn": "eravos.tape-memory · Third Generation Dub",
+   "d": 0.009,
+   "nnOther": "eravos.fx-haunt · Haunted Cassette",
+   "dOther": 0.154
   },
   {
    "tool": "eravos.tape-memory",
    "preset": "Lofi Late Night",
    "kind": "effect",
    "nn": "eravos.tape-memory · Lofi Study",
-   "d": 0.015,
-   "nnOther": "eravos.fx-haunt · Reverse Ghost",
-   "dOther": 0.169
+   "d": 0.013,
+   "nnOther": "eravos.fx-haunt · Haunted Cassette",
+   "dOther": 0.156
   },
   {
    "tool": "eravos.tape-memory",
    "preset": "Odd · Steppers Cassette",
    "kind": "effect",
    "nn": "eravos.tape-memory · Lofi Study",
-   "d": 0.015,
-   "nnOther": "eravos.fx-haunt · Reverse Ghost",
-   "dOther": 0.176
+   "d": 0.013,
+   "nnOther": "eravos.fx-haunt · Haunted Cassette",
+   "dOther": 0.162
   },
   {
    "tool": "eravos.embodiment-lab",
    "preset": "Feelings · Grounded",
    "kind": "sound",
    "nn": "eravos.embodiment-lab · Feelings · Safe",
-   "d": 0.015,
+   "d": 0.013,
    "nnOther": "eravos.organ · Pedal Drone",
-   "dOther": 0.125
+   "dOther": 0.111
   },
   {
    "tool": "eravos.embodiment-lab",
    "preset": "Feelings · Held",
    "kind": "sound",
    "nn": "eravos.embodiment-lab · Odd · Hold Her Voice",
-   "d": 0.055,
+   "d": 0.052,
    "nnOther": "eravos.reese-bass · Wide Rumble",
-   "dOther": 0.075
+   "dOther": 0.107
   },
   {
    "tool": "eravos.embodiment-lab",
    "preset": "Feelings · Heavy Heart",
    "kind": "sound",
-   "nn": "eravos.reese-bass · Wide Rumble",
-   "d": 0.081,
+   "nn": "eravos.embodiment-lab · Feelings · Held",
+   "d": 0.079,
    "nnOther": "eravos.reese-bass · Wide Rumble",
-   "dOther": 0.081
+   "dOther": 0.09
   },
   {
    "tool": "eravos.embodiment-lab",
    "preset": "Feelings · Ache",
    "kind": "sound",
    "nn": "eravos.embodiment-lab · Feelings · Grounded",
-   "d": 0.081,
+   "d": 0.072,
    "nnOther": "eravos.organ · Pedal Drone",
-   "dOther": 0.123
+   "dOther": 0.113
   },
   {
    "tool": "eravos.embodiment-lab",
    "preset": "Feelings · Longing",
    "kind": "sound",
    "nn": "eravos.embodiment-lab · Feelings · Ache",
-   "d": 0.107,
+   "d": 0.095,
    "nnOther": "eravos.organ · Pedal Drone",
-   "dOther": 0.168
+   "dOther": 0.148
   },
   {
    "tool": "eravos.embodiment-lab",
    "preset": "Feelings · Wonder",
    "kind": "sound",
    "nn": "eravos.embodiment-lab · Feelings · Grounded",
-   "d": 0.076,
+   "d": 0.066,
    "nnOther": "eravos.organ · Pedal Drone",
-   "dOther": 0.12
+   "dOther": 0.106
   },
   {
    "tool": "eravos.embodiment-lab",
    "preset": "Feelings · Release",
    "kind": "sound",
    "nn": "eravos.embodiment-lab · Feelings · Grounded",
-   "d": 0.056,
+   "d": 0.051,
    "nnOther": "eravos.organ · Pedal Drone",
-   "dOther": 0.114
+   "dOther": 0.106
   },
   {
    "tool": "eravos.embodiment-lab",
    "preset": "Feelings · Awake",
    "kind": "sound",
    "nn": "eravos.embodiment-lab · Odd · Breathing Drum & Bass",
-   "d": 0.011,
+   "d": 0.01,
    "nnOther": "eravos.organ · Pedal Drone",
-   "dOther": 0.133
+   "dOther": 0.128
   },
   {
    "tool": "eravos.embodiment-lab",
    "preset": "Feelings · Safe",
    "kind": "sound",
    "nn": "eravos.embodiment-lab · Feelings · Grounded",
-   "d": 0.015,
+   "d": 0.013,
    "nnOther": "eravos.organ · Pedal Drone",
-   "dOther": 0.134
+   "dOther": 0.118
   },
   {
    "tool": "eravos.embodiment-lab",
    "preset": "Feelings · Calm Fire",
    "kind": "sound",
-   "nn": "eravos.embodiment-lab · Feelings · Hanging Tree",
-   "d": 0.083,
+   "nn": "eravos.organ · Pedal Drone",
+   "d": 0.089,
    "nnOther": "eravos.organ · Pedal Drone",
-   "dOther": 0.1
+   "dOther": 0.089
   },
   {
    "tool": "eravos.embodiment-lab",
    "preset": "Feelings · Hanging Tree",
    "kind": "sound",
-   "nn": "eravos.embodiment-lab · Feelings · Calm Fire",
-   "d": 0.083,
+   "nn": "eravos.embodiment-lab · Feelings · Awake",
+   "d": 0.1,
    "nnOther": "eravos.organ · Pedal Drone",
-   "dOther": 0.119
+   "dOther": 0.115
   },
   {
    "tool": "eravos.embodiment-lab",
    "preset": "Odd · Breathing Drum & Bass",
    "kind": "sound",
    "nn": "eravos.embodiment-lab · Feelings · Awake",
-   "d": 0.011,
+   "d": 0.01,
    "nnOther": "eravos.organ · Pedal Drone",
-   "dOther": 0.136
+   "dOther": 0.131
   },
   {
    "tool": "eravos.embodiment-lab",
    "preset": "Odd · Hold Her Voice",
    "kind": "sound",
    "nn": "eravos.embodiment-lab · Feelings · Held",
-   "d": 0.055,
-   "nnOther": "eravos.reese-bass · Wide Rumble",
-   "dOther": 0.109
+   "d": 0.052,
+   "nnOther": "eravos.xen-synth · π Drone",
+   "dOther": 0.126
   },
   {
    "tool": "eravos.coven",
    "preset": "Witch House Choir",
    "kind": "sound",
-   "nn": "eravos.coven · Odd · Dancehall Coven",
-   "d": 0.039,
-   "nnOther": "eravos.organ · Hanging Tree",
-   "dOther": 0.057
+   "nn": "eravos.coven · Odd · Séance Over 303",
+   "d": 0.048,
+   "nnOther": "eravos.swarm-oscillator · Choir Drift",
+   "dOther": 0.102
   },
   {
    "tool": "eravos.coven",
    "preset": "Hex Drone",
    "kind": "sound",
-   "nn": "eravos.retro-poly · Synthwave Bass (arp)",
-   "d": 0.052,
-   "nnOther": "eravos.retro-poly · Synthwave Bass (arp)",
-   "dOther": 0.052
+   "nn": "eravos.organ · Lanegan Drone",
+   "d": 0.069,
+   "nnOther": "eravos.organ · Lanegan Drone",
+   "dOther": 0.069
   },
   {
    "tool": "eravos.coven",
    "preset": "Séance Pad",
    "kind": "sound",
    "nn": "eravos.coven · Odd · Séance Over 303",
-   "d": 0.058,
+   "d": 0.061,
    "nnOther": "eravos.retro-dco · VHS Dreams",
-   "dOther": 0.065
+   "dOther": 0.079
   },
   {
    "tool": "eravos.coven",
    "preset": "Ritual Bell",
    "kind": "sound",
-   "nn": "eravos.swarm-oscillator · Locked Unison",
-   "d": 0.113,
-   "nnOther": "eravos.swarm-oscillator · Locked Unison",
-   "dOther": 0.113
+   "nn": "eravos.organ · Odd · Cathedral Riddim Organ",
+   "d": 0.126,
+   "nnOther": "eravos.organ · Odd · Cathedral Riddim Organ",
+   "dOther": 0.126
   },
   {
    "tool": "eravos.coven",
    "preset": "Static Ghost",
    "kind": "sound",
-   "nn": "eravos.organ · Vampire Ballroom",
-   "d": 0.084,
-   "nnOther": "eravos.organ · Vampire Ballroom",
-   "dOther": 0.084
+   "nn": "eravos.coven · Séance Pad",
+   "d": 0.074,
+   "nnOther": "eravos.retro-dco · VHS Dreams",
+   "dOther": 0.103
   },
   {
    "tool": "eravos.coven",
    "preset": "Graveyard Chant (screwed)",
    "kind": "sound",
-   "nn": "eravos.coven · Odd · Riddim Requiem",
-   "d": 0.047,
+   "nn": "eravos.organ · Hanging Tree",
+   "d": 0.073,
    "nnOther": "eravos.organ · Hanging Tree",
-   "dOther": 0.072
+   "dOther": 0.073
   },
   {
    "tool": "eravos.coven",
    "preset": "Crystal Coven",
    "kind": "sound",
    "nn": "eravos.retro-dco · Five-Voice Brass Swell",
-   "d": 0.077,
+   "d": 0.067,
    "nnOther": "eravos.retro-dco · Five-Voice Brass Swell",
-   "dOther": 0.077
+   "dOther": 0.067
   },
   {
    "tool": "eravos.coven",
    "preset": "Odd · Séance Over 303",
    "kind": "sound",
    "nn": "eravos.coven · Witch House Choir",
-   "d": 0.043,
-   "nnOther": "eravos.organ · Hanging Tree",
-   "dOther": 0.066
+   "d": 0.048,
+   "nnOther": "eravos.retro-dco · VHS Dreams",
+   "dOther": 0.085
   },
   {
    "tool": "eravos.coven",
    "preset": "Odd · Dancehall Coven",
    "kind": "sound",
-   "nn": "eravos.coven · Witch House Choir",
-   "d": 0.039,
-   "nnOther": "eravos.organ · Hanging Tree",
-   "dOther": 0.072
+   "nn": "eravos.coven · Odd · Riddim Requiem",
+   "d": 0.06,
+   "nnOther": "eravos.retro-dco · Voice-Card Motion",
+   "dOther": 0.085
   },
   {
    "tool": "eravos.coven",
    "preset": "Odd · Riddim Requiem",
    "kind": "sound",
-   "nn": "eravos.coven · Graveyard Chant (screwed)",
-   "d": 0.047,
-   "nnOther": "eravos.retro-poly · Synthwave Bass (arp)",
-   "dOther": 0.085
+   "nn": "eravos.coven · Odd · Dancehall Coven",
+   "d": 0.06,
+   "nnOther": "eravos.organ · Funeral Pulse",
+   "dOther": 0.077
   },
   {
    "tool": "eravos.coven",
    "preset": "Odd · Golden Ghost Choir",
    "kind": "sound",
-   "nn": "eravos.swarm-oscillator · Loose Constellation",
-   "d": 0.19,
-   "nnOther": "eravos.swarm-oscillator · Loose Constellation",
-   "dOther": 0.19
+   "nn": "eravos.embodiment-lab · Odd · Breathing Drum & Bass",
+   "d": 0.175,
+   "nnOther": "eravos.embodiment-lab · Odd · Breathing Drum & Bass",
+   "dOther": 0.175
   },
   {
    "tool": "eravos.dub-station",
    "preset": "Bun Dem (dancehall)",
    "kind": "effect",
    "nn": "eravos.dub-station · Roots One Drop",
-   "d": 0.024,
+   "d": 0.02,
    "nnOther": "eravos.fx-echo · Lofi Warm Echo",
-   "dOther": 0.102
+   "dOther": 0.089
   },
   {
    "tool": "eravos.dub-station",
    "preset": "Roots One Drop",
    "kind": "effect",
    "nn": "eravos.dub-station · Odd · Golden Ratio Siren",
-   "d": 0.01,
+   "d": 0.008,
    "nnOther": "eravos.fx-echo · Lofi Warm Echo",
-   "dOther": 0.097
+   "dOther": 0.084
   },
   {
    "tool": "eravos.dub-station",
    "preset": "Organ Bubble",
    "kind": "effect",
    "nn": "eravos.dub-station · Odd · Lullaby Dub",
-   "d": 0.031,
-   "nnOther": "eravos.fx-echo · Lofi Warm Echo",
-   "dOther": 0.047
+   "d": 0.027,
+   "nnOther": "eravos.fx-echo · 80s · Gated Slap '84",
+   "dOther": 0.062
   },
   {
    "tool": "eravos.dub-station",
    "preset": "Tubby Echo Chamber",
    "kind": "effect",
-   "nn": "eravos.dub-station · Odd · Cathedral Sound System",
-   "d": 0.032,
+   "nn": "eravos.dub-station · Sound System Siren",
+   "d": 0.034,
    "nnOther": "eravos.fx-echo · Lofi Warm Echo",
-   "dOther": 0.083
+   "dOther": 0.072
   },
   {
    "tool": "eravos.dub-station",
    "preset": "Sound System Siren",
    "kind": "effect",
    "nn": "eravos.dub-station · Odd · Golden Ratio Siren",
-   "d": 0.011,
+   "d": 0.01,
    "nnOther": "eravos.fx-echo · Lofi Warm Echo",
-   "dOther": 0.099
+   "dOther": 0.086
   },
   {
    "tool": "eravos.dub-station",
    "preset": "Steppers Dub",
    "kind": "effect",
    "nn": "eravos.dub-station · Roots One Drop",
-   "d": 0.029,
+   "d": 0.025,
    "nnOther": "eravos.fx-echo · Lofi Warm Echo",
-   "dOther": 0.119
+   "dOther": 0.103
   },
   {
    "tool": "eravos.dub-station",
    "preset": "Odd · Cathedral Sound System",
    "kind": "effect",
    "nn": "eravos.dub-station · Odd · Lullaby Dub",
-   "d": 0.02,
-   "nnOther": "eravos.fx-echo · Lofi Warm Echo",
-   "dOther": 0.058
+   "d": 0.017,
+   "nnOther": "eravos.fx-echo · 80s · Gated Slap '84",
+   "dOther": 0.062
   },
   {
    "tool": "eravos.dub-station",
    "preset": "Odd · Golden Ratio Siren",
    "kind": "effect",
    "nn": "eravos.dub-station · Roots One Drop",
-   "d": 0.01,
+   "d": 0.008,
    "nnOther": "eravos.fx-echo · Lofi Warm Echo",
-   "dOther": 0.097
+   "dOther": 0.084
   },
   {
    "tool": "eravos.dub-station",
    "preset": "Odd · Synthwave Steppers",
    "kind": "effect",
    "nn": "eravos.dub-station · Bun Dem (dancehall)",
-   "d": 0.031,
-   "nnOther": "eravos.fx-haunt · Odd · Séance Phone",
-   "dOther": 0.12
+   "d": 0.026,
+   "nnOther": "eravos.fx-echo · Lofi Warm Echo",
+   "dOther": 0.105
   },
   {
    "tool": "eravos.dub-station",
    "preset": "Odd · Acid Rewind",
    "kind": "effect",
    "nn": "eravos.dub-station · Sound System Siren",
-   "d": 0.091,
-   "nnOther": "eravos.fx-haunt · Odd · Séance Phone",
-   "dOther": 0.133
+   "d": 0.078,
+   "nnOther": "eravos.fx-echo · Lofi Warm Echo",
+   "dOther": 0.116
   },
   {
    "tool": "eravos.dub-station",
    "preset": "Odd · Lullaby Dub",
    "kind": "effect",
    "nn": "eravos.dub-station · Odd · Cathedral Sound System",
-   "d": 0.02,
-   "nnOther": "eravos.fx-echo · Lofi Warm Echo",
-   "dOther": 0.05
+   "d": 0.017,
+   "nnOther": "eravos.fx-echo · 80s · Gated Slap '84",
+   "dOther": 0.059
   },
   {
    "tool": "eravos.organ",
    "preset": "Hanging Tree",
    "kind": "sound",
-   "nn": "eravos.coven · Witch House Choir",
-   "d": 0.057,
-   "nnOther": "eravos.coven · Witch House Choir",
-   "dOther": 0.057
+   "nn": "eravos.coven · Graveyard Chant (screwed)",
+   "d": 0.073,
+   "nnOther": "eravos.coven · Graveyard Chant (screwed)",
+   "dOther": 0.073
   },
   {
    "tool": "eravos.organ",
    "preset": "Lanegan Drone",
    "kind": "sound",
-   "nn": "eravos.organ · Odd · Funeral Dancehall",
-   "d": 0.055,
-   "nnOther": "eravos.retro-poly · 80s · Miami Night Bass",
-   "dOther": 0.071
+   "nn": "eravos.coven · Hex Drone",
+   "d": 0.069,
+   "nnOther": "eravos.coven · Hex Drone",
+   "dOther": 0.069
   },
   {
    "tool": "eravos.organ",
    "preset": "Fuzz Rotor (fast)",
    "kind": "sound",
    "nn": "eravos.organ · Eerie Celeste",
-   "d": 0.06,
-   "nnOther": "eravos.xen-synth · Bohlen–Pierce Clarinet",
-   "dOther": 0.1
+   "d": 0.055,
+   "nnOther": "eravos.retro-poly · Lofi Felt Keys",
+   "dOther": 0.09
   },
   {
    "tool": "eravos.organ",
    "preset": "Funeral Pulse",
    "kind": "sound",
    "nn": "eravos.organ · Odd · Funeral Dancehall",
-   "d": 0.037,
-   "nnOther": "eravos.retro-poly · Synthwave Bass (arp)",
+   "d": 0.063,
+   "nnOther": "eravos.coven · Odd · Riddim Requiem",
    "dOther": 0.077
   },
   {
@@ -1852,333 +1843,333 @@
    "preset": "Stoner Doom",
    "kind": "sound",
    "nn": "eravos.organ · Odd · Organ Into Wobble",
-   "d": 0.046,
-   "nnOther": "eravos.acid-synth · Rolling Bassline",
-   "dOther": 0.089
+   "d": 0.042,
+   "nnOther": "eravos.xen-synth · Prime Ghost (otonal)",
+   "dOther": 0.093
   },
   {
    "tool": "eravos.organ",
    "preset": "Vampire Ballroom",
    "kind": "sound",
-   "nn": "eravos.coven · Static Ghost",
-   "d": 0.084,
+   "nn": "eravos.organ · Hanging Tree",
+   "d": 0.11,
    "nnOther": "eravos.coven · Static Ghost",
-   "dOther": 0.084
+   "dOther": 0.121
   },
   {
    "tool": "eravos.organ",
    "preset": "Breathing Crypt",
    "kind": "sound",
    "nn": "eravos.organ · Lanegan Drone",
-   "d": 0.058,
-   "nnOther": "eravos.reese-bass · Odd · Golden Reese",
-   "dOther": 0.072
+   "d": 0.079,
+   "nnOther": "eravos.embodiment-lab · Feelings · Heavy Heart",
+   "dOther": 0.117
   },
   {
    "tool": "eravos.organ",
    "preset": "Cathedral Full",
    "kind": "sound",
    "nn": "eravos.organ · Odd · Cathedral Riddim Organ",
-   "d": 0.085,
-   "nnOther": "eravos.coven · Static Ghost",
-   "dOther": 0.088
+   "d": 0.077,
+   "nnOther": "eravos.retro-dco · String Machine",
+   "dOther": 0.107
   },
   {
    "tool": "eravos.organ",
    "preset": "Flute 8'",
    "kind": "sound",
-   "nn": "eravos.xen-synth · Odd · 19-EDO Wobble Lead",
-   "d": 0.155,
-   "nnOther": "eravos.xen-synth · Odd · 19-EDO Wobble Lead",
-   "dOther": 0.155
+   "nn": "eravos.xen-synth · Partch Diamond Strings",
+   "d": 0.147,
+   "nnOther": "eravos.xen-synth · Partch Diamond Strings",
+   "dOther": 0.147
   },
   {
    "tool": "eravos.organ",
    "preset": "Eerie Celeste",
    "kind": "sound",
    "nn": "eravos.organ · Fuzz Rotor (fast)",
-   "d": 0.06,
+   "d": 0.055,
    "nnOther": "eravos.retro-poly · Lofi Felt Keys",
-   "dOther": 0.075
+   "dOther": 0.065
   },
   {
    "tool": "eravos.organ",
    "preset": "Pedal Drone",
    "kind": "sound",
    "nn": "eravos.embodiment-lab · Feelings · Calm Fire",
-   "d": 0.1,
+   "d": 0.089,
    "nnOther": "eravos.embodiment-lab · Feelings · Calm Fire",
-   "dOther": 0.1
+   "dOther": 0.089
   },
   {
    "tool": "eravos.organ",
    "preset": "Gothic Chord Funeral",
    "kind": "sound",
-   "nn": "eravos.retro-poly · Synthwave Bass (arp)",
-   "d": 0.097,
-   "nnOther": "eravos.retro-poly · Synthwave Bass (arp)",
-   "dOther": 0.097
+   "nn": "eravos.recursive-spectra · Stretching Organ",
+   "d": 0.09,
+   "nnOther": "eravos.recursive-spectra · Stretching Organ",
+   "dOther": 0.09
   },
   {
    "tool": "eravos.organ",
    "preset": "Desert Gospel",
    "kind": "sound",
    "nn": "eravos.organ · Odd · Dub Bubble Hammond",
-   "d": 0.015,
-   "nnOther": "eravos.xen-synth · Bohlen–Pierce Clarinet",
-   "dOther": 0.085
+   "d": 0.025,
+   "nnOther": "eravos.retro-poly · Lofi Felt Keys",
+   "dOther": 0.096
   },
   {
    "tool": "eravos.organ",
    "preset": "80s · Cathedral Synth-Pop",
    "kind": "sound",
    "nn": "eravos.organ · Odd · Synthwave Chapel",
-   "d": 0.012,
-   "nnOther": "eravos.retro-dco · String Machine",
-   "dOther": 0.079
+   "d": 0.011,
+   "nnOther": "eravos.xen-synth · Prime Ghost (otonal)",
+   "dOther": 0.081
   },
   {
    "tool": "eravos.organ",
    "preset": "Odd · Cathedral Riddim Organ",
    "kind": "sound",
    "nn": "eravos.organ · Cathedral Full",
-   "d": 0.085,
-   "nnOther": "eravos.retro-dco · Five-Voice Brass Swell",
-   "dOther": 0.106
+   "d": 0.077,
+   "nnOther": "eravos.swarm-oscillator · Shatter Bloom",
+   "dOther": 0.101
   },
   {
    "tool": "eravos.organ",
    "preset": "Odd · Dub Bubble Hammond",
    "kind": "sound",
    "nn": "eravos.organ · Desert Gospel",
-   "d": 0.015,
-   "nnOther": "eravos.xen-synth · Bohlen–Pierce Clarinet",
-   "dOther": 0.077
+   "d": 0.025,
+   "nnOther": "eravos.retro-poly · Lofi Felt Keys",
+   "dOther": 0.096
   },
   {
    "tool": "eravos.organ",
    "preset": "Odd · Funeral Dancehall",
    "kind": "sound",
    "nn": "eravos.organ · Funeral Pulse",
-   "d": 0.037,
-   "nnOther": "eravos.coven · Hex Drone",
-   "dOther": 0.06
+   "d": 0.063,
+   "nnOther": "eravos.coven · Odd · Riddim Requiem",
+   "dOther": 0.086
   },
   {
    "tool": "eravos.organ",
    "preset": "Odd · Organ Into Wobble",
    "kind": "sound",
    "nn": "eravos.organ · Stoner Doom",
-   "d": 0.046,
-   "nnOther": "eravos.acid-synth · Rolling Bassline",
-   "dOther": 0.095
+   "d": 0.042,
+   "nnOther": "eravos.xen-synth · Prime Ghost (otonal)",
+   "dOther": 0.091
   },
   {
    "tool": "eravos.organ",
    "preset": "Odd · Synthwave Chapel",
    "kind": "sound",
    "nn": "eravos.organ · 80s · Cathedral Synth-Pop",
-   "d": 0.012,
-   "nnOther": "eravos.retro-dco · Five-Voice Brass Swell",
-   "dOther": 0.086
+   "d": 0.011,
+   "nnOther": "eravos.xen-synth · Prime Ghost (otonal)",
+   "dOther": 0.084
   },
   {
    "tool": "eravos.retro-dco",
    "preset": "Outrun Lead",
    "kind": "sound",
-   "nn": "eravos.acid-synth · Phuture Squelch",
-   "d": 0.056,
-   "nnOther": "eravos.acid-synth · Phuture Squelch",
-   "dOther": 0.056
+   "nn": "eravos.retro-dco · Odd · Steppers Juno Cards",
+   "d": 0.06,
+   "nnOther": "eravos.retro-poly · Darksynth Saw",
+   "dOther": 0.082
   },
   {
    "tool": "eravos.retro-dco",
    "preset": "Chorus Glass Poly",
    "kind": "sound",
    "nn": "eravos.retro-dco · String Machine",
-   "d": 0.019,
-   "nnOther": "eravos.coven · Séance Pad",
-   "dOther": 0.071
+   "d": 0.021,
+   "nnOther": "eravos.organ · 80s · Cathedral Synth-Pop",
+   "dOther": 0.099
   },
   {
    "tool": "eravos.retro-dco",
    "preset": "Five-Voice Brass Swell",
    "kind": "sound",
    "nn": "eravos.retro-dco · Voice-Card Motion",
-   "d": 0.062,
+   "d": 0.061,
    "nnOther": "eravos.coven · Crystal Coven",
-   "dOther": 0.077
+   "dOther": 0.067
   },
   {
    "tool": "eravos.retro-dco",
    "preset": "Voice-Card Motion",
    "kind": "sound",
-   "nn": "eravos.retro-dco · String Machine",
-   "d": 0.042,
-   "nnOther": "eravos.coven · Séance Pad",
-   "dOther": 0.066
+   "nn": "eravos.retro-dco · Five-Voice Brass Swell",
+   "d": 0.061,
+   "nnOther": "eravos.coven · Odd · Dancehall Coven",
+   "dOther": 0.085
   },
   {
    "tool": "eravos.retro-dco",
    "preset": "VHS Dreams",
    "kind": "sound",
-   "nn": "eravos.retro-dco · Chorus Glass Poly",
-   "d": 0.061,
+   "nn": "eravos.coven · Séance Pad",
+   "d": 0.079,
    "nnOther": "eravos.coven · Séance Pad",
-   "dOther": 0.065
+   "dOther": 0.079
   },
   {
    "tool": "eravos.retro-dco",
    "preset": "Arcade Pulse",
    "kind": "sound",
    "nn": "eravos.supersaw · Trance Pluck",
-   "d": 0.091,
+   "d": 0.163,
    "nnOther": "eravos.supersaw · Trance Pluck",
-   "dOther": 0.091
+   "dOther": 0.163
   },
   {
    "tool": "eravos.retro-dco",
    "preset": "Analog Machine Bass",
    "kind": "sound",
    "nn": "eravos.retro-dco · Sub Growl",
-   "d": 0.101,
-   "nnOther": "eravos.wub-osc · FM Growl 1:1",
+   "d": 0.102,
+   "nnOther": "eravos.reese-bass · 80s · Tron Grid Bass",
    "dOther": 0.126
   },
   {
    "tool": "eravos.retro-dco",
    "preset": "Coldwave Lead",
    "kind": "sound",
-   "nn": "eravos.acid-synth · Odd · Séance Squelch",
-   "d": 0.087,
-   "nnOther": "eravos.acid-synth · Odd · Séance Squelch",
-   "dOther": 0.087
+   "nn": "eravos.acid-synth · Odd · Dancehall Acid Stab",
+   "d": 0.094,
+   "nnOther": "eravos.acid-synth · Odd · Dancehall Acid Stab",
+   "dOther": 0.094
   },
   {
    "tool": "eravos.retro-dco",
    "preset": "Neon Noir Stab",
    "kind": "sound",
    "nn": "eravos.syn-osc · Pluck",
-   "d": 0.395,
+   "d": 0.35,
    "nnOther": "eravos.syn-osc · Pluck",
-   "dOther": 0.395
+   "dOther": 0.35
   },
   {
    "tool": "eravos.retro-dco",
    "preset": "Sync Sweep",
    "kind": "sound",
    "nn": "eravos.supersaw · Future Bass Chords (7th)",
-   "d": 0.116,
+   "d": 0.106,
    "nnOther": "eravos.supersaw · Future Bass Chords (7th)",
-   "dOther": 0.116
+   "dOther": 0.106
   },
   {
    "tool": "eravos.retro-dco",
    "preset": "Sub Growl",
    "kind": "sound",
-   "nn": "eravos.acid-synth · Club · Minimal Pluck Bass",
-   "d": 0.069,
-   "nnOther": "eravos.acid-synth · Club · Minimal Pluck Bass",
-   "dOther": 0.069
+   "nn": "eravos.wub-osc · FM Growl 1:1",
+   "d": 0.091,
+   "nnOther": "eravos.wub-osc · FM Growl 1:1",
+   "dOther": 0.091
   },
   {
    "tool": "eravos.retro-dco",
    "preset": "String Machine",
    "kind": "sound",
    "nn": "eravos.retro-dco · Chorus Glass Poly",
-   "d": 0.019,
-   "nnOther": "eravos.coven · Séance Pad",
-   "dOther": 0.071
+   "d": 0.021,
+   "nnOther": "eravos.organ · 80s · Cathedral Synth-Pop",
+   "dOther": 0.098
   },
   {
    "tool": "eravos.retro-dco",
    "preset": "Odd · Steppers Juno Cards",
    "kind": "sound",
-   "nn": "eravos.acid-synth · Phuture Squelch",
-   "d": 0.067,
-   "nnOther": "eravos.acid-synth · Phuture Squelch",
-   "dOther": 0.067
+   "nn": "eravos.retro-dco · Outrun Lead",
+   "d": 0.06,
+   "nnOther": "eravos.retro-poly · Lofi Keys",
+   "dOther": 0.07
   },
   {
    "tool": "eravos.retro-dco",
    "preset": "Odd · Chapel Ladder Pad",
    "kind": "sound",
-   "nn": "eravos.retro-dco · Chorus Glass Poly",
-   "d": 0.049,
+   "nn": "eravos.coven · Séance Pad",
+   "d": 0.081,
    "nnOther": "eravos.coven · Séance Pad",
-   "dOther": 0.076
+   "dOther": 0.081
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "Outrun Lead",
    "kind": "sound",
-   "nn": "eravos.retro-poly · EDM Pad · Neon Glow Pad",
-   "d": 0.051,
+   "nn": "eravos.retro-poly · 80s · Neon Sync Lead",
+   "d": 0.06,
    "nnOther": "eravos.supersaw · EDM Pad · Trance Supersaw Pad",
-   "dOther": 0.072
+   "dOther": 0.068
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "Nightdrive Pad",
    "kind": "sound",
    "nn": "eravos.retro-poly · EDM Pad · Ambient Drift Pad",
-   "d": 0.026,
-   "nnOther": "eravos.supersaw · EDM Pad · Dreamy Detuned Bed",
-   "dOther": 0.069
+   "d": 0.024,
+   "nnOther": "eravos.supersaw · Odd · Acid Church Pad",
+   "dOther": 0.08
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "Brass Stab '84",
    "kind": "sound",
    "nn": "eravos.retro-poly · Neon Keys",
-   "d": 0.034,
+   "d": 0.031,
    "nnOther": "eravos.supersaw · EDM Pad · Festival Chord Wall",
-   "dOther": 0.092
+   "dOther": 0.082
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "String Machine",
    "kind": "sound",
    "nn": "eravos.retro-poly · 80s · Jupiter Strings",
-   "d": 0.081,
+   "d": 0.071,
    "nnOther": "eravos.supersaw · EDM Pad · Plucky Pad Stab",
-   "dOther": 0.097
+   "dOther": 0.084
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "Synthwave Bass (arp)",
    "kind": "sound",
    "nn": "eravos.retro-poly · 80s · Miami Night Bass",
-   "d": 0.027,
-   "nnOther": "eravos.coven · Hex Drone",
-   "dOther": 0.052
+   "d": 0.023,
+   "nnOther": "eravos.coven · Odd · Séance Over 303",
+   "dOther": 0.089
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "Darksynth Saw",
    "kind": "sound",
-   "nn": "eravos.bass-forge · Odd · Golden Dub Growl",
-   "d": 0.074,
-   "nnOther": "eravos.bass-forge · Odd · Golden Dub Growl",
-   "dOther": 0.074
+   "nn": "eravos.retro-dco · Outrun Lead",
+   "d": 0.082,
+   "nnOther": "eravos.retro-dco · Outrun Lead",
+   "dOther": 0.082
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "Neon Keys",
    "kind": "sound",
    "nn": "eravos.retro-poly · EDM Pad · Midnight Brass Pad",
-   "d": 0.034,
+   "d": 0.03,
    "nnOther": "eravos.supersaw · EDM Pad · Festival Chord Wall",
-   "dOther": 0.089
+   "dOther": 0.078
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "80s · Juno Brass Swell",
    "kind": "sound",
    "nn": "eravos.retro-poly · Outrun Lead",
-   "d": 0.088,
-   "nnOther": "eravos.sample-player · Reverse swell",
-   "dOther": 0.091
+   "d": 0.086,
+   "nnOther": "eravos.supersaw · EDM Pad · Trance Supersaw Pad",
+   "dOther": 0.107
   },
   {
    "tool": "eravos.retro-poly",
@@ -2187,43 +2178,43 @@
    "nn": "eravos.retro-poly · EDM Pad · Chillwave Juno Wash",
    "d": 0.023,
    "nnOther": "eravos.supersaw · Chord Stab (triad)",
-   "dOther": 0.113
+   "dOther": 0.099
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "80s · Miami Night Bass",
    "kind": "sound",
    "nn": "eravos.retro-poly · Synthwave Bass (arp)",
-   "d": 0.027,
-   "nnOther": "eravos.coven · Hex Drone",
-   "dOther": 0.065
+   "d": 0.023,
+   "nnOther": "eravos.coven · Odd · Séance Over 303",
+   "dOther": 0.103
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "80s · Neon Sync Lead",
    "kind": "sound",
-   "nn": "eravos.retro-poly · Odd · Steppers Brass",
-   "d": 0.055,
+   "nn": "eravos.retro-poly · Outrun Lead",
+   "d": 0.06,
    "nnOther": "eravos.supersaw · EDM Pad · Trance Supersaw Pad",
-   "dOther": 0.091
+   "dOther": 0.082
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "80s · Blade Runner Pad",
    "kind": "sound",
    "nn": "eravos.retro-poly · EDM Pad · Ambient Drift Pad",
-   "d": 0.019,
-   "nnOther": "eravos.supersaw · EDM Pad · Dreamy Detuned Bed",
-   "dOther": 0.067
+   "d": 0.027,
+   "nnOther": "eravos.supersaw · EDM Pad · Progressive Sus Pad",
+   "dOther": 0.083
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "EDM Pad · Deep House Chord Pad",
    "kind": "sound",
-   "nn": "eravos.retro-poly · Nightdrive Pad",
-   "d": 0.036,
-   "nnOther": "eravos.supersaw · EDM Pad · Dreamy Detuned Bed",
-   "dOther": 0.076
+   "nn": "eravos.retro-poly · EDM Pad · Ambient Drift Pad",
+   "d": 0.039,
+   "nnOther": "eravos.supersaw · Odd · Acid Church Pad",
+   "dOther": 0.078
   },
   {
    "tool": "eravos.retro-poly",
@@ -2231,260 +2222,314 @@
    "kind": "sound",
    "nn": "eravos.retro-poly · 80s · Jupiter Strings",
    "d": 0.023,
-   "nnOther": "eravos.xen-synth · φ Organ (ED φ)",
-   "dOther": 0.117
+   "nnOther": "eravos.supersaw · Chord Stab (triad)",
+   "dOther": 0.106
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "EDM Pad · Synthwave Sunset Pad",
    "kind": "sound",
    "nn": "eravos.retro-poly · EDM Pad · Lush Unison Strings",
-   "d": 0.029,
-   "nnOther": "eravos.supersaw · EDM Pad · Trance Supersaw Pad",
-   "dOther": 0.082
+   "d": 0.027,
+   "nnOther": "eravos.supersaw · Sidechain Chord Pump",
+   "dOther": 0.076
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "EDM Pad · Techno Stab Pad",
    "kind": "sound",
-   "nn": "eravos.retro-poly · EDM Pad · Deep House Chord Pad",
-   "d": 0.056,
-   "nnOther": "eravos.supersaw · Airy Sus Pad",
-   "dOther": 0.086
+   "nn": "eravos.retro-poly · Outrun Lead",
+   "d": 0.067,
+   "nnOther": "eravos.supersaw · EDM Pad · Trance Supersaw Pad",
+   "dOther": 0.088
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "EDM Pad · Lush Unison Strings",
    "kind": "sound",
    "nn": "eravos.retro-poly · EDM Pad · Synthwave Sunset Pad",
-   "d": 0.029,
+   "d": 0.027,
    "nnOther": "eravos.supersaw · Airy Sus Pad",
-   "dOther": 0.08
+   "dOther": 0.078
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "EDM Pad · Garage Organ Pad",
    "kind": "sound",
    "nn": "eravos.retro-poly · EDM Pad · Chillwave Juno Wash",
-   "d": 0.062,
-   "nnOther": "eravos.xen-synth · φ Organ (ED φ)",
-   "dOther": 0.107
+   "d": 0.075,
+   "nnOther": "eravos.retro-dco · Odd · Steppers Juno Cards",
+   "dOther": 0.117
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "EDM Pad · Ambient Drift Pad",
    "kind": "sound",
-   "nn": "eravos.retro-poly · 80s · Blade Runner Pad",
-   "d": 0.019,
-   "nnOther": "eravos.supersaw · EDM Pad · Dreamy Detuned Bed",
-   "dOther": 0.073
+   "nn": "eravos.retro-poly · Nightdrive Pad",
+   "d": 0.024,
+   "nnOther": "eravos.supersaw · Odd · Acid Church Pad",
+   "dOther": 0.081
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "EDM Pad · Arp Pad Pulse",
    "kind": "sound",
    "nn": "eravos.retro-poly · EDM Pad · Neon Glow Pad",
-   "d": 0.044,
+   "d": 0.04,
    "nnOther": "eravos.supersaw · Airy Sus Pad",
-   "dOther": 0.07
+   "dOther": 0.081
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "EDM Pad · Neon Glow Pad",
    "kind": "sound",
    "nn": "eravos.retro-poly · EDM Pad · Lush Unison Strings",
-   "d": 0.039,
-   "nnOther": "eravos.supersaw · EDM Pad · Trance Supersaw Pad",
-   "dOther": 0.072
+   "d": 0.037,
+   "nnOther": "eravos.supersaw · Airy Sus Pad",
+   "dOther": 0.082
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "EDM Pad · Midnight Brass Pad",
    "kind": "sound",
    "nn": "eravos.retro-poly · Neon Keys",
-   "d": 0.034,
+   "d": 0.03,
    "nnOther": "eravos.supersaw · EDM Pad · Festival Chord Wall",
-   "dOther": 0.077
+   "dOther": 0.067
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "Lofi Keys",
    "kind": "sound",
    "nn": "eravos.retro-dco · Odd · Steppers Juno Cards",
-   "d": 0.075,
+   "d": 0.07,
    "nnOther": "eravos.retro-dco · Odd · Steppers Juno Cards",
-   "dOther": 0.075
+   "dOther": 0.07
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "Lofi Felt Keys",
    "kind": "sound",
    "nn": "eravos.organ · Eerie Celeste",
-   "d": 0.075,
+   "d": 0.065,
    "nnOther": "eravos.organ · Eerie Celeste",
-   "dOther": 0.075
+   "dOther": 0.065
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "Odd · Steppers Brass",
    "kind": "sound",
-   "nn": "eravos.retro-poly · Outrun Lead",
-   "d": 0.053,
-   "nnOther": "eravos.supersaw · EDM Pad · Trance Supersaw Pad",
-   "dOther": 0.081
+   "nn": "eravos.retro-poly · EDM Pad · Neon Glow Pad",
+   "d": 0.052,
+   "nnOther": "eravos.supersaw · EDM Pad · Future Bass Chord Pad",
+   "dOther": 0.085
   },
   {
    "tool": "eravos.retro-poly",
    "preset": "Odd · Wobble Pad Glow",
    "kind": "sound",
-   "nn": "eravos.retro-poly · 80s · Blade Runner Pad",
-   "d": 0.039,
-   "nnOther": "eravos.supersaw · EDM Pad · Dreamy Detuned Bed",
-   "dOther": 0.079
+   "nn": "eravos.retro-poly · EDM Pad · Ambient Drift Pad",
+   "d": 0.037,
+   "nnOther": "eravos.supersaw · Odd · Acid Church Pad",
+   "dOther": 0.09
   },
   {
    "tool": "eravos.swarm-oscillator",
    "preset": "Loose Constellation",
    "kind": "sound",
    "nn": "eravos.swarm-oscillator · Odd · Golden Swarm",
-   "d": 0.044,
-   "nnOther": "eravos.coven · Static Ghost",
+   "d": 0.056,
+   "nnOther": "eravos.retro-poly · Outrun Lead",
    "dOther": 0.107
   },
   {
    "tool": "eravos.swarm-oscillator",
    "preset": "Locked Unison",
    "kind": "sound",
-   "nn": "eravos.swarm-oscillator · Pulsing Machine",
-   "d": 0.066,
-   "nnOther": "eravos.retro-dco · Five-Voice Brass Swell",
-   "dOther": 0.095
+   "nn": "eravos.swarm-oscillator · Metal Swarm",
+   "d": 0.093,
+   "nnOther": "eravos.acid-synth · Phuture Squelch",
+   "dOther": 0.094
   },
   {
    "tool": "eravos.swarm-oscillator",
    "preset": "Harmonic Swarm",
    "kind": "sound",
    "nn": "eravos.swarm-oscillator · Organic Strings",
-   "d": 0.078,
+   "d": 0.092,
    "nnOther": "eravos.retro-dco · Voice-Card Motion",
-   "dOther": 0.107
+   "dOther": 0.094
   },
   {
    "tool": "eravos.swarm-oscillator",
    "preset": "Choir Drift",
    "kind": "sound",
-   "nn": "eravos.swarm-oscillator · Organic Strings",
-   "d": 0.09,
-   "nnOther": "eravos.supersaw · EDM Pad · Dreamy Detuned Bed",
-   "dOther": 0.114
+   "nn": "eravos.coven · Witch House Choir",
+   "d": 0.102,
+   "nnOther": "eravos.coven · Witch House Choir",
+   "dOther": 0.102
   },
   {
    "tool": "eravos.swarm-oscillator",
    "preset": "Detuned Cathedral",
    "kind": "sound",
-   "nn": "eravos.swarm-oscillator · Odd · Golden Swarm",
-   "d": 0.067,
-   "nnOther": "eravos.bass-forge · Laser Zap",
-   "dOther": 0.107
+   "nn": "eravos.swarm-oscillator · Tide Lock",
+   "d": 0.074,
+   "nnOther": "eravos.bass-forge · Yoi Talker",
+   "dOther": 0.112
   },
   {
    "tool": "eravos.swarm-oscillator",
    "preset": "Pulsing Machine",
    "kind": "sound",
-   "nn": "eravos.swarm-oscillator · Locked Unison",
-   "d": 0.066,
+   "nn": "eravos.coven · Crystal Coven",
+   "d": 0.078,
    "nnOther": "eravos.coven · Crystal Coven",
-   "dOther": 0.09
+   "dOther": 0.078
   },
   {
    "tool": "eravos.swarm-oscillator",
    "preset": "Fractured Cluster",
    "kind": "sound",
    "nn": "eravos.swarm-oscillator · Odd · Séance Fracture",
-   "d": 0.09,
+   "d": 0.08,
    "nnOther": "eravos.retro-poly · Outrun Lead",
-   "dOther": 0.113
+   "dOther": 0.098
   },
   {
    "tool": "eravos.swarm-oscillator",
    "preset": "Organic Strings",
    "kind": "sound",
    "nn": "eravos.swarm-oscillator · Harmonic Swarm",
-   "d": 0.078,
+   "d": 0.092,
    "nnOther": "eravos.retro-dco · Voice-Card Motion",
-   "dOther": 0.085
+   "dOther": 0.096
+  },
+  {
+   "tool": "eravos.swarm-oscillator",
+   "preset": "Breathing Swarm",
+   "kind": "sound",
+   "nn": "eravos.swarm-oscillator · Blooming Chord",
+   "d": 0.08,
+   "nnOther": "eravos.retro-poly · EDM Pad · Techno Stab Pad",
+   "dOther": 0.101
+  },
+  {
+   "tool": "eravos.swarm-oscillator",
+   "preset": "Blooming Chord",
+   "kind": "sound",
+   "nn": "eravos.swarm-oscillator · Breathing Swarm",
+   "d": 0.08,
+   "nnOther": "eravos.retro-poly · EDM Pad · Techno Stab Pad",
+   "dOther": 0.114
+  },
+  {
+   "tool": "eravos.swarm-oscillator",
+   "preset": "Metal Swarm",
+   "kind": "sound",
+   "nn": "eravos.swarm-oscillator · Odd · Lullaby Lock",
+   "d": 0.071,
+   "nnOther": "eravos.xen-synth · Bohlen–Pierce Clarinet",
+   "dOther": 0.117
+  },
+  {
+   "tool": "eravos.swarm-oscillator",
+   "preset": "Growl Cloud",
+   "kind": "sound",
+   "nn": "eravos.reese-bass · Melodic Growl",
+   "d": 0.054,
+   "nnOther": "eravos.reese-bass · Melodic Growl",
+   "dOther": 0.054
+  },
+  {
+   "tool": "eravos.swarm-oscillator",
+   "preset": "Tide Lock",
+   "kind": "sound",
+   "nn": "eravos.swarm-oscillator · Detuned Cathedral",
+   "d": 0.074,
+   "nnOther": "eravos.coven · Static Ghost",
+   "dOther": 0.103
+  },
+  {
+   "tool": "eravos.swarm-oscillator",
+   "preset": "Shatter Bloom",
+   "kind": "sound",
+   "nn": "eravos.bass-forge · Odd · Golden Dub Growl",
+   "d": 0.051,
+   "nnOther": "eravos.bass-forge · Odd · Golden Dub Growl",
+   "dOther": 0.051
   },
   {
    "tool": "eravos.swarm-oscillator",
    "preset": "Odd · Cathedral Swarm",
    "kind": "sound",
-   "nn": "eravos.supersaw · EDM Pad · Trance Supersaw Pad",
-   "d": 0.092,
+   "nn": "eravos.swarm-oscillator · Odd · Séance Fracture",
+   "d": 0.098,
    "nnOther": "eravos.supersaw · EDM Pad · Trance Supersaw Pad",
-   "dOther": 0.092
+   "dOther": 0.099
   },
   {
    "tool": "eravos.swarm-oscillator",
    "preset": "Odd · Séance Fracture",
    "kind": "sound",
    "nn": "eravos.swarm-oscillator · Fractured Cluster",
-   "d": 0.09,
-   "nnOther": "eravos.coven · Static Ghost",
-   "dOther": 0.115
+   "d": 0.08,
+   "nnOther": "eravos.retro-poly · EDM Pad · Techno Stab Pad",
+   "dOther": 0.108
   },
   {
    "tool": "eravos.swarm-oscillator",
    "preset": "Odd · Golden Swarm",
    "kind": "sound",
    "nn": "eravos.swarm-oscillator · Loose Constellation",
-   "d": 0.044,
-   "nnOther": "eravos.bass-forge · Laser Zap",
-   "dOther": 0.101
+   "d": 0.056,
+   "nnOther": "eravos.bass-forge · Brostep Growl",
+   "dOther": 0.106
   },
   {
    "tool": "eravos.swarm-oscillator",
    "preset": "Odd · Lullaby Lock",
    "kind": "sound",
-   "nn": "eravos.xen-synth · Bohlen–Pierce Clarinet",
-   "d": 0.109,
+   "nn": "eravos.swarm-oscillator · Metal Swarm",
+   "d": 0.071,
    "nnOther": "eravos.xen-synth · Bohlen–Pierce Clarinet",
-   "dOther": 0.109
+   "dOther": 0.105
   },
   {
    "tool": "eravos.channel",
    "preset": "Vocal",
    "kind": "effect",
    "nn": "eravos.channel · Odd · Her Voice (on top)",
-   "d": 0.012,
+   "d": 0.01,
    "nnOther": "eravos.fx-eq · 80s Snare Snap",
-   "dOther": 0.021
+   "dOther": 0.018
   },
   {
    "tool": "eravos.channel",
    "preset": "Bass",
    "kind": "effect",
-   "nn": "eravos.channel · Drums",
-   "d": 0.011,
+   "nn": "eravos.fx-destroyer · Wub Grit · sub stays clean",
+   "d": 0.029,
    "nnOther": "eravos.fx-destroyer · Wub Grit · sub stays clean",
-   "dOther": 0.034
+   "dOther": 0.029
   },
   {
    "tool": "eravos.channel",
    "preset": "Drums",
    "kind": "effect",
-   "nn": "eravos.channel · Bass",
-   "d": 0.011,
-   "nnOther": "eravos.fx-dynamics · Tight Gate",
-   "dOther": 0.029
+   "nn": "eravos.fx-eq · Bass Mud Cut",
+   "d": 0.114,
+   "nnOther": "eravos.fx-eq · Bass Mud Cut",
+   "dOther": 0.114
   },
   {
    "tool": "eravos.channel",
    "preset": "Pad / Lead",
    "kind": "effect",
    "nn": "eravos.channel · Odd · Organ Under",
-   "d": 0.015,
+   "d": 0.013,
    "nnOther": "eravos.fx-eq · 80s Snare Snap",
-   "dOther": 0.034
+   "dOther": 0.029
   },
   {
    "tool": "eravos.channel",
@@ -2499,37 +2544,37 @@
    "tool": "eravos.channel",
    "preset": "80s · 80s Snare Room",
    "kind": "effect",
-   "nn": "eravos.fx-moddelay · Supersaw Widener",
-   "d": 0.031,
-   "nnOther": "eravos.fx-moddelay · Supersaw Widener",
-   "dOther": 0.031
+   "nn": "eravos.fx-eq · Odd · Make Room for Her",
+   "d": 0.027,
+   "nnOther": "eravos.fx-eq · Odd · Make Room for Her",
+   "dOther": 0.027
   },
   {
    "tool": "eravos.channel",
    "preset": "Odd · Her Voice (on top)",
    "kind": "effect",
    "nn": "eravos.channel · Vocal",
-   "d": 0.012,
+   "d": 0.01,
    "nnOther": "eravos.fx-eq · Vocal Clarity",
-   "dOther": 0.014
+   "dOther": 0.012
   },
   {
    "tool": "eravos.channel",
    "preset": "Odd · Organ Under",
    "kind": "effect",
    "nn": "eravos.channel · Pad / Lead",
-   "d": 0.015,
+   "d": 0.013,
    "nnOther": "eravos.fx-eq · 80s Snare Snap",
-   "dOther": 0.032
+   "dOther": 0.028
   },
   {
    "tool": "eravos.sidechain-compressor",
    "preset": "Classic 1/4 Pump",
    "kind": "effect",
    "nn": "eravos.sidechain-compressor · Odd · Steppers Pump 1/4",
-   "d": 0.003,
-   "nnOther": "eravos.fx-moddelay · Odd · Chapel Chorus",
-   "dOther": 0.009
+   "d": 0.002,
+   "nnOther": "eravos.fx-eq · Flat",
+   "dOther": 0.014
   },
   {
    "tool": "eravos.sidechain-compressor",
@@ -2544,19 +2589,19 @@
    "tool": "eravos.sidechain-compressor",
    "preset": "Hard Gate 1/8",
    "kind": "effect",
-   "nn": "eravos.fx-glitch · Reverse Tails",
-   "d": 0.018,
-   "nnOther": "eravos.fx-glitch · Reverse Tails",
-   "dOther": 0.018
+   "nn": "eravos.sidechain-compressor · Trance Gate 1/16",
+   "d": 0.056,
+   "nnOther": "eravos.granular · Stutter 1/8",
+   "dOther": 0.12
   },
   {
    "tool": "eravos.sidechain-compressor",
    "preset": "Half-time 1/2",
    "kind": "effect",
    "nn": "eravos.fx-eq · Odd · Make Room for Her",
-   "d": 0.042,
+   "d": 0.037,
    "nnOther": "eravos.fx-eq · Odd · Make Room for Her",
-   "dOther": 0.042
+   "dOther": 0.037
   },
   {
    "tool": "eravos.sidechain-compressor",
@@ -2571,17 +2616,17 @@
    "tool": "eravos.sidechain-compressor",
    "preset": "Trance Gate 1/16",
    "kind": "effect",
-   "nn": "eravos.fx-glitch · Reverse Tails",
-   "d": 0.038,
-   "nnOther": "eravos.fx-glitch · Reverse Tails",
-   "dOther": 0.038
+   "nn": "eravos.sidechain-compressor · Hard Gate 1/8",
+   "d": 0.056,
+   "nnOther": "eravos.granular · Stutter 1/8",
+   "dOther": 0.102
   },
   {
    "tool": "eravos.sidechain-compressor",
    "preset": "Club · House Pump 1/4 (deep)",
    "kind": "effect",
    "nn": "eravos.sidechain-compressor · Subtle Glue",
-   "d": 0.006,
+   "d": 0.005,
    "nnOther": "eravos.fx-eq · Flat",
    "dOther": 0.006
   },
@@ -2590,9 +2635,9 @@
    "preset": "Lofi Gentle Pump",
    "kind": "effect",
    "nn": "eravos.sidechain-compressor · Odd · Steppers Pump 1/4",
-   "d": 0.011,
-   "nnOther": "eravos.fx-moddelay · Odd · Chapel Chorus",
-   "dOther": 0.014
+   "d": 0.01,
+   "nnOther": "eravos.fx-eq · Odd · Make Room for Her",
+   "dOther": 0.019
   },
   {
    "tool": "eravos.sidechain-compressor",
@@ -2608,98 +2653,98 @@
    "preset": "Odd · Steppers Pump 1/4",
    "kind": "effect",
    "nn": "eravos.sidechain-compressor · Classic 1/4 Pump",
-   "d": 0.003,
-   "nnOther": "eravos.fx-moddelay · Odd · Chapel Chorus",
-   "dOther": 0.009
+   "d": 0.002,
+   "nnOther": "eravos.fx-eq · Flat",
+   "dOther": 0.014
   },
   {
    "tool": "eravos.curve-synth",
    "preset": "Songs-for-the-Dead Dive",
    "kind": "sound",
    "nn": "eravos.curve-synth · Odd · Falling Coin",
-   "d": 0.151,
+   "d": 0.141,
    "nnOther": "eravos.supersaw · Monstercat Pluck",
-   "dOther": 0.221
+   "dOther": 0.194
   },
   {
    "tool": "eravos.curve-synth",
    "preset": "Ricochet",
    "kind": "sound",
    "nn": "eravos.curve-synth · Odd · Music Box Bounce",
-   "d": 0.126,
+   "d": 0.11,
    "nnOther": "eravos.supersaw · Monstercat Pluck",
-   "dOther": 0.202
+   "dOther": 0.177
   },
   {
    "tool": "eravos.curve-synth",
    "preset": "Siren",
    "kind": "sound",
    "nn": "eravos.curve-synth · Odd · Siren Into Drop",
-   "d": 0.051,
-   "nnOther": "eravos.bass-forge · Odd · Golden Dub Growl",
-   "dOther": 0.163
+   "d": 0.044,
+   "nnOther": "eravos.retro-poly · Darksynth Saw",
+   "dOther": 0.178
   },
   {
    "tool": "eravos.curve-synth",
    "preset": "Drop Whoop",
    "kind": "sound",
    "nn": "eravos.reese-bass · Hoover-ish",
-   "d": 0.135,
+   "d": 0.154,
    "nnOther": "eravos.reese-bass · Hoover-ish",
-   "dOther": 0.135
+   "dOther": 0.154
   },
   {
    "tool": "eravos.curve-synth",
    "preset": "Bending Lead",
    "kind": "sound",
-   "nn": "eravos.sample-player · Whole clip",
-   "d": 0.046,
-   "nnOther": "eravos.sample-player · Whole clip",
-   "dOther": 0.046
+   "nn": "eravos.curve-synth · Whoop Bass",
+   "d": 0.049,
+   "nnOther": "eravos.acid-synth · Phuture Squelch",
+   "dOther": 0.111
   },
   {
    "tool": "eravos.curve-synth",
    "preset": "Plain Lead (no bend)",
    "kind": "sound",
-   "nn": "eravos.curve-synth · Bending Lead",
-   "d": 0.079,
+   "nn": "eravos.sample-player · Whole clip",
+   "d": 0.082,
    "nnOther": "eravos.sample-player · Whole clip",
-   "dOther": 0.094
+   "dOther": 0.082
   },
   {
    "tool": "eravos.curve-synth",
    "preset": "Vibrato Lead",
    "kind": "sound",
-   "nn": "eravos.curve-synth · Ricochet Notes",
-   "d": 0.088,
-   "nnOther": "eravos.syn-partials · Glass Keys",
-   "dOther": 0.104
+   "nn": "eravos.syn-partials · Hollow Reed",
+   "d": 0.105,
+   "nnOther": "eravos.syn-partials · Hollow Reed",
+   "dOther": 0.105
   },
   {
    "tool": "eravos.curve-synth",
    "preset": "Laser Pluck",
    "kind": "sound",
-   "nn": "eravos.bass-forge · Neuro Reese-FM",
-   "d": 0.079,
-   "nnOther": "eravos.bass-forge · Neuro Reese-FM",
-   "dOther": 0.079
+   "nn": "eravos.acid-synth · Phuture Squelch",
+   "d": 0.077,
+   "nnOther": "eravos.acid-synth · Phuture Squelch",
+   "dOther": 0.077
   },
   {
    "tool": "eravos.curve-synth",
    "preset": "Whoop Bass",
    "kind": "sound",
    "nn": "eravos.curve-synth · Bending Lead",
-   "d": 0.056,
-   "nnOther": "eravos.sample-player · Whole clip",
-   "dOther": 0.077
+   "d": 0.049,
+   "nnOther": "eravos.acid-synth · Phuture Squelch",
+   "dOther": 0.122
   },
   {
    "tool": "eravos.curve-synth",
    "preset": "Ricochet Notes",
    "kind": "sound",
-   "nn": "eravos.curve-synth · Vibrato Lead",
-   "d": 0.088,
-   "nnOther": "eravos.xen-synth · Odd · 19-EDO Wobble Lead",
+   "nn": "eravos.syn-partials · Glass Keys",
+   "d": 0.123,
+   "nnOther": "eravos.syn-partials · Glass Keys",
    "dOther": 0.123
   },
   {
@@ -2707,324 +2752,324 @@
    "preset": "Odd · Music Box Bounce",
    "kind": "sound",
    "nn": "eravos.curve-synth · Ricochet",
-   "d": 0.126,
-   "nnOther": "eravos.supersaw · Club · Organ House Stab",
-   "dOther": 0.137
+   "d": 0.11,
+   "nnOther": "eravos.supersaw · Monstercat Pluck",
+   "dOther": 0.123
   },
   {
    "tool": "eravos.curve-synth",
    "preset": "Odd · Siren Into Drop",
    "kind": "sound",
    "nn": "eravos.curve-synth · Siren",
-   "d": 0.051,
-   "nnOther": "eravos.bass-forge · Odd · Golden Dub Growl",
-   "dOther": 0.147
+   "d": 0.044,
+   "nnOther": "eravos.retro-poly · Darksynth Saw",
+   "dOther": 0.169
   },
   {
    "tool": "eravos.curve-synth",
    "preset": "Odd · Falling Coin",
    "kind": "sound",
    "nn": "eravos.supersaw · Monstercat Pluck",
-   "d": 0.134,
+   "d": 0.12,
    "nnOther": "eravos.supersaw · Monstercat Pluck",
-   "dOther": 0.134
+   "dOther": 0.12
   },
   {
    "tool": "eravos.supersaw",
    "preset": "Festival Lead",
    "kind": "sound",
-   "nn": "eravos.supersaw · Odd · Gospel Stack",
-   "d": 0.048,
-   "nnOther": "eravos.curve-synth · Whoop Bass",
-   "dOther": 0.091
+   "nn": "eravos.supersaw · EDM Pad · Festival Chord Wall",
+   "d": 0.066,
+   "nnOther": "eravos.retro-poly · EDM Pad · Midnight Brass Pad",
+   "dOther": 0.083
   },
   {
    "tool": "eravos.supersaw",
    "preset": "Trance Pluck",
    "kind": "sound",
-   "nn": "eravos.retro-dco · Arcade Pulse",
-   "d": 0.091,
-   "nnOther": "eravos.retro-dco · Arcade Pulse",
-   "dOther": 0.091
+   "nn": "eravos.supersaw · Odd · Steppers Pluck",
+   "d": 0.088,
+   "nnOther": "eravos.curve-synth · Odd · Music Box Bounce",
+   "dOther": 0.158
   },
   {
    "tool": "eravos.supersaw",
    "preset": "Wide Pad",
    "kind": "sound",
-   "nn": "eravos.supersaw · Airy Sus Pad",
-   "d": 0.038,
-   "nnOther": "eravos.retro-poly · EDM Pad · Arp Pad Pulse",
-   "dOther": 0.087
+   "nn": "eravos.supersaw · Silk Pad (add9)",
+   "d": 0.042,
+   "nnOther": "eravos.retro-poly · EDM Pad · Lush Unison Strings",
+   "dOther": 0.099
   },
   {
    "tool": "eravos.supersaw",
    "preset": "Chord Stab (triad)",
    "kind": "sound",
    "nn": "eravos.supersaw · EDM Pad · Plucky Pad Stab",
-   "d": 0.049,
+   "d": 0.043,
    "nnOther": "eravos.retro-poly · String Machine",
-   "dOther": 0.107
+   "dOther": 0.093
   },
   {
    "tool": "eravos.supersaw",
    "preset": "Future Bass Chords (7th)",
    "kind": "sound",
    "nn": "eravos.supersaw · Future Bass Chords (add9)",
-   "d": 0.035,
+   "d": 0.03,
    "nnOther": "eravos.retro-poly · EDM Pad · Midnight Brass Pad",
-   "dOther": 0.106
+   "dOther": 0.096
   },
   {
    "tool": "eravos.supersaw",
    "preset": "Future Bass Chords (add9)",
    "kind": "sound",
-   "nn": "eravos.supersaw · 80s · Jump Brass (Van)",
-   "d": 0.029,
+   "nn": "eravos.supersaw · Future Bass Chords (7th)",
+   "d": 0.03,
    "nnOther": "eravos.retro-poly · String Machine",
-   "dOther": 0.105
+   "dOther": 0.096
   },
   {
    "tool": "eravos.supersaw",
    "preset": "Monstercat Pluck",
    "kind": "sound",
    "nn": "eravos.supersaw · Trance Pluck",
-   "d": 0.125,
+   "d": 0.111,
    "nnOther": "eravos.curve-synth · Odd · Falling Coin",
-   "dOther": 0.134
+   "dOther": 0.12
   },
   {
    "tool": "eravos.supersaw",
    "preset": "Euphoric Lead",
    "kind": "sound",
    "nn": "eravos.supersaw · EDM Pad · Hardstyle Lead Pad",
-   "d": 0.133,
+   "d": 0.116,
    "nnOther": "eravos.retro-poly · EDM Pad · Midnight Brass Pad",
-   "dOther": 0.183
+   "dOther": 0.16
   },
   {
    "tool": "eravos.supersaw",
    "preset": "Silk Pad (add9)",
    "kind": "sound",
    "nn": "eravos.supersaw · 80s · Hyperspace Pad",
-   "d": 0.036,
+   "d": 0.035,
    "nnOther": "eravos.retro-poly · 80s · Blade Runner Pad",
-   "dOther": 0.105
+   "dOther": 0.097
   },
   {
    "tool": "eravos.supersaw",
    "preset": "Airy Sus Pad",
    "kind": "sound",
-   "nn": "eravos.supersaw · Wide Pad",
-   "d": 0.038,
-   "nnOther": "eravos.retro-poly · EDM Pad · Arp Pad Pulse",
-   "dOther": 0.07
+   "nn": "eravos.supersaw · Odd · Acid Church Pad",
+   "d": 0.061,
+   "nnOther": "eravos.retro-poly · EDM Pad · Synthwave Sunset Pad",
+   "dOther": 0.077
   },
   {
    "tool": "eravos.supersaw",
    "preset": "Sidechain Chord Pump",
    "kind": "sound",
-   "nn": "eravos.supersaw · EDM Pad · Sus4 Anthem Pad",
-   "d": 0.046,
+   "nn": "eravos.supersaw · EDM Pad · Future Bass Chord Pad",
+   "d": 0.049,
    "nnOther": "eravos.retro-poly · EDM Pad · Synthwave Sunset Pad",
-   "dOther": 0.084
+   "dOther": 0.076
   },
   {
    "tool": "eravos.supersaw",
    "preset": "Melodic Saw Bass",
    "kind": "sound",
    "nn": "eravos.acid-synth · Rolling Bassline",
-   "d": 0.085,
+   "d": 0.075,
    "nnOther": "eravos.acid-synth · Rolling Bassline",
-   "dOther": 0.085
+   "dOther": 0.075
   },
   {
    "tool": "eravos.supersaw",
    "preset": "80s · Jump Brass (Van)",
    "kind": "sound",
    "nn": "eravos.supersaw · Future Bass Chords (add9)",
-   "d": 0.029,
+   "d": 0.05,
    "nnOther": "eravos.retro-poly · EDM Pad · Midnight Brass Pad",
-   "dOther": 0.096
+   "dOther": 0.084
   },
   {
    "tool": "eravos.supersaw",
    "preset": "80s · Hyperspace Pad",
    "kind": "sound",
    "nn": "eravos.supersaw · Silk Pad (add9)",
-   "d": 0.036,
-   "nnOther": "eravos.retro-poly · EDM Pad · Arp Pad Pulse",
-   "dOther": 0.116
+   "d": 0.035,
+   "nnOther": "eravos.retro-poly · EDM Pad · Lush Unison Strings",
+   "dOther": 0.109
   },
   {
    "tool": "eravos.supersaw",
    "preset": "Club · Organ House Stab",
    "kind": "sound",
    "nn": "eravos.supersaw · Odd · Steppers Pluck",
-   "d": 0.122,
-   "nnOther": "eravos.retro-dco · Arcade Pulse",
-   "dOther": 0.129
+   "d": 0.106,
+   "nnOther": "eravos.curve-synth · Odd · Music Box Bounce",
+   "dOther": 0.123
   },
   {
    "tool": "eravos.supersaw",
    "preset": "EDM Pad · Trance Supersaw Pad",
    "kind": "sound",
-   "nn": "eravos.supersaw · Airy Sus Pad",
-   "d": 0.045,
-   "nnOther": "eravos.retro-poly · EDM Pad · Neon Glow Pad",
-   "dOther": 0.072
+   "nn": "eravos.retro-poly · Outrun Lead",
+   "d": 0.068,
+   "nnOther": "eravos.retro-poly · Outrun Lead",
+   "dOther": 0.068
   },
   {
    "tool": "eravos.supersaw",
    "preset": "EDM Pad · Future Bass Chord Pad",
    "kind": "sound",
    "nn": "eravos.supersaw · EDM Pad · Uplifting Wide Pad",
-   "d": 0.033,
+   "d": 0.031,
    "nnOther": "eravos.retro-poly · EDM Pad · Neon Glow Pad",
-   "dOther": 0.093
+   "dOther": 0.082
   },
   {
    "tool": "eravos.supersaw",
    "preset": "EDM Pad · Melodic Dubstep Saws",
    "kind": "sound",
-   "nn": "eravos.supersaw · EDM Pad · Big Room Swell",
-   "d": 0.032,
-   "nnOther": "eravos.swarm-oscillator · Odd · Cathedral Swarm",
-   "dOther": 0.113
+   "nn": "eravos.supersaw · Odd · Wobble Halo Saws",
+   "d": 0.029,
+   "nnOther": "eravos.retro-poly · EDM Pad · Neon Glow Pad",
+   "dOther": 0.102
   },
   {
    "tool": "eravos.supersaw",
    "preset": "EDM Pad · Progressive Sus Pad",
    "kind": "sound",
-   "nn": "eravos.supersaw · Wide Pad",
-   "d": 0.049,
-   "nnOther": "eravos.retro-poly · EDM Pad · Deep House Chord Pad",
-   "dOther": 0.086
+   "nn": "eravos.supersaw · Sidechain Chord Pump",
+   "d": 0.053,
+   "nnOther": "eravos.retro-poly · 80s · Blade Runner Pad",
+   "dOther": 0.083
   },
   {
    "tool": "eravos.supersaw",
    "preset": "EDM Pad · Hardstyle Lead Pad",
    "kind": "sound",
    "nn": "eravos.supersaw · EDM Pad · Festival Chord Wall",
-   "d": 0.041,
+   "d": 0.038,
    "nnOther": "eravos.retro-poly · EDM Pad · Midnight Brass Pad",
-   "dOther": 0.089
+   "dOther": 0.08
   },
   {
    "tool": "eravos.supersaw",
    "preset": "EDM Pad · Euphoric Breakdown",
    "kind": "sound",
    "nn": "eravos.supersaw · Sidechain Chord Pump",
-   "d": 0.077,
+   "d": 0.076,
    "nnOther": "eravos.retro-poly · EDM Pad · Lush Unison Strings",
-   "dOther": 0.131
+   "dOther": 0.124
   },
   {
    "tool": "eravos.supersaw",
    "preset": "EDM Pad · Big Room Swell",
    "kind": "sound",
-   "nn": "eravos.supersaw · EDM Pad · Uplifting Wide Pad",
-   "d": 0.026,
-   "nnOther": "eravos.retro-poly · EDM Pad · Neon Glow Pad",
-   "dOther": 0.102
+   "nn": "eravos.supersaw · EDM Pad · Sus4 Anthem Pad",
+   "d": 0.04,
+   "nnOther": "eravos.retro-poly · EDM Pad · Synthwave Sunset Pad",
+   "dOther": 0.099
   },
   {
    "tool": "eravos.supersaw",
    "preset": "EDM Pad · Dark Minor Seventh Pad",
    "kind": "sound",
    "nn": "eravos.organ · Hanging Tree",
-   "d": 0.085,
+   "d": 0.074,
    "nnOther": "eravos.organ · Hanging Tree",
-   "dOther": 0.085
+   "dOther": 0.074
   },
   {
    "tool": "eravos.supersaw",
    "preset": "EDM Pad · Sus4 Anthem Pad",
    "kind": "sound",
    "nn": "eravos.supersaw · EDM Pad · Big Room Swell",
-   "d": 0.034,
-   "nnOther": "eravos.retro-poly · EDM Pad · Neon Glow Pad",
-   "dOther": 0.084
+   "d": 0.04,
+   "nnOther": "eravos.retro-poly · EDM Pad · Synthwave Sunset Pad",
+   "dOther": 0.103
   },
   {
    "tool": "eravos.supersaw",
    "preset": "EDM Pad · Airy Octave Pad",
    "kind": "sound",
    "nn": "eravos.supersaw · EDM Pad · Melodic Dubstep Saws",
-   "d": 0.153,
-   "nnOther": "eravos.retro-poly · 80s · Neon Sync Lead",
-   "dOther": 0.175
+   "d": 0.14,
+   "nnOther": "eravos.retro-poly · Odd · Steppers Brass",
+   "dOther": 0.178
   },
   {
    "tool": "eravos.supersaw",
    "preset": "EDM Pad · Plucky Pad Stab",
    "kind": "sound",
-   "nn": "eravos.supersaw · Future Bass Chords (7th)",
-   "d": 0.045,
+   "nn": "eravos.supersaw · Chord Stab (triad)",
+   "d": 0.043,
    "nnOther": "eravos.retro-poly · String Machine",
-   "dOther": 0.097
+   "dOther": 0.084
   },
   {
    "tool": "eravos.supersaw",
    "preset": "EDM Pad · Uplifting Wide Pad",
    "kind": "sound",
-   "nn": "eravos.supersaw · EDM Pad · Big Room Swell",
-   "d": 0.026,
+   "nn": "eravos.supersaw · EDM Pad · Melodic Dubstep Saws",
+   "d": 0.029,
    "nnOther": "eravos.retro-poly · Odd · Steppers Brass",
-   "dOther": 0.093
+   "dOther": 0.085
   },
   {
    "tool": "eravos.supersaw",
    "preset": "EDM Pad · Dreamy Detuned Bed",
    "kind": "sound",
    "nn": "eravos.supersaw · EDM Pad · Progressive Sus Pad",
-   "d": 0.058,
+   "d": 0.067,
    "nnOther": "eravos.retro-poly · 80s · Blade Runner Pad",
-   "dOther": 0.067
+   "dOther": 0.094
   },
   {
    "tool": "eravos.supersaw",
    "preset": "EDM Pad · Festival Chord Wall",
    "kind": "sound",
    "nn": "eravos.supersaw · EDM Pad · Hardstyle Lead Pad",
-   "d": 0.041,
+   "d": 0.038,
    "nnOther": "eravos.retro-poly · EDM Pad · Midnight Brass Pad",
-   "dOther": 0.077
+   "dOther": 0.067
   },
   {
    "tool": "eravos.supersaw",
    "preset": "Odd · Gospel Stack",
    "kind": "sound",
-   "nn": "eravos.supersaw · Festival Lead",
-   "d": 0.048,
-   "nnOther": "eravos.retro-poly · EDM Pad · Midnight Brass Pad",
-   "dOther": 0.095
+   "nn": "eravos.supersaw · 80s · Jump Brass (Van)",
+   "d": 0.078,
+   "nnOther": "eravos.retro-poly · Brass Stab '84",
+   "dOther": 0.09
   },
   {
    "tool": "eravos.supersaw",
    "preset": "Odd · Acid Church Pad",
    "kind": "sound",
    "nn": "eravos.supersaw · Airy Sus Pad",
-   "d": 0.054,
+   "d": 0.061,
    "nnOther": "eravos.retro-poly · EDM Pad · Deep House Chord Pad",
-   "dOther": 0.084
+   "dOther": 0.078
   },
   {
    "tool": "eravos.supersaw",
    "preset": "Odd · Steppers Pluck",
    "kind": "sound",
-   "nn": "eravos.retro-dco · Arcade Pulse",
-   "d": 0.099,
+   "nn": "eravos.supersaw · Trance Pluck",
+   "d": 0.088,
    "nnOther": "eravos.retro-dco · Arcade Pulse",
-   "dOther": 0.099
+   "dOther": 0.167
   },
   {
    "tool": "eravos.supersaw",
    "preset": "Odd · Wobble Halo Saws",
    "kind": "sound",
    "nn": "eravos.supersaw · EDM Pad · Melodic Dubstep Saws",
-   "d": 0.032,
-   "nnOther": "eravos.swarm-oscillator · Odd · Cathedral Swarm",
-   "dOther": 0.11
+   "d": 0.029,
+   "nnOther": "eravos.retro-poly · EDM Pad · Synthwave Sunset Pad",
+   "dOther": 0.103
   },
   {
    "tool": "eravos.suite-hub",
@@ -3039,10 +3084,10 @@
    "tool": "eravos.granular",
    "preset": "Voice Cloud",
    "kind": "effect",
-   "nn": "eravos.fx-echo · Odd · Steppers Tape",
-   "d": 0.029,
-   "nnOther": "eravos.fx-echo · Odd · Steppers Tape",
-   "dOther": 0.029
+   "nn": "eravos.granular · Reverse Swell",
+   "d": 0.072,
+   "nnOther": "eravos.fx-echo · Worn Tape",
+   "dOther": 0.092
   },
   {
    "tool": "eravos.granular",
@@ -3057,280 +3102,280 @@
    "tool": "eravos.granular",
    "preset": "Shimmer Pad",
    "kind": "effect",
-   "nn": "eravos.fx-echo · Odd · Steppers Tape",
-   "d": 0.047,
-   "nnOther": "eravos.fx-echo · Odd · Steppers Tape",
-   "dOther": 0.047
+   "nn": "eravos.granular · Reverse Swell",
+   "d": 0.062,
+   "nnOther": "eravos.fx-echo · Worn Tape",
+   "dOther": 0.077
   },
   {
    "tool": "eravos.granular",
    "preset": "Rain",
    "kind": "effect",
-   "nn": "eravos.granular · Odd · Choir Grain Halo",
-   "d": 0.032,
+   "nn": "eravos.granular · Voice Cloud",
+   "d": 0.081,
    "nnOther": "eravos.fx-echo · Worn Tape",
-   "dOther": 0.047
+   "dOther": 0.154
   },
   {
    "tool": "eravos.granular",
    "preset": "Glitch Dust",
    "kind": "effect",
-   "nn": "eravos.granular · Odd · Riddim Grain Stutter",
-   "d": 0.031,
-   "nnOther": "eravos.sidechain-compressor · Half-time 1/2",
-   "dOther": 0.059
+   "nn": "eravos.granular · Stutter 1/8",
+   "d": 0.081,
+   "nnOther": "eravos.sidechain-compressor · Trance Gate 1/16",
+   "dOther": 0.123
   },
   {
    "tool": "eravos.granular",
    "preset": "Octave Down Smear",
    "kind": "effect",
-   "nn": "eravos.granular · Rain",
-   "d": 0.045,
-   "nnOther": "eravos.fx-echo · Worn Tape",
-   "dOther": 0.066
+   "nn": "eravos.granular · Odd · Choir Grain Halo",
+   "d": 0.07,
+   "nnOther": "eravos.fx-echo · Odd · Steppers Tape",
+   "dOther": 0.083
   },
   {
    "tool": "eravos.granular",
    "preset": "Reverse Swell",
    "kind": "effect",
    "nn": "eravos.fx-echo · Worn Tape",
-   "d": 0.032,
+   "d": 0.036,
    "nnOther": "eravos.fx-echo · Worn Tape",
-   "dOther": 0.032
+   "dOther": 0.036
   },
   {
    "tool": "eravos.granular",
    "preset": "Stutter 1/8",
    "kind": "effect",
    "nn": "eravos.granular · Glitch Dust",
-   "d": 0.057,
-   "nnOther": "eravos.fx-pitch · Thirds Choir",
-   "dOther": 0.07
+   "d": 0.081,
+   "nnOther": "eravos.sidechain-compressor · Trance Gate 1/16",
+   "dOther": 0.102
   },
   {
    "tool": "eravos.granular",
    "preset": "Played Cloud (keys)",
    "kind": "effect",
-   "nn": "eravos.granular · Voice Cloud",
-   "d": 0.037,
-   "nnOther": "eravos.fx-echo · Odd · Steppers Tape",
-   "dOther": 0.044
+   "nn": "eravos.granular · Shimmer Pad",
+   "d": 0.078,
+   "nnOther": "eravos.fx-echo · Worn Tape",
+   "dOther": 0.109
   },
   {
    "tool": "eravos.granular",
    "preset": "Odd · Choir Grain Halo",
    "kind": "effect",
-   "nn": "eravos.granular · Rain",
-   "d": 0.032,
-   "nnOther": "eravos.fx-echo · Odd · Steppers Tape",
-   "dOther": 0.044
+   "nn": "eravos.granular · Octave Down Smear",
+   "d": 0.07,
+   "nnOther": "eravos.dub-station · Odd · Lullaby Dub",
+   "dOther": 0.112
   },
   {
    "tool": "eravos.granular",
    "preset": "Odd · Riddim Grain Stutter",
    "kind": "effect",
    "nn": "eravos.granular · Glitch Dust",
-   "d": 0.031,
-   "nnOther": "eravos.fx-pitch · Thirds Choir",
-   "dOther": 0.041
+   "d": 0.109,
+   "nnOther": "eravos.fx-phaser · Odd · Wobble Phase",
+   "dOther": 0.12
   },
   {
    "tool": "eravos.syn-osc",
    "preset": "Morph Lead",
    "kind": "sound",
-   "nn": "eravos.syn-osc · Growl Modulator ×1 (wire into FM in)",
-   "d": 0.087,
-   "nnOther": "eravos.clip-maker · Odd · Her words (tight)",
-   "dOther": 0.125
+   "nn": "eravos.supersaw · 80s · Jump Brass (Van)",
+   "d": 0.133,
+   "nnOther": "eravos.supersaw · 80s · Jump Brass (Van)",
+   "dOther": 0.133
   },
   {
    "tool": "eravos.syn-osc",
    "preset": "Glass Pad",
    "kind": "sound",
    "nn": "eravos.syn-osc · Odd · Morph Choir Pad",
-   "d": 0.067,
+   "d": 0.075,
    "nnOther": "eravos.recursive-spectra · Stretching Organ",
-   "dOther": 0.147
+   "dOther": 0.17
   },
   {
    "tool": "eravos.syn-osc",
    "preset": "Vowel Bass",
    "kind": "sound",
    "nn": "eravos.wub-osc · FM Riddim 2:1",
-   "d": 0.13,
+   "d": 0.113,
    "nnOther": "eravos.wub-osc · FM Riddim 2:1",
-   "dOther": 0.13
+   "dOther": 0.113
   },
   {
    "tool": "eravos.syn-osc",
    "preset": "Drawbar Organ",
    "kind": "sound",
    "nn": "eravos.syn-partials · Drawbars",
-   "d": 0.02,
+   "d": 0.017,
    "nnOther": "eravos.syn-partials · Drawbars",
-   "dOther": 0.02
+   "dOther": 0.017
   },
   {
    "tool": "eravos.syn-osc",
    "preset": "Pluck",
    "kind": "sound",
    "nn": "eravos.sample-player · Odd · Her Voice · Chopped Triplets",
-   "d": 0.123,
+   "d": 0.107,
    "nnOther": "eravos.sample-player · Odd · Her Voice · Chopped Triplets",
-   "dOther": 0.123
+   "dOther": 0.107
   },
   {
    "tool": "eravos.syn-osc",
    "preset": "Sub Sine",
    "kind": "sound",
    "nn": "eravos.sub-engine · Odd · Séance 808",
-   "d": 0.116,
+   "d": 0.149,
    "nnOther": "eravos.sub-engine · Odd · Séance 808",
-   "dOther": 0.116
+   "dOther": 0.149
   },
   {
    "tool": "eravos.syn-osc",
    "preset": "FM Modulator ×2 (wire into FM in)",
    "kind": "sound",
-   "nn": "eravos.curve-synth · Ricochet Notes",
-   "d": 0.219,
-   "nnOther": "eravos.curve-synth · Ricochet Notes",
-   "dOther": 0.219
+   "nn": "eravos.curve-synth · Vibrato Lead",
+   "d": 0.204,
+   "nnOther": "eravos.curve-synth · Vibrato Lead",
+   "dOther": 0.204
   },
   {
    "tool": "eravos.syn-osc",
    "preset": "Bell Modulator ×7 (wire into FM in)",
    "kind": "sound",
    "nn": "eravos.syn-osc · FM Modulator ×2 (wire into FM in)",
-   "d": 0.238,
-   "nnOther": "eravos.syn-partials · Tubular Bell",
-   "dOther": 0.299
+   "d": 0.206,
+   "nnOther": "eravos.curve-synth · Vibrato Lead",
+   "dOther": 0.28
   },
   {
    "tool": "eravos.syn-osc",
    "preset": "Growl Modulator ×1 (wire into FM in)",
    "kind": "sound",
    "nn": "eravos.clip-maker · Odd · Her words (tight)",
-   "d": 0.086,
+   "d": 0.075,
    "nnOther": "eravos.clip-maker · Odd · Her words (tight)",
-   "dOther": 0.086
+   "dOther": 0.075
   },
   {
    "tool": "eravos.syn-osc",
    "preset": "Odd · Gospel Morph Stack",
    "kind": "sound",
-   "nn": "eravos.syn-osc · Drawbar Organ",
-   "d": 0.131,
-   "nnOther": "eravos.syn-partials · Drawbars",
-   "dOther": 0.135
+   "nn": "eravos.xen-synth · Tuning-matched 10-EDO",
+   "d": 0.158,
+   "nnOther": "eravos.xen-synth · Tuning-matched 10-EDO",
+   "dOther": 0.158
   },
   {
    "tool": "eravos.syn-osc",
    "preset": "Odd · Morph Choir Pad",
    "kind": "sound",
    "nn": "eravos.syn-osc · Glass Pad",
-   "d": 0.067,
+   "d": 0.075,
    "nnOther": "eravos.recursive-spectra · Stretching Organ",
-   "dOther": 0.135
+   "dOther": 0.136
   },
   {
    "tool": "eravos.syn-partials",
    "preset": "Glass Keys",
    "kind": "sound",
    "nn": "eravos.syn-partials · Tubular Bell",
-   "d": 0.097,
-   "nnOther": "eravos.curve-synth · Vibrato Lead",
-   "dOther": 0.104
+   "d": 0.084,
+   "nnOther": "eravos.curve-synth · Ricochet Notes",
+   "dOther": 0.123
   },
   {
    "tool": "eravos.syn-partials",
    "preset": "Tubular Bell",
    "kind": "sound",
    "nn": "eravos.syn-partials · Glass Keys",
-   "d": 0.097,
-   "nnOther": "eravos.curve-synth · Vibrato Lead",
-   "dOther": 0.144
+   "d": 0.084,
+   "nnOther": "eravos.curve-synth · Ricochet Notes",
+   "dOther": 0.146
   },
   {
    "tool": "eravos.syn-partials",
    "preset": "Hollow Reed",
    "kind": "sound",
    "nn": "eravos.curve-synth · Vibrato Lead",
-   "d": 0.121,
+   "d": 0.105,
    "nnOther": "eravos.curve-synth · Vibrato Lead",
-   "dOther": 0.121
+   "dOther": 0.105
   },
   {
    "tool": "eravos.syn-partials",
    "preset": "Drawbars",
    "kind": "sound",
    "nn": "eravos.syn-osc · Drawbar Organ",
-   "d": 0.02,
+   "d": 0.017,
    "nnOther": "eravos.syn-osc · Drawbar Organ",
-   "dOther": 0.02
+   "dOther": 0.017
   },
   {
    "tool": "eravos.syn-partials",
    "preset": "Evolving Choir",
    "kind": "sound",
    "nn": "eravos.syn-partials · Odd · Bell Choir",
-   "d": 0.015,
+   "d": 0.03,
    "nnOther": "eravos.retro-poly · Odd · Wobble Pad Glow",
-   "dOther": 0.109
+   "dOther": 0.15
   },
   {
    "tool": "eravos.syn-partials",
    "preset": "Mallet",
    "kind": "sound",
    "nn": "eravos.xen-synth · Odd · Slendro Riddim Bells",
-   "d": 0.154,
+   "d": 0.144,
    "nnOther": "eravos.xen-synth · Odd · Slendro Riddim Bells",
-   "dOther": 0.154
+   "dOther": 0.144
   },
   {
    "tool": "eravos.syn-partials",
    "preset": "Saw to Sine Pad",
    "kind": "sound",
-   "nn": "eravos.syn-partials · Odd · Bell Choir",
-   "d": 0.087,
-   "nnOther": "eravos.retro-dco · String Machine",
-   "dOther": 0.097
+   "nn": "eravos.swarm-oscillator · Organic Strings",
+   "d": 0.118,
+   "nnOther": "eravos.swarm-oscillator · Organic Strings",
+   "dOther": 0.118
   },
   {
    "tool": "eravos.syn-partials",
    "preset": "Octave Air",
    "kind": "sound",
-   "nn": "eravos.syn-partials · Evolving Choir",
-   "d": 0.089,
-   "nnOther": "eravos.retro-poly · Odd · Wobble Pad Glow",
-   "dOther": 0.144
+   "nn": "eravos.syn-partials · Saw to Sine Pad",
+   "d": 0.16,
+   "nnOther": "eravos.sample-player · Reverse swell",
+   "dOther": 0.176
   },
   {
    "tool": "eravos.syn-partials",
    "preset": "Odd · Spectral Glass Pad",
    "kind": "sound",
    "nn": "eravos.syn-partials · Glass Keys",
-   "d": 0.125,
-   "nnOther": "eravos.xen-synth · Partch Diamond Strings",
-   "dOther": 0.139
+   "d": 0.11,
+   "nnOther": "eravos.swarm-oscillator · Odd · Lullaby Lock",
+   "dOther": 0.157
   },
   {
    "tool": "eravos.syn-partials",
    "preset": "Odd · Bell Choir",
    "kind": "sound",
    "nn": "eravos.syn-partials · Evolving Choir",
-   "d": 0.015,
+   "d": 0.03,
    "nnOther": "eravos.retro-poly · Odd · Wobble Pad Glow",
-   "dOther": 0.104
+   "dOther": 0.128
   },
   {
    "tool": "eravos.clip-maker",
    "preset": "Odd · Her words (tight)",
    "kind": "sound",
    "nn": "eravos.syn-osc · Growl Modulator ×1 (wire into FM in)",
-   "d": 0.086,
+   "d": 0.075,
    "nnOther": "eravos.syn-osc · Growl Modulator ×1 (wire into FM in)",
-   "dOther": 0.086
+   "dOther": 0.075
   },
   {
    "tool": "eravos.sample-player",
@@ -3338,17 +3383,17 @@
    "kind": "sound",
    "nn": "eravos.sample-player · Auto chop",
    "d": 0,
-   "nnOther": "eravos.curve-synth · Bending Lead",
-   "dOther": 0.046
+   "nnOther": "eravos.clip-maker · Odd · Her words (tight)",
+   "dOther": 0.076
   },
   {
    "tool": "eravos.sample-player",
    "preset": "Chop 8",
    "kind": "sound",
    "nn": "eravos.sample-player · Odd · Her Voice · Chopped Triplets",
-   "d": 0.021,
+   "d": 0.228,
    "nnOther": "eravos.syn-osc · Pluck",
-   "dOther": 0.124
+   "dOther": 0.238
   },
   {
    "tool": "eravos.sample-player",
@@ -3356,26 +3401,26 @@
    "kind": "sound",
    "nn": "eravos.sample-player · Whole clip",
    "d": 0,
-   "nnOther": "eravos.curve-synth · Bending Lead",
-   "dOther": 0.046
+   "nnOther": "eravos.clip-maker · Odd · Her words (tight)",
+   "dOther": 0.076
   },
   {
    "tool": "eravos.sample-player",
    "preset": "Melodic voice",
    "kind": "sound",
    "nn": "eravos.sample-player · Odd · Her Voice · Up Front",
-   "d": 0.021,
-   "nnOther": "eravos.curve-synth · Bending Lead",
-   "dOther": 0.05
+   "d": 0.018,
+   "nnOther": "eravos.clip-maker · Odd · Her words (tight)",
+   "dOther": 0.078
   },
   {
    "tool": "eravos.sample-player",
    "preset": "Reverse swell",
    "kind": "sound",
-   "nn": "eravos.retro-poly · 80s · Juno Brass Swell",
-   "d": 0.091,
-   "nnOther": "eravos.retro-poly · 80s · Juno Brass Swell",
-   "dOther": 0.091
+   "nn": "eravos.sample-player · Whole clip",
+   "d": 0.115,
+   "nnOther": "eravos.curve-synth · Plain Lead (no bend)",
+   "dOther": 0.141
   },
   {
    "tool": "eravos.sample-player",
@@ -3383,53 +3428,53 @@
    "kind": "sound",
    "nn": "eravos.sample-player · Whole clip",
    "d": 0.001,
-   "nnOther": "eravos.curve-synth · Bending Lead",
-   "dOther": 0.046
+   "nnOther": "eravos.clip-maker · Odd · Her words (tight)",
+   "dOther": 0.076
   },
   {
    "tool": "eravos.sample-player",
    "preset": "Odd · Her Voice · Chopped Triplets",
    "kind": "sound",
-   "nn": "eravos.sample-player · Chop 8",
-   "d": 0.021,
+   "nn": "eravos.syn-osc · Pluck",
+   "d": 0.107,
    "nnOther": "eravos.syn-osc · Pluck",
-   "dOther": 0.123
+   "dOther": 0.107
   },
   {
    "tool": "eravos.wub-filter",
    "preset": "Yoi Vowel (OO → AH)",
    "kind": "effect",
    "nn": "eravos.wub-filter · Yoi Yoi (OO → YOI)",
-   "d": 0.048,
-   "nnOther": "eravos.fx-filter · Lofi Underwater",
-   "dOther": 0.076
+   "d": 0.042,
+   "nnOther": "eravos.fx-destroyer · Growl Fold · sub stays clean",
+   "dOther": 0.092
   },
   {
    "tool": "eravos.wub-filter",
    "preset": "Yoi Yoi (OO → YOI)",
    "kind": "effect",
    "nn": "eravos.wub-filter · Yoi Vowel (OO → AH)",
-   "d": 0.048,
-   "nnOther": "eravos.fx-filter · Lofi Underwater",
-   "dOther": 0.064
+   "d": 0.042,
+   "nnOther": "eravos.fx-destroyer · Fold Growl",
+   "dOther": 0.086
   },
   {
    "tool": "eravos.wub-filter",
    "preset": "Hollow Comb (−)",
    "kind": "effect",
    "nn": "eravos.fx-moddelay · 80s · Dimension D Wide",
-   "d": 0.119,
+   "d": 0.107,
    "nnOther": "eravos.fx-moddelay · 80s · Dimension D Wide",
-   "dOther": 0.119
+   "dOther": 0.107
   },
   {
    "tool": "eravos.wub-filter",
    "preset": "Bandpass Yap",
    "kind": "effect",
    "nn": "eravos.wub-filter · Yoi Vowel (OO → AH)",
-   "d": 0.102,
-   "nnOther": "eravos.fx-filter · Lofi Underwater",
-   "dOther": 0.128
+   "d": 0.088,
+   "nnOther": "eravos.fx-destroyer · Growl Fold · sub stays clean",
+   "dOther": 0.111
   },
   {
    "tool": "eravos.wub-osc",
@@ -3437,71 +3482,71 @@
    "kind": "sound",
    "nn": "eravos.wub-osc · Odd · Acid Saw Wub",
    "d": 0,
-   "nnOther": "eravos.curve-synth · Laser Pluck",
-   "dOther": 0.09
+   "nnOther": "eravos.bass-forge · Riddim Stair",
+   "dOther": 0.089
   },
   {
    "tool": "eravos.wub-osc",
    "preset": "Classic Wub Saw",
    "kind": "sound",
    "nn": "eravos.wub-osc · Dive Bomb",
-   "d": 0.009,
-   "nnOther": "eravos.bass-forge · Odd · Organ Grinder",
-   "dOther": 0.065
+   "d": 0.008,
+   "nnOther": "eravos.curve-synth · Laser Pluck",
+   "dOther": 0.082
   },
   {
    "tool": "eravos.wub-osc",
    "preset": "Square Talker",
    "kind": "sound",
    "nn": "eravos.wub-osc · Dive Bomb",
-   "d": 0.073,
-   "nnOther": "eravos.bass-forge · Riddim Stair",
-   "dOther": 0.107
+   "d": 0.063,
+   "nnOther": "eravos.curve-synth · Laser Pluck",
+   "dOther": 0.099
   },
   {
    "tool": "eravos.wub-osc",
    "preset": "FM Growl 1:1",
    "kind": "sound",
-   "nn": "eravos.wub-osc · FM Low Grind 0.5:1",
-   "d": 0.094,
+   "nn": "eravos.retro-dco · Sub Growl",
+   "d": 0.091,
    "nnOther": "eravos.retro-dco · Sub Growl",
-   "dOther": 0.101
+   "dOther": 0.091
   },
   {
    "tool": "eravos.wub-osc",
    "preset": "FM Riddim 2:1",
    "kind": "sound",
-   "nn": "eravos.wub-osc · FM Growl 1:1",
-   "d": 0.1,
-   "nnOther": "eravos.retro-dco · Sub Growl",
-   "dOther": 0.117
+   "nn": "eravos.syn-osc · Vowel Bass",
+   "d": 0.113,
+   "nnOther": "eravos.syn-osc · Vowel Bass",
+   "dOther": 0.113
   },
   {
    "tool": "eravos.wub-osc",
    "preset": "FM Clang 3:1",
    "kind": "sound",
    "nn": "eravos.sub-engine · Phone-Speaker Sub",
-   "d": 0.068,
+   "d": 0.059,
    "nnOther": "eravos.sub-engine · Phone-Speaker Sub",
-   "dOther": 0.068
+   "dOther": 0.059
   },
   {
    "tool": "eravos.wub-osc",
    "preset": "FM Low Grind 0.5:1",
    "kind": "sound",
    "nn": "eravos.wub-osc · FM Growl 1:1",
-   "d": 0.094,
+   "d": 0.099,
    "nnOther": "eravos.acid-synth · Deep Minimal",
-   "dOther": 0.111
+   "dOther": 0.135
   },
   {
    "tool": "eravos.wub-osc",
    "preset": "Dive Bomb",
    "kind": "sound",
    "nn": "eravos.wub-osc · Classic Wub Saw",
-   "d": 0.009,
-   "nnOther": "eravos.bass-forge · Odd · Organ Grinder",
-   "dOther": 0.071
+   "d": 0.008,
+   "nnOther": "eravos.curve-synth · Laser Pluck",
+   "dOther": 0.085
   },
   {
    "tool": "eravos.wub-osc",
@@ -3509,62 +3554,62 @@
    "kind": "sound",
    "nn": "eravos.wub-osc · Init Saw",
    "d": 0,
-   "nnOther": "eravos.curve-synth · Laser Pluck",
-   "dOther": 0.09
+   "nnOther": "eravos.bass-forge · Riddim Stair",
+   "dOther": 0.089
   },
   {
    "tool": "eravos.recursive-spectra",
    "preset": "Golden Drift",
    "kind": "sound",
-   "nn": "eravos.recursive-spectra · Bell Fractal",
-   "d": 0.09,
+   "nn": "eravos.organ · Funeral Pulse",
+   "d": 0.084,
    "nnOther": "eravos.organ · Funeral Pulse",
-   "dOther": 0.093
+   "dOther": 0.084
   },
   {
    "tool": "eravos.recursive-spectra",
    "preset": "Bell Fractal",
    "kind": "sound",
-   "nn": "eravos.recursive-spectra · Golden Drift",
-   "d": 0.09,
-   "nnOther": "eravos.organ · Breathing Crypt",
-   "dOther": 0.108
+   "nn": "eravos.recursive-spectra · Witch Bell Loop",
+   "d": 0.088,
+   "nnOther": "eravos.organ · Odd · Funeral Dancehall",
+   "dOther": 0.118
   },
   {
    "tool": "eravos.recursive-spectra",
    "preset": "Stretching Organ",
    "kind": "sound",
    "nn": "eravos.organ · Gothic Chord Funeral",
-   "d": 0.1,
+   "d": 0.09,
    "nnOther": "eravos.organ · Gothic Chord Funeral",
-   "dOther": 0.1
+   "dOther": 0.09
   },
   {
    "tool": "eravos.recursive-spectra",
    "preset": "Mirror Choir",
    "kind": "sound",
-   "nn": "eravos.retro-dco · String Machine",
-   "d": 0.096,
-   "nnOther": "eravos.retro-dco · String Machine",
-   "dOther": 0.096
+   "nn": "eravos.xen-synth · Prime Ghost (otonal)",
+   "d": 0.086,
+   "nnOther": "eravos.xen-synth · Prime Ghost (otonal)",
+   "dOther": 0.086
   },
   {
    "tool": "eravos.recursive-spectra",
    "preset": "φ Spiral Pad",
    "kind": "sound",
-   "nn": "eravos.retro-dco · Five-Voice Brass Swell",
-   "d": 0.111,
-   "nnOther": "eravos.retro-dco · Five-Voice Brass Swell",
-   "dOther": 0.111
+   "nn": "eravos.retro-dco · Voice-Card Motion",
+   "d": 0.106,
+   "nnOther": "eravos.retro-dco · Voice-Card Motion",
+   "dOther": 0.106
   },
   {
    "tool": "eravos.recursive-spectra",
    "preset": "Membrane Storm",
    "kind": "sound",
-   "nn": "eravos.reese-bass · Odd · Chapel Reese",
-   "d": 0.08,
-   "nnOther": "eravos.reese-bass · Odd · Chapel Reese",
-   "dOther": 0.08
+   "nn": "eravos.recursive-spectra · Witch Bell Loop",
+   "d": 0.077,
+   "nnOther": "eravos.acid-synth · Deep Minimal",
+   "dOther": 0.127
   },
   {
    "tool": "eravos.recursive-spectra",
@@ -3572,8 +3617,8 @@
    "kind": "sound",
    "nn": "eravos.recursive-spectra · Odd · Trap Spectrum Drone",
    "d": 0.033,
-   "nnOther": "eravos.reese-bass · Odd · Chapel Reese",
-   "dOther": 0.086
+   "nnOther": "eravos.acid-synth · Deep Minimal",
+   "dOther": 0.119
   },
   {
    "tool": "eravos.recursive-spectra",
@@ -3581,143 +3626,143 @@
    "kind": "sound",
    "nn": "eravos.recursive-spectra · Witch Bell Loop",
    "d": 0.033,
-   "nnOther": "eravos.reese-bass · Odd · Chapel Reese",
-   "dOther": 0.072
+   "nnOther": "eravos.acid-synth · Deep Minimal",
+   "dOther": 0.117
   },
   {
    "tool": "eravos.recursive-spectra",
    "preset": "Odd · Breathing Spectrum",
    "kind": "sound",
-   "nn": "eravos.syn-partials · Odd · Bell Choir",
-   "d": 0.126,
-   "nnOther": "eravos.syn-partials · Odd · Bell Choir",
-   "dOther": 0.126
+   "nn": "eravos.xen-synth · Partch Diamond Strings",
+   "d": 0.143,
+   "nnOther": "eravos.xen-synth · Partch Diamond Strings",
+   "dOther": 0.143
   },
   {
    "tool": "eravos.xen-synth",
    "preset": "Golden Bells",
    "kind": "sound",
    "nn": "eravos.xen-synth · Odd · Golden Dub Bells",
-   "d": 0.064,
+   "d": 0.055,
    "nnOther": "eravos.supersaw · Melodic Saw Bass",
-   "dOther": 0.102
+   "dOther": 0.103
   },
   {
    "tool": "eravos.xen-synth",
    "preset": "Bohlen–Pierce Clarinet",
    "kind": "sound",
-   "nn": "eravos.organ · Odd · Dub Bubble Hammond",
-   "d": 0.077,
-   "nnOther": "eravos.organ · Odd · Dub Bubble Hammond",
-   "dOther": 0.077
+   "nn": "eravos.xen-synth · Tuning-matched 10-EDO",
+   "d": 0.096,
+   "nnOther": "eravos.swarm-oscillator · Odd · Lullaby Lock",
+   "dOther": 0.105
   },
   {
    "tool": "eravos.xen-synth",
    "preset": "Tuning-matched 10-EDO",
    "kind": "sound",
-   "nn": "eravos.organ · Odd · Dub Bubble Hammond",
-   "d": 0.089,
+   "nn": "eravos.xen-synth · Bohlen–Pierce Clarinet",
+   "d": 0.096,
    "nnOther": "eravos.organ · Odd · Dub Bubble Hammond",
-   "dOther": 0.089
+   "dOther": 0.101
   },
   {
    "tool": "eravos.xen-synth",
    "preset": "φ Organ (ED φ)",
    "kind": "sound",
-   "nn": "eravos.retro-dco · Five-Voice Brass Swell",
-   "d": 0.103,
-   "nnOther": "eravos.retro-dco · Five-Voice Brass Swell",
-   "dOther": 0.103
+   "nn": "eravos.xen-synth · Bohlen–Pierce Clarinet",
+   "d": 0.102,
+   "nnOther": "eravos.retro-poly · Lofi Keys",
+   "dOther": 0.108
   },
   {
    "tool": "eravos.xen-synth",
    "preset": "Carlos α Glass",
    "kind": "sound",
    "nn": "eravos.xen-synth · Odd · 19-EDO Wobble Lead",
-   "d": 0.04,
-   "nnOther": "eravos.syn-partials · Drawbars",
-   "dOther": 0.122
+   "d": 0.037,
+   "nnOther": "eravos.organ · Desert Gospel",
+   "dOther": 0.13
   },
   {
    "tool": "eravos.xen-synth",
    "preset": "Stretched Piano 22",
    "kind": "sound",
-   "nn": "eravos.xen-synth · Tuning-matched 10-EDO",
-   "d": 0.111,
+   "nn": "eravos.retro-poly · Lofi Felt Keys",
+   "d": 0.107,
    "nnOther": "eravos.retro-poly · Lofi Felt Keys",
-   "dOther": 0.114
+   "dOther": 0.107
   },
   {
    "tool": "eravos.xen-synth",
    "preset": "Prime Ghost (otonal)",
    "kind": "sound",
-   "nn": "eravos.organ · Funeral Pulse",
-   "d": 0.09,
-   "nnOther": "eravos.organ · Funeral Pulse",
-   "dOther": 0.09
+   "nn": "eravos.organ · 80s · Cathedral Synth-Pop",
+   "d": 0.081,
+   "nnOther": "eravos.organ · 80s · Cathedral Synth-Pop",
+   "dOther": 0.081
   },
   {
    "tool": "eravos.xen-synth",
    "preset": "Slendro Metallophone",
    "kind": "sound",
-   "nn": "eravos.retro-dco · Coldwave Lead",
-   "d": 0.134,
-   "nnOther": "eravos.retro-dco · Coldwave Lead",
-   "dOther": 0.134
+   "nn": "eravos.organ · Eerie Celeste",
+   "d": 0.146,
+   "nnOther": "eravos.organ · Eerie Celeste",
+   "dOther": 0.146
   },
   {
    "tool": "eravos.xen-synth",
    "preset": "π Drone",
    "kind": "sound",
-   "nn": "eravos.reese-bass · Wide Rumble",
-   "d": 0.08,
-   "nnOther": "eravos.reese-bass · Wide Rumble",
-   "dOther": 0.08
+   "nn": "eravos.embodiment-lab · Feelings · Held",
+   "d": 0.111,
+   "nnOther": "eravos.embodiment-lab · Feelings · Held",
+   "dOther": 0.111
   },
   {
    "tool": "eravos.xen-synth",
    "preset": "Partch Diamond Strings",
    "kind": "sound",
-   "nn": "eravos.xen-synth · Tuning-matched 10-EDO",
-   "d": 0.106,
-   "nnOther": "eravos.recursive-spectra · Stretching Organ",
-   "dOther": 0.119
+   "nn": "eravos.xen-synth · Prime Ghost (otonal)",
+   "d": 0.114,
+   "nnOther": "eravos.retro-poly · Lofi Felt Keys",
+   "dOther": 0.118
   },
   {
    "tool": "eravos.xen-synth",
    "preset": "Silver-Mean Membrane",
    "kind": "sound",
-   "nn": "eravos.wub-osc · FM Growl 1:1",
-   "d": 0.188,
-   "nnOther": "eravos.wub-osc · FM Growl 1:1",
-   "dOther": 0.188
+   "nn": "eravos.xen-synth · π Drone",
+   "d": 0.302,
+   "nnOther": "eravos.organ · Pedal Drone",
+   "dOther": 0.313
   },
   {
    "tool": "eravos.xen-synth",
    "preset": "Odd · Golden Dub Bells",
    "kind": "sound",
    "nn": "eravos.xen-synth · Golden Bells",
-   "d": 0.064,
+   "d": 0.055,
    "nnOther": "eravos.supersaw · Melodic Saw Bass",
-   "dOther": 0.128
+   "dOther": 0.121
   },
   {
    "tool": "eravos.xen-synth",
    "preset": "Odd · 19-EDO Wobble Lead",
    "kind": "sound",
    "nn": "eravos.xen-synth · Carlos α Glass",
-   "d": 0.04,
-   "nnOther": "eravos.syn-partials · Drawbars",
-   "dOther": 0.107
+   "d": 0.037,
+   "nnOther": "eravos.organ · Desert Gospel",
+   "dOther": 0.116
   },
   {
    "tool": "eravos.xen-synth",
    "preset": "Odd · Slendro Riddim Bells",
    "kind": "sound",
    "nn": "eravos.syn-partials · Mallet",
-   "d": 0.154,
+   "d": 0.144,
    "nnOther": "eravos.syn-partials · Mallet",
-   "dOther": 0.154
+   "dOther": 0.144
   }
  ],
  "tools": [
@@ -3734,40 +3779,16 @@
    "twinsInside": 0
   },
   {
-   "id": "eravos.fx-dynamics",
-   "label": "Dynamics",
-   "kind": "effect",
-   "presets": 9,
-   "novel": 0,
-   "medAny": 0,
-   "medOther": 0.03623936464666756,
-   "insideOf": "Mod Delay",
-   "insideShare": 0.6666666666666666,
-   "twinsInside": 9
-  },
-  {
    "id": "eravos.fx-glitch",
    "label": "Glitch",
    "kind": "effect",
    "presets": 8,
-   "novel": 1,
+   "novel": 0,
    "medAny": 0,
    "medOther": 0,
    "insideOf": "Dynamics",
-   "insideShare": 0.625,
+   "insideShare": 0.875,
    "twinsInside": 0
-  },
-  {
-   "id": "eravos.fx-squash",
-   "label": "Squash",
-   "kind": "effect",
-   "presets": 5,
-   "novel": 0,
-   "medAny": 0.018155280072808345,
-   "medOther": 0.027162120099431593,
-   "insideOf": "EQ",
-   "insideShare": 0.6,
-   "twinsInside": 3
   },
   {
    "id": "eravos.sub-engine",
@@ -3775,59 +3796,35 @@
    "kind": "sound",
    "presets": 15,
    "novel": 2,
-   "medAny": 0.010895699587855256,
-   "medOther": 0.03916289151377275,
+   "medAny": 0.009434474214778941,
+   "medOther": 0.033712491250209246,
    "insideOf": "Reese Bass",
-   "insideShare": 0.6,
-   "twinsInside": 10
+   "insideShare": 0.8666666666666667,
+   "twinsInside": 12
+  },
+  {
+   "id": "eravos.fx-dynamics",
+   "label": "Dynamics",
+   "kind": "effect",
+   "presets": 9,
+   "novel": 0,
+   "medAny": 0,
+   "medOther": 0.0314118931812677,
+   "insideOf": "Mod Delay",
+   "insideShare": 0.6666666666666666,
+   "twinsInside": 9
   },
   {
    "id": "eravos.channel",
    "label": "Channel",
    "kind": "effect",
    "presets": 8,
-   "novel": 0,
-   "medAny": 0.01182079720231609,
-   "medOther": 0.030964699944653232,
+   "novel": 1,
+   "medAny": 0.013075534385999978,
+   "medOther": 0.027789608590885136,
    "insideOf": "EQ",
-   "insideShare": 0.5,
-   "twinsInside": 6
-  },
-  {
-   "id": "eravos.granular",
-   "label": "Granular",
-   "kind": "effect",
-   "presets": 11,
-   "novel": 2,
-   "medAny": 0.0320931955152178,
-   "medOther": 0.043868446587924645,
-   "insideOf": "Tape Echo",
-   "insideShare": 0.36363636363636365,
-   "twinsInside": 0
-  },
-  {
-   "id": "eravos.fx-eq",
-   "label": "EQ",
-   "kind": "effect",
-   "presets": 9,
-   "novel": 1,
-   "medAny": 0.018740703502690505,
-   "medOther": 0.018740703502690505,
-   "insideOf": "Channel",
-   "insideShare": 0.3333333333333333,
-   "twinsInside": 1
-  },
-  {
-   "id": "eravos.fx-echo",
-   "label": "Tape Echo",
-   "kind": "effect",
-   "presets": 13,
-   "novel": 1,
-   "medAny": 0.011438681318667687,
-   "medOther": 0.03585597673153238,
-   "insideOf": "Granular",
-   "insideShare": 0.3076923076923077,
-   "twinsInside": 7
+   "insideShare": 0.625,
+   "twinsInside": 4
   },
   {
    "id": "eravos.sidechain-compressor",
@@ -3835,46 +3832,34 @@
    "kind": "effect",
    "presets": 10,
    "novel": 0,
-   "medAny": 0.0062473467580446964,
-   "medOther": 0.008702976852158996,
-   "insideOf": "Mod Delay",
-   "insideShare": 0.3,
+   "medAny": 0.00541067123947003,
+   "medOther": 0.014040653342648542,
+   "insideOf": "EQ",
+   "insideShare": 0.6,
    "twinsInside": 4
   },
   {
-   "id": "eravos.fx-pitch",
-   "label": "Pitch",
+   "id": "eravos.fx-squash",
+   "label": "Squash",
+   "kind": "effect",
+   "presets": 5,
+   "novel": 0,
+   "medAny": 0.015726037573135208,
+   "medOther": 0.023523477674843796,
+   "insideOf": "EQ",
+   "insideShare": 0.6,
+   "twinsInside": 3
+  },
+  {
+   "id": "eravos.fx-eq",
+   "label": "EQ",
    "kind": "effect",
    "presets": 9,
-   "novel": 3,
-   "medAny": 0.04120952585560493,
-   "medOther": 0.04352499393405512,
-   "insideOf": "Glitch",
-   "insideShare": 0.2222222222222222,
-   "twinsInside": 0
-  },
-  {
-   "id": "eravos.fx-moddelay",
-   "label": "Mod Delay",
-   "kind": "effect",
-   "presets": 10,
    "novel": 2,
-   "medAny": 0.03567771365769613,
-   "medOther": 0.06714707880513641,
+   "medAny": 0.018173944408210563,
+   "medOther": 0.019306952659899537,
    "insideOf": "Sidechain",
-   "insideShare": 0.2,
-   "twinsInside": 0
-  },
-  {
-   "id": "eravos.fx-phaser",
-   "label": "Phaser",
-   "kind": "effect",
-   "presets": 8,
-   "novel": 5,
-   "medAny": 0.0467608293674191,
-   "medOther": 0.07041678836400825,
-   "insideOf": "Pitch",
-   "insideShare": 0.125,
+   "insideShare": 0.4444444444444444,
    "twinsInside": 2
   },
   {
@@ -3882,12 +3867,60 @@
    "label": "Destroyer",
    "kind": "effect",
    "presets": 10,
+   "novel": 1,
+   "medAny": 0.028256999462476833,
+   "medOther": 0.06070678892370026,
+   "insideOf": "Channel",
+   "insideShare": 0.3,
+   "twinsInside": 6
+  },
+  {
+   "id": "eravos.fx-phaser",
+   "label": "Phaser",
+   "kind": "effect",
+   "presets": 8,
    "novel": 2,
-   "medAny": 0.03262071219484775,
-   "medOther": 0.05543886449428972,
+   "medAny": 0.0480433635066818,
+   "medOther": 0.08182120493761817,
+   "insideOf": "Pitch",
+   "insideShare": 0.25,
+   "twinsInside": 2
+  },
+  {
+   "id": "eravos.fx-echo",
+   "label": "Tape Echo",
+   "kind": "effect",
+   "presets": 13,
+   "novel": 2,
+   "medAny": 0.01693560602826125,
+   "medOther": 0.06347850230915406,
    "insideOf": "Dynamics",
-   "insideShare": 0.1,
+   "insideShare": 0.23076923076923078,
+   "twinsInside": 6
+  },
+  {
+   "id": "eravos.fx-pitch",
+   "label": "Pitch",
+   "kind": "effect",
+   "presets": 9,
+   "novel": 4,
+   "medAny": 0.0463812628669652,
+   "medOther": 0.08673233047436675,
+   "insideOf": "Mod Delay",
+   "insideShare": 0.1111111111111111,
    "twinsInside": 0
+  },
+  {
+   "id": "eravos.fx-moddelay",
+   "label": "Mod Delay",
+   "kind": "effect",
+   "presets": 10,
+   "novel": 5,
+   "medAny": 0.06466723718173047,
+   "medOther": 0.07813410848744441,
+   "insideOf": "Pitch",
+   "insideShare": 0.1,
+   "twinsInside": 4
   },
   {
    "id": "eravos.syn-partials",
@@ -3895,11 +3928,23 @@
    "kind": "sound",
    "presets": 10,
    "novel": 7,
-   "medAny": 0.0972963750940202,
-   "medOther": 0.1213229940128139,
+   "medAny": 0.10509811533337438,
+   "medOther": 0.14398780700153085,
    "insideOf": "Morph Osc",
    "insideShare": 0.1,
-   "twinsInside": 2
+   "twinsInside": 0
+  },
+  {
+   "id": "eravos.granular",
+   "label": "Granular",
+   "kind": "effect",
+   "presets": 11,
+   "novel": 9,
+   "medAny": 0.07215895231440958,
+   "medOther": 0.1015695557397086,
+   "insideOf": "Dynamics",
+   "insideShare": 0.09090909090909091,
+   "twinsInside": 0
   },
   {
    "id": "eravos.syn-osc",
@@ -3907,11 +3952,23 @@
    "kind": "sound",
    "presets": 11,
    "novel": 10,
-   "medAny": 0.1157465188924962,
-   "medOther": 0.13013359148483541,
+   "medAny": 0.11271334571370421,
+   "medOther": 0.1361519702689698,
    "insideOf": "Partials",
    "insideShare": 0.09090909090909091,
    "twinsInside": 0
+  },
+  {
+   "id": "eravos.reese-bass",
+   "label": "Reese Bass",
+   "kind": "sound",
+   "presets": 13,
+   "novel": 5,
+   "medAny": 0.04149281000906644,
+   "medOther": 0.06973173455707798,
+   "insideOf": "Deep Sub",
+   "insideShare": 0.07692307692307693,
+   "twinsInside": 2
   },
   {
    "id": "eravos.bass-forge",
@@ -3919,83 +3976,23 @@
    "kind": "sound",
    "presets": 13,
    "novel": 7,
-   "medAny": 0.04957509853643907,
-   "medOther": 0.10100045256702372,
-   "insideOf": "Reese Bass",
+   "medAny": 0.06333175839162687,
+   "medOther": 0.09568200281606157,
+   "insideOf": "Swarm Oscillator",
    "insideShare": 0.07692307692307693,
-   "twinsInside": 0
-  },
-  {
-   "id": "eravos.reese-bass",
-   "label": "Reese Bass",
-   "kind": "sound",
-   "presets": 14,
-   "novel": 4,
-   "medAny": 0.04325594244226151,
-   "medOther": 0.07531020620897302,
-   "insideOf": "Deep Sub",
-   "insideShare": 0.07142857142857142,
-   "twinsInside": 5
-  },
-  {
-   "id": "eravos.sample-player",
-   "label": "Sample",
-   "kind": "sound",
-   "presets": 7,
-   "novel": 1,
-   "medAny": 0.02087697901683684,
-   "medOther": 0.049584711128125986,
-   "insideOf": null,
-   "insideShare": 0,
-   "twinsInside": 6
-  },
-  {
-   "id": "eravos.coven",
-   "label": "Coven",
-   "kind": "sound",
-   "presets": 11,
-   "novel": 8,
-   "medAny": 0.051537649104291795,
-   "medOther": 0.07161728581661875,
-   "insideOf": null,
-   "insideShare": 0,
-   "twinsInside": 0
-  },
-  {
-   "id": "eravos.retro-dco",
-   "label": "Retro DCO",
-   "kind": "sound",
-   "presets": 14,
-   "novel": 11,
-   "medAny": 0.06716212491377688,
-   "medOther": 0.07617964857033933,
-   "insideOf": null,
-   "insideShare": 0,
    "twinsInside": 2
   },
   {
-   "id": "eravos.retro-poly",
-   "label": "Retro Poly",
+   "id": "eravos.swarm-oscillator",
+   "label": "Swarm Oscillator",
    "kind": "sound",
-   "presets": 26,
-   "novel": 10,
-   "medAny": 0.03893875255857815,
-   "medOther": 0.07854170597780616,
-   "insideOf": null,
-   "insideShare": 0,
-   "twinsInside": 2
-  },
-  {
-   "id": "eravos.organ",
-   "label": "Gothic Organ",
-   "kind": "sound",
-   "presets": 19,
-   "novel": 13,
-   "medAny": 0.05735486621988279,
-   "medOther": 0.0845681364394886,
-   "insideOf": null,
-   "insideShare": 0,
-   "twinsInside": 4
+   "presets": 18,
+   "novel": 14,
+   "medAny": 0.08013916569761845,
+   "medOther": 0.10194244738964918,
+   "insideOf": "Reese Bass",
+   "insideShare": 0.05555555555555555,
+   "twinsInside": 0
   },
   {
    "id": "eravos.clip-maker",
@@ -4003,8 +4000,56 @@
    "kind": "sound",
    "presets": 1,
    "novel": 1,
-   "medAny": 0.08644847620440015,
-   "medOther": 0.08644847620440015,
+   "medAny": 0.07486662259329495,
+   "medOther": 0.07486662259329495,
+   "insideOf": null,
+   "insideShare": 0,
+   "twinsInside": 0
+  },
+  {
+   "id": "eravos.sample-player",
+   "label": "Sample",
+   "kind": "sound",
+   "presets": 7,
+   "novel": 3,
+   "medAny": 0.01807999472553522,
+   "medOther": 0.07841851542223462,
+   "insideOf": null,
+   "insideShare": 0,
+   "twinsInside": 4
+  },
+  {
+   "id": "eravos.retro-poly",
+   "label": "Retro Poly",
+   "kind": "sound",
+   "presets": 26,
+   "novel": 9,
+   "medAny": 0.037332388987897605,
+   "medOther": 0.0823228399539379,
+   "insideOf": null,
+   "insideShare": 0,
+   "twinsInside": 9
+  },
+  {
+   "id": "eravos.dub-station",
+   "label": "Dub Station",
+   "kind": "effect",
+   "presets": 11,
+   "novel": 1,
+   "medAny": 0.020412847650071547,
+   "medOther": 0.08399121546272977,
+   "insideOf": null,
+   "insideShare": 0,
+   "twinsInside": 9
+  },
+  {
+   "id": "eravos.coven",
+   "label": "Coven",
+   "kind": "sound",
+   "presets": 11,
+   "novel": 9,
+   "medAny": 0.06699893207519206,
+   "medOther": 0.08481982204613046,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 0
@@ -4015,8 +4060,20 @@
    "kind": "sound",
    "presets": 9,
    "novel": 5,
-   "medAny": 0.06757828633974904,
-   "medOther": 0.0897600492913327,
+   "medAny": 0.05854732145897956,
+   "medOther": 0.08922987067418522,
+   "insideOf": null,
+   "insideShare": 0,
+   "twinsInside": 4
+  },
+  {
+   "id": "eravos.organ",
+   "label": "Gothic Organ",
+   "kind": "sound",
+   "presets": 19,
+   "novel": 11,
+   "medAny": 0.06306594560684925,
+   "medOther": 0.09021406688268102,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 4
@@ -4026,21 +4083,69 @@
    "label": "Acid Synth",
    "kind": "sound",
    "presets": 13,
-   "novel": 7,
-   "medAny": 0.05649849392042606,
-   "medOther": 0.0929791388194574,
+   "novel": 9,
+   "medAny": 0.07464379685788042,
+   "medOther": 0.09242216419163514,
    "insideOf": null,
    "insideShare": 0,
-   "twinsInside": 2
+   "twinsInside": 4
   },
   {
    "id": "eravos.supersaw",
    "label": "Supersaw",
    "kind": "sound",
    "presets": 33,
-   "novel": 16,
-   "medAny": 0.04512464694734001,
-   "medOther": 0.09470873818460188,
+   "novel": 15,
+   "medAny": 0.05029516043381578,
+   "medOther": 0.09354143594124965,
+   "insideOf": null,
+   "insideShare": 0,
+   "twinsInside": 0
+  },
+  {
+   "id": "eravos.retro-dco",
+   "label": "Retro DCO",
+   "kind": "sound",
+   "presets": 14,
+   "novel": 12,
+   "medAny": 0.08135738534310845,
+   "medOther": 0.09354281062508321,
+   "insideOf": null,
+   "insideShare": 0,
+   "twinsInside": 2
+  },
+  {
+   "id": "eravos.wub-filter",
+   "label": "Wub Filter",
+   "kind": "effect",
+   "presets": 4,
+   "novel": 2,
+   "medAny": 0.08819987271128284,
+   "medOther": 0.10713711729117918,
+   "insideOf": null,
+   "insideShare": 0,
+   "twinsInside": 0
+  },
+  {
+   "id": "eravos.embodiment-lab",
+   "label": "Embodiment Lab",
+   "kind": "sound",
+   "presets": 13,
+   "novel": 6,
+   "medAny": 0.052187881415491424,
+   "medOther": 0.113365875483319,
+   "insideOf": null,
+   "insideShare": 0,
+   "twinsInside": 4
+  },
+  {
+   "id": "eravos.xen-synth",
+   "label": "Xen Synth",
+   "kind": "sound",
+   "presets": 14,
+   "novel": 10,
+   "medAny": 0.10213641591610363,
+   "medOther": 0.11609230435615779,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 0
@@ -4051,32 +4156,20 @@
    "kind": "sound",
    "presets": 9,
    "novel": 7,
-   "medAny": 0.08985782490166604,
-   "medOther": 0.09616535471439337,
+   "medAny": 0.08645188076998964,
+   "medOther": 0.11654619239716989,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 0
   },
   {
-   "id": "eravos.dub-station",
-   "label": "Dub Station",
-   "kind": "effect",
-   "presets": 11,
-   "novel": 1,
-   "medAny": 0.023543730875824207,
-   "medOther": 0.09694722204626446,
-   "insideOf": null,
-   "insideShare": 0,
-   "twinsInside": 5
-  },
-  {
-   "id": "eravos.swarm-oscillator",
-   "label": "Swarm Oscillator",
+   "id": "eravos.curve-synth",
+   "label": "Curve",
    "kind": "sound",
-   "presets": 12,
-   "novel": 10,
-   "medAny": 0.07801669930836766,
-   "medOther": 0.10712080574865292,
+   "presets": 13,
+   "novel": 9,
+   "medAny": 0.10509811533337438,
+   "medOther": 0.12280331398684259,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 0
@@ -4086,21 +4179,9 @@
    "label": "Filter",
    "kind": "effect",
    "presets": 12,
-   "novel": 10,
-   "medAny": 0.10164938137587358,
-   "medOther": 0.10954397782879163,
-   "insideOf": null,
-   "insideShare": 0,
-   "twinsInside": 0
-  },
-  {
-   "id": "eravos.xen-synth",
-   "label": "Xen Synth",
-   "kind": "sound",
-   "presets": 14,
    "novel": 12,
-   "medAny": 0.08993982954699196,
-   "medOther": 0.11403204004730519,
+   "medAny": 0.11794742686801676,
+   "medOther": 0.12364086508436731,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 0
@@ -4111,47 +4192,11 @@
    "kind": "effect",
    "presets": 8,
    "novel": 4,
-   "medAny": 0.11672912883329868,
-   "medOther": 0.11672912883329868,
+   "medAny": 0.1300399887112943,
+   "medOther": 0.15355646706165801,
    "insideOf": null,
    "insideShare": 0,
-   "twinsInside": 3
-  },
-  {
-   "id": "eravos.wub-filter",
-   "label": "Wub Filter",
-   "kind": "effect",
-   "presets": 4,
-   "novel": 4,
-   "medAny": 0.10183901211320481,
-   "medOther": 0.11931095252891995,
-   "insideOf": null,
-   "insideShare": 0,
-   "twinsInside": 0
-  },
-  {
-   "id": "eravos.embodiment-lab",
-   "label": "Embodiment Lab",
-   "kind": "sound",
-   "presets": 13,
-   "novel": 9,
-   "medAny": 0.05619578623147668,
-   "medOther": 0.12036477734622579,
-   "insideOf": null,
-   "insideShare": 0,
-   "twinsInside": 4
-  },
-  {
-   "id": "eravos.curve-synth",
-   "label": "Curve",
-   "kind": "sound",
-   "presets": 13,
-   "novel": 13,
-   "medAny": 0.08768447666172324,
-   "medOther": 0.1335099493023833,
-   "insideOf": null,
-   "insideShare": 0,
-   "twinsInside": 0
+   "twinsInside": 2
   },
   {
    "id": "eravos.tape-memory",
@@ -4159,8 +4204,8 @@
    "kind": "effect",
    "presets": 10,
    "novel": 2,
-   "medAny": 0.014595489555977505,
-   "medOther": 0.1752278895896533,
+   "medAny": 0.012640244443988041,
+   "medOther": 0.15954175093187442,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 8

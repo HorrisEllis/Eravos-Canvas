@@ -1,0 +1,138 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "swarm-oscillator.living",
+ "version": "1.0.0",
+ "label": "Living",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "living",
+  "genre-instruments",
+  "swarm-1.1"
+ ],
+ "for": "eravos.swarm-oscillator",
+ "items": {
+  "eravos.swarm-oscillator": {
+   "presets": {
+    "Breathing Swarm": {
+     "params": {
+      "mode": "coupled",
+      "voices": 9,
+      "spread": 0.55,
+      "coupling": 0.85,
+      "pull": 0.4,
+      "drift": 0.3,
+      "restless": 0.6,
+      "cohTone": 0.5,
+      "shape": "saw",
+      "cutoff": 2200,
+      "res": 0.15,
+      "attack": 0.05,
+      "release": 1.5,
+      "width": 1,
+      "sub": 0,
+      "level": 0.45
+     }
+    },
+    "Blooming Chord": {
+     "params": {
+      "mode": "harmonic",
+      "voices": 8,
+      "spread": 0.1,
+      "coupling": 0.7,
+      "cluster": 1,
+      "form": 1.6,
+      "cohTone": 0.4,
+      "shape": "tri",
+      "cutoff": 3200,
+      "envAmt": 0.15,
+      "attack": 0.2,
+      "release": 2.5,
+      "width": 0.8,
+      "sub": 0,
+      "level": 0.45
+     }
+    },
+    "Metal Swarm": {
+     "params": {
+      "mode": "coupled",
+      "voices": 9,
+      "spread": 0.3,
+      "coupling": 0.9,
+      "pull": 0.5,
+      "fieldFm": 0.8,
+      "shape": "tri",
+      "cutoff": 9000,
+      "res": 0.1,
+      "attack": 0.005,
+      "decay": 0.6,
+      "sustain": 0.5,
+      "release": 0.5,
+      "width": 0.8,
+      "sub": 0,
+      "level": 0.45
+     }
+    },
+    "Growl Cloud": {
+     "params": {
+      "mode": "free",
+      "voices": 12,
+      "spread": 0.5,
+      "coupling": 0.15,
+      "drift": 0.6,
+      "fieldFm": 1,
+      "shape": "saw",
+      "cutoff": 1800,
+      "res": 0.4,
+      "envAmt": 0.5,
+      "attack": 0.01,
+      "release": 0.6,
+      "width": 1,
+      "sub": 0.3,
+      "octave": -1,
+      "level": 0.45
+     }
+    },
+    "Tide Lock": {
+     "params": {
+      "mode": "coupled",
+      "voices": 16,
+      "spread": 0.7,
+      "coupling": 0.6,
+      "pull": 0.3,
+      "restless": 0.25,
+      "cohTone": -0.6,
+      "fieldFm": 0.3,
+      "shape": "table",
+      "table": 0.4,
+      "cutoff": 7000,
+      "attack": 0.6,
+      "sustain": 1,
+      "release": 3,
+      "width": 1,
+      "level": 0.45
+     }
+    },
+    "Shatter Bloom": {
+     "params": {
+      "mode": "harmonic",
+      "voices": 10,
+      "spread": 0.2,
+      "coupling": 0.8,
+      "cluster": 0.8,
+      "form": 0.5,
+      "restless": 0.8,
+      "fieldFm": 0.5,
+      "shape": "saw",
+      "cutoff": 5000,
+      "res": 0.2,
+      "attack": 0.02,
+      "release": 1.2,
+      "width": 1,
+      "level": 0.45
+     }
+    }
+   }
+  }
+ }
+}

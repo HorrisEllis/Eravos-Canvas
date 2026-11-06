@@ -2,6 +2,25 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.145 N2: Swarm 1.1 — it moves by itself; motion in the fingerprint (2026-11-06)
+Asked: "The swarm doesn't seem like anything new sound wise." · "Lets focus on getting tools more novel from each other" (and "Full note
+and rhythm editor canvas." — mapped, next).
+- oscillator-population 1.1: Restless (locked → a seeded kick in pitch, the coupling rests, then draws it back: it breathes), Form glide
+  (harmonic: each note blooms from one pitch into its chord), Field FM (the swarm's mean sine phase-modulates every voice, pitch kept).
+  All 0 by default: bit-identical to 1.0 (the 1.0 kernel kept as a fixture and compared sample for sample).
+- Swarm Oscillator: More depth ▸ LIFE — Restless, Form glide, Field FM, Lock → tone (coherence moves the cutoff ±2 octaves); every
+  existing preset unchanged; the Living pack (Breathing Swarm, Blooming Chord, Metal Swarm, Growl Cloud, Tide Lock, Shatter Bloom).
+- Found on the way: a phase jump in Restless clicked (now pitch only); Breathing Swarm's 8-note chord hit 1.49 at full level (retuned:
+  0.68).
+- The fingerprint measures motion: how fast the tone and the level move (swings a second, trend removed, still = 0.1/s); novelty weighs
+  four groups (colour · shape · envelope · motion).
+- Measured honestly: over one 2.6 s note the Living presets sit no further from Supersaw than the older ones (median 0.138 vs 0.137,
+  +1.0σ; Growl Cloud and Shatter Bloom −0.3σ from Reese Bass / Bass Forge). Restless takes seconds to show; his ear decides; an 8 s held
+  render is the next measure.
+- Proof: oscillator-population 24 checks; P123 9/9 (+3: Restless swings coherence > 0.3, still < 0.15; Field FM brightness × 1.5; Living
+  shipped; every preset's chord < full scale); contract 4/4; audio-measure 42/42; components all pass; 253 manifests valid; design check
+  no worse (55/72); no-toys green.
+
 ## Done — 3.144 Start: one section, a painting per setup; σ in the novelty report (2026-11-06)
 Asked: "can you make the art for each genre of music and consolidate the start from and setups into one section and remove vegal, and wub
 drop, then make the animated artwork for the setups" · "could always use sigmas to measure deviations between sounds and tools?"
