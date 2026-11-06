@@ -71,6 +71,15 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-06 · The Juno chorus, modelled and proved — bbd-line, ensemble-core
+- **His words (2026-11-06):** "1, 2" (release, then the synthwave parts).
+- **His call:** the parts the synthwave tools share first, then Retro DCO, its UI shown before it is built.
+- **Built:** a bucket-brigade delay model (compander, clock-tracking anti-alias and reconstruction filters, sample-and-hold, hiss inside
+  the line, clock bleed) and a multi-tap ensemble with known machines kept as data.
+- **Proof:** 20 + 20 measured checks — delay equal to the set time by phase, bandwidth following the clock, compander unity ±0.6 dB with
+  the hiss > 20 dB lower in silence, pitch wobble equal to 2π·rate·depth·f within 12 %; a filter corner corrected by measurement.
+- **Check:** `node tools/music/components/bbd-line/bbd-line.test.mjs` · `node tools/music/components/ensemble-core/ensemble-core.test.mjs`
+
 ### 2026-11-06 · Tape Memory — a lofi tape effect built from its parts
 - **His words:** "i also want to be able to make lofi" (2026-11-05) · "Lofi tools: UI previews first." · "yes" (2026-11-06).
 - **His call:** spec and UI preview approved first; the tool built from its seven components, each already proven.

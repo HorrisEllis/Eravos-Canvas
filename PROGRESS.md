@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.136 The Juno chorus parts: bbd-line, ensemble-core (2026-11-06)
+Asked: "1, 2" (release 0.2.13; then the synthwave parts and the Retro DCO preview). random-source and saturator-tape were built by the other
+session (3.134) — so this step is the chorus pair.
+- bbd-line: the bucket-brigade chip — 2:1 compander, anti-alias and reconstruction 4-pole low-passes at clock/3, sample-and-hold at the
+  clock (= stages / 2·time, so the bandwidth falls as the delay grows), hiss inside the line (it breathes with the playing), clock bleed.
+- ensemble-core: 1–8 taps on one line, LFO phases spread k/taps (2 = inverted, the Juno way; 3 = 120°, string machines), a second fast LFO,
+  sine / triangle, spread, mix; the machines as data (juno I, II, I+II, string machine, dimension).
+- Proof: bbd-line 20 checks (delay = time by phase at 15 Hz; clock law; bandwidth vs clock and stages; alias rejection; compander round
+  trip ±0.6 dB; hiss > 20 dB lower in silence; bleed at the clock; seeded; a chorus sweep without clicks; 233 ns); ensemble-core 20 checks
+  (taps average to base at every moment; pitch wobble = 2π·rate·depth·f; triangle plateaus; stereo; machines bounded; 195 ns).
+  Found while proving: the anti-alias corner at 0.45·clock kept too much above half the clock; clock/3 (the margin BBD designs keep).
+- Retro DCO now stands on 9 of its 11 components; left: osc-sub, voice-allocator.
+
 ## Done — 3.135 Tape Memory, the tool (2026-11-06)
 His "yes" to the spec and the UI preview. tools/music/tools/effects/tape-memory/ (scaffolded by build/new-tool.mjs).
 - Engine: in → saturator-tape → bitcrusher → delay-line L / R (time = 15 ms + the transport's lag + wow + flutter; R + drift) → svf high-pass →
