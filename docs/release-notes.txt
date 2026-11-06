@@ -1,3 +1,16 @@
+ERAVOS v0.2.13 (2026-11-06)
+
+Install: on 0.2.10 or later, ERAVOS offers this update by itself (or ERAVOS-Setup-0.2.13.exe).
+
+- Lofi: Start › SETUPS › Lofi — boom bap drums with dust, jazz chords on Retro Poly keys, a deep sub, sidechain; 82 BPM; macros
+  DUST, WARMTH, SWING, PUMP; scenes Study, Rainy, Late Night. Chords gains 7th / 9th / rootless 9 voicings and six jazz progressions;
+  Groove gains a boom bap style; Lofi packs for 8 tools.
+- .erv: save the whole canvas as one readable file in layers, like a PSD (Start › Save as .erv, Ctrl+Shift+S). Switch layers off to
+  open only part of it; drop an .erv on ERAVOS to open it.
+- Automation: ＋ Add lane makes an empty lane; each lane has its own Bind (touch the next control, or pick from a list); Rebind keeps the
+  shape. The XY Pad's X and Y are controls a lane can move.
+- New shared parts for the Pattern Editor: pattern store, seed registry, scale and key.
+
 ERAVOS v0.2.12 (2026-11-06)
 
 Install: on 0.2.10 or later, ERAVOS offers this update by itself (or ERAVOS-Setup-0.2.12.exe).
