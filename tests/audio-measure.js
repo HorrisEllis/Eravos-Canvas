@@ -126,5 +126,36 @@
     return sl && sr2 ? slr / Math.sqrt(sl * sr2) : 1;
   }
 
-  global.AudioMeasure = { db, scan, rms, mean, pitch, cents, foldCents, midiHz, onsets, gridError, modRate, correlation };
+  // 3.143 fingerprint(d, sr, from, to) → { v: [numbers], names: [...] } — what a sound IS, level-independent, for the novelty check
+  // across all of ERAVOS (specs/eravos.music-ecosystem.spec §6 ADDENDUM 2026-11-06). Frames of 2048 (hop 1024, Hann):
+  //   shape     24 log-spaced bands 40 Hz – 16 kHz, each its share of the energy in dB (the tone colour, not the loudness)
+  //   bright    spectral centroid (octaves above 40 Hz) mean + spread over time; flatness (0 tone … 1 noise) mean + spread; flux mean
+  //   envelope  attack (log s to 90 % of the peak), the level half way and at the end (dB under the peak), loudness movement (dB spread)
+  const FP_BANDS = 24, FP_LO = 40, FP_HI = 16000;
+  function fft(re, im) { const N = re.length; for (let i = 1, j = 0; i < N; i++) { let b = N >> 1; for (; j & b; b >>= 1) j ^= b; j ^= b; if (i < j) { let t = re[i]; re[i] = re[j]; re[j] = t; t = im[i]; im[i] = im[j]; im[j] = t; } }
+    for (let len = 2; len <= N; len <<= 1) { const a = -2 * Math.PI / len, wr = Math.cos(a), wi = Math.sin(a); for (let i = 0; i < N; i += len) { let cr = 1, ci = 0; for (let k = 0; k < len / 2; k++) { const p = i + k, q = p + len / 2, tr = re[q] * cr - im[q] * ci, ti = re[q] * ci + im[q] * cr; re[q] = re[p] - tr; im[q] = im[p] - ti; re[p] += tr; im[p] += ti; const nr = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = nr; } } } }
+  function fingerprint(d, sr, from, to) {
+    const N = 2048, hop = 1024, s0 = idx(sr, from, d.length), s1 = idx(sr, to, d.length), win = new Float64Array(N), re = new Float64Array(N), im = new Float64Array(N);
+    for (let i = 0; i < N; i++) win[i] = 0.5 - 0.5 * Math.cos(2 * Math.PI * i / (N - 1));
+    const edges = Array.from({ length: FP_BANDS + 1 }, (_, b) => Math.round(FP_LO * Math.pow(FP_HI / FP_LO, b / FP_BANDS) * N / sr));
+    const band = new Float64Array(FP_BANDS), cents = [], flats = [], fluxes = []; let prev = null, frames = 0;
+    for (let a = s0; a + N <= s1; a += hop) {
+      for (let i = 0; i < N; i++) { re[i] = d[a + i] * win[i]; im[i] = 0; } fft(re, im);
+      const mag = new Float64Array(N / 2); let tot = 0, wsum = 0, lsum = 0, cnt = 0;
+      for (let k = 1; k < N / 2; k++) { const m2 = re[k] * re[k] + im[k] * im[k]; mag[k] = m2; if (k >= edges[0] && k <= edges[FP_BANDS]) { tot += m2; wsum += m2 * Math.log2(Math.max(FP_LO, k * sr / N) / FP_LO); lsum += Math.log(m2 + 1e-24); cnt++; } }
+      if (tot < 1e-12) continue; frames++;
+      for (let b = 0; b < FP_BANDS; b++) { let e = 0; for (let k = edges[b]; k < Math.max(edges[b] + 1, edges[b + 1]); k++) e += mag[k] || 0; band[b] += e / tot; }
+      cents.push(wsum / tot); flats.push(Math.exp(lsum / cnt) / (tot / cnt));
+      if (prev) { let f = 0; for (let k = 1; k < N / 2; k++) { const x = Math.sqrt(mag[k] / tot) - Math.sqrt(prev[k]); f += x > 0 ? x * x : 0; } fluxes.push(Math.sqrt(f)); }
+      prev = mag.map(x => x / tot);
+    }
+    const mu = (a) => a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0, sd = (a) => { const m = mu(a); return a.length ? Math.sqrt(mu(a.map(x => (x - m) * (x - m)))) : 0; };
+    // the envelope: 10 ms RMS steps
+    const step = Math.max(1, Math.round(sr * 0.01)), env = []; for (let a = s0; a + step <= s1; a += step) { let q = 0; for (let i = a; i < a + step; i++) q += d[i] * d[i]; env.push(Math.sqrt(q / step)); }
+    const pk = Math.max(1e-9, ...env), ip = env.findIndex(x => x >= 0.9 * pk), envDb = env.map(x => db(Math.max(x, pk * 1e-5)) - db(pk));
+    const v = [].concat(Array.from(band, x => db(Math.max(1e-6, x / Math.max(1, frames)))),
+      [mu(cents), sd(cents), mu(flats), sd(flats), mu(fluxes), Math.log10(Math.max(0.001, ip * 0.01)), envDb[Math.floor(envDb.length / 2)] || 0, envDb[envDb.length - 1] || 0, sd(envDb.slice(ip > 0 ? ip : 0))]);
+    return { v, frames, names: Array.from({ length: FP_BANDS }, (_, b) => 'band' + b).concat(['centroid', 'centroidMove', 'flatness', 'flatnessMove', 'flux', 'attack', 'midDb', 'endDb', 'levelMove']) };
+  }
+  global.AudioMeasure = { db, scan, rms, mean, pitch, cents, foldCents, midiHz, onsets, gridError, modRate, correlation, fingerprint };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -28,7 +28,7 @@ const browser = await chromium.launch({ args: ['--autoplay-policy=no-user-gestur
 async function page() {
   const p = await browser.newPage(); await p.addInitScript((s) => { window.__SOURCES = s; }, SOURCES);
   await p.goto('file://' + path.join(HERE, 'run.html') + '?auto=0'); await p.waitForFunction(() => window.TH && window.OrganismFactory, null, { timeout: 60000 });
-  await p.addScriptTag({ content: MEASURE }); return p;
+  await p.evaluate(MEASURE); return p;   // Clear Glass has no addScriptTag (it was Playwright's): the measure code, evaluated
 }
 
 // ---------------------------------------------------------------- in the page: measure one tool (all presets)
@@ -76,7 +76,7 @@ async function measureTool(id) {
         }
         r.hits = `${lat.length}/${DRUMS[id].length}`; r.missing = quiet;
         r.maxGridMs = lat.length ? +Math.max(...lat.map(([, x]) => x / SR * 1000)).toFixed(3) : null; r.worst = lat.slice().sort((a, b) => b[1] - a[1]).slice(0, 3).map(([n, x]) => `pad ${n}: ${x} samples`);
-        const U = TH.universe(3), inst = TH.spawn(U, id), c = OrganismFactory.handle(inst).ctx; if (name) c.presets.load(name); if (c.ready) await c.ready; r.outs = tap(U, inst);
+        const U = TH.universe(3), inst = TH.spawn(U, id), c = OrganismFactory.handle(inst).ctx; if (name) c.presets.load(name); if (c.ready) await c.ready; if (c.internals && c.internals.ready) await c.internals.ready; r.outs = tap(U, inst);
         const notes = DRUMS[id]; for (let k = 0; k < 8; k++) U.K.bus.publish('note:trigger', { target: inst, note: notes[k % notes.length], velocity: 0.9, time: 0.1 + k * 0.25, duration: 0.2 });
         stopAt(U, 2.2);
         const buf = await TH.render(U), mono = mixDown(buf); levels(r, buf, mono, 0.1, 2.1);
@@ -109,7 +109,7 @@ async function measureTool(id) {
           r.maxGridMs = +(Math.abs(k - s0) / SR * 1000).toFixed(3); r.worst = [`first sound after the pause: ${((k - s0) / SR * 1000).toFixed(2)} ms from DROP beat 1`]; }
       } else if (out.kind === 'beat') {
         const bpm = 128, bars = 2, secs = bars * 240 / bpm + 1.2, U = TH.universe(secs, { bpm }), inst = TH.spawn(U, id), c = OrganismFactory.handle(inst).ctx;
-        if (name) c.presets.load(name); if (c.ready) await c.ready; r.outs = tap(U, inst);
+        if (name) c.presets.load(name); if (c.ready) await c.ready; if (c.internals && c.internals.ready) await c.internals.ready; r.outs = tap(U, inst);
         U.T.bpm = bpm; U.T.renderTicks(0, bars * 16, 0.05);
         const buf = await TH.render(U), mono = mixDown(buf); levels(r, buf, mono, 0.05, bars * 240 / bpm);
         const ons = M.onsets(mono, SR, { floorDb: -36 }), g = M.gridError(ons, bpm, 0.05);
@@ -117,7 +117,7 @@ async function measureTool(id) {
         r.worst = g.slice().sort((a, b) => Math.abs(b.errMs) - Math.abs(a.errMs)).slice(0, 3).map(e => `step ${e.step}: ${e.errMs.toFixed(2)} ms`);
       } else {
         const secs = 3, bpm = 120, U = TH.universe(secs, { bpm }), inst = TH.spawn(U, id), c = OrganismFactory.handle(inst).ctx;
-        if (name) c.presets.load(name); if (c.ready) await c.ready; r.outs = tap(U, inst);
+        if (name) c.presets.load(name); if (c.ready) await c.ready; if (c.internals && c.internals.ready) await c.internals.ready; r.outs = tap(U, inst);
         let expectHz = M.midiHz(NOTE), note = NOTE;
         if (out.kind === 'sampler') { await c.load(wav(220, 2.6), 'a3-saw.wav'); note = c.params.get('mode') === 'slice' ? 36 : c.params.get('root'); expectHz = 220; }
         if (out.kind === 'clip') { await c.loadAB(wav(220, 2.6), 'a3-saw.wav'); U.K.bus.publish('ui:play:' + inst, {}); expectHz = 220; }
@@ -135,6 +135,7 @@ async function measureTool(id) {
         if (out.kind !== 'effect') { const s0 = Math.round(0.1 * SR); let k = s0; while (k < mono.length && Math.abs(mono[k]) < 1e-7) k++; r.latencySamples = k < mono.length ? k - s0 : null; }
         if (expectHz && !xen) { const p = M.pitch(mono, SR, 0.35, 1.15, { fmin: 20, fmax: 1800 }); r.note = note; r.hz = +p.hz.toFixed(2); r.clarity = +p.clarity.toFixed(2); r.cents = p.hz ? +M.foldCents(p.hz, expectHz).toFixed(1) : null; }
         const mr = M.modRate(mono, SR, 0.3, 1.25, { lo: 0.5, hi: 30, step: 0.02 }); r.modHz = +mr.hz.toFixed(2); r.modDepthDb = +mr.depthDb.toFixed(1);
+        if (M.fingerprint && out.kind !== 'beat') { const fp = M.fingerprint(mono, SR, 0.1, 2.7); if (fp.frames > 4) { r.fp = fp.v.map(x => +x.toFixed(3)); r.chord = chord.length; } }   // 3.143 the novelty check (build/novelty.mjs)
       }
     } catch (e) { r.error = String(e && e.message || e).slice(0, 200); }
     r.ms = Math.round(performance.now() - t0);
