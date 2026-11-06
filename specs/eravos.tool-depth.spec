@@ -70,3 +70,24 @@
 ## ADDENDUM 2026-11-01 (later) — the word is COMPONENT (specs/eravos.components.spec, project-wide)
   His words: "im saying overall. components are what i called them in nexus. or just parts". "Shared DSP block" in K1–K5 above means
   a component: tools/music/components/<name>/ (its own .js, .spec, tests). The K phases stand with that word.
+
+## ADDENDUM 2026-11-06 — the aspects, widened; every control earns its place (his words)
+  "Need to make sure it’s all novel. Full depth in pitch, tone, wavelength, modulation, etc. like I want unique (in relation to Eravos) packs for each tool. Mods. Complete settings for adjusting and tuning each tool." · "The swarm doesn’t seem like anything new sound wise."
+  "Expand wave, modulation, wave, tone, pitch, maybe: Speed, tempo, rhythm, not just limited to those but no noise either" · "Packs aren’t just presets. They’re drum pad sounds. Like units or additional capabilities like mods also. Also need to be novel"
+  ASPECTS (each tool is audited on every one it has; "not just limited to those" — a tool adds the aspects its kind has):
+    pitch       tuning (reference A4), octave / transpose / fine, glide, pitch envelope, bend range, scale + microtuning, drift,
+                per-note pitch curves
+    tone        filter models and slopes, drive / saturation, tilt / EQ, formant, key- and velocity-tracked brightness
+    wave        shapes, wavetable position + morph, sync, FM / PM, folding, phase distortion, ring, unison / stacking
+    modulation  LFOs, envelopes (ADSR, multi-segment), a mod matrix, velocity / aftertouch / per-note expression, macros, cross-mod
+    speed       how fast everything moves — LFO and envelope times, glide time, arp and step rates — free or tempo-synced
+    tempo       follow the transport, own tempo, ratios (½ × 2 ¾ …), swing
+    rhythm      gates, patterns, ratchets, euclidean, probability, polymeter, groove templates
+    (and: space / stereo, dynamics, time — as the tool's kind has them)
+  NO NOISE: a control is there only if it makes a measurable, audible difference no other control on that tool already makes.
+    Testable: sweeping it end to end moves the sound fingerprint (eravos.music-ecosystem.spec §6 ADDENDUM) by at least the novelty
+    threshold, and it is not collinear with another control. A control that fails is removed, folded into another, or justified.
+  SETTINGS: every tool's page gains a Tuning & settings tab (reference pitch, scale, transpose, bend range, velocity curve, voices,
+    tempo follow / ratio, output) — one shared kit part; a tool shows the rows that apply to it.
+  Built tool by tool; the face changes are shown to him first; defaults keep today's sound (null render where provable).
+
