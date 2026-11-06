@@ -51,3 +51,41 @@
   - axioms: CLAUDE.md › Axioms
   - the register: docs/competence/register.jsonl (append-only) → REGISTER.md + LOG.md (node build/competence.mjs; --check fails if an
     earlier entry was changed)
+
+## 09:23:29Z (2026-11-06T09:23:29.966Z) — verbatim ("Okay. I need to externalize. Stop and stay with me for a minute." — notes only, nothing built from this message yet):
+  > Okay. I need to externalize. Stop and stay with me for a minute. 
+  > 
+  > These are all raw. I don’t take notes, this is how they come out synthesisn end state first emergence. Reverse engineering. 
+  > 
+  > Don’t the wubs belong to the wobble bass? I still can’t get it to sound like make it bun dem. Like the highs and lows aren’t it. I’m not sure if he modified it after the fact. 
+  > 
+  > What can eravos do right now? I want to be able to have the canvas seperate from the rest. I want the sound to be deep and studio quality. Can we use yaml to save songs like a psd file. Like so it has layers? Like it saves what’s on the canvas? 
+  > 
+  > Brain storming here. 
+  > 
+  > Also. I don’t think the note editor works and it would be nice to open in a popout window windows.  Or the option. Even a window separate like from the canvas but still connected. That way I can alt tab. 
+  > 
+  > What’s the next highest leverage?
+  > Also maybe full, I keep envisioning like a whole ass extremely detailed note and pattern editor. Like fractals. Then can save for later. I’m struggling with the complicated patterns. 
+  > 
+  > I love to explore. Open loops drive me. I need you to start taking note like I said. I externalize, adjust or manipulate like remove the noise focus on signal, integrate or reintegrate then embody. That’s my feedback loop. I use cross domain synthesis, analogies, mental simulations to simulate hands on learning. Constrain my imagination in what’s been verified/invariant. Build models to maintain consistency and reduce wasted effort with redundancy from rote memorization.
+  - WUBS / WOBBLE BASS: yes — Wub Lab is Wobble Bass as parts (suite allInOne: eravos.wobble-bass; Wub Osc · Wub Filter · Wub Rate · Wub Sub).
+    OPEN: fold the wub tools into Wobble Bass's own components (the suite is the tool seen as parts; F1–F5, axiom 3).
+  - "MAKE IT BUN DEM" sound: OPEN — the highs and lows "aren't it". Likely missing: resampling passes, multiband (separate highs and lows),
+    heavy upward/downward compression, layered sub; planned: resample-forge, multiband-crush, growl-forge, spectral-creature, sub-architect.
+    Next step: measure the reference vs Wobble Bass (spectrum by band, as done for his first song 2026-10-30) — needs his reference audio.
+  - WHAT ERAVOS CAN DO NOW: answered in the session (and to be kept as a page: OPEN).
+  - CANVAS SEPARATE FROM THE REST: OPEN — read as: the canvas (host) shippable/usable on its own, content as packs (already the rule:
+    canvas/ vs tools/<domain>/; boundary test). Clarify with him: separate app? separate window? separate repo?
+  - DEEP, STUDIO-QUALITY SOUND: OPEN (direction) — the component path (filter-svf, osc-va polyBLEP, oversampling, true-peak limiting, 24-bit export).
+  - SONG FILE LIKE A PSD (YAML, LAYERS, SAVES WHAT IS ON THE CANVAS): OPEN (idea) — a project file in layers (canvas · tools + settings ·
+    wires · timeline · audio refs), text so it diffs and merges. Today projects save as JSON in the app's store; a YAML layered export/import
+    is the idea.
+  - NOTE EDITOR "DOESN'T WORK": OPEN (bug report — not yet reproduced; ask what fails).
+  - NOTE EDITOR IN ITS OWN OS WINDOW (alt-tab), connected to the canvas: OPEN (idea) — today: in-canvas borderless panel (3.109); an
+    Electron BrowserWindow sharing the same engine is the path.
+  - NEXT HIGHEST LEVERAGE: pattern-store (23 planned tools) — also the base of the pattern editor below.
+  - A WHOLE DETAILED NOTE AND PATTERN EDITOR, LIKE FRACTALS, SAVE FOR LATER: OPEN (idea) — "I'm struggling with the complicated patterns."
+  - HOW HE WORKS (his own model, recorded as his words): externalize → remove the noise / focus on signal → integrate or reintegrate →
+    embody; cross-domain synthesis, analogies, mental simulation; constrain imagination to what is verified / invariant; build models so
+    nothing is relearned by rote. Applied here: these notes are the externalize step; the map, specs and register are the models.

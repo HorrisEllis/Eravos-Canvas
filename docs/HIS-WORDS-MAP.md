@@ -31,3 +31,13 @@ kept), or **open** (not done yet, and what is missing). Newest at the bottom. Ad
 | 22 | "Update the specs so nothing is lost." | **done** | `specs/eravos.2026-11-06-session.map.spec` (every message, timed, verbatim); addenda: suites, components, macro-automation; the Swarm and component specs |
 | 23 | "And then Add those axioms to a claude.md." | **done** | `CLAUDE.md` › Axioms |
 | 24 | "Also ideas, choices and direction. All of me and what’s proof of competence and ownership, I want logged to a compotenxe and log. Timestamped and what came from it. The date and quotes exactly." | **done** | `docs/competence/` — `register.jsonl` (append-only) → `REGISTER.md`, `LOG.md`; `node build/competence.mjs --check` |
+| 25 | "Don’t the wubs belong to the wobble bass?" (09:23:29Z) | answered: yes — Wub Lab is Wobble Bass as parts · **open**: fold them into its components | `specs/eravos.2026-11-06-session.map.spec` |
+| 26 | "I still can’t get it to sound like make it bun dem. Like the highs and lows aren’t it." (09:23:29Z) | **open** — measure reference vs Wobble Bass by band; planned: resample-forge, multiband-crush, growl-forge | `specs/eravos.2026-11-06-session.map.spec` |
+| 27 | "What can eravos do right now?" (09:23:29Z) | answered in the session | `specs/eravos.2026-11-06-session.map.spec` |
+| 28 | "I want to be able to have the canvas seperate from the rest." (09:23:29Z) | **open** — to clarify (app, window, or repo) | `specs/eravos.2026-11-06-session.map.spec` |
+| 29 | "I want the sound to be deep and studio quality." (09:23:29Z) | **rule / direction** — the component path; **open**: oversampling, true-peak, measurement | `specs/eravos.2026-11-06-session.map.spec` |
+| 30 | "Can we use yaml to save songs like a psd file. Like so it has layers? Like it saves what’s on the canvas?" (09:23:29Z) | **open** (idea) — layered text project file | `specs/eravos.2026-11-06-session.map.spec` |
+| 31 | "Also. I don’t think the note editor works and it would be nice to open in a popout window windows." (09:23:29Z) | **open** — bug not reproduced yet; popout = its own OS window | `specs/eravos.2026-11-06-session.map.spec` |
+| 32 | "What’s the next highest leverage?" (09:23:29Z) | answered: pattern-store (23 tools) | `specs/eravos.2026-11-06-session.map.spec` |
+| 33 | "I keep envisioning like a whole ass extremely detailed note and pattern editor. Like fractals. Then can save for later. I’m struggling with the complicated patterns." (09:23:29Z) | **open** (idea) — stands on pattern-store | `specs/eravos.2026-11-06-session.map.spec` |
+| 34 | "I need you to start taking note like I said." (09:23:29Z) | **done** — this map, the session spec, the register; every message from now on | `specs/eravos.2026-11-06-session.map.spec` |
