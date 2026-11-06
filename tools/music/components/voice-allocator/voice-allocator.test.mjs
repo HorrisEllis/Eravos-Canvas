@@ -18,6 +18,10 @@ const play = (pol, notes, levels) => { const A = VoiceAllocator(3); A.setSteal(p
 // ---- release timing: with release(0.5), a voice is free 0.5 s after its note-off (not before)
 { const A = VoiceAllocator(1); A.release(0.5); A.noteOn(60, 1, 0); A.noteOff(60, 1); A.noteOn(62, 1, 1.2); ok(A.budget().stolen === 1, 'inside its release: taken by a steal');
   const B = VoiceAllocator(1); B.release(0.5); B.noteOn(60, 1, 0); B.noteOff(60, 1); B.noteOn(62, 1, 1.6); ok(B.budget().stolen === 0, 'after its release: free again'); }
+// ---- a note-off booked ahead (a sequenced note's length): until then the voice still sounds — the steal takes another
+{ const A = VoiceAllocator(2); A.noteOn(60, 1, 0); A.noteOff(60, 4); A.noteOn(62, 1, 0.5); const r = snap(A.noteOn(64, 1, 1));
+  ok(r.stolenNote === 60 || r.stolenNote === 62, 'both still sounding at t = 1'); ok(r.stolenNote === 60, 'oldest of the sounding ones (60 still sounds until t = 4)');
+  const B = VoiceAllocator(2); B.noteOn(60, 1, 0); B.noteOn(62, 1, 0.5); B.noteOff(62, 4); B.noteOff(60, 0.8); ok(snap(B.noteOn(64, 1, 1)).stolenNote === 60, 'the one already released (60 at 0.8) goes first, not 62 (booked to end at 4)'); }
 // ---- mono: every note retriggers; letting go returns to the last key still held; the last key up releases
 { const A = VoiceAllocator(8); A.setMode('mono');
   const a = snap(A.noteOn(60, 1, 0)), b = snap(A.noteOn(64, 1, 1)), c = snap(A.noteOn(67, 1, 2));

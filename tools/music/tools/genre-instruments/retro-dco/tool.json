@@ -1,0 +1,110 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.retro-dco",
+  "version": "1.0.0",
+  "label": "Retro DCO",
+  "icon": "🌃",
+  "accent": "#3be8ff",
+  "domain": "music",
+  "category": "genre-instruments",
+  "summary": "80s DCO poly, rebuilt from parts: voice cards, ladder or SVF, poly-mod, the Juno chorus with its bucket brigade.",
+  "tags": [
+    "genre-instruments",
+    "synthwave",
+    "retro",
+    "poly"
+  ],
+  "files": {
+    "engine": "retro-dco.engine.js",
+    "ui": "retro-dco.ui.js",
+    "spec": "retro-dco.spec",
+    "tests": "retro-dco.test.js",
+    "preview": "preview.png",
+    "thumb": "thumb.png"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "midi_in",
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.acid-synth",
+    "eravos.arp",
+    "eravos.bass-drop-builder",
+    "eravos.bass-forge",
+    "eravos.bass-gen",
+    "eravos.breath",
+    "eravos.channel",
+    "eravos.chord-gen",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.coven",
+    "eravos.curve-synth",
+    "eravos.drum-forge",
+    "eravos.dub-station",
+    "eravos.edm-lab",
+    "eravos.embodiment-lab",
+    "eravos.fx-box",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.fx-squash",
+    "eravos.granular",
+    "eravos.groove-gen",
+    "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.master-fx",
+    "eravos.organ",
+    "eravos.pad-forge",
+    "eravos.pads",
+    "eravos.particle-field",
+    "eravos.ratio-lattice",
+    "eravos.recursive-spectra",
+    "eravos.reese-bass",
+    "eravos.retro-poly",
+    "eravos.sample-player",
+    "eravos.sidechain-compressor",
+    "eravos.song-recorder",
+    "eravos.sub-engine",
+    "eravos.suite-hub",
+    "eravos.supersaw",
+    "eravos.swarm-oscillator",
+    "eravos.syn-env",
+    "eravos.syn-osc",
+    "eravos.syn-partials",
+    "eravos.tape-memory",
+    "eravos.timeline",
+    "eravos.wobble-bass",
+    "eravos.wub-filter",
+    "eravos.wub-osc",
+    "eravos.wub-rate",
+    "eravos.wub-sub",
+    "eravos.xen-synth",
+    "eravos.xy-pad"
+  ],
+  "conflicts": [],
+  "status": "built"
+}

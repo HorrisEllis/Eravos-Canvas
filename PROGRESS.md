@@ -2,6 +2,25 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.139 Retro DCO, the tool (2026-11-06)
+Asked: "Build it." (after the UI preview). tools/music/tools/genre-instruments/retro-dco/ — the approved face, playing.
+- Decision A for now: a new tool beside Retro Poly; Retro Poly is untouched. B (Retro Poly rebuilt on it) waits for his ear: Retro Poly's
+  presets draw random drift, so a null render cannot prove "no change".
+- Engine: ONE AudioWorklet from the components' own kernel text — osc-va (saw + pulse, × unison-stack, hard sync), osc-sub, osc-noise,
+  random-source (each card's drift), filter-svf 24 dB or filter-ladder (drive in the loop, full bass compensation), env-adsr ×2, lfo
+  (+ delay fade) and the PWM LFO, filter-svf HPF, bbd-line → ensemble-core (Juno I / II / I+II from ENSEMBLE_MODES). 16 voice cards, each
+  with seeded offsets (pitch, cutoff, envelope times). voice-allocator decides which card plays which note (poly / mono / legato; unison =
+  one card, many voices); steal policy is a control. Every control is an AudioParam (live). Arp and Hold as Retro Poly's.
+- voice-allocator gained: a note-off booked ahead (a sequenced note's length) still counts as sounding until then (3 checks; 28 total).
+- Loudness measured against Retro Poly: the default preset within 0.2 dB; the loudest it can do (six notes, every source full, ladder full
+  drive and resonance, level 1.5, I+II) peaks 0.70. Found while measuring: an edit's comment had swallowed the output-gain loop.
+- Packs: Factory, 12 presets (Outrun Lead, Chorus Glass Poly, Five-Voice Brass Swell, Voice-Card Motion, VHS Dreams, Arcade Pulse, Analog
+  Machine Bass, Coldwave Lead, Neon Noir Stab, Sync Sweep, Sub Growl, String Machine). The eight planned packs (≥ 6 each) are open.
+- Icons: Retro DCO moon-star; Tape Memory had none (the other session's) — cassette-tape.
+- Proof: retro-dco 4/4 (contract) + P139 7/7 (chord + silence after release; A3 = 220 Hz within 5 cents; every voice mode and both filters;
+  chorus off = mono, I spreads; cards steal without sticking; key-up releases; every knob to its far end; loudness); P63 11/11, P45 12/12,
+  P130 4/4, boundary 10/10; design check: a clean new tool (55/72 pass every rule).
+
 ## Done — 3.138 The last two Retro DCO parts: osc-sub, voice-allocator (2026-11-06)
 Asked: "1, 2" (the synthwave parts, then the Retro DCO preview).
 - osc-sub: the sub oscillator — 0 / −1 / −2 octaves; sine, triangle, square (polyBLEP), rounded square (tanh 2 of a sine: a square's

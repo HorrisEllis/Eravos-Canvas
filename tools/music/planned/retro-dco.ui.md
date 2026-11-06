@@ -1,6 +1,6 @@
 # Tool UI — Retro DCO
 
-Written with `docs/templates/TOOL-UI.md`. **A preview, not built** — waiting for his yes.
+Written with `docs/templates/TOOL-UI.md`. **Built 2026-11-06** (his "Build it.") as `tools/music/tools/genre-instruments/retro-dco/` — decision A for now (beside Retro Poly). The preview below is kept as it was shown.
 Preview: `docs/previews/retro-dco.preview.js` (the real kit, in the real canvas, silent) · pictures: `node docs/previews/retro-dco.shots.mjs`
 → `retro-dco-preview.png`, `retro-dco-beside-retro-poly.png`, `retro-dco-more-depth.png`.
 
