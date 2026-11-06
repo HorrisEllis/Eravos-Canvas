@@ -2,6 +2,23 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.143 N1: the novelty report across ERAVOS (2026-11-06)
+Asked: "The sworm and other tools need to be checked for novelty, like I need to be able to make more with this." (and "Need to make sure
+it's all novel").
+- tests/audio-measure.js gains fingerprint(): tone colour (24 log bands, each its share in dB), brightness / noisiness and how they move,
+  envelope (attack, level half way and at the end, loudness movement) — level-independent; checked against known signals
+  (tests/audio-measure.test.mjs: sine vs noise, bright vs dark, a hit vs a held note, tremolo vs steady, level-free).
+- tests/tool-audio.mjs runs again: it called Playwright's addScriptTag (Clear Glass has none) and never ran since the switch; it now
+  waits for worklet tools (Swarm, Retro DCO, Tape Memory were measured silent or 1.9 s late); every preset carries its fingerprint.
+- build/novelty.mjs → docs/novelty-report.md (+ docs/novelty.json): every preset against everything in ERAVOS of its kind; three feature
+  groups weighted equally; CLOSE calibrated from ERAVOS itself (as close as two presets of one tool usually are: 0.045), TWIN half.
+- Findings (68 tools, 615 presets, 413 comparable): 46 % of presets novel; 21 % have a CLOSE sound in another tool. Deep Sub sits inside
+  Reese Bass (60 %). Swarm ↔ Supersaw: median 0.138 against Supersaw's own 0.045 — apart on this measure, so what his ear hears as "nothing
+  new" is in the motion over time (not in one 2.6 s note): N2 has to make the swarming audible, and the measure needs a motion feature.
+  Effects: not fair yet (one saw burst; gates, sidechain, glitch, throws come out untouched). 162 renders FAILED and are listed:
+  Drum Machine 45 (over full scale at its raw output), Wobble Bass 38 (over full scale, sounding after Stop), Pad Forge 34 (late),
+  Wub Filter 11, Wub Sub 9, Destroyer 7, Wub Osc 6, Retro Poly 5 (silent — likely the arp presets without the transport) …
+
 ## Done — 3.141 ERAVOS Update.exe: the updater as its own program; the card never traps you (2026-11-06)
 Asked (with screenshots of the card stuck on "Starting ERAVOS Update…"): "it never closes, or does anything else to update." Then: "why
 not make it another exe?"
