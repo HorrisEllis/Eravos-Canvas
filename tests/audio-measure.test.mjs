@@ -63,7 +63,7 @@ for (const [div, hz] of [['1/4', 140 / 60], ['1/8', 140 / 60 * 2], ['1/16', 140 
   check(f0.every((x, i) => Math.abs(x - fq[i]) < 1e-6), 'the fingerprint does not depend on the level');
   const am = gen(2, t => 0.5 * (1 + 0.9 * Math.sin(2 * Math.PI * 4 * t)) * Math.sin(2 * Math.PI * 440 * t)), fa = F(am);
   check(fa.levelMove > fs.levelMove + 3, `loudness movement: a 4 Hz tremolo ${fa.levelMove.toFixed(1)} dB, a steady note ${fs.levelMove.toFixed(1)}`); }
-// motion (3.144): how fast it moves, not only how much — a slow swell vs fast beating; a still note counts as still
+// motion (3.145): how fast it moves, not only how much — a slow swell vs fast beating; a still note counts as still
 { const F = (d) => { const f = M.fingerprint(d, SR, 0, 4); return Object.fromEntries(f.names.map((n, i) => [n, f.v[i]])); };
   const still = F(gen(4, t => 0.5 * Math.sin(2 * Math.PI * 440 * t)));
   const slow = F(gen(4, t => 0.5 * (1 + 0.8 * Math.sin(2 * Math.PI * 0.75 * t)) * Math.sin(2 * Math.PI * 440 * t)));

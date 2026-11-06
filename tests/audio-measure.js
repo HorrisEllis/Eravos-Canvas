@@ -153,7 +153,7 @@
     // the envelope: 10 ms RMS steps
     const step = Math.max(1, Math.round(sr * 0.01)), env = []; for (let a = s0; a + step <= s1; a += step) { let q = 0; for (let i = a; i < a + step; i++) q += d[i] * d[i]; env.push(Math.sqrt(q / step)); }
     const pk = Math.max(1e-9, ...env), ip = env.findIndex(x => x >= 0.9 * pk), envDb = env.map(x => db(Math.max(x, pk * 1e-5)) - db(pk));
-    // motion (3.144, N2): how FAST the tone and the level move — swings a second apart vs beating many times a second. Each series
+    // motion (3.145, N2): how FAST the tone and the level move — swings a second apart vs beating many times a second. Each series
     // (the centroid per frame, the level per 10 ms after the attack) loses its straight-line trend; a swing is counted when it
     // crosses back past ±(a quarter of its spread), so noise in a still sound counts nothing; log10 of swings a second (0.1…30)
     const rate = (a, dt) => { const n = a.length; if (n < 8) return -1; let sx = 0, sy = 0, sxy = 0, sxx = 0; for (let i = 0; i < n; i++) { sx += i; sy += a[i]; sxy += i * a[i]; sxx += i * i; }

@@ -71,6 +71,16 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-06 · A coupled-oscillator synth that moves by itself — Swarm 1.1
+- **His words (2026-11-06):** "The swarm doesn't seem like anything new sound wise." · "Lets focus on getting tools more novel from each other"
+- **His call:** make the tools more novel from each other, Swarm first.
+- **Built:** three new behaviours in the shared coupled-oscillator part (bursting apart and re-locking, chords that bloom, the swarm
+  modulating itself), a fourth in the tool (how locked it is moves the filter), a six-preset pack, and motion added to the sound fingerprint.
+- **Proof:** the old sound is unchanged sample for sample (a kept copy of the old part); new behaviours measured in node and in offline
+  renders; headroom checked on every preset. The novelty measure was re-run on all of ERAVOS and its result reported as it came out —
+  on one short note the new presets are no further from Supersaw than the old.
+- **Check:** `node tools/music/components/oscillator-population/oscillator-population.test.mjs` · `node tests/run.mjs P123` · `docs/novelty-report.md`
+
 ### 2026-11-06 · An updater proved end to end on Windows — ERAVOS Update.exe
 - **His words (2026-11-06):** "it never closes, or does anything else to update." · "why not make it another exe?"
 - **His call:** the updater as its own program.
