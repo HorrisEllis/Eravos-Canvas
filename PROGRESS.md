@@ -14,6 +14,18 @@ His "yes" to Tape Memory → bottom up: the four parts it lacked, each NEW code 
   magnetisation (hysteresis), faded in over 6 dB (drive 0 = the signal exactly), level kept near full scale, head bump, gap loss, out, mix. 13 checks.
 - Specs: the four "inputs / outputs / limits" lines written (the TO WRITE quoted), status built with the proof. Tape Memory's DAG: 7 of 7.
 
+## Done — 3.133 .erv; the Workshop approved; the Pattern Editor's components (2026-11-06)
+His words: "Can we use yaml to save songs like a psd file…" (09:23:29Z) · "The pattern and note editor are the same." (13:28:34Z) · "First."
+(13:30:25Z) · "Absolutely not. Like I’m talking a full workshop…" (13:38:50Z) · "Agnostic. I was thinking it could be the beginning of photo
+manipulation tools. If possible." (14:09:18Z) · "Nice. That's exactly it. And then the PSD style YAML, maybe ERV as an extension for that." (15:55:01Z)
+- Pattern Editor spec + components: pattern-store (nesting, flatten, grow, versions, diff; a clip round-trips bit for bit), seed-registry
+  (named seeds, reroll history; equal to dsp.mulberry32), scale-key (equal to MusicTheory on 45,540 inputs). Its preview was REJECTED.
+- The Workshop (specs/eravos.workshop.spec): one object on a work surface — layers, tools, properties, history, zoom path — agnostic:
+  music's note first, an image domain (photo manipulation) second. Preview approved ("exactly it"). Not built yet: W1 next.
+- .erv (specs/eravos.erv-format.spec, canvas/runtime/erv.js): Workspace.snapshot ↔ layered YAML (js-yaml 4.1.0 vendored, CORE schema,
+  noCompatMode so `on:`/`y:` read plainly); the kernel's intake hands a dropped .erv over as text; Start › Save as .erv · Open .erv… (the
+  layers first, switch any off; a tool left out takes its wires). "Your audio" became "Your files" (the canvas says no domain word).
+  P120 3/3. Open: "locked" kept in the file, not enforced; a sidecar folder for big audio; Workshop objects as layers inside tools.
 ## Done — 3.132 the Lofi setup (2026-11-06)
 Asked: "i also want to be able to make lofi" → "nope look at the claude.md" → specs → "yes" · "suites are tools and its components."
 - Lofi is a SETUP (Axiom 3), not a tool or a suite: tools/music/suites/lofi/suite.json — Groove (boom bap) → Drum Machine (Lo-fi Dust) →
