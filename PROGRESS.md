@@ -2,6 +2,14 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.123 Restart now waits until ERAVOS Update really runs · v0.2.10 (2026-11-06)
+Asked: "The update helper doesn't work. I hit restart and it closes eravos and does nothing after."
+- apply() closed ERAVOS 0.3 s after spawning a hidden PowerShell that, for a Setup install, must itself start an elevated PowerShell
+  (the admin prompt). Now the helper writes update-started.txt first thing; ERAVOS waits up to 90 s for it, then closes. No signal →
+  ERAVOS stays open, says why, and the update stays ready. The card shows "Starting ERAVOS Update…" (and asks to say Yes to Windows).
+- The release check passes -Started and fails without the signal. updater.mjs all passed; P99 2/2.
+- Note: his installed build has the old helper — v0.2.10 is installed by hand once.
+
 ## Done — 3.122 Suites on the Timeline · slide across keys · zoomed-out draws less · 3 px borders · v0.2.9 (2026-11-06)
 Asked: "some tools can't be added to the timeline. Like the suites … dragging down the piano keys for tools. Like lazy loading. Zooming
 out decreases resolution … the button border width … a couple of pixels wider". Per-tool skins: a preview first (not built).

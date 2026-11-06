@@ -7,8 +7,10 @@
 #   5. writes what happened to update.log and update-result.json (ERAVOS reads it at its next start and tells you), and starts ERAVOS
 # -Setup <ERAVOS-Setup-x.exe>: installed by Setup (Program Files) - it runs the new Setup silently into the same folder instead of 2-4
 # -NoStart: the release check only (ERAVOS would start and move the test folders into its library)
-param([string]$Staged = '', [string]$Setup = '', [Parameter(Mandatory)][string]$Dest, [Parameter(Mandatory)][string]$Version, [Parameter(Mandatory)][string]$Work, [switch]$NoStart)
+param([string]$Staged = '', [string]$Setup = '', [Parameter(Mandatory)][string]$Dest, [Parameter(Mandatory)][string]$Version, [Parameter(Mandatory)][string]$Work, [switch]$NoStart, [string]$Started = '')
 $ErrorActionPreference = 'Stop'
+# 3.123 first thing: tell ERAVOS it really started (ERAVOS waits for this before it closes; without it, it stays open and says so)
+if ($Started) { try { [IO.File]::WriteAllText($Started, [string]$PID) } catch { } }
 Write-Host "ERAVOS Update starting: Dest=$Dest Work=$Work Staged=$Staged Setup=$Setup Version=$Version"
 $log = Join-Path $Work 'update.log'; $result = Join-Path $Work 'update-result.json'
 $keep = @('projects', 'exports', 'drop', 'packs', '.appdata', 'ERAVOS Library', 'portable')

@@ -44,8 +44,11 @@
     } else if (state === 'ready') {
       head.append(el('b', '', 'ERAVOS ' + v + ' is ready'));
       card.append(el('div', 'upd-sub', 'Restart now, or it goes in by itself when you next close ERAVOS. Your projects, exports and settings stay.'));
-      row.append(btn('Restart now', 'pri', () => { draw('restarting', {}); D() && D().applyUpdate && D().applyUpdate(); }),
+      row.append(btn('Restart now', 'pri', () => { draw('starting', {}); D() && D().applyUpdate && D().applyUpdate(); }),
         btn('When I close ERAVOS', '', () => { D() && D().updateLater && D().updateLater(); close(); say('ERAVOS ' + v + ' goes in when you close ERAVOS.', 'good'); }));
+    } else if (state === 'starting') {   // 3.123 waiting for ERAVOS Update to say it runs (and for Windows' permission prompt)
+      head.append(el('b', '', 'Starting ERAVOS Update…'));
+      card.append(el('div', 'upd-sub', info.admin ? 'Windows asks for permission to update ERAVOS — say Yes in its prompt (it may be behind this window). ERAVOS closes once the update has started.' : 'ERAVOS closes once the update has started.'));
     } else if (state === 'restarting') {
       head.append(el('b', '', 'Restarting into ERAVOS ' + v + '…')); card.append(el('div', 'upd-sub', 'ERAVOS Update puts it in place and starts ERAVOS again.'));
     } else if (state === 'failed') {
@@ -60,7 +63,7 @@
     if (!m) return;
     if (m.state === 'available') { let skip = null; try { skip = global.localStorage.getItem(SKIP); } catch (e) {} if (skip !== m.version || m.manual) draw('available', m); }
     else if (m.state === 'downloading' || m.state === 'unpacking') { if (card) draw(m.state, m); }
-    else if (m.state === 'ready' || m.state === 'restarting' || m.state === 'failed') draw(m.state, m);
+    else if (m.state === 'ready' || m.state === 'starting' || m.state === 'restarting' || m.state === 'failed') draw(m.state, m);
     else if (m.state === 'applied') { close(); say('Updated to ERAVOS ' + m.version + '.', 'good', 6000); }
     else if (m.state === 'on-close') say('ERAVOS ' + m.version + ' goes in when you close ERAVOS.', 'good');
     else if (m.state === 'current') say('ERAVOS ' + m.version + ' is the newest.', 'good');

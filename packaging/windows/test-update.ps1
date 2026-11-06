@@ -16,13 +16,14 @@ $helper = Join-Path $repo 'desktop\apply-update.ps1'; $tok = $null; $perr = $nul
 [void][System.Management.Automation.Language.Parser]::ParseFile($helper, [ref]$tok, [ref]$perr)
 if ($perr -and $perr.Count) { $perr | ForEach-Object { Write-Host "PARSE: line $($_.Extent.StartLineNumber): $($_.Message)" }; throw 'apply-update.ps1 does not parse' }
 $ErrorActionPreference = 'Continue'
-& powershell -NoProfile -ExecutionPolicy Bypass -File $helper -Staged $built -Dest $inst -Version '9.9.9' -Work $work -NoStart *>&1 | ForEach-Object { Write-Host "HELPER: $_" }
+& powershell -NoProfile -ExecutionPolicy Bypass -File $helper -Staged $built -Dest $inst -Version '9.9.9' -Work $work -NoStart -Started (Join-Path $root 'started.txt') *>&1 | ForEach-Object { Write-Host "HELPER: $_" }
 Write-Host "helper exit code: $LASTEXITCODE"
 Write-Host "work folder: $work exists=$(Test-Path $work)"; if (Test-Path $work) { Get-ChildItem -Force $work | ForEach-Object { Write-Host "  $($_.Name)" } }
 Write-Host "installed folder has: $((Get-ChildItem -Force $inst | ForEach-Object { $_.Name }) -join ', ')"
 $ErrorActionPreference = 'Stop'
 Start-Sleep 3
 $logf = Join-Path $work 'update.log'; if (Test-Path $logf) { Get-Content $logf | ForEach-Object { Write-Host "LOG: $_" } } else { Write-Host 'no update.log was written' }
+if (-not (Test-Path (Join-Path $root 'started.txt'))) { throw 'the helper did not write its started signal (ERAVOS would wait for it, then stay open)' }
 $resf = Join-Path $work 'update-result.json'; if (-not (Test-Path $resf)) { throw 'no update-result.json was written (see the HELPER / LOG lines above)' }
 $res = Get-Content $resf -Raw | ConvertFrom-Json
 Get-Process ERAVOS -ErrorAction SilentlyContinue | Where-Object { $_.Path -like "$inst*" } | Stop-Process -Force
