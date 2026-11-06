@@ -82,7 +82,7 @@ dag:
   layer 0: lfo ✓ · wave-table ✓
   tool: eravos.lfo ← wave-table + lfo
   build order: lfo ✓ → wave-table ✓ → lfo
-  shared with: lfo 27 · wave-table 3  (other tools on each)
+  shared with: lfo 28 · wave-table 3  (other tools on each)
   in it now: wave-table
   comes out of it: lfo
   planned: —

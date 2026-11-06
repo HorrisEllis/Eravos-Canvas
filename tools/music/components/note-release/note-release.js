@@ -5,7 +5,8 @@
  *       monophonic: if `held` is that note, hold the gain where it is at t (cancelAndHoldAtTime, else cancelScheduledValues) and
  *       fall to 0 with a time constant of release/4; held.off = t. `release` is the tool's Release in seconds.
  *   MusicParts.releaseVoices(ac, voices, note, t, release)
- *       polyphonic: every voice of that note not yet released goes to the tool's own release(voice, t).
+ *       polyphonic: every voice of that note not yet released — or whose release is booked after t (3.130: a key let go before
+ *       the length it was played with) — goes to the tool's own release(voice, t).
  * A component imports no tool (eravos.components). */
 (function (root) {
   'use strict';
@@ -17,7 +18,7 @@
   }
   function releaseVoices(ac, voices, note, t, release) {
     t = Math.max(t || ac.currentTime, ac.currentTime);
-    voices.filter(v => v.note === note && !v.released).forEach(v => release(v, t));
+    voices.filter(v => v.note === note && (!v.released || v.relT > t)).forEach(v => release(v, t));   // 3.130 also a note whose end is booked later (a key let go before it)
   }
   root.MusicParts = root.MusicParts || {};
   root.MusicParts.releaseHeld = releaseHeld; root.MusicParts.releaseVoices = releaseVoices;

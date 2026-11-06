@@ -47,6 +47,7 @@
       { key: 'arpOct', type: 'integer', default: 1, min: 1, max: 3, label: 'Octaves', group: 'ARP' },
       { key: 'arpGate', type: 'number', default: 0.55, min: 0.05, max: 1, step: 0.01, label: 'Gate', group: 'ARP' },
       { key: 'arpHold', type: 'boolean', default: false, label: 'Latch', group: 'ARP' },
+      { key: 'hold', type: 'boolean', default: false, label: 'Hold', group: 'FX' },   // 3.130 keys you let go keep sounding until you play again
       { key: 'level', type: 'number', default: 0.6, min: 0, max: 1.5, step: 0.01, label: 'Level', group: 'OUT' },
     ],
     defaultPreset: 'Outrun Lead',
@@ -105,7 +106,7 @@
             // this note. Unbook it: hold the level here and settle back to sustain; rel() below books the new end (a source may
             // be given a new stop time until it has stopped). Before, overlapping lead notes went silent from the first old end on.
             const a = v.voice.amp.gain; if (typeof a.cancelAndHoldAtTime === 'function') a.cancelAndHoldAtTime(t); else a.cancelScheduledValues(t); a.setTargetAtTime(v.voice.sus, t, 0.008);
-            v.off = Infinity; if (dur !== undefined) rel(v, t + dur); else v.voice.oscs.forEach(o => { try { o.stop(t + 3600); } catch (e) {} }); return v; }
+            v.off = Infinity; v.note = note; if (dur !== undefined) rel(v, t + dur); else v.voice.oscs.forEach(o => { try { o.stop(t + 3600); } catch (e) {} }); return v; }
         }
         while (voices.length >= 6 || (P.get('mono') && voices.length)) kill(voices[0], t);
         const v = { note, voice: voice(f, t, vel), off: Infinity }; voices.push(v);
@@ -114,7 +115,7 @@
       }
       function rel(v, t) { v.off = t; const R = P.get('release'); dsp.release(v.voice.amp.gain, t, R); v.voice.oscs.forEach(o => { try { o.stop(t + R * 1.7 + 0.1); } catch (e) {} }); const last = v.voice.oscs[0]; last.onended = () => { v.voice.unhook.forEach(fn => { try { fn(); } catch (e) {} }); v.voice.nodes.forEach(n => { try { n.disconnect(); } catch (e) {} }); const i = voices.indexOf(v); if (i >= 0) voices.splice(i, 1); }; }
       function kill(v, t) { const i = voices.indexOf(v); if (i >= 0) voices.splice(i, 1); v.voice.amp.gain.cancelScheduledValues(t); v.voice.amp.gain.setTargetAtTime(0, t, 0.006); v.voice.oscs.forEach(o => { try { o.stop(t + 0.05); } catch (e) {} }); v.voice.oscs[0].onended = () => { v.voice.unhook.forEach(fn => { try { fn(); } catch (e) {} }); v.voice.nodes.forEach(n => { try { n.disconnect(); } catch (e) {} }); }; }
-      function noteOff(note, t) { voices.filter(v => v.note === note && v.off === Infinity).forEach(v => rel(v, t || ac.currentTime)); }
+      function noteOff(note, t) { t = Math.max(t || ac.currentTime, ac.currentTime); voices.filter(v => v.note === note && v.off > t).forEach(v => rel(v, t)); }   // 3.130 also a note with a booked end (a held key)
       // ---- arpeggiator over held keys
       const held = []; let arpI = 0;
       function arpSeq() {
@@ -131,13 +132,19 @@
         const triplet = st === 4 / 3 ? (tk.step16 % 4 === 0 ? [0, 4 / 3, 8 / 3] : []) : null;
         (triplet || hits).forEach(off => { const seq = arpSeq(); if (!seq.length) return; const n = P.get('arp') === 'random' ? seq[Math.floor(rnd() * seq.length)] : seq[arpI++ % seq.length]; noteOn(n, 0.85, tk.time + off * sd, Math.max(0.02, st * sd * P.get('arpGate'))); });
       });
+      // 3.130 HOLD: a key you let go keeps sounding; the next key you press (with none down) lets the held ones go — the same key
+      // again only stops it. Hands only: notes from the Timeline and sequencers keep their own lengths.
+      const down = new Set(), latched = new Set();
+      const handOn = (note, vel, t, dur) => { if (P.get('hold') && !(dur < 30)) {   /* a short timed preview plays as itself; a key (30 s or open) is a hand */ if (!down.size && latched.size) { const same = latched.size === 1 && latched.has(note); latched.forEach(n => noteOff(n)); latched.clear(); if (same) return; } down.add(note); return press(note, vel, t, undefined); } return press(note, vel, t, dur); };
+      const handOff = (note) => { if (P.get('hold')) { if (!down.delete(note)) return; latched.add(note); return; } lift(note); };
+      P.onChange('hold', (v) => { if (!v) { latched.forEach(n => { if (!down.has(n)) lift(n); }); latched.clear(); } });
       const press = (note, vel, t, dur) => { if (P.get('arp') === 'off') return noteOn(note, vel, t, dur); if (!P.get('arpHold') || !held.length || held._released) { if (held._released) { held.length = 0; held._released = false; } } if (!held.includes(note)) held.push(note); if (dur !== undefined) setTimeout(() => lift(note), dur * 1000); };
       const lift = (note) => { if (P.get('arp') === 'off') return noteOff(note); if (P.get('arpHold')) { held._released = true; return; } const i = held.indexOf(note); if (i >= 0) held.splice(i, 1); };
       P.onChange('arp', (v) => { if (v === 'off') held.length = 0; arpI = 0; });
       ctx.onNote((p) => noteOn(p.note, p.velocity, p.time, p.duration));        // sequenced notes play directly
-      ctx.onMidi((p) => p.on ? press(p.note, p.velocity) : lift(p.note));      // hands feed the arp
-      ctx.audition = (p) => press(p.note || 60, p.velocity || 0.8, ac.currentTime, P.get('arp') === 'off' ? (p.duration || 1) : undefined);
-      ctx.auditionOff = (p) => lift(p.note || 60);
+      ctx.onMidi((p) => p.on ? handOn(p.note, p.velocity) : handOff(p.note));      // hands feed the arp
+      ctx.audition = (p) => handOn(p.note || 60, p.velocity || 0.8, ac.currentTime, P.get('arp') === 'off' ? (p.duration || 1) : undefined);
+      ctx.auditionOff = (p) => handOff(p.note || 60);
       ctx.internals = { voices, held, arpSeq };
       ctx.onDispose(() => voices.slice().forEach(v => kill(v, ac.currentTime)));
       return {};

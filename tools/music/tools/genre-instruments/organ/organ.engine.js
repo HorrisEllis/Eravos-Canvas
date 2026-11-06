@@ -142,7 +142,7 @@
         updatePedal(t); updateWind();
         return v;
       }
-      function release(v, t) { if (v.off !== Infinity) return; v.off = t; const R = P.get('release'); dsp.release(v.env.gain, t, R); v.nodes.forEach(n => { if (n.stop) try { n.stop(t + R * 1.7 + 0.1); } catch (e) {} }); const last = v.nodes.filter(n => n.stop).pop(); /* a sustaining source: perc and chiff clean up after themselves (oneShot) */ const done = () => { v.nodes.forEach(n => { try { n.disconnect(); } catch (e) {} }); const i = voices.indexOf(v); if (i >= 0) voices.splice(i, 1); updatePedal(ac.currentTime); updateWind(); }; if (last) last.onended = done; else done(); setTimeout(() => { updatePedal(ac.currentTime); updateWind(); }, Math.max(0, (t - ac.currentTime) * 1000) + 5); }
+      function release(v, t) { if (v.off !== Infinity && v.off <= t) return;   /* 3.130 a booked end can be brought forward */ v.off = t; const R = P.get('release'); dsp.release(v.env.gain, t, R); v.nodes.forEach(n => { if (n.stop) try { n.stop(t + R * 1.7 + 0.1); } catch (e) {} }); const last = v.nodes.filter(n => n.stop).pop(); /* a sustaining source: perc and chiff clean up after themselves (oneShot) */ const done = () => { v.nodes.forEach(n => { try { n.disconnect(); } catch (e) {} }); const i = voices.indexOf(v); if (i >= 0) voices.splice(i, 1); updatePedal(ac.currentTime); updateWind(); }; if (last) last.onended = done; else done(); setTimeout(() => { updatePedal(ac.currentTime); updateWind(); }, Math.max(0, (t - ac.currentTime) * 1000) + 5); }
       function kill(v, t) { const i = voices.indexOf(v); if (i >= 0) voices.splice(i, 1); v.env.gain.cancelScheduledValues(t); v.env.gain.setTargetAtTime(0, t, 0.01); v.nodes.forEach(n => { if (n.stop) try { n.stop(t + 0.08); } catch (e) {} }); }
       function updatePedal(t) {
         const held = voices.filter(v => v.off === Infinity || v.off > ac.currentTime + 0.01), low = held.length && P.get('pedal') ? Math.min(...held.map(v => v.note)) : null;
@@ -159,7 +159,7 @@
       ctx.sleepWhen(() => !voices.length && !pedalV);   // 3.62: silent → unplugged after its 7.5 s tail
       ctx.onMidi((p) => { if (p.on) noteOn(p.note, p.velocity); else voices.filter(v => v.note === p.note && v.off === Infinity).forEach(v => release(v, ac.currentTime)); });
       ctx.audition = (p) => noteOn(p.note || 45, p.velocity || 0.8, ac.currentTime, p.duration || 3);
-      ctx.auditionOff = (p) => voices.filter(v => v.note === (p.note || 45) && v.off === Infinity).forEach(v => release(v, ac.currentTime));
+      ctx.auditionOff = (p) => voices.filter(v => v.note === (p.note || 45) && v.off > ac.currentTime).forEach(v => release(v, ac.currentTime));
       ctx.breathPhase = () => ((ac.currentTime - t0) / P.get('breathPeriod')) % 1;
       ctx.internals = { bus, dry, out, level, ampPre, shaper, cabHP, cabMid, cabLP, makeup, dark, pulseG, trem, rotIn, rotDry, rotOut, voices, breath, horn, drum, shaper, get pulse() { return pOsc; }, get pedal() { return pedalV; } };
       ctx.onDispose(() => voices.slice().forEach(v => kill(v, ac.currentTime)));

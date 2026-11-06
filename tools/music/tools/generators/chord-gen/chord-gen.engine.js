@@ -6,7 +6,7 @@
 (function () {
   'use strict';
   const S = OrganismSDK.STD;
-  const PROG = MusicParts.PROGRESSIONS;   // the shared table (components/progression)
+  const PROG = MusicParts.ALL_PROGRESSIONS;   // the shared tables (components/progression): the five, then the jazz six (3.132)
   const CHORD = { type: 'object', required: ['degree', 'notes', 'time'] };
   OrganismFactory.define({
     id: 'eravos.chord-gen', domain: 'music', version: '1.0.0', label: 'Chords', icon: '🎹', accent: '#b066ff',
@@ -22,6 +22,7 @@
     config: [
       { key: 'progression', type: 'enum', options: Object.keys(PROG), default: 'i-VI-III-VII', label: 'Progression', group: 'HARMONY' },
       { key: 'chordBars', type: 'enum', options: [1, 2, 4], default: 1, label: 'Bars/chord', group: 'HARMONY' },
+      { key: 'voicing', type: 'enum', options: ['tension', '7th', '9th', 'rootless 9'], default: 'tension', label: 'Voicing', group: 'HARMONY', hint: 'tension: TENSION decides (triad → add9 → 7sus4 → cluster) · 7th / 9th: the scale’s own thirds stacked · rootless 9: 3-5-7-9, the jazz left hand (the bass plays the root)' },
       { key: 'tension', type: 'number', default: 0.3, min: 0, max: 1, step: 0.01, label: 'TENSION', group: 'HARMONY', hint: 'triad → add9 → 7sus4 → cluster' },
       { key: 'energy', type: 'number', default: 0.6, min: 0, max: 1, step: 0.01, label: 'ENERGY', group: 'PLAY', hint: 'how hard the chords are played' },
       { key: 'octave', type: 'integer', default: 3, min: 2, max: 5, label: 'Octave', group: 'PLAY' },
@@ -34,7 +35,10 @@
       const cs = ctx.modBus('tension', { min: 0, max: 1 }), an = ac.createAnalyser(); an.fftSize = 32; cs.connect(an); const mb = new Float32Array(32);
       const tension = () => { an.getFloatTimeDomainData(mb); return Math.max(0, Math.min(1, P.get('tension') + (mb[mb.length - 1] || 0))); };
       function voicing(degree, ten) {
-        const k = ctx.key, o = P.get('octave'), tri = MT.chord(degree, k.root, k.scale, 'triad', o), r = tri[0];
+        const k = ctx.key, o = P.get('octave'), v = P.get('voicing');
+        // 3.132 the jazz voicings: the scale's own thirds stacked on the degree (lofi, neo-soul) — "tension" below is today's rule, unchanged
+        if (v && v !== 'tension') { const st = v === '7th' ? [0, 2, 4, 6] : v === '9th' ? [0, 2, 4, 6, 8] : [2, 4, 6, 8]; return st.map(x => MT.degreeToMidi(degree + x, o, k.root, k.scale)); }
+        const tri = MT.chord(degree, k.root, k.scale, 'triad', o), r = tri[0];
         if (ten < 0.25) return tri.concat([tri[0] + 12]);
         if (ten < 0.5) return [tri[0], tri[1], tri[2], MT.degreeToMidi(degree + 8, o, k.root, k.scale)];                        // add9
         if (ten < 0.75) { const s = MT.chord(degree, k.root, k.scale, 'sus4', o); return [s[0], s[1], s[2], MT.degreeToMidi(degree + 6, o, k.root, k.scale)]; }   // 7sus4

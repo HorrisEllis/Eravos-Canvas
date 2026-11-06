@@ -36,7 +36,7 @@
       { key: 'quantize', type: 'enum', options: ['off', '1/16', '1/8', '1/4', '1 bar'], default: '1/16', label: 'Grid', group: 'LANES' },
       { key: 'mode', type: 'enum', options: ['read', 'write', 'latch', 'off'], default: 'read', label: 'Mode', group: 'LANES' },
     ],
-    ui_hooks: ['lane_add', 'lane_remove', 'point_edit', 'lane_mode', 'bind'],
+    ui_hooks: ['lane_add', 'lane_remove', 'point_edit', 'lane_mode', 'bind', 'lane_bind', 'lane_bind_to', 'lane_unbind'],
     restoreTwice: true,
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, K = ctx.K;
@@ -66,7 +66,7 @@
       ctx.valueAt = valueAt;
       const logged = new Set();
       function laneOk(l) {
-        if (!l.enabled) return false;
+        if (l.unbound || !l.enabled) return false;   // 3.131 an unbound lane draws but drives nothing (and is not "gone")
         if (!K.registry.has(l.target)) { if (!logged.has(l.id)) { logged.add(l.id); l.missing = true; l.enabled = false; ctx.fault('MUTATION_001', `lane ${l.label || l.key}: target ${l.target} unmounted — lane disabled`); ctx.syncUI(); } return false; }
         return true;
       }
@@ -90,6 +90,30 @@
         lanes.push(lane); ctx.syncUI(); return lane;
       }
       ctx.addLane = addLane; ctx.lanes = () => lanes;
+      // 3.131 BIND ON THE LANE (his words, 2026-11-06: "an empty lane with a bind button to bind a tool or component, or interaction object" ·
+      // "yes"): ＋ Add lane makes an empty lane you can draw on; its own ⊕ Bind points it at the next control touched on anything on the
+      // canvas — a tool's knob, switch or choice, a component's (suites and tools opened as components are on the canvas too), or an
+      // interaction object's (the XY Pad's X and Y, Breath, …). Bind again re-points it; Unbind empties it; the drawn shape is kept.
+      function addEmptyLane() {
+        const slot = laneIndexFree(); if (slot < 0) { ctx.fault('RUNTIME_005', 'max 8 lanes'); return null; }
+        const lane = { id: 'a' + Date.now().toString(36) + slot, slot, target: null, key: null, label: 'Unbound lane', points: [{ bar: 1, value: 0.5, curve: 0 }], enabled: true, hold: false, output: 'event', wire: null, mode: 'read', lastSent: null, unbound: true, fresh: true };
+        lanes.push(lane); ctx.syncUI(); return lane;
+      }
+      function unwire(l) { if (l.wire) K.wires.remove(l.wire, 'lane_rebound'); l.wire = null; l.output = 'event'; srcs[l.slot].offset.cancelScheduledValues(ac.currentTime); srcs[l.slot].offset.setValueAtTime(0, ac.currentTime); }
+      function bindLane(l, target, key) {
+        const c = cfgOf(target, key), r = K.registry.get(target); if (!c || !r) { ctx.fault('RUNTIME_002', `bind: ${target} has no config key ${key}`); return null; }
+        const other = lanes.find(x => x !== l && x.target === target && x.key === key); if (other) return { already: other };
+        unwire(l);
+        const rv = K.registry.readParam(ctx.id, target, key), cur = rv === undefined ? c.default : rv;
+        Object.assign(l, { target, key, label: (r.descriptor.icon || '') + ' ' + r.descriptor.label + ' · ' + (c.label || key), hold: stepHold(c), unbound: false, missing: false, enabled: true, lastSent: null });
+        if (l.fresh && l.points.length === 1) l.points[0].value = norm(c, cur);   // nothing drawn yet: start where the control is (no jump)
+        l.fresh = false; logged.delete(l.id);
+        const hk = audioHookFor(target, key);
+        if (hk) { const w = K.wires.register({ src: { instanceId: ctx.id, hookId: 'auto.hook.mod_lane' + l.slot }, dst: { instanceId: target, hookId: hk.hook_id } }); if (w.ok) { l.output = 'audio'; l.wire = w.wire_id; l.base = cur; } }
+        ctx.syncUI(); return l;
+      }
+      function unbindLane(l) { unwire(l); Object.assign(l, { target: null, key: null, label: 'Unbound lane', unbound: true, missing: false, lastSent: null }); ctx.syncUI(); }
+      ctx.addEmptyLane = addEmptyLane; ctx.bindLane = bindLane; ctx.unbindLane = unbindLane;
       function sendEvent(l, n) {
         if (l.lastSent !== null && Math.abs(l.lastSent - n) <= 1e-3) return false;
         l.lastSent = n; const c = cfgOf(l.target, l.key); if (!c) return false;
@@ -144,16 +168,28 @@
       ctx.on('kernel:organism-unmounted', null, (p) => { lanes.forEach(l => { if (l.target === p.instanceId) laneOk(l); }); });
       // UI
       function snapBar(b) { const q = { off: 0, '1/16': 1 / 16, '1/8': 1 / 8, '1/4': 1 / 4, '1 bar': 1 }[P.get('quantize')]; return q ? 1 + Math.round((b - 1) / q) * q : b; }
-      ctx.onUI('lane_add', { type: 'object', required: ['target', 'key'] }, (p) => addLane(p.target, p.key));
+      ctx.onUI('lane_add', { type: 'object' }, (p) => (p && p.target && p.key ? addLane(p.target, p.key) : addEmptyLane()));
       // 3.125 BIND (like MIDI Mapper's learn — his words, 2026-11-06: "the automation tool needs to have a bind button to bind a tool
       // aspect to the automation tool"): press Bind, then touch any knob, switch or choice on any tool — it gets a lane here
-      let binding = false;
+      let binding = false;   // false · true (a new lane) · a lane id (that lane)
       ctx.onUI('bind', null, (p) => { binding = p && p.on !== undefined ? !!p.on : !binding; ctx.emitUI('status', binding ? { info: 'Touch any knob on any tool to bind it here.' } : { info: '' }); ctx.syncUI(); });
+      ctx.onUI('lane_bind', { type: 'object', required: ['id'] }, (p) => {
+        const l = lanes.find(x => x.id === p.id); if (!l) return;
+        binding = binding === l.id ? false : l.id;
+        ctx.emitUI('status', binding ? { info: 'Touch a control — on a tool, a component or an interaction object (the XY Pad, Breath…) — to bind this lane. ⊕ again cancels.' } : { info: '' }); ctx.syncUI();
+      });
+      ctx.onUI('lane_bind_to', { type: 'object', required: ['id', 'target', 'key'] }, (p) => { const l = lanes.find(x => x.id === p.id); if (!l) return; const r = bindLane(l, p.target, p.key); if (binding === l.id) binding = false; ctx.emitUI('status', r && r.already ? { warn: 'Already on a lane: ' + r.already.label } : r ? { info: 'Bound ✔ ' + r.label } : { warn: 'Could not bind that.' }); ctx.syncUI(); });
+      ctx.onUI('lane_unbind', { type: 'object', required: ['id'] }, (p) => { const l = lanes.find(x => x.id === p.id); if (!l) return; unbindLane(l); if (binding === l.id) binding = false; ctx.emitUI('status', { info: 'Unbound — the lane keeps its shape.' }); });
       ctx.on('ui:config_change:*', { type: 'object', required: ['key'] }, (p, topic) => {
         if (!binding || p._auto || p._midi || p._from === ctx.id) return;
         const target = topic.slice('ui:config_change:'.length); if (target === ctx.id || !K.registry.has(target)) return;
         const c = cfgOf(target, p.key); if (!c || c.hidden || !['number', 'integer', 'enum', 'boolean'].includes(c.type)) return;
-        binding = false;
+        const which = binding; binding = false;
+        if (which !== true) {   // a lane's own Bind
+          const l0 = lanes.find(x => x.id === which); if (!l0) { ctx.syncUI(); return; }
+          const r = bindLane(l0, target, p.key);
+          ctx.emitUI('status', r && r.already ? { warn: 'Already on a lane: ' + r.already.label } : r ? { info: 'Bound ✔ ' + r.label } : { warn: 'Could not bind that.' }); ctx.syncUI(); return;
+        }
         const had = lanes.find(l => l.target === target && l.key === p.key);
         const l = had || addLane(target, p.key);
         ctx.emitUI('status', l ? { info: (had ? 'Already bound: ' : 'Bound ✔ ') + l.label } : { warn: 'All 8 lanes are in use — remove one first.' }); ctx.syncUI();
@@ -173,7 +209,7 @@
         l.points.sort((a, b) => a.bar - b.bar); l.lastSent = null; ctx.syncUI();
       });
       ctx.stateExtra = () => ({
-        lanes: lanes.map(l => ({ id: l.id, label: l.label, points: l.points, enabled: l.enabled, missing: !!l.missing, output: l.output, hold: l.hold, recording: !!l.recording })),
+        lanes: lanes.map(l => ({ id: l.id, label: l.label, points: l.points, enabled: l.enabled, missing: !!l.missing, output: l.output, hold: l.hold, recording: !!l.recording, unbound: !!l.unbound, target: l.target, key: l.key })),
         length: lengthBars(), binding,
         params: K.registry.list().filter(r => !r.descriptor.system && r.instance_id !== ctx.id).map(r => ({ id: r.instance_id, label: (r.descriptor.icon || '') + ' ' + r.descriptor.label, keys: (r.descriptor.config || []).filter(c => ['number', 'integer', 'enum', 'boolean'].includes(c.type) && !c.hidden).map(c => ({ key: c.key, label: c.label || c.key, group: c.group || '' })) })),
       });
@@ -182,7 +218,7 @@
       ctx.loadExtra = (x) => {
         if (!x || !x.lanes) return;
         lanes = [];
-        x.lanes.forEach(sl => { if (!K.registry.has(sl.target)) { lanes.push(Object.assign({}, sl, { enabled: false, missing: true })); return; } const l = addLane(sl.target, sl.key); if (l) { l.points = sl.points; l.enabled = sl.enabled; } });
+        x.lanes.forEach(sl => { if (sl.unbound) { const e = addEmptyLane(); if (e) { e.points = sl.points; e.enabled = sl.enabled; e.fresh = !!sl.fresh; } return; } if (!K.registry.has(sl.target)) { lanes.push(Object.assign({}, sl, { enabled: false, missing: true })); return; } const l = addLane(sl.target, sl.key); if (l) { l.points = sl.points; l.enabled = sl.enabled; } });
         ctx.syncUI();
       };
       return {};

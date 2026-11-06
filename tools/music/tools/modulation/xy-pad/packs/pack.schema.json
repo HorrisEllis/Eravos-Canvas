@@ -98,6 +98,16 @@
                         "minimum": 0,
                         "maximum": 1
                       },
+                      "posX": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "posY": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
                       "_react": {},
                       "tempoX": {
                         "enum": [

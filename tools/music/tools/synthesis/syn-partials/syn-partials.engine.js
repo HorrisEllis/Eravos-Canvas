@@ -80,7 +80,7 @@
         const v = { note, amp, parts, wP, start: t, released: false, end: Infinity }; voices.push(v); return v;
       }
       function release(v, t) {
-        if (v.released) return; v.released = true; v.relT = t;
+        if (v.released && !(v.relT > t)) return; v.released = true; v.relT = t;   // 3.130 a booked end can be brought forward (a key let go)
         const R = P.get('release'), g = v.amp.gain;
         if (typeof g.cancelAndHoldAtTime === 'function') g.cancelAndHoldAtTime(t); else g.cancelScheduledValues(t);
         g.setTargetAtTime(0, t, R / 4); v.end = t + R * 1.6 + 0.05;

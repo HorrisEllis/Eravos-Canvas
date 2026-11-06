@@ -55,7 +55,7 @@ dag:
   layer 0: env-adsr ✓
   tool: eravos.syn-env ← env-adsr
   build order: env-adsr ✓ → syn-env
-  shared with: env-adsr 20  (other tools on each)
+  shared with: env-adsr 21  (other tools on each)
   in it now: —
   comes out of it: env-adsr
   planned: —

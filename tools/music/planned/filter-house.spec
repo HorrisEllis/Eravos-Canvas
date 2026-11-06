@@ -36,4 +36,4 @@ dag:
   layer 0: compressor · ducker · filter-allpass-chain · filter-svf ✓ · lfo ✓ · sampler-voice
   tool: eravos.filter-house ← filter-svf + filter-allpass-chain + ducker + compressor + lfo + sampler-voice
   build order: compressor → ducker → filter-allpass-chain → filter-svf ✓ → lfo ✓ → sampler-voice → filter-house
-  shared with: compressor 4 · ducker 15 · filter-allpass-chain 5 · filter-svf 40 · lfo 27 · sampler-voice 14  (other tools on each)
+  shared with: compressor 4 · ducker 15 · filter-allpass-chain 5 · filter-svf 41 · lfo 28 · sampler-voice 14  (other tools on each)

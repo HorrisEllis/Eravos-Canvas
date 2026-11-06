@@ -36,4 +36,4 @@ dag:
   layer 0: clipper · env-msseg · filter-formant ✓ · lfo ✓ · osc-fm-operator · osc-va ✓ · pitch-shifter · waveshaper
   tool: eravos.screech-engine ← osc-va + osc-fm-operator + filter-formant + waveshaper + clipper + env-msseg + lfo + pitch-shifter
   build order: clipper → env-msseg → filter-formant ✓ → lfo ✓ → osc-fm-operator → osc-va ✓ → pitch-shifter → waveshaper → screech-engine
-  shared with: clipper 9 · env-msseg 14 · filter-formant 7 · lfo 27 · osc-fm-operator 6 · osc-va 26 · pitch-shifter 11 · waveshaper 22  (other tools on each)
+  shared with: clipper 9 · env-msseg 14 · filter-formant 7 · lfo 28 · osc-fm-operator 6 · osc-va 26 · pitch-shifter 11 · waveshaper 22  (other tools on each)

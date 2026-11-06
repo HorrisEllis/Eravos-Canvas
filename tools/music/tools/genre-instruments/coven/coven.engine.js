@@ -105,7 +105,7 @@
       ctx.onNote((p) => noteOn(p.note, p.velocity, p.time, p.duration));
       ctx.onMidi((p) => p.on ? noteOn(p.note, p.velocity) : voices.filter(v => v.note === p.note && v.off === Infinity).forEach(v => release(v, ac.currentTime)));
       ctx.audition = (p) => noteOn(p.note || 57, p.velocity || 0.8, ac.currentTime, p.duration || 3);
-      ctx.auditionOff = (p) => voices.filter(v => v.note === (p.note || 57) && v.off === Infinity).forEach(v => release(v, ac.currentTime));
+      ctx.auditionOff = (p) => voices.filter(v => v.note === (p.note || 57) && v.off > ac.currentTime).forEach(v => release(v, ac.currentTime));
       ctx.internals = { voices, get seq() { return seq; }, mouth, get drone() { return drone; } };
       ctx.onDispose(() => voices.slice().forEach(v => kill(v, ac.currentTime)));
       return {};

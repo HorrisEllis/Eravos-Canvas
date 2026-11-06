@@ -36,4 +36,4 @@ dag:
   layer 0: env-msseg · lfo ✓ · pitch-shifter · slew-lag · step-mod
   tool: eravos.bend-lab ← env-msseg + slew-lag + step-mod + pitch-shifter + lfo
   build order: env-msseg → lfo ✓ → pitch-shifter → slew-lag → step-mod → bend-lab
-  shared with: env-msseg 14 · lfo 27 · pitch-shifter 11 · slew-lag 10 · step-mod 7  (other tools on each)
+  shared with: env-msseg 14 · lfo 28 · pitch-shifter 11 · slew-lag 10 · step-mod 7  (other tools on each)

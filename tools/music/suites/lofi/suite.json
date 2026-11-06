@@ -1,0 +1,329 @@
+{
+  "schema": "eravos.suite/1",
+  "id": "music.lofi",
+  "kind": "setup",
+  "label": "Lofi",
+  "icon": "📼",
+  "accent": "#d6b37a",
+  "version": "1.0.0",
+  "blurb": "Lofi as a system. The Groove plays a lazy boom bap on the dusty kit (through a little bit-crush); Chords plays jazz sevenths and ninths on soft keys, low-passed, with a warm tape echo; the Bassline and a soft sub follow the chords; a gentle pump ties it together. DUST, WARMTH, SWING and PUMP turn all of it. (Spec: specs/eravos.lofi-setup.spec — Piano and Tape Memory join it once built.)",
+  "hub": "eravos.suite-hub",
+  "steps": [
+    {
+      "op": "bpm",
+      "bpm": 82,
+      "why": "lofi sits around 70–90 BPM"
+    }
+  ],
+  "parts": [
+    {
+      "tool": "eravos.groove-gen",
+      "role": "rhythm",
+      "required": true,
+      "preset": "Lofi Study",
+      "why": "the lazy boom bap: plays the drums and tells the Bassline where the kick is",
+      "notes": false
+    },
+    {
+      "tool": "eravos.pads",
+      "role": "drums",
+      "required": true,
+      "preset": "Cinematic & Lo-fi · Lo-fi Dust",
+      "why": "the dusty kit",
+      "notes": false
+    },
+    {
+      "tool": "eravos.fx-destroyer",
+      "role": "dust",
+      "required": true,
+      "preset": "Lo-fi 12-bit 22k",
+      "why": "a little bit-depth and sample rate on the drums"
+    },
+    {
+      "tool": "eravos.chord-gen",
+      "role": "key",
+      "required": true,
+      "preset": "Lofi Study",
+      "why": "jazz chords (7ths, 9ths) in the song's key; the Bassline follows them",
+      "notes": false
+    },
+    {
+      "tool": "eravos.retro-poly",
+      "role": "keys",
+      "required": true,
+      "preset": "Lofi Keys",
+      "why": "soft electric-piano-like keys (the Piano replaces it once built)"
+    },
+    {
+      "tool": "eravos.fx-filter",
+      "role": "warmth",
+      "required": true,
+      "preset": "Lofi Low",
+      "why": "the keys low-passed, warm"
+    },
+    {
+      "tool": "eravos.fx-echo",
+      "role": "space",
+      "required": true,
+      "preset": "Lofi Warm Echo",
+      "why": "a short warm tape echo on the keys"
+    },
+    {
+      "tool": "eravos.bass-gen",
+      "role": "bassline",
+      "required": true,
+      "preset": "Lofi Study",
+      "why": "a round bass behind the beat, on the chords' roots",
+      "notes": false
+    },
+    {
+      "tool": "eravos.sub-engine",
+      "role": "sub",
+      "required": true,
+      "preset": "Lofi Soft Sub",
+      "why": "the soft sine under it"
+    },
+    {
+      "tool": "eravos.sidechain-compressor",
+      "role": "pump",
+      "required": true,
+      "preset": "Lofi Gentle Pump",
+      "why": "a gentle duck on every beat: keys and bass breathe with the kick"
+    }
+  ],
+  "wiring": [
+    {
+      "from": [
+        "eravos.groove-gen",
+        "groove.hook.note_out"
+      ],
+      "to": [
+        "eravos.pads",
+        "pads.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.groove-gen",
+        "groove.hook.step_out"
+      ],
+      "to": [
+        "eravos.bass-gen",
+        "bassg.hook.groove_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.chord-gen",
+        "chordg.hook.chord_out"
+      ],
+      "to": [
+        "eravos.bass-gen",
+        "bassg.hook.chord_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.chord-gen",
+        "chordg.hook.note_out"
+      ],
+      "to": [
+        "eravos.retro-poly",
+        "rp.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.bass-gen",
+        "bassg.hook.note_out"
+      ],
+      "to": [
+        "eravos.sub-engine",
+        "sub.hook.note_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.pads",
+        "pads.hook.audio_out"
+      ],
+      "to": [
+        "eravos.fx-destroyer",
+        "fx.hook.audio_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.retro-poly",
+        "rp.hook.audio_out"
+      ],
+      "to": [
+        "eravos.fx-filter",
+        "fx.hook.audio_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.fx-filter",
+        "fx.hook.audio_out"
+      ],
+      "to": [
+        "eravos.fx-echo",
+        "fx.hook.audio_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.fx-echo",
+        "fx.hook.audio_out"
+      ],
+      "to": [
+        "eravos.sidechain-compressor",
+        "sc.hook.audio_in"
+      ]
+    },
+    {
+      "from": [
+        "eravos.sub-engine",
+        "sub.hook.audio_out"
+      ],
+      "to": [
+        "eravos.sidechain-compressor",
+        "sc.hook.audio_in"
+      ]
+    }
+  ],
+  "output": [
+    "eravos.fx-destroyer",
+    "eravos.sidechain-compressor"
+  ],
+  "macros": [
+    {
+      "label": "DUST",
+      "default": 0.4,
+      "hint": "how worn: fewer bits, more of the crushed drums",
+      "targets": [
+        {
+          "tool": "eravos.fx-destroyer",
+          "key": "bits",
+          "min": 16,
+          "max": 8
+        },
+        {
+          "tool": "eravos.fx-destroyer",
+          "key": "mix",
+          "min": 0.3,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "label": "WARMTH",
+      "default": 0.5,
+      "hint": "how dark: the keys' low-pass closes, the echo ages",
+      "targets": [
+        {
+          "tool": "eravos.fx-filter",
+          "key": "cutoff",
+          "min": 5200,
+          "max": 1100
+        },
+        {
+          "tool": "eravos.fx-echo",
+          "key": "age",
+          "min": 0.3,
+          "max": 0.9
+        }
+      ]
+    },
+    {
+      "label": "SWING",
+      "default": 0.55,
+      "hint": "how lazy the drums lean",
+      "targets": [
+        {
+          "tool": "eravos.groove-gen",
+          "key": "swing",
+          "min": 0.3,
+          "max": 0.6
+        }
+      ]
+    },
+    {
+      "label": "PUMP",
+      "default": 0.4,
+      "hint": "how much the keys and bass breathe with the kick",
+      "targets": [
+        {
+          "tool": "eravos.sidechain-compressor",
+          "key": "depth",
+          "min": 0,
+          "max": 0.7
+        }
+      ]
+    }
+  ],
+  "starter": "Study",
+  "scenes": {
+    "Study": {
+      "eravos.groove-gen": {
+        "preset": "Lofi Study"
+      },
+      "eravos.chord-gen": {
+        "preset": "Lofi Study"
+      },
+      "eravos.bass-gen": {
+        "preset": "Lofi Study"
+      },
+      "eravos.retro-poly": {
+        "preset": "Lofi Keys"
+      },
+      "eravos.fx-filter": {
+        "preset": "Lofi Low"
+      },
+      "eravos.fx-echo": {
+        "preset": "Lofi Warm Echo"
+      }
+    },
+    "Rainy": {
+      "eravos.groove-gen": {
+        "preset": "Lofi Rainy"
+      },
+      "eravos.chord-gen": {
+        "preset": "Lofi Rainy"
+      },
+      "eravos.bass-gen": {
+        "preset": "Lofi Rainy"
+      },
+      "eravos.retro-poly": {
+        "preset": "Lofi Felt Keys"
+      },
+      "eravos.fx-filter": {
+        "preset": "Lofi Underwater"
+      },
+      "eravos.fx-echo": {
+        "preset": "Lofi Long Night"
+      }
+    },
+    "Late Night": {
+      "eravos.groove-gen": {
+        "preset": "Lofi Late Night"
+      },
+      "eravos.chord-gen": {
+        "preset": "Lofi Late Night"
+      },
+      "eravos.bass-gen": {
+        "preset": "Lofi Late Night"
+      },
+      "eravos.retro-poly": {
+        "preset": "Lofi Felt Keys"
+      },
+      "eravos.fx-filter": {
+        "preset": "Lofi Low"
+      },
+      "eravos.fx-echo": {
+        "preset": "Lofi Long Night"
+      }
+    }
+  }
+}

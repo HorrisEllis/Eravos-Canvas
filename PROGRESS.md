@@ -2,7 +2,7 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
-## Done — 3.128 .erv; the Workshop approved; the Pattern Editor's components (2026-11-06)
+## Done — 3.133 .erv; the Workshop approved; the Pattern Editor's components (2026-11-06)
 His words: "Can we use yaml to save songs like a psd file…" (09:23:29Z) · "The pattern and note editor are the same." (13:28:34Z) · "First."
 (13:30:25Z) · "Absolutely not. Like I’m talking a full workshop…" (13:38:50Z) · "Agnostic. I was thinking it could be the beginning of photo
 manipulation tools. If possible." (14:09:18Z) · "Nice. That's exactly it. And then the PSD style YAML, maybe ERV as an extension for that." (15:55:01Z)
@@ -14,6 +14,70 @@ manipulation tools. If possible." (14:09:18Z) · "Nice. That's exactly it. And t
   noCompatMode so `on:`/`y:` read plainly); the kernel's intake hands a dropped .erv over as text; Start › Save as .erv · Open .erv… (the
   layers first, switch any off; a tool left out takes its wires). "Your audio" became "Your files" (the canvas says no domain word).
   P120 3/3. Open: "locked" kept in the file, not enforced; a sidecar folder for big audio; Workshop objects as layers inside tools.
+## Done — 3.132 the Lofi setup (2026-11-06)
+Asked: "i also want to be able to make lofi" → "nope look at the claude.md" → specs → "yes" · "suites are tools and its components."
+- Lofi is a SETUP (Axiom 3), not a tool or a suite: tools/music/suites/lofi/suite.json — Groove (boom bap) → Drum Machine (Lo-fi Dust) →
+  Destroyer (12-bit); Chords (jazz) → Retro Poly (Lofi Keys) → Filter (Lofi Low) → Echo (Lofi Warm Echo) → Sidechain; Bassline → Deep
+  Sub → Sidechain. 82 BPM (steps: a setup may carry its domain's recipe steps; suites.js passes them through). Macros DUST WARMTH SWING PUMP;
+  scenes Study / Rainy / Late Night.
+- Chords: Voicing [tension (today's rule, unchanged), 7th, 9th, rootless 9]; TENSION dims with a jazz voicing. components/progression:
+  JAZZ_PROGRESSIONS (six) + ALL_PROGRESSIONS (the five, then the six) — the five untouched; Chords and Bassline offer ALL.
+- Groove: "boom bap" style (kick 1 and the and-of-2, snare 2 and 4, softer offbeat hats, ghosts); the five styles unchanged.
+- Lofi packs (data only): Groove, Chords, Bassline, Retro Poly, Filter, Deep Sub, Echo, Sidechain. build/tool-kit.mjs regenerated the
+  pack schemas (also XY Pad's posX/posY from 3.131 and Retro Poly's Hold from 3.130, which were stale).
+- Played in the app: no faults; −7…−10 dB RMS; the master compressor pulls 3–5 dB (open: the parts' levels could come down).
+- Tests: p132 3/3; P119 now 8 setups (and "the last step opens the suite"); Chords 12/12; Bassline 16/16; Groove; Echo; Filter; Sidechain;
+  Deep Sub; Retro Poly; Drum Machine; Destroyer; P63 11/11; P14 142/142; boundary 10/10; design check no worse.
+
+## Done — 3.131 Bind on the lane (2026-11-06)
+Asked: "“Automate this”: an empty lane with a bind button to bind a tool or component, or interaction object?" → plan shown → "yes".
+- Automation: ＋ Add lane (ui:lane_add with no target) = an unbound lane — drawn, drives nothing, never "target gone". Each lane: ⊕ Bind
+  (ui:lane_bind {id}) → the next control touched anywhere on the canvas; "or pick ▾" (ui:lane_bind_to); right-click › Unbind (ui:lane_unbind).
+  A lane with nothing drawn starts at the control's value; a drawn shape is kept; one control, one lane. The old ui:bind still works (P118).
+- XY Pad: posX / posY (group PAD) — a hand on the pad publishes them (hook xy.hook.touch_out, ≤ 60/s), anything moving them moves the puck.
+- Open: keyboard pitch bend / mod wheel are not controls yet; components' own windows only where Open as components exists.
+- tests/p131-bind-on-the-lane.test.js 3/3; P118, Automation 8/8, XY Pad, boundary green. Specs: macro-automation + xy-pad ADDENDUM 2026-11-06.
+
+## Done — 3.130 A key let go stops; Retro Poly Hold (2026-11-06)
+Asked: "Retro poly plays a key like your holding it. How do I turn that off. Same with the midi, options to make it hold or single note?"
+- Cause: the on-screen keyboard (ui-music Keyboard and the tools' own) plays a key as a 30-second note and sends "let go" on key-up. Seven
+  tools only let go of a note that had no end booked, so key-up did nothing and the note held for 30 s: Retro Poly, Coven, Organ, Pad
+  Forge, Syn Osc, Syn Partials (and the shared note-release component). Each now brings a booked end forward. Retro Poly mono: the voice a
+  legato note takes over now belongs to the new note (letting that key go stopped nothing before).
+- Retro Poly › Hold (header, beside Mono; off by default): keys and MIDI you let go keep sounding; the next key you press lets them go
+  (the same key alone just stops it). Timeline and sequencer notes keep their own lengths. Single note = Mono (already there).
+- Proof: tests/p130-note-hold.test.js 4/4 — on-screen key, MIDI poly and mono, Hold, and every tool with a keyboard (15) silent 3 s after
+  letting go (7 failed before). Retro Poly 12/12, Coven 13/13, Organ 43/43, Pad Forge 12/12, Syn Osc 4/4, Syn Partials 4/4, P53 88/88,
+  boundary 10/10; null render Syn Osc 11/11 PASS (the others' presets are random-seeded: unproven, 0 FAIL).
+- Open: Wobble Bass sounds before any note in an offline headless render (−4 dB, no key pressed) — left out of the P130 guard, to look at.
+
+## Done — 3.129 Shared components: delay-line, osc-noise (2026-11-06)
+Asked: "Next." (after 3.128: next by overlap, delay-line and osc-noise).
+- delay-line (15 planned tools: echoes, dub, shimmer, tape memory, choruses …): up to 20 s or tempo sync, Hermite fractional read, TAPE
+  (time changes glide, the pitch bends) or DIGITAL (time changes cross-fade, no pitch), feedback to 1.2 through low cut / damp / drive,
+  freeze, mix, an LFO for chorus and flutter; an AudioWorklet from the same kernel text.
+- osc-noise (7 planned tools, retro-dco among them): white, pink, brown, velvet, crackle, band-limited; tilt; stereo width; seeded.
+- Proof: delay-line 19 checks (fractional delay exact to < −80 dB, freeze holds 9 s to 0.01 dB, tape bends / digital keeps 1000 Hz with
+  no click, 151 ns per stereo sample); osc-noise 32 checks (spectra measured by Welch's method: 0 / −3 / −6 dB per octave, tilt equal to
+  its own transfer function, seeds reproducible, 143 ns). Found while proving: a loop filter left "fully open" still darkened every
+  echo, so the ends of damp and low cut now mean off. `node tests/components.mjs` all pass; 21 tool DAGs regenerated.
+- Next, by overlap: ensemble-core / bbd-line (the Juno chorus), saturator-tape, random-source; then Retro DCO on them, UI shown first.
+
+## Done — 3.128 Shared components for the synthwave tools: unison-stack, filter-ladder (2026-11-06)
+Asked: "Retro poly is buggy. I love it though. Like I want more synthwave. Is there more coming?" · "Which components, like what overlap can
+we focus on to speed this up?" · "Do it." (after: merge the other branch, then unison-stack and filter-ladder).
+- The other branch (claude/empty-canvas-blank-tools: Swarm Oscillator, spec DAGs, axioms, competence register) merged (PR #103); the
+  Swarm Oscillator's missing drawn icon added (orbit).
+- unison-stack (11 planned tools: retro-dco, supersaw-cathedral, hoover-engine, pad-forge …): 1–16 voices of any source — detune curve
+  (linear, exp, supersaw), spread (equal-power pan), blend, phase (free, reset, seeded random — no Math.random). Its layout is Supersaw's own,
+  voice for voice (the test writes Supersaw's arithmetic out and compares), so moving Supersaw onto it can null-render later.
+- filter-ladder (lead-glide, poly-filter-matrix, retro-dco — Retro Poly's rebuild): 4 ZDF one-poles in a loop solved in the same sample,
+  tanh drive inside the loop, bass compensation, LP24 / LP12 / BP12 / HP12 / HP24 taps; an AudioWorklet from the same kernel text.
+- Proof: unison-stack 95 checks; filter-ladder 36 checks (−12.04 dB at the cutoff, 24 / 12 dB per octave, the bandpass equal to theory,
+  resonance peak at the cutoff, 1/(1+k) bass loss and its compensation, drive harmonics, self-oscillation bounded 20 s at ~800 Hz, audio-rate
+  cutoff FM bounded, 148 ns per stereo sample); `node tests/components.mjs` all pass; specs' inputs/outputs written, 16 tool DAGs regenerated.
+- Next, by overlap: delay-line + osc-noise (3 synthwave tools each), then ensemble-core / bbd-line (the Juno chorus), saturator-tape,
+  random-source; then Retro DCO on them, its UI shown first.
 
 ## Done — 3.127 Swarm Oscillator; spec DAGs; axioms; the competence register (2026-11-06)
 Asked (07:27:37Z): "Map, spec first / Each tool needs a spec with a dag. / Make the swarm oscillator first. Since you were ready to. /

@@ -71,6 +71,49 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-06 · Lofi, made of parts — the Lofi setup
+- **His words:** "i also want to be able to make lofi" (2026-11-05) · "nope look at the claude.md" · "yes" · "suites are tools and its
+  components." (2026-11-06).
+- **His call:** lofi as parts, not one tool — corrected by him against his own Axioms; specs and previews first; then "yes".
+- **Built:** a setup of eleven existing tools wired into a lofi system with four knobs and three scenes and its own tempo; jazz voicings and
+  six jazz progressions added to the shared progression part and the chord tool without changing a single existing chord; a boom bap
+  rhythm; eight packs of settings, data only; a generic way for a setup to carry its domain's steps without the host knowing them.
+- **Proof:** a new in-app test (builds with every part and wire and no faults, sets 82 BPM; every preset and macro target real and in
+  range; jazz chords and the boom bap where they should be); the default chord voicing proved identical to the old rule for every degree
+  and tension; 14,884 component checks; 244 manifests valid; played in the app with no faults.
+- **Check:** `node tests/run.mjs P132` · `node tools/music/components/progression/progression.test.mjs` · Start › SETUPS › Lofi
+
+### 2026-11-06 · Automation you point at anything — Bind on the lane
+- **His words (2026-11-06):** "“Automate this”: an empty lane with a bind button to bind a tool or component, or interaction object?" · "yes".
+- **His call:** the plan shown in words, then "yes"; the window shown as a screenshot.
+- **Built:** an automation lane that exists before it is bound (draw first), its own Bind that catches the next control touched on anything on
+  the canvas — tools, components, interaction objects — a list to pick from, Rebind that keeps the drawn shape, Unbind, saved and loaded as
+  it was; the XY Pad's position made into two controls so a hand on it binds and a lane can move it.
+- **Proof:** a new in-app test (3 cases: an empty lane drives nothing and binds on a touch; the XY Pad binds and is moved by a lane;
+  rebind / unbind / pick / save–load); the existing Bind test, the Automation tool's own tests (8/8), the XY Pad's, canvas/content boundary.
+- **Check:** `node tests/run.mjs P131` · `node tests/run.mjs Automation`
+
+### 2026-11-06 · A delay and noise, proved on their own — delay-line, osc-noise
+- **His words (2026-11-06):** "Next." (continuing "Which components, like what overlap can we focus on to speed this up?")
+- **His call:** the next shared parts by overlap, from the dependency graph.
+- **Built:** a delay line (to 20 s, tempo sync, tape-style pitch bend or digital cross-fade, filtered and saturated feedback, freeze,
+  modulation) and a noise source (six colours, tilt, stereo width, reproducible seeds), each an AudioWorklet of its tested kernel.
+- **Proof:** 19 + 32 measured checks — fractional delay exact to < −80 dB, freeze held to 0.01 dB over 9 s, noise slopes 0 / −3 / −6 dB per
+  octave by Welch's method, tilt equal to its transfer function; a defect found by the tests (a "fully open" loop filter still darkened
+  echoes) fixed before merging.
+- **Check:** `node tools/music/components/delay-line/delay-line.test.mjs` · `node tools/music/components/osc-noise/osc-noise.test.mjs`
+
+### 2026-11-06 · Shared synth parts, proved on their own — unison-stack, filter-ladder
+- **His words (2026-11-06):** "I want more synthwave. Is there more coming?" · "Which components, like what overlap can we focus on to speed
+  this up?" · "Do it."
+- **His call:** build the parts the most synthwave tools share first (by overlap, from the dependency graph), then the tools on them.
+- **Built:** a unison stack (1–16 voices, three detune curves, equal-power spread, blend, reproducible seeded phase) matching Supersaw's
+  layout exactly; a transistor-ladder filter (zero-delay feedback, saturation inside the loop, bass compensation, five taps) whose
+  AudioWorklet is the tested kernel text.
+- **Proof:** 95 + 36 measured checks — the ladder's −12.04 dB at cutoff, slopes, bandpass equal to its formula, self-oscillation bounded for
+  20 s near its cutoff, 148 ns per stereo sample; every component test passes.
+- **Check:** `node tools/music/components/unison-stack/unison-stack.test.mjs` · `node tools/music/components/filter-ladder/filter-ladder.test.mjs`
+
 ### 2026-11-05 · A piano roll you can work in — piano roll easier, Timeline right-click, Clip look, Canvas zoom
 - **His words (2026-11-05):** "make it easier" · "i dont like the fill options, replace it with pattern selection. also easier to manipulate
   notes, like size and moving" · "remove the split button from the timeline?, and let me select where and right click" · "like the song

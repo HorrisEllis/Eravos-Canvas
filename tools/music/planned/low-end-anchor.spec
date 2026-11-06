@@ -36,4 +36,4 @@ dag:
   layer 0: envelope-follower · eq-parametric · multiband-splitter · phase-correlation · stereo-tools ✓
   tool: eravos.low-end-anchor ← stereo-tools + phase-correlation + multiband-splitter + envelope-follower + eq-parametric
   build order: envelope-follower → eq-parametric → multiband-splitter → phase-correlation → stereo-tools ✓ → low-end-anchor
-  shared with: envelope-follower 7 · eq-parametric 13 · multiband-splitter 10 · phase-correlation 8 · stereo-tools 16  (other tools on each)
+  shared with: envelope-follower 7 · eq-parametric 13 · multiband-splitter 10 · phase-correlation 8 · stereo-tools 17  (other tools on each)
