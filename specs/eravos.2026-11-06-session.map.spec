@@ -93,3 +93,8 @@
 ## 13:23:41Z (2026-11-06T13:23:41.893Z) — verbatim:
   > Already built.
   - in reply to the answer to 09:23:29Z; which thing is already built is not yet known — asked him (not assumed)
+
+## 13:28:34Z (2026-11-06T13:28:34.547Z) — verbatim:
+  > Tell me what’s the highest leverage? The pattern and note editor are the same. That plus tools that give what Eravos doesn’t have right now.
+  - DECIDED (his): the pattern editor and the note editor are ONE editor
+  - answered: the highest leverage, with the gaps ERAVOS has today (see the answer; docs/eco-graph.md)
