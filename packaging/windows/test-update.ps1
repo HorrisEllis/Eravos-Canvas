@@ -11,10 +11,18 @@ robocopy $built $inst /E /NFL /NDL /NJH /NJS /NP | Out-Null
 # what an older install has: a file the new one changes, and your own work
 Set-Content (Join-Path $inst 'canvas\index.html') 'OLD'
 New-Item -ItemType Directory -Force -Path (Join-Path $inst 'projects') | Out-Null; Set-Content (Join-Path $inst 'projects\mine.json') 'MINE'
-& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $repo 'desktop\apply-update.ps1') -Staged $built -Dest $inst -Version '9.9.9' -Work $work
+# 3.118 when it fails, say why: does the helper parse, what did it print, what did it log
+$helper = Join-Path $repo 'desktop\apply-update.ps1'; $tok = $null; $perr = $null
+[void][System.Management.Automation.Language.Parser]::ParseFile($helper, [ref]$tok, [ref]$perr)
+if ($perr -and $perr.Count) { $perr | ForEach-Object { Write-Host "PARSE: line $($_.Extent.StartLineNumber): $($_.Message)" }; throw 'apply-update.ps1 does not parse' }
+$ErrorActionPreference = 'Continue'
+& powershell -NoProfile -ExecutionPolicy Bypass -File $helper -Staged $built -Dest $inst -Version '9.9.9' -Work $work *>&1 | ForEach-Object { Write-Host "HELPER: $_" }
+Write-Host "helper exit code: $LASTEXITCODE"
+$ErrorActionPreference = 'Stop'
 Start-Sleep 3
-$res = Get-Content (Join-Path $work 'update-result.json') -Raw | ConvertFrom-Json
-Get-Content (Join-Path $work 'update.log') | Write-Host
+$logf = Join-Path $work 'update.log'; if (Test-Path $logf) { Get-Content $logf | ForEach-Object { Write-Host "LOG: $_" } } else { Write-Host 'no update.log was written' }
+$resf = Join-Path $work 'update-result.json'; if (-not (Test-Path $resf)) { throw 'no update-result.json was written (see the HELPER / LOG lines above)' }
+$res = Get-Content $resf -Raw | ConvertFrom-Json
 Get-Process ERAVOS -ErrorAction SilentlyContinue | Where-Object { $_.Path -like "$inst*" } | Stop-Process -Force
 if (-not $res.ok) { throw "update failed: $($res.message)" }
 if ((Get-Content (Join-Path $inst 'canvas\index.html') -Raw) -match '^OLD') { throw 'the new files were not put in place' }
