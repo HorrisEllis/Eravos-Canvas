@@ -2,6 +2,24 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.141 ERAVOS Update.exe: the updater as its own program; the card never traps you (2026-11-06)
+Asked (with screenshots of the card stuck on "Starting ERAVOS Update…"): "it never closes, or does anything else to update." Then: "why
+not make it another exe?"
+- Cause: Restart now went ERAVOS → a hidden PowerShell → Start-Process -Verb RunAs. If that one step failed (the -Command quoted through
+  Node and PowerShell twice; a blocked or declined prompt) nothing was logged, the helper never ran, and the card waited.
+- ERAVOS Update.exe (packaging/windows/eravos-update.nsi, built by make-exe.ps1 beside ERAVOS.exe; the zip and the Setup carry it): started
+  as you (an ordinary program, its own window); writes the started signal (ERAVOS closes); waits for ERAVOS to close; asks Windows for admin
+  itself (ExecShellWait runas) for the silent Setup into the same folder; checks the installed version (the uninstall entry, 64-bit
+  view); writes update.log and update-result.json; starts ERAVOS again as you. On a failure its window stays up with the reason.
+- The PowerShell path stays as the fallback (a portable copy, or no exe): -EncodedCommand (nothing to quote), its failure written to a
+  file and shown at once. The Starting card counts seconds and after 8 s offers Run the installer myself (the Setup opened with Windows'
+  own prompt, then ERAVOS closes) and Cancel.
+- Proof: desktop/test/updater.mjs — a launch failure is told at once (303 ms), Cancel ends the wait, the manual install opens the Setup
+  and closes ERAVOS; the release run's new step packaging/windows/test-update-exe.mjs — the whole chain on Windows with the real built
+  exe and Setup: started in 0.9 s, ERAVOS closed, Setup ran, version 0.2.14 confirmed installed, into a folder with a space in its path
+  (run 42292948065, 25 s). The first run found the version read in the wrong registry view (fixed).
+- His 0.2.14 has the old updater: 0.2.15 is installed by hand once; every update after goes through the exe.
+
 ## Done — 3.140 Retro DCO and Tape Memory in the Odd Couples set (2026-11-06)
 Asked: "Continue". P43 listed both as without an Odd Couples pack or a part (Swarm's was done in #122 by the other session, the same way).
 - Retro DCO: Steppers Juno Cards (a part in Synthwave Steppers) · Chapel Ladder Pad (a part in Hanging Tree Dub). Tape Memory: Steppers

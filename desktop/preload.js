@@ -17,6 +17,8 @@ contextBridge.exposeInMainWorld('eravosDesktop', {
   // 3.111 states also: 'unpacking' · 'ready' · 'on-close' · 'applied' · 'failed' (with log)
   downloadUpdate: () => ipcRenderer.invoke('eravos:update-download'),
   applyUpdate: () => ipcRenderer.invoke('eravos:update-apply'),
+  cancelUpdate: () => ipcRenderer.invoke('eravos:update-cancel'),   // 3.141 stop waiting for ERAVOS Update
+  installUpdateManually: () => ipcRenderer.invoke('eravos:update-manual'),   // 3.141 open the downloaded Setup yourself
   updateLater: () => ipcRenderer.invoke('eravos:update-later'),
   updateStatus: () => ipcRenderer.invoke('eravos:update-status'),
   openUpdateLog: () => ipcRenderer.send('eravos:update-log'),

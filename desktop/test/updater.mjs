@@ -49,5 +49,24 @@ ok(U.newer('v0.2.0', '0.1.0') && !U.newer('0.1.0', '0.1.0') && U.newer('1.2.10',
   const f = u.report(); ok(f && f.state === 'failed' && /robocopy/.test(f.message), 'a failed one is told as failed, with why');
   ok(u.report() === null, 'and only once'); }
 
+// 4. (3.141) an installed copy (Setup): Restart now starts ERAVOS Update.exe; if it cannot start, ERAVOS says why at once (not after a
+//    minute) and stays open; Cancel ends the wait; Run the installer myself opens the Setup and then closes ERAVOS
+{ const dir = path.join(tmp, 'installed'), work = path.join(tmp, 'lib', '.appdata', 'update'); fs.mkdirSync(dir, { recursive: true });
+  ['ERAVOS.exe', 'Uninstall ERAVOS.exe', 'ERAVOS Update.exe'].forEach(f => fs.writeFileSync(path.join(dir, f), ''));
+  const SETUP = Buffer.alloc(1000, 3), setupNet = { fetch: async (url) => {
+    if (/releases\/latest/.test(url)) return { ok: true, status: 200, json: async () => ({ tag_name: 'v0.3.0', body: '', html_url: 'x', assets: [{ name: 'ERAVOS-Setup-0.3.0.exe', browser_download_url: 'https://dl/setup', size: SETUP.length }] }) };
+    let done = false; return { ok: true, status: 200, headers: { get: () => String(SETUP.length) }, body: { getReader: () => ({ read: async () => done ? { done: true } : (done = true, { done: false, value: new Uint8Array(SETUP) }) }) } }; } };
+  const told = [], app = fakeApp('0.2.0'), opened = []; const sh = { openExternal() {}, openPath: async (f) => { opened.push(f); return ''; } };
+  const u = U.create({ app, net: setupNet, shell: sh, appDir: dir, workDir: work, startWaitMs: 4000, send: (m) => told.push(m) });
+  await u.check(false); ok(await u.download(), 'the Setup is downloaded and ready');
+  const t0 = Date.now(); const r = await u.apply(), took = Date.now() - t0;
+  ok(r === false && told.some(m => m.state === 'error' && /ERAVOS Update\.exe/.test(m.message)), 'an ERAVOS Update.exe that cannot start: told why — ' + (told.filter(m => m.state === 'error').pop() || {}).message);
+  ok(took < 3000, `… at once (${took} ms), not after the wait`); ok(told[told.length - 1].state === 'ready' && quits === 0, '… ERAVOS stays open, the update still ready');
+  fs.rmSync(path.join(dir, 'ERAVOS Update.exe'));   // no exe: the PowerShell path (it cannot start here either), then Cancel
+  const p2 = u.apply(); await new Promise(res => setTimeout(res, 300)); u.cancel(); const r2 = await p2;
+  ok(r2 === false && told[told.length - 1].state === 'ready', 'Cancel ends the wait; the update is still ready');
+  const m = await u.manual(); ok(m === true && opened[0] && /ERAVOS-Setup-0\.3\.0\.exe$/.test(opened[0]), 'Run the installer myself opens the downloaded Setup');
+  await new Promise(res => setTimeout(res, 1700)); ok(quits === 1, '… and then ERAVOS closes (the installer replaces its files)'); }
+
 fs.rmSync(tmp, { recursive: true, force: true });
 console.log(fails ? `${fails} failed` : 'all passed'); process.exit(fails ? 1 : 0);

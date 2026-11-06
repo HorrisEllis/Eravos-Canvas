@@ -47,10 +47,18 @@
       row.append(btn('Restart now', 'pri', () => { draw('starting', {}); D() && D().applyUpdate && D().applyUpdate(); }),
         btn('When I close ERAVOS', '', () => { D() && D().updateLater && D().updateLater(); close(); say('ERAVOS ' + v + ' goes in when you close ERAVOS.', 'good'); }));
     } else if (state === 'starting') {   // 3.123 waiting for ERAVOS Update to say it runs (and for Windows' permission prompt)
-      head.append(el('b', '', 'Starting ERAVOS Update…'));
+      // 3.141 "it never closes, or does anything else to update": the wait shows its seconds, and never traps you — Cancel, or open the
+      // installer yourself (Windows' own prompt, the way a double-click opens it)
+      const secs = el('span', 'upd-cur', '0 s'); head.append(el('b', '', 'Starting ERAVOS Update…'), secs);
       card.append(el('div', 'upd-sub', info.admin ? 'Windows asks for permission to update ERAVOS — say Yes in its prompt (it may be behind this window). ERAVOS closes once the update has started.' : 'ERAVOS closes once the update has started.'));
+      const t0 = Date.now(), tick = setInterval(() => { if (!card || card.dataset.state !== 'starting') return clearInterval(tick); const n = Math.round((Date.now() - t0) / 1000); secs.textContent = n + ' s';
+        if (n >= 8 && !card.querySelector('.upd-row')) { const r2 = el('div', 'upd-row');
+          if (info.manual && D() && D().installUpdateManually) r2.append(btn('Run the installer myself', 'pri', () => { draw('restarting', {}); D().installUpdateManually(); }));
+          r2.append(btn('Cancel', '', () => { D() && D().cancelUpdate && D().cancelUpdate(); }));
+          card.append(r2); } }, 1000);
     } else if (state === 'restarting') {
-      head.append(el('b', '', 'Restarting into ERAVOS ' + v + '…')); card.append(el('div', 'upd-sub', 'ERAVOS Update puts it in place and starts ERAVOS again.'));
+      head.append(el('b', '', info.manual ? 'Opening the ERAVOS ' + v + ' installer…' : 'Restarting into ERAVOS ' + v + '…'));
+      card.append(el('div', 'upd-sub', info.manual ? 'Say Yes in Windows\' prompt; ERAVOS closes and the installer puts ' + v + ' in place (Run ERAVOS at its end).' : 'ERAVOS Update puts it in place and starts ERAVOS again.'));
     } else if (state === 'failed') {
       head.append(el('b', '', 'The update to ' + v + ' did not go in')); card.append(el('div', 'upd-notes', info.message || ''));
       row.append(btn('Open the log', '', () => { D() && D().openUpdateLog && D().openUpdateLog(); }), btn('Try again', 'pri', () => { draw('downloading', {}); D() && D().downloadUpdate && D().downloadUpdate(); }), btn('Close', '', close));

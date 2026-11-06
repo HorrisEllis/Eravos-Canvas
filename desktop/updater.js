@@ -98,30 +98,64 @@ function create(o) {
     try { fs.rmSync(RESULT, { force: true }); } catch (e) {}
     // 3.123 the helper writes this file the moment it really runs; ERAVOS closes only then ("I hit restart and it closes eravos and does
     // nothing after": it closed 0.3 s after asking, before PowerShell — or the admin prompt — had got going, and nothing was left)
-    const started = path.join(work, 'update-started.txt'); try { fs.mkdirSync(work, { recursive: true }); fs.rmSync(started, { force: true }); } catch (e) {}
+    const started = path.join(work, 'update-started.txt'), failed = path.join(work, 'update-launch-error.txt');
+    try { fs.mkdirSync(work, { recursive: true }); fs.rmSync(started, { force: true }); fs.rmSync(failed, { force: true }); } catch (e) {}
     const args = ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden', '-File', script, '-Dest', appDir, '-Version', st.version, '-Work', work, '-Started', started].concat(st.setup ? ['-Setup', st.setup] : ['-Staged', st.root]);
     const q = (a) => String(a).replace(/'/g, "''"), opts = { detached: true, stdio: 'ignore', windowsHide: true };
     let p;
+    // 3.141 ERAVOS Update.exe (his: "why not make it another exe?"): an ordinary program, started as you, its own window; it asks
+    // Windows for admin itself (in front) for the Setup it runs. Arguments as it reads them: /KEY="value" (quoted here, not by Node).
+    const exe = path.join(appDir, 'ERAVOS Update.exe');
+    if (st.setup && fs.existsSync(exe)) {
+      const a = [['SETUP', st.setup], ['DEST', appDir], ['VERSION', st.version], ['WORK', work], ['STARTED', started]].map(([k, v]) => `/${k}="${v}"`).join(' ') + (o.noStart ? ' /NOSTART' : '');   // noStart: the release check only
+      try { p = spawn(exe, [a], { argv0: `"${exe}"`, detached: true, stdio: 'ignore', windowsVerbatimArguments: true, shell: false }); p.on('error', (e) => { try { fs.writeFileSync(failed, 'ERAVOS Update.exe: ' + e.message); } catch (er) {} }); p.unref(); }
+      catch (e) { try { fs.writeFileSync(failed, 'ERAVOS Update.exe: ' + e.message); } catch (er) {} }
+      return { started, failed, exe: true };
+    }
     try {
-      if (st.setup || !canWrite()) p = spawn('powershell.exe', ['-NoProfile', '-WindowStyle', 'Hidden', '-Command', `Start-Process powershell.exe -Verb RunAs -WindowStyle Hidden -ArgumentList '${args.map(a => `"${q(a)}"`).join(' ')}'`], opts);
+      // 3.141 the elevation step, as -EncodedCommand (base64 UTF-16LE): no quoting passes through Node and PowerShell twice (a path with a
+      // space or an apostrophe could break the command, and the failure was silent). If Start-Process fails — the prompt declined, blocked —
+      // its message goes to update-launch-error.txt and ERAVOS shows it at once instead of waiting.
+      if (st.setup || !canWrite()) {
+        const cmd = `try { Start-Process -FilePath 'powershell.exe' -Verb RunAs -WindowStyle Hidden -ErrorAction Stop -ArgumentList '${args.map(a => `"${q(a)}"`).join(' ')}' } ` +
+          `catch { [IO.File]::WriteAllText('${q(failed)}', [string]$_.Exception.Message) }`;
+        p = spawn('powershell.exe', ['-NoProfile', '-WindowStyle', 'Hidden', '-EncodedCommand', Buffer.from(cmd, 'utf16le').toString('base64')], opts);
+      }
       else p = spawn('powershell.exe', args, opts);
       p.on('error', (e) => tell({ state: 'error', message: 'ERAVOS Update could not start: ' + e.message })); p.unref();
     } catch (e) { tell({ state: 'error', message: 'ERAVOS Update could not start: ' + e.message }); return null; }
-    return started;
+    return { started, failed };
   }
-  // wait (up to `ms`) until the helper says it runs
-  const waitStarted = (file, ms) => new Promise((res) => { const t0 = Date.now(); const tick = () => { if (fs.existsSync(file)) return res(true); if (Date.now() - t0 > ms) return res(false); setTimeout(tick, 300); }; tick(); });
+  // wait (up to `ms`) until the helper says it runs — or its launch says why it could not
+  const waitStarted = (L, ms) => new Promise((res) => { const t0 = Date.now(); const tick = () => {
+    if (fs.existsSync(L.started)) return res({ ok: true });
+    if (fs.existsSync(L.failed)) { let m = ''; try { m = fs.readFileSync(L.failed, 'utf8').trim(); } catch (e) {} return res({ ok: false, why: m || 'it could not start' }); }
+    if (Date.now() - t0 > ms) return res({ ok: false }); setTimeout(tick, 300); }; tick(); });
   // Restart now: hand over; close once ERAVOS Update is running (it starts ERAVOS again when it is done). If it never starts — the admin
   // prompt declined, PowerShell blocked — ERAVOS stays open and says so, with the update still ready.
+  let waiting = null;   // the launch being waited for (Cancel / Run the installer myself end the wait)
   async function apply() {
-    if (!staged) return false; const st = staged, started = launch(st); if (!started) return false;
-    tell({ state: 'starting', version: st.version, admin: !!(st.setup || !canWrite()) });
-    const ok = await waitStarted(started, 90000);
-    if (!ok) { tell({ state: 'error', message: 'ERAVOS Update did not start' + (st.setup || !canWrite() ? ' — Windows asks for permission to update ERAVOS in Program Files; if the prompt was declined or did not show, try again' : '') + '. ERAVOS stays open; the update is still ready.' }); tell(Object.assign({ state: 'ready' }, latest || { version: st.version })); return false; }
+    if (!staged) return false; const st = staged, L = launch(st); if (!L) return false;
+    tell({ state: 'starting', version: st.version, admin: !!(st.setup || !canWrite()), manual: !!st.setup });
+    const me = waiting = {}; const r = await Promise.race([waitStarted(L, o.startWaitMs || 60000), new Promise(res => { me.stop = () => res({ ok: false, stopped: true }); })]);
+    if (waiting === me) waiting = null;
+    if (r.stopped) return false;
+    if (!r.ok) { tell({ state: 'error', message: 'ERAVOS Update did not start' + (r.why ? ': ' + r.why : (st.setup || !canWrite() ? ' — Windows asks for permission to update ERAVOS in Program Files; if the prompt was declined or did not show, use Run the installer myself' : '')) + '. ERAVOS stays open; the update is still ready.' }); tell(Object.assign({ state: 'ready' }, latest || { version: st.version })); return false; }
     staged = null; applyOnQuit = false;
     tell({ state: 'restarting', version: st.version });
     setTimeout(() => app.quit(), 300);
     return true;
+  }
+  // 3.141 Cancel: stop waiting; the update stays ready
+  function cancel() { if (waiting && waiting.stop) waiting.stop(); waiting = null; if (staged) tell(Object.assign({ state: 'ready' }, latest || { version: staged.version })); return true; }
+  // 3.141 Run the installer myself: the downloaded Setup opened the way a double-click opens it (Windows' own prompt, in front);
+  // once it has started, ERAVOS closes so the installer can replace its files. A portable copy: its unpacked folder is shown.
+  async function manual() {
+    if (!staged) return false; const st = staged; if (waiting && waiting.stop) waiting.stop(); waiting = null;
+    if (!st.setup) { shell.openPath(st.root); tell({ state: 'error', message: 'This copy of ERAVOS is not installed by Setup: close ERAVOS and copy the opened folder over it.' }); return false; }
+    const err = await shell.openPath(st.setup);
+    if (err) { tell({ state: 'error', message: 'The installer did not open: ' + err + '. It is in ' + st.setup }); tell(Object.assign({ state: 'ready' }, latest || { version: st.version })); return false; }
+    staged = null; applyOnQuit = false; tell({ state: 'restarting', version: st.version, manual: true }); setTimeout(() => app.quit(), 1500); return true;
   }
   function later() { if (staged) { applyOnQuit = true; tell({ state: 'on-close', version: staged.version }); } return applyOnQuit; }
   // ERAVOS is closing with an update waiting to go in
@@ -137,6 +171,6 @@ function create(o) {
   }
   function start() { const r = report(); if (r) setTimeout(() => tell(r), 2500); setTimeout(() => check(false), FIRST); timer = setInterval(() => check(false), EVERY); }
   function stop() { if (timer) clearInterval(timer); timer = null; }
-  return { start, stop, check, download, apply, later, onQuit, report, get status() { return { state, staged: staged && staged.version, latest, applyOnQuit, canApply: canApply() }; }, get latest() { return latest; } };
+  return { start, stop, check, download, apply, cancel, manual, later, onQuit, report, get status() { return { state, staged: staged && staged.version, latest, applyOnQuit, canApply: canApply() }; }, get latest() { return latest; } };
 }
 module.exports = { create, newer, stagedRoot, REPO };

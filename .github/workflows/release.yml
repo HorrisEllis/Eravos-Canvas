@@ -49,6 +49,8 @@ jobs:
       - name: Test ERAVOS Update on the built app (it must put an update in place and keep your folders)
         shell: powershell
         run: powershell -NoProfile -ExecutionPolicy Bypass -File packaging/windows/test-update.ps1
+      - name: Test ERAVOS Update.exe end to end (Restart now → the exe → the real Setup → installed)
+        run: node packaging/windows/test-update-exe.mjs
       - name: Attach to the release
         if: startsWith(github.ref, 'refs/tags/v') || inputs.release
         uses: softprops/action-gh-release@v2

@@ -1,3 +1,13 @@
+ERAVOS v0.2.15 (2026-11-06)
+
+Install: THIS ONE BY HAND — run ERAVOS-Setup-0.2.15.exe (your 0.2.14 has the old updater, the one that could hang). Your work in
+Documents\ERAVOS is not touched. Every update after this one goes in by itself.
+
+- Fixed: Restart now could sit on "Starting ERAVOS Update…" for ever. Updates now go through ERAVOS Update.exe, a small program of its
+  own: ERAVOS closes, it asks Windows for permission from its own window (in front), installs, checks the new version went in, and starts
+  ERAVOS again. If anything fails its window stays open and says why.
+- The update card counts the seconds while it waits and offers Run the installer myself and Cancel — it can no longer leave you stuck.
+
 ERAVOS v0.2.14 (2026-11-06)
 
 Install: on 0.2.10 or later, ERAVOS offers this update by itself (or ERAVOS-Setup-0.2.14.exe).
