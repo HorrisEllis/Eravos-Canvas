@@ -89,3 +89,7 @@
   - HOW HE WORKS (his own model, recorded as his words): externalize → remove the noise / focus on signal → integrate or reintegrate →
     embody; cross-domain synthesis, analogies, mental simulation; constrain imagination to what is verified / invariant; build models so
     nothing is relearned by rote. Applied here: these notes are the externalize step; the map, specs and register are the models.
+
+## 13:23:41Z (2026-11-06T13:23:41.893Z) — verbatim:
+  > Already built.
+  - in reply to the answer to 09:23:29Z; which thing is already built is not yet known — asked him (not assumed)
