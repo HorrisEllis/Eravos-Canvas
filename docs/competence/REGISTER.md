@@ -6,7 +6,7 @@
 
 **How to read it.** Each entry is one contribution: the exact words (checked word for word against their source by `node build/competence.mjs --check`), when, who it came from, what kind of thing it was, how it developed, what came of it, and the evidence a stranger can check. **Confidence is three separate levels, never one score**: *proposed* (an idea) · *demonstrated* (built and tested here — built by the AI coder to his direction: the idea and the call are his, the code is not claimed as his) · *independently verified* (validated outside this project — none yet). **Append-only**: an entry is never edited; a correction is a new entry that amends it. Generated from `docs/competence/register.jsonl` — do not edit this page. The record before this register (merged work since 2026-10-15, with merge times): `docs/PROOF-OF-COMPETENCY.md`.
 
-**42 entries** · his: 37 (16 proposed · 21 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
+**43 entries** · his: 38 (17 proposed · 21 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
 
 ## Ideas
 _what he originated, proposed or identified_
@@ -56,11 +56,12 @@ _decisions, the alternatives in front of him, and the way he set_
 | R-2026-11-06-34 | 2026-11-06 15:55:01 UTC | “Nice. That's exactly it. And then the PSD style YAML, maybe ERV as an extension for that.” | decision | Approved the agnostic Workshop preview; set the next piece: a layered, PSD-style project file in YAML with its own extension (.erv). | Workshop approved (W1–W4); specs/eravos.erv-format.spec written. | `specs/eravos.workshop.spec` · `specs/eravos.erv-format.spec` | proposed |
 | R-2026-11-06-39 | 2026-11-06 16:05:42 UTC | “Merge and push.” | decision | Merged through a pull request (the house rule: no pushes to main). | PR #112 merged 2026-11-06T16:14:37Z after CI passed. | `git log origin/main --merges (6adc22a)` | demonstrated |
 | R-2026-11-06-40 | 2026-11-06 18:58:31 UTC | “Yes follow up and entry” | direction | The follow-up: a test fixed, Swarm in the Odd Couples set, the proof-of-competency entries. | A follow-up pull request; entries for PR #103 and PR #112 in docs/PROOF-OF-COMPETENCY.md. | `docs/PROOF-OF-COMPETENCY.md` · `tests/p43-odd-couples.test.js` | demonstrated |
+| R-2026-11-07-43 | 2026-11-07 10:08:30 UTC | “What’s next? Highest leverage? Are yo making sure it’s all novel sounds?” | direction | A standing check he asks for: novelty of sound, alongside leverage. | Answered with the N1 numbers; a novelty gate proposed. | `docs/novelty-report.md` · `docs/eco-graph.md` | proposed |
 
 ## Competence
 _what is shown, at its own level — an idea, a built and tested idea, and outside validation are not the same thing_
 
-**proposed** (16)
+**proposed** (17)
 
 - R-2026-11-06-02 · 2026-11-06 06:28:35 UTC · direction — “Also love the synthwave tool.” → The highest-leverage phase-1 tool turned out to be in that family (Swarm Oscillator) — chosen by the graph, not by the preference. · evidence: `docs/eco-graph.md`
 - R-2026-11-06-06 · 2026-11-06 07:06:21 UTC · principle — “Just want to make sure the tools don’t become monolith with packs or mods hard wired in.” → Rule in CLAUDE.md › Axioms; no guard test yet (open). · evidence: `CLAUDE.md › Axioms 1` · `tools/music/tools/genre-instruments/swarm-oscillator/packs/factory/pack.json`
@@ -78,6 +79,7 @@ _what is shown, at its own level — an idea, a built and tested idea, and outsi
 - R-2026-11-06-32 · 2026-11-06 13:38:50 UTC · decision — “Absolutely not. Like I’m talking a full workshop. Editing one note completely like it’s in the center of a work surface or operating table or like photosyop” → Preview rejected; the face to be redesigned. · evidence: `specs/eravos.2026-11-06-session.map.spec` · `tools/music/planned/pattern-editor.spec`
 - R-2026-11-06-33 · 2026-11-06 14:09:18 UTC · idea — “Agnostic. I was thinking it could be the beginning of photo manipulation tools. If possible.” → specs/eravos.workshop.spec — the canvas part; music is its first content. · evidence: `specs/eravos.workshop.spec`
 - R-2026-11-06-34 · 2026-11-06 15:55:01 UTC · decision — “Nice. That's exactly it. And then the PSD style YAML, maybe ERV as an extension for that.” → Workshop approved (W1–W4); specs/eravos.erv-format.spec written. · evidence: `specs/eravos.workshop.spec` · `specs/eravos.erv-format.spec`
+- R-2026-11-07-43 · 2026-11-07 10:08:30 UTC · direction — “What’s next? Highest leverage? Are yo making sure it’s all novel sounds?” → Answered with the N1 numbers; a novelty gate proposed. · evidence: `docs/novelty-report.md` · `docs/eco-graph.md`
 
 **demonstrated** (21)
 
@@ -154,6 +156,7 @@ _whose each contribution is: his, the AI coder’s, or from outside_
 | R-2026-11-06-40 | 2026-11-06 18:58:31 UTC | user | James Brooks | direction |
 | R-2026-11-06-41 | 2026-11-06 09:53:24 UTC | collaborative | record: git (the merge commit on main) | outcome |
 | R-2026-11-06-42 | 2026-11-06 16:14:37 UTC | collaborative | record: git (the merge commit on main) | outcome |
+| R-2026-11-07-43 | 2026-11-07 10:08:30 UTC | user | James Brooks | direction |
 
 ## Outcomes
 _what came of each_
@@ -202,4 +205,5 @@ _what came of each_
 | R-2026-11-06-40 | 2026-11-06 18:58:31 UTC | “Yes follow up and entry” | direction | The follow-up: a test fixed, Swarm in the Odd Couples set, the proof-of-competency entries. | A follow-up pull request; entries for PR #103 and PR #112 in docs/PROOF-OF-COMPETENCY.md. | `docs/PROOF-OF-COMPETENCY.md` · `tests/p43-odd-couples.test.js` | demonstrated |
 | R-2026-11-06-41 | 2026-11-06 09:53:24 UTC | “Merge pull request #103 from HorrisEllis/claude/empty-canvas-blank-tools” | outcome | His direction, built by the AI coder; merged into main. | merge commit 3b64004 on main | `git show 3b64004` · `docs/PROOF-OF-COMPETENCY.md` | demonstrated |
 | R-2026-11-06-42 | 2026-11-06 16:14:37 UTC | “Merge pull request #112 from HorrisEllis/claude/empty-canvas-blank-tools” | outcome | His direction, built by the AI coder; merged into main. | merge commit 6adc22a on main | `git show 6adc22a` · `docs/PROOF-OF-COMPETENCY.md` | demonstrated |
+| R-2026-11-07-43 | 2026-11-07 10:08:30 UTC | “What’s next? Highest leverage? Are yo making sure it’s all novel sounds?” | direction | A standing check he asks for: novelty of sound, alongside leverage. | Answered with the N1 numbers; a novelty gate proposed. | `docs/novelty-report.md` · `docs/eco-graph.md` | proposed |
 

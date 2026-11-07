@@ -127,3 +127,7 @@
 ## 18:58:31Z (2026-11-06T18:58:31.251Z) — verbatim:
   > Yes follow up and entry
   - DONE: the P120 test fixed (looks only at this canvas's tool); Swarm Oscillator's Odd Couples pack (4 presets, each with a job) and its part in four Odd Couples genres; PROOF-OF-COMPETENCY entries for PR #103 and PR #112 with their merge times
+
+## 10:08:30Z (2026-11-07T10:08:30.464Z) — verbatim:
+  > What’s next? Highest leverage? Are yo making sure it’s all novel sounds?
+  - answered from docs/novelty-report.md (N1, built by the other session) and docs/eco-graph.md: not all novel yet (47 % of 418 presets novel; effects not yet measured fairly); next by leverage: the Workshop W1 (ready), waveshaper (19 tools), spectral-features (15)
