@@ -2,9 +2,12 @@
 # this builds ERAVOS for Windows and attaches the installer dist/ERAVOS-Setup-X.Y.Z.exe and the portable dist/ERAVOS_X.Y.Z.zip to the
 # GitHub release of that tag. The app (desktop/updater.js) and Install ERAVOS.bat download the Setup (the zip for a portable copy).
 name: release
+# 3.148 and every merge to main (his: "Can you integrate git into Eravos?"): the same build and tests, published as a pre-release
+# v<next patch>-beta.<run> — ERAVOS on the Beta channel (Settings › About & updates) offers it; Stable never sees it (not "latest")
 on:
   push:
     tags: ['v*']
+    branches: [main]
   workflow_dispatch:   # by hand: a build to download; with "release" on, it also makes the release v<desktop/package.json version>
     inputs:
       release:
@@ -13,6 +16,9 @@ on:
         default: false
 permissions:
   contents: write
+concurrency:   # betas: a newer merge replaces a build still running; releases are never cancelled
+  group: release-${{ github.event_name }}-${{ github.ref }}   # its own group per kind: a merge never cancels a release run by hand
+  cancel-in-progress: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
 jobs:
   windows:
     runs-on: windows-latest
@@ -24,6 +30,17 @@ jobs:
         run: |
           $v = (Get-Content desktop/package.json -Raw | ConvertFrom-Json).version
           "version=$v" >> $env:GITHUB_OUTPUT
+      - name: A beta (a merge to main) — the next patch, -beta.<run>, written into the app before it is built
+        id: beta
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: pwsh
+        run: |
+          $p = Get-Content desktop/package.json -Raw | ConvertFrom-Json
+          $n = ($p.version -split '-')[0].Split('.'); $n[2] = [string]([int]$n[2] + 1)
+          $b = ($n -join '.') + '-beta.${{ github.run_number }}'
+          (Get-Content desktop/package.json -Raw) -replace '"version":\s*"[^"]*"', ('"version": "' + $b + '"') | Set-Content desktop/package.json -NoNewline
+          "version=$b" >> $env:GITHUB_OUTPUT
+          Write-Host "beta $b"
       - name: Check the tag matches the app's version
         if: startsWith(github.ref, 'refs/tags/v')
         shell: pwsh
@@ -63,8 +80,22 @@ jobs:
             dist/ERAVOS_*.zip
           fail_on_unmatched_files: true
           generate_release_notes: true
+      - name: Publish the beta (pre-release; never "latest")
+        if: steps.beta.outcome == 'success'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.beta.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          name: ERAVOS ${{ steps.beta.outputs.version }} (beta — main ${{ github.sha }})
+          prerelease: true
+          make_latest: false
+          files: |
+            dist/ERAVOS-Setup-*.exe
+            dist/ERAVOS_*.zip
+          fail_on_unmatched_files: true
+          generate_release_notes: true
       - name: Keep the build (a run by hand)
-        if: ${{ !startsWith(github.ref, 'refs/tags/v') && !inputs.release }}
+        if: ${{ github.event_name == 'workflow_dispatch' && !inputs.release }}
         uses: actions/upload-artifact@v4
         with:
           name: ERAVOS-windows

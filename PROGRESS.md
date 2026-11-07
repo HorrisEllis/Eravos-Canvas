@@ -2,6 +2,21 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.148 Updates from git: a Beta channel (every merge to main) + release 0.2.16 (2026-11-07)
+Asked: "Can you integrate git into Eravos? Like it’s saying no update. I’m on 0.2.15."
+- Why "no update": nothing had been released after 0.2.15 — releases were made by hand; main had moved on.
+- The release workflow also runs on every merge to main: the same build and tests (components, no-toys, the updater, ERAVOS Update
+  end to end), the app stamped v<next patch>-beta.<run> (0.2.17-beta.N after 0.2.16), published as a pre-release that is never
+  "latest" — Stable never sees it. A newer merge cancels a beta build still running; a release run by hand is never cancelled.
+- desktop/updater.js: Stable (GitHub's latest release, as before) · Beta (the newest of the recent releases and pre-releases that has
+  files); versions compare with betas (0.2.15 < 0.2.16-beta.3 < 0.2.16-beta.4 < 0.2.16); kept in channel.json; a beta build starts on Beta.
+- ⚙ Settings › About & updates › Updates: Stable · Beta (desktop only) — a new control, nothing else changed (docs/previews/updates-channel.png).
+- The installer: Windows' file version takes numbers only — NUMVER (0.2.16 of 0.2.16-beta.12) passed by make-exe.ps1.
+- Proof: desktop/test/updater.mjs all pass (+7: beta ordering, stable default, stable on 0.2.15 = no update, beta picks the newest beta
+  with files, kept, unknown refused, a beta build starts on Beta); P110 2/2; boundary 10/10 (the canvas says "which updates", not a
+  tool word); workflow YAML parses. The first beta proves the rest on GitHub's Windows runner.
+- Open: old betas pile up on the releases page (a tidy step that keeps the last few — his call before anything is deleted).
+
 ## Done — 3.147 Lag: a time budget for the reactive colours; the arp starts on the next step (2026-11-07)
 His words: "the bassline is laggy as hell. it's high leverage. same with arp." (and on Swarm's in-tune Restless: "that sounds worst … like
 a horn" — reverted; Restless is as he first heard it.)

@@ -19,6 +19,20 @@ const shell = { openExternal: (u) => { shell.opened = u; } };
 
 console.log('updater');
 ok(U.newer('v0.2.0', '0.1.0') && !U.newer('0.1.0', '0.1.0') && U.newer('1.2.10', '1.2.9') && !U.newer('0.9.9', '1.0.0'), 'versions compare as numbers');
+ok(U.newer('0.2.16-beta.4', '0.2.15') && U.newer('0.2.16-beta.4', '0.2.16-beta.3') && !U.newer('0.2.16-beta.4', '0.2.16') && U.newer('0.2.16', '0.2.16-beta.9') && !U.newer('0.2.16-beta.3', '0.2.16-beta.3'),
+  'betas: after the last release and the earlier betas, before their own release (3.148)');
+// 3.148 channels: stable reads GitHub's latest release; beta the newest of the releases and pre-releases (every merge to main)
+{ const rel = (tag, pre, files) => ({ tag_name: tag, prerelease: pre, draft: false, name: 'ERAVOS ' + tag, body: '', html_url: 'https://gh/' + tag, assets: (files || ['zip', 'setup']).map(k => ({ name: k === 'zip' ? `ERAVOS_${tag.slice(1)}.zip` : `ERAVOS-Setup-${tag.slice(1)}.exe`, browser_download_url: 'https://dl/' + tag + k, size: 10 })) });
+  const LIST = [rel('v0.2.16-beta.3', true), rel('v0.2.16-beta.12', true), rel('v0.2.16-beta.13', true, []), rel('v0.2.15', false), rel('v0.2.14', false)];
+  const net = { fetch: async (url) => /releases\/latest/.test(url) ? { ok: true, status: 200, json: async () => LIST[3] } : /releases\?/.test(url) ? { ok: true, status: 200, json: async () => LIST } : { ok: false, status: 404 } };
+  const dir = path.join(tmp, 'chan'), work = path.join(dir, 'w'); fs.mkdirSync(dir, { recursive: true });
+  const told = [], u = U.create({ app: fakeApp('0.2.15'), net, shell, appDir: dir, workDir: work, send: (m) => told.push(m) });
+  ok(u.getChannel() === 'stable', 'stable by default');
+  ok(await u.check(true) === null && told.some(m => m.state === 'current'), 'stable on 0.2.15: no update (the newest release is 0.2.15)');
+  ok(u.setChannel('beta') === 'beta' && u.getChannel() === 'beta' && JSON.parse(fs.readFileSync(path.join(work, 'channel.json'), 'utf8')).channel === 'beta', 'beta is kept (channel.json)');
+  const r = await u.check(true); ok(r && r.version === '0.2.16-beta.12' && r.beta === true, 'beta on 0.2.15: the newest beta that has something to install (0.2.16-beta.12; beta.13 has no files yet)');
+  ok(u.setChannel('nightly') === 'beta', 'an unknown channel is refused');
+  const b = U.create({ app: fakeApp('0.2.16-beta.3'), net, shell, appDir: dir, workDir: path.join(tmp, 'chan2'), send: () => {} }); ok(b.getChannel() === 'beta', 'a beta build starts on the beta channel'); }
 { const d = path.join(tmp, 'zipdir'); fs.mkdirSync(path.join(d, 'ERAVOS'), { recursive: true }); fs.writeFileSync(path.join(d, 'ERAVOS', 'ERAVOS.exe'), '');
   ok(U.stagedRoot(d) === path.join(d, 'ERAVOS'), 'finds the app one folder down in the unpacked zip'); }
 

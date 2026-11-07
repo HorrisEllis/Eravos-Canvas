@@ -28,10 +28,14 @@ InstallDir "$PROGRAMFILES64\ERAVOS"
 InstallDirRegKey HKLM "Software\ERAVOS" "InstallDir"
 RequestExecutionLevel admin
 BrandingText "ERAVOS ${VERSION}"
-VIProductVersion "${VERSION}.0"
+; 3.148 a beta (0.2.16-beta.12): Windows' file version takes numbers only — NUMVER is the 0.2.16 part (make-exe.ps1 passes it)
+!ifndef NUMVER
+  !define NUMVER "${VERSION}"
+!endif
+VIProductVersion "${NUMVER}.0"
 VIAddVersionKey "ProductName" "ERAVOS"
 VIAddVersionKey "ProductVersion" "${VERSION}"
-VIAddVersionKey "FileVersion" "${VERSION}"
+VIAddVersionKey "FileVersion" "${NUMVER}"
 VIAddVersionKey "FileDescription" "ERAVOS Setup"
 VIAddVersionKey "LegalCopyright" "ERAVOS"
 

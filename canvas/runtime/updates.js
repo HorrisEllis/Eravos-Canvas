@@ -99,8 +99,17 @@
       const vOf = async () => { try { if (D() && D().info) { const i = await D().info(); if (i && i.version) return i.version; } } catch (e) {} let seen = null; try { seen = global.localStorage.getItem('eravos.update.seen'); } catch (e) {} return seen || 'in the browser'; };
       vOf().then(v => { ver.textContent = v; });
       const go = UI.Button({ label: 'Check for updates', kind: 'primary', hint: 'ask GitHub for a newer ERAVOS', onClick: async () => { st.textContent = 'asking GitHub…'; try { const r = await check(); st.textContent = r === null ? '' : ''; } catch (e) { st.textContent = e.message; } } });
+      // 3.148 which updates: Stable (releases) or Beta (every merge to main, built and tested the same way) — the app only
+      let chan = null;
+      if (D() && D().updateChannel) {
+        const say = h('span', { class: 'as-say', text: '' }), tellC = (c) => { say.textContent = c === 'beta' ? 'every merge to main, as soon as it is built and tested (a few minutes) — newest first, may have rough edges' : 'releases only'; };
+        const seg = UI.Segmented({ label: '', options: ['stable', 'beta'], value: 'stable', hint: 'Stable: releases. Beta: every merge to main.', onChange: async (c) => { tellC(c); try { await D().updateChannel(c); st.textContent = 'asking GitHub…'; await check(); st.textContent = ''; } catch (e) { st.textContent = e.message; } } });
+        D().updateChannel().then(c => { if (seg.set) seg.set(c); tellC(c); }).catch(() => {});
+        chan = h('div', { class: 'as-row' }, [h('span', { class: 'as-k', text: 'Updates' }), seg.el, say]);
+      }
       return h('div', { class: 'as-card' }, [
         h('div', { class: 'as-row' }, [h('span', { class: 'as-k', text: 'ERAVOS' }), ver]),
+        chan,
         h('div', { class: 'as-row' }, [go.el, st]),
         h('p', { class: 'as-say', text: 'When a newer release is out, ERAVOS asks you once; it downloads in the background, then Restart now or When I close ERAVOS. Your work in Documents\\ERAVOS is never touched by an update.' }),
         h('div', { class: 'as-row' }, [h('a', { class: 'as-link', href: 'https://github.com/' + REPO + '/releases', target: '_blank', rel: 'noopener', text: 'All releases →' })]),
