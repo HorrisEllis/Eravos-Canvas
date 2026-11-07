@@ -2754,3 +2754,23 @@ novelty_across_eravos (replaces "inside the same tool" — the original rules ab
     voices cross-modulating, coherence driving timbre), proved against Supersaw · N3 Tuning & settings tab · N4 depth + packs per tool,
     worst duplicates first
 
+
+## ADDENDUM 2026-11-07 — the novelty gate, advisory; five measures, not one; the measure is not an authority
+  Sent by him (2026-11-07T10:26:25Z; recorded verbatim in specs/eravos.2026-11-06-session.map.spec): the order — "Novelty gate, advisory mode
+  first. Establish a baseline, detect duplication and flag collisions. Don’t hard-block merges until the measurement is validated against
+  actual listening." → "W1, The Workshop" → "Waveshaper" → "Spectral-features"; and "ERAVOS should be able to recognize when it is repeating
+  itself without accidentally preventing itself from discovering something new."
+  - BASELINE: build/novelty.mjs also writes docs/novelty-baseline.json — every preset's fingerprint as measured, the per-feature scale, and
+    the calibration (CLOSE, TWIN, μ, σ from ERAVOS itself). The measure lives in ONE place, build/novelty-core.mjs, used by the report and
+    the gate alike (the refactor is to be proved: the report byte-identical before and after on the same render — pending the full render).
+  - THE GATE (build/novelty-gate.mjs), ADVISORY: renders only the tools a branch changed (or named tools, or a given render); every new or
+    changed preset → its nearest sound already in ERAVOS → TWIN / CLOSE / novel, in σ too; a match in another tool says whether they share
+    a ROLE ("roles" in tool.json if declared, else the category — the report says which): same role = "possible duplicate — listen",
+    different role = "overlap, usually fine" (his: "Tool overlap isn’t necessarily redundancy"). It never fails a build (exit 0 always;
+    CI: continue-on-error, the result in the job summary). Hard blocking only when he says the measure has been validated by listening.
+  - FIVE MEASURES, NOT ONE (his: "Novelty isn’t the same as quality"): novelty (measured, the gate) · musical usefulness · expressiveness ·
+    controllability · functional distinctiveness (heard — docs/listening-log.md, one line per listen, never edited). Where the ear and the
+    number disagree, the ear wins and the measure is what gets fixed (the first such line: Swarm, 2026-11-06).
+  - OPEN: declared roles in tool.json for the tools whose category says too little (Deep Sub vs Reese Bass); a fair render for effects (a
+    kick, a key, the transport); longer renders (8 s, held) so motion counts; controllability as a measure (how many controls audibly move
+    the sound) once spectral-features exists.

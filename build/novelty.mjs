@@ -17,19 +17,19 @@
  * in what you play reads closer than it sounds; the measure does not hear pitch movement (bends, glides). A low distance is a lead to
  * listen to, not a verdict. */
 import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
+import { NB, groupsFor, scale, norm, makeDist } from './novelty-core.mjs';   // the measure, shared with build/novelty-gate.mjs
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const src = process.argv[2]; if (!src) { console.error('usage: node build/novelty.mjs <tool-audio.json>'); process.exit(1); }
 const data = JSON.parse(fs.readFileSync(src, 'utf8'));
-const NB = 24; let CLOSE = 0.15, TWIN = 0.07, MU = 0, SD = 1;   // calibrated below from ERAVOS itself
+let CLOSE = 0.15, TWIN = 0.07, MU = 0, SD = 1;   // calibrated below from ERAVOS itself
 const items = [];
 for (const t of data) for (const p of (t.presets || [])) if (p.fp && p.fp.every(Number.isFinite) && !/beat/.test(t.kind) && p.level !== 'FAIL')   // a broken render (silent, clipping, NaN) is no fingerprint — it is reported, not compared
   items.push({ tool: t.id, label: t.label || t.id, kind: t.kind === 'effect' ? 'effect' : 'sound', preset: p.preset || '(default)', v: p.fp, chord: p.chord });
 if (!items.length) { console.error('no fingerprints in ' + src + ' (run tests/tool-audio.mjs with this build)'); process.exit(1); }
-const D = items[0].v.length, lo = new Array(D).fill(Infinity), hi = new Array(D).fill(-Infinity);
-items.forEach(it => it.v.forEach((x, i) => { lo[i] = Math.min(lo[i], x); hi[i] = Math.max(hi[i], x); }));
-items.forEach(it => { it.n = it.v.map((x, i) => hi[i] > lo[i] ? (x - lo[i]) / (hi[i] - lo[i]) : 0); });
-const groups = [[0, NB], [NB, NB + 5], [NB + 5, NB + 9], [NB + 9, D]];   // tone colour · tone shape · envelope · motion (3.145)
-function dist(a, b) { let s = 0; for (const [g0, g1] of groups) { let q = 0; for (let i = g0; i < g1; i++) q += (a.n[i] - b.n[i]) ** 2; s += q / (g1 - g0) / groups.length; } return Math.sqrt(s); }
+const { D, lo, hi } = scale(items);
+items.forEach(it => { it.n = norm(it.v, lo, hi); });
+const groups = groupsFor(D);   // tone colour · tone shape · envelope · motion (3.145)
+const dist = makeDist(groups);
 // calibration: CLOSE = as close as two DIFFERENT presets of ONE tool usually are (the median, over every tool, of each preset's nearest
 // preset in its own tool) — "this sound is no further from that one than a tool's presets are from each other"; TWIN = half of it
 { const own = []; items.forEach(a => { let d = 9; for (const b of items) if (b !== a && b.tool === a.tool && b.kind === a.kind) d = Math.min(d, dist(a, b)); if (d < 9) own.push(d); });
@@ -89,5 +89,9 @@ L.push('', '## What comes next (the spec\'s order)', '', '- N2 Swarm made audibl
   '- N4 per tool, worst first (the top of "Tools inside another tool"): depth and packs until its presets stand apart; twins changed, merged or dropped.',
   '- Every new preset, pad sound, unit and mod: this report run again — CLOSE to anything in ERAVOS is not shipped as new.', '');
 fs.writeFileSync(path.join(ROOT, 'docs/novelty-report.md'), L.join('\n'));
+// the gate's baseline (build/novelty-gate.mjs): every fingerprint as measured, the scale and the calibration — what "already in ERAVOS" means
+const role = (id) => { try { const f = data.find(t => t.id === id); return f && f.category ? String(f.category) : null; } catch (e) { return null; } };
+fs.writeFileSync(path.join(ROOT, 'docs/novelty-baseline.json'), JSON.stringify({ made: new Date().toISOString(), close: CLOSE, twin: TWIN, mu: MU, sd: SD, lo, hi, D,
+  items: items.map(x => ({ tool: x.tool, label: x.label, preset: x.preset, kind: x.kind, category: role(x.tool), v: x.v.map(n => +n.toPrecision(6)) })) }));
 fs.writeFileSync(path.join(ROOT, 'docs/novelty.json'), JSON.stringify({ close: CLOSE, twin: TWIN, items: items.map(x => ({ tool: x.tool, preset: x.preset, kind: x.kind, nn: x.nn && `${x.nn.tool} · ${x.nn.preset}`, d: +x.nnD.toFixed(3), nnOther: x.nnOther && `${x.nnOther.tool} · ${x.nnOther.preset}`, dOther: +x.nnOtherD.toFixed(3) })), tools }, null, 1));
 console.log(`${all} presets · ${byTool.size} tools · ${novel} novel · ${closeOther} close to another tool → docs/novelty-report.md` + (sw ? ` · Swarm↔Supersaw median ${f2(sw.cross)} (Supersaw within ${f2(sw.within)})` : ''));

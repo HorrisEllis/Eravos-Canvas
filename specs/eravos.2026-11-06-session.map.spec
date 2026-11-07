@@ -131,3 +131,43 @@
 ## 10:08:30Z (2026-11-07T10:08:30.464Z) — verbatim:
   > What’s next? Highest leverage? Are yo making sure it’s all novel sounds?
   - answered from docs/novelty-report.md (N1, built by the other session) and docs/eco-graph.md: not all novel yet (47 % of 418 presets novel; effects not yet measured fairly); next by leverage: the Workshop W1 (ready), waveshaper (19 tools), spectral-features (15)
+
+## 10:26:25Z (2026-11-07T10:26:25.044Z) — verbatim (sent by him; its wording reads like an assistant's reply he pasted — recorded as sent, authorship not assumed):
+  > I’d make one adjustment to the proposed order, but I agree with the underlying strategy.
+  > 
+  > My order would be:
+  > 
+  > * Novelty gate, advisory mode first. Establish a baseline, detect duplication and flag collisions. Don’t hard-block merges until the measurement is validated against actual listening.
+  > * W1, The Workshop. This unlocks the pattern-editing workflow and reaches 24 tools. It addresses an existing functional bottleneck.
+  > * Waveshaper. This is the biggest synthesis leverage point, reaching 19 tools. It expands the actual sound-generation vocabulary.
+  > * Spectral-features. Give ERAVOS better analytical capabilities, reference-track comparison and more meaningful novelty detection.
+  > 
+  > Three things I wouldn’t overlook
+  > 
+  > 1. Novelty isn’t the same as quality.
+  > 
+  > A preset can be novel but sound terrible. Another can resemble an existing preset but be substantially more useful.
+  > 
+  > You need separate measurements for:
+  > 
+  > * Novelty
+  > * Musical usefulness
+  > * Expressiveness
+  > * Controllability
+  > * Functional distinctiveness
+  > 
+  > 2. Tool overlap isn’t necessarily redundancy.
+  > 
+  > Deep Sub and Reese Bass might share spectral characteristics but serve different musical roles. The gate should identify functional redundancy, not just acoustic similarity.
+  > 
+  > 3. The real leverage is cumulative.
+  > 
+  > Waveshaper creates more possibilities. Spectral-features evaluates them. The novelty gate helps prevent unnecessary duplication. The Workshop makes those possibilities accessible.
+  > 
+  > That’s a development feedback loop, not simply six more tools.
+  > 
+  > My recommendation: build the measurement infrastructure first, but don’t let an immature measurement system become an authority over creativity.
+  > 
+  > One distinction matters enormously: ERAVOS should be able to recognize when it is repeating itself without accidentally preventing itself from discovering something new.
+  - DECIDED (sent by him): the order — 1 the novelty gate in ADVISORY mode (baseline, flag collisions, never block until validated against listening) · 2 the Workshop W1 · 3 waveshaper · 4 spectral-features
+  - RULES adopted: novelty is not quality (separate measures: novelty, musical usefulness, expressiveness, controllability, functional distinctiveness); overlap is not redundancy (functional role, not only acoustic similarity); the measure must never become an authority over creativity

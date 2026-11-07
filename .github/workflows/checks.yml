@@ -26,3 +26,12 @@ jobs:
         env:
           GLASS_CHROMIUM: /usr/bin/google-chrome
         run: node tests/design-check.mjs
+      - name: Novelty gate's own test (verdicts, roles, never blocks)
+        run: node tests/novelty-gate.test.mjs
+      - name: Novelty gate (advisory — it names close sounds, it never blocks; his call 2026-11-07)
+        continue-on-error: true
+        env:
+          GLASS_CHROMIUM: /usr/bin/google-chrome
+        run: |
+          git fetch --depth=1 origin ${{ github.base_ref || 'main' }}
+          node build/novelty-gate.mjs --base FETCH_HEAD

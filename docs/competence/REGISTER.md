@@ -6,7 +6,7 @@
 
 **How to read it.** Each entry is one contribution: the exact words (checked word for word against their source by `node build/competence.mjs --check`), when, who it came from, what kind of thing it was, how it developed, what came of it, and the evidence a stranger can check. **Confidence is three separate levels, never one score**: *proposed* (an idea) · *demonstrated* (built and tested here — built by the AI coder to his direction: the idea and the call are his, the code is not claimed as his) · *independently verified* (validated outside this project — none yet). **Append-only**: an entry is never edited; a correction is a new entry that amends it. Generated from `docs/competence/register.jsonl` — do not edit this page. The record before this register (merged work since 2026-10-15, with merge times): `docs/PROOF-OF-COMPETENCY.md`.
 
-**43 entries** · his: 38 (17 proposed · 21 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
+**44 entries** · his: 38 (17 proposed · 21 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
 
 ## Ideas
 _what he originated, proposed or identified_
@@ -157,6 +157,7 @@ _whose each contribution is: his, the AI coder’s, or from outside_
 | R-2026-11-06-41 | 2026-11-06 09:53:24 UTC | collaborative | record: git (the merge commit on main) | outcome |
 | R-2026-11-06-42 | 2026-11-06 16:14:37 UTC | collaborative | record: git (the merge commit on main) | outcome |
 | R-2026-11-07-43 | 2026-11-07 10:08:30 UTC | user | James Brooks | direction |
+| R-2026-11-07-44 | 2026-11-07 10:26:25 UTC | collaborative | James Brooks | decision |
 
 ## Outcomes
 _what came of each_
@@ -206,4 +207,5 @@ _what came of each_
 | R-2026-11-06-41 | 2026-11-06 09:53:24 UTC | “Merge pull request #103 from HorrisEllis/claude/empty-canvas-blank-tools” | outcome | His direction, built by the AI coder; merged into main. | merge commit 3b64004 on main | `git show 3b64004` · `docs/PROOF-OF-COMPETENCY.md` | demonstrated |
 | R-2026-11-06-42 | 2026-11-06 16:14:37 UTC | “Merge pull request #112 from HorrisEllis/claude/empty-canvas-blank-tools” | outcome | His direction, built by the AI coder; merged into main. | merge commit 6adc22a on main | `git show 6adc22a` · `docs/PROOF-OF-COMPETENCY.md` | demonstrated |
 | R-2026-11-07-43 | 2026-11-07 10:08:30 UTC | “What’s next? Highest leverage? Are yo making sure it’s all novel sounds?” | direction | A standing check he asks for: novelty of sound, alongside leverage. | Answered with the N1 numbers; a novelty gate proposed. | `docs/novelty-report.md` · `docs/eco-graph.md` | proposed |
+| R-2026-11-07-44 | 2026-11-07 10:26:25 UTC | “I’d make one adjustment to the proposed order, but I agree with the underlying strategy.” | decision | Set the order (advisory novelty gate → Workshop W1 → waveshaper → spectral-features) and three rules: novelty ≠ quality, overlap ≠ redundancy, the measure is not an authority over creativity. | specs/eravos.music-ecosystem.spec ADDENDUM 2026-11-07; build/novelty-gate.mjs (advisory). | `specs/eravos.2026-11-06-session.map.spec` · `build/novelty-gate.mjs` | proposed |
 
