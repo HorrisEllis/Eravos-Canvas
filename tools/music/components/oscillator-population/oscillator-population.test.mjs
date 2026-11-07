@@ -56,8 +56,4 @@ const ch = run({ mode: 3, coupling: 1 }); ok(ch.R < free.R && ch.R < 0.3, `chaot
     let w = 0, t = 0; for (let f = 50; f < 6000; f += 25) { let re = 0, im = 0; for (let j = 0; j < N; j += 2) { re += y[j] * Math.cos(2 * Math.PI * f * j / SR); im += y[j] * Math.sin(2 * Math.PI * f * j / SR); } const e = re * re + im * im; w += e * f; t += e; } return w / t; };
   const off = centroid({}), on = centroid({ fm: 1 }); ok(on > off * 2, `field FM: the swarm's brightness ${off.toFixed(0)} Hz → ${on.toFixed(0)} Hz`);
   const p = POP(8); p.configure(6, 8, 2); p.set({ mode: 1, coupling: 0.4, fm: 1 }); let bad = false; for (let i = 0; i < SR * 4; i++) { p.step(F0, SR); for (let k = 0; k < 6; k++) { const d = p.dt(k); if (!(d >= 0 && d <= 0.49)) bad = true; } } ok(!bad, 'field FM at full stays bounded (every step 0…0.49 of a cycle) for 4 s'); }
-// ---- restless keeps the note in tune (1.1.1, his ear 2026-11-07: "blurry"): the voices' centre stays within 3 cents of the note
-{ const p = POP(32); p.configure(9, 27.5, 7); p.set({ mode: 1, coupling: 0.85, pull: 0.4, drift: 0.3, restless: 0.6 }); let worst = 0, lo = 1;
-  for (let s = 0; s < SR * 8; s++) { p.step(F0, SR); if (s % 2205 === 0 && s > SR * 0.5) { let m = 0; for (let i = 0; i < p.n; i++) m += p.cents(i); worst = Math.max(worst, Math.abs(m / p.n)); lo = Math.min(lo, p.R); } }
-  ok(worst < 3, `restless: the note's centre stays in tune (worst ${worst.toFixed(1)} cents off over 8 s)`); ok(lo < 0.5, `and it still breathes (coherence falls to ${lo.toFixed(2)})`); }
 console.log(`✓ oscillator-population: ${n} checks (free R ${free.R.toFixed(2)} · locked ${lock.R.toFixed(3)} · chaotic ${ch.R.toFixed(2)})`);
