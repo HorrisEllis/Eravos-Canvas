@@ -22,7 +22,7 @@
   const SET = ['mode', 'shape', 'voices', 'spread', 'coupling', 'pull', 'drift', 'cluster', 'table', 'sub', 'octave', 'cutoff', 'res', 'envAmt', 'attack', 'decay', 'sustain', 'release', 'lfoRate', 'lfoCouple', 'width', 'monoBelow', 'level', 'restless', 'form', 'fieldFm', 'cohTone'];
   const SLOTS = 8;
   const DESC = SET.map(k => ({ name: k, defaultValue: 0, minValue: -1e6, maxValue: 1e6, automationRate: 'k-rate' }))
-    .concat([{ name: 'couplingMod', defaultValue: 0, minValue: -1, maxValue: 1, automationRate: 'a-rate' }, { name: 'cutoffMod', defaultValue: 0, minValue: -9600, maxValue: 9600, automationRate: 'a-rate' },
+    .concat([{ name: 'couplingMod', defaultValue: 0, minValue: -1, maxValue: 1, automationRate: 'a-rate' }, { name: 'cutoffMod', defaultValue: 0, minValue: -9600, maxValue: 9600, automationRate: 'a-rate' }, { name: 'bend', defaultValue: 0, minValue: -1e5, maxValue: 1e5, automationRate: 'a-rate' },
       { name: 'snap', defaultValue: 0, minValue: 0, maxValue: 1e9, automationRate: 'a-rate' }])
     .concat([].concat(...Array.from({ length: SLOTS }, (_, i) => [{ name: 'trig' + i, defaultValue: 0, minValue: 0, maxValue: 1e9, automationRate: 'a-rate' },
       { name: 'gate' + i, defaultValue: 0, minValue: 0, maxValue: 1, automationRate: 'a-rate' }, { name: 'note' + i, defaultValue: 60, minValue: 0, maxValue: 127, automationRate: 'k-rate' },
@@ -67,7 +67,7 @@ class EravosSwarm extends AudioWorkletProcessor {
     // settings (k-rate): any change → apply (live)
     let key = ''; for (const k of SET) { const v = params[k][0]; s[k] = v; key += v + ','; } if (key !== this.key) { this.key = key; this.apply(); }
     L.fill(0); if (R !== L) R.fill(0);
-    const cm = params.couplingMod, fm = params.cutoffMod, sn = params.snap, shape = s.shape | 0, va = this.va, wt = this.wt, lfo = this.lfo;
+    const cm = params.couplingMod, fm = params.cutoffMod, bd = params.bend, sn = params.snap, shape = s.shape | 0, va = this.va, wt = this.wt, lfo = this.lfo;
     let lfoV = 0; for (let j = 0; j < B; j++) { const v = lfo.next(); if (j === 0) lfoV = v; }
     const K0 = Math.max(0, Math.min(1, s.coupling + s.lfoCouple * lfoV));
     let loud = null, loudA = 0;
@@ -82,13 +82,14 @@ class EravosSwarm extends AudioWorkletProcessor {
         else if (g < 0.5 && sl.gate >= 0.5) { sl.gate = 0; sl.amp.gate(false); sl.fenv.gate(false); }
         const sv = sn.length > 1 ? sn[j] : sn[0]; if (sv !== sl.snapSeen) { sl.snapSeen = sv; pop.snap(); }
         if ((j & 31) === 0) pop.set({ coupling: Math.max(0, Math.min(1, K0 + (cm.length > 1 ? cm[j] : cm[0]))) });
-        pop.step(sl.f0, sr);
+        const bc = bd.length > 1 ? bd[j] : bd[0], fNow = bc ? sl.f0 * Math.pow(2, bc / 1200) : sl.f0;   // 3.149 the pitch wheel (note bends, Connect edges)
+        pop.step(fNow, sr);
         const n = pop.n, norm = 1 / Math.sqrt(n); let l = 0, r = 0;
         for (let i = 0; i < n; i++) {
           const ph = pop.phase(i), dt = pop.dt(i), x = shape === 3 ? wt.sample(s.table, ph, dt) : shape === 0 ? va.saw(ph, dt) : shape === 1 ? va.pulse(ph, dt, 0.3) : va.tri(ph);
           l += x * sl.gL[i]; r += x * sl.gR[i];
         }
-        const subDt = sl.f0 * 0.5 / sr; sl.sub += subDt; if (sl.sub >= 1) sl.sub -= 1; const sb = sub ? sub * va.square(sl.sub, subDt) * 0.7 : 0;
+        const subDt = fNow * 0.5 / sr; sl.sub += subDt; if (sl.sub >= 1) sl.sub -= 1; const sb = sub ? sub * va.square(sl.sub, subDt) * 0.7 : 0;
         sl.L[j] = l * norm + sb; sl.R[j] = r * norm + sb;
         const a = sl.amp.next(), fe = sl.fenv.next();   // cutoff below: Lock → tone moves it ±2 octaves by how locked the swarm is
         sl.A[j] = a * (0.25 + 0.75 * sl.vel);
@@ -166,7 +167,7 @@ registerProcessor('eravos-swarm', EravosSwarm);`;
         if (ctx.disposed) return null;
         node = new AudioWorkletNode(ac, 'eravos-swarm', { numberOfInputs: 0, numberOfOutputs: 2, outputChannelCount: [2, 1], processorOptions: { tables: tables(), values: values() } }); ctx.track(node);
         node.onprocessorerror = (e) => ctx.fault('RUNTIME_003', 'swarm worklet stopped: ' + ((e && e.message) || 'processor error'));
-        node.connect(out, 0); node.connect(coh, 1); cMod.connect(prm('couplingMod')); fMod.connect(prm('cutoffMod'));
+        node.connect(out, 0); node.connect(coh, 1); cMod.connect(prm('couplingMod')); fMod.connect(prm('cutoffMod')); if (ctx.bendInto) ctx.bendInto(prm('bend'));
         node.port.onmessage = (e) => { if (e.data && e.data.type === 'state') { last = e.data; ctx.emitUI('swarm', e.data); } };
         setAll(0); queue.splice(0).forEach(f => f()); return node;
       }).catch(e => { ctx.fault('RUNTIME_003', 'swarm worklet: ' + e.message); return null; });
