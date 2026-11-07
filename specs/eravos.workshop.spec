@@ -108,3 +108,15 @@ object is — a note, a pattern, an image — is a domain's. Music is the first 
 #   Preview: docs/previews/workshop-void.html (node docs/previews/workshop-void.shots.mjs). The same language comes to ERAVOS as a theme,
 #   "Void" — a new choice beside Dusk, Studio, Field, Midnight; today's look stays the default. Fonts: canvas/runtime/fonts (SIL OFL 1.1,
 #   licences beside them).
+
+# ---- ADDENDUM 2026-11-07 (3) — a build surface (nothing above is changed)
+#   his words: "can you make it more like photoshop? or like a 3d renderer? then it could support a game engine, like this could be the build
+#   surface for emerge."
+#   The layout of an image editor / a 3D editor, in the Void's language: menu · options bar (the current tool's settings) · tool strip ·
+#   document tabs (any kind: pattern, note, photo, scene, .eg module) · ONE viewport (2D or 3D; orbit camera; flat or exploded; wire / lit) ·
+#   docked panels: OUTLINER (the zoom chain as a tree), LAYERS (thumbnail, visibility, lock, blend, opacity, grouped), INSPECTOR / HISTORY /
+#   FIELD · TIMELINE (dope sheet: keys on any layer over time) · ASSETS (kinds, stamps, the library) · status bar.
+#   Agnostic by construction: each panel shows what the open kind gives it; the viewport draws the kind's layers (2D) or its layers as planes
+#   in space (3D). New kinds this makes room for (each its own domain, its own spec, later): SCENE (a game: objects, transforms, a camera,
+#   play in place) and the Emerge MODULE (code as nodes moving through the field — Nexus ERV5, after Emerge, WARP 2, RF1, CF1).
+#   Preview: docs/previews/workshop-studio.html (node docs/previews/workshop-studio.shots.mjs). The Void preview (workshop-void.png) is kept.
