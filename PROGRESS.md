@@ -2,6 +2,21 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.151 Patterns in the browser and on the Timeline; the UI field shown (2026-11-07)
+His words: "patterns need to be in the timeline or in the pattern browser. Need the dag for the ui. Like dynamically changes using the
+constraint field? Like moves around fluidly?" · "Yes. 1 then Show me a preview."
+- tools/music/data/pattern-shapes.js (NEW): every Pattern preset, and every structure saved (Pattern window › Save to Patterns, or the
+  Workshop's SAVE TO PATTERNS), is a block in the pattern browser — its notes emerge in A minor and are kept as semitones from the root, so it
+  plays in any key; sorted bass / lead by its range; played by the instrument it was wired into. To Timeline (window) / TO THE TIMELINE
+  (Workshop) puts the notes that emerged on the Timeline as a clip, on that instrument's track, in the song's key.
+- The Workshop: a kind may give actions (buttons in the bar; the surface still names no domain); what an action says shows in the status bar.
+- Found on the way: a tool's own code may not use browser storage (boundary) — the store lives in the domain's data layer, beside the browser.
+- The UI field (PREVIEW, nothing built): specs/eravos.ui-field.spec — the UI DAG generated from each tool's settings (matters-when, drives),
+  the layout as a constraint field (IN PLAY · MORE · NOT IN PLAY with why), every move animated; shown on the real Swarm Oscillator in free,
+  coupled and harmonic (docs/previews/ui-field-*.png). Opt-in when built; today's layout stays the default.
+- Proof: tests/p151 2/2 (each preset a block whose notes are what emerges; save → a block → the Timeline clip holds exactly the emerged notes
+  in the song's key) · P150 7/7 · P71 10/10 · P76 4/4 · P100 3/3 · boundary 10/10 · design check no worse.
+
 ## Done — 3.150 The Workshop, W1 flat: a pattern as a structure (2026-11-07)
 His words: "agnostic. the structure defines the shape which defines the emergent properties of the conditions." · "can you make it more like
 photoshop? or like a 3d renderer? then it could support a game engine, like this could be the build surface for emerge." · "Yeah, we can just

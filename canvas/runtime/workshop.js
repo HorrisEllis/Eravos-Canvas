@@ -12,7 +12,8 @@
  * A kind: { id, label, layers(doc) → [{ id, label, group, type, sub, fields: [{ key, label, type: number|enum|text, min, max, step, unit,
  *   options }] }], get(doc, key), set(doc, key, value) → doc, draw(g, W, H, doc, { selected, hover }), apply(doc)?, title(doc)?, stations(doc)?,
  *   outline(doc)? → [[depth, text, layerId?]], status(doc)? → [[label, value]], tools? [{ id, label, glyph, layer? }],
- *   pick(doc, x, y, W, H)? → a key/value edit for a click in the viewport (the kind decides what a click means) }
+ *   pick(doc, x, y, W, H)? → a key/value edit for a click in the viewport (the kind decides what a click means),
+ *   actions(doc)? → [{ label, hint, run(doc) → words to show }] (buttons in the bar: where the document can go — the kind says) }
  * Layer types the surface knows (it draws their badges; a kind says what they mean): constraint · curve · value · events · emergent. */
 (function (global) {
   'use strict';
@@ -38,7 +39,7 @@
   function open(kindId, doc0, o) {
     o = o || {}; const K = KINDS.get(kindId); if (!K) throw new Error('Workshop: no kind "' + kindId + '"');
     if (current) current.close();
-    let d = clone(doc0 || {}), selected = null, past = [], future = [], hist = [{ label: 'OPENED', doc: clone(d) }];
+    let d = clone(doc0 || {}), selected = null, note = '', past = [], future = [], hist = [{ label: 'OPENED', doc: clone(d) }];
     const root = el('div', 'ws-app', [], { role: 'dialog', 'aria-label': K.label });
     const bar = el('div', 'ws-bar'), opts = el('div', 'ws-opts'), strip = el('div', 'ws-strip'), tabs = el('div', 'ws-tabs'), vp = el('div', 'ws-vp');
     const cv = el('canvas', 'ws-canvas'); vp.appendChild(cv);
@@ -79,9 +80,9 @@
       // the bar: the name, the kind's stations (where this document sits), the actions
       bar.replaceChildren(el('span', 'ws-name', [], { text: 'WORKSHOP' }), el('span', 'ws-sep'),
         el('span', 'ws-stations', (K.stations ? K.stations(d) : [K.label]).map((s, i, a) => el('span', 'ws-st' + (i === a.length - 2 || a.length === 1 ? ' on' : ''), [el('i', '', [], { text: String(i + 1).padStart(2, '0') }), String(s)]))),
-        el('span', 'ws-end', [el('button', 'ws-btn ghost', [], { type: 'button', text: 'UNDO', title: 'Ctrl+Z', onclick: undo }), el('button', 'ws-btn ghost', [], { type: 'button', text: 'REDO', title: 'Ctrl+Shift+Z', onclick: redo }),
+        el('span', 'ws-end', [].concat((K.actions ? K.actions(d) : []).map(a => el('button', 'ws-btn ghost', [], { type: 'button', text: a.label, title: a.hint || '', onclick: () => { let said = null; try { said = a.run(clone(d)); } catch (e) { said = 'failed: ' + e.message; console.error(e); } if (said) { note = String(said); render(); } } })), [el('button', 'ws-btn ghost', [], { type: 'button', text: 'UNDO', title: 'Ctrl+Z', onclick: undo }), el('button', 'ws-btn ghost', [], { type: 'button', text: 'REDO', title: 'Ctrl+Shift+Z', onclick: redo }),
           el('button', 'ws-btn send', [], { type: 'button', text: 'APPLY →', title: 'write it back to where it came from', onclick: () => { if (o.onApply) o.onApply(clone(d)); else if (K.apply) K.apply(clone(d)); } }),
-          el('button', 'ws-btn ghost', [], { type: 'button', text: '×', title: 'close (Esc)', 'aria-label': 'close', onclick: () => close() })]));
+          el('button', 'ws-btn ghost', [], { type: 'button', text: '×', title: 'close (Esc)', 'aria-label': 'close', onclick: () => close() })])));
       // the options bar: the selected layer's fields
       opts.replaceChildren(el('span', 'ws-tool', [], { text: sel ? sel.label : '' }), ...((sel && sel.fields) || []).map(f => field(f, false)));
       // the tool strip: the kind's tools (a tool may select a layer)
@@ -100,7 +101,7 @@
       if (inspTab === 'history') insp.replaceChildren(tabsI, el('div', 'ws-hist', hist.slice(-40).map((h2, i, a) => el('div', i === a.length - 1 ? 'now' : '', [el('i', '', [], { text: String(hist.length - a.length + i + 1).padStart(2, '0') }), h2.label], { onclick: () => { if (i < a.length - 1) { past.push(clone(d)); future = []; restore(h2.doc, 'BACK TO ' + String(hist.length - a.length + i + 1).padStart(2, '0')); } } }))));
       else insp.replaceChildren(tabsI, el('div', 'ws-ins', [sel ? el('div', 'ws-big', [], { text: sel.label }) : null, sel && sel.sub ? el('div', 'ws-sub', [], { text: sel.sub }) : null].concat(((sel && sel.fields) || []).map(f => field(f, true)))
         .concat((K.status ? K.status(d) : []).map(([k, v]) => el('div', 'ws-kv', [el('span', '', [], { text: k }), el('b', '', [], { text: String(v) })])))));
-      status.replaceChildren(...(K.status ? K.status(d) : []).map(([k, v]) => el('span', '', [k + ' ', el('b', '', [], { text: String(v) })])), el('span', 'ws-r', [], { text: (past.length ? past.length + ' EDITS · ' : '') + 'LIVE' }));
+      status.replaceChildren(...(K.status ? K.status(d) : []).map(([k, v]) => el('span', '', [k + ' ', el('b', '', [], { text: String(v) })])), el('span', 'ws-r', [], { text: (note ? note + ' · ' : '') + (past.length ? past.length + ' EDITS · ' : '') + 'LIVE' }));
       draw();
     }
     const onKey = (e) => { if (!root.isConnected) return; const t = e.target && e.target.tagName; if (t === 'INPUT' || t === 'TEXTAREA') return;
