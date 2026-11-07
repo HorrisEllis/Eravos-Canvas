@@ -69,6 +69,11 @@
       [1, 'WHAT EMERGES · 3'], [2, 'NOTES', 'notes'], [2, 'YOURS', 'yours'], [2, 'VARIATION', 'variation'], [1, 'PLAYS INTO · ' + ((d._into || []).join(', ') || 'nothing wired yet')]],
     status: (d) => { const r = emergeFrom((k) => d[k], d._key); return [['KEY', keyName(d._key)], ['ADMITTED', r.admitted.length + ' notes'], ['EMERGED', r.notes.length + ' notes'], ['BARS', d.bars]]; },
   };
+  const LIB = () => window.MusicParts.PF_LIB, saveShape = (d, nm) => LIB().saveShape(d, nm), toTimeline = (d) => LIB().toTimeline(d), ensureSource = () => LIB() && LIB().ensureSource();
+  KIND.actions = (d) => [
+    { label: 'SAVE TO PATTERNS', hint: 'keep this structure as a block in the pattern browser (Patterns) — it plays in any key', run: (x) => 'saved as ' + saveShape(x) },
+    { label: 'TO THE TIMELINE', hint: 'the notes that emerged, as a clip on the Timeline (on the track of the instrument it plays into)', run: (x) => { const r = toTimeline(x); return r ? 'on the Timeline at bar ' + r.bar : 'no Timeline'; } },
+  ];
   window.MusicParts.PF_KIND = KIND;
 
   OrganismFactory.reg('eravos.pattern-field', function (view) {
@@ -84,9 +89,12 @@
     const knob = (k) => { const c = UI.paramControl(view, cfg(k), { size: 40 }); c.el.dataset.key = k; return c.el; };
     const seg = (k) => UI.paramControl(view, cfg(k), { segMax: 6 }).el;
     const card = (t, kids) => h('div', { class: 'uk-group' }, [h('div', { class: 'uk-group-title', text: t }), h('div', { class: 'uk-row' }, kids)]);
+    ensureSource();
+    const saveB = UI.Button({ label: 'Save to Patterns', hint: 'keep this structure as a block in the pattern browser', onClick: () => { const nm = saveShape(docNow()); saveB.set && saveB.set('Saved · ' + nm); setTimeout(() => saveB.set && saveB.set('Save to Patterns'), 1600); } });
+    const tlB = UI.Button({ label: 'To Timeline', hint: 'the notes that emerged, as a clip on the Timeline', onClick: () => toTimeline(docNow()) });
     const ws = UI.Button({ label: 'Open in Workshop', kind: 'primary', hint: 'the whole structure on the Workshop surface — every change plays at once', onClick: () => openWorkshop() });
     function docNow() { const d = {}; view.descriptor.config.forEach(c => { d[c.key] = get(c.key); }); d._key = key;
-      try { const K = view.K || window.Kernel, outs = K && K.wires ? K.wires.list().filter(w => w.src && w.src.instanceId === view.instanceId).map(w => { const r = K.registry.get(w.dst.instanceId); return r && r.descriptor && r.descriptor.label; }).filter(Boolean) : []; d._into = Array.from(new Set(outs)); } catch (e) { d._into = []; }
+      try { const K = view.K || window.Kernel, outs = K && K.wires ? K.wires.list().filter(w => w.src && w.src.instanceId === view.instanceId).map(w => { const r = K.registry.get(w.dst.instanceId); return r && r.descriptor && r.descriptor.label; }).filter(Boolean) : []; d._into = Array.from(new Set(outs)); d._intoIds = K && K.wires ? Array.from(new Set(K.wires.list().filter(w => w.src && w.src.instanceId === view.instanceId).map(w => { const r = K.registry.get(w.dst.instanceId); return r && r.organism_id; }).filter(Boolean))) : []; } catch (e) { d._into = []; d._intoIds = []; }
       return d; }
     function openWorkshop() {
       if (!window.Workshop) return;
@@ -94,7 +102,7 @@
     }
     view.openWorkshop = openWorkshop;
     view.root.append(h('div', { class: 'uk-panel' }, [
-      h('div', { class: 'org-row', style: { justifyContent: 'space-between', alignItems: 'center' } }, [UI.presetBar(view), ws.el]),
+      h('div', { class: 'org-row', style: { justifyContent: 'space-between', alignItems: 'center' } }, [UI.presetBar(view), h('div', { class: 'org-row', style: { gap: '6px' } }, [saveB.el, tlB.el, ws.el])]),
       cv,
       card('SHAPE', [seg('chords'), seg('densShape'), seg('contour')]),
       card('STRUCTURE', [knob('gridK'), knob('gridN'), knob('densStart'), knob('densEnd'), knob('lo'), knob('hi'), knob('seed')]),
