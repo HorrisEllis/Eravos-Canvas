@@ -137,7 +137,7 @@
       const v = st.getPropertyValue(n).trim(); if (!isCol(v)) continue; if (el._cs[n] !== v) el._cb[n] = v;
       const rc = n.startsWith('--rc-'), c = rc ? colourIn0(el._cb[n], k, o) : colourFor(el._cb[n], k, o); if (c !== v) st.setProperty(n, c); el._cs[n] = c;
       if (rc) { (st._rcB = st._rcB || {})[n] = el._cb[n]; (st._rcL = st._rcL || {})[n] = c; }   // 3.83b a redraw with the same colour keeps this
-      if (n === '--acc') { el.dataset.accLive = c; if (el.dataset.acc0 === undefined) el.dataset.acc0 = el._cb[n]; } }
+      if (n === '--acc') { if (el.dataset.accLive !== c) el.dataset.accLive = c; if (el.dataset.acc0 === undefined) el.dataset.acc0 = el._cb[n]; } }
     live.add(el);
   }
   function unlight(el) { if (!writing) return; if (el.style._rcL) el.style._rcL = {}; if (el._cb) Object.keys(el._cb).forEach(n => el.style.setProperty(n, el._cb[n])); el._cs = {}; delete el.dataset.accLive; live.delete(el); }
@@ -254,7 +254,13 @@
   // 3.121 Settings › Graphics › Low: colours written 4× less often, no glow layer (Balanced: 2×)
   const gfx = () => doc.documentElement.dataset.gfx || 'high';
   const WRITE_MS_BASE = 80; let writing = true, lastW = -1e9;
-  const WRITE_MS_NOW = () => WRITE_MS_BASE * (gfx() === 'low' ? 4 : gfx() === 'balanced' ? 2 : 1);
+  // 3.147 a time budget (his: "the bassline is laggy as hell" — measured: with the colours on and a tool sounding the main thread was busy
+  // 5.9 s of every 6, frames 60–100 ms, stalls to 250 ms; off: 2.3 s). While frames run slow (their average over ~½ s above 22 ms) the
+  // colours are written less often, up to 4× — the same look, fewer restyles; on a machine with room nothing changes (load stays 1)
+  let frameEma = 16.7, prevRaf = 0, load = 1;
+  const budget = (ts) => { if (prevRaf) { const dt = Math.min(250, ts - prevRaf); frameEma += (dt - frameEma) * 0.06; } prevRaf = ts;
+    const want = frameEma > 22 ? Math.min(4, frameEma / 16.7) : 1; load += (want - load) * (want > load ? 0.2 : 0.02); };
+  const WRITE_MS_NOW = () => WRITE_MS_BASE * (gfx() === 'low' ? 4 : gfx() === 'balanced' ? 2 : 1) * (load > 1.05 ? load : 1);
   let pageOff = false;   // 3.83 glass mode: the page palette is the glass layer's; the windows still answer
   const set = (k, v) => { if (!writing || pageOff || rootV[k] === v) return; rootV[k] = v; root.style.setProperty(k, v); };
   // 3.96 "All the colors are meant to be reactive … the button contents and their border": the accents are written in glass mode too.
@@ -290,7 +296,7 @@
   // 3.78 the skip between writes lives only inside the loop: a call from outside (liveAcc, restoreAcc, setMode) always writes
   function frame(ts) { try { frameBody(ts); } finally { writing = true; } }
   function frameBody(ts) {
-    raf = global.requestAnimationFrame(frame);
+    raf = global.requestAnimationFrame(frame); budget(ts);
     if (doc.hidden || ts - last < 33) return;
     // the app is Off: only windows with their own reactive setting (⚙ → Reactive colours) still answer — looked for once a second
     if (!on) { if (ts - ownScan > 1000) { ownScan = ts; ownAny = Array.from(doc.querySelectorAll('.wm-win')).some(w => { const x = settingsOf(w); return x.own && x.mode !== 'off'; }); } if (!ownAny) return; }
@@ -341,7 +347,7 @@
       lvOf.set(w.dataset.instance, t.lv);
       // 3.77 "changing … each sound": this tool's own colour turn — from where ITS sound sits (its own spectrum), its own hits and
       // (3.84: no slow drift — only the sound), so every tool moves with what it plays, not all together
-      const S = settingsOf(w), o = Object.assign(G(), S); w.dataset.react = o.mode;
+      const S = settingsOf(w), o = Object.assign(G(), S); if (w.dataset.react !== o.mode) w.dataset.react = o.mode;
       if (o.mode === 'changing' && t.lv > 0.02) {
         // 3.84 weighted by energy (the byte spectrum's floor counted every empty bin and pulled every tool toward the top)
         if (!t.ff) t.ff = new Float32Array(t.an.frequencyBinCount); t.an.getFloatFrequencyData(t.ff); let wsum = 0, tsum = 0; for (let i = 1; i < t.ff.length; i++) { const pw = Math.pow(10, t.ff[i] / 10); wsum += pw; tsum += pw * i; }
@@ -360,9 +366,9 @@
       quiet.forEach(w => {
         const id = w.dataset.instance, outs = wires.filter(x => x.src && x.src.instanceId === id).map(x => lvOf.get(x.dst.instanceId)).filter(v => v !== undefined);
         const v = outs.length ? Math.max(...outs) : clamp(level * 0.6 + pulse * 0.25, 0, 1), prev = +w.dataset.lv || 0, lv = prev + (v - prev) * 0.4;
-        w.dataset.lv = lv.toFixed(3); lvSet(w, lv);
+        { const lv3 = lv.toFixed(3); if (w.dataset.lv !== lv3) w.dataset.lv = lv3; } lvSet(w, lv);
         // its colour turn: the tool it plays (its first wired destination that has one), else the mix's (3.84: no drift)
-        const S = settingsOf(w), o = Object.assign(G(), S); w.dataset.react = o.mode;
+        const S = settingsOf(w), o = Object.assign(G(), S); if (w.dataset.react !== o.mode) w.dataset.react = o.mode;
         const dst = wires.filter(x => x.src && x.src.instanceId === id).map(x => CanvasWin(x.dst.instanceId)).find(x => x && x._shift !== undefined);
         if (o.mode === 'changing') { w._shift = dst ? dst._shift : shift * (o.amt / (amt || 1)); if (writing) w.style.setProperty('--win-shift', w._shift.toFixed(1) + 'deg'); }
         o.shift = w._shift || 0;
@@ -427,7 +433,7 @@
     get mode() { return mode; }, get amount() { return amt; }, get colors() { return Object.assign({}, custom); }, MODES,
     setMode(m) { if (!MODES.includes(m)) return; mode = m; on = m !== 'off'; ownScan = -1e9; save(); root.classList.toggle('snd-off', !on); root.dataset.react = m; zero(); fire(); },
     rescan() { ownScan = -1e9; },
-    get draw() { return draw; }, DRAWS, get renderer() { return GL() ? GL().renderer : null; },
+    get draw() { return draw; }, get load() { return load; }, DRAWS, get renderer() { return GL() ? GL().renderer : null; },
     get light() { return overLight; },
     setLight(v) { overLight = !!v; save(); lightAttr(); zero(); fire(); },   // 3.95 Light over the tools
     setDraw(d) { if (!DRAWS.includes(d) || d === draw) return; draw = d; save(); zero(); fire(); },   // 3.82 glass · page

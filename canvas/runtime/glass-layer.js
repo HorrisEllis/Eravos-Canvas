@@ -75,7 +75,13 @@
   }
   // ---- the frame loop (the motion budget: runs only while something is lit or still easing)
   function wake() { if (!raf && LAYERS.size) raf = global.requestAnimationFrame(frame); }
+  // 3.147 a time budget: while the page's frames run slow (average above 22 ms) the layer draws every 2nd or 3rd frame — the lights
+  // ease on the real time between (dt), so they move the same, only fewer pictures; with room, every frame as before
+  let ema = 16.7, prevT = 0, skip = 0;
   function frame(t) {
+    if (prevT) ema += (Math.min(250, t - prevT) - ema) * 0.06; prevT = t;
+    const every = ema > 33 ? 3 : ema > 22 ? 2 : 1;
+    if (every > 1 && (++skip % every)) { raf = global.requestAnimationFrame(frame); return; }
     raf = 0; const dt = lastT ? clamp(t - lastT, 1, 100) : 16; lastT = t; let any = false;
     LAYERS.forEach(L => {
       const list = []; L.items.forEach(e => { const r = resolve(e, dt, L.tau); if (r && (r.amt > 0.003 || r.settling)) list.push(r); if (r && (r.settling || r.moving)) any = true; });
