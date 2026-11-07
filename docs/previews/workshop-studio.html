@@ -1,0 +1,170 @@
+<!doctype html>
+<!-- PREVIEW ONLY — the Workshop as a build surface (his words, 2026-11-07: "can you make it more like photoshop? or like a 3d renderer? then it
+     could support a game engine, like this could be the build surface for emerge."). The layout of an image editor / 3D editor — menu, options
+     bar, tool strip, document tabs, one viewport, docked panels (outliner, layers, inspector), a timeline and an asset browser, a status bar —
+     in the Void's language. The viewport shows the open document in 3D: a PATTERN's structure layers stacked as planes (an exploded view), the
+     notes emerging on top. The same surface opens a photo, a scene (a game), an Emerge module (code as nodes in the field). Silent; drawn from
+     maths. node docs/previews/workshop-studio.shots.mjs → docs/previews/workshop-studio.png -->
+<html lang="en"><head><meta charset="utf-8"><title>WORKSHOP</title>
+<style>
+@font-face { font-family: 'Bebas Neue'; src: url(../../canvas/runtime/fonts/bebas-neue-400.woff2) format('woff2'); }
+@font-face { font-family: 'DM Mono'; src: url(../../canvas/runtime/fonts/dm-mono-400.woff2) format('woff2'); font-weight: 400; }
+@font-face { font-family: 'DM Mono'; src: url(../../canvas/runtime/fonts/dm-mono-500.woff2) format('woff2'); font-weight: 500; }
+:root { --void:#030508; --p:#060a12; --p2:#08101b; --line:#16243a; --line2:#1e3050; --c:#00d4ff; --g:#00ff88; --m:#cc44ff; --y:#ffcc00; --o:#ff6b35;
+  --text:#b8cfe0; --t2:#5a7a96; --t3:#2e4a60; --mono:'DM Mono', ui-monospace, monospace; --disp:'Bebas Neue', Impact, sans-serif; }
+* { box-sizing: border-box; } html { text-transform: uppercase; }
+html, body { margin: 0; height: 100%; background: var(--void); color: var(--text); font: 400 10px/1.4 var(--mono); letter-spacing: .08em; overflow: hidden; }
+.app { display: grid; height: 100%; grid-template-rows: 26px 34px 1fr 22px; grid-template-columns: 44px 1fr 300px; }
+.menu { grid-column: 1 / 4; display: flex; align-items: center; gap: 18px; padding: 0 12px; border-bottom: 1px solid var(--line); background: #04070c; }
+.menu .logo { font: 400 14px var(--disp); letter-spacing: .4em; color: var(--c); margin-right: 8px; }
+.menu span { color: var(--t2); } .menu .r { margin-left: auto; color: var(--t3); }
+.opts { grid-column: 1 / 4; display: flex; align-items: center; gap: 10px; padding: 0 12px; border-bottom: 1px solid var(--line); background: var(--p); }
+.opts .tool { font: 400 13px var(--disp); letter-spacing: .25em; color: var(--c); margin-right: 6px; }
+.f { display: flex; align-items: center; gap: 6px; color: var(--t3); } .f b { font-weight: 400; color: var(--text); border: 1px solid var(--line2); padding: 3px 7px; border-radius: 2px; background: #03060b; }
+.chip { padding: 4px 8px; border: 1px solid var(--line); border-radius: 2px; color: var(--t2); } .chip.on { color: var(--c); border-color: rgba(0,212,255,.45); background: rgba(0,212,255,.06); }
+.vs { width: 1px; height: 18px; background: var(--line2); }
+.strip { border-right: 1px solid var(--line); background: var(--p); display: flex; flex-direction: column; align-items: center; padding-top: 8px; gap: 3px; }
+.ti { width: 32px; height: 30px; display: grid; place-items: center; border-radius: 2px; color: var(--t2); font-size: 14px; }
+.ti.on { color: var(--c); background: rgba(0,212,255,.08); box-shadow: inset 0 0 0 1px rgba(0,212,255,.35); }
+.ti.sep { height: 1px; width: 22px; background: var(--line2); margin: 5px 0; }
+.mid { display: grid; grid-template-rows: 28px 1fr 196px; min-width: 0; }
+.tabs { display: flex; align-items: flex-end; gap: 2px; padding: 0 6px; border-bottom: 1px solid var(--line); background: var(--p); }
+.tab { padding: 6px 14px; border: 1px solid var(--line); border-bottom: none; border-radius: 2px 2px 0 0; color: var(--t3); background: #04070c; }
+.tab.on { color: var(--text); background: var(--void); border-color: var(--line2); box-shadow: inset 0 1px 0 var(--c); }
+.tab i { font-style: normal; margin-left: 10px; color: var(--t3); }
+.vp { position: relative; overflow: hidden; }
+.vp canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.vph { position: absolute; top: 8px; left: 10px; display: flex; gap: 6px; z-index: 2; }
+.dockb { display: grid; grid-template-columns: 1fr 360px; border-top: 1px solid var(--line); min-width: 0; }
+.pane { background: var(--p); border-left: 1px solid var(--line); overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+.ph { display: flex; gap: 14px; padding: 7px 10px; border-bottom: 1px solid var(--line); font: 400 11px var(--disp); letter-spacing: .26em; color: var(--t3); }
+.ph .on { color: var(--c); } .ph .x { margin-left: auto; font: 400 9px var(--mono); letter-spacing: .1em; }
+.right { display: grid; grid-template-rows: 210px 1fr 250px; border-left: 1px solid var(--line); min-height: 0; }
+.right .pane { border-left: none; border-bottom: 1px solid var(--line); }
+.tree div { padding: 3px 10px; color: var(--t2); white-space: nowrap; } .tree .sel { color: var(--c); background: rgba(0,212,255,.06); }
+.tree .k { color: var(--t3); margin-right: 6px; }
+.lay { display: grid; grid-template-columns: 16px 16px 34px 1fr 34px; align-items: center; gap: 6px; padding: 4px 10px; border-bottom: 1px solid #0c1626; color: var(--t2); }
+.lay.sel { background: rgba(0,212,255,.07); color: var(--c); box-shadow: inset 2px 0 0 var(--c); }
+.lay .th { height: 20px; border: 1px solid var(--line2); background: #02050a; border-radius: 1px; }
+.lay .gh { font-size: 10px; color: var(--t2); } .lay small { display: block; color: var(--t3); font-size: 8.5px; } .lay .op { text-align: right; color: var(--t3); }
+.lh { padding: 5px 10px; color: var(--t3); font: 400 9px var(--disp); letter-spacing: .28em; background: #04080e; border-bottom: 1px solid var(--line); }
+.lbar { display: flex; gap: 6px; padding: 6px 10px; border-bottom: 1px solid var(--line); }
+.ins { padding: 8px 10px; display: grid; grid-template-columns: 74px 1fr; gap: 6px 8px; align-items: center; }
+.ins .k { color: var(--t3); } .ins .v { color: var(--text); border: 1px solid var(--line2); background: #03060b; padding: 3px 7px; border-radius: 2px; }
+.ins .bar2 { height: 4px; background: #0c1626; position: relative; } .ins .bar2 i { position: absolute; inset: 0 auto 0 0; background: var(--c); box-shadow: 0 0 8px var(--c); }
+.status { grid-column: 1 / 4; display: flex; gap: 22px; align-items: center; padding: 0 12px; border-top: 1px solid var(--line); background: #04070c; color: var(--t3); }
+.status b { font-weight: 400; color: var(--t2); } .status .r { margin-left: auto; color: var(--g); }
+.assets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; }
+.as { border: 1px solid var(--line2); border-radius: 2px; background: #03060b; height: 56px; position: relative; overflow: hidden; }
+.as span { position: absolute; left: 6px; bottom: 4px; color: var(--t2); font-size: 8.5px; } .as.on { border-color: rgba(0,212,255,.5); }
+canvas.mini { position: absolute; inset: 0; width: 100%; height: 100%; }
+</style></head><body>
+<div class="app">
+  <div class="menu"><span class="logo">WORKSHOP</span><span>FILE</span><span>EDIT</span><span>LAYER</span><span>SELECT</span><span>SHAPE</span><span>VIEW</span><span>RENDER</span><span>WINDOW</span><span class="r">01 SONG ─ 02 PATTERN ─ 03 NOTE</span></div>
+  <div class="opts"><span class="tool">DENSITY</span><span class="f">START <b>30 %</b></span><span class="f">END <b>90 %</b></span><span class="vs"></span><span class="chip on">RISE</span><span class="chip">FALL</span><span class="chip">ARCH</span><span class="chip">DRAWN</span><span class="vs"></span><span class="f">MODE</span><span class="chip">FIXED</span><span class="chip on">SEEDED</span><span class="chip">LIVE</span><span class="vs"></span><span class="f">SEED <b>41</b></span><span style="margin-left:auto" class="chip">HEAR · ALONE</span><span class="chip on">APPLY →</span></div>
+  <div class="strip"><div class="ti">⬚</div><div class="ti">✥</div><div class="ti">✎</div><div class="ti sep"></div><div class="ti">⇕</div><div class="ti">⋮</div><div class="ti on">◢</div><div class="ti">〰</div><div class="ti sep"></div><div class="ti">⚄</div><div class="ti">⊙</div><div class="ti">⌫</div><div class="ti sep"></div><div class="ti">⟲</div><div class="ti">⌕</div></div>
+  <div class="mid">
+    <div class="tabs"><span class="tab on">PATTERN · BASSLINE<i>×</i></span><span class="tab">NOTE · A2<i>×</i></span><span class="tab">PHOTO · YOURS<i>×</i></span><span class="tab">SCENE · LEVEL 1<i>×</i></span><span class="tab">FIELD · EMERGE MODULE<i>×</i></span></div>
+    <div class="vp"><div class="vph"><span class="chip on">3D</span><span class="chip">2D</span><span class="chip">TOP</span><span class="chip">FRONT</span><span class="vs"></span><span class="chip on">EXPLODED</span><span class="chip">FLAT</span><span class="vs"></span><span class="chip">WIRE</span><span class="chip on">LIT</span></div><canvas id="vp"></canvas></div>
+    <div class="dockb">
+      <div class="pane" style="border-left:none"><div class="ph"><span class="on">TIMELINE</span><span>CURVES</span><span>MIXER</span><span class="x">4 BARS · 140 BPM · PLAYHEAD 02.3</span></div><canvas id="tl" style="flex:1;width:100%"></canvas></div>
+      <div class="pane"><div class="ph"><span class="on">ASSETS</span><span>KINDS</span><span>STAMPS</span><span class="x">LIBRARY</span></div>
+        <div class="assets"><div class="as on"><canvas class="mini" data-k="pattern"></canvas><span>PATTERN</span></div><div class="as"><canvas class="mini" data-k="note"></canvas><span>NOTE</span></div><div class="as"><canvas class="mini" data-k="photo"></canvas><span>PHOTO</span></div>
+          <div class="as"><canvas class="mini" data-k="scene"></canvas><span>SCENE (GAME)</span></div><div class="as"><canvas class="mini" data-k="module"></canvas><span>.EG MODULE</span></div><div class="as"><canvas class="mini" data-k="stamp"></canvas><span>STAMP · RISE</span></div></div></div>
+    </div>
+  </div>
+  <div class="right">
+    <div class="pane"><div class="ph"><span class="on">OUTLINER</span><span>FIELD</span></div>
+      <div class="tree"><div><span class="k">▾</span>SONG · NIGHT DRIVE</div><div>&nbsp;&nbsp;<span class="k">▾</span>PATTERN · BASSLINE</div><div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">▸</span>STRUCTURE · 6</div><div class="sel">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">◢</span>DENSITY</div><div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">▸</span>EMERGES · 3</div><div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">→</span>PLAYS INTO · RETRO DCO</div><div>&nbsp;&nbsp;<span class="k">▸</span>PATTERN · DRUMS</div><div>&nbsp;&nbsp;<span class="k">▸</span>PATTERN · CHORDS</div></div></div>
+    <div class="pane"><div class="ph"><span class="on">LAYERS</span><span>CHANNELS</span><span>PATHS</span></div>
+      <div class="lbar"><span class="chip">NORMAL ▾</span><span class="chip">OPACITY 100 %</span><span class="chip">🔒</span></div>
+      <div class="lh">WHAT EMERGES</div>
+      <div class="lay"><span class="gh">◉</span><span class="gh">·</span><canvas class="th mini" data-k="notes" style="position:static;height:20px;width:34px"></canvas><div>NOTES<small>EVENTS · FROM THE CONDITIONS</small></div><span class="op">100</span></div>
+      <div class="lay"><span class="gh">◉</span><span class="gh">🔒</span><span class="th" style="background:linear-gradient(90deg,#00ff88 0 12%,#02050a 12%)"></span><div>YOURS<small>LOCKED · KEPT</small></div><span class="op">100</span></div>
+      <div class="lh">STRUCTURE · THE SHAPE</div>
+      <div class="lay"><span class="gh">◉</span><span class="gh">·</span><span class="th" style="background:linear-gradient(180deg,rgba(204,68,255,.1),rgba(204,68,255,.4))"></span><div>CONTOUR<small>CURVE · UP, THEN HOME</small></div><span class="op">70</span></div>
+      <div class="lay sel"><span class="gh">◉</span><span class="gh">·</span><span class="th" style="background:linear-gradient(170deg,transparent 55%,rgba(0,212,255,.5) 56%)"></span><div>DENSITY<small>CURVE · 30 → 90 %</small></div><span class="op">100</span></div>
+      <div class="lay"><span class="gh">◉</span><span class="gh">·</span><span class="th" style="border-top:1px solid var(--c);border-bottom:1px solid var(--c)"></span><div>RANGE<small>CONSTRAINT · A1 – A3</small></div><span class="op">100</span></div>
+      <div class="lay"><span class="gh">◉</span><span class="gh">·</span><span class="th" style="background:repeating-linear-gradient(90deg,rgba(0,212,255,.45) 0 2px,transparent 2px 4px,rgba(0,212,255,.45) 4px 6px,rgba(0,212,255,.45) 6px 8px,transparent 8px 10px)"></span><div>GRID<small>CONSTRAINT · 5 OF 8</small></div><span class="op">100</span></div>
+      <div class="lay"><span class="gh">◉</span><span class="gh">·</span><span class="th" style="background:linear-gradient(90deg,rgba(0,212,255,.25) 0 25%,rgba(0,212,255,.12) 25% 50%,rgba(0,212,255,.25) 50% 75%,rgba(0,212,255,.12) 75%)"></span><div>CHORDS<small>CONSTRAINT · I VI III VII</small></div><span class="op">100</span></div>
+      <div class="lay"><span class="gh">◉</span><span class="gh">·</span><span class="th" style="background:repeating-linear-gradient(180deg,rgba(0,212,255,.18) 0 2px,#02050a 2px 3px)"></span><div>SCALE<small>CONSTRAINT · A MINOR</small></div><span class="op">100</span></div>
+    </div>
+    <div class="pane"><div class="ph"><span class="on">INSPECTOR</span><span>HISTORY</span><span>FIELD</span></div>
+      <div class="ins"><span class="k">LAYER</span><span class="v">DENSITY · CURVE</span><span class="k">START</span><span class="v">30 %</span><span class="k">END</span><span class="v">90 %</span><span class="k">SHAPE</span><span class="v">RISE</span>
+        <span class="k">ADMITTED</span><span class="v" id="adm">—</span><span class="k">EMERGED</span><span class="v" id="emg">—</span><span class="k">SHARE</span><span class="bar2"><i id="shr" style="width:0"></i></span><span class="k">PLAYS INTO</span><span class="v">RETRO DCO · LIVE</span></div></div>
+  </div>
+  <div class="status"><span>ZOOM <b>100 %</b></span><span>CURSOR <b>BAR 02.3 · A2</b></span><span>CAMERA <b>ORBIT · 32° / 18°</b></span><span>LAYERS <b>9</b></span><span>DOCUMENT <b>PATTERN · BASSLINE</b></span><span class="r">PREVIEW · NOT BUILT</span></div>
+</div>
+<script>
+// the pattern (the same model as the earlier previews): the shape from the structure layers, what emerges inside it — counted, not claimed
+const M = (() => { const steps = 64, lo = 33, hi = 57, minor = [0, 2, 3, 5, 7, 8, 10], inKey = (n) => minor.includes(((n - 57) % 12 + 12) % 12);
+  const chords = [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]], tone = (n, b) => chords[b].some(t => (((n - t) % 12) + 12) % 12 === 0);
+  const eu = [1, 0, 1, 1, 0, 1, 1, 0], onGrid = (s) => eu[s % 8] === 1, dens = (s) => 0.3 + 0.6 * (s / steps), cont = (s) => 41 + 9 * Math.sin(Math.PI * s / steps);
+  let seed = 41; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647; const admitted = [], notes = [];
+  for (let s = 0; s < steps; s++) if (onGrid(s)) for (let n = lo; n <= hi; n++) if (inKey(n) && tone(n, s >> 4)) admitted.push([s, n]);
+  for (let s = 0; s < steps; s++) { if (!onGrid(s) || (s > 0 && rnd() > dens(s))) continue; let best = null, bd = 1e9; for (let n = lo; n <= hi; n++) if (inKey(n) && tone(n, s >> 4)) { const d = Math.abs(n - cont(s)) + rnd() * 3; if (d < bd) { bd = d; best = n; } } notes.push([s, best, s === 0]); }
+  return { steps, lo, hi, inKey, tone, onGrid, dens, cont, admitted, notes }; })();
+document.getElementById('adm').textContent = M.admitted.length + ' NOTES'; document.getElementById('emg').textContent = M.notes.length + ' NOTES';
+document.getElementById('shr').style.width = (100 * M.notes.length / M.admitted.length).toFixed(1) + '%';
+function fit(c) { const d = devicePixelRatio || 1, W = c.clientWidth, H = c.clientHeight; c.width = W * d; c.height = H * d; const g = c.getContext('2d'); g.scale(d, d); return [g, W, H]; }
+// the viewport: an orbit camera over the layer stack — each structure layer a plane, exploded upward; the notes on top
+(function () { const [g, W, H] = fit(document.getElementById('vp'));
+  g.fillStyle = '#030508'; g.fillRect(0, 0, W, H); const vg = g.createRadialGradient(W / 2, H * 0.45, 40, W / 2, H * 0.5, W * 0.7); vg.addColorStop(0, 'rgba(0,212,255,.05)'); vg.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = vg; g.fillRect(0, 0, W, H);
+  // an orbit camera (yaw, pitch), near-orthographic: x = time, y = height (the stack), z = pitch
+  const yaw = -0.5, pit = 0.5, cy = Math.cos(yaw), sy = Math.sin(yaw), sp = Math.sin(pit), cp = Math.cos(pit), K = W / 118;
+  const P = (x, y, z) => { const X = x * cy - z * sy, D = x * sy + z * cy; return [W * 0.53 + X * K, H * 0.70 - y * K * cp + D * K * sp, 1]; };
+  // world: x = time (−32…32), z = pitch (−12…12), y = height (the stack)
+  const tx = (s) => (s - 32), pz = (n) => (n - 45);
+  const quad = (pts, fill, stroke) => { g.beginPath(); pts.forEach(([x, y, z], i) => { const [a, b] = P(x, y, z); i ? g.lineTo(a, b) : g.moveTo(a, b); }); g.closePath(); if (fill) { g.fillStyle = fill; g.fill(); } if (stroke) { g.strokeStyle = stroke; g.lineWidth = 1; g.stroke(); } };
+  // the floor: a perspective grid
+  g.lineWidth = 1; for (let i = -40; i <= 40; i += 4) { const a = P(i, -2, -16), b = P(i, -2, 16); g.strokeStyle = 'rgba(30,48,80,.45)'; g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke(); }
+  for (let j = -16; j <= 16; j += 4) { const a = P(-40, -2, j), b = P(40, -2, j); g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke(); }
+  // the stack: SCALE, CHORDS, GRID, RANGE as planes; each draws what it admits
+  const plane = (y, col) => quad([[-33, y, -13], [33, y, -13], [33, y, 13], [-33, y, 13]], 'rgba(3,8,14,.55)', col);
+  // 1 scale: rows in key
+  plane(0, 'rgba(46,74,96,.8)'); for (let n = M.lo; n <= M.hi; n++) if (M.inKey(n)) quad([[-33, 0, pz(n) - 0.35], [33, 0, pz(n) - 0.35], [33, 0, pz(n) + 0.35], [-33, 0, pz(n) + 0.35]], 'rgba(0,212,255,.08)');
+  // 2 chords: each bar's tones
+  plane(7, 'rgba(46,74,96,.8)'); for (let b = 0; b < 4; b++) for (let n = M.lo; n <= M.hi; n++) if (M.inKey(n) && M.tone(n, b)) quad([[tx(b * 16), 7, pz(n) - 0.4], [tx(b * 16 + 16), 7, pz(n) - 0.4], [tx(b * 16 + 16), 7, pz(n) + 0.4], [tx(b * 16), 7, pz(n) + 0.4]], 'rgba(0,212,255,.16)');
+  // 3 grid: the admitted steps as columns of light
+  plane(14, 'rgba(46,74,96,.8)'); for (let s = 0; s < 64; s++) if (M.onGrid(s)) quad([[tx(s) + 0.2, 14, -13], [tx(s) + 0.6, 14, -13], [tx(s) + 0.6, 14, 13], [tx(s) + 0.2, 14, 13]], 'rgba(0,212,255,.10)');
+  // 4 the field the shape admits: points; density lifts the top plane's edge
+  plane(21, 'rgba(0,212,255,.55)');
+  M.admitted.forEach(([s, n]) => { const [a, b, k] = P(tx(s) + 0.4, 21, pz(n)); g.fillStyle = 'rgba(0,212,255,.32)'; g.fillRect(a - 0.8, b - 0.8, 1.6 * k, 1.6 * k); });
+  // contour: a curve hovering over the top plane
+  g.strokeStyle = 'rgba(204,68,255,.7)'; g.setLineDash([3, 4]); g.beginPath(); for (let s = 0; s <= 64; s++) { const [a, b] = P(tx(s), 21.4, pz(M.cont(s))); s ? g.lineTo(a, b) : g.moveTo(a, b); } g.stroke(); g.setLineDash([]);
+  // what emerges: glowing bars standing on the top plane, height = their place in the density
+  M.notes.forEach(([s, n, lock]) => { const x = tx(s), z = pz(n), h = 1.5 + 4 * M.dens(s), col = lock ? 'rgba(0,255,136,' : 'rgba(127,233,255,';
+    g.shadowColor = lock ? '#00ff88' : '#00d4ff'; g.shadowBlur = 14;
+    quad([[x, 21, z - 0.35], [x + 1.4, 21, z - 0.35], [x + 1.4, 21 + h, z - 0.35], [x, 21 + h, z - 0.35]], col + '.9)');
+    quad([[x, 21 + h, z - 0.35], [x + 1.4, 21 + h, z - 0.35], [x + 1.4, 21 + h, z + 0.35], [x, 21 + h, z + 0.35]], col + '1)'); g.shadowBlur = 0; });
+  // the stack's edges: lines joining the planes (the structure)
+  [[-33, -13], [33, -13], [33, 13], [-33, 13]].forEach(([x, z]) => { const a = P(x, 0, z), b = P(x, 21, z); g.strokeStyle = 'rgba(30,48,80,.9)'; g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke(); });
+  // plane names in the margin, left of the stack with a leader line (never over what it shows)
+  [['SCALE', 0], ['CHORDS', 7], ['GRID', 14], ['THE SHAPE · WHAT EMERGES', 21]].forEach(([t, y]) => { const [a, b] = P(-33, y, 13), lx = Math.max(130, a - 60);
+    g.strokeStyle = 'rgba(30,48,80,.9)'; g.beginPath(); g.moveTo(a - 6, b); g.lineTo(lx + 8, b); g.stroke(); g.fillStyle = y === 21 ? '#00d4ff' : '#5a7a96'; g.font = '400 9px "DM Mono", monospace'; g.textAlign = 'right'; g.fillText(t, lx, b + 3); g.textAlign = 'left'; });
+  // the gizmo: the camera's axes, in the corner
+  const gx = W - 64, gy = 78, o = P(0, 0, 0); g.fillStyle = 'rgba(3,5,8,.8)'; g.beginPath(); g.arc(gx, gy, 34, 0, 7); g.fill(); g.strokeStyle = 'rgba(30,48,80,.9)'; g.stroke();
+  [['X', 1, 0, 0, '#ff2d55'], ['Y', 0, 1, 0, '#00ff88'], ['Z', 0, 0, 1, '#00d4ff']].forEach(([t, x, y, z, c]) => { const e = P(x, y, z); let dx = e[0] - o[0], dy = e[1] - o[1]; const l = Math.hypot(dx, dy) || 1; dx = dx / l * 24; dy = dy / l * 24;
+    g.strokeStyle = c; g.lineWidth = 2; g.beginPath(); g.moveTo(gx, gy); g.lineTo(gx + dx, gy + dy); g.stroke(); g.fillStyle = c; g.font = '500 9px "DM Mono", monospace'; g.fillText(t, gx + dx * 1.3 - 3, gy + dy * 1.3 + 3); });
+})();
+// the timeline: a dope sheet — the structure layers' keys over the 4 bars, the playhead
+(function () { const [g, W, H] = fit(document.getElementById('tl')); g.fillStyle = '#04070c'; g.fillRect(0, 0, W, H);
+  const rows = ['NOTES', 'DENSITY', 'CONTOUR', 'RANGE', 'GRID', 'CHORDS', 'SCALE'], L = 92, rh = (H - 22) / rows.length, X = (b) => L + (W - L - 12) * b / 4;
+  for (let b = 0; b <= 16; b++) { const x = X(b / 4); g.fillStyle = b % 4 ? 'rgba(22,36,58,.7)' : 'rgba(30,48,80,1)'; g.fillRect(x, 0, 1, H); if (!(b % 4)) { g.fillStyle = '#2e4a60'; g.font = '400 9px "DM Mono", monospace'; g.fillText(String(b / 4 + 1).padStart(2, '0'), x + 3, 11); } }
+  rows.forEach((r, i) => { const y = 18 + i * rh; g.fillStyle = i === 1 ? 'rgba(0,212,255,.06)' : 'transparent'; g.fillRect(0, y, W, rh); g.fillStyle = i === 1 ? '#00d4ff' : '#5a7a96'; g.font = '400 9px "DM Mono", monospace'; g.fillText(r, 10, y + rh / 2 + 3);
+    g.fillStyle = 'rgba(22,36,58,.9)'; g.fillRect(0, y + rh - 0.5, W, 0.5); });
+  M.notes.forEach(([s, n, lock]) => { g.fillStyle = lock ? '#00ff88' : '#7fe9ff'; g.fillRect(X(s / 16), 18 + rh * 0.3, Math.max(2, (W - L) / 64 * 1.4), rh * 0.4); });
+  const key = (i, b, c) => { const x = X(b), y = 18 + i * rh + rh / 2; g.save(); g.translate(x, y); g.rotate(Math.PI / 4); g.fillStyle = c; g.fillRect(-3.5, -3.5, 7, 7); g.restore(); };
+  key(1, 0, '#00d4ff'); key(1, 4, '#00d4ff'); g.strokeStyle = 'rgba(0,212,255,.5)'; g.beginPath(); g.moveTo(X(0), 18 + rh * 1.5); g.lineTo(X(4), 18 + rh * 1.5); g.stroke();
+  [0, 2, 4].forEach(b => key(2, b, '#cc44ff')); [0].forEach(b => key(3, b, '#5a7a96')); [0].forEach(b => key(4, b, '#5a7a96')); [0, 1, 2, 3].forEach(b => key(5, b, '#5a7a96')); key(6, 0, '#5a7a96');
+  const ph = X(1.56); g.fillStyle = '#ff6b35'; g.fillRect(ph, 0, 1, H); g.beginPath(); g.moveTo(ph - 5, 0); g.lineTo(ph + 5, 0); g.lineTo(ph, 7); g.fill(); })();
+// the assets: each kind's thumbnail (the surface opens every one)
+document.querySelectorAll('canvas.mini').forEach(c => { const [g, W, H] = fit(c), k = c.dataset.k; g.fillStyle = '#02050a'; g.fillRect(0, 0, W, H);
+  if (k === 'pattern' || k === 'notes') M.notes.forEach(([s, n, l]) => { g.fillStyle = l ? '#00ff88' : '#7fe9ff'; g.fillRect(s / 64 * W, H - (n - 31) / 28 * H, Math.max(1.5, W / 40), 1.5); });
+  if (k === 'note') { g.strokeStyle = '#00d4ff'; g.beginPath(); for (let i = 0; i <= 50; i++) { const u = i / 50, y = H * 0.4 + (u > 0.6 ? Math.pow((u - 0.6) / 0.4, 1.6) * H * 0.4 : 0) + Math.sin(u * 30) * 1.2 * (u > 0.4); i ? g.lineTo(u * W, y) : g.moveTo(0, y); } g.stroke(); }
+  if (k === 'photo') { const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#1b2a6b'); gr.addColorStop(0.6, '#d0607a'); gr.addColorStop(1, '#ffb347'); g.fillStyle = gr; g.fillRect(0, 0, W, H); g.fillStyle = '#20112a'; g.fillRect(0, H * 0.72, W, H); }
+  if (k === 'scene') { g.strokeStyle = 'rgba(0,212,255,.6)'; for (let i = -4; i <= 4; i++) { g.beginPath(); g.moveTo(W / 2 + i * 6, H * 0.45); g.lineTo(W / 2 + i * 22, H); g.stroke(); } g.strokeStyle = '#00ff88'; g.strokeRect(W * 0.42, H * 0.25, W * 0.16, H * 0.3); g.strokeStyle = '#ffcc00'; g.strokeRect(W * 0.62, H * 0.4, W * 0.1, H * 0.18); }
+  if (k === 'module') { const ns = [[0.2, 0.3], [0.5, 0.2], [0.8, 0.35], [0.35, 0.7], [0.65, 0.72]]; g.strokeStyle = 'rgba(204,68,255,.6)'; [[0, 1], [1, 2], [0, 3], [3, 4], [1, 4]].forEach(([a, b]) => { g.beginPath(); g.moveTo(ns[a][0] * W, ns[a][1] * H); g.lineTo(ns[b][0] * W, ns[b][1] * H); g.stroke(); }); ns.forEach(([x, y]) => { g.fillStyle = '#cc44ff'; g.fillRect(x * W - 3, y * H - 3, 6, 6); }); }
+  if (k === 'stamp') { g.strokeStyle = '#00d4ff'; g.beginPath(); g.moveTo(4, H - 10); g.lineTo(W - 4, 12); g.stroke(); }
+});
+</script></body></html>

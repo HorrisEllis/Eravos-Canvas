@@ -1,0 +1,62 @@
+/* ERAVOS runtime — workshop.css (3.150): the Workshop's own look, the Void (the approved preview docs/previews/workshop-studio.png; the
+   language of Idearium's spec workshop: near-black, Bebas Neue wide-tracked, DM Mono, hairlines, 2px corners, capitals). Scoped to .ws-app:
+   nothing else in ERAVOS changes. Fonts: runtime/fonts (SIL OFL 1.1, licences beside them). */
+@font-face { font-family: 'WS Display'; src: url(fonts/bebas-neue-400.woff2) format('woff2'); font-display: swap; }
+@font-face { font-family: 'WS Mono'; src: url(fonts/dm-mono-400.woff2) format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'WS Mono'; src: url(fonts/dm-mono-500.woff2) format('woff2'); font-weight: 500; font-display: swap; }
+.ws-app { --wv:#030508; --wp:#060a12; --wl:#16243a; --wl2:#1e3050; --wc:#00d4ff; --wg:#00ff88; --wm:#cc44ff; --wy:#ffcc00; --wt:#b8cfe0; --wt2:#5a7a96; --wt3:#2e4a60;
+  --wmono:'WS Mono', ui-monospace, monospace; --wdisp:'WS Display', Impact, sans-serif;
+  position: fixed; inset: 0; z-index: 299000;   /* over every window, bar and light layer; notices (toasts, 300000) stay above */ display: grid; grid-template-rows: 30px 36px 1fr 22px; grid-template-columns: 44px 1fr 300px;
+  background: var(--wv); color: var(--wt); font: 400 10px/1.4 var(--wmono); letter-spacing: .08em; text-transform: uppercase; }
+.ws-app * { box-sizing: border-box; }
+.ws-app button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: inherit; }
+.ws-bar { grid-column: 1 / 4; display: flex; align-items: center; gap: 16px; padding: 0 12px; border-bottom: 1px solid var(--wl); background: #04070c; }
+.ws-name { font: 400 15px var(--wdisp); letter-spacing: .4em; color: var(--wc); text-shadow: 0 0 20px rgba(0,212,255,.25); }
+.ws-sep { width: 1px; height: 16px; background: var(--wl2); }
+.ws-stations { display: flex; gap: 2px; align-items: center; }
+.ws-st { font: 400 11px var(--wdisp); letter-spacing: .22em; color: var(--wt3); padding: 4px 10px; border: 1px solid transparent; border-radius: 2px; }
+.ws-st i { font: 400 8.5px var(--wmono); font-style: normal; margin-right: 6px; }
+.ws-st.on { color: var(--wc); border-color: rgba(0,212,255,.4); background: rgba(0,212,255,.05); }
+.ws-end { margin-left: auto; display: flex; gap: 8px; }
+.ws-btn { font: 400 11px/1 var(--wdisp) !important; letter-spacing: .18em !important; border: 1px solid rgba(0,212,255,.22) !important; border-radius: 2px; color: rgba(0,212,255,.8) !important; padding: 5px 12px !important; background: rgba(0,212,255,.04) !important; }
+.ws-btn.ghost { border-color: var(--wl) !important; color: var(--wt2) !important; background: none !important; }
+.ws-btn.send { color: var(--wc) !important; border-color: rgba(0,212,255,.5) !important; box-shadow: 0 0 18px rgba(0,212,255,.1); }
+.ws-opts { grid-column: 1 / 4; display: flex; align-items: center; gap: 12px; padding: 0 12px; border-bottom: 1px solid var(--wl); background: var(--wp); overflow-x: auto; white-space: nowrap; }
+.ws-tool { font: 400 13px var(--wdisp); letter-spacing: .25em; color: var(--wc); }
+.ws-f { display: inline-flex; align-items: center; gap: 6px; color: var(--wt3); }
+.ws-num, .ws-txt { width: 64px; font: 400 10px var(--wmono); color: var(--wt); background: #03060b; border: 1px solid var(--wl2); border-radius: 2px; padding: 3px 6px; }
+.ws-unit { color: var(--wt3); }
+.ws-chips { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+.ws-chip { padding: 3px 7px !important; border: 1px solid var(--wl) !important; border-radius: 2px; color: var(--wt2) !important; }
+.ws-chip.on { color: var(--wc) !important; border-color: rgba(0,212,255,.45) !important; background: rgba(0,212,255,.06) !important; }
+.ws-strip { border-right: 1px solid var(--wl); background: var(--wp); display: flex; flex-direction: column; align-items: center; padding-top: 8px; gap: 3px; }
+.ws-ti { width: 32px; height: 30px; border-radius: 2px; color: var(--wt2) !important; font-size: 13px !important; }
+.ws-ti.on { color: var(--wc) !important; background: rgba(0,212,255,.08) !important; box-shadow: inset 0 0 0 1px rgba(0,212,255,.35); }
+.ws-centre { display: grid; grid-template-rows: 28px 1fr; min-width: 0; min-height: 0; }
+.ws-tabs { display: flex; align-items: flex-end; gap: 2px; padding: 0 6px; border-bottom: 1px solid var(--wl); background: var(--wp); }
+.ws-tab { padding: 6px 14px; border: 1px solid var(--wl2); border-bottom: none; border-radius: 2px 2px 0 0; background: var(--wv); color: var(--wt); box-shadow: inset 0 1px 0 var(--wc); }
+.ws-tab i { font-style: normal; margin-left: 10px; color: var(--wt3); cursor: pointer; }
+.ws-vp { position: relative; overflow: hidden; min-height: 0; }
+.ws-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: crosshair; }
+.ws-right { display: grid; grid-template-rows: auto 1fr auto; border-left: 1px solid var(--wl); min-height: 0; background: var(--wp); }
+.ws-pane { border-bottom: 1px solid var(--wl); overflow: auto; min-height: 0; }
+.ws-pane.ws-grow { min-height: 120px; }
+.ws-ph { display: flex; gap: 14px; padding: 7px 10px; border-bottom: 1px solid var(--wl); font: 400 11px var(--wdisp); letter-spacing: .26em; color: var(--wt3); position: sticky; top: 0; background: var(--wp); }
+.ws-ph span { cursor: pointer; } .ws-ph .on { color: var(--wc); } .ws-ph .ws-x { margin-left: auto; font: 400 9px var(--wmono); cursor: default; }
+.ws-tree div { padding: 3px 10px; color: var(--wt2); white-space: nowrap; cursor: default; } .ws-tree .sel { color: var(--wc); background: rgba(0,212,255,.06); }
+.ws-lh { padding: 5px 10px; color: var(--wt3); font: 400 9px var(--wdisp); letter-spacing: .28em; background: #04080e; border-bottom: 1px solid var(--wl); }
+.ws-lay { display: grid; grid-template-columns: 36px 1fr; gap: 8px; align-items: center; padding: 5px 10px; border-bottom: 1px solid #0c1626; color: var(--wt); cursor: pointer; }
+.ws-lay small { display: block; color: var(--wt3); font-size: 8.5px; }
+.ws-lay.sel { background: rgba(0,212,255,.07); color: var(--wc); box-shadow: inset 2px 0 0 var(--wc); }
+.ws-badge { font: 400 7.5px var(--wmono); text-align: center; padding: 2px 0; border: 1px solid var(--wl2); border-radius: 1px; color: var(--wt2); }
+.ws-badge.t-constraint { color: var(--wc); border-color: rgba(0,212,255,.35); } .ws-badge.t-curve { color: var(--wm); border-color: rgba(204,68,255,.35); }
+.ws-badge.t-emergent { color: #d8f6ff; border-color: rgba(216,246,255,.4); } .ws-badge.t-events { color: var(--wg); border-color: rgba(0,255,136,.35); } .ws-badge.t-value { color: var(--wy); border-color: rgba(255,204,0,.35); }
+.ws-ins { padding: 8px 10px; display: flex; flex-direction: column; gap: 7px; }
+.ws-big { font: 400 26px/1 var(--wdisp); letter-spacing: .3em; color: var(--wc); text-shadow: 0 0 24px rgba(0,212,255,.2); }
+.ws-sub { color: var(--wt2); }
+.ws-f.big { display: grid; grid-template-columns: 80px 1fr; } .ws-f.big .ws-num, .ws-f.big .ws-txt { width: 100%; }
+.ws-kv { display: grid; grid-template-columns: 80px 1fr; color: var(--wt3); } .ws-kv b { font-weight: 400; color: var(--wt); }
+.ws-hist { padding: 6px 10px; } .ws-hist div { line-height: 2; color: var(--wt3); cursor: pointer; } .ws-hist div.now { color: var(--wt); } .ws-hist i { font-style: normal; margin-right: 10px; }
+.ws-status { grid-column: 1 / 4; display: flex; gap: 20px; align-items: center; padding: 0 12px; border-top: 1px solid var(--wl); background: #04070c; color: var(--wt3); overflow: hidden; white-space: nowrap; }
+.ws-status b { font-weight: 400; color: var(--wt2); } .ws-status .ws-r { margin-left: auto; color: var(--wg); }
+html.ws-open .glass-layer { display: none !important; }   /* the light layers draw window rims over the whole page: not over the Workshop */

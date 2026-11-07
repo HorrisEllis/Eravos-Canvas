@@ -71,6 +71,17 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-07 · A domain-free editing surface and a pattern built from constraints — the Workshop, W1
+- **His words (2026-11-07):** "agnostic. the structure defines the shape which defines the emergent properties of the conditions." · "can
+  you make it more like photoshop? or like a 3d renderer? … this could be the build surface for emerge." · "Yeah, we can just start with this."
+- **His call:** the editor's layout, flat first; patterns as structure.
+- **Built:** an editing surface that knows nothing about music (any kind plugs in after a contract check), a deterministic generator that
+  turns a pattern's constraints into the space of allowed notes and the notes that emerge, a tool that plays it live into any instrument,
+  and the music pattern kind on the surface.
+- **Proof:** a test kind from no domain drives the surface (refusal, live edits, undo, redo, history); the tool's notes are checked against
+  what the generator says emerged; the generator's own 16 checks; the boundary test keeps the surface free of domain words.
+- **Check:** `node tests/run.mjs P150` · `node tools/music/components/pattern-field/pattern-field.test.mjs`
+
 ### 2026-11-07 · Continuous delivery from git to the desktop app — the Beta channel
 - **His words (2026-11-07):** "Can you integrate git into Eravos? Like it’s saying no update. I’m on 0.2.15."
 - **His call:** updates straight from git.
