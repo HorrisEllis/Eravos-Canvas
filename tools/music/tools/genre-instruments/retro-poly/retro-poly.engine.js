@@ -125,20 +125,26 @@
         return seq;
       }
       const STEP = { '1/4': 4, '1/8': 2, '1/16': 1, '1/8t': 4 / 3, '1/16t': 2 / 3 };
-      ctx.onTick((tk) => {
+      // 3.147 the arp starts on the next step, not ~100 ms later: ticks are dealt out ahead of the clock (the scheduler's lookahead), so
+      // the steps already dealt when a key goes down are kept and played for it (his: "same with arp" — measured: the first note came
+      // up to one step + 100 ms after the key)
+      const ahead = [];
+      ctx.onTick((tk) => { const now = ac.currentTime; while (ahead.length && ahead[0].time <= now) ahead.shift(); ahead.push(tk); if (ahead.length > 64) ahead.shift(); arpTick(tk); });
+      const catchUp = () => { const now = ac.currentTime + 0.003; ahead.slice().forEach(tk => { if (tk.time > now) arpTick(tk); }); };
+      function arpTick(tk) {
         if (P.get('arp') === 'off' || !held.length) return;
         const st = STEP[P.get('arpDiv')], sd = 60 / ctx.bpm / 4;
         const hits = st >= 1 ? (tk.step16 % Math.round(st) === 0 ? [0] : []) : st === 2 / 3 ? [0, 2 / 3] : [];
         const triplet = st === 4 / 3 ? (tk.step16 % 4 === 0 ? [0, 4 / 3, 8 / 3] : []) : null;
         (triplet || hits).forEach(off => { const seq = arpSeq(); if (!seq.length) return; const n = P.get('arp') === 'random' ? seq[Math.floor(rnd() * seq.length)] : seq[arpI++ % seq.length]; noteOn(n, 0.85, tk.time + off * sd, Math.max(0.02, st * sd * P.get('arpGate'))); });
-      });
+      }
       // 3.130 HOLD: a key you let go keeps sounding; the next key you press (with none down) lets the held ones go — the same key
       // again only stops it. Hands only: notes from the Timeline and sequencers keep their own lengths.
       const down = new Set(), latched = new Set();
       const handOn = (note, vel, t, dur) => { if (P.get('hold') && !(dur < 30)) {   /* a short timed preview plays as itself; a key (30 s or open) is a hand */ if (!down.size && latched.size) { const same = latched.size === 1 && latched.has(note); latched.forEach(n => noteOff(n)); latched.clear(); if (same) return; } down.add(note); return press(note, vel, t, undefined); } return press(note, vel, t, dur); };
       const handOff = (note) => { if (P.get('hold')) { if (!down.delete(note)) return; latched.add(note); return; } lift(note); };
       P.onChange('hold', (v) => { if (!v) { latched.forEach(n => { if (!down.has(n)) lift(n); }); latched.clear(); } });
-      const press = (note, vel, t, dur) => { if (P.get('arp') === 'off') return noteOn(note, vel, t, dur); if (!P.get('arpHold') || !held.length || held._released) { if (held._released) { held.length = 0; held._released = false; } } if (!held.includes(note)) held.push(note); if (dur !== undefined) setTimeout(() => lift(note), dur * 1000); };
+      const press = (note, vel, t, dur) => { if (P.get('arp') === 'off') return noteOn(note, vel, t, dur); if (!P.get('arpHold') || !held.length || held._released) { if (held._released) { held.length = 0; held._released = false; } } const wasEmpty = !held.length; if (!held.includes(note)) held.push(note); if (wasEmpty) catchUp(); if (dur !== undefined) setTimeout(() => lift(note), (Math.max(0, (t || ac.currentTime) - ac.currentTime) + dur) * 1000); };
       const lift = (note) => { if (P.get('arp') === 'off') return noteOff(note); if (P.get('arpHold')) { held._released = true; return; } const i = held.indexOf(note); if (i >= 0) held.splice(i, 1); };
       P.onChange('arp', (v) => { if (v === 'off') held.length = 0; arpI = 0; });
       ctx.onNote((p) => noteOn(p.note, p.velocity, p.time, p.duration));        // sequenced notes play directly

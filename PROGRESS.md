@@ -2,6 +2,23 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.147 Lag: a time budget for the reactive colours; the arp starts on the next step (2026-11-07)
+His words: "the bassline is laggy as hell. it's high leverage. same with arp." (and on Swarm's in-tune Restless: "that sounds worst … like
+a horn" — reverted; Restless is as he first heard it.)
+- Measured in the real canvas (Bassline → Retro Poly, 6 s of play, the browser's own counters): reactive colours on, the main thread
+  busy 5.9 s of 6 (off: 2.3 s), frames 60–100 ms, stalls to 250 ms — the colour writes restyling each window (~2 s), the sound-driven
+  glows repainting (~2 s), the full-screen glow layer (~1.5 s). The notes themselves were not late in the sample (≥ 30 ms early); the
+  screen and the controls were. Bassline alone with no sound: fine.
+- sound-css: a time budget — while frames run slow (average over ~½ s above 22 ms) colours are written up to 4× less often; with room,
+  as before. glass-layer: draws every 2nd / 3rd frame while frames are slow (the lights ease on real time, so they move the same).
+  Attributes (data-react, data-lv, data-acc-live) written only when they change (data-react was re-set every frame on every window).
+  Settings › Graphics › Low takes the same case to stalls of ~10 ms.
+- Retro Poly arp: ticks are dealt ~100 ms ahead; a key pressed after a step was dealt waited for the next step dealt after it (up to a
+  step + 100 ms). The steps already dealt are kept and played for the key: the first note on the next step. A timed note's release now
+  counts from its start, not from when it arrived.
+- Proof: tests/p147-arp-starts-now.test.js 1/1 (fails on the old code: silent); retro-poly 12/12, P130 4/4; reactive suites P48 P58 P73
+  P77 P83 P84 P102 P106 green; P82 2 failures as on main.
+
 ## Done — 3.145 N2: Swarm 1.1 — it moves by itself; motion in the fingerprint (2026-11-06)
 Asked: "The swarm doesn't seem like anything new sound wise." · "Lets focus on getting tools more novel from each other" (and "Full note
 and rhythm editor canvas." — mapped, next).
