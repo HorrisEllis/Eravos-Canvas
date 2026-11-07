@@ -1,0 +1,45 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.pattern-field",
+  "version": "1.0.0",
+  "label": "Pattern",
+  "icon": "▦",
+  "accent": "#00d4ff",
+  "domain": "music",
+  "category": "generators",
+  "summary": "A pattern as a structure: its conditions make a shape, and the notes emerge inside it. Plays any instrument wired to it; opens in the Workshop.",
+  "tags": [
+    "generators",
+    "patterns",
+    "workshop"
+  ],
+  "files": {
+    "engine": "pattern-field.engine.js",
+    "ui": "pattern-field.ui.js",
+    "spec": "pattern-field.spec",
+    "tests": "pattern-field.test.js",
+    "preview": "preview.png",
+    "thumb": "thumb.png"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "bus_publish",
+      "bus_subscribe",
+      "registry_read"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [],
+  "conflicts": []
+}

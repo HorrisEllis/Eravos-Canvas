@@ -2,6 +2,30 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.150 The Workshop, W1 flat: a pattern as a structure (2026-11-07)
+His words: "agnostic. the structure defines the shape which defines the emergent properties of the conditions." · "can you make it more like
+photoshop? or like a 3d renderer? then it could support a game engine, like this could be the build surface for emerge." · "Yeah, we can just
+start with this. The small, like just the flat".
+- components/pattern-field (NEW): a pattern's structure (key, chords per bar, a Euclidean grid k of n, a range, density over the pattern, a
+  contour, length, seed, locked notes) → the SHAPE (every note it admits) → what EMERGES (deterministic; two draws a step, so one change never
+  reshuffles the rest; locked notes kept whatever the shape). 16 checks.
+- Pattern (eravos.pattern-field, Generators): its settings are the structure, the key comes from the canvas; it plays what emerges into any
+  instrument wired to it, every change on the next step (live). Window: a flat view of the shape and the notes (the playhead moving), Shape
+  and Structure controls, Open in Workshop. Factory: Rising Line, Four on the Floor, Tresillo Bass, Sparse Arch, Falling Rain, Climb.
+- canvas/runtime/workshop.js + workshop.css (NEW, domain-free): the approved build-surface layout, flat — the bar (the kind's stations,
+  Undo, Redo, Apply →, close), the options bar (the selected layer's fields), the tool strip, a tab, ONE flat viewport the kind draws, OUTLINER,
+  LAYERS (grouped; constraint · curve · value · events · emergent), INSPECTOR / HISTORY, a status bar; every edit one undo step, live to its
+  owner; a kind is checked before it is accepted (a missing part is named). The look is the Void, scoped to the Workshop (nothing else
+  changes); its fonts in canvas/runtime/fonts (SIL OFL, licences beside them).
+- The music PATTERN kind (in the tool's UI): STRUCTURE · THE SHAPE (Scale, Chords, Grid, Range, Density, Contour) · WHAT EMERGES (Notes,
+  Yours, Variation); a click on a note locks or frees it; ADMITTED / EMERGED counted.
+- Found on the way: the light layers drew window rims over the Workshop (hidden while it is open); the outliner looked for the wrong id.
+- Proof: tests/p150-workshop.test.js 2/2 (a kind from no domain: refused when incomplete, opens, edits live, undo, redo, history, options bar,
+  Esc) · pattern-field.test.js (contract 4/4 + 4: the notes played are exactly the ones that emerged; a change reaches the next step; a lock
+  always plays; Open in Workshop → an edit reaches the tool, undo follows, a click locks, closes) · components all pass · boundary 10/10 ·
+  design check clean for the new tool (56/73) · 255 manifests valid · P119 3/3, P38 37/37.
+- Next: W2 (the NOTE kind, the zoom chain, the library), the 3D viewport, the time lane, the assets; Bassline / Arp / Groove opening here.
+
 ## Done — 3.149 A joined note's curve reaches worklet instruments (2026-11-07)
 His words: "when i connect the edges it plays flat. but not when i leave them alone. like its not acknowledging the curve."
 - Cause: Connect edges (and Sketch, and a note's Bend) send ONE note with a pitch curve; separate notes each carry their own pitch, so

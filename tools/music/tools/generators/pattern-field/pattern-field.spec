@@ -1,0 +1,37 @@
+# spec_id: eravos.organism.pattern-field · version 1.0.0 · phase P150 · status built 2026-11-07 (his go: "Yeah, we can just start with this. The small, like just the flat")
+# the design: specs/eravos.workshop.spec ADDENDA 2026-11-07 (structure → shape → what emerges; the build surface) · the part: components/pattern-field
+identity:
+  id: eravos.pattern-field ; label: Pattern ; icon: ▦ ; accent: "#00d4ff" ; category: Generators
+  comp_intent: A pattern as a structure — its conditions make a shape, and the notes emerge inside it. Plays any instrument wired to it.
+  engine_notes: |
+    The settings are the structure; the key comes from the canvas. One builder (MusicParts.PF_TOOL.toStructure) turns the settings and the key
+    into the structure for the engine, its window and the Workshop alike. What emerges is cached and rebuilt on any change (live: the next
+    step played); on each transport step it sends that step's notes to every instrument wired from its note out. It makes no sound itself.
+config:
+  chords: enum [progression, scale only] def progression   # CHORDS
+  progression: enum (the shared progressions) def i-VI-III-VII   # CHORDS
+  chordBars: enum [1, 2, 4] def 1   # CHORDS
+  bars: enum [1, 2, 4, 8] def 4   # PATTERN
+  gridK: integer 0..16 def 5   # GRID (hits)
+  gridN: integer 1..16 def 8   # GRID (of)
+  gridRot: integer 0..15 def 0   # GRID (turn)
+  lo: integer 12..108 def 33   # RANGE (MIDI)
+  hi: integer 13..120 def 57   # RANGE (MIDI)
+  densStart: number 0..1 def 0.3   # DENSITY
+  densEnd: number 0..1 def 0.9   # DENSITY
+  densShape: enum [rise, fall, arch, hold] def rise   # DENSITY
+  contour: enum [flat, rise, fall, arch, wave] def arch   # CONTOUR
+  contourAmt: number 0..36 st def 9   # CONTOUR
+  centre: integer 12..120 def 41   # CONTOUR (MIDI)
+  length: number 0.25..8 steps def 1.6   # NOTES
+  seed: integer 1..99999 def 41   # NOTES
+  locked: object (hidden) def []   # yours: [{ s, n }]
+ports:
+  in: pf.hook.transport_in · pf.hook.theory_in · knob.<every control>
+  out: pf.hook.note_out (notes to any instrument)
+packs: factory — Rising Line · Four on the Floor · Tresillo Bass · Sparse Arch · Falling Rain · Climb
+workshop: the music PATTERN kind (MusicParts.PF_KIND), registered by its window; Open in Workshop edits this tool's structure live
+proof: pattern-field.test.js (the tool contract; it plays the emerged notes into a wired instrument at the right steps; a change reaches the next
+  step; Open in Workshop: the kind is accepted, an edit there changes the tool, a click locks a note) · tests/p150-workshop.test.js (the surface:
+  a bad kind refused and named, undo / redo, history, the canvas names no domain word) · components/pattern-field 16 checks
+open: the 3D viewport, timeline and assets (W later phases) · following a wired Chords · per-note velocity and curves · the NOTE kind (W2)
