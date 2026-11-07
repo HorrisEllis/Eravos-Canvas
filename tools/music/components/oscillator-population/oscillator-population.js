@@ -12,7 +12,7 @@
  *   pull    while coupled, each voice's own frequency is drawn toward the swarm's (adaptive frequency): 0 = only phases lock
  *   snap()  every phase to the mean phase at once (Lock on beat)
  *   1.1 (3.145, N2 — his ear: "The swarm doesn't seem like anything new sound wise"): three behaviours you HEAR, each 0 = as 1.0 exactly
- *   restless 0…1  when the swarm locks (R > 0.92) it bursts apart — a seeded kick in pitch of up to ±90 cents (never a phase jump: it clicks) — and the coupling
+ *   restless 0…1  when the swarm locks (R > 0.92) it bursts apart — a seeded kick in pitch of up to ±40 cents, summing to zero so the note stays in tune (never a phase jump: it clicks) — and the coupling
  *                 pulls it back: it breathes between one wave and a cloud by itself (the period follows coupling and restless)
  *   form     s    harmonic mode: each voice glides from unison to its chord ratio over this long after a note — you hear the chord form
  *   fm       0…1  field FM: the swarm's own sum (its mean sine, an audio-rate signal) phase-modulates every voice, up to 0.3 of a cycle
@@ -33,7 +33,7 @@
     const th = new Float64Array(MAX), phi = new Float64Array(MAX), base = new Float64Array(MAX), drift = new Float64Array(MAX), adapt = new Float64Array(MAX), dts = new Float64Array(MAX), rat = new Float64Array(MAX);
     let mx = 1, my = 0, n = 1, K = 0.45, mode = 1, pull = 0.5, dAmt = 0.25, cluster = 0, seed = 1, tick = 0, R = 1, psi = 0;
     let restless = 0, formS = 0, fmAmt = 0, cool = 0, coolT = 1;   // 1.1
-    const rcur = new Float64Array(MAX).fill(1);
+    const rcur = new Float64Array(MAX).fill(1), kick = new Float64Array(MAX);
     const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
     function configure(count, spreadCents, s) {
       tick = 0;
@@ -69,7 +69,10 @@
         }
         // 1.1 restless: locked → burst apart (seeded), then the coupling draws it back; a cool-down keeps one burst per lock
         if (restless > 0) { if (cool > 0) cool -= 64; else if (R > 0.92) {
-          for (let i = 0; i < n; i++) adapt[i] += (rnd() * 2 - 1) * 90 * restless;   // a kick in pitch only — no phase jump (a jump clicks)
+          // a kick in pitch only (a phase jump clicks); the kicks sum to zero, so the note's centre stays in tune — only the voices
+          // spread around it (1.1.1, his ear 2026-11-07: "blurry": uneven kicks left the whole note 10–24 cents flat)
+          let km = 0; for (let i = 0; i < n; i++) { kick[i] = (rnd() * 2 - 1) * 40 * restless; km += kick[i]; } km /= n;
+          for (let i = 0; i < n; i++) adapt[i] += kick[i] - km;
           cool = coolT = sr * (0.5 + (1 - restless) * 2.5); } }
       }
       for (let i = 0; i < n; i++) {

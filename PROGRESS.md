@@ -2,6 +2,15 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.146 Restless in tune (2026-11-07)
+His ear: "The living breathing sounds odd. They do sound different Like blurry kind of."
+- Measured the cause: each Restless burst kicked every voice's pitch by an uneven random amount — the kicks did not cancel, so the whole
+  note sat 10–24 cents flat, with the voices ±30 cents around it (Restless off: centre within 1 cent).
+- oscillator-population 1.1.1: the kicks sum to zero (the note's centre stays in tune) and are smaller (±40 cents × Restless, was ±90):
+  centre within ±1 cent over 8 s, spread ±7–14 cents, the coherence still falls to 0.1–0.4 and comes back. Restless 0: unchanged.
+- Shown: before / after clips for Breathing Swarm, Shatter Bloom, Tide Lock (his pick). Pictures: docs/previews/swarm-life*.png.
+- Proof: oscillator-population 26 checks (+2: centre within 3 cents over 8 s; still breathes); P123 9/9.
+
 ## Done — 3.145 N2: Swarm 1.1 — it moves by itself; motion in the fingerprint (2026-11-06)
 Asked: "The swarm doesn't seem like anything new sound wise." · "Lets focus on getting tools more novel from each other" (and "Full note
 and rhythm editor canvas." — mapped, next).
