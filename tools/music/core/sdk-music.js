@@ -490,7 +490,12 @@ registerProcessor('eravos-pitch', EravosPitch);`;
           if (!n.detune) return; const start = n.start;
           n.start = function () { srcs.add(n); n.addEventListener('ended', () => { srcs.delete(n); if (n._wheel && bus) { try { bus.disconnect(n.detune); } catch (e) {} } }); if (everBent) join(n); return start.apply(n, arguments); };
         };
-        wake = () => { if (everBent) return; everBent = true; srcs.forEach(join); };
+        // 3.149 a tool that makes its sound in an AudioWorklet has no oscillators to hook: it hands the wheel an a-rate AudioParam in
+        // cents (ctx.bendInto(param)) and the same bus drives it — note bends, Connect edges, Sketch paths, the Pitch lane, bend in.
+        // His words, 2026-11-07: "when i connect the edges it plays flat … like its not acknowledging the curve" (Retro DCO, Swarm)
+        const bendParams = new Set();
+        ctx.bendInto = (prm) => { if (!prm || bendParams.has(prm)) return; bendParams.add(prm); if (everBent) { try { busNode().connect(prm); } catch (e) {} } };
+        wake = () => { if (everBent) return; everBent = true; srcs.forEach(join); bendParams.forEach(prm => { try { busNode().connect(prm); } catch (e) {} }); };
         CUR = ctx; Promise.resolve().then(() => { if (CUR === ctx) CUR = null; });   // the engine is built right after this, in the same task
         const wrap = (name) => { const f0 = ctx[name]; if (typeof f0 !== 'function') return; ctx[name] = function () { const a = Array.from(arguments).map(x => typeof x === 'function' ? function () { const args = arguments; return withTool(ctx, () => x.apply(this, args)); } : x); return f0.apply(ctx, a); }; };
         ['on', 'onUI', 'interval', 'timeout'].forEach(wrap);

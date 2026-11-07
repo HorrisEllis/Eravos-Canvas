@@ -2,6 +2,17 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.149 A joined note's curve reaches worklet instruments (2026-11-07)
+His words: "when i connect the edges it plays flat. but not when i leave them alone. like its not acknowledging the curve."
+- Cause: Connect edges (and Sketch, and a note's Bend) send ONE note with a pitch curve; separate notes each carry their own pitch, so
+  they played. The SDK's pitch wheel bends the oscillators a tool creates (their .detune) — Retro DCO and Swarm Oscillator make their
+  sound in one AudioWorklet, had none, and played the note's first pitch for its whole length.
+- sdk-music: ctx.bendInto(param) — a worklet tool hands the wheel an a-rate AudioParam in cents; the same bus drives it (note bends,
+  joined notes, Sketch paths, the Pitch lane, bend in). Retro DCO: a `bend` param added to every voice's cents. Swarm: f0 bent per sample
+  (and its sub).
+- Proof: tests/p149 5/5 — Retro DCO, Swarm, Retro Poly, Supersaw, Pad Forge each glide an octave on a joined path and on a Bend
+  (old code: Retro DCO and Swarm ×1.00, flat); P139 7/7, P123 9/9, P108 2/2, retro-dco 4/4, swarm 4/4, timeline 33/33, P130 4/4.
+
 ## Done — 3.148 Updates from git: a Beta channel (every merge to main) + release 0.2.16 (2026-11-07)
 Asked: "Can you integrate git into Eravos? Like it’s saying no update. I’m on 0.2.15."
 - Why "no update": nothing had been released after 0.2.15 — releases were made by hand; main had moved on.

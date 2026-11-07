@@ -24,7 +24,7 @@
     'detuneCurve', 'spread', 'subShape', 'subOct', 'noiseColour'];
   const SLOTS = 16;
   const DESC = SET.map(k => ({ name: k, defaultValue: 0, minValue: -1e6, maxValue: 1e6, automationRate: 'k-rate' }))
-    .concat(['cutoffMod', 'pwmMod', 'resMod', 'driftMod'].map(k => ({ name: k, defaultValue: 0, minValue: -1e5, maxValue: 1e5, automationRate: 'a-rate' })))
+    .concat(['cutoffMod', 'pwmMod', 'resMod', 'driftMod', 'bend'].map(k => ({ name: k, defaultValue: 0, minValue: -1e5, maxValue: 1e5, automationRate: 'a-rate' })))   // bend: the pitch wheel, cents (3.149)
     .concat([].concat(...Array.from({ length: SLOTS }, (_, i) => [{ name: 'trig' + i, defaultValue: 0, minValue: 0, maxValue: 1e9, automationRate: 'a-rate' },
       { name: 'gate' + i, defaultValue: 0, minValue: 0, maxValue: 1, automationRate: 'a-rate' }, { name: 'note' + i, defaultValue: 60, minValue: -24, maxValue: 160, automationRate: 'a-rate' },
       { name: 'vel' + i, defaultValue: 0.8, minValue: 0, maxValue: 1, automationRate: 'k-rate' }])));
@@ -85,7 +85,7 @@ class EravosRetroDCO extends AudioWorkletProcessor {
     const out = outputs[0], L = out[0], R = out[1] || out[0], B = L.length, sr = this.sr, s = this.s;
     let key = ''; for (const k of SET) { const v = params[k][0]; s[k] = v; key += v + ','; } if (key !== this.key) { this.key = key; this.apply(); }
     L.fill(0); if (R !== L) R.fill(0);
-    const va = this.va, uni = this.uni, cm = params.cutoffMod, pm = params.pwmMod, rm = params.resMod, dm = params.driftMod;
+    const va = this.va, uni = this.uni, cm = params.cutoffMod, pm = params.pwmMod, rm = params.resMod, dm = params.driftMod, bd = params.bend;
     for (let j = 0; j < B; j++) { this.lfoB[j] = this.lfo.next(); this.pwB[j] = this.pwmLfo.next(); }
     if (s.noise > 0) this.noise.process([this.nz], B, this.PN);
     const ladder = (s.filter | 0) === 1, n = uni.count, sync = s.sync >= 0.5, ratio = Math.max(1, s.syncRatio), dly = Math.max(0.001, s.lfoDelay) * sr;
@@ -102,7 +102,7 @@ class EravosRetroDCO extends AudioWorkletProcessor {
         if (g < 0.5 && sl.gate >= 0.5) { sl.gate = 0; sl.amp.gate(false); sl.fenv.gate(false); }
         sl.lf += (sl.lt - sl.lf) * gk; sl.on++;
         const fade = sl.on >= dly ? 1 : sl.on / dly, l = this.lfoB[j] * fade, fe = sl.fenv.next(), a = sl.amp.next();
-        const cents = sl.cardC + (sl.D[j] * 12 * s.drift) + (dm.length > 1 ? dm[j] : dm[0]) * 12 + l * s.lfoPitch + fe * s.pmEnvPitch * 100 + sl.subY * s.pmSubPitch * 1200;
+        const cents = (bd.length > 1 ? bd[j] : bd[0]) + sl.cardC + (sl.D[j] * 12 * s.drift) + (dm.length > 1 ? dm[j] : dm[0]) * 12 + l * s.lfoPitch + fe * s.pmEnvPitch * 100 + sl.subY * s.pmSubPitch * 1200;
         const f = Math.pow(2, sl.lf + cents / 1200);
         let w = s.width + s.pwm * 0.45 * this.pwB[j] + l * s.lfoPw * 0.45 + fe * s.pmEnvPw * 0.45 + (pm.length > 1 ? pm[j] : pm[0]) * 0.45; w = w < 0.02 ? 0.02 : w > 0.98 ? 0.98 : w;
         let yl = 0, yr = 0;
@@ -199,7 +199,7 @@ registerProcessor('eravos-retro-dco', EravosRetroDCO);`;
         if (ctx.disposed) return null;
         node = new AudioWorkletNode(ac, 'eravos-retro-dco', { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2], processorOptions: { values: values(), modes: MP.ENSEMBLE_MODES } }); ctx.track(node);
         node.onprocessorerror = (er) => ctx.fault('RUNTIME_003', 'retro dco worklet stopped: ' + ((er && er.message) || 'processor error'));
-        node.connect(out); Object.keys(mods).forEach(k => mods[k].connect(prm(k + 'Mod')));
+        node.connect(out); Object.keys(mods).forEach(k => mods[k].connect(prm(k + 'Mod'))); if (ctx.bendInto) ctx.bendInto(prm('bend'));   // 3.149 note bends and glides reach the worklet
         node.port.onmessage = (m) => { if (m.data && m.data.type === 'cards') { cards = m.data.levels; ctx.emitUI('cards', { levels: cards }); } };
         SET.forEach(k => prm(k).setValueAtTime(valueOf(k), 0)); queue.splice(0).forEach(f => f()); return node;
       }).catch(er => { ctx.fault('RUNTIME_003', 'retro dco worklet: ' + er.message); return null; });
