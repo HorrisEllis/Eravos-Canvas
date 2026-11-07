@@ -59,3 +59,41 @@ object is — a note, a pattern, an image — is a domain's. Music is the first 
   - shown to him as a preview and approved before W1 is built
 
 ## ADDENDUM 2026-11-06T15:55:01.373Z — approved: "Nice. That's exactly it." (the preview, docs/previews/workshop-note.png + workshop-photo.png)
+
+# ---- ADDENDUM 2026-11-07 — the field's surface: structure → shape → what emerges (nothing above is changed)
+# His words (2026-11-07, verbatim): "workshop next? is that the highest leverage?" · "im struggling with patterns. like the complexity of them.
+#   also nexus im working on field, that im trying to make agnostic." · "agnostic. the structure defines the shape which defines the emergent
+#   properties of the conditions. no look at the spec workshop in idearium. look at the eravos phases" · "do it."
+# Read in Nexus (read only): docs/2026-11-07-eravos-as-a-system-phasemap.spec (ERV0–ERV5: COS the hub; ERAVOS registered, not copied; ERV4 the
+#   kind contract as a schema; ERV5 the visual coding and debug environment, after CIE11, EM2, RF1, CF1) · emerge/emerge/spec/field.spec (the
+#   constrained relational field: its shape is constraints; a transition is admitted or refused with its cause; state deterministic,
+#   observations above it; rewind by refolding history) · idearium/ui/js/workshop.js + phases WK1–WK6 (the spec workshop: documents).
+
+## A new layer type (the canvas's; agnostic)
+  constraint  a rule over the object's space that ADMITS or REFUSES positions / values (a scale over pitch, a grid over time, a range, a
+              set per region — chords per bar; for a photo: a palette, a crop, a mask) — the canvas draws what is admitted (the possibility
+              space) and what is refused (closed), the domain says what the rule means. Constraint layers together are the object's SHAPE.
+  emergent    events the conditions produce inside the shape (by a seed, deterministic: the same shape + the same seed → the same events);
+              a locked event is the user's and is kept when the shape changes; editing the shape re-derives the rest, live while it plays.
+  So a pattern is not a machine with knobs: it is a structure; its shape defines what can emerge. The same surface, at code scale (ERV5),
+  is the field's view in Nexus.
+
+## music · PATTERN (the first kind built, before NOTE — patterns are the highest leverage: his "tools where i can have it automate the beat or
+## pattern is immensly high leverage")
+  structure   Scale (constraint) · Chords (constraint per bar) · Grid (constraint: steps, euclid k of n, swing) · Range (constraint) ·
+              Density (curve: how much of the admitted space emerges, over the bars) · Contour (curve: where the line leans)
+  emerges     Notes (events) · Yours (locked events) · Variation (value: the seed)
+  plays into  any wired instrument (it replaces nothing: Bassline, Arp, Groove keep working; each can open its pattern here and, later,
+              stand on this kind — proved by the null render before any tool moves)
+  preview     docs/previews/workshop-pattern.png (node docs/previews/workshop.shots.mjs) — shown to him before W1 is built
+
+## Order (revised; W3, W4 as above)
+  W1  the surface + layer types (curve, value, events, constraint, emergent) + history + zoom path; Workshop.addKind checked against a
+      schema (ERAVOS's side of Nexus ERV4: schemas/workshop-kind.schema.json; a kind missing apply is refused and named); music's PATTERN
+  W2  music's NOTE kind and the zoom chain note ↔ pattern ↔ song; library (save, stamp); Bassline / Arp / Groove open their pattern here
+  ERAVOS's side of Nexus ERV3: a suite template (templates/suite/) — none exists; schemas here are the source (ERV_D2 (a))
+  ERAVOS's side of ERV2 (its own registry at its door) waits on ERV1 (Nexus)
+
+## His calls, as read (to confirm — "do it." answered a message that proposed them)
+  ERV_D1 ERAVOS joins Nexus by registration, never copied · ERV_D2 ERAVOS's schemas are the one source, COS's copy checked against them ·
+  ERV_D4 the name: "the Workshop", as the field's surface ("field" stays the name of the relational constraint field)

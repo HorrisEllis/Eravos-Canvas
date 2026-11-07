@@ -30,6 +30,47 @@
         g.fillStyle = '#e8e2ff'; g.font = '12px ui-monospace, monospace'; g.fillText('PITCH  dive −7 st · vibrato 5.2 Hz   (dashed: brightness · filled: loudness · ghosts at the edges: its neighbours)', x0 + 8, mid - 162);
       },
     },
+    // 2026-11-07 his words: "agnostic. the structure defines the shape which defines the emergent properties of the conditions." — a
+    // PATTERN: its structure layers (scale, chords, grid, range, density, contour) are the shape; the notes are what the conditions produce.
+    // The shaded cells are every note the shape admits (the possibility space); the bright ones emerged (seed 41); the ringed one is yours.
+    pattern: {
+      title: 'Pattern · Bassline (4 bars)', where: ['Song · Night Drive', 'Pattern · Bassline', 'Note'], accent: '#00d4ff', selected: 'Density',
+      tools: ['✎ Pen', '⇕ Range', '⋮ Grid', '◢ Density', '〰 Contour', '⚄ Seed', '🔒 Lock', '⌫ Erase'], tool: 3,
+      groups: [['STRUCTURE — THE SHAPE', [['Scale', 'constraint · A minor', 100], ['Chords', 'constraint · i–VI–III–VII', 100], ['Grid', 'constraint · 16ths · 5 of 8', 100], ['Range', 'constraint · A1 – A3', 100], ['Density', 'curve · over the 4 bars', 100], ['Contour', 'curve · up, then home', 70]]],
+        ['WHAT EMERGES', [['Notes', 'events · what the conditions produce', 100], ['Yours (locked)', 'events · kept when the shape changes', 100], ['Variation', 'value · seed 41', 100]]]],
+      props: [['Start', '30 %'], ['End', '90 %'], ['Shape', 'rise'], ['Over', '4 bars'], ['Live', 'while it plays'], ['Plays into', 'any wired tool']],
+      history: ['Scale: A minor', 'Chords: i–VI–III–VII', 'Range: A1 – A3', 'Lock: A2 on bar 1', 'Density: rise 30 → 90 %'],
+      preview: ['alone', 'with its tools', 'in the song'],
+      draw(g, W, H, acc) {
+        const L = 34, R = 34, T = 64, B = 96, x0 = L, x1 = W - R, y0 = T, y1 = H - B, steps = 64, lo = 33, hi = 57, rows = hi - lo + 1;
+        const cw = (x1 - x0) / steps, rh = (y1 - y0) / rows, X = (s) => x0 + s * cw, Y = (n) => y1 - (n - lo + 1) * rh;
+        const minor = [0, 2, 3, 5, 7, 8, 10], inKey = (n) => minor.includes(((n - 57) % 12 + 12) % 12);
+        const chords = [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]], tone = (n, bar) => chords[bar].some(c => (((n - c) % 12) + 12) % 12 === 0);
+        const eu = [1, 0, 1, 1, 0, 1, 1, 0], onGrid = (s) => eu[s % 8] === 1, dens = (s) => 0.3 + 0.6 * (s / steps), cont = (s) => 40 + 9 * Math.sin(Math.PI * s / steps);
+        let seed = 41; const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+        // the shape: rows outside the key are closed; the chord's tones in each bar are where the line can land
+        for (let n = lo; n <= hi; n++) { const y = Y(n); if (!inKey(n)) { g.fillStyle = '#040406'; g.fillRect(x0, y, x1 - x0, rh); continue; }
+          for (let bar = 0; bar < 4; bar++) { g.fillStyle = tone(n, bar) ? 'rgba(0,212,255,0.07)' : 'rgba(255,255,255,0.025)'; g.fillRect(X(bar * 16), y, 16 * cw, rh - 1); } }
+        // the grid: steps the rhythm admits are lit columns
+        for (let s = 0; s < steps; s++) { if (onGrid(s)) { g.fillStyle = 'rgba(0,212,255,0.045)'; g.fillRect(X(s), y0, cw - 1, y1 - y0); } }
+        for (let bar = 0; bar <= 4; bar++) { g.fillStyle = 'rgba(255,255,255,0.14)'; g.fillRect(X(bar * 16), y0, 1, y1 - y0); }
+        // the possibility space: every note the shape admits (in key, a chord tone, on the grid)
+        for (let s = 0; s < steps; s++) { if (!onGrid(s)) continue; const bar = s >> 4; for (let n = lo; n <= hi; n++) if (inKey(n) && tone(n, bar)) { g.fillStyle = 'rgba(0,212,255,0.16)'; g.beginPath(); g.arc(X(s) + cw / 2, Y(n) + rh / 2, 1.6, 0, 7); g.fill(); } }
+        // range: the band the line may move in
+        g.strokeStyle = 'rgba(0,212,255,0.35)'; g.setLineDash([4, 4]); g.strokeRect(x0, Y(hi), x1 - x0, Y(lo) - Y(hi) + rh); g.setLineDash([]);
+        // contour: where the line leans (a soft guide)
+        g.strokeStyle = 'rgba(199,176,255,0.55)'; g.lineWidth = 1.5; g.beginPath(); for (let s = 0; s <= steps; s++) { const y = Y(cont(s)) + rh / 2; s ? g.lineTo(X(s), y) : g.moveTo(X(s), y); } g.stroke();
+        // what emerges: on each admitted step, by the density there, the chord tone nearest the contour (seed 41)
+        const notes = []; for (let s = 0; s < steps; s++) { if (!onGrid(s) || rnd() > dens(s)) continue; const bar = s >> 4, c = cont(s); let best = null, bd = 1e9;
+          for (let n = lo; n <= hi; n++) if (inKey(n) && tone(n, bar)) { const d = Math.abs(n - c) + rnd() * 3; if (d < bd) { bd = d; best = n; } } notes.push([s, best]); }
+        notes.forEach(([s, n], i) => { const lock = s === 0; g.fillStyle = acc; g.shadowColor = acc; g.shadowBlur = 10; g.fillRect(X(s) + 1, Y(n) + 1, cw * 1.6, rh - 2); g.shadowBlur = 0;
+          if (lock) { g.strokeStyle = '#ffffff'; g.lineWidth = 2; g.strokeRect(X(s) - 2, Y(n) - 2, cw * 1.6 + 6, rh + 4); } void i; });
+        // density: the selected layer, drawn under the roll with its two handles
+        const dy0 = y1 + 22, dh = 46; g.fillStyle = 'rgba(0,212,255,0.10)'; g.beginPath(); g.moveTo(x0, dy0 + dh); for (let s = 0; s <= steps; s++) g.lineTo(X(s), dy0 + dh - dens(s) * dh); g.lineTo(x1, dy0 + dh); g.closePath(); g.fill();
+        g.strokeStyle = acc; g.lineWidth = 2.5; g.beginPath(); for (let s = 0; s <= steps; s++) { const y = dy0 + dh - dens(s) * dh; s ? g.lineTo(X(s), y) : g.moveTo(X(s), y); } g.stroke();
+        [[0, dens(0)], [steps, dens(steps)]].forEach(([s, v]) => { g.fillStyle = '#050507'; g.beginPath(); g.arc(X(s), dy0 + dh - v * dh, 6, 0, 7); g.fill(); g.strokeStyle = acc; g.lineWidth = 2; g.stroke(); });
+      },
+    },
     photo: {
       title: 'Photo (your picture)', where: ['Board · Moodboard', 'Photo', 'Region'], accent: '#ffb347',
       tools: ['🖌 Brush', '⌫ Eraser', '☁ Smudge', '⎘ Clone', '⬚ Select', '⤡ Transform', '▣ Fill'],
@@ -56,20 +97,23 @@
     const head = h('div', { class: 'org-row', style: { gridColumn: '1 / 4', justifyContent: 'space-between', alignItems: 'center' } }, [
       h('div', { class: 'org-row', style: { gap: '10px', alignItems: 'baseline' } }, [h('b', { style: { font: '600 15px var(--font, sans-serif)', letterSpacing: '0.14em', color: 'var(--acc, #00d4ff)' }, text: 'WORKSHOP' }), h('span', { class: 'uk-hint', style: { margin: 0 }, text: K.title })]),
       h('div', { class: 'org-row', style: { gap: '8px' } }, [UI.Button({ label: 'Save to library' }).el, UI.Button({ label: '⎘ Save a layer as a stamp' }).el, UI.Button({ label: 'Apply', kind: 'primary' }).el, UI.Button({ label: '⧉ Pop out' }).el, UI.Button({ label: '×' }).el])]);
-    const tools = card('TOOLS', K.tools.map((t, i) => { const b = UI.Button({ label: t }).el; b.style.width = '100%'; b.style.margin = '3px 0'; if (i === (kindId === 'note' ? 1 : 0)) b.classList.add('on'); return b; }));
+    const tools = card('TOOLS', K.tools.map((t, i) => { const b = UI.Button({ label: t }).el; b.style.width = '100%'; b.style.margin = '3px 0'; if (i === (K.tool !== undefined ? K.tool : kindId === 'note' ? 1 : 0)) b.classList.add('on'); return b; }));
     const surf = UI.Canvas(900, 560); surf.style.width = '100%'; surf.style.height = '100%';
     UI.loop(surf, () => { const g = surf.g; surf.fit(); const W = surf.W, H = surf.H || 560; g.fillStyle = '#060608'; g.fillRect(0, 0, W, H);
       g.strokeStyle = 'rgba(255,255,255,0.04)'; g.lineWidth = 1; for (let x = 0; x < W; x += 24) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); } for (let y = 0; y < H; y += 24) { g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
       K.draw(g, W, H, K.accent); }, 6);
     const centre = h('div', { class: 'uk-group', style: { margin: 0, padding: '0', overflow: 'hidden', position: 'relative' } }, [surf]);
-    const layers = card('LAYERS', K.layers.map(([n, t, a, sel]) => h('div', { class: 'org-row', style: { gap: '6px', alignItems: 'center', padding: '4px 6px', margin: '2px 0', borderRadius: '6px', outline: sel ? '1px solid ' + K.accent : 'none' } }, [
-      h('span', { text: '◉', style: { color: K.accent, fontSize: '12px' } }), h('div', { style: { flex: '1' } }, [h('div', { text: n, style: { fontSize: '12px' } }), h('div', { class: 'uk-hint', style: { margin: 0, fontSize: '10px' }, text: t })]), h('span', { class: 'uk-hint', style: { margin: 0 }, text: a + '%' })])));
-    const props = card('PROPERTIES — ' + K.layers.find(l => l[3])[0].toUpperCase(), [h('div', { class: 'uk-row', style: { flexWrap: 'wrap', gap: '6px' } }, K.props.map(([k, v]) => h('div', { style: { minWidth: '110px' } }, [h('div', { class: 'uk-hint', style: { margin: 0, fontSize: '10px' }, text: k }), h('b', { text: v, style: { fontSize: '12px' } })])))]);
+    // a kind may group its layers (the pattern: STRUCTURE — the shape · WHAT EMERGES); the surface draws the groups, it knows no meaning
+    const groups = K.groups || [[null, K.layers]], selName = K.selected || (K.layers.find(l => l[3]) || [])[0];
+    const row = ([n, t, a]) => h('div', { class: 'org-row', style: { gap: '6px', alignItems: 'center', padding: '4px 6px', margin: '2px 0', borderRadius: '6px', outline: n === selName ? '1px solid ' + K.accent : 'none' } }, [
+      h('span', { text: '◉', style: { color: K.accent, fontSize: '12px' } }), h('div', { style: { flex: '1' } }, [h('div', { text: n, style: { fontSize: '12px' } }), h('div', { class: 'uk-hint', style: { margin: 0, fontSize: '10px' }, text: t })]), h('span', { class: 'uk-hint', style: { margin: 0 }, text: a + '%' })]);
+    const layers = card('LAYERS', [].concat(...groups.map(([gt, ls]) => (gt ? [h('div', { class: 'org-label', style: { margin: '8px 6px 2px', fontSize: '10px' }, text: gt })] : []).concat(ls.map(row)))));
+    const props = card('PROPERTIES — ' + String(selName).toUpperCase(), [h('div', { class: 'uk-row', style: { flexWrap: 'wrap', gap: '6px' } }, K.props.map(([k, v]) => h('div', { style: { minWidth: '110px' } }, [h('div', { class: 'uk-hint', style: { margin: 0, fontSize: '10px' }, text: k }), h('b', { text: v, style: { fontSize: '12px' } })])))]);
     const hist = card('HISTORY', K.history.map((x, i) => h('div', { class: 'uk-hint', style: { margin: '2px 0', color: i === K.history.length - 1 ? 'var(--text, #ddd)' : '' }, text: (i + 1) + '. ' + x })));
     const right = h('div', { style: { display: 'flex', flexDirection: 'column', gap: '8px', overflow: 'hidden' } }, [layers, props, hist]);
-    const crumbs = h('div', { class: 'org-row', style: { gap: '6px', alignItems: 'center' } }, [h('span', { class: 'org-label', text: 'ZOOM' })].concat(...K.where.map((w, i) => [i ? h('span', { class: 'uk-hint', style: { margin: 0 }, text: '›' }) : null, (() => { const b = UI.Button({ label: w }).el; if (i === K.where.length - 2 && kindId === 'note' || i === 1 && kindId === 'photo') b.classList.add('on'); return b; })()].filter(Boolean))));
+    const crumbs = h('div', { class: 'org-row', style: { gap: '6px', alignItems: 'center' } }, [h('span', { class: 'org-label', text: 'ZOOM' })].concat(...K.where.map((w, i) => [i ? h('span', { class: 'uk-hint', style: { margin: 0 }, text: '›' }) : null, (() => { const b = UI.Button({ label: w }).el; if (i === K.where.length - 2 && kindId === 'note' || i === 1 && kindId !== 'note') b.classList.add('on'); return b; })()].filter(Boolean))));
     const prev = UI.Segmented({ options: K.preview, value: K.preview[0] });
-    const foot = h('div', { class: 'org-row', style: { gridColumn: '1 / 4', justifyContent: 'space-between', alignItems: 'center' } }, [crumbs, h('div', { class: 'org-row', style: { gap: '8px', alignItems: 'center' } }, [h('span', { class: 'org-label', text: kindId === 'note' ? 'HEAR' : 'SEE' }), prev.el])]);
+    const foot = h('div', { class: 'org-row', style: { gridColumn: '1 / 4', justifyContent: 'space-between', alignItems: 'center' } }, [crumbs, h('div', { class: 'org-row', style: { gap: '8px', alignItems: 'center' } }, [h('span', { class: 'org-label', text: kindId === 'photo' ? 'SEE' : 'HEAR' }), prev.el])]);
     ov.append(head, tools, centre, right, foot); document.body.appendChild(ov);
   };
 })();
