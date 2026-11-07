@@ -1,3 +1,16 @@
+ERAVOS v0.2.16 (2026-11-07)
+
+Install: on 0.2.15, ERAVOS offers this update by itself (⚙ Settings › About & updates › Check for updates).
+
+- Updates from git: ⚙ Settings › About & updates › Updates — Stable (releases, as before) or Beta: every merge to main, built and
+  tested on GitHub the same way as a release, offered a few minutes after it lands (0.2.17-beta.N). Switch back to Stable any time.
+- Less lag while tools play: the reactive colours and the glow layer now keep to a time budget — while the screen is busy they
+  update less often (measured: with Bassline driving Retro Poly the page was busy 5.9 s of every 6). Settings › Graphics › Low
+  takes it further.
+- Retro Poly's arp starts on the next step after you press a key (it could wait a step and ~100 ms more).
+- Swarm Oscillator 1.1: More depth › LIFE — Restless, Form glide, Field FM, Lock → tone — and the Living pack.
+- The novelty measure hears motion (how fast tone and level move).
+
 ERAVOS v0.2.15 (2026-11-06)
 
 Install: THIS ONE BY HAND — run ERAVOS-Setup-0.2.15.exe (your 0.2.14 has the old updater, the one that could hang). Your work in

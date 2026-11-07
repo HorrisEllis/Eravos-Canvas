@@ -101,7 +101,7 @@ elseif ($nsis) {
   if (Test-Path (Split-Path $nsiStage)) { Remove-Item (Split-Path $nsiStage) -Recurse -Force }
   New-Item -ItemType Directory -Force -Path $nsiStage | Out-Null
   Get-ChildItem -Force $out | Where-Object { $keep -notcontains $_.Name -and $_.Name -ne 'uninstall.ps1' } | Copy-Item -Destination $nsiStage -Recurse -Force
-  & $nsis /V2 "/DVERSION=$($pkg.version)" "/DSRC=$nsiStage" "/DOUT=$setup" (Join-Path $repo 'packaging\windows\eravos.nsi')
+  & $nsis /V2 "/DVERSION=$($pkg.version)" "/DNUMVER=$(($pkg.version -split '-')[0])" "/DSRC=$nsiStage" "/DOUT=$setup" (Join-Path $repo 'packaging\windows\eravos.nsi')
   if ($LASTEXITCODE -ne 0) { throw "makensis failed ($LASTEXITCODE)" }
   Remove-Item (Split-Path $nsiStage) -Recurse -Force
 } else {

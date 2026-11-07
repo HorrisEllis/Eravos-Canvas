@@ -71,6 +71,22 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-07 · Continuous delivery from git to the desktop app — the Beta channel
+- **His words (2026-11-07):** "Can you integrate git into Eravos? Like it’s saying no update. I’m on 0.2.15."
+- **His call:** updates straight from git.
+- **Built:** every merge to the main branch is built and tested on a Windows runner and published as a pre-release; the app's updater
+  gained a Stable / Beta choice and version ordering that understands betas; the installer's numeric version handles beta numbers.
+- **Proof:** the updater's tests run against a fake GitHub (seven new checks for ordering and channel choice); the first beta build is
+  the end-to-end check on GitHub's runner.
+- **Check:** `node desktop/test/updater.mjs` · `.github/workflows/release.yml` · the releases page (pre-releases marked beta)
+
+### 2026-11-07 · Lag measured and budgeted; an arp that starts on time
+- **His words (2026-11-07):** "the bassline is laggy as hell. it's high leverage. same with arp."
+- **Built:** the lag traced with the browser's own counters to the sound-reactive colours (the page busy 5.9 s of every 6); a time
+  budget for them and the glow layer; the arp's first note moved from up to a step + 100 ms late to the next step.
+- **Proof:** a test that fails on the old arp and passes on the new; the reactive-colour suites green.
+- **Check:** `node tests/run.mjs P147`
+
 ### 2026-11-06 · A coupled-oscillator synth that moves by itself — Swarm 1.1
 - **His words (2026-11-06):** "The swarm doesn't seem like anything new sound wise." · "Lets focus on getting tools more novel from each other"
 - **His call:** make the tools more novel from each other, Swarm first.

@@ -116,6 +116,7 @@ ipcMain.handle('eravos:update-cancel', () => UPDATER ? UPDATER.cancel() : false)
 ipcMain.handle('eravos:update-manual', () => UPDATER ? UPDATER.manual() : false);
 ipcMain.handle('eravos:update-later', () => UPDATER ? UPDATER.later() : false);
 ipcMain.handle('eravos:update-status', () => UPDATER ? UPDATER.status : null);
+ipcMain.handle('eravos:update-channel', (e, c) => UPDATER ? (c ? UPDATER.setChannel(c) : UPDATER.getChannel()) : 'stable');   // 3.148 stable · beta (every merge to main)
 ipcMain.on('eravos:update-log', () => shell.openPath(path.join(DIRS.appdata, 'update', 'update.log')));
 app.on('will-quit', () => { if (UPDATER) UPDATER.onQuit(); });
 ipcMain.handle('eravos:info', () => ({ library: HOME, dirs: DIRS, version: app.getVersion(), desktop: true }));

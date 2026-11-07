@@ -14,14 +14,18 @@
  *   create({ app, net, shell, appDir, workDir, send }) → { start, check(manual), download(), apply(), onQuit(), status } */
 'use strict';
 const path = require('path'), fs = require('fs'), { spawn } = require('child_process');
-const REPO = 'HorrisEllis/Eravos-Canvas', API = `https://api.github.com/repos/${REPO}/releases/latest`;
+const REPO = 'HorrisEllis/Eravos-Canvas', API = `https://api.github.com/repos/${REPO}/releases/latest`, LIST = `https://api.github.com/repos/${REPO}/releases?per_page=30`;
+// 3.148 channels (his: "Can you integrate git into Eravos?"): stable = the releases; beta = also every merge to main (built and tested
+// by the release workflow, published as a pre-release v<next>-beta.<run>). Kept in the update folder (channel.json).
+const CHANNELS = ['stable', 'beta'];
 const EVERY = 6 * 60 * 60 * 1000, FIRST = 15 * 1000, UA = { 'User-Agent': 'ERAVOS-updater' };
 
-// '1.2.10' > '1.2.9'; a 'v' in front and anything after a '-' are ignored
+// '1.2.10' > '1.2.9'; a 'v' in front is ignored. 3.148 betas: '0.2.16-beta.4' is after 0.2.15 and '0.2.16-beta.3', before 0.2.16
 function newer(a, b) {
-  const p = (v) => String(v || '').replace(/^v/i, '').split('-')[0].split('.').map(n => parseInt(n, 10) || 0);
-  const x = p(a), y = p(b); for (let i = 0; i < Math.max(x.length, y.length); i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); }
-  return false;
+  const p = (v) => { const [n, pre] = String(v || '').replace(/^v/i, '').split('-'); return { n: n.split('.').map(x => parseInt(x, 10) || 0), pre: pre === undefined ? null : (parseInt(String(pre).replace(/^\D+/, ''), 10) || 0) }; };
+  const x = p(a), y = p(b); for (let i = 0; i < Math.max(x.n.length, y.n.length); i++) { if ((x.n[i] || 0) !== (y.n[i] || 0)) return (x.n[i] || 0) > (y.n[i] || 0); }
+  if (x.pre === null || y.pre === null) return x.pre === null && y.pre !== null;   // the release itself is after any of its betas
+  return x.pre > y.pre;
 }
 // the unpacked release: its ERAVOS.exe is at the top, or one folder down (the build zips an ERAVOS\ folder)
 function stagedRoot(dir) {
@@ -42,13 +46,25 @@ function create(o) {
   const viaSetup = () => fs.existsSync(path.join(appDir, 'Uninstall ERAVOS.exe'));
   const canWrite = () => { try { const t = path.join(appDir, '.update-test'); fs.writeFileSync(t, ''); fs.unlinkSync(t); return true; } catch (e) { return false; } };
 
+  const CHAN = path.join(work, 'channel.json');
+  const getChannel = () => { try { const c = JSON.parse(fs.readFileSync(CHAN, 'utf8')).channel; if (CHANNELS.includes(c)) return c; } catch (e) {} return /-beta/.test(app.getVersion()) ? 'beta' : 'stable'; };
+  const setChannel = (c) => { if (!CHANNELS.includes(c)) return getChannel(); try { fs.mkdirSync(work, { recursive: true }); fs.writeFileSync(CHAN, JSON.stringify({ channel: c })); } catch (e) {} return c; };
+  // beta: the newest of the recent releases and pre-releases that carries something to install; stable: GitHub's latest release
+  async function fetchRelease() {
+    const hd = { headers: Object.assign({ Accept: 'application/vnd.github+json' }, UA) };
+    if (getChannel() !== 'beta') { const r = await net.fetch(API, hd); return r.ok ? { rel: await r.json() } : { status: r.status }; }
+    const r = await net.fetch(LIST, hd); if (!r.ok) return { status: r.status };
+    const all = (await r.json()).filter(x => !x.draft && (x.assets || []).some(a => /^ERAVOS(_|-Setup-)/i.test(a.name)));
+    if (!all.length) return { status: 404 };
+    return { rel: all.reduce((m, x) => (newer(String(x.tag_name).replace(/^v/i, ''), String(m.tag_name).replace(/^v/i, '')) ? x : m)) };
+  }
   async function check(manual) {
     try {
-      const r = await net.fetch(API, { headers: Object.assign({ Accept: 'application/vnd.github+json' }, UA) });
-      if (!r.ok) { if (manual) tell({ state: 'error', message: r.status === 404 ? 'no release is published yet' : 'GitHub said ' + r.status }); return null; }
-      const rel = await r.json(), version = String(rel.tag_name || '').replace(/^v/i, '');
+      const f = await fetchRelease();
+      if (!f.rel) { if (manual) tell({ state: 'error', message: f.status === 404 ? 'no release is published yet' : 'GitHub said ' + f.status }); return null; }
+      const rel = f.rel, version = String(rel.tag_name || '').replace(/^v/i, '');
       const asset = (rel.assets || []).find(a => /^ERAVOS_.*\.zip$/i.test(a.name)), setup = (rel.assets || []).find(a => /^ERAVOS-Setup-.*\.exe$/i.test(a.name));
-      latest = { version, current: app.getVersion(), name: rel.name || ('ERAVOS ' + version), notes: String(rel.body || '').slice(0, 1200), page: rel.html_url,
+      latest = { version, channel: getChannel(), beta: !!rel.prerelease, current: app.getVersion(), name: rel.name || ('ERAVOS ' + version), notes: String(rel.body || '').slice(0, 1200), page: rel.html_url,
         zip: asset ? asset.browser_download_url : null, size: asset ? asset.size : 0, setup: setup ? setup.browser_download_url : null, setupSize: setup ? setup.size : 0 };
       latest.canInstall = canApply() && (viaSetup() ? !!latest.setup : !!latest.zip);
       if (newer(version, app.getVersion())) { if (state === 'ready' && staged) tell(Object.assign({ state: 'ready' }, latest)); else tell(Object.assign({ state: 'available', manual: !!manual }, latest)); return latest; }
@@ -171,6 +187,6 @@ function create(o) {
   }
   function start() { const r = report(); if (r) setTimeout(() => tell(r), 2500); setTimeout(() => check(false), FIRST); timer = setInterval(() => check(false), EVERY); }
   function stop() { if (timer) clearInterval(timer); timer = null; }
-  return { start, stop, check, download, apply, cancel, manual, later, onQuit, report, get status() { return { state, staged: staged && staged.version, latest, applyOnQuit, canApply: canApply() }; }, get latest() { return latest; } };
+  return { start, stop, check, download, apply, cancel, manual, later, onQuit, report, getChannel, setChannel, get status() { return { state, staged: staged && staged.version, latest, applyOnQuit, canApply: canApply(), channel: getChannel() }; }, get latest() { return latest; } };
 }
-module.exports = { create, newer, stagedRoot, REPO };
+module.exports = { create, newer, stagedRoot, REPO, CHANNELS };

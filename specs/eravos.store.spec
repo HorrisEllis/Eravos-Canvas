@@ -112,3 +112,9 @@ open_gaps:
   - components shared by tools are copied into each tool's files today in places (docs/duplicates.md, ~9 %): the store needs them as
     their own units first (the phase-1 components are; older shared code is not yet)
   - in-page tool tests need a browser in the store's CI (the driver exists; the runner on Linux is proven, Windows not yet)
+
+# ---- ADDENDUM 2026-11-07 (nothing above is changed)
+#   his words: "Can you integrate git into Eravos? Like it’s saying no update. I’m on 0.2.15."
+#   S6 begun for the app itself: every merge to main → a beta of ERAVOS (v<next patch>-beta.<run>, a pre-release, never "latest"),
+#   offered on Settings › About & updates › Updates › Beta. D3 answered for the app: betas on every merge to main (branches on demand
+#   stays open). Units (tools, packs) from branches: still S6, after S1–S4.

@@ -21,6 +21,7 @@ contextBridge.exposeInMainWorld('eravosDesktop', {
   installUpdateManually: () => ipcRenderer.invoke('eravos:update-manual'),   // 3.141 open the downloaded Setup yourself
   updateLater: () => ipcRenderer.invoke('eravos:update-later'),
   updateStatus: () => ipcRenderer.invoke('eravos:update-status'),
+  updateChannel: (c) => ipcRenderer.invoke('eravos:update-channel', c),   // 3.148 get (no argument) or set 'stable' | 'beta'
   openUpdateLog: () => ipcRenderer.send('eravos:update-log'),
 });
 // ERAVOS Glass (host/glass.js) runs inside the app: tell the page before its scripts run (canvas/runtime/glass-link.js)
