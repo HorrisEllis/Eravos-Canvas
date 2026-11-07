@@ -97,3 +97,14 @@ object is — a note, a pattern, an image — is a domain's. Music is the first 
 ## His calls, as read (to confirm — "do it." answered a message that proposed them)
   ERV_D1 ERAVOS joins Nexus by registration, never copied · ERV_D2 ERAVOS's schemas are the one source, COS's copy checked against them ·
   ERV_D4 the name: "the Workshop", as the field's surface ("field" stays the name of the relational constraint field)
+
+# ---- ADDENDUM 2026-11-07 (2) — the look (nothing above is changed)
+#   his words: "no that looks like a childs tool. look at the spec workshop ui. something like that. you can add more themes also. cos is meant
+#   to be the eco system. my compartmentalizing."
+#   The kit preview (docs/previews/workshop-pattern.png) is rejected and kept. The Workshop takes the language of Idearium's spec workshop
+#   (Nexus idearium/ui/css/void-theme.css, read, not copied): the Void (near-black, its stars), Bebas Neue wide-tracked, DM Mono for working
+#   text, hairlines, 2px corners, capitals, the zoom path as the pipeline's numbered stations, glass panels: layers left (STRUCTURE · WHAT
+#   EMERGES), the surface centre, DETAILS right (the selected layer large, its fields, shape, mode, hear, history), APPLY → bottom of the bar.
+#   Preview: docs/previews/workshop-void.html (node docs/previews/workshop-void.shots.mjs). The same language comes to ERAVOS as a theme,
+#   "Void" — a new choice beside Dusk, Studio, Field, Midnight; today's look stays the default. Fonts: canvas/runtime/fonts (SIL OFL 1.1,
+#   licences beside them).

@@ -1,0 +1,140 @@
+<!doctype html>
+<!-- PREVIEW ONLY — the Workshop in the Void (his words, 2026-11-07: "no that looks like a childs tool. look at the spec workshop ui. something
+     like that. you can add more themes also."). The language of Idearium's spec workshop (Nexus idearium/ui/css/void-theme.css, read, not
+     copied): the near-black field and its stars, Bebas Neue wide-tracked, DM Mono for working text, hairlines, 2px corners, capitals, the
+     pipeline as stations. A PATTERN on the surface: the structure layers are its shape; the notes are what the conditions produce.
+     Silent; drawn from maths here. node docs/previews/workshop-void.shots.mjs → docs/previews/workshop-void.png -->
+<html lang="en"><head><meta charset="utf-8"><title>WORKSHOP</title>
+<style>
+@font-face { font-family: 'Bebas Neue'; src: url(../../canvas/runtime/fonts/bebas-neue-400.woff2) format('woff2'); }
+@font-face { font-family: 'DM Mono'; src: url(../../canvas/runtime/fonts/dm-mono-400.woff2) format('woff2'); font-weight: 400; }
+@font-face { font-family: 'DM Mono'; src: url(../../canvas/runtime/fonts/dm-mono-500.woff2) format('woff2'); font-weight: 500; }
+@font-face { font-family: 'Space Grotesk'; src: url(../../canvas/runtime/fonts/space-grotesk-400.woff2) format('woff2'); }
+:root { --void:#030508; --bg1:#080d17; --line:#1a2a40; --line2:#1e3050; --line3:#2a4060; --c:#00d4ff; --g:#00ff88; --m:#cc44ff; --y:#ffcc00;
+  --text:#b8cfe0; --text2:#5a7a96; --text3:#2e4a60; --mono:'DM Mono', ui-monospace, monospace; --display:'Bebas Neue', Impact, sans-serif;
+  --glass: rgba(5,8,15,.78); }
+* { box-sizing: border-box; } html { text-transform: uppercase; }
+html, body { margin: 0; height: 100%; background: var(--void); color: var(--text); font: 13px/1.6 'Space Grotesk', system-ui, sans-serif; overflow: hidden; }
+#sky { position: fixed; inset: 0; width: 100%; height: 100%; }
+.bar { position: relative; z-index: 2; height: 58px; display: flex; align-items: center; gap: 22px; padding: 0 20px; border-bottom: 1px solid var(--line); background: rgba(3,5,8,.7); }
+.name { font: 400 22px/1 var(--display); letter-spacing: .42em; color: var(--c); text-shadow: 0 0 24px rgba(0,212,255,.25); }
+.sep { width: 1px; height: 26px; background: var(--line2); }
+.stations { display: flex; align-items: center; gap: 0; }
+.st { font: 400 12px/1 var(--display); letter-spacing: .22em; color: var(--text3); padding: 8px 12px; border: 1px solid transparent; border-radius: 2px; }
+.st i { font: 400 9px var(--mono); font-style: normal; letter-spacing: .1em; margin-right: 7px; color: var(--text3); }
+.st.on { color: var(--c); border-color: rgba(0,212,255,.4); background: rgba(0,212,255,.05); box-shadow: 0 0 20px rgba(0,212,255,.08); }
+.st.on i { color: var(--c); } .link { width: 34px; height: 1px; background: var(--line2); }
+.end { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+.saved { font: 400 10px var(--mono); letter-spacing: .14em; color: var(--text2); }
+.btn { font: 400 12px/1 var(--display); letter-spacing: .18em; background: rgba(0,212,255,.05); border: 1px solid rgba(0,212,255,.22); border-radius: 2px; color: rgba(0,212,255,.75); padding: 8px 16px; }
+.btn.ghost { background: none; border-color: var(--line); color: var(--text2); }
+.btn.send { color: var(--c); border-color: rgba(0,212,255,.5); box-shadow: 0 0 22px rgba(0,212,255,.1); }
+.stage { position: relative; z-index: 2; display: grid; grid-template-columns: 232px 1fr 300px; gap: 0; height: calc(100% - 58px); padding: 18px 20px 20px; }
+.panel { background: var(--glass); border: 1px solid var(--line); backdrop-filter: blur(6px); overflow: hidden; }
+.panel + .panel { border-left: none; }
+.lbl { font: 400 10px/1 var(--display); letter-spacing: .3em; color: var(--text2); margin: 18px 18px 10px; }
+.lbl .n { font: 400 9px var(--mono); color: var(--text3); letter-spacing: .1em; margin-left: 6px; }
+.layer { display: flex; align-items: center; justify-content: space-between; padding: 10px 18px; border-left: 2px solid transparent; font: 400 12px/1 var(--display); letter-spacing: .2em; color: var(--text); }
+.layer small { display: block; font: 400 9px/1.5 var(--mono); letter-spacing: .08em; color: var(--text3); margin-top: 4px; }
+.layer .k { font: 400 9px var(--mono); color: var(--text3); letter-spacing: .1em; }
+.layer.on { border-left-color: var(--c); background: rgba(0,212,255,.06); color: var(--c); }
+.layer.emerge { color: #d8e6f2; } .layer .dot { display: inline-block; width: 6px; height: 6px; border-radius: 1px; margin-right: 10px; vertical-align: 1px; }
+.centre { display: flex; flex-direction: column; }
+.ctop { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px 0; }
+.ctop .t { font: 400 10px var(--display); letter-spacing: .3em; color: var(--text2); }
+.ctop .chips { display: flex; gap: 6px; }
+.chip { font: 400 10px/1 var(--mono); letter-spacing: .12em; padding: 6px 9px; border: 1px solid var(--line); border-radius: 2px; color: var(--text2); background: rgba(3,5,8,.6); }
+.chip.on { color: var(--c); border-color: rgba(0,212,255,.4); }
+canvas#surf { flex: 1; width: 100%; display: block; }
+.big { font: 400 34px/1 var(--display); letter-spacing: .3em; color: var(--c); margin: 4px 18px 4px; text-shadow: 0 0 30px rgba(0,212,255,.2); }
+.sub { font: 400 10px/1.6 var(--mono); letter-spacing: .12em; color: var(--text2); margin: 0 18px 8px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 18px; }
+.field { border: 1px solid var(--line); border-radius: 2px; padding: 9px 11px; background: rgba(3,5,8,.5); }
+.field b { display: block; font: 400 9px var(--display); letter-spacing: .28em; color: var(--text3); font-weight: 400; margin-bottom: 4px; }
+.field span { font: 500 15px var(--mono); color: var(--text); letter-spacing: .04em; }
+.chips2 { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 18px; }
+.hist { margin: 0 18px; font: 400 10px/2 var(--mono); letter-spacing: .08em; color: var(--text3); }
+.hist div:last-child { color: var(--text); } .hist i { font-style: normal; color: var(--text3); margin-right: 10px; }
+.apply { position: absolute; right: 38px; bottom: 38px; }
+</style></head><body>
+<canvas id="sky"></canvas>
+<header class="bar">
+  <div class="name">WORKSHOP</div><div class="sep"></div>
+  <nav class="stations"><span class="st"><i>01</i>SONG</span><span class="link"></span><span class="st on"><i>02</i>PATTERN</span><span class="link"></span><span class="st"><i>03</i>NOTE</span></nav>
+  <div class="end"><span class="saved">SAVED · 4 BARS · SEED 41</span><span class="btn ghost">STAMP A LAYER</span><span class="btn ghost">SAVE TO LIBRARY</span><span class="btn ghost">POP OUT</span><span class="btn send">APPLY →</span></div>
+</header>
+<main class="stage">
+  <section class="panel">
+    <div class="lbl">STRUCTURE <span class="n">THE SHAPE · 6</span></div>
+    <div class="layer"><div><span class="dot" style="background:#2a4060"></span>SCALE<small>CONSTRAINT · A MINOR</small></div><span class="k">ON</span></div>
+    <div class="layer"><div><span class="dot" style="background:#2a4060"></span>CHORDS<small>CONSTRAINT · I – VI – III – VII</small></div><span class="k">ON</span></div>
+    <div class="layer"><div><span class="dot" style="background:#2a4060"></span>GRID<small>CONSTRAINT · 16THS · 5 OF 8</small></div><span class="k">ON</span></div>
+    <div class="layer"><div><span class="dot" style="background:#2a4060"></span>RANGE<small>CONSTRAINT · A1 – A3</small></div><span class="k">ON</span></div>
+    <div class="layer on"><div><span class="dot" style="background:var(--c)"></span>DENSITY<small>CURVE · OVER THE 4 BARS</small></div><span class="k">100</span></div>
+    <div class="layer"><div><span class="dot" style="background:var(--m)"></span>CONTOUR<small>CURVE · UP, THEN HOME</small></div><span class="k">70</span></div>
+    <div class="lbl" style="margin-top:26px">WHAT EMERGES <span class="n">3</span></div>
+    <div class="layer emerge"><div><span class="dot" style="background:#d8f6ff"></span>NOTES<small>EVENTS · WHAT THE CONDITIONS PRODUCE</small></div><span class="k">ON</span></div>
+    <div class="layer emerge"><div><span class="dot" style="background:var(--g)"></span>YOURS<small>LOCKED · KEPT WHEN THE SHAPE CHANGES</small></div><span class="k">1</span></div>
+    <div class="layer emerge"><div><span class="dot" style="background:var(--y)"></span>VARIATION<small>VALUE · SEED 41</small></div><span class="k">41</span></div>
+  </section>
+  <section class="panel centre">
+    <div class="ctop"><span class="t">PATTERN · BASSLINE · A MINOR · 140 BPM</span><span class="chips"><span class="chip on">DENSITY</span><span class="chip">RANGE</span><span class="chip">GRID</span><span class="chip">CONTOUR</span><span class="chip">PEN</span><span class="chip">LOCK</span><span class="chip">ERASE</span></span></div>
+    <canvas id="surf"></canvas>
+  </section>
+  <section class="panel" style="position:relative">
+    <div class="lbl">DETAILS</div>
+    <div class="big">DENSITY</div>
+    <div class="sub">HOW MUCH OF WHAT THE SHAPE ADMITS EMERGES, OVER THE PATTERN</div>
+    <div class="row"><div class="field"><b>START</b><span>30 %</span></div><div class="field"><b>END</b><span>90 %</span></div></div>
+    <div class="lbl">SHAPE</div><div class="chips2"><span class="chip on">RISE</span><span class="chip">FALL</span><span class="chip">ARCH</span><span class="chip">HOLD</span><span class="chip">DRAWN</span></div>
+    <div class="lbl">MODE</div><div class="chips2"><span class="chip">FIXED</span><span class="chip on">SEEDED</span><span class="chip">LIVE · EVERY BAR</span></div>
+    <div class="lbl">HEAR</div><div class="chips2"><span class="chip on">ALONE</span><span class="chip">WITH ITS TOOLS</span><span class="chip">IN THE SONG</span></div>
+    <div class="lbl">HISTORY</div>
+    <div class="hist"><div><i>01</i>SCALE · A MINOR</div><div><i>02</i>CHORDS · I – VI – III – VII</div><div><i>03</i>RANGE · A1 – A3</div><div><i>04</i>LOCK · A2, BAR 1</div><div><i>05</i>DENSITY · RISE 30 → 90 %</div></div>
+  </section>
+</main>
+<script>
+// the stars (the Void's sky)
+(function () { const c = document.getElementById('sky'), g = c.getContext('2d'), d = devicePixelRatio || 1; c.width = innerWidth * d; c.height = innerHeight * d; g.scale(d, d);
+  let s = 7; const r = () => (s = (s * 16807) % 2147483647) / 2147483647; for (let i = 0; i < 260; i++) { const a = r() * 0.5 + 0.08; g.fillStyle = `rgba(${r() < .2 ? '204,68,255' : '0,212,255'},${a})`; g.fillRect(r() * innerWidth, r() * innerHeight, r() < .9 ? 1 : 1.6, r() < .9 ? 1 : 1.6); } })();
+// the surface: the shape (constraints) and what emerges inside it
+(function () {
+  const c = document.getElementById('surf'), d = devicePixelRatio || 1, W = c.clientWidth, H = c.clientHeight; c.width = W * d; c.height = H * d; const g = c.getContext('2d'); g.scale(d, d);
+  const L = 54, R = 22, T = 26, laneH = 70, B = laneH + 54, x0 = L, x1 = W - R, y0 = T, y1 = H - B, steps = 64, lo = 33, hi = 57, rows = hi - lo + 1;
+  const cw = (x1 - x0) / steps, rh = (y1 - y0) / rows, X = (s) => x0 + s * cw, Y = (n) => y1 - (n - lo + 1) * rh;
+  const minor = [0, 2, 3, 5, 7, 8, 10], inKey = (n) => minor.includes(((n - 57) % 12 + 12) % 12);
+  const chords = [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]], tone = (n, bar) => chords[bar].some(t => (((n - t) % 12) + 12) % 12 === 0);
+  const eu = [1, 0, 1, 1, 0, 1, 1, 0], onGrid = (s) => eu[s % 8] === 1, dens = (s) => 0.3 + 0.6 * (s / steps), cont = (s) => 41 + 9 * Math.sin(Math.PI * s / steps);
+  let seed = 41; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+  // rows: hairlines; closed rows (out of key) a shade darker; chord tones of each bar a faint lane
+  for (let n = lo; n <= hi; n++) { const y = Y(n);
+    if (!inKey(n)) { g.fillStyle = 'rgba(0,0,0,.45)'; g.fillRect(x0, y, x1 - x0, rh); }
+    else for (let bar = 0; bar < 4; bar++) if (tone(n, bar)) { g.fillStyle = 'rgba(0,212,255,.045)'; g.fillRect(X(bar * 16), y, 16 * cw, rh); }
+    g.fillStyle = 'rgba(26,42,64,.55)'; g.fillRect(x0, y + rh - 0.5, x1 - x0, 0.5);
+    if (n % 12 === 9) { g.fillStyle = '#5a7a96'; g.font = '400 9px "DM Mono", monospace'; g.fillText('A' + (Math.floor(n / 12) - 1), 18, y + rh * 0.75); } }
+  // the grid: the steps the rhythm admits, as thin ticks above the roll; bar lines
+  for (let s = 0; s < steps; s++) { g.fillStyle = onGrid(s) ? 'rgba(0,212,255,.55)' : 'rgba(42,64,96,.6)'; g.fillRect(X(s) + cw * 0.3, y0 - 10, cw * 0.4, onGrid(s) ? 4 : 2); }
+  for (let bar = 0; bar <= 4; bar++) { g.fillStyle = 'rgba(42,64,96,.9)'; g.fillRect(X(bar * 16), y0, 1, y1 - y0);
+    if (bar < 4) { g.fillStyle = '#2e4a60'; g.font = '400 9px "DM Mono", monospace'; g.fillText(String(bar + 1).padStart(2, '0'), X(bar * 16) + 4, y1 + 14); } }
+  // the possibility space: every note the shape admits
+  for (let s = 0; s < steps; s++) { if (!onGrid(s)) continue; const bar = s >> 4; for (let n = lo; n <= hi; n++) if (inKey(n) && tone(n, bar)) { g.fillStyle = 'rgba(0,212,255,.28)'; g.fillRect(X(s) + cw / 2 - 0.75, Y(n) + rh / 2 - 0.75, 1.5, 1.5); } }
+  // range: two hairlines at its edges
+  g.fillStyle = 'rgba(0,212,255,.5)'; g.fillRect(x0, Y(hi), x1 - x0, 1); g.fillRect(x0, Y(lo) + rh - 1, x1 - x0, 1);
+  // contour: a thin magenta guide
+  g.strokeStyle = 'rgba(204,68,255,.55)'; g.lineWidth = 1; g.setLineDash([2, 4]); g.beginPath(); for (let s = 0; s <= steps; s++) { const y = Y(cont(s)) + rh / 2; s ? g.lineTo(X(s), y) : g.moveTo(X(s), y); } g.stroke(); g.setLineDash([]);
+  // what emerges: slim bars with a soft glow; the locked one green
+  for (let s = 0; s < steps; s++) { if (!onGrid(s) || (s > 0 && rnd() > dens(s))) continue; const bar = s >> 4, cc = cont(s); let best = null, bd = 1e9;
+    for (let n = lo; n <= hi; n++) if (inKey(n) && tone(n, bar)) { const dd = Math.abs(n - cc) + rnd() * 3; if (dd < bd) { bd = dd; best = n; } }
+    const lock = s === 0, col = lock ? '#00ff88' : '#7fe9ff', y = Y(best) + rh * 0.28, h = rh * 0.44, w = cw * 1.7;
+    g.shadowColor = lock ? 'rgba(0,255,136,.7)' : 'rgba(0,212,255,.7)'; g.shadowBlur = 12; g.fillStyle = col; g.fillRect(X(s) + 1, y, w, h); g.shadowBlur = 0;
+    if (lock) { g.strokeStyle = 'rgba(0,255,136,.6)'; g.lineWidth = 1; g.strokeRect(X(s) - 2.5, y - 3.5, w + 7, h + 7); } }
+  // density: the selected layer, its own lane under the roll, with two handles
+  const ly0 = y1 + 28, lh = laneH - 16; g.fillStyle = 'rgba(26,42,64,.8)'; g.fillRect(x0, ly0 + lh, x1 - x0, 0.5);
+  const grad = g.createLinearGradient(0, ly0, 0, ly0 + lh); grad.addColorStop(0, 'rgba(0,212,255,.16)'); grad.addColorStop(1, 'rgba(0,212,255,0)');
+  g.fillStyle = grad; g.beginPath(); g.moveTo(x0, ly0 + lh); for (let s = 0; s <= steps; s++) g.lineTo(X(s), ly0 + lh - dens(s) * lh); g.lineTo(x1, ly0 + lh); g.closePath(); g.fill();
+  g.strokeStyle = '#00d4ff'; g.lineWidth = 1.5; g.shadowColor = 'rgba(0,212,255,.6)'; g.shadowBlur = 8; g.beginPath(); for (let s = 0; s <= steps; s++) { const y = ly0 + lh - dens(s) * lh; s ? g.lineTo(X(s), y) : g.moveTo(X(s), y); } g.stroke(); g.shadowBlur = 0;
+  [[0, dens(0)], [steps, dens(steps)]].forEach(([s, v]) => { const x = X(s), y = ly0 + lh - v * lh; g.fillStyle = '#030508'; g.fillRect(x - 4, y - 4, 8, 8); g.strokeStyle = '#00d4ff'; g.lineWidth = 1; g.strokeRect(x - 4, y - 4, 8, 8); });
+  g.fillStyle = '#5a7a96'; g.font = '400 9px "DM Mono", monospace'; g.fillText('DENSITY', 6, ly0 + lh / 2 + 3);
+})();
+</script></body></html>
