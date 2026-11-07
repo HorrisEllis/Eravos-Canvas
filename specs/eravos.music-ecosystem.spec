@@ -2762,7 +2762,7 @@ novelty_across_eravos (replaces "inside the same tool" — the original rules ab
   itself without accidentally preventing itself from discovering something new."
   - BASELINE: build/novelty.mjs also writes docs/novelty-baseline.json — every preset's fingerprint as measured, the per-feature scale, and
     the calibration (CLOSE, TWIN, μ, σ from ERAVOS itself). The measure lives in ONE place, build/novelty-core.mjs, used by the report and
-    the gate alike (the refactor is to be proved: the report byte-identical before and after on the same render — pending the full render).
+    the gate alike (refactor proved 2026-11-07: on the same 621-preset render, the report and novelty.json from the old code and the new are byte-identical).
   - THE GATE (build/novelty-gate.mjs), ADVISORY: renders only the tools a branch changed (or named tools, or a given render); every new or
     changed preset → its nearest sound already in ERAVOS → TWIN / CLOSE / novel, in σ too; a match in another tool says whether they share
     a ROLE ("roles" in tool.json if declared, else the category — the report says which): same role = "possible duplicate — listen",

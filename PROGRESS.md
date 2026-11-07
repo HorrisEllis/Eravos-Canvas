@@ -2,6 +2,20 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.146 The novelty gate, advisory (2026-11-07)
+Sent by him (10:26:25Z): "Novelty gate, advisory mode first. Establish a baseline, detect duplication and flag collisions. Don’t hard-block
+merges until the measurement is validated against actual listening." (then W1, waveshaper, spectral-features) · "Novelty isn’t the same as
+quality." · "Tool overlap isn’t necessarily redundancy."
+- build/novelty-core.mjs: the measure in one place; build/novelty.mjs uses it — proved: old and new code give byte-identical report and
+  novelty.json on the same 621-preset render. novelty.mjs also writes docs/novelty-baseline.json (418 fingerprints, scale, calibration).
+- build/novelty-gate.mjs: renders the tools a branch changed (or --tools / --audio), compares every new or changed preset with the
+  baseline → TWIN / CLOSE / novel in σ; a match in another tool: same role (tool.json "roles", else category) = possible duplicate — listen,
+  different role = overlap, usually fine. Exit 0 always; CI step continue-on-error, the table in the job summary.
+- Real data: Swarm + Retro DCO re-rendered → 0 changed (renders are repeatable); a temporary near-copy of Locked Unison → TWIN 0.000.
+- tests/novelty-gate.test.mjs 8/8 (verdicts, roles, unchanged skipped, failed renders named, never blocks). docs/listening-log.md: the
+  four measures the ear decides; first line the Swarm disagreement. Report refreshed: 418 presets, 197 novel, 91 close to another tool.
+- Open: declared roles in tool.json (Deep Sub vs Reese Bass); a fair render for effects; 8 s held renders; controllability measured.
+
 ## Done — 3.145 N2: Swarm 1.1 — it moves by itself; motion in the fingerprint (2026-11-06)
 Asked: "The swarm doesn't seem like anything new sound wise." · "Lets focus on getting tools more novel from each other" (and "Full note
 and rhythm editor canvas." — mapped, next).
