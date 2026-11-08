@@ -44,6 +44,7 @@
   "works_with": [
     "eravos.agents.ai-step",
     "eravos.image.image-adjust",
+    "eravos.orchestration.box",
     "eravos.video.video-clip"
   ],
   "status": "built",
