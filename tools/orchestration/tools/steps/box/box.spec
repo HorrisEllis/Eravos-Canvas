@@ -25,3 +25,14 @@ acceptance (each must pass before status → built):
   - save → load is exact, the extra included (the .erv round trip)
   - no word of any kind, system or network address in its code (the test reads the engine and the window)
   - standard: unmount leaves zero subscribers/ports/wires; every shipped pack preset loads
+
+# ---- ADDENDUM 2026-11-08 — the step on the Workshop (nothing above changed)
+# His words (2026-11-08): "like we can use it for nodes, each compartment. like eravos needs to stay agnostic. maybe it edits steps, like it does a
+#   note, or pattern." · "always show me the ui preview first so i can give feedback" · shown docs/previews/step-workshop.png, then: "okay the
+#   workshop it to edit. the canvas are for the tools."
+workshop_kind: orchestration.step (window.EravosStepKind), added by the Box's window with Workshop.addKind, as the Pattern adds music.pattern; the
+  Workshop is unchanged. Layers, each read from the step it is given (no field name fixed): Gate (constraint: one field per gate key) · Step
+  (kind from the kinds it was given, ref, step, state) · Settings (every leaf of its args, typed) · Contract (after, gives) · Last value (emergent).
+  Every edit reaches the tool at once (ui hook step_set: params and the whole box); undo and redo follow. "Open in Workshop" on the window.
+  The canvas holds the tools wired; the Workshop edits one of them.
+acceptance (added): the kind passes Workshop.check; its layers come from the step; an edit, an undo and a gate change reach the tool (P153 2/2)

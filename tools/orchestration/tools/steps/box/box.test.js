@@ -32,3 +32,35 @@ describe('Box — one step of a pipeline, data only', () => {
     const b = TH.spawn(U, 'eravos.orchestration.box'); ctxOf(b).loadExtra(saved); assert.deepEqual(ctxOf(b).saveExtra(), saved);
   });
 });
+
+// 2026-11-08 — the step on the Workshop. James: "maybe it edits steps, like it does a note, or pattern." · "okay the workshop it to edit. the
+// canvas are for the tools."
+window.__phase = 'P153';
+describe('Box — a step opened on the Workshop, edited live', () => {
+  const ctxOf = (a) => OrganismFactory.handle(a).ctx;
+  const STEP = { id: 'pricing', kind: 'pipeline', ref: 'pricing-table', hooks: { in: ['in'], out: ['out'] }, contract: { requires: ['overview'], gives: ['output'] },
+    gate: { notEmpty: true }, args: { task: { id: 'pricing', step: { type: 'pipeline', config: { pipeline: 'pricing-table', retries: 2 } } } } };
+  const KINDS = ['gate', 'system', 'agent', 'macro', 'pipeline', 'procedure', 'tool', 'build'];
+  it('the kind is accepted by the Workshop, and its layers are read from the step itself (no field is fixed)', () => {
+    const K = window.EravosStepKind; assert.ok(K, 'the Box offers its kind'); assert.deepEqual(Workshop.check(K), [], 'a whole kind');
+    const L = K.layers({ kind: 'pipeline', ref: 'pricing-table', step: 'pricing', state: '', kinds: KINDS, box: STEP, last: null });
+    assert.deepEqual(L.map(l => [l.id, l.type]), [['gate', 'constraint'], ['step', 'value'], ['settings', 'value'], ['contract', 'value'], ['last', 'emergent']]);
+    assert.deepEqual(L[0].fields.map(f => f.key), ['gate.notEmpty'], 'the gate\'s own keys');
+    assert.ok(L[2].fields.some(f => f.key === 'arg.task.step.config.retries' && f.type === 'number'), 'every leaf of its settings, typed');
+    assert.deepEqual(L[1].fields[0].options, KINDS, 'the kinds it was given');
+  });
+  it('opened from the Box: an edit in the Workshop reaches the tool at once, and undo takes it back', async () => {
+    if (!Workshop.kinds().includes('orchestration.step')) assert.ok(Workshop.addKind(window.EravosStepKind).ok, 'registered as the Box\'s window does');
+    const U = TH.universe(0.2), a = TH.spawn(U, 'eravos.orchestration.box'), c = ctxOf(a);
+    c.params.setMany({ kind: 'pipeline', ref: 'pricing-table', step: 'pricing' }); c.loadExtra({ box: STEP, kinds: KINDS });
+    const send = (x) => U.K.bus.publish('ui:step_set:' + a, x);
+    const ws = Workshop.open('orchestration.step', { kind: 'pipeline', ref: 'pricing-table', step: 'pricing', state: '', kinds: KINDS, box: STEP, last: null },
+      { onChange: (d) => send({ params: { kind: d.kind, ref: d.ref, step: d.step, state: d.state }, box: d.box }) });
+    ws.set('arg.task.step.config.retries', '4', 'retries'); await TH.sleep(10);
+    assert.equal(c.stateExtra().box.args.task.step.config.retries, 4, 'a setting changed on the tool, typed');
+    ws.set('kind', 'build', 'Kind'); await TH.sleep(10); assert.equal(c.params.get('kind'), 'build', 'the kind changed on the tool');
+    ws.undo(); await TH.sleep(10); assert.equal(c.params.get('kind'), 'pipeline', 'undo reached the tool');
+    ws.set('gate.notEmpty', 'false', 'gate'); await TH.sleep(10); assert.ok(c.stateExtra().box.gate.notEmpty === false, 'the gate edited, as a boolean');
+    ws.close();
+  });
+});
