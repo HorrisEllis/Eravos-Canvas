@@ -803,7 +803,8 @@
       const first = Array.from(S).sort((a, b) => a - b)[0];
       CM.show(x, y, [
         // 3.116 the note editor (it opened only on a double-click): pitch, bend, oscillation and the instrument's knobs for this note
-        { label: '✎ Edit note…', hint: 'the note editor: pitch, length, velocity, bend, oscillation and the instrument’s own knobs for this note only (or double-click a note)', disabled: first === undefined, run: () => openEditor(first) },
+        // W2a (his, 2026-11-08: "The edit pattern or note doesn’t open workshop"): the note opens on the Workshop; double-click keeps the quick editor
+        { label: '✎ Edit note…', hint: 'on the Workshop: its timing, pitch, velocity, chance, bend and oscillation, live (double-click a note for the quick editor)', disabled: first === undefined, run: () => openWorkshop(first) },
         { sep: true },
         // 3.120 select by what a note is (timeline-depth.spec "Editing": select by pitch, velocity) — then edit them all at once
         { label: '◎ Select every ' + (first !== undefined ? nameOf(notes[first].n) : 'such') + ' in the clip', hint: 'every note of this pitch', disabled: first === undefined, run: () => { const n = notes[first].n; selOnly(notes.map((a, i) => a.n === n ? i : -1).filter(i => i >= 0)); draw(); readout.textContent = S.size + ' selected'; } },
@@ -878,6 +879,13 @@
     const lenName = (l) => { const m = { 0.25: '1/64', 0.5: '1/32', 1: '1/16', 2: '1/8', 3: '1/8.', 4: '1/4', 6: '1/4.', 8: '1/2', 12: '1/2.', 16: '1 bar' }; return m[Math.round(l * 192) / 192] || (+(l / 4).toFixed(3) + ' beat'); };
     let insts = [], edNote = null;
     const toolName = () => { const r = lane && insts.find(x => x.value === lane.target); return r ? r.label.replace(/\s*·[^·]*$/, '') : (lane ? lane.name : 'this tool'); };
+    // W2a: the clip's notes on the Workshop (tools/music/tools/arrange/timeline/timeline.workshop.js), the open note `i`; every edit through commit()
+    function openWorkshop(i) {
+      const WK = global.EravosTimelineWorkshop; if (!WK || !WK.ensure() || !clip) return openEditor(i);
+      closeEditor(); if (i !== undefined && !S.has(i)) selOnly(i); draw();
+      return global.Workshop.open('music.notes', { notes: notes.map(n => JSON.parse(JSON.stringify(n))), sel: Math.max(0, i | 0), name: clip.name || toolName(), drums: !!drums },
+        { onChange: (d) => commit(d.notes.map(n => Object.assign({}, n))), title: clip.name || toolName() });
+    }
     function openEditor(i) {
       const a0 = notes[i]; if (!a0) return; if (!S.has(i)) selOnly(i); draw(); editor.innerHTML = ''; edMode = 'note'; toolCtl = new Map(); toolSig = '';   // a note inside a selection keeps the selection
       let cur = Object.assign({}, a0), timer = null;
@@ -1221,7 +1229,7 @@
     return { el, show, hide, playhead, setFull, setWindowed, get title() { return title.textContent; }, get full() { return !!full; }, get open() { return !!clip; }, get clipId() { return clip && clip.id; }, get drums() { return drums; },
       // for tests and the timeline's own keys: the grid/tool/zoom the roll is in, and what it holds
       get state() { return { tool, grid, len, lastLen, pps, row: ROW, step: stepOn, cursor, notes: notes.map(n => Object.assign({}, n)) }; }, setTool, zoomTo: (p, at) => { userZoom = true; zoomTo(p, at); }, setRow,
-      setGrid: (v) => { gridSel.set(v); grid = GRIDS.find(g => g[0] === String(v))[2]; draw(); }, canvas: cv, ruler, vel, openEditor, setLane, sketch: (pts, as, replace) => sketchToNotes({ pts, replace }, as), get lane() { return xk ? xk.key : ''; }, setStep, get selected() { return Array.from(S).sort((a, b) => a - b); },
+      setGrid: (v) => { gridSel.set(v); grid = GRIDS.find(g => g[0] === String(v))[2]; draw(); }, canvas: cv, ruler, vel, openEditor, openWorkshop, setLane, sketch: (pts, as, replace) => sketchToNotes({ pts, replace }, as), get lane() { return xk ? xk.key : ''; }, setStep, get selected() { return Array.from(S).sort((a, b) => a - b); },
       select: (idx) => { selOnly(idx); draw(); }, connectEdges, noteMenu, curveSel, quantize, unquantize, setStrength: (v) => { qStrength = v; }, pathOf: (k) => notes[k] ? pathOf(notes[k]) : null,
       // where note k's middle is on screen (for tests: the same mapping every hit test inverts)
       pointOf: (k) => { const a = notes[k]; if (!a) return null; const r = cv.getBoundingClientRect(), sx = r.width / (cv.offsetWidth || r.width || 1), sy = r.height / (cv.offsetHeight || r.height || 1);

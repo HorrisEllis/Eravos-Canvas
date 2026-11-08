@@ -115,7 +115,7 @@ describe('P112 · piano roll: Connect edges · its own window', () => {
       const ns = t.clip().notes; assert.equal(ns[0].pr, 0.5); assert.equal(ns[0].rt, 3); assert.equal(ns[0].mt, -0.2);
       assert.ok(!('pr' in ns[1]) && !('rt' in ns[1]) && !('mt' in ns[1]), 'defaults are not stored: songs from before stay the same');
       t.roll.select([0]); const menu = () => document.querySelector('.cm');
-      t.roll.noteMenu(100, 100); Array.from(menu().querySelectorAll('.cm-item')).find(b => /Edit note/.test(b.textContent)).click(); await TH.sleep(40);
+      t.roll.openEditor(0); await TH.sleep(40);   // the quick editor (double-click); W2a moved the menu's Edit note… to the Workshop (P154)
       const txt = t.roll.el.textContent; ['Chance', 'Ratchet', 'Nudge'].forEach(w => assert.ok(txt.includes(w), w + ' in the note editor'));
     } finally { if (window.ContextMenu) ContextMenu.close(); OrganismFactory.close(t.id); restoreView(); }
   });

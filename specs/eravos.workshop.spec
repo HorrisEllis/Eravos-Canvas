@@ -120,3 +120,23 @@ object is — a note, a pattern, an image — is a domain's. Music is the first 
 #   in space (3D). New kinds this makes room for (each its own domain, its own spec, later): SCENE (a game: objects, transforms, a camera,
 #   play in place) and the Emerge MODULE (code as nodes moving through the field — Nexus ERV5, after Emerge, WARP 2, RF1, CF1).
 #   Preview: docs/previews/workshop-studio.html (node docs/previews/workshop-studio.shots.mjs). The Void preview (workshop-void.png) is kept.
+
+## ADDENDUM 2026-11-08 — W2 slice a: notes and patterns open on the Workshop (his report)
+# James, 2026-11-08: "The edit pattern or note doesn’t open workshop." · "The workshop should be built. It says in the commit"
+# Found: W1 (3.150) built the surface and the PATTERN-structure kind; the Step kind followed (PR #139, #141). The piano roll's "✎ Edit note…"
+# still opened the 3.116 inline editor and the Patterns browser's "✎ Edit notes" the piano roll: W2's NOTE kind was never built, so his
+# call (13:28:34, 2026-11-06: "one editor"; this spec: "the note editor IS the workshop at note scale; patterns are the workshop at pattern
+# scale") was not yet true in the app. The approved note preview (docs/previews/workshop-note.png, "Nice. That's exactly it.") stands.
+W2a  music's NOTES kind (`music.notes`, tools/music/tools/arrange/timeline/timeline.workshop.js — content, never canvas/):
+       document  { notes: the clip's notes as the roll keeps them (s, l, n, v, pr, rt, mt, b{from,to,at,shape,osc{rate,rateTo,depth,shape,fade}}),
+                   sel: the note open, name, drums }
+       stations  SONG › PATTERN (its name) › NOTE (its pitch): the zoom chain. Pattern scale = every note drawn; a click on one opens it
+                 (pick → sel). Note scale = that note's layers.
+       layers    PATTERN (events: which note is open) · TIMING (value: start, length, nudge) · PITCH (value) · VELOCITY (value) ·
+                 DEPTH (value: chance, ratchet) · BEND (curve: from, to, starts, curve) · OSCILLATE (curve: depth, rate, shape, fade in);
+                 drums: no bend, no oscillate (the roll's own rule).
+       live      every edit reaches the clip at once (the roll's commit → clip_edit), one undo step each.
+     wired     "✎ Edit note…" opens the note on the Workshop; double-click keeps the quick inline editor (nothing taken away).
+               "✎ Edit notes" (Patterns) puts the pattern on the Timeline as before and opens it on the Workshop at pattern scale.
+     proof     tests/p154-workshop-notes.test.js: Edit note… opens music.notes on that note; an edit reaches the clip; pick opens another
+               note; Patterns › Edit notes opens the Workshop; the inline editor still opens on double-click.
