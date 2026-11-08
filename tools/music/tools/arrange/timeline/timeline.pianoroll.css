@@ -91,3 +91,6 @@ select.tlpr-toolsel, .tlpr-toolsel select { font-weight: 600; color: var(--tool-
 .tlpr-more[hidden] { display: none; }
 .tlpr-bar > .tlpr-pos { flex: 1 1 40px; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .tlpr-bar .uk-field select.uk-select { max-width: 190px; }
+/* W2b: the roll hosted on the Workshop fills its viewport (the roll's own look, unchanged) */
+.tlpr.tlpr-in-ws { display: flex; flex: 1 1 auto; margin: 0; border: 0; border-radius: 0; min-height: 0; }
+.tlpr.tlpr-in-ws .tlpr-nows { display: none !important; }   /* full screen and its own window are the Workshop's already */

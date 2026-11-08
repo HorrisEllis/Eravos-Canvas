@@ -2,6 +2,18 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.153 The Workshop hosts the whole piano roll (W2b); dropped tool zips kept in Documents\ERAVOS\tools (2026-11-08)
+His words: "need all of the node editor from the timeline, like workshop needs much more. can you continue the workshop." · "also tools should be added by dragging in zipped tools. the documents folder, not in the program files."
+- canvas/runtime/workshop.js: a kind's own editor can be hosted in the viewport (o.host / hostLabel / hostKey / onView; api.record, api.sync,
+  api.view). Two tabs: the hosted editor and the drawn view (kept).
+- timeline.pianoroll.js: openWorkshop moves the roll itself into the Workshop (every tool, lane, key and menu), each commit is a HISTORY step
+  (ADD / EDIT / DELETE · n notes), undo there puts the clip back, the inspector follows the selected note, close returns it to the same spot.
+- Drops: a dropped zip that brings a tool is kept in Documents\ERAVOS\tools (was packs\), other packs in packs\ — never the app's folder;
+  both load every start (desktop/main.js keep-pack kind, desktop-bridge.js isTool). Measured on the built packs: 69 tool zips → tools, Core and
+  Bundles → packs.
+- Proof: tests/p155 3/3; P154 4/4, P150 7/7, P151 2/2, P112 13/13, P76 4/4, P108/P109/P113 green, Timeline 89/89, boundary 10/10; design check no
+  worse. P70's curve-lane failure is on main too.
+
 ## Done — 3.152 Notes and patterns open on the Workshop (W2a) (2026-11-08)
 His words: "The edit pattern or note doesn’t open workshop." · "The workshop should be built. It says in the commit"
 - Found: the Workshop was built and released (W1, 3.150; the Step kind, PR #139/#141; in v0.2.17), but only the Pattern and Step tools opened it.
