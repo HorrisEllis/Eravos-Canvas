@@ -44,7 +44,8 @@
   "works_with": [
     "eravos.agents.ai-step",
     "eravos.coding.code-cell",
-    "eravos.image.image-adjust"
+    "eravos.image.image-adjust",
+    "eravos.orchestration.box"
   ],
   "status": "built",
   "conflicts": []
