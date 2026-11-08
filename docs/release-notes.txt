@@ -1,3 +1,16 @@
+ERAVOS v0.2.17 (2026-11-08)
+
+Install: on 0.2.16, ERAVOS offers this update by itself (⚙ Settings › About & updates › Check for updates).
+
+- The Workshop (flat): one thing on a work surface, edited completely — layers, history, undo. The Pattern tool opens on it: a pattern
+  as a structure → a shape → the notes that emerge, played live into any wired instrument.
+- Patterns in the browser and on the Timeline: Pattern presets and your saved structures are blocks in the pattern browser; To the
+  Timeline writes the emerged notes as a clip you can edit note by note.
+- A joined note's curve reaches worklet instruments (Retro DCO, Swarm): Connect edges no longer play flat.
+- Automation and Cybernetics (was AI Automation) gains Step: one step of a pipeline as a tool, wired to the steps before and after it.
+  A Nexus pipeline opens on the canvas as Steps and wires (Start › Open a .erv). Open in Workshop edits a step completely: what it
+  carries comes forward, what it does not is set aside with the reason. Nothing about the canvas changed.
+
 ERAVOS v0.2.16 (2026-11-07)
 
 Install: on 0.2.15, ERAVOS offers this update by itself (⚙ Settings › About & updates › Check for updates).
