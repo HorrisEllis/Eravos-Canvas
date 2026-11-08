@@ -6,7 +6,7 @@
 
 **How to read it.** Each entry is one contribution: the exact words (checked word for word against their source by `node build/competence.mjs --check`), when, who it came from, what kind of thing it was, how it developed, what came of it, and the evidence a stranger can check. **Confidence is three separate levels, never one score**: *proposed* (an idea) · *demonstrated* (built and tested here — built by the AI coder to his direction: the idea and the call are his, the code is not claimed as his) · *independently verified* (validated outside this project — none yet). **Append-only**: an entry is never edited; a correction is a new entry that amends it. Generated from `docs/competence/register.jsonl` — do not edit this page. The record before this register (merged work since 2026-10-15, with merge times): `docs/PROOF-OF-COMPETENCY.md`.
 
-**44 entries** · his: 38 (17 proposed · 21 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
+**45 entries** · his: 39 (17 proposed · 22 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
 
 ## Ideas
 _what he originated, proposed or identified_
@@ -57,6 +57,7 @@ _decisions, the alternatives in front of him, and the way he set_
 | R-2026-11-06-39 | 2026-11-06 16:05:42 UTC | “Merge and push.” | decision | Merged through a pull request (the house rule: no pushes to main). | PR #112 merged 2026-11-06T16:14:37Z after CI passed. | `git log origin/main --merges (6adc22a)` | demonstrated |
 | R-2026-11-06-40 | 2026-11-06 18:58:31 UTC | “Yes follow up and entry” | direction | The follow-up: a test fixed, Swarm in the Odd Couples set, the proof-of-competency entries. | A follow-up pull request; entries for PR #103 and PR #112 in docs/PROOF-OF-COMPETENCY.md. | `docs/PROOF-OF-COMPETENCY.md` · `tests/p43-odd-couples.test.js` | demonstrated |
 | R-2026-11-07-43 | 2026-11-07 10:08:30 UTC | “What’s next? Highest leverage? Are yo making sure it’s all novel sounds?” | direction | A standing check he asks for: novelty of sound, alongside leverage. | Answered with the N1 numbers; a novelty gate proposed. | `docs/novelty-report.md` · `docs/eco-graph.md` | proposed |
+| R-2026-11-08-45 | 2026-11-08 17:29:52 UTC | “Merge other branches and reorientate” | direction | Asked to bring every branch into main and take stock. | Nothing left to merge (all 7 branches contained in main); state of main summarised. | `git branch -r / git rev-list origin/main..<branch>` | demonstrated |
 
 ## Competence
 _what is shown, at its own level — an idea, a built and tested idea, and outside validation are not the same thing_
@@ -81,7 +82,7 @@ _what is shown, at its own level — an idea, a built and tested idea, and outsi
 - R-2026-11-06-34 · 2026-11-06 15:55:01 UTC · decision — “Nice. That's exactly it. And then the PSD style YAML, maybe ERV as an extension for that.” → Workshop approved (W1–W4); specs/eravos.erv-format.spec written. · evidence: `specs/eravos.workshop.spec` · `specs/eravos.erv-format.spec`
 - R-2026-11-07-43 · 2026-11-07 10:08:30 UTC · direction — “What’s next? Highest leverage? Are yo making sure it’s all novel sounds?” → Answered with the N1 numbers; a novelty gate proposed. · evidence: `docs/novelty-report.md` · `docs/eco-graph.md`
 
-**demonstrated** (21)
+**demonstrated** (22)
 
 - R-2026-11-06-01 · 2026-11-06 06:28:35 UTC · idea — “Can you when picking empty canvas have every tool empty of presets?” → 3.124 built: OrganismFactory.blankStart — 27 tools that loaded a default preset now open plain on an empty canvas. · evidence: `tests/p116-blank-start.test.js (2/2)` · `commit faaccca (branch claude/empty-canvas-blank-tools (commit ids change if squash-merged; the merge is logged as its own entry))`
 - R-2026-11-06-03 · 2026-11-06 06:56:30 UTC · direction — “Ui preview. What’s the highest leverage?” → Swarm Oscillator ranked first (6 components to build, 14.5 other tools each); its UI previewed before any code. · evidence: `docs/eco-graph.md` · `docs/previews/swarm-oscillator-preview.png` · `tools/music/planned/swarm-oscillator.ui.md`
@@ -104,6 +105,7 @@ _what is shown, at its own level — an idea, a built and tested idea, and outsi
 - R-2026-11-06-24 · 2026-11-06 09:23:29 UTC · observation — “Don’t the wubs belong to the wobble bass?” → Confirmed in the code; folding them into its components is open. · evidence: `specs/eravos.2026-11-06-session.map.spec`
 - R-2026-11-06-39 · 2026-11-06 16:05:42 UTC · decision — “Merge and push.” → PR #112 merged 2026-11-06T16:14:37Z after CI passed. · evidence: `git log origin/main --merges (6adc22a)`
 - R-2026-11-06-40 · 2026-11-06 18:58:31 UTC · direction — “Yes follow up and entry” → A follow-up pull request; entries for PR #103 and PR #112 in docs/PROOF-OF-COMPETENCY.md. · evidence: `docs/PROOF-OF-COMPETENCY.md` · `tests/p43-odd-couples.test.js`
+- R-2026-11-08-45 · 2026-11-08 17:29:52 UTC · direction — “Merge other branches and reorientate” → Nothing left to merge (all 7 branches contained in main); state of main summarised. · evidence: `git branch -r / git rev-list origin/main..<branch>`
 
 **independently verified** (0)
 
@@ -158,6 +160,7 @@ _whose each contribution is: his, the AI coder’s, or from outside_
 | R-2026-11-06-42 | 2026-11-06 16:14:37 UTC | collaborative | record: git (the merge commit on main) | outcome |
 | R-2026-11-07-43 | 2026-11-07 10:08:30 UTC | user | James Brooks | direction |
 | R-2026-11-07-44 | 2026-11-07 10:26:25 UTC | collaborative | James Brooks | decision |
+| R-2026-11-08-45 | 2026-11-08 17:29:52 UTC | user | James Brooks | direction |
 
 ## Outcomes
 _what came of each_
@@ -208,4 +211,5 @@ _what came of each_
 | R-2026-11-06-42 | 2026-11-06 16:14:37 UTC | “Merge pull request #112 from HorrisEllis/claude/empty-canvas-blank-tools” | outcome | His direction, built by the AI coder; merged into main. | merge commit 6adc22a on main | `git show 6adc22a` · `docs/PROOF-OF-COMPETENCY.md` | demonstrated |
 | R-2026-11-07-43 | 2026-11-07 10:08:30 UTC | “What’s next? Highest leverage? Are yo making sure it’s all novel sounds?” | direction | A standing check he asks for: novelty of sound, alongside leverage. | Answered with the N1 numbers; a novelty gate proposed. | `docs/novelty-report.md` · `docs/eco-graph.md` | proposed |
 | R-2026-11-07-44 | 2026-11-07 10:26:25 UTC | “I’d make one adjustment to the proposed order, but I agree with the underlying strategy.” | decision | Set the order (advisory novelty gate → Workshop W1 → waveshaper → spectral-features) and three rules: novelty ≠ quality, overlap ≠ redundancy, the measure is not an authority over creativity. | specs/eravos.music-ecosystem.spec ADDENDUM 2026-11-07; build/novelty-gate.mjs (advisory). | `specs/eravos.2026-11-06-session.map.spec` · `build/novelty-gate.mjs` | proposed |
+| R-2026-11-08-45 | 2026-11-08 17:29:52 UTC | “Merge other branches and reorientate” | direction | Asked to bring every branch into main and take stock. | Nothing left to merge (all 7 branches contained in main); state of main summarised. | `git branch -r / git rev-list origin/main..<branch>` | demonstrated |
 
