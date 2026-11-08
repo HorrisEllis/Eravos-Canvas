@@ -41,7 +41,10 @@ describe('Right-click menu: the canvas, any window, and what each tool adds (3.7
       pub('clip_add', { kind: 'notes', target: syn, startBar: 1, bars: 8, notes: [{ s: 0, l: 4, n: 60, v: 0.8 }] }); await TH.sleep(40);
       const cv = v.root.querySelector('canvas[aria-label^="arrangement"]'), li = I.lanes.findIndex(l => l.name === 'Keys'), r = cv.getBoundingClientRect(), s = r.width / cv.offsetWidth, ppb = OrganismFactory.handle(tl).ctx.params.get('pxPerBar');
       rc(cv, r.left + (3 * ppb + 10) * s, r.top + (26 + li * 48 + 24) * s);
-      const it = items().join(' | '); ['Split here (bar 4)', 'In half', 'Repeat ×1', 'Delete the clip', 'full screen', 'Bounce'].forEach(w => assert.ok(it.includes(w), w + ' in ' + it));
+      // 3.115 the clip menu was renamed (Split here · Duplicate · Delete); 2026-11-08 ✎ Edit notes opens the Workshop, 🎹 Edit in the piano roll below it
+      const it = items().join(' | '); ['Edit notes', 'Edit in the piano roll', 'Split here', 'Duplicate', 'Delete'].forEach(w => assert.ok(it.includes(w), w + ' in ' + it));
+      click(/Edit notes/); await TH.sleep(30); assert.ok(Workshop.current && Workshop.current.kind === 'music.notes', 'Edit notes opens the Workshop'); Workshop.current.close();
+      rc(cv, r.left + (3 * ppb + 10) * s, r.top + (26 + li * 48 + 24) * s);
       click(/Split here/); await TH.sleep(20); assert.deepEqual(I.clips.map(c => [c.startBar, c.bars]).sort((a, b) => a[0] - b[0]), [[1, 3], [4, 5]], 'cut at bar 4');
       pub('lane_add', { kind: 'auto', target: syn, key: 'cutoff', points: [[2, 1000]] }); await TH.sleep(30);
       const ai = I.lanes.findIndex(l => l.kind === 'auto'), ev = rc(cv, r.left + (ppb + 10) * s, r.top + (26 + ai * 48 + 24) * s);
