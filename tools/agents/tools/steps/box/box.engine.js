@@ -1,4 +1,4 @@
-/* eravos.orchestration.box 0.1.0 — Box · spec box.spec (domain orchestration · Orchestration)
+/* eravos.agents.box 0.1.0 — Box · spec box.spec (domain agents · AI Automation)
  * One step of a pipeline as a tool. Data, never a fixed list: its kind, ref and step are words it was given; the whole step rides in extra
  * `box`; a kind's colour is its place in the kinds list it was given. What arrives on in goes out as { step, kind, ref, value }.
  * No network, no system named: a pipeline arrives as an ordinary .erv; running it is its owner's.
@@ -7,7 +7,7 @@
   'use strict';
   const S = OrganismSDK.STD;
   OrganismFactory.define({
-    id: 'eravos.orchestration.box', domain: 'orchestration', version: '0.1.0', label: 'Box', icon: '◆', accent: '#00d4ff',
+    id: 'eravos.agents.box', domain: 'agents', version: '0.1.0', label: 'Box', icon: '◆', accent: '#00d4ff',
     category: 'Steps', blurb: 'One step of a pipeline: its kind, what it names, its gate — wired to the steps before and after it.',
     size: { w: 260, h: 190 }, minSize: { w: 200, h: 140 },
     permissions: ['bus_publish', 'bus_subscribe'],
@@ -17,7 +17,7 @@
       S.data_out('box.hook.out', 'out', 'json', 'what this step passes on: { step, kind, ref, value }'),
     ],
     config: [
-      { key: 'kind', type: 'string', default: '', label: 'Kind', group: 'STEP' },
+      { key: 'kind', type: 'string', default: '', label: 'Kind', group: 'STEP', hidden: true },   // data, never shown (his, 2026-11-08)
       { key: 'ref', type: 'string', default: '', label: 'Names', group: 'STEP' },
       { key: 'step', type: 'string', default: '', label: 'Step', group: 'STEP' },
       { key: 'state', type: 'string', default: '', label: 'State', group: 'STEP' },

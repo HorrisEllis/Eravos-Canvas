@@ -44,8 +44,8 @@
   },
   "works_with": [
     "eravos.agents.ai-step",
+    "eravos.agents.box",
     "eravos.coding.code-cell",
-    "eravos.orchestration.box",
     "eravos.video.video-clip"
   ],
   "status": "built",

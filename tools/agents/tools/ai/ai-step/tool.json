@@ -43,9 +43,9 @@
     ]
   },
   "works_with": [
+    "eravos.agents.box",
     "eravos.coding.code-cell",
     "eravos.image.image-adjust",
-    "eravos.orchestration.box",
     "eravos.video.video-clip"
   ],
   "status": "built",

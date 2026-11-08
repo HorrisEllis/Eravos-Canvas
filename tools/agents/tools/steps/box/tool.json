@@ -1,11 +1,11 @@
 {
   "schema": "eravos.tool/1",
-  "id": "eravos.orchestration.box",
+  "id": "eravos.agents.box",
   "version": "0.1.0",
   "label": "Box",
   "icon": "◆",
   "accent": "#00d4ff",
-  "domain": "orchestration",
+  "domain": "agents",
   "category": "steps",
   "summary": "One step of a pipeline as a tool: its kind, what it names, its gate — wired to the steps before and after it.",
   "tags": [
