@@ -54,6 +54,8 @@ jobs:
           node tests/no-playwright.mjs
       - name: Test the update service (no Electron, no network)
         run: node desktop/test/updater.mjs
+      - name: Test the tools in the library (Documents\ERAVOS\tools, store S3)
+        run: node desktop/test/library-tools.mjs
       - name: NSIS (makes ERAVOS-Setup.exe)
         shell: pwsh
         run: |

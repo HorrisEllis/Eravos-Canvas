@@ -128,3 +128,15 @@ open_gaps:
 #   What it needs first: the repository made (a new repo needs him — a session cannot create one), and S1–S2 here before the move, so the
 #   units that move already carry version, digest and needs (the DAG that tells the canvas what it needs) and the resolver is proved.
 #   Still his: D2 (a starter set or nothing), D4 (the music domain core in the library too); D3 answered 2026-11-07 for the app.
+
+# ---- ADDENDUM 2026-11-08 (later) — S3 built: the tools live in Documents\ERAVOS\tools (nothing above is changed)
+#   his words (2026-11-08): "no they were in program files. my eravos folder in documents is empty, just empty folders." · "like i want to make everything outside of the canvas, in a seperate repo. like a tool store." (again — D1 stands: the store repo, after S1–S2)
+#   Found: 3.153 kept DROPPED tool zips in the library, but the tools that ship with ERAVOS stayed in the app folder (Program Files) and
+#   were served from there; the library's folders were made empty.
+#   S3 (desktop/library-tools.js, desktop/main.js): on start the app folder's tools/ (the bundle — the first "store") is put into
+#   Documents\ERAVOS\tools and the page is served the tools from there; the app folder answers only for a file the library lacks.
+#   A new ERAVOS version refreshes only files still as they were copied (digests in tools\.bundled.json); a file you edited is kept;
+#   a file the bundle dropped is removed only if untouched; dropped zips beside them are never touched. Development (not packaged)
+#   serves the repo's tools as before. Measured on the real tree: 1,610 files, 30 MB, first start 278 ms, later starts 17 ms.
+#   Proof: node desktop/test/library-tools.mjs 14/14 (in the release workflow). Not yet run in a built ERAVOS.exe (no Electron here).
+#   Next on this line: S1 (manifests with version, digest, needs) → S2 (the resolver) → the store repo (D1) replaces the bundle.
