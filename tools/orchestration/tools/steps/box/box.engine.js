@@ -17,7 +17,7 @@
       S.data_out('box.hook.out', 'out', 'json', 'what this step passes on: { step, kind, ref, value }'),
     ],
     config: [
-      { key: 'kind', type: 'string', default: '', label: 'Kind', group: 'STEP' },
+      { key: 'kind', type: 'string', default: '', label: 'Kind', group: 'STEP', hidden: true },   // data, never shown (his, 2026-11-08)
       { key: 'ref', type: 'string', default: '', label: 'Names', group: 'STEP' },
       { key: 'step', type: 'string', default: '', label: 'Step', group: 'STEP' },
       { key: 'state', type: 'string', default: '', label: 'State', group: 'STEP' },

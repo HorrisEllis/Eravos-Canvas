@@ -107,3 +107,5 @@ kept), or **open** (not done yet, and what is missing). Newest at the bottom. Ad
 | N6 | "like we can use it for nodes, each compartment. like eravos needs to stay agnostic. maybe it edits steps, like it does a note, or pattern." | **done** (after the preview) | the Workshop kind `orchestration.step`, added by the Box like the Pattern adds its own; the Workshop unchanged · `docs/previews/step-workshop.png` |
 | N7 | "always show me the ui preview first so i can give feedback" | **rule** | a preview before any UI is built or merged (as 2026-11-05's "show him first") |
 | N8 | "okay the workshop it to edit. the canvas are for the tools." | **rule** | the canvas holds the tools wired; the Workshop edits one of them (box.spec ADDENDUM 2026-11-08) |
+| N11 | "also no need to show kinds in the ui. stop doing that. adding noise to the ui" | **rule** (preview) | the kind is data and a colour only: no chip, word, picker or status (box.ui.js; the setting hidden) · `docs/previews/canvas-run-2.png` |
+| N12 | "also pricing?" | answered | his Fiverr gig pipeline's Scope & Pricing page; the box now shows a step's own label ("Scope & Pricing: each package"), not its type |

@@ -47,7 +47,7 @@ describe('Box — a step opened on the Workshop, edited live', () => {
     assert.deepEqual(L.map(l => [l.id, l.type]), [['gate', 'constraint'], ['step', 'value'], ['settings', 'value'], ['contract', 'value'], ['last', 'emergent']]);
     assert.deepEqual(L[0].fields.map(f => f.key), ['gate.notEmpty'], 'the gate\'s own keys');
     assert.ok(L[2].fields.some(f => f.key === 'arg.task.step.config.retries' && f.type === 'number'), 'every leaf of its settings, typed');
-    assert.deepEqual(L[1].fields[0].options, KINDS, 'the kinds it was given');
+    assert.ok(!L.some(l => (l.fields || []).some(f => f.key === 'kind')) && !/pipeline/i.test(L[1].sub), 'no kind shown (his, 2026-11-08: "no need to show kinds in the ui")');
   });
   it('opened from the Box: an edit in the Workshop reaches the tool at once, and undo takes it back', async () => {
     if (!Workshop.kinds().includes('orchestration.step')) assert.ok(Workshop.addKind(window.EravosStepKind).ok, 'registered as the Box\'s window does');
@@ -58,8 +58,8 @@ describe('Box — a step opened on the Workshop, edited live', () => {
       { onChange: (d) => send({ params: { kind: d.kind, ref: d.ref, step: d.step, state: d.state }, box: d.box }) });
     ws.set('arg.task.step.config.retries', '4', 'retries'); await TH.sleep(10);
     assert.equal(c.stateExtra().box.args.task.step.config.retries, 4, 'a setting changed on the tool, typed');
-    ws.set('kind', 'build', 'Kind'); await TH.sleep(10); assert.equal(c.params.get('kind'), 'build', 'the kind changed on the tool');
-    ws.undo(); await TH.sleep(10); assert.equal(c.params.get('kind'), 'pipeline', 'undo reached the tool');
+    ws.set('ref', 'pricing-v2', 'Names'); await TH.sleep(10); assert.equal(c.params.get('ref'), 'pricing-v2', 'what it names changed on the tool');
+    ws.undo(); await TH.sleep(10); assert.equal(c.params.get('ref'), 'pricing-table', 'undo reached the tool');
     ws.set('gate.notEmpty', 'false', 'gate'); await TH.sleep(10); assert.ok(c.stateExtra().box.gate.notEmpty === false, 'the gate edited, as a boolean');
     ws.close();
   });
