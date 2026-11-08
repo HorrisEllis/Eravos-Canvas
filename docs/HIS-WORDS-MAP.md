@@ -94,3 +94,13 @@ kept), or **open** (not done yet, and what is missing). Newest at the bottom. Ad
 | 85 | "Yeah, we can just start with this. The small, like just the flat" | **done** W1 (3.150) | the Workshop surface (`canvas/runtime/workshop.js` + `workshop.css`, domain-free, flat viewport, checked kinds, undo / history, live); the Pattern tool (`tools/music/tools/generators/pattern-field/`) + its part (`components/pattern-field`) + the music PATTERN kind; `docs/previews/workshop-built*.png` |
 | 86 | "Just some ideas. Okay patterns need to be in the timeline or in the pattern browser.  Need the dag for the ui. Like dynamically changes using the constraint field? Like moves around fluidly?" | **done** (patterns, 3.151) · **preview** (the UI field) | patterns: `tools/music/data/pattern-shapes.js` (Pattern presets + saved shapes as browser blocks; To the Timeline), `tests/p151` · UI: `specs/eravos.ui-field.spec`, `docs/previews/ui-field-*.png` |
 | 87 | "Yes. 1 then Show me a preview." | **done** | as above |
+
+## 2026-11-08 — ERAVOS, the build surface for Nexus (said in the Nexus session)
+
+| # | His words (2026-11-08) | Status | Where · proof |
+|---|---|---|---|
+| N1 | "okay the ui is for eravos. using the tools." | **done** (box) | the Orchestration domain, `tools/orchestration/`; its Box tool `eravos.orchestration.box` |
+| N2 | "no i meant the entire canvas. i want nothing about the canvas changed. i want the tools compatable with eravos independantly. eravos is the build surface for nexus. that way if something needs to be built, we can make a tool for eravos. not rebuild it." | **rule** | nothing in `canvas/` changed (boundary 10/10); a pipeline arrives as an ordinary .erv, opened by `Erv.open` |
+| N3 | "nothing is hardcoded" | **rule** | the Box knows no kind, system or address: its kind, ref and colour are data it is given (box.spec) |
+| N4 | "then it can be the entire visual surface for nexus. architect, the wire harness for a visual debugging ui, code generation ui for emerge, debugging, endless possiblies. already a domain for the automation, eventually i want ot add eravos as a system or a compartment at least. it should slot right in" | open | each a domain of tools, built when asked; ERAVOS as a Nexus system or compartment is mapped in Nexus (docs/2026-11-07-eravos-as-a-system-phasemap.spec) |
+

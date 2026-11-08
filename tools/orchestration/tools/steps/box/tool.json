@@ -1,0 +1,51 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.orchestration.box",
+  "version": "0.1.0",
+  "label": "Box",
+  "icon": "◆",
+  "accent": "#00d4ff",
+  "domain": "orchestration",
+  "category": "steps",
+  "summary": "One step of a pipeline as a tool: its kind, what it names, its gate — wired to the steps before and after it.",
+  "tags": [
+    "pipeline",
+    "step",
+    "automation",
+    "orchestration",
+    "dag"
+  ],
+  "files": {
+    "engine": "box.engine.js",
+    "ui": "box.ui.js",
+    "css": "box.css",
+    "preview": "preview.png",
+    "spec": "box.spec",
+    "tests": "box.test.js",
+    "thumb": "thumb.png"
+  },
+  "needs": {
+    "units": [],
+    "tools": [],
+    "permissions": [
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "works_with": [
+    "eravos.agents.ai-step",
+    "eravos.coding.code-cell",
+    "eravos.image.image-adjust",
+    "eravos.video.video-clip"
+  ],
+  "conflicts": [],
+  "status": "building"
+}
