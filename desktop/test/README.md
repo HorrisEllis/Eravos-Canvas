@@ -5,7 +5,7 @@ Build first (`node desktop/build.mjs`), then (ELECTRON = ERAVOS.exe, or an `elec
 
     # the exe layout (canvas/ + tools/ beside resources/app): grows, plays the Future Bass song
     ELECTRON=<electron binary> APP=<ERAVOS>/resources/app LIB=<empty folder> PLAY=1 node desktop/test/skel.mjs
-    # extra packs: drop Core, Effects, Synths packs (node desktop/packs.mjs --out <dir>) → kept in packs/ → restart restores them
+    # extra packs: drop Core, Effects, Synths packs (node desktop/packs.mjs --out <dir>) → tool packs kept in tools/, the rest in packs/ → restart restores them
     ELECTRON=<electron binary> APP=<ERAVOS>/resources/app PACKS=<dir> LIB=<empty folder> node desktop/test/bare.mjs
 
 Linux without a display: prefix with `xvfb-run -a`. Add `--no-sandbox` is already passed.

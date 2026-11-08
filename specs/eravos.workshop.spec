@@ -140,3 +140,19 @@ W2a  music's NOTES kind (`music.notes`, tools/music/tools/arrange/timeline/timel
                "✎ Edit notes" (Patterns) puts the pattern on the Timeline as before and opens it on the Workshop at pattern scale.
      proof     tests/p154-workshop-notes.test.js: Edit note… opens music.notes on that note; an edit reaches the clip; pick opens another
                note; Patterns › Edit notes opens the Workshop; the inline editor still opens on double-click.
+
+## ADDENDUM 2026-11-08 (later) — W2b: the Workshop hosts the whole piano roll (his words)
+# James, 2026-11-08: "need all of the node editor from the timeline, like workshop needs much more. can you continue the workshop."
+W2b  The canvas's Workshop may HOST a kind's own editor in its viewport (domain-free: Workshop.open(..., { host, hostLabel, hostKey, onView })):
+       view      two tabs over the viewport: the hosted editor (first) and the kind's drawn view (kept: nothing taken away)
+       history   api.record(doc, label): an edit made in the hosted editor is one step in HISTORY (no onChange echo);
+                 api.sync(doc): the editor's selection reaches the inspector (no step); undo / redo / a HISTORY click restore through onChange
+       keys      hostKey(e): the editor keeps its own Esc (a selection, its quick editor, step input); Esc with nothing open closes the Workshop
+     music   "✎ Edit note…", Timeline right-click › ✎ Edit notes and Patterns › ✎ Edit notes open the Workshop with the Timeline's piano roll
+             in it — every tool (draw, paint, split, erase, select, bend, sketch), grid, zoom, lanes (velocity, curves), patterns, scale lock,
+             quantize / humanize / legato / Connect edges, clipboard, step input, per-note knobs — the roll's own code, moved, not copied.
+             Each roll edit is a HISTORY step (ADD · EDIT · DELETE, with how many notes); the inspector follows the selected note.
+             Closing puts the roll back in the Timeline at the same spot; hiding the roll closes the Workshop. ⛶ and ⧉ hide inside it.
+     dag     Workshop(host) ← timeline.pianoroll.el · roll.commit → clip_edit + Workshop.record · Workshop.undo → onChange → roll.commit
+             (no record) · roll.select → Workshop.sync · Workshop.close → onClose → the roll back home
+     proof   tests/p155-workshop-hosts-roll.test.js 3/3; P154 4/4 (the drawn view is the second tab); Timeline 89/89; boundary 10/10

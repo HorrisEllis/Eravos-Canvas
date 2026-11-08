@@ -120,8 +120,9 @@ ipcMain.handle('eravos:update-channel', (e, c) => UPDATER ? (c ? UPDATER.setChan
 ipcMain.on('eravos:update-log', () => shell.openPath(path.join(DIRS.appdata, 'update', 'update.log')));
 app.on('will-quit', () => { if (UPDATER) UPDATER.onQuit(); });
 ipcMain.handle('eravos:info', () => ({ library: HOME, dirs: DIRS, version: app.getVersion(), desktop: true }));
-ipcMain.handle('eravos:keep-pack', (e, { name, data }) => {
-  const safe = path.basename(String(name || 'pack.zip')).replace(/[^\w.\- ]+/g, '_'); const dst = path.join(DIRS.packs, /\.zip$/i.test(safe) ? safe : safe + '.zip');
+// a dropped zip is kept in the library (Documents\ERAVOS), never in the app's folder: tools → tools\, every other pack → packs\
+ipcMain.handle('eravos:keep-pack', (e, { name, data, kind }) => {
+  const safe = path.basename(String(name || 'pack.zip')).replace(/[^\w.\- ]+/g, '_'); const dst = path.join(kind === 'tools' ? DIRS.tools : DIRS.packs, /\.zip$/i.test(safe) ? safe : safe + '.zip');
   try { if (fs.existsSync(dst) && fs.statSync(dst).size === data.byteLength) return { kept: false, path: dst }; fs.writeFileSync(dst, Buffer.from(data)); return { kept: true, path: dst }; } catch (err) { return { kept: false, error: err.message }; }
 });
 ipcMain.on('eravos:open-library', (e, sub) => shell.openPath(sub && DIRS[sub] ? DIRS[sub] : HOME));
