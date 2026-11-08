@@ -2,6 +2,11 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.154 W2b withdrawn: the piano roll back out of the Workshop (2026-11-08)
+His words: "no the note editor, not the piano, the tools are for the canvas. if its going to be in the workshop, it needs to add what the timeline doesn't. like all the ways to manipulate a note, that the piano roll has. im trying to decide if thats better or not. the note editor is for fully shaping, manipulating."
+- workshop.js, workshop.css, timeline.pianoroll.js/.css, P154 and run.html put back as they were before 3.153; tests/p155 and the preview removed.
+  The dropped-tool-zip fix from 3.153 stays. The note editor's direction (shaping one note) is in specs/eravos.workshop.spec, his to decide.
+
 ## Done — 3.153 The Workshop hosts the whole piano roll (W2b); dropped tool zips kept in Documents\ERAVOS\tools (2026-11-08)
 His words: "need all of the node editor from the timeline, like workshop needs much more. can you continue the workshop." · "also tools should be added by dragging in zipped tools. the documents folder, not in the program files."
 - canvas/runtime/workshop.js: a kind's own editor can be hosted in the viewport (o.host / hostLabel / hostKey / onView; api.record, api.sync,

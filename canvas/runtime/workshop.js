@@ -7,7 +7,7 @@
  * a tab per open document · ONE flat viewport (the kind draws it) · OUTLINER · LAYERS (grouped, as the kind groups them) · INSPECTOR / HISTORY ·
  * a status bar. Every edit is one undo step (Ctrl+Z / Ctrl+Shift+Z, or a click in HISTORY); every edit reaches its owner at once (live).
  *   Workshop.check(kind) → [] or the problems, in words · Workshop.addKind(kind) → { ok, problems } · Workshop.kinds()
- *   Workshop.open(kindId, doc, { onChange(doc), onApply(doc), onClose(), title, host, hostLabel, hostKey(e), onView(v) }) → { doc(), set(key, v), select(layerId), undo(), redo(),
+ *   Workshop.open(kindId, doc, { onChange(doc), onApply(doc), onClose(), title }) → { doc(), set(key, v), select(layerId), undo(), redo(),
  *     history(), close(), el } · Workshop.current
  * A kind: { id, label, layers(doc) → [{ id, label, group, type, sub, fields: [{ key, label, type: number|enum|text, min, max, step, unit,
  *   options }] }], get(doc, key), set(doc, key, value) → doc, draw(g, W, H, doc, { selected, hover }), apply(doc)?, title(doc)?, stations(doc)?,
@@ -43,11 +43,6 @@
     const root = el('div', 'ws-app', [], { role: 'dialog', 'aria-label': K.label });
     const bar = el('div', 'ws-bar'), opts = el('div', 'ws-opts'), strip = el('div', 'ws-strip'), tabs = el('div', 'ws-tabs'), vp = el('div', 'ws-vp');
     const cv = el('canvas', 'ws-canvas'); vp.appendChild(cv);
-    // W2b: a kind's own editor may be HOSTED in the viewport (o.host: an element; o.hostLabel its tab). It edits the document itself and
-    // tells the Workshop with api.record (one history step, no onChange back) or api.sync (no step). The drawn view stays one tab away.
-    let view = o.host ? 'host' : 'drawn';
-    if (o.host) vp.appendChild(o.host);
-    function showView() { cv.style.display = view === 'drawn' ? '' : 'none'; if (o.host) o.host.style.display = view === 'host' ? '' : 'none'; vp.classList.toggle('ws-hosted', view === 'host'); }
     const outl = el('div', 'ws-pane'), lays = el('div', 'ws-pane ws-grow'), insp = el('div', 'ws-pane'), status = el('div', 'ws-status');
     const right = el('div', 'ws-right', [outl, lays, insp]), centre = el('div', 'ws-centre', [tabs, vp]);
     root.append(bar, opts, strip, centre, right, status);
@@ -92,9 +87,7 @@
       opts.replaceChildren(el('span', 'ws-tool', [], { text: sel ? sel.label : '' }), ...((sel && sel.fields) || []).map(f => field(f, false)));
       // the tool strip: the kind's tools (a tool may select a layer)
       strip.replaceChildren(...(K.tools || []).map(t => el('button', 'ws-ti' + (t.layer && t.layer === selected ? ' on' : ''), [], { type: 'button', title: t.label, text: t.glyph || t.label.slice(0, 1), onclick: () => { if (t.layer) { selected = t.layer; render(); } } })));
-      tabs.replaceChildren(...(o.host ? [el('span', 'ws-tab' + (view === 'host' ? ' on' : ''), [String(o.hostLabel || 'EDITOR')], { onclick: () => setView('host') })] : []),
-        el('span', 'ws-tab' + (view === 'drawn' ? ' on' : ''), [String(title), el('i', '', [], { text: '×', onclick: (e) => { e.stopPropagation(); close(); } })], { onclick: () => setView('drawn') }));
-      showView();
+      tabs.replaceChildren(el('span', 'ws-tab on', [String(title), el('i', '', [], { text: '×', onclick: () => close() })]));
       // OUTLINER
       const ol = K.outline ? K.outline(d) : [[0, title]];
       outl.replaceChildren(el('div', 'ws-ph', [el('span', 'on', [], { text: 'OUTLINER' })]), el('div', 'ws-tree', ol.map(([depth, t, lid]) => el('div', lid && lid === selected ? 'sel' : '', [], { text: ' '.repeat(depth * 3) + t, onclick: () => { if (lid) { selected = lid; render(); } } }))));
@@ -111,19 +104,14 @@
       status.replaceChildren(...(K.status ? K.status(d) : []).map(([k, v]) => el('span', '', [k + ' ', el('b', '', [], { text: String(v) })])), el('span', 'ws-r', [], { text: (note ? note + ' · ' : '') + (past.length ? past.length + ' EDITS · ' : '') + 'LIVE' }));
       draw();
     }
-    function setView(v) { if (v !== 'host' && v !== 'drawn') return; if (v === 'host' && !o.host) return; view = v; render(); if (o.onView) { try { o.onView(v); } catch (e) { console.error(e); } } }
-    function record(next, label) { past.push(clone(d)); future = []; d = clone(next); hist.push({ label: String(label || 'EDIT'), doc: clone(d) }); if (hist.length > 200) hist.splice(1, 1); render(); }
-    function sync(next) { d = clone(next); render(); }
     const onKey = (e) => { if (!root.isConnected) return; const t = e.target && e.target.tagName; if (t === 'INPUT' || t === 'TEXTAREA') return;
-      if (o.hostKey && view === 'host') { let mine = false; try { mine = !!o.hostKey(e); } catch (er) { console.error(er); } if (mine) return; }
       if (e.key === 'Escape') { e.preventDefault(); close(); } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); } };
     const onResize = () => draw();
     cv.addEventListener('pointerdown', (e) => { if (!K.pick) return; const r = cv.getBoundingClientRect(), p = K.pick(d, e.clientX - r.left, e.clientY - r.top, r.width, r.height, { selected }); if (p && p.key !== undefined) edit(p.key, p.value, p.label); });
     function close() { if (!root.isConnected) return; root.remove(); doc.documentElement.classList.remove('ws-open'); global.removeEventListener('keydown', onKey, true); global.removeEventListener('resize', onResize); if (current === api) current = null; if (o.onClose) o.onClose(clone(d)); }
     global.addEventListener('keydown', onKey, true); global.addEventListener('resize', onResize);
     doc.body.appendChild(root); doc.documentElement.classList.add('ws-open'); render(); global.requestAnimationFrame(draw);
-    const api = { el: root, doc: () => clone(d), set: (k, v, label) => edit(k, v, label), select: (id) => { selected = id; render(); }, undo, redo, history: () => hist.map(h2 => h2.label), close, kind: K.id,
-      record, sync, view: (v) => { if (v !== undefined) setView(v); return view; } };
+    const api = { el: root, doc: () => clone(d), set: (k, v, label) => edit(k, v, label), select: (id) => { selected = id; render(); }, undo, redo, history: () => hist.map(h2 => h2.label), close, kind: K.id };
     current = api; return api;
   }
   global.Workshop = { check, addKind, open, kinds: () => Array.from(KINDS.keys()), TYPES, get current() { return current; } };
