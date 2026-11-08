@@ -22,7 +22,7 @@
       { key: 'step', type: 'string', default: '', label: 'Step', group: 'STEP' },
       { key: 'state', type: 'string', default: '', label: 'State', group: 'STEP' },
     ],
-    ui_hooks: [],
+    ui_hooks: ['step_set'],
     presets: {},
     engine(ctx) {
       const P = ctx.params;
@@ -33,6 +33,8 @@
         out({ step: P.get('step'), kind: P.get('kind'), ref: P.get('ref'), value });
         ctx.syncUI();
       });
+      // the Workshop's edits (his: "maybe it edits steps, like it does a note, or pattern"): the step's words and its whole box, at once
+      ctx.onUI('step_set', null, (x) => { if (!x) return; if (x.params) P.setMany(x.params); if (x.box && typeof x.box === 'object') box = x.box; ctx.syncUI(); });
       ctx.stateExtra = () => ({ box, kinds, last });
       ctx.saveExtra = () => ({ box, kinds, last });
       ctx.loadExtra = (x) => { if (!x) return; box = x.box === undefined ? null : x.box; kinds = Array.isArray(x.kinds) ? x.kinds : []; last = x.last === undefined ? null : x.last; };
