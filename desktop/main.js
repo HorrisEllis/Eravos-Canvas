@@ -2,7 +2,8 @@
  * One window, served from eravos://app/ (privileged secure scheme: stable origin, secure context, no port).
  * The app grants MIDI + microphone to its own origin only. The app folder (Program Files\ERAVOS when installed) has the
  * project's own layout — canvas/ tools/ schemas/ README.md, served as the app — and is never written to.
- * Your work lives in the library, Documents\ERAVOS: projects/ exports/ packs/ tools/ drop/ .appdata/ (see pickHome). */
+ * Your work lives in the library, Documents\ERAVOS: projects/ exports/ packs/ tools/ drop/ .appdata/ (see pickHome).
+ * The tools are served from the library's tools/ (store S3, library-tools.js); the app folder's copy fills it on start. */
 'use strict';
 const { app, BrowserWindow, protocol, net, session, shell, ipcMain, Menu, dialog } = require('electron');
 const path = require('path'), fs = require('fs'), { pathToFileURL } = require('url');
@@ -44,6 +45,13 @@ for (const old of OLD_HOMES) ['projects', 'exports', 'packs', 'drop', '.appdata'
 const OLD = [path.join(HOME, 'ERAVOS Library'), path.join(app.getPath('documents'), 'ERAVOS Library')].find(d => fs.existsSync(d));
 if (OLD) [['Projects', 'projects'], ['Exports', 'exports'], ['Drop Here', 'drop'], ['.appdata', 'appdata']].forEach(([from, to]) => adopt(path.join(OLD, from), DIRS[to]));
 Object.values(DIRS).forEach(d => fs.mkdirSync(d, { recursive: true }));
+// store S3 (his words 2026-11-08: "no they were in program files. my eravos folder in documents is empty"): the tools live in the library.
+// The app folder's tools/ is the first copy (the bundle) — put into Documents\ERAVOS\tools on start (only what changed; nothing you
+// edited is overwritten) and served from there; the app folder answers only for a file the library does not have. In development (not
+// packaged) the repo's tools/ is served as it is, so edits show at once — ERAVOS_LIBRARY_TOOLS=1 tries the library path there too.
+const LIBTOOLS = require('./library-tools.js'), BUNDLE_TOOLS = path.join(APP_DIR, 'tools');
+const TOOLS_IN_LIBRARY = app.isPackaged || process.env.ERAVOS_LIBRARY_TOOLS === '1';
+if (TOOLS_IN_LIBRARY) { try { const r = LIBTOOLS.sync(BUNDLE_TOOLS, DIRS.tools, { version: app.getVersion() }); if (!r.skipped) console.log(`tools → ${DIRS.tools}: ${r.copied} copied, ${r.updated} updated, ${r.removed} removed, ${r.kept.length} of yours kept`); } catch (e) { console.error('tools into the library failed:', e.message); } }
 app.setPath('userData', DIRS.appdata);
 
 // ---------------------------------------------------------------- one instance
@@ -157,6 +165,10 @@ app.whenReady().then(async () => {
       return net.fetch(`http://127.0.0.1:${GLASS.port}${u.pathname}${u.search}`, init);
     }
     let rel = decodeURIComponent(u.pathname); if (rel.endsWith('/')) rel += 'index.html';
+    if (TOOLS_IN_LIBRARY && /^\/tools\//.test(rel)) {   // the tools: from Documents\ERAVOS\tools, else the app folder's copy
+      const f = LIBTOOLS.resolve(rel.slice('/tools/'.length), DIRS.tools, BUNDLE_TOOLS);
+      return f ? net.fetch(pathToFileURL(f).toString()) : new Response('not found', { status: 404 });
+    }
     const file = path.resolve(APP_DIR, '.' + rel);
     if (!file.startsWith(APP_DIR + path.sep)) return new Response('forbidden', { status: 403 });
     // only the project's app folders — never your projects, .appdata or the Electron runtime next to them

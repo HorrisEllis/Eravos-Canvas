@@ -2,6 +2,12 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.155 The tools live in Documents\ERAVOS\tools (store S3) (2026-11-08)
+His words: "no they were in program files. my eravos folder in documents is empty, just empty folders." · "like i want to make everything outside of the canvas, in a seperate repo. like a tool store."
+- desktop/library-tools.js (NEW): sync(bundle → library) and resolve(library, else bundle). desktop/main.js: on start (packaged) the app
+  folder's tools/ goes into Documents\ERAVOS\tools; eravos://app/tools/* is served from there. Your edits are kept across versions.
+- Measured: 1,610 files, 30 MB; first start 278 ms, later 17 ms. desktop/test/library-tools.mjs 14/14, in the release workflow.
+
 ## Done — 3.154 W2b withdrawn: the piano roll back out of the Workshop (2026-11-08)
 His words: "no the note editor, not the piano, the tools are for the canvas. if its going to be in the workshop, it needs to add what the timeline doesn't. like all the ways to manipulate a note, that the piano roll has. im trying to decide if thats better or not. the note editor is for fully shaping, manipulating."
 - workshop.js, workshop.css, timeline.pianoroll.js/.css, P154 and run.html put back as they were before 3.153; tests/p155 and the preview removed.
