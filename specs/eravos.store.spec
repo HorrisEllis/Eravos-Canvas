@@ -118,3 +118,13 @@ open_gaps:
 #   S6 begun for the app itself: every merge to main → a beta of ERAVOS (v<next patch>-beta.<run>, a pre-release, never "latest"),
 #   offered on Settings › About & updates › Updates › Beta. D3 answered for the app: betas on every merge to main (branches on demand
 #   stays open). Units (tools, packs) from branches: still S6, after S1–S4.
+
+# ---- ADDENDUM 2026-11-08 — D1 answered: a separate repo (nothing above is changed)
+#   his words (2026-11-08): "like i want to make everything outside of the canvas, in a seperate repo. like a tool store." Said after
+#   "remember this is meant to be dynamic and expanding. dag is what tells eravos canvas what it needs."
+#   D1 decided by him: the store is its own repository (the line is the repo line): everything that is not the canvas — domains, tools,
+#   components, packs, suites — lives there and is built into units by its CI; this repo keeps the canvas (host, kernel, runtime, schemas,
+#   its own UI elements). The proposal "start here, move later" is superseded (kept above, §9).
+#   What it needs first: the repository made (a new repo needs him — a session cannot create one), and S1–S2 here before the move, so the
+#   units that move already carry version, digest and needs (the DAG that tells the canvas what it needs) and the resolver is proved.
+#   Still his: D2 (a starter set or nothing), D4 (the music domain core in the library too); D3 answered 2026-11-07 for the app.
