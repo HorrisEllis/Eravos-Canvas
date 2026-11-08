@@ -113,7 +113,6 @@
     // position:fixed would stay inside it) — full screen MOVES the roll onto the page over everything, and back to the same
     // spot after. Every hit test maps by the live rect (toContent), so nothing else changes. ⛶ again, Esc or closing the clip.
     let full = null;
-    let ws = null, wsIn = false, wsHome = null, wsSel = -1;   // W2b: the Workshop this roll is hosted on (openWorkshop)
     const fullBtn = UI.Button({ label: '⛶', hint: 'Full screen — the notes fill the whole screen (⛶ again or Esc)', onClick: () => setFull(!full) });
     function fullKey(e) { if (e.key !== 'Escape' || !full) return; if (S.size || stepOn || editor.classList.contains('open')) return; e.preventDefault(); e.stopPropagation(); setFull(false); }
     function setFull(on) {
@@ -125,7 +124,6 @@
     }
     // 3.109 ⧉ the roll in its own borderless window (the timeline places it; the roll only asks)
     const winBtn = UI.Button({ label: '⧉', hint: 'the piano roll in its own window — size it and place it anywhere on the canvas (⧉ again: back under the tracks)', onClick: () => { if (opts && opts.onWindow) opts.onWindow(); } });
-    [fullBtn, winBtn].forEach(b => b.el.classList.add('tlpr-nows'));
     if (!(opts && opts.onWindow)) winBtn.el.style.display = 'none';
     const setWindowed = (on) => { winBtn.set('⧉'); winBtn.el.title = on ? 'Back inside — the piano roll under the tracks' : 'Own window — the piano roll in a window of its own'; winBtn.el.classList.toggle('on', !!on); el.classList.toggle('tlpr-win', !!on); };
     const readout = h('span', { class: 'tlpr-pos', 'aria-live': 'polite', text: '' });
@@ -232,7 +230,6 @@
     }
     function draw() {
       if (!clip) return;
-      if (ws) wsFollow();
       const st = steps(), W = Math.max(200, st * pps), H = Hh();
       const g = size(cv, W, H);
       if (drums) rowNotes.forEach((n, i) => { g.fillStyle = i % 2 ? '#0e141c' : '#111822'; g.fillRect(0, i * ROW, W, ROW); g.fillStyle = '#0a0f15'; g.fillRect(0, i * ROW + ROW - 1, W, 1); });
@@ -450,14 +447,7 @@
       const { x, y } = vLocal(e), k = curveK(), q = drag.pts[drag.at], lo = drag.at > 0 ? drag.pts[drag.at - 1][0] + 1e-3 : 1, hi = drag.at < drag.pts.length - 1 ? drag.pts[drag.at + 1][0] - 1e-3 : 1e9;
       q[0] = clampN(Math.round(cBar(x) * 64) / 64, lo, hi); q[1] = cV(k, y); drag.changed = true; readout.textContent = autoL.name + ' ' + q[1] + (k.unit ? ' ' + k.unit : '') + ' · bar ' + q[0].toFixed(2); draw();
     }
-    function commit(next) { const prev = notes; notes = next; draw(); if (clip) view.emit('clip_edit', { id: clip.id, patch: { notes: next } }); if (ws && !wsIn) ws.record(wsDoc(), editLabel(prev, next)); }
-    // W2b: while the roll is hosted on the Workshop, every edit made here is one step in the Workshop's HISTORY (undo there puts it back)
-    const wsDoc = () => ({ notes: notes.map(n => JSON.parse(JSON.stringify(n))), sel: Math.max(0, Math.min(notes.length - 1, S.size ? Math.min(...S) : 0)), name: (clip && clip.name) || toolName(), drums: !!drums });
-    function editLabel(a, b) {
-      const d = b.length - a.length; if (d > 0) return 'ADD · ' + d + (d === 1 ? ' NOTE' : ' NOTES'); if (d < 0) return 'DELETE · ' + (-d) + (d === -1 ? ' NOTE' : ' NOTES');
-      let k = 0; for (let i = 0; i < b.length; i++) if (JSON.stringify(a[i]) !== JSON.stringify(b[i])) k++; return 'EDIT · ' + k + (k === 1 ? ' NOTE' : ' NOTES');
-    }
-    function wsFollow() { if (!ws) return; const i = S.size ? Math.min(...S) : -1; if (i === wsSel || i < 0) return; wsSel = i; ws.sync(wsDoc()); }
+    function commit(next) { notes = next; draw(); if (clip) view.emit('clip_edit', { id: clip.id, patch: { notes: next } }); }
     function audition(ns) { if (lane) view.emit('note_audition', { lane: lane.id, note: ns[0], notes: ns }); }
     function pitchFor(n) { return drums ? n : lock ? MT.quantize(n, key.root, key.scale) : n; }
     function stampNotes(n) {
@@ -892,23 +882,9 @@
     // W2a: the clip's notes on the Workshop (tools/music/tools/arrange/timeline/timeline.workshop.js), the open note `i`; every edit through commit()
     function openWorkshop(i) {
       const WK = global.EravosTimelineWorkshop; if (!WK || !WK.ensure() || !clip) return openEditor(i);
-      closeEditor(); setFull(false); if (i !== undefined && !S.has(i)) selOnly(i); draw();
-      // the whole roll moves into the Workshop's viewport (every tool, key and lane as it is) and comes back to the same spot on close
-      wsHome = { parent: el.parentNode, next: el.nextSibling }; el.classList.add('tlpr-in-ws');
-      const api = global.Workshop.open('music.notes', Object.assign(wsDoc(), { sel: Math.max(0, i | 0) }), {
-        host: el, hostLabel: 'PIANO ROLL', title: clip.name || toolName(),
-        onChange: (d) => { wsIn = true; try { commit(d.notes.map(n => Object.assign({}, n))); } finally { wsIn = false; } },
-        hostKey: (e) => {   // the roll's own Esc (a selection, the quick editor, step input) is the roll's, not "close the Workshop"
-          if (e.key !== 'Escape' || !(S.size || stepOn || editor.classList.contains('open'))) return false;
-          if (!el.contains(document.activeElement)) { e.preventDefault(); if (editor.classList.contains('open')) closeEditor(); else if (stepOn) setStep(false); else { S.clear(); draw(); } }
-          return true;
-        },
-        onView: (v) => { if (v === 'host') requestAnimationFrame(() => { autoFill(); draw(); }); },
-        onClose: () => { const h = wsHome; ws = null; wsHome = null; wsSel = -1; el.classList.remove('tlpr-in-ws'); el.style.display = '';
-          if (h && h.parent) h.parent.insertBefore(el, h.next && h.next.parentNode === h.parent ? h.next : null); if (clip) requestAnimationFrame(draw); }
-      });
-      ws = api; wsSel = i | 0; requestAnimationFrame(() => { autoFill(); draw(); cv.focus({ preventScroll: true }); });
-      return api;
+      closeEditor(); if (i !== undefined && !S.has(i)) selOnly(i); draw();
+      return global.Workshop.open('music.notes', { notes: notes.map(n => JSON.parse(JSON.stringify(n))), sel: Math.max(0, i | 0), name: clip.name || toolName(), drums: !!drums },
+        { onChange: (d) => commit(d.notes.map(n => Object.assign({}, n))), title: clip.name || toolName() });
     }
     function openEditor(i) {
       const a0 = notes[i]; if (!a0) return; if (!S.has(i)) selOnly(i); draw(); editor.innerHTML = ''; edMode = 'note'; toolCtl = new Map(); toolSig = '';   // a note inside a selection keeps the selection
@@ -1247,7 +1223,7 @@
         ['wheel', 'pointerdown', 'keydown'].forEach(t => scroll.addEventListener(t, () => { userScrolled = true; }, { passive: true })); }
       centreNow = centre;
     }
-    function hide() { if (ws) ws.close(); setFull(false); clip = null; openedId = null; closeEditor(); setStep(false); el.classList.remove('open'); }
+    function hide() { setFull(false); clip = null; openedId = null; closeEditor(); setStep(false); el.classList.remove('open'); }
     function playhead(barPos) { if (!clip) return; const p = barPos === null ? null : (barPos - clip.startBar) * 16; if (p !== playStep) { playStep = p; draw(); } }
     setMode(null); setTool('draw');
     return { el, show, hide, playhead, setFull, setWindowed, get title() { return title.textContent; }, get full() { return !!full; }, get open() { return !!clip; }, get clipId() { return clip && clip.id; }, get drums() { return drums; },

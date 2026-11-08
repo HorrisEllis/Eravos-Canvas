@@ -156,3 +156,9 @@ W2b  The canvas's Workshop may HOST a kind's own editor in its viewport (domain-
      dag     Workshop(host) ← timeline.pianoroll.el · roll.commit → clip_edit + Workshop.record · Workshop.undo → onChange → roll.commit
              (no record) · roll.select → Workshop.sync · Workshop.close → onClose → the roll back home
      proof   tests/p155-workshop-hosts-roll.test.js 3/3; P154 4/4 (the drawn view is the second tab); Timeline 89/89; boundary 10/10
+
+## ADDENDUM 2026-11-08 (later still) — W2b withdrawn: the roll stays on the canvas; the note editor shapes a note (his correction)
+# James, 2026-11-08: "no the note editor, not the piano, the tools are for the canvas. if its going to be in the workshop, it needs to add what the timeline doesn't. like all the ways to manipulate a note, that the piano roll has. im trying to decide if thats better or not. the note editor is for fully shaping, manipulating."
+W2b (the Workshop hosting the piano roll, PR #145) is taken back out: the roll's tools are the canvas's (the Timeline). Kept above as it was
+(nothing lost). The Workshop's note scale is for FULLY SHAPING one note — what the Timeline and its roll do not do. Open: his decision on
+whether that split is better (the coder's read: yes — the roll arranges many notes, the note editor shapes one, no copy between them).
