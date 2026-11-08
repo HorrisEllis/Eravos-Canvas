@@ -1,9 +1,9 @@
-# spec_id: eravos.agents.box · version 0.1.0 · status building · template eravos.tool/1 · domain agents (AI Automation)
+# spec_id: eravos.agents.step · version 0.1.0 · status building · template eravos.tool/1 · domain agents (AI Automation)
 # His words (2026-11-08): "okay the ui is for eravos. using the tools." · "nothing is hardcoded" · "no i meant the entire canvas. i want nothing
 #   about the canvas changed. i want the tools compatable with eravos independantly. eravos is the build surface for nexus. that way if something
 #   needs to be built, we can make a tool for eravos. not rebuild it."
 identity:
-  id: eravos.agents.box ; label: Box ; icon: ◆ ; category: Steps
+  id: eravos.agents.step ; label: Box ; icon: ◆ ; category: Steps
   purpose: one step of a pipeline as a tool on the canvas. A pipeline is boxes and wires; it arrives as an ordinary .erv (one box per step, the
     wires between them), written by whoever owns the pipeline (Nexus writes it from its box shape), or is built here by hand.
 contract:
@@ -13,8 +13,8 @@ contract:
   what arrives on in is passed on out as { step, kind, ref, value } (so a person can wire boxes and watch data move); the window shows the last.
   it calls no network and names no system: running a pipeline is its owner's (Nexus's engine); a box shows what it is given.
 ports (dataflow):
-  in:  box.hook.in (in, any) — what the step receives
-  out: box.hook.out (out, json) — { step, kind, ref, value }
+  in:  step.hook.in (in, any) — what the step receives
+  out: step.hook.out (out, json) — { step, kind, ref, value }
 params: kind (string) · ref (string) · step (string) · state (string: what the owner said last — waiting, running, done, failed, gap; '' = none)
 extra (saved): box (the whole step) · kinds (the kinds list it was given) · last (the last value through it)
 needs: units [] · tools [] · permissions [bus_publish, bus_subscribe]
@@ -41,7 +41,7 @@ acceptance (added): the kind passes Workshop.check; its layers come from the ste
 # His words (2026-11-08): "also no need to show kinds in the ui. stop doing that. adding noise to the ui" · "Also isn’t ai automation a domain
 #   already." · "The ui is meant to dynamically change in relation to the kind. Show me the ui for the workshop" · shown the previews, then: "I liked
 #   the uploaded screenshot. 3d. Is it like that? So why not use that domain? Yes. Follow the spec."
-moved: from its own Orchestration domain into AI Automation (agents), category Steps beside AI and Code; id eravos.agents.box (was
+moved: from its own Orchestration domain into AI Automation (agents), category Steps beside AI and Code; id eravos.agents.step (was
   eravos.orchestration.box, PR #138); the Orchestration domain removed (one automation domain). Its Workshop kind is agents.step.
 no kinds shown: the kind is data (the setting hidden) and a colour; the window, the Workshop's title, outline, status and node show the step's own
   label; "last" shows the value that came in, without the wrappers each step adds.
@@ -50,3 +50,8 @@ the Workshop reshapes to the step (after specs/eravos.ui-field.spec): IN PLAY = 
 3D: the approved studio layout (docs/previews/workshop-studio.png) is the Workshop spec's later phases; the flat surface (W1) is what is built.
 acceptance (P153, updated): in play / not in play from the data; settings named plainly; nothing repeated; an edit, an undo, a gate change reach
   the tool — 2/2.
+
+# ---- ADDENDUM 2026-11-08 — named Step (nothing above changed)
+# His words (2026-11-08): "step, makes more sense, wait, why not just call them step then it can be agnostic"
+renamed: eravos.agents.box → eravos.agents.step (folder steps/step, files step.*, hooks step.hook.in / step.hook.out, label Step). The Workshop kind
+  stays agents.step. The domain's label Automation and Cybernetics (id agents unchanged), his suggestion, held for his answer before release.

@@ -8,7 +8,7 @@ await p.addInitScript(() => { window.ERAVOS_CATALOG_ALL = true; });
 await p.goto('file://' + ROOT + '/canvas/index.html?noboot'); await p.waitForFunction(() => window.Shell && window.Shell.X && window.Erv && window.Workshop);
 const id = await p.evaluate(async (text) => { Shell.activate(); Shell.X.enterMode('agents'); document.querySelectorAll('.overlay').forEach(o => o.remove());
   await Erv.open(text); await new Promise(x => setTimeout(x, 500));
-  return Kernel.registry.list().find(x => x.organism_id === 'eravos.agents.box' && x.instance_id === 'overview').instance_id; }, fs.readFileSync(ROOT + '/docs/previews/fiverr-gig.erv', 'utf8'));
+  return Kernel.registry.list().find(x => x.organism_id === 'eravos.agents.step' && x.instance_id === 'overview').instance_id; }, fs.readFileSync(ROOT + '/docs/previews/fiverr-gig.erv', 'utf8'));
 await p.evaluate((id) => { const w = CanvasWM.windowOf(id); [...w.querySelectorAll('button')].find(x => /Open in Workshop/.test(x.textContent)).click(); }, id);
 await p.waitForTimeout(700);
 await p.evaluate(() => { const l = [...document.querySelectorAll('.ws-app *')].find(e => /^GATE$/i.test(e.textContent.trim())); if (l) l.click(); });

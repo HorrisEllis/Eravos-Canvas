@@ -1,7 +1,7 @@
 {
  "schema": "eravos.domain/1",
  "id": "agents",
- "label": "AI Automation",
+ "label": "Automation and Cybernetics",
  "version": "1.0.0",
  "icon": "✦",
  "core": [],

@@ -1,16 +1,16 @@
 {
   "schema": "eravos.pack/1",
-  "id": "box.factory",
+  "id": "step.factory",
   "version": "0.1.0",
   "label": "Factory",
   "author": "ERAVOS",
   "tags": [
     "factory"
   ],
-  "for": "eravos.agents.box",
+  "for": "eravos.agents.step",
   "enabled": true,
   "items": {
-    "eravos.agents.box": {
+    "eravos.agents.step": {
       "presets": {}
     }
   }

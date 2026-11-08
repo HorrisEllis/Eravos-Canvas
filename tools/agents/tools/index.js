@@ -4,6 +4,6 @@
   var C = window.Catalog;   // the canvas Catalog loads only installed tools; without it (pack builder, old canvas) → all of them
   function w(k, p) { var u = base + p; if (C) C.load(u, k === 'css'); else document.write(k === 'css' ? '<link rel="stylesheet" href="' + u + '">' : '<script src="' + u + '"><\/script>'); }
   function css(p) { w('css', p); } function js(p) { w('js', p); }
-  [["eravos.agents.ai-step",[["css","tools/ai/ai-step/ai-step.css"],["js","tools/ai/ai-step/ai-step.engine.js"],["js","tools/ai/ai-step/ai-step.ui.js"],["js","tools/ai/ai-step/packs/index.js"]]],["eravos.agents.box",[["css","tools/steps/box/box.css"],["js","tools/steps/box/box.engine.js"],["js","tools/steps/box/box.ui.js"],["js","tools/steps/box/packs/index.js"]]]].forEach(function (t) { if (!C || C.take(t[0])) t[1].forEach(function (f) { w(f[0], f[1]); }); });
+  [["eravos.agents.ai-step",[["css","tools/ai/ai-step/ai-step.css"],["js","tools/ai/ai-step/ai-step.engine.js"],["js","tools/ai/ai-step/ai-step.ui.js"],["js","tools/ai/ai-step/packs/index.js"]]],["eravos.agents.step",[["css","tools/steps/step/step.css"],["js","tools/steps/step/step.engine.js"],["js","tools/steps/step/step.ui.js"],["js","tools/steps/step/packs/index.js"]]]].forEach(function (t) { if (!C || C.take(t[0])) t[1].forEach(function (f) { w(f[0], f[1]); }); });
   
 })();

@@ -1,8 +1,8 @@
 {
   "schema": "eravos.tool/1",
-  "id": "eravos.agents.box",
+  "id": "eravos.agents.step",
   "version": "0.1.0",
-  "label": "Box",
+  "label": "Step",
   "icon": "◆",
   "accent": "#00d4ff",
   "domain": "agents",
@@ -16,12 +16,12 @@
     "dag"
   ],
   "files": {
-    "engine": "box.engine.js",
-    "ui": "box.ui.js",
-    "css": "box.css",
+    "engine": "step.engine.js",
+    "ui": "step.ui.js",
+    "css": "step.css",
     "preview": "preview.png",
-    "spec": "box.spec",
-    "tests": "box.test.js",
+    "spec": "step.spec",
+    "tests": "step.test.js",
     "thumb": "thumb.png"
   },
   "needs": {
