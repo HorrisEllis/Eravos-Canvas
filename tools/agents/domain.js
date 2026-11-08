@@ -7,7 +7,7 @@
     install() {},
     shell(S) {
       if (typeof S.mode !== 'function') return;
-      S.mode({ id: 'agents', domain: 'agents', label: 'AI Automation', icon: '✦', accent: '#ffb86b', units: [], categories: ['AI', 'Code'],
+      S.mode({ id: 'agents', domain: 'agents', label: 'AI Automation', icon: '✦', accent: '#ffb86b', units: [], categories: ['AI', 'Code', 'Steps'],
         brand: { tagline: 'Chain AI steps, code and tools into automations you can see — every step a window, every hand-off a wire.' },
         blurb: 'AI steps with any provider (your key stays on this computer), wired to code cells and every other tool.' });
     },

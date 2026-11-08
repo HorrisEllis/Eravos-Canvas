@@ -7,10 +7,10 @@
   "tags": [
     "factory"
   ],
-  "for": "eravos.orchestration.box",
+  "for": "eravos.agents.box",
   "enabled": true,
   "items": {
-    "eravos.orchestration.box": {
+    "eravos.agents.box": {
       "presets": {}
     }
   }

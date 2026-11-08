@@ -1,4 +1,4 @@
-/* eravos.orchestration.box — the step's window. Black surfaces; only the kind's colour is a colour. */
+/* eravos.agents.box — the step's window. Black surfaces; only the kind's colour is a colour. */
 .box-kind { display: inline-block; padding: 2px 6px; border: 1px solid currentColor; border-radius: 2px; text-transform: uppercase; letter-spacing: .08em; font-size: 10px; }
 .box-state { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; opacity: .75; }
 .box-ref { margin: 8px 0 3px; font-size: 12px; word-break: break-word; }
