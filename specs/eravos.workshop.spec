@@ -162,3 +162,35 @@ W2b  The canvas's Workshop may HOST a kind's own editor in its viewport (domain-
 W2b (the Workshop hosting the piano roll, PR #145) is taken back out: the roll's tools are the canvas's (the Timeline). Kept above as it was
 (nothing lost). The Workshop's note scale is for FULLY SHAPING one note — what the Timeline and its roll do not do. Open: his decision on
 whether that split is better (the coder's read: yes — the roll arranges many notes, the note editor shapes one, no copy between them).
+
+## ADDENDUM 2026-11-08 (night) — W3: the 3D viewport, and SHAPE: a note shaped fractally (his words; nothing above is changed)
+# James, 2026-11-08: "yeah, that needs to be moved to the editor. pattern editor. i want you to finish the workshop with the 3d. the preview
+#   should be in here if not i have it." · "i want the 3d. like i want like a full modulation, waveform, oscillation, like all the ways to edit
+#   a sound, give it as much depth as possible. fractally and recursively."
+# "that" = the list of ways to shape one note the Timeline does not have (pitch over its life, volume, tone, time, space, variation…).
+# The 3D preview is in the repo: docs/previews/workshop-studio.html / .png (ADDENDUM 2026-11-07 (3)): orbit camera, layers as planes,
+#   3D · 2D · TOP · FRONT · EXPLODED · FLAT · WIRE · LIT.
+W3a  THE VIEWPORT IN 3D (canvas, domain-free — canvas/runtime/workshop.js)
+       modes      2D (the kind's draw, as now) · 3D (the kind's layers as planes in space: each layer drawn by the kind on its own plane,
+                  K.drawLayer(g, W, H, doc, layerId, { wire }), stacked EXPLODED (apart) or FLAT (together)); views TOP · FRONT · free orbit
+                  (drag to turn, wheel to zoom); WIRE (lines only) · LIT (glow); an axis gizmo. Near-orthographic: a plane is an affine image
+                  of its 2D drawing, so Canvas 2D draws it (no WebGL needed; WebGL when it needs speed — Looking Glass later).
+       draw       K.stroke(doc, points, W, H, { selected }) → { key, value, label }: a drag in 2D draws (one history step)
+       actions    an action may carry { key, value } (an edit, one history step) — K.actions(doc, { selected })
+       stations   K.stationKey: a click on a station is an edit (go up the zoom path)
+W3b  SHAPE — a note shaped fractally (music, tools/music/tools/arrange/timeline/timeline.workshop.js)
+       a SIGNAL  { base: points [t 0…1, value], mods: [MOD] }  — what moves over the note's life
+       a MOD     { shape: sine · triangle · saw · ramp · square · random (stepped) · smooth (random, glided) · drawn (a wave you draw),
+                   wave (the drawn cycle), rate: SIGNAL (cycles over the note), depth: SIGNAL (in the target's units), phase, fade, seed, on }
+       recursion a mod's RATE and DEPTH are SIGNALS, so they have mods, whose rate and depth are signals … — down to any level (bounded at 8 so
+                 the sound is always computable); the zoom path shows where you are: SONG › PATTERN › NOTE › PITCH › MOD 1 › RATE › MOD 1 …
+       targets   PITCH (semitones over the note — glides, scoops, falls, vibrato with fade-in, trills, drawn melodies inside one note) and
+                 ANY number knob of the note's instrument (filter, drive, level, pan, wobble … — what the instrument has), each its own signal
+       sound     the tree compiles into what the engine already plays: pitch → the note's drawn bend path (b.path, 64 points), each knob → its
+                 per-note curve (c, 64 points, clamped to the knob's range); the tree itself is kept on the note (sh) so it opens again as it
+                 was. Live: every edit reaches the clip at once. No toys: nothing recorded, every value the engine rebuilds.
+       3D        the open signal's planes: RESULT (what plays), BASE, each MOD's contribution, each mod's RATE and DEPTH — exploded upward,
+                 the recursion as height
+       dag       note.sh ─ compile ─→ note.b.path + note.c ─→ clip_edit ─→ timeline.engine (cleanB/cleanC, bendNote, per-note curves) ─→ sound
+       open      (his to choose next): per-note envelope beyond the instrument's knobs · stereo width · conditions (every Nth loop, fills) ·
+                 layering one note into a chord · audition alone / A-B · the IMAGE domain's PHOTO kind (old W3 raster) moves to W4

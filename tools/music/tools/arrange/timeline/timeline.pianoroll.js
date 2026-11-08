@@ -883,7 +883,9 @@
     function openWorkshop(i) {
       const WK = global.EravosTimelineWorkshop; if (!WK || !WK.ensure() || !clip) return openEditor(i);
       closeEditor(); if (i !== undefined && !S.has(i)) selOnly(i); draw();
-      return global.Workshop.open('music.notes', { notes: notes.map(n => JSON.parse(JSON.stringify(n))), sel: Math.max(0, i | 0), name: clip.name || toolName(), drums: !!drums },
+      // W3b: the instrument's number knobs travel with the document, so a note can be shaped on any of them
+      const knobs = ((lane && knobsAll[lane.target]) || []).filter(k => k.type !== 'enum' && !k.lane && isFinite(k.min) && isFinite(k.max)).map(k => ({ key: k.key, label: k.label, min: k.min, max: k.max, unit: k.unit || '', val: isFinite(k.val) ? k.val : isFinite(k.def) ? k.def : k.min }));
+      return global.Workshop.open('music.notes', { notes: notes.map(n => JSON.parse(JSON.stringify(n))), sel: Math.max(0, i | 0), name: clip.name || toolName(), drums: !!drums, knobs },
         { onChange: (d) => commit(d.notes.map(n => Object.assign({}, n))), title: clip.name || toolName() });
     }
     function openEditor(i) {
