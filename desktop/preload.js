@@ -9,7 +9,7 @@ contextBridge.exposeInMainWorld('eravosDesktop', {
   packsDone: () => ipcRenderer.send('eravos:packs-done'),
   fileDone: (id, ok) => ipcRenderer.send('eravos:file-done', { id, ok: !!ok }),
   onSaved: (cb) => ipcRenderer.on('eravos:saved', (e, s) => cb(s)),
-  keepPack: (name, data) => ipcRenderer.invoke('eravos:keep-pack', { name, data }),
+  keepPack: (name, data, kind) => ipcRenderer.invoke('eravos:keep-pack', { name, data, kind }),
   openLibrary: (sub) => ipcRenderer.send('eravos:open-library', sub || ''),
   // 3.99 updates (desktop/updater.js): { state: 'available' | 'current' | 'downloading' | 'restarting' | 'error', version, notes, page }
   onUpdate: (cb) => ipcRenderer.on('eravos:update', (e, m) => cb(m)),

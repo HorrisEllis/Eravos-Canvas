@@ -36,7 +36,7 @@ describe('P154 notes and patterns on the Workshop', () => {
   it('pattern scale: a click on another note in the view opens it; its own bend is shown and kept', async () => {
     const t = await make(NOTES);
     try {
-      t.roll.openWorkshop(0); await TH.sleep(40); const ws = Workshop.current;
+      t.roll.openWorkshop(0); await TH.sleep(40); const ws = Workshop.current; ws.view('drawn'); await TH.sleep(20);   // W2b: the drawn view is the second tab
       const cv = document.querySelector('.ws-app .ws-canvas'), r = cv.getBoundingClientRect();
       cv.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: r.left + r.width * 0.75, clientY: r.top + r.height * 0.05 })); await TH.sleep(20);
       assert.ok(/NOTE · G4/.test(document.querySelector('.ws-stations').textContent), 'the click opened the third note (G4)');

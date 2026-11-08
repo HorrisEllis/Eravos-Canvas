@@ -10,6 +10,9 @@
   async function manifestOf(ab) {
     try { const files = await global.Intake.unzip(ab); const mf = files.get('manifest.json'); return mf ? JSON.parse(new TextDecoder().decode(await mf.data())) : null; } catch (e) { return null; }
   }
+  // a pack that brings a tool (code to mount) is kept in tools/, everything else in packs/ — both in the library, never the app's folder
+  const isTool = (m) => !!m && (!!m.tool_version || /\.tool$/.test(String(m.pack_id || '')) || ['engines', 'ui'].some(k => m.contents && m.contents[k] && Object.keys(m.contents[k]).length));
+  async function keep(name, ab) { const m = await manifestOf(ab), kind = isTool(m) ? 'tools' : 'packs'; const k = await D.keepPack(name, new Uint8Array(ab), kind); return Object.assign({ kind }, k || {}); }
   function dependencyOrder(items) { // Kahn's algorithm over pack_id → dependencies; unknown deps are left to the installer to judge
     const byId = new Map(items.filter(i => i.m && i.m.pack_id).map(i => [i.m.pack_id, i])), out = [], seen = new Set(), temp = new Set();
     const visit = (i) => { if (seen.has(i)) return; if (temp.has(i)) return; temp.add(i); ((i.m && i.m.dependencies) || []).forEach(d => { const x = byId.get(d); if (x) visit(x); }); temp.delete(i); seen.add(i); out.push(i); };
@@ -25,7 +28,7 @@
     const orig = intake.file.bind(intake); let fromFolder = 0;
     intake.file = async function (name, ab, mime, pos) {
       const r = await orig(name, ab, mime, pos);
-      if (r && r.kind === 'pack' && !fromFolder) { try { const k = await D.keepPack(name, new Uint8Array(ab)); if (k && k.kept) S.toast(`Kept “${name}” in ERAVOS › packs — it loads every start`, 'good', 4000); } catch (e) {} }
+      if (r && r.kind === 'pack' && !fromFolder) { try { const k = await keep(name, ab); if (k.kept) S.toast(`Kept “${name}” in Documents › ERAVOS › ${k.kind} — it loads every start`, 'good', 4000); } catch (e) {} }
       return r;
     };
     // installing from the packs folder: putting the pack there is the consent — no install prompt every start
@@ -41,7 +44,7 @@
         const r = await intake.file(f.name, ab, '', pos);
         ok = !!r;
         if (!pack) S.toast(ok ? `Took in “${f.name}” from the drop folder` : `Couldn’t open “${f.name}” from the drop folder — it may be damaged or a kind of file nothing installed can open. Details: the red dot, top right.`, ok ? 'good' : 'bad', 3500);
-        if (!pack && ok && r.kind === 'pack') { try { await D.keepPack(f.name, new Uint8Array(ab)); } catch (e) {} }
+        if (!pack && ok && r.kind === 'pack') { try { await keep(f.name, ab); } catch (e) {} }
       } catch (e) { S.K.fault('ASSET_001', { message: `${f.name}: ${e.message}` }); }
       finally { if (pack) { fromFolder--; if (!fromFolder) global.confirm = confirm0; } D.fileDone(f.id, ok); }
     });
