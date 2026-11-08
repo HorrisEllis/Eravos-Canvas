@@ -1,16 +1,16 @@
-/* Box (eravos.agents.box) — tests that travel with the tool. The contract is shared (tests/harness.js TH.toolContract):
+/* Step (eravos.agents.step) — tests that travel with the tool. The contract is shared (tests/harness.js TH.toolContract):
  * spawns clean, every shipped preset loads in range, save → load is exact, closing leaves nothing behind, Stop all is
  * obeyed. Add this tool's own tests below it. */
-TH.toolContract('eravos.agents.box');
+TH.toolContract('eravos.agents.step');
 
-// 2026-11-08 — box.spec's acceptance. James: "i want the tools compatable with eravos independantly. eravos is the build surface for nexus."
+// 2026-11-08 — step.spec's acceptance. James: "i want the tools compatable with eravos independantly. eravos is the build surface for nexus."
 window.__phase = 'P152';
-describe('Box — one step of a pipeline, data only', () => {
+describe('Step — one step of a pipeline, data only', () => {
   const ctxOf = (a) => OrganismFactory.handle(a).ctx;
   const STEP = { id: 'pricing', kind: 'pipeline', ref: 'pricing-table', hooks: { in: ['in'], out: ['out'] }, contract: { requires: ['overview'], gives: ['output'] }, gate: { notEmpty: true }, args: { task: { id: 'pricing' } } };
   const KINDS = ['gate', 'system', 'agent', 'macro', 'pipeline', 'procedure', 'tool', 'build'];
   function opened(U) {
-    const a = TH.spawn(U, 'eravos.agents.box'); const c = ctxOf(a);
+    const a = TH.spawn(U, 'eravos.agents.step'); const c = ctxOf(a);
     c.params.setMany({ kind: 'pipeline', ref: 'pricing-table', step: 'pricing', state: 'running' }); c.loadExtra({ box: STEP, kinds: KINDS }); return { a, c };
   }
   it('opened with a step: its kind, ref, step and whole box are what it was given', () => {
@@ -20,23 +20,23 @@ describe('Box — one step of a pipeline, data only', () => {
   });
   it('a value on in goes out once as { step, kind, ref, value }', async () => {
     const U = TH.universe(0.2), { a } = opened(U)
-    const src = TH.spawn(U, 'eravos.agents.box'), dst = TH.spawn(U, 'eravos.agents.box');
-    U.K.wires.register({ src: { instanceId: a, hookId: 'box.hook.out' }, dst: { instanceId: dst, hookId: 'box.hook.in' } });
-    U.K.wires.register({ src: { instanceId: src, hookId: 'box.hook.out' }, dst: { instanceId: a, hookId: 'box.hook.in' } });
+    const src = TH.spawn(U, 'eravos.agents.step'), dst = TH.spawn(U, 'eravos.agents.step');
+    U.K.wires.register({ src: { instanceId: a, hookId: 'step.hook.out' }, dst: { instanceId: dst, hookId: 'step.hook.in' } });
+    U.K.wires.register({ src: { instanceId: src, hookId: 'step.hook.out' }, dst: { instanceId: a, hookId: 'step.hook.in' } });
     U.K.data.send(src, 'out', { hello: 1 }); await new Promise(r => setTimeout(r, 20));
     const last = ctxOf(dst).stateExtra().last;
     assert.equal(last.step, 'pricing'); assert.equal(last.kind, 'pipeline'); assert.equal(last.ref, 'pricing-table'); assert.deepEqual(last.value, { hello: 1 });
   });
   it('save → load keeps the whole step and the kinds (the .erv round trip)', () => {
     const U = TH.universe(0.2), { c } = opened(U); const saved = JSON.parse(JSON.stringify(c.saveExtra()));
-    const b = TH.spawn(U, 'eravos.agents.box'); ctxOf(b).loadExtra(saved); assert.deepEqual(ctxOf(b).saveExtra(), saved);
+    const b = TH.spawn(U, 'eravos.agents.step'); ctxOf(b).loadExtra(saved); assert.deepEqual(ctxOf(b).saveExtra(), saved);
   });
 });
 
 // 2026-11-08 — the step on the Workshop. James: "maybe it edits steps, like it does a note, or pattern." · "okay the workshop it to edit. the
 // canvas are for the tools."
 window.__phase = 'P153';
-describe('Box — a step opened on the Workshop, edited live', () => {
+describe('Step — a step opened on the Workshop, edited live', () => {
   const ctxOf = (a) => OrganismFactory.handle(a).ctx;
   const STEP = { id: 'pricing', kind: 'pipeline', ref: 'pricing-table', hooks: { in: ['in'], out: ['out'] }, contract: { requires: ['overview'], gives: ['output'] },
     gate: { notEmpty: true }, args: { task: { id: 'pricing', step: { type: 'pipeline', config: { pipeline: 'pricing-table', retries: 2 } } } } };
@@ -57,7 +57,7 @@ describe('Box — a step opened on the Workshop, edited live', () => {
   });
   it('opened from the Box: an edit in the Workshop reaches the tool at once, and undo takes it back', async () => {
     if (!Workshop.kinds().includes('agents.step')) assert.ok(Workshop.addKind(window.EravosStepKind).ok, 'registered as the Box\'s window does');
-    const U = TH.universe(0.2), a = TH.spawn(U, 'eravos.agents.box'), c = ctxOf(a);
+    const U = TH.universe(0.2), a = TH.spawn(U, 'eravos.agents.step'), c = ctxOf(a);
     c.params.setMany({ kind: 'pipeline', ref: 'pricing-table', step: 'pricing' }); c.loadExtra({ box: STEP, kinds: KINDS });
     const send = (x) => U.K.bus.publish('ui:step_set:' + a, x);
     const ws = Workshop.open('agents.step', { kind: 'pipeline', ref: 'pricing-table', step: 'pricing', state: '', kinds: KINDS, box: STEP, last: null },

@@ -1,0 +1,6 @@
+/* eravos.agents.step — the step's window. Black surfaces; only the kind's colour is a colour. */
+.step-kind { display: inline-block; padding: 2px 6px; border: 1px solid currentColor; border-radius: 2px; text-transform: uppercase; letter-spacing: .08em; font-size: 10px; }
+.step-state { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; opacity: .75; }
+.step-ref { margin: 8px 0 3px; font-size: 12px; word-break: break-word; }
+.step-meta, .step-gate, .step-last { font-size: 10px; opacity: .6; word-break: break-word; }
+.step-gate { margin-top: 6px; padding-top: 5px; border-top: 1px dashed rgba(255,255,255,.12); }

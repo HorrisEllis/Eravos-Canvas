@@ -1,4 +1,4 @@
-/* eravos.agents.box UI — the step: its kind (coloured by its place in the kinds it was given), what it names, its state, its gate, the
+/* eravos.agents.step UI — the step: its kind (coloured by its place in the kinds it was given), what it names, its state, its gate, the
  * last value through it. Only view.* : state in. No kind, system or address is named here.
  * 2026-11-08, his: "also no need to show kinds in the ui. stop doing that. adding noise to the ui": the kind is data and a colour only; no word,
  * chip, picker or status shows it.
@@ -86,14 +86,14 @@
   };
   window.EravosStepKind = KIND;
 
-OrganismFactory.reg('eravos.agents.box', function (view) {
+OrganismFactory.reg('eravos.agents.step', function (view) {
   const UI = view.ui, h = UI.h;
-  if (window.Workshop && !window.Workshop.kinds().includes(KIND.id)) { const a = window.Workshop.addKind(KIND); if (!a.ok) console.error('Box: the Workshop refused its kind —', a.problems.join('; ')); }
+  if (window.Workshop && !window.Workshop.kinds().includes(KIND.id)) { const a = window.Workshop.addKind(KIND); if (!a.ok) console.error('Step: the Workshop refused its kind —', a.problems.join('; ')); }
   let cur = {};
   const hue = (kind, kinds) => { const i = (kinds || []).indexOf(kind); if (i >= 0) return Math.round(i * 360 / kinds.length + 30) % 360;
     let n = 0; for (const c of String(kind)) n = (n * 31 + c.charCodeAt(0)) % 360; return n; };
-  const st = h('span', { class: 'box-state' }), ref = h('div', { class: 'box-ref' }), meta = h('div', { class: 'box-meta' });
-  const gate = h('div', { class: 'box-gate' }), last = h('div', { class: 'box-last' });
+  const st = h('span', { class: 'step-state' }), ref = h('div', { class: 'step-ref' }), meta = h('div', { class: 'step-meta' });
+  const gate = h('div', { class: 'step-gate' }), last = h('div', { class: 'step-last' });
   view.on('state_sync', (s) => {
     cur = s;
     const p = s.params || {}, b = s.box || {}, c = `hsl(${hue(p.kind, s.kinds)} 78% 64%)`;

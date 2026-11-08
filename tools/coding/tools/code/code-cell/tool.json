@@ -43,7 +43,7 @@
   },
   "works_with": [
     "eravos.agents.ai-step",
-    "eravos.agents.box",
+    "eravos.agents.step",
     "eravos.image.image-adjust",
     "eravos.video.video-clip"
   ],

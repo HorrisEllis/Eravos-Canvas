@@ -10,7 +10,7 @@ await p.addInitScript(() => { window.ERAVOS_CATALOG_ALL = true; });
 await p.goto('file://' + ROOT + '/canvas/index.html?noboot'); await p.waitForFunction(() => window.Shell && window.Shell.X && window.Erv && window.Workspace);
 const r = await p.evaluate(async (text) => { Shell.activate(); Shell.X.enterMode('agents'); document.querySelectorAll('.overlay').forEach(o => o.remove());
   const res = await Erv.open(text); await new Promise(x => setTimeout(x, 600));
-  return { ok: res.ok, windows: Kernel.registry.list().filter(x => x.organism_id === 'eravos.agents.box').length, wires: Kernel.wires.list().length,
+  return { ok: res.ok, windows: Kernel.registry.list().filter(x => x.organism_id === 'eravos.agents.step').length, wires: Kernel.wires.list().length,
     faults: Kernel.faults.list().slice(-3).map(f => f.message) }; }, fs.readFileSync(file, 'utf8'));
 console.log(JSON.stringify(r));
 await p.screenshot({ path: out }); await b.close(); console.log('ok');
