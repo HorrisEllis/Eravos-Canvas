@@ -172,3 +172,8 @@
   - DECIDED (sent by him): the order — 1 the novelty gate in ADVISORY mode (baseline, flag collisions, never block until validated against listening) · 2 the Workshop W1 · 3 waveshaper · 4 spectral-features
   - RULES adopted: novelty is not quality (separate measures: novelty, musical usefulness, expressiveness, controllability, functional distinctiveness); overlap is not redundancy (functional role, not only acoustic similarity); the measure must never become an authority over creativity
   - BUILT (step 1 of his order): the novelty gate, advisory — build/novelty-core.mjs (one measure; refactor proved byte-identical), build/novelty-gate.mjs, docs/novelty-baseline.json (418 sounds), tests/novelty-gate.test.mjs 8/8, a CI step that cannot fail the build, docs/listening-log.md; on real data: a re-render is unchanged (0 listed), a near-copy preset is named TWIN and the gate still exits 0
+
+## 17:29:52Z (2026-11-08T17:29:52.667Z) — verbatim:
+  > Merge other branches and reorientate
+  - checked: no open pull requests; every remote branch (7) has 0 commits not in main — nothing left to merge; the novelty gate (3.146) is in main; this branch reset to main
+  - reoriented: since 3.146 main gained 3.147–3.151 (lag budget, Beta channel, joined-note curves, the Workshop W1 flat, patterns in the browser + the UI field preview) and the orchestration domain (Box tool, Nexus pipelines as .erv)
