@@ -1,3 +1,11 @@
+ERAVOS v0.2.18 (2026-11-08)
+
+Install: on 0.2.17, ERAVOS offers this update by itself (⚙ Settings › About & updates › Check for updates).
+
+- Notes and patterns open on the Workshop: the piano roll's ✎ Edit note…, Patterns › ✎ Edit notes, and now the Timeline: right-click a
+  clip › ✎ Edit notes. Timing, pitch, velocity, chance, bend and oscillation, live, one undo step each. 🎹 Edit in the piano roll is
+  right below it; double-click a note still opens the quick editor.
+
 ERAVOS v0.2.17 (2026-11-08)
 
 Install: on 0.2.16, ERAVOS offers this update by itself (⚙ Settings › About & updates › Check for updates).
