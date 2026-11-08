@@ -1,3 +1,11 @@
+ERAVOS v0.2.18 (2026-11-08)
+
+Install: on 0.2.17, ERAVOS offers this update by itself (⚙ Settings › About & updates › Check for updates).
+
+- Edit notes opens the Workshop: right-click a clip on the Timeline › ✎ Edit notes, or Patterns › ✎ Edit notes. A click on a note selects
+  it, a click on an empty spot adds one; pitch, start, length, velocity, bend and the note's own knobs; Delete and Duplicate; undo and
+  history; every edit is heard at once. 🎹 Edit in the piano roll is right below it.
+
 ERAVOS v0.2.17 (2026-11-08)
 
 Install: on 0.2.16, ERAVOS offers this update by itself (⚙ Settings › About & updates › Check for updates).

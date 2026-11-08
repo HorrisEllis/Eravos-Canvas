@@ -140,7 +140,8 @@
     const T = F().handle(r.tl); if (!T) return r;
     const clip = T.ctx.internals.clips.find(c => c.kind === 'notes' && r.lane && c.lane === r.lane.id && Math.abs(c.startBar - r.bar) < 1e-6);
     K.bus.publish('canvas:focus-request', { instanceId: r.tl });
-    if (clip) { const open = () => T.view && T.view.openClip && T.view.openClip(clip.id); if (!open()) setTimeout(open, 60); }
+    // W2a: the pattern's notes open in the Workshop (the Timeline's piano roll when the Workshop is not there)
+    if (clip) { const open = () => (global.NoteWorkshop && global.NoteWorkshop.open({ K, tl: r.tl, clip: clip.id })) || (T.view && T.view.openClip && T.view.openClip(clip.id)); if (!open()) setTimeout(open, 60); }
     return Object.assign({ clip: clip ? clip.id : null }, r);
   }
   // ---- ▶ hear it: rendered in its own offline universe (nothing on the canvas changes), kept for the session

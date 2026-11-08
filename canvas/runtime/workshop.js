@@ -13,7 +13,8 @@
  *   options }] }], get(doc, key), set(doc, key, value) → doc, draw(g, W, H, doc, { selected, hover }), apply(doc)?, title(doc)?, stations(doc)?,
  *   outline(doc)? → [[depth, text, layerId?]], status(doc)? → [[label, value]], tools? [{ id, label, glyph, layer? }],
  *   pick(doc, x, y, W, H)? → a key/value edit for a click in the viewport (the kind decides what a click means),
- *   actions(doc)? → [{ label, hint, run(doc) → words to show }] (buttons in the bar: where the document can go — the kind says) }
+ *   actions(doc)? → [{ label, hint, run(doc) → words to show, or an edit { key, value, label, say } applied as one undo step (W2a) }]
+ *   (buttons in the bar: where the document can go — the kind says) }
  * Layer types the surface knows (it draws their badges; a kind says what they mean): constraint · curve · value · events · emergent. */
 (function (global) {
   'use strict';
@@ -80,7 +81,7 @@
       // the bar: the name, the kind's stations (where this document sits), the actions
       bar.replaceChildren(el('span', 'ws-name', [], { text: 'WORKSHOP' }), el('span', 'ws-sep'),
         el('span', 'ws-stations', (K.stations ? K.stations(d) : [K.label]).map((s, i, a) => el('span', 'ws-st' + (i === a.length - 2 || a.length === 1 ? ' on' : ''), [el('i', '', [], { text: String(i + 1).padStart(2, '0') }), String(s)]))),
-        el('span', 'ws-end', [].concat((K.actions ? K.actions(d) : []).map(a => el('button', 'ws-btn ghost', [], { type: 'button', text: a.label, title: a.hint || '', onclick: () => { let said = null; try { said = a.run(clone(d)); } catch (e) { said = 'failed: ' + e.message; console.error(e); } if (said) { note = String(said); render(); } } })), [el('button', 'ws-btn ghost', [], { type: 'button', text: 'UNDO', title: 'Ctrl+Z', onclick: undo }), el('button', 'ws-btn ghost', [], { type: 'button', text: 'REDO', title: 'Ctrl+Shift+Z', onclick: redo }),
+        el('span', 'ws-end', [].concat((K.actions ? K.actions(d) : []).map(a => el('button', 'ws-btn ghost', [], { type: 'button', text: a.label, title: a.hint || '', onclick: () => { let said = null; try { said = a.run(clone(d)); } catch (e) { said = 'failed: ' + e.message; console.error(e); } if (said && typeof said === 'object' && said.key !== undefined) { const ed = said; said = ed.say || null; edit(ed.key, ed.value, ed.label); } if (said) { note = String(said); render(); } } })), [el('button', 'ws-btn ghost', [], { type: 'button', text: 'UNDO', title: 'Ctrl+Z', onclick: undo }), el('button', 'ws-btn ghost', [], { type: 'button', text: 'REDO', title: 'Ctrl+Shift+Z', onclick: redo }),
           el('button', 'ws-btn send', [], { type: 'button', text: 'APPLY →', title: 'write it back to where it came from', onclick: () => { if (o.onApply) o.onApply(clone(d)); else if (K.apply) K.apply(clone(d)); } }),
           el('button', 'ws-btn ghost', [], { type: 'button', text: '×', title: 'close (Esc)', 'aria-label': 'close', onclick: () => close() })])));
       // the options bar: the selected layer's fields

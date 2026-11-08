@@ -57,7 +57,8 @@ describe('🧩 Patterns page by tool (3.85)', () => {
 /* 3.89 — James, 2026-11-01: "the per note editing with the timeline, why not utilize that for the patterns." */
 describe('✎ A pattern opens in the piano roll (3.89)', () => {
   function host() { const h = document.getElementById('wmhost'); if (!CanvasWM.world) { CanvasWM.init(h, Kernel); WireSystem.init(Kernel); OrganismFactory.boot(Kernel); } Kernel.audio.boot(); }
-  it('Edit notes: the pattern lands on the Timeline and its clip is open in the piano roll, where its notes can carry their own knobs', async () => {
+  // W2a (2026-11-08, "editing a note, whether in the pattern menu or in the timeline"): Edit notes opens the Workshop (the roll stays one click away)
+  it('Edit notes: the pattern lands on the Timeline and its clip opens in the Workshop, where its notes can carry their own knobs', async () => {
     host(); const tl = OrganismFactory.spawn('eravos.timeline', { x: 10, y: 10 }); await TH.sleep(40);
     const p = PatternLibrary.all().find(x => x.type === 'bass' && x.notes && x.notes.length > 2);
     let made = [];
@@ -65,11 +66,9 @@ describe('✎ A pattern opens in the piano roll (3.89)', () => {
       const before = new Set(Kernel.registry.list().map(r => r.instance_id));
       const r = PatternLibrary.edit(p); made = Kernel.registry.list().map(r => r.instance_id).filter(id => !before.has(id));
       assert.ok(r && r.clip, 'a clip on the Timeline'); await TH.sleep(120);
-      // 3.112 the roll may be in its own window (the default): look in the roll itself
-      const H = OrganismFactory.handle(tl), grid = H.view.roll.el.querySelector('canvas[aria-label^="Note grid"]');
-      assert.ok(grid && grid.offsetParent, 'the piano roll is open');
-      const txt = H.view.root.textContent + ' ' + H.view.roll.el.textContent + ' ' + (H.view.roll.title || '');
-      assert.ok(/note/i.test(txt) && txt.includes(p.name.split(' · ')[0]), 'on that pattern');
+      const H = OrganismFactory.handle(tl), ws = Workshop.current;
+      assert.ok(ws && ws.kind === 'music.notes' && ws.doc().clip === r.clip, 'the Workshop is open on that clip');
+      assert.ok(ws.doc().name.includes(p.name.split(' · ')[0]) || ws.el.textContent.includes(p.name.split(' · ')[0]), 'on that pattern'); ws.close();
       const c = H.ctx.internals.clips.find(x => x.id === r.clip); assert.equal(c.notes.length, p.notes.length, 'all its notes');
       const knob = (OrganismFactory.def(p.tool).config || []).find(k => k.type === 'number').key;   // any of the tool's knobs
       Kernel.bus.publish('ui:clip_edit:' + tl, { id: c.id, patch: { notes: c.notes.map((n, i) => i === 1 ? Object.assign({}, n, { p: { [knob]: 0.5 } }) : n) } });

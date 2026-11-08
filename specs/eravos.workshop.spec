@@ -120,3 +120,25 @@ object is — a note, a pattern, an image — is a domain's. Music is the first 
 #   in space (3D). New kinds this makes room for (each its own domain, its own spec, later): SCENE (a game: objects, transforms, a camera,
 #   play in place) and the Emerge MODULE (code as nodes moving through the field — Nexus ERV5, after Emerge, WARP 2, RF1, CF1).
 #   Preview: docs/previews/workshop-studio.html (node docs/previews/workshop-studio.shots.mjs). The Void preview (workshop-void.png) is kept.
+
+## ADDENDUM 2026-11-08 — W2a: editing NOTES in the Workshop (from the Timeline and from Patterns)
+  His words: "When you right click on edit note. Does it open the workshop?" (it did not: the Timeline's piano roll opened) · "do that.
+  editing a note, whether in the pattern menu or in the timeline." · "continue".
+  Built here (W2a; the zoom chain, the library and Bassline / Arp / Groove opening here stay W2b):
+    the music NOTES kind (tools/music/data/note-workshop.js → window.NoteWorkshop, a part both entries use; the Workshop names no domain):
+      viewport  a flat roll of the clip: bars and beats, the rows its notes reach, each note drawn with its velocity and its bend; the
+                selected note outlined. A click on a note selects it; a click on an empty spot adds a note there (snapped to a 16th, the
+                last length used).
+      layers    CLIP (bars) · NOTE (pitch, start, length, velocity) · BEND (from, to, shape) · THIS NOTE'S KNOBS (the instrument's own
+                settings, set for this note only — the per-note knobs the Timeline already plays, 3.53)
+      actions   DELETE NOTE · DUPLICATE NOTE · PIANO ROLL (the Timeline's roll, as before)
+      live      every edit reaches the clip at once (ui:clip_edit {notes}); Undo / Redo / History as every kind; APPLY writes and closes
+    entries    Timeline › right-click a notes clip › ✎ Edit notes → the Workshop (🎹 Edit in the piano roll keeps the roll) ·
+               Patterns › ✎ Edit notes → the pattern goes to the Timeline (as before) and opens in the Workshop
+    the surface (domain-free, small): an action may return an edit ({ key, value, label, say }), applied as one undo step.
+  dag:
+    note-workshop  needs: Workshop (canvas/runtime/workshop.js) · Timeline (clips, ui:clip_edit, lanes → the instrument) · the instrument's
+                   descriptor (its knobs) · UIKit none (the Workshop draws its own fields)
+    used by        Timeline (context menu) · Pattern Library (✎ Edit notes)
+  Proof: tests/p152-note-workshop.test.js — Edit notes from the Timeline and from Patterns opens the Workshop on that clip; a note edit, an
+  add, a delete and a per-note knob reach the clip live; undo puts the clip back; the piano roll is still reachable.
