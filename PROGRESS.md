@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.152 Notes and patterns open on the Workshop (W2a) (2026-11-08)
+His words: "The edit pattern or note doesn’t open workshop." · "The workshop should be built. It says in the commit"
+- Found: the Workshop was built and released (W1, 3.150; the Step kind, PR #139/#141; in v0.2.17), but only the Pattern and Step tools opened it.
+  The piano roll's ✎ Edit note… still opened the 3.116 inline editor and Patterns › ✎ Edit notes the piano roll: W2's note kind was never built.
+- tools/music/tools/arrange/timeline/timeline.workshop.js (NEW): the Workshop's NOTES kind (`music.notes`). The document is the clip's notes as the
+  roll keeps them. Stations SONG › PATTERN › NOTE. Pattern scale: every note drawn, a click opens one. Note scale: Timing (start, length, nudge),
+  Pitch, Velocity, Chance and ratchet, Bend and Oscillate as curves (none for drums). Every edit goes through the roll's own commit (live), one
+  undo step each; defaults are not stored; opening it changes nothing.
+- ✎ Edit note… opens the note there; double-click keeps the quick editor. Patterns › ✎ Edit notes lands the pattern on the Timeline (as before)
+  and opens it on the Workshop. canvas/runtime/workshop.js unchanged (domain-free).
+- Proof: tests/p154-workshop-notes.test.js 4/4; P150 7/7, P151 2/2, P112 13/13 (its Edit note… check moved to the quick editor), P76 4/4,
+  boundary 10/10, 258 manifests valid. Timeline 88/89: the one failure (a plain wheel scrolls time) fails on main too, not from this.
+
 ## Done — 3.151 Patterns in the browser and on the Timeline; the UI field shown (2026-11-07)
 His words: "patterns need to be in the timeline or in the pattern browser. Need the dag for the ui. Like dynamically changes using the
 constraint field? Like moves around fluidly?" · "Yes. 1 then Show me a preview."

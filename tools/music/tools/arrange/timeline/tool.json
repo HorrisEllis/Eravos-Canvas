@@ -17,7 +17,8 @@
     "ui": "timeline.ui.js",
     "css": "timeline.pianoroll.css",
     "extra": [
-      "timeline.pianoroll.js"
+      "timeline.pianoroll.js",
+      "timeline.workshop.js"
     ],
     "spec": "timeline.spec",
     "preview": "preview.png",

@@ -74,6 +74,6 @@ describe('✎ A pattern opens in the piano roll (3.89)', () => {
       const knob = (OrganismFactory.def(p.tool).config || []).find(k => k.type === 'number').key;   // any of the tool's knobs
       Kernel.bus.publish('ui:clip_edit:' + tl, { id: c.id, patch: { notes: c.notes.map((n, i) => i === 1 ? Object.assign({}, n, { p: { [knob]: 0.5 } }) : n) } });
       await TH.sleep(20); assert.ok(H.ctx.internals.clips.find(x => x.id === c.id).notes.some(n => n.p), 'a note can carry its own knob');
-    } finally { OrganismFactory.close(tl); made.forEach(id => { try { OrganismFactory.close(id); } catch (e) {} }); }
+    } finally { if (window.Workshop && Workshop.current) Workshop.current.close(); OrganismFactory.close(tl); made.forEach(id => { try { OrganismFactory.close(id); } catch (e) {} }); }   // W2a: Edit notes also opens the Workshop
   });
 });

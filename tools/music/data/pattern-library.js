@@ -140,7 +140,9 @@
     const T = F().handle(r.tl); if (!T) return r;
     const clip = T.ctx.internals.clips.find(c => c.kind === 'notes' && r.lane && c.lane === r.lane.id && Math.abs(c.startBar - r.bar) < 1e-6);
     K.bus.publish('canvas:focus-request', { instanceId: r.tl });
-    if (clip) { const open = () => T.view && T.view.openClip && T.view.openClip(clip.id); if (!open()) setTimeout(open, 60); }
+    // W2a (his, 2026-11-08: "The edit pattern or note doesn’t open workshop"): the pattern opens in the roll, then on the Workshop at pattern scale
+    const onWs = () => { const R = T.view && T.view.roll; if (o.workshop !== false && R && R.openWorkshop && global.Workshop) R.openWorkshop(0); };
+    if (clip) { const open = () => T.view && T.view.openClip && T.view.openClip(clip.id); if (open()) onWs(); else setTimeout(() => { if (open()) onWs(); }, 60); }
     return Object.assign({ clip: clip ? clip.id : null }, r);
   }
   // ---- ▶ hear it: rendered in its own offline universe (nothing on the canvas changes), kept for the session
@@ -297,7 +299,7 @@
       hear.onclick = async () => { if (playing && playing.id === p.id) { stop(); return; } hear.textContent = '…'; const ok = await play(p, () => { hear.textContent = '▶'; }); hear.textContent = ok ? '■' : '▶'; if (ok === null) status.textContent = 'no sound came out of “' + p.name + '”'; };
       const sendB = h('button', { class: 'sbk-alt sm', text: '→ Timeline', title: !!p.curve ? 'adds this curve to the track that plays this kind of tool (or a new track with it)' : 'adds it after what is on the track that plays this kind of tool (or a new track with it), in your song’s key' });
       sendB.onclick = () => { const r = send(p); status.textContent = r ? '“' + p.name + '” → the Timeline, bar ' + r.bar : 'could not send it'; };
-      const editB = !p.notes ? null : h('button', { class: 'sbk-alt sm', text: '✎ Edit notes', title: 'put it on the Timeline and open it in the piano roll: change any note, and give each note its own knobs, bend and curves' });
+      const editB = !p.notes ? null : h('button', { class: 'sbk-alt sm', text: '✎ Edit notes', title: 'put it on the Timeline and open it on the Workshop: open any note, and give it its own timing, bend and curves' });
       if (editB) editB.onclick = () => { const r = edit(p); if (r) close(); else status.textContent = 'could not open it'; };
       const star = h('button', { class: 'plib-star' + (favs.has(p.id) ? ' on' : ''), text: favs.has(p.id) ? '★' : '☆', title: 'keep it in ★ Favourites', 'aria-label': 'favourite' });
       star.onclick = () => { tog(favs, p.id); store.set({ favs: [...favs] }); star.classList.toggle('on', favs.has(p.id)); star.textContent = favs.has(p.id) ? '★' : '☆'; if (pick.fav) paint(); };
