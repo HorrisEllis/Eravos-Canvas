@@ -1,6 +1,6 @@
 {
- "close": 0.05726065749951272,
- "twin": 0.02863032874975636,
+ "close": 0.05939588719027519,
+ "twin": 0.029697943595137596,
  "items": [
   {
    "tool": "eravos.acid-synth",
@@ -63,7 +63,7 @@
    "nn": "eravos.acid-synth · Odd · Golden Acid",
    "d": 0.028,
    "nnOther": "eravos.reese-bass · 80s · Tron Grid Bass",
-   "dOther": 0.094
+   "dOther": 0.087
   },
   {
    "tool": "eravos.acid-synth",
@@ -79,9 +79,9 @@
    "preset": "Club · Minimal Pluck Bass",
    "kind": "sound",
    "nn": "eravos.reese-bass · 80s · Tron Grid Bass",
-   "d": 0.06,
+   "d": 0.063,
    "nnOther": "eravos.reese-bass · 80s · Tron Grid Bass",
-   "dOther": 0.06
+   "dOther": 0.063
   },
   {
    "tool": "eravos.acid-synth",
@@ -99,16 +99,16 @@
    "nn": "eravos.acid-synth · 80s · Electro Funk Bass",
    "d": 0.028,
    "nnOther": "eravos.reese-bass · 80s · Tron Grid Bass",
-   "dOther": 0.088
+   "dOther": 0.081
   },
   {
    "tool": "eravos.acid-synth",
    "preset": "Odd · Acid Under Organ",
    "kind": "sound",
    "nn": "eravos.reese-bass · 80s · Tron Grid Bass",
-   "d": 0.076,
+   "d": 0.071,
    "nnOther": "eravos.reese-bass · 80s · Tron Grid Bass",
-   "dOther": 0.076
+   "dOther": 0.071
   },
   {
    "tool": "eravos.acid-synth",
@@ -205,9 +205,9 @@
    "preset": "Dub Wobble (soft)",
    "kind": "sound",
    "nn": "eravos.reese-bass · Classic Reese",
-   "d": 0.071,
+   "d": 0.063,
    "nnOther": "eravos.reese-bass · Classic Reese",
-   "dOther": 0.071
+   "dOther": 0.063
   },
   {
    "tool": "eravos.bass-forge",
@@ -241,36 +241,36 @@
    "preset": "Classic Reese",
    "kind": "sound",
    "nn": "eravos.reese-bass · Odd · Golden Reese",
-   "d": 0.034,
+   "d": 0.035,
    "nnOther": "eravos.bass-forge · Dub Wobble (soft)",
-   "dOther": 0.071
+   "dOther": 0.063
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Neuro Flange",
    "kind": "sound",
    "nn": "eravos.reese-bass · Melodic Growl",
-   "d": 0.026,
+   "d": 0.021,
    "nnOther": "eravos.swarm-oscillator · Growl Cloud",
-   "dOther": 0.065
+   "dOther": 0.046
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Wide Rumble",
    "kind": "sound",
    "nn": "eravos.embodiment-lab · Feelings · Heavy Heart",
-   "d": 0.09,
+   "d": 0.085,
    "nnOther": "eravos.embodiment-lab · Feelings · Heavy Heart",
-   "dOther": 0.09
+   "dOther": 0.085
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Hoover-ish",
    "kind": "sound",
-   "nn": "eravos.reese-bass · Neuro Flange",
-   "d": 0.055,
-   "nnOther": "eravos.swarm-oscillator · Growl Cloud",
-   "dOther": 0.062
+   "nn": "eravos.coven · Séance Pad",
+   "d": 0.103,
+   "nnOther": "eravos.coven · Séance Pad",
+   "dOther": 0.103
   },
   {
    "tool": "eravos.reese-bass",
@@ -285,73 +285,73 @@
    "tool": "eravos.reese-bass",
    "preset": "Colour Bass",
    "kind": "sound",
-   "nn": "eravos.bass-forge · Dub Wobble (soft)",
-   "d": 0.081,
+   "nn": "eravos.reese-bass · Classic Reese",
+   "d": 0.079,
    "nnOther": "eravos.bass-forge · Dub Wobble (soft)",
-   "dOther": 0.081
+   "dOther": 0.083
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Melodic Growl",
    "kind": "sound",
    "nn": "eravos.reese-bass · Neuro Flange",
-   "d": 0.026,
+   "d": 0.021,
    "nnOther": "eravos.swarm-oscillator · Growl Cloud",
-   "dOther": 0.054
+   "dOther": 0.048
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Her Drop (dubstep reese)",
    "kind": "sound",
-   "nn": "eravos.reese-bass · Neuro Flange",
-   "d": 0.032,
-   "nnOther": "eravos.organ · Funeral Pulse",
-   "dOther": 0.079
+   "nn": "eravos.reese-bass · Melodic Growl",
+   "d": 0.036,
+   "nnOther": "eravos.swarm-oscillator · Growl Cloud",
+   "dOther": 0.073
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Warm Future Sub",
    "kind": "sound",
    "nn": "eravos.wub-osc · FM Clang 3:1",
-   "d": 0.066,
+   "d": 0.067,
    "nnOther": "eravos.wub-osc · FM Clang 3:1",
-   "dOther": 0.066
+   "dOther": 0.067
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "80s · Tron Grid Bass",
    "kind": "sound",
    "nn": "eravos.acid-synth · Club · Minimal Pluck Bass",
-   "d": 0.06,
+   "d": 0.063,
    "nnOther": "eravos.acid-synth · Club · Minimal Pluck Bass",
-   "dOther": 0.06
+   "dOther": 0.063
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Odd · Chapel Reese",
    "kind": "sound",
    "nn": "eravos.sub-engine · Earthquake Drop",
-   "d": 0.109,
+   "d": 0.112,
    "nnOther": "eravos.sub-engine · Earthquake Drop",
-   "dOther": 0.109
+   "dOther": 0.112
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Odd · Breathing Reese",
    "kind": "sound",
    "nn": "eravos.reese-bass · Melodic Growl",
-   "d": 0.041,
+   "d": 0.049,
    "nnOther": "eravos.swarm-oscillator · Growl Cloud",
-   "dOther": 0.07
+   "dOther": 0.079
   },
   {
    "tool": "eravos.reese-bass",
    "preset": "Odd · Golden Reese",
    "kind": "sound",
    "nn": "eravos.reese-bass · Classic Reese",
-   "d": 0.034,
+   "d": 0.035,
    "nnOther": "eravos.bass-forge · Dub Wobble (soft)",
-   "dOther": 0.086
+   "dOther": 0.081
   },
   {
    "tool": "eravos.sub-engine",
@@ -394,9 +394,9 @@
    "preset": "Earthquake Drop",
    "kind": "sound",
    "nn": "eravos.reese-bass · Odd · Chapel Reese",
-   "d": 0.109,
+   "d": 0.112,
    "nnOther": "eravos.reese-bass · Odd · Chapel Reese",
-   "dOther": 0.109
+   "dOther": 0.112
   },
   {
    "tool": "eravos.sub-engine",
@@ -494,33 +494,33 @@
    "kind": "effect",
    "nn": "eravos.fx-destroyer · Odd · Golden Fold",
    "d": 0.021,
-   "nnOther": "eravos.fx-dynamics · Tight Gate",
-   "dOther": 0.028
+   "nnOther": "eravos.channel · Flat",
+   "dOther": 0.025
   },
   {
    "tool": "eravos.fx-destroyer",
    "preset": "Fold Growl",
    "kind": "effect",
    "nn": "eravos.fx-destroyer · Growl Fold · sub stays clean",
-   "d": 0.027,
-   "nnOther": "eravos.channel · Bass",
-   "dOther": 0.061
+   "d": 0.028,
+   "nnOther": "eravos.fx-filter · Lofi Low",
+   "dOther": 0.063
   },
   {
    "tool": "eravos.fx-destroyer",
    "preset": "Lo-fi 12-bit 22k",
    "kind": "effect",
    "nn": "eravos.fx-destroyer · Cassette 8-bit (smooth)",
-   "d": 0.038,
+   "d": 0.05,
    "nnOther": "eravos.fx-phaser · Vocal Air",
-   "dOther": 0.109
+   "dOther": 0.107
   },
   {
    "tool": "eravos.fx-destroyer",
    "preset": "Total Destruction",
    "kind": "effect",
-   "nn": "eravos.fx-destroyer · 80s · SP-1200 Grit (12-bit)",
-   "d": 0.089,
+   "nn": "eravos.fx-destroyer · Cassette 8-bit (smooth)",
+   "d": 0.08,
    "nnOther": "eravos.fx-filter · Tremble 1/16",
    "dOther": 0.144
   },
@@ -528,26 +528,26 @@
    "tool": "eravos.fx-destroyer",
    "preset": "80s · SP-1200 Grit (12-bit)",
    "kind": "effect",
-   "nn": "eravos.fx-destroyer · Lo-fi 12-bit 22k",
-   "d": 0.05,
+   "nn": "eravos.fx-destroyer · Cassette 8-bit (smooth)",
+   "d": 0.058,
    "nnOther": "eravos.fx-phaser · Vocal Air",
-   "dOther": 0.123
+   "dOther": 0.128
   },
   {
    "tool": "eravos.fx-destroyer",
    "preset": "Fuzz Box",
    "kind": "effect",
    "nn": "eravos.fx-destroyer · Wub Grit · sub stays clean",
-   "d": 0.028,
-   "nnOther": "eravos.channel · Bass",
-   "dOther": 0.048
+   "d": 0.03,
+   "nnOther": "eravos.channel · Flat",
+   "dOther": 0.049
   },
   {
    "tool": "eravos.fx-destroyer",
    "preset": "Wub Grit · sub stays clean",
    "kind": "effect",
    "nn": "eravos.fx-destroyer · Grit",
-   "d": 0.024,
+   "d": 0.026,
    "nnOther": "eravos.channel · Bass",
    "dOther": 0.029
   },
@@ -556,18 +556,18 @@
    "preset": "Growl Fold · sub stays clean",
    "kind": "effect",
    "nn": "eravos.fx-destroyer · Fold Growl",
-   "d": 0.027,
-   "nnOther": "eravos.channel · Bass",
-   "dOther": 0.048
+   "d": 0.028,
+   "nnOther": "eravos.fx-phaser · Vocal Air",
+   "dOther": 0.05
   },
   {
    "tool": "eravos.fx-destroyer",
    "preset": "Cassette 8-bit (smooth)",
    "kind": "effect",
    "nn": "eravos.fx-destroyer · Lo-fi 12-bit 22k",
-   "d": 0.038,
+   "d": 0.05,
    "nnOther": "eravos.fx-filter · Lofi Low",
-   "dOther": 0.121
+   "dOther": 0.128
   },
   {
    "tool": "eravos.fx-destroyer",
@@ -576,7 +576,7 @@
    "nn": "eravos.fx-destroyer · Grit",
    "d": 0.021,
    "nnOther": "eravos.fx-squash · Parallel Smash",
-   "dOther": 0.041
+   "dOther": 0.036
   },
   {
    "tool": "eravos.fx-dynamics",
@@ -808,9 +808,9 @@
    "preset": "Bass Mud Cut",
    "kind": "effect",
    "nn": "eravos.fx-eq · Odd · Make Room for Her",
-   "d": 0.057,
+   "d": 0.033,
    "nnOther": "eravos.sidechain-compressor · Lofi Gentle Pump",
-   "dOther": 0.058
+   "dOther": 0.035
   },
   {
    "tool": "eravos.fx-eq",
@@ -870,10 +870,10 @@
    "tool": "eravos.fx-filter",
    "preset": "Build HP 1/1",
    "kind": "effect",
-   "nn": "eravos.fx-pitch · Fifth Harmony",
-   "d": 0.118,
-   "nnOther": "eravos.fx-pitch · Fifth Harmony",
-   "dOther": 0.118
+   "nn": "eravos.fx-moddelay · Juno Wide",
+   "d": 0.119,
+   "nnOther": "eravos.fx-moddelay · Juno Wide",
+   "dOther": 0.119
   },
   {
    "tool": "eravos.fx-filter",
@@ -888,10 +888,10 @@
    "tool": "eravos.fx-filter",
    "preset": "Tremble 1/16",
    "kind": "effect",
-   "nn": "eravos.fx-squash · Mids Only",
-   "d": 0.091,
-   "nnOther": "eravos.fx-squash · Mids Only",
-   "dOther": 0.091
+   "nn": "eravos.fx-eq · Bass Mud Cut",
+   "d": 0.082,
+   "nnOther": "eravos.fx-eq · Bass Mud Cut",
+   "dOther": 0.082
   },
   {
    "tool": "eravos.fx-filter",
@@ -915,19 +915,19 @@
    "tool": "eravos.fx-filter",
    "preset": "80s · Cassette Lo-cut",
    "kind": "effect",
-   "nn": "eravos.fx-eq · Bass Mud Cut",
-   "d": 0.144,
-   "nnOther": "eravos.fx-eq · Bass Mud Cut",
-   "dOther": 0.144
+   "nn": "eravos.fx-filter · Lofi Radio",
+   "d": 0.145,
+   "nnOther": "eravos.channel · Drums",
+   "dOther": 0.145
   },
   {
    "tool": "eravos.fx-filter",
    "preset": "Lofi Low",
    "kind": "effect",
    "nn": "eravos.fx-destroyer · Fold Growl",
-   "d": 0.066,
+   "d": 0.063,
    "nnOther": "eravos.fx-destroyer · Fold Growl",
-   "dOther": 0.066
+   "dOther": 0.063
   },
   {
    "tool": "eravos.fx-filter",
@@ -943,9 +943,9 @@
    "preset": "Lofi Radio",
    "kind": "effect",
    "nn": "eravos.fx-eq · Odd · Church Low Cut",
-   "d": 0.091,
+   "d": 0.09,
    "nnOther": "eravos.fx-eq · Odd · Church Low Cut",
-   "dOther": 0.091
+   "dOther": 0.09
   },
   {
    "tool": "eravos.fx-filter",
@@ -978,10 +978,10 @@
    "tool": "eravos.fx-glitch",
    "preset": "Build Roll",
    "kind": "effect",
-   "nn": "eravos.fx-dynamics · Tight Gate",
-   "d": 0,
-   "nnOther": "eravos.fx-dynamics · Tight Gate",
-   "dOther": 0
+   "nn": "eravos.channel · Flat",
+   "d": 0.028,
+   "nnOther": "eravos.channel · Flat",
+   "dOther": 0.028
   },
   {
    "tool": "eravos.fx-glitch",
@@ -1005,10 +1005,10 @@
    "tool": "eravos.fx-glitch",
    "preset": "Chaos 50",
    "kind": "effect",
-   "nn": "eravos.channel · Flat",
-   "d": 0.005,
-   "nnOther": "eravos.channel · Flat",
-   "dOther": 0.005
+   "nn": "eravos.sidechain-compressor · Odd · Steppers Pump 1/4",
+   "d": 0.003,
+   "nnOther": "eravos.sidechain-compressor · Odd · Steppers Pump 1/4",
+   "dOther": 0.003
   },
   {
    "tool": "eravos.fx-glitch",
@@ -1041,54 +1041,54 @@
    "tool": "eravos.fx-haunt",
    "preset": "Chopped & Screwed",
    "kind": "effect",
-   "nn": "eravos.fx-haunt · Odd · Chapel Tape",
-   "d": 0.033,
+   "nn": "eravos.fx-haunt · Haunted Cassette",
+   "d": 0.006,
    "nnOther": "eravos.fx-echo · Slapback",
-   "dOther": 0.105
+   "dOther": 0.103
   },
   {
    "tool": "eravos.fx-haunt",
    "preset": "Haunted Cassette",
    "kind": "effect",
    "nn": "eravos.fx-haunt · Chopped & Screwed",
-   "d": 0.045,
+   "d": 0.006,
    "nnOther": "eravos.fx-echo · Slapback",
-   "dOther": 0.105
+   "dOther": 0.104
   },
   {
    "tool": "eravos.fx-haunt",
    "preset": "Witch Fog",
    "kind": "effect",
    "nn": "eravos.fx-haunt · Chopped & Screwed",
-   "d": 0.136,
+   "d": 0.134,
    "nnOther": "eravos.fx-phaser · 80s · Small Stone Swirl",
-   "dOther": 0.154
+   "dOther": 0.158
   },
   {
    "tool": "eravos.fx-haunt",
    "preset": "Séance Radio",
    "kind": "effect",
    "nn": "eravos.fx-haunt · Telephone From Below",
-   "d": 0.13,
+   "d": 0.131,
    "nnOther": "eravos.fx-phaser · Dubstep Sweep 1/8",
-   "dOther": 0.179
+   "dOther": 0.178
   },
   {
    "tool": "eravos.fx-haunt",
    "preset": "Reverse Ghost",
    "kind": "effect",
    "nn": "eravos.fx-haunt · Odd · Chapel Tape",
-   "d": 0.022,
+   "d": 0.02,
    "nnOther": "eravos.fx-echo · Slapback",
-   "dOther": 0.128
+   "dOther": 0.12
   },
   {
    "tool": "eravos.fx-haunt",
    "preset": "Telephone From Below",
    "kind": "effect",
    "nn": "eravos.fx-haunt · Séance Radio",
-   "d": 0.13,
-   "nnOther": "eravos.fx-eq · Telephone",
+   "d": 0.131,
+   "nnOther": "eravos.fx-filter · Odd · Acid Auto-Wah",
    "dOther": 0.227
   },
   {
@@ -1096,16 +1096,16 @@
    "preset": "Odd · Chapel Tape",
    "kind": "effect",
    "nn": "eravos.fx-haunt · Reverse Ghost",
-   "d": 0.022,
+   "d": 0.02,
    "nnOther": "eravos.fx-echo · Slapback",
-   "dOther": 0.121
+   "dOther": 0.126
   },
   {
    "tool": "eravos.fx-haunt",
    "preset": "Odd · Séance Phone",
    "kind": "effect",
-   "nn": "eravos.fx-haunt · Haunted Cassette",
-   "d": 0.134,
+   "nn": "eravos.fx-phaser · Deep 12-stage",
+   "d": 0.154,
    "nnOther": "eravos.fx-phaser · Deep 12-stage",
    "dOther": 0.154
   },
@@ -1113,10 +1113,10 @@
    "tool": "eravos.fx-moddelay",
    "preset": "Juno Wide",
    "kind": "effect",
-   "nn": "eravos.fx-pitch · Fifth Harmony",
-   "d": 0.086,
-   "nnOther": "eravos.fx-pitch · Fifth Harmony",
-   "dOther": 0.086
+   "nn": "eravos.fx-filter · Build HP 1/1",
+   "d": 0.119,
+   "nnOther": "eravos.fx-filter · Build HP 1/1",
+   "dOther": 0.119
   },
   {
    "tool": "eravos.fx-moddelay",
@@ -1124,7 +1124,7 @@
    "kind": "effect",
    "nn": "eravos.fx-moddelay · Odd · Chapel Chorus",
    "d": 0.019,
-   "nnOther": "eravos.fx-pitch · Vocal Double (+7 c)",
+   "nnOther": "eravos.fx-glitch · Build Roll",
    "dOther": 0.028
   },
   {
@@ -1160,8 +1160,8 @@
    "kind": "effect",
    "nn": "eravos.fx-moddelay · 80s · Juno Chorus II",
    "d": 0.026,
-   "nnOther": "eravos.fx-pitch · Vocal Double (+7 c)",
-   "dOther": 0.082
+   "nnOther": "eravos.fx-pitch · Odd · Golden Fifth",
+   "dOther": 0.029
   },
   {
    "tool": "eravos.fx-moddelay",
@@ -1169,8 +1169,8 @@
    "kind": "effect",
    "nn": "eravos.fx-moddelay · Supersaw Widener",
    "d": 0.026,
-   "nnOther": "eravos.fx-pitch · Vocal Double (+7 c)",
-   "dOther": 0.078
+   "nnOther": "eravos.fx-pitch · Odd · Golden Fifth",
+   "dOther": 0.047
   },
   {
    "tool": "eravos.fx-moddelay",
@@ -1203,9 +1203,9 @@
    "tool": "eravos.fx-phaser",
    "preset": "70s Swirl",
    "kind": "effect",
-   "nn": "eravos.fx-pitch · Odd · Golden Fifth",
+   "nn": "eravos.sidechain-compressor · Lofi Gentle Pump",
    "d": 0.054,
-   "nnOther": "eravos.fx-pitch · Odd · Golden Fifth",
+   "nnOther": "eravos.sidechain-compressor · Lofi Gentle Pump",
    "dOther": 0.054
   },
   {
@@ -1230,10 +1230,10 @@
    "tool": "eravos.fx-phaser",
    "preset": "Vocal Air",
    "kind": "effect",
-   "nn": "eravos.fx-pitch · Odd · Golden Fifth",
-   "d": 0.037,
-   "nnOther": "eravos.fx-pitch · Odd · Golden Fifth",
-   "dOther": 0.037
+   "nn": "eravos.sidechain-compressor · Club · House Pump 1/4 (deep)",
+   "d": 0.039,
+   "nnOther": "eravos.sidechain-compressor · Club · House Pump 1/4 (deep)",
+   "dOther": 0.039
   },
   {
    "tool": "eravos.fx-phaser",
@@ -1294,25 +1294,25 @@
    "preset": "Vocal Double (+7 c)",
    "kind": "effect",
    "nn": "eravos.fx-moddelay · Slow Shimmer",
-   "d": 0.028,
+   "d": 0.029,
    "nnOther": "eravos.fx-moddelay · Slow Shimmer",
-   "dOther": 0.028
+   "dOther": 0.029
   },
   {
    "tool": "eravos.fx-pitch",
    "preset": "Fifth Harmony",
    "kind": "effect",
-   "nn": "eravos.fx-moddelay · Juno Wide",
-   "d": 0.086,
-   "nnOther": "eravos.fx-moddelay · Juno Wide",
-   "dOther": 0.086
+   "nn": "eravos.fx-pitch · Thirds Choir",
+   "d": 0.087,
+   "nnOther": "eravos.fx-moddelay · Supersaw Widener",
+   "dOther": 0.109
   },
   {
    "tool": "eravos.fx-pitch",
    "preset": "Octave Stack",
    "kind": "effect",
    "nn": "eravos.fx-pitch · Odd · Octave Under the Choir",
-   "d": 0.029,
+   "d": 0.028,
    "nnOther": "eravos.fx-moddelay · Supersaw Widener",
    "dOther": 0.086
   },
@@ -1320,17 +1320,17 @@
    "tool": "eravos.fx-pitch",
    "preset": "Thirds Choir",
    "kind": "effect",
-   "nn": "eravos.fx-moddelay · Juno Wide",
-   "d": 0.094,
-   "nnOther": "eravos.fx-moddelay · Juno Wide",
-   "dOther": 0.094
+   "nn": "eravos.fx-pitch · Octave Stack",
+   "d": 0.08,
+   "nnOther": "eravos.granular · Odd · Riddim Grain Stutter",
+   "dOther": 0.111
   },
   {
    "tool": "eravos.fx-pitch",
    "preset": "Screwed (-5 st)",
    "kind": "effect",
    "nn": "eravos.fx-pitch · Odd · Octave Under the Choir",
-   "d": 0.046,
+   "d": 0.049,
    "nnOther": "eravos.fx-moddelay · Supersaw Widener",
    "dOther": 0.087
   },
@@ -1339,18 +1339,18 @@
    "preset": "Odd · Octave Under the Choir",
    "kind": "effect",
    "nn": "eravos.fx-pitch · Octave Stack",
-   "d": 0.029,
+   "d": 0.028,
    "nnOther": "eravos.fx-moddelay · Supersaw Widener",
-   "dOther": 0.091
+   "dOther": 0.095
   },
   {
    "tool": "eravos.fx-pitch",
    "preset": "Odd · Golden Fifth",
    "kind": "effect",
-   "nn": "eravos.sidechain-compressor · Classic 1/4 Pump",
-   "d": 0.019,
-   "nnOther": "eravos.sidechain-compressor · Classic 1/4 Pump",
-   "dOther": 0.019
+   "nn": "eravos.fx-moddelay · Supersaw Widener",
+   "d": 0.029,
+   "nnOther": "eravos.fx-moddelay · Supersaw Widener",
+   "dOther": 0.029
   },
   {
    "tool": "eravos.fx-squash",
@@ -1403,8 +1403,8 @@
    "kind": "effect",
    "nn": "eravos.tape-memory · Lofi Study",
    "d": 0.008,
-   "nnOther": "eravos.fx-haunt · Haunted Cassette",
-   "dOther": 0.16
+   "nnOther": "eravos.fx-haunt · Chopped & Screwed",
+   "dOther": 0.162
   },
   {
    "tool": "eravos.tape-memory",
@@ -1412,8 +1412,8 @@
    "kind": "effect",
    "nn": "eravos.tape-memory · Tracking Error",
    "d": 0.008,
-   "nnOther": "eravos.fx-haunt · Haunted Cassette",
-   "dOther": 0.157
+   "nnOther": "eravos.fx-haunt · Chopped & Screwed",
+   "dOther": 0.158
   },
   {
    "tool": "eravos.tape-memory",
@@ -1430,8 +1430,8 @@
    "kind": "effect",
    "nn": "eravos.tape-memory · Third Generation Dub",
    "d": 0.008,
-   "nnOther": "eravos.fx-haunt · Haunted Cassette",
-   "dOther": 0.155
+   "nnOther": "eravos.fx-haunt · Chopped & Screwed",
+   "dOther": 0.157
   },
   {
    "tool": "eravos.tape-memory",
@@ -1448,8 +1448,8 @@
    "kind": "effect",
    "nn": "eravos.tape-memory · Odd · Steppers Cassette",
    "d": 0.017,
-   "nnOther": "eravos.fx-haunt · Haunted Cassette",
-   "dOther": 0.165
+   "nnOther": "eravos.fx-haunt · Chopped & Screwed",
+   "dOther": 0.166
   },
   {
    "tool": "eravos.tape-memory",
@@ -1457,8 +1457,8 @@
    "kind": "effect",
    "nn": "eravos.tape-memory · Lofi Cassette",
    "d": 0.008,
-   "nnOther": "eravos.fx-haunt · Haunted Cassette",
-   "dOther": 0.16
+   "nnOther": "eravos.fx-haunt · Chopped & Screwed",
+   "dOther": 0.161
   },
   {
    "tool": "eravos.tape-memory",
@@ -1466,8 +1466,8 @@
    "kind": "effect",
    "nn": "eravos.tape-memory · Third Generation Dub",
    "d": 0.009,
-   "nnOther": "eravos.fx-haunt · Haunted Cassette",
-   "dOther": 0.154
+   "nnOther": "eravos.fx-haunt · Chopped & Screwed",
+   "dOther": 0.155
   },
   {
    "tool": "eravos.tape-memory",
@@ -1475,8 +1475,8 @@
    "kind": "effect",
    "nn": "eravos.tape-memory · Lofi Study",
    "d": 0.013,
-   "nnOther": "eravos.fx-haunt · Haunted Cassette",
-   "dOther": 0.156
+   "nnOther": "eravos.fx-haunt · Chopped & Screwed",
+   "dOther": 0.157
   },
   {
    "tool": "eravos.tape-memory",
@@ -1484,8 +1484,8 @@
    "kind": "effect",
    "nn": "eravos.tape-memory · Lofi Study",
    "d": 0.013,
-   "nnOther": "eravos.fx-haunt · Haunted Cassette",
-   "dOther": 0.162
+   "nnOther": "eravos.fx-haunt · Chopped & Screwed",
+   "dOther": 0.163
   },
   {
    "tool": "eravos.embodiment-lab",
@@ -1503,7 +1503,7 @@
    "nn": "eravos.embodiment-lab · Odd · Hold Her Voice",
    "d": 0.052,
    "nnOther": "eravos.reese-bass · Wide Rumble",
-   "dOther": 0.107
+   "dOther": 0.101
   },
   {
    "tool": "eravos.embodiment-lab",
@@ -1511,8 +1511,8 @@
    "kind": "sound",
    "nn": "eravos.embodiment-lab · Feelings · Held",
    "d": 0.079,
-   "nnOther": "eravos.reese-bass · Wide Rumble",
-   "dOther": 0.09
+   "nnOther": "eravos.recursive-spectra · Membrane Storm",
+   "dOther": 0.08
   },
   {
    "tool": "eravos.embodiment-lab",
@@ -1537,7 +1537,7 @@
    "preset": "Feelings · Wonder",
    "kind": "sound",
    "nn": "eravos.embodiment-lab · Feelings · Grounded",
-   "d": 0.066,
+   "d": 0.067,
    "nnOther": "eravos.organ · Pedal Drone",
    "dOther": 0.106
   },
@@ -1573,9 +1573,9 @@
    "preset": "Feelings · Calm Fire",
    "kind": "sound",
    "nn": "eravos.organ · Pedal Drone",
-   "d": 0.089,
+   "d": 0.091,
    "nnOther": "eravos.organ · Pedal Drone",
-   "dOther": 0.089
+   "dOther": 0.091
   },
   {
    "tool": "eravos.embodiment-lab",
@@ -1780,7 +1780,7 @@
    "preset": "Odd · Synthwave Steppers",
    "kind": "effect",
    "nn": "eravos.dub-station · Bun Dem (dancehall)",
-   "d": 0.026,
+   "d": 0.027,
    "nnOther": "eravos.fx-echo · Lofi Warm Echo",
    "dOther": 0.105
   },
@@ -1862,8 +1862,8 @@
    "kind": "sound",
    "nn": "eravos.organ · Lanegan Drone",
    "d": 0.079,
-   "nnOther": "eravos.embodiment-lab · Feelings · Heavy Heart",
-   "dOther": 0.117
+   "nnOther": "eravos.recursive-spectra · Membrane Storm",
+   "dOther": 0.094
   },
   {
    "tool": "eravos.organ",
@@ -1879,9 +1879,9 @@
    "preset": "Flute 8'",
    "kind": "sound",
    "nn": "eravos.xen-synth · Partch Diamond Strings",
-   "d": 0.147,
+   "d": 0.146,
    "nnOther": "eravos.xen-synth · Partch Diamond Strings",
-   "dOther": 0.147
+   "dOther": 0.146
   },
   {
    "tool": "eravos.organ",
@@ -1897,9 +1897,9 @@
    "preset": "Pedal Drone",
    "kind": "sound",
    "nn": "eravos.embodiment-lab · Feelings · Calm Fire",
-   "d": 0.089,
+   "d": 0.091,
    "nnOther": "eravos.embodiment-lab · Feelings · Calm Fire",
-   "dOther": 0.089
+   "dOther": 0.091
   },
   {
    "tool": "eravos.organ",
@@ -2104,7 +2104,7 @@
    "preset": "Outrun Lead",
    "kind": "sound",
    "nn": "eravos.retro-poly · 80s · Neon Sync Lead",
-   "d": 0.06,
+   "d": 0.059,
    "nnOther": "eravos.supersaw · EDM Pad · Trance Supersaw Pad",
    "dOther": 0.068
   },
@@ -2194,7 +2194,7 @@
    "preset": "80s · Neon Sync Lead",
    "kind": "sound",
    "nn": "eravos.retro-poly · Outrun Lead",
-   "d": 0.06,
+   "d": 0.059,
    "nnOther": "eravos.supersaw · EDM Pad · Trance Supersaw Pad",
    "dOther": 0.082
   },
@@ -2276,7 +2276,7 @@
    "kind": "sound",
    "nn": "eravos.retro-poly · EDM Pad · Neon Glow Pad",
    "d": 0.04,
-   "nnOther": "eravos.supersaw · Airy Sus Pad",
+   "nnOther": "eravos.supersaw · Odd · Acid Church Pad",
    "dOther": 0.081
   },
   {
@@ -2436,10 +2436,10 @@
    "tool": "eravos.swarm-oscillator",
    "preset": "Growl Cloud",
    "kind": "sound",
-   "nn": "eravos.reese-bass · Melodic Growl",
-   "d": 0.054,
-   "nnOther": "eravos.reese-bass · Melodic Growl",
-   "dOther": 0.054
+   "nn": "eravos.reese-bass · Neuro Flange",
+   "d": 0.046,
+   "nnOther": "eravos.reese-bass · Neuro Flange",
+   "dOther": 0.046
   },
   {
    "tool": "eravos.swarm-oscillator",
@@ -2475,7 +2475,7 @@
    "nn": "eravos.swarm-oscillator · Fractured Cluster",
    "d": 0.08,
    "nnOther": "eravos.retro-poly · EDM Pad · Techno Stab Pad",
-   "dOther": 0.108
+   "dOther": 0.107
   },
   {
    "tool": "eravos.swarm-oscillator",
@@ -2517,10 +2517,10 @@
    "tool": "eravos.channel",
    "preset": "Drums",
    "kind": "effect",
-   "nn": "eravos.fx-eq · Bass Mud Cut",
-   "d": 0.114,
-   "nnOther": "eravos.fx-eq · Bass Mud Cut",
-   "dOther": 0.114
+   "nn": "eravos.fx-filter · Lofi Underwater",
+   "d": 0.117,
+   "nnOther": "eravos.fx-filter · Lofi Underwater",
+   "dOther": 0.117
   },
   {
    "tool": "eravos.channel",
@@ -2573,8 +2573,8 @@
    "kind": "effect",
    "nn": "eravos.sidechain-compressor · Odd · Steppers Pump 1/4",
    "d": 0.002,
-   "nnOther": "eravos.fx-eq · Flat",
-   "dOther": 0.014
+   "nnOther": "eravos.fx-glitch · Chaos 50",
+   "dOther": 0.004
   },
   {
    "tool": "eravos.sidechain-compressor",
@@ -2636,8 +2636,8 @@
    "kind": "effect",
    "nn": "eravos.sidechain-compressor · Odd · Steppers Pump 1/4",
    "d": 0.01,
-   "nnOther": "eravos.fx-eq · Odd · Make Room for Her",
-   "dOther": 0.019
+   "nnOther": "eravos.fx-glitch · Chaos 50",
+   "dOther": 0.01
   },
   {
    "tool": "eravos.sidechain-compressor",
@@ -2654,44 +2654,44 @@
    "kind": "effect",
    "nn": "eravos.sidechain-compressor · Classic 1/4 Pump",
    "d": 0.002,
-   "nnOther": "eravos.fx-eq · Flat",
-   "dOther": 0.014
+   "nnOther": "eravos.fx-glitch · Chaos 50",
+   "dOther": 0.003
   },
   {
    "tool": "eravos.curve-synth",
    "preset": "Songs-for-the-Dead Dive",
    "kind": "sound",
-   "nn": "eravos.curve-synth · Odd · Falling Coin",
+   "nn": "eravos.curve-synth · Ricochet",
    "d": 0.141,
    "nnOther": "eravos.supersaw · Monstercat Pluck",
-   "dOther": 0.194
+   "dOther": 0.191
   },
   {
    "tool": "eravos.curve-synth",
    "preset": "Ricochet",
    "kind": "sound",
    "nn": "eravos.curve-synth · Odd · Music Box Bounce",
-   "d": 0.11,
+   "d": 0.108,
    "nnOther": "eravos.supersaw · Monstercat Pluck",
-   "dOther": 0.177
+   "dOther": 0.175
   },
   {
    "tool": "eravos.curve-synth",
    "preset": "Siren",
    "kind": "sound",
    "nn": "eravos.curve-synth · Odd · Siren Into Drop",
-   "d": 0.044,
-   "nnOther": "eravos.retro-poly · Darksynth Saw",
-   "dOther": 0.178
+   "d": 0.045,
+   "nnOther": "eravos.wub-osc · Square Talker",
+   "dOther": 0.179
   },
   {
    "tool": "eravos.curve-synth",
    "preset": "Drop Whoop",
    "kind": "sound",
    "nn": "eravos.reese-bass · Hoover-ish",
-   "d": 0.154,
+   "d": 0.137,
    "nnOther": "eravos.reese-bass · Hoover-ish",
-   "dOther": 0.154
+   "dOther": 0.137
   },
   {
    "tool": "eravos.curve-synth",
@@ -2736,7 +2736,7 @@
    "nn": "eravos.curve-synth · Bending Lead",
    "d": 0.049,
    "nnOther": "eravos.acid-synth · Phuture Squelch",
-   "dOther": 0.122
+   "dOther": 0.123
   },
   {
    "tool": "eravos.curve-synth",
@@ -2752,18 +2752,18 @@
    "preset": "Odd · Music Box Bounce",
    "kind": "sound",
    "nn": "eravos.curve-synth · Ricochet",
-   "d": 0.11,
+   "d": 0.108,
    "nnOther": "eravos.supersaw · Monstercat Pluck",
-   "dOther": 0.123
+   "dOther": 0.122
   },
   {
    "tool": "eravos.curve-synth",
    "preset": "Odd · Siren Into Drop",
    "kind": "sound",
    "nn": "eravos.curve-synth · Siren",
-   "d": 0.044,
+   "d": 0.045,
    "nnOther": "eravos.retro-poly · Darksynth Saw",
-   "dOther": 0.169
+   "dOther": 0.168
   },
   {
    "tool": "eravos.curve-synth",
@@ -2790,7 +2790,7 @@
    "nn": "eravos.supersaw · Odd · Steppers Pluck",
    "d": 0.088,
    "nnOther": "eravos.curve-synth · Odd · Music Box Bounce",
-   "dOther": 0.158
+   "dOther": 0.157
   },
   {
    "tool": "eravos.supersaw",
@@ -2833,7 +2833,7 @@
    "preset": "Monstercat Pluck",
    "kind": "sound",
    "nn": "eravos.supersaw · Trance Pluck",
-   "d": 0.111,
+   "d": 0.112,
    "nnOther": "eravos.curve-synth · Odd · Falling Coin",
    "dOther": 0.12
   },
@@ -2842,7 +2842,7 @@
    "preset": "Euphoric Lead",
    "kind": "sound",
    "nn": "eravos.supersaw · EDM Pad · Hardstyle Lead Pad",
-   "d": 0.116,
+   "d": 0.115,
    "nnOther": "eravos.retro-poly · EDM Pad · Midnight Brass Pad",
    "dOther": 0.16
   },
@@ -2907,7 +2907,7 @@
    "nn": "eravos.supersaw · Odd · Steppers Pluck",
    "d": 0.106,
    "nnOther": "eravos.curve-synth · Odd · Music Box Bounce",
-   "dOther": 0.123
+   "dOther": 0.124
   },
   {
    "tool": "eravos.supersaw",
@@ -3176,8 +3176,8 @@
    "kind": "effect",
    "nn": "eravos.granular · Glitch Dust",
    "d": 0.109,
-   "nnOther": "eravos.fx-phaser · Odd · Wobble Phase",
-   "dOther": 0.12
+   "nnOther": "eravos.fx-pitch · Thirds Choir",
+   "dOther": 0.111
   },
   {
    "tool": "eravos.syn-osc",
@@ -3447,7 +3447,7 @@
    "nn": "eravos.wub-filter · Yoi Yoi (OO → YOI)",
    "d": 0.042,
    "nnOther": "eravos.fx-destroyer · Growl Fold · sub stays clean",
-   "dOther": 0.092
+   "dOther": 0.09
   },
   {
    "tool": "eravos.wub-filter",
@@ -3456,16 +3456,16 @@
    "nn": "eravos.wub-filter · Yoi Vowel (OO → AH)",
    "d": 0.042,
    "nnOther": "eravos.fx-destroyer · Fold Growl",
-   "dOther": 0.086
+   "dOther": 0.083
   },
   {
    "tool": "eravos.wub-filter",
    "preset": "Hollow Comb (−)",
    "kind": "effect",
    "nn": "eravos.fx-moddelay · 80s · Dimension D Wide",
-   "d": 0.107,
+   "d": 0.131,
    "nnOther": "eravos.fx-moddelay · 80s · Dimension D Wide",
-   "dOther": 0.107
+   "dOther": 0.131
   },
   {
    "tool": "eravos.wub-filter",
@@ -3474,7 +3474,7 @@
    "nn": "eravos.wub-filter · Yoi Vowel (OO → AH)",
    "d": 0.088,
    "nnOther": "eravos.fx-destroyer · Growl Fold · sub stays clean",
-   "dOther": 0.111
+   "dOther": 0.113
   },
   {
    "tool": "eravos.wub-osc",
@@ -3606,10 +3606,10 @@
    "tool": "eravos.recursive-spectra",
    "preset": "Membrane Storm",
    "kind": "sound",
-   "nn": "eravos.recursive-spectra · Witch Bell Loop",
-   "d": 0.077,
-   "nnOther": "eravos.acid-synth · Deep Minimal",
-   "dOther": 0.127
+   "nn": "eravos.embodiment-lab · Feelings · Heavy Heart",
+   "d": 0.08,
+   "nnOther": "eravos.embodiment-lab · Feelings · Heavy Heart",
+   "dOther": 0.08
   },
   {
    "tool": "eravos.recursive-spectra",
@@ -3779,6 +3779,18 @@
    "twinsInside": 0
   },
   {
+   "id": "eravos.sub-engine",
+   "label": "Deep Sub",
+   "kind": "sound",
+   "presets": 15,
+   "novel": 2,
+   "medAny": 0.009435000564151483,
+   "medOther": 0.03378577613598258,
+   "insideOf": "Reese Bass",
+   "insideShare": 0.8666666666666667,
+   "twinsInside": 12
+  },
+  {
    "id": "eravos.fx-glitch",
    "label": "Glitch",
    "kind": "effect",
@@ -3787,20 +3799,8 @@
    "medAny": 0,
    "medOther": 0,
    "insideOf": "Dynamics",
-   "insideShare": 0.875,
+   "insideShare": 0.75,
    "twinsInside": 0
-  },
-  {
-   "id": "eravos.sub-engine",
-   "label": "Deep Sub",
-   "kind": "sound",
-   "presets": 15,
-   "novel": 2,
-   "medAny": 0.009434474214778941,
-   "medOther": 0.033712491250209246,
-   "insideOf": "Reese Bass",
-   "insideShare": 0.8666666666666667,
-   "twinsInside": 12
   },
   {
    "id": "eravos.fx-dynamics",
@@ -3809,7 +3809,7 @@
    "presets": 9,
    "novel": 0,
    "medAny": 0,
-   "medOther": 0.0314118931812677,
+   "medOther": 0.031413307429876844,
    "insideOf": "Mod Delay",
    "insideShare": 0.6666666666666666,
    "twinsInside": 9
@@ -3820,22 +3820,10 @@
    "kind": "effect",
    "presets": 8,
    "novel": 1,
-   "medAny": 0.013075534385999978,
-   "medOther": 0.027789608590885136,
+   "medAny": 0.01307535149074482,
+   "medOther": 0.02777228816622893,
    "insideOf": "EQ",
    "insideShare": 0.625,
-   "twinsInside": 4
-  },
-  {
-   "id": "eravos.sidechain-compressor",
-   "label": "Sidechain",
-   "kind": "effect",
-   "presets": 10,
-   "novel": 0,
-   "medAny": 0.00541067123947003,
-   "medOther": 0.014040653342648542,
-   "insideOf": "EQ",
-   "insideShare": 0.6,
    "twinsInside": 4
   },
   {
@@ -3844,8 +3832,8 @@
    "kind": "effect",
    "presets": 5,
    "novel": 0,
-   "medAny": 0.015726037573135208,
-   "medOther": 0.023523477674843796,
+   "medAny": 0.015725408865991403,
+   "medOther": 0.02351285237785501,
    "insideOf": "EQ",
    "insideShare": 0.6,
    "twinsInside": 3
@@ -3855,12 +3843,24 @@
    "label": "EQ",
    "kind": "effect",
    "presets": 9,
-   "novel": 2,
-   "medAny": 0.018173944408210563,
-   "medOther": 0.019306952659899537,
+   "novel": 1,
+   "medAny": 0.01817719231735163,
+   "medOther": 0.01924987240780438,
    "insideOf": "Sidechain",
-   "insideShare": 0.4444444444444444,
+   "insideShare": 0.5555555555555556,
    "twinsInside": 2
+  },
+  {
+   "id": "eravos.sidechain-compressor",
+   "label": "Sidechain",
+   "kind": "effect",
+   "presets": 10,
+   "novel": 0,
+   "medAny": 0.00541049692347776,
+   "medOther": 0.005650362176478236,
+   "insideOf": "Glitch",
+   "insideShare": 0.3,
+   "twinsInside": 4
   },
   {
    "id": "eravos.fx-destroyer",
@@ -3868,11 +3868,11 @@
    "kind": "effect",
    "presets": 10,
    "novel": 1,
-   "medAny": 0.028256999462476833,
-   "medOther": 0.06070678892370026,
+   "medAny": 0.029830419072829944,
+   "medOther": 0.0634459786139322,
    "insideOf": "Channel",
    "insideShare": 0.3,
-   "twinsInside": 6
+   "twinsInside": 5
   },
   {
    "id": "eravos.fx-phaser",
@@ -3880,9 +3880,9 @@
    "kind": "effect",
    "presets": 8,
    "novel": 2,
-   "medAny": 0.0480433635066818,
-   "medOther": 0.08182120493761817,
-   "insideOf": "Pitch",
+   "medAny": 0.048057844776662514,
+   "medOther": 0.0818208193153237,
+   "insideOf": "Sidechain",
    "insideShare": 0.25,
    "twinsInside": 2
   },
@@ -3892,8 +3892,8 @@
    "kind": "effect",
    "presets": 13,
    "novel": 2,
-   "medAny": 0.01693560602826125,
-   "medOther": 0.06347850230915406,
+   "medAny": 0.01693590573984747,
+   "medOther": 0.06349344091575054,
    "insideOf": "Dynamics",
    "insideShare": 0.23076923076923078,
    "twinsInside": 6
@@ -3904,11 +3904,11 @@
    "kind": "effect",
    "presets": 9,
    "novel": 4,
-   "medAny": 0.0463812628669652,
-   "medOther": 0.08673233047436675,
+   "medAny": 0.04882357778288693,
+   "medOther": 0.09486288316195185,
    "insideOf": "Mod Delay",
-   "insideShare": 0.1111111111111111,
-   "twinsInside": 0
+   "insideShare": 0.2222222222222222,
+   "twinsInside": 2
   },
   {
    "id": "eravos.fx-moddelay",
@@ -3916,10 +3916,34 @@
    "kind": "effect",
    "presets": 10,
    "novel": 5,
-   "medAny": 0.06466723718173047,
-   "medOther": 0.07813410848744441,
+   "medAny": 0.06466723447847053,
+   "medOther": 0.078043718540728,
    "insideOf": "Pitch",
-   "insideShare": 0.1,
+   "insideShare": 0.2,
+   "twinsInside": 4
+  },
+  {
+   "id": "eravos.reese-bass",
+   "label": "Reese Bass",
+   "kind": "sound",
+   "presets": 13,
+   "novel": 6,
+   "medAny": 0.04939580553237622,
+   "medOther": 0.073402937667294,
+   "insideOf": "Swarm Oscillator",
+   "insideShare": 0.15384615384615385,
+   "twinsInside": 2
+  },
+  {
+   "id": "eravos.wub-osc",
+   "label": "Wub Osc",
+   "kind": "sound",
+   "presets": 9,
+   "novel": 4,
+   "medAny": 0.058545464720339314,
+   "medOther": 0.08924697462016362,
+   "insideOf": "Deep Sub",
+   "insideShare": 0.1111111111111111,
    "twinsInside": 4
   },
   {
@@ -3928,11 +3952,23 @@
    "kind": "sound",
    "presets": 10,
    "novel": 7,
-   "medAny": 0.10509811533337438,
-   "medOther": 0.14398780700153085,
+   "medAny": 0.10508923934998138,
+   "medOther": 0.1440116555273455,
    "insideOf": "Morph Osc",
    "insideShare": 0.1,
    "twinsInside": 0
+  },
+  {
+   "id": "eravos.dub-station",
+   "label": "Dub Station",
+   "kind": "effect",
+   "presets": 11,
+   "novel": 1,
+   "medAny": 0.020422077062593944,
+   "medOther": 0.08415779538497475,
+   "insideOf": "Tape Echo",
+   "insideShare": 0.09090909090909091,
+   "twinsInside": 9
   },
   {
    "id": "eravos.granular",
@@ -3940,8 +3976,8 @@
    "kind": "effect",
    "presets": 11,
    "novel": 9,
-   "medAny": 0.07215895231440958,
-   "medOther": 0.1015695557397086,
+   "medAny": 0.07215852576161091,
+   "medOther": 0.10157020628084758,
    "insideOf": "Dynamics",
    "insideShare": 0.09090909090909091,
    "twinsInside": 0
@@ -3952,23 +3988,11 @@
    "kind": "sound",
    "presets": 11,
    "novel": 10,
-   "medAny": 0.11271334571370421,
-   "medOther": 0.1361519702689698,
+   "medAny": 0.11270951988033157,
+   "medOther": 0.13612781394188012,
    "insideOf": "Partials",
    "insideShare": 0.09090909090909091,
    "twinsInside": 0
-  },
-  {
-   "id": "eravos.reese-bass",
-   "label": "Reese Bass",
-   "kind": "sound",
-   "presets": 13,
-   "novel": 5,
-   "medAny": 0.04149281000906644,
-   "medOther": 0.06973173455707798,
-   "insideOf": "Deep Sub",
-   "insideShare": 0.07692307692307693,
-   "twinsInside": 2
   },
   {
    "id": "eravos.bass-forge",
@@ -3976,8 +4000,8 @@
    "kind": "sound",
    "presets": 13,
    "novel": 7,
-   "medAny": 0.06333175839162687,
-   "medOther": 0.09568200281606157,
+   "medAny": 0.06326296590909924,
+   "medOther": 0.09568749409967682,
    "insideOf": "Swarm Oscillator",
    "insideShare": 0.07692307692307693,
    "twinsInside": 2
@@ -3988,8 +4012,8 @@
    "kind": "sound",
    "presets": 18,
    "novel": 14,
-   "medAny": 0.08013916569761845,
-   "medOther": 0.10194244738964918,
+   "medAny": 0.08014131042024415,
+   "medOther": 0.10193893313531222,
    "insideOf": "Reese Bass",
    "insideShare": 0.05555555555555555,
    "twinsInside": 0
@@ -4000,8 +4024,8 @@
    "kind": "sound",
    "presets": 1,
    "novel": 1,
-   "medAny": 0.07486662259329495,
-   "medOther": 0.07486662259329495,
+   "medAny": 0.07486658526997525,
+   "medOther": 0.07486658526997525,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 0
@@ -4012,8 +4036,8 @@
    "kind": "sound",
    "presets": 7,
    "novel": 3,
-   "medAny": 0.01807999472553522,
-   "medOther": 0.07841851542223462,
+   "medAny": 0.01807999430838663,
+   "medOther": 0.07841851541404553,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 4
@@ -4024,20 +4048,8 @@
    "kind": "sound",
    "presets": 26,
    "novel": 9,
-   "medAny": 0.037332388987897605,
-   "medOther": 0.0823228399539379,
-   "insideOf": null,
-   "insideShare": 0,
-   "twinsInside": 9
-  },
-  {
-   "id": "eravos.dub-station",
-   "label": "Dub Station",
-   "kind": "effect",
-   "presets": 11,
-   "novel": 1,
-   "medAny": 0.020412847650071547,
-   "medOther": 0.08399121546272977,
+   "medAny": 0.03729109574784994,
+   "medOther": 0.08231476125505349,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 9
@@ -4048,23 +4060,11 @@
    "kind": "sound",
    "presets": 11,
    "novel": 9,
-   "medAny": 0.06699893207519206,
-   "medOther": 0.08481982204613046,
+   "medAny": 0.06700506342791915,
+   "medOther": 0.08481996482531726,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 0
-  },
-  {
-   "id": "eravos.wub-osc",
-   "label": "Wub Osc",
-   "kind": "sound",
-   "presets": 9,
-   "novel": 5,
-   "medAny": 0.05854732145897956,
-   "medOther": 0.08922987067418522,
-   "insideOf": null,
-   "insideShare": 0,
-   "twinsInside": 4
   },
   {
    "id": "eravos.organ",
@@ -4072,8 +4072,8 @@
    "kind": "sound",
    "presets": 19,
    "novel": 11,
-   "medAny": 0.06306594560684925,
-   "medOther": 0.09021406688268102,
+   "medAny": 0.0630568176346657,
+   "medOther": 0.09060213194393278,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 4
@@ -4084,23 +4084,11 @@
    "kind": "sound",
    "presets": 13,
    "novel": 9,
-   "medAny": 0.07464379685788042,
-   "medOther": 0.09242216419163514,
+   "medAny": 0.07120675661396547,
+   "medOther": 0.09159418363690469,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 4
-  },
-  {
-   "id": "eravos.supersaw",
-   "label": "Supersaw",
-   "kind": "sound",
-   "presets": 33,
-   "novel": 15,
-   "medAny": 0.05029516043381578,
-   "medOther": 0.09354143594124965,
-   "insideOf": null,
-   "insideShare": 0,
-   "twinsInside": 0
   },
   {
    "id": "eravos.retro-dco",
@@ -4108,11 +4096,35 @@
    "kind": "sound",
    "presets": 14,
    "novel": 12,
-   "medAny": 0.08135738534310845,
-   "medOther": 0.09354281062508321,
+   "medAny": 0.08136308678995964,
+   "medOther": 0.09354254452855386,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 2
+  },
+  {
+   "id": "eravos.supersaw",
+   "label": "Supersaw",
+   "kind": "sound",
+   "presets": 33,
+   "novel": 15,
+   "medAny": 0.05024535696714634,
+   "medOther": 0.09355061846580841,
+   "insideOf": null,
+   "insideShare": 0,
+   "twinsInside": 3
+  },
+  {
+   "id": "eravos.recursive-spectra",
+   "label": "Recursive Spectra",
+   "kind": "sound",
+   "presets": 9,
+   "novel": 7,
+   "medAny": 0.08644575725860489,
+   "medOther": 0.10558261838468593,
+   "insideOf": null,
+   "insideShare": 0,
+   "twinsInside": 0
   },
   {
    "id": "eravos.wub-filter",
@@ -4120,8 +4132,8 @@
    "kind": "effect",
    "presets": 4,
    "novel": 2,
-   "medAny": 0.08819987271128284,
-   "medOther": 0.10713711729117918,
+   "medAny": 0.08820410946726583,
+   "medOther": 0.1132707056661698,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 0
@@ -4132,8 +4144,8 @@
    "kind": "sound",
    "presets": 13,
    "novel": 6,
-   "medAny": 0.052187881415491424,
-   "medOther": 0.113365875483319,
+   "medAny": 0.052195541412954925,
+   "medOther": 0.1133722675295606,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 4
@@ -4144,20 +4156,8 @@
    "kind": "sound",
    "presets": 14,
    "novel": 10,
-   "medAny": 0.10213641591610363,
-   "medOther": 0.11609230435615779,
-   "insideOf": null,
-   "insideShare": 0,
-   "twinsInside": 0
-  },
-  {
-   "id": "eravos.recursive-spectra",
-   "label": "Recursive Spectra",
-   "kind": "sound",
-   "presets": 9,
-   "novel": 7,
-   "medAny": 0.08645188076998964,
-   "medOther": 0.11654619239716989,
+   "medAny": 0.10213590092947555,
+   "medOther": 0.11609941642261785,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 0
@@ -4168,8 +4168,8 @@
    "kind": "sound",
    "presets": 13,
    "novel": 9,
-   "medAny": 0.10509811533337438,
-   "medOther": 0.12280331398684259,
+   "medAny": 0.10508923934998138,
+   "medOther": 0.12267048019909149,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 0
@@ -4180,8 +4180,8 @@
    "kind": "effect",
    "presets": 12,
    "novel": 12,
-   "medAny": 0.11794742686801676,
-   "medOther": 0.12364086508436731,
+   "medAny": 0.11934285075848165,
+   "medOther": 0.12368994958099214,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 0
@@ -4192,11 +4192,11 @@
    "kind": "effect",
    "presets": 8,
    "novel": 4,
-   "medAny": 0.1300399887112943,
-   "medOther": 0.15355646706165801,
+   "medAny": 0.13135704174525098,
+   "medOther": 0.15431123469060268,
    "insideOf": null,
    "insideShare": 0,
-   "twinsInside": 2
+   "twinsInside": 4
   },
   {
    "id": "eravos.tape-memory",
@@ -4204,8 +4204,8 @@
    "kind": "effect",
    "presets": 10,
    "novel": 2,
-   "medAny": 0.012640244443988041,
-   "medOther": 0.15954175093187442,
+   "medAny": 0.012690625515746123,
+   "medOther": 0.16102514961391434,
    "insideOf": null,
    "insideShare": 0,
    "twinsInside": 8
