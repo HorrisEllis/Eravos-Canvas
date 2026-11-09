@@ -49,8 +49,11 @@ Object.values(DIRS).forEach(d => fs.mkdirSync(d, { recursive: true }));
 // The app folder's tools/ is the first copy (the bundle) — put into Documents\ERAVOS\tools on start (only what changed; nothing you
 // edited is overwritten) and served from there; the app folder answers only for a file the library does not have. In development (not
 // packaged) the repo's tools/ is served as it is, so edits show at once — ERAVOS_LIBRARY_TOOLS=1 tries the library path there too.
-const LIBTOOLS = require('./library-tools.js'), BUNDLE_TOOLS = path.join(APP_DIR, 'tools');
-const TOOLS_IN_LIBRARY = app.isPackaged || process.env.ERAVOS_LIBRARY_TOOLS === '1';
+// never let a missing helper stop ERAVOS from opening (0.2.19: a Setup without this file would not start) — without it the app serves
+// the tools from its own folder, as before 3.155
+let LIBTOOLS = null; try { LIBTOOLS = require('./library-tools.js'); } catch (e) { console.error('library-tools.js missing — tools served from the app folder:', e.message); }
+const BUNDLE_TOOLS = path.join(APP_DIR, 'tools');
+const TOOLS_IN_LIBRARY = !!LIBTOOLS && (app.isPackaged || process.env.ERAVOS_LIBRARY_TOOLS === '1');
 if (TOOLS_IN_LIBRARY) { try { const r = LIBTOOLS.sync(BUNDLE_TOOLS, DIRS.tools, { version: app.getVersion() }); if (!r.skipped) console.log(`tools → ${DIRS.tools}: ${r.copied} copied, ${r.updated} updated, ${r.removed} removed, ${r.kept.length} of yours kept`); } catch (e) { console.error('tools into the library failed:', e.message); } }
 app.setPath('userData', DIRS.appdata);
 

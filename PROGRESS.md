@@ -2,8 +2,15 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
-## Built, shown, not merged yet — 3.159 The Workshop's layout (W3e) and navigation, instrument, speed, note library (W3f) (2026-11-09)
-His words: see specs/eravos.workshop.spec ADDENDA 2026-11-09 (3) and (4). PR #152 waits for his OK (a visual change).
+## Done — 3.160 Fixed: ERAVOS would not open (0.2.19) (2026-11-09)
+His words: "its not opening. i deleted my tools from the program files and no longer have them. i tried to reinstall but it didn't work. looks great though, the tool" (with the dialog "Error: Cannot find module './library-tools.js'", resources\app\main.js:52).
+- Cause: 3.155 made desktop/main.js require ./library-tools.js; desktop/build.mjs copied it, packaging/windows/make-exe.ps1 (which makes the
+  Setup) did not. Fixed: make-exe.ps1 copies it; main.js opens without it (tools from the app folder, as before); desktop/test/shipped-files.mjs
+  follows every require from main.js / preload.js and fails if either build does not ship it (fails on the old make-exe.ps1) — in checks.yml
+  and release.yml. Release 0.2.19.
+
+## Done — 3.159 The Workshop's layout (W3e) and navigation, instrument, speed, note library (W3f) (2026-11-09)
+His words: see specs/eravos.workshop.spec ADDENDA 2026-11-09 (3) and (4). Approved: "looks great though, the tool".
 - W3e: no buttons up top; PROPERTIES over Photoshop-style LAYERS (eyes, thumbnails, folding groups, layer tools in the footer); V B O; keys
   for every action (?); right-click menus with keys. W3f: the navigator (a mini piano roll; click, [ ], N folds); dropdowns for long choices;
   PLAYS (any instrument, a new one added, the lane follows, undo); per-note Speed (the tool's tempo for that note — sdk-music); the Note Library
