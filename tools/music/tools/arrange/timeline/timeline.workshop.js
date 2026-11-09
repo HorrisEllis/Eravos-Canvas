@@ -168,9 +168,10 @@
       g.globalAlpha = 0.35; plot(g, cyc, x0, y0, w, h, -1.05, 1.05, COLORS[+mi[1] % COLORS.length], 1.5, [3, 4]); g.globalAlpha = 1;
       g.fillStyle = COLORS[+mi[1] % COLORS.length]; g.fillText('MOD ' + (+mi[1] + 1) + ' · ONE CYCLE OF ITS WAVE (dashed) — draw here to make a wave of your own', x0, y0 + h + 12);
     }
-    ((sig && sig.mods) || []).forEach((m, i) => { const arr = series(a, at, 'm:' + i, 320); if (!arr) return; const off = new Float64Array(arr.length).map((_, j) => arr[j] + (r.lo + r.hi) / 2); g.globalAlpha = m.on === false ? 0.2 : 0.7; plot(g, off, x0, y0, w, h, r.lo, r.hi, COLORS[i % COLORS.length], sel === 'm:' + i ? 2 : 1); g.globalAlpha = 1; });
-    plot(g, series(a, at, 'base', 320), x0, y0, w, h, r.lo, r.hi, sel === 'base' ? '#00d4ff' : 'rgba(255,255,255,0.55)', sel === 'base' ? 2 : 1.2, [8, 5]);
-    plot(g, series(a, at, 'result', 640), x0, y0, w, h, r.lo, r.hi, '#00d4ff', 2.6);
+    const hid = o.hidden || new Set();
+    ((sig && sig.mods) || []).forEach((m, i) => { if (hid.has('m:' + i)) return; const arr = series(a, at, 'm:' + i, 320); if (!arr) return; const off = new Float64Array(arr.length).map((_, j) => arr[j] + (r.lo + r.hi) / 2); g.globalAlpha = m.on === false ? 0.2 : 0.7; plot(g, off, x0, y0, w, h, r.lo, r.hi, COLORS[i % COLORS.length], sel === 'm:' + i ? 2 : 1); g.globalAlpha = 1; });
+    if (!hid.has('base')) plot(g, series(a, at, 'base', 320), x0, y0, w, h, r.lo, r.hi, sel === 'base' ? '#00d4ff' : 'rgba(255,255,255,0.55)', sel === 'base' ? 2 : 1.2, [8, 5]);
+    if (!hid.has('result')) plot(g, series(a, at, 'result', 640), x0, y0, w, h, r.lo, r.hi, '#00d4ff', 2.6);
   }
   const KIND = {
     id: 'music.notes', label: 'Notes',
@@ -182,18 +183,18 @@
     actions(d, o) {
       const a = noteOf(d), at = shapeAt(d), sel = (o && o.selected) || '', M = MT(); if (!a) return [];
       const into = /^(T:.+|m:\d+:(rate|depth))$/.test(sel), out = [];
-      out.push({ label: '▶ HEAR', hint: 'play this note alone, shaped (its instrument, its curves, its knobs)', disabled: !HOOK.hear, run: (doc) => { const x = noteOf(doc); if (x && HOOK.hear) HOOK.hear(x); return 'heard ' + (doc.drums ? 'pad ' + x.n : nameOf(x.n)); } });
+      out.push({ label: '▶ HEAR', name: "Hear it", keys: 'Space', hint: 'play this note alone, shaped (its instrument, its curves, its knobs)', disabled: !HOOK.hear, run: (doc) => { const x = noteOf(doc); if (x && HOOK.hear) HOOK.hear(x); return 'heard ' + (doc.drums ? 'pad ' + x.n : nameOf(x.n)); } });
       // A / B: keep this version as A, change it, then hear and swap — the studio's before / after
       const ab = d.ab && d.ab.i === (d.sel | 0) ? d.ab : null;
-      out.push({ label: ab ? 'A ← NOW' : 'SET A', key: 'abSet', value: true, hint: 'keep the note as it is now as A, to compare against' });
-      if (ab) { out.push({ label: '▶ A', hint: 'hear A', disabled: !HOOK.hear, run: () => { HOOK.hear(ab.note); return 'heard A'; } }); out.push({ label: '⇄ A/B', key: 'abSwap', value: true, hint: 'swap: the note becomes A, A becomes what it was' }); }
-      if ((a.sh && Object.keys(a.sh.t || {}).length) || a.p || a.x) out.push({ label: '⇉ ALL NOTES', key: 'shapeAll', value: true, disabled: (d.notes || []).length < 2, hint: 'give every note in this pattern this note\'s shape and its own knob values' });
-      const pk = /^P:(.+)$/.exec(sel); if (!at && pk) out.push({ label: '✕ KNOB', key: 'unsetp', value: pk[1], hint: 'this note goes back to the instrument\'s own value' });
-      if (at) out.push({ label: '▴ UP', key: 'nav', value: 'up', hint: 'one level up the tree' });
-      out.push({ label: '▾ INTO', key: 'nav', value: 'into:' + sel, disabled: !into, hint: 'open the selected curve and shape IT (its own base and modulators)' });
-      if (at) { const n = ((signalAt(a, at) || {}).mods || []).length; out.push({ label: '＋ MOD', key: 'addmod', value: n, hint: 'add a modulator here (its rate and depth can be shaped too)' });
-        const mi = /^m:(\d+)$/.exec(sel); out.push({ label: '− MOD', key: 'delmod', value: mi ? +mi[1] : -1, disabled: !mi, hint: 'take the selected modulator away' });
-        if (!(at.p || []).length) out.push({ label: '✕ UNSHAPE', key: 'unshape', value: at.t, hint: 'stop shaping this (the note plays as before it was shaped)' }); }
+      out.push({ label: ab ? 'A ← NOW' : 'SET A', name: "Keep this as A", keys: 'A', key: 'abSet', value: true, hint: 'keep the note as it is now as A, to compare against' });
+      if (ab) { out.push({ label: '▶ A', name: "Hear A", keys: 'Shift+Space', hint: 'hear A', disabled: !HOOK.hear, run: () => { HOOK.hear(ab.note); return 'heard A'; } }); out.push({ label: '⇄ A/B', name: "Swap A and B", keys: 'X', key: 'abSwap', value: true, hint: 'swap: the note becomes A, A becomes what it was' }); }
+      if ((a.sh && Object.keys(a.sh.t || {}).length) || a.p || a.x) out.push({ label: '⇉ ALL NOTES', name: "Give every note this shape", keys: 'Shift+A', key: 'shapeAll', value: true, disabled: (d.notes || []).length < 2, hint: 'give every note in this pattern this note\'s shape and its own knob values' });
+      const pk = /^P:(.+)$/.exec(sel); if (!at && pk) out.push({ label: '✕ KNOB', name: "Back to the instrument's value", keys: 'Delete', icon: '−', only: 'layer', key: 'unsetp', value: pk[1], hint: 'this note goes back to the instrument\'s own value' });
+      if (at) out.push({ label: '▴ UP', name: "Up a level", keys: 'Backspace', icon: '⤴', key: 'nav', value: 'up', hint: 'one level up the tree' });
+      out.push({ label: '▾ INTO', name: "Open it", keys: 'Enter', icon: '⤵', open: true, key: 'nav', value: 'into:' + sel, disabled: !into, hint: 'open the selected curve and shape IT (its own base and modulators)' });
+      if (at) { const n = ((signalAt(a, at) || {}).mods || []).length; out.push({ label: '＋ MOD', name: "Add a modulator", keys: 'M', icon: '＋', key: 'addmod', value: n, hint: 'add a modulator here (its rate and depth can be shaped too)' });
+        const mi = /^m:(\d+)$/.exec(sel); out.push({ label: '− MOD', name: "Remove the modulator", keys: 'Delete', icon: '−', only: 'layer', key: 'delmod', value: mi ? +mi[1] : -1, disabled: !mi, hint: 'take the selected modulator away' });
+        if (!(at.p || []).length) out.push({ label: '✕ UNSHAPE', name: "Stop shaping this", keys: 'U', icon: '⊘', key: 'unshape', value: at.t, hint: 'stop shaping this (the note plays as before it was shaped)' }); }
       return out;
     },
     layers(d) {

@@ -68,3 +68,36 @@ html.ws-open .glass-layer { display: none !important; }   /* the light layers dr
 .ws-st.go { cursor: pointer; }
 .ws-st.go:hover { color: var(--wc); }
 .ws-sel { background: var(--wv); color: var(--wt); border: 1px solid var(--wl2); border-radius: 2px; font: inherit; padding: 3px 6px; }
+/* ---- W3e the layout (2026-11-09: "more of a photoshop format. Like layers. I hate the top right … key bindings … right click context menus
+   … replace the bottom right with a photoshop esc layers menu and group the layer tools there"): PROPERTIES over LAYERS; no buttons up top */
+.ws-right { grid-template-rows: minmax(150px, 46%) minmax(0, 1fr); }
+.ws-props { border-bottom: 1px solid var(--wl2); }
+.ws-layers { display: flex; flex-direction: column; overflow: hidden; border-bottom: none; }
+.ws-lbody { flex: 1 1 auto; overflow: auto; min-height: 0; }
+.ws-lh { cursor: pointer; user-select: none; } .ws-lh:hover { color: var(--wt2); }
+.ws-lay { grid-template-columns: 18px 48px 1fr; gap: 8px; padding: 4px 8px 4px 6px; user-select: none; }
+.ws-lay.off { opacity: .42; }
+.ws-eye { width: 18px; height: 18px; color: var(--wt3) !important; font-size: 11px !important; padding: 0 !important; } .ws-eye:hover { color: var(--wc) !important; }
+.ws-lay.sel .ws-eye { color: var(--wc) !important; }
+.ws-thumb { width: 48px; height: 24px; display: block; border: 1px solid var(--wl2); border-radius: 1px; background: #02050a; }
+.ws-lay.sel .ws-thumb { border-color: rgba(0,212,255,.55); }
+.ws-ln { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ws-ln small { overflow: hidden; text-overflow: ellipsis; }
+.ws-lfoot { display: flex; gap: 2px; justify-content: flex-end; padding: 4px 6px; border-top: 1px solid var(--wl2); background: #04080e; }
+.ws-lt { width: 26px; height: 22px; border-radius: 2px; color: var(--wt2) !important; font-size: 12px !important; text-transform: none !important; }
+.ws-lt:hover:not(:disabled) { color: var(--wc) !important; background: rgba(0,212,255,.07) !important; } .ws-lt:disabled { opacity: .25; cursor: default; }
+.ws-vph { position: static; }
+.ws-opts .ws-vs { height: 14px; }
+.ws-hint { color: var(--wt3); }
+.ws-status .ws-keys { margin-left: 8px; color: var(--wt2); } .ws-status .ws-keys:hover { color: var(--wc); }
+.ws-status .ws-r { margin-left: auto; }
+.ws-sheet { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 460px; max-height: 70vh; overflow: auto; z-index: 5;
+  background: rgba(4,8,14,.97); border: 1px solid var(--wl2); border-radius: 2px; box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+.ws-kl { padding: 8px 12px; display: grid; gap: 5px; } .ws-kl .ws-kv { grid-template-columns: 1fr auto; } .ws-kl b { color: var(--wc); }
+/* the context menu, over the Workshop and in its language */
+html.ws-open .cm { z-index: 299500; background: #060a12; border: 1px solid #1e3050; border-radius: 2px; font: 400 10.5px/1.4 'WS Mono', ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; color: #b8cfe0; min-width: 240px; }
+html.ws-open .cm-item { border-radius: 1px; padding: 5px 9px; } html.ws-open .cm-item:hover, html.ws-open .cm-item:focus { background: rgba(0,212,255,.08); color: #00d4ff; }
+html.ws-open .cm-s, html.ws-open .cm-h { font: 400 9px 'WS Display', Impact, sans-serif; letter-spacing: .28em; color: #2e4a60; padding: 6px 9px 3px; }
+html.ws-open .cm-item { font: inherit !important; text-transform: uppercase; letter-spacing: .06em; }
+.ws-lt { color: var(--wt) !important; font-size: 14px !important; }
+.ws-f.big { grid-template-columns: 80px 1fr auto; gap: 8px; } .ws-f.big .ws-unit { white-space: nowrap; }
+.ws-kl .ws-kv span { color: var(--wt); }

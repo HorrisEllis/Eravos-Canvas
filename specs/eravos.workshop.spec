@@ -224,3 +224,22 @@ W3d  note.x — every part played by the Timeline (timeline.engine.js playNotes)
        humanize within range and repeatable, plain notes unchanged); P112 13/13 (the old event depth) green
      not here: stereo width as its own control — a note reaches its instrument, not a mixer; width and pan are per note through the
        instrument's own knobs (ITS KNOBS, SHAPE), where the instrument has them
+
+## ADDENDUM 2026-11-09 (3) — W3e: the layout, keys and menus (his words; nothing above is changed) — shown to him before it merges
+# James, 2026-11-09: "Okay the ui needs more of a photoshop format. Like layers. I hate the top right. Add key bindings. Right click context menus less explicit buttons for things that make it look low quality and cluttered. Like undo doesn’t need a button. Make it enterprise grade, powerful but as simple as possible without losing control or functionality. Like undo and redo. Shouldn’t be two places to change the chord either. Replace the bottom right with a photoshop esc layers menu and group the layer tools there."
+W3e  the bar          the name and the path only (click a station to go up) — no buttons (UNDO, REDO, APPLY, × and the kind's actions gone)
+     the options bar  the current tool and what it works on, and the view (2D 3D · TOP FRONT ORBIT · EXPLODED FLAT · WIRE LIT) — no value fields
+     the tool strip   SELECT (V: a click opens what is under it) · DRAW (B: drag draws the selected curve) · ORBIT (O: drag turns the 3D view)
+     top right        PROPERTIES (the ONE place a value is edited) · HISTORY · OUTLINER
+     bottom right     LAYERS, Photoshop's way: eye (show / hide), a thumbnail drawn by the kind, name and what it holds; groups fold;
+                      double-click opens it (the kind's `open` action); right-click: hide, show only this, show all, then what the kind can do
+                      with it; the LAYER TOOLS in its footer (the kind's actions with an `icon`: up, open, add, remove, unshape)
+     keys             Ctrl+Z / Ctrl+Shift+Z (Ctrl+Y) · Ctrl+Enter apply · Esc close · V B O · ↑ ↓ layers · H hide (Alt+H only this) · 2 3 ·
+                      T F · E W · ? the key sheet — and the kind's: Space hear · Shift+Space hear A · A keep as A · X swap A/B · Shift+A every
+                      note · Enter open · Backspace up · M add a modulator · Delete remove · U stop shaping
+     menus            right-click the view: the kind's actions, the view, undo / redo / apply / close — each with its key (context-menu.js
+                      gained item.keys); in the Workshop the menu takes the Workshop's look
+     contract         an action may carry name (its words in menus), keys, icon (a layer tool), open (what Enter / a double-click does),
+                      only ('layer' | 'view'); a choice with > 8 options in the options bar is a dropdown (W3d) — the bar no longer holds fields
+     proof            tests/p159 1/1; P150 (its field edit now in PROPERTIES), P151, P154, P156, P157, P158, P110, boundary green
+     previews         docs/previews/workshop-layers-layout.png · workshop-layer-menu.png · workshop-keys.png

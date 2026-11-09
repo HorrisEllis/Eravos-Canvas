@@ -1003,3 +1003,6 @@ html[data-gfx="low"] * { box-shadow: none !important; text-shadow: none !importa
 :is(.uk-btn, .tb-btn, .uk-toggle, .tp-btn, .ap-btn, .sbk-chip, .sbk-alt, .fl-btn, .uk-seg, .uk-select) { border-width: 3px !important; box-sizing: border-box; }
 /* the thicker border takes no extra room: rows keep their height */
 :where(.uk-btn, .uk-toggle, .tp-btn, .ap-btn, .sbk-chip, .sbk-alt, .fl-btn, .uk-seg, .uk-select) { margin: -1.5px; }   /* :where — a button with its own margin keeps it */
+/* a menu item's key, right-aligned (context-menu.js: item.keys) */
+.cm-item:has(.cm-k) { display: flex; align-items: center; gap: 24px; }
+.cm-k { margin-left: auto; opacity: .5; font-size: .85em; letter-spacing: .04em; }
