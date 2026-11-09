@@ -2,6 +2,13 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.157 The Workshop: hear a shaped note, its shape to all, its own knobs (W3c) (2026-11-09)
+His words: "Just ant them to be zipped per tool. With a dag. This is future plans.  Not now. Continue the wokshop" · on decoupling: "No. Forget I said it. As long as it doesn’t have any dependence." (measured: none — specs/eravos.decouple.map.spec)
+- ▶ HEAR (the note alone through its instrument, shaped, for its length) · ⇉ ALL NOTES (the shape and knob values to every note, one step) ·
+  ITS KNOBS · THIS NOTE ONLY (any number knob of the instrument per note — p; ＋ set, inspector value, ✕ KNOB). timeline.workshop.js (bind),
+  timeline.pianoroll.js (the hear hook through note_audition).
+- Proof: tests/p157 2/2; P156 3/3, P154 4/4, P150 7/7, Timeline 89/89, P76, P112, boundary green; design check no worse.
+
 ## Done — 3.156 The Workshop in 3D; a note shaped fractally (W3) (2026-11-08)
 His words: "yeah, that needs to be moved to the editor. pattern editor. i want you to finish the workshop with the 3d." · "i want the 3d. like i want like a full modulation, waveform, oscillation, like all the ways to edit a sound, give it as much depth as possible. fractally and recursively."
 - canvas/runtime/workshop.js (domain-free): the viewport in 3D — the kind's layers as planes (K.drawLayer), EXPLODED / FLAT, TOP / FRONT /
