@@ -217,6 +217,11 @@
     ((sig && sig.mods) || []).forEach((m, i) => { if (hid.has('m:' + i)) return; const arr = series(a, at, 'm:' + i, 320); if (!arr) return; const off = new Float64Array(arr.length).map((_, j) => arr[j] + (r.lo + r.hi) / 2); g.globalAlpha = m.on === false ? 0.2 : 0.7; plot(g, off, x0, y0, w, h, r.lo, r.hi, COLORS[i % COLORS.length], sel === 'm:' + i ? 2 : 1); g.globalAlpha = 1; });
     if (!hid.has('base')) plot(g, series(a, at, 'base', 320), x0, y0, w, h, r.lo, r.hi, sel === 'base' ? '#00d4ff' : 'rgba(255,255,255,0.55)', sel === 'base' ? 2 : 1.2, [8, 5]);
     if (!hid.has('result')) plot(g, series(a, at, 'result', 640), x0, y0, w, h, r.lo, r.hi, '#00d4ff', 2.6);
+    if (o.tool === 'points') {   // the open curve's points as handles (the base, or the selected modulator's drawn wave)
+      const pts = mod ? (mod.shape === 'drawn' && mod.wave ? mod.wave : []) : ((sig && sig.base) || []), lo2 = mod ? -1.05 : r.lo, hi2 = mod ? 1.05 : r.hi;
+      g.fillStyle = '#06090e'; g.strokeStyle = mod ? COLORS[+mi[1] % COLORS.length] : '#ffffff'; g.lineWidth = 1.5;
+      pts.forEach(q => { const px = x0 + q[0] * w, py = y0 + (1 - (clamp(q[1], lo2, hi2) - lo2) / (hi2 - lo2)) * h; g.fillRect(px - 4, py - 4, 8, 8); g.strokeRect(px - 4, py - 4, 8, 8); }); g.lineWidth = 1;
+    }
   }
   const KIND = {
     id: 'music.notes', label: 'Notes',
@@ -230,6 +235,7 @@
       const into = /^(T:.+|m:\d+:(rate|depth))$/.test(sel), out = [];
       out.push({ label: 'SAVE NOTE', name: 'Save to the note library', keys: 'Mod+S', hint: 'keep this note — how it moves and plays — in the note library (Patterns › Notes); it fits any note of any tool', disabled: !global.NoteLibrary,
         run: (doc) => { const x0 = noteOf(doc); const nm = (doc.drums ? 'pad ' + x0.n : nameOf(x0.n)) + ' · ' + (global.NoteLibrary.describe({ note: x0 }) || 'note'); global.NoteLibrary.save(x0, nm, { tool: HOOK.label ? HOOK.label(doc.target) : '' }); return 'saved “' + nm + '” to the note library'; } });
+      out.push({ label: 'RHYTHMS', name: 'Open the rhythm library', keys: 'R', hint: 'pick a rhythm and put it into this pattern (⇥ Into the Workshop)', disabled: !global.PatternLibrary, run: () => { global.PatternLibrary.open({ tab: 'patterns', reopen: true }); return ''; } });
       out.push({ label: 'LIBRARY', name: 'Open the note library', keys: 'Shift+L', hint: 'Patterns › Notes', disabled: !global.PatternLibrary, run: () => { global.PatternLibrary.open({ tab: 'notes' }); return ''; } });
       const N = (d.notes || []).length, si = d.sel | 0;
       out.push({ label: '◂ NOTE', name: 'Previous note', keys: '[', key: 'sel', value: Math.max(1, si), disabled: si <= 0 });
@@ -295,6 +301,7 @@
       const at = shapeAt(d), a0 = noteOf(d);
       if (key === 'add' || key === 'setp') return '';
       if (key === 'libApply') return '—';
+      if (key === 'bpm') return Math.round((d.bpm || (HOOK.bpm ? HOOK.bpm() : 120)) * 10) / 10;
       if (/^p\./.test(key) && a0) return a0.p ? a0.p[key.slice(2)] : undefined;
       if (at && a0) { const sig = signalAt(a0, at) || {}, M = MT();
         if (key === 'base.preset') return (sig.pre && sig.pre.shape) || '';
@@ -316,6 +323,8 @@
         const pp = Object.assign({}, a0.p || {}); if (key === 'unsetp') delete pp[kk]; else pp[kk] = key === 'setp' ? kn.val : clamp(+v, kn.min, kn.max);
         if (Object.keys(pp).length) a0.p = pp; else delete a0.p; out.notes[i0] = a0; return out;
       }
+      if (key === 'bpm') { const b = clamp(+v, 40, 240); if (!isFinite(b)) return d; out.bpm = b; return out; }
+      if (key === 'loadPattern') { if (!v || !Array.isArray(v.notes) || !v.notes.length) return d; out.notes = v.notes.map(n => JSON.parse(JSON.stringify(n))); out.sel = 0; out.at = null; out.ab = null; return out; }
       if (key === 'instrument') {
         let id = String(v || ''); if (!id) return d;
         if (id.startsWith('new:')) { id = HOOK.spawn ? HOOK.spawn(id.slice(4)) : null; if (!id) return d; }
@@ -333,6 +342,7 @@
           if (sh) x.sh = JSON.parse(JSON.stringify(sh)); else delete x.sh; if (pp) x.p = Object.assign({}, x.p || {}, pp); if (a0.x) x.x = JSON.parse(JSON.stringify(a0.x)); return tidy(compile(x, out)); });
         return out;
       }
+      if (key === 'curve') key = 'stroke';   // W3g the toolbar writes curves as the pen always did
       if (/^(add|unshape|stroke|addmod|delmod)$|^base\.|^m\.\d/.test(key)) {
       if (!a0 || !M) return d;
       const prevT = Object.keys((a0.sh && a0.sh.t) || {}); a0._shPitch = prevT.includes('pitch'); a0._shKnobs = {}; prevT.filter(t => t.startsWith('k:')).forEach(t => { a0._shKnobs[t.slice(2)] = 1; });
@@ -414,6 +424,31 @@
       const val = id === 'velocity' ? a.v : id === 'pitch' ? a.n / 127 : id === 'depth' ? (a.pr || 1) : id === 'timing' ? Math.min(1, a.l / 16) : 0.5;
       g.fillStyle = col; g.globalAlpha = (o && o.wire) ? 0.35 : 0.8; g.fillRect(8, H / 2 - 8, (W - 16) * clamp(val, 0, 1), 16); g.globalAlpha = 1; g.shadowBlur = 0;
     },
+    // W3g THE TOOLBAR on the view: pen, line, points, smooth, move, erase — on the open curve (a SIGNAL's base) or, a modulator selected, its
+    // wave (one cycle; it becomes drawn). On the note itself, a tool opens its PITCH to shape (making it if needed). curve-edit does the work.
+    drag(d, tool, pts, W, H, o) {
+      const a = noteOf(d), at = shapeAt(d), CE = global.MusicParts && global.MusicParts.curveEdit, M = MT(); o = o || {}; if (!a || !CE || !M || !pts.length) return null;
+      const top = navTop(H); if (pts[0][1] < top) return null;
+      if (!at) { if (o.phase !== 'end' || d.drums) return null; const has = a.sh && a.sh.t && a.sh.t.pitch; return has ? { key: 'nav', value: 'into:T:pitch', label: 'Shape the pitch' } : { key: 'add', value: 'Pitch', label: 'Shape the pitch' }; }
+      const y0 = top + 26, h = H - y0 - 14, x0 = 16, w = W - 32, sig = signalAt(a, at) || { base: [[0, 0], [1, 0]], mods: [] }, mi = /^m:(\d+)$/.exec(o.selected || ''), mod = mi && sig.mods[+mi[1]];
+      let curve, lo, hi, rest, clo, chi;
+      if (mod) { curve = mod.shape === 'drawn' && mod.wave && mod.wave.length > 1 ? mod.wave.concat([[1, mod.wave[0][1]]]) : Array.from({ length: 17 }, (_, i) => [i / 16, M.wave(mod, i / 16)]); lo = -1.05; hi = 1.05; clo = -1; chi = 1; rest = 0; }
+      else { const r = viewRange(d, at, a), rr = rangeOf(d, at, a); curve = sig.base && sig.base.length ? sig.base : [[0, 0], [1, 0]]; lo = r.lo; hi = r.hi; clo = rr.lo; chi = rr.hi; rest = (at.p || []).length ? 0 : targetInfo(d, at.t, a).def; }
+      const P = pts.map(([x, y]) => [clamp((x - x0) / w, 0, 1), lo + (hi - lo) * clamp(1 - (y - y0) / h, 0, 1)]), last = P[P.length - 1];
+      let out = null;
+      if (tool === 'pen') { if (P.length < 2) return null; out = CE.pen(curve, P); }
+      else if (tool === 'line') { if (P.length < 2) return null; out = CE.line(curve, P[0], last); }
+      else if (tool === 'points') { const nb = CE.nearest(curve, P[0][0], P[0][1], w, h / Math.max(1e-9, hi - lo));
+        if (o.alt) { if (nb.dist > 12 || o.phase !== 'end') return null; out = CE.removePoint(curve, nb.index); }
+        else if (nb.dist <= 12) out = CE.movePoint(curve, nb.index, last[0], last[1]);
+        else { if (o.phase !== 'end') return null; out = CE.addPoint(curve, P[0][0], P[0][1]).curve; } }
+      else if (tool === 'smooth') out = CE.smooth(curve, P.map(q => q[0]), 0.06, 1);
+      else if (tool === 'erase') out = CE.erase(curve, P.map(q => q[0]), 0.05, rest);
+      else if (tool === 'move') { const dv = last[1] - P[0][1]; if (o.shift) { const vals = curve.map(q => q[1]), mid = (Math.min(...vals) + Math.max(...vals)) / 2; out = CE.scale(curve, Math.max(0, 1 + dv / Math.max(1e-9, (hi - lo) / 2)), mid); } else out = CE.offset(curve, dv); }
+      if (!out) return null; out = out.map(q => [q[0], clamp(q[1], clo, chi)]);
+      const NAMES = { pen: 'Pen', line: 'Line', points: 'Points', smooth: 'Smooth', erase: 'Erase', move: 'Move' };
+      return mod ? { key: 'curve', value: { wave: +mi[1], pts: out.filter(q => q[0] < 1) }, label: NAMES[tool] + ' · the wave of mod ' + (+mi[1] + 1) } : { key: 'curve', value: { pts: out }, label: NAMES[tool] + ' · ' + atLabel(d, at, a) };
+    },
     // a drag in the view draws: the open curve's base, or — a drawn modulator selected — its wave (one cycle)
     stroke(d, pts, W, H, o) {
       const a = noteOf(d), at = shapeAt(d); if (!a || !at || pts.length < 2) return null;
@@ -430,6 +465,7 @@
     // a click on the pattern strip opens that note (the zoom from pattern scale to note scale)
     pick(d, x, y, W, H) { return (d.notes || []).length ? pickNav(d, x, y, W, H) : null; },
     // W3f the options bar's picker: the instrument this pattern plays — any tool the piano roll can play (one on the canvas, or a new one)
+    bar(d) { return HOOK.bpm ? [{ key: 'bpm', label: 'TEMPO', type: 'number', min: 40, max: 240, step: 1, unit: 'BPM' }] : []; },
     picker(d) { if (!HOOK.instruments) return null; const opts = HOOK.instruments(); const has = opts.some(g2 => (g2.options || []).some(o2 => o2.value === d.target));
       return { label: 'PLAYS', key: 'instrument', value: d.target || '', hint: 'the instrument this pattern plays — pick one on the canvas, or add a new one', options: (has || !d.target ? [] : [{ value: d.target, label: (HOOK.label ? HOOK.label(d.target) : d.target) }]).concat(d.target ? [] : [{ value: '', label: '— pick an instrument —' }], opts) }; },
   };

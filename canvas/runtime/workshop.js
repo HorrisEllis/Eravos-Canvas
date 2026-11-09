@@ -9,6 +9,8 @@
  *   Workshop.check(kind) → [] or the problems, in words · Workshop.addKind(kind) → { ok, problems } · Workshop.kinds()
  *   Workshop.open(kindId, doc, { onChange(doc), onApply(doc), onClose(), title }) → { doc(), set(key, v), select(layerId), undo(), redo(),
  *     history(), close(), el } · Workshop.current
+ * W3g drag(doc, tool, points, W, H, { selected, phase, alt, shift }) → { key, value, label } (the toolbar: pen line points smooth move erase);
+ *   bar(doc) → fields shown in the options bar (a document-wide value the kind names).
  * W3f picker(doc) → { label, key, value, options: [{ value, label } | { group, options }] } (a dropdown first in the options bar; a change is
  *   edit(key, value)); pick may return { run } (a click that changes the view, not the document — no history).
  * W3e the layout: the bar = the path only; options bar = the view; tools V B O; PROPERTIES (the one place a value is edited) · HISTORY ·
@@ -88,7 +90,7 @@
       const r = vp.getBoundingClientRect(), dpr = Math.min(2, global.devicePixelRatio || 1), W = Math.max(50, r.width), H = Math.max(50, r.height);
       if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
       const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
-      try { if (mode === '3d' && K.drawLayer) draw3d(g, W, H, dpr); else K.draw(g, W, H, d, { selected, hidden }); } catch (e) { console.error(e); }
+      try { if (mode === '3d' && K.drawLayer) draw3d(g, W, H, dpr); else K.draw(g, W, H, preview || d, { selected, hidden, tool }); } catch (e) { console.error(e); }
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
       if (stroke && stroke.pts.length > 1) { g.strokeStyle = 'rgba(255,255,255,0.85)'; g.lineWidth = 2; g.setLineDash([4, 3]); g.beginPath(); stroke.pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); g.setLineDash([]); }
     }
@@ -147,7 +149,7 @@
     const viewItems = () => !K.drawLayer ? [] : [{ section: 'VIEW' },
       { label: mode === '3d' ? '2D view' : '3D view', keys: mode === '3d' ? '2' : '3', run: () => { mode = mode === '3d' ? '2d' : '3d'; chips(); draw(); } },
       { label: 'Look from the top', keys: 'T', run: () => setCam('top') }, { label: 'Look from the front', keys: 'F', run: () => setCam('front') },
-      { label: exploded ? 'Stack the layers flat' : 'Spread the layers apart', keys: 'E', run: () => { exploded = !exploded; chips(); draw(); } },
+      { label: exploded ? 'Stack the layers flat' : 'Spread the layers apart', keys: 'Shift+E', run: () => { exploded = !exploded; chips(); draw(); } },
       { label: wire ? 'Lit' : 'Wire', keys: 'W', run: () => { wire = !wire; chips(); draw(); } }];
     const histItems = () => [{ section: 'EDIT' }, { label: 'Undo' + (past.length ? '' : ''), keys: 'Mod+Z', disabled: !past.length, run: undo }, { label: 'Redo', keys: 'Mod+Shift+Z', disabled: !future.length, run: redo },
       ...((o.onApply || K.apply) ? [{ label: 'Apply — write it back', keys: 'Mod+Enter', run: apply }] : []), { label: 'Close the Workshop', keys: 'Esc', run: () => close() }];
@@ -159,8 +161,15 @@
     const kindItems = (where) => acts().filter(a => !where || !a.only || a.only === where).map(a => ({ label: nameOf(a), keys: a.keys, hint: a.hint, disabled: a.disabled, run: () => runAct(a) }));
     function apply() { if (o.onApply) o.onApply(clone(d)); else if (K.apply) K.apply(clone(d)); note = 'APPLIED'; render(); }
     function setCam(v) { mode = '3d'; if (v === 'top') { cam.pitch = Math.PI / 2 - 0.001; cam.yaw = 0; } else if (v === 'front') { cam.pitch = 0.18; cam.yaw = 0; } else cam = { yaw: -0.55, pitch: 0.62, zoom: 1 }; chips(); draw(); }
-    const TOOLS = [['select', 'V', '⬚', 'Select — a click opens what is under it'], ['draw', 'B', '✎', 'Draw — drag to draw the selected curve'], ['orbit', 'O', '⟲', 'Orbit — drag to turn the 3D view (wheel zooms)']];
-    let tool = 'draw';
+    // W3g the toolbar (his words, 2026-11-09: "manipulate it on the canvas, like photoshop, needs the toolbar, for drawing, shaping, editing"):
+    // each tool works ON the view, live while the hand moves (K.drag → K.set, drawn, no history), one history step when it lets go
+    const ALL_TOOLS = [['select', 'V', '⬚', 'Select — a click opens what is under it'], ['pen', 'P', '✎', 'Pen — draw freehand; only the stretch you draw changes'],
+      ['line', 'L', '╱', 'Line — a straight line from where you start to where you let go'], ['points', 'D', '◇', 'Points — drag a point; click the curve to add one; Alt+click removes one'],
+      ['smooth', 'S', '≈', 'Smooth — a brush that smooths what it passes over'], ['move', 'G', '↕', 'Move — drag the whole curve up or down; Shift scales it'],
+      ['erase', 'E', '⌫', 'Erase — a brush that flattens what it passes over'], ['orbit', 'O', '⟲', 'Orbit — drag to turn the 3D view (wheel zooms)']];
+    const CURVE_TOOLS = ['pen', 'line', 'points', 'smooth', 'move', 'erase'];
+    const TOOLS = ALL_TOOLS.filter(([id]) => id === 'select' || (id === 'orbit' ? !!K.drawLayer : K.drag ? true : id === 'pen' && !!K.stroke));
+    let tool = TOOLS.some(t => t[0] === 'pen') ? 'pen' : 'select', preview = null, drag = null;
     function thumb(l) {
       if (!K.drawLayer) return el('span', 'ws-badge t-' + (TYPES.includes(l.type) ? l.type : 'value'), [], { text: (l.type || 'value').slice(0, 4).toUpperCase() });
       const c = el('canvas', 'ws-thumb'); c.width = 96; c.height = 48; const g = c.getContext('2d'); g.fillStyle = '#02050a'; g.fillRect(0, 0, 96, 48);
@@ -180,9 +189,10 @@
       opts.replaceChildren(...(pk ? [el('span', 'ws-pkl', [], { text: pk.label }), (() => { const sl = el('select', 'ws-sel ws-picker', [], { title: pk.hint || pk.label });
         (pk.options || []).forEach(op => { if (op.group) { const og = el('optgroup', '', [], {}); og.label = op.group; (op.options || []).forEach(o2 => { const oe = el('option', '', [], { value: String(o2.value), text: o2.label }); if (String(o2.value) === String(pk.value)) oe.selected = true; og.appendChild(oe); }); sl.appendChild(og); }
           else { const oe = el('option', '', [], { value: String(op.value), text: op.label }); if (String(op.value) === String(pk.value)) oe.selected = true; sl.appendChild(oe); } });
-        sl.addEventListener('change', () => edit(pk.key, sl.value, pk.label)); sl.addEventListener('keydown', (e) => e.stopPropagation()); return sl; })(), el('span', 'ws-vs')] : []), vph);
+        sl.addEventListener('change', () => edit(pk.key, sl.value, pk.label)); sl.addEventListener('keydown', (e) => e.stopPropagation()); return sl; })(), el('span', 'ws-vs')] : []),
+        ...(K.bar ? K.bar(d) : []).map(f => field(f, false)).concat(K.bar && K.bar(d).length ? [el('span', 'ws-vs')] : []), vph);   // W3g the kind's own bar fields (document-wide values it names)
       // the tool strip: the canvas's tools, then the kind's
-      strip.replaceChildren(...TOOLS.map(([id, key, glyph, hint]) => el('button', 'ws-ti' + (tool === id ? ' on' : ''), [], { type: 'button', title: hint + ' (' + key + ')', text: glyph, onclick: () => { tool = id; if (id === 'orbit' && K.drawLayer) mode = '3d'; render(); } })),
+      strip.replaceChildren(...TOOLS.map(([id, key, glyph, hint]) => el('button', 'ws-ti' + (tool === id ? ' on' : ''), [], { type: 'button', title: hint + ' (' + key + ')', text: glyph, onclick: () => { tool = id; if (id === 'orbit' && K.drawLayer) mode = '3d'; else if (mode === '3d' && id !== 'select') mode = '2d'; render(); } })),
         ...(K.tools || []).map(t => el('button', 'ws-ti' + (t.layer && t.layer === selected ? ' on' : ''), [], { type: 'button', title: t.label, text: t.glyph || t.label.slice(0, 1), onclick: () => { if (t.layer) { selected = t.layer; render(); } } })));
       tabs.replaceChildren(el('span', 'ws-tab on', [String(title), el('i', '', [], { text: '×', title: 'close (Esc)', onclick: () => close() })]));
       // PROPERTIES · HISTORY · OUTLINER (top right): the one place a value is edited
@@ -211,8 +221,8 @@
     }
     // the keys, in one place (?): the canvas's, then the kind's
     function keyList() {
-      return [['Undo', 'Mod+Z'], ['Redo', 'Mod+Shift+Z'], ...((o.onApply || K.apply) ? [['Apply', 'Mod+Enter']] : []), ['Close', 'Esc'], ['Select / Draw / Orbit', 'V · B · O'], ['Previous / next layer', '↑ · ↓'], ['Show / hide the layer', 'H'],
-        ...(K.drawLayer ? [['2D / 3D', '2 · 3'], ['Top / front view', 'T · F'], ['Spread / flat', 'E'], ['Wire / lit', 'W']] : []), ['Right-click', 'what the layer or view can do'], ['This sheet', '?']]
+      return [['Undo', 'Mod+Z'], ['Redo', 'Mod+Shift+Z'], ...((o.onApply || K.apply) ? [['Apply', 'Mod+Enter']] : []), ['Close', 'Esc'], ['Select · Pen · Line · Points · Smooth · Move · Erase · Orbit', 'V P L D S G E O'], ['Previous / next layer', '↑ · ↓'], ['Show / hide the layer', 'H'],
+        ...(K.drawLayer ? [['2D / 3D', '2 · 3'], ['Top / front view', 'T · F'], ['Spread / flat', 'Shift+E'], ['Wire / lit', 'W']] : []), ['Right-click', 'what the layer or view can do'], ['This sheet', '?']]
         .concat(acts().filter(a => a.keys).map(a => [nameOf(a), a.keys]));
     }
     function keySheet() {
@@ -238,12 +248,13 @@
       const L = layers(), i = Math.max(0, L.findIndex(l => l.id === selected));
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { eat(); const j = Math.max(0, Math.min(L.length - 1, i + (e.key === 'ArrowDown' ? 1 : -1))); selected = L[j] && L[j].id; return render(); }
       if (e.key === '?') { eat(); return keySheet(); }
-      if (k === 'v' || k === 'b' || k === 'o') { eat(); tool = k === 'v' ? 'select' : k === 'b' ? 'draw' : 'orbit'; if (tool === 'orbit' && K.drawLayer) mode = '3d'; return render(); }
+      if (k === 'e' && e.shiftKey && K.drawLayer) { eat(); exploded = !exploded; chips(); return draw(); }
+      const T = !e.shiftKey && TOOLS.find(t => t[1].toLowerCase() === k); if (T) { eat(); tool = T[0]; if (tool === 'orbit' && K.drawLayer) mode = '3d'; else if (tool !== 'select' && mode === '3d') mode = '2d'; return render(); }
       if (k === 'h' && selected) { eat(); if (e.altKey) hidden = new Set(L.map(x => x.id).filter(id => id !== selected)); else hidden.has(selected) ? hidden.delete(selected) : hidden.add(selected); return render(); }
       if (!K.drawLayer) return;
-      if (k === '2' || k === '3') { eat(); mode = k === '3' ? '3d' : '2d'; if (mode === '2d' && tool === 'orbit') tool = 'draw'; return render(); }
+      if (k === '2' || k === '3') { eat(); mode = k === '3' ? '3d' : '2d'; if (mode === '2d' && tool === 'orbit') tool = TOOLS.some(t => t[0] === 'pen') ? 'pen' : 'select'; return render(); }
       if (k === 't') { eat(); return setCam('top'); } if (k === 'f') { eat(); return setCam('front'); }
-      if (k === 'e') { eat(); exploded = !exploded; chips(); return draw(); } if (k === 'w') { eat(); wire = !wire; chips(); return draw(); }
+      if (k === 'w') { eat(); wire = !wire; chips(); return draw(); }
     };
     const onResize = () => draw();
     cv.addEventListener('pointerdown', (e) => {
@@ -251,14 +262,24 @@
       if (e.button === 2) return;
       if ((mode === '3d' && K.drawLayer) || tool === 'orbit') { if (K.drawLayer && mode !== '3d') { mode = '3d'; chips(); } orbit = { x: e.clientX, y: e.clientY, yaw: cam.yaw, pitch: cam.pitch }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} return; }
       const p = K.pick ? K.pick(d, x, y, r.width, r.height, { selected }) : null; if (p && p.run) { try { p.run(); } catch (er) { console.error(er); } render(); return; } if (p && p.key !== undefined) return edit(p.key, p.value, p.label);
-      if (K.stroke && tool === 'draw') { stroke = { pts: [[x, y]] }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} }
+      if (K.drag && CURVE_TOOLS.includes(tool)) { drag = { pts: [[x, y]], alt: e.altKey, shift: e.shiftKey }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} dragStep('move'); return; }
+      if (K.stroke && tool === 'pen') { stroke = { pts: [[x, y]] }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} }
     });
     cv.addEventListener('pointermove', (e) => {
       if (orbit) { cam.yaw = orbit.yaw + (e.clientX - orbit.x) * 0.008; cam.pitch = Math.max(0.02, Math.min(Math.PI / 2 - 0.001, orbit.pitch + (e.clientY - orbit.y) * 0.006)); draw(); return; }
+      if (drag) { const r = cv.getBoundingClientRect(); drag.pts.push([e.clientX - r.left, e.clientY - r.top]); drag.shift = e.shiftKey; dragStep('move'); return; }
       if (stroke) { const r = cv.getBoundingClientRect(); stroke.pts.push([e.clientX - r.left, e.clientY - r.top]); draw(); }
     });
+    // a curve tool: what the hand has done so far, drawn (not kept); kept once, when it lets go
+    function dragStep(phase) {
+      const r = cv.getBoundingClientRect(); let res = null;
+      try { res = K.drag(d, tool, drag.pts, r.width, r.height, { selected, phase, alt: drag.alt, shift: drag.shift }); } catch (e) { console.error(e); }
+      if (phase === 'end') { preview = null; drag = null; if (res && res.key !== undefined) return edit(res.key, res.value, res.label); return draw(); }
+      try { preview = res && res.key !== undefined ? K.set(d, res.key, res.value) : null; } catch (e) { preview = null; } draw();
+    }
     const endPointer = () => {
       if (orbit) { orbit = null; chips(); return; }
+      if (drag) return dragStep('end');
       if (!stroke) return; const st = stroke; stroke = null; const r = cv.getBoundingClientRect();
       if (st.pts.length > 1) { let res = null; try { res = K.stroke(d, st.pts, r.width, r.height, { selected }); } catch (e) { console.error(e); } if (res && res.key !== undefined) return edit(res.key, res.value, res.label); }
       draw();
@@ -271,7 +292,8 @@
     global.addEventListener('keydown', onKey, true); global.addEventListener('resize', onResize);
     doc.body.appendChild(root); doc.documentElement.classList.add('ws-open'); render(); global.requestAnimationFrame(draw);
     const api = { el: root, doc: () => clone(d), set: (k, v, label) => edit(k, v, label), select: (id) => { selected = id; render(); }, undo, redo, history: () => hist.map(h2 => h2.label), close, kind: K.id,
-      get selected() { return selected; }, keys: () => keyList(), get hidden() { return Array.from(hidden); }, tool: (t) => { if (t) { tool = t; render(); } return tool; },
+      get selected() { return selected; }, keys: () => keyList(), tools: () => TOOLS.map(t => t[0]),
+      drag: (t, pts, o3) => { const r = cv.getBoundingClientRect(); const res = K.drag ? K.drag(d, t, pts, r.width, r.height, Object.assign({ selected, phase: 'end' }, o3 || {})) : null; if (res && res.key !== undefined) edit(res.key, res.value, res.label); return !!res; }, get hidden() { return Array.from(hidden); }, tool: (t) => { if (t) { tool = t; render(); } return tool; },
       // W3a: the viewport (for tests and the kind's own buttons)
       view: (o2) => { if (o2) { if (o2.mode) mode = o2.mode; if (o2.exploded !== undefined) exploded = !!o2.exploded; if (o2.wire !== undefined) wire = !!o2.wire; if (o2.cam) Object.assign(cam, o2.cam); chips(); draw(); } return { mode, exploded, wire, cam: Object.assign({}, cam) }; },
       stroke: (pts) => { const r = cv.getBoundingClientRect(); const res = K.stroke ? K.stroke(d, pts, r.width, r.height, { selected }) : null; if (res && res.key !== undefined) edit(res.key, res.value, res.label); return !!res; },

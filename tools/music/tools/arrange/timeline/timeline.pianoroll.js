@@ -896,10 +896,13 @@
         instruments: () => [{ group: 'On the canvas', options: (insts || []).map(o => ({ value: o.value, label: o.label })) },
           { group: 'Add one', options: (window.OrganismFactory ? OrganismFactory.defined() : []).filter(isInst).map(dd => ({ value: 'new:' + dd.id, label: '＋ ' + (dd.icon ? dd.icon + ' ' : '') + (dd.label || dd.id) })).sort((x, y) => x.label.localeCompare(y.label)) }],
         spawn: (org) => { try { const id = OrganismFactory.spawn(org, {}); if (id) insts = (insts || []).concat([{ value: id, label: ((OrganismFactory.def(org) || {}).label || org) + ' ·' + String(id).split('-').slice(-1)[0] }]); return id; } catch (e) { console.error(e); return null; } },
+        bpm: () => (window.Kernel && Kernel.music && Kernel.music.bpm) || 120,
         knobsOf, label: (id) => ((insts || []).find(o => o.value === id) || {}).label || id,
       });
-      return global.Workshop.open('music.notes', { notes: notes.map(n => JSON.parse(JSON.stringify(n))), sel: Math.max(0, i | 0), name: clip.name || toolName(), drums: !!drums, knobs, target: (lane && lane.target) || '' },
-        { onChange: (d) => { if (lane && d.target && d.target !== lane.target) view.emit('lane_edit', { id: lane.id, patch: { target: d.target } }); commit(d.notes.map(n => Object.assign({}, n))); }, title: clip.name || toolName() });
+      return global.Workshop.open('music.notes', { notes: notes.map(n => JSON.parse(JSON.stringify(n))), sel: Math.max(0, i | 0), name: clip.name || toolName(), drums: !!drums, knobs, target: (lane && lane.target) || '', bpm: (window.Kernel && Kernel.music && Kernel.music.bpm) || 120 },
+        { onChange: (d) => { if (lane && d.target && d.target !== lane.target) view.emit('lane_edit', { id: lane.id, patch: { target: d.target } });
+          if (d.bpm && window.Kernel && Kernel.music && Math.abs(Kernel.music.bpm - d.bpm) > 1e-6) Kernel.bus.publish('ui:transport-bpm', { bpm: d.bpm });   /* W3g TEMPO (undo puts it back) */
+          commit(d.notes.map(n => Object.assign({}, n))); }, title: clip.name || toolName() });
     }
     function openEditor(i) {
       const a0 = notes[i]; if (!a0) return; if (!S.has(i)) selOnly(i); draw(); editor.innerHTML = ''; edMode = 'note'; toolCtl = new Map(); toolSig = '';   // a note inside a selection keeps the selection

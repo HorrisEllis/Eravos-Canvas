@@ -338,7 +338,7 @@
         const lb = h('button', { class: 'tb-btn', id: 'learnBtn', title: 'Learn — short lessons, a map you choose your own path through (off the canvas)', 'data-ic': 'graduation-cap', text: 'Learn' });
         const sd = h('button', { class: 'tb-btn', id: 'soundsBtn', title: 'Sounds — every preset, drum kit packs (mix & match pads), capture any sound to a pad (off the canvas)', 'data-ic': 'audio-lines', text: 'Sounds' });
         // 3.71 "what about instead of so much songs, we have a pattern library"
-        const pb = h('button', { class: 'tb-btn', id: 'patternsBtn', title: 'Patterns — one idea at a time from every genre: drum grooves, bass lines, wobble phrases, drops, fills, curves. Hear it, send it to your song (off the canvas)', 'data-ic': 'puzzle', text: 'Patterns' });
+        const pb = h('button', { class: 'tb-btn', id: 'patternsBtn', title: 'Rhythm library — rhythms and notes: one idea at a time from every genre: drum grooves, bass lines, wobble phrases, drops, fills, curves. Hear it, send it to your song (off the canvas)', 'data-ic': 'puzzle', text: 'Rhythms' });   // W3g his: "maybe rename it to rhythm library"
         pb.onclick = () => global.PatternLibrary && global.PatternLibrary.open();
         sb.onclick = () => global.Songbook && global.Songbook.open(); lb.onclick = () => global.Learn && global.Learn.open(); sd.onclick = () => global.Sounds && global.Sounds.open();
         g.append(sb, pb, sd, lb); S.slot('bar').appendChild(g);

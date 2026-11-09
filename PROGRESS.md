@@ -2,6 +2,18 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Built, shown, not merged yet — 3.161 The Workshop's toolbar, tempo, the rhythm library (W3g) (2026-11-09)
+His words: "looks great though, the tool but i want to be able to manipulate it on the canvas, like photoshop, needs the toolbar, for drawing, shaping, editing, etc. tempo. next patterns from the pattern storage, maybe rename it to rhythm library."
+- canvas/runtime/workshop.js: the toolbar V P L D S G E O (select, pen, line, points, smooth, move, erase, orbit) works on the view, live while
+  the hand moves (K.drag → K.set drawn, no history), one step when it lets go; Shift+E spreads / flattens; K.bar fields in the options bar.
+- tools/music/components/curve-edit (NEW, spec first): pen, line, move / add / remove a point, smooth and erase brushes (they follow the stroke),
+  offset, scale, simplify — 16 checks.
+- music.notes: the tools on the open curve or a modulator's wave (it becomes drawn); on the note a tool opens its pitch; POINTS shows handles;
+  TEMPO in the options bar (the transport's own; undo puts it back); R opens the RHYTHM LIBRARY (renamed from Patterns: the toolbar button, its
+  tab); ⇥ Workshop on a rhythm puts it into the open pattern (one step; undo).
+- Proof: tests/p161 3/3; P150 … P160, P76, P86, Timeline 89/89, boundary green; components; design check no worse. P73 (shapes) on main too.
+- Previews: docs/previews/workshop-toolbar.png, rhythm-library.png.
+
 ## Done — 3.160 Fixed: ERAVOS would not open (0.2.19) (2026-11-09)
 His words: "its not opening. i deleted my tools from the program files and no longer have them. i tried to reinstall but it didn't work. looks great though, the tool" (with the dialog "Error: Cannot find module './library-tools.js'", resources\app\main.js:52).
 - Cause: 3.155 made desktop/main.js require ./library-tools.js; desktop/build.mjs copied it, packaging/windows/make-exe.ps1 (which makes the
