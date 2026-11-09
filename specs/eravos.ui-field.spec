@@ -30,3 +30,19 @@ phases:
   UF2  the field layout in the kit (UIKit.fieldLayout(view, cells)), opt-in; Swarm, Retro DCO, Pattern first; FLIP; the hand-never-moves rule
   UF3  "moving" conditions (wires, LFOs, lanes) and the touched history; every tool
 open: the face size N per window size; whether IN PLAY reorders while playing or only on a state change (his call)
+
+# ---- ADDENDUM 2026-11-09 — the field of nodes, any language, templates (his words; a proposal, nothing built; nothing above is changed)
+#   his words (2026-11-09): "constraint field of nodes? maybe it can use what ever language it wants if the tool imports the ui elements, or the canvas dynamically changes around the dag. like could always have each tool, or domain have a template or every kind, or what ever?"
+#   The coder's reading, his to confirm:
+#   ONE CONTRACT, MANY LANGUAGES  what a tool hands the canvas is DATA — its DAG (nodes: its controls, parts and stages; edges: matters-when,
+#     drives, feeds) and the UI elements it needs (store S1 needs.ui). The canvas never runs a tool's UI code to lay it out; it reads the DAG
+#     and draws it with its own elements. So a tool may be written in JS today, Emerge tomorrow, anything that emits the schema — the
+#     Workshop kind contract (layers, fields, actions, draw) is already this kind of contract, domain-free.
+#   THE CANVAS CHANGES AROUND THE DAG  the layout is the field's emergent result (UF2): what is in play, what is resting and why, what is
+#     moving — for a tool's face AND for the Workshop: every node a layer, every edge a wire you can see in 3D, the same mechanism at every
+#     scale (component → tool → suite → project, the rule "systems all the way down").
+#   TEMPLATES, INHERITED  canvas default (panels, keys, toolbar, the field) → DOMAIN template (music: keys, transport, knobs, notes) → KIND
+#     template (instrument, effect, pattern, note, sound) → the TOOL (only what differs). A tool with no UI of its own still opens complete.
+#   First step proposed (highest leverage): the INSTRUMENT kind generated from any tool's config + spec dag — every tool opens on the Workshop
+#     (its knobs as layers grouped by its dag's stages, each shapeable with mod-tree, its signal flow as planes in 3D), no per-tool code;
+#     then UF1 (when / why in the schema) so the field can hide what does nothing.
