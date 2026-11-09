@@ -1,3 +1,16 @@
+ERAVOS v0.2.20 (2026-11-09)
+
+Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.20.exe from the release.
+
+- The Workshop says what to do: a line at the bottom of the view tells you what the hand can do there; ⤓ save, ▶ play and ✕ close sit at
+  the foot of the tool strip.
+- The toolbar: draw and edit right on the view — Pen P, Line L, Points D (drag a point, click to add, Alt+click to remove), Smooth S,
+  Move G (Shift scales), Erase E, Orbit O. On a note, a tool opens its pitch to shape. With a modulator selected, the tools draw its wave.
+- 3D shows the shapes (pitch, curves, modulators) as planes — not plain numbers; click a plane to select it, double-click to open it.
+- Fixed: the layer tools at the foot of the LAYERS panel could never be clicked.
+- TEMPO in the top bar. The pattern library is the Rhythm Library (R opens it from the Workshop; ⇥ Workshop puts a rhythm into the open
+  pattern).
+
 ERAVOS v0.2.19 (2026-11-09)
 
 Install: download ERAVOS-Setup-0.2.19.exe from the release and run it (if 0.2.18's beta would not open, this is the fix). Your work and your

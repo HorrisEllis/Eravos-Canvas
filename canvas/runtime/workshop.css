@@ -105,3 +105,9 @@ html.ws-open .cm-item { font: inherit !important; text-transform: uppercase; let
 .ws-pkl { font: 400 11px var(--wdisp); letter-spacing: .26em; color: var(--wt3); }
 .ws-picker { min-width: 220px; color: var(--wc); border-color: rgba(0,212,255,.35); }
 .ws-f.big .ws-sel { width: 100%; }
+/* W3h the foot of the tool strip (play, save, close) and the help line in the view */
+.ws-strip .ws-sgap { flex: 1 1 auto; }
+.ws-strip .ws-sa { color: var(--wt) !important; } .ws-strip .ws-sa:hover:not(:disabled) { color: var(--wc) !important; background: rgba(0,212,255,.07) !important; }
+.ws-strip .ws-close { margin-bottom: 8px; } .ws-strip .ws-close:hover { color: #ff6b8a !important; }
+.ws-hintline { position: absolute; left: 12px; bottom: 8px; right: 12px; color: var(--wt3); font: 400 9.5px var(--wmono); letter-spacing: .08em; pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ws-hintline:empty { display: none; }

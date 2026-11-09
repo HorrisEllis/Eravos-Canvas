@@ -2,7 +2,15 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
-## Built, shown, not merged yet — 3.161 The Workshop's toolbar, tempo, the rhythm library (W3g) (2026-11-09)
+## Built, shown — 3.162 What to do with it (W3h); release 0.2.20 (2026-11-09)
+His words: "what do i even do with this? i cant edit layers or draw, manipulate or do anything with it. no way to close, save or play the note either."
+- The foot of the tool strip: ⤓ save · ▶ play · ✕ close; a help line in the view (the kind's hint); 3D: only shapes are planes, a click picks
+  one, a double-click opens it; OSCILLATE's plane is its oscillation only.
+- Fixed: the Workshop's element helper set disabled="false" (a disabled button) — the layer tools could never be clicked; tests/run.html now loads
+  workshop.css, so the Workshop tests run the real layout (P161 had passed on an unstyled page).
+- Proof: tests/p162 1/1; P150 … P161 green. Version 0.2.20.
+
+## Done — 3.161 The Workshop's toolbar, tempo, the rhythm library (W3g) (2026-11-09)
 His words: "looks great though, the tool but i want to be able to manipulate it on the canvas, like photoshop, needs the toolbar, for drawing, shaping, editing, etc. tempo. next patterns from the pattern storage, maybe rename it to rhythm library."
 - canvas/runtime/workshop.js: the toolbar V P L D S G E O (select, pen, line, points, smooth, move, erase, orbit) works on the view, live while
   the hand moves (K.drag → K.set drawn, no history), one step when it lets go; Shift+E spreads / flattens; K.bar fields in the options bar.

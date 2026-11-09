@@ -9,6 +9,8 @@
  *   Workshop.check(kind) → [] or the problems, in words · Workshop.addKind(kind) → { ok, problems } · Workshop.kinds()
  *   Workshop.open(kindId, doc, { onChange(doc), onApply(doc), onClose(), title }) → { doc(), set(key, v), select(layerId), undo(), redo(),
  *     history(), close(), el } · Workshop.current
+ * W3h actions with `strip: true` sit at the foot of the tool strip (with ✕ close); hint(doc, { tool, mode, selected }) → a line of help in the
+ *   view; in 3D only shapes are planes (a value layer is a number, not a shape) and a click picks a plane.
  * W3g drag(doc, tool, points, W, H, { selected, phase, alt, shift }) → { key, value, label } (the toolbar: pen line points smooth move erase);
  *   bar(doc) → fields shown in the options bar (a document-wide value the kind names).
  * W3f picker(doc) → { label, key, value, options: [{ value, label } | { group, options }] } (a dropdown first in the options bar; a change is
@@ -30,7 +32,7 @@
   const doc = global.document; if (!doc) return;
   const TYPES = ['constraint', 'curve', 'value', 'events', 'emergent', 'raster', 'adjust'];
   const KINDS = new Map();
-  const el = (tag, cls, kids, attrs) => { const e = doc.createElement(tag); if (cls) e.className = cls; if (attrs) Object.keys(attrs).forEach(k => { if (k === 'text') e.textContent = attrs[k]; else if (k.startsWith('on')) e.addEventListener(k.slice(2), attrs[k]); else e.setAttribute(k, attrs[k]); }); (kids || []).forEach(c => { if (c != null) e.appendChild(typeof c === 'string' ? doc.createTextNode(c) : c); }); return e; };
+  const el = (tag, cls, kids, attrs) => { const e = doc.createElement(tag); if (cls) e.className = cls; if (attrs) Object.keys(attrs).forEach(k => { if (k === 'text') e.textContent = attrs[k]; else if (k.startsWith('on')) e.addEventListener(k.slice(2), attrs[k]); else if (attrs[k] === false || attrs[k] == null) { /* a false flag is no attribute (disabled: false must not disable) */ } else e.setAttribute(k, attrs[k] === true ? '' : attrs[k]); }); (kids || []).forEach(c => { if (c != null) e.appendChild(typeof c === 'string' ? doc.createTextNode(c) : c); }); return e; };
   const clone = (x) => JSON.parse(JSON.stringify(x));
 
   function check(k) {
@@ -53,10 +55,11 @@
     let d = clone(doc0 || {}), selected = null, note = '', past = [], future = [], hist = [{ label: 'OPENED', doc: clone(d) }];
     const root = el('div', 'ws-app', [], { role: 'dialog', 'aria-label': K.label });
     const bar = el('div', 'ws-bar'), opts = el('div', 'ws-opts'), strip = el('div', 'ws-strip'), tabs = el('div', 'ws-tabs'), vp = el('div', 'ws-vp');
-    const cv = el('canvas', 'ws-canvas'), vph = el('div', 'ws-vph'); vp.append(cv);
+    const cv = el('canvas', 'ws-canvas'), vph = el('div', 'ws-vph'), hintline = el('div', 'ws-hintline'); vp.append(cv, hintline);   // W3h a line saying what to do here
     // W3a the viewport: 2D (the kind's draw) or 3D (the kind's layers as planes; K.drawLayer) — orbit, top, front, exploded / flat, wire / lit
     let mode = '2d', exploded = true, wire = false, cam = { yaw: -0.55, pitch: 0.62, zoom: 1 }, stroke = null, orbit = null;
-    const offs = new Map();
+    const offs = new Map(); let planes = [];   // W3h the 3D planes as drawn (a click picks one)
+    const inPoly = (x, y, P) => { let c = false; for (let i = 0, j = P.length - 1; i < P.length; j = i++) { if ((P[i][1] > y) !== (P[j][1] > y) && x < (P[j][0] - P[i][0]) * (y - P[i][1]) / ((P[j][1] - P[i][1]) || 1e-9) + P[i][0]) c = !c; } return c; };
     const lays = el('div', 'ws-pane ws-layers'), insp = el('div', 'ws-pane ws-props'), status = el('div', 'ws-status');
     const right = el('div', 'ws-right', [insp, lays]), centre = el('div', 'ws-centre', [tabs, vp]);
     let hidden = new Set(); const folded = new Set();   // the eye and the folded groups (the view's, not the document's)
@@ -100,7 +103,7 @@
       return [W / 2 + s * (x * cy - z * sy), H / 2 - s * y * cp + s * (x * sy + z * cy) * sp];
     }
     function draw3d(g, W, H, dpr) {
-      const L = layers().filter(l => !l.hidden && !hidden.has(l.id)), n = L.length, PW = 512, PH = 256, A = 1, B = 0.42, gap = exploded ? Math.min(0.42, 1.15 / Math.max(1, n)) : 0.025;
+      planes = []; const L = layers().filter(l => !l.hidden && !hidden.has(l.id) && l.type !== 'value'), n = L.length, PW = 512, PH = 256, A = 1, B = 0.42, gap = exploded ? Math.min(0.42, 1.15 / Math.max(1, n)) : 0.025;
       g.fillStyle = '#05070a'; g.fillRect(0, 0, W, H);
       // the floor: a faint grid under the stack
       const fy = -((n - 1) / 2) * gap - 0.18; g.strokeStyle = 'rgba(120,150,180,0.08)'; g.lineWidth = 1;
@@ -111,7 +114,7 @@
         const og = o.getContext('2d'); og.setTransform(1, 0, 0, 1, 0, 0); og.clearRect(0, 0, PW, PH);
         try { K.drawLayer(og, PW, PH, d, l.id, { wire, selected: l.id === selected }); } catch (e) { console.error(e); }
         const h = (i - (n - 1) / 2) * gap, p0 = proj(W, H, -A, h, -B), px = proj(W, H, A, h, -B), pz = proj(W, H, -A, h, B), p3 = proj(W, H, A, h, B);
-        const sel = l.id === selected;
+        const sel = l.id === selected; planes.push({ id: l.id, poly: [p0, px, p3, pz] });
         // the plane: glass, its frame, its name
         g.setTransform(dpr, 0, 0, dpr, 0, 0); g.beginPath(); g.moveTo(p0[0], p0[1]); g.lineTo(px[0], px[1]); g.lineTo(p3[0], p3[1]); g.lineTo(pz[0], pz[1]); g.closePath();
         if (!wire) { g.fillStyle = sel ? 'rgba(0,212,255,0.07)' : 'rgba(140,170,200,0.035)'; g.fill(); }
@@ -129,6 +132,7 @@
         g.strokeStyle = c; g.beginPath(); g.moveTo(gx, gy); g.lineTo(gx + dx * k, gy + dy * k); g.stroke(); g.fillStyle = c; g.fillText(t, gx + dx * k + 3, gy + dy * k + 3); });
     }
     function chips() {
+      hintline.textContent = K.hint ? (K.hint(d, { tool, mode, selected }) || '') : '';   // W3h the help line follows the view
       if (!K.drawLayer) { vph.replaceChildren(); return; }
       const chip = (t, on, fn, title) => el('button', 'ws-chip' + (on ? ' on' : ''), [], { type: 'button', text: t, title: title || '', onclick: () => { fn(); chips(); draw(); } });
       vph.replaceChildren(chip('2D', mode === '2d', () => { mode = '2d'; }), chip('3D', mode === '3d', () => { mode = '3d'; }), el('span', 'ws-vs'),
@@ -193,7 +197,10 @@
         ...(K.bar ? K.bar(d) : []).map(f => field(f, false)).concat(K.bar && K.bar(d).length ? [el('span', 'ws-vs')] : []), vph);   // W3g the kind's own bar fields (document-wide values it names)
       // the tool strip: the canvas's tools, then the kind's
       strip.replaceChildren(...TOOLS.map(([id, key, glyph, hint]) => el('button', 'ws-ti' + (tool === id ? ' on' : ''), [], { type: 'button', title: hint + ' (' + key + ')', text: glyph, onclick: () => { tool = id; if (id === 'orbit' && K.drawLayer) mode = '3d'; else if (mode === '3d' && id !== 'select') mode = '2d'; render(); } })),
-        ...(K.tools || []).map(t => el('button', 'ws-ti' + (t.layer && t.layer === selected ? ' on' : ''), [], { type: 'button', title: t.label, text: t.glyph || t.label.slice(0, 1), onclick: () => { if (t.layer) { selected = t.layer; render(); } } })));
+        ...(K.tools || []).map(t => el('button', 'ws-ti' + (t.layer && t.layer === selected ? ' on' : ''), [], { type: 'button', title: t.label, text: t.glyph || t.label.slice(0, 1), onclick: () => { if (t.layer) { selected = t.layer; render(); } } })),
+        // W3h (his words, 2026-11-09: "no way to close, save or play [it] either"): the few things always at hand, at the foot of the strip
+        el('span', 'ws-sgap'), ...acts().filter(a => a.strip).map(a => el('button', 'ws-ti ws-sa', [], { type: 'button', text: a.icon || '•', disabled: !!a.disabled, title: nameOf(a) + (a.keys ? '  (' + KEYS(a.keys) + ')' : '') + (a.hint ? ' — ' + a.hint : ''), onclick: () => runAct(a) })),
+        el('button', 'ws-ti ws-sa ws-close', [], { type: 'button', text: '✕', title: 'Close the Workshop (Esc) — your changes are already in place', onclick: () => close() }));
       tabs.replaceChildren(el('span', 'ws-tab on', [String(title), el('i', '', [], { text: '×', title: 'close (Esc)', onclick: () => close() })]));
       // PROPERTIES · HISTORY · OUTLINER (top right): the one place a value is edited
       const tabsI = el('div', 'ws-ph', ['properties', 'history', 'outliner'].map(t => el('span', t === inspTab ? 'on' : '', [], { text: t.toUpperCase(), onclick: () => { inspTab = t; render(); } })));
@@ -266,7 +273,7 @@
       if (K.stroke && tool === 'pen') { stroke = { pts: [[x, y]] }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} }
     });
     cv.addEventListener('pointermove', (e) => {
-      if (orbit) { cam.yaw = orbit.yaw + (e.clientX - orbit.x) * 0.008; cam.pitch = Math.max(0.02, Math.min(Math.PI / 2 - 0.001, orbit.pitch + (e.clientY - orbit.y) * 0.006)); draw(); return; }
+      if (orbit) { orbit.lastX = e.clientX; orbit.lastY = e.clientY; cam.yaw = orbit.yaw + (e.clientX - orbit.x) * 0.008; cam.pitch = Math.max(0.02, Math.min(Math.PI / 2 - 0.001, orbit.pitch + (e.clientY - orbit.y) * 0.006)); draw(); return; }
       if (drag) { const r = cv.getBoundingClientRect(); drag.pts.push([e.clientX - r.left, e.clientY - r.top]); drag.shift = e.shiftKey; dragStep('move'); return; }
       if (stroke) { const r = cv.getBoundingClientRect(); stroke.pts.push([e.clientX - r.left, e.clientY - r.top]); draw(); }
     });
@@ -278,7 +285,10 @@
       try { preview = res && res.key !== undefined ? K.set(d, res.key, res.value) : null; } catch (e) { preview = null; } draw();
     }
     const endPointer = () => {
-      if (orbit) { orbit = null; chips(); return; }
+      if (orbit) { const o2 = orbit; orbit = null;
+        if (o2.lastX === undefined || Math.hypot(o2.lastX - o2.x, o2.lastY - o2.y) < 4) {   // W3h a click in 3D (no turn): the plane under it is selected
+          const r = cv.getBoundingClientRect(), x = o2.x - r.left, y = o2.y - r.top; const hit = planes.slice().reverse().find(pl => inPoly(x, y, pl.poly)); if (hit) { selected = hit.id; render(); return; } }
+        chips(); return; }
       if (drag) return dragStep('end');
       if (!stroke) return; const st = stroke; stroke = null; const r = cv.getBoundingClientRect();
       if (st.pts.length > 1) { let res = null; try { res = K.stroke(d, st.pts, r.width, r.height, { selected }); } catch (e) { console.error(e); } if (res && res.key !== undefined) return edit(res.key, res.value, res.label); }
@@ -286,6 +296,7 @@
     };
     cv.addEventListener('contextmenu', (e) => { e.preventDefault(); e.stopPropagation(); menu(e.clientX, e.clientY, kindItems('view').concat(viewItems(), histItems())); });
     root.addEventListener('contextmenu', (e) => { if (e.defaultPrevented) return; const t = e.target && e.target.tagName; if (t === 'INPUT' || t === 'TEXTAREA') return; e.preventDefault(); e.stopPropagation(); menu(e.clientX, e.clientY, kindItems().concat(histItems())); });
+    cv.addEventListener('dblclick', () => { const a = acts().find(x => x.open); if (a && !a.disabled) runAct(a); });   // W3h double-click opens what is selected (2D or 3D)
     cv.addEventListener('pointerup', endPointer); cv.addEventListener('pointercancel', endPointer);
     cv.addEventListener('wheel', (e) => { if (mode !== '3d') return; e.preventDefault(); cam.zoom = Math.max(0.3, Math.min(4, cam.zoom * (e.deltaY < 0 ? 1.1 : 1 / 1.1))); draw(); }, { passive: false });
     function close() { if (!root.isConnected) return; root.remove(); doc.documentElement.classList.remove('ws-open'); global.removeEventListener('keydown', onKey, true); global.removeEventListener('resize', onResize); if (current === api) current = null; if (o.onClose) o.onClose(clone(d)); }
