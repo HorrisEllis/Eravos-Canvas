@@ -40,7 +40,7 @@ describe('P154 notes and patterns on the Workshop', () => {
       const cv = document.querySelector('.ws-app .ws-canvas'), r = cv.getBoundingClientRect();
       cv.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: r.left + r.width * 0.75, clientY: r.top + r.height * 0.05 })); await TH.sleep(20);
       assert.ok(/NOTE · G4/.test(document.querySelector('.ws-stations').textContent), 'the click opened the third note (G4)');
-      ws.select('bend'); assert.ok(/-12/.test(document.querySelector('.ws-ins').textContent) || /−12|-12/.test(document.querySelector('.ws-lays, .ws-pane.ws-grow').textContent), 'its bend shows');
+      ws.select('bend'); assert.ok(/-12/.test(document.querySelector('.ws-ins').textContent) || /−12|-12/.test(document.querySelector('.ws-layers').textContent), 'its bend shows');
       const sorted = (o) => JSON.stringify(Object.keys(o).sort().map(k => [k, o[k]])); assert.equal(sorted(t.clip().notes.find(n => n.n === 67).b), sorted(NOTES[2].b), "and is kept exactly");
     } finally { closeWs(); OrganismFactory.close(t.id); restoreView(); }
   });

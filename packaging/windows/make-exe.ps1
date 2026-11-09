@@ -41,6 +41,7 @@ New-Item -ItemType Directory -Force -Path $app | Out-Null
 Copy-Item (Join-Path $repo 'desktop\main.js') $app -Force
 Copy-Item (Join-Path $repo 'desktop\preload.js') $app -Force
 Copy-Item (Join-Path $repo 'desktop\updater.js') $app -Force   # 3.99 the update service
+Copy-Item (Join-Path $repo 'desktop\library-tools.js') $app -Force   # 3.155 the tools in Documents\ERAVOS\tools (main.js requires it)
 Copy-Item (Join-Path $repo 'desktop\apply-update.ps1') $app -Force   # 3.111 ERAVOS Update: puts a downloaded update in place
 $appPkg = [ordered]@{ name = $pkg.name; productName = $pkg.productName; version = $pkg.version; description = $pkg.description; author = $pkg.author; main = 'main.js'; private = $true }
 [IO.File]::WriteAllText((Join-Path $app 'package.json'), ($appPkg | ConvertTo-Json), $utf8)

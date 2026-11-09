@@ -5,7 +5,7 @@
  * with ContextMenu.contribute(fn)), then its presets, then the window: duplicate (same settings), its page, settings, expand, fold, close.
  * It opens only where nothing else took the right-click (a knob's "Move with", a grid that deletes on right-click: e.defaultPrevented),
  * and never over a text field (the browser's own menu stays there). Esc or a click elsewhere closes it.
- * An item: { label, hint?, run(), disabled?, danger? } · { section: 'title' } · { sep: true } */
+ * An item: { label, hint?, keys? (shown right-aligned), run(), disabled?, danger? } · { section: 'title' } · { sep: true } */
 (function (global) {
   'use strict';
   const doc = global.document;
@@ -21,6 +21,7 @@
       if (it.sep) return h('div', { class: 'cm-sep', role: 'separator' });
       if (it.section) return h('div', { class: 'cm-s', text: it.section });
       const b = h('button', { class: 'cm-item' + (it.danger ? ' danger' : ''), role: 'menuitem', text: it.label, title: it.hint || '' });
+      if (it.keys) { b.textContent = ''; b.append(h('span', { class: 'cm-l', text: it.label }), h('span', { class: 'cm-k', text: it.keys })); }   // its key, right-aligned
       if (it.disabled) b.disabled = true;
       b.addEventListener('click', (e) => { e.stopPropagation(); close(); try { it.run && it.run(); } catch (err) { console.error('[ERAVOS] menu item failed', err); } });
       return b;

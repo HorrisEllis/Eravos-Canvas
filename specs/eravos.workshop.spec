@@ -224,3 +224,47 @@ W3d  note.x — every part played by the Timeline (timeline.engine.js playNotes)
        humanize within range and repeatable, plain notes unchanged); P112 13/13 (the old event depth) green
      not here: stereo width as its own control — a note reaches its instrument, not a mixer; width and pan are per note through the
        instrument's own knobs (ITS KNOBS, SHAPE), where the instrument has them
+
+## ADDENDUM 2026-11-09 (3) — W3e: the layout, keys and menus (his words; nothing above is changed) — shown to him before it merges
+# James, 2026-11-09: "Okay the ui needs more of a photoshop format. Like layers. I hate the top right. Add key bindings. Right click context menus less explicit buttons for things that make it look low quality and cluttered. Like undo doesn’t need a button. Make it enterprise grade, powerful but as simple as possible without losing control or functionality. Like undo and redo. Shouldn’t be two places to change the chord either. Replace the bottom right with a photoshop esc layers menu and group the layer tools there."
+W3e  the bar          the name and the path only (click a station to go up) — no buttons (UNDO, REDO, APPLY, × and the kind's actions gone)
+     the options bar  the current tool and what it works on, and the view (2D 3D · TOP FRONT ORBIT · EXPLODED FLAT · WIRE LIT) — no value fields
+     the tool strip   SELECT (V: a click opens what is under it) · DRAW (B: drag draws the selected curve) · ORBIT (O: drag turns the 3D view)
+     top right        PROPERTIES (the ONE place a value is edited) · HISTORY · OUTLINER
+     bottom right     LAYERS, Photoshop's way: eye (show / hide), a thumbnail drawn by the kind, name and what it holds; groups fold;
+                      double-click opens it (the kind's `open` action); right-click: hide, show only this, show all, then what the kind can do
+                      with it; the LAYER TOOLS in its footer (the kind's actions with an `icon`: up, open, add, remove, unshape)
+     keys             Ctrl+Z / Ctrl+Shift+Z (Ctrl+Y) · Ctrl+Enter apply · Esc close · V B O · ↑ ↓ layers · H hide (Alt+H only this) · 2 3 ·
+                      T F · E W · ? the key sheet — and the kind's: Space hear · Shift+Space hear A · A keep as A · X swap A/B · Shift+A every
+                      note · Enter open · Backspace up · M add a modulator · Delete remove · U stop shaping
+     menus            right-click the view: the kind's actions, the view, undo / redo / apply / close — each with its key (context-menu.js
+                      gained item.keys); in the Workshop the menu takes the Workshop's look
+     contract         an action may carry name (its words in menus), keys, icon (a layer tool), open (what Enter / a double-click does),
+                      only ('layer' | 'view'); a choice with > 8 options in the options bar is a dropdown (W3d) — the bar no longer holds fields
+     proof            tests/p159 1/1; P150 (its field edit now in PROPERTIES), P151, P154, P156, P157, P158, P110, boundary green
+     previews         docs/previews/workshop-layers-layout.png · workshop-layer-menu.png · workshop-keys.png
+
+## ADDENDUM 2026-11-09 (4) — W3f: navigate, the instrument, a note's speed, the note library (his words; nothing above is changed)
+# James, 2026-11-09: "I’m glad you got rid of the redundant ass second section for fucking changing the chords. The top half of the canvas should be able to collapse. Unless you can select the other notes, or actually maybe make that like a mini piano roll preview so you can edit one at a time and not have to hit save and then edit again and then write like I’m just saying make it like a way to navigate. OK now the mod section drop down menus not 1 million buttons. … the top left one isn’t even doing anything practical, replace it with a drop-down menu to change to tool."
+# Asked which tool the dropdown changes: "Any tool the piano roll can play. Also a note library, inside of the patterns library. Have 2 tabs. One for notes, the other for patterns. Agnostic note. Also the tempo and speed it plays. Like have the tool speed up for a single note. Way more depth."
+W3f  NAVIGATOR      the top of the view is the pattern as a mini piano roll (keys, bars and beats, every note, the open one lit, shaped notes
+                    marked); a click opens a note — nothing to save, nothing to reopen; [ and ] step through the notes; N (or ▴ fold) folds
+                    it to a strip and gives the shaping view the room (kept while ERAVOS runs)
+     DROPDOWNS      a choice with more than 3 options is one dropdown in PROPERTIES (the wave, the chord, speed …); on / off stays two
+     PICKER         the options bar's top left (it repeated the selected layer) is now PLAYS: a dropdown of every tool the roll can play —
+                    those on the canvas and every instrument that can be added (a new one is made); the lane follows, and undo puts the
+                    lane back (the document carries the target; the roll keeps the lane in step on every change); the knobs to shape follow
+     SPEED          note.x.tempo (¼ … 4 ×): the Timeline sends it with the note; the music SDK gives the TOOL that speed for that note only
+                    (ctx.bpm × it while the note owns it — synced LFOs, arps, gates, anything reading the tool's tempo), then its own again;
+                    the same ownership as per-note settings (sdk-music noteTempo; note schema `tempo`)
+     NOTE LIBRARY   tools/music/data/note-library.js (window.NoteLibrary): a saved note = how a note moves and plays (sh, b, c, p, x,
+                    chance, ratchet, nudge, velocity) without its place or pitch — agnostic: it fits any note of any tool; knob parts
+                    come along only where the instrument has the knob, the rest is said (LIBRARY in the status bar). Ctrl+S saves the open
+                    note; PROPERTIES › From the library puts one on it; Shift+L opens Patterns › Notes. The Patterns library has two
+                    tabs: PATTERNS (as before) · NOTES (each saved note drawn, Apply → the note open in the Workshop, rename, delete)
+     dag            note.x.tempo ─→ playNotes ─→ note:trigger.tempo ─→ sdk noteTempo ─→ ctx.bpm (bpmFns) ─→ the tool's synced parts
+                    Workshop ─Ctrl+S→ NoteLibrary ─→ Patterns › Notes ─Apply→ Workshop.set('libApply') ─→ clip_edit
+     proof          tests/p160 4/4 (a navigator click opens G4, [ ], N folds; dropdowns; the picker adds an instrument, the lane follows, undo;
+                    the trigger carries ×2 and the tool runs at ×2 bpm for the note, then its own; save, fit another note, what is left out,
+                    the Notes tab applies); P154 … P159, Timeline 89/89, boundary green
+     previews       docs/previews/workshop-navigator.png · workshop-note-navigator.png · patterns-notes-tab.png

@@ -15,6 +15,7 @@
       params: { type: 'object' },   // 3.53 per-note settings: { knob: value } for this note only (see ctx.onNote)
       curves: { type: 'object' },   // 3.65 per-note curves: { knob: [[t 0…1, value], …] } over this note (see noteCurves)
       bend: { type: 'object' },     // 3.56 the note's pitch curve: { from, to (semitones), shape, at (0…0.95 of the note) } (see PITCH WHEEL)
+      tempo: { type: 'number', minimum: 0.25, maximum: 4 },   // W3f this tool's speed for this note only (× the song's tempo; see noteTempo)
     },
   };
   const MIDI_SCHEMA = { type: 'object', required: ['note', 'velocity', 'on'], properties: { note: { type: 'integer', minimum: 0, maximum: 127 }, velocity: { type: 'number', minimum: 0, maximum: 1 }, on: { type: 'boolean' } } };
@@ -345,7 +346,12 @@ registerProcessor('eravos-pitch', EravosPitch);`;
       let midiArmed = false;
       const RATES = { '¼': 0.25, '½': 0.5, '¾': 0.75, '1': 1, '1½': 1.5, '2': 2, '3': 3, '4': 4 };
       const hasTempo = () => (ctx.descriptor.config || []).some(c => c.key === 'tempoX');
-      function tempoRate() {
+      // W3f a NOTE may set the tool's speed for itself (his words, 2026-11-09: "the tempo and speed it plays. Like have the tool speed up for a
+      // single note"): while it owns it, everything in the tool that follows its tempo (synced LFOs, arps, gates, delays read through ctx.bpm)
+      // runs that many times the song's tempo; at its end the tool's own speed comes back. The same ownership as per-note settings.
+      let noteTempoX = 1, tempoTok = 0;
+      function tempoRate() { return toolRate() * noteTempoX; }
+      function toolRate() {
         if (!ctx.params || !hasTempo()) return 1;
         const x = ctx.params.get('tempoX'); if (x === 'own') { const b = +ctx.params.get('tempoBpm'); return b > 0 && K.music.bpm > 0 ? b / K.music.bpm : 1; }
         return RATES[x] || 1;
@@ -638,6 +644,13 @@ registerProcessor('eravos-pitch', EravosPitch);`;
         const set = () => { if (v === null) autoLive.delete(p.key); else autoLive.set(p.key, v); if (!noteOwner.has(p.key)) P.live(p.key, v); };
         if (v === null || typeof p.time !== 'number' || p.time <= ac.currentTime + 0.003) set(); else ctx.atAudioTime(p.time, set);
       });
+      function noteTempo(x, t, end, quiet) {
+        const tok = ++tempoTok, set = (v) => { if (noteTempoX === v) return; noteTempoX = v; bpmFns.forEach(fn => api.safe(() => fn(ctx.bpm))); };
+        if (quiet || t <= ac.currentTime + 0.002) set(x); else ctx.atAudioTime(t, () => { if (tempoTok === tok) set(x); });
+        ctx.atAudioTime(end, () => { if (tempoTok === tok) set(1); });
+      }
+      ctx.noteTempo = () => noteTempoX;
+      ctx.onSilence(() => { if (noteTempoX !== 1) { noteTempoX = 1; tempoTok++; } });
       ctx.onSilence(() => { if (ctx.params) { noteOwner.forEach((_, k) => ctx.params.live(k, autoLive.has(k) ? autoLive.get(k) : null)); } noteOwner.clear(); noteTok++;
         if (wheel && bent) { const o = wheel.offset; o.cancelScheduledValues(0); o.setValueAtTime(0, ac.currentTime); bent = false; }
         if (lane) { lane.offset.cancelScheduledValues(0); lane.offset.setValueAtTime(0, ac.currentTime); } });
@@ -647,6 +660,7 @@ registerProcessor('eravos-pitch', EravosPitch);`;
         sounding = sounding.filter(e => e > t);
         if (sounding.length >= NOTE_CEILING) { if (ctx.notesDropped++ % 64 === 0) K.fault('RUNTIME_005', { instance_id: ctx.id, message: `more than ${NOTE_CEILING} notes at once — extra notes skipped`, quiet: true }); return; }
         const quiet = !sounding.length, curved = p.curves ? noteCurves(p, t, end, quiet) : [];
+        if (typeof p.tempo === 'number' && p.tempo > 0 && p.tempo !== noteTempoX) noteTempo(p.tempo, t, end, quiet);
         if (p.params) { if (curved.length) { const rest = Object.assign({}, p.params); curved.forEach(k => delete rest[k]); noteParams(Object.assign({}, p, { params: rest }), t, end, quiet); } else noteParams(p, t, end, quiet); }
         sounding.push(end);
         // 3.39 delay compensation: a tool whose whole voice runs through an oversampled shaper is late by ctx.latency

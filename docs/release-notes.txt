@@ -1,3 +1,19 @@
+ERAVOS v0.2.19 (2026-11-09)
+
+Install: download ERAVOS-Setup-0.2.19.exe from the release and run it (if 0.2.18's beta would not open, this is the fix). Your work and your
+tools are kept: the Setup puts the tools back in the app folder and ERAVOS copies them into Documents\ERAVOS\tools on its first start.
+
+- Fixed: ERAVOS would not open after the last update ("Cannot find module './library-tools.js'") — the Setup did not include the file that
+  puts the tools in Documents\ERAVOS\tools. It does now, ERAVOS opens even if that file is ever missing, and a check fails the build before
+  a Setup can ship without a file the app needs.
+- The tools live in Documents\ERAVOS\tools: copied there on start and loaded from there; an update replaces only the files you have not
+  changed; zips you dropped in are never touched.
+- The Workshop: a Photoshop-like layout — PROPERTIES over a LAYERS panel (eyes, thumbnails, folding groups, layer tools), no buttons up top,
+  keys for everything (? shows them), right-click menus. A mini piano roll on top to move between notes ([ ] steps, N folds it). PLAYS picks
+  the instrument. A note can be shaped to any depth (pitch or any knob: a curve plus modulators whose rate and depth have modulators), seen
+  in 3D; played as a chord, on some passes only, with a shaped ratchet, humanized, at its own speed; heard alone (Space); A / B.
+- The note library: Ctrl+S keeps a note; the Patterns library has a Notes tab beside Patterns.
+
 ERAVOS v0.2.18 (2026-11-08)
 
 Install: on 0.2.17, ERAVOS offers this update by itself (⚙ Settings › About & updates › Check for updates).

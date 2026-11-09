@@ -886,9 +886,20 @@
       // W3b: the instrument's number knobs travel with the document, so a note can be shaped on any of them
       const knobs = ((lane && knobsAll[lane.target]) || []).filter(k => k.type !== 'enum' && !k.lane && isFinite(k.min) && isFinite(k.max)).map(k => ({ key: k.key, label: k.label, min: k.min, max: k.max, unit: k.unit || '', val: isFinite(k.val) ? k.val : isFinite(k.def) ? k.def : k.min }));
       // ▶ HEAR on the Workshop: the open note through this lane's instrument — its bend path, its curves, its own knob values, its length
-      WK.bind({ hear: (a) => { if (!lane) return; const sec = clampN(a.l / 4 * 60 / ((window.Kernel && Kernel.music && Kernel.music.bpm) || 120), 0.1, 4); view.emit('note_audition', Object.assign({ lane: lane.id, note: a.n, notes: [a.n].concat(((a.x && a.x.iv) || []).map(iv => Math.max(0, Math.min(127, a.n + iv)))), duration: sec }, a.b ? { bend: a.b } : {}, a.c ? { curves: a.c } : {}, a.p ? { params: a.p } : {})); } });
-      return global.Workshop.open('music.notes', { notes: notes.map(n => JSON.parse(JSON.stringify(n))), sel: Math.max(0, i | 0), name: clip.name || toolName(), drums: !!drums, knobs },
-        { onChange: (d) => commit(d.notes.map(n => Object.assign({}, n))), title: clip.name || toolName() });
+      // W3f the instrument this pattern plays is picked on the Workshop (any tool the roll can play: one on the canvas, or a new one)
+      const isInst = (dd) => (dd.hooks || []).some(hk => hk.direction === 'in' && /note:trigger/.test(String(hk.event_type || '')));
+      const knobsOf = (id) => { const r = window.Kernel && Kernel.registry.get(id); if (!r) return [];
+        return (r.descriptor.config || []).filter(c => !c.hidden && !c.settingsOnly && (c.type === 'number' || c.type === 'integer') && isFinite(c.min) && isFinite(c.max))
+          .map(c => { const live = (knobsAll[id] || []).find(k => k.key === c.key), v = live ? live.val : undefined; return { key: c.key, label: c.label || c.key, min: c.min, max: c.max, unit: c.unit || '', val: isFinite(v) ? +v : isFinite(c.default) ? c.default : c.min }; }); };
+      WK.bind({
+        hear: (a) => { if (!lane) return; const sec = clampN(a.l / 4 * 60 / ((window.Kernel && Kernel.music && Kernel.music.bpm) || 120), 0.1, 4); view.emit('note_audition', Object.assign({ lane: lane.id, note: a.n, notes: [a.n].concat(((a.x && a.x.iv) || []).map(iv => Math.max(0, Math.min(127, a.n + iv)))), duration: sec }, a.b ? { bend: a.b } : {}, a.c ? { curves: a.c } : {}, a.p ? { params: a.p } : {}, a.x && a.x.tempo ? { tempo: a.x.tempo } : {})); },
+        instruments: () => [{ group: 'On the canvas', options: (insts || []).map(o => ({ value: o.value, label: o.label })) },
+          { group: 'Add one', options: (window.OrganismFactory ? OrganismFactory.defined() : []).filter(isInst).map(dd => ({ value: 'new:' + dd.id, label: '＋ ' + (dd.icon ? dd.icon + ' ' : '') + (dd.label || dd.id) })).sort((x, y) => x.label.localeCompare(y.label)) }],
+        spawn: (org) => { try { const id = OrganismFactory.spawn(org, {}); if (id) insts = (insts || []).concat([{ value: id, label: ((OrganismFactory.def(org) || {}).label || org) + ' ·' + String(id).split('-').slice(-1)[0] }]); return id; } catch (e) { console.error(e); return null; } },
+        knobsOf, label: (id) => ((insts || []).find(o => o.value === id) || {}).label || id,
+      });
+      return global.Workshop.open('music.notes', { notes: notes.map(n => JSON.parse(JSON.stringify(n))), sel: Math.max(0, i | 0), name: clip.name || toolName(), drums: !!drums, knobs, target: (lane && lane.target) || '' },
+        { onChange: (d) => { if (lane && d.target && d.target !== lane.target) view.emit('lane_edit', { id: lane.id, patch: { target: d.target } }); commit(d.notes.map(n => Object.assign({}, n))); }, title: clip.name || toolName() });
     }
     function openEditor(i) {
       const a0 = notes[i]; if (!a0) return; if (!S.has(i)) selOnly(i); draw(); editor.innerHTML = ''; edMode = 'note'; toolCtl = new Map(); toolSig = '';   // a note inside a selection keeps the selection

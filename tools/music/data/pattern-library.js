@@ -261,7 +261,7 @@
     search.addEventListener('input', () => { pick.q = search.value.trim().toLowerCase(); paint(); });
     search.addEventListener('keydown', (e) => e.stopPropagation());
     clear.onclick = () => { pick.types.clear(); pick.genres.clear(); pick.fav = false; pick.q = search.value = ''; pick.lo = lo.value = ''; pick.hi = hi.value = ''; paint(); };
-    const close = () => { stop(); if (io) io.disconnect(); ov.remove(); document.removeEventListener('keydown', key, true); page = null; };
+    const close = () => { stop(); if (io) io.disconnect(); if (typeof nBody !== 'undefined' && nBody._off) nBody._off(); ov.remove(); document.removeEventListener('keydown', key, true); page = null; };
     const key = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } else if (e.key === '/' && document.activeElement !== search) { e.preventDefault(); search.focus(); } };
     const io = 'IntersectionObserver' in global ? new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting && e.target._p) { drawCard(e.target, e.target._p); io.unobserve(e.target); } })) : null;
     // 3.85 "clean up the pattern ui, sort it by tool instead? its overwhelming": the tools down the left (pick one, see only its
@@ -276,9 +276,18 @@
     const kindOfTool = (id) => { const d = toolMeta(id), w = (id + ' ' + (d.label || '') + ' ' + (d.category || '')).toLowerCase();
       return /drum|kit|pads|perc|beat|groove/.test(w) ? 'Drums' : /wobble|wub|bass|sub|reese|acid/.test(w) ? 'Bass' : /pad|chord|organ|poly|keys|piano|choir|coven|string/.test(w) ? 'Keys & pads' : /lead|saw|arp|pluck|bell/.test(w) ? 'Leads' : 'More'; };
     const RAIL_ORDER = ['Drums', 'Bass', 'Keys & pads', 'Leads', 'More'];
+    // W3f two tabs (his words, 2026-11-09: "a note library, inside of the patterns library. Have 2 tabs. One for notes, the other for patterns."):
+    // PATTERNS as before; NOTES — the saved notes (NoteLibrary), each applied to the note open in the Workshop
+    const pBody = h('div', { class: 'plib-body' }, [rail, h('div', { class: 'plib-main' }, [h('div', { class: 'sbk-filter' }, [h('div', { class: 'sbk-row2 plib-top-row' }, [search, moreBtn, status]), toolHead, typeRow, aboutLine, filterBox]), grid])]);
+    const wsNotes = () => global.Workshop && global.Workshop.current && global.Workshop.current.kind === 'music.notes' ? global.Workshop.current : null;
+    const nBody = global.NoteLibrary ? global.NoteLibrary.page(h, { canApply: () => !!wsNotes(), onApply: (sv) => { const ws = wsNotes(); if (ws) { ws.set('libApply', sv.id, 'From the library: ' + sv.name); close(); } } }) : h('div');
+    nBody.classList.add('plib-notes');
+    const tabBtn = (id, text) => h('button', { class: 'plib-tab' + ((o && o.tab || 'patterns') === id ? ' on' : ''), type: 'button', text, onclick: (e) => { tabsEl.querySelectorAll('.plib-tab').forEach(b => b.classList.toggle('on', b === e.currentTarget)); pBody.style.display = id === 'patterns' ? '' : 'none'; nBody.style.display = id === 'notes' ? '' : 'none'; } });
+    const tabsEl = h('div', { class: 'plib-tabs', role: 'tablist' }, [tabBtn('patterns', '🧩 Patterns · ' + lib.length), tabBtn('notes', '♪ Notes · ' + (global.NoteLibrary ? global.NoteLibrary.all().length : 0))]);
+    if ((o && o.tab) === 'notes') pBody.style.display = 'none'; else nBody.style.display = 'none';
     ov.append(h('div', { class: 'sbk-box' }, [
-      h('header', { class: 'sbk-head' }, [h('div', {}, [h('b', { text: '🧩 Patterns' }), h('span', { class: 'sbk-sub', text: ' every song in blocks — each instrument, each section. Hear it, send it to your song. ' + lib.length + ' patterns' })]), h('button', { class: 'sbk-x', text: '×', 'aria-label': 'close', onclick: () => close() })]),
-      h('div', { class: 'plib-body' }, [rail, h('div', { class: 'plib-main' }, [h('div', { class: 'sbk-filter' }, [h('div', { class: 'sbk-row2 plib-top-row' }, [search, moreBtn, status]), toolHead, typeRow, aboutLine, filterBox]), grid])])]));
+      h('header', { class: 'sbk-head' }, [h('div', {}, [tabsEl, h('span', { class: 'sbk-sub', text: ' every song in blocks — each instrument, each section — and the notes you saved. Hear it, send it to your song.' })]), h('button', { class: 'sbk-x', text: '×', 'aria-label': 'close', onclick: () => close() })]),
+      pBody, nBody]));
     ov.addEventListener('mousedown', (e) => { if (e.target === ov) close(); });
     document.addEventListener('keydown', key, true);
     const genres = Array.from(new Map(lib.map(p => [p.genre, p.genreLabel])).entries()).sort((a, b) => a[1].localeCompare(b[1]));

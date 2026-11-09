@@ -17,7 +17,7 @@ describe('P150 the Workshop — any kind on one surface', () => {
     ws.set('size', 50, 'Size'); assert.equal(ws.doc().size, 50, 'edited'); assert.deepEqual(seen, [50], 'the owner heard it at once (live)');
     ws.undo(); assert.equal(ws.doc().size, 20, 'undo'); ws.redo(); assert.equal(ws.doc().size, 50, 'redo'); assert.deepEqual(seen, [50, 20, 50], 'the owner followed both');
     assert.ok(ws.history().length >= 4 && /size · 50/i.test(ws.history().join('|')), 'the history: ' + ws.history().join(' · '));
-    const inp = document.querySelector('.ws-opts .ws-num'); inp.value = '80'; inp.dispatchEvent(new Event('change')); assert.equal(ws.doc().size, 80, 'the options bar edits the selected layer');
+    const inp = document.querySelector('.ws-ins .ws-num'); inp.value = '80'; inp.dispatchEvent(new Event('change')); assert.equal(ws.doc().size, 80, 'the options bar edits the selected layer');
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })); await TH.sleep(10); assert.ok(!document.querySelector('.ws-app') && !Workshop.current, 'Esc closes it');
   });
 });

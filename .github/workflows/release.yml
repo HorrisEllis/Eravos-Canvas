@@ -56,6 +56,8 @@ jobs:
         run: node desktop/test/updater.mjs
       - name: Test the tools in the library (Documents\ERAVOS\tools, store S3)
         run: node desktop/test/library-tools.mjs
+      - name: The app ships every file its main process needs (the Setup starts)
+        run: node desktop/test/shipped-files.mjs
       - name: NSIS (makes ERAVOS-Setup.exe)
         shell: pwsh
         run: |

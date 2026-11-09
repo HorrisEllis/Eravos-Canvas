@@ -9,6 +9,11 @@
  *   Workshop.check(kind) → [] or the problems, in words · Workshop.addKind(kind) → { ok, problems } · Workshop.kinds()
  *   Workshop.open(kindId, doc, { onChange(doc), onApply(doc), onClose(), title }) → { doc(), set(key, v), select(layerId), undo(), redo(),
  *     history(), close(), el } · Workshop.current
+ * W3f picker(doc) → { label, key, value, options: [{ value, label } | { group, options }] } (a dropdown first in the options bar; a change is
+ *   edit(key, value)); pick may return { run } (a click that changes the view, not the document — no history).
+ * W3e the layout: the bar = the path only; options bar = the view; tools V B O; PROPERTIES (the one place a value is edited) · HISTORY ·
+ *   OUTLINER over LAYERS (eye, thumbnail, name, folding groups, footer tools = actions with `icon`); keys (an action's `keys`, e.g. 'Space',
+ *   'Mod+Enter', 'Shift+A'; `open: true` = what Enter / a double-click does) and right-click menus (an action's `only`: 'layer' | 'view').
  * W3a (optional): drawLayer(g, W, H, doc, layerId, { wire, selected }) → the 3D viewport (layers as planes) · stroke(doc, points, W, H,
  *   { selected }) → { key, value, label } (a drag that draws) · actions(doc, { selected }) items may be { label, key, value } (an edit) ·
  *   stationKey (a station click = edit(stationKey, index)).
@@ -46,20 +51,21 @@
     let d = clone(doc0 || {}), selected = null, note = '', past = [], future = [], hist = [{ label: 'OPENED', doc: clone(d) }];
     const root = el('div', 'ws-app', [], { role: 'dialog', 'aria-label': K.label });
     const bar = el('div', 'ws-bar'), opts = el('div', 'ws-opts'), strip = el('div', 'ws-strip'), tabs = el('div', 'ws-tabs'), vp = el('div', 'ws-vp');
-    const cv = el('canvas', 'ws-canvas'), vph = el('div', 'ws-vph'); vp.append(cv, vph);
+    const cv = el('canvas', 'ws-canvas'), vph = el('div', 'ws-vph'); vp.append(cv);
     // W3a the viewport: 2D (the kind's draw) or 3D (the kind's layers as planes; K.drawLayer) — orbit, top, front, exploded / flat, wire / lit
     let mode = '2d', exploded = true, wire = false, cam = { yaw: -0.55, pitch: 0.62, zoom: 1 }, stroke = null, orbit = null;
     const offs = new Map();
-    const outl = el('div', 'ws-pane'), lays = el('div', 'ws-pane ws-grow'), insp = el('div', 'ws-pane'), status = el('div', 'ws-status');
-    const right = el('div', 'ws-right', [outl, lays, insp]), centre = el('div', 'ws-centre', [tabs, vp]);
+    const lays = el('div', 'ws-pane ws-layers'), insp = el('div', 'ws-pane ws-props'), status = el('div', 'ws-status');
+    const right = el('div', 'ws-right', [insp, lays]), centre = el('div', 'ws-centre', [tabs, vp]);
+    let hidden = new Set(); const folded = new Set();   // the eye and the folded groups (the view's, not the document's)
     root.append(bar, opts, strip, centre, right, status);
     const layers = () => K.layers(d) || [];
     const layerOf = (id) => layers().find(l => l.id === id) || null;
-    let inspTab = 'inspector';
+    let inspTab = 'properties';
 
     function field(f, big) {
       const v = K.get(d, f.key), wrap = el('label', 'ws-f' + (big ? ' big' : ''), [el('span', 'ws-fk', [], { text: f.label || f.key })]);
-      if (f.type === 'enum' && !big && (f.options || []).length > 8) {   // a long list in the options bar: one dropdown, not a wall of chips
+      if (f.type === 'enum' && (f.options || []).length > (big ? 3 : 8)) {   // more than a few choices: one dropdown, not a wall of buttons
         const sel = el('select', 'ws-sel'); (f.options || []).forEach(op => { const o2 = el('option', '', [], { value: String(op), text: String(op) }); if (String(op) === String(v)) o2.selected = true; sel.appendChild(o2); });
         sel.addEventListener('change', () => edit(f.key, typeof v === 'number' ? +sel.value : sel.value, f.label)); wrap.appendChild(sel); }
       else if (f.type === 'enum') { const ch = el('span', 'ws-chips'); (f.options || []).forEach(op => ch.appendChild(el('button', 'ws-chip' + (String(op) === String(v) ? ' on' : ''), [], { type: 'button', text: String(op), onclick: () => edit(f.key, typeof v === 'number' ? +op : op, f.label) }))); wrap.appendChild(ch); }
@@ -82,7 +88,7 @@
       const r = vp.getBoundingClientRect(), dpr = Math.min(2, global.devicePixelRatio || 1), W = Math.max(50, r.width), H = Math.max(50, r.height);
       if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
       const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
-      try { if (mode === '3d' && K.drawLayer) draw3d(g, W, H, dpr); else K.draw(g, W, H, d, { selected }); } catch (e) { console.error(e); }
+      try { if (mode === '3d' && K.drawLayer) draw3d(g, W, H, dpr); else K.draw(g, W, H, d, { selected, hidden }); } catch (e) { console.error(e); }
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
       if (stroke && stroke.pts.length > 1) { g.strokeStyle = 'rgba(255,255,255,0.85)'; g.lineWidth = 2; g.setLineDash([4, 3]); g.beginPath(); stroke.pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); g.setLineDash([]); }
     }
@@ -92,7 +98,7 @@
       return [W / 2 + s * (x * cy - z * sy), H / 2 - s * y * cp + s * (x * sy + z * cy) * sp];
     }
     function draw3d(g, W, H, dpr) {
-      const L = layers().filter(l => !l.hidden), n = L.length, PW = 512, PH = 256, A = 1, B = 0.42, gap = exploded ? Math.min(0.42, 1.15 / Math.max(1, n)) : 0.025;
+      const L = layers().filter(l => !l.hidden && !hidden.has(l.id)), n = L.length, PW = 512, PH = 256, A = 1, B = 0.42, gap = exploded ? Math.min(0.42, 1.15 / Math.max(1, n)) : 0.025;
       g.fillStyle = '#05070a'; g.fillRect(0, 0, W, H);
       // the floor: a faint grid under the stack
       const fy = -((n - 1) / 2) * gap - 0.18; g.strokeStyle = 'rgba(120,150,180,0.08)'; g.lineWidth = 1;
@@ -130,47 +136,122 @@
         chip('EXPLODED', exploded, () => { exploded = true; }), chip('FLAT', !exploded, () => { exploded = false; }), el('span', 'ws-vs'),
         chip('WIRE', wire, () => { wire = true; }), chip('LIT', !wire, () => { wire = false; }));
     }
+    // ---- W3e the layout (his words, 2026-11-09: "the ui needs more of a photoshop format. Like layers. I hate the top right. Add key bindings.
+    // Right click context menus less explicit buttons … Like undo doesn't need a button … Shouldn't be two places to change [a value] either.
+    // Replace the bottom right with a photoshop esc layers menu and group the layer tools there."): the bar holds only the path; the options
+    // bar the view; the left strip the tools (V B O); the right column PROPERTIES (the ONE place a value is edited · HISTORY · OUTLINER)
+    // over LAYERS (eye, thumbnail, name; groups that fold; the layer tools in its footer). Everything else: keys and right-click menus.
+    const KEYS = (k) => String(k || '').replace('Mod+', /Mac/.test(global.navigator && global.navigator.platform || '') ? '⌘' : 'Ctrl+');
+    function acts() { return (K.actions ? K.actions(d, { selected }) : []).filter(Boolean); }
+    function runAct(a) { if (!a || a.disabled) return false; if (a.key !== undefined) { edit(a.key, a.value, a.label); return true; } let said = null; try { said = a.run(clone(d)); } catch (e) { said = 'failed: ' + e.message; console.error(e); } if (said) note = String(said); render(); return true; }
+    const viewItems = () => !K.drawLayer ? [] : [{ section: 'VIEW' },
+      { label: mode === '3d' ? '2D view' : '3D view', keys: mode === '3d' ? '2' : '3', run: () => { mode = mode === '3d' ? '2d' : '3d'; chips(); draw(); } },
+      { label: 'Look from the top', keys: 'T', run: () => setCam('top') }, { label: 'Look from the front', keys: 'F', run: () => setCam('front') },
+      { label: exploded ? 'Stack the layers flat' : 'Spread the layers apart', keys: 'E', run: () => { exploded = !exploded; chips(); draw(); } },
+      { label: wire ? 'Lit' : 'Wire', keys: 'W', run: () => { wire = !wire; chips(); draw(); } }];
+    const histItems = () => [{ section: 'EDIT' }, { label: 'Undo' + (past.length ? '' : ''), keys: 'Mod+Z', disabled: !past.length, run: undo }, { label: 'Redo', keys: 'Mod+Shift+Z', disabled: !future.length, run: redo },
+      ...((o.onApply || K.apply) ? [{ label: 'Apply — write it back', keys: 'Mod+Enter', run: apply }] : []), { label: 'Close the Workshop', keys: 'Esc', run: () => close() }];
+    function menu(x, y, items, title) {
+      const CM = global.ContextMenu; if (!CM || !CM.show) return;
+      CM.show(x, y, items.map(it => it.section || it.sep ? it : Object.assign({}, it, { label: it.label, keys: it.keys ? KEYS(it.keys) : '', run: it.run || (() => runAct(it)) })), title);
+    }
+    const nameOf = (a) => a.name || a.label.replace(/^[^\w(]+\s*/, '');   // an action's words in a menu or the key sheet (its `name`, else its label)
+    const kindItems = (where) => acts().filter(a => !where || !a.only || a.only === where).map(a => ({ label: nameOf(a), keys: a.keys, hint: a.hint, disabled: a.disabled, run: () => runAct(a) }));
+    function apply() { if (o.onApply) o.onApply(clone(d)); else if (K.apply) K.apply(clone(d)); note = 'APPLIED'; render(); }
+    function setCam(v) { mode = '3d'; if (v === 'top') { cam.pitch = Math.PI / 2 - 0.001; cam.yaw = 0; } else if (v === 'front') { cam.pitch = 0.18; cam.yaw = 0; } else cam = { yaw: -0.55, pitch: 0.62, zoom: 1 }; chips(); draw(); }
+    const TOOLS = [['select', 'V', '⬚', 'Select — a click opens what is under it'], ['draw', 'B', '✎', 'Draw — drag to draw the selected curve'], ['orbit', 'O', '⟲', 'Orbit — drag to turn the 3D view (wheel zooms)']];
+    let tool = 'draw';
+    function thumb(l) {
+      if (!K.drawLayer) return el('span', 'ws-badge t-' + (TYPES.includes(l.type) ? l.type : 'value'), [], { text: (l.type || 'value').slice(0, 4).toUpperCase() });
+      const c = el('canvas', 'ws-thumb'); c.width = 96; c.height = 48; const g = c.getContext('2d'); g.fillStyle = '#02050a'; g.fillRect(0, 0, 96, 48);
+      try { K.drawLayer(g, 96, 48, d, l.id, { wire: true, thumb: true, selected: l.id === selected }); } catch (e) {} g.shadowBlur = 0; return c;
+    }
     function render() {
       const L = layers(); if (!selected || !layerOf(selected)) selected = (L.find(l => l.fields && l.fields.length) || L[0] || {}).id || null;
       const sel = layerOf(selected), title = (o.title || (K.title ? K.title(d) : K.label));
-      // the bar: the name, the kind's stations (where this document sits), the actions
+      // the bar: the name and the path (where this document sits; click to go up) — nothing else
       bar.replaceChildren(el('span', 'ws-name', [], { text: 'WORKSHOP' }), el('span', 'ws-sep'),
         el('span', 'ws-stations', (K.stations ? K.stations(d) : [K.label]).map((s, i, a) => el('span', 'ws-st' + (i === a.length - 1 ? ' on' : '') + (K.stationKey && i < a.length - 1 ? ' go' : ''), [el('i', '', [], { text: String(i + 1).padStart(2, '0') }), String(s)],
-          K.stationKey && i < a.length - 1 ? { title: 'go up to ' + s, onclick: () => edit(K.stationKey, i, 'GO TO ' + s) } : {}))),
-        el('span', 'ws-end', [].concat((K.actions ? K.actions(d, { selected }) : []).map(a => el('button', 'ws-btn ghost', [], { type: 'button', text: a.label, title: a.hint || '', disabled: !!a.disabled, onclick: () => {
-          if (a.key !== undefined) return edit(a.key, a.value, a.label);   // W3a: an action that is an edit (one history step)
-          let said = null; try { said = a.run(clone(d)); } catch (e) { said = 'failed: ' + e.message; console.error(e); } if (said) { note = String(said); render(); } } })), [el('button', 'ws-btn ghost', [], { type: 'button', text: 'UNDO', title: 'Ctrl+Z', onclick: undo }), el('button', 'ws-btn ghost', [], { type: 'button', text: 'REDO', title: 'Ctrl+Shift+Z', onclick: redo }),
-          el('button', 'ws-btn send', [], { type: 'button', text: 'APPLY →', title: 'write it back to where it came from', onclick: () => { if (o.onApply) o.onApply(clone(d)); else if (K.apply) K.apply(clone(d)); } }),
-          el('button', 'ws-btn ghost', [], { type: 'button', text: '×', title: 'close (Esc)', 'aria-label': 'close', onclick: () => close() })])));
-      // the options bar: the selected layer's fields
-      opts.replaceChildren(el('span', 'ws-tool', [], { text: sel ? sel.label : '' }), ...((sel && sel.fields) || []).map(f => field(f, false)));
-      // the tool strip: the kind's tools (a tool may select a layer)
-      strip.replaceChildren(...(K.tools || []).map(t => el('button', 'ws-ti' + (t.layer && t.layer === selected ? ' on' : ''), [], { type: 'button', title: t.label, text: t.glyph || t.label.slice(0, 1), onclick: () => { if (t.layer) { selected = t.layer; render(); } } })));
-      tabs.replaceChildren(el('span', 'ws-tab on', [String(title), el('i', '', [], { text: '×', onclick: () => close() })]));
-      // OUTLINER
-      const ol = K.outline ? K.outline(d) : [[0, title]];
-      outl.replaceChildren(el('div', 'ws-ph', [el('span', 'on', [], { text: 'OUTLINER' })]), el('div', 'ws-tree', ol.map(([depth, t, lid]) => el('div', lid && lid === selected ? 'sel' : '', [], { text: ' '.repeat(depth * 3) + t, onclick: () => { if (lid) { selected = lid; render(); } } }))));
-      // LAYERS, in the kind's groups
-      const groups = []; L.forEach(l => { const gname = l.group || ''; let gr = groups.find(x => x[0] === gname); if (!gr) groups.push(gr = [gname, []]); gr[1].push(l); });
-      lays.replaceChildren(el('div', 'ws-ph', [el('span', 'on', [], { text: 'LAYERS' }), el('span', 'ws-x', [], { text: String(L.length) })]),
-        ...[].concat(...groups.map(([gname, ls]) => [gname ? el('div', 'ws-lh', [], { text: gname }) : null].concat(ls.map(l => el('div', 'ws-lay' + (l.id === selected ? ' sel' : ''), [
-          el('span', 'ws-badge t-' + (TYPES.includes(l.type) ? l.type : 'value'), [], { text: (l.type || 'value').slice(0, 4).toUpperCase() }), el('div', '', [String(l.label), el('small', '', [], { text: l.sub || '' })])], { onclick: () => { selected = l.id; render(); } }))))).filter(Boolean));
-      // INSPECTOR / HISTORY
-      const tabsI = el('div', 'ws-ph', ['inspector', 'history'].map(t => el('span', t === inspTab ? 'on' : '', [], { text: t.toUpperCase(), onclick: () => { inspTab = t; render(); } })));
-      if (inspTab === 'history') insp.replaceChildren(tabsI, el('div', 'ws-hist', hist.slice(-40).map((h2, i, a) => el('div', i === a.length - 1 ? 'now' : '', [el('i', '', [], { text: String(hist.length - a.length + i + 1).padStart(2, '0') }), h2.label], { onclick: () => { if (i < a.length - 1) { past.push(clone(d)); future = []; restore(h2.doc, 'BACK TO ' + String(hist.length - a.length + i + 1).padStart(2, '0')); } } }))));
+          K.stationKey && i < a.length - 1 ? { title: 'go up to ' + s + ' (Backspace: one level up)', onclick: () => edit(K.stationKey, i, 'GO TO ' + s) } : {}))));
+      // the options bar: what the current tool works on, and the view
+      // the options bar: the kind's picker (what the document plays on, its owner's choice — e.g. an instrument), then the view. Nothing that
+      // the panels already say (the selected layer is PROPERTIES' to show).
+      const pk = K.picker ? K.picker(d) : null;
+      opts.replaceChildren(...(pk ? [el('span', 'ws-pkl', [], { text: pk.label }), (() => { const sl = el('select', 'ws-sel ws-picker', [], { title: pk.hint || pk.label });
+        (pk.options || []).forEach(op => { if (op.group) { const og = el('optgroup', '', [], {}); og.label = op.group; (op.options || []).forEach(o2 => { const oe = el('option', '', [], { value: String(o2.value), text: o2.label }); if (String(o2.value) === String(pk.value)) oe.selected = true; og.appendChild(oe); }); sl.appendChild(og); }
+          else { const oe = el('option', '', [], { value: String(op.value), text: op.label }); if (String(op.value) === String(pk.value)) oe.selected = true; sl.appendChild(oe); } });
+        sl.addEventListener('change', () => edit(pk.key, sl.value, pk.label)); sl.addEventListener('keydown', (e) => e.stopPropagation()); return sl; })(), el('span', 'ws-vs')] : []), vph);
+      // the tool strip: the canvas's tools, then the kind's
+      strip.replaceChildren(...TOOLS.map(([id, key, glyph, hint]) => el('button', 'ws-ti' + (tool === id ? ' on' : ''), [], { type: 'button', title: hint + ' (' + key + ')', text: glyph, onclick: () => { tool = id; if (id === 'orbit' && K.drawLayer) mode = '3d'; render(); } })),
+        ...(K.tools || []).map(t => el('button', 'ws-ti' + (t.layer && t.layer === selected ? ' on' : ''), [], { type: 'button', title: t.label, text: t.glyph || t.label.slice(0, 1), onclick: () => { if (t.layer) { selected = t.layer; render(); } } })));
+      tabs.replaceChildren(el('span', 'ws-tab on', [String(title), el('i', '', [], { text: '×', title: 'close (Esc)', onclick: () => close() })]));
+      // PROPERTIES · HISTORY · OUTLINER (top right): the one place a value is edited
+      const tabsI = el('div', 'ws-ph', ['properties', 'history', 'outliner'].map(t => el('span', t === inspTab ? 'on' : '', [], { text: t.toUpperCase(), onclick: () => { inspTab = t; render(); } })));
+      if (inspTab === 'history') insp.replaceChildren(tabsI, el('div', 'ws-hist', hist.slice(-60).map((h2, i, a) => el('div', i === a.length - 1 ? 'now' : '', [el('i', '', [], { text: String(hist.length - a.length + i + 1).padStart(2, '0') }), h2.label], { onclick: () => { if (i < a.length - 1) { past.push(clone(d)); future = []; restore(h2.doc, 'BACK TO ' + String(hist.length - a.length + i + 1).padStart(2, '0')); } } }))));
+      else if (inspTab === 'outliner') { const ol = K.outline ? K.outline(d) : [[0, title]]; insp.replaceChildren(tabsI, el('div', 'ws-tree', ol.map(([depth, t, lid]) => el('div', lid && lid === selected ? 'sel' : '', [], { text: ' '.repeat(depth * 3) + t, onclick: () => { if (lid) { selected = lid; render(); } } })))); }
       else insp.replaceChildren(tabsI, el('div', 'ws-ins', [sel ? el('div', 'ws-big', [], { text: sel.label }) : null, sel && sel.sub ? el('div', 'ws-sub', [], { text: sel.sub }) : null].concat(((sel && sel.fields) || []).map(f => field(f, true)))
-        .concat((K.status ? K.status(d) : []).map(([k, v]) => el('div', 'ws-kv', [el('span', '', [], { text: k }), el('b', '', [], { text: String(v) })])))));
-      status.replaceChildren(...(K.status ? K.status(d) : []).map(([k, v]) => el('span', '', [k + ' ', el('b', '', [], { text: String(v) })])), el('span', 'ws-r', [], { text: (note ? note + ' · ' : '') + (past.length ? past.length + ' EDITS · ' : '') + 'LIVE' }));
+        .concat(sel && !(sel.fields || []).length ? [el('div', 'ws-hint', [], { text: 'nothing to set here — right-click for what it can do' })] : [])));
+      // LAYERS (bottom right): eye · thumbnail · name; groups fold; the layer tools in the footer
+      const groups = []; L.forEach(l => { const gname = l.group || ''; let gr = groups.find(x => x[0] === gname); if (!gr) groups.push(gr = [gname, []]); gr[1].push(l); });
+      const row = (l) => { const r = el('div', 'ws-lay' + (l.id === selected ? ' sel' : '') + (hidden.has(l.id) ? ' off' : ''), [
+          el('button', 'ws-eye', [], { type: 'button', text: hidden.has(l.id) ? '◌' : '◉', title: 'show / hide (H)', onclick: (e) => { e.stopPropagation(); hidden.has(l.id) ? hidden.delete(l.id) : hidden.add(l.id); render(); } }),
+          thumb(l), el('div', 'ws-ln', [String(l.label), el('small', '', [], { text: l.sub || '' })])], { onclick: () => { selected = l.id; render(); } });
+        r.addEventListener('dblclick', () => { selected = l.id; const a = acts().find(x => x.open); if (a && !a.disabled) runAct(a); else render(); });
+        r.addEventListener('contextmenu', (e) => { e.preventDefault(); e.stopPropagation(); selected = l.id; render();
+          menu(e.clientX, e.clientY, [{ section: String(l.label).toUpperCase() }, { label: hidden.has(l.id) ? 'Show it' : 'Hide it', keys: 'H', run: () => { hidden.has(l.id) ? hidden.delete(l.id) : hidden.add(l.id); render(); } },
+            { label: 'Show only this', keys: 'Alt+H', run: () => { hidden = new Set(L.map(x => x.id).filter(id => id !== l.id)); render(); } }, { label: 'Show all', run: () => { hidden = new Set(); render(); } }, { sep: true }].concat(kindItems('layer'))); });
+        return r; };
+      const foot = el('div', 'ws-lfoot', acts().filter(a => a.icon).map(a => el('button', 'ws-lt', [], { type: 'button', text: a.icon, disabled: !!a.disabled, title: nameOf(a) + (a.keys ? '  (' + KEYS(a.keys) + ')' : '') + (a.hint ? ' — ' + a.hint : ''), onclick: () => runAct(a) })));
+      lays.replaceChildren(el('div', 'ws-ph', [el('span', 'on', [], { text: 'LAYERS' }), el('span', 'ws-x', [], { text: String(L.length) })]),
+        el('div', 'ws-lbody', [].concat(...groups.map(([gname, ls]) => [gname ? el('div', 'ws-lh' + (folded.has(gname) ? ' folded' : ''), [], { text: (folded.has(gname) ? '▸ ' : '▾ ') + gname, onclick: () => { folded.has(gname) ? folded.delete(gname) : folded.add(gname); render(); } }) : null]
+          .concat(folded.has(gname) ? [] : ls.map(row)))).filter(Boolean)), foot);
+      status.replaceChildren(...(K.status ? K.status(d) : []).map(([k, v]) => el('span', '', [k + ' ', el('b', '', [], { text: String(v) })])),
+        el('span', 'ws-r', [], { text: (note ? note + ' · ' : '') + (past.length ? past.length + ' EDITS · ' : '') + 'LIVE' }), el('button', 'ws-keys', [], { type: 'button', text: '? KEYS', title: 'every key (?)', onclick: () => keySheet() }));
       chips(); draw();
     }
-    const onKey = (e) => { if (!root.isConnected) return; const t = e.target && e.target.tagName; if (t === 'INPUT' || t === 'TEXTAREA') return;
-      if (e.key === 'Escape') { e.preventDefault(); close(); } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); } };
+    // the keys, in one place (?): the canvas's, then the kind's
+    function keyList() {
+      return [['Undo', 'Mod+Z'], ['Redo', 'Mod+Shift+Z'], ...((o.onApply || K.apply) ? [['Apply', 'Mod+Enter']] : []), ['Close', 'Esc'], ['Select / Draw / Orbit', 'V · B · O'], ['Previous / next layer', '↑ · ↓'], ['Show / hide the layer', 'H'],
+        ...(K.drawLayer ? [['2D / 3D', '2 · 3'], ['Top / front view', 'T · F'], ['Spread / flat', 'E'], ['Wire / lit', 'W']] : []), ['Right-click', 'what the layer or view can do'], ['This sheet', '?']]
+        .concat(acts().filter(a => a.keys).map(a => [nameOf(a), a.keys]));
+    }
+    function keySheet() {
+      const old = root.querySelector('.ws-sheet'); if (old) { old.remove(); return; }
+      const sh = el('div', 'ws-sheet', [el('div', 'ws-ph', [el('span', 'on', [], { text: 'KEYS' }), el('span', 'ws-x', [], { text: 'Esc or ? closes' })]), el('div', 'ws-kl', keyList().map(([w, k]) => el('div', 'ws-kv', [el('span', '', [], { text: w }), el('b', '', [], { text: KEYS(k) })])))]);
+      sh.addEventListener('click', () => sh.remove()); root.appendChild(sh);
+    }
+    // keys: the canvas's (undo, redo, apply, close, tools, view, layers), then the kind's (an action with keys)
+    const match = (e, k) => { const parts = String(k).split('+'), key = parts.pop(), want = { mod: parts.includes('Mod'), shift: parts.includes('Shift'), alt: parts.includes('Alt') };
+      const ek = e.key === ' ' ? 'Space' : e.key.length === 1 ? e.key.toUpperCase() : e.key;
+      return (e.ctrlKey || e.metaKey) === want.mod && e.shiftKey === want.shift && e.altKey === want.alt && ek.toUpperCase() === key.toUpperCase(); };
+    const onKey = (e) => { if (!root.isConnected) return; const t = e.target && e.target.tagName; if (t === 'INPUT' || t === 'TEXTAREA' || t === 'SELECT') return;
+      if (global.ContextMenu && global.ContextMenu.open) return;   // a menu is open: its own keys
+      if (o.hostKey) { let mine = false; try { mine = !!o.hostKey(e); } catch (er) {} if (mine) return; }
+      const sheet = root.querySelector('.ws-sheet'); if (sheet && (e.key === 'Escape' || e.key === '?')) { e.preventDefault(); sheet.remove(); return; }
+      const mod = e.ctrlKey || e.metaKey, k = e.key.toLowerCase(), eat = () => { e.preventDefault(); e.stopPropagation(); };
+      if (mod && k === 'z') { eat(); return e.shiftKey ? redo() : undo(); } if (mod && k === 'y') { eat(); return redo(); }
+      if (mod && e.key === 'Enter' && (o.onApply || K.apply)) { eat(); return apply(); }
+      // the kind's own keys first (Space, Enter, Backspace, M …), so a kind can give a key a meaning
+      const A = acts().find(a => a.keys && match(e, a.keys)); if (A) { eat(); return runAct(A); }
+      if (e.key === 'Escape') { eat(); return close(); }
+      if (mod || e.altKey && k !== 'h') return;
+      const L = layers(), i = Math.max(0, L.findIndex(l => l.id === selected));
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { eat(); const j = Math.max(0, Math.min(L.length - 1, i + (e.key === 'ArrowDown' ? 1 : -1))); selected = L[j] && L[j].id; return render(); }
+      if (e.key === '?') { eat(); return keySheet(); }
+      if (k === 'v' || k === 'b' || k === 'o') { eat(); tool = k === 'v' ? 'select' : k === 'b' ? 'draw' : 'orbit'; if (tool === 'orbit' && K.drawLayer) mode = '3d'; return render(); }
+      if (k === 'h' && selected) { eat(); if (e.altKey) hidden = new Set(L.map(x => x.id).filter(id => id !== selected)); else hidden.has(selected) ? hidden.delete(selected) : hidden.add(selected); return render(); }
+      if (!K.drawLayer) return;
+      if (k === '2' || k === '3') { eat(); mode = k === '3' ? '3d' : '2d'; if (mode === '2d' && tool === 'orbit') tool = 'draw'; return render(); }
+      if (k === 't') { eat(); return setCam('top'); } if (k === 'f') { eat(); return setCam('front'); }
+      if (k === 'e') { eat(); exploded = !exploded; chips(); return draw(); } if (k === 'w') { eat(); wire = !wire; chips(); return draw(); }
+    };
     const onResize = () => draw();
     cv.addEventListener('pointerdown', (e) => {
       const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
-      if (mode === '3d' && K.drawLayer) { orbit = { x: e.clientX, y: e.clientY, yaw: cam.yaw, pitch: cam.pitch }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} return; }
-      const p = K.pick ? K.pick(d, x, y, r.width, r.height, { selected }) : null; if (p && p.key !== undefined) return edit(p.key, p.value, p.label);
-      if (K.stroke) { stroke = { pts: [[x, y]] }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} }
+      if (e.button === 2) return;
+      if ((mode === '3d' && K.drawLayer) || tool === 'orbit') { if (K.drawLayer && mode !== '3d') { mode = '3d'; chips(); } orbit = { x: e.clientX, y: e.clientY, yaw: cam.yaw, pitch: cam.pitch }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} return; }
+      const p = K.pick ? K.pick(d, x, y, r.width, r.height, { selected }) : null; if (p && p.run) { try { p.run(); } catch (er) { console.error(er); } render(); return; } if (p && p.key !== undefined) return edit(p.key, p.value, p.label);
+      if (K.stroke && tool === 'draw') { stroke = { pts: [[x, y]] }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} }
     });
     cv.addEventListener('pointermove', (e) => {
       if (orbit) { cam.yaw = orbit.yaw + (e.clientX - orbit.x) * 0.008; cam.pitch = Math.max(0.02, Math.min(Math.PI / 2 - 0.001, orbit.pitch + (e.clientY - orbit.y) * 0.006)); draw(); return; }
@@ -182,13 +263,15 @@
       if (st.pts.length > 1) { let res = null; try { res = K.stroke(d, st.pts, r.width, r.height, { selected }); } catch (e) { console.error(e); } if (res && res.key !== undefined) return edit(res.key, res.value, res.label); }
       draw();
     };
+    cv.addEventListener('contextmenu', (e) => { e.preventDefault(); e.stopPropagation(); menu(e.clientX, e.clientY, kindItems('view').concat(viewItems(), histItems())); });
+    root.addEventListener('contextmenu', (e) => { if (e.defaultPrevented) return; const t = e.target && e.target.tagName; if (t === 'INPUT' || t === 'TEXTAREA') return; e.preventDefault(); e.stopPropagation(); menu(e.clientX, e.clientY, kindItems().concat(histItems())); });
     cv.addEventListener('pointerup', endPointer); cv.addEventListener('pointercancel', endPointer);
     cv.addEventListener('wheel', (e) => { if (mode !== '3d') return; e.preventDefault(); cam.zoom = Math.max(0.3, Math.min(4, cam.zoom * (e.deltaY < 0 ? 1.1 : 1 / 1.1))); draw(); }, { passive: false });
     function close() { if (!root.isConnected) return; root.remove(); doc.documentElement.classList.remove('ws-open'); global.removeEventListener('keydown', onKey, true); global.removeEventListener('resize', onResize); if (current === api) current = null; if (o.onClose) o.onClose(clone(d)); }
     global.addEventListener('keydown', onKey, true); global.addEventListener('resize', onResize);
     doc.body.appendChild(root); doc.documentElement.classList.add('ws-open'); render(); global.requestAnimationFrame(draw);
     const api = { el: root, doc: () => clone(d), set: (k, v, label) => edit(k, v, label), select: (id) => { selected = id; render(); }, undo, redo, history: () => hist.map(h2 => h2.label), close, kind: K.id,
-      get selected() { return selected; },
+      get selected() { return selected; }, keys: () => keyList(), get hidden() { return Array.from(hidden); }, tool: (t) => { if (t) { tool = t; render(); } return tool; },
       // W3a: the viewport (for tests and the kind's own buttons)
       view: (o2) => { if (o2) { if (o2.mode) mode = o2.mode; if (o2.exploded !== undefined) exploded = !!o2.exploded; if (o2.wire !== undefined) wire = !!o2.wire; if (o2.cam) Object.assign(cam, o2.cam); chips(); draw(); } return { mode, exploded, wire, cam: Object.assign({}, cam) }; },
       stroke: (pts) => { const r = cv.getBoundingClientRect(); const res = K.stroke ? K.stroke(d, pts, r.width, r.height, { selected }) : null; if (res && res.key !== undefined) edit(res.key, res.value, res.label); return !!res; },

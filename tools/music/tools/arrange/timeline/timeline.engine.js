@@ -231,6 +231,7 @@
           if (Array.isArray(x.iv)) { const iv = x.iv.map(v => Math.round(clamp(+v, -24, 36))).filter(v => isFinite(v) && v !== 0).slice(0, 6); if (iv.length) { o.iv = iv;
             if (+x.strum > 0) o.strum = Math.round(clamp(+x.strum, 0, 250)); if (['down', 'out'].includes(x.dir)) o.dir = x.dir; if (+x.fall > 0) o.fall = Math.round(clamp(+x.fall, 0, 0.5) * 100) / 100; } }
           if (['accel', 'decel'].includes(x.rs)) o.rs = x.rs; if (['flat', 'grow'].includes(x.rv)) o.rv = x.rv;
+          if (+x.tempo > 0 && +x.tempo !== 1) o.tempo = Math.round(clamp(+x.tempo, 0.25, 4) * 1000) / 1000;   // W3f the tool's speed for this note
           if (+x.ht > 0) o.ht = Math.round(clamp(+x.ht, 0, 60)); if (+x.hv > 0) o.hv = Math.round(clamp(+x.hv, 0, 0.4) * 100) / 100;
           return Object.keys(o).length ? o : null;
         };
@@ -313,7 +314,7 @@
               for (let k = 0; k < hits; k++) { const u0 = at(k), u1 = at(k + 1);
                 const time = (hits > 1 && shaped ? Math.max(tk.time, t0 + u0 * len * sd) : Math.max(tk.time, t0) + k * each) + strum;
                 const dur = hits > 1 ? (shaped ? (u1 - u0) * len * sd * 0.85 : each * 0.85) : Math.max(0.01, len * sd * 0.98 - strum);
-                ctx.emit('note:trigger', Object.assign({ target: lane.target, note: clamp(n.n + iv, 0, 127), velocity: x ? clamp((velK(k) + jv) * fall, 0.05, 1) : velK(k), time, duration: dur }, n.p ? { params: n.p } : {}, n.b && hits === 1 ? { bend: n.b } : {}, n.c ? { curves: n.c } : {})); }
+                ctx.emit('note:trigger', Object.assign({ target: lane.target, note: clamp(n.n + iv, 0, 127), velocity: x ? clamp((velK(k) + jv) * fall, 0.05, 1) : velK(k), time, duration: dur }, n.p ? { params: n.p } : {}, n.b && hits === 1 ? { bend: n.b } : {}, n.c ? { curves: n.c } : {}, x && x.tempo ? { tempo: x.tempo } : {})); }
             });
           });
         });
