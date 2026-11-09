@@ -247,7 +247,7 @@
     lib = lib.filter(p => !twinIds.has(p.id));   // the page works on the ideas; a twin rides on its line's card
     const favs = new Set(saved.favs || []), folded = new Set(saved.folded || []), openFam = new Set(saved.openFam || []), more = {};
     const typeLabel = (t) => (TYPES.find(x => x[0] === t) || [0, t])[1];
-    const ov = h('div', { class: 'overlay sbk plib', role: 'dialog', 'aria-label': 'Patterns' });
+    const ov = h('div', { class: 'overlay sbk plib', role: 'dialog', 'aria-label': 'Rhythm library' });   // W3g his: "maybe rename it to rhythm library"
     const quickRow = h('div', { class: 'sbk-chips plib-quick' }), typeRow = h('div', { class: 'sbk-chips' }), famRow = h('div', { class: 'sbk-chips plib-fams' }),
       genreRow = h('div', { class: 'sbk-chips plib-genres' }), grid = h('div', { class: 'plib-list' }), status = h('span', { class: 'sbk-sub' });
     const search = h('input', { class: 'sbk-q', type: 'search', placeholder: 'find a pattern, a genre, a tool, a BPM… (words narrow it)', value: pick.q });
@@ -283,10 +283,10 @@
     const nBody = global.NoteLibrary ? global.NoteLibrary.page(h, { canApply: () => !!wsNotes(), onApply: (sv) => { const ws = wsNotes(); if (ws) { ws.set('libApply', sv.id, 'From the library: ' + sv.name); close(); } } }) : h('div');
     nBody.classList.add('plib-notes');
     const tabBtn = (id, text) => h('button', { class: 'plib-tab' + ((o && o.tab || 'patterns') === id ? ' on' : ''), type: 'button', text, onclick: (e) => { tabsEl.querySelectorAll('.plib-tab').forEach(b => b.classList.toggle('on', b === e.currentTarget)); pBody.style.display = id === 'patterns' ? '' : 'none'; nBody.style.display = id === 'notes' ? '' : 'none'; } });
-    const tabsEl = h('div', { class: 'plib-tabs', role: 'tablist' }, [tabBtn('patterns', '🧩 Patterns · ' + lib.length), tabBtn('notes', '♪ Notes · ' + (global.NoteLibrary ? global.NoteLibrary.all().length : 0))]);
+    const tabsEl = h('div', { class: 'plib-tabs', role: 'tablist' }, [tabBtn('patterns', '🥁 Rhythms · ' + lib.length), tabBtn('notes', '♪ Notes · ' + (global.NoteLibrary ? global.NoteLibrary.all().length : 0))]);
     if ((o && o.tab) === 'notes') pBody.style.display = 'none'; else nBody.style.display = 'none';
     ov.append(h('div', { class: 'sbk-box' }, [
-      h('header', { class: 'sbk-head' }, [h('div', {}, [tabsEl, h('span', { class: 'sbk-sub', text: ' every song in blocks — each instrument, each section — and the notes you saved. Hear it, send it to your song.' })]), h('button', { class: 'sbk-x', text: '×', 'aria-label': 'close', onclick: () => close() })]),
+      h('header', { class: 'sbk-head' }, [h('div', {}, [tabsEl, h('span', { class: 'sbk-sub', text: ' THE RHYTHM LIBRARY — every song in blocks (each instrument, each section), and the notes you saved. Hear it, send it to your song, or put it into the Workshop.' })]), h('button', { class: 'sbk-x', text: '×', 'aria-label': 'close', onclick: () => close() })]),
       pBody, nBody]));
     ov.addEventListener('mousedown', (e) => { if (e.target === ov) close(); });
     document.addEventListener('keydown', key, true);
@@ -306,6 +306,12 @@
       if (curveB) curveB.onclick = () => { const on = p === p0; p = on ? twin : p0; curveB.classList.toggle('on', on); curveB.setAttribute('aria-pressed', on ? 'true' : 'false'); drawCard(cv, p); if (playing) stop(); };
       const hear = h('button', { class: 'sbk-alt sm', text: '▶', title: 'hear it — rendered off the canvas, nothing changes' });
       hear.onclick = async () => { if (playing && playing.id === p.id) { stop(); return; } hear.textContent = '…'; const ok = await play(p, () => { hear.textContent = '▶'; }); hear.textContent = ok ? '■' : '▶'; if (ok === null) status.textContent = 'no sound came out of “' + p.name + '”'; };
+      // W3g ⇥ Into the Workshop: while a pattern is open there, this rhythm's notes replace its notes (in the song's key; undo brings them back)
+      const wsOpen = global.Workshop && global.Workshop.current && global.Workshop.current.kind === 'music.notes';
+      const intoB = wsOpen && p.notes && p.notes.length ? h('button', { class: 'sbk-alt sm', text: '⇥ Workshop', title: 'put this rhythm into the pattern open in the Workshop (its notes replace the ones there — Ctrl+Z brings them back)' }) : null;
+      if (intoB) intoB.onclick = () => { const key = (global.Kernel && global.Kernel.music && global.Kernel.music.key) || {}, root = +key.root || 0;
+        const notes = p.notes.map(n => Object.assign({ s: n.s, l: n.l, n: p.drums ? n.n : n.r + root, v: n.v }, n.p ? { p: n.p } : {}, n.b ? { b: n.b } : {}));
+        global.Workshop.current.set('loadPattern', { notes, name: p.name }, 'Rhythm: ' + p.name); close(); };
       const sendB = h('button', { class: 'sbk-alt sm', text: '→ Timeline', title: !!p.curve ? 'adds this curve to the track that plays this kind of tool (or a new track with it)' : 'adds it after what is on the track that plays this kind of tool (or a new track with it), in your song’s key' });
       sendB.onclick = () => { const r = send(p); status.textContent = r ? '“' + p.name + '” → the Timeline, bar ' + r.bar : 'could not send it'; };
       const editB = !p.notes ? null : h('button', { class: 'sbk-alt sm', text: '✎ Edit notes', title: 'put it on the Timeline and open it on the Workshop: open any note, and give it its own timing, bend and curves' });
@@ -316,7 +322,7 @@
       del.onclick = () => { if (!global.confirm('Delete “' + p0.name + '” for good?')) return; if (playing) stop(); discard([p0, twin]); lib = lib.filter(x => x !== p0); status.textContent = 'Deleted “' + p0.name + '”.'; paint(); };
       return h('div', { class: 'plib-card', style: { '--acc': p.type === 'drop' ? '#ff2266' : !!p.curve ? '#ffd24a' : '#00d4ff' } }, [
         h('div', { class: 'plib-top' }, [h('b', { text: p.song ? p.name.slice(p.song.title.length + 3) : p.name }), star, del]), p.song ? h('small', { class: 'plib-song', text: '♪ ' + p.song.title }) : null, h('small', { text: typeLabel(p.type) + ' · ' + p.genreLabel + ' · ' + p.bars + (p.bars > 1 ? ' bars' : ' bar') + ' · ' + p.bpm + ' BPM' }),
-        cv, h('div', { class: 'plib-actions' }, [hear, sendB].concat(curveB ? [curveB] : []).concat(editB ? [editB] : []).concat([h('span', { class: 'plib-tool', text: pick.tool ? (p.preset || '') : ((F().def(p.tool) || {}).label || p.tool) + (p.preset ? ' · ' + p.preset : '') })]))]);
+        cv, h('div', { class: 'plib-actions' }, [hear].concat(intoB ? [intoB] : [], [sendB]).concat(curveB ? [curveB] : []).concat(editB ? [editB] : []).concat([h('span', { class: 'plib-tool', text: pick.tool ? (p.preset || '') : ((F().def(p.tool) || {}).label || p.tool) + (p.preset ? ' · ' + p.preset : '') })]))]);
     }
     function paint() {
       // 3.85 the tools, each with how many of its patterns match what else is picked; grouped by what they are

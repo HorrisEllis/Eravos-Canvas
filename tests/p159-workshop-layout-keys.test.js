@@ -16,7 +16,7 @@ describe('P159 the Workshop: layers, keys, menus, one place for a value', () => 
       const right = app.querySelector('.ws-right'); assert.ok(right.children[0].classList.contains('ws-props') && right.children[1].classList.contains('ws-layers'), 'PROPERTIES over LAYERS');
       assert.ok(app.querySelector('.ws-layers .ws-lfoot') && app.querySelectorAll('.ws-layers .ws-thumb').length > 3, 'the layers panel: thumbnails, and the layer tools in its footer');
       ws.select('chord'); await TH.sleep(10);
-      assert.equal(app.querySelectorAll('.ws-opts .ws-f').length, 0, 'the options bar holds no value fields');
+      assert.ok(!Array.from(app.querySelectorAll('.ws-opts .ws-f')).some(f => /Chord|Strum/i.test(f.textContent)), 'the options bar holds no layer fields (only the kind\'s own bar: TEMPO, W3g)');
       assert.ok(Array.from(app.querySelectorAll('.ws-props .ws-f')).some(f => /Chord/i.test(f.textContent)), 'the chord is set in PROPERTIES — the one place');
       // keys
       ws.set('add', 'Pitch'); await TH.sleep(10); const n0 = (clipOf().notes[0].sh.t.pitch.mods || []).length;

@@ -1,0 +1,20 @@
+// node tools/music/components/curve-edit/curve-edit.test.mjs — every claim in curve-edit.spec, measured.
+import { createRequire } from 'module'; const C = createRequire(import.meta.url)('./curve-edit.js');
+let n = 0; const ok = (c, m) => { n++; if (!c) { console.error('FAIL: ' + m); process.exit(1); } };
+const base = [[0, 0], [0.25, 2], [0.5, 0], [0.75, -2], [1, 0]], frozen = JSON.stringify(base);
+const p = C.pen(base, [[0.6, 5], [0.65, 5], [0.7, 5]]);
+ok(Math.abs(C.at(p, 0.25) - 2) < 1e-9 && Math.abs(C.at(p, 0) ) < 1e-9, 'pen: outside the stroke, as it was'); ok(Math.abs(C.at(p, 0.65) - 5) < 1e-9, 'pen: the stroke is the curve where it passed');
+const l = C.line(base, [0.2, 1], [0.8, 3]); ok(Math.abs(C.at(l, 0.2) - 1) < 1e-9 && Math.abs(C.at(l, 0.8) - 3) < 1e-9 && Math.abs(C.at(l, 0.5) - 2) < 1e-9, 'line: through both ends, straight');
+ok(!l.some(q => q[0] > 0.2 && q[0] < 0.8), 'line: what was between is gone');
+const m = C.movePoint(base, 2, 0.9, 7); ok(m[2][0] < m[3][0] && m[2][1] === 7, 'a moved point never passes its neighbour'); ok(C.movePoint(base, 0, 0.5, 1)[0][0] === 0 && C.movePoint(base, 4, 0.2, 1)[4][0] === 1, 'the ends stay at 0 and 1');
+const a = C.addPoint(base, 0.6, 9); ok(a.curve.length === 6 && a.curve[a.index][1] === 9, 'add a point'); ok(C.removePoint(base, 2).length === 4 && C.removePoint(base, 0).length === 5 && C.removePoint([[0, 0], [1, 1]], 1).length === 2, 'remove: never an end, never below 2');
+ok(C.nearest(base, 0.26, 2, 100, 10).index === 1, 'nearest point, in the caller\'s units');
+const rough = []; for (let i = 0; i <= 64; i++) rough.push([i / 64, i % 2 ? 1 : -1]);
+const rr = (c, a2, b2) => { let s = 0; for (let t = a2; t < b2; t += 1 / 128) s += Math.abs(C.at(c, t + 1 / 128) - C.at(c, t)); return s; };
+const sm = C.smooth(rough, [0.5], 0.1, 1); ok(rr(sm, 0.45, 0.55) < rr(rough, 0.45, 0.55) * 0.5, 'smooth: rough where it passed becomes smooth'); ok(Math.abs(rr(sm, 0.05, 0.25) - rr(rough, 0.05, 0.25)) < 1e-9, 'and nowhere else');
+const er = C.erase([[0, 4], [1, 4]], [0.5], 0.1, 0); ok(Math.abs(C.at(er, 0.5)) < 1e-6 && C.at(er, 0.4) > 0 && C.at(er, 0.4) < 4 && Math.abs(C.at(er, 0.2) - 4) < 1e-9, 'erase: rest in the middle, a ramp at the edges, untouched beyond');
+const er2 = C.erase([[0, 4], [1, 4]], [0.2, 0.8], 0.05, 0); ok(Math.abs(C.at(er2, 0.5)) < 1e-6, 'a brush stroke paints the whole way between the hand\'s samples');
+ok(C.offset(base, 1)[1][1] === 3 && C.scale(base, 2, 0)[3][1] === -4, 'offset and scale exact');
+const s = C.simplify(rough.map(q => [q[0], Math.sin(q[0] * 6)]), 0.01, 129); ok(s.length < 65 && s.every(q => Math.abs(q[1] - Math.sin(q[0] * 6)) < 1e-9), 'simplify keeps fewer points, on the curve');
+ok(JSON.stringify(base) === frozen, 'the input is never changed');
+console.log(`curve-edit: ${n} checks passed`);

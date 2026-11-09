@@ -268,3 +268,22 @@ W3f  NAVIGATOR      the top of the view is the pattern as a mini piano roll (key
                     the trigger carries ×2 and the tool runs at ×2 bpm for the note, then its own; save, fit another note, what is left out,
                     the Notes tab applies); P154 … P159, Timeline 89/89, boundary green
      previews       docs/previews/workshop-navigator.png · workshop-note-navigator.png · patterns-notes-tab.png
+
+## ADDENDUM 2026-11-09 (5) — W3g: the toolbar (draw, shape, edit on the canvas), tempo, rhythms from the library (his words; nothing above changed)
+# James, 2026-11-09: "looks great though, the tool but i want to be able to manipulate it on the canvas, like photoshop, needs the toolbar, for
+#   drawing, shaping, editing, etc. tempo. next patterns from the pattern storage, maybe rename it to rhythm library."
+W3g  TOOLBAR (canvas, domain-free; the left strip) — every tool works ON the view, live while the hand moves, one history step when it lets go:
+       SELECT V (a click opens what is under it) · PEN P (draw freehand: only the stretch drawn changes) · LINE L (a straight line from where the
+       drag starts to where it ends) · POINTS D (the curve's points as handles: drag one to move it, click the curve to add one, Alt+click to
+       remove one) · SMOOTH S (a brush that smooths what it passes over) · MOVE G (drag the whole curve up or down; Shift scales it around its
+       middle) · ERASE E (a brush that flattens what it passes over to the curve's rest value) · ORBIT O (turn the 3D view)
+       contract: K.drag(doc, tool, points, W, H, { selected, phase: 'move' | 'end', alt, shift }) → { key, value, label }; the canvas draws
+       K.set(doc, key, value) while the hand moves (no history) and records it once at the end; K.draw gets { tool } (handles for POINTS).
+       Spread / flat moves to Shift+E (E is the eraser).
+     music    the tools work on the open curve — a SIGNAL's base, or, a modulator selected, its wave (one cycle; it becomes drawn). On the
+              note itself (nothing open), a tool opens its PITCH to shape (making it if needed).
+     TEMPO    the options bar: PLAYS · TEMPO (the song's BPM, the transport's own; undo puts it back) — the per-note Speed stays in HOW IT PLAYS
+     RHYTHMS  the Patterns library is the RHYTHM LIBRARY (the name on its button and tab; the code keeps PatternLibrary). From the Workshop,
+              R opens it; each rhythm (a pattern with notes) has ⇥ Into the Workshop while a pattern is open there: its notes replace the
+              open pattern's (in the song's key; one history step — undo brings the old notes back)
+     proof    tests/p161
