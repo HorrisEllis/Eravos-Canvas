@@ -2,8 +2,17 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.158 How a note plays: when, a chord, the ratchet's shape, humanize, A / B (W3d) (2026-11-09)
+His words: "Yes the rest of the note shaping. Enterprise grade. Studio quality." · "Decouple. Pretend I didn’t say it · Delete that." — the decouple map and its entries removed.
+- timeline.engine.js: note.x (cleaned; absent = exactly as before) — cond (pass k of every N, plays or skips), iv (a chord from the one note:
+  strum, direction, each voice softer), rs / rv (the ratchet speeds up or slows down; velocity fades, flat or grows), ht / hv (humanize per pass,
+  seeded). timeline.workshop.js: HOW IT PLAYS layers (When, Chord, Ratchet shape, Humanize), A / B (SET A, ▶ A, ⇄ A/B), the view draws voices,
+  hits and words; HEAR plays the chord. workshop.js: a long enum in the options bar is a dropdown.
+- Proof: tests/p158 6/6; P112 13/13, P157, P156, P154, P150, P149, P76, Timeline 89/89, boundary green; design check no worse.
+- Preview: docs/previews/workshop-how-it-plays.png.
+
 ## Done — 3.157 The Workshop: hear a shaped note, its shape to all, its own knobs (W3c) (2026-11-09)
-His words: "Just ant them to be zipped per tool. With a dag. This is future plans.  Not now. Continue the wokshop" · on decoupling: "No. Forget I said it. As long as it doesn’t have any dependence." (measured: none — specs/eravos.decouple.map.spec)
+His words: "Just ant them to be zipped per tool. With a dag. This is future plans.  Not now. Continue the wokshop"
 - ▶ HEAR (the note alone through its instrument, shaped, for its length) · ⇉ ALL NOTES (the shape and knob values to every note, one step) ·
   ITS KNOBS · THIS NOTE ONLY (any number knob of the instrument per note — p; ＋ set, inspector value, ✕ KNOB). timeline.workshop.js (bind),
   timeline.pianoroll.js (the hear hook through note_audition).

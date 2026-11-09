@@ -205,3 +205,22 @@ W3c  ▶ HEAR       the open note alone through its lane's instrument: its bend 
      dag          note.p ─→ clip_edit ─→ timeline.engine cleanP ─→ note:trigger params ─→ the instrument for that note
      proof        tests/p157 2/2
      open (his)   conditions (every Nth loop, fills only) · one note into a chord · stereo width beyond the instrument's knobs · A / B
+
+## ADDENDUM 2026-11-09 (2) — W3d: how a note plays (his words; nothing above is changed)
+# James, 2026-11-09: "Yes the rest of the note shaping. Enterprise grade. Studio quality."
+W3d  note.x — every part played by the Timeline (timeline.engine.js playNotes), absent = the note plays exactly as before (proved)
+       when        cond { every 2…16, at 0…every−1, skip? } — plays (or skips) on pass `at` of every `every` passes of its clip / repeat
+       chord       iv: up to 6 intervals (−24…+36 st) above / below the note; strum 0…250 ms between voices; dir up · down · out (from the root);
+                   fall: each voice that much softer — named shapes in the Workshop (octaves, fifth, power, major, minor, sus, dim, aug, 7th,
+                   maj7, min7, add9, minor 9, stack of 4ths); every voice carries the note's bend, curves and knob values
+       ratchet     rs: even (as before) · accel (hits speed up) · decel (slow down); rv: fade (as before) · flat · grow
+       humanize    ht ± ms (0…60), hv ± velocity (0…0.4), seeded by clip, note and pass — the same pass plays the same, every time
+     A / B (the Workshop's): SET A keeps the note as it is; ▶ A hears it; ⇄ A/B swaps (one history step each) — before / after
+     ▶ HEAR plays the chord's voices; ⇉ ALL NOTES carries x with the shape
+     the view: the chord's voices as their own lines (strum offsets), the ratchet's hits with their velocities, when and humanize in words;
+       a long choice list in the options bar is one dropdown (canvas: > 8 options)
+     dag   note.x ─→ clip_edit ─→ cleanNotes xn() ─→ playNotes: cond → (jitter) → voices × hits ─→ note:trigger
+     proof tests/p158 6/6 (counted from the triggers: 4 of 16 passes, voices and strum to the ms, gaps shrinking / growing, velocities,
+       humanize within range and repeatable, plain notes unchanged); P112 13/13 (the old event depth) green
+     not here: stereo width as its own control — a note reaches its instrument, not a mixer; width and pan are per note through the
+       instrument's own knobs (ITS KNOBS, SHAPE), where the instrument has them

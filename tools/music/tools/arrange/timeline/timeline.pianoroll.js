@@ -886,7 +886,7 @@
       // W3b: the instrument's number knobs travel with the document, so a note can be shaped on any of them
       const knobs = ((lane && knobsAll[lane.target]) || []).filter(k => k.type !== 'enum' && !k.lane && isFinite(k.min) && isFinite(k.max)).map(k => ({ key: k.key, label: k.label, min: k.min, max: k.max, unit: k.unit || '', val: isFinite(k.val) ? k.val : isFinite(k.def) ? k.def : k.min }));
       // ▶ HEAR on the Workshop: the open note through this lane's instrument — its bend path, its curves, its own knob values, its length
-      WK.bind({ hear: (a) => { if (!lane) return; const sec = clampN(a.l / 4 * 60 / ((window.Kernel && Kernel.music && Kernel.music.bpm) || 120), 0.1, 4); view.emit('note_audition', Object.assign({ lane: lane.id, note: a.n, duration: sec }, a.b ? { bend: a.b } : {}, a.c ? { curves: a.c } : {}, a.p ? { params: a.p } : {})); } });
+      WK.bind({ hear: (a) => { if (!lane) return; const sec = clampN(a.l / 4 * 60 / ((window.Kernel && Kernel.music && Kernel.music.bpm) || 120), 0.1, 4); view.emit('note_audition', Object.assign({ lane: lane.id, note: a.n, notes: [a.n].concat(((a.x && a.x.iv) || []).map(iv => Math.max(0, Math.min(127, a.n + iv)))), duration: sec }, a.b ? { bend: a.b } : {}, a.c ? { curves: a.c } : {}, a.p ? { params: a.p } : {})); } });
       return global.Workshop.open('music.notes', { notes: notes.map(n => JSON.parse(JSON.stringify(n))), sel: Math.max(0, i | 0), name: clip.name || toolName(), drums: !!drums, knobs },
         { onChange: (d) => commit(d.notes.map(n => Object.assign({}, n))), title: clip.name || toolName() });
     }

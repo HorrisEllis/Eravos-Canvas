@@ -222,10 +222,22 @@
         const mt = (x) => { const v = Math.round(clamp(+x, -0.5, 0.5) * 100) / 100; return isFinite(+x) && v !== 0 ? v : null; };
         // W3b a note's SHAPE (the Workshop's fractal modulation tree, components/mod-tree): kept as data so it opens again as it was; what PLAYS
         // is what it compiled into (b.path, c). Plain data only, at most 32 kB.
+        // W3d HOW A NOTE PLAYS (x): when (cond: plays — or skips — on pass `at` of every `every`), a chord from the one note (iv: semitones
+        // above it, strum in ms, dir up | down | out, fall: velocity lost per voice), the ratchet's shape (rs: even | accel | decel; rv: fade |
+        // flat | grow) and humanize per play (ht: ± ms, hv: ± velocity, seeded by the pass — the same pass plays the same). Absent = as before.
+        const xn = (x) => {
+          if (!x || typeof x !== 'object') return null; const o = {};
+          if (x.cond && +x.cond.every > 1) { const ev = Math.round(clamp(+x.cond.every, 2, 16)); o.cond = { every: ev, at: Math.round(clamp(+x.cond.at || 0, 0, ev - 1)) }; if (x.cond.skip) o.cond.skip = true; }
+          if (Array.isArray(x.iv)) { const iv = x.iv.map(v => Math.round(clamp(+v, -24, 36))).filter(v => isFinite(v) && v !== 0).slice(0, 6); if (iv.length) { o.iv = iv;
+            if (+x.strum > 0) o.strum = Math.round(clamp(+x.strum, 0, 250)); if (['down', 'out'].includes(x.dir)) o.dir = x.dir; if (+x.fall > 0) o.fall = Math.round(clamp(+x.fall, 0, 0.5) * 100) / 100; } }
+          if (['accel', 'decel'].includes(x.rs)) o.rs = x.rs; if (['flat', 'grow'].includes(x.rv)) o.rv = x.rv;
+          if (+x.ht > 0) o.ht = Math.round(clamp(+x.ht, 0, 60)); if (+x.hv > 0) o.hv = Math.round(clamp(+x.hv, 0, 0.4) * 100) / 100;
+          return Object.keys(o).length ? o : null;
+        };
         const sh = (x) => { if (!x || typeof x !== 'object' || Array.isArray(x)) return null; try { const j = JSON.stringify(x); return j.length <= 32768 ? JSON.parse(j) : null; } catch (e) { return null; } };
-        return (Array.isArray(arr) ? arr : []).map(n => ({ s: +n.s, l: +n.l, n: Math.round(+n.n), v: n.v === undefined ? 0.85 : +n.v, p: cleanP(n.p), b: cleanB(n.b), c: cleanC(n.c), sh: sh(n.sh), pr: pr(n.pr), rt: rt(n.rt), mt: mt(n.mt), qs: isFinite(+n.qs) && n.qs !== null && n.qs !== undefined ? Math.round(+n.qs * 192) / 192 : null }))
+        return (Array.isArray(arr) ? arr : []).map(n => ({ s: +n.s, l: +n.l, n: Math.round(+n.n), v: n.v === undefined ? 0.85 : +n.v, p: cleanP(n.p), b: cleanB(n.b), c: cleanC(n.c), sh: sh(n.sh), x: xn(n.x), pr: pr(n.pr), rt: rt(n.rt), mt: mt(n.mt), qs: isFinite(+n.qs) && n.qs !== null && n.qs !== undefined ? Math.round(+n.qs * 192) / 192 : null }))
           .filter(n => isFinite(n.s) && isFinite(n.l) && isFinite(n.n) && isFinite(n.v) && n.s >= 0 && n.s < max)
-          .map(n => Object.assign({ s: Math.round(n.s * 192) / 192, l: clamp(Math.round(n.l * 192) / 192, 0.125, max - n.s), n: clamp(n.n, 0, 127), v: clamp(n.v, 0.05, 1) }, n.p ? { p: n.p } : {}, n.b ? { b: n.b } : {}, n.c ? { c: n.c } : {}, n.sh ? { sh: n.sh } : {}, n.pr ? { pr: n.pr } : {}, n.rt ? { rt: n.rt } : {}, n.mt ? { mt: n.mt } : {}, n.qs !== null && n.qs >= 0 && n.qs !== n.s ? { qs: n.qs } : {}))   // 3.48: 1/192 step — exact for 1/64 and every triplet; 1/128-note minimum
+          .map(n => Object.assign({ s: Math.round(n.s * 192) / 192, l: clamp(Math.round(n.l * 192) / 192, 0.125, max - n.s), n: clamp(n.n, 0, 127), v: clamp(n.v, 0.05, 1) }, n.p ? { p: n.p } : {}, n.b ? { b: n.b } : {}, n.c ? { c: n.c } : {}, n.sh ? { sh: n.sh } : {}, n.x ? { x: n.x } : {}, n.pr ? { pr: n.pr } : {}, n.rt ? { rt: n.rt } : {}, n.mt ? { mt: n.mt } : {}, n.qs !== null && n.qs >= 0 && n.qs !== n.s ? { qs: n.qs } : {}))   // 3.48: 1/192 step — exact for 1/64 and every triplet; 1/128-note minimum
           .sort((a, b) => a.s - b.s || a.n - b.n);
       }
       const snap16 = (b) => Math.max(1, 1 + Math.round((b - 1) * 16) / 16);
@@ -285,8 +297,24 @@
           c.notes.forEach((n, ni) => {
             if (Math.floor(n.s + 1e-9) !== lp || n.s >= room) return;
             if (n.pr && chanceOf(c.id, ni, pass) >= n.pr) return;   // 3.117 chance: the same pass always decides the same way
-            const len = Math.min(n.l, room - n.s), hits = n.rt || 1, t0 = tk.time + (n.s - lp + (n.mt || 0)) * sd, each = len * sd / hits;
-            for (let k = 0; k < hits; k++) ctx.emit('note:trigger', Object.assign({ target: lane.target, note: n.n, velocity: hits > 1 ? Math.max(0.05, n.v * (1 - 0.1 * k / hits)) : n.v, time: Math.max(tk.time, t0) + k * each, duration: hits > 1 ? each * 0.85 : len * sd * 0.98 }, n.p ? { params: n.p } : {}, n.b && hits === 1 ? { bend: n.b } : {}, n.c ? { curves: n.c } : {}));
+            const x = n.x;
+            if (x && x.cond) { const on = pass % x.cond.every === x.cond.at; if (on === !!x.cond.skip) return; }   // W3d when: this pass or not
+            const len = Math.min(n.l, room - n.s), hits = n.rt || 1, each = len * sd / hits;
+            const jt = x && x.ht ? (chanceOf(c.id + '~t', ni, pass) * 2 - 1) * x.ht / 1000 : 0, jv = x && x.hv ? (chanceOf(c.id + '~v', ni, pass) * 2 - 1) * x.hv : 0;
+            const t0 = tk.time + (n.s - lp + (n.mt || 0)) * sd + jt;
+            // the ratchet's hits: evenly (as before), speeding up or slowing down — u is where hit k starts, as a fraction of the note
+            const at = (k) => !x || !x.rs ? k / hits : x.rs === 'accel' ? Math.pow(k / hits, 0.6) : 1 - Math.pow(1 - k / hits, 0.6);
+            const velK = (k) => hits <= 1 ? n.v : !x || !x.rv ? Math.max(0.05, n.v * (1 - 0.1 * k / hits)) : x.rv === 'flat' ? n.v : Math.min(1, n.v * (0.7 + 0.3 * (k + 1) / hits));
+            // the chord: the note and its voices, strummed in their order
+            const vs = [0].concat((x && x.iv) || []), order = !x || !x.dir ? vs : x.dir === 'down' ? vs.slice().sort((a, b) => b - a) : vs.slice().sort((a, b) => Math.abs(a) - Math.abs(b));
+            order.forEach((iv, vi) => {
+              const strum = x && x.strum ? vi * x.strum / 1000 : 0, fall = x && x.fall ? 1 - x.fall * vi : 1;
+              const shaped = !!(x && x.rs);   // even hits keep the arithmetic they always had (a note with no x plays exactly as before)
+              for (let k = 0; k < hits; k++) { const u0 = at(k), u1 = at(k + 1);
+                const time = (hits > 1 && shaped ? Math.max(tk.time, t0 + u0 * len * sd) : Math.max(tk.time, t0) + k * each) + strum;
+                const dur = hits > 1 ? (shaped ? (u1 - u0) * len * sd * 0.85 : each * 0.85) : Math.max(0.01, len * sd * 0.98 - strum);
+                ctx.emit('note:trigger', Object.assign({ target: lane.target, note: clamp(n.n + iv, 0, 127), velocity: x ? clamp((velK(k) + jv) * fall, 0.05, 1) : velK(k), time, duration: dur }, n.p ? { params: n.p } : {}, n.b && hits === 1 ? { bend: n.b } : {}, n.c ? { curves: n.c } : {})); }
+            });
           });
         });
       }
