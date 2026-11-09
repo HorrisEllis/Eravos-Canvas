@@ -46,3 +46,10 @@ open: the face size N per window size; whether IN PLAY reorders while playing or
 #   First step proposed (highest leverage): the INSTRUMENT kind generated from any tool's config + spec dag — every tool opens on the Workshop
 #     (its knobs as layers grouped by its dag's stages, each shapeable with mod-tree, its signal flow as planes in 3D), no per-tool code;
 #     then UF1 (when / why in the schema) so the field can hide what does nothing.
+
+# ---- ADDENDUM 2026-11-09 (2) — the instrument kind, previewed (his words: "Preview first."; nothing above is changed; nothing built)
+#   docs/previews/instrument-kind.preview.js generates a Workshop kind from a tool's OWN settings, through the music domain's stage words
+#   (CONTROL · SOURCE · MOD · SHAPE · AMP · FX · OUT) — no code for the tool. Shown on the real Retro DCO (60 settings, 14 groups):
+#   instrument-kind-flow.png (2D: its signal flow as a field of nodes — each group a node with its settings as bars, modulators above feeding in;
+#   PROPERTIES edits the selected stage; LAYERS = the stages, grouped by what they do) · instrument-kind-3d.png (each stage a plane).
+#   node docs/previews/instrument-kind.shots.mjs remakes them. Waiting for his word before any of it is built.
