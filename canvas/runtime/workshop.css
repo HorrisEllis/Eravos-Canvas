@@ -67,3 +67,4 @@ html.ws-open .glass-layer { display: none !important; }   /* the light layers dr
 .ws-vs { width: 1px; height: 16px; background: var(--wl2); margin: 0 4px; }
 .ws-st.go { cursor: pointer; }
 .ws-st.go:hover { color: var(--wc); }
+.ws-sel { background: var(--wv); color: var(--wt); border: 1px solid var(--wl2); border-radius: 2px; font: inherit; padding: 3px 6px; }

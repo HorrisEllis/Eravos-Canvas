@@ -21,6 +21,26 @@
   };
   ['from', 'to', 'at', 'shape'].forEach(k => { FIELDS['b.' + k] = [(a) => Object.assign({}, BEND0, a.b)[k], (a, v) => { a.b = Object.assign({}, BEND0, a.b, { [k]: v }); }]; });
   ['rate', 'depth', 'shape', 'fade'].forEach(k => { FIELDS['osc.' + k] = [(a) => Object.assign({}, OSC0, a.b && a.b.osc)[k], (a, v) => { const b = Object.assign({}, BEND0, a.b); b.osc = Object.assign({}, OSC0, b.osc, { [k]: v }); a.b = b; }]; });
+  // W3d HOW IT PLAYS (note.x — the Timeline plays it): when, a chord from the note, the ratchet's shape, humanize per play
+  const CHORDS = { none: [], 'octave up': [12], 'octave down': [-12], fifth: [7], 'power (5 + 8)': [7, 12], major: [4, 7], minor: [3, 7], sus2: [2, 7], sus4: [5, 7],
+    dim: [3, 6], aug: [4, 8], '7th': [4, 7, 10], maj7: [4, 7, 11], min7: [3, 7, 10], add9: [4, 7, 14], 'minor 9': [3, 7, 10, 14], 'stack of 4ths': [5, 10, 15] };
+  const chordName = (iv) => { const k = JSON.stringify(iv || []); return Object.keys(CHORDS).find(n => JSON.stringify(CHORDS[n]) === k) || (iv && iv.length ? 'custom' : 'none'); };
+  const RS = { even: null, 'speeds up': 'accel', 'slows down': 'decel' }, RV = { fades: null, flat: 'flat', grows: 'grow' }, DIRS = { up: null, down: 'down', 'from the root out': 'out' };
+  const xOf = (a) => Object.assign({}, a.x || {}), putX = (a, o) => { Object.keys(o).forEach(k => { if (o[k] === null || o[k] === undefined || o[k] === 0 || o[k] === '') delete o[k]; }); if (o.cond && !(o.cond.every > 1)) delete o.cond; if (!o.iv || !o.iv.length) { delete o.iv; delete o.strum; delete o.dir; delete o.fall; } if (Object.keys(o).length) a.x = o; else delete a.x; };
+  const keyOfVal = (m, v) => Object.keys(m).find(k => m[k] === (v || null)) || Object.keys(m)[0];
+  Object.assign(FIELDS, {
+    'x.every': [(a) => (a.x && a.x.cond ? a.x.cond.every : 1), (a, v) => { const o = xOf(a), ev = Math.round(clamp(v, 1, 16)); o.cond = ev > 1 ? Object.assign({}, o.cond || {}, { every: ev, at: Math.min(ev - 1, (o.cond && o.cond.at) || 0) }) : null; putX(a, o); }],
+    'x.at': [(a) => (a.x && a.x.cond ? a.x.cond.at + 1 : 1), (a, v) => { const o = xOf(a); if (!o.cond) return; o.cond = Object.assign({}, o.cond, { at: Math.round(clamp(v, 1, o.cond.every)) - 1 }); putX(a, o); }],
+    'x.skip': [(a) => (a.x && a.x.cond && a.x.cond.skip ? 'skips' : 'plays'), (a, v) => { const o = xOf(a); if (!o.cond) return; o.cond = Object.assign({}, o.cond); if (v === 'skips') o.cond.skip = true; else delete o.cond.skip; putX(a, o); }],
+    'x.chord': [(a) => chordName(a.x && a.x.iv), (a, v) => { const o = xOf(a); o.iv = (CHORDS[v] || []).slice(); putX(a, o); }],
+    'x.strum': [(a) => (a.x && a.x.strum) || 0, (a, v) => { const o = xOf(a); o.strum = Math.round(clamp(v, 0, 250)); putX(a, o); }],
+    'x.dir': [(a) => keyOfVal(DIRS, a.x && a.x.dir), (a, v) => { const o = xOf(a); o.dir = DIRS[v] || null; putX(a, o); }],
+    'x.fall': [(a) => Math.round(((a.x && a.x.fall) || 0) * 100), (a, v) => { const o = xOf(a); o.fall = clamp(v, 0, 50) / 100; putX(a, o); }],
+    'x.rs': [(a) => keyOfVal(RS, a.x && a.x.rs), (a, v) => { const o = xOf(a); o.rs = RS[v] || null; putX(a, o); }],
+    'x.rv': [(a) => keyOfVal(RV, a.x && a.x.rv), (a, v) => { const o = xOf(a); o.rv = RV[v] || null; putX(a, o); }],
+    'x.ht': [(a) => (a.x && a.x.ht) || 0, (a, v) => { const o = xOf(a); o.ht = Math.round(clamp(v, 0, 60)); putX(a, o); }],
+    'x.hv': [(a) => Math.round(((a.x && a.x.hv) || 0) * 100), (a, v) => { const o = xOf(a); o.hv = clamp(v, 0, 40) / 100; putX(a, o); }],
+  });
   // the roll's own rule (3.117): defaults are not stored
   function tidy(a) { if (a.b) { if (a.b.osc && !(a.b.osc.depth > 0)) delete a.b.osc; if (!a.b.from && !a.b.to && !a.b.osc && !a.b.path) delete a.b; } return a; }
   const noteOf = (d) => (d.notes || [])[clamp(d.sel | 0, 0, Math.max(0, (d.notes || []).length - 1))];
@@ -163,7 +183,11 @@
       const a = noteOf(d), at = shapeAt(d), sel = (o && o.selected) || '', M = MT(); if (!a) return [];
       const into = /^(T:.+|m:\d+:(rate|depth))$/.test(sel), out = [];
       out.push({ label: '▶ HEAR', hint: 'play this note alone, shaped (its instrument, its curves, its knobs)', disabled: !HOOK.hear, run: (doc) => { const x = noteOf(doc); if (x && HOOK.hear) HOOK.hear(x); return 'heard ' + (doc.drums ? 'pad ' + x.n : nameOf(x.n)); } });
-      if ((a.sh && Object.keys(a.sh.t || {}).length) || a.p) out.push({ label: '⇉ ALL NOTES', key: 'shapeAll', value: true, disabled: (d.notes || []).length < 2, hint: 'give every note in this pattern this note\'s shape and its own knob values' });
+      // A / B: keep this version as A, change it, then hear and swap — the studio's before / after
+      const ab = d.ab && d.ab.i === (d.sel | 0) ? d.ab : null;
+      out.push({ label: ab ? 'A ← NOW' : 'SET A', key: 'abSet', value: true, hint: 'keep the note as it is now as A, to compare against' });
+      if (ab) { out.push({ label: '▶ A', hint: 'hear A', disabled: !HOOK.hear, run: () => { HOOK.hear(ab.note); return 'heard A'; } }); out.push({ label: '⇄ A/B', key: 'abSwap', value: true, hint: 'swap: the note becomes A, A becomes what it was' }); }
+      if ((a.sh && Object.keys(a.sh.t || {}).length) || a.p || a.x) out.push({ label: '⇉ ALL NOTES', key: 'shapeAll', value: true, disabled: (d.notes || []).length < 2, hint: 'give every note in this pattern this note\'s shape and its own knob values' });
       const pk = /^P:(.+)$/.exec(sel); if (!at && pk) out.push({ label: '✕ KNOB', key: 'unsetp', value: pk[1], hint: 'this note goes back to the instrument\'s own value' });
       if (at) out.push({ label: '▴ UP', key: 'nav', value: 'up', hint: 'one level up the tree' });
       out.push({ label: '▾ INTO', key: 'nav', value: 'into:' + sel, disabled: !into, hint: 'open the selected curve and shape IT (its own base and modulators)' });
@@ -188,6 +212,17 @@
         if (!T.pitch) L.push({ id: 'bend', group: 'ITS CURVES', type: 'curve', label: 'Bend', sub: b.from || b.to ? (b.from > 0 ? '+' : '') + b.from + ' → ' + (b.to > 0 ? '+' : '') + b.to + ' st, ' + b.shape : 'flat', fields: [{ key: 'b.from', label: 'From', type: 'number', min: -48, max: 48, step: 0.1, unit: 'st' }, { key: 'b.to', label: 'Bend to', type: 'number', min: -48, max: 48, step: 0.1, unit: 'st' }, { key: 'b.at', label: 'Starts', type: 'number', min: 0, max: 0.95, step: 0.01 }, { key: 'b.shape', label: 'Curve', type: 'enum', options: ['smooth', 'linear', 'early', 'late'] }] });
         L.push({ id: 'osc', group: 'ITS CURVES', type: 'curve', label: 'Oscillate', sub: o.depth > 0 ? '±' + o.depth + ' st, ' + o.shape + ', ' + o.rate : 'off', fields: [{ key: 'osc.depth', label: 'Depth', type: 'number', min: 0, max: 12, step: 0.05, unit: 'st' }, { key: 'osc.rate', label: 'Rate', type: 'enum', options: RATES }, { key: 'osc.shape', label: 'Shape', type: 'enum', options: ['sine', 'triangle', 'saw', 'square', 'random'] }, { key: 'osc.fade', label: 'Fade in', type: 'number', min: 0, max: 1, step: 0.01 }] });
       }
+      // HOW IT PLAYS: when, as a chord, its ratchet's shape, humanize (the Timeline plays every one)
+      const x = a.x || {}, cnd = x.cond;
+      L.push({ id: 'when', group: 'HOW IT PLAYS', type: 'value', label: 'When', sub: cnd ? (cnd.skip ? 'skips' : 'plays') + ' on pass ' + (cnd.at + 1) + ' of every ' + cnd.every : 'every time', fields: [
+        { key: 'x.every', label: 'Every', type: 'number', min: 1, max: 16, step: 1, unit: 'passes' }, { key: 'x.at', label: 'On pass', type: 'number', min: 1, max: cnd ? cnd.every : 1, step: 1 }, { key: 'x.skip', label: 'It', type: 'enum', options: ['plays', 'skips'] }] });
+      L.push({ id: 'chord', group: 'HOW IT PLAYS', type: 'value', label: 'Chord', sub: x.iv ? chordName(x.iv) + ' · ' + (x.iv.length + 1) + ' voices' + (x.strum ? ' · strum ' + x.strum + ' ms' : '') : 'one voice', fields: [
+        { key: 'x.chord', label: 'Chord', type: 'enum', options: Object.keys(CHORDS) }, { key: 'x.strum', label: 'Strum', type: 'number', min: 0, max: 250, step: 1, unit: 'ms' },
+        { key: 'x.dir', label: 'Strum from', type: 'enum', options: Object.keys(DIRS) }, { key: 'x.fall', label: 'Each voice softer', type: 'number', min: 0, max: 50, step: 1, unit: '%' }] });
+      if ((a.rt || 1) > 1) L.push({ id: 'repeat', group: 'HOW IT PLAYS', type: 'value', label: 'Ratchet shape', sub: '×' + a.rt + ' · ' + keyOfVal(RS, x.rs) + ' · ' + keyOfVal(RV, x.rv), fields: [
+        { key: 'x.rs', label: 'Hits', type: 'enum', options: Object.keys(RS) }, { key: 'x.rv', label: 'Velocity', type: 'enum', options: Object.keys(RV) }] });
+      L.push({ id: 'human', group: 'HOW IT PLAYS', type: 'value', label: 'Humanize', sub: x.ht || x.hv ? '± ' + (x.ht || 0) + ' ms · ± ' + Math.round((x.hv || 0) * 100) + ' % velocity, new each pass' : 'exact', fields: [
+        { key: 'x.ht', label: 'Timing', type: 'number', min: 0, max: 60, step: 1, unit: '± ms' }, { key: 'x.hv', label: 'Velocity', type: 'number', min: 0, max: 40, step: 1, unit: '± %' }] });
       // SHAPE: what this note moves over its life, each a tree of modulators (▾ INTO to shape it)
       const M = MT();
       Object.keys(T).forEach(t => { const r = targetInfo(d, t, a); L.push({ id: 'T:' + t, group: 'SHAPE · WHAT IT MOVES', type: 'curve', label: r.label, sub: (M ? M.count(T[t]) : 0) + ' mods · ' + (M ? M.depthOf(T[t]) : 0) + ' deep — ▾ INTO', fields: [] }); });
@@ -223,10 +258,12 @@
         const pp = Object.assign({}, a0.p || {}); if (key === 'unsetp') delete pp[kk]; else pp[kk] = key === 'setp' ? kn.val : clamp(+v, kn.min, kn.max);
         if (Object.keys(pp).length) a0.p = pp; else delete a0.p; out.notes[i0] = a0; return out;
       }
+      if (key === 'abSet') { if (!a0) return d; out.ab = { i: i0, note: JSON.parse(JSON.stringify(a0)) }; return out; }
+      if (key === 'abSwap') { const ab = out.ab; if (!a0 || !ab || ab.i !== i0) return d; out.notes[i0] = JSON.parse(JSON.stringify(ab.note)); out.ab = { i: i0, note: JSON.parse(JSON.stringify(a0)) }; return out; }
       if (key === 'shapeAll') {
         if (!a0 || !M) return d; const sh = a0.sh ? JSON.parse(JSON.stringify(a0.sh)) : null, pp = a0.p ? Object.assign({}, a0.p) : null;
         out.notes = out.notes.map((x, j) => { if (j === i0) return x; const prevT = Object.keys((x.sh && x.sh.t) || {}); x._shPitch = prevT.includes('pitch'); x._shKnobs = {}; prevT.filter(t => t.startsWith('k:')).forEach(t => { x._shKnobs[t.slice(2)] = 1; });
-          if (sh) x.sh = JSON.parse(JSON.stringify(sh)); else delete x.sh; if (pp) x.p = Object.assign({}, x.p || {}, pp); return tidy(compile(x, out)); });
+          if (sh) x.sh = JSON.parse(JSON.stringify(sh)); else delete x.sh; if (pp) x.p = Object.assign({}, x.p || {}, pp); if (a0.x) x.x = JSON.parse(JSON.stringify(a0.x)); return tidy(compile(x, out)); });
         return out;
       }
       if (/^(add|unshape|stroke|addmod|delmod)$|^base\.|^m\.\d/.test(key)) {
@@ -275,12 +312,24 @@
       ns.forEach((x, i) => { g.fillStyle = i === (d.sel | 0) ? '#00d4ff' : 'rgba(0,212,255,0.35)'; g.fillRect(X(x.s), Y(x.n) - 3, Math.max(3, X(x.s + x.l) - X(x.s) - 1), 6); });
       if (!a) return;
       // the open note: its length across the width, its pitch curve in semitones around it (bend + oscillation), velocity as its weight
-      const y0 = top + (H - top) / 2, span = Math.max(4, ...[0, 0.25, 0.5, 0.75, 1].map(t => Math.abs(curve(a, t)))) * 1.2, k = (H - top - 30) / 2 / span;
+      // the view holds the note's curve and every chord voice above or below it
+      const cs = [0, 0.1, 0.25, 0.4, 0.5, 0.6, 0.75, 0.9, 1].map(t => curve(a, t)), ivs = [0].concat((a.x && a.x.iv) || []);
+      const vLo = Math.min(...cs) + Math.min(...ivs), vHi = Math.max(...cs) + Math.max(...ivs), pad = Math.max(2, (vHi - vLo) * 0.12), lo2 = Math.min(vLo - pad, -2), hi2 = Math.max(vHi + pad, 2);
+      const k = (H - top - 40) / (hi2 - lo2), y0 = top + 28 + hi2 * k;
       g.strokeStyle = '#1c2026'; g.beginPath(); g.moveTo(16, y0); g.lineTo(W - 16, y0); g.stroke();
       g.fillStyle = '#7f93a8'; g.font = '12px sans-serif'; g.fillText((d.drums ? 'pad ' + a.n : nameOf(a.n)) + ' · ' + a.l + ' sixteenths · velocity ' + Math.round(a.v * 127), 16, top + 18);
       g.strokeStyle = '#00d4ff'; g.lineWidth = 1 + 4 * a.v; g.beginPath();
       for (let p = 0; p <= 200; p++) { const t = p / 200, x = 16 + t * (W - 32), y = y0 - curve(a, t) * k; if (p) g.lineTo(x, y); else g.moveTo(x, y); }
       g.stroke(); g.lineWidth = 1;
+      // how it plays: the chord's voices (their own lines, as far apart as they sound), the ratchet's hits, when it plays
+      const xx = a.x || {}, strumW = xx.strum ? Math.min(0.2, xx.strum / 1000 / Math.max(0.1, a.l / 4 * 0.5)) : 0;
+      (xx.iv || []).forEach((iv, vi) => { g.strokeStyle = 'rgba(255,79,216,' + (0.75 - 0.08 * vi) + ')'; g.lineWidth = 1 + 3 * a.v * (1 - (xx.fall || 0) * (vi + 1)); g.beginPath();
+        for (let p = 0; p <= 120; p++) { const t = p / 120, x = 16 + (strumW * (vi + 1) + t * (1 - strumW * (vi + 1))) * (W - 32), y = y0 - (curve(a, t) + iv) * k; if (y < top + 24 || y > H - 6) { g.moveTo(x, Math.max(top + 24, Math.min(H - 6, y))); continue; } if (p) g.lineTo(x, y); else g.moveTo(x, y); }
+        g.stroke(); g.fillStyle = '#ff4fd8'; g.fillText((iv > 0 ? '+' : '') + iv + ' st', W - 52, Math.max(top + 30, Math.min(H - 8, y0 - (curve(a, 1) + iv) * k)) - 4); }); g.lineWidth = 1;
+      const hits = a.rt || 1; if (hits > 1) { const at = (q) => !xx.rs ? q / hits : xx.rs === 'accel' ? Math.pow(q / hits, 0.6) : 1 - Math.pow(1 - q / hits, 0.6);
+        for (let q = 0; q < hits; q++) { const vq = !xx.rv ? 1 - 0.1 * q / hits : xx.rv === 'flat' ? 1 : 0.7 + 0.3 * (q + 1) / hits; g.fillStyle = '#ffb000'; g.fillRect(16 + at(q) * (W - 32), H - 8 - 22 * vq, 3, 22 * vq); } }
+      g.fillStyle = '#7f93a8'; const when = xx.cond ? (xx.cond.skip ? 'skips' : 'plays') + ' on pass ' + (xx.cond.at + 1) + ' of every ' + xx.cond.every : '';
+      const hum = xx.ht || xx.hv ? 'humanize ± ' + (xx.ht || 0) + ' ms ± ' + Math.round((xx.hv || 0) * 100) + ' %' : ''; g.fillText([when, hum].filter(Boolean).join(' · '), W - 16 - g.measureText([when, hum].filter(Boolean).join(' · ')).width, top + 18);
     },
     // W3a the 3D viewport: each layer on its own plane (the kind draws it; the canvas places the plane)
     drawLayer(g, W, H, d, id, o) {

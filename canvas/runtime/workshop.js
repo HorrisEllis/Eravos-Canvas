@@ -59,7 +59,10 @@
 
     function field(f, big) {
       const v = K.get(d, f.key), wrap = el('label', 'ws-f' + (big ? ' big' : ''), [el('span', 'ws-fk', [], { text: f.label || f.key })]);
-      if (f.type === 'enum') { const ch = el('span', 'ws-chips'); (f.options || []).forEach(op => ch.appendChild(el('button', 'ws-chip' + (String(op) === String(v) ? ' on' : ''), [], { type: 'button', text: String(op), onclick: () => edit(f.key, typeof v === 'number' ? +op : op, f.label) }))); wrap.appendChild(ch); }
+      if (f.type === 'enum' && !big && (f.options || []).length > 8) {   // a long list in the options bar: one dropdown, not a wall of chips
+        const sel = el('select', 'ws-sel'); (f.options || []).forEach(op => { const o2 = el('option', '', [], { value: String(op), text: String(op) }); if (String(op) === String(v)) o2.selected = true; sel.appendChild(o2); });
+        sel.addEventListener('change', () => edit(f.key, typeof v === 'number' ? +sel.value : sel.value, f.label)); wrap.appendChild(sel); }
+      else if (f.type === 'enum') { const ch = el('span', 'ws-chips'); (f.options || []).forEach(op => ch.appendChild(el('button', 'ws-chip' + (String(op) === String(v) ? ' on' : ''), [], { type: 'button', text: String(op), onclick: () => edit(f.key, typeof v === 'number' ? +op : op, f.label) }))); wrap.appendChild(ch); }
       else if (f.type === 'number') { const inp = el('input', 'ws-num', [], { type: 'number', step: String(f.step || 1), value: String(v) }); if (f.min !== undefined) inp.min = f.min; if (f.max !== undefined) inp.max = f.max;
         inp.addEventListener('change', () => { let x = +inp.value; if (!isFinite(x)) return; if (f.min !== undefined) x = Math.max(f.min, x); if (f.max !== undefined) x = Math.min(f.max, x); edit(f.key, x, f.label); });
         wrap.appendChild(inp); if (f.unit) wrap.appendChild(el('span', 'ws-unit', [], { text: f.unit })); }
