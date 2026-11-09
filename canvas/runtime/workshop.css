@@ -101,3 +101,7 @@ html.ws-open .cm-item { font: inherit !important; text-transform: uppercase; let
 .ws-lt { color: var(--wt) !important; font-size: 14px !important; }
 .ws-f.big { grid-template-columns: 80px 1fr auto; gap: 8px; } .ws-f.big .ws-unit { white-space: nowrap; }
 .ws-kl .ws-kv span { color: var(--wt); }
+/* W3f the options bar's picker (the kind's: e.g. which instrument plays) */
+.ws-pkl { font: 400 11px var(--wdisp); letter-spacing: .26em; color: var(--wt3); }
+.ws-picker { min-width: 220px; color: var(--wc); border-color: rgba(0,212,255,.35); }
+.ws-f.big .ws-sel { width: 100%; }

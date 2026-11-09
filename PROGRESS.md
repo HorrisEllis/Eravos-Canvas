@@ -2,6 +2,14 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Built, shown, not merged yet — 3.159 The Workshop's layout (W3e) and navigation, instrument, speed, note library (W3f) (2026-11-09)
+His words: see specs/eravos.workshop.spec ADDENDA 2026-11-09 (3) and (4). PR #152 waits for his OK (a visual change).
+- W3e: no buttons up top; PROPERTIES over Photoshop-style LAYERS (eyes, thumbnails, folding groups, layer tools in the footer); V B O; keys
+  for every action (?); right-click menus with keys. W3f: the navigator (a mini piano roll; click, [ ], N folds); dropdowns for long choices;
+  PLAYS (any instrument, a new one added, the lane follows, undo); per-note Speed (the tool's tempo for that note — sdk-music); the Note Library
+  (Ctrl+S, From the library, Patterns › Notes tab).
+- Proof: tests/p159 1/1, p160 4/4; P150 … P158, Timeline 89/89, P149, P123, P76, boundary green; components; design check no worse.
+
 ## Done — 3.158 How a note plays: when, a chord, the ratchet's shape, humanize, A / B (W3d) (2026-11-09)
 His words: "Yes the rest of the note shaping. Enterprise grade. Studio quality." · "Decouple. Pretend I didn’t say it · Delete that." — the decouple map and its entries removed.
 - timeline.engine.js: note.x (cleaned; absent = exactly as before) — cond (pass k of every N, plays or skips), iv (a chord from the one note:

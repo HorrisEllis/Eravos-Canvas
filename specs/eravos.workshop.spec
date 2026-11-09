@@ -243,3 +243,28 @@ W3e  the bar          the name and the path only (click a station to go up) — 
                       only ('layer' | 'view'); a choice with > 8 options in the options bar is a dropdown (W3d) — the bar no longer holds fields
      proof            tests/p159 1/1; P150 (its field edit now in PROPERTIES), P151, P154, P156, P157, P158, P110, boundary green
      previews         docs/previews/workshop-layers-layout.png · workshop-layer-menu.png · workshop-keys.png
+
+## ADDENDUM 2026-11-09 (4) — W3f: navigate, the instrument, a note's speed, the note library (his words; nothing above is changed)
+# James, 2026-11-09: "I’m glad you got rid of the redundant ass second section for fucking changing the chords. The top half of the canvas should be able to collapse. Unless you can select the other notes, or actually maybe make that like a mini piano roll preview so you can edit one at a time and not have to hit save and then edit again and then write like I’m just saying make it like a way to navigate. OK now the mod section drop down menus not 1 million buttons. … the top left one isn’t even doing anything practical, replace it with a drop-down menu to change to tool."
+# Asked which tool the dropdown changes: "Any tool the piano roll can play. Also a note library, inside of the patterns library. Have 2 tabs. One for notes, the other for patterns. Agnostic note. Also the tempo and speed it plays. Like have the tool speed up for a single note. Way more depth."
+W3f  NAVIGATOR      the top of the view is the pattern as a mini piano roll (keys, bars and beats, every note, the open one lit, shaped notes
+                    marked); a click opens a note — nothing to save, nothing to reopen; [ and ] step through the notes; N (or ▴ fold) folds
+                    it to a strip and gives the shaping view the room (kept while ERAVOS runs)
+     DROPDOWNS      a choice with more than 3 options is one dropdown in PROPERTIES (the wave, the chord, speed …); on / off stays two
+     PICKER         the options bar's top left (it repeated the selected layer) is now PLAYS: a dropdown of every tool the roll can play —
+                    those on the canvas and every instrument that can be added (a new one is made); the lane follows, and undo puts the
+                    lane back (the document carries the target; the roll keeps the lane in step on every change); the knobs to shape follow
+     SPEED          note.x.tempo (¼ … 4 ×): the Timeline sends it with the note; the music SDK gives the TOOL that speed for that note only
+                    (ctx.bpm × it while the note owns it — synced LFOs, arps, gates, anything reading the tool's tempo), then its own again;
+                    the same ownership as per-note settings (sdk-music noteTempo; note schema `tempo`)
+     NOTE LIBRARY   tools/music/data/note-library.js (window.NoteLibrary): a saved note = how a note moves and plays (sh, b, c, p, x,
+                    chance, ratchet, nudge, velocity) without its place or pitch — agnostic: it fits any note of any tool; knob parts
+                    come along only where the instrument has the knob, the rest is said (LIBRARY in the status bar). Ctrl+S saves the open
+                    note; PROPERTIES › From the library puts one on it; Shift+L opens Patterns › Notes. The Patterns library has two
+                    tabs: PATTERNS (as before) · NOTES (each saved note drawn, Apply → the note open in the Workshop, rename, delete)
+     dag            note.x.tempo ─→ playNotes ─→ note:trigger.tempo ─→ sdk noteTempo ─→ ctx.bpm (bpmFns) ─→ the tool's synced parts
+                    Workshop ─Ctrl+S→ NoteLibrary ─→ Patterns › Notes ─Apply→ Workshop.set('libApply') ─→ clip_edit
+     proof          tests/p160 4/4 (a navigator click opens G4, [ ], N folds; dropdowns; the picker adds an instrument, the lane follows, undo;
+                    the trigger carries ×2 and the tool runs at ×2 bpm for the note, then its own; save, fit another note, what is left out,
+                    the Notes tab applies); P154 … P159, Timeline 89/89, boundary green
+     previews       docs/previews/workshop-navigator.png · workshop-note-navigator.png · patterns-notes-tab.png

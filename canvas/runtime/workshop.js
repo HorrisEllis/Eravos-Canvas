@@ -9,6 +9,8 @@
  *   Workshop.check(kind) → [] or the problems, in words · Workshop.addKind(kind) → { ok, problems } · Workshop.kinds()
  *   Workshop.open(kindId, doc, { onChange(doc), onApply(doc), onClose(), title }) → { doc(), set(key, v), select(layerId), undo(), redo(),
  *     history(), close(), el } · Workshop.current
+ * W3f picker(doc) → { label, key, value, options: [{ value, label } | { group, options }] } (a dropdown first in the options bar; a change is
+ *   edit(key, value)); pick may return { run } (a click that changes the view, not the document — no history).
  * W3e the layout: the bar = the path only; options bar = the view; tools V B O; PROPERTIES (the one place a value is edited) · HISTORY ·
  *   OUTLINER over LAYERS (eye, thumbnail, name, folding groups, footer tools = actions with `icon`); keys (an action's `keys`, e.g. 'Space',
  *   'Mod+Enter', 'Shift+A'; `open: true` = what Enter / a double-click does) and right-click menus (an action's `only`: 'layer' | 'view').
@@ -63,7 +65,7 @@
 
     function field(f, big) {
       const v = K.get(d, f.key), wrap = el('label', 'ws-f' + (big ? ' big' : ''), [el('span', 'ws-fk', [], { text: f.label || f.key })]);
-      if (f.type === 'enum' && !big && (f.options || []).length > 8) {   // a long list in the options bar: one dropdown, not a wall of chips
+      if (f.type === 'enum' && (f.options || []).length > (big ? 3 : 8)) {   // more than a few choices: one dropdown, not a wall of buttons
         const sel = el('select', 'ws-sel'); (f.options || []).forEach(op => { const o2 = el('option', '', [], { value: String(op), text: String(op) }); if (String(op) === String(v)) o2.selected = true; sel.appendChild(o2); });
         sel.addEventListener('change', () => edit(f.key, typeof v === 'number' ? +sel.value : sel.value, f.label)); wrap.appendChild(sel); }
       else if (f.type === 'enum') { const ch = el('span', 'ws-chips'); (f.options || []).forEach(op => ch.appendChild(el('button', 'ws-chip' + (String(op) === String(v) ? ' on' : ''), [], { type: 'button', text: String(op), onclick: () => edit(f.key, typeof v === 'number' ? +op : op, f.label) }))); wrap.appendChild(ch); }
@@ -141,7 +143,7 @@
     // over LAYERS (eye, thumbnail, name; groups that fold; the layer tools in its footer). Everything else: keys and right-click menus.
     const KEYS = (k) => String(k || '').replace('Mod+', /Mac/.test(global.navigator && global.navigator.platform || '') ? '⌘' : 'Ctrl+');
     function acts() { return (K.actions ? K.actions(d, { selected }) : []).filter(Boolean); }
-    function runAct(a) { if (!a || a.disabled) return false; if (a.key !== undefined) { edit(a.key, a.value, a.label); return true; } let said = null; try { said = a.run(clone(d)); } catch (e) { said = 'failed: ' + e.message; console.error(e); } if (said) { note = String(said); render(); } return true; }
+    function runAct(a) { if (!a || a.disabled) return false; if (a.key !== undefined) { edit(a.key, a.value, a.label); return true; } let said = null; try { said = a.run(clone(d)); } catch (e) { said = 'failed: ' + e.message; console.error(e); } if (said) note = String(said); render(); return true; }
     const viewItems = () => !K.drawLayer ? [] : [{ section: 'VIEW' },
       { label: mode === '3d' ? '2D view' : '3D view', keys: mode === '3d' ? '2' : '3', run: () => { mode = mode === '3d' ? '2d' : '3d'; chips(); draw(); } },
       { label: 'Look from the top', keys: 'T', run: () => setCam('top') }, { label: 'Look from the front', keys: 'F', run: () => setCam('front') },
@@ -172,7 +174,13 @@
         el('span', 'ws-stations', (K.stations ? K.stations(d) : [K.label]).map((s, i, a) => el('span', 'ws-st' + (i === a.length - 1 ? ' on' : '') + (K.stationKey && i < a.length - 1 ? ' go' : ''), [el('i', '', [], { text: String(i + 1).padStart(2, '0') }), String(s)],
           K.stationKey && i < a.length - 1 ? { title: 'go up to ' + s + ' (Backspace: one level up)', onclick: () => edit(K.stationKey, i, 'GO TO ' + s) } : {}))));
       // the options bar: what the current tool works on, and the view
-      opts.replaceChildren(el('span', 'ws-tool', [], { text: (TOOLS.find(t => t[0] === tool) || [])[0] ? tool.toUpperCase() + (sel ? ' · ' + sel.label : '') : '' }), el('span', 'ws-vs'), vph);
+      // the options bar: the kind's picker (what the document plays on, its owner's choice — e.g. an instrument), then the view. Nothing that
+      // the panels already say (the selected layer is PROPERTIES' to show).
+      const pk = K.picker ? K.picker(d) : null;
+      opts.replaceChildren(...(pk ? [el('span', 'ws-pkl', [], { text: pk.label }), (() => { const sl = el('select', 'ws-sel ws-picker', [], { title: pk.hint || pk.label });
+        (pk.options || []).forEach(op => { if (op.group) { const og = el('optgroup', '', [], {}); og.label = op.group; (op.options || []).forEach(o2 => { const oe = el('option', '', [], { value: String(o2.value), text: o2.label }); if (String(o2.value) === String(pk.value)) oe.selected = true; og.appendChild(oe); }); sl.appendChild(og); }
+          else { const oe = el('option', '', [], { value: String(op.value), text: op.label }); if (String(op.value) === String(pk.value)) oe.selected = true; sl.appendChild(oe); } });
+        sl.addEventListener('change', () => edit(pk.key, sl.value, pk.label)); sl.addEventListener('keydown', (e) => e.stopPropagation()); return sl; })(), el('span', 'ws-vs')] : []), vph);
       // the tool strip: the canvas's tools, then the kind's
       strip.replaceChildren(...TOOLS.map(([id, key, glyph, hint]) => el('button', 'ws-ti' + (tool === id ? ' on' : ''), [], { type: 'button', title: hint + ' (' + key + ')', text: glyph, onclick: () => { tool = id; if (id === 'orbit' && K.drawLayer) mode = '3d'; render(); } })),
         ...(K.tools || []).map(t => el('button', 'ws-ti' + (t.layer && t.layer === selected ? ' on' : ''), [], { type: 'button', title: t.label, text: t.glyph || t.label.slice(0, 1), onclick: () => { if (t.layer) { selected = t.layer; render(); } } })));
@@ -242,7 +250,7 @@
       const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
       if (e.button === 2) return;
       if ((mode === '3d' && K.drawLayer) || tool === 'orbit') { if (K.drawLayer && mode !== '3d') { mode = '3d'; chips(); } orbit = { x: e.clientX, y: e.clientY, yaw: cam.yaw, pitch: cam.pitch }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} return; }
-      const p = K.pick ? K.pick(d, x, y, r.width, r.height, { selected }) : null; if (p && p.key !== undefined) return edit(p.key, p.value, p.label);
+      const p = K.pick ? K.pick(d, x, y, r.width, r.height, { selected }) : null; if (p && p.run) { try { p.run(); } catch (er) { console.error(er); } render(); return; } if (p && p.key !== undefined) return edit(p.key, p.value, p.label);
       if (K.stroke && tool === 'draw') { stroke = { pts: [[x, y]] }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} }
     });
     cv.addEventListener('pointermove', (e) => {

@@ -25,6 +25,7 @@
   const CHORDS = { none: [], 'octave up': [12], 'octave down': [-12], fifth: [7], 'power (5 + 8)': [7, 12], major: [4, 7], minor: [3, 7], sus2: [2, 7], sus4: [5, 7],
     dim: [3, 6], aug: [4, 8], '7th': [4, 7, 10], maj7: [4, 7, 11], min7: [3, 7, 10], add9: [4, 7, 14], 'minor 9': [3, 7, 10, 14], 'stack of 4ths': [5, 10, 15] };
   const chordName = (iv) => { const k = JSON.stringify(iv || []); return Object.keys(CHORDS).find(n => JSON.stringify(CHORDS[n]) === k) || (iv && iv.length ? 'custom' : 'none'); };
+  const SPEEDS = { '¼ ×': 0.25, '½ ×': 0.5, '¾ ×': 0.75, 'as the song': null, '1½ ×': 1.5, '2 ×': 2, '3 ×': 3, '4 ×': 4 };
   const RS = { even: null, 'speeds up': 'accel', 'slows down': 'decel' }, RV = { fades: null, flat: 'flat', grows: 'grow' }, DIRS = { up: null, down: 'down', 'from the root out': 'out' };
   const xOf = (a) => Object.assign({}, a.x || {}), putX = (a, o) => { Object.keys(o).forEach(k => { if (o[k] === null || o[k] === undefined || o[k] === 0 || o[k] === '') delete o[k]; }); if (o.cond && !(o.cond.every > 1)) delete o.cond; if (!o.iv || !o.iv.length) { delete o.iv; delete o.strum; delete o.dir; delete o.fall; } if (Object.keys(o).length) a.x = o; else delete a.x; };
   const keyOfVal = (m, v) => Object.keys(m).find(k => m[k] === (v || null)) || Object.keys(m)[0];
@@ -38,6 +39,7 @@
     'x.fall': [(a) => Math.round(((a.x && a.x.fall) || 0) * 100), (a, v) => { const o = xOf(a); o.fall = clamp(v, 0, 50) / 100; putX(a, o); }],
     'x.rs': [(a) => keyOfVal(RS, a.x && a.x.rs), (a, v) => { const o = xOf(a); o.rs = RS[v] || null; putX(a, o); }],
     'x.rv': [(a) => keyOfVal(RV, a.x && a.x.rv), (a, v) => { const o = xOf(a); o.rv = RV[v] || null; putX(a, o); }],
+    'x.tempo': [(a) => keyOfVal(SPEEDS, a.x && a.x.tempo), (a, v) => { const o = xOf(a); o.tempo = SPEEDS[v] || null; putX(a, o); }],
     'x.ht': [(a) => (a.x && a.x.ht) || 0, (a, v) => { const o = xOf(a); o.ht = Math.round(clamp(v, 0, 60)); putX(a, o); }],
     'x.hv': [(a) => Math.round(((a.x && a.x.hv) || 0) * 100), (a, v) => { const o = xOf(a); o.hv = clamp(v, 0, 40) / 100; putX(a, o); }],
   });
@@ -47,6 +49,11 @@
 
   // the pitch over the note, in semitones from its own pitch: the bend curve, plus the oscillation around it (what the roll's engine plays)
   function curve(a, t) {
+    if (a.b && a.b.shape === 'path' && a.b.path && global.MusicParts && global.MusicParts.pathAt) {   // a drawn or shaped pitch: its path, then its oscillation
+      let st = global.MusicParts.pathAt(a.b.path, t); const o = a.b.osc;
+      if (o && o.depth > 0) { const cyc = typeof o.rate === 'number' ? o.rate * 2 : 8, ph = t * cyc, f = o.fade ? Math.min(1, t / o.fade) : 1; st += Math.sin(ph * 2 * Math.PI) * o.depth * f; }
+      return st;
+    }
     const b = Object.assign({}, BEND0, a.b), u = t <= b.at ? 0 : (t - b.at) / Math.max(1e-6, 1 - b.at);
     const e = b.shape === 'linear' ? u : b.shape === 'early' ? 1 - Math.pow(1 - u, 3) : b.shape === 'late' ? u * u * u : u * u * (3 - 2 * u);
     let st = b.from + (b.to - b.from) * e; const o = b.osc;
@@ -141,6 +148,47 @@
     return L;
   }
   function shapeAt(d) { return d.at && d.at.t ? d.at : null; }
+  // ---- W3f THE NAVIGATOR (his words, 2026-11-09: "The top half of the canvas should be able to collapse … make that like a mini piano roll
+  // preview so you can edit one at a time … make it like a way to navigate"): the pattern as a small piano roll — keys, bars and beats, every
+  // note; a click opens a note (no save, no reopen), [ and ] step through them, N folds it to a strip
+  let NAV_OPEN = true;   // folded or open: kept while ERAVOS runs (a tool keeps no browser storage — the boundary test)
+  const navToggle = () => { NAV_OPEN = !NAV_OPEN; };
+  const navTop = (H) => NAV_OPEN ? Math.max(110, Math.round(H * 0.3)) : 30;
+  const NAV_KW = 34;
+  function navGeom(d, W, top) {
+    const ns = d.notes || [], end = Math.max(16, Math.ceil(Math.max(16, ...ns.map(x => x.s + x.l)) / 16) * 16);
+    let lo = Math.min(...ns.map(x => x.n)), hi = Math.max(...ns.map(x => x.n)); if (!isFinite(lo)) { lo = 60; hi = 72; }
+    const mid = (lo + hi) / 2, span = Math.max(12, hi - lo + 4); lo = Math.floor(mid - span / 2); hi = lo + span;
+    const x0 = NAV_KW + 4, w = W - x0 - 8, y0 = 22, h = Math.max(8, top - y0 - 6), rh = h / (hi - lo + 1);
+    return { ns, end, lo, hi, x0, w, y0, h, rh, X: (st) => x0 + st / end * w, Y: (n) => y0 + (hi - n) * rh };
+  }
+  function drawNav(g, W, top, d) {
+    const G = navGeom(d, W, top), sel = d.sel | 0, black = (n) => [1, 3, 6, 8, 10].includes(((n % 12) + 12) % 12);
+    g.fillStyle = '#06090e'; g.fillRect(0, 0, W, top);
+    g.fillStyle = '#5a7a96'; g.font = '10px monospace'; g.fillText('NOTES · ' + G.ns.length + (d.drums ? ' · PADS' : '') + '   click one to open it · [ ] step', 10, 14);
+    g.textAlign = 'right'; g.fillStyle = '#7fdcff'; g.fillText((NAV_OPEN ? '▴ fold' : '▾ open') + ' (N)', W - 10, 14); g.textAlign = 'left';
+    if (!NAV_OPEN) { G.ns.forEach((x, i) => { g.fillStyle = i === sel ? '#00d4ff' : 'rgba(0,212,255,0.4)'; g.fillRect(G.X(x.s), 20, Math.max(2, G.X(x.s + x.l) - G.X(x.s) - 1), 5); });
+      g.strokeStyle = '#16243a'; g.beginPath(); g.moveTo(0, top - 0.5); g.lineTo(W, top - 0.5); g.stroke(); return; }
+    // the keys and their rows
+    for (let n = G.lo; n <= G.hi; n++) { const y = G.Y(n); g.fillStyle = black(n) ? '#090d14' : '#0b1018'; g.fillRect(G.x0, y, G.w, G.rh); g.fillStyle = black(n) ? '#1a2230' : '#c8d4de'; g.fillRect(4, y + 0.5, NAV_KW - 6, Math.max(1, G.rh - 1));
+      if (!d.drums && ((n % 12) + 12) % 12 === 0 && G.rh >= 6) { g.fillStyle = '#5a7a96'; g.font = Math.min(9, G.rh) + 'px monospace'; g.fillText('C' + (Math.floor(n / 12) - 1), NAV_KW + 6, y + G.rh - 1); } }
+    // bars and beats
+    for (let st = 0; st <= G.end; st += 4) { g.strokeStyle = st % 16 === 0 ? '#1e3050' : '#111a28'; g.beginPath(); g.moveTo(G.X(st) + 0.5, G.y0); g.lineTo(G.X(st) + 0.5, G.y0 + G.h); g.stroke(); }
+    // the notes
+    G.ns.forEach((x, i) => { const on = i === sel, xx = G.X(x.s), ww = Math.max(3, G.X(x.s + x.l) - xx - 1), yy = G.Y(x.n), hh = Math.max(3, G.rh - 1);
+      g.shadowColor = '#00d4ff'; g.shadowBlur = on ? 10 : 0; g.fillStyle = on ? '#00d4ff' : 'rgba(0,212,255,' + (0.3 + 0.4 * x.v) + ')'; g.fillRect(xx, yy, ww, hh); g.shadowBlur = 0;
+      if (x.sh || x.x || x.b || x.c) { g.fillStyle = on ? '#06090e' : '#ff4fd8'; g.fillRect(xx + 1, yy + 1, 3, Math.max(2, hh - 2)); }
+      if (on) { g.strokeStyle = '#e8fbff'; g.lineWidth = 1; g.strokeRect(xx + 0.5, yy + 0.5, ww - 1, hh - 1); }
+      if (ww > 34 && hh >= 9) { g.fillStyle = on ? '#031018' : '#cfefff'; g.font = '9px monospace'; g.fillText(d.drums ? 'pad ' + x.n : nameOf(x.n), xx + 6, yy + hh - 2); } });
+    g.strokeStyle = '#16243a'; g.beginPath(); g.moveTo(0, top - 0.5); g.lineTo(W, top - 0.5); g.stroke();
+  }
+  function pickNav(d, x, y, W, H) {
+    const top = navTop(H); if (y > top) return null;
+    if (y < 20 && x > W - 120) return { run: navToggle };
+    const G = navGeom(d, W, top), st = (x - G.x0) / G.w * G.end, n = NAV_OPEN ? G.hi - Math.floor((y - G.y0) / G.rh) : null;
+    let best = -1, bd = 1e9; G.ns.forEach((q, i) => { const dx = st < q.s ? q.s - st : st > q.s + q.l ? st - q.s - q.l : 0, dy = n === null ? 0 : Math.abs(q.n - n) * 0.6; if (dx + dy < bd) { bd = dx + dy; best = i; } });
+    return best >= 0 && best !== (d.sel | 0) ? { key: 'sel', value: best + 1, label: 'Open note' } : null;
+  }
   let HOOK = {};   // the opener's: { hear(note) } — the roll plays a note through its lane's instrument, curves and all
   const bind = (h) => { HOOK = h || {}; };
   // the view's range for the open curve: its whole range for a target's base; for a mod's rate / depth, what it holds (with room)
@@ -151,11 +199,8 @@
     return { lo: Math.max(r.lo, Math.min(0, mn)), hi: Math.max(mx * 1.3, r.lo + (r.hi - r.lo) * 0.1, 1e-3), unit: r.unit };
   }
   function drawShape(g, W, H, d, a, top, o) {
-    const ns = d.notes || [], at = d.at, end = Math.max(16, ...ns.map(x => x.s + x.l)), lo = Math.min(...ns.map(x => x.n)) - 1, hi = Math.max(...ns.map(x => x.n)) + 1;
-    g.fillStyle = '#0a0b0d'; g.fillRect(0, 0, W, H);
-    const X = (s) => 10 + (s / end) * (W - 20), Y = (n) => 44 + (1 - (n - lo) / Math.max(1, hi - lo)) * (top - 56);
-    ns.forEach((x, i) => { g.fillStyle = i === (d.sel | 0) ? '#00d4ff' : 'rgba(0,212,255,0.35)'; g.fillRect(X(x.s), Y(x.n) - 3, Math.max(3, X(x.s + x.l) - X(x.s) - 1), 6); });
-    g.strokeStyle = '#1c2026'; g.beginPath(); g.moveTo(0, top); g.lineTo(W, top); g.stroke();
+    const at = d.at;
+    g.fillStyle = '#0a0b0d'; g.fillRect(0, 0, W, H); drawNav(g, W, top, d);
     const sig = signalAt(a, at), r = viewRange(d, at, a), y0 = top + 26, h = H - y0 - 14, x0 = 16, w = W - 32, sel = o.selected || '';
     g.fillStyle = '#7f93a8'; g.font = '12px sans-serif'; g.fillText(atLabel(d, at, a).toUpperCase() + ' · over the note (' + a.l + ' sixteenths) · draw in here', x0, top + 17);
     // the grid: the range's ends and its middle, in its units
@@ -183,6 +228,13 @@
     actions(d, o) {
       const a = noteOf(d), at = shapeAt(d), sel = (o && o.selected) || '', M = MT(); if (!a) return [];
       const into = /^(T:.+|m:\d+:(rate|depth))$/.test(sel), out = [];
+      out.push({ label: 'SAVE NOTE', name: 'Save to the note library', keys: 'Mod+S', hint: 'keep this note — how it moves and plays — in the note library (Patterns › Notes); it fits any note of any tool', disabled: !global.NoteLibrary,
+        run: (doc) => { const x0 = noteOf(doc); const nm = (doc.drums ? 'pad ' + x0.n : nameOf(x0.n)) + ' · ' + (global.NoteLibrary.describe({ note: x0 }) || 'note'); global.NoteLibrary.save(x0, nm, { tool: HOOK.label ? HOOK.label(doc.target) : '' }); return 'saved “' + nm + '” to the note library'; } });
+      out.push({ label: 'LIBRARY', name: 'Open the note library', keys: 'Shift+L', hint: 'Patterns › Notes', disabled: !global.PatternLibrary, run: () => { global.PatternLibrary.open({ tab: 'notes' }); return ''; } });
+      const N = (d.notes || []).length, si = d.sel | 0;
+      out.push({ label: '◂ NOTE', name: 'Previous note', keys: '[', key: 'sel', value: Math.max(1, si), disabled: si <= 0 });
+      out.push({ label: 'NOTE ▸', name: 'Next note', keys: ']', key: 'sel', value: Math.min(N, si + 2), disabled: si >= N - 1 });
+      out.push({ label: 'NAVIGATOR', name: NAV_OPEN ? 'Fold the notes navigator' : 'Open the notes navigator', keys: 'N', only: 'view', run: () => { navToggle(); return ''; } });
       out.push({ label: '▶ HEAR', name: "Hear it", keys: 'Space', hint: 'play this note alone, shaped (its instrument, its curves, its knobs)', disabled: !HOOK.hear, run: (doc) => { const x = noteOf(doc); if (x && HOOK.hear) HOOK.hear(x); return 'heard ' + (doc.drums ? 'pad ' + x.n : nameOf(x.n)); } });
       // A / B: keep this version as A, change it, then hear and swap — the studio's before / after
       const ab = d.ab && d.ab.i === (d.sel | 0) ? d.ab : null;
@@ -222,6 +274,8 @@
         { key: 'x.dir', label: 'Strum from', type: 'enum', options: Object.keys(DIRS) }, { key: 'x.fall', label: 'Each voice softer', type: 'number', min: 0, max: 50, step: 1, unit: '%' }] });
       if ((a.rt || 1) > 1) L.push({ id: 'repeat', group: 'HOW IT PLAYS', type: 'value', label: 'Ratchet shape', sub: '×' + a.rt + ' · ' + keyOfVal(RS, x.rs) + ' · ' + keyOfVal(RV, x.rv), fields: [
         { key: 'x.rs', label: 'Hits', type: 'enum', options: Object.keys(RS) }, { key: 'x.rv', label: 'Velocity', type: 'enum', options: Object.keys(RV) }] });
+      L.push({ id: 'speed', group: 'HOW IT PLAYS', type: 'value', label: 'Speed', sub: x.tempo ? x.tempo + ' × — the tool runs ' + (x.tempo > 1 ? 'faster' : 'slower') + ' for this note (its synced LFOs, arps, gates …)' : 'as the song', fields: [
+        { key: 'x.tempo', label: 'Its tool runs', type: 'enum', options: Object.keys(SPEEDS) }] });
       L.push({ id: 'human', group: 'HOW IT PLAYS', type: 'value', label: 'Humanize', sub: x.ht || x.hv ? '± ' + (x.ht || 0) + ' ms · ± ' + Math.round((x.hv || 0) * 100) + ' % velocity, new each pass' : 'exact', fields: [
         { key: 'x.ht', label: 'Timing', type: 'number', min: 0, max: 60, step: 1, unit: '± ms' }, { key: 'x.hv', label: 'Velocity', type: 'number', min: 0, max: 40, step: 1, unit: '± %' }] });
       // SHAPE: what this note moves over its life, each a tree of modulators (▾ INTO to shape it)
@@ -231,6 +285,8 @@
       Object.keys(a.p || {}).forEach(k => { const kn = knobOf(d, k); if (!kn) return; L.push({ id: 'P:' + k, group: 'ITS KNOBS · THIS NOTE ONLY', type: 'value', label: kn.label, sub: a.p[k] + (kn.unit ? ' ' + kn.unit : '') + ' (the instrument: ' + kn.val + ')', fields: [{ key: 'p.' + k, label: kn.label, type: 'number', min: kn.min, max: kn.max, step: (kn.max - kn.min) / 200 || 0.01, unit: kn.unit }] }); });
       const freeK = (d.knobs || []).filter(k => !(a.p && a.p[k.key] !== undefined));
       if (freeK.length) L.push({ id: 'setknob', group: 'ITS KNOBS · THIS NOTE ONLY', type: 'value', label: '＋ Set a knob for this note', sub: 'only this note plays with it', fields: [{ key: 'setp', label: 'Knob', type: 'enum', options: freeK.map(k => k.label) }] });
+      const NL = global.NoteLibrary, saved = NL ? NL.all() : [];
+      L.push({ id: 'library', group: 'NOTE LIBRARY', type: 'value', label: 'From the library', sub: saved.length ? saved.length + ' saved notes — pick one to put it on this note (Ctrl+S saves this one)' : 'none yet — Ctrl+S saves this note', fields: saved.length ? [{ key: 'libApply', label: 'Put on', type: 'enum', options: ['—'].concat(saved.map(sv => sv.name)) }] : [] });
       const can = (d.drums ? [] : ['Pitch']).filter(() => !T.pitch).concat((d.knobs || []).filter(k => !T['k:' + k.key]).map(k => k.label));
       if (M && can.length) L.push({ id: 'addshape', group: 'SHAPE · WHAT IT MOVES', type: 'value', label: '＋ Shape something', sub: 'pitch or any knob of ' + (d.knobs && d.knobs.length ? 'its instrument' : 'the note'), fields: [{ key: 'add', label: 'Shape', type: 'enum', options: can }] });
       return L;
@@ -238,6 +294,7 @@
     get(d, key) {
       const at = shapeAt(d), a0 = noteOf(d);
       if (key === 'add' || key === 'setp') return '';
+      if (key === 'libApply') return '—';
       if (/^p\./.test(key) && a0) return a0.p ? a0.p[key.slice(2)] : undefined;
       if (at && a0) { const sig = signalAt(a0, at) || {}, M = MT();
         if (key === 'base.preset') return (sig.pre && sig.pre.shape) || '';
@@ -258,6 +315,15 @@
         if (!a0) return d; const kk = key === 'setp' ? ((out.knobs || []).find(q => q.label === v) || {}).key : key === 'unsetp' ? v : key.slice(2), kn = knobOf(out, kk); if (!kn) return d;
         const pp = Object.assign({}, a0.p || {}); if (key === 'unsetp') delete pp[kk]; else pp[kk] = key === 'setp' ? kn.val : clamp(+v, kn.min, kn.max);
         if (Object.keys(pp).length) a0.p = pp; else delete a0.p; out.notes[i0] = a0; return out;
+      }
+      if (key === 'instrument') {
+        let id = String(v || ''); if (!id) return d;
+        if (id.startsWith('new:')) { id = HOOK.spawn ? HOOK.spawn(id.slice(4)) : null; if (!id) return d; }
+        out.target = id; out.knobs = HOOK.knobsOf ? HOOK.knobsOf(id) : out.knobs; return out;
+      }
+      if (key === 'libApply') {
+        const NL = global.NoteLibrary; if (!a0 || !NL || v === '—') return d; const sv = NL.get(v) || NL.all().find(x => x.name === v); if (!sv) return d;
+        const r = NL.applyTo(a0, sv, (out.knobs || []).map(k => k.key)); out.notes[i0] = tidy(r.note); out.libNote = r.dropped.length ? 'left out (this instrument has no ' + r.dropped.join(', ') + ')' : ''; return out;
       }
       if (key === 'abSet') { if (!a0) return d; out.ab = { i: i0, note: JSON.parse(JSON.stringify(a0)) }; return out; }
       if (key === 'abSwap') { const ab = out.ab; if (!a0 || !ab || ab.i !== i0) return d; out.notes[i0] = JSON.parse(JSON.stringify(ab.note)); out.ab = { i: i0, note: JSON.parse(JSON.stringify(a0)) }; return out; }
@@ -300,17 +366,14 @@
       f[1](a, v); out.notes[i] = tidy(a); return out;
     },
     outline(d) { return [[0, 'SONG'], [1, 'PATTERN · ' + (d.name || 'clip'), 'pattern']].concat((d.notes || []).map((a, i) => [2, (i === (d.sel | 0) ? '▸ ' : '') + (d.drums ? 'pad ' + a.n : nameOf(a.n)) + ' @ ' + a.s, i === (d.sel | 0) ? 'timing' : null])); },
-    status(d) { const a = noteOf(d); return [['NOTES', (d.notes || []).length]].concat(a ? [['OPEN', d.drums ? 'pad ' + a.n : nameOf(a.n)], ['VEL', Math.round(a.v * 127)]] : []); },
+    status(d) { const a = noteOf(d); return (d.libNote ? [['LIBRARY', d.libNote]] : []).concat([['NOTES', (d.notes || []).length]]).concat(a ? [['OPEN', d.drums ? 'pad ' + a.n : nameOf(a.n)], ['VEL', Math.round(a.v * 127)]] : []); },
     // the view: the pattern along the top (pattern scale: click a note to open it), the open note large below (note scale: its pitch curve)
     draw(g, W, H, d, o) {
-      const ns = d.notes || [], a = noteOf(d), top = Math.round(H * 0.32);
+      const ns = d.notes || [], a = noteOf(d), top = navTop(H);
       if (shapeAt(d) && a) return drawShape(g, W, H, d, a, top, o || {});
       g.fillStyle = '#0a0b0d'; g.fillRect(0, 0, W, H);
       if (!ns.length) { g.fillStyle = '#7f93a8'; g.font = '13px sans-serif'; g.fillText('No notes in this clip', 16, 24); return; }
-      const end = Math.max(16, ...ns.map(x => x.s + x.l)), lo = Math.min(...ns.map(x => x.n)) - 1, hi = Math.max(...ns.map(x => x.n)) + 1;
-      const X = (s) => 10 + (s / end) * (W - 20), Y = (n) => 44 + (1 - (n - lo) / Math.max(1, hi - lo)) * (top - 56);
-      g.strokeStyle = '#1c2026'; g.beginPath(); g.moveTo(0, top); g.lineTo(W, top); g.stroke();
-      ns.forEach((x, i) => { g.fillStyle = i === (d.sel | 0) ? '#00d4ff' : 'rgba(0,212,255,0.35)'; g.fillRect(X(x.s), Y(x.n) - 3, Math.max(3, X(x.s + x.l) - X(x.s) - 1), 6); });
+      drawNav(g, W, top, d);
       if (!a) return;
       // the open note: its length across the width, its pitch curve in semitones around it (bend + oscillation), velocity as its weight
       // the view holds the note's curve and every chord voice above or below it
@@ -354,7 +417,7 @@
     // a drag in the view draws: the open curve's base, or — a drawn modulator selected — its wave (one cycle)
     stroke(d, pts, W, H, o) {
       const a = noteOf(d), at = shapeAt(d); if (!a || !at || pts.length < 2) return null;
-      const top = Math.round(H * 0.32), y0 = top + 26, h = H - y0 - 14, sel = (o && o.selected) || '', mi = /^m:(\d+)$/.exec(sel), sig = signalAt(a, at);
+      const top = navTop(H), y0 = top + 26, h = H - y0 - 14, sel = (o && o.selected) || '', mi = /^m:(\d+)$/.exec(sel), sig = signalAt(a, at);
       const mod = mi && sig && sig.mods[+mi[1]];
       const xs = pts.map(([x, y]) => [clamp((x - 16) / Math.max(1, W - 32), 0, 1), clamp(1 - (y - y0) / Math.max(1, h), 0, 1)]).sort((p, q) => p[0] - q[0]);
       // keep one point per 1/64 of the width (the hand's jitter out, at most 65 points)
@@ -365,13 +428,11 @@
       return { key: 'stroke', value: { pts: binned.map(([x, y]) => [x, Math.round((r.lo + (r.hi - r.lo) * y) * 1000) / 1000]) }, label: 'Draw ' + atLabel(d, at, a) };
     },
     // a click on the pattern strip opens that note (the zoom from pattern scale to note scale)
-    pick(d, x, y, W, H) {
-      const ns = d.notes || [], top = Math.round(H * 0.32); if (!ns.length || y > top) return null;
-      const end = Math.max(16, ...ns.map(q => q.s + q.l)), s = ((x - 10) / (W - 20)) * end;
-      let best = -1, bd = 1e9; ns.forEach((q, i) => { const dd = s < q.s ? q.s - s : s > q.s + q.l ? s - q.s - q.l : 0; if (dd < bd) { bd = dd; best = i; } });
-      return best >= 0 && best !== (d.sel | 0) ? { key: 'sel', value: best + 1, label: 'Open note' } : null;
-    },
+    pick(d, x, y, W, H) { return (d.notes || []).length ? pickNav(d, x, y, W, H) : null; },
+    // W3f the options bar's picker: the instrument this pattern plays — any tool the piano roll can play (one on the canvas, or a new one)
+    picker(d) { if (!HOOK.instruments) return null; const opts = HOOK.instruments(); const has = opts.some(g2 => (g2.options || []).some(o2 => o2.value === d.target));
+      return { label: 'PLAYS', key: 'instrument', value: d.target || '', hint: 'the instrument this pattern plays — pick one on the canvas, or add a new one', options: (has || !d.target ? [] : [{ value: d.target, label: (HOOK.label ? HOOK.label(d.target) : d.target) }]).concat(d.target ? [] : [{ value: '', label: '— pick an instrument —' }], opts) }; },
   };
   function ensure() { const W = global.Workshop; if (!W) return false; if (W.kinds().includes(KIND.id)) return true; const r = W.addKind(KIND); if (!r.ok) console.error('Timeline: the Workshop refused the notes kind —', r.problems.join('; ')); return r.ok; }
-  global.EravosTimelineWorkshop = { KIND, ensure, curve, bind };
+  global.EravosTimelineWorkshop = { KIND, ensure, curve, bind, navGeom, navTop, get navOpen() { return NAV_OPEN; } };
 })(typeof window !== 'undefined' ? window : globalThis);
