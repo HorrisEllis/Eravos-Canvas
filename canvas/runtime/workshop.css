@@ -60,3 +60,10 @@
 .ws-status { grid-column: 1 / 4; display: flex; gap: 20px; align-items: center; padding: 0 12px; border-top: 1px solid var(--wl); background: #04070c; color: var(--wt3); overflow: hidden; white-space: nowrap; }
 .ws-status b { font-weight: 400; color: var(--wt2); } .ws-status .ws-r { margin-left: auto; color: var(--wg); }
 html.ws-open .glass-layer { display: none !important; }   /* the light layers draw window rims over the whole page: not over the Workshop */
+/* W3a the viewport's own bar: 2D · 3D · TOP · FRONT · ORBIT · EXPLODED · FLAT · WIRE · LIT (the studio preview's chips) */
+.ws-vph { position: absolute; left: 10px; top: 10px; display: flex; gap: 4px; align-items: center; pointer-events: auto; }
+.ws-vph:empty { display: none; }
+.ws-vph .ws-chip { font-size: 10px; padding: 4px 9px; background: var(--wp); }
+.ws-vs { width: 1px; height: 16px; background: var(--wl2); margin: 0 4px; }
+.ws-st.go { cursor: pointer; }
+.ws-st.go:hover { color: var(--wc); }

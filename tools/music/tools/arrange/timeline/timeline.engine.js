@@ -220,9 +220,12 @@
         const pr = (x) => { const v = clamp(+x, 0.05, 1); return isFinite(+x) && v < 1 ? Math.round(v * 100) / 100 : null; };
         const rt = (x) => { const v = Math.round(clamp(+x, 1, 8)); return isFinite(+x) && v > 1 ? v : null; };
         const mt = (x) => { const v = Math.round(clamp(+x, -0.5, 0.5) * 100) / 100; return isFinite(+x) && v !== 0 ? v : null; };
-        return (Array.isArray(arr) ? arr : []).map(n => ({ s: +n.s, l: +n.l, n: Math.round(+n.n), v: n.v === undefined ? 0.85 : +n.v, p: cleanP(n.p), b: cleanB(n.b), c: cleanC(n.c), pr: pr(n.pr), rt: rt(n.rt), mt: mt(n.mt), qs: isFinite(+n.qs) && n.qs !== null && n.qs !== undefined ? Math.round(+n.qs * 192) / 192 : null }))
+        // W3b a note's SHAPE (the Workshop's fractal modulation tree, components/mod-tree): kept as data so it opens again as it was; what PLAYS
+        // is what it compiled into (b.path, c). Plain data only, at most 32 kB.
+        const sh = (x) => { if (!x || typeof x !== 'object' || Array.isArray(x)) return null; try { const j = JSON.stringify(x); return j.length <= 32768 ? JSON.parse(j) : null; } catch (e) { return null; } };
+        return (Array.isArray(arr) ? arr : []).map(n => ({ s: +n.s, l: +n.l, n: Math.round(+n.n), v: n.v === undefined ? 0.85 : +n.v, p: cleanP(n.p), b: cleanB(n.b), c: cleanC(n.c), sh: sh(n.sh), pr: pr(n.pr), rt: rt(n.rt), mt: mt(n.mt), qs: isFinite(+n.qs) && n.qs !== null && n.qs !== undefined ? Math.round(+n.qs * 192) / 192 : null }))
           .filter(n => isFinite(n.s) && isFinite(n.l) && isFinite(n.n) && isFinite(n.v) && n.s >= 0 && n.s < max)
-          .map(n => Object.assign({ s: Math.round(n.s * 192) / 192, l: clamp(Math.round(n.l * 192) / 192, 0.125, max - n.s), n: clamp(n.n, 0, 127), v: clamp(n.v, 0.05, 1) }, n.p ? { p: n.p } : {}, n.b ? { b: n.b } : {}, n.c ? { c: n.c } : {}, n.pr ? { pr: n.pr } : {}, n.rt ? { rt: n.rt } : {}, n.mt ? { mt: n.mt } : {}, n.qs !== null && n.qs >= 0 && n.qs !== n.s ? { qs: n.qs } : {}))   // 3.48: 1/192 step — exact for 1/64 and every triplet; 1/128-note minimum
+          .map(n => Object.assign({ s: Math.round(n.s * 192) / 192, l: clamp(Math.round(n.l * 192) / 192, 0.125, max - n.s), n: clamp(n.n, 0, 127), v: clamp(n.v, 0.05, 1) }, n.p ? { p: n.p } : {}, n.b ? { b: n.b } : {}, n.c ? { c: n.c } : {}, n.sh ? { sh: n.sh } : {}, n.pr ? { pr: n.pr } : {}, n.rt ? { rt: n.rt } : {}, n.mt ? { mt: n.mt } : {}, n.qs !== null && n.qs >= 0 && n.qs !== n.s ? { qs: n.qs } : {}))   // 3.48: 1/192 step — exact for 1/64 and every triplet; 1/128-note minimum
           .sort((a, b) => a.s - b.s || a.n - b.n);
       }
       const snap16 = (b) => Math.max(1, 1 + Math.round((b - 1) * 16) / 16);

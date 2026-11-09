@@ -2,6 +2,21 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.156 The Workshop in 3D; a note shaped fractally (W3) (2026-11-08)
+His words: "yeah, that needs to be moved to the editor. pattern editor. i want you to finish the workshop with the 3d." · "i want the 3d. like i want like a full modulation, waveform, oscillation, like all the ways to edit a sound, give it as much depth as possible. fractally and recursively."
+- canvas/runtime/workshop.js (domain-free): the viewport in 3D — the kind's layers as planes (K.drawLayer), EXPLODED / FLAT, TOP / FRONT /
+  ORBIT (drag turns, wheel zooms), WIRE / LIT, an axis gizmo; a drag in 2D draws (K.stroke, one history step); bar actions that are edits;
+  the station path clickable (go up). Canvas 2D only: each plane is an affine map of the kind's drawing.
+- tools/music/components/mod-tree (NEW, spec first): a SIGNAL = drawn base + modulators; every modulator's rate and depth are signals, so it
+  nests (bounded at 8). Eight waves (sine, triangle, saw, ramp, square, random, smooth, drawn), phase, fade-in, seed; the rate integrated.
+- music.notes: ＋ Shape something → Pitch or any number knob of the note's instrument; ▾ INTO / ▴ UP through the tree (stations SONG › PATTERN
+  › NOTE › PITCH › MOD 1 › RATE …); base presets (flat, rise, fall, arch, dip, s-curve, zigzag, steps) or drawn; a modulator selected, the drag
+  draws its wave. The tree compiles into what the engine plays (b.path, c[knob]) and is kept on the note (sh; the engine keeps it).
+- Proof: tests/p156 3/3 (two and three levels; a rising rate speeds the vibrato; ±2 st measured; 3D draws in every view with no error; a drag
+  orbits; a drawn base is one step and undo is exact; a knob's curve stays in its range; unshape restores); mod-tree 19 checks; P154, P150,
+  P151, P108, P112, P76, P113, Timeline 89/89, boundary 10/10 green; components all pass; design check no worse. P70's curve-lane failure is on main.
+- Previews: docs/previews/workshop-shape-3d.png, workshop-shape-2d.png.
+
 ## Done — 3.155 The tools live in Documents\ERAVOS\tools (store S3) (2026-11-08)
 His words: "no they were in program files. my eravos folder in documents is empty, just empty folders." · "like i want to make everything outside of the canvas, in a seperate repo. like a tool store."
 - desktop/library-tools.js (NEW): sync(bundle → library) and resolve(library, else bundle). desktop/main.js: on start (packaged) the app

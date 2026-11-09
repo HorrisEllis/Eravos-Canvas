@@ -9,6 +9,9 @@
  *   Workshop.check(kind) → [] or the problems, in words · Workshop.addKind(kind) → { ok, problems } · Workshop.kinds()
  *   Workshop.open(kindId, doc, { onChange(doc), onApply(doc), onClose(), title }) → { doc(), set(key, v), select(layerId), undo(), redo(),
  *     history(), close(), el } · Workshop.current
+ * W3a (optional): drawLayer(g, W, H, doc, layerId, { wire, selected }) → the 3D viewport (layers as planes) · stroke(doc, points, W, H,
+ *   { selected }) → { key, value, label } (a drag that draws) · actions(doc, { selected }) items may be { label, key, value } (an edit) ·
+ *   stationKey (a station click = edit(stationKey, index)).
  * A kind: { id, label, layers(doc) → [{ id, label, group, type, sub, fields: [{ key, label, type: number|enum|text, min, max, step, unit,
  *   options }] }], get(doc, key), set(doc, key, value) → doc, draw(g, W, H, doc, { selected, hover }), apply(doc)?, title(doc)?, stations(doc)?,
  *   outline(doc)? → [[depth, text, layerId?]], status(doc)? → [[label, value]], tools? [{ id, label, glyph, layer? }],
@@ -31,6 +34,7 @@
     ['layers', 'get', 'set', 'draw'].forEach(f => { if (typeof k[f] !== 'function') p.push(f + ': missing (a function)'); });
     if (k.apply !== undefined && typeof k.apply !== 'function') p.push('apply: a function, when given');
     if (k.tools !== undefined && !Array.isArray(k.tools)) p.push('tools: a list');
+    ['drawLayer', 'stroke', 'actions', 'pick'].forEach(f => { if (k[f] !== undefined && typeof k[f] !== 'function') p.push(f + ': a function, when given'); });
     return p;
   }
   function addKind(k) { const problems = check(k); if (!problems.length) KINDS.set(k.id, k); return { ok: !problems.length, problems }; }
@@ -42,7 +46,10 @@
     let d = clone(doc0 || {}), selected = null, note = '', past = [], future = [], hist = [{ label: 'OPENED', doc: clone(d) }];
     const root = el('div', 'ws-app', [], { role: 'dialog', 'aria-label': K.label });
     const bar = el('div', 'ws-bar'), opts = el('div', 'ws-opts'), strip = el('div', 'ws-strip'), tabs = el('div', 'ws-tabs'), vp = el('div', 'ws-vp');
-    const cv = el('canvas', 'ws-canvas'); vp.appendChild(cv);
+    const cv = el('canvas', 'ws-canvas'), vph = el('div', 'ws-vph'); vp.append(cv, vph);
+    // W3a the viewport: 2D (the kind's draw) or 3D (the kind's layers as planes; K.drawLayer) — orbit, top, front, exploded / flat, wire / lit
+    let mode = '2d', exploded = true, wire = false, cam = { yaw: -0.55, pitch: 0.62, zoom: 1 }, stroke = null, orbit = null;
+    const offs = new Map();
     const outl = el('div', 'ws-pane'), lays = el('div', 'ws-pane ws-grow'), insp = el('div', 'ws-pane'), status = el('div', 'ws-status');
     const right = el('div', 'ws-right', [outl, lays, insp]), centre = el('div', 'ws-centre', [tabs, vp]);
     root.append(bar, opts, strip, centre, right, status);
@@ -61,7 +68,7 @@
     }
     function edit(key, value, label) {
       past.push(clone(d)); future = []; d = K.set(d, key, value) || d;
-      hist.push({ label: (label || key) + ' · ' + (typeof value === 'number' ? +value.toFixed(3) : String(value)), doc: clone(d) }); if (hist.length > 200) hist.splice(1, 1);
+      hist.push({ label: (label || key) + (value !== null && typeof value === 'object' ? '' : ' · ' + (typeof value === 'number' ? +value.toFixed(3) : String(value))), doc: clone(d) }); if (hist.length > 200) hist.splice(1, 1);
       if (o.onChange) { try { o.onChange(clone(d)); } catch (e) { console.error(e); } } render();
     }
     function restore(x, label) { d = clone(x); if (o.onChange) { try { o.onChange(clone(d)); } catch (e) { console.error(e); } } hist.push({ label, doc: clone(d) }); render(); }
@@ -72,15 +79,64 @@
       const r = vp.getBoundingClientRect(), dpr = Math.min(2, global.devicePixelRatio || 1), W = Math.max(50, r.width), H = Math.max(50, r.height);
       if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
       const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
-      try { K.draw(g, W, H, d, { selected }); } catch (e) { console.error(e); }
+      try { if (mode === '3d' && K.drawLayer) draw3d(g, W, H, dpr); else K.draw(g, W, H, d, { selected }); } catch (e) { console.error(e); }
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (stroke && stroke.pts.length > 1) { g.strokeStyle = 'rgba(255,255,255,0.85)'; g.lineWidth = 2; g.setLineDash([4, 3]); g.beginPath(); stroke.pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); g.setLineDash([]); }
+    }
+    // a plane in space is an affine map of its 2D drawing (near-orthographic camera): x = across the layer, z = into it, y = its height
+    function proj(W, H, x, y, z) {
+      const s = Math.min(W * 0.34, H * 0.5) * cam.zoom, cy = Math.cos(cam.yaw), sy = Math.sin(cam.yaw), cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
+      return [W / 2 + s * (x * cy - z * sy), H / 2 - s * y * cp + s * (x * sy + z * cy) * sp];
+    }
+    function draw3d(g, W, H, dpr) {
+      const L = layers().filter(l => !l.hidden), n = L.length, PW = 512, PH = 256, A = 1, B = 0.42, gap = exploded ? Math.min(0.42, 1.15 / Math.max(1, n)) : 0.025;
+      g.fillStyle = '#05070a'; g.fillRect(0, 0, W, H);
+      // the floor: a faint grid under the stack
+      const fy = -((n - 1) / 2) * gap - 0.18; g.strokeStyle = 'rgba(120,150,180,0.08)'; g.lineWidth = 1;
+      for (let i = -6; i <= 6; i++) { let a = proj(W, H, i / 6 * 1.3, fy, -0.9), b = proj(W, H, i / 6 * 1.3, fy, 0.9); g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke();
+        a = proj(W, H, -1.3, fy, i / 6 * 0.9); b = proj(W, H, 1.3, fy, i / 6 * 0.9); g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke(); }
+      L.forEach((l, i) => {
+        let o = offs.get(l.id); if (!o) { o = doc.createElement('canvas'); o.width = PW; o.height = PH; offs.set(l.id, o); }
+        const og = o.getContext('2d'); og.setTransform(1, 0, 0, 1, 0, 0); og.clearRect(0, 0, PW, PH);
+        try { K.drawLayer(og, PW, PH, d, l.id, { wire, selected: l.id === selected }); } catch (e) { console.error(e); }
+        const h = (i - (n - 1) / 2) * gap, p0 = proj(W, H, -A, h, -B), px = proj(W, H, A, h, -B), pz = proj(W, H, -A, h, B), p3 = proj(W, H, A, h, B);
+        const sel = l.id === selected;
+        // the plane: glass, its frame, its name
+        g.setTransform(dpr, 0, 0, dpr, 0, 0); g.beginPath(); g.moveTo(p0[0], p0[1]); g.lineTo(px[0], px[1]); g.lineTo(p3[0], p3[1]); g.lineTo(pz[0], pz[1]); g.closePath();
+        if (!wire) { g.fillStyle = sel ? 'rgba(0,212,255,0.07)' : 'rgba(140,170,200,0.035)'; g.fill(); }
+        g.strokeStyle = sel ? 'rgba(0,212,255,0.75)' : 'rgba(140,170,200,0.22)'; g.lineWidth = sel ? 1.4 : 1; g.stroke();
+        g.setTransform(dpr * (px[0] - p0[0]) / PW, dpr * (px[1] - p0[1]) / PW, dpr * (pz[0] - p0[0]) / PH, dpr * (pz[1] - p0[1]) / PH, dpr * p0[0], dpr * p0[1]);
+        if (!wire) g.globalCompositeOperation = 'lighter';
+        g.drawImage(o, 0, 0); g.globalCompositeOperation = 'source-over';
+        g.setTransform(dpr, 0, 0, dpr, 0, 0); g.fillStyle = sel ? '#00d4ff' : 'rgba(170,190,210,0.7)'; g.font = '10px "DM Mono", monospace';
+        const lx = Math.min(p0[0], pz[0]) - 8; g.textAlign = 'right'; g.fillText(String(l.label).toUpperCase(), lx, (p0[1] + pz[1]) / 2 + 3); g.textAlign = 'left';
+      });
+      // the axis gizmo
+      const gx = W - 46, gy = 46, ax = [[1, 0, 0, '#ff4d6d', 'X'], [0, 1, 0, '#2bff88', 'Y'], [0, 0, 1, '#00d4ff', 'Z']], o0 = proj(W, H, 0, 0, 0);
+      g.strokeStyle = 'rgba(140,170,200,0.25)'; g.beginPath(); g.arc(gx, gy, 30, 0, Math.PI * 2); g.stroke();
+      ax.forEach(([x, y, z, c, t]) => { const q = proj(W, H, x * 0.12 / cam.zoom, y * 0.12 / cam.zoom, z * 0.12 / cam.zoom); const dx = q[0] - o0[0], dy = q[1] - o0[1], k = 24 / Math.max(1e-6, Math.hypot(dx, dy) || 1) * Math.min(1, Math.hypot(dx, dy) / 8);
+        g.strokeStyle = c; g.beginPath(); g.moveTo(gx, gy); g.lineTo(gx + dx * k, gy + dy * k); g.stroke(); g.fillStyle = c; g.fillText(t, gx + dx * k + 3, gy + dy * k + 3); });
+    }
+    function chips() {
+      if (!K.drawLayer) { vph.replaceChildren(); return; }
+      const chip = (t, on, fn, title) => el('button', 'ws-chip' + (on ? ' on' : ''), [], { type: 'button', text: t, title: title || '', onclick: () => { fn(); chips(); draw(); } });
+      vph.replaceChildren(chip('2D', mode === '2d', () => { mode = '2d'; }), chip('3D', mode === '3d', () => { mode = '3d'; }), el('span', 'ws-vs'),
+        chip('TOP', mode === '3d' && cam.pitch > 1.5, () => { mode = '3d'; cam.pitch = Math.PI / 2 - 0.001; cam.yaw = 0; }, 'look down on the stack'),
+        chip('FRONT', mode === '3d' && Math.abs(cam.yaw) < 0.01 && cam.pitch < 0.3, () => { mode = '3d'; cam.pitch = 0.18; cam.yaw = 0; }, 'look at it from the front'),
+        chip('ORBIT', false, () => { mode = '3d'; cam = { yaw: -0.55, pitch: 0.62, zoom: 1 }; }, 'back to the turned view (drag to turn, wheel to zoom)'), el('span', 'ws-vs'),
+        chip('EXPLODED', exploded, () => { exploded = true; }), chip('FLAT', !exploded, () => { exploded = false; }), el('span', 'ws-vs'),
+        chip('WIRE', wire, () => { wire = true; }), chip('LIT', !wire, () => { wire = false; }));
     }
     function render() {
       const L = layers(); if (!selected || !layerOf(selected)) selected = (L.find(l => l.fields && l.fields.length) || L[0] || {}).id || null;
       const sel = layerOf(selected), title = (o.title || (K.title ? K.title(d) : K.label));
       // the bar: the name, the kind's stations (where this document sits), the actions
       bar.replaceChildren(el('span', 'ws-name', [], { text: 'WORKSHOP' }), el('span', 'ws-sep'),
-        el('span', 'ws-stations', (K.stations ? K.stations(d) : [K.label]).map((s, i, a) => el('span', 'ws-st' + (i === a.length - 2 || a.length === 1 ? ' on' : ''), [el('i', '', [], { text: String(i + 1).padStart(2, '0') }), String(s)]))),
-        el('span', 'ws-end', [].concat((K.actions ? K.actions(d) : []).map(a => el('button', 'ws-btn ghost', [], { type: 'button', text: a.label, title: a.hint || '', onclick: () => { let said = null; try { said = a.run(clone(d)); } catch (e) { said = 'failed: ' + e.message; console.error(e); } if (said) { note = String(said); render(); } } })), [el('button', 'ws-btn ghost', [], { type: 'button', text: 'UNDO', title: 'Ctrl+Z', onclick: undo }), el('button', 'ws-btn ghost', [], { type: 'button', text: 'REDO', title: 'Ctrl+Shift+Z', onclick: redo }),
+        el('span', 'ws-stations', (K.stations ? K.stations(d) : [K.label]).map((s, i, a) => el('span', 'ws-st' + (i === a.length - 1 ? ' on' : '') + (K.stationKey && i < a.length - 1 ? ' go' : ''), [el('i', '', [], { text: String(i + 1).padStart(2, '0') }), String(s)],
+          K.stationKey && i < a.length - 1 ? { title: 'go up to ' + s, onclick: () => edit(K.stationKey, i, 'GO TO ' + s) } : {}))),
+        el('span', 'ws-end', [].concat((K.actions ? K.actions(d, { selected }) : []).map(a => el('button', 'ws-btn ghost', [], { type: 'button', text: a.label, title: a.hint || '', disabled: !!a.disabled, onclick: () => {
+          if (a.key !== undefined) return edit(a.key, a.value, a.label);   // W3a: an action that is an edit (one history step)
+          let said = null; try { said = a.run(clone(d)); } catch (e) { said = 'failed: ' + e.message; console.error(e); } if (said) { note = String(said); render(); } } })), [el('button', 'ws-btn ghost', [], { type: 'button', text: 'UNDO', title: 'Ctrl+Z', onclick: undo }), el('button', 'ws-btn ghost', [], { type: 'button', text: 'REDO', title: 'Ctrl+Shift+Z', onclick: redo }),
           el('button', 'ws-btn send', [], { type: 'button', text: 'APPLY →', title: 'write it back to where it came from', onclick: () => { if (o.onApply) o.onApply(clone(d)); else if (K.apply) K.apply(clone(d)); } }),
           el('button', 'ws-btn ghost', [], { type: 'button', text: '×', title: 'close (Esc)', 'aria-label': 'close', onclick: () => close() })])));
       // the options bar: the selected layer's fields
@@ -102,16 +158,38 @@
       else insp.replaceChildren(tabsI, el('div', 'ws-ins', [sel ? el('div', 'ws-big', [], { text: sel.label }) : null, sel && sel.sub ? el('div', 'ws-sub', [], { text: sel.sub }) : null].concat(((sel && sel.fields) || []).map(f => field(f, true)))
         .concat((K.status ? K.status(d) : []).map(([k, v]) => el('div', 'ws-kv', [el('span', '', [], { text: k }), el('b', '', [], { text: String(v) })])))));
       status.replaceChildren(...(K.status ? K.status(d) : []).map(([k, v]) => el('span', '', [k + ' ', el('b', '', [], { text: String(v) })])), el('span', 'ws-r', [], { text: (note ? note + ' · ' : '') + (past.length ? past.length + ' EDITS · ' : '') + 'LIVE' }));
-      draw();
+      chips(); draw();
     }
     const onKey = (e) => { if (!root.isConnected) return; const t = e.target && e.target.tagName; if (t === 'INPUT' || t === 'TEXTAREA') return;
       if (e.key === 'Escape') { e.preventDefault(); close(); } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); } };
     const onResize = () => draw();
-    cv.addEventListener('pointerdown', (e) => { if (!K.pick) return; const r = cv.getBoundingClientRect(), p = K.pick(d, e.clientX - r.left, e.clientY - r.top, r.width, r.height, { selected }); if (p && p.key !== undefined) edit(p.key, p.value, p.label); });
+    cv.addEventListener('pointerdown', (e) => {
+      const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+      if (mode === '3d' && K.drawLayer) { orbit = { x: e.clientX, y: e.clientY, yaw: cam.yaw, pitch: cam.pitch }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} return; }
+      const p = K.pick ? K.pick(d, x, y, r.width, r.height, { selected }) : null; if (p && p.key !== undefined) return edit(p.key, p.value, p.label);
+      if (K.stroke) { stroke = { pts: [[x, y]] }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} }
+    });
+    cv.addEventListener('pointermove', (e) => {
+      if (orbit) { cam.yaw = orbit.yaw + (e.clientX - orbit.x) * 0.008; cam.pitch = Math.max(0.02, Math.min(Math.PI / 2 - 0.001, orbit.pitch + (e.clientY - orbit.y) * 0.006)); draw(); return; }
+      if (stroke) { const r = cv.getBoundingClientRect(); stroke.pts.push([e.clientX - r.left, e.clientY - r.top]); draw(); }
+    });
+    const endPointer = () => {
+      if (orbit) { orbit = null; chips(); return; }
+      if (!stroke) return; const st = stroke; stroke = null; const r = cv.getBoundingClientRect();
+      if (st.pts.length > 1) { let res = null; try { res = K.stroke(d, st.pts, r.width, r.height, { selected }); } catch (e) { console.error(e); } if (res && res.key !== undefined) return edit(res.key, res.value, res.label); }
+      draw();
+    };
+    cv.addEventListener('pointerup', endPointer); cv.addEventListener('pointercancel', endPointer);
+    cv.addEventListener('wheel', (e) => { if (mode !== '3d') return; e.preventDefault(); cam.zoom = Math.max(0.3, Math.min(4, cam.zoom * (e.deltaY < 0 ? 1.1 : 1 / 1.1))); draw(); }, { passive: false });
     function close() { if (!root.isConnected) return; root.remove(); doc.documentElement.classList.remove('ws-open'); global.removeEventListener('keydown', onKey, true); global.removeEventListener('resize', onResize); if (current === api) current = null; if (o.onClose) o.onClose(clone(d)); }
     global.addEventListener('keydown', onKey, true); global.addEventListener('resize', onResize);
     doc.body.appendChild(root); doc.documentElement.classList.add('ws-open'); render(); global.requestAnimationFrame(draw);
-    const api = { el: root, doc: () => clone(d), set: (k, v, label) => edit(k, v, label), select: (id) => { selected = id; render(); }, undo, redo, history: () => hist.map(h2 => h2.label), close, kind: K.id };
+    const api = { el: root, doc: () => clone(d), set: (k, v, label) => edit(k, v, label), select: (id) => { selected = id; render(); }, undo, redo, history: () => hist.map(h2 => h2.label), close, kind: K.id,
+      get selected() { return selected; },
+      // W3a: the viewport (for tests and the kind's own buttons)
+      view: (o2) => { if (o2) { if (o2.mode) mode = o2.mode; if (o2.exploded !== undefined) exploded = !!o2.exploded; if (o2.wire !== undefined) wire = !!o2.wire; if (o2.cam) Object.assign(cam, o2.cam); chips(); draw(); } return { mode, exploded, wire, cam: Object.assign({}, cam) }; },
+      stroke: (pts) => { const r = cv.getBoundingClientRect(); const res = K.stroke ? K.stroke(d, pts, r.width, r.height, { selected }) : null; if (res && res.key !== undefined) edit(res.key, res.value, res.label); return !!res; },
+      action: (label) => { const a = (K.actions ? K.actions(d, { selected }) : []).find(x => x.label === label); if (!a || a.disabled) return false; if (a.key !== undefined) edit(a.key, a.value, a.label); else a.run(clone(d)); return true; } };
     current = api; return api;
   }
   global.Workshop = { check, addKind, open, kinds: () => Array.from(KINDS.keys()), TYPES, get current() { return current; } };
