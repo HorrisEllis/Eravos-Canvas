@@ -211,7 +211,6 @@
     if (mod) {   // the selected modulator's wave, one cycle, large in the background (draw over it to make your own)
       const M = MT(), cyc = new Float64Array(161).map((_, i) => M ? M.wave(mod, i / 160) : 0);
       g.globalAlpha = 0.35; plot(g, cyc, x0, y0, w, h, -1.05, 1.05, COLORS[+mi[1] % COLORS.length], 1.5, [3, 4]); g.globalAlpha = 1;
-      g.fillStyle = COLORS[+mi[1] % COLORS.length]; g.fillText('MOD ' + (+mi[1] + 1) + ' · ONE CYCLE OF ITS WAVE (dashed) — draw here to make a wave of your own', x0, y0 + h + 12);
     }
     const hid = o.hidden || new Set();
     ((sig && sig.mods) || []).forEach((m, i) => { if (hid.has('m:' + i)) return; const arr = series(a, at, 'm:' + i, 320); if (!arr) return; const off = new Float64Array(arr.length).map((_, j) => arr[j] + (r.lo + r.hi) / 2); g.globalAlpha = m.on === false ? 0.2 : 0.7; plot(g, off, x0, y0, w, h, r.lo, r.hi, COLORS[i % COLORS.length], sel === 'm:' + i ? 2 : 1); g.globalAlpha = 1; });
@@ -233,7 +232,7 @@
     actions(d, o) {
       const a = noteOf(d), at = shapeAt(d), sel = (o && o.selected) || '', M = MT(); if (!a) return [];
       const into = /^(T:.+|m:\d+:(rate|depth))$/.test(sel), out = [];
-      out.push({ label: 'SAVE NOTE', name: 'Save to the note library', keys: 'Mod+S', hint: 'keep this note — how it moves and plays — in the note library (Patterns › Notes); it fits any note of any tool', disabled: !global.NoteLibrary,
+      out.push({ label: 'SAVE NOTE', name: 'Save to the note library', keys: 'Mod+S', strip: true, icon: '⤓', hint: 'keep this note — how it moves and plays — in the note library (Patterns › Notes); it fits any note of any tool', disabled: !global.NoteLibrary,
         run: (doc) => { const x0 = noteOf(doc); const nm = (doc.drums ? 'pad ' + x0.n : nameOf(x0.n)) + ' · ' + (global.NoteLibrary.describe({ note: x0 }) || 'note'); global.NoteLibrary.save(x0, nm, { tool: HOOK.label ? HOOK.label(doc.target) : '' }); return 'saved “' + nm + '” to the note library'; } });
       out.push({ label: 'RHYTHMS', name: 'Open the rhythm library', keys: 'R', hint: 'pick a rhythm and put it into this pattern (⇥ Into the Workshop)', disabled: !global.PatternLibrary, run: () => { global.PatternLibrary.open({ tab: 'patterns', reopen: true }); return ''; } });
       out.push({ label: 'LIBRARY', name: 'Open the note library', keys: 'Shift+L', hint: 'Patterns › Notes', disabled: !global.PatternLibrary, run: () => { global.PatternLibrary.open({ tab: 'notes' }); return ''; } });
@@ -241,7 +240,7 @@
       out.push({ label: '◂ NOTE', name: 'Previous note', keys: '[', key: 'sel', value: Math.max(1, si), disabled: si <= 0 });
       out.push({ label: 'NOTE ▸', name: 'Next note', keys: ']', key: 'sel', value: Math.min(N, si + 2), disabled: si >= N - 1 });
       out.push({ label: 'NAVIGATOR', name: NAV_OPEN ? 'Fold the notes navigator' : 'Open the notes navigator', keys: 'N', only: 'view', run: () => { navToggle(); return ''; } });
-      out.push({ label: '▶ HEAR', name: "Hear it", keys: 'Space', hint: 'play this note alone, shaped (its instrument, its curves, its knobs)', disabled: !HOOK.hear, run: (doc) => { const x = noteOf(doc); if (x && HOOK.hear) HOOK.hear(x); return 'heard ' + (doc.drums ? 'pad ' + x.n : nameOf(x.n)); } });
+      out.push({ label: '▶ HEAR', name: "Hear it", keys: 'Space', strip: true, icon: '▶', hint: 'play this note alone, shaped (its instrument, its curves, its knobs)', disabled: !HOOK.hear, run: (doc) => { const x = noteOf(doc); if (x && HOOK.hear) HOOK.hear(x); return 'heard ' + (doc.drums ? 'pad ' + x.n : nameOf(x.n)); } });
       // A / B: keep this version as A, change it, then hear and swap — the studio's before / after
       const ab = d.ab && d.ab.i === (d.sel | 0) ? d.ab : null;
       out.push({ label: ab ? 'A ← NOW' : 'SET A', name: "Keep this as A", keys: 'A', key: 'abSet', value: true, hint: 'keep the note as it is now as A, to compare against' });
@@ -419,7 +418,9 @@
         ns.forEach((x, i) => { g.fillStyle = i === (d.sel | 0) ? '#00d4ff' : 'rgba(0,212,255,0.4)'; g.fillRect(8 + x.s / end * (W - 16), 8 + (1 - (x.n - lo) / Math.max(1, hi - lo)) * (H - 24), Math.max(4, x.l / end * (W - 16) - 2), 10); }); g.shadowBlur = 0; return; }
       const T = (a.sh && a.sh.t) || {}, M = MT();
       if (id.startsWith('T:') && M && T[id.slice(2)]) { const arr = M.sample(T[id.slice(2)], 160), mn = Math.min(...arr), mx = Math.max(...arr), pad = (mx - mn) * 0.15 || 1; plot(g, arr, 8, 8, W - 16, H - 16, mn - pad, mx + pad, col, lw); g.shadowBlur = 0; return; }
-      if (id === 'bend' || id === 'osc') { const arr = new Float64Array(160).map((_, i) => curve(a, i / 159)); const mx = Math.max(2, ...Array.from(arr).map(Math.abs)); plot(g, arr, 8, 8, W - 16, H - 16, -mx, mx, col, lw); g.shadowBlur = 0; return; }
+      if (id === 'osc') { const o2 = (a.b && a.b.osc) || null, arr = new Float64Array(160).map((_, i) => { if (!o2 || !(o2.depth > 0)) return 0; const t = i / 159, cyc = typeof o2.rate === 'number' ? o2.rate * 2 : 8, f = o2.fade ? Math.min(1, t / o2.fade) : 1; return Math.sin(t * cyc * 2 * Math.PI) * o2.depth * f; });   // its own oscillation only
+        plot(g, arr, 8, 8, W - 16, H - 16, -Math.max(1, o2 ? o2.depth : 1), Math.max(1, o2 ? o2.depth : 1), col, lw); g.shadowBlur = 0; return; }
+      if (id === 'bend') { const arr = new Float64Array(160).map((_, i) => curve(a, i / 159)); const mx = Math.max(2, ...Array.from(arr).map(Math.abs)); plot(g, arr, 8, 8, W - 16, H - 16, -mx, mx, col, lw); g.shadowBlur = 0; return; }
       // a value: a bar as long as the value is high in its range
       const val = id === 'velocity' ? a.v : id === 'pitch' ? a.n / 127 : id === 'depth' ? (a.pr || 1) : id === 'timing' ? Math.min(1, a.l / 16) : 0.5;
       g.fillStyle = col; g.globalAlpha = (o && o.wire) ? 0.35 : 0.8; g.fillRect(8, H / 2 - 8, (W - 16) * clamp(val, 0, 1), 16); g.globalAlpha = 1; g.shadowBlur = 0;
@@ -465,6 +466,14 @@
     // a click on the pattern strip opens that note (the zoom from pattern scale to note scale)
     pick(d, x, y, W, H) { return (d.notes || []).length ? pickNav(d, x, y, W, H) : null; },
     // W3f the options bar's picker: the instrument this pattern plays — any tool the piano roll can play (one on the canvas, or a new one)
+    // W3h a line of help in the view: what the hand can do here
+    hint(d, o) {
+      const at = shapeAt(d), a = noteOf(d); if (!a) return 'No notes — draw some in the piano roll';
+      if (o && o.mode === '3d') return '3D — drag to turn · click a plane to select it · double-click to open it · 2 for the flat view';
+      if (!at) return (d.drums ? '' : 'Draw on the note (P) to shape its pitch · ') + 'pick a layer on the right to change it · Space plays · changes are in your song as you make them · Esc closes · right-click for everything';
+      const mi = /^m:\d+$/.test((o && o.selected) || '');
+      return (mi ? 'Drawing the wave of the selected modulator' : 'Drawing ' + atLabel(d, at, a)) + ' — P pen · L line · D points · S smooth · G move · E erase · M adds a modulator · Backspace up · Space plays';
+    },
     bar(d) { return HOOK.bpm ? [{ key: 'bpm', label: 'TEMPO', type: 'number', min: 40, max: 240, step: 1, unit: 'BPM' }] : []; },
     picker(d) { if (!HOOK.instruments) return null; const opts = HOOK.instruments(); const has = opts.some(g2 => (g2.options || []).some(o2 => o2.value === d.target));
       return { label: 'PLAYS', key: 'instrument', value: d.target || '', hint: 'the instrument this pattern plays — pick one on the canvas, or add a new one', options: (has || !d.target ? [] : [{ value: d.target, label: (HOOK.label ? HOOK.label(d.target) : d.target) }]).concat(d.target ? [] : [{ value: '', label: '— pick an instrument —' }], opts) }; },

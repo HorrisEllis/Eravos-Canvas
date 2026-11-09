@@ -287,3 +287,16 @@ W3g  TOOLBAR (canvas, domain-free; the left strip) — every tool works ON the v
               R opens it; each rhythm (a pattern with notes) has ⇥ Into the Workshop while a pattern is open there: its notes replace the
               open pattern's (in the song's key; one history step — undo brings the old notes back)
      proof    tests/p161
+
+## ADDENDUM 2026-11-09 (6) — W3h: what to do with it (his words; nothing above is changed)
+# James, 2026-11-09 (on 0.2.19, a screenshot of the note in 3D): "what do i even do with this? i cant edit layers or draw, manipulate or do
+#   anything with it. no way to close, save or play the note either."
+# Found: 0.2.19 was built before the toolbar (W3g) merged; play, save, close lived only on keys and menus with nothing on screen saying so; in 3D
+#   every layer was a plane, numbers too (bars that mean nothing), and a drag only turned the view; the canvas's element helper turned
+#   disabled: false into a disabled button (the layer tools were never clickable); the tests ran without workshop.css (no real layout).
+W3h  AT HAND      ⤓ save to the note library · ▶ play it · ✕ close — at the foot of the tool strip (an action's `strip: true`), always there
+     HELP LINE    a line in the view says what the hand can do here (on the note, in a curve, in 3D) — the kind's hint(doc, { tool, mode })
+     3D           only shapes are planes (a value layer is a number); a click (no turn) selects the plane under it; a double-click opens it
+                  (2D too); OSCILLATE's plane is its oscillation alone
+     FIXED        disabled: false no longer disables (el helper); tests/run.html loads workshop.css, so every Workshop test runs the real layout
+     proof        tests/p162 1/1; P150 … P161 green with the real layout
