@@ -194,3 +194,14 @@ W3b  SHAPE — a note shaped fractally (music, tools/music/tools/arrange/timelin
        dag       note.sh ─ compile ─→ note.b.path + note.c ─→ clip_edit ─→ timeline.engine (cleanB/cleanC, bendNote, per-note curves) ─→ sound
        open      (his to choose next): per-note envelope beyond the instrument's knobs · stereo width · conditions (every Nth loop, fills) ·
                  layering one note into a chord · audition alone / A-B · the IMAGE domain's PHOTO kind (old W3 raster) moves to W4
+
+## ADDENDUM 2026-11-09 — W3c: hear it, give its shape to all, its own knobs (his words; nothing above is changed)
+# James, 2026-11-09: "Just ant them to be zipped per tool. With a dag. This is future plans.  Not now. Continue the wokshop"
+W3c  ▶ HEAR       the open note alone through its lane's instrument: its bend path, its knob curves, its own knob values, its length
+                  (the Timeline's note_audition; at most 4 s) — from any place in the tree, so a change is heard where it is made
+     ⇉ ALL NOTES  every note of the pattern takes this note's shape (sh, compiled for each) and its own knob values — one history step
+     ITS KNOBS    any number knob of the instrument set for this note only (p): an envelope per note (its attack, its release), its
+                  drive, its cutoff … — ＋ Set a knob for this note, its value in the inspector, ✕ KNOB back to the instrument's
+     dag          note.p ─→ clip_edit ─→ timeline.engine cleanP ─→ note:trigger params ─→ the instrument for that note
+     proof        tests/p157 2/2
+     open (his)   conditions (every Nth loop, fills only) · one note into a chord · stereo width beyond the instrument's knobs · A / B

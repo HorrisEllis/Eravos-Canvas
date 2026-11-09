@@ -121,6 +121,8 @@
     return L;
   }
   function shapeAt(d) { return d.at && d.at.t ? d.at : null; }
+  let HOOK = {};   // the opener's: { hear(note) } — the roll plays a note through its lane's instrument, curves and all
+  const bind = (h) => { HOOK = h || {}; };
   // the view's range for the open curve: its whole range for a target's base; for a mod's rate / depth, what it holds (with room)
   function viewRange(d, at, a) {
     const r = rangeOf(d, at, a); if (!(at.p || []).length && at.t !== 'pitch') return r;
@@ -160,6 +162,9 @@
     actions(d, o) {
       const a = noteOf(d), at = shapeAt(d), sel = (o && o.selected) || '', M = MT(); if (!a) return [];
       const into = /^(T:.+|m:\d+:(rate|depth))$/.test(sel), out = [];
+      out.push({ label: '▶ HEAR', hint: 'play this note alone, shaped (its instrument, its curves, its knobs)', disabled: !HOOK.hear, run: (doc) => { const x = noteOf(doc); if (x && HOOK.hear) HOOK.hear(x); return 'heard ' + (doc.drums ? 'pad ' + x.n : nameOf(x.n)); } });
+      if ((a.sh && Object.keys(a.sh.t || {}).length) || a.p) out.push({ label: '⇉ ALL NOTES', key: 'shapeAll', value: true, disabled: (d.notes || []).length < 2, hint: 'give every note in this pattern this note\'s shape and its own knob values' });
+      const pk = /^P:(.+)$/.exec(sel); if (!at && pk) out.push({ label: '✕ KNOB', key: 'unsetp', value: pk[1], hint: 'this note goes back to the instrument\'s own value' });
       if (at) out.push({ label: '▴ UP', key: 'nav', value: 'up', hint: 'one level up the tree' });
       out.push({ label: '▾ INTO', key: 'nav', value: 'into:' + sel, disabled: !into, hint: 'open the selected curve and shape IT (its own base and modulators)' });
       if (at) { const n = ((signalAt(a, at) || {}).mods || []).length; out.push({ label: '＋ MOD', key: 'addmod', value: n, hint: 'add a modulator here (its rate and depth can be shaped too)' });
@@ -186,13 +191,18 @@
       // SHAPE: what this note moves over its life, each a tree of modulators (▾ INTO to shape it)
       const M = MT();
       Object.keys(T).forEach(t => { const r = targetInfo(d, t, a); L.push({ id: 'T:' + t, group: 'SHAPE · WHAT IT MOVES', type: 'curve', label: r.label, sub: (M ? M.count(T[t]) : 0) + ' mods · ' + (M ? M.depthOf(T[t]) : 0) + ' deep — ▾ INTO', fields: [] }); });
+      // ITS KNOBS: any knob of the instrument set for this note only (an envelope per note: its attack, its release …)
+      Object.keys(a.p || {}).forEach(k => { const kn = knobOf(d, k); if (!kn) return; L.push({ id: 'P:' + k, group: 'ITS KNOBS · THIS NOTE ONLY', type: 'value', label: kn.label, sub: a.p[k] + (kn.unit ? ' ' + kn.unit : '') + ' (the instrument: ' + kn.val + ')', fields: [{ key: 'p.' + k, label: kn.label, type: 'number', min: kn.min, max: kn.max, step: (kn.max - kn.min) / 200 || 0.01, unit: kn.unit }] }); });
+      const freeK = (d.knobs || []).filter(k => !(a.p && a.p[k.key] !== undefined));
+      if (freeK.length) L.push({ id: 'setknob', group: 'ITS KNOBS · THIS NOTE ONLY', type: 'value', label: '＋ Set a knob for this note', sub: 'only this note plays with it', fields: [{ key: 'setp', label: 'Knob', type: 'enum', options: freeK.map(k => k.label) }] });
       const can = (d.drums ? [] : ['Pitch']).filter(() => !T.pitch).concat((d.knobs || []).filter(k => !T['k:' + k.key]).map(k => k.label));
       if (M && can.length) L.push({ id: 'addshape', group: 'SHAPE · WHAT IT MOVES', type: 'value', label: '＋ Shape something', sub: 'pitch or any knob of ' + (d.knobs && d.knobs.length ? 'its instrument' : 'the note'), fields: [{ key: 'add', label: 'Shape', type: 'enum', options: can }] });
       return L;
     },
     get(d, key) {
       const at = shapeAt(d), a0 = noteOf(d);
-      if (key === 'add') return '';
+      if (key === 'add' || key === 'setp') return '';
+      if (/^p\./.test(key) && a0) return a0.p ? a0.p[key.slice(2)] : undefined;
       if (at && a0) { const sig = signalAt(a0, at) || {}, M = MT();
         if (key === 'base.preset') return (sig.pre && sig.pre.shape) || '';
         if (key === 'base.lo' || key === 'base.hi') { const r = rangeOf(d, at, a0); return sig.pre ? sig.pre[key.slice(5)] : (M ? M.at(sig, key === 'base.lo' ? 0 : 1) : r.lo); }
@@ -207,6 +217,17 @@
         if (v === 'up') { out.at = out.at && (out.at.p || []).length ? { t: out.at.t, p: out.at.p.slice(0, -1) } : null; return out; }
         const m = /^into:(?:T:(.+)|m:(\d+):(rate|depth))$/.exec(String(v)); if (!m) return d;
         out.at = m[1] ? { t: m[1], p: [] } : (out.at ? { t: out.at.t, p: (out.at.p || []).concat([[+m[2], m[3]]]) } : null); return out;
+      }
+      if (key === 'setp' || key === 'unsetp' || /^p\./.test(key)) {
+        if (!a0) return d; const kk = key === 'setp' ? ((out.knobs || []).find(q => q.label === v) || {}).key : key === 'unsetp' ? v : key.slice(2), kn = knobOf(out, kk); if (!kn) return d;
+        const pp = Object.assign({}, a0.p || {}); if (key === 'unsetp') delete pp[kk]; else pp[kk] = key === 'setp' ? kn.val : clamp(+v, kn.min, kn.max);
+        if (Object.keys(pp).length) a0.p = pp; else delete a0.p; out.notes[i0] = a0; return out;
+      }
+      if (key === 'shapeAll') {
+        if (!a0 || !M) return d; const sh = a0.sh ? JSON.parse(JSON.stringify(a0.sh)) : null, pp = a0.p ? Object.assign({}, a0.p) : null;
+        out.notes = out.notes.map((x, j) => { if (j === i0) return x; const prevT = Object.keys((x.sh && x.sh.t) || {}); x._shPitch = prevT.includes('pitch'); x._shKnobs = {}; prevT.filter(t => t.startsWith('k:')).forEach(t => { x._shKnobs[t.slice(2)] = 1; });
+          if (sh) x.sh = JSON.parse(JSON.stringify(sh)); else delete x.sh; if (pp) x.p = Object.assign({}, x.p || {}, pp); return tidy(compile(x, out)); });
+        return out;
       }
       if (/^(add|unshape|stroke|addmod|delmod)$|^base\.|^m\.\d/.test(key)) {
       if (!a0 || !M) return d;
@@ -302,5 +323,5 @@
     },
   };
   function ensure() { const W = global.Workshop; if (!W) return false; if (W.kinds().includes(KIND.id)) return true; const r = W.addKind(KIND); if (!r.ok) console.error('Timeline: the Workshop refused the notes kind —', r.problems.join('; ')); return r.ok; }
-  global.EravosTimelineWorkshop = { KIND, ensure, curve };
+  global.EravosTimelineWorkshop = { KIND, ensure, curve, bind };
 })(typeof window !== 'undefined' ? window : globalThis);
