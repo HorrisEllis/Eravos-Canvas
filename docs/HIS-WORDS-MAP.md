@@ -94,6 +94,8 @@ kept), or **open** (not done yet, and what is missing). Newest at the bottom. Ad
 | 85 | "Yeah, we can just start with this. The small, like just the flat" | **done** W1 (3.150) | the Workshop surface (`canvas/runtime/workshop.js` + `workshop.css`, domain-free, flat viewport, checked kinds, undo / history, live); the Pattern tool (`tools/music/tools/generators/pattern-field/`) + its part (`components/pattern-field`) + the music PATTERN kind; `docs/previews/workshop-built*.png` |
 | 86 | "Just some ideas. Okay patterns need to be in the timeline or in the pattern browser.  Need the dag for the ui. Like dynamically changes using the constraint field? Like moves around fluidly?" | **done** (patterns, 3.151) · **preview** (the UI field) | patterns: `tools/music/data/pattern-shapes.js` (Pattern presets + saved shapes as browser blocks; To the Timeline), `tests/p151` · UI: `specs/eravos.ui-field.spec`, `docs/previews/ui-field-*.png` |
 | 87 | "Yes. 1 then Show me a preview." | **done** | as above |
+| 88 | "I need like a video or something. It’s just a static still" · "its okay. put a pin in it for now. i dont want to burn through tokens" | **pinned** | `docs/previews/ui-field.video.mjs` (frame-stepped 30 fps recorder, not yet run to the end) |
+| 89 | "merge other branches" | **done** | `claude/nice-dirac-t64qeo` merged (the instrument-kind preview); `claude/sharp-hypatia-9q2vyc` merged as a record (main's bends kept; `specs/eravos.phase52-map.spec` ADDENDUM 2026-11-10) |
 
 ## 2026-11-08 — ERAVOS, the build surface for Nexus (said in the Nexus session)
 
