@@ -44,11 +44,14 @@
     let n = 0; ranked.forEach(([c, s]) => { const k = c.dataset.cell, dst = s < 0 ? rest : n++ < FACE ? face : more; dst.querySelector('.uf-row').appendChild(c);
       c.querySelector('.uf-why').textContent = s < 0 ? DEPS[k][2] : ''; c.querySelector('.uf-score').textContent = s < 0 ? '' : String(s); });
     rest.querySelector('.uk-group-title').textContent = 'NOT IN PLAY — ' + state.mode.toUpperCase() + ' MODE' + (state.shape !== 'table' ? ' · ' + state.shape.toUpperCase() : '');
-    // FLIP: each control starts where it was and glides to where the field put it
-    cells.forEach(c => { const a = before.get(c), b = c.getBoundingClientRect(), dx = a.left - b.left, dy = a.top - b.top; if (!dx && !dy) return;
-      c.style.transition = 'none'; c.style.transform = `translate(${dx}px, ${dy}px)`; requestAnimationFrame(() => { c.style.transition = 'transform 420ms cubic-bezier(.2,.8,.2,1)'; c.style.transform = ''; }); });
+    // FLIP: each control starts where it was and glides to where the field put it (state.manual: the recorder steps it, frame by frame)
+    const moves = []; cells.forEach(c => { const a = before.get(c), b = c.getBoundingClientRect(), dx = a.left - b.left, dy = a.top - b.top; if (!dx && !dy) return; moves.push([c, dx, dy]);
+      c.style.transition = 'none'; c.style.transform = `translate(${dx}px, ${dy}px)`; if (!state.manual) requestAnimationFrame(() => { c.style.transition = 'transform 420ms cubic-bezier(.2,.8,.2,1)'; c.style.transform = ''; }); });
+    window.__ufMoves = moves;
     return ranked.map(([c, s]) => c.dataset.cell + ':' + s);
   };
+  // the recorder's step: u 0…1 along the glide (eased like the live one)
+  window.__ufStep = function (u) { const e = 1 - Math.pow(1 - u, 3); (window.__ufMoves || []).forEach(([c, dx, dy]) => { c.style.transform = u >= 1 ? '' : `translate(${dx * (1 - e)}px, ${dy * (1 - e)}px)`; }); };
   // the DAG, drawn beside the window: the two settings the others depend on, every control, what it drives
   window.__uiDag = function (x, y, w, h, state) {
     state = Object.assign({ mode: 'coupled', shape: 'saw' }, state || {}); let cv = document.getElementById('uf-dag'); if (!cv) { cv = document.createElement('canvas'); cv.id = 'uf-dag'; document.body.appendChild(cv); }
