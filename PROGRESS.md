@@ -10,6 +10,19 @@ His words: "what do i even do with this? i cant edit layers or draw, manipulate 
   workshop.css, so the Workshop tests run the real layout (P161 had passed on an unstyled page).
 - Proof: tests/p162 1/1; P150 … P161 green. Version 0.2.20.
 
+## Done — 3.164 Knobs while a note sounds: the guard knob by knob; Retro Poly, Supersaw, Organ follow (2026-11-10)
+His words: "continue with the remaining instruments."
+- The guard rebuilt (tests/p163): for EVERY numeric knob of EVERY instrument, three renders of one held note — low throughout, high from the
+  start, low then moved at 1.0 s — by level and brightness. A knob that matters before a note but does nothing mid-note lags. One suite per
+  instrument (a whole run in one page ran the browser out of memory). 31 instruments.
+- What it showed: Sub Engine, Wub Sub, Pad Forge, Embodiment Lab, Bass Forge, Wobble Bass, Reese, Retro DCO, Swarm DO follow (the first,
+  one-knob measure misjudged them: a filter above a pure sine changes nothing either way). The real lags were 36 knobs on 11 tools.
+- Fixed: Retro Poly (saw, pulse, width, noise, sustain, filter sustain — with 3.163's cutoff, res, sub: 11 of 12), Supersaw (mix, sustain:
+  all), Organ (every drawbar and celeste: all — each note now has a silent pipe for a closed drawbar, so it can be pulled out mid-note).
+- Left, listed in the test (20 knobs, the list only shrinks): xen-synth n, baseHz, baseNote, partials, tilt, even, sustain · acid-synth tune · sub-engine sustain · coven spread, vibrato · retro-poly
+  envAmt · curve-synth span, sustain · syn-osc fine, detune, width, sustain · syn-partials sustain · wub-osc dive.
+- Proof: P163 31/31 with the list · organ 43/43 · retro-poly 12/12 · supersaw 13/13 · P130 4/4.
+
 ## Done — 3.163 A knob moved during a note reaches that note: the guard, Retro Poly, Supersaw (2026-11-10)
 His words: "the workshop when drawing or manipulating or shaping, doesn't do much to change the sound." · "changing any tools values, knobs,
 presets or what ever is really delayed" · "whats cheaper, or higher leverage? … do it."
