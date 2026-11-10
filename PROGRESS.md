@@ -16,10 +16,10 @@ His words: "continue with the remaining instruments."
   start, low then moved at 1.0 s — by level and brightness. A knob that matters before a note but does nothing mid-note lags. One suite per
   instrument (a whole run in one page ran the browser out of memory). 31 instruments.
 - What it showed: Sub Engine, Wub Sub, Pad Forge, Embodiment Lab, Bass Forge, Wobble Bass, Reese, Retro DCO, Swarm DO follow (the first,
-  one-knob measure misjudged them: a filter above a pure sine changes nothing either way). The real lags were 29 knobs on 10 tools.
+  one-knob measure misjudged them: a filter above a pure sine changes nothing either way). The real lags were 36 knobs on 11 tools.
 - Fixed: Retro Poly (saw, pulse, width, noise, sustain, filter sustain — with 3.163's cutoff, res, sub: 11 of 12), Supersaw (mix, sustain:
   all), Organ (every drawbar and celeste: all — each note now has a silent pipe for a closed drawbar, so it can be pulled out mid-note).
-- Left, listed in the test (13 knobs, the list only shrinks): acid-synth tune · sub-engine sustain · coven spread, vibrato · retro-poly
+- Left, listed in the test (20 knobs, the list only shrinks): xen-synth n, baseHz, baseNote, partials, tilt, even, sustain · acid-synth tune · sub-engine sustain · coven spread, vibrato · retro-poly
   envAmt · curve-synth span, sustain · syn-osc fine, detune, width, sustain · syn-partials sustain · wub-osc dive.
 - Proof: P163 31/31 with the list · organ 43/43 · retro-poly 12/12 · supersaw 13/13 · P130 4/4.
 

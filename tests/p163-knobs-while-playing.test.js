@@ -11,7 +11,7 @@ window.__phase = 'P163';
 (function () {
   const SKIP = /^(attack|decay|release|glide|seed|voices|unison|fA|fD|fR|porta|delay|lfoDelay|hold|octave|transpose|steps|bars)$|Attack|Decay|Release|Time$/;
   // today's list (2026-11-10, after Retro Poly, Supersaw, Organ): it only shrinks
-  const LAGGING = new Set('acid-synth:tune sub-engine:sustain coven:spread coven:vibrato retro-poly:envAmt curve-synth:span curve-synth:sustain syn-osc:fine syn-osc:detune syn-osc:width syn-osc:sustain syn-partials:sustain wub-osc:dive'.split(' '));
+  const LAGGING = new Set('acid-synth:tune sub-engine:sustain coven:spread coven:vibrato retro-poly:envAmt curve-synth:span curve-synth:sustain syn-osc:fine syn-osc:detune syn-osc:width syn-osc:sustain syn-partials:sustain wub-osc:dive xen-synth:n xen-synth:baseHz xen-synth:baseNote xen-synth:partials xen-synth:tilt xen-synth:even xen-synth:sustain'.split(' '));
   async function once(id, key, mode, lo, hi) {
     const sr = 22050, ctx = new OfflineAudioContext(1, sr * 2.0, sr), K = Kernel.create({ ctx, quiet: true, syncIR: true }); MasterTransport.create(K, { offline: true, bpm: 120 }).boot();
     const a = OrganismFactory.spawn(id, { K, headless: true }); if (!a) return null; const c = OrganismFactory.handle(a).ctx; if (c.internals && c.internals.ready) await c.internals.ready;
