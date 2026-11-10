@@ -53,3 +53,10 @@ open: the face size N per window size; whether IN PLAY reorders while playing or
 #   instrument-kind-flow.png (2D: its signal flow as a field of nodes — each group a node with its settings as bars, modulators above feeding in;
 #   PROPERTIES edits the selected stage; LAYERS = the stages, grouped by what they do) · instrument-kind-3d.png (each stage a plane).
 #   node docs/previews/instrument-kind.shots.mjs remakes them. Waiting for his word before any of it is built.
+
+# ---- ADDENDUM 2026-11-10 — additive or optional, never a removal (nothing above is changed)
+#   his words: "will adding the contraint field, remove anything from how it works now, i want it to be additive or optional."
+#   RULE: the constraint field removes and changes nothing. Every tool's layout as it is today stays the default and stays complete; the
+#   field is an option (Settings › Look › Layout: As designed · Fluid, per tool too). With Fluid on, no control is ever hidden: what does
+#   nothing in the current state moves to NOT IN PLAY (still there, still usable, with why), the rest reorders. Hand-coded dims keep working;
+#   the generated DAG only adds edges. A guard test: with the option off, every tool's window is identical to before.
