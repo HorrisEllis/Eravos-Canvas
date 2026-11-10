@@ -95,7 +95,7 @@
         lp1.frequency.setValueAtTime(base, t); lp1.frequency.linearRampToValueAtTime(peak, t + P.get('fA')); lp1.frequency.setTargetAtTime(base + (peak - base) * P.get('fS'), t + P.get('fA'), P.get('fD') / 3);
         lp2.frequency.value = Math.min(18000, peak * 1.6);
         const top = 0.25 + 0.75 * vel; dsp.adsr(amp.gain, t, { a: P.get('attack'), d: P.get('decay'), s: P.get('sustain'), peak: top });
-        return { amp, lp1, oscs, nodes, f, pitched, unhook, sus: top * P.get('sustain') };
+        return { amp, lp1, lp2, sbg, oscs, nodes, f, pitched, unhook, sus: top * P.get('sustain'), c0: Math.max(1, P.get('cutoff')) };
       }
       function noteOn(note, vel, t, dur) {
         t = Math.max(t || ac.currentTime, ac.currentTime); const f = MT.hz(Math.max(0, note + 12 * P.get('octave')));
@@ -143,6 +143,12 @@
       const down = new Set(), latched = new Set();
       const handOn = (note, vel, t, dur) => { if (P.get('hold') && !(dur < 30)) {   /* a short timed preview plays as itself; a key (30 s or open) is a hand */ if (!down.size && latched.size) { const same = latched.size === 1 && latched.has(note); latched.forEach(n => noteOff(n)); latched.clear(); if (same) return; } down.add(note); return press(note, vel, t, undefined); } return press(note, vel, t, dur); };
       const handOff = (note) => { if (P.get('hold')) { if (!down.delete(note)) return; latched.add(note); return; } lift(note); };
+      // 3.163 a knob moved while a note sounds reaches that note (axiom 4; his: "changing any tools values, knobs, presets or what ever is
+      // really delayed"): each voice keeps the cutoff it started with; a change shifts its filters by the difference (detune, in cents), so
+      // its own filter envelope keeps its shape; resonance and the sub level follow too. Before, all three waited for the next note.
+      P.onChange('cutoff', (c) => { const now = ac.currentTime; voices.forEach(x => { const d = 1200 * Math.log2(Math.max(1, c) / x.voice.c0); [x.voice.lp1, x.voice.lp2].forEach(f => f.detune.setTargetAtTime(d, now, 0.012)); }); });
+      P.onChange('res', (q) => voices.forEach(x => x.voice.lp1.Q.setTargetAtTime(q, ac.currentTime, 0.012)));
+      P.onChange('sub', (v) => voices.forEach(x => x.voice.sbg.gain.setTargetAtTime(v * 0.14, ac.currentTime, 0.012)));
       P.onChange('hold', (v) => { if (!v) { latched.forEach(n => { if (!down.has(n)) lift(n); }); latched.clear(); } });
       const press = (note, vel, t, dur) => { if (P.get('arp') === 'off') return noteOn(note, vel, t, dur); if (!P.get('arpHold') || !held.length || held._released) { if (held._released) { held.length = 0; held._released = false; } } const wasEmpty = !held.length; if (!held.includes(note)) held.push(note); if (wasEmpty) catchUp(); if (dur !== undefined) setTimeout(() => lift(note), (Math.max(0, (t || ac.currentTime) - ac.currentTime) + dur) * 1000); };
       const lift = (note) => { if (P.get('arp') === 'off') return noteOff(note); if (P.get('arpHold')) { held._released = true; return; } const i = held.indexOf(note); if (i >= 0) held.splice(i, 1); };

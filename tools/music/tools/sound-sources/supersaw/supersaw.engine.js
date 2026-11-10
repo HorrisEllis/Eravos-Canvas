@@ -77,7 +77,7 @@
         const c = P.get('cutoff'), fk = Math.min(20000, c * Math.pow(2, P.get('fEnv')));
         const fA = P.get('fA'), fD = P.get('fD'), fS = P.get('fS');
         lp.frequency.setValueAtTime(c, t); lp.frequency.linearRampToValueAtTime(fk, t + fA); lp.frequency.linearRampToValueAtTime(c + (fk - c) * fS, t + fA + fD);
-        const v = { note, oscs, amp, lp, sum, start: t, released: false, end: Infinity, peak, sus: Sus };
+        const v = { note, oscs, amp, lp, sum, start: t, released: false, end: Infinity, peak, sus: Sus, c0: Math.max(1, c) };
         voices.push(v);
         if (dur !== undefined) release(v, t + Math.max(0.01, dur));
         return v;
@@ -129,6 +129,9 @@
       ctx.onUI('key_up', { type: 'object', required: ['note'] }, (p) => noteOff(p.note));
       ctx.onKey(() => ctx.syncUI());
       P.onChange('level', (v) => lvl.gain.setTargetAtTime(v * 0.5, ac.currentTime, 0.01));
+      // 3.163 a cutoff moved while notes sound reaches them (axiom 4): each voice keeps the cutoff it started with; a change shifts its filter
+      // by the difference (detune, in cents) — its filter envelope keeps its shape. Before, the cutoff waited for the next note.
+      P.onChange('cutoff', (c) => { const now = ac.currentTime; voices.forEach(x => { if (x.lp && x.c0) x.lp.detune.setTargetAtTime(1200 * Math.log2(Math.max(1, c) / x.c0), now, 0.012); }); });
       ctx.audition = (p) => noteOn(p.note || 69, 0.85, ac.currentTime, 0.6);
       return { unmount() { voices.slice().forEach(v => kill(v, ac.currentTime)); } };
     },

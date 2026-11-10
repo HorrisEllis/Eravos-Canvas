@@ -10,6 +10,21 @@ His words: "what do i even do with this? i cant edit layers or draw, manipulate 
   workshop.css, so the Workshop tests run the real layout (P161 had passed on an unstyled page).
 - Proof: tests/p162 1/1; P150 … P161 green. Version 0.2.20.
 
+## Done — 3.163 A knob moved during a note reaches that note: the guard, Retro Poly, Supersaw (2026-11-10)
+His words: "the workshop when drawing or manipulating or shaping, doesn't do much to change the sound." · "changing any tools values, knobs,
+presets or what ever is really delayed" · "whats cheaper, or higher leverage? … do it."
+- Found, measured live: many instruments read a knob only when a note starts, so a knob, preset, automation lane or Workshop curve was heard
+  on the NEXT note (Retro Poly: cutoff at note-on; a 150 Hz → 9 kHz sweep mid-note changed the note by 0.00 octave).
+- tests/p163-knobs-while-playing.test.js: every instrument with a tone knob holds a note; the knob moves at 1.0 s (offline, sample-exact);
+  brightness (RMS of the change over RMS) against the same note left alone. Fixed tools are asserted; the others are listed, and the list
+  only shrinks. Today: 12 measured; following: Retro Poly (fixed), Supersaw (fixed), Retro DCO, Swarm, and the worklet tools; partly (0.4–0.5
+  oct): Acid Synth (its drive after the filter flattens the measure), Bass Forge, Wobble Bass (its own LFO sweeps the same filter; it sets the
+  filter live); not yet: Sub Engine, Wub Sub, Pad Forge, Embodiment Lab.
+- Retro Poly: each voice keeps the cutoff it started with; a change shifts its filters by the difference (detune) so its filter envelope keeps
+  its shape; resonance and sub level follow too. Supersaw: the same for its cutoff. Nothing changes when no knob moves.
+- Also found: Workshop shapes faster than ~32 cycles per note lose depth in the 64-point compile (open).
+- Proof: P163 1/1 (fails on the old Retro Poly: −0.00 oct) · retro-poly 12/12 · supersaw 13/13 · P130 4/4 · P147 1/1.
+
 ## Done — 3.161 The Workshop's toolbar, tempo, the rhythm library (W3g) (2026-11-09)
 His words: "looks great though, the tool but i want to be able to manipulate it on the canvas, like photoshop, needs the toolbar, for drawing, shaping, editing, etc. tempo. next patterns from the pattern storage, maybe rename it to rhythm library."
 - canvas/runtime/workshop.js: the toolbar V P L D S G E O (select, pen, line, points, smooth, move, erase, orbit) works on the view, live while
