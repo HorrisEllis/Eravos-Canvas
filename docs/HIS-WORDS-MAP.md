@@ -96,6 +96,12 @@ kept), or **open** (not done yet, and what is missing). Newest at the bottom. Ad
 | 87 | "Yes. 1 then Show me a preview." | **done** | as above |
 | 88 | "I need like a video or something. It’s just a static still" · "its okay. put a pin in it for now. i dont want to burn through tokens" | **pinned** | `docs/previews/ui-field.video.mjs` (frame-stepped 30 fps recorder, not yet run to the end) |
 | 89 | "merge other branches" | **done** | `claude/nice-dirac-t64qeo` merged (the instrument-kind preview); `claude/sharp-hypatia-9q2vyc` merged as a record (main's bends kept; `specs/eravos.phase52-map.spec` ADDENDUM 2026-11-10) |
+| 90 | "the workshop when drawing or manipulating or shaping, doesn't do much to change the sound." | **open** — measure first (which edits reach the sound, by how much) | — |
+| 91 | "also the ability to add a note on the piano roll from the map would be usefull." | **open** | — |
+| 92 | "also the pattern editor is meant to be in the workshop, like more than just a note, i want to be able to add or create patterns for the library and the timeline and import them into the timeline." | **open** — the Workshop at pattern scale: make / edit a pattern, save to the library, import into the Timeline | — |
+| 93 | "i love the 3d exploded view, just needs to make sure each layer is manipulatable." | **open** — every plane editable in 3D | — |
+| 94 | "also love the automation tool, looks bad but extremely useful, same with the bass and chord tool." | noted — their look is open (shown to him before any change) | — |
+| 95 | "will adding the contraint field, remove anything from how it works now, i want it to be additive or optional." | **rule** — the constraint field only adds (an option, off by default); nothing that works today is removed or changed | `specs/eravos.ui-field.spec` ADDENDUM 2026-11-10 |
 
 ## 2026-11-08 — ERAVOS, the build surface for Nexus (said in the Nexus session)
 
