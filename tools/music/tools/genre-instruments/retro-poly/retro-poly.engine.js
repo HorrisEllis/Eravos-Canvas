@@ -75,7 +75,7 @@
         const nodes = [], mk = (n) => { nodes.push(n); return n; }, pitched = [], unhook = [];
         const amp = mk(ac.createGain()), lp1 = mk(ac.createBiquadFilter()), lp2 = mk(ac.createBiquadFilter()); amp.gain.value = 0; lp1.type = lp2.type = 'lowpass'; lp1.Q.value = P.get('res'); lp2.Q.value = 0.7;
         cutMod.connect(lp1.detune); cutMod.connect(lp2.detune); unhook.push(() => { cutMod.disconnect(lp1.detune); cutMod.disconnect(lp2.detune); }); lp1.connect(lp2); lp2.connect(amp); amp.connect(bus);
-        const oscs = [], U = P.get('mono') ? P.get('unison') : 1;
+        const oscs = [], parts = [], U = P.get('mono') ? P.get('unison') : 1; let ngain = null;
         for (let u = 0; u < U; u++) {
           const det = U > 1 ? (u - (U - 1) / 2) * 11 : 0;
           const saw = mk(ac.createOscillator()); saw.type = 'sawtooth'; saw.frequency.value = f; saw.detune.value = det;
@@ -84,10 +84,10 @@
           const dl = mk(ac.createDelay(0.1)), pos = mk(ac.createGain()), neg = mk(ac.createGain()); dl.delayTime.value = P.get('width') / f; pos.gain.value = P.get('pulse') * 0.2 / Math.sqrt(U); neg.gain.value = -P.get('pulse') * 0.2 / Math.sqrt(U);
           const pw = mk(ac.createGain()); pw.gain.value = P.get('pwm') * 0.4 * P.get('width') / f; pwmBus.connect(pw); unhook.push(() => pwmBus.disconnect(pw)); pw.connect(dl.delayTime);
           saw.connect(pos); saw.connect(dl); dl.connect(neg); pos.connect(lp1); neg.connect(lp1);
-          oscs.push(saw); pitched.push({ o: saw, k: 1, dl }); saw.start(t);
+          oscs.push(saw); pitched.push({ o: saw, k: 1, dl }); parts.push({ sg, pos, neg, dl, pw, U }); saw.start(t);
         }
         const sub = mk(ac.createOscillator()); sub.type = 'square'; sub.frequency.value = f / 2; const sbg = mk(ac.createGain()); sbg.gain.value = P.get('sub') * 0.14; sub.connect(sbg); sbg.connect(lp1); sub.start(t); oscs.push(sub); pitched.push({ o: sub, k: 0.5 });
-        if (P.get('noise') > 0) { const n = mk(dsp.noiseSource(ac, 'white')); const ng = mk(ac.createGain()); ng.gain.value = P.get('noise') * 0.1; n.connect(ng); ng.connect(lp1); n.start(t, rnd()); oscs.push(n); }
+        if (P.get('noise') > 0) { const n = mk(dsp.noiseSource(ac, 'white')); const ng = mk(ac.createGain()); ng.gain.value = P.get('noise') * 0.1; ngain = ng; n.connect(ng); ng.connect(lp1); n.start(t, rnd()); oscs.push(n); }
         // drift: each voice its own slow wander
         const dr = P.get('drift'); if (dr > 0) { const l = mk(ac.createOscillator()), lg = mk(ac.createGain()); l.frequency.value = 0.08 + rnd() * 0.25; lg.gain.value = dr * 9; l.connect(lg); oscs.forEach(o => { if (o.detune) lg.connect(o.detune); }); l.start(t); oscs.push(l); oscs.forEach(o => { if (o.detune) o.detune.value += (rnd() - 0.5) * dr * 6; }); }
         // filter env
@@ -95,7 +95,7 @@
         lp1.frequency.setValueAtTime(base, t); lp1.frequency.linearRampToValueAtTime(peak, t + P.get('fA')); lp1.frequency.setTargetAtTime(base + (peak - base) * P.get('fS'), t + P.get('fA'), P.get('fD') / 3);
         lp2.frequency.value = Math.min(18000, peak * 1.6);
         const top = 0.25 + 0.75 * vel; dsp.adsr(amp.gain, t, { a: P.get('attack'), d: P.get('decay'), s: P.get('sustain'), peak: top });
-        return { amp, lp1, lp2, sbg, oscs, nodes, f, pitched, unhook, sus: top * P.get('sustain'), c0: Math.max(1, P.get('cutoff')) };
+        return { amp, lp1, lp2, sbg, oscs, nodes, f, pitched, unhook, parts, ngain, top, base, t0: t, sus: top * P.get('sustain'), c0: Math.max(1, P.get('cutoff')) };
       }
       function noteOn(note, vel, t, dur) {
         t = Math.max(t || ac.currentTime, ac.currentTime); const f = MT.hz(Math.max(0, note + 12 * P.get('octave')));
@@ -149,6 +149,16 @@
       P.onChange('cutoff', (c) => { const now = ac.currentTime; voices.forEach(x => { const d = 1200 * Math.log2(Math.max(1, c) / x.voice.c0); [x.voice.lp1, x.voice.lp2].forEach(f => f.detune.setTargetAtTime(d, now, 0.012)); }); });
       P.onChange('res', (q) => voices.forEach(x => x.voice.lp1.Q.setTargetAtTime(q, ac.currentTime, 0.012)));
       P.onChange('sub', (v) => voices.forEach(x => x.voice.sbg.gain.setTargetAtTime(v * 0.14, ac.currentTime, 0.012)));
+      // 3.164 the rest of what a sounding voice was built from follows too: the saw and pulse levels, the pulse width, the noise level (when
+      // the voice has noise), the amp's sustain, and the filter envelope's amount and sustain (once the voice is past its attack and decay)
+      const each = (fn) => { const now = ac.currentTime; voices.forEach(x => fn(x.voice, now, x)); };
+      P.onChange('saw', (v) => each((V, now) => V.parts.forEach(q => q.sg.gain.setTargetAtTime(v * 0.22 / Math.sqrt(q.U), now, 0.012))));
+      P.onChange('pulse', (v) => each((V, now) => V.parts.forEach(q => { q.pos.gain.setTargetAtTime(v * 0.2 / Math.sqrt(q.U), now, 0.012); q.neg.gain.setTargetAtTime(-v * 0.2 / Math.sqrt(q.U), now, 0.012); })));
+      P.onChange('width', (w) => each((V, now) => V.parts.forEach(q => { q.dl.delayTime.setTargetAtTime(w / V.f, now, 0.012); q.pw.gain.setTargetAtTime(P.get('pwm') * 0.4 * w / V.f, now, 0.012); })));
+      P.onChange('noise', (v) => each((V, now) => { if (V.ngain) V.ngain.gain.setTargetAtTime(v * 0.1, now, 0.012); }));
+      P.onChange('sustain', (sv) => each((V, now, x) => { if (x.off <= now || now < V.t0 + P.get('attack') + P.get('decay')) return; V.sus = V.top * sv; V.amp.gain.cancelScheduledValues(now); V.amp.gain.setTargetAtTime(V.sus, now, 0.03); if (x.off !== Infinity) rel(x, x.off); }));
+      const fenv = () => each((V, now, x) => { if (x.off <= now || now < V.t0 + P.get('fA')) return; const peak = Math.max(40, Math.min(18000, V.base * Math.pow(2, P.get('envAmt') * 5))); V.lp1.frequency.cancelScheduledValues(now); V.lp1.frequency.setTargetAtTime(V.base + (peak - V.base) * P.get('fS'), now, 0.03); });
+      P.onChange('envAmt', fenv); P.onChange('fS', fenv);
       P.onChange('hold', (v) => { if (!v) { latched.forEach(n => { if (!down.has(n)) lift(n); }); latched.clear(); } });
       const press = (note, vel, t, dur) => { if (P.get('arp') === 'off') return noteOn(note, vel, t, dur); if (!P.get('arpHold') || !held.length || held._released) { if (held._released) { held.length = 0; held._released = false; } } const wasEmpty = !held.length; if (!held.includes(note)) held.push(note); if (wasEmpty) catchUp(); if (dur !== undefined) setTimeout(() => lift(note), (Math.max(0, (t || ac.currentTime) - ac.currentTime) + dur) * 1000); };
       const lift = (note) => { if (P.get('arp') === 'off') return noteOff(note); if (P.get('arpHold')) { held._released = true; return; } const i = held.indexOf(note); if (i >= 0) held.splice(i, 1); };

@@ -63,7 +63,7 @@
           const gL = ac.createGain(), gR = ac.createGain(); gL.gain.value = lv * Math.cos(th); gR.gain.value = lv * Math.sin(th);
           o.connect(gL); o.connect(gR); gL.connect(sumL); gR.connect(sumR);
           o.start(t, Math.random() * 0.01);
-          oscs.push({ o, dm });
+          oscs.push({ o, dm, gL, gR, center, th, n });
         }
         const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = hz * 0.7; hp.Q.value = 0.5;
         const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = P.get('res');
@@ -131,6 +131,9 @@
       P.onChange('level', (v) => lvl.gain.setTargetAtTime(v * 0.5, ac.currentTime, 0.01));
       // 3.163 a cutoff moved while notes sound reaches them (axiom 4): each voice keeps the cutoff it started with; a change shifts its filter
       // by the difference (detune, in cents) — its filter envelope keeps its shape. Before, the cutoff waited for the next note.
+      // 3.164 Mix and the amp's sustain follow sounding notes too (sustain once the note is past its attack and decay, and not yet released)
+      P.onChange('mix', (mix) => { const now = ac.currentTime; voices.forEach(x => x.oscs.forEach(q => { if (!q.gL) return; const lv = (q.center ? 1 - mix * 0.4 : mix) / Math.sqrt(q.n); q.gL.gain.setTargetAtTime(lv * Math.cos(q.th), now, 0.012); q.gR.gain.setTargetAtTime(lv * Math.sin(q.th), now, 0.012); })); });
+      P.onChange('aS', (sv) => { const now = ac.currentTime; voices.forEach(x => { if ((x.released && x.relT <= now) || now < x.start + P.get('aA') + P.get('aD')) return; x.sus = sv; x.amp.gain.cancelScheduledValues(now); x.amp.gain.setTargetAtTime(x.peak * sv, now, 0.03); if (x.released) x.amp.gain.setTargetAtTime(0, x.relT, P.get('aR') / 4);   /* a booked end stays booked */ }); });
       P.onChange('cutoff', (c) => { const now = ac.currentTime; voices.forEach(x => { if (x.lp && x.c0) x.lp.detune.setTargetAtTime(1200 * Math.log2(Math.max(1, c) / x.c0), now, 0.012); }); });
       ctx.audition = (p) => noteOn(p.note || 69, 0.85, ac.currentTime, 0.6);
       return { unmount() { voices.slice().forEach(v => kill(v, ac.currentTime)); } };
