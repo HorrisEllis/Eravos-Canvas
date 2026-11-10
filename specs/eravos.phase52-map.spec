@@ -71,3 +71,28 @@
     peak 0 dB → −1.5 (clipping gone); pad Reese at −9 dB, the loudest thing → Pad Forge at −17 dB, an octave down; drop under 100 Hz:
     40% → 43%, now Wub Sub (−15 dB, centre 44 Hz) instead of Supersaw. Wobble's Bun Dem lane is quiet (−32 dB alone; its notes are
     short 1/16 hits), so it is his to turn up (Level, Depth) or lengthen. Pad Forge gained Octave and Pitch for this (tests 10/10).
+
+## ADDENDUM 2026-10-22 (later) — P52.6a CURVES built
+  James: "What about curvature? like bending notes, drawing." then "needs to have the timeline curves".
+  Built as the first part of P52.6. What "simpler" means for the timeline is still his to name.
+  - A note may carry `b: [[x 0..1 of the note, semitones ±24], …]` (at most 64 points). The timeline keeps it through save/load
+    (cleanNotes) and sends it as `bend` on note:trigger.
+  - Piano roll: Bend tool (〰, key 6). Drag across a note to draw its curve freehand. One row is one semitone. Shift snaps to whole
+    semitones. The curve is drawn on the note. Double-click the note in Bend mode to clear it. One drag is one undo step.
+  - The music SDK plays it sample-accurate, as cents on oscillator detune (a ConstantSource):
+    - Poly tools follow it automatically, per note (each oscillator the note creates).
+    - Mono tools follow it through `ctx.bendTargets([...])`: Wobble Bass, Reese (plus its voices), Wub Osc, Wub Sub, Acid Synth,
+      Sub Engine. A straight note after a bent one resets to 0.
+  - Limit, said (§1.2): tools with no per-note oscillator and no registered targets (sample players, Pad Forge, Granular) ignore a
+    bend for now. Each can register its pitch params with bendTargets when wanted.
+  - Proof: tests/p52-curves.test.js, 4/4. It draws and clears a curve, checks save/load and send, and renders two notes: Wub Sub
+    goes up an octave at the end of the bent note and the next note is straight; a Retro Poly bent note ends an octave up.
+  - Open with him: should a bend be drawn on the note (built), or should there also be a separate pitch lane under the roll?
+
+## ADDENDUM 2026-11-10 — P52.6a, merged as a record (nothing above is changed)
+  His words: "merge other branches". The branch claude/sharp-hypatia-9q2vyc (22 Oct) carried P52.6a above: bends drawn per note, played
+  through ctx.bendTargets. By the time it was merged main had built the same and more another way, so the merge keeps main's code and this
+  entry as the record: 3.56 a note's bend (from, to, shape, at) on the SDK's pitch wheel (oscillators hooked, no per-tool targets) · 3.108
+  Sketch: one stroke = one note whose bend follows a drawn path · 3.113 Curves for every selected note · 3.149 the wheel reaches worklet
+  instruments (ctx.bendInto). tests/p52-curves.test.js tested the bendTargets way and is not carried; the bends are proved by P108, P113,
+  P149 and the Timeline suite. The branch's commits stay in the history (this merge).
