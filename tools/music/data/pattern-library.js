@@ -145,6 +145,8 @@
     if (clip) { const open = () => T.view && T.view.openClip && T.view.openClip(clip.id); if (open()) onWs(); else setTimeout(() => { if (open()) onWs(); }, 60); }
     return Object.assign({ clip: clip ? clip.id : null }, r);
   }
+  // 3.165 ＋ New pattern: an empty two-bar pattern on the Timeline (the track of the tool picked here, else Retro Poly), open on the Workshop
+  function newPattern(o) { o = o || {}; return edit({ name: 'New pattern', type: 'lead', bars: 2, genre: 'yours', genreLabel: 'Yours', bpm: 120, scale: 'minor', tool: o.tool || pick.tool || 'eravos.retro-poly', notes: [], source: 'your pattern' }, o); }
   // ---- ▶ hear it: rendered in its own offline universe (nothing on the canvas changes), kept for the session
   const sounds = new Map(); let playing = null;
   async function render(p) {
@@ -200,6 +202,7 @@
   // curves, tension and build → drop; results in sections (by type, family or genre) that fold; sort, BPM range, ★ favourites.
   // What you pick stays picked the next time the page opens; folds and favourites stay across visits.
   const FAMILIES = [
+    ['yours', '✎ Yours & shapes', /^(yours|shapes)$/],   // 3.165 what you made (the Workshop's patterns, the Pattern tool's shapes)
     ['deep', '🕳 Deep drops & tension', /^(hd-|tension-)/],
     ['dubstep', 'Dubstep', /^(dubstep|riddim|melodic|tearout|deathstep|trapstep|drumstep|wub-|brostep|talker|dancehall-dubstep|reese-vs-wub)/],
     ['dnb', 'Drum & Bass', /^(dnb|neuro|jungle|breakbeat|reese-roller|halftime-reese)$/],
@@ -286,7 +289,8 @@
     const tabsEl = h('div', { class: 'plib-tabs', role: 'tablist' }, [tabBtn('patterns', '🥁 Rhythms · ' + lib.length), tabBtn('notes', '♪ Notes · ' + (global.NoteLibrary ? global.NoteLibrary.all().length : 0))]);
     if ((o && o.tab) === 'notes') pBody.style.display = 'none'; else nBody.style.display = 'none';
     ov.append(h('div', { class: 'sbk-box' }, [
-      h('header', { class: 'sbk-head' }, [h('div', {}, [tabsEl, h('span', { class: 'sbk-sub', text: ' THE RHYTHM LIBRARY — every song in blocks (each instrument, each section), and the notes you saved. Hear it, send it to your song, or put it into the Workshop.' })]), h('button', { class: 'sbk-x', text: '×', 'aria-label': 'close', onclick: () => close() })]),
+      h('header', { class: 'sbk-head' }, [h('div', {}, [tabsEl, h('span', { class: 'sbk-sub', text: ' THE RHYTHM LIBRARY — every song in blocks (each instrument, each section), and the notes you saved. Hear it, send it to your song, or put it into the Workshop.' })]),
+        h('button', { class: 'sbk-alt sm plib-new', type: 'button', text: '＋ New pattern', title: 'an empty pattern on the Timeline, open on the Workshop: click the map to add notes, or press I for an idea — then SAVE PATTERN keeps it here under Yours', onclick: () => { close(); newPattern(); } }), h('button', { class: 'sbk-x', text: '×', 'aria-label': 'close', onclick: () => close() })]),
       pBody, nBody]));
     ov.addEventListener('mousedown', (e) => { if (e.target === ov) close(); });
     document.addEventListener('keydown', key, true);
@@ -446,5 +450,5 @@
   }
   // tests: the page as on a fresh start (nothing picked, no tool chosen yet)
   function forget() { pick.types.clear(); pick.genres.clear(); Object.assign(pick, { fav: false, q: '', lo: '', hi: '', sort: 'genre', group: 'type', tool: null }); }
-  global.PatternLibrary = { forTool, discard, deleted: () => [...gone], kindsFor, about: ABOUT, draw: drawCard, forget, edit, addTransform: (fn) => { if (typeof fn === 'function') { transforms.push(fn); LIB = null; } }, addSource: (fn) => { if (typeof fn === 'function') { sources.push(fn); LIB = null; } }, all, types: TYPES.map(t => ({ id: t[0], label: t[1] })), get: (id) => all().find(p => p.id === id) || null, send, render, play, stop, open, rebuild: () => { LIB = null; return all(); }, fromGenre, families: FAMILIES.map(f => ({ id: f[0], label: f[1] })), familyOf, matches };
+  global.PatternLibrary = { newPattern, forTool, discard, deleted: () => [...gone], kindsFor, about: ABOUT, draw: drawCard, forget, edit, addTransform: (fn) => { if (typeof fn === 'function') { transforms.push(fn); LIB = null; } }, addSource: (fn) => { if (typeof fn === 'function') { sources.push(fn); LIB = null; } }, all, types: TYPES.map(t => ({ id: t[0], label: t[1] })), get: (id) => all().find(p => p.id === id) || null, send, render, play, stop, open, rebuild: () => { LIB = null; return all(); }, fromGenre, families: FAMILIES.map(f => ({ id: f[0], label: f[1] })), familyOf, matches };
 })(typeof window !== 'undefined' ? window : globalThis);
