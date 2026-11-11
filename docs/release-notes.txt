@@ -1,3 +1,14 @@
+ERAVOS v0.2.21 (2026-11-11)
+
+Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.21.exe from the release.
+
+- Make a pattern without knowing how: Patterns › ＋ New pattern opens an empty pattern on the Workshop. Press I (✦ IDEA) and it fills with
+  notes in your song's key; press I again for another take; ＋ BUSIER / − SPARSER for more or fewer notes. It plays in your song as you go.
+- The Workshop's map adds notes: click an empty spot to put a note there, click a note to open it; ✕ NOTE (Shift+Delete) removes it.
+- SAVE PATTERN (Ctrl+Shift+S) keeps the whole pattern in the rhythm library under Yours — any key, any song.
+- Knobs are heard while a note sounds: Retro Poly (cutoff, resonance, levels, width, sustain), Supersaw (cutoff, mix, sustain) and the Organ
+  (pull a drawbar out mid-chord) no longer wait for the next note. This is also why shaping a note on the Workshop did so little before.
+
 ERAVOS v0.2.20 (2026-11-09)
 
 Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.20.exe from the release.
