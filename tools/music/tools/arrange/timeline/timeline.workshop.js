@@ -165,7 +165,7 @@
   function drawNav(g, W, top, d) {
     const G = navGeom(d, W, top), sel = d.sel | 0, black = (n) => [1, 3, 6, 8, 10].includes(((n % 12) + 12) % 12);
     g.fillStyle = '#06090e'; g.fillRect(0, 0, W, top);
-    g.fillStyle = '#5a7a96'; g.font = '10px monospace'; g.fillText('NOTES · ' + G.ns.length + (d.drums ? ' · PADS' : '') + '   click one to open it · [ ] step', 10, 14);
+    g.fillStyle = '#5a7a96'; g.font = '10px monospace'; g.fillText('NOTES · ' + G.ns.length + (d.drums ? ' · PADS' : '') + '   click a note to open it · click an empty spot to add one · [ ] step', 10, 14);
     g.textAlign = 'right'; g.fillStyle = '#7fdcff'; g.fillText((NAV_OPEN ? '▴ fold' : '▾ open') + ' (N)', W - 10, 14); g.textAlign = 'left';
     if (!NAV_OPEN) { G.ns.forEach((x, i) => { g.fillStyle = i === sel ? '#00d4ff' : 'rgba(0,212,255,0.4)'; g.fillRect(G.X(x.s), 20, Math.max(2, G.X(x.s + x.l) - G.X(x.s) - 1), 5); });
       g.strokeStyle = '#16243a'; g.beginPath(); g.moveTo(0, top - 0.5); g.lineTo(W, top - 0.5); g.stroke(); return; }
@@ -187,7 +187,26 @@
     if (y < 20 && x > W - 120) return { run: navToggle };
     const G = navGeom(d, W, top), st = (x - G.x0) / G.w * G.end, n = NAV_OPEN ? G.hi - Math.floor((y - G.y0) / G.rh) : null;
     let best = -1, bd = 1e9; G.ns.forEach((q, i) => { const dx = st < q.s ? q.s - st : st > q.s + q.l ? st - q.s - q.l : 0, dy = n === null ? 0 : Math.abs(q.n - n) * 0.6; if (dx + dy < bd) { bd = dx + dy; best = i; } });
-    return best >= 0 && best !== (d.sel | 0) ? { key: 'sel', value: best + 1, label: 'Open note' } : null;
+    // 3.165 the map adds notes (his words, 2026-11-10: "the ability to add a note on the piano roll from the map would be usefull"): a click ON
+    // a note (or within half a step of one) opens it; a click on an empty spot of the open map puts a note there, on the 16th under the hand
+    if (best >= 0 && (bd <= 0.5 || n === null)) return best !== (d.sel | 0) ? { key: 'sel', value: best + 1, label: 'Open note' } : null;
+    if (n === null || x < G.x0 || y < G.y0 || st < 0 || st >= G.end) return null;
+    return { key: 'addNote', value: { s: Math.floor(st), n: clamp(n, 0, 127) }, label: 'Add ' + (d.drums ? 'pad ' + n : nameOf(n)) };
+  }
+  // IDEA: a take on this pattern from a structure — the song's key, its own range (where its notes are now; a melody's octaves when empty),
+  // a rhythm, a contour and a density picked by the seed. v = { seed?, dens? } (absent: the next seed / the same density).
+  const RHY = [[5, 8], [3, 8], [7, 16], [5, 16], [9, 16], [4, 16], [6, 8]], CONT = ['arch', 'rise', 'wave', 'fall', 'flat'];
+  function ideaNotes(d, v) {
+    const MP = global.MusicParts, PF = MP && MP.PF, TL = MP && MP.PF_TOOL; if (!PF || !TL || d.drums) return null;
+    const ns = d.notes || [], prev = d.idea || {}, seed = v && v.seed ? v.seed : (prev.seed || 0) + 1, dens = clamp(v && v.dens !== undefined ? v.dens : (prev.dens || 0.6), 0.15, 1);
+    let lo = prev.lo, hi = prev.hi, bars = prev.bars;
+    if (lo === undefined) { const p = ns.map(x => x.n); lo = p.length ? Math.min(...p) - 3 : 55; hi = p.length ? Math.max(...p) + 3 : 74; if (hi - lo < 14) { const m = (lo + hi) / 2; lo = Math.round(m - 7); hi = lo + 14; }
+      bars = clamp(Math.ceil(Math.max(32, ...ns.map(x => x.s + x.l)) / 16), 1, 8); }
+    const key = (global.Kernel && global.Kernel.music && global.Kernel.music.key) || { root: 9, scale: 'minor' }, r = RHY[seed % RHY.length];
+    const cfg = { chords: 'progression', progression: 'i-VI-III-VII', chordBars: 1, bars, gridK: r[0], gridN: r[1], gridRot: seed % 3 === 2 ? 2 : 0, lo, hi, densStart: dens * 0.75, densEnd: dens, densShape: seed % 2 ? 'rise' : 'arch',
+      contour: CONT[seed % CONT.length], contourAmt: Math.round((hi - lo) * 0.45), centre: Math.round(lo + (hi - lo) * 0.3), length: r[1] === 16 ? 1.2 : 1.7, seed: seed * 7 + 3, locked: [] };
+    const out = PF.emerge(TL.toStructure((k) => cfg[k], key)); if (!out.notes.length) return null;
+    return { notes: out.notes.map(x => ({ s: x.s, l: Math.max(0.5, Math.round(x.len * 4) / 4), n: x.n, v: Math.round(x.vel * 100) / 100 })), idea: { seed, dens, lo, hi, bars } };
   }
   let HOOK = {};   // the opener's: { hear(note) } — the roll plays a note through its lane's instrument, curves and all
   const bind = (h) => { HOOK = h || {}; };
@@ -230,8 +249,17 @@
     stationKey: 'go',
     // the bar: up and into the tree (the fractal), add / take away a modulator, stop shaping
     actions(d, o) {
-      const a = noteOf(d), at = shapeAt(d), sel = (o && o.selected) || '', M = MT(); if (!a) return [];
+      const a = noteOf(d), at = shapeAt(d), sel = (o && o.selected) || '', M = MT();
       const into = /^(T:.+|m:\d+:(rate|depth))$/.test(sel), out = [];
+      // 3.165 the pattern's own actions (also on an empty pattern)
+      const canIdea = !d.drums && !!(global.MusicParts && global.MusicParts.PF && global.MusicParts.PF_TOOL), dn = (d.idea && d.idea.dens) || 0.6;
+      out.push({ label: '✦ IDEA', name: 'An idea for this pattern', keys: 'I', key: 'idea', value: {}, disabled: !canIdea, hint: 'fill the pattern with notes that fit the song\'s key — a rhythm, a line, a shape; press again for another take (undo brings the last one back)' });
+      if (d.idea) { out.push({ label: '＋ BUSIER', name: 'The idea, busier', keys: 'Shift+ArrowUp', key: 'idea', value: { seed: d.idea.seed, dens: Math.min(1, dn + 0.15) }, disabled: dn >= 1, hint: 'the same take with more notes' });
+        out.push({ label: '− SPARSER', name: 'The idea, sparser', keys: 'Shift+ArrowDown', key: 'idea', value: { seed: d.idea.seed, dens: Math.max(0.15, dn - 0.15) }, disabled: dn <= 0.15, hint: 'the same take with fewer notes' }); }
+      out.push({ label: 'SAVE PATTERN', name: 'Save the pattern to the rhythm library', keys: 'Mod+Shift+S', hint: 'keep the whole pattern in the rhythm library (Patterns › Yours) — it plays in any key, on any song', disabled: !(d.notes || []).length || !(global.MusicParts && global.MusicParts.PF_LIB && global.MusicParts.PF_LIB.saveNotes),
+        run: (doc) => { const nm = global.MusicParts.PF_LIB.saveNotes(doc.name && !/^New pattern/.test(doc.name) ? doc.name : '', doc.notes, { drums: !!doc.drums, tool: HOOK.organism ? HOOK.organism(doc.target) : null }); return 'saved “' + nm + '” to the rhythm library (Yours)'; } });
+      if (a) out.push({ label: '✕ NOTE', name: 'Take this note away', keys: 'Shift+Delete', key: 'delNote', value: true, hint: 'remove the open note from the pattern' });
+      if (!a) { out.push({ label: 'RHYTHMS', name: 'Open the rhythm library', keys: 'R', hint: 'pick a rhythm and put it into this pattern (⇥ Into the Workshop)', disabled: !global.PatternLibrary, run: () => { global.PatternLibrary.open({ tab: 'patterns', reopen: true }); return ''; } }); return out; }
       out.push({ label: 'SAVE NOTE', name: 'Save to the note library', keys: 'Mod+S', strip: true, icon: '⤓', hint: 'keep this note — how it moves and plays — in the note library (Patterns › Notes); it fits any note of any tool', disabled: !global.NoteLibrary,
         run: (doc) => { const x0 = noteOf(doc); const nm = (doc.drums ? 'pad ' + x0.n : nameOf(x0.n)) + ' · ' + (global.NoteLibrary.describe({ note: x0 }) || 'note'); global.NoteLibrary.save(x0, nm, { tool: HOOK.label ? HOOK.label(doc.target) : '' }); return 'saved “' + nm + '” to the note library'; } });
       out.push({ label: 'RHYTHMS', name: 'Open the rhythm library', keys: 'R', hint: 'pick a rhythm and put it into this pattern (⇥ Into the Workshop)', disabled: !global.PatternLibrary, run: () => { global.PatternLibrary.open({ tab: 'patterns', reopen: true }); return ''; } });
@@ -309,6 +337,11 @@
     set(d, key, v) {
       const out = Object.assign({}, d, { notes: (d.notes || []).map(x => JSON.parse(JSON.stringify(x))) });
       if (key === 'sel') { out.sel = clamp(Math.round(v) - 1, 0, Math.max(0, out.notes.length - 1)); out.at = null; return out; }
+      // 3.165 PATTERN SCALE: add a note (from the map), take the open note away, and IDEA — notes that emerge from a structure in the song's
+      // key (components/pattern-field): press again for another take; busier / sparser keeps the take and changes how much of it sounds
+      if (key === 'addNote') { const cur = out.notes[clamp(out.sel | 0, 0, out.notes.length - 1)]; out.notes.push({ s: Math.max(0, Math.round(v.s)), l: cur ? cur.l : 2, n: Math.round(v.n), v: cur ? cur.v : 0.8 }); out.sel = out.notes.length - 1; out.at = null; return out; }
+      if (key === 'delNote') { if (!out.notes.length) return out; out.notes.splice(clamp(out.sel | 0, 0, out.notes.length - 1), 1); out.sel = clamp(out.sel | 0, 0, Math.max(0, out.notes.length - 1)); out.at = null; return out; }
+      if (key === 'idea') { const made = ideaNotes(out, v); if (made) { out.notes = made.notes; out.idea = made.idea; out.sel = 0; out.at = null; } return out; }
       const i0 = clamp(out.sel | 0, 0, out.notes.length - 1), a0 = out.notes[i0], M = MT();
       // where you are in the tree (not the note's data)
       if (key === 'go') { const k = Math.round(v); if (k <= 2) out.at = null; else if (out.at) out.at = { t: out.at.t, p: (out.at.p || []).slice(0, Math.max(0, Math.floor((k - 3) / 2))) }; return out; }
@@ -464,11 +497,11 @@
       return { key: 'stroke', value: { pts: binned.map(([x, y]) => [x, Math.round((r.lo + (r.hi - r.lo) * y) * 1000) / 1000]) }, label: 'Draw ' + atLabel(d, at, a) };
     },
     // a click on the pattern strip opens that note (the zoom from pattern scale to note scale)
-    pick(d, x, y, W, H) { return (d.notes || []).length ? pickNav(d, x, y, W, H) : null; },
+    pick(d, x, y, W, H) { return pickNav(d, x, y, W, H); },
     // W3f the options bar's picker: the instrument this pattern plays — any tool the piano roll can play (one on the canvas, or a new one)
     // W3h a line of help in the view: what the hand can do here
     hint(d, o) {
-      const at = shapeAt(d), a = noteOf(d); if (!a) return 'No notes — draw some in the piano roll';
+      const at = shapeAt(d), a = noteOf(d); if (!a) return 'An empty pattern — click the map above to add a note · I for an idea (press again for another) · R for the rhythm library';
       if (o && o.mode === '3d') return '3D — drag to turn · click a plane to select it · double-click to open it · 2 for the flat view';
       if (!at) return (d.drums ? '' : 'Draw on the note (P) to shape its pitch · ') + 'pick a layer on the right to change it · Space plays · changes are in your song as you make them · Esc closes · right-click for everything';
       const mi = /^m:\d+$/.test((o && o.selected) || '');

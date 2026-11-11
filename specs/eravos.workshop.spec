@@ -300,3 +300,9 @@ W3h  AT HAND      ⤓ save to the note library · ▶ play it · ✕ close — a
                   (2D too); OSCILLATE's plane is its oscillation alone
      FIXED        disabled: false no longer disables (el helper); tests/run.html loads workshop.css, so every Workshop test runs the real layout
      proof        tests/p162 1/1; P150 … P161 green with the real layout
+
+# ---- ADDENDUM 2026-11-11 — pattern scale on the Workshop (3.165; nothing above is changed)
+#   his words: "the pattern editor is meant to be in the workshop, like more than just a note" · "im struggling with complex patterns."
+#   The notes kind edits the pattern too: the map adds a note on an empty spot; ✕ NOTE; ✦ IDEA (notes from a structure in the song's key,
+#   another take each press, busier / sparser); SAVE PATTERN → the rhythm library (Yours); Patterns › ＋ New pattern. Open: move / resize a
+#   note on the map; every 3D plane editable; an idea per kind of part (bass, chords, drums).

@@ -20,10 +20,24 @@
   function librarySource() {
     const d = F() && F().def('eravos.pattern-field'), out = [];
     Object.keys((d && d.presets) || {}).forEach(nm => { const pr = d.presets[nm]; out.push(toLibrary(nm.replace(/^.*· /, ''), pr.params || pr, null, false)); });
-    readSaved().forEach(x => out.push(toLibrary(x.name, x.params, x.tool, true)));
+    readSaved().forEach(x => { if (x.notes) out.push(fromNotes(x)); else out.push(toLibrary(x.name, x.params, x.tool, true)); });
     return out.filter(p => p.notes.length);
   }
   let sourced = false; const ensureSource = () => { if (sourced || !global.PatternLibrary) return; sourced = true; global.PatternLibrary.addSource(librarySource); };
+  // 3.165 a whole pattern made on the Workshop (his words, 2026-11-10: "i want to be able to add or create patterns for the library and the
+  // timeline and import them into the timeline"): its notes kept as semitones from the song's root (drums: as they are), with each note's
+  // bend and own knob values — a block under Yours, sent to the Timeline like any other
+  function fromNotes(x) {
+    const hi = Math.max(0, ...x.notes.map(n => (x.drums ? n.n : n.r)));
+    return { name: '✎ ' + x.name, type: x.drums ? 'drums' : hi <= 51 ? 'bass' : 'lead', bars: x.bars, genre: 'yours', genreLabel: 'Yours', bpm: 120, scale: 'minor', drums: !!x.drums,
+      tool: x.tool || (x.drums ? 'eravos.pads' : 'eravos.retro-poly'), notes: x.notes.map(n => Object.assign({}, n)), source: 'your pattern' };
+  }
+  function saveNotes(name, notes, o) {
+    o = o || {}; const K = global.Kernel, root = K && K.music && K.music.key ? +K.music.key.root || 0 : 0, a = readSaved(), nm = name || ('Pattern ' + (a.filter(q => q.notes).length + 1));
+    const bars = Math.max(1, Math.min(8, Math.ceil(Math.max(1, ...notes.map(n => n.s + n.l)) / 16)));
+    a.push({ name: nm, drums: !!o.drums, tool: o.tool || null, bars, at: Date.now(), notes: notes.map(n => Object.assign(o.drums ? { s: n.s, l: n.l, n: n.n, v: n.v } : { s: n.s, l: n.l, r: n.n - root, v: n.v }, n.b ? { b: n.b } : {}, n.p ? { p: n.p } : {})) });
+    writeSaved(a); ensureSource(); if (global.PatternLibrary) global.PatternLibrary.rebuild(); return nm;
+  }
   function saveShape(d, name) {
     const P = {}; Object.keys(d).forEach(k => { if (k[0] !== '_') P[k] = d[k]; }); const a = readSaved(), nm = name || ('Shape ' + (a.length + 1));
     a.push({ name: nm, params: P, tool: (d._intoIds || [])[0] || null, at: Date.now() }); writeSaved(a); ensureSource(); if (global.PatternLibrary) global.PatternLibrary.rebuild(); return nm;
@@ -33,6 +47,6 @@
     const p = toLibrary('Shape', P, (d._intoIds || [])[0] || null, true); return global.PatternLibrary.send(p);
   }
   global.MusicParts = global.MusicParts || {};
-  global.MusicParts.PF_LIB = { toLibrary, librarySource, saveShape, toTimeline, readSaved, ensureSource, SAVED };
+  global.MusicParts.PF_LIB = { toLibrary, librarySource, saveShape, saveNotes, toTimeline, readSaved, ensureSource, SAVED };
   ensureSource();
 })(window);

@@ -38,7 +38,9 @@ describe('P154 notes and patterns on the Workshop', () => {
     try {
       t.roll.openWorkshop(0); await TH.sleep(40); const ws = Workshop.current;
       const cv = document.querySelector('.ws-app .ws-canvas'), r = cv.getBoundingClientRect();
-      cv.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: r.left + r.width * 0.75, clientY: r.top + r.height * 0.05 })); await TH.sleep(20);
+      // 3.165: a click ON the note opens it (a click on an empty spot of the map now adds a note there — P165)
+      const G = EravosTimelineWorkshop.navGeom(ws.doc(), r.width, EravosTimelineWorkshop.navTop(r.height)), g4 = ws.doc().notes[2];
+      cv.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: r.left + G.X(g4.s + 1), clientY: r.top + G.Y(g4.n) + G.rh / 2 })); await TH.sleep(20);
       assert.ok(/NOTE · G4/.test(document.querySelector('.ws-stations').textContent), 'the click opened the third note (G4)');
       ws.select('bend'); assert.ok(/-12/.test(document.querySelector('.ws-ins').textContent) || /−12|-12/.test(document.querySelector('.ws-layers').textContent), 'its bend shows');
       const sorted = (o) => JSON.stringify(Object.keys(o).sort().map(k => [k, o[k]])); assert.equal(sorted(t.clip().notes.find(n => n.n === 67).b), sorted(NOTES[2].b), "and is kept exactly");

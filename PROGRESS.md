@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Done — 3.165 Patterns made on the Workshop: the map adds notes, IDEA, save, New pattern (2026-11-11)
+His words: "the ability to add a note on the piano roll from the map would be usefull. also the pattern editor is meant to be in the workshop …
+i want to be able to add or create patterns for the library and the timeline and import them into the timeline." · "i want to make music
+badly. im struggling with complex patterns. never done this before"
+- The Workshop's map (navigator): a click on a note opens it; a click on an empty spot adds a note there (the 16th and key under the hand).
+  ✕ NOTE (Shift+Delete) takes the open note away. Works on an empty pattern.
+- ✦ IDEA (I): fills the pattern with notes in the song's key from a structure (components/pattern-field: a rhythm, a contour, a density by
+  seed); again = another take; ＋ BUSIER / − SPARSER keep the take; undo brings the last one back. Live in the Timeline's clip.
+- SAVE PATTERN (Ctrl+Shift+S): the whole pattern into the rhythm library under Yours (kept from the root: any key), → Timeline from there.
+- Patterns › ＋ New pattern: an empty two-bar pattern on the Timeline, open on the Workshop.
+- Also: the Shapes / Yours genres have a family (P73 was failing on main). No screenshot shown (his call: low on tokens).
+- Proof: tests/p165 2/2 · P150 P154 P156–P162 P151 P71 P73 P76 boundary green.
+
 ## Built, shown — 3.162 What to do with it (W3h); release 0.2.20 (2026-11-09)
 His words: "what do i even do with this? i cant edit layers or draw, manipulate or do anything with it. no way to close, save or play the note either."
 - The foot of the tool strip: ⤓ save · ▶ play · ✕ close; a help line in the view (the kind's hint); 3D: only shapes are planes, a click picks

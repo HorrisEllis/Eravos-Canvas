@@ -897,6 +897,7 @@
           { group: 'Add one', options: (window.OrganismFactory ? OrganismFactory.defined() : []).filter(isInst).map(dd => ({ value: 'new:' + dd.id, label: '＋ ' + (dd.icon ? dd.icon + ' ' : '') + (dd.label || dd.id) })).sort((x, y) => x.label.localeCompare(y.label)) }],
         spawn: (org) => { try { const id = OrganismFactory.spawn(org, {}); if (id) insts = (insts || []).concat([{ value: id, label: ((OrganismFactory.def(org) || {}).label || org) + ' ·' + String(id).split('-').slice(-1)[0] }]); return id; } catch (e) { console.error(e); return null; } },
         bpm: () => (window.Kernel && Kernel.music && Kernel.music.bpm) || 120,
+        organism: (id) => { try { const r = window.Kernel.registry.get(id); return (r && r.organism_id) || null; } catch (e) { return null; } },
         knobsOf, label: (id) => ((insts || []).find(o => o.value === id) || {}).label || id,
       });
       return global.Workshop.open('music.notes', { notes: notes.map(n => JSON.parse(JSON.stringify(n))), sel: Math.max(0, i | 0), name: clip.name || toolName(), drums: !!drums, knobs, target: (lane && lane.target) || '', bpm: (window.Kernel && Kernel.music && Kernel.music.bpm) || 120 },
