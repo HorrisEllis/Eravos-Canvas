@@ -17,7 +17,7 @@ describe('P161 the toolbar on the view, tempo, the rhythm library', () => {
     const t = await make(NOTES);
     try {
       t.roll.openWorkshop(0); await TH.sleep(40); const ws = Workshop.current, cv = document.querySelector('.ws-app .ws-canvas'), r = cv.getBoundingClientRect(), W = r.width, H = r.height;
-      assert.deepEqual(ws.tools(), ['select', 'pen', 'line', 'points', 'smooth', 'move', 'erase', 'orbit'], 'the toolbar'); assert.equal(document.querySelectorAll('.ws-strip .ws-ti').length >= 8, true, 'on the left strip');
+      assert.deepEqual(ws.tools(), ['select', 'pen', 'line', 'points', 'smooth', 'move', 'erase'], 'the toolbar (no Orbit: 2026-11-12, the toolbar edits)'); assert.equal(document.querySelectorAll('.ws-strip .ws-ti').length >= 7, true, 'on the left strip');
       key('p'); assert.equal(ws.tool(), 'pen', 'P = pen'); key('d'); assert.equal(ws.tool(), 'points', 'D = points'); key('g'); assert.equal(ws.tool(), 'move', 'G = move'); key('p');
       const top = EravosTimelineWorkshop.navTop(H), y0 = top + 26, h = H - y0 - 14, X = (tt) => 16 + tt * (W - 32), Y = (f) => y0 + (1 - f) * h;
       ws.drag('pen', [[X(0.5), Y(0.5)]]); await TH.sleep(10); assert.ok(/PITCH/.test(document.querySelector('.ws-stations').textContent), 'a tool on the note opens its pitch');

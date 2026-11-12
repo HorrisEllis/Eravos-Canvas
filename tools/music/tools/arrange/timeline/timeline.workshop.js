@@ -315,7 +315,8 @@
         { key: 'x.ht', label: 'Timing', type: 'number', min: 0, max: 60, step: 1, unit: '± ms' }, { key: 'x.hv', label: 'Velocity', type: 'number', min: 0, max: 40, step: 1, unit: '± %' }] });
       // SHAPE: what this note moves over its life, each a tree of modulators (▾ INTO to shape it)
       const M = MT();
-      Object.keys(T).forEach(t => { const r = targetInfo(d, t, a); L.push({ id: 'T:' + t, group: 'SHAPE · WHAT IT MOVES', type: 'curve', label: r.label, sub: (M ? M.count(T[t]) : 0) + ' mods · ' + (M ? M.depthOf(T[t]) : 0) + ' deep — ▾ INTO', fields: [] }); });
+      Object.keys(T).forEach(t => { const r = targetInfo(d, t, a); L.push({ id: 'T:' + t, group: 'SHAPE · WHAT IT MOVES', type: 'curve', label: r.label + ' curve',   // 2026-11-12: not a second "Pitch" beside the note's pitch (his: "no duplicates in the ui")
+        sub: (M ? M.count(T[t]) : 0) + ' mods · ' + (M ? M.depthOf(T[t]) : 0) + ' deep — ▾ INTO', fields: [] }); });
       // ITS KNOBS: any knob of the instrument set for this note only (an envelope per note: its attack, its release …)
       Object.keys(a.p || {}).forEach(k => { const kn = knobOf(d, k); if (!kn) return; L.push({ id: 'P:' + k, group: 'ITS KNOBS · THIS NOTE ONLY', type: 'value', label: kn.label, sub: a.p[k] + (kn.unit ? ' ' + kn.unit : '') + ' (the instrument: ' + kn.val + ')', fields: [{ key: 'p.' + k, label: kn.label, type: 'number', min: kn.min, max: kn.max, step: (kn.max - kn.min) / 200 || 0.01, unit: kn.unit }] }); });
       const freeK = (d.knobs || []).filter(k => !(a.p && a.p[k.key] !== undefined));
@@ -531,7 +532,7 @@
     // W3h a line of help in the view: what the hand can do here
     hint(d, o) {
       const at = shapeAt(d), a = noteOf(d); if (!a) return 'An empty pattern — click the map above to add a note · I for an idea (press again for another) · R for the rhythm library';
-      if (o && o.mode === '3d') return '3D — draw on a plane with the pen · Alt-drag or O to turn · click a plane to select it · double-click to open it · 2 for the flat view';
+      if (o && o.mode === '3d') return '3D — draw on a plane with the pen · Alt-drag to turn · click a plane to select it · double-click to open it · 2 for the flat view';
       if (!at) return (d.drums ? '' : 'Draw on the note (P) to shape its pitch · ') + 'pick a layer on the right to change it · Space plays · changes are in your song as you make them · Esc closes · right-click for everything';
       const mi = /^m:\d+$/.test((o && o.selected) || '');
       return (mi ? 'Drawing the wave of the selected modulator' : 'Drawing ' + atLabel(d, at, a)) + ' — P pen · L line · D points · S smooth · G move · E erase · M adds a modulator · Backspace up · Space plays';
