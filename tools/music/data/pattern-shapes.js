@@ -32,10 +32,13 @@
     return { name: '✎ ' + x.name, type: x.drums ? 'drums' : hi <= 51 ? 'bass' : 'lead', bars: x.bars, genre: 'yours', genreLabel: 'Yours', bpm: 120, scale: 'minor', drums: !!x.drums,
       tool: x.tool || (x.drums ? 'eravos.pads' : 'eravos.retro-poly'), notes: x.notes.map(n => Object.assign({}, n)), source: 'your pattern' };
   }
+  // 2026-11-12: a saved pattern keeps all a note carries (shape, how it plays, chance, ratchet, knob curves) — before, only b and p
+  const KEEP = ['p', 'b', 'c', 'sh', 'x', 'pr', 'rt', 'mt'];
+  const keep = (n) => { const o = {}; KEEP.forEach(k => { if (n[k] !== undefined && n[k] !== null) o[k] = JSON.parse(JSON.stringify(n[k])); }); return o; };
   function saveNotes(name, notes, o) {
     o = o || {}; const K = global.Kernel, root = K && K.music && K.music.key ? +K.music.key.root || 0 : 0, a = readSaved(), nm = name || ('Pattern ' + (a.filter(q => q.notes).length + 1));
     const bars = Math.max(1, Math.min(8, Math.ceil(Math.max(1, ...notes.map(n => n.s + n.l)) / 16)));
-    a.push({ name: nm, drums: !!o.drums, tool: o.tool || null, bars, at: Date.now(), notes: notes.map(n => Object.assign(o.drums ? { s: n.s, l: n.l, n: n.n, v: n.v } : { s: n.s, l: n.l, r: n.n - root, v: n.v }, n.b ? { b: n.b } : {}, n.p ? { p: n.p } : {})) });
+    a.push({ name: nm, drums: !!o.drums, tool: o.tool || null, bars, at: Date.now(), notes: notes.map(n => Object.assign(o.drums ? { s: n.s, l: n.l, n: n.n, v: n.v } : { s: n.s, l: n.l, r: n.n - root, v: n.v }, keep(n))) });
     writeSaved(a); ensureSource(); if (global.PatternLibrary) global.PatternLibrary.rebuild(); return nm;
   }
   function saveShape(d, name) {

@@ -2,6 +2,29 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.171 Showcase patterns — Lofi, Synthwave, Wobble Bass; a library pattern keeps everything its notes carry (2026-11-12)
+His words: "also can you make some patterns testing all the new tools and features. lofi, synthwave, and wobblebass?"
+- tools/music/data/showcase-patterns.js (NEW, data only): 13 hand-made patterns — Lofi (82 BPM: keys as 9ths from one note, strummed,
+  the tape drifting · a melody whose wobble's depth has its own modulator · a sub that sighs with a pickup on pass 4 · drums with a late
+  snare, hats by chance, a dragging ratchet), Synthwave (105: Retro DCO outrun bass with a shaped filter per note, a brass swell chord whose
+  vibrato blooms, a lead with bends, an accelerating ratchet and a note at double speed · Swarm bloom: coupling rises, cluster breathes on a
+  triangle whose rate has a modulator, the second chord skips on pass 2 · Neon Gated drums with a ratchet fill on pass 4), Wobble Bass (150:
+  the rate per note and bending up inside each note, a stuttering dive · Yoi talk: vowels per note, the formant sliding, a swap on pass 2 ·
+  Tearout: ratchets both ways, a laser dive that grows · Riddim: two notes at double speed). Shapes are compiled as the Workshop compiles
+  them, so they play as written and open in the Workshop as made. Filed under Chill, Synth & Dark, Dubstep; the curve transform adds theirs.
+- Found and fixed: a library pattern placed on the Timeline (send, the page's ⇥) and a pattern saved from the Workshop (SAVE PATTERN) kept
+  only a note's knobs and bend — its shape, how it plays, chance, ratchet, microtiming and knob curves were dropped.
+- Proof: tests/p171-showcase-patterns.test.js 17/17 (every preset on its tool, every feature used, every pattern rendered and heard; the
+  placement and save checks fail on the old code); P71 P72 P73 P76 P100 P151 P154 P165, boundary, no-toys green.
+
+## 3.170 Drawing on the Workshop draws (2026-11-12)
+His words: "okay exploded view works. drawing does nothing."
+- At the note a drag only opened the pitch (a drum note: nothing) and in 3D every press turned the camera (as at 3.156). Now a drag at the
+  note draws into the shape it is over — the pitch, or a pad's first knob — made if needed, one step, then the view is that shape; in 3D
+  the pen draws on the plane under it (a kind with planeDraw: its drag gets 0–1 points on the plane), and Alt, the middle button, O, or a
+  drag that starts off every plane turns the camera. The 3D help line says so.
+- Proof: tests/p170-drawing-draws.test.js 3/3 (fails on the old code); P156's orbit drag uses Alt; P162's click still picks a shape first.
+
 ## 3.169 A new layer on the Workshop — built, shown, not merged yet (2026-11-12)
 His words: "also why cant i add layers?" (with a screenshot: a drum note in 3D, one plane)
 - Why it looked that way: adding a layer existed only as two ＋ rows at the bottom of the list (Set a knob for this note, Shape something),
