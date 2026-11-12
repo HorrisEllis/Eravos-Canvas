@@ -69,7 +69,7 @@
     return n;
   }
 
-  // ======================================================================== SYNTHWAVE (105 BPM; Retro DCO, Swarm, the Neon Gated kit)
+  // ======================================================================== SYNTHWAVE (105 BPM; Retro DCO, Swarm, the Synthwave Gated kit)
   const SW = (o) => Object.assign({ genre: 'synthwave-showcase', genreLabel: 'Synthwave · showcase', bpm: 105, scale: 'minor', source: 'hand-made · 3.171' }, o);
   const DCOR = { cutoff: [60, 16000], res: [0, 1], pwm: [0, 1], width: [0.05, 0.5], drive: [0, 24], envAmt: [-1, 1] };
   function outrunBass() {   // 8ths, octave pump; every note's filter snaps shut (a shaped cutoff); the last of each bar ratchets
@@ -98,7 +98,7 @@
     return ch.map(([r, iv], b) => shaped({ s: b * 32, l: 32, r, v: 0.7, x: Object.assign({ iv, strum: 60, dir: 'out', fall: 0.1 }, b ? { cond: { every: 2, at: 1, skip: true } } : {}) },
       { 'k:coupling': sig([[0, 0.1], [0.7, 0.85], [1, 0.7]]), 'k:cluster': sig([[0, 0.35], [1, 0.35]], [mod('triangle', 2, 0.25, { rateMods: [mod('ramp', 1, -1.5)] })]) }, SWR));
   }
-  const NEON = { tool: 'eravos.pads', preset: 'Synthwave · Neon Gated', drums: true };
+  const NEON = { tool: 'eravos.pads', preset: 'Retro Machines · Synthwave Gated', drums: true };
   function neonDrums() {   // four on the floor, gated snare + clap on 2 and 4, 16th hats humanized, offbeats by chance, a snare ratchet fill on pass 4
     const n = [], hit = (s, p, v, o) => n.push(Object.assign({ s, l: 1, n: p, v }, o || {}));
     for (let b = 0; b < 4; b++) { const o = b * 16;

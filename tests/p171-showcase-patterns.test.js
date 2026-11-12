@@ -5,7 +5,7 @@
 window.__phase = 'P171';
 describe('P171 showcase patterns: lofi, synthwave, wobble bass', () => {
   const L = () => PatternLibrary.all().filter(p => /-showcase$/.test(p.genre) && p.source === 'hand-made · 3.171');   // the curve transform adds its own curves to these genres too
-  const named = (tool, name) => { const all = []; ['presets', 'kits'].forEach(k => ContentPacks.items(tool, k).forEach(x => all.push(x.name, (x.packLabel || '') + ' · ' + x.name))); return all.includes(name); };
+  const named = (tool, name) => Object.keys((OrganismFactory.def(tool) || {}).presets || {}).includes(name);   // the names preset_load finds (a kit is not a preset)
   it('thirteen patterns in three genres, on the new tools, every preset there, every feature used', () => {
     const P = L(); assert.equal(P.length, 13, P.length + ': ' + P.map(p => p.name.slice(0, 18) + '/' + p.type).join(' | ').slice(-400));
     assert.deepEqual([...new Set(P.map(p => p.genre))].sort(), ['lofi-showcase', 'synthwave-showcase', 'wub-showcase']);

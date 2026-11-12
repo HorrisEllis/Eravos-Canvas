@@ -2,6 +2,40 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.173 ERAVOS Now — six songs on the new tools, automation and the Workshop's notes (2026-11-12)
+His words: "also add songs that use the new tools, automation, and full extent of eravos."
+- tools/music/data/eravos-now-songbook.js (NEW, data only): three genres, two songs each, each song its own variant (by its seed) — Lofi Tape
+  (Tape Hiss Diary, Rain on the Reel: Retro Poly keys through Tape Memory → pump, a Retro DCO line, Sub, Lo-fi Dust), Synthwave Night (Neon
+  Cartography, Midnight Voice Cards: Retro DCO bass / brass / lead, a Swarm pad, Synthwave Gated), Wobble Lab (Workshop Wub, Vowel Machine:
+  Wobble Bass shaped per note, Metal Swarm, Sub, grit → pump). Ten curve lanes (keys and brass filters, DCO vibrato depth, bass filter, the
+  Swarm's coupling and restlessness, a pitch riser, the Wobble's depth with an LFO, its rate bend, a filter that closes then rips open);
+  notes carry shapes (nested modulators), chords from one note, pass conditions, ratchets both ways, speed, chance, microtiming, humanize,
+  a knob per note. A shelf of its own: ✨ ERAVOS Now.
+- Found: "Synthwave · Neon Gated" is a kit, not a Drum Machine preset (preset_load faulted) — the showcase pattern and the songs use
+  "Retro Machines · Synthwave Gated"; the Odd Couples sidechain preset is "Odd · Wobble Breathes With Kick". P171 / P173 now check names
+  against the tool's real preset list.
+- Proof: tests/p173-eravos-now-songs.test.js 5/5 (every tool and preset real, the features used, the songs of a genre under 80 % shared
+  notes, each genre written with no fault and heard); P171 17/17, P172 1/1 (the new songs included), P19, P44.
+
+## 3.172 The songs library lists no song twice (2026-11-12)
+His words: "can you also remove duplicate songs in the songs library, a lot of the same songs"
+- No two titles were equal; the sameness was in the notes: most songs are a genre + a seed, and seeds of one genre often write the same
+  song. Measured (each song generated; its notes as part · position · pitch class from the key's root; Jaccard against every earlier song
+  of its genre): 321 songs, 45 share ≥ 80 % (85 ≥ 70 %, 14 ≥ 90 %). Those 45 are not listed; each is kept, with what it repeats and how much
+  (tools/music/data/songbook-same.js; Songbook.same(); Songbook.all({ same: true }) lists every song). Nothing deleted.
+- Proof: tests/p172-songs-not-the-same.test.js (no two listed songs of a genre share 80 %); P19 P22 P40–P44 P62 green (P43's two
+  pattern-field failures and P70's curve-lane right-click are on main too).
+
+## 3.172b The Workshop: ▶ ⤓ ✕ at the top right, once; no Orbit tool (2026-11-12)
+His words: "aslo the play, x and done icons should be in the top right. not duplicated. no duplicates in the ui. i hate that. remove the
+duel orbit buttons. the toolbar is for editing, not for different views."
+- ▶ ⤓ ✕ moved from the foot of the tool strip to the right of the top bar; the LAYERS footer no longer repeats ⤓ ▶ (＋ ∿ ⤵ stay). The
+  Orbit tool is gone from the strip (the options bar's ORBIT / TOP / FRONT and Alt-drag turn the view). A tool key in 3D no longer drops
+  to 2D. A shape layer reads "Pitch curve", not a second "Pitch". (2026-11-09 he said "I hate the top right" of the buttons then there;
+  today's call puts these three there — P159 keeps both quotes.)
+- Proof: P162 (each of ⤓ ▶ ✕ appears once), P159, P161, P166 updated; the Workshop suites and boundary green. Preview:
+  docs/previews/workshop-top-right.png.
+
 ## 3.171 Showcase patterns — Lofi, Synthwave, Wobble Bass; a library pattern keeps everything its notes carry (2026-11-12)
 His words: "also can you make some patterns testing all the new tools and features. lofi, synthwave, and wobblebass?"
 - tools/music/data/showcase-patterns.js (NEW, data only): 13 hand-made patterns — Lofi (82 BPM: keys as 9ths from one note, strummed,
