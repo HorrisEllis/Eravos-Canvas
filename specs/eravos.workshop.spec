@@ -306,3 +306,9 @@ W3h  AT HAND      ⤓ save to the note library · ▶ play it · ✕ close — a
 #   The notes kind edits the pattern too: the map adds a note on an empty spot; ✕ NOTE; ✦ IDEA (notes from a structure in the song's key,
 #   another take each press, busier / sparser); SAVE PATTERN → the rhythm library (Yours); Patterns › ＋ New pattern. Open: move / resize a
 #   note on the map; every 3D plane editable; an idea per kind of part (bass, chords, drums).
+
+# ---- ADDENDUM 2026-11-12 — a new layer (nothing above is changed)
+#   his words: "also why cant i add layers?"
+#   A kind may say what can be made: addable(doc) → [{ section, label, key, value, hint }] — each an edit, one history step. The surface shows
+#   ＋ on LAYERS (New layer, Ctrl+Shift+N) and a NEW LAYER section in its right-click menus. music · NOTE: SHAPE OVER THE NOTE (pitch, any
+#   knob of its instrument — a curve, a plane in 3D) · SET FOR THIS NOTE ONLY (any free knob). Open: per-pad knobs for drum tools (tune, decay).

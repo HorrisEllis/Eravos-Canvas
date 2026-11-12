@@ -407,6 +407,15 @@
       const i = clamp(out.sel | 0, 0, out.notes.length - 1), a = out.notes[i], f = FIELDS[key]; if (!a || !f) return d;
       f[1](a, v); out.notes[i] = tidy(a); return out;
     },
+    // NEW LAYER (his words, 2026-11-12: "why cant i add layers?"): shape pitch or any knob over the note (a curve: a plane in 3D), or set a knob
+    // for this note only — the same edits as the ＋ rows, made reachable as layers are in an image editor
+    addable(d) {
+      const a = noteOf(d); if (!a || shapeAt(d)) return []; const T = (a.sh && a.sh.t) || {}, out = [], K2 = d.knobs || [];
+      if (MT()) { if (!d.drums && !T.pitch) out.push({ section: 'SHAPE OVER THE NOTE', label: 'Pitch', name: 'New layer: pitch', key: 'add', value: 'Pitch', hint: 'a curve — bends, vibrato, drift' });
+        K2.filter(k => !T['k:' + k.key]).forEach(k => out.push({ section: 'SHAPE OVER THE NOTE', label: k.label, name: 'New layer: ' + k.label, key: 'add', value: k.label, hint: 'this knob moves over the note' })); }
+      K2.filter(k => !(a.p && a.p[k.key] !== undefined)).forEach(k => out.push({ section: 'SET FOR THIS NOTE ONLY', label: k.label, name: 'Set ' + k.label + ' for this note', key: 'setp', value: k.label, hint: 'one value, only this note plays with it' }));
+      return out;
+    },
     outline(d) { return [[0, 'SONG'], [1, 'PATTERN · ' + (d.name || 'clip'), 'pattern']].concat((d.notes || []).map((a, i) => [2, (i === (d.sel | 0) ? '▸ ' : '') + (d.drums ? 'pad ' + a.n : nameOf(a.n)) + ' @ ' + a.s, 'timing', i === (d.sel | 0) ? null : { key: 'sel', value: i + 1, label: 'Open note' }])); },
     status(d) { const a = noteOf(d); return (d.libNote ? [['LIBRARY', d.libNote]] : []).concat([['NOTES', (d.notes || []).length]]).concat(a ? [['OPEN', d.drums ? 'pad ' + a.n : nameOf(a.n)], ['VEL', Math.round(a.v * 127)]] : []); },
     // the view: the pattern along the top (pattern scale: click a note to open it), the open note large below (note scale: its pitch curve)

@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.169 A new layer on the Workshop — built, shown, not merged yet (2026-11-12)
+His words: "also why cant i add layers?" (with a screenshot: a drum note in 3D, one plane)
+- Why it looked that way: adding a layer existed only as two ＋ rows at the bottom of the list (Set a knob for this note, Shape something),
+  used through a dropdown; and in 3D only curves are planes, so a note with nothing shaped shows one.
+- canvas/runtime/workshop.js (domain-free): a kind may say what can be made, addable(doc) → [{ section, label, key, value }]; LAYERS gains
+  ＋ (New layer), Ctrl+Shift+N, and a NEW LAYER section in the right-click menus; each item is one history step.
+- timeline.workshop.js: SHAPE OVER THE NOTE (Pitch for a melodic note, each knob of the instrument) · SET FOR THIS NOTE ONLY (each free knob).
+  A shaped knob is a curve: a plane in 3D. The two ＋ rows stay as they were.
+- Found: the Drum Machine gives the Timeline only Volume and Humanize as knobs, so a drum note can add only those (its pads' tune / decay
+  are not knobs the Timeline sees) — a next step, his call.
+- Proof: tests/p169-new-layer.test.js 2/2; P150 P154 P156 P157 P159 P160 P162 P165 P166 P167 P168, boundary green; design check no worse.
+  Preview: docs/previews/new-layer-menu.png, new-layer-3d.png.
+
 ## 3.168 The notes in the OUTLINER open when clicked (2026-11-12)
 His words: "the notes listed in the note workshop don't do anything."
 - Cause: the note kind's outline gave a layer only to the open note; every other note row was plain text, and the outliner did nothing on click.

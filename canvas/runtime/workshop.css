@@ -43,6 +43,7 @@
 .ws-pane.ws-grow { min-height: 120px; }
 .ws-ph { display: flex; gap: 14px; padding: 7px 10px; border-bottom: 1px solid var(--wl); font: 400 11px var(--wdisp); letter-spacing: .26em; color: var(--wt3); position: sticky; top: 0; background: var(--wp); }
 .ws-ph span { cursor: pointer; } .ws-ph .on { color: var(--wc); } .ws-ph .ws-x { margin-left: auto; font: 400 9px var(--wmono); cursor: default; }
+.ws-ph .ws-new { background: none; border: 1px solid var(--wl); border-radius: 2px; color: var(--wt2); font: 400 12px var(--wmono); line-height: 1; padding: 1px 6px; margin: -2px 0; cursor: pointer; } .ws-ph .ws-new:hover { color: var(--wc); border-color: var(--wc); }
 .ws-tree div { padding: 3px 10px; color: var(--wt2); white-space: nowrap; cursor: default; } .ws-tree .sel { color: var(--wc); background: rgba(0,212,255,.06); } .ws-tree .go { cursor: pointer; } .ws-tree .go:hover { color: var(--wt); }
 .ws-lh { padding: 5px 10px; color: var(--wt3); font: 400 9px var(--wdisp); letter-spacing: .28em; background: #04080e; border-bottom: 1px solid var(--wl); }
 .ws-lay { display: grid; grid-template-columns: 36px 1fr; gap: 8px; align-items: center; padding: 5px 10px; border-bottom: 1px solid #0c1626; color: var(--wt); cursor: pointer; }
