@@ -315,3 +315,9 @@ W3h  AT HAND      ⤓ save to the note library · ▶ play it · ✕ close — a
 #   his words, then: "it worked before. when i was able to add mods. we are regressing. it was exploded before and i was able to draw. no it
 #   should be under the layers section. also the mods." — in 3D every layer is a plane again (as at 3.156); ＋ (New layer) and ∿ (a modulator
 #   on the selected shape) sit at the foot of LAYERS; ＋'s menu adds MODULATE.
+
+# ---- ADDENDUM 2026-11-12 (2) — drawing draws (nothing above is changed)
+#   his words: "okay exploded view works. drawing does nothing."
+#   At the note a drag draws into the shape it is over (pitch, or a pad's first knob), making it if needed — one step. In 3D the pen draws on
+#   the plane under it: a kind with planeDraw: true gets drag(…, { norm: true }) with points 0–1 across and up that plane; the camera turns
+#   with Alt, the middle button, O (Orbit), or a drag that starts off every plane.

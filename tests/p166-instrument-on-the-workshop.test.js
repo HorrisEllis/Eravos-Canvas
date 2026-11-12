@@ -26,7 +26,7 @@ describe('P166 any tool on the Workshop, from its own settings', () => {
       assert.equal(st('DCO'), 'SOURCE'); assert.equal(st('VCF'), 'SHAPE'); assert.equal(st('ENV'), 'AMP'); assert.equal(st('LFO'), 'MOD'); assert.equal(st('OUT'), 'OUT');
       const wires = IW.wiresOf(def); assert.ok(wires.some(w => w.from === 'LFO' && w.to === 'VCF') && wires.some(w => w.from === 'VELOCITY' && w.to === 'VCF'), 'LFO → cutoff and Vel → cutoff are wired to the VCF: ' + JSON.stringify(wires));
       assert.ok(!wires.some(w => w.to === 'CARDS' || w.to === 'ARP'), 'nothing is guessed');
-      assert.deepEqual(ws.tools(), ['select', 'pen', 'orbit'], 'the tools that mean something here');
+      assert.deepEqual(ws.tools(), ['select', 'pen'], 'the tools that mean something here (no Orbit: 2026-11-12)');
       // drag the Cutoff bar: live while the hand moves, kept when it lets go
       const cv = document.querySelector('.ws-app .ws-canvas'), r = cv.getBoundingClientRect(), L = IW.layout(def, r.width, r.height), bar = L.parts.get('VCF').bars.find(q => q.c.key === 'cutoff');
       const c0 = read(id, 'cutoff'), n0 = ws.history().length, X = r.left + bar.bx + bar.bw / 2, Y = (f) => r.top + bar.y + bar.h * (1 - f);

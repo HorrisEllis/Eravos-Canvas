@@ -2,6 +2,7 @@
  * are all new" · "make it bun dem … kind of higher and slower". Checks: every song sits on exactly one shelf and nothing falls
  * in "More"; the Synthesis showcase uses every Synthesis tool and writes without a fault; Key / Tempo on a song moves every
  * pitched note by exactly that many semitones (drums stay on their pads) and scales the BPM. */
+/* 3.172 (2026-11-12): a song that repeats another (data/songbook-same.js) is kept but not listed — Songbook.all({ same: true }) is every song */
 window.__phase = 'P44';
 describe('Songs — shelved by category, the Synthesis showcase, key & tempo', () => {
   it('every song has one shelf, every shelf on the page has songs, none land in "More"', () => {
@@ -51,7 +52,7 @@ describe('Songs — shelved by category, the Synthesis showcase, key & tempo', (
     const G = SongEngine.genres().find(g => g.id === 'bun-dem-fire'); assert.ok(G, 'genre');
     const bad = []; [].concat(Object.values(G.parts), G.fx || [], G.mods || []).forEach(p => { const d = OrganismFactory.def(p.organism); [].concat(p.preset || []).forEach(n => { if (!d || !(d.presets || {})[n]) bad.push(p.organism + ' "' + n + '"'); }); });
     assert.equal(bad.join(' · '), '');
-    window.BunDemFireSongbook.songs.forEach(id => { const s = Songbook.all().find(x => x.id === id); assert.ok(s, id); assert.equal(Songbook.categoryOf(s), Songbook.categoryOf(Songbook.all().find(x => x.id === 'bun-dem'))); });
+    window.BunDemFireSongbook.songs.forEach(id => { const s = Songbook.all({ same: true }).find(x => x.id === id); assert.ok(s, id); assert.equal(Songbook.categoryOf(s), Songbook.categoryOf(Songbook.all().find(x => x.id === 'bun-dem'))); });
     const U = TH.universe(0.2, { bpm: 150 }), n0 = U.K.faults.list().length, rec = Recipes.get('eravos.recipe.engine.bun-dem-fire'); rec._pinned = 75;
     await Recipes.run(rec.id, { K: U.K, headless: true, clear: true });
     assert.equal(U.K.faults.list().slice(n0).map(f => f.fault_class + ' ' + f.message).join(' | '), '');

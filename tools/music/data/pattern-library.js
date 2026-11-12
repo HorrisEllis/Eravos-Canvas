@@ -129,7 +129,7 @@
       pub('lane_add', Object.assign({ kind: 'auto', target: lane.target, key: p.curve.key, name: p.name.replace(/\s*\(.*$/, ''), points: p.curve.points.map(q => [q[0] + bar, q[1]]) }, p.curve.osc ? { osc: p.curve.osc } : {}));
       return { tl, lane, tool: lane.target, bar };
     }
-    const notes = p.notes.map(n => Object.assign({ s: n.s, l: n.l, n: p.drums ? n.n : n.r + root, v: n.v }, n.p ? { p: n.p } : {}, n.b ? { b: n.b } : {}));
+    const notes = p.notes.map(n => Object.assign({ s: n.s, l: n.l, n: p.drums ? n.n : n.r + root, v: n.v }, carry(n)));
     pub('clip_add', Object.assign({ kind: 'notes', lane: lane.id, startBar: bar, bars: o.bars || p.bars, name: p.name, notes }, o.loop ? { loop: o.loop } : {}));
     return { tl, lane, tool: lane.target, bar };
   }
@@ -146,6 +146,10 @@
     return Object.assign({ clip: clip ? clip.id : null }, r);
   }
   // 3.165 ＋ New pattern: an empty two-bar pattern on the Timeline (the track of the tool picked here, else Retro Poly), open on the Workshop
+  // 2026-11-12: everything a note can carry goes onto the Timeline with it — its knobs (p), bend (b), knob curves (c), its Workshop shape (sh),
+  // how it plays (x), chance (pr), ratchet (rt), microtiming (mt); before, only p and b went, so a shaped pattern played flat
+  const CARRY = ['p', 'b', 'c', 'sh', 'x', 'pr', 'rt', 'mt'];
+  function carry(n) { const o = {}; CARRY.forEach(k => { if (n[k] !== undefined && n[k] !== null) o[k] = JSON.parse(JSON.stringify(n[k])); }); return o; }
   function newPattern(o) { o = o || {}; return edit({ name: 'New pattern', type: 'lead', bars: 2, genre: 'yours', genreLabel: 'Yours', bpm: 120, scale: 'minor', tool: o.tool || pick.tool || 'eravos.retro-poly', notes: [], source: 'your pattern' }, o); }
   // ---- ▶ hear it: rendered in its own offline universe (nothing on the canvas changes), kept for the session
   const sounds = new Map(); let playing = null;
@@ -210,7 +214,7 @@
     ['techno', 'Techno & Trance', /^(techno|trance|psytrance|hardstyle)$/],
     ['trap', 'Trap & Hip-hop', /^(trap|phonk|future-bass|moombahton)$/],
     ['reggae', 'Reggae & Dancehall', /^(reggae|dancehall|bun-dem)/],
-    ['synth', 'Synth & Dark', /^(synthwave|darkwave|witch-house|hanging-tree)$/],
+    ['synth', 'Synth & Dark', /^(synthwave|darkwave|witch-house|hanging-tree)(-showcase)?$/],
     ['chill', 'Chill & Ambient', /^(lofi|ambient|am-)/],
     ['lost-love', 'Lost Love', /^ll-/], ['for-her', 'For Her', /^her-/], ['odd-couples', 'Odd Couples', /^oc-/], ['synthesis', 'Synthesis', /^syn-/]];
   const familyOf = (genre) => (FAMILIES.find(f => f[2].test(genre)) || ['other', 'More'])[0];
@@ -314,7 +318,7 @@
       const wsOpen = global.Workshop && global.Workshop.current && global.Workshop.current.kind === 'music.notes';
       const intoB = wsOpen && p.notes && p.notes.length ? h('button', { class: 'sbk-alt sm', text: '⇥ Workshop', title: 'put this rhythm into the pattern open in the Workshop (its notes replace the ones there — Ctrl+Z brings them back)' }) : null;
       if (intoB) intoB.onclick = () => { const key = (global.Kernel && global.Kernel.music && global.Kernel.music.key) || {}, root = +key.root || 0;
-        const notes = p.notes.map(n => Object.assign({ s: n.s, l: n.l, n: p.drums ? n.n : n.r + root, v: n.v }, n.p ? { p: n.p } : {}, n.b ? { b: n.b } : {}));
+        const notes = p.notes.map(n => Object.assign({ s: n.s, l: n.l, n: p.drums ? n.n : n.r + root, v: n.v }, carry(n)));
         global.Workshop.current.set('loadPattern', { notes, name: p.name }, 'Rhythm: ' + p.name); close(); };
       const sendB = h('button', { class: 'sbk-alt sm', text: '→ Timeline', title: !!p.curve ? 'adds this curve to the track that plays this kind of tool (or a new track with it)' : 'adds it after what is on the track that plays this kind of tool (or a new track with it), in your song’s key' });
       sendB.onclick = () => { const r = send(p); status.textContent = r ? '“' + p.name + '” → the Timeline, bar ' + r.bar : 'could not send it'; };

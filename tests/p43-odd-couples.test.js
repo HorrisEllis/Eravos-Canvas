@@ -1,6 +1,7 @@
 /* 3.41 — the Odd Couples songbook: "each tool has to add packs, and new songs … as creative as possible, the tools that
  * normally go nowhere near together". Checks: every tool has an Odd Couples pack; every song is wired, every preset it names
  * exists, every tool plays somewhere; every genre writes without a fault and gives her clip to the break AND the drop. */
+/* 3.172 (2026-11-12): a song that repeats another (data/songbook-same.js) is kept but not listed — Songbook.all({ same: true }) is every song */
 window.__phase = 'P43';
 describe('Odd Couples — a pack for every tool, songs from tools that never meet', () => {
   const OC = () => window.OddCouplesSongbook;
@@ -8,7 +9,7 @@ describe('Odd Couples — a pack for every tool, songs from tools that never mee
   const used = (G) => [].concat(Object.values(G.parts).map(p => [p.organism, p.preset]), (G.fx || []).map(f => [f.organism, f.preset]), (G.mods || []).map(m => [m.organism, m.preset]));
   it('twelve genres and seventy-two songs, every song on the Songs page under 🧪 Odd Couples', () => {
     assert.equal(OC().genres.length, 12); assert.equal(OC().songs.length, 72);
-    const all = Songbook.all(); OC().songs.forEach(id => { const s = all.find(x => x.id === id); assert.ok(s, id); assert.ok(s.mood.includes('odd'), id + ' tagged odd'); });
+    const all = Songbook.all({ same: true }); OC().songs.forEach(id => { const s = all.find(x => x.id === id); assert.ok(s, id); assert.ok(s.mood.includes('odd'), id + ' tagged odd'); });
   });
   it('every music tool has an Odd Couples pack', () => {
     // a tool with no sound of its own declares noPacks (3.48 the suite window: nothing to preset) — listed, not hidden

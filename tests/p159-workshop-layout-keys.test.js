@@ -12,7 +12,8 @@ describe('P159 the Workshop: layers, keys, menus, one place for a value', () => 
       await TH.sleep(150); pub('lane_add', { kind: 'inst', name: 'Lead' }); await TH.sleep(60); pub('clip_add', { kind: 'notes', startBar: 1, bars: 2, notes: [{ s: 0, l: 8, n: 60, v: 0.8 }, { s: 8, l: 8, n: 64, v: 0.7 }] }); await TH.sleep(80);
       const H = OrganismFactory.handle(id), clipOf = () => H.ctx.internals.clips.find(c => c.kind === 'notes'); H.view.openClip(clipOf().id); await TH.sleep(250);
       H.view.roll.openWorkshop(0); await TH.sleep(40); const ws = Workshop.current, app = document.querySelector('.ws-app');
-      assert.equal(app.querySelectorAll('.ws-bar button, .ws-btn').length, 0, 'no buttons in the top bar');
+      // 2026-11-12 his words, later: "the play, x and done icons should be in the top right. not duplicated" — the top bar holds those three and nothing else
+      assert.equal(app.querySelectorAll('.ws-bar button:not(.ws-ab), .ws-btn').length, 0, 'no other buttons in the top bar'); assert.ok(app.querySelectorAll('.ws-bar .ws-ab').length <= 3, 'at most ▶ ⤓ ✕ up top');
       const right = app.querySelector('.ws-right'); assert.ok(right.children[0].classList.contains('ws-props') && right.children[1].classList.contains('ws-layers'), 'PROPERTIES over LAYERS');
       assert.ok(app.querySelector('.ws-layers .ws-lfoot') && app.querySelectorAll('.ws-layers .ws-thumb').length > 3, 'the layers panel: thumbnails, and the layer tools in its footer');
       ws.select('chord'); await TH.sleep(10);
