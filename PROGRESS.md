@@ -2,6 +2,15 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.167 The exploded view explodes again (2026-11-12)
+His words: "the eploded view doesn't explode it anymore"
+- Cause: the 3D gap was 1.15 / layers. A note (3 layers) still spread; an instrument on the Workshop (I1) has 14 stages, which ended
+  0.08 apart and overlapped into one block (277 px top to bottom vs 84 px flat, the planes about 21 px apart).
+- canvas/runtime/workshop.js: exploded keeps its distance (0.383–0.42) whatever the count, and the camera steps back to fit the stack
+  (the user's zoom still applies). Few layers: unchanged (the note view 198.6 px before and after). view() also returns the drawn planes.
+- Proof: tests/p167-exploded-stays-apart.test.js 1/1 (fails on the old code: 21.3 px between planes); P150 P156 P159 P162 P165 P166,
+  boundary green; design check no worse. Before / after: docs/previews/exploded-before.png, exploded-after.png.
+
 ## Built, shown, not merged yet — 3.166 Any tool on the Workshop, from its own settings (I1) (2026-11-12)
 His words: "How hard would that be to edit?" · "Start." (and 2026-11-09: "constraint field of nodes? … could always have each tool, or domain have a template or every kind")
 - tools/music/core/instrument-workshop.js (NEW): one kind, `music.instrument`, generated from a tool's settings through music's stage words
