@@ -149,3 +149,6 @@ kept), or **open** (not done yet, and what is missing). Newest at the bottom. Ad
 | N-I1 | "How hard would that be to edit?" · "Start." | **built, shown** | 3.166 I1: any tool on the Workshop from its own settings, drag a bar live — `tests/p166`; I2–I4 open |
 | N-X1 | "the eploded view doesn't explode it anymore" (2026-11-12) | **done** | 3.167: exploded keeps its distance, the camera fits the stack — `tests/p167` (PR #162) |
 | N-X2 | "okay and the notes listed in the note workshop don't do anything." (2026-11-12) | **done** | 3.168: each note in the OUTLINER opens its note, one undo step — `tests/p168` (PR #163) |
+| N-X3 | "also why cant i add layers?" (2026-11-12) | **done** | 3.169: ＋ New layer at the foot of LAYERS, Ctrl+Shift+N, right-click — `tests/p169` (PR #165) |
+| N-X4 | "it worked before. when i was able to add mods. we are regressing. it was exploded before and i was able to draw. no it should be under the layers section. also the mods." (2026-11-12) | **done** | 3.169: every layer a plane again (as 3.156); ＋ and ∿ (a mod) under LAYERS — `tests/p169` (PR #165) |
+| N-X5 | (found, his call) drum notes can shape only Volume and Humanize — the Drum Machine shows the Timeline no per-pad knobs (tune, decay, tone) | **open** | asked 2026-11-12 |
