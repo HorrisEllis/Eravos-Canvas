@@ -1,4 +1,5 @@
 /* 3.62 — "add songs that use the automation, arp, etc" (2026-10-23): the 🪜 Arp & Motion songbook. */
+/* 3.172 (2026-11-12): a song that repeats another (data/songbook-same.js) is kept but not listed — Songbook.all({ same: true }) is every song */
 window.__phase = 'P62';
 describe('🪜 Arp & Motion: songs built from the Arp, curves and repeating clips (3.62)', () => {
   const G = () => SongEngine.genres().find(g => g.id === 'am-arp-motion');
@@ -6,7 +7,7 @@ describe('🪜 Arp & Motion: songs built from the Arp, curves and repeating clip
     assert.ok(G(), 'genre'); assert.equal(window.ArpMotionSongbook.songs.length, 6);
     const bad = []; Object.values(G().parts).forEach(p => { const d = OrganismFactory.def(p.organism); if (!d) bad.push(p.organism); [].concat(p.preset || []).forEach(n => { if (!(d.presets || {})[n]) bad.push(p.organism + ' "' + n + '"'); }); });
     assert.equal(bad.join(' · '), '');
-    window.ArpMotionSongbook.songs.forEach(id => { const s = Songbook.all().find(x => x.id === id); assert.ok(s, id); assert.equal(Songbook.categoryOf(s), 'motion', id); });
+    window.ArpMotionSongbook.songs.forEach(id => { const s = Songbook.all({ same: true }).find(x => x.id === id); assert.ok(s, id); assert.equal(Songbook.categoryOf(s), 'motion', id); });
   });
   it('what a song writes: the Arp plays the pluck, its chords repeat, the curves climb through every build, the lead glides and blooms', () => {
     const st = SongEngine.generate('am-arp-motion', 6201), steps = st.steps || st, ev = (t) => steps.filter(s => s.op === 'event' && s.topic === t);
