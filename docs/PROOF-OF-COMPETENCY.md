@@ -71,6 +71,17 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-12 · A regression found by comparing versions, fixed, and layers made addable — PR #165
+- **His words (2026-11-12):** "also why cant i add layers?" · "it worked before. when i was able to add mods. we are regressing. it was
+  exploded before and i was able to draw. no it should be under the layers section. also the mods." · "yes"
+- **His call:** layers and mods added from the foot of LAYERS; the exploded view as it was.
+- **Built:** the 3.156 version and today's were rendered side by side; the cause was a later change that drew only curves in 3D (a drum
+  note: six planes → one). Every layer is a plane again, with click-picking still preferring curves. A domain-free contract lets a kind
+  list the layers that can be made; the note kind offers shapes, per-note knob values and modulators, each one undo step.
+- **Proof:** P169 3/3 (the exploded drum note has ≥ 5 planes; ∿ adds a modulator in one step and undo removes it); P162's picking test
+  kept; the Workshop suites and boundary green; design check no worse.
+- **Check:** `node tests/run.mjs P169` · `docs/previews/new-layer-drum-exploded.png`, `new-layer-drum-mod.png`
+
 ### 2026-11-12 · Two Workshop bugs found by measurement, each guarded by a test that fails on the old code — PRs #162, #163
 - **His words (2026-11-12):** "the eploded view doesn't explode it anymore" · "okay and the notes listed in the note workshop don't do anything." · "yes"
 - **His call:** fix both; merge.
