@@ -306,3 +306,12 @@ W3h  AT HAND      ⤓ save to the note library · ▶ play it · ✕ close — a
 #   The notes kind edits the pattern too: the map adds a note on an empty spot; ✕ NOTE; ✦ IDEA (notes from a structure in the song's key,
 #   another take each press, busier / sparser); SAVE PATTERN → the rhythm library (Yours); Patterns › ＋ New pattern. Open: move / resize a
 #   note on the map; every 3D plane editable; an idea per kind of part (bass, chords, drums).
+
+# ---- ADDENDUM 2026-11-12 — a new layer (nothing above is changed)
+#   his words: "also why cant i add layers?"
+#   A kind may say what can be made: addable(doc) → [{ section, label, key, value, hint }] — each an edit, one history step. The surface shows
+#   ＋ on LAYERS (New layer, Ctrl+Shift+N) and a NEW LAYER section in its right-click menus. music · NOTE: SHAPE OVER THE NOTE (pitch, any
+#   knob of its instrument — a curve, a plane in 3D) · SET FOR THIS NOTE ONLY (any free knob). Open: per-pad knobs for drum tools (tune, decay).
+#   his words, then: "it worked before. when i was able to add mods. we are regressing. it was exploded before and i was able to draw. no it
+#   should be under the layers section. also the mods." — in 3D every layer is a plane again (as at 3.156); ＋ (New layer) and ∿ (a modulator
+#   on the selected shape) sit at the foot of LAYERS; ＋'s menu adds MODULATE.

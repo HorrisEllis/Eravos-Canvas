@@ -11,7 +11,7 @@
  *     history(), close(), el } · Workshop.current
  * I1 open(…, { onLive(doc) }): called with the previewed document while a drag moves (before it is kept); kind.toolset: the tool ids it offers.
  * W3h actions with `strip: true` sit at the foot of the tool strip (with ✕ close); hint(doc, { tool, mode, selected }) → a line of help in the
- *   view; in 3D only shapes are planes (a value layer is a number, not a shape) and a click picks a plane.
+ *   view; in 3D every layer is a plane (2026-11-12, as at 3.156) and a click picks a plane — a shape first where planes overlap.
  * W3g drag(doc, tool, points, W, H, { selected, phase, alt, shift }) → { key, value, label } (the toolbar: pen line points smooth move erase);
  *   bar(doc) → fields shown in the options bar (a document-wide value the kind names).
  * W3f picker(doc) → { label, key, value, options: [{ value, label } | { group, options }] } (a dropdown first in the options bar; a change is
@@ -25,6 +25,8 @@
  * A kind: { id, label, layers(doc) → [{ id, label, group, type, sub, fields: [{ key, label, type: number|enum|text, min, max, step, unit,
  *   options }] }], get(doc, key), set(doc, key, value) → doc, draw(g, W, H, doc, { selected, hover }), apply(doc)?, title(doc)?, stations(doc)?,
  *   outline(doc)? → [[depth, text, layerId?, { key, value, label }?]] (a click selects the layer and makes the edit — e.g. opens that item), status(doc)? → [[label, value]], tools? [{ id, label, glyph, layer? }],
+ *   addable(doc)? → [{ section?, label, key, value, hint? }] — the layers that can be made: ＋ on LAYERS, Ctrl+Shift+N, right-click › NEW LAYER
+ *     (each an edit; his words, 2026-11-12: "why cant i add layers?"),
  *   pick(doc, x, y, W, H)? → a key/value edit for a click in the viewport (the kind decides what a click means),
  *   actions(doc)? → [{ label, hint, run(doc) → words to show }] (buttons in the bar: where the document can go — the kind says) }
  * Layer types the surface knows (it draws their badges; a kind says what they mean): constraint · curve · value · events · emergent. */
@@ -107,7 +109,8 @@
     function draw3d(g, W, H, dpr) {
       // exploded: the layers keep their distance however many there are (it was 1.15 / n — fourteen stages ended 0.08 apart, one block);
       // the camera fits the stack instead. Few layers: the same view as before (fit stays 1)
-      planes = []; const L = layers().filter(l => !l.hidden && !hidden.has(l.id) && l.type !== 'value'), n = L.length, PW = 512, PH = 256, A = 1, B = 0.42, gap = exploded ? (n <= 2 ? 0.42 : Math.max(0.383, Math.min(0.42, 1.15 / n))) : 0.025;
+      planes = []; const L = layers().filter(l => !l.hidden && !hidden.has(l.id)),   // every layer a plane, as at 3.156 (his: "it was exploded before")
+        n = L.length, PW = 512, PH = 256, A = 1, B = 0.42, gap = exploded ? (n <= 2 ? 0.42 : Math.max(0.383, Math.min(0.42, 1.15 / n))) : 0.025;
       fit = 1; const z0 = cam.zoom; cam.zoom = 1; const top = ((n - 1) / 2) * gap, ext = [];
       [-top, top].forEach(h => [[-A, -B], [A, -B], [-A, B], [A, B]].forEach(([x, z]) => ext.push(proj(W, H, x, h, z)))); cam.zoom = z0;
       const ew = Math.max(...ext.map(q => q[0])) - Math.min(...ext.map(q => q[0])), eh = Math.max(...ext.map(q => q[1])) - Math.min(...ext.map(q => q[1]));
@@ -122,7 +125,7 @@
         const og = o.getContext('2d'); og.setTransform(1, 0, 0, 1, 0, 0); og.clearRect(0, 0, PW, PH);
         try { K.drawLayer(og, PW, PH, d, l.id, { wire, selected: l.id === selected }); } catch (e) { console.error(e); }
         const h = (i - (n - 1) / 2) * gap, p0 = proj(W, H, -A, h, -B), px = proj(W, H, A, h, -B), pz = proj(W, H, -A, h, B), p3 = proj(W, H, A, h, B);
-        const sel = l.id === selected; planes.push({ id: l.id, poly: [p0, px, p3, pz] });
+        const sel = l.id === selected; planes.push({ id: l.id, type: l.type, poly: [p0, px, p3, pz] });
         // the plane: glass, its frame, its name
         g.setTransform(dpr, 0, 0, dpr, 0, 0); g.beginPath(); g.moveTo(p0[0], p0[1]); g.lineTo(px[0], px[1]); g.lineTo(p3[0], p3[1]); g.lineTo(pz[0], pz[1]); g.closePath();
         if (!wire) { g.fillStyle = sel ? 'rgba(0,212,255,0.07)' : 'rgba(140,170,200,0.035)'; g.fill(); }
@@ -170,6 +173,12 @@
       CM.show(x, y, items.map(it => it.section || it.sep ? it : Object.assign({}, it, { label: it.label, keys: it.keys ? KEYS(it.keys) : '', run: it.run || (() => runAct(it)) })), title);
     }
     const nameOf = (a) => a.name || a.label.replace(/^[^\w(]+\s*/, '');   // an action's words in a menu or the key sheet (its `name`, else its label)
+    // NEW LAYER: what the kind says can be made (a menu of edits, grouped by its sections)
+    const addables = () => { try { return (K.addable ? K.addable(d) : []).filter(Boolean); } catch (e) { console.error(e); return []; } };
+    const newItems = () => { const A = addables(); if (!A.length) return []; const out = []; let sec = null;
+      A.forEach(a => { const s2 = a.section || 'NEW LAYER'; if (s2 !== sec) { out.push({ section: s2 }); sec = s2; } out.push({ label: a.label, hint: a.hint, disabled: a.disabled, run: () => { edit(a.key, a.value, a.name || a.label); } }); });
+      return out; };
+    function newLayerMenu(x, y) { const items = newItems(); if (items.length) menu(x, y, items, 'NEW LAYER'); }
     const kindItems = (where) => acts().filter(a => !where || !a.only || a.only === where).map(a => ({ label: nameOf(a), keys: a.keys, hint: a.hint, disabled: a.disabled, run: () => runAct(a) }));
     function apply() { if (o.onApply) o.onApply(clone(d)); else if (K.apply) K.apply(clone(d)); note = 'APPLIED'; render(); }
     function setCam(v) { mode = '3d'; if (v === 'top') { cam.pitch = Math.PI / 2 - 0.001; cam.yaw = 0; } else if (v === 'front') { cam.pitch = 0.18; cam.yaw = 0; } else cam = { yaw: -0.55, pitch: 0.62, zoom: 1 }; chips(); draw(); }
@@ -224,9 +233,10 @@
         r.addEventListener('dblclick', () => { selected = l.id; const a = acts().find(x => x.open); if (a && !a.disabled) runAct(a); else render(); });
         r.addEventListener('contextmenu', (e) => { e.preventDefault(); e.stopPropagation(); selected = l.id; render();
           menu(e.clientX, e.clientY, [{ section: String(l.label).toUpperCase() }, { label: hidden.has(l.id) ? 'Show it' : 'Hide it', keys: 'H', run: () => { hidden.has(l.id) ? hidden.delete(l.id) : hidden.add(l.id); render(); } },
-            { label: 'Show only this', keys: 'Alt+H', run: () => { hidden = new Set(L.map(x => x.id).filter(id => id !== l.id)); render(); } }, { label: 'Show all', run: () => { hidden = new Set(); render(); } }, { sep: true }].concat(kindItems('layer'))); });
+            { label: 'Show only this', keys: 'Alt+H', run: () => { hidden = new Set(L.map(x => x.id).filter(id => id !== l.id)); render(); } }, { label: 'Show all', run: () => { hidden = new Set(); render(); } }, { sep: true }].concat(kindItems('layer'), newItems())); });
         return r; };
-      const foot = el('div', 'ws-lfoot', acts().filter(a => a.icon).map(a => el('button', 'ws-lt', [], { type: 'button', text: a.icon, disabled: !!a.disabled, title: nameOf(a) + (a.keys ? '  (' + KEYS(a.keys) + ')' : '') + (a.hint ? ' — ' + a.hint : ''), onclick: () => runAct(a) })));
+      const canAdd = addables().length > 0;
+      const foot = el('div', 'ws-lfoot', [canAdd ? el('button', 'ws-lt ws-new', [], { type: 'button', text: '＋', title: 'New layer  (' + KEYS('Mod+Shift+N') + ') — shape something, set a knob, add a mod', onclick: (e) => { const r = e.currentTarget.getBoundingClientRect(); newLayerMenu(r.left, r.top - 4); } }) : null].filter(Boolean).concat(acts().filter(a => a.icon).map(a => el('button', 'ws-lt', [], { type: 'button', text: a.icon, disabled: !!a.disabled, title: nameOf(a) + (a.keys ? '  (' + KEYS(a.keys) + ')' : '') + (a.hint ? ' — ' + a.hint : ''), onclick: () => runAct(a) }))));
       lays.replaceChildren(el('div', 'ws-ph', [el('span', 'on', [], { text: 'LAYERS' }), el('span', 'ws-x', [], { text: String(L.length) })]),
         el('div', 'ws-lbody', [].concat(...groups.map(([gname, ls]) => [gname ? el('div', 'ws-lh' + (folded.has(gname) ? ' folded' : ''), [], { text: (folded.has(gname) ? '▸ ' : '▾ ') + gname, onclick: () => { folded.has(gname) ? folded.delete(gname) : folded.add(gname); render(); } }) : null]
           .concat(folded.has(gname) ? [] : ls.map(row)))).filter(Boolean)), foot);
@@ -236,7 +246,7 @@
     }
     // the keys, in one place (?): the canvas's, then the kind's
     function keyList() {
-      return [['Undo', 'Mod+Z'], ['Redo', 'Mod+Shift+Z'], ...((o.onApply || K.apply) ? [['Apply', 'Mod+Enter']] : []), ['Close', 'Esc'], ['Select · Pen · Line · Points · Smooth · Move · Erase · Orbit', 'V P L D S G E O'], ['Previous / next layer', '↑ · ↓'], ['Show / hide the layer', 'H'],
+      return [['Undo', 'Mod+Z'], ['Redo', 'Mod+Shift+Z'], ...((o.onApply || K.apply) ? [['Apply', 'Mod+Enter']] : []), ['Close', 'Esc'], ['Select · Pen · Line · Points · Smooth · Move · Erase · Orbit', 'V P L D S G E O'], ['Previous / next layer', '↑ · ↓'], ['Show / hide the layer', 'H'], ...(K.addable ? [['New layer', 'Mod+Shift+N']] : []),
         ...(K.drawLayer ? [['2D / 3D', '2 · 3'], ['Top / front view', 'T · F'], ['Spread / flat', 'Shift+E'], ['Wire / lit', 'W']] : []), ['Right-click', 'what the layer or view can do'], ['This sheet', '?']]
         .concat(acts().filter(a => a.keys).map(a => [nameOf(a), a.keys]));
     }
@@ -254,6 +264,7 @@
       if (o.hostKey) { let mine = false; try { mine = !!o.hostKey(e); } catch (er) {} if (mine) return; }
       const sheet = root.querySelector('.ws-sheet'); if (sheet && (e.key === 'Escape' || e.key === '?')) { e.preventDefault(); sheet.remove(); return; }
       const mod = e.ctrlKey || e.metaKey, k = e.key.toLowerCase(), eat = () => { e.preventDefault(); e.stopPropagation(); };
+      if (mod && e.shiftKey && k === 'n' && addables().length) { eat(); const r = lays.getBoundingClientRect(); return newLayerMenu(r.left + 10, r.top + 30); }
       if (mod && k === 'z') { eat(); return e.shiftKey ? redo() : undo(); } if (mod && k === 'y') { eat(); return redo(); }
       if (mod && e.key === 'Enter' && (o.onApply || K.apply)) { eat(); return apply(); }
       // the kind's own keys first (Space, Enter, Backspace, M …), so a kind can give a key a meaning
@@ -296,7 +307,7 @@
     const endPointer = () => {
       if (orbit) { const o2 = orbit; orbit = null;
         if (o2.lastX === undefined || Math.hypot(o2.lastX - o2.x, o2.lastY - o2.y) < 4) {   // W3h a click in 3D (no turn): the plane under it is selected
-          const r = cv.getBoundingClientRect(), x = o2.x - r.left, y = o2.y - r.top; const hit = planes.slice().reverse().find(pl => inPoly(x, y, pl.poly)); if (hit) { selected = hit.id; render(); return; } }
+          const r = cv.getBoundingClientRect(), x = o2.x - r.left, y = o2.y - r.top; const under = planes.slice().reverse().filter(pl => inPoly(x, y, pl.poly)), hit = under.find(pl => pl.type !== 'value') || under[0];   /* a shape first where planes overlap */ if (hit) { selected = hit.id; render(); return; } }
         chips(); return; }
       if (drag) return dragStep('end');
       if (!stroke) return; const st = stroke; stroke = null; const r = cv.getBoundingClientRect();
@@ -304,7 +315,7 @@
       draw();
     };
     cv.addEventListener('contextmenu', (e) => { e.preventDefault(); e.stopPropagation(); menu(e.clientX, e.clientY, kindItems('view').concat(viewItems(), histItems())); });
-    root.addEventListener('contextmenu', (e) => { if (e.defaultPrevented) return; const t = e.target && e.target.tagName; if (t === 'INPUT' || t === 'TEXTAREA') return; e.preventDefault(); e.stopPropagation(); menu(e.clientX, e.clientY, kindItems().concat(histItems())); });
+    root.addEventListener('contextmenu', (e) => { if (e.defaultPrevented) return; const t = e.target && e.target.tagName; if (t === 'INPUT' || t === 'TEXTAREA') return; e.preventDefault(); e.stopPropagation(); menu(e.clientX, e.clientY, kindItems().concat(newItems(), histItems())); });
     cv.addEventListener('dblclick', () => { const a = acts().find(x => x.open); if (a && !a.disabled) runAct(a); });   // W3h double-click opens what is selected (2D or 3D)
     cv.addEventListener('pointerup', endPointer); cv.addEventListener('pointercancel', endPointer);
     cv.addEventListener('wheel', (e) => { if (mode !== '3d') return; e.preventDefault(); cam.zoom = Math.max(0.3, Math.min(4, cam.zoom * (e.deltaY < 0 ? 1.1 : 1 / 1.1))); draw(); }, { passive: false });
@@ -317,6 +328,7 @@
       // W3a: the viewport (for tests and the kind's own buttons)
       view: (o2) => { if (o2) { if (o2.mode) mode = o2.mode; if (o2.exploded !== undefined) exploded = !!o2.exploded; if (o2.wire !== undefined) wire = !!o2.wire; if (o2.cam) Object.assign(cam, o2.cam); chips(); draw(); } return { mode, exploded, wire, cam: Object.assign({}, cam), planes: planes.map(p => ({ id: p.id, poly: p.poly.map(q => q.slice()) })) }; },
       stroke: (pts) => { const r = cv.getBoundingClientRect(); const res = K.stroke ? K.stroke(d, pts, r.width, r.height, { selected }) : null; if (res && res.key !== undefined) edit(res.key, res.value, res.label); return !!res; },
+      addable: () => addables().map(a => (a.section ? a.section + ' › ' : '') + a.label), add: (label, section) => { const a = addables().find(x => x.label === label && (!section || x.section === section)); if (!a || a.disabled) return false; edit(a.key, a.value, a.name || a.label); return true; },
       action: (label) => { const a = (K.actions ? K.actions(d, { selected }) : []).find(x => x.label === label); if (!a || a.disabled) return false; if (a.key !== undefined) edit(a.key, a.value, a.label); else a.run(clone(d)); return true; } };
     current = api; return api;
   }

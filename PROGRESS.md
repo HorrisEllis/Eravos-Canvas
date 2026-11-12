@@ -2,6 +2,24 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.169 A new layer on the Workshop — built, shown, not merged yet (2026-11-12)
+His words: "also why cant i add layers?" (with a screenshot: a drum note in 3D, one plane)
+- Why it looked that way: adding a layer existed only as two ＋ rows at the bottom of the list (Set a knob for this note, Shape something),
+  used through a dropdown; and in 3D only curves are planes, so a note with nothing shaped shows one.
+- canvas/runtime/workshop.js (domain-free): a kind may say what can be made, addable(doc) → [{ section, label, key, value }]; LAYERS gains
+  ＋ (New layer), Ctrl+Shift+N, and a NEW LAYER section in the right-click menus; each item is one history step.
+- timeline.workshop.js: SHAPE OVER THE NOTE (Pitch for a melodic note, each knob of the instrument) · SET FOR THIS NOTE ONLY (each free knob).
+  A shaped knob is a curve: a plane in 3D. The two ＋ rows stay as they were.
+- Found: the Drum Machine gives the Timeline only Volume and Humanize as knobs, so a drum note can add only those (its pads' tune / decay
+  are not knobs the Timeline sees) — a next step, his call.
+- Then his words: "it worked before. when i was able to add mods. we are regressing. it was exploded before and i was able to draw. no it
+  should be under the layers section. also the mods." — the regression: W3h (3.162) drew only shapes in 3D ("a value layer is a number"),
+  so a drum note (no curves) went from six planes at 3.156 to one. Every layer is a plane again; a click still picks a shape first where
+  planes overlap (P162 kept). ＋ moved from the LAYERS header to its foot, beside ∿ — add a modulator to the selected shape (or pitch / the
+  first knob), shaping it first if needed, one step; ＋'s menu gains MODULATE.
+- Proof: tests/p169-new-layer.test.js 3/3; P150 P154 P156 P157 P159 P160 P162 P165 P166 P167 P168, boundary green; design check no worse.
+  Preview: docs/previews/new-layer-drum-exploded.png, new-layer-drum-mod.png.
+
 ## 3.168 The notes in the OUTLINER open when clicked (2026-11-12)
 His words: "the notes listed in the note workshop don't do anything."
 - Cause: the note kind's outline gave a layer only to the open note; every other note row was plain text, and the outliner did nothing on click.

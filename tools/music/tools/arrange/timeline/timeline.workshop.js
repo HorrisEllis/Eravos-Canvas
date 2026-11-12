@@ -275,6 +275,8 @@
       if (ab) { out.push({ label: '▶ A', name: "Hear A", keys: 'Shift+Space', hint: 'hear A', disabled: !HOOK.hear, run: () => { HOOK.hear(ab.note); return 'heard A'; } }); out.push({ label: '⇄ A/B', name: "Swap A and B", keys: 'X', key: 'abSwap', value: true, hint: 'swap: the note becomes A, A becomes what it was' }); }
       if ((a.sh && Object.keys(a.sh.t || {}).length) || a.p || a.x) out.push({ label: '⇉ ALL NOTES', name: "Give every note this shape", keys: 'Shift+A', key: 'shapeAll', value: true, disabled: (d.notes || []).length < 2, hint: 'give every note in this pattern this note\'s shape and its own knob values' });
       const pk = /^P:(.+)$/.exec(sel); if (!at && pk) out.push({ label: '✕ KNOB', name: "Back to the instrument's value", keys: 'Delete', icon: '−', only: 'layer', key: 'unsetp', value: pk[1], hint: 'this note goes back to the instrument\'s own value' });
+      if (!at && M) { const ts = /^T:(.+)$/.exec(sel), K3 = d.knobs || [], lab = ts ? (ts[1] === 'pitch' ? 'Pitch' : (K3.find(k => 'k:' + k.key === ts[1]) || {}).label) : (d.drums ? (K3[0] || {}).label : 'Pitch');
+        if (lab) out.push({ label: '∿ MOD', name: 'Add a modulator to ' + lab, keys: 'M', icon: '∿', key: 'modTo', value: lab, hint: 'add a modulator to ' + lab + ' (select a shape to choose another; ＋ lists them all)' }); }
       if (at) out.push({ label: '▴ UP', name: "Up a level", keys: 'Backspace', icon: '⤴', key: 'nav', value: 'up', hint: 'one level up the tree' });
       out.push({ label: '▾ INTO', name: "Open it", keys: 'Enter', icon: '⤵', open: true, key: 'nav', value: 'into:' + sel, disabled: !into, hint: 'open the selected curve and shape IT (its own base and modulators)' });
       if (at) { const n = ((signalAt(a, at) || {}).mods || []).length; out.push({ label: '＋ MOD', name: "Add a modulator", keys: 'M', icon: '＋', key: 'addmod', value: n, hint: 'add a modulator here (its rate and depth can be shaped too)' });
@@ -374,6 +376,10 @@
           if (sh) x.sh = JSON.parse(JSON.stringify(sh)); else delete x.sh; if (pp) x.p = Object.assign({}, x.p || {}, pp); if (a0.x) x.x = JSON.parse(JSON.stringify(a0.x)); return tidy(compile(x, out)); });
         return out;
       }
+      if (key === 'modTo') { const K4 = out.knobs || [], kn = K4.find(q => q.label === v), t = v === 'Pitch' ? 'pitch' : kn ? 'k:' + kn.key : null; if (!t || !MT()) return d;
+        const a1 = noteOf(out), has = !!(a1 && a1.sh && a1.sh.t && a1.sh.t[t]);
+        let o1 = has ? Object.assign({}, out, { at: { t, p: [] } }) : KIND.set(out, 'add', v); if (!o1 || !o1.at) return d;
+        const n = (((noteOf(o1) || {}).sh || {}).t || {})[t]; return KIND.set(o1, 'addmod', ((n && n.mods) || []).length); }
       if (key === 'curve') key = 'stroke';   // W3g the toolbar writes curves as the pen always did
       if (/^(add|unshape|stroke|addmod|delmod)$|^base\.|^m\.\d/.test(key)) {
       if (!a0 || !M) return d;
@@ -406,6 +412,18 @@
       }
       const i = clamp(out.sel | 0, 0, out.notes.length - 1), a = out.notes[i], f = FIELDS[key]; if (!a || !f) return d;
       f[1](a, v); out.notes[i] = tidy(a); return out;
+    },
+    // NEW LAYER (his words, 2026-11-12: "why cant i add layers?"): shape pitch or any knob over the note (a curve: a plane in 3D), or set a knob
+    // for this note only — the same edits as the ＋ rows, made reachable as layers are in an image editor
+    addable(d) {
+      const a = noteOf(d); if (!a || shapeAt(d)) return []; const T = (a.sh && a.sh.t) || {}, out = [], K2 = d.knobs || [];
+      if (MT()) { if (!d.drums && !T.pitch) out.push({ section: 'SHAPE OVER THE NOTE', label: 'Pitch', name: 'New layer: pitch', key: 'add', value: 'Pitch', hint: 'a curve — bends, vibrato, drift' });
+        K2.filter(k => !T['k:' + k.key]).forEach(k => out.push({ section: 'SHAPE OVER THE NOTE', label: k.label, name: 'New layer: ' + k.label, key: 'add', value: k.label, hint: 'this knob moves over the note' })); }
+      if (MT()) { const tl = (t) => t === 'pitch' ? 'Pitch' : ((K2.find(k => 'k:' + k.key === t) || {}).label);
+        (d.drums ? [] : ['pitch']).concat(K2.map(k => 'k:' + k.key)).forEach(t => { const lab = tl(t); if (!lab) return;
+          out.push({ section: 'MODULATE', label: lab, name: 'Add a modulator to ' + lab, key: 'modTo', value: lab, hint: T[t] ? 'another modulator on it' : 'shape it and add a modulator (a sine — its rate and depth can be shaped too)' }); }); }
+      K2.filter(k => !(a.p && a.p[k.key] !== undefined)).forEach(k => out.push({ section: 'SET FOR THIS NOTE ONLY', label: k.label, name: 'Set ' + k.label + ' for this note', key: 'setp', value: k.label, hint: 'one value, only this note plays with it' }));
+      return out;
     },
     outline(d) { return [[0, 'SONG'], [1, 'PATTERN · ' + (d.name || 'clip'), 'pattern']].concat((d.notes || []).map((a, i) => [2, (i === (d.sel | 0) ? '▸ ' : '') + (d.drums ? 'pad ' + a.n : nameOf(a.n)) + ' @ ' + a.s, 'timing', i === (d.sel | 0) ? null : { key: 'sel', value: i + 1, label: 'Open note' }])); },
     status(d) { const a = noteOf(d); return (d.libNote ? [['LIBRARY', d.libNote]] : []).concat([['NOTES', (d.notes || []).length]]).concat(a ? [['OPEN', d.drums ? 'pad ' + a.n : nameOf(a.n)], ['VEL', Math.round(a.v * 127)]] : []); },
