@@ -71,6 +71,16 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-12 · Two Workshop bugs found by measurement, each guarded by a test that fails on the old code — PRs #162, #163
+- **His words (2026-11-12):** "the eploded view doesn't explode it anymore" · "okay and the notes listed in the note workshop don't do anything." · "yes"
+- **His call:** fix both; merge.
+- **Built:** the 3D exploded view kept a spacing divided by the layer count, so a 14-stage instrument collapsed into one block; exploded now
+  keeps its distance and the camera fits the stack (few-layer views unchanged). The Workshop's outliner listed every note but linked only
+  the open one; an outline row may now carry an edit, and each note row opens its note as one undo step (the surface stays domain-free).
+- **Proof:** measured before fixing: 14 planes 21.3 px apart (exploded 277 px vs flat 84 px); after: 470 px, the note view 198.6 px before and
+  after. P167 and P168 each fail on the old code and pass on the new; P150 P154 P156 P159 P160 P162 P165 P166 and boundary green.
+- **Check:** `node tests/run.mjs P167` · `node tests/run.mjs P168` · `docs/previews/exploded-before.png`, `exploded-after.png`
+
 ### 2026-11-07 · A domain-free editing surface and a pattern built from constraints — the Workshop, W1
 - **His words (2026-11-07):** "agnostic. the structure defines the shape which defines the emergent properties of the conditions." · "can
   you make it more like photoshop? or like a 3d renderer? … this could be the build surface for emerge." · "Yeah, we can just start with this."
