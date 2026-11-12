@@ -24,7 +24,7 @@
  *   stationKey (a station click = edit(stationKey, index)).
  * A kind: { id, label, layers(doc) → [{ id, label, group, type, sub, fields: [{ key, label, type: number|enum|text, min, max, step, unit,
  *   options }] }], get(doc, key), set(doc, key, value) → doc, draw(g, W, H, doc, { selected, hover }), apply(doc)?, title(doc)?, stations(doc)?,
- *   outline(doc)? → [[depth, text, layerId?]], status(doc)? → [[label, value]], tools? [{ id, label, glyph, layer? }],
+ *   outline(doc)? → [[depth, text, layerId?, { key, value, label }?]] (a click selects the layer and makes the edit — e.g. opens that item), status(doc)? → [[label, value]], tools? [{ id, label, glyph, layer? }],
  *   pick(doc, x, y, W, H)? → a key/value edit for a click in the viewport (the kind decides what a click means),
  *   actions(doc)? → [{ label, hint, run(doc) → words to show }] (buttons in the bar: where the document can go — the kind says) }
  * Layer types the surface knows (it draws their badges; a kind says what they mean): constraint · curve · value · events · emergent. */
@@ -213,7 +213,7 @@
       // PROPERTIES · HISTORY · OUTLINER (top right): the one place a value is edited
       const tabsI = el('div', 'ws-ph', ['properties', 'history', 'outliner'].map(t => el('span', t === inspTab ? 'on' : '', [], { text: t.toUpperCase(), onclick: () => { inspTab = t; render(); } })));
       if (inspTab === 'history') insp.replaceChildren(tabsI, el('div', 'ws-hist', hist.slice(-60).map((h2, i, a) => el('div', i === a.length - 1 ? 'now' : '', [el('i', '', [], { text: String(hist.length - a.length + i + 1).padStart(2, '0') }), h2.label], { onclick: () => { if (i < a.length - 1) { past.push(clone(d)); future = []; restore(h2.doc, 'BACK TO ' + String(hist.length - a.length + i + 1).padStart(2, '0')); } } }))));
-      else if (inspTab === 'outliner') { const ol = K.outline ? K.outline(d) : [[0, title]]; insp.replaceChildren(tabsI, el('div', 'ws-tree', ol.map(([depth, t, lid]) => el('div', lid && lid === selected ? 'sel' : '', [], { text: ' '.repeat(depth * 3) + t, onclick: () => { if (lid) { selected = lid; render(); } } })))); }
+      else if (inspTab === 'outliner') { const ol = K.outline ? K.outline(d) : [[0, title]]; insp.replaceChildren(tabsI, el('div', 'ws-tree', ol.map(([depth, t, lid, go]) => el('div', (lid && lid === selected ? 'sel' : '') + (lid || go ? ' go' : ''), [], { text: ' '.repeat(depth * 3) + t, onclick: () => { if (lid) selected = lid; if (go && go.key !== undefined) edit(go.key, go.value, go.label || t); else if (lid) render(); } })))); }
       else insp.replaceChildren(tabsI, el('div', 'ws-ins', [sel ? el('div', 'ws-big', [], { text: sel.label }) : null, sel && sel.sub ? el('div', 'ws-sub', [], { text: sel.sub }) : null].concat(((sel && sel.fields) || []).map(f => field(f, true)))
         .concat(sel && !(sel.fields || []).length ? [el('div', 'ws-hint', [], { text: 'nothing to set here — right-click for what it can do' })] : [])));
       // LAYERS (bottom right): eye · thumbnail · name; groups fold; the layer tools in the footer
