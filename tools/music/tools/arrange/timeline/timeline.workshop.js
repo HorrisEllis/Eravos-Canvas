@@ -407,7 +407,7 @@
       const i = clamp(out.sel | 0, 0, out.notes.length - 1), a = out.notes[i], f = FIELDS[key]; if (!a || !f) return d;
       f[1](a, v); out.notes[i] = tidy(a); return out;
     },
-    outline(d) { return [[0, 'SONG'], [1, 'PATTERN · ' + (d.name || 'clip'), 'pattern']].concat((d.notes || []).map((a, i) => [2, (i === (d.sel | 0) ? '▸ ' : '') + (d.drums ? 'pad ' + a.n : nameOf(a.n)) + ' @ ' + a.s, i === (d.sel | 0) ? 'timing' : null])); },
+    outline(d) { return [[0, 'SONG'], [1, 'PATTERN · ' + (d.name || 'clip'), 'pattern']].concat((d.notes || []).map((a, i) => [2, (i === (d.sel | 0) ? '▸ ' : '') + (d.drums ? 'pad ' + a.n : nameOf(a.n)) + ' @ ' + a.s, 'timing', i === (d.sel | 0) ? null : { key: 'sel', value: i + 1, label: 'Open note' }])); },
     status(d) { const a = noteOf(d); return (d.libNote ? [['LIBRARY', d.libNote]] : []).concat([['NOTES', (d.notes || []).length]]).concat(a ? [['OPEN', d.drums ? 'pad ' + a.n : nameOf(a.n)], ['VEL', Math.round(a.v * 127)]] : []); },
     // the view: the pattern along the top (pattern scale: click a note to open it), the open note large below (note scale: its pitch curve)
     draw(g, W, H, d, o) {

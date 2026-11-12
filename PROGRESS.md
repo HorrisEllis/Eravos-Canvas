@@ -2,6 +2,14 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.168 The notes in the OUTLINER open when clicked (2026-11-12)
+His words: "the notes listed in the note workshop don't do anything."
+- Cause: the note kind's outline gave a layer only to the open note; every other note row was plain text, and the outliner did nothing on click.
+- canvas/runtime/workshop.js: an outline row may carry an edit ([depth, text, layerId, { key, value, label }]) — a click selects the layer and
+  makes the edit (one history step); clickable rows show a pointer (workshop.css). Domain-free.
+- timeline.workshop.js: each note row opens its note (sel); the open one stays marked ▸.
+- Proof: tests/p168-outliner-opens-notes.test.js 1/1 (fails on the old code); P150 P154 P159 P160 P162 P166, boundary green; design check no worse.
+
 ## Built, shown, not merged yet — 3.166 Any tool on the Workshop, from its own settings (I1) (2026-11-12)
 His words: "How hard would that be to edit?" · "Start." (and 2026-11-09: "constraint field of nodes? … could always have each tool, or domain have a template or every kind")
 - tools/music/core/instrument-workshop.js (NEW): one kind, `music.instrument`, generated from a tool's settings through music's stage words
