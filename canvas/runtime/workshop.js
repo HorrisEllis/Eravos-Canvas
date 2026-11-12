@@ -20,7 +20,8 @@
  *   OUTLINER over LAYERS (eye, thumbnail, name, folding groups, footer tools = actions with `icon`); keys (an action's `keys`, e.g. 'Space',
  *   'Mod+Enter', 'Shift+A'; `open: true` = what Enter / a double-click does) and right-click menus (an action's `only`: 'layer' | 'view').
  * W3a (optional): drawLayer(g, W, H, doc, layerId, { wire, selected }) → the 3D viewport (layers as planes) · stroke(doc, points, W, H,
- *   { selected }) → { key, value, label } (a drag that draws) · actions(doc, { selected }) items may be { label, key, value } (an edit) ·
+ *   { selected }) → { key, value, label } (a drag that draws) · drag(doc, tool, pts, W, H, { selected, phase, norm }) — norm: pts are 0–1
+ *   across and up on the selected layer's plane (a drag in 3D; only for a kind with planeDraw: true) · actions(doc, { selected }) items may be { label, key, value } (an edit) ·
  *   stationKey (a station click = edit(stationKey, index)).
  * A kind: { id, label, layers(doc) → [{ id, label, group, type, sub, fields: [{ key, label, type: number|enum|text, min, max, step, unit,
  *   options }] }], get(doc, key), set(doc, key, value) → doc, draw(g, W, H, doc, { selected, hover }), apply(doc)?, title(doc)?, stations(doc)?,
@@ -100,6 +101,11 @@
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
       if (stroke && stroke.pts.length > 1) { g.strokeStyle = 'rgba(255,255,255,0.85)'; g.lineWidth = 2; g.setLineDash([4, 3]); g.beginPath(); stroke.pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); g.setLineDash([]); }
     }
+    function onPlane(pl, x, y) {
+      const [p0, px, , pz] = pl.poly, ax = px[0] - p0[0], ay = px[1] - p0[1], bx = pz[0] - p0[0], by = pz[1] - p0[1], det = ax * by - ay * bx || 1e-9;
+      const u = ((x - p0[0]) * by - (y - p0[1]) * bx) / det, v = (ax * (y - p0[1]) - ay * (x - p0[0])) / det;   // u across (0–1), v into the plane's rows (0–1)
+      return [Math.max(0, Math.min(1, (u * 512 - 8) / 496)), Math.max(0, Math.min(1, 1 - (v * 256 - 8) / 240))];
+    }
     // a plane in space is an affine map of its 2D drawing (near-orthographic camera): x = across the layer, z = into it, y = its height
     function proj(W, H, x, y, z) {
       const s = Math.min(W * 0.34, H * 0.5) * cam.zoom * fit, cy = Math.cos(cam.yaw), sy = Math.sin(cam.yaw), cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
@@ -149,7 +155,7 @@
       vph.replaceChildren(chip('2D', mode === '2d', () => { mode = '2d'; }), chip('3D', mode === '3d', () => { mode = '3d'; }), el('span', 'ws-vs'),
         chip('TOP', mode === '3d' && cam.pitch > 1.5, () => { mode = '3d'; cam.pitch = Math.PI / 2 - 0.001; cam.yaw = 0; }, 'look down on the stack'),
         chip('FRONT', mode === '3d' && Math.abs(cam.yaw) < 0.01 && cam.pitch < 0.3, () => { mode = '3d'; cam.pitch = 0.18; cam.yaw = 0; }, 'look at it from the front'),
-        chip('ORBIT', false, () => { mode = '3d'; cam = { yaw: -0.55, pitch: 0.62, zoom: 1 }; }, 'back to the turned view (drag to turn, wheel to zoom)'), el('span', 'ws-vs'),
+        chip('ORBIT', false, () => { mode = '3d'; cam = { yaw: -0.55, pitch: 0.62, zoom: 1 }; }, 'back to the turned view (Alt-drag or O to turn, wheel to zoom)'), el('span', 'ws-vs'),
         chip('EXPLODED', exploded, () => { exploded = true; }), chip('FLAT', !exploded, () => { exploded = false; }), el('span', 'ws-vs'),
         chip('WIRE', wire, () => { wire = true; }), chip('LIT', !wire, () => { wire = false; }));
     }
@@ -286,6 +292,11 @@
     cv.addEventListener('pointerdown', (e) => {
       const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
       if (e.button === 2) return;
+      // 2026-11-12 (his: "drawing does nothing"): in 3D a curve tool draws on the plane under the hand — its point on that plane, 0–1 across
+      // and up, goes to the kind as o.norm; the camera turns with Orbit (O), Alt, the middle button, or a drag that starts off every plane
+      if (mode === '3d' && K.drawLayer && K.drag && K.planeDraw && CURVE_TOOLS.includes(tool) && !e.altKey && e.button === 0) {
+        const under = planes.slice().reverse().filter(pl => inPoly(x, y, pl.poly)), hit = under.find(pl => pl.type !== 'value') || under[0];   /* a shape first, as a click */
+        if (hit) { if (selected !== hit.id) { selected = hit.id; render(); } stroke = { pts: [[x, y]], plane: hit, uv: [onPlane(hit, x, y)] }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} return; } }
       if ((mode === '3d' && K.drawLayer) || tool === 'orbit') { if (K.drawLayer && mode !== '3d') { mode = '3d'; chips(); } orbit = { x: e.clientX, y: e.clientY, yaw: cam.yaw, pitch: cam.pitch }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} return; }
       const p = K.pick ? K.pick(d, x, y, r.width, r.height, { selected }) : null; if (p && p.run) { try { p.run(); } catch (er) { console.error(er); } render(); return; } if (p && p.key !== undefined) return edit(p.key, p.value, p.label);
       if (K.drag && CURVE_TOOLS.includes(tool)) { drag = { pts: [[x, y]], alt: e.altKey, shift: e.shiftKey }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} dragStep('move'); return; }
@@ -294,7 +305,7 @@
     cv.addEventListener('pointermove', (e) => {
       if (orbit) { orbit.lastX = e.clientX; orbit.lastY = e.clientY; cam.yaw = orbit.yaw + (e.clientX - orbit.x) * 0.008; cam.pitch = Math.max(0.02, Math.min(Math.PI / 2 - 0.001, orbit.pitch + (e.clientY - orbit.y) * 0.006)); draw(); return; }
       if (drag) { const r = cv.getBoundingClientRect(); drag.pts.push([e.clientX - r.left, e.clientY - r.top]); drag.shift = e.shiftKey; dragStep('move'); return; }
-      if (stroke) { const r = cv.getBoundingClientRect(); stroke.pts.push([e.clientX - r.left, e.clientY - r.top]); draw(); }
+      if (stroke) { const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top; stroke.pts.push([x, y]); if (stroke.plane) stroke.uv.push(onPlane(stroke.plane, x, y)); draw(); }
     });
     // a curve tool: what the hand has done so far, drawn (not kept); kept once, when it lets go
     function dragStep(phase) {
@@ -311,6 +322,7 @@
         chips(); return; }
       if (drag) return dragStep('end');
       if (!stroke) return; const st = stroke; stroke = null; const r = cv.getBoundingClientRect();
+      if (st.plane) { if (st.uv.length > 1) { let res = null; try { res = K.drag(d, tool, st.uv, r.width, r.height, { selected: st.plane.id, phase: 'end', norm: true }); } catch (e) { console.error(e); } if (res && res.key !== undefined) return edit(res.key, res.value, res.label); } return draw(); }
       if (st.pts.length > 1) { let res = null; try { res = K.stroke(d, st.pts, r.width, r.height, { selected }); } catch (e) { console.error(e); } if (res && res.key !== undefined) return edit(res.key, res.value, res.label); }
       draw();
     };

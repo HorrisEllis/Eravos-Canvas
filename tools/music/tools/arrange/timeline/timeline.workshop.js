@@ -376,6 +376,11 @@
           if (sh) x.sh = JSON.parse(JSON.stringify(sh)); else delete x.sh; if (pp) x.p = Object.assign({}, x.p || {}, pp); if (a0.x) x.x = JSON.parse(JSON.stringify(a0.x)); return tidy(compile(x, out)); });
         return out;
       }
+      if (key === 'drawOn') { const K4 = out.knobs || [], kn = K4.find(q => q.label === v.t), t = v.t === 'Pitch' ? 'pitch' : kn ? 'k:' + kn.key : null; if (!t || !MT()) return d;
+        const a1 = noteOf(out), has = !!(a1 && a1.sh && a1.sh.t && a1.sh.t[t]);
+        const o1 = has ? Object.assign({}, out, { at: { t, p: [] } }) : KIND.set(out, 'add', v.t); if (!o1 || !o1.at) return d;
+        const res = KIND.drag(o1, v.tool === 'erase' || v.tool === 'smooth' || v.tool === 'move' || v.tool === 'points' ? v.tool : (v.tool || 'pen'), v.pts, v.W, v.H, { phase: 'end', selected: 'base', norm: v.norm });
+        return res && res.key !== undefined ? KIND.set(o1, res.key, res.value) : o1; }
       if (key === 'modTo') { const K4 = out.knobs || [], kn = K4.find(q => q.label === v), t = v === 'Pitch' ? 'pitch' : kn ? 'k:' + kn.key : null; if (!t || !MT()) return d;
         const a1 = noteOf(out), has = !!(a1 && a1.sh && a1.sh.t && a1.sh.t[t]);
         let o1 = has ? Object.assign({}, out, { at: { t, p: [] } }) : KIND.set(out, 'add', v); if (!o1 || !o1.at) return d;
@@ -478,15 +483,21 @@
     },
     // W3g THE TOOLBAR on the view: pen, line, points, smooth, move, erase — on the open curve (a SIGNAL's base) or, a modulator selected, its
     // wave (one cycle; it becomes drawn). On the note itself, a tool opens its PITCH to shape (making it if needed). curve-edit does the work.
+    planeDraw: true,   // 2026-11-12: a drag in 3D draws on the plane under the pen (drag gets o.norm)
     drag(d, tool, pts, W, H, o) {
       const a = noteOf(d), at = shapeAt(d), CE = global.MusicParts && global.MusicParts.curveEdit, M = MT(); o = o || {}; if (!a || !CE || !M || !pts.length) return null;
-      const top = navTop(H); if (pts[0][1] < top) return null;
-      if (!at) { if (o.phase !== 'end' || d.drums) return null; const has = a.sh && a.sh.t && a.sh.t.pitch; return has ? { key: 'nav', value: 'into:T:pitch', label: 'Shape the pitch' } : { key: 'add', value: 'Pitch', label: 'Shape the pitch' }; }
+      const top = navTop(H); if (!o.norm && pts[0][1] < top) return null;
+      // 2026-11-12 (his: "drawing does nothing"): at the note, a drag DRAWS — on the shape it is over (a T: layer), else the pitch (a pad: its
+      // first knob); the shape is made if it is not there, and the stroke is drawn into it: one step, then the view is that shape
+      if (!at) { if (o.phase !== 'end') return null; const K5 = d.knobs || [], sel = o.selected || '', ts = /^T:(.+)$/.exec(sel);
+        const t = ts ? ts[1] : (d.drums ? (K5[0] ? 'k:' + K5[0].key : null) : 'pitch'); if (!t) return null;
+        const lab = t === 'pitch' ? 'Pitch' : (K5.find(k => 'k:' + k.key === t) || {}).label; if (!lab) return null;
+        return { key: 'drawOn', value: { t: lab, tool, pts, W, H, norm: !!o.norm }, label: 'Draw ' + (t === 'pitch' ? 'the pitch' : lab) }; }
       const y0 = top + 26, h = H - y0 - 14, x0 = 16, w = W - 32, sig = signalAt(a, at) || { base: [[0, 0], [1, 0]], mods: [] }, mi = /^m:(\d+)$/.exec(o.selected || ''), mod = mi && sig.mods[+mi[1]];
       let curve, lo, hi, rest, clo, chi;
       if (mod) { curve = mod.shape === 'drawn' && mod.wave && mod.wave.length > 1 ? mod.wave.concat([[1, mod.wave[0][1]]]) : Array.from({ length: 17 }, (_, i) => [i / 16, M.wave(mod, i / 16)]); lo = -1.05; hi = 1.05; clo = -1; chi = 1; rest = 0; }
       else { const r = viewRange(d, at, a), rr = rangeOf(d, at, a); curve = sig.base && sig.base.length ? sig.base : [[0, 0], [1, 0]]; lo = r.lo; hi = r.hi; clo = rr.lo; chi = rr.hi; rest = (at.p || []).length ? 0 : targetInfo(d, at.t, a).def; }
-      const P = pts.map(([x, y]) => [clamp((x - x0) / w, 0, 1), lo + (hi - lo) * clamp(1 - (y - y0) / h, 0, 1)]), last = P[P.length - 1];
+      const P = pts.map(([x, y]) => o.norm ? [clamp(x, 0, 1), lo + (hi - lo) * clamp(y, 0, 1)] : [clamp((x - x0) / w, 0, 1), lo + (hi - lo) * clamp(1 - (y - y0) / h, 0, 1)]), last = P[P.length - 1];
       let out = null;
       if (tool === 'pen') { if (P.length < 2) return null; out = CE.pen(curve, P); }
       else if (tool === 'line') { if (P.length < 2) return null; out = CE.line(curve, P[0], last); }
@@ -520,7 +531,7 @@
     // W3h a line of help in the view: what the hand can do here
     hint(d, o) {
       const at = shapeAt(d), a = noteOf(d); if (!a) return 'An empty pattern — click the map above to add a note · I for an idea (press again for another) · R for the rhythm library';
-      if (o && o.mode === '3d') return '3D — drag to turn · click a plane to select it · double-click to open it · 2 for the flat view';
+      if (o && o.mode === '3d') return '3D — draw on a plane with the pen · Alt-drag or O to turn · click a plane to select it · double-click to open it · 2 for the flat view';
       if (!at) return (d.drums ? '' : 'Draw on the note (P) to shape its pitch · ') + 'pick a layer on the right to change it · Space plays · changes are in your song as you make them · Esc closes · right-click for everything';
       const mi = /^m:\d+$/.test((o && o.selected) || '');
       return (mi ? 'Drawing the wave of the selected modulator' : 'Drawing ' + atLabel(d, at, a)) + ' — P pen · L line · D points · S smooth · G move · E erase · M adds a modulator · Backspace up · Space plays';

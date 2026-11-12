@@ -64,11 +64,11 @@ describe('P156 the Workshop in 3D; a note shaped fractally', () => {
       const errs = []; const oe = console.error; console.error = (...x) => { errs.push(x.join(' ')); oe.apply(console, x); };
       try { for (const o of [{ exploded: false }, { exploded: true, wire: true }, { wire: false, cam: { pitch: Math.PI / 2 - 0.001, yaw: 0 } }, { cam: { pitch: 0.6, yaw: -0.5, zoom: 2 } }]) { ws.view(o); await TH.sleep(10); } } finally { console.error = oe; }
       assert.equal(errs.length, 0, 'every view draws without an error: ' + errs.join(' | '));
-      // drag to orbit
+      // drag to orbit — Alt (2026-11-12, P170: the pen draws on the plane under it; Alt, the middle button, O or a drag off the planes turns)
       const r = cv.getBoundingClientRect(), yaw0 = ws.view().cam.yaw;
-      cv.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: r.left + 300, clientY: r.top + 300, pointerId: 1 }));
-      cv.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, clientX: r.left + 380, clientY: r.top + 310, pointerId: 1 }));
-      cv.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX: r.left + 380, clientY: r.top + 310, pointerId: 1 }));
+      cv.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, altKey: true, clientX: r.left + 300, clientY: r.top + 300, pointerId: 1 }));
+      cv.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, altKey: true, clientX: r.left + 380, clientY: r.top + 310, pointerId: 1 }));
+      cv.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, altKey: true, clientX: r.left + 380, clientY: r.top + 310, pointerId: 1 }));
       assert.ok(Math.abs(ws.view().cam.yaw - yaw0) > 0.3, 'a drag turns the camera');
       // 2D: draw the base with a drag — one history step; undo puts it back
       ws.view({ mode: '2d' }); ws.select('base'); await TH.sleep(20); const before = JSON.stringify(t.clip().notes[1]), n0 = ws.history().length;
