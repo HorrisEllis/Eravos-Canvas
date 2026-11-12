@@ -100,11 +100,18 @@
     }
     // a plane in space is an affine map of its 2D drawing (near-orthographic camera): x = across the layer, z = into it, y = its height
     function proj(W, H, x, y, z) {
-      const s = Math.min(W * 0.34, H * 0.5) * cam.zoom, cy = Math.cos(cam.yaw), sy = Math.sin(cam.yaw), cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
+      const s = Math.min(W * 0.34, H * 0.5) * cam.zoom * fit, cy = Math.cos(cam.yaw), sy = Math.sin(cam.yaw), cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
       return [W / 2 + s * (x * cy - z * sy), H / 2 - s * y * cp + s * (x * sy + z * cy) * sp];
     }
+    let fit = 1;   // the camera steps back so a tall stack stays in view (the user's zoom still applies on top)
     function draw3d(g, W, H, dpr) {
-      planes = []; const L = layers().filter(l => !l.hidden && !hidden.has(l.id) && l.type !== 'value'), n = L.length, PW = 512, PH = 256, A = 1, B = 0.42, gap = exploded ? Math.min(0.42, 1.15 / Math.max(1, n)) : 0.025;
+      // exploded: the layers keep their distance however many there are (it was 1.15 / n — fourteen stages ended 0.08 apart, one block);
+      // the camera fits the stack instead. Few layers: the same view as before (fit stays 1)
+      planes = []; const L = layers().filter(l => !l.hidden && !hidden.has(l.id) && l.type !== 'value'), n = L.length, PW = 512, PH = 256, A = 1, B = 0.42, gap = exploded ? (n <= 2 ? 0.42 : Math.max(0.383, Math.min(0.42, 1.15 / n))) : 0.025;
+      fit = 1; const z0 = cam.zoom; cam.zoom = 1; const top = ((n - 1) / 2) * gap, ext = [];
+      [-top, top].forEach(h => [[-A, -B], [A, -B], [-A, B], [A, B]].forEach(([x, z]) => ext.push(proj(W, H, x, h, z)))); cam.zoom = z0;
+      const ew = Math.max(...ext.map(q => q[0])) - Math.min(...ext.map(q => q[0])), eh = Math.max(...ext.map(q => q[1])) - Math.min(...ext.map(q => q[1]));
+      fit = Math.min(1, (W * 0.86) / Math.max(1, ew), (H * 0.86) / Math.max(1, eh));
       g.fillStyle = '#05070a'; g.fillRect(0, 0, W, H);
       // the floor: a faint grid under the stack
       const fy = -((n - 1) / 2) * gap - 0.18; g.strokeStyle = 'rgba(120,150,180,0.08)'; g.lineWidth = 1;
@@ -308,7 +315,7 @@
       get selected() { return selected; }, keys: () => keyList(), tools: () => TOOLS.map(t => t[0]),
       drag: (t, pts, o3) => { const r = cv.getBoundingClientRect(); const res = K.drag ? K.drag(d, t, pts, r.width, r.height, Object.assign({ selected, phase: 'end' }, o3 || {})) : null; if (res && res.key !== undefined) edit(res.key, res.value, res.label); return !!res; }, get hidden() { return Array.from(hidden); }, tool: (t) => { if (t) { tool = t; render(); } return tool; },
       // W3a: the viewport (for tests and the kind's own buttons)
-      view: (o2) => { if (o2) { if (o2.mode) mode = o2.mode; if (o2.exploded !== undefined) exploded = !!o2.exploded; if (o2.wire !== undefined) wire = !!o2.wire; if (o2.cam) Object.assign(cam, o2.cam); chips(); draw(); } return { mode, exploded, wire, cam: Object.assign({}, cam) }; },
+      view: (o2) => { if (o2) { if (o2.mode) mode = o2.mode; if (o2.exploded !== undefined) exploded = !!o2.exploded; if (o2.wire !== undefined) wire = !!o2.wire; if (o2.cam) Object.assign(cam, o2.cam); chips(); draw(); } return { mode, exploded, wire, cam: Object.assign({}, cam), planes: planes.map(p => ({ id: p.id, poly: p.poly.map(q => q.slice()) })) }; },
       stroke: (pts) => { const r = cv.getBoundingClientRect(); const res = K.stroke ? K.stroke(d, pts, r.width, r.height, { selected }) : null; if (res && res.key !== undefined) edit(res.key, res.value, res.label); return !!res; },
       action: (label) => { const a = (K.actions ? K.actions(d, { selected }) : []).find(x => x.label === label); if (!a || a.disabled) return false; if (a.key !== undefined) edit(a.key, a.value, a.label); else a.run(clone(d)); return true; } };
     current = api; return api;
