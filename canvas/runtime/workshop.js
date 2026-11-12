@@ -9,6 +9,7 @@
  *   Workshop.check(kind) → [] or the problems, in words · Workshop.addKind(kind) → { ok, problems } · Workshop.kinds()
  *   Workshop.open(kindId, doc, { onChange(doc), onApply(doc), onClose(), title }) → { doc(), set(key, v), select(layerId), undo(), redo(),
  *     history(), close(), el } · Workshop.current
+ * I1 open(…, { onLive(doc) }): called with the previewed document while a drag moves (before it is kept); kind.toolset: the tool ids it offers.
  * W3h actions with `strip: true` sit at the foot of the tool strip (with ✕ close); hint(doc, { tool, mode, selected }) → a line of help in the
  *   view; in 3D only shapes are planes (a value layer is a number, not a shape) and a click picks a plane.
  * W3g drag(doc, tool, points, W, H, { selected, phase, alt, shift }) → { key, value, label } (the toolbar: pen line points smooth move erase);
@@ -172,7 +173,7 @@
       ['smooth', 'S', '≈', 'Smooth — a brush that smooths what it passes over'], ['move', 'G', '↕', 'Move — drag the whole curve up or down; Shift scales it'],
       ['erase', 'E', '⌫', 'Erase — a brush that flattens what it passes over'], ['orbit', 'O', '⟲', 'Orbit — drag to turn the 3D view (wheel zooms)']];
     const CURVE_TOOLS = ['pen', 'line', 'points', 'smooth', 'move', 'erase'];
-    const TOOLS = ALL_TOOLS.filter(([id]) => id === 'select' || (id === 'orbit' ? !!K.drawLayer : K.drag ? true : id === 'pen' && !!K.stroke));
+    const TOOLS = ALL_TOOLS.filter(([id]) => id === 'select' || (id === 'orbit' ? !!K.drawLayer : K.drag ? true : id === 'pen' && !!K.stroke)).filter(([id]) => !K.toolset || K.toolset.includes(id));   // I1 a kind may offer only some tools
     let tool = TOOLS.some(t => t[0] === 'pen') ? 'pen' : 'select', preview = null, drag = null;
     function thumb(l) {
       if (!K.drawLayer) return el('span', 'ws-badge t-' + (TYPES.includes(l.type) ? l.type : 'value'), [], { text: (l.type || 'value').slice(0, 4).toUpperCase() });
@@ -283,6 +284,7 @@
       try { res = K.drag(d, tool, drag.pts, r.width, r.height, { selected, phase, alt: drag.alt, shift: drag.shift }); } catch (e) { console.error(e); }
       if (phase === 'end') { preview = null; drag = null; if (res && res.key !== undefined) return edit(res.key, res.value, res.label); return draw(); }
       try { preview = res && res.key !== undefined ? K.set(d, res.key, res.value) : null; } catch (e) { preview = null; } draw();
+      if (preview && o.onLive) { try { o.onLive(clone(preview)); } catch (e) { console.error(e); } }   // I1 the owner may follow the hand (live), before it is kept
     }
     const endPointer = () => {
       if (orbit) { const o2 = orbit; orbit = null;

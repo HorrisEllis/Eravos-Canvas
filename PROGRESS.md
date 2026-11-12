@@ -2,6 +2,17 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Built, shown, not merged yet — 3.166 Any tool on the Workshop, from its own settings (I1) (2026-11-12)
+His words: "How hard would that be to edit?" · "Start." (and 2026-11-09: "constraint field of nodes? … could always have each tool, or domain have a template or every kind")
+- tools/music/core/instrument-workshop.js (NEW): one kind, `music.instrument`, generated from a tool's settings through music's stage words
+  (CONTROL · SOURCE · MOD · SHAPE · AMP · FX · OUT) — no code per tool. Its flow as nodes; drag a bar = set it, LIVE while the hand moves, one
+  history step on release (Shift: fine); a word steps to its next choice; a click selects a stage; undo puts the tool back; 3D planes; wires
+  only where a modulator's setting names its target ("→ cutoff"). Right-click a tool › Open on the Workshop.
+- canvas/runtime/workshop.js: open(…, { onLive }) and kind.toolset (domain-free).
+- Proof: tests/p166 3/3 (every tool with settings makes a whole kind; Retro DCO live drag / fine / word / select / undo; an effect opens from
+  the menu); boundary 10/10, P150 … P165 green; design check no worse. P70's curve-lane failure is on main.
+- Previews: docs/previews/instrument-retro-dco.png, instrument-wobble-bass.png.
+
 ## Done — 3.165 Patterns made on the Workshop: the map adds notes, IDEA, save, New pattern (2026-11-11)
 His words: "the ability to add a note on the piano roll from the map would be usefull. also the pattern editor is meant to be in the workshop …
 i want to be able to add or create patterns for the library and the timeline and import them into the timeline." · "i want to make music

@@ -60,3 +60,19 @@ open: the face size N per window size; whether IN PLAY reorders while playing or
 #   field is an option (Settings › Look › Layout: As designed · Fluid, per tool too). With Fluid on, no control is ever hidden: what does
 #   nothing in the current state moves to NOT IN PLAY (still there, still usable, with why), the rest reorders. Hand-coded dims keep working;
 #   the generated DAG only adds edges. A guard test: with the option off, every tool's window is identical to before.
+
+# ---- ADDENDUM 2026-11-12 — I1: the instrument kind, built (slice 1 of 4; nothing above is changed)
+#   his words: "How hard would that be to edit?" (2026-11-09) → the answer given: the view itself is the editor, in four slices · "Start." (2026-11-12)
+#   I1  tools/music/core/instrument-workshop.js → window.InstrumentWorkshop.open(instanceId): ONE kind (`music.instrument`) for every tool,
+#       generated from the tool's own settings (config groups) through the music domain's stage words — no code per tool.
+#         view     its signal flow as nodes (CONTROL → SOURCE → SHAPE → AMP → FX → OUT; modulators above), each number setting a bar with its
+#                  name, each choice a word
+#         edit     DRAG A BAR to set it — LIVE while the hand moves (the tool hears it at once), one history step when it lets go; Shift = fine;
+#                  click a word to step to its next choice; click a node to select its stage (PROPERTIES edits it too); undo puts the tool back
+#         wires    only what the settings themselves say: a modulator setting named "→ x" is wired to the stage that owns x (no guessing)
+#         3D       each stage a plane, its settings as bars
+#         open     right-click any tool's window › Open on the Workshop
+#       canvas (domain-free): Workshop.open(…, { onLive(doc) }) — called while a drag previews; kind.toolset — the tools a kind offers
+#       dag      tool.config ─→ stages (domain words) ─→ kind layers / nodes ─→ drag / click ─→ ui:config_change:<tool> ─→ the tool's sound
+#       proof    tests/p166
+#   next: I2 a setting shaped over time (mod-tree) · I3 modulation wires you can drag · I4 resting what does nothing now (UF1 when / why)
