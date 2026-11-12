@@ -11,7 +11,7 @@
  *     history(), close(), el } · Workshop.current
  * I1 open(…, { onLive(doc) }): called with the previewed document while a drag moves (before it is kept); kind.toolset: the tool ids it offers.
  * W3h actions with `strip: true` sit at the foot of the tool strip (with ✕ close); hint(doc, { tool, mode, selected }) → a line of help in the
- *   view; in 3D only shapes are planes (a value layer is a number, not a shape) and a click picks a plane.
+ *   view; in 3D every layer is a plane (2026-11-12, as at 3.156) and a click picks a plane — a shape first where planes overlap.
  * W3g drag(doc, tool, points, W, H, { selected, phase, alt, shift }) → { key, value, label } (the toolbar: pen line points smooth move erase);
  *   bar(doc) → fields shown in the options bar (a document-wide value the kind names).
  * W3f picker(doc) → { label, key, value, options: [{ value, label } | { group, options }] } (a dropdown first in the options bar; a change is
@@ -109,7 +109,8 @@
     function draw3d(g, W, H, dpr) {
       // exploded: the layers keep their distance however many there are (it was 1.15 / n — fourteen stages ended 0.08 apart, one block);
       // the camera fits the stack instead. Few layers: the same view as before (fit stays 1)
-      planes = []; const L = layers().filter(l => !l.hidden && !hidden.has(l.id) && l.type !== 'value'), n = L.length, PW = 512, PH = 256, A = 1, B = 0.42, gap = exploded ? (n <= 2 ? 0.42 : Math.max(0.383, Math.min(0.42, 1.15 / n))) : 0.025;
+      planes = []; const L = layers().filter(l => !l.hidden && !hidden.has(l.id)),   // every layer a plane, as at 3.156 (his: "it was exploded before")
+        n = L.length, PW = 512, PH = 256, A = 1, B = 0.42, gap = exploded ? (n <= 2 ? 0.42 : Math.max(0.383, Math.min(0.42, 1.15 / n))) : 0.025;
       fit = 1; const z0 = cam.zoom; cam.zoom = 1; const top = ((n - 1) / 2) * gap, ext = [];
       [-top, top].forEach(h => [[-A, -B], [A, -B], [-A, B], [A, B]].forEach(([x, z]) => ext.push(proj(W, H, x, h, z)))); cam.zoom = z0;
       const ew = Math.max(...ext.map(q => q[0])) - Math.min(...ext.map(q => q[0])), eh = Math.max(...ext.map(q => q[1])) - Math.min(...ext.map(q => q[1]));
@@ -124,7 +125,7 @@
         const og = o.getContext('2d'); og.setTransform(1, 0, 0, 1, 0, 0); og.clearRect(0, 0, PW, PH);
         try { K.drawLayer(og, PW, PH, d, l.id, { wire, selected: l.id === selected }); } catch (e) { console.error(e); }
         const h = (i - (n - 1) / 2) * gap, p0 = proj(W, H, -A, h, -B), px = proj(W, H, A, h, -B), pz = proj(W, H, -A, h, B), p3 = proj(W, H, A, h, B);
-        const sel = l.id === selected; planes.push({ id: l.id, poly: [p0, px, p3, pz] });
+        const sel = l.id === selected; planes.push({ id: l.id, type: l.type, poly: [p0, px, p3, pz] });
         // the plane: glass, its frame, its name
         g.setTransform(dpr, 0, 0, dpr, 0, 0); g.beginPath(); g.moveTo(p0[0], p0[1]); g.lineTo(px[0], px[1]); g.lineTo(p3[0], p3[1]); g.lineTo(pz[0], pz[1]); g.closePath();
         if (!wire) { g.fillStyle = sel ? 'rgba(0,212,255,0.07)' : 'rgba(140,170,200,0.035)'; g.fill(); }
@@ -234,10 +235,9 @@
           menu(e.clientX, e.clientY, [{ section: String(l.label).toUpperCase() }, { label: hidden.has(l.id) ? 'Show it' : 'Hide it', keys: 'H', run: () => { hidden.has(l.id) ? hidden.delete(l.id) : hidden.add(l.id); render(); } },
             { label: 'Show only this', keys: 'Alt+H', run: () => { hidden = new Set(L.map(x => x.id).filter(id => id !== l.id)); render(); } }, { label: 'Show all', run: () => { hidden = new Set(); render(); } }, { sep: true }].concat(kindItems('layer'), newItems())); });
         return r; };
-      const foot = el('div', 'ws-lfoot', acts().filter(a => a.icon).map(a => el('button', 'ws-lt', [], { type: 'button', text: a.icon, disabled: !!a.disabled, title: nameOf(a) + (a.keys ? '  (' + KEYS(a.keys) + ')' : '') + (a.hint ? ' — ' + a.hint : ''), onclick: () => runAct(a) })));
       const canAdd = addables().length > 0;
-      lays.replaceChildren(el('div', 'ws-ph', [el('span', 'on', [], { text: 'LAYERS' }), el('span', 'ws-x', [], { text: String(L.length) }),
-          canAdd ? el('button', 'ws-new', [], { type: 'button', text: '＋', title: 'New layer  (' + KEYS('Mod+Shift+N') + ')', onclick: (e) => { const r = e.currentTarget.getBoundingClientRect(); newLayerMenu(r.left, r.bottom + 2); } }) : null].filter(Boolean)),
+      const foot = el('div', 'ws-lfoot', [canAdd ? el('button', 'ws-lt ws-new', [], { type: 'button', text: '＋', title: 'New layer  (' + KEYS('Mod+Shift+N') + ') — shape something, set a knob, add a mod', onclick: (e) => { const r = e.currentTarget.getBoundingClientRect(); newLayerMenu(r.left, r.top - 4); } }) : null].filter(Boolean).concat(acts().filter(a => a.icon).map(a => el('button', 'ws-lt', [], { type: 'button', text: a.icon, disabled: !!a.disabled, title: nameOf(a) + (a.keys ? '  (' + KEYS(a.keys) + ')' : '') + (a.hint ? ' — ' + a.hint : ''), onclick: () => runAct(a) }))));
+      lays.replaceChildren(el('div', 'ws-ph', [el('span', 'on', [], { text: 'LAYERS' }), el('span', 'ws-x', [], { text: String(L.length) })]),
         el('div', 'ws-lbody', [].concat(...groups.map(([gname, ls]) => [gname ? el('div', 'ws-lh' + (folded.has(gname) ? ' folded' : ''), [], { text: (folded.has(gname) ? '▸ ' : '▾ ') + gname, onclick: () => { folded.has(gname) ? folded.delete(gname) : folded.add(gname); render(); } }) : null]
           .concat(folded.has(gname) ? [] : ls.map(row)))).filter(Boolean)), foot);
       status.replaceChildren(...(K.status ? K.status(d) : []).map(([k, v]) => el('span', '', [k + ' ', el('b', '', [], { text: String(v) })])),
@@ -307,7 +307,7 @@
     const endPointer = () => {
       if (orbit) { const o2 = orbit; orbit = null;
         if (o2.lastX === undefined || Math.hypot(o2.lastX - o2.x, o2.lastY - o2.y) < 4) {   // W3h a click in 3D (no turn): the plane under it is selected
-          const r = cv.getBoundingClientRect(), x = o2.x - r.left, y = o2.y - r.top; const hit = planes.slice().reverse().find(pl => inPoly(x, y, pl.poly)); if (hit) { selected = hit.id; render(); return; } }
+          const r = cv.getBoundingClientRect(), x = o2.x - r.left, y = o2.y - r.top; const under = planes.slice().reverse().filter(pl => inPoly(x, y, pl.poly)), hit = under.find(pl => pl.type !== 'value') || under[0];   /* a shape first where planes overlap */ if (hit) { selected = hit.id; render(); return; } }
         chips(); return; }
       if (drag) return dragStep('end');
       if (!stroke) return; const st = stroke; stroke = null; const r = cv.getBoundingClientRect();

@@ -1,4 +1,6 @@
-/* P169 — layers can be added on the Workshop. His words, 2026-11-12: "also why cant i add layers?" (a drum note in 3D: one plane).
+/* P169 — layers can be added on the Workshop. His words, 2026-11-12: "also why cant i add layers?" (a drum note in 3D: one plane) ·
+ * "it worked before. when i was able to add mods. we are regressing. it was exploded before and i was able to draw. no it should be under the
+ * layers section. also the mods." — every layer a plane again (as at 3.156); ＋ and ∿ (a mod) at the foot of LAYERS.
  * ＋ on LAYERS (Ctrl+Shift+N, right-click › NEW LAYER) lists what the kind can make; a shape is a curve, so it becomes a plane in 3D. */
 window.__phase = 'P169';
 describe('P169 a new layer on the Workshop', () => {
@@ -15,11 +17,14 @@ describe('P169 a new layer on the Workshop', () => {
   it('a drum note: ＋ offers its knobs; shaping one adds a plane in 3D; undo takes it away', async () => {
     const t = await make('eravos.pads', [{ s: 0, l: 2, n: 36, v: 0.8 }, { s: 4, l: 2, n: 38, v: 0.8 }]);
     try {
-      const ws = t.ws, btn = ws.el.querySelector('.ws-layers .ws-new');
-      assert.ok(btn, 'a ＋ on LAYERS'); const A = ws.addable();
+      const ws = t.ws, btn = ws.el.querySelector('.ws-layers .ws-lfoot .ws-new');
+      assert.ok(btn, 'a ＋ at the foot of LAYERS'); assert.ok(!ws.el.querySelector('.ws-layers .ws-ph .ws-new'), 'not in the header');
+      assert.ok(Array.from(ws.el.querySelectorAll('.ws-lfoot .ws-lt')).some(b => b.textContent === '∿'), 'a ∿ (add a mod) beside it'); const A = ws.addable();
       assert.ok(A.some(x => /^SHAPE OVER THE NOTE › /.test(x)), 'it can shape a knob over the note: ' + A.slice(0, 6).join(' | '));
       assert.ok(!A.includes('SHAPE OVER THE NOTE › Pitch'), 'a pad has no pitch to bend');
-      ws.view({ mode: '3d' }); await TH.sleep(40); const p0 = ws.view().planes.length;
+      ws.view({ mode: '3d', exploded: true }); await TH.sleep(40); const p0 = ws.view().planes.length;
+      assert.ok(p0 >= 5, 'a drum note explodes into its layers again: ' + p0 + ' planes');
+      assert.ok(A.some(x => /^MODULATE › /.test(x)), 'MODULATE is offered');
       const first = A.find(x => /^SHAPE OVER THE NOTE › /.test(x)).replace(/^.* › /, '');
       assert.ok(ws.add(first, 'SHAPE OVER THE NOTE'), 'shape ' + first); await TH.sleep(40);
       // back up to the note: the shape is a layer of it
@@ -32,6 +37,16 @@ describe('P169 a new layer on the Workshop', () => {
       btn.click(); await TH.sleep(30); const cm = document.querySelector('.cm');
       assert.ok(cm && /SHAPE OVER THE NOTE/i.test(cm.textContent), 'the ＋ opens the NEW LAYER menu');
       if (ContextMenu.close) ContextMenu.close();
+    } finally { t.done(); }
+  });
+  it('∿ on a drum note: a modulator on its first knob, in one step; undo takes it back', async () => {
+    const t = await make('eravos.pads', [{ s: 0, l: 4, n: 36, v: 0.8 }]);
+    try {
+      const ws = t.ws, b = Array.from(ws.el.querySelectorAll('.ws-lfoot .ws-lt')).find(x => x.textContent === '∿'); assert.ok(b && !b.disabled, 'a ∿');
+      const h0 = ws.history().length; b.click(); await TH.sleep(40);
+      const L = EravosTimelineWorkshop.KIND.layers(ws.doc()); assert.ok(L.some(l => /^m:0$/.test(l.id)), 'a modulator layer: ' + L.map(l => l.id).join(','));
+      assert.equal(ws.history().length, h0 + 1, 'one history step');
+      ws.undo(); await TH.sleep(30); assert.ok(!EravosTimelineWorkshop.KIND.layers(ws.doc()).some(l => /^m:/.test(l.id)), 'undo takes it back');
     } finally { t.done(); }
   });
   it('a melodic note: ＋ Pitch makes a pitch curve — two planes become three', async () => {
