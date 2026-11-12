@@ -71,6 +71,21 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-12 · Duplicates measured, not guessed; a library that drops nothing; songs on the new tools — PR #167
+- **His words (2026-11-12):** "okay exploded view works. drawing does nothing. also can you make some patterns testing all the new tools and
+  features. lofi, synthwave, and wobblebass?" · "aslo the play, x and done icons should be in the top right. not duplicated. no duplicates in
+  the ui. i hate that. remove the duel orbit buttons. the toolbar is for editing, not for different views. can you also remove duplicate songs
+  in the songs library, a lot of the same songs, also add songs that use the new tools, automation, and full extent of eravos." · "and then
+  merge and push"
+- **His call:** buttons once, top right; no view tools in the toolbar; fewer, distinct songs; new songs and patterns on the new tools.
+- **Built:** drawing at the note and on 3D planes (an inverse map from screen to plane); the Workshop's actions in one place; 13 patterns and
+  6 songs written as data whose per-note shapes are compiled exactly as the editor compiles them; a song-sameness measure (notes with key and
+  tempo removed, Jaccard within a genre) that hid 45 of 321 songs without deleting any. Found and fixed on the way: the pattern library and the
+  Workshop's save dropped every note field but two; a kit referenced as a preset never loaded.
+- **Proof:** P170 3/3, P171 17/17, P172, P173 5/5 — the drawing, placement, save and preset checks each fail on the old code or name; every
+  pattern and every new genre rendered and heard; the library suites green.
+- **Check:** `node tests/run.mjs P170` · `P171` · `P172` · `P173` · `tools/music/data/songbook-same.js` (each hidden song, what it repeats, how much)
+
 ### 2026-11-12 · A regression found by comparing versions, fixed, and layers made addable — PR #165
 - **His words (2026-11-12):** "also why cant i add layers?" · "it worked before. when i was able to add mods. we are regressing. it was
   exploded before and i was able to draw. no it should be under the layers section. also the mods." · "yes"
