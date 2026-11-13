@@ -71,6 +71,20 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-13 · Songs made to a reference by measurement, and a layer system finished — PRs #169, #170
+- **His words (2026-11-13):** "6? also they sound horrible. more like floor falls out." · "considering i said everything eravos could do
+  including automation. way too shallow … also stop making new catagories. i told you the catagories." · "Yes. Then make sure we can edit,
+  change and manipulate layers in workshop. Let's get that finished." · "Murge and pull"
+- **His call:** songs like Floor Falls Out, on his three shelves, with the whole system wired in; layers editable like an image editor's.
+- **Built:** a measure (level, 30–60 Hz share, above 150 Hz, the pause as a hole, clipping) and A/B runs that found the cause of the harsh
+  sound (a preset pairing, also present in an existing genre) instead of guessing; 24 songs tuned to the reference's profile; an additive
+  extension of the song engine (curves on effects and modulators, any modulation output to any knob) proved byte-identical on every
+  existing genre. A domain-free layer contract (what a layer can do, one edit for each operation) with lock, clipboard, amount, order, rename,
+  duplicate, delete, reset and on/off reaching what plays.
+- **Proof:** P173 6/6 (three genres written and measured against FFO #5901), P172 (no two songs ≥ 80 % the same), every existing genre's
+  steps identical before / after; P174 4/4 (each layer op checked against the compiled note), mod-tree 22 checks.
+- **Check:** `node tests/run.mjs P173` · `P174` · `node tools/music/components/mod-tree/mod-tree.test.mjs` · `docs/previews/workshop-layers.png`
+
 ### 2026-11-12 · Duplicates measured, not guessed; a library that drops nothing; songs on the new tools — PR #167
 - **His words (2026-11-12):** "okay exploded view works. drawing does nothing. also can you make some patterns testing all the new tools and
   features. lofi, synthwave, and wobblebass?" · "aslo the play, x and done icons should be in the top right. not duplicated. no duplicates in
