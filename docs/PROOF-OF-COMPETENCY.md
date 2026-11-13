@@ -71,6 +71,20 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-13 · Piano: an approved design built from tested parts; four faults found by measurement before he heard them — PR (3.182)
+- **His words:** "yes" (2026-11-06, to the Piano preview among the lofi tools) · "then i want the next set of high leverage tools" (2026-11-13)
+- **His call:** the face (approved as a preview); the order (high leverage, from the dependency graph — the approved, ready tool first).
+- **Built:** a modelled piano (6 models, no samples) assembled in one audio worklet from seven tested components' own code, on his approved face.
+- **Proof:**
+  - Faults found by measuring, not by ear, each fixed and each now guarded by a test:
+    - a 400× level mismatch between the models
+    - a body resonance that pushed the presets to 7× full scale
+    - a drive stage that silenced the sound
+    - a brightness control that could not reach a sounding note
+  - The tool contract passes 49/49 and its acceptance tests 6/6: pitch exact, the stretched 12th partial, the pedal, live controls and headroom.
+  - It passes the every-instrument guards and the design check.
+- **Check:** `node tests/run.mjs P182` · `node tests/run.mjs piano` · `docs/previews/piano-built.png`
+
 ### 2026-11-13 · Every component's contract finished; the check that found the author's own wrong defaults — PR (3.181)
 - **His words (2026-11-13, 13:53:40 UTC):** "continue with the component contracts."
 - **Built:** the ten remaining contracts, and a check that compares any default the code states with the default in the contract.

@@ -986,7 +986,7 @@ html[data-theme][data-material][data-material] .wm-body :is([class$="-card"], [c
 .cm-s { padding: 9px 12px 3px; font-size: 11px; }
 .cm-item { padding: 10px 14px; font-size: 14px; border-radius: 7px; min-height: 38px; }
 .cm-sep { margin: 5px 8px; }
-/* 3.114 a coloured border on every tool (Settings › Canvas, on by default): each window and a tool's own windows (the piano roll)
+/* 3.114 a coloured border on every tool (Settings › Canvas, on by default): each window and the windows a tool opens of its own
  * outlined in the window's own colour, so neighbours — a tool's own window and the docked window below it — never run together */
 html[data-tool-borders="on"] .wm-win, html[data-tool-borders="on"] .wm-panel { outline: 2px solid color-mix(in srgb, var(--acc, #00d4ff) 80%, transparent); outline-offset: 0; }
 html[data-tool-borders="on"] .wm-win.wm-snap { outline-color: var(--acc, #00d4ff); }

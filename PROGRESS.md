@@ -2,6 +2,29 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.182 Piano — built from its parts, on the face he approved (2026-11-13)
+His words: "yes" (2026-11-06, to the lofi previews — Tape Memory, Piano, the Lofi setup, Bind on the lane) · "then i want the next set of
+high leverage tools" (2026-11-13T13:53:40Z). The dependency graph: 6 planned tools ready; Retro DCO, Swarm, Tape Memory built; Pattern Editor
+became the Field; Ensemble Organism never shown; Piano approved and ready (7 of 7 components) — first.
+- tools/music/tools/genre-instruments/piano/: one AudioWorklet from the components' own kernel text (modal-resonator, karplus-string — its new
+  KSTRING_SRC, bit-identical to KString, 42 checks — filter-svf, env-adsr, lfo, stereo-tools, saturator-tube) + voice-allocator (24 voices).
+  tine and reed are modal (the tine's tonebar + its clamped overtones for Bell; the reed's odd harmonics, Bell = partials 3 and 7); felt /
+  upright / honky / grand are 1–3 stretched strings; a hammer pulse (harder = shorter); brightness through the filter (live); a body of modes
+  (Resonance, Mic Y); 12 sympathetic strings the pedal opens; the tremolo swing; the tube. 22 controls, 12 on the face (the approved preview,
+  its display lit by real notes). Factory pack: the spec's 10 names.
+- Found while building, each fixed and guarded: (1) the tine was 400× the strings — per-model gains measured (every model at 0.10 RMS);
+  (2) the body fed the whole signal through narrow modes: presets peaked 2.8–7.1 × full scale — input scaled per model, a test now plays every
+  factory preset's chords under full scale; (3) the tube sat after the model gain, so it saw ±60 and Drive silenced the sound — gain, then
+  tube, then Level; (4) Bright on the tine and reed set the strike, not the sound — now the filter (P163 follows). Hammer and Velocity curve
+  shape the strike (onset: true; P163 skips them, as it skips attack and glide).
+- Canvas wording: "like the piano roll" in Settings › Canvas's border hint → "the windows a tool opens of its own" (the canvas names no tool —
+  with a Piano tool, "piano" became a tool name; tests/boundary.test.js).
+- OPEN: MIDI CC64 / CC67 to the pedal — the SDK carries notes, not controllers (bind a pedal with the MIDI Mapper).
+- Proof: piano.test.js — the contract 49/49 (presets in range, save → load, closes clean, Stop all) + P182 6/6 (every model sounds and within
+  6 dB; every preset's chords under full scale; A3 = 220 Hz on tine and grand; the grand's 12th partial sharp at Stretch 0.5, in tune at 0; key
+  up stops, pedal holds; Bright reaches a sounding note); P163 32/32, P130 4/4, P38 37/37, P176, P119, boundary 10/10; design check 58/75
+  (clean); no-toys; validate 261. docs/previews/piano-built.png (playing).
+
 ## 3.181 CG1 finished: every component with code carries a checked contract (2026-11-13)
 His words: "continue with the component contracts. then i want the next set of high leverage tools" (13:53:40Z).
 - The 10 data / logic components now carry <id>.contract.json (33 of 33 with code). Types curve, pattern, harmony added to tools/music/types.json.

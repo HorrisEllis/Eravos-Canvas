@@ -86,3 +86,6 @@
   - BUILT 3.181: CG1 finished — the 10 data / logic components' contracts (33 of 33 with code); a check that a contract's default equals the
     default the code states (it found 5 wrong defaults of mine, now fixed); all 18 tools announce their components' UI elements
   - OPEN: the next set of high-leverage tools — from the dependency graph (docs/eco-graph.md), each spec first and its UI shown to him first
+  - BUILT 3.182: the first of the next set — Piano (approved 2026-11-06, the one approved tool ready to build: 7 of 7 components built).
+    The rest of the set, from docs/eco-graph.md: Ensemble Organism (ready, never shown — UI preview first); the components that unlock the most
+    (slew-lag, mpe-expression, relationship-graph, reverb-fdn, waveshaper) — each spec + tested code, no UI.

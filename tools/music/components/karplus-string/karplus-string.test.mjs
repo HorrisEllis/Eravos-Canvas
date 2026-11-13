@@ -1,5 +1,5 @@
 // node tools/music/components/karplus-string/karplus-string.test.mjs — the string proves its own numbers (new code).
-import { createRequire } from 'module'; const { KString, kstringLoopDelay, phaseDelay } = createRequire(import.meta.url)('./karplus-string.js');
+import { createRequire } from 'module'; const { KString, kstringLoopDelay, phaseDelay, KSTRING_SRC } = createRequire(import.meta.url)('./karplus-string.js');
 let n = 0; const ok = (c, m) => { n++; if (!c) { console.error('FAIL: ' + m); process.exit(1); } };
 const SR = 48000;
 // pluck: a short soft burst (a hammer), then let it ring
@@ -37,4 +37,7 @@ const kth = (lp, k, f0) => { let lo = f0 * (k - 0.6), hi = f0 * (k + 1.4); for (
 for (const o of [{ t60: 20, stretch: 1, bright: 0 }, { t60: 20, stretch: 0.6, bright: 0.2 }]) for (const f0 of [55, 440, 2000]) { const { y } = pluck(f0, o, 3); let a = 0, b = 0; for (let j = 0; j < SR / 2; j++) a = Math.max(a, Math.abs(y[j])); for (let j = SR * 2; j < SR * 3; j++) b = Math.max(b, Math.abs(y[j])); ok(b <= a + 1e-9, `${f0} Hz, dark and long (bright ${o.bright}): it only ever decays — stable (${a.toFixed(3)} → ${b.toFixed(3)})`); }
 { const { y, k } = pluck(98, { t60: 1, stretch: 1, bright: 0.5 }, 12); ok(y.every(Number.isFinite), 'finite'); ok(k.energy < 1e-12, `rung out after 12 s (energy ${k.energy.toExponential(1)})`);
   const z = pluck(5000, { t60: 1, stretch: 1 }, 1).y; ok(z.every(Number.isFinite), '5 kHz with full stretch: finite (stretch eased to fit)'); }
+// ---- KSTRING_SRC (3.182): the text a worklet runs is the same string, sample for sample
+{ const K2 = new Function(KSTRING_SRC + '\nreturn KString;')(), a = KString(), b = K2(); a.set(220, SR, { t60: 3, bright: 0.4, stretch: 0.7, detune: 3 }); b.set(220, SR, { t60: 3, bright: 0.4, stretch: 0.7, detune: 3 });
+  let same = true; for (let j = 0; j < SR; j++) { const x = j < 96 ? Math.sin(j * 0.3) * (1 - j / 96) : 0; if (a.tick(x) !== b.tick(x)) { same = false; break; } } ok(same, 'KSTRING_SRC runs the same string as KString, bit for bit (one second)'); }
 console.log(`karplus-string: ${n} checks passed — tuned exactly (the loop worked out; half a cent measured), stretched like a piano, stable, decays on time, dark and bright`);

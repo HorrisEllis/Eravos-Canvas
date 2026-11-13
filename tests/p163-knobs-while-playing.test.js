@@ -5,7 +5,8 @@
  *   C the knob low throughout · A the knob high from the start · B low, moved to high at 1.0 s (ctx.suspend) —
  * compared over 1.4–1.9 s by level (dB) and brightness (RMS of the change over RMS, octaves). A knob MATTERS when A differs from C
  * (≥ 1.5 dB or ≥ 0.25 oct); it LAGS when it matters and B moved less than a third of the way from C to A. Knobs that only shape a
- * note's start (times: s / ms, attack, decay, glide …) are left out. LAGGING below is today's list: a pair not on it that lags fails;
+ * note's start (times: s / ms, attack, decay, glide …) are left out, and so is a knob its tool marks onset: true (3.182 — it shapes how a
+ * note is struck, like Piano's Hammer: a hammer cannot change a string already ringing; it reaches the next note). LAGGING below is today's list: a pair not on it that lags fails;
  * the list only shrinks (a fixed pair still listed is reported, to be removed). */
 window.__phase = 'P163';
 (function () {
@@ -30,7 +31,7 @@ window.__phase = 'P163';
     it(d.id + ': every numeric knob that matters is followed by the sounding note', async () => {
       const lag = [], ok = [], healed = [];
       for (const c of d.config || []) {
-        if ((c.type !== 'number' && c.type !== 'integer') || c.hidden || SKIP.test(c.key) || /^(s|ms)$/.test(c.unit || '') || !(c.max > c.min)) continue;
+        if ((c.type !== 'number' && c.type !== 'integer') || c.hidden || c.onset || SKIP.test(c.key) || /^(s|ms)$/.test(c.unit || '') || !(c.max > c.min)) continue;
         const lo = c.min + (c.max - c.min) * 0.05, hi = c.min + (c.max - c.min) * 0.9, pair = d.id.replace('eravos.', '') + ':' + c.key;
         let C, A, B; try { C = await once(d.id, c.key, 'C', lo, hi); A = await once(d.id, c.key, 'A', lo, hi); if (!C || !A || dist(A, C) < 1) continue; B = await once(d.id, c.key, 'B', lo, hi); } catch (e) { continue; }
         if (dist(B, C) >= dist(A, C) / 3) { ok.push(pair); if (LAGGING.has(pair)) healed.push(pair); } else lag.push(pair);
