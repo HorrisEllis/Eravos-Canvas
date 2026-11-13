@@ -81,7 +81,7 @@ describe('P156 the Workshop in 3D; a note shaped fractally', () => {
       // a drawn wave: a modulator selected, the drag draws its cycle
       ws.select('m:0'); ws.stroke(pts); await TH.sleep(20);
       const m0 = t.clip().notes[1].sh.t.pitch.mods[0]; assert.ok(m0.shape === 'drawn' && m0.wave.length > 10, 'the drag drew the wave of mod 1');
-      ws.action('✕ UNSHAPE'); await TH.sleep(20); assert.ok(!t.clip().notes[1].sh && !t.clip().notes[1].b, 'unshape: the note plays as before it was shaped');
+      ws.layer('base', 'remove'); await TH.sleep(20); assert.ok(!t.clip().notes[1].sh && !t.clip().notes[1].b, 'unshape (2026-11-13: the base layer’s Delete — ✕ UNSHAPE was the same, in a second place): the note plays as before it was shaped');
     } finally { closeWs(); OrganismFactory.close(t.id); restoreView(); }
   });
   it('any knob of the instrument: shaped, compiled into the note\'s curve for that knob, inside the knob\'s range', async () => {
@@ -95,7 +95,7 @@ describe('P156 the Workshop in 3D; a note shaped fractally', () => {
       const c = t.clip().notes[0].c && t.clip().notes[0].c[k.key]; assert.ok(c && c.length === 64, 'the note now carries a curve for ' + k.label);
       assert.ok(c.every(q => q[1] >= k.min - 1e-9 && q[1] <= k.max + 1e-9), 'every point inside ' + k.min + '…' + k.max);
       assert.ok(span(c) > (k.max - k.min) * 0.3, 'and it moves (span ' + span(c).toFixed(3) + ')');
-      ws.action('✕ UNSHAPE'); await TH.sleep(20); assert.ok(!(t.clip().notes[0].c && t.clip().notes[0].c[k.key]), 'unshaping takes the curve away');
+      ws.layer('base', 'remove'); await TH.sleep(20); assert.ok(!(t.clip().notes[0].c && t.clip().notes[0].c[k.key]), 'unshaping (the base layer’s Delete) takes the curve away');
     } finally { closeWs(); OrganismFactory.close(t.id); if (t.inst) OrganismFactory.close(t.inst); restoreView(); }
   });
 });

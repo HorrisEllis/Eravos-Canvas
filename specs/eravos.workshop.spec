@@ -321,3 +321,11 @@ W3h  AT HAND      ⤓ save to the note library · ▶ play it · ✕ close — a
 #   At the note a drag draws into the shape it is over (pitch, or a pad's first knob), making it if needed — one step. In 3D the pen draws on
 #   the plane under it: a kind with planeDraw: true gets drag(…, { norm: true }) with points 0–1 across and up that plane; the camera turns
 #   with Alt, the middle button, O (Orbit), or a drag that starts off every plane.
+
+# ---- ADDENDUM 2026-11-13 — layers, finished (nothing above is changed)
+#   his words: "make sure we can edit, change and manipulate layers in workshop. Let's get that finished."
+#   A kind says what each layer can do: layerOps(doc, id, { clip }) → { enable, amount, rename, duplicate, remove, reset, move, copy, paste,
+#   label: { op: words } } and does it: set(doc, '@layer', { id, op, value }) (it may name the layer to select next: __sel); copyLayer(doc, id).
+#   The surface: the eye (off in the result where the kind can, else the view's hide; Alt+click = only this) · lock (the surface's: no edit,
+#   field or pen reaches a locked layer) · amount in PROPERTIES · drag / Ctrl+[ ] to order · F2 / double-click to rename · Ctrl+J · Delete ·
+#   Ctrl+C / V (one clipboard for every document) · reset — each one undo step; the layer's menu lists only what it can do.

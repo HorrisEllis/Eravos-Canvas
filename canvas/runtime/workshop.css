@@ -113,3 +113,15 @@ html.ws-open .cm-item { font: inherit !important; text-transform: uppercase; let
 .ws-ab.ws-close:hover { color: #ff6b8a !important; border-color: #ff6b8a !important; }
 .ws-hintline { position: absolute; left: 12px; bottom: 8px; right: 12px; color: var(--wt3); font: 400 9.5px var(--wmono); letter-spacing: .08em; pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ws-hintline:empty { display: none; }
+
+/* 2026-11-13 layers: lock, off, drag to reorder, rename in place, amount */
+.ws-lay { grid-template-columns: 18px 48px 1fr 18px; }   /* eye · thumbnail · name · lock */
+.ws-lay .ws-lock { background: none; border: 0; padding: 0 4px; font-size: 11px; opacity: .22; cursor: pointer; filter: grayscale(1); }
+.ws-lay:hover .ws-lock { opacity: .6; } .ws-lay .ws-lock.on { opacity: .95; filter: none; }
+.ws-lay.locked .ws-ln { color: var(--wt2); } .ws-lay.off .ws-ln { opacity: .45; text-decoration: line-through; text-decoration-color: rgba(184,207,224,.35); }
+.ws-lay.drop { box-shadow: inset 0 2px 0 var(--wc); } .ws-lay[draggable="true"] { cursor: grab; }
+.ws-rename { width: 100%; background: #02050a; border: 1px solid var(--wc); color: var(--wt); font: 400 11px var(--wmono); padding: 2px 4px; border-radius: 2px; }
+.ws-ins.locked .ws-f { opacity: .4; pointer-events: none; }
+.ws-lockbar { display: block; width: 100%; margin: 4px 0 8px; padding: 5px 8px; background: rgba(255,204,0,.06) !important; border: 1px solid rgba(255,204,0,.35) !important; color: var(--wy) !important; font: 400 10px var(--wmono); letter-spacing: .12em; border-radius: 2px; cursor: pointer; text-align: left; }
+.ws-amount .ws-range { flex: 1 1 auto; accent-color: var(--wc); }
+.ws-lfoot .ws-del { margin-left: auto; }

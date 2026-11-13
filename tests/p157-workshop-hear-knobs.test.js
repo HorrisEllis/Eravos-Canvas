@@ -42,7 +42,7 @@ describe('P157 hear a shaped note; its shape to all; its own knobs', () => {
       ws.set('add', 'Pitch'); ws.action('＋ MOD'); ws.set('m.0.depth', 2); ws.action('▴ UP'); await TH.sleep(20);
       assert.ok(ws.action('⇉ ALL NOTES')); await TH.sleep(30);
       t.clip().notes.forEach((x, i) => { assert.ok(x.sh && x.sh.t.pitch.mods.length === 1, 'note ' + (i + 1) + ' has the shape'); assert.ok(x.b && x.b.shape === 'path', 'and plays it'); assert.equal(x.p[kn.key], kn.max, 'and the knob'); });
-      ws.select('P:' + kn.key); assert.ok(ws.action('✕ KNOB')); await TH.sleep(20); assert.ok(!(t.clip().notes[1].p && t.clip().notes[1].p[kn.key] !== undefined), '✕ KNOB: this note back to the instrument\'s value');
+      ws.select('P:' + kn.key); assert.ok(ws.layer('P:' + kn.key, 'remove'));   /* 2026-11-13: the knob layer's Delete (✕ KNOB was the same, in a second place) */ await TH.sleep(20); assert.ok(!(t.clip().notes[1].p && t.clip().notes[1].p[kn.key] !== undefined), '✕ KNOB: this note back to the instrument\'s value');
       ws.undo(); await TH.sleep(20); assert.equal(t.clip().notes[1].p[kn.key], kn.max, 'undo brings it back');
     } finally { closeWs(); OrganismFactory.close(t.id); OrganismFactory.close(t.inst); restoreView(); }
   });
