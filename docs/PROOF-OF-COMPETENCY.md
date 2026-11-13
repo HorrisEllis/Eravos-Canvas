@@ -71,6 +71,17 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-13 · 301 songs taken apart into reusable rhythms and lines, per tool — PR (3.180)
+- **His words (2026-11-13, 13:11:29 UTC):** "also songs decomposed one by one." · "rhythmes and notes per tool." · "just begin."
+- **His call:** every song taken apart; rhythms and notes per tool.
+- **Built:**
+  - A decomposer that generates every listed song as data and splits it into parts, then bar by bar into rhythms (onsets) and lines (notes relative to the key).
+  - Each rhythm and line is kept once and keeps its provenance (bars, songs). The first run showed velocity humanisation was inflating "distinct" rhythms, so velocity was taken out of identity and kept as a mean.
+  - A consistency test, and a CI check that the files stay in step with the songbooks.
+- **Proof:** 301 songs, 0 failures; 3,933 rhythms and 4,607 lines across 21 tools; two runs byte-identical; the test fails on a removed rhythm
+  (323 problems) and passes on the real data. One recipe song is listed honestly as not decomposed into notes (with the reason).
+- **Check:** `node tests/song-parts.test.mjs` · `node build/song-decompose.mjs` · `docs/song-decomposition.md`
+
 ### 2026-11-13 · Contracts checked against code; tools announce what they need — PR (3.179)
 - **His words (2026-11-13):** "Each component of each tool has a element for the ui to synthesis." (13:07:08) · "Each tool needs that. Dag. It
   has to anounce what it needs to the canvas." (13:08:14) · "just begin. … all tools zipped in a zip with all of its components, dag, etc. all
