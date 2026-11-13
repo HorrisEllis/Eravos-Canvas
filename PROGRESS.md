@@ -19,6 +19,19 @@ The full in-page suite (1,600 tests) on today's main: 10 failed. Each re-run on 
   (known) — listed in CLAUDE.md › Open.
 - Songs re-decomposed (Glitch Gospel and Wub Floor Machine changed). Proof: P63 11/11, P43 6/6, P16 67/67, P58 18/18, P11.S 9/9, Tape
   Memory 8/8, P132 3/3, P173 6/6, P172 1/1, song parts ✓, validate 263.
+## 3.184 The pedal off the display; options in title case — shown, waiting for his yes (2026-11-13)
+His words (with a screenshot): "overlap. why lowercase all the time also? like porffesssional anbd production grade, matching the themes. enterprise grade."
+- The overlap, measured: Piano's display ends at y 287 and the Sustain pedal's row starts at 287; the button (30 px in a 27 px row, −1.5 px
+  margin, 3 px ring) rides into the display's edge. The pedal now sits in the header beside Model (as Retro DCO's Hold) — no overlap, and
+  Piano ~30 px shorter (it helps the "cut off" on a short screen).
+- Lowercase: every setting's options are SHOWN in title case — UIKit.optionText (canvas, domain-free: all-lowercase words capitalised, small
+  joining words kept small mid-phrase, anything with digits / capitals / symbols as written; a tool may give optionLabels) and UIKit.words, where
+  a domain registers its acronyms (music, ui-music.js: SVF, LFO, FM, BPM, MIDI, PWM, HP, LP, DnB, UKG, VHS, file formats, Roman numerals). The
+  values are stored as before, so presets, songs and projects are unchanged.
+- His "why not hold? like the other piano tool?": the pedal's button is labelled Hold, as Retro DCO's and Retro Poly's (the same place, the same
+  word); its hint says it is the sustain pedal (notes ring until Hold is off). The stored key stays `pedal` — presets and projects unchanged.
+- Shown first (his rule): docs/previews/case-before-*.png / case-after-*.png (Piano, Retro DCO, Swarm). OPEN: the lowercase words tools draw
+  in their displays and hint lines — a second pass, shown first.
 
 ## 3.183 Element synthesis, ES1 — Piano's controls separated into elements; a face synthesised from them (preview) (2026-11-13)
 His words: "make sure you are seperating the elements for synthesis. i want to add the element synthesis" (14:28:04Z) · earlier: "Each
