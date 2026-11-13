@@ -16,6 +16,8 @@
     "needs"
   ],
   "properties": {
+    "field": { "type": "object", "additionalProperties": false, "description": "what the Field offers first for this tool (3.176): first = setting keys in order; stages = a settings group → its stage word; say = a line shown with it",
+      "properties": { "first": { "type": "array", "items": { "type": "string" } }, "stages": { "type": "object", "additionalProperties": { "type": "string" } }, "say": { "type": "string" } } },
     "schema": {
       "const": "eravos.tool/1"
     },

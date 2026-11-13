@@ -343,3 +343,19 @@ W3h  AT HAND      ⤓ save to the note library · ▶ play it · ✕ close — a
 #   - TOOL-SPECIFIC: a note's New-layer menu and its knob layers follow the playing tool — its contract (tool.json "field": { first: [keys],
 #     stages: { group: stage }, say }, carried by the catalogue) first, then its settings' groups on the sound's stages in the DAG order
 #     (control · source · shape · amp · mod · fx · out). Contracts: Retro DCO, Swarm, Retro Poly, Wobble Bass, Supersaw, Sub Engine.
+
+## ADDENDUM 2026-11-13 (3) — the Field becomes a tool; the compatibility graph and mutation live in it; it is the merged surface (his words; nothing above is changed)
+# his words (2026-11-13, verbatim): "what about having tools combined when connected into a large interface? not just listing mods but using
+#   field to change the ui dynamically. to make something completely new." (12:31:19Z) · "i want tools to mutate into new ones. yes the
+#   workshop. component integration" (12:34:18Z) · "should we have that in the workshop, the canvas? i feel the workshop should be a tool on its
+#   own. like can we make the canvas more bare?" (12:36:57Z) · map: specs/eravos.2026-11-13-session.map.spec
+#   - A TOOL, NOT THE CANVAS: canvas/runtime/workshop.{js,css} → tools/core/field/ (specs/eravos.bare-canvas.spec BC1: moved, nothing he sees
+#     changes, every Field test unchanged). The kind contract (addKind: layers, get, set, draw, drag, pick, actions, addable, layerOps) is
+#     unchanged; it becomes the "editable" port a tool offers (BC2).
+#   - WIRED TO WHAT IT EDITS (BC2, preview first): a Field window from ＋ Add, wired to a tool → edits it; wired to several → one merged surface
+#     (specs/eravos.ui-field.spec ADDENDUM 2026-11-13). Opening from a note / pattern / ⇥ Field keeps working.
+#   - THE DAG AS LAYERS THAT ARE PARTS: today a tool's stages are words over its settings (3.176); with component ports as data
+#     (specs/eravos.compat-graph.spec CG1–CG2) each stage is a real component — right-click › SWAP FOR … (siblings that fit), drag one in from
+#     the library (where it fits lights), REWIRE, VARY its ranges, ⚄ MUTATE (a few mutants, each playable at once; keep → a new tool with its
+#     lineage). Every mutant offered has passed types, builds and plays; the novelty gate says new or not (advisory). CG4 — preview first.
+#   - decided 2026-11-13: not waiting for Emerge — built as data Emerge takes over (docs/eravos-v2-emerge-looking-glass.md ADDENDUM 2026-11-13).

@@ -71,6 +71,35 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-13 · Decisions: tools that mutate, a bare canvas, not waiting for Emerge — mapped and specced before any code
+_Decisions and specs only: nothing below is built yet. Each line names who made the call._
+- **His words (2026-11-13, UTC):** "I love the bassline, needs more depth and control. like tempo and the cord tool. bassline is high
+  leverage." · "what about have seperate ui elements for each tool that can merge automatically. dynamic ui synthesiss" (12:31:19) ·
+  "what about a compatability graph? i want tools to mutate into new ones. yes the workshop. component integration, ive wanted this for a
+  long time. especially with emerge. like variable driven innovation." (12:34:18) · "i feel the workshop should be a tool on its own. like
+  can we make the canvas more bare?" (12:36:57) · "is emerge worth waiting for on this?" (12:41:38) · "add that to the eravos v2 spec"
+  (12:42:13) · "lets begin. map and update the specs first. add addendums. and record decisions in the proof of componency doc" (12:42:48)
+- **His calls:**
+  - tools should mutate into new ones through a compatibility graph (his idea; long held, "especially with emerge")
+  - the Field becomes a tool of its own; the canvas becomes barer
+  - tools' UIs should merge when wired: dynamic UI synthesis (his idea and his name for it)
+  - Bassline is the high-leverage tool to deepen (time, and depth like the Chords tool)
+  - the Emerge decision goes into the v2 plan; map and spec first, then begin
+- **The AI coder's proposals, adopted by him** ("add that", "lets begin"):
+  - not waiting for Emerge: the design is language-independent, Emerge cannot host it yet, and v1 data carries over (a v1 → v2 table)
+  - the order: the Field out of the canvas → component ports as data → the graph → one mutant → the Field's swap / mutate UI (shown first) → Bassline 2.0
+- **Still his to decide** (in the specs): tools/core/ as the home of domain-free tools · whether suites and the reactive look leave the canvas
+  · whether the graph checker is the first piece written in Emerge.
+- **Mapped first (measured, not assumed):**
+  - Tool ports are typed already: 144 specs list them; audio 135, modulation 121, note:trigger 68 …
+  - Component ports are prose: 79 of 110 component specs still say TO WRITE. That makes component ports as data the first build step.
+  - The canvas's 36 runtime files (6,072 lines) sorted into host and leaves, with how many tool files use each.
+- **Found while doing it:** 3.176's six tool contracts failed the manifest schema (`unknown key field`); build/validate.mjs is not in CI,
+  so it merged. The schema now knows `field` (258 manifests valid); putting validate in CI is listed as open.
+- **Check:** `specs/eravos.2026-11-13-session.map.spec` · `specs/eravos.compat-graph.spec` · `specs/eravos.bare-canvas.spec` · addenda
+  2026-11-13 in `specs/eravos.{workshop,ui-field,suites,components}.spec` and `bass-gen.spec` · `docs/eravos-v2-emerge-looking-glass.md` ·
+  register R-2026-11-13-46…54 (`node build/competence.mjs --check`) · `node build/validate.mjs`
+
 ### 2026-11-13 · Every song preview measured and fixed by cause; the Field made tool-specific — PR #172
 - **His words (2026-11-13):** "shouldn't the workshop be called field? … What about tool dependant. Also erasing parts of the notes or
   patterns. Making it thicker or thinner, longer." · "I meant tool specific. Using the dag maybe or contract" · "Maybe options for it? Or pitch

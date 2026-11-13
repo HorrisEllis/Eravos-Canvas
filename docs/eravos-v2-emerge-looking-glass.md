@@ -78,3 +78,61 @@ refused here). To remove that friction: start a session on the Emerge repo, or a
 - Never a big-bang rewrite: one module at a time, old and new side by side until the new one proves identical.
 - Sound is proven, not listened to: `tests/components.mjs`, the null render (`Null Render.bat`).
 - The ledger in `CLAUDE.md` gets one line per finished phase.
+
+## ADDENDUM 2026-11-13 — the compatibility graph, tools that mutate, a bare canvas: built in v1 now, as data Emerge takes over
+
+His words, 2026-11-13, in order:
+- "what about having tools combined when connected into a large interface? not just listing mods but using field to change the ui
+  dynamically. to make something completely new. that would be sick. what about have seperate ui elements for each tool that can merge
+  automatically. dynamic ui synthesiss"
+- "what about a compatability graph? i want tools to mutate into new ones. yes the workshop. component integration, ive wanted this for a
+  long time. especially with emerge. like variable driven innovation."
+- "should we have that in the workshop, the canvas? i feel the workshop should be a tool on its own. like can we make the canvas more bare?"
+- "is emerge worth waiting for on this?"
+- "add that to the eravos v2 spec"
+
+### The idea
+- **A compatibility graph.** Nodes: components (111 today) and tools. Edges: this output can feed that input, by typed ports (audio mono /
+  stereo, control, pitch, gate, note events, modulation; units and ranges). "Fits the same slot": the same port shape (filter-svf ·
+  filter-ladder · filter-formant; osc-va · osc-wavetable · oscillator-population). Bridges: an adapter the graph inserts when types differ
+  (an envelope's control into a pitch input through a scaler).
+- **Tools that mutate.** A tool is a DAG of components (every tool spec carries one, checked), so a mutation is an edit of the DAG: swap a
+  component for a compatible one · insert one where the types allow · rewire (a modulator to another destination, one tool's envelope into
+  another) · graft (part of one tool's DAG into another) · change its variables (a component's ranges and options). Each mutant: the types
+  fit, it plays without blowing up, the novelty gate says whether it is new; his ear decides the rest; a kept mutant is a new tool with its
+  lineage (what it came from, which mutation).
+- **Dynamic UI synthesis.** Each tool's UI as separate parts with roles (a rate, a key / scale, a keyboard, a step grid, a tone, a level);
+  wired tools merge what they share (one tempo, one key, one keyboard — no duplicates) and keep what is their own, laid out in signal order
+  (the UI field, `specs/eravos.ui-field.spec`); the Field reshapes the merged surface live; unwiring splits it back; a merged surface you like
+  saves as a suite.
+- **The Field, a tool of its own; the canvas, bare.** The Field (today `canvas/runtime/workshop.js`) becomes a domain-free tool
+  (`tools/core/field/`, proposed) that is wired to what it edits — wired to several tools, it is the merged surface. The compatibility graph
+  and mutation live in the Field; a domain supplies its port types and words. The canvas keeps only the host (windows, wires, the tool host,
+  the kit and themes, menus, history, save / open, settings, updates); what is a tool leaves it, one PR each, each proved to change nothing.
+
+### Decided (proposed 2026-11-13, his "add that"): do not wait for Emerge
+- The hard part is design and data (port types, the slot relation, the mutation ops, what a tool declares to the Field); it is the same in JS
+  or Emerge. Emerge today compiles to CommonJS; E2 (Windows), E3 (calling Windows) and Looking Glass are still ahead.
+- Built in v1 now it gives Emerge real requirements: types taken from ports that were used, variables from variables that were mutated and
+  heard — not a type system designed by guessing.
+- Kept Emerge-ready: ports, DAGs and variables are declarative data (specs, tool.json), never JS behaviour; the graph checker is a pure
+  function (data in → verdict out, no DOM, no audio); every type, slot and mutation is defined in its spec.
+
+### v1 → v2: what each piece becomes
+| v1 (data + a checker run over it) | v2 (Emerge) |
+|---|---|
+| a port's type (in a component spec / tool.json) | a type |
+| "fits the same slot" (same port shape) | a component implements a typed interface |
+| a bridge (adapter) | a typed conversion |
+| a tool's DAG (spec `dag:` / `signal_dag`) | a typed composition — a wrong wire does not compile |
+| a component's ranges and options | variables in its definition (variable-driven innovation) |
+| a mutation (swap / insert / rewire / graft / vary) | a program transform, checked by the compiler |
+| a mutant's lineage | provenance kept with the built tool |
+| the checker's verdict at test time | the verdict at compile time |
+| the Field (a domain-free tool in JS) | a Looking Glass surface — UI as typed data, layers as a runtime operation |
+
+### Open (his call)
+- The graph checker as the first piece of ERAVOS written in Emerge (it already compiles to CommonJS, so it runs inside v1) — needs a
+  session with push access to `HorrisEllis/Nexus`; otherwise JS now, ported later.
+- Order in v1: bare canvas + the Field as a tool → the compatibility graph and mutation in the Field → Bassline's depth as the first tool
+  written natively against the graph (or Bassline first).

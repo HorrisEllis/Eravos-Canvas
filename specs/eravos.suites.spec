@@ -143,3 +143,11 @@
     companion set: mods inside, tools wired in) is "Setup", its button "Load the whole setup".
   - Proof: tests/p119-suites-rework.test.js 3/3; P48 P49 P63 P94 updated to the new rule and green.
   - Open: a domain-free suite window once a second domain has tools; Components on the suite page.
+
+## ADDENDUM 2026-11-13 — a merged surface saves as a suite; a mutant is a tool (his words; nothing above is changed)
+# his words (2026-11-13, verbatim): "what about having tools combined when connected into a large interface? … to make something completely
+#   new" (12:31:19Z) · "i want tools to mutate into new ones" (12:34:18Z) · map: specs/eravos.2026-11-13-session.map.spec
+#   - Tools wired together show one merged surface (specs/eravos.ui-field.spec ADDENDUM 2026-11-13); right-click › Save what is wired here as a
+#     suite (2026-11-06) also keeps that surface's layout (the parts he moved, hid or regrouped in the Field). Opening the suite brings it back.
+#   - A mutant (specs/eravos.compat-graph.spec) is not a suite: it is ONE tool — its components assembled into one engine — with its lineage.
+#     A suite stays tools and components wired (axiom 3). Both start in his library (Documents\ERAVOS).

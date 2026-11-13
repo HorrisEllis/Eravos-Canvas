@@ -110,7 +110,7 @@ dag:
   layer 0: progression ✓
   tool: eravos.edm-lab ← progression
   build order: progression ✓ → edm-lab
-  shared with: progression 2  (other tools on each)
+  shared with: progression 3  (other tools on each)
   in it now: progression
   comes out of it: —
   planned: —
