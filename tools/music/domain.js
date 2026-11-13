@@ -22,8 +22,8 @@
     if (desc.tempo === false || (desc.config || []).some(c => c.key === 'tempoX')) return;
     if (!(desc.hooks || []).some(hk => hk.direction === 'in' && /transport:tick/.test(String(hk.event_type || '')))) return;
     desc.config = (desc.config || []).concat([
-      { key: 'tempoX', type: 'enum', options: ['¼', '½', '¾', '1', '1½', '2', '3', '4', 'own'], default: '1', label: 'Speed', group: 'TEMPO', hint: 'this tool’s speed against the song: ½ = half time, 2 = double time, own = its own BPM below', settingsOnly: true },
-      { key: 'tempoBpm', type: 'number', default: 120, min: 30, max: 300, step: 0.5, unit: 'BPM', label: 'Own BPM', group: 'TEMPO', hint: 'used when Speed is “own” — stays locked to the song’s start', settingsOnly: true },
+      { key: 'tempoX', type: 'enum', options: ['¼', '½', '¾', '1', '1½', '2', '3', '4', 'own'], default: '1', label: 'Speed', group: 'TEMPO', element: 'own:tempo', hint: 'this tool’s speed against the song: ½ = half time, 2 = double time, own = its own BPM below', settingsOnly: true },
+      { key: 'tempoBpm', type: 'number', default: 120, min: 30, max: 300, step: 0.5, unit: 'BPM', label: 'Own BPM', group: 'TEMPO', element: 'own:tempo', hint: 'used when Speed is “own” — stays locked to the song’s start', settingsOnly: true },
     ]);
   });
   F.onDefine((desc) => {

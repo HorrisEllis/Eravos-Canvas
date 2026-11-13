@@ -2,6 +2,23 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.183 Element synthesis, ES1 — Piano's controls separated into elements; a face synthesised from them (preview) (2026-11-13)
+His words: "make sure you are seperating the elements for synthesis. i want to add the element synthesis" (14:28:04Z) · earlier: "Each
+component of each tool has a element for the ui to synthesis." (13:07:08Z).
+- Separating: every Piano control names its element — a component Piano announces (filter-svf, modal-resonator, karplus-string, env-adsr,
+  lfo, saturator-tube, stereo-tools) or its own part (own:piano, own:hammer, own:pedal, own:mic, own:out); Decay names both string and tine.
+  The music domain's per-tool Speed / Own BPM name own:tempo on every tool. The catalog carries each tool's announced components.
+- Synthesis: tools/core/elements/elements.js (domain-free, beside the Field): elementsOf (in the sound's order — announced components in DAG
+  order, own parts placed, or the tool's elementOrder), check, face (one uk-group card per element, UI.paramControl — the same kit; skips what
+  the tool shows elsewhere, no duplicates; today's face keys first, the rest by element behind More depth ▸).
+- PREVIEW, not a change: docs/previews/element-synthesis-piano.png — today's face (left) beside the synthesised one (right, same window,
+  same size). Today's stays the default (his rule); ES3 (a choice) after his yes.
+- "cut off" (his, 14:27:33Z): measured — the face fits its window; windows are capped at the visible canvas (3.37) and scroll with the keys
+  pinned, so a short screen hides the lower cards. A shorter Piano layout is open — to be shown first.
+- Proof: tests/p183-elements.test.js 2/2 (every control in an announced or own element; order source → shape → fx, out last; the face holds
+  every control once, nothing shown twice, the face keys first); boundary 10/10 (tools/core/elements scanned), Piano 49/49, P163 32/32,
+  P38 37/37, validate 261.
+
 ## 3.182 Piano — built from its parts, on the face he approved (2026-11-13)
 His words: "yes" (2026-11-06, to the lofi previews — Tape Memory, Piano, the Lofi setup, Bind on the lane) · "then i want the next set of
 high leverage tools" (2026-11-13T13:53:40Z). The dependency graph: 6 planned tools ready; Retro DCO, Swarm, Tape Memory built; Pattern Editor

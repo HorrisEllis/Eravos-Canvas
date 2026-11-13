@@ -11,7 +11,7 @@ import fs from 'fs';
 const root = path.join(__dirname, '..');
 const read = (rel) => fs.readFileSync(path.join(root, rel), 'utf8');
 const list = (dir, re) => fs.readdirSync(path.join(root, dir)).filter(f => re.test(f)).map(f => dir + '/' + f);
-const skeleton = [...list('canvas/kernel', /\.js$/), ...list('canvas/runtime', /\.(js|css)$/), 'canvas/index.html', 'canvas/scripts.js', ...list('tools/core', /\.js$/), ...list('tools/core/field', /\.(js|css)$/)];   // tools/core is domain-free too (bare-canvas BC1)
+const skeleton = [...list('canvas/kernel', /\.js$/), ...list('canvas/runtime', /\.(js|css)$/), 'canvas/index.html', 'canvas/scripts.js', ...list('tools/core', /\.js$/), ...list('tools/core/field', /\.(js|css)$/), ...list('tools/core/elements', /\.js$/)];   // tools/core is domain-free too (bare-canvas BC1)
 // every tool's code: tools/<d>/tools/<category>/<tool>/*.js (the generated packs/index.js is data, not tool code)
 const toolDirs = fs.readdirSync(path.join(root, 'tools')).filter(d => fs.existsSync(path.join(root, 'tools', d, 'tools')))
   .flatMap(d => fs.readdirSync(path.join(root, 'tools', d, 'tools')).filter(c => fs.statSync(path.join(root, 'tools', d, 'tools', c)).isDirectory())
