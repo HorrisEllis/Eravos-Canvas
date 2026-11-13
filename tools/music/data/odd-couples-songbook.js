@@ -171,10 +171,11 @@
     { id: 'oc-glitch-gospel', label: 'Odd Couples · Glitch Gospel', icon: '🙌', accent: '#00e676', family: 'Odd Couples', bpm: [122, 124], roots: [5, 10], scales: ['major', 'mixolydian'], progs: [[1, 4, 6, 5], [4, 5, 3, 6]],
       tagline: 'Gospel seventh stacks and a tonewheel shuffle, stuttered and tape-stopped by a glitch engine, on a four-on-the-floor',
       drums: { main: HOUSE, light: { hat: '..x...x...x...x.', shaker: 'o.o.o.o.o.o.o.o.' } }, leadRhythm: 'pluck', bar,
-      form: ODD({ intro: ['organ', 'drums'], verse: ['drums', 'bass', 'organ'], build: ['stack', 'drums', 'organ'], drop: ['drums', 'bass', 'stack', 'organ'], pat1: { bass: 'bhA' }, brk: ['organ'], lift: 1 }),
+      form: ODD({ intro: ['organ', 'drums'], verse: ['drums', 'bass', 'organ', 'keys'], build: ['stack', 'drums', 'organ', 'keys'], drop: ['drums', 'bass', 'stack', 'organ'], pat1: { bass: 'bhA' }, brk: ['organ', 'keys'], lift: 1 }),
       parts: { drums: KIT('House · Disco Room', 'House · Melodic House'), bass: { role: 'bass', organism: 'eravos.sub-engine', preset: 'Club · Deep House Sub', style: 'offbeat', name: 'Bass' },
         organ: { role: 'chords', organism: 'eravos.organ', preset: O('Dub Bubble Hammond'), style: 'stab', voicing: 'seventh', octave: 4, name: 'Hammond' },
-        stack: { role: 'chords', organism: 'eravos.syn-osc', preset: O('Gospel Morph Stack'), style: 'pulse', voicing: 'seventh', octave: 4, name: 'Gospel stack' } },   // 3.43: vowel tables, swept by its Envelope
+        stack: { role: 'chords', organism: 'eravos.syn-osc', preset: O('Gospel Morph Stack'), style: 'pulse', voicing: 'seventh', octave: 4, name: 'Gospel stack' },   // 3.43: vowel tables, swept by its Envelope
+        keys: { role: 'chords', organism: 'eravos.piano', preset: O('Gospel Glitch Keys'), style: 'stab', voicing: 'seventh', octave: 4, name: 'Piano', configure: { level: 0.45 } } },   // 3.185: gospel's own instrument, the modelled upright
       fx: [{ organism: 'eravos.fx-glitch', preset: O('Gospel Stutter'), on: 'stack' }, { organism: 'eravos.fx-glitch', preset: O('Organ Tape Stop'), on: 'organ' }, { organism: 'eravos.fx-moddelay', preset: O('Chapel Chorus'), on: 'fx1' }],
       mods: HER(O('Cathedral Drop')).concat([{ organism: 'eravos.xy-pad', preset: O('Organ ↔ Wub') }, { organism: 'eravos.macro-automation', preset: O('16-bar latch') }, { organism: 'eravos.syn-env', preset: O('Gospel Vowel Sweep'), to: 'stack', key: 'morph' }]),   // the Envelope follows the stack's chords by itself
       master: { compThresh: -14, compRatio: 3, reverbMix: 0.2 } },   // measured: −11 / 2.5 drove the master soft-clipper (13–32 samples a song)

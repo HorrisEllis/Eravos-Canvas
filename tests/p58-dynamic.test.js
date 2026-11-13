@@ -160,7 +160,7 @@ describe('💥 Heavy Drops: songs built around the drop', () => {
     assert.ok(G(), 'genre'); assert.equal(window.HeavyDropsSongbook.songs.length, 8);
     const bad = []; [].concat(Object.values(G().parts), G().fx || [], G().mods || []).forEach(p => { const d = OrganismFactory.def(p.organism); [].concat(p.preset || []).forEach(n => { if (!d || !(d.presets || {})[n]) bad.push(p.organism + ' "' + n + '"'); }); });
     assert.equal(bad.join(' · '), '');
-    window.HeavyDropsSongbook.songs.forEach(id => { const s = Songbook.all().find(x => x.id === id); assert.ok(s, id); assert.equal(Songbook.categoryOf(s), 'heavy', id + ' on the 💥 Heavy Drops shelf'); });
+    window.HeavyDropsSongbook.songs.forEach(id => { const s = Songbook.all({ same: true }).find(x => x.id === id); /* 3.172: a song that repeats another is kept, not listed */ assert.ok(s, id); assert.equal(Songbook.categoryOf(s), 'heavy', id + ' on the 💥 Heavy Drops shelf'); });
     assert.equal(Songbook.categories().find(c => c.id === 'heavy').label, '💥 Heavy Drops');
   });
   it('the drop is written with everything: the floor falls out, dives at every turn, per-note wobble, a speed-up, a Pitch riser, the Drop Builder’s room', () => {

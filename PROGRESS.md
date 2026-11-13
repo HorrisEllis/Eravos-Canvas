@@ -2,6 +2,24 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.185 The full suite run: six failures of mine found and fixed (2026-11-13)
+The full in-page suite (1,600 tests) on today's main: 10 failed. Each re-run on main and on main of 2026-11-10 to find whose they are.
+- Mine, fixed here:
+  - P63 Piano had no drawn icon → tools/music/icons.json maps it to Lucide's piano (already in the set: no drawing changed); the agents'
+    Step tool had none either → footprints (lucide-static 1.72.0 in a scratch folder; the generated files differ only by the new entries).
+  - P43 Piano and Pattern had no Odd Couples pack, and no part in the set → packs/odd-couples for both (3 presets each); Piano plays
+    in Odd Couples · Glitch Gospel (its keys, level 0.45 — those songs gain a piano); Pattern is a generator like Arp (notes out through a
+    wire, which the genre format cannot write yet — the same listed open loop).
+  - P16 Wub Floor Machine's Swarm stepped by semitones (+7, +3, +5) in drop 2 — out of key on some chords → scale steps.
+  - P58 a Heavy Drops song hidden as a repeat (3.172) was looked for in the listed songs → Songbook.all({ same: true }).
+  - P11.S Tape Memory hissed at −30 dB for ever after Stop → the dust runs while the tape runs: the transport playing, or music coming in
+    (a follower on the input, a constant that Play / Stop moves; either opens it, never more than fully). Its test plays the transport for
+    hiss and crackle.
+- Not mine (also failing on main of 2026-11-10): P23 a plain wheel over a fitting Timeline · P70 a curve lane's right-click · P82 ×2
+  (known) — listed in CLAUDE.md › Open.
+- Songs re-decomposed (Glitch Gospel and Wub Floor Machine changed). Proof: P63 11/11, P43 6/6, P16 67/67, P58 18/18, P11.S 9/9, Tape
+  Memory 8/8, P132 3/3, P173 6/6, P172 1/1, song parts ✓, validate 263.
+
 ## 3.183 Element synthesis, ES1 — Piano's controls separated into elements; a face synthesised from them (preview) (2026-11-13)
 His words: "make sure you are seperating the elements for synthesis. i want to add the element synthesis" (14:28:04Z) · earlier: "Each
 component of each tool has a element for the ui to synthesis." (13:07:08Z).

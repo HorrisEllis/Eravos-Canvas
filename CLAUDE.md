@@ -97,6 +97,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-13 | **Full suite: six of my failures fixed** (3.185): Piano's and Step's icons; Odd Couples packs + a Glitch Gospel piano; Swarm in key (scale steps); a hidden repeat found; Tape Memory silent after Stop (its dust runs while the tape runs) | `icons.json`, `odd-couples-songbook.js`, `eravos-now-songbook.js`, `tape-memory.engine.js` | P63 P43 P16 P58 P11.S Tape Memory green |
 | 2026-11-13 | **Element synthesis, ES1** (3.183): every Piano control names its element (component or own part); `tools/core/elements/` synthesises a face from them — one card per element, in the sound's order, the same kit, no duplicates, face first + More depth; shown as a preview beside today's face (today's stays) | `tools/core/elements/elements.js`, `piano.engine.js`, `tools/music/domain.js` | `tests/p183` 2/2; `docs/previews/element-synthesis-piano.png` |
 | 2026-11-13 | **Piano** (3.182): the approved face, built from its 7 components + voice-allocator in one worklet — tine, reed (modal), felt, upright, honky, grand (stretched strings), hammer, body, sympathetic strings, pedal, tremolo, tube; 10 factory presets; four level / headroom faults found by measuring, fixed and guarded | `tools/music/tools/genre-instruments/piano/`, `karplus-string` (KSTRING_SRC) | `piano` 49/49, P182 6/6, P163 32/32, design check clean |
 | 2026-11-13 | **CG1 finished** (3.181): 33 of 33 components with code carry a checked contract; a default stated in the code is checked too (5 hand-written defaults were wrong, fixed); 18 tools announce their components' UI elements | `tools/music/components/*/<id>.contract.json`, `build/component-contract.mjs` | `node build/component-contract.mjs` (CI) |
@@ -214,5 +215,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 - Piano: MIDI CC64 / CC67 straight to the pedal (the SDK carries notes, not controllers). Piano cut off on a short screen (the window is capped
   at the visible canvas and scrolls under its keys) — a shorter layout, shown first.
 - **Element synthesis** (2026-11-13): ES1 ✓ (Piano separated, the synthesiser, a preview) → his yes → ES2 Retro DCO, Swarm, Tape Memory → ES3 a choice.
+- Failing before today's work (main of 2026-11-10): P23 (a plain wheel over a fitting Timeline scrolls nothing) · P70 (a curve lane's
+  right-click) · P82 ×2 (glass layer) — the full suite is otherwise 1,600 green.
 - Wobble Bass sounds before any note in an offline headless render (found 3.130; left out of the P130 guard).
 - AE vowel: Wub Filter's third band −12 dB vs the table's −14 dB (his call).
