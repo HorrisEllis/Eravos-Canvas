@@ -41,3 +41,14 @@
     render runs ahead of the messages). Rule: everything timed reaches a worklet as AudioParams (settings k-rate, notes as slots of
     trigger/gate/note/velocity); only bulk data (tables) and panic travel as messages / processorOptions.
   - Presets are data beside a tool (packs/), never in its engine (Swarm's 8 moved out of the engine before it shipped).
+
+## ADDENDUM 2026-11-13 — a component's ports and variables as data (the compatibility graph's first need)
+# his words (2026-11-13T12:34:18Z, verbatim): "what about a compatability graph? i want tools to mutate into new ones. yes the workshop.
+#   component integration, ive wanted this for a long time. especially with emerge. like variable driven innovation." · specs/eravos.compat-graph.spec
+#   - measured 2026-11-13: 110 component specs; "inputs / outputs / limits" written (prose) for 31, still TO WRITE for 79; 33 have code.
+#   - every component spec gains `ports:` (id, dir, type, channels, rate, unit, range) and `variables:` (key, type, range, default, AudioParam?)
+#     as data, beside the prose line (the prose is kept — axiom 9). Written from the code and its tests, never guessed; a check (CG1) fails when
+#     a spec's ports or variables disagree with its kernel's inputs and AudioParams.
+#   - order: the 33 with code first (their ports can be read off the code), then each of the 79 as it is built — its spec's ports before its
+#     code (axiom 8).
+#   - types are the domain's names (specs/eravos.compat-graph.spec › the model); for Emerge (v2) each becomes a type.

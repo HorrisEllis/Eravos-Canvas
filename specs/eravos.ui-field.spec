@@ -76,3 +76,22 @@ open: the face size N per window size; whether IN PLAY reorders while playing or
 #       dag      tool.config ─→ stages (domain words) ─→ kind layers / nodes ─→ drag / click ─→ ui:config_change:<tool> ─→ the tool's sound
 #       proof    tests/p166
 #   next: I2 a setting shaped over time (mod-tree) · I3 modulation wires you can drag · I4 resting what does nothing now (UF1 when / why)
+
+## ADDENDUM 2026-11-13 — dynamic UI synthesis: each tool's UI as parts with roles; wired tools merge (his words; nothing above is changed)
+# his words (2026-11-13T12:31:19Z, verbatim): "what do you think about having tools combined when connected into a large interface? not just
+#   listing mods but using field to change the ui dynamically. to make something completely new. that would be sick. what about have seperate
+#   ui elements for each tool that can merge automatically. dynamic ui synthesiss" · map: specs/eravos.2026-11-13-session.map.spec
+#   - PARTS WITH ROLES: a tool's UI declared as parts (data beside its config, like the DAG above): each part { id, role, keys [config keys],
+#     stage, size }. Roles are a domain's words (music, proposed: tempo · rate · key / scale · keyboard · step grid · pattern · tone · space ·
+#     level · macro); the canvas only matches role names (canvas / content separation).
+#   - MERGE BY ROLE: tools wired together merge the parts that share a role — one tempo, one key, one keyboard for Bassline + Chords + an
+#     instrument (no duplicates: his "no duplicates in the ui. i hate that", 2026-11-12). A merged part drives every tool behind it; it opens
+#     to set each apart (power without overwhelm, axiom 7). Parts only one tool has stay that tool's, in their own section (axiom 6).
+#   - LAYOUT AS A FIELD: placed in signal order (the tools' DAG and the wires: what plays it → source → shape → out), sized by the constraint
+#     field above (UF1–UF3); it moves when a wire is added or removed.
+#   - THE FIELD RESHAPES IT: the merged surface opens in the Field (specs/eravos.workshop.spec ADDENDUM 2026-11-13 (3)) — its parts are layers:
+#     hide, regroup, reorder, bring a part from one tool beside another's. Unwiring splits it back into the tools; a surface he likes saves as a
+#     suite (specs/eravos.suites.spec ADDENDUM 2026-11-13).
+#   - with the compatibility graph (specs/eravos.compat-graph.spec CG5): a mutant's UI is made the same way, from its components' parts.
+#   phases: US1 parts + roles declared for three tools (Bassline, Chords, Retro DCO) — data only · US2 the merge as a preview shown to him
+#     (Bassline + Chords + Retro DCO) · US3 built (after his yes) · US4 every tool's parts (a guard: a tool without parts is listed).

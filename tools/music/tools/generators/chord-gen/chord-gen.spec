@@ -51,7 +51,7 @@ dag:
   layer 0: chord-engine · progression ✓
   tool: eravos.chord-gen ← progression + chord-engine
   build order: chord-engine → progression ✓ → chord-gen
-  shared with: chord-engine 4 · progression 2  (other tools on each)
+  shared with: chord-engine 4 · progression 3  (other tools on each)
   in it now: progression
   comes out of it: chord-engine
   planned: —

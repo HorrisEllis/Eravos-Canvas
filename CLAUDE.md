@@ -188,6 +188,11 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 - **The store** (2026-11-06): the canvas installs on the system, everything else (domains, tools, components, packs, suites) lives in Documents\ERAVOS as whole zips from a store, the graph says what each needs (UI elements included) — `specs/eravos.store.spec`, S0 written; decisions D1–D4 his.
 - **Novel, full depth, no noise** (2026-11-06): every preset, pad sound, unit and mod novel against ALL of ERAVOS (measured); every tool full depth in pitch · tone · wave · modulation · speed · tempo · rhythm (and what its kind has), each control earning its place; a Tuning & settings tab per tool. Order N1 (the report) → N2 Swarm made new → N3 settings tab → N4 per tool. `specs/eravos.music-ecosystem.spec` + `eravos.tool-depth.spec` ADDENDA 2026-11-06.
+- **Mutation, a bare canvas, dynamic UI** (2026-11-13, specced, nothing built): the compatibility graph and tools that mutate
+  (`specs/eravos.compat-graph.spec`), the Field a tool and the canvas the host only (`specs/eravos.bare-canvas.spec`), UIs that merge when
+  wired (`specs/eravos.ui-field.spec` ADDENDUM 2026-11-13), Bassline 2.0 (`bass-gen.spec` ADDENDUM). Not waiting for Emerge (v2 plan
+  ADDENDUM 2026-11-13). Order: BC1 → CG1 → CG2 → CG3 → the Field's swap / mutate UI (shown first) → Bassline 2.0. Map: `specs/eravos.2026-11-13-session.map.spec`.
+- `node build/validate.mjs` is not in CI (3.176's tool contracts merged failing it; fixed 2026-11-13) — add it to checks.yml.
 - Connecting with people (share as a link, remix with credit, play together, share packs) — pinned 2026-11-05.
 - Songs as a rhythm-exploring tool only (not usable for making music).
 - Patterns for each tool with variety: presets, depth, curves, per-note editing — everything the timeline can do.
