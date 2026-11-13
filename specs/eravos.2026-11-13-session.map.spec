@@ -74,4 +74,4 @@
     needs.components + needs.elements in 18 tool.json)
   - OPEN, specced: specs/eravos.store-browse.spec (NEW — Browse, a tool's page, whole isolated zips, the interaction contract) · store.spec
     ADDENDUM 2026-11-13 (2)
-  - OPEN, specced: specs/eravos.song-decomposition.spec (NEW — every song into parts; rhythms and notes per tool)
+  - BUILT 3.180 (SD1): specs/eravos.song-decomposition.spec — 301 songs into parts; 3,933 rhythms and 4,607 lines per tool (build/song-decompose.mjs)

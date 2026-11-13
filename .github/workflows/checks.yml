@@ -34,6 +34,13 @@ jobs:
         run: |
           git fetch --depth=1 origin ${{ github.base_ref || 'main' }}
           node build/competence.mjs --check --base FETCH_HEAD
+      - name: Songs decomposed hold together, and are up to date with the songbooks
+        env:
+          GLASS_CHROMIUM: /usr/bin/google-chrome
+        run: |
+          node tests/song-parts.test.mjs
+          node build/song-decompose.mjs
+          git diff --exit-code -- tools/music/data/song-parts docs/song-decomposition.md
       - name: Design check (every tool, against docs/DESIGN-GUIDE.md)
         env:
           GLASS_CHROMIUM: /usr/bin/google-chrome

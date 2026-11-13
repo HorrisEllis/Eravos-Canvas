@@ -2,6 +2,18 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.180 Songs decomposed one by one — rhythms and lines per tool (SD1) (2026-11-13)
+His words: "also songs decomposed one by one." · "rhythmes and notes per tool." · "just begin."
+- build/song-decompose.mjs drives the page, takes every song the Songs menu lists (300 from the Song Engine as data — no audio — and 1 from
+  its recipe) and takes it apart: tempo, key, sections, each part's tool, preset and role, bar by bar which rhythm and which line it plays,
+  how its tools are patched / modulated / wired, its curve lanes. Per tool: the rhythms (onsets; drums keep pads) and lines (notes relative
+  to the key root) it plays, each kept once, with the bars that use it, the songs it came from, its mean velocities.
+- 301 songs, none failed · 84,388 part-bars → 3,933 rhythms, 4,607 lines, 21 tools (Retro DCO: 14 rhythms, 95 lines; Pads 3,168 rhythms).
+  Velocity is not identity (it was: 5,040 "rhythms" that were the same onsets humanised). Deterministic: two runs byte-identical.
+- Not into notes: the one recipe song (its notes come from a sequencer starter) — its tools are listed.
+- Files: tools/music/data/song-parts/ (index.json, songs.json, one per tool; 4.6 MB, data, not loaded by the app yet — Browse SB2–SB3 will),
+  docs/song-decomposition.md. tests/song-parts.test.mjs + an up-to-date check in CI.
+
 ## 3.179 Component contracts; every tool announces its needs; the store, Browse and songs decomposed specced (2026-11-13)
 His words: "just begin. also songs decomposed one by one. maybe a tool store … like you click browse … a tool page per tool with the relevant
 dependancies and packs. rhythmes and notes per tool. like all tools zipped in a zip with all of its components, dag, etc. all isolated from

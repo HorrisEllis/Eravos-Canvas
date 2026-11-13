@@ -6,7 +6,7 @@
 
 **How to read it.** Each entry is one contribution: the exact words (checked word for word against their source by `node build/competence.mjs --check`), when, who it came from, what kind of thing it was, how it developed, what came of it, and the evidence a stranger can check. **Confidence is three separate levels, never one score**: *proposed* (an idea) · *demonstrated* (built and tested here — built by the AI coder to his direction: the idea and the call are his, the code is not claimed as his) · *independently verified* (validated outside this project — none yet). **Append-only**: an entry is never edited; a correction is a new entry that amends it. Generated from `docs/competence/register.jsonl` — do not edit this page. The record before this register (merged work since 2026-10-15, with merge times): `docs/PROOF-OF-COMPETENCY.md`.
 
-**61 entries** · his: 53 (26 proposed · 27 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
+**62 entries** · his: 54 (26 proposed · 28 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
 
 ## Ideas
 _what he originated, proposed or identified_
@@ -105,7 +105,7 @@ _what is shown, at its own level — an idea, a built and tested idea, and outsi
 - R-2026-11-13-59 · 2026-11-13 13:11:29 UTC · principle — “like all tools zipped in a zip with all of its components, dag, etc. all isolated from each other. the canvas using a interaction contract.” → specs/eravos.store-browse.spec › A TOOL'S ZIP, THE INTERACTION CONTRACT; specs/eravos.store.spec ADDENDUM 2026-11-13 (2). · evidence: `specs/eravos.store-browse.spec`
 - R-2026-11-13-60 · 2026-11-13 13:11:29 UTC · idea — “also songs decomposed one by one.” → specs/eravos.song-decomposition.spec (SD1–SD3). · evidence: `specs/eravos.song-decomposition.spec`
 
-**demonstrated** (27)
+**demonstrated** (28)
 
 - R-2026-11-06-01 · 2026-11-06 06:28:35 UTC · idea — “Can you when picking empty canvas have every tool empty of presets?” → 3.124 built: OrganismFactory.blankStart — 27 tools that loaded a default preset now open plain on an empty canvas. · evidence: `tests/p116-blank-start.test.js (2/2)` · `commit faaccca (branch claude/empty-canvas-blank-tools (commit ids change if squash-merged; the merge is logged as its own entry))`
 - R-2026-11-06-03 · 2026-11-06 06:56:30 UTC · direction — “Ui preview. What’s the highest leverage?” → Swarm Oscillator ranked first (6 components to build, 14.5 other tools each); its UI previewed before any code. · evidence: `docs/eco-graph.md` · `docs/previews/swarm-oscillator-preview.png` · `tools/music/planned/swarm-oscillator.ui.md`
@@ -134,6 +134,7 @@ _what is shown, at its own level — an idea, a built and tested idea, and outsi
 - R-2026-11-13-48 · 2026-11-13 08:39:01 UTC · direction — “What about tool dependant.” → 3.176: a tool's own knobs first, the rest by stage. · evidence: `tests/p176-field-tool-specific.test.js` · `PR #172`
 - R-2026-11-13-54 · 2026-11-13 12:42:48 UTC · direction — “lets begin. map and update the specs first. add addendums. and record decisions in the proof of componency doc” → specs/eravos.2026-11-13-session.map.spec and the specs it lists. · evidence: `specs/eravos.2026-11-13-session.map.spec` · `docs/PROOF-OF-COMPETENCY.md`
 - R-2026-11-13-61 · 2026-11-13 13:11:29 UTC · direction — “just begin.” → 3.179: 23 of 33 components carry a contract; 18 tools announce their components and elements; both checks in CI. · evidence: `build/component-contract.mjs` · `build/tool-needs.mjs` · `docs/component-contracts.md`
+- R-2026-11-13-62 · 2026-11-13 13:11:29 UTC · outcome — “also songs decomposed one by one.” → 301 songs, 0 failed; 3,933 rhythms and 4,607 lines across 21 tools; deterministic; tested. · evidence: `build/song-decompose.mjs` · `tests/song-parts.test.mjs` · `docs/song-decomposition.md`
 
 **independently verified** (0)
 
@@ -205,6 +206,7 @@ _whose each contribution is: his, the AI coder’s, or from outside_
 | R-2026-11-13-59 | 2026-11-13 13:11:29 UTC | user | James Brooks | principle |
 | R-2026-11-13-60 | 2026-11-13 13:11:29 UTC | user | James Brooks | idea |
 | R-2026-11-13-61 | 2026-11-13 13:11:29 UTC | user | James Brooks | direction |
+| R-2026-11-13-62 | 2026-11-13 13:11:29 UTC | user | James Brooks | outcome |
 
 ## Outcomes
 _what came of each_
@@ -272,4 +274,5 @@ _what came of each_
 | R-2026-11-13-59 | 2026-11-13 13:11:29 UTC | “like all tools zipped in a zip with all of its components, dag, etc. all isolated from each other. the canvas using a interaction contract.” | principle | A tool's zip carries its components inside it, pinned by digest (an update to one tool never changes another); the canvas and a tool meet only through the manifest, the kernel hooks, the announced kit elements and the SDK — the kernel's existing ui_hooks contract made the rule for tools. | specs/eravos.store-browse.spec › A TOOL'S ZIP, THE INTERACTION CONTRACT; specs/eravos.store.spec ADDENDUM 2026-11-13 (2). | `specs/eravos.store-browse.spec` | proposed |
 | R-2026-11-13-60 | 2026-11-13 13:11:29 UTC | “also songs decomposed one by one.” | idea | Every listed song generated as data (no audio) and taken apart into parts: tool, preset, notes, rhythm, curves; rhythms and lines per tool, de-duplicated, with the songs each came from. | specs/eravos.song-decomposition.spec (SD1–SD3). | `specs/eravos.song-decomposition.spec` | proposed |
 | R-2026-11-13-61 | 2026-11-13 13:11:29 UTC | “just begin.” | direction | Began CG1 with the components that make or shape sound: a contract each (ports, variables, UI element) checked against its own code, and every tool's announcement generated from its DAG. | 3.179: 23 of 33 components carry a contract; 18 tools announce their components and elements; both checks in CI. | `build/component-contract.mjs` · `build/tool-needs.mjs` · `docs/component-contracts.md` | demonstrated |
+| R-2026-11-13-62 | 2026-11-13 13:11:29 UTC | “also songs decomposed one by one.” | outcome | Built SD1: every listed song generated as data and split into parts and bars; rhythms (onsets) and lines (notes relative to the key) per tool, kept once with their songs. Velocity taken out of identity after the first run showed it inflated the count. | 301 songs, 0 failed; 3,933 rhythms and 4,607 lines across 21 tools; deterministic; tested. | `build/song-decompose.mjs` · `tests/song-parts.test.mjs` · `docs/song-decomposition.md` | demonstrated |
 
