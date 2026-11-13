@@ -71,6 +71,16 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-13 · Element synthesis: an interface generated from a tool's parts, shown before adopted — PR (3.183)
+- **His words (2026-11-13):** "make sure you are seperating the elements for synthesis. i want to add the element synthesis" (14:28:04 UTC)
+- **His call:** each control belongs to an element; a tool's interface is made from its elements.
+- **Built:**
+  - Every control is attributed to the component or own part it drives. The music domain's shared controls are attributed too, which a test caught.
+  - A domain-free synthesiser that orders the elements by signal flow and draws them with the existing kit, with no duplicates, and with the face controls first and the depth folded away.
+  - Shown as a preview beside today's face; today's face is not replaced.
+- **Proof:** P183 2/2; the boundary, tool contract and every-instrument guards are unchanged and green.
+- **Check:** `node tests/run.mjs P183` · `docs/previews/element-synthesis-piano.png`
+
 ### 2026-11-13 · Piano: an approved design built from tested parts; four faults found by measurement before he heard them — PR (3.182)
 - **His words:** "yes" (2026-11-06, to the Piano preview among the lofi tools) · "then i want the next set of high leverage tools" (2026-11-13)
 - **His call:** the face (approved as a preview); the order (high leverage, from the dependency graph — the approved, ready tool first).

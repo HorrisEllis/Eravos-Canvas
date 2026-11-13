@@ -10,7 +10,7 @@ if (!m) fail('specs/eravos.bare-canvas.spec has no host_files: line');
 const host = new Set(m ? m[1].trim().split(/\s+/) : []), files = fs.readdirSync(path.join(ROOT, 'canvas/runtime')).filter(f => /\.js$/.test(f));
 files.filter(f => !host.has(f)).forEach(f => fail(`canvas/runtime/${f} is not on the host list — the canvas is the host only: move it to tools/, or list it in the spec with why`));
 [...host].filter(f => !files.includes(f)).forEach(f => fail(`the host list names ${f}, which is not in canvas/runtime — take it off the list`));
-['tools/core/field/field.js', 'tools/core/field/field.css', 'tools/core/domain.json', 'tools/core/index.js'].forEach(f => { if (!fs.existsSync(path.join(ROOT, f))) fail(`${f} is missing (the Field lives in tools/core)`); });
+['tools/core/field/field.js', 'tools/core/field/field.css', 'tools/core/elements/elements.js', 'tools/core/domain.json', 'tools/core/index.js'].forEach(f => { if (!fs.existsSync(path.join(ROOT, f))) fail(`${f} is missing (the Field lives in tools/core)`); });
 const dom = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools/core/domain.json'), 'utf8'));
 if (dom.always !== true) fail('tools/core/domain.json must be "always": true (the Field loads before any domain that uses it)');
 if (!/ERAVOS_DOMAINS = \['core'/.test(fs.readFileSync(path.join(ROOT, 'tools/index.js'), 'utf8'))) fail('tools/index.js must list core first');

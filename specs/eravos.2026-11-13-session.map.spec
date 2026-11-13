@@ -89,3 +89,17 @@
   - BUILT 3.182: the first of the next set — Piano (approved 2026-11-06, the one approved tool ready to build: 7 of 7 components built).
     The rest of the set, from docs/eco-graph.md: Ensemble Organism (ready, never shown — UI preview first); the components that unlock the most
     (slew-lag, mpe-expression, relationship-graph, reverb-fdn, waveshaper) — each spec + tested code, no UI.
+
+## 14:27:33Z (2026-11-13T14:27:33.120Z) — verbatim:
+  > okay. what leverage does this add? also the ui was okay, but cut off
+  - answered (measured from the specs): waveshaper + env-msseg + slew-lag take the ready planned tools from 2 to 5 (Analog Drift, Hoover
+    Engine, Log Drum), reach 29 planned tools, leave 8 one part away; Destroyer, Wobble Bass, Acid Synth, Sub Engine move onto them
+  - "cut off": measured — Piano's face fits its window (0 px over); a window is capped at the visible canvas (3.37) and then scrolls with its
+    keys pinned at the bottom, so on a short screen the lower cards slide under the keys. OPEN: a shorter Piano layout — shown to him first.
+
+## 14:28:04Z (2026-11-13T14:28:04.336Z) — verbatim:
+  > make sure you are seperating the elements for synthesis. i want to add the element synthesis
+  - BUILT 3.183 (ES1): specs/eravos.ui-field.spec ADDENDUM 2026-11-13 (3) — every Piano control names its element (a component it announces,
+    or its own part); tools/core/elements/ synthesises a face from them (one card per element, in the sound's order, the same kit); the
+    tempo controls every music tool carries name own:tempo; P183 guards it. PREVIEW: docs/previews/element-synthesis-piano.png (today's face
+    beside the synthesised one) — today's stays until his yes.

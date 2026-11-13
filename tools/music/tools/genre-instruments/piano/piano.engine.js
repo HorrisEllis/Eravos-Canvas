@@ -149,22 +149,28 @@ registerProcessor('eravos-piano', EravosPiano);`;
     hooks: [S.audio_out('pia.hook.audio_out'), S.note_in('pia.hook.note_in'), S.midi_in('pia.hook.midi_in'), S.transport_in('pia.hook.transport_in'), S.theory_in('pia.hook.theory_in'),
       S.mod_in('pia.hook.mod_bright', 'brightness'), S.mod_in('pia.hook.mod_trem', 'tremolo')],
     config: [
-      { key: 'model', type: 'enum', default: 'tine', options: MODELS, label: 'Model', group: 'BODY', hint: 'tine: the electric piano of soul and lofi · reed: barkier · felt: the soft muted upright · upright · honky: three strings far apart · grand' },
-      Object.assign(n('hardness', 'Hammer', 'STRIKE', 0.45, 0, 1, 0.01, '', 'how hard the hammer is: harder = a shorter strike, brighter — each note as it is struck'), { onset: true }), n('brightness', 'Bright', 'STRIKE', 0.5, 0, 1, 0.01, '', 'opened further the harder you play'),
-      n('bell', 'Bell', 'STRIKE', 0.35, 0, 1, 0.01, '', 'the tine’s or reed’s ring'),
-      n('decay', 'Decay', 'BODY', 3.5, 0.3, 20, 0.01, 's', 'how long a held note rings (low notes longer)'), n('release', 'Release', 'BODY', 0.4, 0.02, 4, 0.01, 's'), n('resonance', 'Resonance', 'BODY', 0.3, 0, 1, 0.01, '', 'the body: a soundboard, or the pickup’s ring'),
-      n('trem', 'Tremolo', 'MOVE', 0.25, 0, 1, 0.01, '', 'the electric pianos swing left and right'), n('tremRate', 'Trem rate', 'MOVE', 4.5, 0.5, 12, 0.01, 'Hz'),
-      n('drive', 'Drive', 'OUT', 0.15, 0, 1, 0.01, '', 'a tube pushed: warmth, then grit'), n('width', 'Width', 'OUT', 0.6, 0, 1, 0.01, '', 'low notes left, high notes right'), n('level', 'Level', 'OUT', 0.7, 0, 1.5),
-      n('detune', 'String detune', 'STRING+', 0.15, 0, 1, 0.01, '', 'the strings of one note apart (honky: far)'), n('inharm', 'Stretch', 'STRING+', 0.5, 0, 1, 0.01, '', 'a stiff string’s overtones run sharp'),
-      n('sympathetic', 'Sympathetic', 'STRING+', 0.3, 0, 1, 0.01, '', 'other strings ring with what you play — more with the pedal down'),
-      Object.assign(n('velCurve', 'Velocity curve', 'PLAY+', 0.5, 0, 1, 0.01, '', 'soft: a light touch is loud · hard: you have to dig in — each note as it is struck'), { onset: true }), n('keyOff', 'Key-off thump', 'PLAY+', 0.2, 0, 1, 0.01, '', 'the key coming back up'),
-      n('pedalNoise', 'Pedal noise', 'PLAY+', 0.1, 0, 1, 0.01, '', 'the dampers lifting and falling'),
-      n('micX', 'Mic X', 'MIC', 0.5, 0, 1, 0.01, '', 'over the hammers (bright) … far end (dark)'), n('micY', 'Mic Y', 'MIC', 0.5, 0, 1, 0.01, '', 'close … into the room (more body)'), n('lid', 'Lid', 'MIC', 0.7, 0, 1, 0.01, '', 'the grand’s lid: open is brighter'),
-      { key: 'tremSync', type: 'enum', default: 'free', options: SYNC, label: 'Tremolo on the beat', group: 'MOVE+', hint: 'free: Trem rate · or locked to the song’s tempo' },
-      { key: 'pedal', type: 'boolean', default: false, label: 'Sustain pedal', group: 'PLAY', hint: 'notes ring after you let go; sympathetic strings open (bind a MIDI pedal with the MIDI Mapper)' },
+      { key: 'model', type: 'enum', default: 'tine', options: MODELS, label: 'Model', group: 'BODY', hint: 'tine: the electric piano of soul and lofi · reed: barkier · felt: the soft muted upright · upright · honky: three strings far apart · grand', element: 'own:piano' },
+      Object.assign(n('hardness', 'Hammer', 'STRIKE', 0.45, 0, 1, 0.01, '', 'how hard the hammer is: harder = a shorter strike, brighter — each note as it is struck'), { onset: true, element: 'own:hammer' }), Object.assign(n('brightness', 'Bright', 'STRIKE', 0.5, 0, 1, 0.01, '', 'opened further the harder you play'), { element: 'filter-svf' }),
+      Object.assign(n('bell', 'Bell', 'STRIKE', 0.35, 0, 1, 0.01, '', 'the tine’s or reed’s ring'), { element: 'modal-resonator' }),
+      Object.assign(n('decay', 'Decay', 'BODY', 3.5, 0.3, 20, 0.01, 's', 'how long a held note rings (low notes longer)'), { element: ['karplus-string', 'modal-resonator'] }), Object.assign(n('release', 'Release', 'BODY', 0.4, 0.02, 4, 0.01, 's'), { element: 'env-adsr' }), Object.assign(n('resonance', 'Resonance', 'BODY', 0.3, 0, 1, 0.01, '', 'the body: a soundboard, or the pickup’s ring'), { element: 'modal-resonator' }),
+      Object.assign(n('trem', 'Tremolo', 'MOVE', 0.25, 0, 1, 0.01, '', 'the electric pianos swing left and right'), { element: 'lfo' }), Object.assign(n('tremRate', 'Trem rate', 'MOVE', 4.5, 0.5, 12, 0.01, 'Hz'), { element: 'lfo' }),
+      Object.assign(n('drive', 'Drive', 'OUT', 0.15, 0, 1, 0.01, '', 'a tube pushed: warmth, then grit'), { element: 'saturator-tube' }), Object.assign(n('width', 'Width', 'OUT', 0.6, 0, 1, 0.01, '', 'low notes left, high notes right'), { element: 'stereo-tools' }), Object.assign(n('level', 'Level', 'OUT', 0.7, 0, 1.5), { element: 'own:out' }),
+      Object.assign(n('detune', 'String detune', 'STRING+', 0.15, 0, 1, 0.01, '', 'the strings of one note apart (honky: far)'), { element: 'karplus-string' }), Object.assign(n('inharm', 'Stretch', 'STRING+', 0.5, 0, 1, 0.01, '', 'a stiff string’s overtones run sharp'), { element: 'karplus-string' }),
+      Object.assign(n('sympathetic', 'Sympathetic', 'STRING+', 0.3, 0, 1, 0.01, '', 'other strings ring with what you play — more with the pedal down'), { element: 'karplus-string' }),
+      Object.assign(n('velCurve', 'Velocity curve', 'PLAY+', 0.5, 0, 1, 0.01, '', 'soft: a light touch is loud · hard: you have to dig in — each note as it is struck'), { onset: true, element: 'own:hammer' }), Object.assign(n('keyOff', 'Key-off thump', 'PLAY+', 0.2, 0, 1, 0.01, '', 'the key coming back up'), { element: 'own:hammer' }),
+      Object.assign(n('pedalNoise', 'Pedal noise', 'PLAY+', 0.1, 0, 1, 0.01, '', 'the dampers lifting and falling'), { element: 'own:pedal' }),
+      Object.assign(n('micX', 'Mic X', 'MIC', 0.5, 0, 1, 0.01, '', 'over the hammers (bright) … far end (dark)'), { element: 'own:mic' }), Object.assign(n('micY', 'Mic Y', 'MIC', 0.5, 0, 1, 0.01, '', 'close … into the room (more body)'), { element: 'own:mic' }), Object.assign(n('lid', 'Lid', 'MIC', 0.7, 0, 1, 0.01, '', 'the grand’s lid: open is brighter'), { element: 'own:mic' }),
+      { key: 'tremSync', type: 'enum', default: 'free', options: SYNC, label: 'Tremolo on the beat', group: 'MOVE+', hint: 'free: Trem rate · or locked to the song’s tempo', element: 'lfo' },
+      { key: 'pedal', type: 'boolean', default: false, label: 'Sustain pedal', group: 'PLAY', hint: 'notes ring after you let go; sympathetic strings open (bind a MIDI pedal with the MIDI Mapper)', element: 'own:pedal' },
     ],
     // presets are data beside the tool (packs/factory/pack.json) — never in the engine
     defaultPreset: 'Tine Classic',
+    // separating the elements for synthesis (specs/eravos.ui-field.spec ADDENDUM 2026-11-13 (3), his words: "make sure you are seperating the
+    // elements for synthesis"): each control → the component it drives (as announced) or the tool's own part (own:<name>)
+    faceKeys: ['hardness', 'brightness', 'bell', 'decay', 'release', 'resonance', 'trem', 'tremRate', 'drive', 'width', 'level'],   // today's face (the rest: More depth)
+    elementOrder: ['own:piano', 'own:hammer', 'modal-resonator', 'karplus-string', 'filter-svf', 'env-adsr', 'own:pedal', 'lfo', 'saturator-tube', 'stereo-tools', 'own:mic', 'own:tempo', 'own:out'],   // the sound's flow, own parts placed
+    elementWords: { 'own:piano': 'PIANO', 'own:hammer': 'HAMMER', 'modal-resonator': 'TINE · REED · BODY', 'karplus-string': 'STRINGS', 'filter-svf': 'BRIGHTNESS',
+      'env-adsr': 'HOLD · RELEASE', 'lfo': 'TREMOLO', 'saturator-tube': 'TUBE', 'stereo-tools': 'STEREO', 'own:pedal': 'PEDAL', 'own:mic': 'MIC', 'own:tempo': 'TEMPO', 'own:out': 'OUT' },
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params;
       const out = ac.createGain(); ctx.track(out); ctx.port('out', { kind: 'audio', direction: 'out', node: out, label: 'piano' });

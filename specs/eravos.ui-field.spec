@@ -108,3 +108,20 @@ open: the face size N per window size; whether IN PLAY reorders while playing or
 #     (specs/eravos.store.spec ADDENDUM 2026-11-13).
 #   - phases: US0 (new) elements for Retro DCO's 12 components, data only, and Retro DCO's face rebuilt from them as a PREVIEW beside today's
 #     (shown to him — his rule; today's stays the default) → US1–US4 as above.
+
+## ADDENDUM 2026-11-13 (3) — element synthesis: every control separated into its element; a face synthesised from the elements (his words; nothing above is changed)
+# his words (2026-11-13, verbatim): "make sure you are seperating the elements for synthesis. i want to add the element synthesis" (after 14:27:33Z)
+#   · earlier: "Each component of each tool has a element for the ui to synthesis." (13:07:08Z) · map: specs/eravos.2026-11-13-session.map.spec
+#   - SEPARATING: every control of a tool names the element it belongs to — `element:` on its config entry: a component the tool announces
+#     (needs.components, from its DAG) or the tool's own part, `own:<name>` (Piano's hammer, its mic, its pedal — parts that are no component).
+#     A control that drives two components names both (array, the first is where it is shown). A guard (tests/elements.test.mjs, CI): every
+#     control of a separated tool names an element; every component element is one the tool announces; every announced component that has
+#     controls is reached.
+#   - SYNTHESIS: tools/core/elements/ (domain-free, like the Field): ElementSynthesis.face(view) builds a face from the tool's elements — one
+#     card per element, in the tool's signal order (the order of needs.components, its own parts placed where its controls first appear), each
+#     card holding its element's controls drawn with the same kit (UI.paramControl, uk-group cards — today's look, no new kit); a domain may give
+#     an element its words (def.elementWords). It names no domain or tool (tests/boundary.test.js scans tools/core).
+#   - TODAY'S FACE STAYS (his rule: show first, or add): the synthesised face is shown to him as a preview beside today's; it becomes a choice
+#     only after his yes.
+#   phases: ES1 Piano separated + the synthesiser + the guard + the preview (2026-11-13) · ES2 Retro DCO, Swarm, Tape Memory separated · ES3 his
+#     call: the synthesised face as a choice (a tool page tab, or a window option) · ES4 every tool (CG1's contracts give the component side).
