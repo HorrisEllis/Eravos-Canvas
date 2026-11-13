@@ -37,11 +37,9 @@
       const x = px * W, y = py * H; g.fillStyle = 'rgba(127,184,255,.18)'; g.beginPath(); g.arc(x, y, 22, 0, 6.283); g.fill();
       g.fillStyle = '#7fb8ff'; g.beginPath(); g.arc(x, y, 7, 0, 6.283); g.fill();
     }, 30);
-    const cap = UI.Button({ label: '● CAPTURE', kind: 'primary', hint: 'records your drag: a feeling lane and notes on the Timeline', onClick: () => {} });
-    const ret = UI.Button({ label: '◎ Return', hint: 'glide back to the middle', onClick: () => {} });
     const seg = UI.Segmented ? UI.Segmented({ options: [{ value: 'love', label: 'Love' }, { value: 'anger', label: 'Anger' }, { value: 'sadness', label: 'Sadness' }], value: feeling, onChange: (v) => { feeling = v; } }) : null;
     view.__feel = (v) => { feeling = v; };
     view.root.style.display = 'flex'; view.root.style.flexDirection = 'column';
-    view.root.append(h('div', { class: 'org-row', style: { justifyContent: 'space-between' } }, [seg ? seg.el : UI.presetBar(view), h('div', { class: 'org-row' }, [ret.el, cap.el])]), cv);
+    view.root.append(h('div', { class: 'org-row', style: { justifyContent: 'space-between' } }, [seg ? seg.el : UI.presetBar(view)]), cv);
   });
 })();
