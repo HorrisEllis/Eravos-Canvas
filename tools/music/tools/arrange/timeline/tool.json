@@ -40,11 +40,15 @@
     ],
     "components": [
       "pitch-path@1.0.0",
-      "mod-tree@1.1.0"
+      "mod-tree@1.1.0",
+      "pattern-field@1.0.0",
+      "curve-edit@1.0.0"
     ],
     "elements": [
       "pitch-path.element@1",
-      "mod-tree.element@1"
+      "mod-tree.element@1",
+      "pattern-field.element@1",
+      "curve-edit.element@1"
     ]
   },
   "packs": {
