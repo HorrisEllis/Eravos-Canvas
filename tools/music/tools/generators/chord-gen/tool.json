@@ -36,6 +36,9 @@
     ],
     "components": [
       "progression@1.0.0"
+    ],
+    "elements": [
+      "progression.element@1"
     ]
   },
   "packs": {

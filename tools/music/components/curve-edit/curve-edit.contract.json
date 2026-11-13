@@ -1,0 +1,36 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "curve-edit",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "logic",
+ "kernel": "MusicParts.curveEdit",
+ "ports": [
+  {
+   "id": "curve",
+   "dir": "in",
+   "type": "curve",
+   "rate": "event"
+  },
+  {
+   "id": "stroke",
+   "dir": "in",
+   "type": "curve",
+   "rate": "event",
+   "about": "what the hand drew"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "curve",
+   "rate": "event",
+   "about": "a new curve — the input is never changed"
+  }
+ ],
+ "variables": [],
+ "element": {
+  "version": 1,
+  "controls": [],
+  "needs_ui": []
+ }
+}

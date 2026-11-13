@@ -38,7 +38,8 @@
       "note-release@1.0.0"
     ],
     "elements": [
-      "filter-formant.element@1"
+      "filter-formant.element@1",
+      "note-release.element@1"
     ]
   },
   "packs": {

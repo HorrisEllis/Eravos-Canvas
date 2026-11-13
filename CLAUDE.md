@@ -97,6 +97,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-13 | **CG1 finished** (3.181): 33 of 33 components with code carry a checked contract; a default stated in the code is checked too (5 hand-written defaults were wrong, fixed); 18 tools announce their components' UI elements | `tools/music/components/*/<id>.contract.json`, `build/component-contract.mjs` | `node build/component-contract.mjs` (CI) |
 | 2026-11-13 | **Songs decomposed** (3.180, SD1): 301 songs into parts — each part's tool, preset, bar-by-bar rhythm and line; per tool 3,933 rhythms and 4,607 lines (onsets / notes relative to the key; velocity not identity), each naming its songs | `build/song-decompose.mjs`, `tools/music/data/song-parts/`, `docs/song-decomposition.md` | `tests/song-parts.test.mjs`; deterministic (two runs identical); CI keeps it up to date |
 | 2026-11-13 | **Component contracts; tools announce their needs** (3.179, CG1): 23 sound components carry `<id>.contract.json` (ports, variables, UI element) checked against their code; 18 tool.json announce their components and elements from the DAG; specs: Browse, isolated tool zips, the interaction contract, songs decomposed | `build/component-contract.mjs`, `build/tool-needs.mjs`, `tools/music/types.json`, `specs/eravos.store-browse.spec`, `specs/eravos.song-decomposition.spec` | both checks in CI; P38 37/37, P139 7/7, boundary 10/10 |
 | 2026-11-13 | **The Field leaves the canvas** (3.178, BC1): `canvas/runtime/workshop.*` → `tools/core/field/` (a domain-free domain loaded first: `"always"`); the canvas = the host (a guard lists its 35 files); validate + the guard in CI — nothing he sees changes | `tools/core/`, `canvas/runtime/catalog.js`, `tests/bare-canvas.test.mjs` | Field suites unchanged and green, P38 37/37, boundary 10/10 |
@@ -197,7 +198,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
   (`specs/eravos.compat-graph.spec`), the Field a tool and the canvas the host only (`specs/eravos.bare-canvas.spec`), UIs that merge when
   wired (`specs/eravos.ui-field.spec` ADDENDUM 2026-11-13), Bassline 2.0 (`bass-gen.spec` ADDENDUM). Not waiting for Emerge (v2 plan
   ADDENDUM 2026-11-13). Every component carries its own UI element; every tool announces its needs from its DAG and the canvas imports it from the zip
-  (`specs/eravos.store.spec` ADDENDUM 2026-11-13, I1–I4). ERAVOS 2's name: "Synthesis" proposed, to confirm. Order: BC1 ✓ → CG1 (ports + variables + element: 23 of 33 ✓) → CG2 → CG3 → the Field's swap / mutate UI (shown first) → Bassline 2.0. Map: `specs/eravos.2026-11-13-session.map.spec`.
+  (`specs/eravos.store.spec` ADDENDUM 2026-11-13, I1–I4). ERAVOS 2's name: "Synthesis" proposed, to confirm. Order: BC1 ✓ → CG1 ✓ (33 of 33) → CG2 → CG3 → the Field's swap / mutate UI (shown first) → Bassline 2.0. Map: `specs/eravos.2026-11-13-session.map.spec`.
 - **The store** (2026-11-13, specced; the Browse UI rejected — see Next): every tool a
   whole isolated zip, the canvas only through the interaction contract (`specs/eravos.store-browse.spec`; preview first, SB1); songs decomposed
   into rhythms and notes per tool (SD1 ✓ 3.180).

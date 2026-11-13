@@ -71,6 +71,12 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-13 · Every component's contract finished; the check that found the author's own wrong defaults — PR (3.181)
+- **His words (2026-11-13, 13:53:40 UTC):** "continue with the component contracts."
+- **Built:** the ten remaining contracts, and a check that compares any default the code states with the default in the contract.
+- **Proof:** the new check caught five wrong defaults that had been written by hand, including two already merged; all five are fixed. A planted wrong default fails the check. 33 of 33 components with code pass.
+- **Check:** `node build/component-contract.mjs` · `docs/component-contracts.md`
+
 ### 2026-11-13 · Decision: no new UI — the Browse preview shown and rejected before any of it was built
 - **His words (2026-11-13, 13:27:55 UTC):** "no. i like the current ui. do not change it."
 - **His call:** the UI stays as it is. Browse is not built.

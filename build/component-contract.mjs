@@ -28,7 +28,7 @@ for (const d of fs.readdirSync(path.join(ROOT, 'tools')).filter(d => fs.existsSy
     if (!T) { fail(id, `tools/${d}/types.json is missing`); continue; }
     const src = fs.readFileSync(js, 'utf8'), mod = require(js), ver = (src.match(/eravos\.component\.[\w-]+ (\d+\.\d+\.\d+)/) || [])[1];
     if (c.version !== ver) fail(id, `version ${c.version}, the code says ${ver}`);
-    const kname = String(c.kernel || '').replace(/^MusicParts\./, ''); if (!mod[kname]) fail(id, `kernel ${c.kernel} is not exported`);
+    const kname = String(c.kernel || '').replace(/^MusicParts\./, ''); if (!mod[kname] && !new RegExp(`MusicParts\\.${kname}\\s*=`).test(src)) fail(id, `kernel ${c.kernel} is not exported`);   // a kernel may be a group of functions set on MusicParts (curveEdit, modTree, PF)
     if (c.worklet && !src.includes(`'${c.worklet}'`)) fail(id, `worklet ${c.worklet} not registered in the code`);
     if (!Array.isArray(c.ports) || !c.ports.length) fail(id, 'no ports');
     (c.ports || []).forEach(p => { if (!T.types[p.type]) fail(id, `port ${p.id}: type ${p.type} is not in tools/${d}/types.json`); if (!['in', 'out'].includes(p.dir)) fail(id, `port ${p.id}: dir ${p.dir}`); });
@@ -51,12 +51,16 @@ for (const d of fs.readdirSync(path.join(ROOT, 'tools')).filter(d => fs.existsSy
       if (v.from) { const L = mod[v.from]; if (!Array.isArray(L) || L.join('|') !== v.options.join('|')) fail(id, `${v.key}: options ≠ ${v.from}`); }
       const name = v.code || v.key; if (!new RegExp(`\\b${name.replace(/[^\w]/g, '')}\\b`).test(src)) fail(id, `${v.key}: no "${name}" in the code`);
       if (v.type === 'number' && !(v.min <= v.default && v.default <= v.max)) fail(id, `${v.key}: default outside ${v.min}…${v.max}`);
+      // where the code states a default in a form that can be read (x = x || 2 · x === undefined ? 4 : x · num(st.x, 4)), the contract must say the same
+      if (v.type === 'number') { const n = (name.match(/\w+/) || [''])[0], E = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const seen = [new RegExp(`\\b${E(n)} = ${E(n)} \\|\\| (-?[\\d.]+)`), new RegExp(`\\b${E(n)} === undefined \\? (-?[\\d.]+)`), new RegExp(`num\\(\\w+\\.${E(n)}, (-?[\\d.]+)\\)`)].map(re => (src.match(re) || [])[1]).filter(x => x !== undefined);
+        if (seen.length && !seen.map(Number).includes(v.default)) fail(id, `${v.key}: default ${v.default}, the code's ${seen.join(' / ')}`); }
       if (v.type === 'enum' && !v.options.includes(v.default)) fail(id, `${v.key}: default not an option`);
     });
     const E = c.element || {}, CK = (E.controls || []).map(x => x.key);
     if (CK.join() !== keys.join()) fail(id, 'element controls are not its variables, in order');
     (E.controls || []).forEach(x => { if (!T.roles.includes(x.role)) fail(id, `control ${x.key}: role ${x.role} not in types.json`); });
-    if (!(E.controls || []).some(x => x.face)) fail(id, 'element: nothing on the face');
+    if (V.length && !(E.controls || []).some(x => x.face)) fail(id, 'element: nothing on the face');   // a component with no settings of its own has an element with no controls
     const need = [...new Set(V.map(v => KIT[v.type]))].sort().join(); if ((E.needs_ui || []).slice().sort().join() !== need) fail(id, `element needs_ui ${E.needs_ui} ≠ ${need}`);
   }
 }

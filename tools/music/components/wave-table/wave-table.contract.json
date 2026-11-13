@@ -1,0 +1,61 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "wave-table",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "logic",
+ "kernel": "MusicParts.periodicWave",
+ "ports": [
+  {
+   "id": "cycle",
+   "dir": "in",
+   "type": "curve",
+   "rate": "event",
+   "about": "a drawn cycle, 0…1 → −1…1"
+  },
+  {
+   "id": "wave",
+   "dir": "out",
+   "type": "data",
+   "rate": "event",
+   "about": "a PeriodicWave + its DC"
+  }
+ ],
+ "variables": [
+  {
+   "key": "phase",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "role": "time"
+  },
+  {
+   "key": "harmonics",
+   "type": "number",
+   "min": 1,
+   "max": 512,
+   "default": 33,
+   "role": "tone",
+   "integer": true
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "phase",
+    "role": "time",
+    "face": false
+   },
+   {
+    "key": "harmonics",
+    "role": "tone",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.knob"
+  ]
+ }
+}

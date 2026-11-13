@@ -1,0 +1,74 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "scale-key",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "logic",
+ "kernel": "MusicParts.KEY",
+ "ports": [
+  {
+   "id": "in",
+   "dir": "in",
+   "type": "note",
+   "rate": "event"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "note",
+   "rate": "event",
+   "about": "snapped into the key"
+  }
+ ],
+ "variables": [
+  {
+   "key": "root",
+   "type": "number",
+   "min": 0,
+   "max": 11,
+   "default": 0,
+   "role": "pitch",
+   "integer": true,
+   "code": "r"
+  },
+  {
+   "key": "scale",
+   "type": "enum",
+   "options": [
+    "major",
+    "minor",
+    "dorian",
+    "phrygian",
+    "lydian",
+    "mixolydian",
+    "harmonic_minor",
+    "pentatonic_major",
+    "pentatonic_minor",
+    "blues",
+    "chromatic"
+   ],
+   "default": "minor",
+   "role": "mode",
+   "code": "SCALES"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "root",
+    "role": "pitch",
+    "face": true
+   },
+   {
+    "key": "scale",
+    "role": "mode",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.knob",
+   "kit.segmented"
+  ]
+ }
+}

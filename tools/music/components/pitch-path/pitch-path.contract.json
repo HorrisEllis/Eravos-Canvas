@@ -1,0 +1,77 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "pitch-path",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "logic",
+ "kernel": "MusicParts.pathAt",
+ "ports": [
+  {
+   "id": "path",
+   "dir": "in",
+   "type": "curve",
+   "rate": "event"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "pitch",
+   "unit": "semitones",
+   "rate": "block"
+  }
+ ],
+ "variables": [
+  {
+   "key": "win",
+   "type": "number",
+   "min": 1,
+   "max": 32,
+   "default": 2,
+   "role": "shape",
+   "integer": true,
+   "about": "how much of the hand’s jitter is taken out"
+  },
+  {
+   "key": "eps",
+   "type": "number",
+   "min": 0.01,
+   "max": 2,
+   "default": 0.08,
+   "role": "pitch",
+   "unit": "semitones"
+  },
+  {
+   "key": "max",
+   "type": "number",
+   "min": 2,
+   "max": 256,
+   "default": 48,
+   "role": "voice",
+   "integer": true,
+   "about": "points kept at most"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "win",
+    "role": "shape",
+    "face": true
+   },
+   {
+    "key": "eps",
+    "role": "pitch",
+    "face": false
+   },
+   {
+    "key": "max",
+    "role": "voice",
+    "face": false
+   }
+  ],
+  "needs_ui": [
+   "kit.knob"
+  ]
+ }
+}

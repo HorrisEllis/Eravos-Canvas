@@ -80,3 +80,9 @@
   > no. i like the current ui. do not change it.
   - RULE: the UI stays as it is — Browse not built (specs/eravos.store-browse.spec ADDENDUM 2026-11-13 — the Browse UI: NO); the preview kept
     unmerged on branch claude/browse-preview. Data and no-UI work (contracts, announcements, decomposed songs, zips, import) continue.
+
+## 13:53:40Z (2026-11-13T13:53:40.203Z) — verbatim:
+  > continue with the component contracts. then i want the next set of high leverage tools
+  - BUILT 3.181: CG1 finished — the 10 data / logic components' contracts (33 of 33 with code); a check that a contract's default equals the
+    default the code states (it found 5 wrong defaults of mine, now fixed); all 18 tools announce their components' UI elements
+  - OPEN: the next set of high-leverage tools — from the dependency graph (docs/eco-graph.md), each spec first and its UI shown to him first

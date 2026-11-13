@@ -35,6 +35,11 @@
       "progression@1.0.0",
       "pattern-field@1.0.0",
       "scale-key@1.0.0"
+    ],
+    "elements": [
+      "progression.element@1",
+      "pattern-field.element@1",
+      "scale-key.element@1"
     ]
   },
   "packs": {

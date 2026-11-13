@@ -6,7 +6,7 @@
 
 **How to read it.** Each entry is one contribution: the exact words (checked word for word against their source by `node build/competence.mjs --check`), when, who it came from, what kind of thing it was, how it developed, what came of it, and the evidence a stranger can check. **Confidence is three separate levels, never one score**: *proposed* (an idea) · *demonstrated* (built and tested here — built by the AI coder to his direction: the idea and the call are his, the code is not claimed as his) · *independently verified* (validated outside this project — none yet). **Append-only**: an entry is never edited; a correction is a new entry that amends it. Generated from `docs/competence/register.jsonl` — do not edit this page. The record before this register (merged work since 2026-10-15, with merge times): `docs/PROOF-OF-COMPETENCY.md`.
 
-**63 entries** · his: 55 (26 proposed · 29 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
+**64 entries** · his: 56 (26 proposed · 30 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
 
 ## Ideas
 _what he originated, proposed or identified_
@@ -73,6 +73,7 @@ _decisions, the alternatives in front of him, and the way he set_
 | R-2026-11-13-54 | 2026-11-13 12:42:48 UTC | “lets begin. map and update the specs first. add addendums. and record decisions in the proof of componency doc” | direction | Session map with every message and its time; two new specs and five addenda; decisions in the proof-of-competency doc and this register. | specs/eravos.2026-11-13-session.map.spec and the specs it lists. | `specs/eravos.2026-11-13-session.map.spec` · `docs/PROOF-OF-COMPETENCY.md` | demonstrated |
 | R-2026-11-13-61 | 2026-11-13 13:11:29 UTC | “just begin.” | direction | Began CG1 with the components that make or shape sound: a contract each (ports, variables, UI element) checked against its own code, and every tool's announcement generated from its DAG. | 3.179: 23 of 33 components carry a contract; 18 tools announce their components and elements; both checks in CI. | `build/component-contract.mjs` · `build/tool-needs.mjs` · `docs/component-contracts.md` | demonstrated |
 | R-2026-11-13-63 | 2026-11-13 13:27:55 UTC | “no. i like the current ui. do not change it.” | decision<br>from: build Browse as previewed · keep the current UI | Said to the Browse preview (SB1), shown before any code. The UI stays; the preview is kept unmerged; the store work continues with no UI. | Browse withdrawn (SB3); CLAUDE.md Next: no new store / Browse UI. | `specs/eravos.store-browse.spec` · `CLAUDE.md` | demonstrated |
+| R-2026-11-13-64 | 2026-11-13 13:53:40 UTC | “continue with the component contracts. then i want the next set of high leverage tools” | direction | Finished CG1 (the 10 data / logic components) and added a default check that found five hand-written defaults wrong; then the next tools from the dependency graph. | 33 of 33 contracts true to their code; 18 tools announce their elements. | `build/component-contract.mjs` · `docs/component-contracts.md` | demonstrated |
 
 ## Competence
 _what is shown, at its own level — an idea, a built and tested idea, and outside validation are not the same thing_
@@ -106,7 +107,7 @@ _what is shown, at its own level — an idea, a built and tested idea, and outsi
 - R-2026-11-13-59 · 2026-11-13 13:11:29 UTC · principle — “like all tools zipped in a zip with all of its components, dag, etc. all isolated from each other. the canvas using a interaction contract.” → specs/eravos.store-browse.spec › A TOOL'S ZIP, THE INTERACTION CONTRACT; specs/eravos.store.spec ADDENDUM 2026-11-13 (2). · evidence: `specs/eravos.store-browse.spec`
 - R-2026-11-13-60 · 2026-11-13 13:11:29 UTC · idea — “also songs decomposed one by one.” → specs/eravos.song-decomposition.spec (SD1–SD3). · evidence: `specs/eravos.song-decomposition.spec`
 
-**demonstrated** (29)
+**demonstrated** (30)
 
 - R-2026-11-06-01 · 2026-11-06 06:28:35 UTC · idea — “Can you when picking empty canvas have every tool empty of presets?” → 3.124 built: OrganismFactory.blankStart — 27 tools that loaded a default preset now open plain on an empty canvas. · evidence: `tests/p116-blank-start.test.js (2/2)` · `commit faaccca (branch claude/empty-canvas-blank-tools (commit ids change if squash-merged; the merge is logged as its own entry))`
 - R-2026-11-06-03 · 2026-11-06 06:56:30 UTC · direction — “Ui preview. What’s the highest leverage?” → Swarm Oscillator ranked first (6 components to build, 14.5 other tools each); its UI previewed before any code. · evidence: `docs/eco-graph.md` · `docs/previews/swarm-oscillator-preview.png` · `tools/music/planned/swarm-oscillator.ui.md`
@@ -137,6 +138,7 @@ _what is shown, at its own level — an idea, a built and tested idea, and outsi
 - R-2026-11-13-61 · 2026-11-13 13:11:29 UTC · direction — “just begin.” → 3.179: 23 of 33 components carry a contract; 18 tools announce their components and elements; both checks in CI. · evidence: `build/component-contract.mjs` · `build/tool-needs.mjs` · `docs/component-contracts.md`
 - R-2026-11-13-62 · 2026-11-13 13:11:29 UTC · outcome — “also songs decomposed one by one.” → 301 songs, 0 failed; 3,933 rhythms and 4,607 lines across 21 tools; deterministic; tested. · evidence: `build/song-decompose.mjs` · `tests/song-parts.test.mjs` · `docs/song-decomposition.md`
 - R-2026-11-13-63 · 2026-11-13 13:27:55 UTC · decision — “no. i like the current ui. do not change it.” → Browse withdrawn (SB3); CLAUDE.md Next: no new store / Browse UI. · evidence: `specs/eravos.store-browse.spec` · `CLAUDE.md`
+- R-2026-11-13-64 · 2026-11-13 13:53:40 UTC · direction — “continue with the component contracts. then i want the next set of high leverage tools” → 33 of 33 contracts true to their code; 18 tools announce their elements. · evidence: `build/component-contract.mjs` · `docs/component-contracts.md`
 
 **independently verified** (0)
 
@@ -210,6 +212,7 @@ _whose each contribution is: his, the AI coder’s, or from outside_
 | R-2026-11-13-61 | 2026-11-13 13:11:29 UTC | user | James Brooks | direction |
 | R-2026-11-13-62 | 2026-11-13 13:11:29 UTC | user | James Brooks | outcome |
 | R-2026-11-13-63 | 2026-11-13 13:27:55 UTC | user | James Brooks | decision — chosen from: build Browse as previewed · keep the current UI |
+| R-2026-11-13-64 | 2026-11-13 13:53:40 UTC | user | James Brooks | direction |
 
 ## Outcomes
 _what came of each_
@@ -279,4 +282,5 @@ _what came of each_
 | R-2026-11-13-61 | 2026-11-13 13:11:29 UTC | “just begin.” | direction | Began CG1 with the components that make or shape sound: a contract each (ports, variables, UI element) checked against its own code, and every tool's announcement generated from its DAG. | 3.179: 23 of 33 components carry a contract; 18 tools announce their components and elements; both checks in CI. | `build/component-contract.mjs` · `build/tool-needs.mjs` · `docs/component-contracts.md` | demonstrated |
 | R-2026-11-13-62 | 2026-11-13 13:11:29 UTC | “also songs decomposed one by one.” | outcome | Built SD1: every listed song generated as data and split into parts and bars; rhythms (onsets) and lines (notes relative to the key) per tool, kept once with their songs. Velocity taken out of identity after the first run showed it inflated the count. | 301 songs, 0 failed; 3,933 rhythms and 4,607 lines across 21 tools; deterministic; tested. | `build/song-decompose.mjs` · `tests/song-parts.test.mjs` · `docs/song-decomposition.md` | demonstrated |
 | R-2026-11-13-63 | 2026-11-13 13:27:55 UTC | “no. i like the current ui. do not change it.” | decision<br>from: build Browse as previewed · keep the current UI | Said to the Browse preview (SB1), shown before any code. The UI stays; the preview is kept unmerged; the store work continues with no UI. | Browse withdrawn (SB3); CLAUDE.md Next: no new store / Browse UI. | `specs/eravos.store-browse.spec` · `CLAUDE.md` | demonstrated |
+| R-2026-11-13-64 | 2026-11-13 13:53:40 UTC | “continue with the component contracts. then i want the next set of high leverage tools” | direction | Finished CG1 (the 10 data / logic components) and added a default check that found five hand-written defaults wrong; then the next tools from the dependency graph. | 33 of 33 contracts true to their code; 18 tools announce their elements. | `build/component-contract.mjs` · `docs/component-contracts.md` | demonstrated |
 
