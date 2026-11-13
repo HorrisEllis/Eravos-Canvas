@@ -1,7 +1,9 @@
 /* eravos.bass-gen UI — 1.1 (3.79, in the look kit, the Groove way). The window is the tool: the line screen (the last two bars as
  * played: pitch up, length across, slides drawn as curves, ghosts hollow, level as brightness), the rhythm strip, a knob bank
  * (ENERGY large, length, octave, slides, ghosts, jumps) and its own chords. Its page adds STEPS — a lane per step for level, octave
- * and slide (drag the bars, click the cells) — and the rest of the feel, beside MOTION and PERFORM from the domain. */
+ * and slide (drag the bars, click the cells) — and the rest of the feel, beside MOTION and PERFORM from the domain.
+ * 2.0 (3.186): two more lanes — LOCK (a step's pitch: root, 3rd, 5th, 7th, octave, a step up or down) and REST — and TIME (feel, swing,
+ * phrase, answer) and NOTES (the pool, tension, range, anticipation) on the same page; the window itself unchanged. */
 OrganismFactory.reg('eravos.bass-gen', function (view) {
   const UI = view.ui, h = UI.h;
   const cfg = (k) => (view.descriptor.config || []).find(c => c.key === k);
@@ -60,12 +62,13 @@ OrganismFactory.reg('eravos.bass-gen', function (view) {
   ]);
 
   // ---- STEPS (its page): level bars, octave cells, slide cells — one column per 16th
-  let St = { vel: new Array(16).fill(0), oct: new Array(16).fill(0), slide: new Array(16).fill(0) };
-  const lanes = UI.Canvas(560, 172); lanes.classList.add('gg-map', 'bl-lanes'); lanes.style.cursor = 'pointer';
-  const LH = { vel: [0, 100], oct: [108, 138], slide: [142, 172] }, LW = 56;
+  let St = { vel: new Array(16).fill(0), oct: new Array(16).fill(0), slide: new Array(16).fill(0), lock: new Array(16).fill(0), rest: new Array(16).fill(0) };
+  const LOCKW = ['·', 'ROOT', '3RD', '5TH', '7TH', 'OCT', '+1', '−1'];
+  const lanes = UI.Canvas(560, 240); lanes.classList.add('gg-map', 'bl-lanes'); lanes.style.cursor = 'pointer';
+  const LH = { vel: [0, 100], oct: [108, 138], slide: [142, 172], lock: [176, 206], rest: [210, 240] }, LW = 56;
   UI.loop(lanes, () => {
     const g = lanes.g, W = lanes.fit().W, cw = (W - LW) / 16, A = acc(lanes); g.clearRect(0, 0, W, lanes.H);
-    g.font = '700 8.5px monospace'; g.fillStyle = '#8796a8'; g.fillText('LEVEL', 4, 54); g.fillText('OCTAVE', 4, 127); g.fillText('SLIDE', 4, 161);
+    g.font = '700 8.5px monospace'; g.fillStyle = '#8796a8'; g.fillText('LEVEL', 4, 54); g.fillText('OCTAVE', 4, 127); g.fillText('SLIDE', 4, 161); g.fillText('LOCK', 4, 195); g.fillText('REST', 4, 229);
     for (let s = 0; s < 16; s++) {
       const x = LW + s * cw, beat = s % 4 === 0, base = beat ? '#121a24' : '#0c121a';
       // level: a bar up or down from the middle line
@@ -74,7 +77,7 @@ OrganismFactory.reg('eravos.bass-gen', function (view) {
       if (v) g.fillRect(x + 3, v > 0 ? mid - v * 46 : mid, cw - 6, Math.abs(v) * 46); else g.fillRect(x + 3, mid - 1, cw - 6, 2);
       g.shadowBlur = 0; g.globalAlpha = 1;
       // octave and slide: cells that say what they do
-      [['oct', St.oct[s], St.oct[s] > 0 ? '+1' : St.oct[s] < 0 ? '−1' : '·'], ['slide', St.slide[s], St.slide[s] > 0 ? 'ON' : St.slide[s] < 0 ? 'OFF' : 'AUTO']].forEach(([k, val, txt]) => {
+      [['oct', St.oct[s], St.oct[s] > 0 ? '+1' : St.oct[s] < 0 ? '−1' : '·'], ['slide', St.slide[s], St.slide[s] > 0 ? 'ON' : St.slide[s] < 0 ? 'OFF' : 'AUTO'], ['lock', St.lock[s], LOCKW[St.lock[s]] || '·'], ['rest', St.rest[s], St.rest[s] ? 'REST' : '·']].forEach(([k, val, txt]) => {
         const [y0, y1] = LH[k]; g.fillStyle = base; g.fillRect(x + 1, y0 + 1, cw - 2, y1 - y0 - 2);
         if (val) { g.strokeStyle = val > 0 ? A : '#5b6878'; g.lineWidth = 1.5; g.strokeRect(x + 2, y0 + 2, cw - 4, y1 - y0 - 4); }
         g.fillStyle = val > 0 ? A : val < 0 ? '#8796a8' : '#3a4656'; g.font = '700 8.5px monospace'; g.textAlign = 'center'; g.fillText(txt, x + cw / 2, (y0 + y1) / 2 + 3); g.textAlign = 'left';
@@ -91,17 +94,22 @@ OrganismFactory.reg('eravos.bass-gen', function (view) {
     e.stopPropagation(); const p = where(e); if (!p.inLanes) return;
     const cyc = (v) => v === 0 ? 1 : v > 0 ? -1 : 0;
     if (p.y < LH.vel[1]) { if (e.button === 2) { St.vel[p.step] = 0; view.emit('step_set', { step: p.step, vel: 0 }); return; } drag = true; try { lanes.setPointerCapture(e.pointerId); } catch (x) {} setVel(e); return; }
-    const k = p.y < LH.oct[1] + 2 ? 'oct' : 'slide', v = e.button === 2 ? 0 : cyc(St[k][p.step]); St[k][p.step] = v; view.emit('step_set', { step: p.step, [k]: v });
+    const k = p.y < LH.oct[1] + 2 ? 'oct' : p.y < LH.slide[1] + 2 ? 'slide' : p.y < LH.lock[1] + 2 ? 'lock' : 'rest';
+    const v = e.button === 2 ? 0 : k === 'lock' ? (St.lock[p.step] + 1) % 8 : k === 'rest' ? (St.rest[p.step] ? 0 : 1) : cyc(St[k][p.step]); St[k][p.step] = v; view.emit('step_set', { step: p.step, [k]: v });
   });
   lanes.addEventListener('pointermove', (e) => { if (drag) setVel(e); });
   ['pointerup', 'pointercancel'].forEach(t => lanes.addEventListener(t, () => { drag = null; }));
-  function paintSteps(x) { if (!x || drag) return; ['vel', 'oct', 'slide'].forEach(k => { if (Array.isArray(x[k])) St[k] = x[k].slice(0, 16).concat(new Array(16).fill(0)).slice(0, 16).map(v => +v || 0); }); }
+  function paintSteps(x) { if (!x || drag) return; ['vel', 'oct', 'slide', 'lock', 'rest'].forEach(k => { if (Array.isArray(x[k])) St[k] = x[k].slice(0, 16).concat(new Array(16).fill(0)).slice(0, 16).map(v => +v || 0); }); }
   view.bind('steps', paintSteps);
-  const reset = UI.Button({ label: 'Reset steps', hint: 'every step back to its default', onClick: () => view.emit('step_set', { step: 0, all: { vel: 0, oct: 0, slide: 0 } }) }).el;
+  const reset = UI.Button({ label: 'Reset steps', hint: 'every step back to its default', onClick: () => view.emit('step_set', { step: 0, all: { vel: 0, oct: 0, slide: 0, lock: 0, rest: 0 } }) }).el;
   const feel = h('div', { class: 'gg-feel' }, [
-    head('Steps', [h('span', { class: 'mo-count', text: 'DRAG A LEVEL · CLICK A CELL · RIGHT-CLICK RESETS' }), reset]), lanes,
+    head('Steps', [h('span', { class: 'mo-count', text: 'DRAG A LEVEL · CLICK A CELL (LOCK CYCLES ROOT → 3RD → 5TH …) · RIGHT-CLICK RESETS' }), reset]), lanes,
     head('Feel', [h('span', { class: 'mo-count', text: 'HOW IT MOVES AROUND THE ROOT' })]),
     h('div', { class: 'gg-knobs' }, [ctl('move', { size: 52 }).el, ctl('humanize', { size: 52 }).el, ctl('accent', { size: 52 }).el, ctl('follow', { size: 52 }).el, ctl('seed', { size: 52 }).el]),
+    head('Time', [h('span', { class: 'mo-count', text: 'WHERE IT LANDS' })]),
+    h('div', { class: 'gg-bank' }, [h('div', { class: 'gg-knobs' }, [ctl('swing', { size: 52 }).el, ctl('answer', { size: 52 }).el]), h('div', { class: 'gg-strips' }, [strip('feel', 'Feel'), strip('phrase', 'Phrase')])]),
+    head('Notes', [h('span', { class: 'mo-count', text: 'WHAT IT PLAYS BESIDES THE ROOT' })]),
+    h('div', { class: 'gg-bank' }, [h('div', { class: 'gg-knobs' }, [ctl('tension', { size: 52 }).el, ctl('span', { size: 52 }).el, ctl('anticipate', { size: 52 }).el]), h('div', { class: 'gg-strips' }, [strip('pool', 'Pool')])]),
   ]);
 
   view.root.append(play);

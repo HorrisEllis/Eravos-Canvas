@@ -115,3 +115,9 @@
 ## (after the before / after) — verbatim:
   > okay why not hold? like the other piano tool?
   - done in 3.184: Piano's pedal button labelled Hold (as Retro DCO / Retro Poly); hint: the sustain pedal; stored key `pedal` kept
+
+## 15:58:04Z (2026-11-13T15:58:04.232Z) — verbatim:
+  > Okay. The bassline tool. Way more depth. I like that tool. A lot.
+  - "Okay.": the Hold / title-case branch merged (PR #185)
+  - 3.186 (SHOWN, not merged): Bassline 2.0 — bass-gen.spec ADDENDUM 2026-11-13 (2): TIME, NOTES, LOCK and REST lanes on its page; the
+    window unchanged; defaults play 1.1's notes. docs/previews/bassline-2-{window,steps}.png
