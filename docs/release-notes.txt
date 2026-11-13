@@ -1,3 +1,25 @@
+ERAVOS v0.2.22 (2026-11-13)
+
+Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.22.exe from the release.
+
+- The Workshop is now called the Field (same place, same keys).
+- On the Field's map: Erase cuts away part of a note (a cut through the middle splits it in two); drag a note's end to make it longer or
+  shorter, its start to move where it begins; Shift+drag up / down makes it thicker or thinner — pick what "thick" means in the bar:
+  pitch width (the default), loudness or voices.
+- The Field follows the tool that plays the note: Retro DCO, Swarm, Retro Poly, Wobble Bass, Supersaw and Sub Engine offer their own most
+  useful knobs first, then the rest in the order the sound flows.
+- Layers, finished: the eye turns a shape or modulator off in what you hear, lock, an amount (0–100 %), drag to reorder (Ctrl+[ / ]),
+  rename (F2), duplicate (Ctrl+J), delete, reset, and copy / paste a layer onto another note — each one undoable. ＋ New layer and a
+  modulator from the note again; the exploded view explodes again; notes in the outliner open.
+- Drawing draws: drag at a note to draw its shape, the pen draws on 3D planes too. ▶ ⤓ ✕ sit top right, once.
+- Songs: 24 new songs on your three shelves (lofi, synthwave, wobble bass) built like Floor Falls Out, using everything — curves on
+  instruments, effects and modulators, LFOs, the XY Pad, the Arp, the Drop Builder. Songs that repeat another are no longer listed (kept).
+- Song previews: every one was tested. Quiet previews are now levelled by loudness, so you can hear them; 11 genres that distorted had the
+  part driving the distortion turned down (most often the Sub Engine) — they sound cleaner. Breathing DnB and Hanging Dub still run warm.
+- 13 showcase patterns for Lofi, Synthwave and Wobble Bass in the Rhythm Library.
+- Under the hood (nothing to see): the Field moved out of the canvas into its own part; every sound component now carries a checked
+  description of its inputs, settings and controls, and each tool states what it is made of — the groundwork for tools as whole zips.
+
 ERAVOS v0.2.21 (2026-11-11)
 
 Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.21.exe from the release.
