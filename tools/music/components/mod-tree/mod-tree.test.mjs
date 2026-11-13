@@ -35,4 +35,9 @@ const fd = M.signal(); const mf = M.mod('square', 8, 1); mf.fade = 0.5; fd.mods.
 const P = ['mods', 0, 'rate', 'base']; const s4 = M.signal(); s4.mods.push(M.mod('sine', 4, 1)); const before = JSON.stringify(s4);
 const s5 = M.set(s4, P, [[0, 9], [1, 9]]); ok(JSON.stringify(s4) === before, 'set leaves the original as it was'); ok(M.get(s5, P)[0][1] === 9, 'get reads what set wrote');
 ok(M.resample(M.sample(s1, 512), 64).length === 64 && M.resample(M.sample(s1, 512), 64)[63][0] === 1, 'resample: 64 points, 0 to 1');
+// 1.1 a modulator's amount: absent = 1 (bit-identical), 0.5 halves what it adds, 0 adds nothing
+const am = (amt) => { const s = M.signal([[0, 2], [1, 2]]); const m = M.mod('sine', 3, 1); if (amt !== undefined) m.amt = amt; s.mods.push(m); return Array.from(M.sample(s, 300)); };
+const am1 = am(), amU = am(1), amH = am(0.5), am0 = am(0);
+ok(JSON.stringify(am1) === JSON.stringify(amU), 'amount 1 = no amount (1.0 signals sample the same)');
+ok(am1.every((v, i) => Math.abs((amH[i] - 2) - (v - 2) / 2) < 1e-12), 'amount 0.5 halves what the modulator adds'); ok(am0.every(v => Math.abs(v - 2) < 1e-12), 'amount 0: the base alone');
 console.log(`mod-tree: ${n} checks passed`);

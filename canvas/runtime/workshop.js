@@ -36,6 +36,7 @@
   const doc = global.document; if (!doc) return;
   const TYPES = ['constraint', 'curve', 'value', 'events', 'emergent', 'raster', 'adjust'];
   const KINDS = new Map();
+  let CLIP = null;   // 2026-11-13 layers: a copied layer ({ kind, data }) — kept across documents, so a layer copied on one note pastes onto another
   const el = (tag, cls, kids, attrs) => { const e = doc.createElement(tag); if (cls) e.className = cls; if (attrs) Object.keys(attrs).forEach(k => { if (k === 'text') e.textContent = attrs[k]; else if (k.startsWith('on')) e.addEventListener(k.slice(2), attrs[k]); else if (attrs[k] === false || attrs[k] == null) { /* a false flag is no attribute (disabled: false must not disable) */ } else e.setAttribute(k, attrs[k] === true ? '' : attrs[k]); }); (kids || []).forEach(c => { if (c != null) e.appendChild(typeof c === 'string' ? doc.createTextNode(c) : c); }); return e; };
   const clone = (x) => JSON.parse(JSON.stringify(x));
 
@@ -67,12 +68,54 @@
     const lays = el('div', 'ws-pane ws-layers'), insp = el('div', 'ws-pane ws-props'), status = el('div', 'ws-status');
     const right = el('div', 'ws-right', [insp, lays]), centre = el('div', 'ws-centre', [tabs, vp]);
     let hidden = new Set(); const folded = new Set();   // the eye and the folded groups (the view's, not the document's)
+    // ---- LAYERS (2026-11-13, his words: "make sure we can edit, change and manipulate layers in workshop. Let's get that finished."): a kind says
+    // what each layer can do (layerOps(doc, id, { clip }) → { enable, amount, rename, duplicate, remove, reset, move, copy, paste, label }) and
+    // does it (set(doc, '@layer', { id, op, value })); copyLayer(doc, id) → what a copy carries. The canvas keeps LOCK (no edit reaches a locked
+    // layer) and the clipboard. The eye turns a layer off in the result where the kind can (else it hides it from the view).
+    const locked = new Set();
+    const opsOf = (id) => { if (!K.layerOps || !id) return {}; try { return K.layerOps(d, id, { clip: CLIP && CLIP.kind === K.id ? CLIP.data : null }) || {}; } catch (e) { console.error(e); return {}; } };
+    const opName = (ops, op, dflt) => (ops.label && ops.label[op]) || dflt;
+    function refuse(why) { note = why; render(); return false; }
+    function layerOp(id, op, value, label) {
+      if (!id) return false; const ops = opsOf(id), lay = layerOf(id), nm = lay ? String(lay.label) : id;
+      if (op === 'lock') { if (locked.has(id)) locked.delete(id); else locked.add(id); note = (locked.has(id) ? 'LOCKED ' : 'UNLOCKED ') + nm.toUpperCase(); render(); return true; }
+      if (op === 'hide') { if (hidden.has(id)) hidden.delete(id); else hidden.add(id); render(); return true; }
+      if (op === 'copy') { if (!ops.copy || !K.copyLayer) return false; const data = K.copyLayer(d, id); if (!data) return false; CLIP = { kind: K.id, data }; note = 'COPIED ' + nm.toUpperCase(); render(); return true; }
+      if (op !== 'enable' && locked.has(id)) return refuse('LOCKED — unlock it (/) to change it');
+      if (op === 'paste') { if (!ops.paste || !CLIP) return false; edit('@layer', { id, op, value: CLIP.data }, label || 'Paste ' + (CLIP.data.label || 'layer') + ' onto ' + nm); return true; }
+      const can = op === 'enable' ? ops.enable !== undefined : op === 'amount' ? ops.amount !== undefined : !!ops[op]; if (!can) return false;
+      edit('@layer', { id, op, value }, label || ({ enable: value ? 'Turn on ' : 'Turn off ', amount: 'Amount of ', rename: 'Rename ', duplicate: 'Duplicate ', remove: 'Delete ', reset: 'Reset ', move: 'Move ' }[op] || op + ' ') + nm);
+      return true;
+    }
+    // a step up or down in its group (Ctrl+[ / ]): before the one above, after the one below
+    function moveBy(id, dir) { const L = layers(), me = L.find(l => l.id === id); if (!me) return false; const grp = L.filter(l => opsOf(l.id).move), i = grp.indexOf(me), nb = grp[i + dir];   // the layers that move, among themselves (a modulator per group)
+      return nb ? layerOp(id, 'move', dir < 0 ? { before: nb.id } : { after: nb.id }, (dir < 0 ? 'Move up ' : 'Move down ') + me.label) : false; }
+    function renameAt(id) { const row = lays.querySelector('.ws-lay[data-id="' + (global.CSS && CSS.escape ? CSS.escape(id) : id) + '"] .ws-ln'), lay = layerOf(id); if (!row || !lay || !opsOf(id).rename || locked.has(id)) return false;
+      const inp = el('input', 'ws-rename', [], { value: String(lay.label).replace(/ \(off\)$| · \d+ %$/, '') }); row.replaceChildren(inp); inp.focus(); inp.select();
+      const done = (ok) => { inp.onblur = null; if (ok && inp.value.trim() !== String(lay.label)) layerOp(id, 'rename', inp.value); else render(); };
+      inp.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') done(true); else if (e.key === 'Escape') done(false); }); inp.onblur = () => done(true); return true; }
+    // the LAYER section of a layer's right-click menu: only what this layer can do
+    function layerItems(l) {
+      const ops = opsOf(l.id), lk = locked.has(l.id), it = [{ section: 'LAYER' }];
+      if (ops.enable !== undefined) it.push({ label: ops.enable ? 'Turn off (it stops playing)' : 'Turn on', keys: '.', run: () => layerOp(l.id, 'enable', !ops.enable) });
+      it.push({ label: hidden.has(l.id) ? 'Show it in the view' : 'Hide it from the view', keys: 'H', run: () => layerOp(l.id, 'hide') });
+      if (ops.rename) it.push({ label: 'Rename…', keys: 'F2', disabled: lk, run: () => renameAt(l.id) });
+      if (ops.duplicate) it.push({ label: 'Duplicate', keys: 'Mod+J', disabled: lk, run: () => layerOp(l.id, 'duplicate') });
+      if (ops.copy) it.push({ label: 'Copy', keys: 'Mod+C', run: () => layerOp(l.id, 'copy') });
+      if (ops.paste !== undefined || CLIP) it.push({ label: 'Paste' + (CLIP && CLIP.kind === K.id ? ' ' + (CLIP.data.label || '') : ''), keys: 'Mod+V', disabled: !ops.paste || lk, run: () => layerOp(l.id, 'paste') });
+      if (ops.move) it.push({ label: 'Move up', keys: 'Mod+[', disabled: lk, run: () => moveBy(l.id, -1) }, { label: 'Move down', keys: 'Mod+]', disabled: lk, run: () => moveBy(l.id, 1) });
+      if (ops.reset) it.push({ label: opName(ops, 'reset', 'Reset'), disabled: lk, run: () => layerOp(l.id, 'reset') });
+      if (ops.remove) it.push({ label: opName(ops, 'remove', 'Delete'), keys: 'Delete', disabled: lk, run: () => layerOp(l.id, 'remove') });
+      it.push({ label: lk ? 'Unlock' : 'Lock', keys: '/', run: () => layerOp(l.id, 'lock') });
+      return it;
+    }
     root.append(bar, opts, strip, centre, right, status);
     const layers = () => K.layers(d) || [];
     const layerOf = (id) => layers().find(l => l.id === id) || null;
     let inspTab = 'properties';
 
     function field(f, big) {
+      if (f.key === '@amount') return amountField();
       const v = K.get(d, f.key), wrap = el('label', 'ws-f' + (big ? ' big' : ''), [el('span', 'ws-fk', [], { text: f.label || f.key })]);
       if (f.type === 'enum' && (f.options || []).length > (big ? 3 : 8)) {   // more than a few choices: one dropdown, not a wall of buttons
         const sel = el('select', 'ws-sel'); (f.options || []).forEach(op => { const o2 = el('option', '', [], { value: String(op), text: String(op) }); if (String(op) === String(v)) o2.selected = true; sel.appendChild(o2); });
@@ -84,8 +127,16 @@
       else { const inp = el('input', 'ws-txt', [], { value: String(v == null ? '' : v) }); inp.addEventListener('change', () => edit(f.key, inp.value, f.label)); wrap.appendChild(inp); }
       return wrap;
     }
+    // AMOUNT (0–100 %): how much of the selected layer plays — one place, in PROPERTIES
+    function amountField() {
+      const ops = opsOf(selected), v = Math.round((ops.amount === undefined ? 1 : ops.amount) * 100), wrap = el('label', 'ws-f big ws-amount', [el('span', 'ws-fk', [], { text: 'Amount' })]);
+      const sl = el('input', 'ws-range', [], { type: 'range', min: '0', max: '100', step: '1', value: String(v), title: 'how much of this layer plays (0–100 %)' }), num = el('span', 'ws-unit', [], { text: v + ' %' });
+      sl.addEventListener('input', () => { num.textContent = sl.value + ' %'; }); sl.addEventListener('change', () => layerOp(selected, 'amount', +sl.value / 100)); sl.addEventListener('keydown', (e) => e.stopPropagation());
+      wrap.append(sl, num); return wrap;
+    }
     function edit(key, value, label) {
       past.push(clone(d)); future = []; d = K.set(d, key, value) || d;
+      if (d && d.__sel !== undefined) { if (d.__sel) selected = d.__sel; d = Object.assign({}, d); delete d.__sel; }   // 2026-11-13: the kind names the layer to select (a moved / duplicated / pasted one)
       hist.push({ label: (label || key) + (value !== null && typeof value === 'object' ? '' : ' · ' + (typeof value === 'number' ? +value.toFixed(3) : String(value))), doc: clone(d) }); if (hist.length > 200) hist.splice(1, 1);
       if (o.onChange) { try { o.onChange(clone(d)); } catch (e) { console.error(e); } } render();
     }
@@ -229,20 +280,36 @@
       const tabsI = el('div', 'ws-ph', ['properties', 'history', 'outliner'].map(t => el('span', t === inspTab ? 'on' : '', [], { text: t.toUpperCase(), onclick: () => { inspTab = t; render(); } })));
       if (inspTab === 'history') insp.replaceChildren(tabsI, el('div', 'ws-hist', hist.slice(-60).map((h2, i, a) => el('div', i === a.length - 1 ? 'now' : '', [el('i', '', [], { text: String(hist.length - a.length + i + 1).padStart(2, '0') }), h2.label], { onclick: () => { if (i < a.length - 1) { past.push(clone(d)); future = []; restore(h2.doc, 'BACK TO ' + String(hist.length - a.length + i + 1).padStart(2, '0')); } } }))));
       else if (inspTab === 'outliner') { const ol = K.outline ? K.outline(d) : [[0, title]]; insp.replaceChildren(tabsI, el('div', 'ws-tree', ol.map(([depth, t, lid, go]) => el('div', (lid && lid === selected ? 'sel' : '') + (lid || go ? ' go' : ''), [], { text: ' '.repeat(depth * 3) + t, onclick: () => { if (lid) selected = lid; if (go && go.key !== undefined) edit(go.key, go.value, go.label || t); else if (lid) render(); } })))); }
-      else insp.replaceChildren(tabsI, el('div', 'ws-ins', [sel ? el('div', 'ws-big', [], { text: sel.label }) : null, sel && sel.sub ? el('div', 'ws-sub', [], { text: sel.sub }) : null].concat(((sel && sel.fields) || []).map(f => field(f, true)))
+      else insp.replaceChildren(tabsI, el('div', 'ws-ins' + (sel && locked.has(sel.id) ? ' locked' : ''), [sel ? el('div', 'ws-big', [], { text: sel.label }) : null, sel && sel.sub ? el('div', 'ws-sub', [], { text: sel.sub }) : null,
+        sel && locked.has(sel.id) ? el('button', 'ws-lockbar', [], { type: 'button', text: '🔒 LOCKED — click to unlock (/)', onclick: () => layerOp(sel.id, 'lock') }) : null].concat((sel && opsOf(sel.id).amount !== undefined ? [{ key: '@amount' }] : []).concat((sel && sel.fields) || []).map(f => field(f, true)))
         .concat(sel && !(sel.fields || []).length ? [el('div', 'ws-hint', [], { text: 'nothing to set here — right-click for what it can do' })] : [])));
       // LAYERS (bottom right): eye · thumbnail · name; groups fold; the layer tools in the footer
       const groups = []; L.forEach(l => { const gname = l.group || ''; let gr = groups.find(x => x[0] === gname); if (!gr) groups.push(gr = [gname, []]); gr[1].push(l); });
-      const row = (l) => { const r = el('div', 'ws-lay' + (l.id === selected ? ' sel' : '') + (hidden.has(l.id) ? ' off' : ''), [
-          el('button', 'ws-eye', [], { type: 'button', text: hidden.has(l.id) ? '◌' : '◉', title: 'show / hide (H)', onclick: (e) => { e.stopPropagation(); hidden.has(l.id) ? hidden.delete(l.id) : hidden.add(l.id); render(); } }),
-          thumb(l), el('div', 'ws-ln', [String(l.label), el('small', '', [], { text: l.sub || '' })])], { onclick: () => { selected = l.id; render(); } });
+      let dragId = null;
+      const row = (l) => { const ops = opsOf(l.id), sound = ops.enable !== undefined, on = sound ? ops.enable : !hidden.has(l.id), lk = locked.has(l.id);
+        const nameEl = el('div', 'ws-ln', [String(l.label), el('small', '', [], { text: l.sub || '' })]);
+        if (ops.rename) nameEl.addEventListener('dblclick', (e) => { e.stopPropagation(); selected = l.id; renameAt(l.id); });
+        const r = el('div', 'ws-lay' + (l.id === selected ? ' sel' : '') + (!on || hidden.has(l.id) ? ' off' : '') + (lk ? ' locked' : ''), [
+          el('button', 'ws-eye', [], { type: 'button', text: on && !hidden.has(l.id) ? '◉' : '◌', title: sound ? (on ? 'on — click to turn it off (it stops playing)' : 'off — click to turn it on') + ' · Alt+click: show only this' : 'show / hide in the view (H) · Alt+click: show only this',
+            onclick: (e) => { e.stopPropagation(); if (e.altKey) { hidden = new Set(layers().map(x => x.id).filter(x => x !== l.id)); render(); return; } if (sound) layerOp(l.id, 'enable', !ops.enable); else layerOp(l.id, 'hide'); } }),
+          thumb(l), nameEl,
+          el('button', 'ws-lock' + (lk ? ' on' : ''), [], { type: 'button', text: lk ? '🔒' : '🔓', title: (lk ? 'locked — click to unlock' : 'lock it: no edit reaches it') + ' (/)', onclick: (e) => { e.stopPropagation(); layerOp(l.id, 'lock'); } })],
+          { onclick: () => { selected = l.id; render(); } });
+        r.dataset.id = l.id;
+        if (ops.move && !lk) { r.draggable = true;
+          r.addEventListener('dragstart', (e) => { dragId = l.id; try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', l.id); } catch (er) {} });
+          r.addEventListener('dragend', () => { dragId = null; lays.querySelectorAll('.ws-lay.drop').forEach(x => x.classList.remove('drop')); }); }
+        r.addEventListener('dragover', (e) => { if (!dragId || dragId === l.id || !opsOf(l.id).move) return; e.preventDefault(); r.classList.add('drop'); });
+        r.addEventListener('dragleave', () => r.classList.remove('drop'));
+        r.addEventListener('drop', (e) => { e.preventDefault(); r.classList.remove('drop'); const from = dragId; dragId = null; if (from && from !== l.id) { const L2 = layers(), a = L2.findIndex(x => x.id === from), b = L2.findIndex(x => x.id === l.id); layerOp(from, 'move', a < b ? { after: l.id } : { before: l.id }); } });
         r.addEventListener('dblclick', () => { selected = l.id; const a = acts().find(x => x.open); if (a && !a.disabled) runAct(a); else render(); });
         r.addEventListener('contextmenu', (e) => { e.preventDefault(); e.stopPropagation(); selected = l.id; render();
-          menu(e.clientX, e.clientY, [{ section: String(l.label).toUpperCase() }, { label: hidden.has(l.id) ? 'Show it' : 'Hide it', keys: 'H', run: () => { hidden.has(l.id) ? hidden.delete(l.id) : hidden.add(l.id); render(); } },
-            { label: 'Show only this', keys: 'Alt+H', run: () => { hidden = new Set(L.map(x => x.id).filter(id => id !== l.id)); render(); } }, { label: 'Show all', run: () => { hidden = new Set(); render(); } }, { sep: true }].concat(kindItems('layer'), newItems())); });
+          menu(e.clientX, e.clientY, layerItems(l).concat([{ label: 'Show only this', keys: 'Alt+H', run: () => { hidden = new Set(L.map(x => x.id).filter(id => id !== l.id)); render(); } }, { label: 'Show all', run: () => { hidden = new Set(); render(); } }],
+            acts().filter(a => a.only === 'layer').length ? [{ section: String(l.label).toUpperCase() }].concat(acts().filter(a => a.only === 'layer').map(a => ({ label: nameOf(a), keys: a.keys, hint: a.hint, disabled: a.disabled, run: () => runAct(a) }))) : [], newItems()), String(l.label).toUpperCase()); });   // 2026-11-13: a layer's menu holds what acts on the layer (the note's and the pattern's own actions are the view's right-click)
         return r; };
       const canAdd = addables().length > 0;
-      const foot = el('div', 'ws-lfoot', [canAdd ? el('button', 'ws-lt ws-new', [], { type: 'button', text: '＋', title: 'New layer  (' + KEYS('Mod+Shift+N') + ') — shape something, set a knob, add a mod', onclick: (e) => { const r = e.currentTarget.getBoundingClientRect(); newLayerMenu(r.left, r.top - 4); } }) : null].filter(Boolean).concat(acts().filter(a => a.icon && !a.strip).map(a => el('button', 'ws-lt', [], { type: 'button', text: a.icon, disabled: !!a.disabled, title: nameOf(a) + (a.keys ? '  (' + KEYS(a.keys) + ')' : '') + (a.hint ? ' — ' + a.hint : ''), onclick: () => runAct(a) }))));
+      const foot = el('div', 'ws-lfoot', [canAdd ? el('button', 'ws-lt ws-new', [], { type: 'button', text: '＋', title: 'New layer  (' + KEYS('Mod+Shift+N') + ') — shape something, set a knob, add a mod', onclick: (e) => { const r = e.currentTarget.getBoundingClientRect(); newLayerMenu(r.left, r.top - 4); } }) : null,
+        opsOf(selected).remove ? el('button', 'ws-lt ws-del', [], { type: 'button', text: '🗑', disabled: locked.has(selected), title: opName(opsOf(selected), 'remove', 'Delete') + ' — ' + ((layerOf(selected) || {}).label || '') + '  (Delete)', onclick: () => layerOp(selected, 'remove') }) : null].filter(Boolean).concat(acts().filter(a => a.icon && !a.strip).map(a => el('button', 'ws-lt', [], { type: 'button', text: a.icon, disabled: !!a.disabled, title: nameOf(a) + (a.keys ? '  (' + KEYS(a.keys) + ')' : '') + (a.hint ? ' — ' + a.hint : ''), onclick: () => runAct(a) }))));
       lays.replaceChildren(el('div', 'ws-ph', [el('span', 'on', [], { text: 'LAYERS' }), el('span', 'ws-x', [], { text: String(L.length) })]),
         el('div', 'ws-lbody', [].concat(...groups.map(([gname, ls]) => [gname ? el('div', 'ws-lh' + (folded.has(gname) ? ' folded' : ''), [], { text: (folded.has(gname) ? '▸ ' : '▾ ') + gname, onclick: () => { folded.has(gname) ? folded.delete(gname) : folded.add(gname); render(); } }) : null]
           .concat(folded.has(gname) ? [] : ls.map(row)))).filter(Boolean)), foot);
@@ -252,7 +319,7 @@
     }
     // the keys, in one place (?): the canvas's, then the kind's
     function keyList() {
-      return [['Undo', 'Mod+Z'], ['Redo', 'Mod+Shift+Z'], ...((o.onApply || K.apply) ? [['Apply', 'Mod+Enter']] : []), ['Close', 'Esc'], ['Select · Pen · Line · Points · Smooth · Move · Erase', 'V P L D S G E'], ['Turn the 3D view', 'Alt-drag · middle-drag'], ['Previous / next layer', '↑ · ↓'], ['Show / hide the layer', 'H'], ...(K.addable ? [['New layer', 'Mod+Shift+N']] : []),
+      return [['Undo', 'Mod+Z'], ['Redo', 'Mod+Shift+Z'], ...((o.onApply || K.apply) ? [['Apply', 'Mod+Enter']] : []), ['Close', 'Esc'], ['Select · Pen · Line · Points · Smooth · Move · Erase', 'V P L D S G E'], ['Turn the 3D view', 'Alt-drag · middle-drag'], ['Previous / next layer', '↑ · ↓'], ['Show / hide the layer', 'H'], ...(K.layerOps ? [['Turn the layer on / off (it plays or not)', '.'], ['Rename the layer', 'F2'], ['Duplicate', 'Mod+J'], ['Copy · paste a layer', 'Mod+C · Mod+V'], ['Move the layer up / down', 'Mod+[ · Mod+]'], ['Delete the layer', 'Delete'], ['Lock / unlock', '/']] : []), ...(K.addable ? [['New layer', 'Mod+Shift+N']] : []),
         ...(K.drawLayer ? [['2D / 3D', '2 · 3'], ['Top / front view', 'T · F'], ['Spread / flat', 'Shift+E'], ['Wire / lit', 'W']] : []), ['Right-click', 'what the layer or view can do'], ['This sheet', '?']]
         .concat(acts().filter(a => a.keys).map(a => [nameOf(a), a.keys]));
     }
@@ -271,6 +338,16 @@
       const sheet = root.querySelector('.ws-sheet'); if (sheet && (e.key === 'Escape' || e.key === '?')) { e.preventDefault(); sheet.remove(); return; }
       const mod = e.ctrlKey || e.metaKey, k = e.key.toLowerCase(), eat = () => { e.preventDefault(); e.stopPropagation(); };
       if (mod && e.shiftKey && k === 'n' && addables().length) { eat(); const r = lays.getBoundingClientRect(); return newLayerMenu(r.left + 10, r.top + 30); }
+      if (selected && K.layerOps) {   // 2026-11-13 the selected layer's own keys
+        if (e.key === 'Delete' && !e.shiftKey && opsOf(selected).remove) { eat(); return layerOp(selected, 'remove'); }
+        if (mod && k === 'j' && opsOf(selected).duplicate) { eat(); return layerOp(selected, 'duplicate'); }
+        if (mod && !e.shiftKey && k === 'c' && opsOf(selected).copy) { eat(); return layerOp(selected, 'copy'); }
+        if (mod && !e.shiftKey && k === 'v' && CLIP) { eat(); return layerOp(selected, 'paste'); }
+        if (mod && (e.key === '[' || e.key === ']') && opsOf(selected).move) { eat(); return moveBy(selected, e.key === '[' ? -1 : 1); }
+        if (!mod && e.key === '/') { eat(); return layerOp(selected, 'lock'); }
+        if (e.key === 'F2') { eat(); return renameAt(selected); }
+        if (!mod && e.key === '.' && opsOf(selected).enable !== undefined) { eat(); return layerOp(selected, 'enable', !opsOf(selected).enable); }
+      }
       if (mod && k === 'z') { eat(); return e.shiftKey ? redo() : undo(); } if (mod && k === 'y') { eat(); return redo(); }
       if (mod && e.key === 'Enter' && (o.onApply || K.apply)) { eat(); return apply(); }
       // the kind's own keys first (Space, Enter, Backspace, M …), so a kind can give a key a meaning
@@ -296,9 +373,11 @@
       // and up, goes to the kind as o.norm; the camera turns with Orbit (O), Alt, the middle button, or a drag that starts off every plane
       if (mode === '3d' && K.drawLayer && K.drag && K.planeDraw && CURVE_TOOLS.includes(tool) && !e.altKey && e.button === 0) {
         const under = planes.slice().reverse().filter(pl => inPoly(x, y, pl.poly)), hit = under.find(pl => pl.type !== 'value') || under[0];   /* a shape first, as a click */
+        if (hit && locked.has(hit.id)) { selected = hit.id; return refuse('LOCKED — unlock it (/) to draw on it'); }
         if (hit) { if (selected !== hit.id) { selected = hit.id; render(); } stroke = { pts: [[x, y]], plane: hit, uv: [onPlane(hit, x, y)] }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} return; } }
       if (mode === '3d' && K.drawLayer) { orbit = { x: e.clientX, y: e.clientY, yaw: cam.yaw, pitch: cam.pitch }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} return; }
       const p = K.pick ? K.pick(d, x, y, r.width, r.height, { selected }) : null; if (p && p.run) { try { p.run(); } catch (er) { console.error(er); } render(); return; } if (p && p.key !== undefined) return edit(p.key, p.value, p.label);
+      if ((K.drag && CURVE_TOOLS.includes(tool)) || (K.stroke && tool === 'pen')) { if (selected && locked.has(selected)) return refuse('LOCKED — unlock it (/) to draw on it'); }
       if (K.drag && CURVE_TOOLS.includes(tool)) { drag = { pts: [[x, y]], alt: e.altKey, shift: e.shiftKey }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} dragStep('move'); return; }
       if (K.stroke && tool === 'pen') { stroke = { pts: [[x, y]] }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} }
     });
@@ -340,6 +419,7 @@
       // W3a: the viewport (for tests and the kind's own buttons)
       view: (o2) => { if (o2) { if (o2.mode) mode = o2.mode; if (o2.exploded !== undefined) exploded = !!o2.exploded; if (o2.wire !== undefined) wire = !!o2.wire; if (o2.cam) Object.assign(cam, o2.cam); chips(); draw(); } return { mode, exploded, wire, cam: Object.assign({}, cam), planes: planes.map(p => ({ id: p.id, poly: p.poly.map(q => q.slice()) })) }; },
       stroke: (pts) => { const r = cv.getBoundingClientRect(); const res = K.stroke ? K.stroke(d, pts, r.width, r.height, { selected }) : null; if (res && res.key !== undefined) edit(res.key, res.value, res.label); return !!res; },
+      layer: (id, op, value) => layerOp(id, op, value), layerOps: (id) => opsOf(id), locked: (id) => locked.has(id), clipboard: () => CLIP, moveBy: (id, dir) => moveBy(id, dir),
       addable: () => addables().map(a => (a.section ? a.section + ' › ' : '') + a.label), add: (label, section) => { const a = addables().find(x => x.label === label && (!section || x.section === section)); if (!a || a.disabled) return false; edit(a.key, a.value, a.name || a.label); return true; },
       action: (label) => { const a = (K.actions ? K.actions(d, { selected }) : []).find(x => x.label === label); if (!a || a.disabled) return false; if (a.key !== undefined) edit(a.key, a.value, a.label); else a.run(clone(d)); return true; } };
     current = api; return api;

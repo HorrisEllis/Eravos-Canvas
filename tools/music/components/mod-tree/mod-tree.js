@@ -1,4 +1,4 @@
-/* eravos.component.mod-tree 1.0.0 — a value over a span as a SIGNAL (a drawn base + modulators) where every modulator's rate and depth are
+/* eravos.component.mod-tree 1.1.0 (1.1: a modulator's amount, m.amt 0–1; absent = 1, every 1.0 signal samples bit-identically) — a value over a span as a SIGNAL (a drawn base + modulators) where every modulator's rate and depth are
  * signals too: modulation that nests to any level (bounded at 8). His words (2026-11-08): "full modulation, waveform, oscillation, like all
  * the ways to edit a sound, give it as much depth as possible. fractally and recursively." Spec: mod-tree.spec. A component imports no tool.
  *   MusicParts.modTree.sample(sig, N) → Float64Array · at(sig, t) · resample(arr, n) → [[t, v]] · get(root, path) · set(root, path, v)
@@ -42,10 +42,11 @@
     for (const m of sig.mods) {
       if (!m || m.on === false) continue;
       const rate = sampleAt(m.rate, N, lvl + 1), depth = sampleAt(m.depth, N, lvl + 1), fade = clamp(+m.fade || 0, 0, 1), dt = N > 1 ? 1 / (N - 1) : 0;
+      const amt = m.amt === undefined ? 1 : clamp(+m.amt, 0, 1);   // 1.1 (2026-11-13): the layer's AMOUNT — how much of this modulator plays (absent = all of it)
       let ph = +m.phase || 0;
       for (let i = 0; i < N; i++) {
         const t = N > 1 ? i / (N - 1) : 0, f = fade > 0 ? Math.min(1, t / fade) : 1;
-        out[i] += depth[i] * f * wave(m, ph);
+        out[i] += depth[i] * f * amt * wave(m, ph);
         ph += Math.max(0, rate[i]) * dt;   // the rate integrated (trapezoid would be finer; at 128+ samples per span this is inaudible)
       }
     }

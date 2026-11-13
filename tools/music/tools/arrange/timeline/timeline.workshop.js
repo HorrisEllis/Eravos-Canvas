@@ -100,20 +100,86 @@
   const atLabel = (d, at, a) => targetInfo(d, at.t, a).label + (at.p || []).map(([i, sub]) => ' › MOD ' + (i + 1) + ' › ' + sub.toUpperCase()).join('');
   function compile(a, d) {
     const M = MT(); if (!M) return a; const T = (a.sh && a.sh.t) || {};
+    // 2026-11-13 layers: a shape that is OFF plays as if unshaped (it stays, ready to turn on); its AMOUNT (0–1) scales how far it moves from rest
+    const on = (t) => T[t] && T[t].off !== true, amt = (t) => (T[t] && T[t].amt !== undefined ? clamp(+T[t].amt, 0, 1) : 1);
     // pitch owns the bend while it is shaped; the note's own oscillation still plays on top (the engine adds it to the path)
-    if (T.pitch) {
-      const path = M.resample(M.sample(T.pitch, 256), 64).map(([t, v]) => [t, clamp(v, -48, 48)]), osc = a.b && a.b.osc;
+    if (on('pitch')) {
+      const k0 = amt('pitch'), path = M.resample(M.sample(T.pitch, 256), 64).map(([t, v]) => [t, clamp(v * k0, -48, 48)]), osc = a.b && a.b.osc;
       if (path.some(q => Math.abs(q[1]) > 1e-4)) a.b = Object.assign({ from: path[0][1], to: path[63][1], shape: 'path', at: 0, path }, osc ? { osc } : {});
       else if (osc) a.b = { from: 0, to: 0, at: 0, shape: 'smooth', osc }; else delete a.b;
-    } else if (a.b && a.b.shape === 'path' && a._shPitch) { const osc = a.b.osc; if (osc) a.b = { from: 0, to: 0, at: 0, shape: 'smooth', osc }; else delete a.b; }
+    } else if (a.b && a.b.shape === 'path' && (a._shPitch || T.pitch)) { const osc = a.b.osc; if (osc) a.b = { from: 0, to: 0, at: 0, shape: 'smooth', osc }; else delete a.b; }
     const c = Object.assign({}, a.c || {});
-    Object.keys(a._shKnobs || {}).forEach(k => { if (!T['k:' + k]) delete c[k]; });
-    Object.keys(T).filter(t => t.startsWith('k:')).forEach(t => { const r = targetInfo(d, t, a); c[t.slice(2)] = M.resample(M.sample(T[t], 256), 64).map(([x, v]) => [x, clamp(v, r.min, r.max)]); });
+    Object.keys(a._shKnobs || {}).forEach(k => { if (!on('k:' + k)) delete c[k]; });
+    Object.keys(T).filter(t => t.startsWith('k:')).forEach(t => { const r = targetInfo(d, t, a), k0 = amt(t); if (!on(t)) { delete c[t.slice(2)]; return; }
+      c[t.slice(2)] = M.resample(M.sample(T[t], 256), 64).map(([x, v]) => [x, clamp(r.def + (v - r.def) * k0, r.min, r.max)]); });
     if (Object.keys(c).length) a.c = c; else delete a.c;
     delete a._shPitch; delete a._shKnobs;
     if (a.sh && !Object.keys(T).length) delete a.sh;
     return a;
   }
+  function layerSet(d, out, o) {
+    const i0 = clamp(out.sel | 0, 0, out.notes.length - 1), a0 = out.notes[i0], M = MT(), id = o.id || '', op = o.op, val = o.value; if (!a0 || !M) return d;
+    const T0 = (a0.sh && a0.sh.t) || {}; a0._shPitch = !!T0.pitch; a0._shKnobs = {}; Object.keys(T0).filter(t => t.startsWith('k:')).forEach(t => { a0._shKnobs[t.slice(2)] = 1; });
+    const T = () => Object.assign({}, (a0.sh && a0.sh.t) || {}), setT = (t2) => { a0.sh = { t: t2 }; }, at = out.at; let sel;
+    if (!at) {
+      const ts = /^T:(.+)$/.exec(id), t = ts && ts[1];
+      if (t && T0[t]) { const t2 = T(), g = Object.assign({}, t2[t]);
+        if (op === 'enable') { if (val) delete g.off; else g.off = true; t2[t] = g; }
+        else if (op === 'amount') { const k = clamp(+val, 0, 1); if (k >= 1) delete g.amt; else g.amt = Math.round(k * 1000) / 1000; t2[t] = g; }
+        else if (op === 'rename') { const nm = String(val || '').trim().slice(0, 40); if (nm) g.name = nm; else delete g.name; t2[t] = g; }
+        else if (op === 'remove') { delete t2[t]; sel = 'pattern'; }
+        else if (op === 'reset') { const r = targetInfo(out, t, a0), lv = t === 'pitch' ? 0 : r.def; t2[t] = Object.assign({ base: [[0, lv], [1, lv]], mods: [] }, g.name ? { name: g.name } : {}); }
+        else if (op === 'move') { const ids = reorder(Object.keys(t2).map(k => 'T:' + k), id, val); if (!ids) return d; const t3 = {}; ids.forEach(x => { t3[x.slice(2)] = t2[x.slice(2)]; }); setT(t3); sel = id; }
+        else if (op === 'paste' && val && val.type === 'shape' && val.t === t) t2[t] = Object.assign(J(val.sig), g.name ? { name: g.name } : {});
+        else if (op === 'paste' && val && val.type === 'mod') { g.mods = (g.mods || []).concat([J(val.mod)]); t2[t] = g; }
+        else return d;
+        if (op !== 'move') setT(t2);
+      } else if (/^P:/.test(id)) { const k = id.slice(2);
+        if (op === 'remove') { if (a0.p) delete a0.p[k]; sel = 'pattern'; }
+        else if (op === 'paste' && val && val.type === 'knob') { a0.p = Object.assign({}, a0.p, { [val.k]: val.v }); sel = 'P:' + val.k; }
+        else return d;
+      } else if (VAL[id] && op === 'reset') VAL[id].forEach(k => setP(a0, k, undefined));
+      else if (VAL[id] && op === 'paste' && val && val.type === 'values' && val.layer === id) val.v.forEach(([k, x]) => setP(a0, k, J(x)));
+      else if (op === 'paste' && val && val.type === 'shape') { const t2 = T(); t2[val.t] = J(val.sig); setT(t2); sel = 'T:' + val.t; }
+      else if (op === 'paste' && val && val.type === 'knob') { a0.p = Object.assign({}, a0.p, { [val.k]: val.v }); sel = 'P:' + val.k; }
+      else return d;
+      clean(a0); if (a0.sh && !Object.keys(a0.sh.t || {}).length) delete a0.sh;
+    } else {
+      const P = sigPath(at), sig = M.get(a0, P); if (!sig) return d;
+      const put = (path, x) => { const r = M.set(a0, path, x); Object.keys(r).forEach(k2 => { a0[k2] = r[k2]; }); };
+      const mods = (sig.mods || []).map(J), mi = /^m:(\d+)$/.exec(id), i = mi ? +mi[1] : -1, r = rangeOf(out, at, a0);
+      if (mi && mods[i]) { const m = mods[i];
+        if (op === 'enable') { if (val) delete m.on; else m.on = false; }
+        else if (op === 'amount') { const k = clamp(+val, 0, 1); if (k >= 1) delete m.amt; else m.amt = Math.round(k * 1000) / 1000; }
+        else if (op === 'rename') { const nm = String(val || '').trim().slice(0, 40); if (nm) m.name = nm; else delete m.name; }
+        else if (op === 'remove') { mods.splice(i, 1); sel = mods.length ? 'm:' + Math.min(i, mods.length - 1) : 'base'; }
+        else if (op === 'reset') { const span = (r.hi - r.lo) / 2, md = M.mod('sine', r.unit === 'cycles' ? 2 : 4, at.t === 'pitch' && !(at.p || []).length ? 0.5 : span * 0.25); md.seed = m.seed || i + 1; if (m.name) md.name = m.name; mods[i] = md; }
+        else if (op === 'duplicate') { const cp = J(m); if (cp.name) cp.name = cp.name + ' copy'; mods.splice(i + 1, 0, cp); sel = 'm:' + (i + 1); }
+        else if (op === 'move') { const ids = reorder(mods.map((_, j) => 'm:' + j), id, val); if (!ids) return d; const nx = ids.map(x => mods[+x.slice(2)]); mods.splice(0, mods.length, ...nx); sel = 'm:' + ids.indexOf(id); }
+        else if (op === 'paste' && val && val.type === 'mod') { mods.splice(i + 1, 0, J(val.mod)); sel = 'm:' + (i + 1); }
+        else return d;
+        put(P.concat(['mods']), mods);
+      } else if (id === 'base') {
+        if (op === 'reset') { const v0 = M.baseAt(sig.base, 0), nx = Object.assign({}, sig, { base: [[0, v0], [1, v0]] }); delete nx.pre; put(P, nx); }
+        else if (op === 'remove' && !(at.p || []).length) { const t2 = T(); delete t2[at.t]; setT(t2); if (!Object.keys(t2).length) delete a0.sh; out.at = null; sel = 'pattern'; }
+        else if (op === 'paste' && val && val.type === 'base') { const nx = Object.assign({}, sig, { base: J(val.base) }); if (val.pre) nx.pre = J(val.pre); else delete nx.pre; put(P, nx); }
+        else if (op === 'paste' && val && val.type === 'shape') put(P, Object.assign(J(val.sig), sig.name ? { name: sig.name } : {}));
+        else if (op === 'paste' && val && val.type === 'mod') { put(P.concat(['mods']), mods.concat([J(val.mod)])); sel = 'm:' + mods.length; }
+        else return d;
+      } else if (id === 'result' && op === 'paste' && val && val.type === 'mod') { put(P.concat(['mods']), mods.concat([J(val.mod)])); sel = 'm:' + mods.length; }
+      else return d;
+    }
+    out.notes[i0] = tidy(compile(a0, out)); if (sel !== undefined) out.__sel = sel; return out;
+  }
+  // ---- LAYERS (2026-11-13, his words: "make sure we can edit, change and manipulate layers in workshop. Let's get that finished.")
+  // what each layer can do (the canvas offers it: the eye, amount, rename, duplicate, delete, reset, order, copy / paste) and the note's
+  // fields a value layer holds (what its copy / paste / reset carry)
+  const VAL = { depth: ['pr', 'rt'], when: ['x.cond'], chord: ['x.iv', 'x.strum', 'x.dir', 'x.fall'], speed: ['x.tempo'], human: ['x.ht', 'x.hv'], repeat: ['x.rs', 'x.rv'], bend: ['b'] };
+  const getP = (o, p) => p.split('.').reduce((x, k) => (x == null ? undefined : x[k]), o);
+  const setP = (o, p, v) => { const ks = p.split('.'); let x = o; ks.slice(0, -1).forEach(k => { if (!x[k] || typeof x[k] !== 'object') x[k] = {}; x = x[k]; }); if (v === undefined) delete x[ks[ks.length - 1]]; else x[ks[ks.length - 1]] = v; };
+  const clean = (a) => { if (a.x && !Object.keys(a.x).length) delete a.x; if (a.p && !Object.keys(a.p).length) delete a.p; return a; };
+  const J = (x) => (x === undefined ? undefined : JSON.parse(JSON.stringify(x)));
+  const reorder = (ids, id, to) => { const L = ids.filter(x => x !== id), at = to && to.before ? L.indexOf(to.before) : to && to.after ? L.indexOf(to.after) + 1 : -1; if (at < 0) return null; L.splice(at, 0, id); return L; };
   const signalAt = (a, at) => { const M = MT(); return M ? M.get(a, sigPath(at).slice(0)) : null; };
   // sample one thing in the open place: the result, the base, one mod's own contribution, a mod's rate / depth
   function series(a, at, what, N) {
@@ -137,12 +203,12 @@
         { key: 'base.hi', label: 'To', type: 'number', min: r.lo, max: r.hi, step: (r.hi - r.lo) / 200 || 0.01, unit: r.unit }] }];
     ((sig && sig.mods) || []).forEach((m, i) => {
       const rate = M ? M.baseAt(m.rate.base, 0) : 0, dep = M ? M.baseAt(m.depth.base, 0) : 0, g = 'MOD ' + (i + 1) + (m.on === false ? ' (off)' : '');
-      L.push({ id: 'm:' + i, group: g, type: 'curve', label: 'Mod ' + (i + 1) + ' · ' + m.shape, sub: 'rate ' + (Math.round(rate * 100) / 100) + (M && M.count(m.rate) ? '~' : '') + ' · depth ' + fmt(dep) + (M && M.count(m.depth) ? '~' : '') + (M && (M.count(m.rate) + M.count(m.depth)) ? ' · ' + (M.count(m.rate) + M.count(m.depth)) + ' inside' : ''), fields: [
+      L.push({ id: 'm:' + i, group: g, type: 'curve', label: (m.name || 'Mod ' + (i + 1) + ' · ' + m.shape) + (m.amt !== undefined && m.amt < 1 ? ' · ' + Math.round(m.amt * 100) + ' %' : ''), sub: 'rate ' + (Math.round(rate * 100) / 100) + (M && M.count(m.rate) ? '~' : '') + ' · depth ' + fmt(dep) + (M && M.count(m.depth) ? '~' : '') + (M && (M.count(m.rate) + M.count(m.depth)) ? ' · ' + (M.count(m.rate) + M.count(m.depth)) + ' inside' : ''), fields: [
         { key: 'm.' + i + '.shape', label: 'Wave', type: 'enum', options: M ? M.SHAPES : ['sine'] },
         { key: 'm.' + i + '.rate', label: 'Rate', type: 'number', min: 0, max: 64, step: 0.25, unit: 'cycles' },
         { key: 'm.' + i + '.depth', label: 'Depth', type: 'number', min: 0, max: Math.max(0.01, (r.hi - r.lo) / 2), step: ((r.hi - r.lo) / 400) || 0.01, unit: r.unit },
         { key: 'm.' + i + '.phase', label: 'Phase', type: 'number', min: 0, max: 1, step: 0.05 }, { key: 'm.' + i + '.fade', label: 'Fade in', type: 'number', min: 0, max: 1, step: 0.05 },
-        { key: 'm.' + i + '.seed', label: 'Seed', type: 'number', min: 1, max: 9999, step: 1 }, { key: 'm.' + i + '.on', label: 'On', type: 'enum', options: ['on', 'off'] }] });
+        { key: 'm.' + i + '.seed', label: 'Seed', type: 'number', min: 1, max: 9999, step: 1 }] });   // its on / off is the layer's eye (2026-11-13: one place, no duplicate)
       if (!deep) ['rate', 'depth'].forEach(sub => L.push({ id: 'm:' + i + ':' + sub, group: g, type: 'curve', label: (sub === 'rate' ? 'Rate' : 'Depth') + ' of mod ' + (i + 1), sub: (M ? M.count(m[sub]) : 0) + ' mods inside — ▾ INTO to shape it', fields: [] }));
     });
     return L;
@@ -274,14 +340,12 @@
       out.push({ label: ab ? 'A ← NOW' : 'SET A', name: "Keep this as A", keys: 'A', key: 'abSet', value: true, hint: 'keep the note as it is now as A, to compare against' });
       if (ab) { out.push({ label: '▶ A', name: "Hear A", keys: 'Shift+Space', hint: 'hear A', disabled: !HOOK.hear, run: () => { HOOK.hear(ab.note); return 'heard A'; } }); out.push({ label: '⇄ A/B', name: "Swap A and B", keys: 'X', key: 'abSwap', value: true, hint: 'swap: the note becomes A, A becomes what it was' }); }
       if ((a.sh && Object.keys(a.sh.t || {}).length) || a.p || a.x) out.push({ label: '⇉ ALL NOTES', name: "Give every note this shape", keys: 'Shift+A', key: 'shapeAll', value: true, disabled: (d.notes || []).length < 2, hint: 'give every note in this pattern this note\'s shape and its own knob values' });
-      const pk = /^P:(.+)$/.exec(sel); if (!at && pk) out.push({ label: '✕ KNOB', name: "Back to the instrument's value", keys: 'Delete', icon: '−', only: 'layer', key: 'unsetp', value: pk[1], hint: 'this note goes back to the instrument\'s own value' });
       if (!at && M) { const ts = /^T:(.+)$/.exec(sel), K3 = d.knobs || [], lab = ts ? (ts[1] === 'pitch' ? 'Pitch' : (K3.find(k => 'k:' + k.key === ts[1]) || {}).label) : (d.drums ? (K3[0] || {}).label : 'Pitch');
         if (lab) out.push({ label: '∿ MOD', name: 'Add a modulator to ' + lab, keys: 'M', icon: '∿', key: 'modTo', value: lab, hint: 'add a modulator to ' + lab + ' (select a shape to choose another; ＋ lists them all)' }); }
       if (at) out.push({ label: '▴ UP', name: "Up a level", keys: 'Backspace', icon: '⤴', key: 'nav', value: 'up', hint: 'one level up the tree' });
       out.push({ label: '▾ INTO', name: "Open it", keys: 'Enter', icon: '⤵', open: true, key: 'nav', value: 'into:' + sel, disabled: !into, hint: 'open the selected curve and shape IT (its own base and modulators)' });
       if (at) { const n = ((signalAt(a, at) || {}).mods || []).length; out.push({ label: '＋ MOD', name: "Add a modulator", keys: 'M', icon: '＋', key: 'addmod', value: n, hint: 'add a modulator here (its rate and depth can be shaped too)' });
-        const mi = /^m:(\d+)$/.exec(sel); out.push({ label: '− MOD', name: "Remove the modulator", keys: 'Delete', icon: '−', only: 'layer', key: 'delmod', value: mi ? +mi[1] : -1, disabled: !mi, hint: 'take the selected modulator away' });
-        if (!(at.p || []).length) out.push({ label: '✕ UNSHAPE', name: "Stop shaping this", keys: 'U', icon: '⊘', key: 'unshape', value: at.t, hint: 'stop shaping this (the note plays as before it was shaped)' }); }
+      }   // − MOD, ✕ KNOB, ✕ UNSHAPE: now the layer's own Delete (2026-11-13, one place)
       return out;
     },
     layers(d) {
@@ -315,7 +379,7 @@
         { key: 'x.ht', label: 'Timing', type: 'number', min: 0, max: 60, step: 1, unit: '± ms' }, { key: 'x.hv', label: 'Velocity', type: 'number', min: 0, max: 40, step: 1, unit: '± %' }] });
       // SHAPE: what this note moves over its life, each a tree of modulators (▾ INTO to shape it)
       const M = MT();
-      Object.keys(T).forEach(t => { const r = targetInfo(d, t, a); L.push({ id: 'T:' + t, group: 'SHAPE · WHAT IT MOVES', type: 'curve', label: r.label + ' curve',   // 2026-11-12: not a second "Pitch" beside the note's pitch (his: "no duplicates in the ui")
+      Object.keys(T).forEach(t => { const r = targetInfo(d, t, a), g0 = T[t]; L.push({ id: 'T:' + t, group: 'SHAPE · WHAT IT MOVES', type: 'curve', label: (g0.name || r.label + ' curve') + (g0.off ? ' (off)' : g0.amt !== undefined && g0.amt < 1 ? ' · ' + Math.round(g0.amt * 100) + ' %' : ''),   // 2026-11-12: not a second "Pitch" beside the note's pitch (his: "no duplicates in the ui")
         sub: (M ? M.count(T[t]) : 0) + ' mods · ' + (M ? M.depthOf(T[t]) : 0) + ' deep — ▾ INTO', fields: [] }); });
       // ITS KNOBS: any knob of the instrument set for this note only (an envelope per note: its attack, its release …)
       Object.keys(a.p || {}).forEach(k => { const kn = knobOf(d, k); if (!kn) return; L.push({ id: 'P:' + k, group: 'ITS KNOBS · THIS NOTE ONLY', type: 'value', label: kn.label, sub: a.p[k] + (kn.unit ? ' ' + kn.unit : '') + ' (the instrument: ' + kn.val + ')', fields: [{ key: 'p.' + k, label: kn.label, type: 'number', min: kn.min, max: kn.max, step: (kn.max - kn.min) / 200 || 0.01, unit: kn.unit }] }); });
@@ -339,6 +403,7 @@
         const m = /^m\.(\d+)\.(\w+)$/.exec(key); if (m) { const mod = (sig.mods || [])[+m[1]] || {}; if (m[2] === 'rate' || m[2] === 'depth') return M && mod[m[2]] ? Math.round(M.baseAt(mod[m[2]].base, 0) * 1000) / 1000 : 0; if (m[2] === 'on') return mod.on === false ? 'off' : 'on'; return mod[m[2]]; } } if (key === 'sel') return (d.sel | 0) + 1; const a = noteOf(d), f = FIELDS[key]; return a && f ? f[0](a) : undefined; },
     set(d, key, v) {
       const out = Object.assign({}, d, { notes: (d.notes || []).map(x => JSON.parse(JSON.stringify(x))) });
+      if (key === '@layer') return layerSet(d, out, v || {});
       if (key === 'sel') { out.sel = clamp(Math.round(v) - 1, 0, Math.max(0, out.notes.length - 1)); out.at = null; return out; }
       // 3.165 PATTERN SCALE: add a note (from the map), take the open note away, and IDEA — notes that emerge from a structure in the song's
       // key (components/pattern-field): press again for another take; busier / sparser keeps the take and changes how much of it sounds
@@ -418,6 +483,38 @@
       }
       const i = clamp(out.sel | 0, 0, out.notes.length - 1), a = out.notes[i], f = FIELDS[key]; if (!a || !f) return d;
       f[1](a, v); out.notes[i] = tidy(a); return out;
+    },
+    // ---- LAYERS: what the selected layer can do (the canvas shows only these) · what a copy carries (the canvas keeps it across notes)
+    layerOps(d, id, o) {
+      const a = noteOf(d), at = shapeAt(d), clip = o && o.clip; if (!a || !id) return {};
+      if (!at) {
+        const T = (a.sh && a.sh.t) || {}, ts = /^T:(.+)$/.exec(id);
+        if (ts && T[ts[1]]) { const g = T[ts[1]];
+          return { enable: g.off !== true, amount: g.amt === undefined ? 1 : g.amt, rename: true, remove: true, reset: true, move: Object.keys(T).length > 1, copy: true,
+            paste: !!clip && ((clip.type === 'shape' && clip.t === ts[1]) || clip.type === 'mod'), label: { remove: 'Stop shaping this', reset: 'Flatten it (no mods)' } }; }
+        if (/^P:/.test(id)) return { remove: true, copy: true, paste: !!clip && clip.type === 'knob', label: { remove: 'Back to the instrument’s value' } };
+        if (VAL[id]) return { reset: true, copy: true, paste: !!clip && clip.type === 'values' && clip.layer === id };
+        return { paste: !!clip && (clip.type === 'shape' || clip.type === 'knob') };
+      }
+      const sig = signalAt(a, at), mi = /^m:(\d+)$/.exec(id), mods = (sig && sig.mods) || [];
+      if (mi && mods[+mi[1]]) { const m = mods[+mi[1]];
+        return { enable: m.on !== false, amount: m.amt === undefined ? 1 : m.amt, rename: true, remove: true, reset: true, duplicate: true, move: mods.length > 1, copy: true, paste: !!clip && clip.type === 'mod' }; }
+      if (id === 'base') return { reset: true, copy: true, remove: !(at.p || []).length, paste: !!clip && ['base', 'shape', 'mod'].includes(clip.type), label: { remove: 'Stop shaping this', reset: 'Flatten it' } };
+      if (id === 'result') return { copy: true, paste: !!clip && clip.type === 'mod' };
+      return {};
+    },
+    copyLayer(d, id) {
+      const a = noteOf(d), at = shapeAt(d); if (!a) return null;
+      if (!at) { const T = (a.sh && a.sh.t) || {}, ts = /^T:(.+)$/.exec(id);
+        if (ts && T[ts[1]]) return { type: 'shape', t: ts[1], sig: J(T[ts[1]]), label: (T[ts[1]].name || targetInfo(d, ts[1], a).label) + ' curve' };
+        if (/^P:/.test(id) && a.p && a.p[id.slice(2)] !== undefined) return { type: 'knob', k: id.slice(2), v: a.p[id.slice(2)], label: 'knob' };
+        if (VAL[id]) return { type: 'values', layer: id, v: VAL[id].map(k => [k, J(getP(a, k))]), label: id };
+        return null; }
+      const sig = signalAt(a, at), mi = /^m:(\d+)$/.exec(id);
+      if (mi && sig && sig.mods[+mi[1]]) return { type: 'mod', mod: J(sig.mods[+mi[1]]), label: 'modulator' };
+      if (id === 'base' && sig) return { type: 'base', base: J(sig.base), pre: J(sig.pre), label: 'base' };
+      if (id === 'result' && sig) return { type: 'shape', t: at.t, sig: J(sig), label: 'shape' };
+      return null;
     },
     // NEW LAYER (his words, 2026-11-12: "why cant i add layers?"): shape pitch or any knob over the note (a curve: a plane in 3D), or set a knob
     // for this note only — the same edits as the ＋ rows, made reachable as layers are in an image editor

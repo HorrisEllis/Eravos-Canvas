@@ -2,6 +2,24 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.175 Layers in the Workshop, finished — built, shown, not merged yet (2026-11-13)
+His words: "make sure we can edit, change and manipulate layers in workshop. Let's get that finished."
+- The spec promised show · solo · lock · amount · order (W1); only show and "Show only this" were built. Now, for every layer that can:
+  the EYE turns it off in what plays (a shape plays as if unshaped, a modulator adds nothing; the row is struck through) — view-only where a
+  layer cannot be off; Alt+click the eye shows only it · LOCK (🔒 on the row, /): no edit, field or pen reaches it · AMOUNT 0–100 % (PROPERTIES,
+  one place): how much of a shape or a modulator plays · ORDER: drag a row, Ctrl+[ / ] · RENAME: double-click the name, F2 · DUPLICATE:
+  Ctrl+J · DELETE: Delete, 🗑 in the footer · RESET · COPY / PASTE (Ctrl+C / V) across notes: a shape, a modulator, a chord, a knob, a value.
+  Each is one undo step; the right-click LAYER menu lists only what that layer can do.
+- canvas/runtime/workshop.js (domain-free): layerOps(doc, id, { clip }) and set(doc, '@layer', { id, op, value }); copyLayer; the clipboard
+  across documents; the kind names the layer to select after a move / duplicate / paste (__sel, never kept). A layer's menu holds layer
+  actions only (the note's and pattern's are the view's right-click).
+- timeline.workshop.js: the ops on shapes (T:), modulators (m:), the base, knob layers (P:) and value layers; compile plays a shape's off and
+  amount; the kind's own − MOD, ✕ KNOB, ✕ UNSHAPE and a modulator's On field are gone (the layer's Delete and eye do them — no duplicates).
+- components/mod-tree 1.1: a modulator's amount (m.amt; absent = 1, every 1.0 signal samples the same — 22 checks).
+- Proof: tests/p174-workshop-layers.test.js 4/4 (each op reaches what plays: off flattens, 50 % halves the rise, lock refuses delete, amount
+  and the pen, Ctrl+J / Ctrl+] / Delete keys, the menu, a shape / modulator / chord pasted onto another note); P150 P154 P156 P157 P158 P159
+  P160 P161 P162 P165–P171, boundary green; components; design check no worse. Preview: docs/previews/workshop-layers.png.
+
 ## 3.174 The machine songs — his three categories, Floor Falls Out's arc, everything wired, measured (2026-11-13)
 His words: "6? also they sound horrible. more like floor falls out." · "considering i said everything eravos could do including automation. way
 too shallow for how much depth ive been giving it. also stop making new catagories. i told you the catagories."
