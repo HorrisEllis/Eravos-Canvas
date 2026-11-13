@@ -39,6 +39,9 @@
     ],
     "components": [
       "wave-table@1.0.0"
+    ],
+    "elements": [
+      "wave-table.element@1"
     ]
   },
   "packs": {

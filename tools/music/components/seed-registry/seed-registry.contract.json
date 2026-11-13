@@ -1,0 +1,48 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "seed-registry",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "logic",
+ "kernel": "MusicParts.Seeds",
+ "ports": [
+  {
+   "id": "path",
+   "dir": "in",
+   "type": "data",
+   "rate": "event",
+   "about": "where the random choice is"
+  },
+  {
+   "id": "rng",
+   "dir": "out",
+   "type": "data",
+   "rate": "event",
+   "about": "a generator: the same path, the same numbers"
+  }
+ ],
+ "variables": [
+  {
+   "key": "projectSeed",
+   "type": "number",
+   "min": 0,
+   "max": 4294967295,
+   "default": 1,
+   "role": "seed",
+   "integer": true
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "projectSeed",
+    "role": "seed",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.knob"
+  ]
+ }
+}

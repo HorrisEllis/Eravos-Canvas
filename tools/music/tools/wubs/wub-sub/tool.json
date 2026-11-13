@@ -38,6 +38,9 @@
     ],
     "components": [
       "note-release@1.0.0"
+    ],
+    "elements": [
+      "note-release.element@1"
     ]
   },
   "packs": {

@@ -1,0 +1,97 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "mod-tree",
+ "version": "1.1.0",
+ "domain": "music",
+ "kind": "logic",
+ "kernel": "MusicParts.modTree",
+ "ports": [
+  {
+   "id": "base",
+   "dir": "in",
+   "type": "curve",
+   "rate": "event"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "control",
+   "rate": "block",
+   "about": "the value over the span: base + modulators, nested up to 8 deep"
+  }
+ ],
+ "variables": [
+  {
+   "key": "shape",
+   "type": "enum",
+   "options": [
+    "sine",
+    "triangle",
+    "saw",
+    "ramp",
+    "square",
+    "random",
+    "smooth",
+    "drawn"
+   ],
+   "default": "sine",
+   "from": "SHAPES",
+   "role": "shape"
+  },
+  {
+   "key": "rate",
+   "type": "number",
+   "min": 0,
+   "max": 64,
+   "default": 4,
+   "role": "rate",
+   "unit": "per span"
+  },
+  {
+   "key": "depth",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 1,
+   "role": "depth"
+  },
+  {
+   "key": "amt",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 1,
+   "role": "mix",
+   "about": "a modulator's amount (1.1)"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "shape",
+    "role": "shape",
+    "face": true
+   },
+   {
+    "key": "rate",
+    "role": "rate",
+    "face": true
+   },
+   {
+    "key": "depth",
+    "role": "depth",
+    "face": true
+   },
+   {
+    "key": "amt",
+    "role": "mix",
+    "face": false
+   }
+  ],
+  "needs_ui": [
+   "kit.knob",
+   "kit.segmented"
+  ]
+ }
+}

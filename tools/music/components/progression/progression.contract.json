@@ -1,0 +1,72 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "progression",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "logic",
+ "kernel": "MusicParts.degreeAt",
+ "ports": [
+  {
+   "id": "bar",
+   "dir": "in",
+   "type": "control",
+   "rate": "event"
+  },
+  {
+   "id": "degree",
+   "dir": "out",
+   "type": "harmony",
+   "rate": "event"
+  }
+ ],
+ "variables": [
+  {
+   "key": "name",
+   "type": "enum",
+   "options": [
+    "i-VI-III-VII",
+    "i-iv-v-i",
+    "vi-IV-I-V",
+    "i-i-VI-VII",
+    "i-v-VI-iv",
+    "ii-V-I-I",
+    "ii-V-I-vi",
+    "I-vi-ii-V",
+    "IV-iii-vi-ii",
+    "i-iv-VII-III",
+    "vi-ii-V-I"
+   ],
+   "default": "i-VI-III-VII",
+   "role": "mode",
+   "about": "the progression"
+  },
+  {
+   "key": "chordBars",
+   "type": "number",
+   "min": 1,
+   "max": 8,
+   "default": 1,
+   "role": "time",
+   "integer": true
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "name",
+    "role": "mode",
+    "face": true
+   },
+   {
+    "key": "chordBars",
+    "role": "time",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.knob",
+   "kit.segmented"
+  ]
+ }
+}

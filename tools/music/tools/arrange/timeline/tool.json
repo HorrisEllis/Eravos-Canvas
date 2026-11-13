@@ -41,6 +41,10 @@
     "components": [
       "pitch-path@1.0.0",
       "mod-tree@1.1.0"
+    ],
+    "elements": [
+      "pitch-path.element@1",
+      "mod-tree.element@1"
     ]
   },
   "packs": {

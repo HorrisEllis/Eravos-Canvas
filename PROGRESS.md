@@ -2,6 +2,15 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.181 CG1 finished: every component with code carries a checked contract (2026-11-13)
+His words: "continue with the component contracts. then i want the next set of high leverage tools" (13:53:40Z).
+- The 10 data / logic components now carry <id>.contract.json (33 of 33 with code). Types curve, pattern, harmony added to tools/music/types.json.
+- build/component-contract.mjs also checks a default against the code wherever the code states one in a form it can read — it caught five
+  wrong defaults I had written (pitch-path win 5 → 2, eps 0.15 → 0.08; mod-tree depth 0.5 → 1; karplus-string bright 0.5 → 0.6;
+  unison-stack blend 0 → 0.5); a planted wrong default fails it.
+- build/tool-needs.mjs: all 18 tools that list their components now announce their components' UI elements too (5 before).
+- Proof: component-contract ✓ 33/33, tool-needs --check ✓, validate 259, components ✓.
+
 ## 3.180 Songs decomposed one by one — rhythms and lines per tool (SD1) (2026-11-13)
 His words: "also songs decomposed one by one." · "rhythmes and notes per tool." · "just begin."
 - build/song-decompose.mjs drives the page, takes every song the Songs menu lists (300 from the Song Engine as data — no audio — and 1 from

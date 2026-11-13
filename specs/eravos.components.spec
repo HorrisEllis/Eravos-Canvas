@@ -74,3 +74,12 @@
 #     Honest limit: 49 variables (not AudioParams) are checked by name only — their ranges come from the code's header until a kernel exports them.
 #   - done: 23 of 33 components with code (all that make or shape sound). To write: the 10 data / logic ones (curve-edit, mod-tree, note-release,
 #     pattern-field, pattern-store, pitch-path, progression, scale-key, seed-registry, wave-table).
+
+## ADDENDUM 2026-11-13 (4) — CG1 finished: every component with code carries a contract
+#   his words (2026-11-13T13:53:40Z): "continue with the component contracts."
+#   - the 10 data / logic components (curve-edit, mod-tree, note-release, pattern-field, pattern-store, pitch-path, progression, scale-key,
+#     seed-registry, wave-table): kind logic; ports of the new types curve, pattern, harmony (tools/music/types.json); a component with no
+#     settings of its own (curve-edit) has an element with no controls; a kernel may be a group of functions set on MusicParts.
+#   - a new check: where the code states a default (x = x || d · x === undefined ? d : x · num(st.x, d)), the contract must say d. It found five
+#     wrong defaults written by hand (pitch-path win, eps; mod-tree depth; karplus-string bright; unison-stack blend) — fixed.
+#   - 33 of 33 components with code; 155 variables (80 exact against AudioParams, 75 by name + readable defaults).

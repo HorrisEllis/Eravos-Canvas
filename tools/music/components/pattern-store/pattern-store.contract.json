@@ -1,0 +1,48 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "pattern-store",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "logic",
+ "kernel": "MusicParts.PatternStore",
+ "ports": [
+  {
+   "id": "in",
+   "dir": "in",
+   "type": "pattern",
+   "rate": "event"
+  },
+  {
+   "id": "flat",
+   "dir": "out",
+   "type": "pattern",
+   "rate": "event",
+   "about": "flatten(): plain notes from nested patterns"
+  }
+ ],
+ "variables": [
+  {
+   "key": "depth",
+   "type": "number",
+   "min": 0,
+   "max": 12,
+   "default": 6,
+   "role": "depth",
+   "integer": true,
+   "about": "how deep patterns nest when flattened"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "depth",
+    "role": "depth",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.knob"
+  ]
+ }
+}

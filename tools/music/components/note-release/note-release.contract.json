@@ -1,0 +1,49 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "note-release",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "logic",
+ "kernel": "MusicParts.releaseHeld",
+ "ports": [
+  {
+   "id": "off",
+   "dir": "in",
+   "type": "note",
+   "rate": "event",
+   "about": "the key let go"
+  },
+  {
+   "id": "gain",
+   "dir": "out",
+   "type": "control",
+   "rate": "audio",
+   "about": "the tool's own gain, brought down"
+  }
+ ],
+ "variables": [
+  {
+   "key": "release",
+   "type": "number",
+   "min": 0.001,
+   "max": 30,
+   "default": 0.3,
+   "role": "time",
+   "unit": "s",
+   "about": "the tool's Release — each tool passes its own; 0.3 s is a placeholder default"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "release",
+    "role": "time",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.knob"
+  ]
+ }
+}

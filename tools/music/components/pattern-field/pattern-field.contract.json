@@ -1,0 +1,185 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "pattern-field",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "logic",
+ "kernel": "MusicParts.PF",
+ "ports": [
+  {
+   "id": "chords",
+   "dir": "in",
+   "type": "harmony",
+   "rate": "event"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "pattern",
+   "rate": "event",
+   "about": "what emerges — the same structure + seed, the same notes"
+  }
+ ],
+ "variables": [
+  {
+   "key": "bars",
+   "type": "number",
+   "min": 1,
+   "max": 8,
+   "default": 4,
+   "role": "time",
+   "integer": true
+  },
+  {
+   "key": "root",
+   "type": "number",
+   "min": 0,
+   "max": 11,
+   "default": 9,
+   "role": "pitch",
+   "integer": true
+  },
+  {
+   "key": "k",
+   "type": "number",
+   "min": 0,
+   "max": 32,
+   "default": 5,
+   "role": "rate",
+   "integer": true,
+   "about": "hits of every n steps"
+  },
+  {
+   "key": "n",
+   "type": "number",
+   "min": 1,
+   "max": 32,
+   "default": 8,
+   "role": "rate",
+   "integer": true
+  },
+  {
+   "key": "rot",
+   "type": "number",
+   "min": 0,
+   "max": 31,
+   "default": 0,
+   "role": "time",
+   "integer": true
+  },
+  {
+   "key": "shape",
+   "type": "enum",
+   "options": [
+    "rise",
+    "fall",
+    "arch",
+    "hold"
+   ],
+   "default": "rise",
+   "role": "shape",
+   "about": "how the density moves",
+   "code": "shapes"
+  },
+  {
+   "key": "contour",
+   "type": "enum",
+   "options": [
+    "flat",
+    "rise",
+    "fall",
+    "arch",
+    "wave"
+   ],
+   "default": "arch",
+   "role": "pitch",
+   "code": "cshapes"
+  },
+  {
+   "key": "amount",
+   "type": "number",
+   "min": 0,
+   "max": 36,
+   "default": 9,
+   "role": "depth",
+   "unit": "semitones"
+  },
+  {
+   "key": "length",
+   "type": "number",
+   "min": 0.25,
+   "max": 16,
+   "default": 1.6,
+   "role": "time",
+   "unit": "steps"
+  },
+  {
+   "key": "seed",
+   "type": "number",
+   "min": 1,
+   "max": 2147483647,
+   "default": 41,
+   "role": "seed",
+   "integer": true
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "bars",
+    "role": "time",
+    "face": false
+   },
+   {
+    "key": "root",
+    "role": "pitch",
+    "face": false
+   },
+   {
+    "key": "k",
+    "role": "rate",
+    "face": true
+   },
+   {
+    "key": "n",
+    "role": "rate",
+    "face": true
+   },
+   {
+    "key": "rot",
+    "role": "time",
+    "face": false
+   },
+   {
+    "key": "shape",
+    "role": "shape",
+    "face": false
+   },
+   {
+    "key": "contour",
+    "role": "pitch",
+    "face": true
+   },
+   {
+    "key": "amount",
+    "role": "depth",
+    "face": false
+   },
+   {
+    "key": "length",
+    "role": "time",
+    "face": false
+   },
+   {
+    "key": "seed",
+    "role": "seed",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.knob",
+   "kit.segmented"
+  ]
+ }
+}
