@@ -27,8 +27,9 @@ describe('tool · Tape Memory — the tape, measured', () => {
     assert.gt(Math.max(...ps) - Math.min(...ps), 6, `wow: the pitch moves (${Math.min(...ps).toFixed(0)}…${Math.max(...ps).toFixed(0)} Hz)`);
     const sp = (await render(2, { speed: 0.8 })).ch; assert.near(pitch(sp, SR * 1.2, SR * 2), 352, 6, 'speed 0.8: 352 Hz (while the lag builds, the read head runs slow)');
     const quiet = (await render(1, {}, false)).ch; assert.lt(rms(quiet, SR * 0.4, SR), 1e-5, 'no input, no dust: silence (after the settings have glided in)');
-    const hiss = (await render(1, { hiss: 1, wear: 0.5 }, false)).ch; assert.gt(rms(hiss, 2000, SR), 3e-3, 'hiss: noise of its own');
-    const cr = (await render(2, { crackle: 1, wear: 1 }, false)).ch; let clicks = 0; for (let j = 1; j < cr.length; j++) if (Math.abs(cr[j]) > 0.02 && Math.abs(cr[j - 1]) <= 0.02) clicks++; assert.gt(clicks, 5, `crackle: clicks (${clicks})`);
+    // 3.185: the dust runs while the tape runs — the transport playing, or music coming in (stopped and silent, a tape is silent: P11.S)
+    const run = (U) => U.T.play(), hiss = (await render(1, { hiss: 1, wear: 0.5, _at: run }, false)).ch; assert.gt(rms(hiss, 2000, SR), 3e-3, 'hiss: noise of its own');
+    const cr = (await render(2, { crackle: 1, wear: 1, _at: run }, false)).ch; let clicks = 0; for (let j = 1; j < cr.length; j++) if (Math.abs(cr[j]) > 0.02 && Math.abs(cr[j - 1]) <= 0.02) clicks++; assert.gt(clicks, 5, `crackle: clicks (${clicks})`);
   });
   it('Tape stop: the tape slows to a stop (no more tone); dropouts dip the sound and come out on their port', async () => {
     const SR = 48000, st = (await render(3, { stopTime: 0.5, _at: (U, c) => U.K.bus.publish('ui:config_change:' + c.id, { key: 'stopped', value: true }) })).ch;

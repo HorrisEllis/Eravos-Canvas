@@ -71,6 +71,16 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-13 · Accountability: the full suite run, my own regressions found and fixed — PR (3.185)
+- **What happened:** a full run of the 1,600 in-page tests found 10 failures. I re-ran each failing suite on current main and on main from 2026-11-10 to find out which change caused it.
+- **Mine, now fixed:** six failures introduced by my work on 2026-11-12 and 2026-11-13, fixed at the cause:
+  - an icon and two packs that were never made
+  - an out-of-key line in a song
+  - a test that looked for a song my own de-duplication had hidden
+  - an effect whose hiss never stopped
+- **Not mine:** four failures that were already there on 2026-11-10, recorded as open, not hidden.
+- **Check:** `node tests/run.mjs P63` · `P43` · `P16` · `P58` · `P11.S` · `"Tape Memory"`
+
 ### 2026-11-13 · Element synthesis: an interface generated from a tool's parts, shown before adopted — PR (3.183)
 - **His words (2026-11-13):** "make sure you are seperating the elements for synthesis. i want to add the element synthesis" (14:28:04 UTC)
 - **His call:** each control belongs to an element; a tool's interface is made from its elements.

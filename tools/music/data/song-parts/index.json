@@ -64,6 +64,12 @@
    "lines": 0,
    "bars": 21748
   },
+  "eravos.piano": {
+   "file": "piano.json",
+   "rhythms": 1,
+   "lines": 10,
+   "bars": 160
+  },
   "eravos.reese-bass": {
    "file": "reese-bass.json",
    "rhythms": 15,

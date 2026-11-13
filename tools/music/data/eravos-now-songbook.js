@@ -63,9 +63,9 @@
       else n.push(shaped({ s: 0, l: 16, n: lo, v: 1, p: { div: '1/8' } }, { pitch: sig([[0, 0], [0.45, 0], [1, lastBar ? -12 : -7]], [mod('square', 8, [[0, 0], [0.45, 0], [1, 1.2]])]) }));
       return n; }
     if (p === 'talk' && kind === 'drop') {   // drop 2: the Swarm (Growl Cloud) talks like Raven Drop's Reese — slides, a fifth that answers, a dive at the turn
-      const lo = at(deg, 3), v = (b + rot + 1) % 4;
-      if (v === 0) { N(0, 6, lo, 1, { b: { from: -2, to: 0, shape: 'early' } }); N(6, 2, lo + 7, 0.85); N(8, 8, lo, 0.95, { b: { from: 0, to: 0, osc: { rate: '1/8', depth: 0.5, shape: 'sine', fade: 0.3 } } }); }
-      else if (v === 1) { N(0, 3, lo, 1); N(3, 3, lo + 3, 0.9, { b: { from: 2, to: 0, shape: 'early' } }); N(8, 8, lo + 5, 0.95, { b: { from: 0, to: -5, shape: 'late', at: 0.5 } }); }
+      const lo = at(deg, 3), v = (b + rot + 1) % 4, fifth = at(deg + 4, 3), third = at(deg + 2, 3), fourth = at(deg + 3, 3);   // 3.185: scale steps, so every note is in the key (P16)
+      if (v === 0) { N(0, 6, lo, 1, { b: { from: -2, to: 0, shape: 'early' } }); N(6, 2, fifth, 0.85); N(8, 8, lo, 0.95, { b: { from: 0, to: 0, osc: { rate: '1/8', depth: 0.5, shape: 'sine', fade: 0.3 } } }); }
+      else if (v === 1) { N(0, 3, lo, 1); N(3, 3, third, 0.9, { b: { from: 2, to: 0, shape: 'early' } }); N(8, 8, fourth, 0.95, { b: { from: 0, to: -5, shape: 'late', at: 0.5 } }); }
       else if (v === 2) { N(0, 4, lo, 1); N(4, 4, lo + 12, 0.9, { b: { from: 0, to: -12, shape: 'linear' } }); N(8, 8, lo, 0.95, { b: { from: 0, to: 0, osc: { rate: '1/16', rateTo: '1/4', depth: 0.6, shape: 'triangle' } } }); }
       else N(0, 16, lo, 1, { b: { from: 0, to: lastBar ? -12 : -7, shape: 'late', at: 0.45, osc: { rate: '1/8', rateTo: '1/32', depth: 0.35, shape: 'sine' } } });
       return n; }

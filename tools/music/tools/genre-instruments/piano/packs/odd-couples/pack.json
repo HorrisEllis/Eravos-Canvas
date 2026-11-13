@@ -1,0 +1,65 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "piano.odd-couples",
+ "version": "1.0.0",
+ "label": "Odd Couples",
+ "prefix": "Odd",
+ "author": "James Brooks",
+ "tags": [
+  "odd-couples",
+  "cross-genre"
+ ],
+ "for": "eravos.piano",
+ "items": {
+  "eravos.piano": {
+   "presets": {
+    "Gospel Glitch Keys": {
+     "params": {
+      "model": "upright",
+      "hardness": 0.6,
+      "brightness": 0.65,
+      "decay": 4,
+      "release": 0.35,
+      "resonance": 0.4,
+      "detune": 0.25,
+      "sympathetic": 0.35,
+      "drive": 0.2,
+      "width": 0.6,
+      "level": 0.6
+     }
+    },
+    "Séance Tine": {
+     "params": {
+      "model": "tine",
+      "hardness": 0.35,
+      "brightness": 0.4,
+      "bell": 0.7,
+      "decay": 6,
+      "release": 0.8,
+      "resonance": 0.45,
+      "trem": 0.55,
+      "tremRate": 3.2,
+      "drive": 0.25,
+      "width": 0.7,
+      "level": 0.65
+     }
+    },
+    "Dub Honky Skank": {
+     "params": {
+      "model": "honky",
+      "hardness": 0.7,
+      "brightness": 0.6,
+      "decay": 2.2,
+      "release": 0.15,
+      "resonance": 0.3,
+      "detune": 0.7,
+      "inharm": 0.6,
+      "drive": 0.3,
+      "width": 0.5,
+      "level": 0.6
+     }
+    }
+   }
+  }
+ }
+}

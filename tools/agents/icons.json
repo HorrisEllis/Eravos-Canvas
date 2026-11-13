@@ -1,7 +1,7 @@
 {
   "_": "Which drawn icon each agents tool and category shows (Lucide names). build/icons.mjs \u2192 core/icons.gen.js.",
   "tools": {
-    "eravos.agents.ai-step": "sparkles"
+    "eravos.agents.ai-step": "sparkles", "eravos.agents.step": "footprints"
   },
   "categories": {
     "AI": "sparkles"
