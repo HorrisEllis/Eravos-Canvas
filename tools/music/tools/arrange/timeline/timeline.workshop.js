@@ -177,18 +177,23 @@
   const STAGE_ORDER = ['CONTROL', 'SOURCE', 'SHAPE', 'AMP', 'MOD', 'FX', 'OUT', 'MORE'];
   function toolOf(d) {
     const org = HOOK.organism && d.target ? HOOK.organism(d.target) : null, meta = org && global.Catalog && global.Catalog.meta ? global.Catalog.meta(org) : null;
-    return { org, label: (HOOK.label && d.target ? HOOK.label(d.target) : '') || (meta && meta.label) || 'its instrument', field: (meta && meta.field) || {} };
+    return { org, label: (meta && meta.label) || 'its instrument', field: (meta && meta.field) || {} };   // the tool's name (not its window's: "🌃 Retro DCO ·537")
   }
+  // a knob with no group: its stage from its own name (the stage words above, applied to the key — Retro DCO's knobs carry few groups)
+  const BY_KEY = [['AMP', /^(attack|decay|sustain|release|amp|vca|env(?!amt))/i], ['SHAPE', /(cutoff|^res|reso|filter|hpf|lpf|drive|envamt|keytrack|formant|tone)/i],
+    ['MOD', /(lfo|^mod|drift|wobble|rate|restless|vibrato)/i], ['FX', /(chorus|delay|echo|reverb|bbd|width|space|tape)/i], ['OUT', /^(level|volume|gain|out|master|pan)/i],
+    ['CONTROL', /(arp|glide|porta|voice|poly|legato|hold|bend)/i]];
+  const stageOfKnob = (tl, k, IW) => (tl.field.stages && tl.field.stages[k.group]) || (k.group ? (IW && IW.stageOf ? IW.stageOf(k.group, true) : 'MORE') : ((BY_KEY.find(b => b[1].test(k.key)) || ['SOURCE'])[0]));
   function knobSections(d, list) {
     const tl = toolOf(d), IW = global.InstrumentWorkshop, first = tl.field.first || [], out = [];
     const F = list.filter(k => first.includes(k.key)).sort((a, b) => first.indexOf(a.key) - first.indexOf(b.key)); if (F.length) out.push([String(tl.label).toUpperCase() + ' · FIRST', F]);
-    const groups = new Map(); list.filter(k => !first.includes(k.key)).forEach(k => { const st = (tl.field.stages && tl.field.stages[k.group]) || (IW && IW.stageOf ? IW.stageOf(k.group || '', true) : 'MORE'), key = st + (k.group ? ' · ' + k.group : '');
+    const groups = new Map(); list.filter(k => !first.includes(k.key)).forEach(k => { const st = stageOfKnob(tl, k, IW), key = st + (k.group ? ' · ' + k.group : '');
       if (!groups.has(key)) groups.set(key, { st, ks: [] }); groups.get(key).ks.push(k); });
     [...groups.entries()].sort((a, b) => STAGE_ORDER.indexOf(a[1].st) - STAGE_ORDER.indexOf(b[1].st)).forEach(([key, g]) => out.push([key, g.ks]));
     return out;
   }
   const knobStage = (d, key) => { const k = (d.knobs || []).find(q => q.key === key); if (!k) return 'MORE'; const tl = toolOf(d), IW = global.InstrumentWorkshop;
-    return (tl.field.first || []).includes(key) ? String(tl.label).toUpperCase() : (tl.field.stages && tl.field.stages[k.group]) || (IW && IW.stageOf ? IW.stageOf(k.group || '', true) : 'MORE') + (k.group ? ' · ' + k.group : ''); };
+    return (tl.field.first || []).includes(key) ? String(tl.label).toUpperCase() : stageOfKnob(tl, k, IW) + (k.group ? ' · ' + k.group : ''); };
   // ---- LAYERS (2026-11-13, his words: "make sure we can edit, change and manipulate layers in workshop. Let's get that finished.")
   // what each layer can do (the canvas offers it: the eye, amount, rename, duplicate, delete, reset, order, copy / paste) and the note's
   // fields a value layer holds (what its copy / paste / reset carry)
@@ -273,7 +278,7 @@
   // shorter), its start, or the whole note (time and pitch); Shift + MOVE up / down makes it thicker / thinner — what thickness is, the options
   // bar says (THICKNESS: pitch width — its oscillation's width, the default · loudness — its velocity · voices — notes stacked on it)
   const THICK = ['pitch width', 'loudness', 'voices'], LADDER = [[], [12], [7, 12], [7, 12, 19], [7, 12, 19, 24]];
-  const thickOf = (d) => THICK.includes(d.thick) ? d.thick : (() => { try { const v = global.localStorage.getItem('eravos.field.thick'); return THICK.includes(v) ? v : d.drums ? 'loudness' : THICK[0]; } catch (e) { return d.drums ? 'loudness' : THICK[0]; } })();   // a pad has no pitch to widen: loudness
+  const thickOf = (d) => THICK.includes(d.thick) ? d.thick : d.drums ? 'loudness' : THICK[0];   // kept on the doc (a tool keeps no side state); a pad has no pitch to widen: loudness
   function mapDrag(d, tool, pts, W, H, o) {
     if (!NAV_OPEN || (tool !== 'erase' && tool !== 'move')) return null;
     const top = navTop(H), G = navGeom(d, W, top), toSt = (x) => (x - G.x0) / G.w * G.end, toN = (y) => G.hi - Math.floor((y - G.y0) / G.rh), snap = (v) => Math.round(v * 4) / 4;
@@ -493,7 +498,7 @@
       }
       if (key === 'bpm') { const b = clamp(+v, 40, 240); if (!isFinite(b)) return d; out.bpm = b; return out; }
       if (key === 'mapEdit') return mapEdit(out, v || {}) || d;
-      if (key === 'thick') { if (!THICK.includes(v)) return d; out.thick = v; try { global.localStorage.setItem('eravos.field.thick', v); } catch (e) {} return out; }
+      if (key === 'thick') { if (!THICK.includes(v)) return d; out.thick = v; return out; }
       if (key === 'loadPattern') { if (!v || !Array.isArray(v.notes) || !v.notes.length) return d; out.notes = v.notes.map(n => JSON.parse(JSON.stringify(n))); out.sel = 0; out.at = null; out.ab = null; return out; }
       if (key === 'instrument') {
         let id = String(v || ''); if (!id) return d;

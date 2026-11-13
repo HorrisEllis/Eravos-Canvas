@@ -24,7 +24,7 @@ describe('P176 the Field follows the playing tool', () => {
       const first = A.filter(x => /FIRST › /.test(x)).map(x => x.replace(/^.* › /, '')); assert.equal(first[0], 'Cutoff', 'in the contract’s order: ' + first.join(', '));
       const order = ['CONTROL', 'SOURCE', 'SHAPE', 'AMP', 'MOD', 'FX', 'OUT', 'MORE'], st = secs.slice(2).map(x => x.split(' · ')[0]);
       assert.ok(st.every((x, i) => i === 0 || order.indexOf(x) >= order.indexOf(st[i - 1])), 'stages in the DAG’s order: ' + secs.slice(2).join(' | '));
-      assert.ok(secs.some(x => /^SOURCE · /.test(x)) && secs.some(x => /^AMP · /.test(x)), 'its own groups on their stages: ' + secs.join(' | '));
+      assert.ok(secs.some(x => /^SOURCE( · |$)/.test(x)) && secs.some(x => /^AMP( · |$)/.test(x)), 'its own groups on their stages: ' + secs.join(' | '));
       ws.add('Cutoff', 'SHAPE OVER THE NOTE'); ws.action('▴ UP'); await TH.sleep(20);
       const L = EravosTimelineWorkshop.KIND.layers(ws.doc()), sh = L.find(l => /^T:k:cutoff/.test(l.id)); assert.ok(sh && /RETRO DCO/.test(sh.group), 'the cutoff curve under Retro DCO: ' + (sh && sh.group));
       const saw = ws.addable().find(x => /^SET FOR THIS NOTE ONLY · SOURCE[^›]* › Saw$/.test(x)); assert.ok(saw, 'Saw for this note, under SOURCE');

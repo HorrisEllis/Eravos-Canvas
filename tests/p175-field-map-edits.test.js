@@ -35,7 +35,7 @@ describe('P175 the Field: its name, and the map edits notes', () => {
   it('MOVE: drag the end — longer; the start — later; the note — another time and pitch', async () => {
     const t = await make([{ s: 0, l: 4, n: 60, v: 0.8 }, { s: 8, l: 4, n: 64, v: 0.8 }]);
     try { const ws = t.ws; tool(ws, 'g'); assert.equal(ws.tool(), 'move');
-      await drag(ws, [at(ws, 3.8, 60), at(ws, 5, 60), at(ws, 6, 60)]); assert.equal(t.clip().notes[0].l, 6, 'the end dragged: longer (4 → 6)');
+      await drag(ws, [at(ws, 4, 60), at(ws, 5, 60), at(ws, 6, 60)]); assert.equal(t.clip().notes[0].l, 6, 'the end dragged: longer (4 → 6)');
       await drag(ws, [at(ws, 6, 60), at(ws, 4.5, 60), at(ws, 4, 60)]); assert.equal(t.clip().notes[0].l, 4, 'and back: shorter');
       await drag(ws, [at(ws, 9.5, 64), at(ws, 11, 66), at(ws, 12, 67)]); const m = t.clip().notes.find(q => q.n === 67); assert.ok(m && m.s === 10.5, 'the note moved in time and pitch: ' + JSON.stringify(t.clip().notes.map(q => [q.s, q.n])));
     } finally { t.done(); }

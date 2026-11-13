@@ -30,12 +30,12 @@ describe('Pattern — the structure plays what emerges', () => {
   });
 });
 describe('Pattern — in the Workshop', () => {
-  it('its kind is accepted; Open in Workshop edits the tool live; a click on the surface locks a note; Apply and close', async () => {
+  it('its kind is accepted; Open in Field edits the tool live; a click on the surface locks a note; Apply and close', async () => {
     const hh = document.getElementById('wmhost'); if (!CanvasWM.world) { CanvasWM.init(hh, Kernel); WireSystem.init(Kernel); OrganismFactory.boot(Kernel); } Kernel.audio.boot();
     const id = OrganismFactory.spawn('eravos.pattern-field', { K: Kernel, x: 30, y: 30 }); await TH.sleep(80);
     try {
       assert.ok(Workshop.kinds().includes('music.pattern'), 'the Workshop knows the pattern kind'); assert.deepEqual(Workshop.check(MusicParts.PF_KIND), [], 'and it passes the check');
-      const w = CanvasWM.windowOf(id), b = [...w.querySelectorAll('button')].find(x => /Open in Workshop/.test(x.textContent)); assert.ok(b, 'the window offers Open in Workshop'); b.click(); await TH.sleep(60);
+      const w = CanvasWM.windowOf(id), b = [...w.querySelectorAll('button')].find(x => /Open in Field/.test(x.textContent)); assert.ok(b, 'the window offers Open in Field'); b.click(); await TH.sleep(60);
       const ws = Workshop.current; assert.ok(ws && ws.kind === 'music.pattern' && document.querySelector('.ws-app'), 'the Workshop opened on the pattern');
       ws.set('densEnd', 0.2); await TH.sleep(40); assert.equal(OrganismFactory.handle(id).ctx.params.get('densEnd'), 0.2, 'an edit in the Workshop reached the tool (live)');
       assert.ok(ws.undo(), 'undo'); await TH.sleep(40); assert.equal(OrganismFactory.handle(id).ctx.params.get('densEnd'), 0.9, '… and the tool followed the undo');

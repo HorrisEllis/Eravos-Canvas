@@ -2,7 +2,37 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
-## 3.175 Layers in the Workshop, finished — built, shown, not merged yet (2026-11-13)
+## 3.177 Every song's preview tested; quiet previews levelled, distorted ones trimmed (2026-11-13)
+His words: "I cant hear some of them in the preview. Can you also test them. Some sound lterrible".
+- Measured, not guessed: every listed song's preview (301) rendered as the Songs page renders it and measured — level (RMS), how spiky (peak
+  over average), share under 60 Hz and above 5 kHz, silent bars, and PINNED (samples pressed against the peak: the master's limiter squashing a
+  too-hot sum, heard as distortion). None silent or failing (one recipe song has no preview, by design); 44 only slow under load (alone ≤ 35 s).
+- Why some could not be heard: previews were normalised by peak, so a spiky song (one loud hit) played far below the rest. tools/music/data/
+  song-preview.js now levels by loudness: aim −14 dB RMS (up to 4× the peak gain), a soft clip above 0.89 (tanh) — no new hard clipping.
+- Why some sounded terrible: 26 songs pinned 0.20–0.47 % (Floor Falls Out: 0.07 %). Each problem genre's parts were taken out one at a time to
+  find the part driving it — the Sub Engine at its 0.8 default in most; a wobble, a wub, an organ, a Reese or an acid line in others.
+  tools/music/data/songbook-mix.js (new, data only, loaded after every songbook): 17 level trims on 11 genres, each with its measured before →
+  after. Re-measured on 49 songs: median pinned 0.22 → 0.11 (Rivals 0.41 → 0.10, Dark to Dawn 0.47 → 0.13). Still warm: Breathing DnB
+  (~0.32 %) and Hanging Dub (~0.20 %) — his ear decides. Lost Love's boomy low end (65–72 % under 60 Hz) left as the genre's character.
+- Proof: P19 21/21, P44 29/29, P71 10/10, P72 4/4, P172, P173 green; the audit scripts and per-song table in the session's scratchpad.
+
+## 3.176 The Workshop is the Field; erase, longer, thicker on the map; each tool's own Field (2026-11-13)
+His words: "shouldn't the workshop be called field? I like it so far. What about tool dependant. Also erasing parts of the notes or patterns.
+Making it thicker or thinner, longer." · his answers: "Rename it Field" · "I meant tool specific. Using the dag maybe or contract" · "Maybe
+options for it? Or pitch width."
+- FIELD: every word he sees (the surface's title, Close the Field, ⇥ Field, Open in Field, the menus and hints) — code names kept.
+- The notes map: ERASE cuts the part of a note (or of several) under the stroke — a note split in two where it crosses the middle · MOVE: the
+  body moves (start, pitch), the end grip makes it longer / shorter, the start grip moves its start keeping its end · THICKNESS (Shift+drag up
+  / down): options — pitch width (default: a vibrato's depth, drawn as a band), loudness (a pad's default), voices (unison ghosts drawn) —
+  a THICKNESS choice in the bar, kept on the note's doc.
+- Tool specific, from its contract and its DAG: a tool.json may carry "field": { first: [keys], stages: { group: stage } } (Retro DCO, Swarm,
+  Retro Poly, Wobble Bass, Supersaw, Sub Engine written); the catalog carries it (build/index-tools.mjs). The Field offers that tool's FIRST
+  knobs first (in the contract's order), then the rest by stage in the sound's order (CONTROL SOURCE SHAPE AMP MOD FX OUT) — a knob with no
+  group staged by its name — and a shaped knob's layer sits under its stage.
+- Proof: tests/p175-field-map-edits.test.js 4/4, tests/p176-field-tool-specific.test.js 3/3; P150 P154 P156–P162 P165 P167–P174, boundary
+  10/10 green; components; design check 57/74, no tool worse.
+
+## 3.175 Layers in the Workshop, finished (2026-11-13, PR #170)
 His words: "make sure we can edit, change and manipulate layers in workshop. Let's get that finished."
 - The spec promised show · solo · lock · amount · order (W1); only show and "Show only this" were built. Now, for every layer that can:
   the EYE turns it off in what plays (a shape plays as if unshaped, a modulator adds nothing; the row is struck through) — view-only where a
