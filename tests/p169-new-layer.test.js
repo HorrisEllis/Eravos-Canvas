@@ -20,18 +20,18 @@ describe('P169 a new layer on the Workshop', () => {
       const ws = t.ws, btn = ws.el.querySelector('.ws-layers .ws-lfoot .ws-new');
       assert.ok(btn, 'a ＋ at the foot of LAYERS'); assert.ok(!ws.el.querySelector('.ws-layers .ws-ph .ws-new'), 'not in the header');
       assert.ok(Array.from(ws.el.querySelectorAll('.ws-lfoot .ws-lt')).some(b => b.textContent === '∿'), 'a ∿ (add a mod) beside it'); const A = ws.addable();
-      assert.ok(A.some(x => /^SHAPE OVER THE NOTE › /.test(x)), 'it can shape a knob over the note: ' + A.slice(0, 6).join(' | '));
-      assert.ok(!A.includes('SHAPE OVER THE NOTE › Pitch'), 'a pad has no pitch to bend');
+      assert.ok(A.some(x => /^SHAPE OVER THE NOTE( · [^›]+)? › /.test(x)), 'it can shape a knob over the note: ' + A.slice(0, 6).join(' | '));
+      assert.ok(!A.some(x => /^SHAPE OVER THE NOTE[^›]* › Pitch$/.test(x)), 'a pad has no pitch to bend');
       ws.view({ mode: '3d', exploded: true }); await TH.sleep(40); const p0 = ws.view().planes.length;
       assert.ok(p0 >= 5, 'a drum note explodes into its layers again: ' + p0 + ' planes');
-      assert.ok(A.some(x => /^MODULATE › /.test(x)), 'MODULATE is offered');
-      const first = A.find(x => /^SHAPE OVER THE NOTE › /.test(x)).replace(/^.* › /, '');
+      assert.ok(A.some(x => /^MODULATE( · [^›]+)? › /.test(x)), 'MODULATE is offered');
+      const first = A.find(x => /^SHAPE OVER THE NOTE( · [^›]+)? › /.test(x)).replace(/^.* › /, '');
       assert.ok(ws.add(first, 'SHAPE OVER THE NOTE'), 'shape ' + first); await TH.sleep(40);
       // back up to the note: the shape is a layer of it
       ws.undo(); ws.redo(); await TH.sleep(20);
       const L = Array.from(ws.el.querySelectorAll('.ws-layers .ws-lay')).map(r => r.textContent);
       assert.ok(ws.history().length >= 1, 'one history step: ' + ws.history().join(' | '));
-      ws.undo(); await TH.sleep(30); assert.equal(ws.addable().filter(x => x === 'SHAPE OVER THE NOTE › ' + first).length, 1, 'undo takes the shape away');
+      ws.undo(); await TH.sleep(30); assert.equal(ws.addable().filter(x => x.startsWith('SHAPE OVER THE NOTE') && x.endsWith(' › ' + first)).length, 1, 'undo takes the shape away');
       ws.view({ mode: '3d' }); await TH.sleep(30); assert.equal(ws.view().planes.length, p0, 'back to ' + p0 + ' plane(s)');
       // the button opens a menu
       btn.click(); await TH.sleep(30); const cm = document.querySelector('.cm');
@@ -52,10 +52,10 @@ describe('P169 a new layer on the Workshop', () => {
   it('a melodic note: ＋ Pitch makes a pitch curve — two planes become three', async () => {
     const t = await make('eravos.retro-poly', [{ s: 0, l: 8, n: 60, v: 0.8 }]);
     try {
-      const ws = t.ws; assert.ok(ws.addable().includes('SHAPE OVER THE NOTE › Pitch'), 'Pitch can be added: ' + ws.addable().slice(0, 4).join(' | '));
+      const ws = t.ws; assert.ok(ws.addable().some(x => /^SHAPE OVER THE NOTE[^›]* › Pitch$/.test(x)), 'Pitch can be added: ' + ws.addable().slice(0, 4).join(' | '));
       ws.view({ mode: '3d' }); await TH.sleep(30); const n0 = ws.view().planes.length;
       assert.ok(ws.add('Pitch')); await TH.sleep(30);
-      assert.ok(!ws.addable().includes('SHAPE OVER THE NOTE › Pitch'), 'pitch is shaped now, not offered again');
+      assert.ok(!ws.addable().some(x => /^SHAPE OVER THE NOTE[^›]* › Pitch$/.test(x)), 'pitch is shaped now, not offered again');
       assert.ok(ws.view().planes.length >= 1, 'the shape draws in 3D');
       assert.ok(n0 >= 1);
     } finally { t.done(); }

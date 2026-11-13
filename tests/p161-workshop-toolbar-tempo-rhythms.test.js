@@ -68,7 +68,7 @@ describe('P161 the toolbar on the view, tempo, the rhythm library', () => {
       t.roll.openWorkshop(0); await TH.sleep(40); const ws = Workshop.current, before = JSON.stringify(t.clipOf().notes);
       key('r'); await TH.sleep(150); const pl = document.querySelector('.plib'); assert.ok(pl && pl.getAttribute('aria-label') === 'Rhythm library', 'R opens the rhythm library');
       assert.ok(/Rhythms/.test(pl.querySelector('.plib-tabs').textContent), 'its tab: Rhythms');
-      await TH.sleep(200); const b = Array.from(pl.querySelectorAll('button')).find(x => /⇥ Workshop/.test(x.textContent)); assert.ok(b, 'each rhythm offers ⇥ Into the Workshop');
+      await TH.sleep(200); const b = Array.from(pl.querySelectorAll('button')).find(x => /⇥ Field/.test(x.textContent)); assert.ok(b, 'each rhythm offers ⇥ Into the Workshop');
       b.click(); await TH.sleep(60); assert.ok(!document.querySelector('.plib'), 'the library closes');
       assert.ok(JSON.stringify(t.clipOf().notes) !== before && t.clipOf().notes.length > 0, 'the rhythm is the pattern now (' + t.clipOf().notes.length + ' notes)');
       assert.ok(/Rhythm:/.test(ws.history().slice(-1)[0]), 'one history step: ' + ws.history().slice(-1)[0]);

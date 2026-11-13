@@ -277,7 +277,7 @@
     stop: 'the tape stops (keys and drums slow to half speed)', sag: 'the tape sags', dropout: 'the tape drops out and throws its echo', rewind: 'the tape rewinds up to speed',
   };
   const NOTE = (mv, g) => ({ move: mv, listen: 'Floor Falls Out’s arc. In each pause ' + SAY[mv] + '. Open any lane: curves move the instruments, the effects and the XY Pad.', drop: g,
-    voice: 'Her clips fit the two pauses — her voice alone where the floor goes.', tools: 'Retro DCO · Swarm Oscillator · Tape Memory · Wobble Bass · Arp · LFO · XY Pad · Sidechain · Echo · Destroyer · Drop Builder · curve lanes on tools, effects and modulators · the Workshop’s notes' });
+    voice: 'Her clips fit the two pauses — her voice alone where the floor goes.', tools: 'Retro DCO · Swarm Oscillator · Tape Memory · Wobble Bass · Arp · LFO · XY Pad · Sidechain · Echo · Destroyer · Drop Builder · curve lanes on tools, effects and modulators · the Field’s notes' });
   // a seed per song: base + its place, or its own where two drew the same progression (P172 measured 0.87 shared: 9105 → 9113, the same move)
   const OWN = { 9105: 9113 };
   const shelf = (genre, base, mv, titles, moods, drop) => titles.map((t, i) => { const seed = OWN[base + i + 1] || base + i + 1;

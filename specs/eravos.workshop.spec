@@ -329,3 +329,17 @@ W3h  AT HAND      ⤓ save to the note library · ▶ play it · ✕ close — a
 #   The surface: the eye (off in the result where the kind can, else the view's hide; Alt+click = only this) · lock (the surface's: no edit,
 #   field or pen reaches a locked layer) · amount in PROPERTIES · drag / Ctrl+[ ] to order · F2 / double-click to rename · Ctrl+J · Delete ·
 #   Ctrl+C / V (one clipboard for every document) · reset — each one undo step; the layer's menu lists only what it can do.
+
+# ---- ADDENDUM 2026-11-13 (2) — its name is FIELD; the map edits notes; it follows the tool (nothing above is changed)
+#   his words: "Also shouldn't the workshop be called field? I like it so far. What about tool dependant. Also erasing parts of the notes or
+#   patterns. Making it thicker or thinner, longer." · his answers: "Rename it Field" · "I meant tool specific. Using the dag maybe or contract" ·
+#   thickness: "Maybe options for it? Or pitch width."
+#   - NAME: what he sees says FIELD (the bar, menus, buttons, hints, the catalogue); the code keeps Workshop / workshop.js (ids, files, tests).
+#     This changes ERV_D4 above (there "the Workshop" was the field's surface and "field" the relational constraint field): one name now.
+#   - THE MAP: ERASE (E) cuts out what it passes over (a note may split in two) · MOVE (G): a note's end → longer / shorter, its start, or the
+#     whole note in time and pitch · Shift + MOVE up / down → thicker / thinner. THICKNESS (the options bar) means pitch width (its oscillation's
+#     width — the default; a pad: loudness), loudness (velocity) or voices (notes stacked on it). It is a gesture onto values that have their
+#     place already (Oscillate's depth, Velocity, Chord) — no second place for a value. The map draws a pitch width as a band, voices as ghosts.
+#   - TOOL-SPECIFIC: a note's New-layer menu and its knob layers follow the playing tool — its contract (tool.json "field": { first: [keys],
+#     stages: { group: stage }, say }, carried by the catalogue) first, then its settings' groups on the sound's stages in the DAG order
+#     (control · source · shape · amp · mod · fx · out). Contracts: Retro DCO, Swarm, Retro Poly, Wobble Bass, Supersaw, Sub Engine.

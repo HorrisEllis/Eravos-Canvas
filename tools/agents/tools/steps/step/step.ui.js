@@ -88,7 +88,7 @@
 
 OrganismFactory.reg('eravos.agents.step', function (view) {
   const UI = view.ui, h = UI.h;
-  if (window.Workshop && !window.Workshop.kinds().includes(KIND.id)) { const a = window.Workshop.addKind(KIND); if (!a.ok) console.error('Step: the Workshop refused its kind —', a.problems.join('; ')); }
+  if (window.Workshop && !window.Workshop.kinds().includes(KIND.id)) { const a = window.Workshop.addKind(KIND); if (!a.ok) console.error('Step: the Field refused its kind —', a.problems.join('; ')); }
   let cur = {};
   const hue = (kind, kinds) => { const i = (kinds || []).indexOf(kind); if (i >= 0) return Math.round(i * 360 / kinds.length + 30) % 360;
     let n = 0; for (const c of String(kind)) n = (n * 31 + c.charCodeAt(0)) % 360; return n; };
@@ -111,7 +111,7 @@ OrganismFactory.reg('eravos.agents.step', function (view) {
     window.Workshop.open(KIND.id, docNow(), { onChange: (d) => view.emit('step_set', { params: { kind: d.kind, ref: d.ref, step: d.step, state: d.state }, box: d.box }) });
   }
   view.openWorkshop = openWorkshop;
-  const ws = UI.Button({ label: 'Open in Workshop', hint: 'the whole step on the Workshop surface: its gate, settings and contract, every change live', onClick: () => openWorkshop() });
+  const ws = UI.Button({ label: 'Open in Field', hint: 'the whole step on the Field: its gate, settings and contract, every change live', onClick: () => openWorkshop() });
   view.root.append(h('div', { class: 'org-row', style: { justifyContent: 'space-between', alignItems: 'center' } }, [st]), ref, meta, gate, last,
     h('div', { class: 'org-row', style: { marginTop: '8px' } }, [ws.el]));
 });

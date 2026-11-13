@@ -1,4 +1,4 @@
-/* eravos.pattern-field UI — the window (a flat view of the shape and what emerges, the main controls, Open in Workshop) and the Workshop's
+/* eravos.pattern-field UI — the window (a flat view of the shape and what emerges, the main controls, Open in Field) and the Field's
  * music PATTERN kind (canvas/runtime/workshop.js is domain-free; every word and picture of a pattern is here). 3.150, W1 flat. */
 (function () {
   'use strict';
@@ -78,7 +78,7 @@
 
   OrganismFactory.reg('eravos.pattern-field', function (view) {
     const UI = view.ui, h = UI.h, cfg = (k) => view.descriptor.config.find(c => c.key === k), st = () => view.state || {};
-    if (window.Workshop && !window.Workshop.kinds().includes(KIND.id)) { const a = window.Workshop.addKind(KIND); if (!a.ok) console.error('Pattern: the Workshop refused its kind —', a.problems.join('; ')); }
+    if (window.Workshop && !window.Workshop.kinds().includes(KIND.id)) { const a = window.Workshop.addKind(KIND); if (!a.ok) console.error('Pattern: the Field refused its kind —', a.problems.join('; ')); }
     let key = null, cursor = -1;
     view.on('state_sync', (s) => { if (s && s.key) key = s.key; });
     view.on('pf_shape', (s) => { if (s && s.key) key = s.key; });
@@ -92,7 +92,7 @@
     ensureSource();
     const saveB = UI.Button({ label: 'Save to Patterns', hint: 'keep this structure as a block in the pattern browser', onClick: () => { const nm = saveShape(docNow()); saveB.set && saveB.set('Saved · ' + nm); setTimeout(() => saveB.set && saveB.set('Save to Patterns'), 1600); } });
     const tlB = UI.Button({ label: 'To Timeline', hint: 'the notes that emerged, as a clip on the Timeline', onClick: () => toTimeline(docNow()) });
-    const ws = UI.Button({ label: 'Open in Workshop', kind: 'primary', hint: 'the whole structure on the Workshop surface — every change plays at once', onClick: () => openWorkshop() });
+    const ws = UI.Button({ label: 'Open in Field', kind: 'primary', hint: 'the whole structure on the Field — every change plays at once', onClick: () => openWorkshop() });
     function docNow() { const d = {}; view.descriptor.config.forEach(c => { d[c.key] = get(c.key); }); d._key = key;
       try { const K = view.K || window.Kernel, outs = K && K.wires ? K.wires.list().filter(w => w.src && w.src.instanceId === view.instanceId).map(w => { const r = K.registry.get(w.dst.instanceId); return r && r.descriptor && r.descriptor.label; }).filter(Boolean) : []; d._into = Array.from(new Set(outs)); d._intoIds = K && K.wires ? Array.from(new Set(K.wires.list().filter(w => w.src && w.src.instanceId === view.instanceId).map(w => { const r = K.registry.get(w.dst.instanceId); return r && r.organism_id; }).filter(Boolean))) : []; } catch (e) { d._into = []; d._intoIds = []; }
       return d; }

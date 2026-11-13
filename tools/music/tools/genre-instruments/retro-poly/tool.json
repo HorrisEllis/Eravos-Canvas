@@ -106,5 +106,16 @@
     "eravos.xy-pad"
   ],
   "status": "built",
-  "conflicts": []
+  "conflicts": [],
+  "field": {
+    "first": [
+      "cutoff",
+      "res",
+      "envAmt",
+      "pwm",
+      "drift",
+      "glide"
+    ],
+    "say": "the filter, the pulse width, the drift and the glide"
+  }
 }

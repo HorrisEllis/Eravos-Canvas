@@ -608,7 +608,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
       CM.show(e.clientX, e.clientY, [
         // his words (2026-11-08): "When you right click on edit note. Does it open the workshop?" · "do that. editing a note, whether in the pattern
         // menu or in the timeline." — the clip opens in the roll, then on the Workshop (W2a, music.notes); the roll alone stays one click away
-        c.kind === 'notes' ? { label: '✎ Edit notes', hint: 'on the Workshop', run: () => { sel = c.id; drawInsp(); syncRoll(); draw(); if (roll && roll.openWorkshop) roll.openWorkshop(0); } } : null,
+        c.kind === 'notes' ? { label: '✎ Edit notes', hint: 'on the Field', run: () => { sel = c.id; drawInsp(); syncRoll(); draw(); if (roll && roll.openWorkshop) roll.openWorkshop(0); } } : null,
         c.kind === 'notes' ? { label: '🎹 Edit in the piano roll', run: () => { sel = c.id; drawInsp(); syncRoll(); draw(); } } : null,
         { label: '✂ Split here', hint: 'cut this clip at ' + bs(at), run: () => view.emit('clip_split_at', { lanes: [c.lane], bars: [at] }) },
         { label: '⧉ Duplicate', run: () => view.emit('clip_duplicate', { id: c.id }) },
@@ -635,7 +635,7 @@ OrganismFactory.reg('eravos.timeline', function (view) {
       if (at && at > c.startBar && at < c.startBar + len) items.push({ label: '✂ Split here (bar ' + (Math.round(at * 4) / 4) + ')', run: () => view.emit('clip_split_at', { lanes: [c.lane], bars: [at] }) });
       if (len >= 2 || c.kind === 'audio') items.push({ label: '✂ In half', run: () => view.emit('clip_split', { id: c.id, bar: c.kind === 'audio' ? c.startBar + len / 2 : c.startBar + Math.max(1, Math.round(len / 2)) }) });
       items.push({ label: '⧉ Repeat ×1', run: () => view.emit('clip_repeat', { id: c.id, times: 1 }) }, { label: '⧉ Repeat ×3 (four in a row)', run: () => view.emit('clip_repeat', { id: c.id, times: 3 }) });
-      if (c.kind === 'notes') items.push({ label: '✎ Edit its notes', hint: 'on the Workshop', run: () => { sel = c.id; drawInsp(); syncRoll(); draw(); if (roll && roll.openWorkshop) roll.openWorkshop(0); } },
+      if (c.kind === 'notes') items.push({ label: '✎ Edit its notes', hint: 'on the Field', run: () => { sel = c.id; drawInsp(); syncRoll(); draw(); if (roll && roll.openWorkshop) roll.openWorkshop(0); } },
         { label: '🎹 Edit in the piano roll', run: () => { sel = c.id; drawInsp(); syncRoll(); draw(); } });
       items.push({ label: '🗑 Delete the clip', danger: true, run: () => { view.emit('clip_remove', { id: c.id }); if (sel === c.id) sel = null; } }, { sep: true });
     }

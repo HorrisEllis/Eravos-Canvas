@@ -67,13 +67,13 @@
     const box = h('div', { class: 'nlib' }), list = h('div', { class: 'plib-list nlib-list' }), head = h('p', { class: 'plib-about' });
     function paint() {
       const a = read(), can = o.canApply ? o.canApply() : false;
-      head.textContent = a.length ? a.length + ' saved note' + (a.length > 1 ? 's' : '') + ' — each fits any note of any tool (knob parts come along where the tool has the knob). ' + (can ? 'Apply puts it on the note open in the Workshop.' : 'Open a note in the Workshop to apply one.')
-        : 'No saved notes yet. In the Workshop, shape a note and press Ctrl+S (or right-click › Save to the note library).';
+      head.textContent = a.length ? a.length + ' saved note' + (a.length > 1 ? 's' : '') + ' — each fits any note of any tool (knob parts come along where the tool has the knob). ' + (can ? 'Apply puts it on the note open in the Field.' : 'Open a note in the Field to apply one.')
+        : 'No saved notes yet. In the Field, shape a note and press Ctrl+S (or right-click › Save to the note library).';
       list.replaceChildren(...a.map(s => {
         const cv = h('canvas', { class: 'plib-draw nlib-draw', width: 240, height: 64 }); draw(cv, s);
         const name = h('b', { class: 'nlib-name', text: s.name, title: 'click to rename' });
         name.onclick = () => { const v = global.prompt('Name', s.name); if (v) { rename(s.id, v); paint(); } };
-        const apply = h('button', { class: 'sbk-alt sm', text: 'Apply', title: 'put it on the note open in the Workshop' }); apply.disabled = !can; apply.onclick = () => { if (o.onApply) o.onApply(s); paint(); };
+        const apply = h('button', { class: 'sbk-alt sm', text: 'Apply', title: 'put it on the note open in the Field' }); apply.disabled = !can; apply.onclick = () => { if (o.onApply) o.onApply(s); paint(); };
         const del = h('button', { class: 'sbk-alt sm', text: 'Delete', title: 'delete it from the library' }); del.onclick = () => { if (global.confirm('Delete “' + s.name + '”?')) { remove(s.id); paint(); } };
         return h('div', { class: 'plib-card nlib-card' }, [cv, h('div', { class: 'nlib-meta' }, [name, h('span', { class: 'sbk-sub', text: describe(s) + (s.from && s.from.tool ? ' · made on ' + s.from.tool : '') })]), h('div', { class: 'nlib-act' }, [apply, del])]);
       }));

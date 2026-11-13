@@ -293,8 +293,8 @@
     const tabsEl = h('div', { class: 'plib-tabs', role: 'tablist' }, [tabBtn('patterns', '🥁 Rhythms · ' + lib.length), tabBtn('notes', '♪ Notes · ' + (global.NoteLibrary ? global.NoteLibrary.all().length : 0))]);
     if ((o && o.tab) === 'notes') pBody.style.display = 'none'; else nBody.style.display = 'none';
     ov.append(h('div', { class: 'sbk-box' }, [
-      h('header', { class: 'sbk-head' }, [h('div', {}, [tabsEl, h('span', { class: 'sbk-sub', text: ' THE RHYTHM LIBRARY — every song in blocks (each instrument, each section), and the notes you saved. Hear it, send it to your song, or put it into the Workshop.' })]),
-        h('button', { class: 'sbk-alt sm plib-new', type: 'button', text: '＋ New pattern', title: 'an empty pattern on the Timeline, open on the Workshop: click the map to add notes, or press I for an idea — then SAVE PATTERN keeps it here under Yours', onclick: () => { close(); newPattern(); } }), h('button', { class: 'sbk-x', text: '×', 'aria-label': 'close', onclick: () => close() })]),
+      h('header', { class: 'sbk-head' }, [h('div', {}, [tabsEl, h('span', { class: 'sbk-sub', text: ' THE RHYTHM LIBRARY — every song in blocks (each instrument, each section), and the notes you saved. Hear it, send it to your song, or put it into the Field.' })]),
+        h('button', { class: 'sbk-alt sm plib-new', type: 'button', text: '＋ New pattern', title: 'an empty pattern on the Timeline, open on the Field: click the map to add notes, or press I for an idea — then SAVE PATTERN keeps it here under Yours', onclick: () => { close(); newPattern(); } }), h('button', { class: 'sbk-x', text: '×', 'aria-label': 'close', onclick: () => close() })]),
       pBody, nBody]));
     ov.addEventListener('mousedown', (e) => { if (e.target === ov) close(); });
     document.addEventListener('keydown', key, true);
@@ -316,13 +316,13 @@
       hear.onclick = async () => { if (playing && playing.id === p.id) { stop(); return; } hear.textContent = '…'; const ok = await play(p, () => { hear.textContent = '▶'; }); hear.textContent = ok ? '■' : '▶'; if (ok === null) status.textContent = 'no sound came out of “' + p.name + '”'; };
       // W3g ⇥ Into the Workshop: while a pattern is open there, this rhythm's notes replace its notes (in the song's key; undo brings them back)
       const wsOpen = global.Workshop && global.Workshop.current && global.Workshop.current.kind === 'music.notes';
-      const intoB = wsOpen && p.notes && p.notes.length ? h('button', { class: 'sbk-alt sm', text: '⇥ Workshop', title: 'put this rhythm into the pattern open in the Workshop (its notes replace the ones there — Ctrl+Z brings them back)' }) : null;
+      const intoB = wsOpen && p.notes && p.notes.length ? h('button', { class: 'sbk-alt sm', text: '⇥ Field', title: 'put this rhythm into the pattern open in the Field (its notes replace the ones there — Ctrl+Z brings them back)' }) : null;
       if (intoB) intoB.onclick = () => { const key = (global.Kernel && global.Kernel.music && global.Kernel.music.key) || {}, root = +key.root || 0;
         const notes = p.notes.map(n => Object.assign({ s: n.s, l: n.l, n: p.drums ? n.n : n.r + root, v: n.v }, carry(n)));
         global.Workshop.current.set('loadPattern', { notes, name: p.name }, 'Rhythm: ' + p.name); close(); };
       const sendB = h('button', { class: 'sbk-alt sm', text: '→ Timeline', title: !!p.curve ? 'adds this curve to the track that plays this kind of tool (or a new track with it)' : 'adds it after what is on the track that plays this kind of tool (or a new track with it), in your song’s key' });
       sendB.onclick = () => { const r = send(p); status.textContent = r ? '“' + p.name + '” → the Timeline, bar ' + r.bar : 'could not send it'; };
-      const editB = !p.notes ? null : h('button', { class: 'sbk-alt sm', text: '✎ Edit notes', title: 'put it on the Timeline and open it on the Workshop: open any note, and give it its own timing, bend and curves' });
+      const editB = !p.notes ? null : h('button', { class: 'sbk-alt sm', text: '✎ Edit notes', title: 'put it on the Timeline and open it on the Field: open any note, and give it its own timing, bend and curves' });
       if (editB) editB.onclick = () => { const r = edit(p); if (r) close(); else status.textContent = 'could not open it'; };
       const star = h('button', { class: 'plib-star' + (favs.has(p.id) ? ' on' : ''), text: favs.has(p.id) ? '★' : '☆', title: 'keep it in ★ Favourites', 'aria-label': 'favourite' });
       star.onclick = () => { tog(favs, p.id); store.set({ favs: [...favs] }); star.classList.toggle('on', favs.has(p.id)); star.textContent = favs.has(p.id) ? '★' : '☆'; if (pick.fav) paint(); };

@@ -105,5 +105,15 @@
     "eravos.xy-pad"
   ],
   "status": "built",
-  "conflicts": []
+  "conflicts": [],
+  "field": {
+    "first": [
+      "cutoff",
+      "detune",
+      "spread",
+      "mix",
+      "res"
+    ],
+    "say": "the filter, the detune and the width"
+  }
 }

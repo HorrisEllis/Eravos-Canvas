@@ -4,7 +4,7 @@
  * (k hits of n), a range, density over the pattern (how much of what the shape admits sounds), a contour (where the line leans), a note length,
  * a seed, and the notes you lock. Together they make the SHAPE: every note it admits; inside it the notes EMERGE (components/pattern-field:
  * the same structure + seed → the same notes). It makes no sound: notes go to each instrument wired from its note out. Every setting reaches
- * the next step it plays (live). Open in Workshop edits the same structure on the Workshop surface (canvas/runtime/workshop.js). */
+ * the next step it plays (live). Open in Field edits the same structure on the Field surface (canvas/runtime/workshop.js). */
 (function () {
   'use strict';
   const S = OrganismSDK.STD, PROG = MusicParts.ALL_PROGRESSIONS, clamp = (v, a, b) => v < a ? a : v > b ? b : v;

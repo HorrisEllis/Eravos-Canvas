@@ -804,7 +804,7 @@
       CM.show(x, y, [
         // 3.116 the note editor (it opened only on a double-click): pitch, bend, oscillation and the instrument's knobs for this note
         // W2a (his, 2026-11-08: "The edit pattern or note doesn’t open workshop"): the note opens on the Workshop; double-click keeps the quick editor
-        { label: '✎ Edit note…', hint: 'on the Workshop: its timing, pitch, velocity, chance, bend and oscillation, live (double-click a note for the quick editor)', disabled: first === undefined, run: () => openWorkshop(first) },
+        { label: '✎ Edit note…', hint: 'on the Field: its timing, pitch, velocity, chance, bend and oscillation, live (double-click a note for the quick editor)', disabled: first === undefined, run: () => openWorkshop(first) },
         { sep: true },
         // 3.120 select by what a note is (timeline-depth.spec "Editing": select by pitch, velocity) — then edit them all at once
         { label: '◎ Select every ' + (first !== undefined ? nameOf(notes[first].n) : 'such') + ' in the clip', hint: 'every note of this pitch', disabled: first === undefined, run: () => { const n = notes[first].n; selOnly(notes.map((a, i) => a.n === n ? i : -1).filter(i => i >= 0)); draw(); readout.textContent = S.size + ' selected'; } },
