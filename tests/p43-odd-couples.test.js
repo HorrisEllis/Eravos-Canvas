@@ -32,7 +32,8 @@ describe('Odd Couples — a pack for every tool, songs from tools that never mee
     // 3.48 the suite window (eravos.suite-hub): the system its parts end in, no sound of its own
     // 3.48/3.49 the generator parts (Groove, Chords, Bassline, Arp) play only through a wire from their note out into an instrument, and the Song
     // Engine's genre format cannot wire one yet. The coder's open loop (eravos.phase48-map P48.10), not hidden: they join the set when it can.
-    const ALLOWED = ['eravos.groove-gen', 'eravos.chord-gen', 'eravos.bass-gen', 'eravos.arp', 'eravos.suite-hub', 'eravos.song-recorder', 'eravos.mixer', 'eravos.coach', 'eravos.midi-mapper', 'eravos.contrast-analyser', 'eravos.sequencer'];
+    // 3.185 the Pattern tool (eravos.pattern-field, 3.150) is a generator of the same kind: notes out, through a wire
+    const ALLOWED = ['eravos.groove-gen', 'eravos.chord-gen', 'eravos.bass-gen', 'eravos.arp', 'eravos.pattern-field', 'eravos.suite-hub', 'eravos.song-recorder', 'eravos.mixer', 'eravos.coach', 'eravos.midi-mapper', 'eravos.contrast-analyser', 'eravos.sequencer'];
     assert.equal(notUsed.filter(id => !ALLOWED.includes(id)).join(', '), '');
   });
   it('pairs that never meet: no genre shares its organ / choir / 303 / xen / dub pairing with another family', () => {

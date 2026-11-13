@@ -74,7 +74,18 @@
         fx.wetIn.connect(sat); sat.connect(crush); crush.connect(split); split.connect(dL, 0); split.connect(dR, 1); dL.connect(merge, 0, 0); dR.connect(merge, 0, 1);
         merge.connect(hp); hp.connect(lp); lp.connect(dropG); dropG.connect(out);
         // dust
-        hissN.connect(hissG); hissG.connect(out); crackN.connect(bp); bp.connect(crackG); crackG.connect(out);
+        // 3.185: the dust runs while the tape runs — a follower on what comes in opens it (fully, at any playing level) and lets it fall
+        // after the music stops (silent within ~5 s), as a stopped tape is silent (P18 stop contract: Tape Memory hissed at −30 dB for ever)
+        const runG = g(), absW = ac.createWaveShaper(), env = ac.createBiquadFilter(), open = ac.createWaveShaper(); [absW, env, open].forEach(x => ctx.track(x));
+        const curve = (f) => { const c = new Float32Array(1025); for (let i = 0; i < 1025; i++) c[i] = f(i / 512 - 1); return c; };
+        absW.curve = curve(x => Math.abs(x)); env.type = 'lowpass'; env.frequency.value = 0.3; env.Q.value = 0.5; open.curve = curve(x => Math.min(1, Math.max(0, x) * 200));
+        // the tape also runs while the transport plays (its hiss through a song's quiet bars): either one opens it, neither more than fully
+        const playing = ac.createConstantSource(), both = g(), clamp = ac.createWaveShaper(); [playing, clamp].forEach(x => ctx.track(x)); playing.offset.value = 0; playing.start();
+        clamp.curve = curve(x => Math.min(0.5, Math.max(0, x))); both.gain.value = 0.5;   // (follower + playing) × 0.5 → the shaper's −1…1 input; × 2 back out
+        runG.gain.value = 0; fx.wetIn.connect(absW); absW.connect(env); env.connect(open); open.connect(both); playing.connect(both); both.connect(clamp);
+        const twice = g(); twice.gain.value = 2; clamp.connect(twice); twice.connect(runG.gain);
+        ctx.onPlay(() => playing.offset.setTargetAtTime(1, ac.currentTime, 0.05)); ctx.onStop(() => playing.offset.setTargetAtTime(0, ac.currentTime, 0.4));
+        hissN.connect(hissG); hissG.connect(runG); crackN.connect(bp); bp.connect(crackG); crackG.connect(runG); runG.connect(out);
         // what moves the read head: the transport's lag (ch1), wow and flutter on both sides, the L/R drift on the right
         tr.connect(tSplit); [dL, dR].forEach(d => { tSplit.connect(d.parameters.get('time'), 1); wowG.connect(d.parameters.get('time')); flutG.connect(d.parameters.get('time')); });
         wowR.connect(wowG); flutR.connect(flutG); driftR.connect(driftG); driftG.connect(dR.parameters.get('time'));
