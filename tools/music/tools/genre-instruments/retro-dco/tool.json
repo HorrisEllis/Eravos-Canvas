@@ -106,5 +106,16 @@
     "eravos.xy-pad"
   ],
   "conflicts": [],
-  "status": "built"
+  "status": "built",
+  "field": {
+    "first": [
+      "cutoff",
+      "res",
+      "envAmt",
+      "pwm",
+      "lfoPitch",
+      "drive"
+    ],
+    "say": "the filter, its envelope, the pulse width, the vibrato and the drive"
+  }
 }

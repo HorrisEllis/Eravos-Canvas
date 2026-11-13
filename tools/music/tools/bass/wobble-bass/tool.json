@@ -106,5 +106,16 @@
     "eravos.xy-pad"
   ],
   "status": "built",
-  "conflicts": []
+  "conflicts": [],
+  "field": {
+    "first": [
+      "depth",
+      "formantShift",
+      "fmIndex",
+      "cutoff",
+      "wtPos",
+      "rateBend"
+    ],
+    "say": "the wobble's depth, the vowel's place, the growl, the wavetable and the rate bend"
+  }
 }

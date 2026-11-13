@@ -171,6 +171,24 @@
     }
     out.notes[i0] = tidy(compile(a0, out)); if (sel !== undefined) out.__sel = sel; return out;
   }
+  // ---- TOOL-SPECIFIC (2026-11-13, his words: "I meant tool specific. Using the dag maybe or contract"): a note's knob layers and its New-layer menu
+  // follow the playing tool — its settings' groups placed on the sound's stages (the DAG order: control · source · shape · amp · mod · fx · out,
+  // InstrumentWorkshop.stageOf) and its contract (tool.json "field": { first: [keys] — what its notes offer first, stages: { group: stage } })
+  const STAGE_ORDER = ['CONTROL', 'SOURCE', 'SHAPE', 'AMP', 'MOD', 'FX', 'OUT', 'MORE'];
+  function toolOf(d) {
+    const org = HOOK.organism && d.target ? HOOK.organism(d.target) : null, meta = org && global.Catalog && global.Catalog.meta ? global.Catalog.meta(org) : null;
+    return { org, label: (HOOK.label && d.target ? HOOK.label(d.target) : '') || (meta && meta.label) || 'its instrument', field: (meta && meta.field) || {} };
+  }
+  function knobSections(d, list) {
+    const tl = toolOf(d), IW = global.InstrumentWorkshop, first = tl.field.first || [], out = [];
+    const F = list.filter(k => first.includes(k.key)).sort((a, b) => first.indexOf(a.key) - first.indexOf(b.key)); if (F.length) out.push([String(tl.label).toUpperCase() + ' · FIRST', F]);
+    const groups = new Map(); list.filter(k => !first.includes(k.key)).forEach(k => { const st = (tl.field.stages && tl.field.stages[k.group]) || (IW && IW.stageOf ? IW.stageOf(k.group || '', true) : 'MORE'), key = st + (k.group ? ' · ' + k.group : '');
+      if (!groups.has(key)) groups.set(key, { st, ks: [] }); groups.get(key).ks.push(k); });
+    [...groups.entries()].sort((a, b) => STAGE_ORDER.indexOf(a[1].st) - STAGE_ORDER.indexOf(b[1].st)).forEach(([key, g]) => out.push([key, g.ks]));
+    return out;
+  }
+  const knobStage = (d, key) => { const k = (d.knobs || []).find(q => q.key === key); if (!k) return 'MORE'; const tl = toolOf(d), IW = global.InstrumentWorkshop;
+    return (tl.field.first || []).includes(key) ? String(tl.label).toUpperCase() : (tl.field.stages && tl.field.stages[k.group]) || (IW && IW.stageOf ? IW.stageOf(k.group || '', true) : 'MORE') + (k.group ? ' · ' + k.group : ''); };
   // ---- LAYERS (2026-11-13, his words: "make sure we can edit, change and manipulate layers in workshop. Let's get that finished.")
   // what each layer can do (the canvas offers it: the eye, amount, rename, duplicate, delete, reset, order, copy / paste) and the note's
   // fields a value layer holds (what its copy / paste / reset carry)
@@ -231,7 +249,7 @@
   function drawNav(g, W, top, d) {
     const G = navGeom(d, W, top), sel = d.sel | 0, black = (n) => [1, 3, 6, 8, 10].includes(((n % 12) + 12) % 12);
     g.fillStyle = '#06090e'; g.fillRect(0, 0, W, top);
-    g.fillStyle = '#5a7a96'; g.font = '10px monospace'; g.fillText('NOTES · ' + G.ns.length + (d.drums ? ' · PADS' : '') + '   click a note to open it · click an empty spot to add one · [ ] step', 10, 14);
+    g.fillStyle = '#5a7a96'; g.font = '10px monospace'; g.fillText('NOTES · ' + G.ns.length + (d.drums ? ' · PADS' : '') + '   click a note to open it · an empty spot adds one · E erase · G drag the end (longer), the note (move), Shift (thicker) · [ ] step', 10, 14);
     g.textAlign = 'right'; g.fillStyle = '#7fdcff'; g.fillText((NAV_OPEN ? '▴ fold' : '▾ open') + ' (N)', W - 10, 14); g.textAlign = 'left';
     if (!NAV_OPEN) { G.ns.forEach((x, i) => { g.fillStyle = i === sel ? '#00d4ff' : 'rgba(0,212,255,0.4)'; g.fillRect(G.X(x.s), 20, Math.max(2, G.X(x.s + x.l) - G.X(x.s) - 1), 5); });
       g.strokeStyle = '#16243a'; g.beginPath(); g.moveTo(0, top - 0.5); g.lineTo(W, top - 0.5); g.stroke(); return; }
@@ -242,14 +260,63 @@
     for (let st = 0; st <= G.end; st += 4) { g.strokeStyle = st % 16 === 0 ? '#1e3050' : '#111a28'; g.beginPath(); g.moveTo(G.X(st) + 0.5, G.y0); g.lineTo(G.X(st) + 0.5, G.y0 + G.h); g.stroke(); }
     // the notes
     G.ns.forEach((x, i) => { const on = i === sel, xx = G.X(x.s), ww = Math.max(3, G.X(x.s + x.l) - xx - 1), yy = G.Y(x.n), hh = Math.max(3, G.rh - 1);
+      const dep = (x.b && x.b.osc && x.b.osc.depth) || 0; if (dep > 0) { g.fillStyle = 'rgba(0,212,255,0.12)'; g.fillRect(xx, G.Y(x.n + dep), ww, Math.max(hh, G.Y(x.n - dep) + G.rh - G.Y(x.n + dep))); }   // 2026-11-13 its pitch width
+      ((x.x && x.x.iv) || []).forEach(iv => { const yv = G.Y(x.n + iv); if (yv >= G.y0 - 1 && yv <= G.y0 + G.h) { g.strokeStyle = 'rgba(0,212,255,0.45)'; g.strokeRect(xx + 0.5, yv + 0.5, ww - 1, Math.max(2, hh - 1)); } });   // its voices
       g.shadowColor = '#00d4ff'; g.shadowBlur = on ? 10 : 0; g.fillStyle = on ? '#00d4ff' : 'rgba(0,212,255,' + (0.3 + 0.4 * x.v) + ')'; g.fillRect(xx, yy, ww, hh); g.shadowBlur = 0;
       if (x.sh || x.x || x.b || x.c) { g.fillStyle = on ? '#06090e' : '#ff4fd8'; g.fillRect(xx + 1, yy + 1, 3, Math.max(2, hh - 2)); }
       if (on) { g.strokeStyle = '#e8fbff'; g.lineWidth = 1; g.strokeRect(xx + 0.5, yy + 0.5, ww - 1, hh - 1); }
       if (ww > 34 && hh >= 9) { g.fillStyle = on ? '#031018' : '#cfefff'; g.font = '9px monospace'; g.fillText(d.drums ? 'pad ' + x.n : nameOf(x.n), xx + 6, yy + hh - 2); } });
     g.strokeStyle = '#16243a'; g.beginPath(); g.moveTo(0, top - 0.5); g.lineTo(W, top - 0.5); g.stroke();
   }
-  function pickNav(d, x, y, W, H) {
+  // 2026-11-13 (his words: "erasing parts of the notes or patterns. Making it thicker or thinner, longer." · thickness: "Maybe options for it? Or
+  // pitch width."): on the open map, ERASE (E) cuts out what it passes over (a note may split in two); MOVE (G) drags a note's end (longer /
+  // shorter), its start, or the whole note (time and pitch); Shift + MOVE up / down makes it thicker / thinner — what thickness is, the options
+  // bar says (THICKNESS: pitch width — its oscillation's width, the default · loudness — its velocity · voices — notes stacked on it)
+  const THICK = ['pitch width', 'loudness', 'voices'], LADDER = [[], [12], [7, 12], [7, 12, 19], [7, 12, 19, 24]];
+  const thickOf = (d) => THICK.includes(d.thick) ? d.thick : (() => { try { const v = global.localStorage.getItem('eravos.field.thick'); return THICK.includes(v) ? v : d.drums ? 'loudness' : THICK[0]; } catch (e) { return d.drums ? 'loudness' : THICK[0]; } })();   // a pad has no pitch to widen: loudness
+  function mapDrag(d, tool, pts, W, H, o) {
+    if (!NAV_OPEN || (tool !== 'erase' && tool !== 'move')) return null;
+    const top = navTop(H), G = navGeom(d, W, top), toSt = (x) => (x - G.x0) / G.w * G.end, toN = (y) => G.hi - Math.floor((y - G.y0) / G.rh), snap = (v) => Math.round(v * 4) / 4;
+    if (tool === 'erase') {   // each point of the stroke takes half a step either side on its row
+      const rows = new Map(); pts.forEach(([x, y]) => { const st = toSt(x), n = toN(y); if (!rows.has(n)) rows.set(n, []); rows.get(n).push([st - 0.5, st + 0.5]); });
+      const cuts = []; rows.forEach((iv, n) => { iv.sort((a, b) => a[0] - b[0]).forEach(c => { const l = cuts.length && cuts[cuts.length - 1]; if (l && l[0] === n && c[0] <= l[2]) l[2] = Math.max(l[2], c[1]); else cuts.push([n, c[0], c[1]]); }); });
+      return { key: 'mapEdit', value: { op: 'erase', cuts }, label: 'Erase parts of notes' };
+    }
+    const [x0, y0] = pts[0], [x1, y1] = pts[pts.length - 1], st0 = toSt(x0), n0 = toN(y0);
+    const i = (d.notes || []).findIndex(q => q.n === n0 && st0 >= q.s - 0.6 && st0 <= q.s + q.l + 0.6); if (i < 0) return null;
+    const q = d.notes[i], dSt = toSt(x1) - st0, dN = toN(y1) - n0, grip = Math.max(0.5, Math.min(2, q.l * 0.25));
+    if (o.shift) return { key: 'mapEdit', value: { op: 'thick', i, by: (y0 - y1) / 20 }, label: 'Thicker / thinner (' + thickOf(d) + ')' };
+    if (st0 >= q.s + q.l - grip) return { key: 'mapEdit', value: { op: 'len', i, l: Math.max(0.25, snap(q.l + dSt)) }, label: 'Longer / shorter' };
+    if (st0 <= q.s + grip && q.l > 1) { const ns = clamp(snap(q.s + dSt), 0, q.s + q.l - 0.25); return { key: 'mapEdit', value: { op: 'start', i, s: ns, l: q.s + q.l - ns }, label: 'Move the start' }; }
+    return { key: 'mapEdit', value: { op: 'move', i, s: clamp(snap(q.s + dSt), 0, Math.max(0, G.end - 0.25)), n: clamp(q.n + dN, 0, 127) }, label: 'Move the note' };
+  }
+  function mapEdit(out, v) {
+    const N = out.notes;
+    if (v.op === 'erase') {
+      const keep = N[clamp(out.sel | 0, 0, Math.max(0, N.length - 1))], res = [];
+      N.forEach(q => { let segs = [[q.s, q.s + q.l]];
+        v.cuts.filter(c => c[0] === q.n).forEach(([, a, b]) => { segs = segs.flatMap(([u, w]) => (b <= u || a >= w) ? [[u, w]] : [[u, Math.max(u, a)], [Math.min(w, b), w]].filter(([p2, r2]) => r2 - p2 >= 0.125)); });
+        segs.forEach(([u, w]) => { const c = JSON.parse(JSON.stringify(q)); c.s = Math.round(u * 192) / 192; c.l = Math.round((w - u) * 192) / 192; c._was = q === keep; res.push(c); }); });
+      res.sort((a, b) => a.s - b.s || a.n - b.n); const si = res.findIndex(c => c._was); res.forEach(c => { delete c._was; });
+      out.notes = res; out.sel = si >= 0 ? si : clamp(out.sel | 0, 0, Math.max(0, res.length - 1)); out.at = null; return out;
+    }
+    const q = N[v.i]; if (!q) return null;
+    if (v.op === 'len') q.l = v.l;
+    else if (v.op === 'start') { q.s = v.s; q.l = v.l; }
+    else if (v.op === 'move') { q.s = v.s; q.n = v.n; }
+    else if (v.op === 'thick') {
+      const mode = thickOf(out);
+      if (mode === 'loudness') q.v = clamp(Math.round((q.v + v.by * 0.05) * 100) / 100, 0.05, 1);
+      else if (mode === 'voices') { const iv = JSON.stringify((q.x && q.x.iv) || []), k0 = Math.max(0, LADDER.findIndex(L => JSON.stringify(L) === iv)), k = clamp(k0 + Math.round(v.by / 2), 0, LADDER.length - 1);
+        q.x = Object.assign({}, q.x); if (k) q.x.iv = LADDER[k].slice(); else delete q.x.iv; if (!Object.keys(q.x).length) delete q.x; }
+      else { const o0 = (q.b && q.b.osc) || {}, dep = clamp(Math.round(((o0.depth || 0) + v.by * 0.25) * 100) / 100, 0, 12);
+        if (dep > 0) q.b = Object.assign({}, BEND0, q.b, { osc: Object.assign({}, OSC0, o0, { depth: dep }) }); else if (q.b) { q.b = Object.assign({}, q.b); delete q.b.osc; } tidy(q); }
+    } else return null;
+    out.notes = N.map(x => x); const moved = q; out.notes.sort((a, b) => a.s - b.s || a.n - b.n); out.sel = out.notes.indexOf(moved); out.at = null; return out;
+  }
+  function pickNav(d, x, y, W, H, o) {
     const top = navTop(H); if (y > top) return null;
+    if (NAV_OPEN && o && (o.tool === 'erase' || o.tool === 'move') && y > 22) return null;   // the map's own edits (above) take the hand
     if (y < 20 && x > W - 120) return { run: navToggle };
     const G = navGeom(d, W, top), st = (x - G.x0) / G.w * G.end, n = NAV_OPEN ? G.hi - Math.floor((y - G.y0) / G.rh) : null;
     let best = -1, bd = 1e9; G.ns.forEach((q, i) => { const dx = st < q.s ? q.s - st : st > q.s + q.l ? st - q.s - q.l : 0, dy = n === null ? 0 : Math.abs(q.n - n) * 0.6; if (dx + dy < bd) { bd = dx + dy; best = i; } });
@@ -325,10 +392,10 @@
       out.push({ label: 'SAVE PATTERN', name: 'Save the pattern to the rhythm library', keys: 'Mod+Shift+S', hint: 'keep the whole pattern in the rhythm library (Patterns › Yours) — it plays in any key, on any song', disabled: !(d.notes || []).length || !(global.MusicParts && global.MusicParts.PF_LIB && global.MusicParts.PF_LIB.saveNotes),
         run: (doc) => { const nm = global.MusicParts.PF_LIB.saveNotes(doc.name && !/^New pattern/.test(doc.name) ? doc.name : '', doc.notes, { drums: !!doc.drums, tool: HOOK.organism ? HOOK.organism(doc.target) : null }); return 'saved “' + nm + '” to the rhythm library (Yours)'; } });
       if (a) out.push({ label: '✕ NOTE', name: 'Take this note away', keys: 'Shift+Delete', key: 'delNote', value: true, hint: 'remove the open note from the pattern' });
-      if (!a) { out.push({ label: 'RHYTHMS', name: 'Open the rhythm library', keys: 'R', hint: 'pick a rhythm and put it into this pattern (⇥ Into the Workshop)', disabled: !global.PatternLibrary, run: () => { global.PatternLibrary.open({ tab: 'patterns', reopen: true }); return ''; } }); return out; }
+      if (!a) { out.push({ label: 'RHYTHMS', name: 'Open the rhythm library', keys: 'R', hint: 'pick a rhythm and put it into this pattern (⇥ Into the Field)', disabled: !global.PatternLibrary, run: () => { global.PatternLibrary.open({ tab: 'patterns', reopen: true }); return ''; } }); return out; }
       out.push({ label: 'SAVE NOTE', name: 'Save to the note library', keys: 'Mod+S', strip: true, icon: '⤓', hint: 'keep this note — how it moves and plays — in the note library (Patterns › Notes); it fits any note of any tool', disabled: !global.NoteLibrary,
         run: (doc) => { const x0 = noteOf(doc); const nm = (doc.drums ? 'pad ' + x0.n : nameOf(x0.n)) + ' · ' + (global.NoteLibrary.describe({ note: x0 }) || 'note'); global.NoteLibrary.save(x0, nm, { tool: HOOK.label ? HOOK.label(doc.target) : '' }); return 'saved “' + nm + '” to the note library'; } });
-      out.push({ label: 'RHYTHMS', name: 'Open the rhythm library', keys: 'R', hint: 'pick a rhythm and put it into this pattern (⇥ Into the Workshop)', disabled: !global.PatternLibrary, run: () => { global.PatternLibrary.open({ tab: 'patterns', reopen: true }); return ''; } });
+      out.push({ label: 'RHYTHMS', name: 'Open the rhythm library', keys: 'R', hint: 'pick a rhythm and put it into this pattern (⇥ Into the Field)', disabled: !global.PatternLibrary, run: () => { global.PatternLibrary.open({ tab: 'patterns', reopen: true }); return ''; } });
       out.push({ label: 'LIBRARY', name: 'Open the note library', keys: 'Shift+L', hint: 'Patterns › Notes', disabled: !global.PatternLibrary, run: () => { global.PatternLibrary.open({ tab: 'notes' }); return ''; } });
       const N = (d.notes || []).length, si = d.sel | 0;
       out.push({ label: '◂ NOTE', name: 'Previous note', keys: '[', key: 'sel', value: Math.max(1, si), disabled: si <= 0 });
@@ -379,12 +446,12 @@
         { key: 'x.ht', label: 'Timing', type: 'number', min: 0, max: 60, step: 1, unit: '± ms' }, { key: 'x.hv', label: 'Velocity', type: 'number', min: 0, max: 40, step: 1, unit: '± %' }] });
       // SHAPE: what this note moves over its life, each a tree of modulators (▾ INTO to shape it)
       const M = MT();
-      Object.keys(T).forEach(t => { const r = targetInfo(d, t, a), g0 = T[t]; L.push({ id: 'T:' + t, group: 'SHAPE · WHAT IT MOVES', type: 'curve', label: (g0.name || r.label + ' curve') + (g0.off ? ' (off)' : g0.amt !== undefined && g0.amt < 1 ? ' · ' + Math.round(g0.amt * 100) + ' %' : ''),   // 2026-11-12: not a second "Pitch" beside the note's pitch (his: "no duplicates in the ui")
+      Object.keys(T).forEach(t => { const r = targetInfo(d, t, a), g0 = T[t]; L.push({ id: 'T:' + t, group: 'SHAPE · ' + (t === 'pitch' ? 'PITCH' : knobStage(d, t.slice(2))), type: 'curve', label: (g0.name || r.label + ' curve') + (g0.off ? ' (off)' : g0.amt !== undefined && g0.amt < 1 ? ' · ' + Math.round(g0.amt * 100) + ' %' : ''),   // 2026-11-12: not a second "Pitch" beside the note's pitch (his: "no duplicates in the ui")
         sub: (M ? M.count(T[t]) : 0) + ' mods · ' + (M ? M.depthOf(T[t]) : 0) + ' deep — ▾ INTO', fields: [] }); });
       // ITS KNOBS: any knob of the instrument set for this note only (an envelope per note: its attack, its release …)
-      Object.keys(a.p || {}).forEach(k => { const kn = knobOf(d, k); if (!kn) return; L.push({ id: 'P:' + k, group: 'ITS KNOBS · THIS NOTE ONLY', type: 'value', label: kn.label, sub: a.p[k] + (kn.unit ? ' ' + kn.unit : '') + ' (the instrument: ' + kn.val + ')', fields: [{ key: 'p.' + k, label: kn.label, type: 'number', min: kn.min, max: kn.max, step: (kn.max - kn.min) / 200 || 0.01, unit: kn.unit }] }); });
+      Object.keys(a.p || {}).forEach(k => { const kn = knobOf(d, k); if (!kn) return; L.push({ id: 'P:' + k, group: 'THIS NOTE ONLY · ' + knobStage(d, k), type: 'value', label: kn.label, sub: a.p[k] + (kn.unit ? ' ' + kn.unit : '') + ' (the instrument: ' + kn.val + ')', fields: [{ key: 'p.' + k, label: kn.label, type: 'number', min: kn.min, max: kn.max, step: (kn.max - kn.min) / 200 || 0.01, unit: kn.unit }] }); });
       const freeK = (d.knobs || []).filter(k => !(a.p && a.p[k.key] !== undefined));
-      if (freeK.length) L.push({ id: 'setknob', group: 'ITS KNOBS · THIS NOTE ONLY', type: 'value', label: '＋ Set a knob for this note', sub: 'only this note plays with it', fields: [{ key: 'setp', label: 'Knob', type: 'enum', options: freeK.map(k => k.label) }] });
+      if (freeK.length) L.push({ id: 'setknob', group: 'THIS NOTE ONLY', type: 'value', label: '＋ Set a knob for this note', sub: 'only this note plays with it', fields: [{ key: 'setp', label: 'Knob', type: 'enum', options: freeK.map(k => k.label) }] });
       const NL = global.NoteLibrary, saved = NL ? NL.all() : [];
       L.push({ id: 'library', group: 'NOTE LIBRARY', type: 'value', label: 'From the library', sub: saved.length ? saved.length + ' saved notes — pick one to put it on this note (Ctrl+S saves this one)' : 'none yet — Ctrl+S saves this note', fields: saved.length ? [{ key: 'libApply', label: 'Put on', type: 'enum', options: ['—'].concat(saved.map(sv => sv.name)) }] : [] });
       const can = (d.drums ? [] : ['Pitch']).filter(() => !T.pitch).concat((d.knobs || []).filter(k => !T['k:' + k.key]).map(k => k.label));
@@ -396,6 +463,7 @@
       if (key === 'add' || key === 'setp') return '';
       if (key === 'libApply') return '—';
       if (key === 'bpm') return Math.round((d.bpm || (HOOK.bpm ? HOOK.bpm() : 120)) * 10) / 10;
+      if (key === 'thick') return thickOf(d);
       if (/^p\./.test(key) && a0) return a0.p ? a0.p[key.slice(2)] : undefined;
       if (at && a0) { const sig = signalAt(a0, at) || {}, M = MT();
         if (key === 'base.preset') return (sig.pre && sig.pre.shape) || '';
@@ -424,6 +492,8 @@
         if (Object.keys(pp).length) a0.p = pp; else delete a0.p; out.notes[i0] = a0; return out;
       }
       if (key === 'bpm') { const b = clamp(+v, 40, 240); if (!isFinite(b)) return d; out.bpm = b; return out; }
+      if (key === 'mapEdit') return mapEdit(out, v || {}) || d;
+      if (key === 'thick') { if (!THICK.includes(v)) return d; out.thick = v; try { global.localStorage.setItem('eravos.field.thick', v); } catch (e) {} return out; }
       if (key === 'loadPattern') { if (!v || !Array.isArray(v.notes) || !v.notes.length) return d; out.notes = v.notes.map(n => JSON.parse(JSON.stringify(n))); out.sel = 0; out.at = null; out.ab = null; return out; }
       if (key === 'instrument') {
         let id = String(v || ''); if (!id) return d;
@@ -520,12 +590,12 @@
     // for this note only — the same edits as the ＋ rows, made reachable as layers are in an image editor
     addable(d) {
       const a = noteOf(d); if (!a || shapeAt(d)) return []; const T = (a.sh && a.sh.t) || {}, out = [], K2 = d.knobs || [];
-      if (MT()) { if (!d.drums && !T.pitch) out.push({ section: 'SHAPE OVER THE NOTE', label: 'Pitch', name: 'New layer: pitch', key: 'add', value: 'Pitch', hint: 'a curve — bends, vibrato, drift' });
-        K2.filter(k => !T['k:' + k.key]).forEach(k => out.push({ section: 'SHAPE OVER THE NOTE', label: k.label, name: 'New layer: ' + k.label, key: 'add', value: k.label, hint: 'this knob moves over the note' })); }
-      if (MT()) { const tl = (t) => t === 'pitch' ? 'Pitch' : ((K2.find(k => 'k:' + k.key === t) || {}).label);
-        (d.drums ? [] : ['pitch']).concat(K2.map(k => 'k:' + k.key)).forEach(t => { const lab = tl(t); if (!lab) return;
-          out.push({ section: 'MODULATE', label: lab, name: 'Add a modulator to ' + lab, key: 'modTo', value: lab, hint: T[t] ? 'another modulator on it' : 'shape it and add a modulator (a sine — its rate and depth can be shaped too)' }); }); }
-      K2.filter(k => !(a.p && a.p[k.key] !== undefined)).forEach(k => out.push({ section: 'SET FOR THIS NOTE ONLY', label: k.label, name: 'Set ' + k.label + ' for this note', key: 'setp', value: k.label, hint: 'one value, only this note plays with it' }));
+      // the tool's own sections (its contract's FIRST, then its stages in the sound's order — knobSections); each title starts with what it does
+      if (MT()) { if (!d.drums && !T.pitch) out.push({ section: 'SHAPE OVER THE NOTE · PITCH', label: 'Pitch', name: 'New layer: pitch', key: 'add', value: 'Pitch', hint: 'a curve — bends, vibrato, drift' });
+        knobSections(d, K2.filter(k => !T['k:' + k.key])).forEach(([sec, ks]) => ks.forEach(k => out.push({ section: 'SHAPE OVER THE NOTE · ' + sec, label: k.label, name: 'New layer: ' + k.label, key: 'add', value: k.label, hint: 'this knob moves over the note' }))); }
+      if (MT()) { if (!d.drums) out.push({ section: 'MODULATE · PITCH', label: 'Pitch', name: 'Add a modulator to Pitch', key: 'modTo', value: 'Pitch', hint: T.pitch ? 'another modulator on it' : 'shape it and add a modulator (a sine — its rate and depth can be shaped too)' });
+        knobSections(d, K2).forEach(([sec, ks]) => ks.forEach(k => out.push({ section: 'MODULATE · ' + sec, label: k.label, name: 'Add a modulator to ' + k.label, key: 'modTo', value: k.label, hint: T['k:' + k.key] ? 'another modulator on it' : 'shape it and add a modulator (a sine — its rate and depth can be shaped too)' }))); }
+      knobSections(d, K2.filter(k => !(a.p && a.p[k.key] !== undefined))).forEach(([sec, ks]) => ks.forEach(k => out.push({ section: 'SET FOR THIS NOTE ONLY · ' + sec, label: k.label, name: 'Set ' + k.label + ' for this note', key: 'setp', value: k.label, hint: 'one value, only this note plays with it' })));
       return out;
     },
     outline(d) { return [[0, 'SONG'], [1, 'PATTERN · ' + (d.name || 'clip'), 'pattern']].concat((d.notes || []).map((a, i) => [2, (i === (d.sel | 0) ? '▸ ' : '') + (d.drums ? 'pad ' + a.n : nameOf(a.n)) + ' @ ' + a.s, 'timing', i === (d.sel | 0) ? null : { key: 'sel', value: i + 1, label: 'Open note' }])); },
@@ -584,7 +654,7 @@
     planeDraw: true,   // 2026-11-12: a drag in 3D draws on the plane under the pen (drag gets o.norm)
     drag(d, tool, pts, W, H, o) {
       const a = noteOf(d), at = shapeAt(d), CE = global.MusicParts && global.MusicParts.curveEdit, M = MT(); o = o || {}; if (!a || !CE || !M || !pts.length) return null;
-      const top = navTop(H); if (!o.norm && pts[0][1] < top) return null;
+      const top = navTop(H); if (!o.norm && pts[0][1] < top) return mapDrag(d, tool, pts, W, H, o);
       // 2026-11-12 (his: "drawing does nothing"): at the note, a drag DRAWS — on the shape it is over (a T: layer), else the pitch (a pad: its
       // first knob); the shape is made if it is not there, and the stroke is drawn into it: one step, then the view is that shape
       if (!at) { if (o.phase !== 'end') return null; const K5 = d.knobs || [], sel = o.selected || '', ts = /^T:(.+)$/.exec(sel);
@@ -624,7 +694,7 @@
       return { key: 'stroke', value: { pts: binned.map(([x, y]) => [x, Math.round((r.lo + (r.hi - r.lo) * y) * 1000) / 1000]) }, label: 'Draw ' + atLabel(d, at, a) };
     },
     // a click on the pattern strip opens that note (the zoom from pattern scale to note scale)
-    pick(d, x, y, W, H) { return pickNav(d, x, y, W, H); },
+    pick(d, x, y, W, H, o) { return pickNav(d, x, y, W, H, o); },
     // W3f the options bar's picker: the instrument this pattern plays — any tool the piano roll can play (one on the canvas, or a new one)
     // W3h a line of help in the view: what the hand can do here
     hint(d, o) {
@@ -634,10 +704,10 @@
       const mi = /^m:\d+$/.test((o && o.selected) || '');
       return (mi ? 'Drawing the wave of the selected modulator' : 'Drawing ' + atLabel(d, at, a)) + ' — P pen · L line · D points · S smooth · G move · E erase · M adds a modulator · Backspace up · Space plays';
     },
-    bar(d) { return HOOK.bpm ? [{ key: 'bpm', label: 'TEMPO', type: 'number', min: 40, max: 240, step: 1, unit: 'BPM' }] : []; },
+    bar(d) { return (HOOK.bpm ? [{ key: 'bpm', label: 'TEMPO', type: 'number', min: 40, max: 240, step: 1, unit: 'BPM' }] : []).concat([{ key: 'thick', label: 'THICKNESS', type: 'enum', options: THICK }]); },
     picker(d) { if (!HOOK.instruments) return null; const opts = HOOK.instruments(); const has = opts.some(g2 => (g2.options || []).some(o2 => o2.value === d.target));
       return { label: 'PLAYS', key: 'instrument', value: d.target || '', hint: 'the instrument this pattern plays — pick one on the canvas, or add a new one', options: (has || !d.target ? [] : [{ value: d.target, label: (HOOK.label ? HOOK.label(d.target) : d.target) }]).concat(d.target ? [] : [{ value: '', label: '— pick an instrument —' }], opts) }; },
   };
-  function ensure() { const W = global.Workshop; if (!W) return false; if (W.kinds().includes(KIND.id)) return true; const r = W.addKind(KIND); if (!r.ok) console.error('Timeline: the Workshop refused the notes kind —', r.problems.join('; ')); return r.ok; }
+  function ensure() { const W = global.Workshop; if (!W) return false; if (W.kinds().includes(KIND.id)) return true; const r = W.addKind(KIND); if (!r.ok) console.error('Timeline: the Field refused the notes kind —', r.problems.join('; ')); return r.ok; }
   global.EravosTimelineWorkshop = { KIND, ensure, curve, bind, navGeom, navTop, get navOpen() { return NAV_OPEN; } };
 })(typeof window !== 'undefined' ? window : globalThis);

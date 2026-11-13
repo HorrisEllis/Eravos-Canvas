@@ -70,8 +70,13 @@
         T.bpm = m.bpm; const start = (w.from - 1) * 16; T.renderTicks(start, start + w.bars * 16, 0.05);
         const buf = await ctx.startRendering();
         let pk = 0; for (let c = 0; c < buf.numberOfChannels; c++) { const d = buf.getChannelData(c); for (let i = 0; i < d.length; i++) { const a = Math.abs(d[i]); if (a > pk) pk = a; } }
-        if (pk > 1e-4) { const k = 0.89 / pk; for (let c = 0; c < buf.numberOfChannels; c++) { const d = buf.getChannelData(c); for (let i = 0; i < d.length; i++) d[i] *= k; } }   // −1 dB
-        const out = { buf, from: w.from, bars: w.bars, barSec, silent: pk <= 1e-4 };
+        // 2026-11-13 (his words: "I cant hear some of them in the preview"): previews are levelled by LOUDNESS, not by their highest peak — a song
+        // with sharp peaks (measured: one at 17 dB over its average) played ~7 dB under the rest. To −14 dB RMS (at most ×4 over the peak's
+        // level), the few peaks above −1 dB rounded by a soft clip. Only the preview; the song plays as written.
+        if (pk > 1e-4) { let e = 0, n = 0; for (let c = 0; c < buf.numberOfChannels; c++) { const d = buf.getChannelData(c); for (let i = 0; i < d.length; i++) { e += d[i] * d[i]; n++; } }
+          const kPeak = 0.89 / pk, rmsAfter = Math.sqrt(e / Math.max(1, n)) * kPeak, want = Math.pow(10, -14 / 20), k = kPeak * Math.max(1, Math.min(4, want / Math.max(1e-6, rmsAfter))), T = 0.89, R = 1 - T;
+          for (let c = 0; c < buf.numberOfChannels; c++) { const d = buf.getChannelData(c); for (let i = 0; i < d.length; i++) { const x = d[i] * k, a = Math.abs(x); d[i] = a <= T ? x : Math.sign(x) * (T + R * Math.tanh((a - T) / R)); } } }
+        const out = { buf, from: w.from, bars: w.bars, barSec, silent: pk <= 1e-4, peak: pk };   // peak: before the −1 dB levelling (the song audit reads it)
         sounds.set(s.id, out); if (sounds.size > 12) sounds.delete(sounds.keys().next().value); return out;
       } finally { try { global.OrganismFactory.clearAll(K); } catch (e) {} busy.delete(s.id); }
     })();

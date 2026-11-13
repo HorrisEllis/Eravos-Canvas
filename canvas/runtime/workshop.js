@@ -28,7 +28,7 @@
  *   outline(doc)? → [[depth, text, layerId?, { key, value, label }?]] (a click selects the layer and makes the edit — e.g. opens that item), status(doc)? → [[label, value]], tools? [{ id, label, glyph, layer? }],
  *   addable(doc)? → [{ section?, label, key, value, hint? }] — the layers that can be made: ＋ on LAYERS, Ctrl+Shift+N, right-click › NEW LAYER
  *     (each an edit; his words, 2026-11-12: "why cant i add layers?"),
- *   pick(doc, x, y, W, H)? → a key/value edit for a click in the viewport (the kind decides what a click means),
+ *   pick(doc, x, y, W, H, { selected, tool })? → a key/value edit for a click in the viewport (the kind decides what a click means; a tool may take it),
  *   actions(doc)? → [{ label, hint, run(doc) → words to show }] (buttons in the bar: where the document can go — the kind says) }
  * Layer types the surface knows (it draws their badges; a kind says what they mean): constraint · curve · value · events · emergent. */
 (function (global) {
@@ -224,7 +224,7 @@
       { label: exploded ? 'Stack the layers flat' : 'Spread the layers apart', keys: 'Shift+E', run: () => { exploded = !exploded; chips(); draw(); } },
       { label: wire ? 'Lit' : 'Wire', keys: 'W', run: () => { wire = !wire; chips(); draw(); } }];
     const histItems = () => [{ section: 'EDIT' }, { label: 'Undo' + (past.length ? '' : ''), keys: 'Mod+Z', disabled: !past.length, run: undo }, { label: 'Redo', keys: 'Mod+Shift+Z', disabled: !future.length, run: redo },
-      ...((o.onApply || K.apply) ? [{ label: 'Apply — write it back', keys: 'Mod+Enter', run: apply }] : []), { label: 'Close the Workshop', keys: 'Esc', run: () => close() }];
+      ...((o.onApply || K.apply) ? [{ label: 'Apply — write it back', keys: 'Mod+Enter', run: apply }] : []), { label: 'Close the Field', keys: 'Esc', run: () => close() }];
     function menu(x, y, items, title) {
       const CM = global.ContextMenu; if (!CM || !CM.show) return;
       CM.show(x, y, items.map(it => it.section || it.sep ? it : Object.assign({}, it, { label: it.label, keys: it.keys ? KEYS(it.keys) : '', run: it.run || (() => runAct(it)) })), title);
@@ -257,11 +257,11 @@
       const L = layers(); if (!selected || !layerOf(selected)) selected = (L.find(l => l.fields && l.fields.length) || L[0] || {}).id || null;
       const sel = layerOf(selected), title = (o.title || (K.title ? K.title(d) : K.label));
       // the bar: the name and the path (where this document sits; click to go up) — nothing else
-      bar.replaceChildren(el('span', 'ws-name', [], { text: 'WORKSHOP' }), el('span', 'ws-sep'),
+      bar.replaceChildren(el('span', 'ws-name', [], { text: 'FIELD' }), el('span', 'ws-sep'),
         el('span', 'ws-stations', (K.stations ? K.stations(d) : [K.label]).map((s, i, a) => el('span', 'ws-st' + (i === a.length - 1 ? ' on' : '') + (K.stationKey && i < a.length - 1 ? ' go' : ''), [el('i', '', [], { text: String(i + 1).padStart(2, '0') }), String(s)],
           K.stationKey && i < a.length - 1 ? { title: 'go up to ' + s + ' (Backspace: one level up)', onclick: () => edit(K.stationKey, i, 'GO TO ' + s) } : {}))),
         el('span', 'ws-acts', acts().filter(a => a.strip).map(a => el('button', 'ws-ab', [], { type: 'button', text: a.icon || '•', disabled: !!a.disabled, title: nameOf(a) + (a.keys ? '  (' + KEYS(a.keys) + ')' : '') + (a.hint ? ' — ' + a.hint : ''), onclick: () => runAct(a) }))
-          .concat([el('button', 'ws-ab ws-close', [], { type: 'button', text: '✕', title: 'Close the Workshop (Esc) — your changes are already in place', onclick: () => close() })])));
+          .concat([el('button', 'ws-ab ws-close', [], { type: 'button', text: '✕', title: 'Close the Field (Esc) — your changes are already in place', onclick: () => close() })])));
       // the options bar: what the current tool works on, and the view
       // the options bar: the kind's picker (what the document plays on, its owner's choice — e.g. an instrument), then the view. Nothing that
       // the panels already say (the selected layer is PROPERTIES' to show).
@@ -376,7 +376,7 @@
         if (hit && locked.has(hit.id)) { selected = hit.id; return refuse('LOCKED — unlock it (/) to draw on it'); }
         if (hit) { if (selected !== hit.id) { selected = hit.id; render(); } stroke = { pts: [[x, y]], plane: hit, uv: [onPlane(hit, x, y)] }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} return; } }
       if (mode === '3d' && K.drawLayer) { orbit = { x: e.clientX, y: e.clientY, yaw: cam.yaw, pitch: cam.pitch }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} return; }
-      const p = K.pick ? K.pick(d, x, y, r.width, r.height, { selected }) : null; if (p && p.run) { try { p.run(); } catch (er) { console.error(er); } render(); return; } if (p && p.key !== undefined) return edit(p.key, p.value, p.label);
+      const p = K.pick ? K.pick(d, x, y, r.width, r.height, { selected, tool }) : null; if (p && p.run) { try { p.run(); } catch (er) { console.error(er); } render(); return; } if (p && p.key !== undefined) return edit(p.key, p.value, p.label);
       if ((K.drag && CURVE_TOOLS.includes(tool)) || (K.stroke && tool === 'pen')) { if (selected && locked.has(selected)) return refuse('LOCKED — unlock it (/) to draw on it'); }
       if (K.drag && CURVE_TOOLS.includes(tool)) { drag = { pts: [[x, y]], alt: e.altKey, shift: e.shiftKey }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} dragStep('move'); return; }
       if (K.stroke && tool === 'pen') { stroke = { pts: [[x, y]] }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} }
@@ -419,8 +419,8 @@
       // W3a: the viewport (for tests and the kind's own buttons)
       view: (o2) => { if (o2) { if (o2.mode) mode = o2.mode; if (o2.exploded !== undefined) exploded = !!o2.exploded; if (o2.wire !== undefined) wire = !!o2.wire; if (o2.cam) Object.assign(cam, o2.cam); chips(); draw(); } return { mode, exploded, wire, cam: Object.assign({}, cam), planes: planes.map(p => ({ id: p.id, poly: p.poly.map(q => q.slice()) })) }; },
       stroke: (pts) => { const r = cv.getBoundingClientRect(); const res = K.stroke ? K.stroke(d, pts, r.width, r.height, { selected }) : null; if (res && res.key !== undefined) edit(res.key, res.value, res.label); return !!res; },
-      layer: (id, op, value) => layerOp(id, op, value), layerOps: (id) => opsOf(id), locked: (id) => locked.has(id), clipboard: () => CLIP, moveBy: (id, dir) => moveBy(id, dir),
-      addable: () => addables().map(a => (a.section ? a.section + ' › ' : '') + a.label), add: (label, section) => { const a = addables().find(x => x.label === label && (!section || x.section === section)); if (!a || a.disabled) return false; edit(a.key, a.value, a.name || a.label); return true; },
+      tool: () => tool, layer: (id, op, value) => layerOp(id, op, value), layerOps: (id) => opsOf(id), locked: (id) => locked.has(id), clipboard: () => CLIP, moveBy: (id, dir) => moveBy(id, dir),
+      addable: () => addables().map(a => (a.section ? a.section + ' › ' : '') + a.label), add: (label, section) => { const a = addables().find(x => x.label === label && (!section || x.section === section || String(x.section || '').startsWith(section + ' · '))); if (!a || a.disabled) return false; edit(a.key, a.value, a.name || a.label); return true; },
       action: (label) => { const a = (K.actions ? K.actions(d, { selected }) : []).find(x => x.label === label); if (!a || a.disabled) return false; if (a.key !== undefined) edit(a.key, a.value, a.label); else a.run(clone(d)); return true; } };
     current = api; return api;
   }

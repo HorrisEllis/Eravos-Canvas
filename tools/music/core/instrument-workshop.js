@@ -138,7 +138,7 @@
       return { key: c.key, value: +clamp(val, c.min, c.max).toPrecision(8), label: c.label || c.key };
     },
   };
-  function ensure() { const W = global.Workshop; if (!W) return false; if (W.kinds().includes(KIND.id)) return true; const r = W.addKind(KIND); if (!r.ok) console.error('InstrumentWorkshop: the Workshop refused the kind —', r.problems.join('; ')); return r.ok; }
+  function ensure() { const W = global.Workshop; if (!W) return false; if (W.kinds().includes(KIND.id)) return true; const r = W.addKind(KIND); if (!r.ok) console.error('InstrumentWorkshop: the Field refused the kind —', r.problems.join('; ')); return r.ok; }
   function open(instanceId) {
     const K = KN(), rec = K && K.registry.get(instanceId); if (!rec || !ensure()) return null;
     const def = rec.descriptor, values = {};
@@ -151,7 +151,7 @@
   // right-click any tool's window › Open on the Workshop
   if (global.ContextMenu && global.ContextMenu.contribute) global.ContextMenu.contribute(({ def, instanceId }) => {
     if (!def || !global.Workshop || !groupsOf(def).length) return [];
-    return [{ label: '◇ Open on the Workshop', hint: 'its whole sound as a flow you can grab — every setting, live', run: () => open(instanceId) }];
+    return [{ label: '◇ Open on the Field', hint: 'its whole sound as a flow you can grab — every setting, live', run: () => open(instanceId) }];
   });
   global.InstrumentWorkshop = { open, KIND, ensure, stageOf, groupsOf, wiresOf, layout, STAGES, ORDER };
 })(typeof window !== 'undefined' ? window : globalThis);

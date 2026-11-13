@@ -106,5 +106,12 @@
     "eravos.xy-pad"
   ],
   "status": "built",
-  "conflicts": []
+  "conflicts": [],
+  "field": {
+    "first": [
+      "level",
+      "drive"
+    ],
+    "say": "the weight and the grit"
+  }
 }

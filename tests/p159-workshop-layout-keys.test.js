@@ -34,7 +34,7 @@ describe('P159 the Workshop: layers, keys, menus, one place for a value', () => 
       const cv = app.querySelector('.ws-canvas'), r = cv.getBoundingClientRect();
       cv.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: r.left + 300, clientY: r.top + 300 })); await TH.sleep(20);
       const cm = document.querySelector('.cm'); assert.ok(cm, 'a menu opens'); const txt = cm.textContent;
-      ['Hear it', 'Add a modulator', 'Undo', '3D view', 'Close the Workshop'].forEach(w => assert.ok(new RegExp(w, 'i').test(txt), 'the menu has ' + w));
+      ['Hear it', 'Add a modulator', 'Undo', '3D view', 'Close the Field'].forEach(w => assert.ok(new RegExp(w, 'i').test(txt), 'the menu has ' + w));
       assert.ok(cm.querySelector('.cm-k') && /Space/.test(txt), 'and each item its key'); ContextMenu.close();
       key('Escape'); await TH.sleep(10); assert.ok(!Workshop.current, 'Esc closes the Workshop');
     } finally { if (window.ContextMenu) ContextMenu.close(); if (window.Workshop && Workshop.current) Workshop.current.close(); OrganismFactory.close(id); CanvasWM.view = view0; CanvasWM.applyView(); }

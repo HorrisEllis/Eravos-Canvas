@@ -108,5 +108,16 @@
     "eravos.xy-pad"
   ],
   "conflicts": [],
-  "status": "built"
+  "status": "built",
+  "field": {
+    "first": [
+      "coupling",
+      "cluster",
+      "spread",
+      "cutoff",
+      "restless",
+      "drift"
+    ],
+    "say": "how the swarm pulls together, clusters, spreads and stays restless"
+  }
 }
