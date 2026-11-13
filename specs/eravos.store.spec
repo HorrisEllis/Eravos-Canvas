@@ -140,3 +140,28 @@ open_gaps:
 #   serves the repo's tools as before. Measured on the real tree: 1,610 files, 30 MB, first start 278 ms, later starts 17 ms.
 #   Proof: node desktop/test/library-tools.mjs 14/14 (in the release workflow). Not yet run in a built ERAVOS.exe (no Electron here).
 #   Next on this line: S1 (manifests with version, digest, needs) → S2 (the resolver) → the store repo (D1) replaces the bundle.
+
+# ---- ADDENDUM 2026-11-13 — every tool announces what it needs (from its DAG); the canvas imports it from the zip (nothing above is changed)
+#   his words (2026-11-13, verbatim): "Each component of each tool has a element for the ui to synthesis." (13:07:08Z) · "Okay. Each tool
+#   needs that. Dag. It has to anounce what it needs to the canvas. The canvas needs to import it from the zip." (13:08:14Z)
+#   Said again in his own words since 2026-11-06 ("the dependency graph tells the canvas what elements from the UI it needs") and 2026-11-08
+#   ("dag is what tells eravos canvas what it needs") — now with a new level: the COMPONENT's UI element.
+#   THE ANNOUNCEMENT (S1, extended): a tool's manifest says, generated from its DAG and never hand-written —
+#     needs.components  [osc-va@^1, filter-svf@^1, …]   from the spec's dag: (build/spec-dag.mjs computes it today)
+#     needs.elements    [osc-va.element@1, filter-svf.element@1, …]   each component's own UI element (its controls, as data + its draw code)
+#                       — the parts the tool's UI is synthesised from (specs/eravos.ui-field.spec ADDENDUM 2026-11-13 (2))
+#     needs.ui          [kit.knob@1, kit.segmented@1, …]  the canvas's kit elements it calls (build/ui-needs.mjs, as specced above)
+#     needs.domain · needs.canvas · needs.permissions   as above
+#     Today (measured): tool.json needs = { units, tools, permissions } only — no components, elements, versions.
+#   IMPORT FROM THE ZIP (S3 extended; S3 today serves an UNPACKED copy of the bundled tools/ folder):
+#     I1  the canvas reads a zip's manifest WITHOUT running any of its code; builds the graph (S2's resolver) from manifests only
+#     I2  each needed component's zip, and its element, imported before the tool (topological order); a missing one: refused in words
+#         ("Retro DCO needs the ladder filter's element 1.x"), never half-loaded on screen
+#     I3  the zip's digest checked; unpacked to Documents\ERAVOS\<kind>\<id>@<version>\ (decision D5) and served from there, as S3 serves
+#         tools today; the zip is kept beside it as the original
+#     I4  the bundled tools/ (S3) becomes zips: each tool, each component, its element — the app folder ships zips, the library imports them;
+#         a session can prove I1–I4 with no store repo (D1's repo comes after)
+#   decisions (his call): D5 unpack into the library (proposed: editable, as your edits are kept today) or run straight from inside the zip
+#     (nothing to unpack; edits impossible) · D6 a component's element: one per component (proposed) or several (a compact and a full one)
+#   order: CG1 (ports + variables + element, as data, per component) = S1's component half → S1 for tools (the announcement, generated) →
+#     S2 the resolver → I1–I4 → the store repo (D1).

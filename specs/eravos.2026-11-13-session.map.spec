@@ -52,3 +52,16 @@
 ## (after 12:42:48Z) — verbatim:
   > yes that works
   - BUILT 3.178 (BC1): the Field → tools/core/field/; the canvas the host only (tests/bare-canvas.test.mjs); validate in CI
+
+## 13:07:08Z (2026-11-13T13:07:08.971Z) — verbatim:
+  > Each component of each tool has a element for the ui to synthesis. Should we call Eravos 2: synthesis, or field?
+  - RULE (specced): every component carries its own UI element; a tool's UI is synthesised from its components' elements —
+    specs/eravos.ui-field.spec ADDENDUM 2026-11-13 (2) · specs/eravos.components.spec ADDENDUM 2026-11-13 (2)
+  - the name: recommended "ERAVOS 2: Synthesis" (Field stays the surface inside it); his next message began "Okay." — recorded as
+    proposed, to confirm (docs/eravos-v2-emerge-looking-glass.md ADDENDUM 2026-11-13 (2))
+
+## 13:08:14Z (2026-11-13T13:08:14.110Z) — verbatim:
+  > Okay. Each tool needs that. Dag. It has to anounce what it needs to the canvas. The canvas needs to import it from the zip.
+  - RULE (specced): every tool announces what it needs — generated from its DAG: its components (each bringing its element), the canvas's
+    kit elements, its domain — and the canvas imports it from the tool's zip: specs/eravos.store.spec ADDENDUM 2026-11-13 (S1 and S3 extended:
+    the announcement; I1–I4: import from the zip) · specs/eravos.compat-graph.spec ADDENDUM 2026-11-13

@@ -71,6 +71,27 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-13 · Decisions: a UI element per component; every tool announces its needs; the canvas imports from the zip — specs only
+_Decisions and specs only: nothing below is built yet._
+- **His words (2026-11-13, UTC):** "Each component of each tool has a element for the ui to synthesis. Should we call Eravos 2: synthesis,
+  or field?" (13:07:08) · "Okay. Each tool needs that. Dag. It has to anounce what it needs to the canvas. The canvas needs to import it
+  from the zip." (13:08:14)
+- **His calls:** every component carries its own UI element, and a tool's UI is synthesised from them; every tool announces what it needs,
+  from its DAG; the canvas imports it from the zip. This continues a line he has held since 2026-11-06 ("the dependency graph tells the
+  canvas what elements from the UI it needs") and 2026-11-08 ("dag is what tells eravos canvas what it needs").
+- **The AI coder's proposals:**
+  - the name "ERAVOS 2: Synthesis", with Field kept as the surface inside it. His reply began "Okay."; it is recorded as proposed, to confirm.
+  - what the announcement carries: components, their elements and kit elements, generated from the DAG and never hand-written.
+  - the import steps I1–I4: read the manifest without running code → components and elements before the tool → check the digest → unpack to the library.
+  - the first proof: Retro DCO's face rebuilt from its 12 components' elements, as a preview beside today's.
+- **Still his to decide:** the name · D5 unpack into the library (editable) or run straight from the zip · D6 one element per component or
+  several.
+- **Measured first:** tool.json `needs` today holds units, tools and permissions only: no components, elements or versions. The store spec's
+  resolver (S2) and import (S3) exist as spec; S3 serves an unpacked folder today.
+- **Check:** `specs/eravos.store.spec` ADDENDUM 2026-11-13 · `specs/eravos.{ui-field,components}.spec` ADDENDA 2026-11-13 (2) ·
+  `specs/eravos.compat-graph.spec` ADDENDUM 2026-11-13 · `docs/eravos-v2-emerge-looking-glass.md` ADDENDUM 2026-11-13 (2) · register
+  R-2026-11-13-55…57
+
 ### 2026-11-13 · A part moved out of the host with nothing changed, and a rule that keeps it out — PR (BC1)
 - **His words (2026-11-13):** "i feel the workshop should be a tool on its own. like can we make the canvas more bare?" · "yes that works"
 - **His call:** the Field a tool of its own; a barer canvas.

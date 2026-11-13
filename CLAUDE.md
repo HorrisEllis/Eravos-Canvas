@@ -192,7 +192,8 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 - **Mutation, a bare canvas, dynamic UI** (2026-11-13, specced, nothing built): the compatibility graph and tools that mutate
   (`specs/eravos.compat-graph.spec`), the Field a tool and the canvas the host only (`specs/eravos.bare-canvas.spec`), UIs that merge when
   wired (`specs/eravos.ui-field.spec` ADDENDUM 2026-11-13), Bassline 2.0 (`bass-gen.spec` ADDENDUM). Not waiting for Emerge (v2 plan
-  ADDENDUM 2026-11-13). Order: BC1 ✓ → CG1 → CG2 → CG3 → the Field's swap / mutate UI (shown first) → Bassline 2.0. Map: `specs/eravos.2026-11-13-session.map.spec`.
+  ADDENDUM 2026-11-13). Every component carries its own UI element; every tool announces its needs from its DAG and the canvas imports it from the zip
+  (`specs/eravos.store.spec` ADDENDUM 2026-11-13, I1–I4). ERAVOS 2's name: "Synthesis" proposed, to confirm. Order: BC1 ✓ → CG1 (ports + variables + element) → CG2 → CG3 → the Field's swap / mutate UI (shown first) → Bassline 2.0. Map: `specs/eravos.2026-11-13-session.map.spec`.
 - Connecting with people (share as a link, remix with credit, play together, share packs) — pinned 2026-11-05.
 - Songs as a rhythm-exploring tool only (not usable for making music).
 - Patterns for each tool with variety: presets, depth, curves, per-note editing — everything the timeline can do.

@@ -95,3 +95,16 @@ open: the face size N per window size; whether IN PLAY reorders while playing or
 #   - with the compatibility graph (specs/eravos.compat-graph.spec CG5): a mutant's UI is made the same way, from its components' parts.
 #   phases: US1 parts + roles declared for three tools (Bassline, Chords, Retro DCO) — data only · US2 the merge as a preview shown to him
 #     (Bassline + Chords + Retro DCO) · US3 built (after his yes) · US4 every tool's parts (a guard: a tool without parts is listed).
+
+## ADDENDUM 2026-11-13 (2) — the element is the component's, not the tool's (his words; nothing above is changed)
+# his words (2026-11-13T13:07:08Z, verbatim): "Each component of each tool has a element for the ui to synthesis." · (13:08:14Z) "Okay. Each
+#   tool needs that. Dag."
+#   - US1 refined: the parts with roles belong to COMPONENTS. Each component ships its element (its controls as data: key, role, range,
+#     and how it draws) beside its kernel; a tool's UI = its DAG's components' elements, placed by the DAG and the constraint field. The
+#     tool adds only what is its own (its face's order, which elements open first — the tool.json "field" contract, 3.176, is the start).
+#   - so a mutant's UI needs no one to draw it (a swapped component brings its element); merged tools merge their components' elements by
+#     role (one tempo, one key); the Field lays them out as layers.
+#   - announced and imported: a tool's manifest names the elements it needs (from its DAG); the canvas imports them from the zips
+#     (specs/eravos.store.spec ADDENDUM 2026-11-13).
+#   - phases: US0 (new) elements for Retro DCO's 12 components, data only, and Retro DCO's face rebuilt from them as a PREVIEW beside today's
+#     (shown to him — his rule; today's stays the default) → US1–US4 as above.

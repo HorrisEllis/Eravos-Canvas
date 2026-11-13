@@ -52,3 +52,12 @@
 #   - order: the 33 with code first (their ports can be read off the code), then each of the 79 as it is built — its spec's ports before its
 #     code (axiom 8).
 #   - types are the domain's names (specs/eravos.compat-graph.spec › the model); for Emerge (v2) each becomes a type.
+
+## ADDENDUM 2026-11-13 (2) — every component carries its UI element
+# his words (2026-11-13T13:07:08Z, verbatim): "Each component of each tool has a element for the ui to synthesis." · (13:08:14Z) "Okay. Each
+#   tool needs that. Dag. It has to anounce what it needs to the canvas. The canvas needs to import it from the zip."
+#   - a component folder: <id>.js (kernel) · <id>.spec (now with ports:, variables:, element:) · <id>.test.mjs · <id>.element.js (NEW: its
+#     controls drawn with the canvas kit, for any tool holding it; data-driven from variables:) — and it zips as one unit with all of it.
+#   - element: in the spec: { version, controls: [{ key (a variable), role, face: true|false }], needs.ui: [kit elements] } — the tool's UI is
+#     synthesised from these (specs/eravos.ui-field.spec ADDENDUM 2026-11-13 (2)); the element never names a tool (it is the component's).
+#   - CG1 = ports + variables + element for each of the 33 components with code (Retro DCO's 12 first: its UI is the first synthesised).
