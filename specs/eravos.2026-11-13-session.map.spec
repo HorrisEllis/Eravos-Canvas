@@ -154,3 +154,15 @@
     tuning theory, synthesis, game audio, the polyvagal debate)
   - OPEN: which thing looked and sounded horrible (Embodiment Lab in the app?) · the name · "bite the hand" read right · the UI preview first
 
+## (after the research) — verbatim, in order:
+  > i didn't ask for that. show me the preview.
+  > bite the hand hand that feeds you. a song.
+  > no / no corners
+  > all one feeling
+  > no capture button or return
+  > resize to add more dynamic range.
+  > then build it.
+  - "bite the hand…": a song, like Hanging Tree — an example of sadness, not a fourth feeling
+  - PREVIEW (shown, reshaped by each answer): one feeling fills the pad; the picker; no buttons; the pad the whole window
+  - BUILT 3.187: Feelings (tools/music/tools/embodiment/feelings/) + components/ratio-set; feeling-song.spec ADDENDUM 2026-11-13 (3)
+

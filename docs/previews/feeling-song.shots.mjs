@@ -1,7 +1,7 @@
 // node docs/previews/feeling-song.shots.mjs — pictures of the Feelings pad preview in the real canvas, silent. Not built.
 import { chromium } from '../../host/driver/glass.js'; import path from 'path'; import { fileURLToPath } from 'url'; import fs from 'fs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'), OUT = ROOT + '/docs/previews';
-const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1000, height: 800 }, deviceScaleFactor: 2 });
+const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1100, height: 980 }, deviceScaleFactor: 2 });
 await p.addInitScript(() => { window.ERAVOS_CATALOG_ALL = true; });
 p.on('pageerror', e => console.log('ERR', e.message));
 await p.goto('file://' + ROOT + '/canvas/index.html?noboot'); await p.waitForFunction(() => window.Shell && window.Shell.X);

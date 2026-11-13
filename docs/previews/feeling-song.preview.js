@@ -4,7 +4,7 @@
   OrganismFactory.define({
     id: 'eravos.feeling-song', domain: 'music', version: '0.1.0', label: 'Feelings', icon: '◇', accent: '#7fb8ff',
     category: 'Embodiment', blurb: 'One pad, a feeling in each corner: drag to blend them.',
-    size: { w: 560, h: 560 }, minSize: { w: 360, h: 360 },
+    size: { w: 900, h: 820 }, minSize: { w: 420, h: 420 },
     permissions: ['audio_out', 'bus_publish', 'bus_subscribe'],
     hooks: [S.audio_out('fs.hook.audio_out')],
     config: [{ key: 'level', type: 'number', default: 0.6, min: 0, max: 1, step: 0.01, label: 'Level', group: 'OUT' }],
@@ -16,12 +16,16 @@
     const FEEL = { love: 'LOVE', anger: 'ANGER', sadness: 'SADNESS' };
     let feeling = 'sadness';
     let px = 0.62, py = 0.66, trail = [], drag = false;
-    const cv = UI.Canvas(520, 470); cv.style.width = '100%'; cv.style.flex = '1'; cv.style.cursor = 'crosshair';
+    const cv = UI.Canvas(860, 720); cv.style.width = '100%'; cv.style.flex = '1'; cv.style.cursor = 'crosshair';
     const at = (e) => { const r = cv.getBoundingClientRect(); px = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); py = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height)); };
     cv.addEventListener('pointerdown', e => { drag = true; at(e); }); window.addEventListener('pointermove', e => drag && at(e)); window.addEventListener('pointerup', () => { drag = false; });
     view.__at = (x, y, path) => { px = x; py = y; if (path) trail = path.map(p => ({ x: p[0], y: p[1], a: p[2] })); };
     UI.loop(cv, () => {
-      const g = cv.g; cv.fit(); const W = cv.W, H = cv.H || 470;
+      const g = cv.g; cv.fit();
+      // the pad fills the window: as tall as the window allows (resize the window = a bigger pad, finer control)
+      const want = Math.max(240, Math.floor(view.root.clientHeight - cv.offsetTop - 10));
+      if (Math.abs(want - cv.H) > 1) { cv.H = want; cv.style.height = want + 'px'; cv.height = want * cv.dpr; g.setTransform(cv.dpr, 0, 0, cv.dpr, 0, 0); }
+      const W = cv.W, H = cv.H;
       g.fillStyle = '#050505'; g.fillRect(0, 0, W, H);
       // the feeling's light, strongest where you are
       const gr = g.createRadialGradient(px * W, py * H, 0, px * W, py * H, Math.max(W, H) * 0.8); gr.addColorStop(0, 'rgba(127,184,255,.22)'); gr.addColorStop(1, 'rgba(127,184,255,.02)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
