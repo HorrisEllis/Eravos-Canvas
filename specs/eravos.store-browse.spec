@@ -74,3 +74,9 @@
   - D5 (his call): Ctrl+B for Browse.
 open gaps: credit and authors (connecting with people, S7); paid / free (not asked); how a pack for a tool you do not have is shown
   (proposed: listed, with "needs <tool>").
+
+# ---- ADDENDUM 2026-11-13 — SB1: the preview, shown to him (nothing above is changed; nothing built)
+#   docs/previews/store-browse.preview.js + store-browse.shots.mjs → docs/previews/browse-1-domains … browse-7-notes.png: the ＋ Add menu's own
+#   layout and classes (rail · main · detail), real data — the catalog's 5 domains and tools, Retro DCO's announcement (12 components, 12
+#   elements), its 12 component contracts drawn as its DAG with each element's face controls, its 2 packs and 12 presets, and its 14 rhythms /
+#   95 lines decomposed from 24 songs. Waiting for his yes before SB2–SB3.

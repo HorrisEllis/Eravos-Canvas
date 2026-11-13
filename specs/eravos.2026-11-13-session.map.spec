@@ -73,5 +73,5 @@
     element; build/component-contract.mjs checks each against its code) and every tool's announcement from its DAG (build/tool-needs.mjs:
     needs.components + needs.elements in 18 tool.json)
   - OPEN, specced: specs/eravos.store-browse.spec (NEW — Browse, a tool's page, whole isolated zips, the interaction contract) · store.spec
-    ADDENDUM 2026-11-13 (2)
+    ADDENDUM 2026-11-13 (2) · SB1 preview shown (docs/previews/browse-*.png), waiting for his yes
   - BUILT 3.180 (SD1): specs/eravos.song-decomposition.spec — 301 songs into parts; 3,933 rhythms and 4,607 lines per tool (build/song-decompose.mjs)
