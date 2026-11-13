@@ -101,3 +101,12 @@ lineage:  { from: [tool@version …], ops: [{ op, args, at }], by: 'him' | 'muta
   - which of his ears' verdicts feed back (keep / throw away as data the mutate op learns from — later, his call)
 acceptance (CG0): this spec, the map's numbers reproducible: grep the specs' dependencies blocks for hook types; count component specs whose
   inputs / outputs line is TO WRITE.
+
+## ADDENDUM 2026-11-13 — a component node carries its UI element; a tool announces its needs (nothing above is changed)
+# his words (2026-11-13, verbatim): "Each component of each tool has a element for the ui to synthesis." (13:07:08Z) · "Okay. Each tool needs
+#   that. Dag. It has to anounce what it needs to the canvas. The canvas needs to import it from the zip." (13:08:14Z)
+#   - component (the model above) gains element: { version, controls [{ key, role, face }], needs.ui } — a mutation that swaps a component
+#     swaps its element; the mutant's UI is synthesised, never drawn by hand.
+#   - a kept mutant is a tool like any other: its manifest announces needs (components, elements, ui, domain) generated from its DAG, and it
+#     is zipped and imported by the canvas like any tool (specs/eravos.store.spec ADDENDUM 2026-11-13).
+#   - CG1 now writes ports + variables + element (specs/eravos.components.spec ADDENDUM 2026-11-13 (2)).

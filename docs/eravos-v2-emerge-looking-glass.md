@@ -136,3 +136,17 @@ His words, 2026-11-13, in order:
   session with push access to `HorrisEllis/Nexus`; otherwise JS now, ported later.
 - Order in v1: bare canvas + the Field as a tool → the compatibility graph and mutation in the Field → Bassline's depth as the first tool
   written natively against the graph (or Bassline first).
+
+## ADDENDUM 2026-11-13 (2) — the name, and UI synthesised from components
+
+His words (2026-11-13): "Each component of each tool has a element for the ui to synthesis. Should we call Eravos 2: synthesis, or field?"
+(13:07:08Z) · "Okay. Each tool needs that. Dag. It has to anounce what it needs to the canvas. The canvas needs to import it from the zip."
+(13:08:14Z)
+
+- **The name — proposed, to confirm:** **ERAVOS 2: Synthesis**. One word for what v2 does three times: sound synthesised from components,
+  tools synthesised from components (mutation), UI synthesised from each component's element. **Field** stays the name of the surface inside
+  it (v1's editor already carries it, and the Field theme shares the word). His reply began "Okay." — recorded as proposed until he confirms.
+- **For v2:** a component's element becomes Looking Glass data (UI as typed data, its spec), its variables Emerge variables; a tool's UI is
+  composed by the compiler from its components' elements, as v1 composes it from the DAG (specs/eravos.ui-field.spec ADDENDUM 2026-11-13 (2)).
+  The announcement (a tool's needs from its DAG) and import from the zip are v1 work (specs/eravos.store.spec ADDENDUM 2026-11-13) that
+  carries over unchanged as the v2 package format.

@@ -6,7 +6,7 @@
 
 **How to read it.** Each entry is one contribution: the exact words (checked word for word against their source by `node build/competence.mjs --check`), when, who it came from, what kind of thing it was, how it developed, what came of it, and the evidence a stranger can check. **Confidence is three separate levels, never one score**: *proposed* (an idea) · *demonstrated* (built and tested here — built by the AI coder to his direction: the idea and the call are his, the code is not claimed as his) · *independently verified* (validated outside this project — none yet). **Append-only**: an entry is never edited; a correction is a new entry that amends it. Generated from `docs/competence/register.jsonl` — do not edit this page. The record before this register (merged work since 2026-10-15, with merge times): `docs/PROOF-OF-COMPETENCY.md`.
 
-**54 entries** · his: 47 (21 proposed · 26 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
+**57 entries** · his: 49 (23 proposed · 26 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
 
 ## Ideas
 _what he originated, proposed or identified_
@@ -40,6 +40,8 @@ _what he originated, proposed or identified_
 | R-2026-11-13-47 | 2026-11-13 08:39:01 UTC | “Also erasing parts of the notes or patterns. Making it thicker or thinner, longer.” | idea | Erase splits a note under the stroke; the end and start grips; thickness as options (his answer: "Maybe options for it? Or pitch width.") — pitch width, loudness, voices. | 3.176, on the Field's notes map. | `tests/p175-field-map-edits.test.js` · `PR #172` | demonstrated |
 | R-2026-11-13-50 | 2026-11-13 12:31:19 UTC | “what about have seperate ui elements for each tool that can merge automatically. dynamic ui synthesiss” | idea | UI parts with roles declared as data; wired tools merge parts that share a role (one tempo, one key), laid out in signal order by the constraint field; the Field reshapes it; unwiring splits it; a surface saves as a suite. | specs/eravos.ui-field.spec ADDENDUM 2026-11-13 (US1–US4); specs/eravos.suites.spec ADDENDUM 2026-11-13. | `specs/eravos.ui-field.spec` | proposed |
 | R-2026-11-13-51 | 2026-11-13 12:34:18 UTC | “what about a compatability graph? i want tools to mutate into new ones.” | idea | A graph of components and tools by typed ports; siblings that fit a slot; bridges; mutation ops (swap, insert, rewire, graft, vary, remove) checked for types, build, play, and measured for novelty; a kept mutant is a tool with lineage. Map measured first: tool ports typed already (144 specs), component ports prose (79 of 110 TO WRITE). | specs/eravos.compat-graph.spec (CG0–CG5); specs/eravos.components.spec ADDENDUM 2026-11-13. | `specs/eravos.compat-graph.spec` | proposed |
+| R-2026-11-13-55 | 2026-11-13 13:07:08 UTC | “Each component of each tool has a element for the ui to synthesis.” | principle | Moves UI synthesis down a level: the element belongs to the component (its controls as data + how it draws), and a tool's UI is synthesised from its DAG's components' elements; a mutant needs no hand-drawn UI. | specs/eravos.components.spec and specs/eravos.ui-field.spec ADDENDA 2026-11-13 (2); US0: Retro DCO's face from its 12 components' elements, as a preview first. | `specs/eravos.ui-field.spec` · `specs/eravos.components.spec` | proposed |
+| R-2026-11-13-57 | 2026-11-13 13:08:14 UTC | “It has to anounce what it needs to the canvas. The canvas needs to import it from the zip.” | principle | The store spec already had needs and a resolver (S1–S2, from his 2026-11-06 and 2026-11-08 words); this adds what the announcement carries (components and their elements, generated from the DAG) and how the canvas imports (manifest read with no code run, components and elements before the tool, digest, unpacked to the library) — I1–I4. | specs/eravos.store.spec ADDENDUM 2026-11-13; decisions D5 (unpack or run from the zip) and D6 (elements per component) his. | `specs/eravos.store.spec` | proposed |
 
 ## Choices and direction
 _decisions, the alternatives in front of him, and the way he set_
@@ -70,7 +72,7 @@ _decisions, the alternatives in front of him, and the way he set_
 ## Competence
 _what is shown, at its own level — an idea, a built and tested idea, and outside validation are not the same thing_
 
-**proposed** (21)
+**proposed** (23)
 
 - R-2026-11-06-02 · 2026-11-06 06:28:35 UTC · direction — “Also love the synthwave tool.” → The highest-leverage phase-1 tool turned out to be in that family (Swarm Oscillator) — chosen by the graph, not by the preference. · evidence: `docs/eco-graph.md`
 - R-2026-11-06-06 · 2026-11-06 07:06:21 UTC · principle — “Just want to make sure the tools don’t become monolith with packs or mods hard wired in.” → Rule in CLAUDE.md › Axioms; no guard test yet (open). · evidence: `CLAUDE.md › Axioms 1` · `tools/music/tools/genre-instruments/swarm-oscillator/packs/factory/pack.json`
@@ -93,6 +95,8 @@ _what is shown, at its own level — an idea, a built and tested idea, and outsi
 - R-2026-11-13-50 · 2026-11-13 12:31:19 UTC · idea — “what about have seperate ui elements for each tool that can merge automatically. dynamic ui synthesiss” → specs/eravos.ui-field.spec ADDENDUM 2026-11-13 (US1–US4); specs/eravos.suites.spec ADDENDUM 2026-11-13. · evidence: `specs/eravos.ui-field.spec`
 - R-2026-11-13-51 · 2026-11-13 12:34:18 UTC · idea — “what about a compatability graph? i want tools to mutate into new ones.” → specs/eravos.compat-graph.spec (CG0–CG5); specs/eravos.components.spec ADDENDUM 2026-11-13. · evidence: `specs/eravos.compat-graph.spec`
 - R-2026-11-13-52 · 2026-11-13 12:36:57 UTC · decision — “i feel the workshop should be a tool on its own. like can we make the canvas more bare?” → specs/eravos.bare-canvas.spec (BC0–BC4); specs/eravos.workshop.spec ADDENDUM 2026-11-13 (3). · evidence: `specs/eravos.bare-canvas.spec`
+- R-2026-11-13-55 · 2026-11-13 13:07:08 UTC · principle — “Each component of each tool has a element for the ui to synthesis.” → specs/eravos.components.spec and specs/eravos.ui-field.spec ADDENDA 2026-11-13 (2); US0: Retro DCO's face from its 12 components' elements, as a preview first. · evidence: `specs/eravos.ui-field.spec` · `specs/eravos.components.spec`
+- R-2026-11-13-57 · 2026-11-13 13:08:14 UTC · principle — “It has to anounce what it needs to the canvas. The canvas needs to import it from the zip.” → specs/eravos.store.spec ADDENDUM 2026-11-13; decisions D5 (unpack or run from the zip) and D6 (elements per component) his. · evidence: `specs/eravos.store.spec`
 
 **demonstrated** (26)
 
@@ -186,6 +190,9 @@ _whose each contribution is: his, the AI coder’s, or from outside_
 | R-2026-11-13-52 | 2026-11-13 12:36:57 UTC | user | James Brooks | decision |
 | R-2026-11-13-53 | 2026-11-13 12:42:13 UTC | collaborative | James Brooks | decision — chosen from: wait for Emerge · build in v1 now as data Emerge takes over |
 | R-2026-11-13-54 | 2026-11-13 12:42:48 UTC | user | James Brooks | direction |
+| R-2026-11-13-55 | 2026-11-13 13:07:08 UTC | user | James Brooks | principle |
+| R-2026-11-13-56 | 2026-11-13 13:07:08 UTC | collaborative | James Brooks | decision — chosen from: ERAVOS 2: Synthesis (recommended; Field stays the surface) · ERAVOS 2: Field |
+| R-2026-11-13-57 | 2026-11-13 13:08:14 UTC | user | James Brooks | principle |
 
 ## Outcomes
 _what came of each_
@@ -246,4 +253,7 @@ _what came of each_
 | R-2026-11-13-52 | 2026-11-13 12:36:57 UTC | “i feel the workshop should be a tool on its own. like can we make the canvas more bare?” | decision | The canvas's 36 runtime files mapped (lines, globals, tools using each) into host / leaves; the Field first to leave, into a domain-free tools/core/, with a guard that the canvas only grows by a listed decision. | specs/eravos.bare-canvas.spec (BC0–BC4); specs/eravos.workshop.spec ADDENDUM 2026-11-13 (3). | `specs/eravos.bare-canvas.spec` | proposed |
 | R-2026-11-13-53 | 2026-11-13 12:42:13 UTC | “add that to the eravos v2 spec” | decision<br>from: wait for Emerge · build in v1 now as data Emerge takes over | His question "is emerge worth waiting for on this?" was answered by the AI coder (do not wait: the design is language-independent, Emerge is not yet ready for it, v1 data carries over); he had it added to the v2 plan. | docs/eravos-v2-emerge-looking-glass.md ADDENDUM 2026-11-13 with the v1 → v2 table. | `docs/eravos-v2-emerge-looking-glass.md` | proposed |
 | R-2026-11-13-54 | 2026-11-13 12:42:48 UTC | “lets begin. map and update the specs first. add addendums. and record decisions in the proof of componency doc” | direction | Session map with every message and its time; two new specs and five addenda; decisions in the proof-of-competency doc and this register. | specs/eravos.2026-11-13-session.map.spec and the specs it lists. | `specs/eravos.2026-11-13-session.map.spec` · `docs/PROOF-OF-COMPETENCY.md` | demonstrated |
+| R-2026-11-13-55 | 2026-11-13 13:07:08 UTC | “Each component of each tool has a element for the ui to synthesis.” | principle | Moves UI synthesis down a level: the element belongs to the component (its controls as data + how it draws), and a tool's UI is synthesised from its DAG's components' elements; a mutant needs no hand-drawn UI. | specs/eravos.components.spec and specs/eravos.ui-field.spec ADDENDA 2026-11-13 (2); US0: Retro DCO's face from its 12 components' elements, as a preview first. | `specs/eravos.ui-field.spec` · `specs/eravos.components.spec` | proposed |
+| R-2026-11-13-56 | 2026-11-13 13:07:08 UTC | “Should we call Eravos 2: synthesis, or field?” | decision<br>from: ERAVOS 2: Synthesis (recommended; Field stays the surface) · ERAVOS 2: Field | His question; the AI coder recommended Synthesis (one word for sound, tool and UI synthesis; Field already names v1's editor and a theme). His reply began "Okay."; recorded as proposed until he confirms. | docs/eravos-v2-emerge-looking-glass.md ADDENDUM 2026-11-13 (2). | `docs/eravos-v2-emerge-looking-glass.md` | proposed |
+| R-2026-11-13-57 | 2026-11-13 13:08:14 UTC | “It has to anounce what it needs to the canvas. The canvas needs to import it from the zip.” | principle | The store spec already had needs and a resolver (S1–S2, from his 2026-11-06 and 2026-11-08 words); this adds what the announcement carries (components and their elements, generated from the DAG) and how the canvas imports (manifest read with no code run, components and elements before the tool, digest, unpacked to the library) — I1–I4. | specs/eravos.store.spec ADDENDUM 2026-11-13; decisions D5 (unpack or run from the zip) and D6 (elements per component) his. | `specs/eravos.store.spec` | proposed |
 
