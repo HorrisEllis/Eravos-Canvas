@@ -1,6 +1,6 @@
 /* eravos.timeline — the Workshop's NOTES kind (music.notes), W2 slice a (specs/eravos.workshop.spec ADDENDUM 2026-11-08).
  * His words, 2026-11-08: "The edit pattern or note doesn’t open workshop." · 2026-11-06 (13:28:34): the note editor and the pattern editor are one —
- * "the note editor IS the workshop at note scale; patterns are the workshop at pattern scale". canvas/runtime/workshop.js stays domain-free:
+ * "the note editor IS the workshop at note scale; patterns are the workshop at pattern scale". tools/core/field/field.js stays domain-free:
  * every word and picture of a note is here. The document is the clip's notes exactly as the piano roll keeps them, so Apply is not needed:
  * every edit goes back through the roll's own commit (live), and a note round-trips unchanged when nothing was touched.
  *   EravosTimelineWorkshop.KIND · EravosTimelineWorkshop.ensure() → true when the kind is on the Workshop */

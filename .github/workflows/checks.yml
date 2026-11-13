@@ -14,6 +14,10 @@ jobs:
           node-version: 22
       - name: Components, null-render maths
         run: node tests/components.mjs
+      - name: Every manifest valid (tool.json, domain, suite, pack schemas)
+        run: node build/validate.mjs
+      - name: The canvas is the host only (specs/eravos.bare-canvas.spec)
+        run: node tests/bare-canvas.test.mjs
       - name: No toys
         run: node tests/no-toys.mjs
       - name: No Playwright

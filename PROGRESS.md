@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.178 The Field leaves the canvas (BC1) — nothing he sees changes (2026-11-13)
+His words: "i feel the workshop should be a tool on its own. like can we make the canvas more bare?" · "yes that works".
+- canvas/runtime/workshop.{js,css} → tools/core/field/field.{js,css} (git mv: history kept). tools/core/ is a new tool-less, domain-free
+  domain (domain.json "always": true): the Catalog loads a domain marked always before any other, whatever is installed (the canvas reads the
+  flag, names no domain); tools/index.js lists core first; the generator carries the flag; the schema knows it. window.Workshop kept as the
+  global (16 files call it). Toolless domains are not Start cards, so nothing new shows.
+- The rule: tests/bare-canvas.test.mjs — every canvas/runtime/*.js on the spec's host_files line (35), or it fails; tools/core scanned by
+  the boundary test as the canvas is. CI now runs build/validate.mjs (3.176's contracts had merged failing it) and the bare-canvas guard.
+- Also: P166 still looked for "Open on the Workshop" (a 3.176 rename it had missed).
+- Proof: P150 P154 P156–P162 P165–P171 P174–P176, P38 (catalog) 37/37, boundary 10/10 green unchanged; design check no worse; validate 259;
+  shipped-files, library-tools 14/14, components, no-toys, no-playwright; a fresh profile in the real canvas: only core loads, the Field is
+  there, the Start cards unchanged, installing Timeline + Retro DCO then loads music and its Field kinds, no page errors.
+
 ## 3.177 Every song's preview tested; quiet previews levelled, distorted ones trimmed (2026-11-13)
 His words: "I cant hear some of them in the preview. Can you also test them. Some sound lterrible".
 - Measured, not guessed: every listed song's preview (301) rendered as the Songs page renders it and measured — level (RMS), how spiky (peak

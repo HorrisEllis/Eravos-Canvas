@@ -50,11 +50,11 @@ describe('P166 any tool on the Workshop, from its own settings', () => {
       const errs = []; const oe = console.error; console.error = (...a) => { errs.push(a.join(' ')); oe.apply(console, a); }; try { ws.view({ mode: '3d' }); ws.view({ mode: '2d' }); } finally { console.error = oe; } assert.equal(errs.length, 0, '2D and 3D draw: ' + errs.join(' | '));
     } finally { closeWs(); OrganismFactory.close(id); }
   });
-  it('right-click a tool › Open on the Workshop — an effect too', async () => {
+  it('right-click a tool › Open on the Field — an effect too', async () => {
     host(); const fx = OrganismFactory.defined().map(d => d.id).find(x => /tape-memory|fx-filter|echo/.test(x)), id = OrganismFactory.spawn(fx, { x: 40, y: 40 }); await TH.sleep(250);
     try {
       const rec = OrganismFactory.handle(id), items = ContextMenu.windowItems ? ContextMenu.windowItems(rec.instanceId ? rec : Object.assign({ instanceId: id }, rec)) : [];
-      const it = (items || []).find(x => x && /Open on the Workshop/.test(x.label || '')); assert.ok(it, fx + ': the menu offers Open on the Workshop');
+      const it = (items || []).find(x => x && /Open on the Field/.test(x.label || '')); assert.ok(it, fx + ': the menu offers Open on the Field');
       it.run(); await TH.sleep(60); assert.ok(Workshop.current && Workshop.current.kind === 'music.instrument' && Workshop.current.doc().organism === fx, 'and it opens ' + fx);
       assert.ok(!Workshop.current.keys().some(k => k[0] === 'Hear it'), 'an effect has no Hear (it is not played)');
     } finally { closeWs(); OrganismFactory.close(id); }

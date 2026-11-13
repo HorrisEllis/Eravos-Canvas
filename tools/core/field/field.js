@@ -1,4 +1,4 @@
-/* ERAVOS runtime — workshop.js → window.Workshop (3.150, W1 flat). Domain-free: it names no domain and no topic; every word, field and
+/* ERAVOS core — field/field.js → window.Workshop (3.150, W1 flat; the Field — moved from canvas/runtime/workshop.js 2026-11-13, specs/eravos.bare-canvas.spec BC1). Domain-free: it names no domain and no topic; every word, field and
  * picture comes from the KIND that is open (specs/eravos.workshop.spec and its ADDENDA 2026-11-07).
  * His words, 2026-11-07: "can you make it more like photoshop? or like a 3d renderer? then it could support a game engine, like this could be
  * the build surface for emerge." · "Yeah, we can just start with this. The small, like just the flat". The approved preview:

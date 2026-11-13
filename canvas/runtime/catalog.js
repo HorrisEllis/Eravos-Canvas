@@ -49,7 +49,7 @@
   const drained = () => new Promise(r => { if (!busy && !queue.length) r(); else waiters.push(r); });
   // ---------------------------------------------------------------- domains + tools
   function needDomains() {   // installed tools' domains + the domains they speak through (ports), in boot order
-    const want = new Set(rec.domainsChosen || []);
+    const want = new Set(rec.domainsChosen || []); domains.forEach(d => { if (d.always) want.add(d.id); });   // a domain marked always (shared parts) loads whatever is installed
     tools.forEach(t => { if (isInstalled(t.id)) want.add(t.domain); });
     let grew = true; while (grew) { grew = false; Array.from(want).forEach(d => ((domains.get(d) || {}).ports || []).forEach(p => { if (!want.has(p)) { want.add(p); grew = true; } })); }
     return want;
@@ -67,7 +67,7 @@
     tool(meta) { tools.set(meta.id, meta); },
     boot(order) {
       if (all()) { (order || Array.from(domains.keys())).forEach(id => { if (domains.has(id)) loadDomain(id); else if (global.ERAVOS_TOOLS) { loadedDomains.add(id); load(global.ERAVOS_TOOLS + id + '/index.js'); } }); return; }
-      const want = needDomains(); (order || Array.from(domains.keys())).forEach(id => { if (want.has(id)) loadDomain(id); });
+      const want = needDomains(); domains.forEach(d => { if (d.always) loadDomain(d.id); }); (order || Array.from(domains.keys())).forEach(id => { if (want.has(id)) loadDomain(id); });
     },
     take(id) { if (!isInstalled(id) || loadedTools.has(id)) return false; loadedTools.add(id); return true; },
     async install(ids, K) {
