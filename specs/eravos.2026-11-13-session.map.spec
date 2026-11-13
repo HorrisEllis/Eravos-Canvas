@@ -127,3 +127,10 @@
   - 3.186 (SHOWN, not merged): TIME · PITCH on the window itself — Own BPM, Swing, Answer, Pitch (transpose, scale steps / semitones), Tension,
     Range, Ahead; Speed, Feel, Pool, Pitch in. Every knob automates (Speed and Own BPM gained their inputs, every music tool). P184: numerals
     in sequence keep their case (i-VI-III-VII)
+
+## (after the Time · Pitch preview) — verbatim:
+  > Push. The. Next tool.
+  - "Push.": PR #186 merged (Bassline 2.0, CI green)
+  - "The next tool": Ensemble Organism (docs/eco-graph.md — 6 of 6 components built). SPEC FIRST: its depth audit (ADDENDUM 2026-11-13 — ports,
+    params, signal_dag, modes, decisions D1–D4); UI SHOWN FIRST: tools/music/planned/ensemble-organism.ui.md,
+    docs/previews/ensemble-organism-{preview,beside-mod-delay,more-depth}.png — built on his yes
