@@ -71,6 +71,20 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-13 · Every song preview measured and fixed by cause; the Field made tool-specific — PR #172
+- **His words (2026-11-13):** "shouldn't the workshop be called field? … What about tool dependant. Also erasing parts of the notes or
+  patterns. Making it thicker or thinner, longer." · "I meant tool specific. Using the dag maybe or contract" · "Maybe options for it? Or pitch
+  width." · "I cant hear some of them in the preview. Can you also test them. Some sound lterrible" · "merge and push"
+- **His call:** the name Field; tool-specific through the DAG / contract; thickness as options with pitch width; test every song.
+- **Built:** an audit that renders all 301 song previews and measures level, spikiness, low / high share, silent bars and limiter pinning;
+  the quiet-preview cause (peak normalisation) fixed with loudness levelling; the distortion cause found by removing parts one at a time
+  (the Sub Engine's default level in most) and fixed with 17 data-only trims, each with its measured before → after. A tool contract
+  (`field` in tool.json, carried by the catalog) puts a tool's own knobs first, the rest staged in signal order; map edits (erase, length,
+  thickness options).
+- **Proof:** median pinned 0.22 → 0.11 % on the 49 re-measured songs (Rivals 0.41 → 0.10, Dark to Dawn 0.47 → 0.13); P175 4/4, P176 3/3;
+  P150–P174, P19 P44 P71 P72, boundary 10/10 green; design check no worse.
+- **Check:** `node tests/run.mjs P175` · `P176` · `P44` · `tools/music/data/songbook-mix.js` (each trim with its measurement)
+
 ### 2026-11-13 · Songs made to a reference by measurement, and a layer system finished — PRs #169, #170
 - **His words (2026-11-13):** "6? also they sound horrible. more like floor falls out." · "considering i said everything eravos could do
   including automation. way too shallow … also stop making new catagories. i told you the catagories." · "Yes. Then make sure we can edit,
