@@ -170,7 +170,6 @@
   // 3.44 categories: every song sits in one — styles first, then the three collections. Picked by genre id, so a new genre
   // lands in its style by name (dub / wub / reese / house …) and anything unknown shows under "More".
   const CATS = [
-    { id: 'now', label: '✨ ERAVOS Now', re: /^now-/ },   // 3.173 songs made with what ERAVOS has now (the new tools, automation, the Workshop's notes)
     { id: 'dubstep', label: '🔊 Dubstep & Wubs', ids: ['dubstep', 'dubstep-og', 'riddim', 'riddim-war', 'tearout', 'deathstep', 'brostep-wub', 'talker', 'wub-rig', 'melodic', 'melodic-wub', 'tension-study', 'trapstep', 'reese-vs-wub', 'dancehall-dubstep'], re: /step|wub|riddim|tearout|talker/ },
     { id: 'dnb', label: '⚡ Drum & Bass · Breaks', ids: ['dnb', 'neuro', 'jungle', 'breakbeat', 'drumstep', 'reese-roller', 'halftime-reese', 'wub-neuro'], re: /dnb|neuro|jungle|break|reese/ },
     { id: 'house', label: '🏠 House · Garage', ids: ['house', 'deep-house', 'tech-house', 'bass-house', 'ukg', 'future-garage', 'electro', 'big-room'], re: /house|garage|ukg|electro/ },
@@ -190,7 +189,7 @@
   ];
   function categoryOf(s) {
     const g = String((s && s.genre) || '');
-    return (CATS.find(c => (c.id === 'now' || c.id === 'her' || c.id === 'lostlove' || c.id === 'odd' || c.id === 'synthesis' || c.id === 'heavy' || c.id === 'motion') && c.re.test(g))
+    return (CATS.find(c => (c.id === 'her' || c.id === 'lostlove' || c.id === 'odd' || c.id === 'synthesis' || c.id === 'heavy' || c.id === 'motion') && c.re.test(g))
       || CATS.find(c => (c.ids || []).includes(g)) || CATS.find(c => c.re.test(g)) || CATS[CATS.length - 1]).id;
   }
   const MOODS = [['mine', '📖 My songs'], ['foryou', '💜 For you'], ['all', 'Any mood'], ['edm', 'EDM'], ['her', 'For her'], ['heavy', 'Heavy'], ['dark', 'Dark'], ['goth', 'Goth'], ['80s', '80s'], ['island', 'Island'], ['warm', 'Warm'], ['party', 'Party'], ['calm', 'Calm'], ['fast', 'Fast']];

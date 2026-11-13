@@ -37,3 +37,17 @@
   a Heavy Drops song appears under its genre AND under Collection › Heavy Drops · tests in p19 (Songs by category) updated
 
 # ADDENDUM 3.73 — every genre's melodic parts now move (eravos.pattern-library.spec, addendum 3.73); a genre opts out with curve: false.
+
+# ---- ADDENDUM 2026-11-13 — the machine songs; the Song Engine reaches effects and modulators (nothing above is changed)
+#   his words: "6? also they sound horrible. more like floor falls out." · "considering i said everything eravos could do including automation.
+#   way too shallow for how much depth ive been giving it. also stop making new catagories. i told you the catagories."
+#   - categories: his three (2026-11-12: "lofi, synthwave, and wobblebass"), on the existing shelves — 🌙 Chill (lofi-*), 🌆 80s · Synth
+#     (synthwave-*), 🔊 Dubstep & Wubs (wub-*). No new shelf (the 3.173 "✨ ERAVOS Now" shelf is removed).
+#   - the Song Engine (additive; every existing genre writes byte-identical steps, measured on all genres, seed 4242):
+#       G.curves may name an effect (fx<i>) or a modulator (mod<i>) as well as a part — automation on any tool in the song
+#       G.routes [{ from, out?, to, key }] — any violet output (a part's, an effect's, a modulator's; `out` names it) into any knob
+#       a modulator's own `out`; the modulate step also accepts a knob's port name (knob.fmIndex)
+#   - three genres x eight songs on Floor Falls Out's arc, each song its own pause move (4 a genre), progression and phrase order;
+#     measured beside Floor Falls Out (#5901): the drop's level, its 30–60 Hz share, above 150 Hz, the pause as a hole, clipping.
+#     Found: Head Shaker over Earthquake Drop (also in Heavy Drops' own seeds) measures 3 % low end and −11 dB above 150 Hz — thin and
+#     harsh; Floor Falls Out is Classic Wub 1/8 over Deep Sine (21 %, −19 dB). The wub songs use that sound.

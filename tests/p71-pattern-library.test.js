@@ -43,7 +43,7 @@ describe('🧩 Pattern Library: one idea at a time, from every genre (3.71)', ()
       const ov = document.querySelector('.plib'); assert.ok(ov, 'open'); ov.querySelector('.plib-rt[data-tool=""]').click();   // 3.85: the every-tool view
       const cards = () => ov.querySelectorAll('.plib-card').length; assert.gt(cards(), 50);
       const chip = [...ov.querySelectorAll('.sbk-chip')].find(b => /Drops/.test(b.textContent)); chip.click();
-      assert.ok([...ov.querySelectorAll('.plib-card small')].every(s => /Drops/.test(s.textContent)), 'only drops'); assert.ok(cards() >= 4);
+      assert.ok([...ov.querySelectorAll('.plib-card small:not(.plib-song)')].every(s => /Drops/.test(s.textContent)), 'only drops (the type line; a song’s ♪ line is its title — 3.174): ' + [...ov.querySelectorAll('.plib-card small:not(.plib-song)')].map(s => s.textContent).filter(t => !/Drops/.test(t)).slice(0, 4).join(' | ')); assert.ok(cards() >= 4);
       assert.ok(ov.querySelector('.plib-card button'), '▶ and → Timeline on every card');
     } finally { pg.close(); }
   });

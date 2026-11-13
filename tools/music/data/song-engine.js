@@ -193,13 +193,17 @@
     (G.mods || []).forEach((m, i) => {
       steps.push({ op: 'mount', organism: m.organism, as: 'mod' + i, at: place(m.organism), preset: Array.isArray(m.preset) ? pick(r, m.preset) : m.preset });
       if (m.configure) steps.push({ op: 'configure', target: 'mod' + i, params: m.configure });
-      if (m.to) steps.push({ op: 'modulate', from: 'mod' + i, to: m.to, key: m.key });
+      if (m.to) steps.push(Object.assign({ op: 'modulate', from: 'mod' + i, to: m.to, key: m.key }, m.out ? { out: m.out } : {}));
       if (m.wireFrom) steps.push({ op: 'wire', from: m.wireFrom, to: ['mod' + i, m.wireTo] });   // e.g. Clip Maker's clips → this Sample
       if (m.into) steps.push({ op: 'wire', from: ['mod' + i, m.out], to: m.into });                // 3.44: this tool → a part's input (Morph Osc → Morph Osc's FM in)
     });
     // 3.62: a genre can wire one part into another (G.wires: [[from, hook], [to, hook]] — the Arp's notes out → the synth it plays).
     // Both ends are parts, so both have a lane: the synth's lane carries its curves (filter …). Genres without it are untouched.
     (G.wires || []).forEach(([from, to]) => { if (G.parts[from[0]] && G.parts[to[0]]) steps.push({ op: 'wire', from, to }); });
+    // 3.174 (his: "everything eravos could do"): G.routes — any violet output to any knob: { from: a part, 'fx<i>' or 'mod<i>', out?: its output
+    // (the port or the knob it names; else its first), to: the same kinds, key: the knob }. Genres without it are untouched.
+    const known = new Set(parts.concat((G.fx || []).map((_, i) => 'fx' + i), (G.mods || []).map((_, i) => 'mod' + i)));
+    (G.routes || []).forEach(rt => { if (known.has(rt.from) && known.has(rt.to) && rt.key) steps.push(Object.assign({ op: 'modulate', from: rt.from, to: rt.to, key: rt.key }, rt.out ? { out: rt.out } : {})); });
     // form → markers + clips
     let bar = 1; const motif = makeMotif(r, G.leadRhythm || 'anthem');
     form.forEach(sec => {
@@ -244,7 +248,8 @@
     // G.curves(sections, r) → [{ part, key, points: [[bar, value]…], osc? }]. Genres without it are untouched.
     if (G.curves) {
       let b = 1; const sections = form.map(sec => { const x = { name: sec.name, kind: sec.kind || sec.name.replace(/\s*\d+$/, ''), bar: b, bars: sec.bars }; b += sec.bars; return x; });
-      (G.curves(sections, r, { key, prog, bpm, seed }) || []).forEach(c => { if (!G.parts[c.part]) return;
+      const auto = new Set((G.fx || []).map((_, i) => 'fx' + i).concat((G.mods || []).map((_, i) => 'mod' + i)));   // 3.174: an effect's or a modulator's knob too
+      (G.curves(sections, r, { key, prog, bpm, seed }) || []).forEach(c => { if (!G.parts[c.part] && !auto.has(c.part)) return;
         steps.push({ op: 'event', target: 'tl', topic: 'lane_add', payload: Object.assign({ kind: 'auto', target: '@' + c.part, key: c.key, points: c.points, name: c.name }, c.osc ? { osc: c.osc } : {}) }); });
     }
     // 3.41: a genre with `voice` sings with her recordings (data/her-voice.js): the timeline's audio goes through a vocal
@@ -272,9 +277,10 @@
   R.defineOp('modulate', (st, c) => {
     const K = c.K, a = c.alias[st.from] || st.from, b = c.alias[st.to] || st.to;
     const ra = K.registry.get(a), rb = K.registry.get(b); if (!ra || !rb) return;
-    const out = Array.from(ra.hooks.values()).find(h => h.wire_type === 'modulation' && h.direction === 'out');
-    const inn = Array.from(rb.hooks.values()).find(h => h.wire_type === 'modulation' && h.direction === 'in' && (h.mod_key === st.key || h.port === 'mod.' + st.key));
-    if (!out || !inn) { K.fault('MOUNT_005', { message: `modulate: ${ra.organism_id} has no violet output or ${rb.organism_id} has no "${st.key}" input` }); return; }
+    const outs = Array.from(ra.hooks.values()).filter(h => h.wire_type === 'modulation' && h.direction === 'out'), want = st.out;   // 3.174: st.out names the output (port, knob or hook)
+    const out = want ? outs.find(h => h.hook_id === want || h.mod_key === want || h.port === want || h.port === 'mod.' + want) : outs[0];
+    const inn = Array.from(rb.hooks.values()).find(h => h.wire_type === 'modulation' && h.direction === 'in' && (h.mod_key === st.key || h.port === 'mod.' + st.key || h.port === st.key || h.hook_id === st.key));
+    if (!out || !inn) { K.fault('MOUNT_005', { message: `modulate: ${ra.organism_id} has no violet output${want ? ' “' + want + '”' : ''} or ${rb.organism_id} has no "${st.key}" input` }); return; }
     K.wires.register({ src: { instanceId: a, hookId: out.hook_id }, dst: { instanceId: b, hookId: inn.hook_id } });
   });
 
