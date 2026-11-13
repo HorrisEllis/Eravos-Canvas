@@ -2,6 +2,28 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.174 The machine songs — his three categories, Floor Falls Out's arc, everything wired, measured (2026-11-13)
+His words: "6? also they sound horrible. more like floor falls out." · "considering i said everything eravos could do including automation. way
+too shallow for how much depth ive been giving it. also stop making new catagories. i told you the catagories."
+- Replaces 3.173's six songs and its shelf (in git: fa2dad5). tools/music/data/eravos-now-songbook.js: three genres x eight songs, on the
+  shelves he named — Wub Floor Machine (🔊), Synthwave Night Machine (🌆), Lo-fi Tape Machine (🌙). Each on Floor Falls Out's arc with a
+  pause move per song (wub: falls / stairs / freefall / rises · synthwave: gate / riser / cut / swell · lofi: the tape stops / sags / drops
+  out / rewinds — keys and drums on their own Tape Memory).
+- Everything wired: curve lanes on instruments, EFFECTS and MODULATORS (Tape wear / speed / dropouts, echo throws, sidechain depth, the
+  XY Pad's X / Y, the Arp's octaves / gate / rate, DCO filters and vibrato, the Swarm's coupling, the wobble's depth on an LFO); LFOs into
+  knobs; the XY Pad's X and Y into two tools; the Swarm's COHERENCE out and Tape Memory's DROPOUT out into other tools; the Arp → a Retro DCO
+  pluck; effects in series; the Drop Builder; the Workshop's notes (chords from one note, a stuttering shaped dive, ratchets, ghosts).
+- Song Engine (additive, every existing genre byte-identical): curves reach fx<i> / mod<i>; G.routes (any out → any knob); modulate by
+  output name and knob port.
+- Measured beside Floor Falls Out #5901 (drop −7 dB, 21 % in 30–60 Hz, −19 dB above 150 Hz, the pause a hole, ~0.1 % at the clipper):
+  wub drops −6.1 … −7.8 dB, 12–21 %, −17.6 … −20.5; synthwave drops −7.9 … −8.9, ~3.3 dB over the build, pauses holes; lofi pauses −21 … −30
+  dB (the tape stops); clipping 0 … 0.21 %. Found on the way: Head Shaker over Earthquake Drop (Heavy Drops' own seeds too) measures 3 % low
+  end and −11 dB above 150 Hz — thin and harsh; the wub songs use Floor Falls Out's Classic Wub / Half-time Growl over Deep Sine; a stock
+  snare roll made the synthwave builds brighter than their drops (now a whisper that rises); the drops needed a sub.
+- Proof: tests/p173-songs-machine.test.js 6/6 (24 songs on his shelves, every preset real, the full extent present, three written with no
+  fault and measured against FFO); P172 (no two songs ≥ 80 % the same); P71 (its Drops check reads the type line, not a song's ♪ title),
+  P73, P171, P44, P19, P62, P72, boundary, no-toys green; P43 ×2 and P70 as on main.
+
 ## 3.173 ERAVOS Now — six songs on the new tools, automation and the Workshop's notes (2026-11-12)
 His words: "also add songs that use the new tools, automation, and full extent of eravos."
 - tools/music/data/eravos-now-songbook.js (NEW, data only): three genres, two songs each, each song its own variant (by its seed) — Lofi Tape
