@@ -134,3 +134,13 @@
   - "The next tool": Ensemble Organism (docs/eco-graph.md — 6 of 6 components built). SPEC FIRST: its depth audit (ADDENDUM 2026-11-13 — ports,
     params, signal_dag, modes, decisions D1–D4); UI SHOWN FIRST: tools/music/planned/ensemble-organism.ui.md,
     docs/previews/ensemble-organism-{preview,beside-mod-delay,more-depth}.png — built on his yes
+
+## (after "Push. The. Next tool.") — verbatim:
+  > i also want a actual tool for irrational frequencies, and unconvential harmonic data, like dragging around to create a nervous system response using poly vegal. like feelings or emotions as frequencies. make patterns from feelings.
+  >
+  > just spec this. i had it before and it was like wail songs, it was beautiful. i want thinking of trying to use it for embodiement
+  - SPECCED (not built): tools/music/planned/feeling-song.spec — the state field (ventral · sympathetic · dorsal, dragged), the cue map as data,
+    irrational and data harmonics (NEW component ratio-set), calls → phrases → themes (NEW component call-grammar), CAPTURE to patterns, RETURN,
+    claims NONE (tests measure the sound, never a body); Feeling Engine folds into its outputs (feeling-engine.spec ADDENDUM 2026-11-13)
+  - OPEN: the name (Feeling Song · Vagal · Calls) · "wail songs" = whale songs? · what he had before, to match by ear · its UI shown first
+
