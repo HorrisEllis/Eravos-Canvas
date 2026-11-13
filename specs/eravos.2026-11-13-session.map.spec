@@ -121,3 +121,9 @@
   - "Okay.": the Hold / title-case branch merged (PR #185)
   - 3.186 (SHOWN, not merged): Bassline 2.0 — bass-gen.spec ADDENDUM 2026-11-13 (2): TIME, NOTES, LOCK and REST lanes on its page; the
     window unchanged; defaults play 1.1's notes. docs/previews/bassline-2-{window,steps}.png
+
+## (after 15:58:04Z) — verbatim, after the preview:
+  > It looks the same. Tempo. Pitch need more automation. Bpm.
+  - 3.186 (SHOWN, not merged): TIME · PITCH on the window itself — Own BPM, Swing, Answer, Pitch (transpose, scale steps / semitones), Tension,
+    Range, Ahead; Speed, Feel, Pool, Pitch in. Every knob automates (Speed and Own BPM gained their inputs, every music tool). P184: numerals
+    in sequence keep their case (i-VI-III-VII)

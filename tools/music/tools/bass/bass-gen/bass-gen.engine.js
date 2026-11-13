@@ -36,7 +36,7 @@
   OrganismFactory.define({
     id: 'eravos.bass-gen', domain: 'music', version: '2.0.0', perform: true, label: 'Bassline', icon: '🎸', accent: '#7c4dff',
     category: 'Bass', blurb: 'The root of the chord on the kick: follows a wired Chords and Groove, plays any bass tool wired to it.',
-    size: { w: 600, h: 440 }, minSize: { w: 440, h: 320 },
+    size: { w: 600, h: 640 }, minSize: { w: 440, h: 360 },
     permissions: ['audio_out', 'bus_publish', 'bus_subscribe', 'registry_read'],   // audio_out: its mod input is an audio-rate port
     provides: ['capability.generation', 'capability.note_out'],
     hooks: [
@@ -65,6 +65,10 @@
       { key: 'swing', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Swing', group: 'TIME', hint: 'the 16ths between the 8ths land late (up to a triplet feel)' },
       { key: 'phrase', type: 'enum', options: [1, 2, 4, 8], default: 2, label: 'Phrase', group: 'TIME', hint: 'bars in a phrase: Answer moves the notes of its second half' },
       { key: 'answer', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Answer', group: 'TIME', hint: 'the second half of each phrase answers the first: the same rhythm, its notes moved up to the third or fifth' },
+      // 2.0 PITCH (his words, 2026-11-13: "Tempo. Pitch need more automation. Bpm."): the whole line moved — in the key's steps (stays in key) or
+      // in semitones; automatable like every knob (its knob.transpose input: an LFO, an Automation lane, the XY Pad move it while it plays)
+      { key: 'transpose', type: 'integer', default: 0, min: -12, max: 12, label: 'Pitch', group: 'PITCH', hint: 'transpose — moves the whole line: in the key’s steps (it stays in key) or in semitones — automate it for a moving bass' },
+      { key: 'transposeIn', type: 'enum', options: ['scale steps', 'semitones'], default: 'scale steps', label: 'Transpose in', group: 'PITCH' },
       // 2.0 NOTES — its own voicing, the way Chords has Voicing and Tension
       { key: 'pool', type: 'enum', options: POOLS, default: 'root', label: 'Pool', group: 'NOTES', hint: 'what it may play besides the root: the fifth, the octave, the chord’s tones, the scale, or a walk toward the next chord' },
       { key: 'tension', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Tension', group: 'NOTES', hint: 'how often it leaves the root for the notes above (the first of the bar stays the root)' },
@@ -118,7 +122,8 @@
         if (!ghost && step !== 0 && ans && ph > 1 && (bar % ph) >= ph / 2 && rnd(bar % (ph / 2), step, 12) < ans) deg += rnd(bar % (ph / 2), step, 13) < 0.5 ? 2 : 4;
         if (nextRoot !== undefined) deg = nextRoot;   // 2.0 anticipation: the next chord's root, early
         if (St.lock[step]) deg = degree(bar) + LOCK[St.lock[step]];   // 2.0 a locked step plays its lock
-        let note = MT.degreeToMidi(deg, P.get('octave') + up + St.oct[step], k.root, k.scale);
+        const tp = Math.round(P.get('transpose') || 0), steps = P.get('transposeIn') !== 'semitones';
+        let note = MT.degreeToMidi(deg + (steps ? tp : 0), P.get('octave') + up + St.oct[step], k.root, k.scale) + (steps ? 0 : tp);
         const floor = MT.degreeToMidi(0, P.get('octave'), k.root, k.scale), span = P.get('span'); while (note >= floor + span * 12 + 12) note -= 12;   // 2.0 Range
         let dur = stepDur * P.get('length') * (e > 0.6 ? 0.65 : 1), vel = 0.7 + 0.3 * e, tt = t;
         const acc = P.get('accent'), hum = P.get('humanize');

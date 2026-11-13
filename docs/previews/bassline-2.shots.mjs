@@ -10,7 +10,7 @@ await p.evaluate(() => { Shell.activate(); Shell.X.enterMode('music'); document.
 const id = await p.evaluate(() => { CanvasWM.world.querySelectorAll('.wm-win').forEach(w => { if (!w.closest('#dock')) w.remove(); }); CanvasWM.view = { x: 0, y: 0, z: 1 }; CanvasWM.applyView();
   const a = OrganismFactory.spawn('eravos.bass-gen', { x: 20, y: 20 }), c = OrganismFactory.handle(a).ctx;
   c.params.set('steps', Object.assign(c.internals.STEPS0(), { vel: [0.6, 0, -0.4, 0, 0.3, 0, 0, 0, 0.6, 0, -0.4, 0, 0.3, 0, 0, 0], lock: [0, 0, 0, 0, 3, 0, 2, 0, 0, 0, 0, 0, 5, 0, 7, 0], rest: [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], slide: [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, -1, 0] }));
-  c.params.setMany({ feel: 'normal', swing: 0.35, pool: 'chord tones', tension: 0.4, anticipate: 0.5, answer: 0.3 }); return a; });
+  c.params.setMany({ feel: 'normal', swing: 0.35, pool: 'chord tones', tension: 0.4, anticipate: 0.5, answer: 0.3, transpose: 2 }); return a; });
 await p.waitForTimeout(1000);
 await (await p.$(`.wm-win[data-instance="${id}"]`)).screenshot({ path: path.join(ROOT, 'docs/previews/bassline-2-window.png') }); console.log('shot window');
 await p.evaluate((id) => { ToolPage.open('eravos.bass-gen', { instanceId: id }); }, id); await p.waitForTimeout(800);

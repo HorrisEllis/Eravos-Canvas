@@ -111,6 +111,17 @@ describe('Bassline 2.0 · time, notes, locks and rests (3.186)', () => {
     const early = a.notes.filter(n => stepOf(n) === 14); assert.gt(early.length, 0, 'notes an 8th early');
     early.forEach(n => { const next = a.notes.find(x => barOf(x) === barOf(n) + 1 && stepOf(x) === 0); if (next) assert.equal(n.note % 12, next.note % 12, 'the next chord’s root'); });
   });
+  it('pitch: Transpose moves the line — in the key\u2019s steps (stays in key) or in semitones (exactly); a change while it plays reaches the next notes', () => {
+    const a = rig(); a.play(2); const k = key(a.c);
+    const s = rig({ transpose: 2 }); s.play(2); s.notes.forEach((n, i) => { assert.ok(MusicTheory.inScale(n.note, k.root, k.scale), 'in key'); assert.gt(n.note, a.notes[i].note); });
+    const t = rig({ transpose: 3, transposeIn: 'semitones' }); t.play(2); t.notes.forEach((n, i) => assert.equal(n.note, a.notes[i].note + 3));
+    const live = rig(); live.U.T.renderTicks(0, 16, 0.05); const before = live.notes.length; live.c.params.set('transpose', 7); live.c.params.set('transposeIn', 'semitones'); live.U.T.renderTicks(16, 32, 0.05);
+    live.notes.slice(before).forEach((n, i) => assert.equal(n.note, a.notes[before + i].note + 7, 'the next bar moved'));
+  });
+  it('automation: Transpose, Swing, Tension, Range, Ahead and the tool\u2019s Speed and BPM each have a modulation input (an LFO, a lane, the XY Pad)', () => {
+    const d = OrganismFactory.def('eravos.bass-gen'), ins = new Set((d.hooks || []).map(h => h.hook_id));
+    ['transpose', 'swing', 'tension', 'span', 'anticipate', 'answer', 'tempoBpm', 'tempoX', 'feel', 'pool'].forEach(k => assert.ok(ins.has('knob.' + k), k + ' can be automated'));
+  });
   it('answer: the second half of each phrase moves its notes; the first half stays', () => {
     const a = rig(); a.play(4); const x = rig({ answer: 1, phrase: 2 }); x.play(4);
     x.notes.forEach((n, i) => { if (barOf(n) % 2 === 0 || stepOf(n) === 0) assert.equal(n.note, a.notes[i].note); });

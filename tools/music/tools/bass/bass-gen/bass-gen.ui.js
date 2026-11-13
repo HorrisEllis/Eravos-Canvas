@@ -58,6 +58,11 @@ OrganismFactory.reg('eravos.bass-gen', function (view) {
         h('div', { class: 'gg-knobs' }, [ctl('energy', { big: true, size: 64 }).el, ctl('length', { size: 44 }).el, ctl('octave', { size: 44 }).el, ctl('slides', { size: 44 }).el, ctl('ghosts', { size: 44 }).el, ctl('jumps', { size: 44 }).el]),
         h('div', { class: 'gg-strips' }, [strip('progression', 'Own chords'), strip('chordBars', 'Bars / chord')]),
       ])]),
+    // 2.0 on the window (his words: "It looks the same. Tempo. Pitch need more automation. Bpm."): its own time and its pitch, one compact
+    // section — the knobs in a row, the four choices side by side — every knob automates (its knob.<key> input)
+    h('section', { class: 'gg-sec' }, [head('Time · Pitch', [h('span', { class: 'mo-count', text: 'EVERY KNOB AUTOMATES' })]),
+      h('div', { class: 'gg-knobs' }, ['tempoBpm', 'swing', 'answer', 'transpose', 'tension', 'span', 'anticipate'].map(k => cfg(k) && ctl(k, { size: 40 }).el).filter(Boolean)),
+      h('div', { class: 'org-row', style: { gap: '8px 14px', flexWrap: 'wrap', alignItems: 'flex-end' } }, [strip('tempoX', 'Speed'), strip('feel', 'Feel'), strip('pool', 'Pool'), strip('transposeIn', 'Pitch in')])]),
     h('div', { class: 'gg-hint', text: 'WIRE A CHORDS’ CHORD OUT AND A GROOVE’S STEP OUT IN · ITS NOTE OUT INTO A BASS (REESE, WOBBLE, ACID)' }),
   ]);
 
@@ -106,10 +111,8 @@ OrganismFactory.reg('eravos.bass-gen', function (view) {
     head('Steps', [h('span', { class: 'mo-count', text: 'DRAG A LEVEL · CLICK A CELL (LOCK CYCLES ROOT → 3RD → 5TH …) · RIGHT-CLICK RESETS' }), reset]), lanes,
     head('Feel', [h('span', { class: 'mo-count', text: 'HOW IT MOVES AROUND THE ROOT' })]),
     h('div', { class: 'gg-knobs' }, [ctl('move', { size: 52 }).el, ctl('humanize', { size: 52 }).el, ctl('accent', { size: 52 }).el, ctl('follow', { size: 52 }).el, ctl('seed', { size: 52 }).el]),
-    head('Time', [h('span', { class: 'mo-count', text: 'WHERE IT LANDS' })]),
-    h('div', { class: 'gg-bank' }, [h('div', { class: 'gg-knobs' }, [ctl('swing', { size: 52 }).el, ctl('answer', { size: 52 }).el]), h('div', { class: 'gg-strips' }, [strip('feel', 'Feel'), strip('phrase', 'Phrase')])]),
-    head('Notes', [h('span', { class: 'mo-count', text: 'WHAT IT PLAYS BESIDES THE ROOT' })]),
-    h('div', { class: 'gg-bank' }, [h('div', { class: 'gg-knobs' }, [ctl('tension', { size: 52 }).el, ctl('span', { size: 52 }).el, ctl('anticipate', { size: 52 }).el]), h('div', { class: 'gg-strips' }, [strip('pool', 'Pool')])]),
+    head('Phrase', [h('span', { class: 'mo-count', text: 'ANSWER ON THE WINDOW MOVES ITS SECOND HALF' })]),
+    h('div', { class: 'gg-strips' }, [strip('phrase', 'Bars')]),
   ]);
 
   view.root.append(play);
