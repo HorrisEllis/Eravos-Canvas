@@ -71,6 +71,12 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-13 · Decision: no new UI — the Browse preview shown and rejected before any of it was built
+- **His words (2026-11-13, 13:27:55 UTC):** "no. i like the current ui. do not change it."
+- **His call:** the UI stays as it is. Browse is not built.
+- **What happened:** a preview of Browse, made with real data, was shown before any code was written; this follows his rule "show him first". He rejected it. The preview is kept unmerged on a branch, and nothing in the app changed.
+- **Check:** `specs/eravos.store-browse.spec` ADDENDUM (the Browse UI: NO) · branch `claude/browse-preview` · `docs/HIS-WORDS-MAP.md` N-X34
+
 ### 2026-11-13 · 301 songs taken apart into reusable rhythms and lines, per tool — PR (3.180)
 - **His words (2026-11-13, 13:11:29 UTC):** "also songs decomposed one by one." · "rhythmes and notes per tool." · "just begin."
 - **His call:** every song taken apart; rhythms and notes per tool.

@@ -181,6 +181,8 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 > Then: "i meant for the work one the next phases. hell no on that ui. i like what it is now."
 
 - **The UI stays as it is.** No restyle, no new kit. (A unified-kit preview was shown and rejected, 2026-11-05.)
+- **No new store / Browse UI** (2026-11-13: "no. i like the current ui. do not change it." — said to the Browse preview, kept unmerged on
+  branch `claude/browse-preview`). The store work goes on underneath, with no UI: contracts, announcements, decomposed songs, zips, import.
 - **Every NEW tool's UI is shown to him before the tool is built** (a preview he approves), consistent with the tools as they are.
 - **Beat colour** — built (3.102, Reactive colours › Beat).
 - **Phase 1 order** (docs/eco-graph.md): filter-svf ✓ → lfo (24) → osc-va (20) → waveshaper (19) → env-adsr (17) → env-msseg (14) → … then its 7 tools, each shown to him as a UI preview first.
@@ -196,9 +198,9 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
   wired (`specs/eravos.ui-field.spec` ADDENDUM 2026-11-13), Bassline 2.0 (`bass-gen.spec` ADDENDUM). Not waiting for Emerge (v2 plan
   ADDENDUM 2026-11-13). Every component carries its own UI element; every tool announces its needs from its DAG and the canvas imports it from the zip
   (`specs/eravos.store.spec` ADDENDUM 2026-11-13, I1–I4). ERAVOS 2's name: "Synthesis" proposed, to confirm. Order: BC1 ✓ → CG1 (ports + variables + element: 23 of 33 ✓) → CG2 → CG3 → the Field's swap / mutate UI (shown first) → Bassline 2.0. Map: `specs/eravos.2026-11-13-session.map.spec`.
-- **The store and Browse** (2026-11-13, specced): Browse (domains → tools → a tool's page: needs, packs, sounds, rhythms, notes), every tool a
+- **The store** (2026-11-13, specced; the Browse UI rejected — see Next): every tool a
   whole isolated zip, the canvas only through the interaction contract (`specs/eravos.store-browse.spec`; preview first, SB1); songs decomposed
-  into rhythms and notes per tool (SD1 ✓ 3.180; next: the pattern library per tool SD2, Browse SB1 preview).
+  into rhythms and notes per tool (SD1 ✓ 3.180).
 - Connecting with people (share as a link, remix with credit, play together, share packs) — pinned 2026-11-05.
 - Songs as a rhythm-exploring tool only (not usable for making music).
 - Patterns for each tool with variety: presets, depth, curves, per-note editing — everything the timeline can do.

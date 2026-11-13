@@ -74,3 +74,11 @@
   - D5 (his call): Ctrl+B for Browse.
 open gaps: credit and authors (connecting with people, S7); paid / free (not asked); how a pack for a tool you do not have is shown
   (proposed: listed, with "needs <tool>").
+
+# ---- ADDENDUM 2026-11-13 — the Browse UI: NO (his words; nothing above is changed)
+#   his words (2026-11-13T13:27:55Z, verbatim): "no. i like the current ui. do not change it."
+#   The SB1 preview (a Browse window: domains → tools → a tool's page with Needs, Packs, Sounds, Rhythms, Notes) was shown and rejected.
+#   The UI stays as it is: no Browse window, no new store UI. SB1 (the preview) is kept unmerged on branch claude/browse-preview (Nothing is
+#   lost); SB3 (building it) is withdrawn. What does not change the look stays: the data under it (component contracts, each tool's announcement,
+#   songs decomposed) and the zip / import / interaction-contract work (SB4, store I1–I4), which has no UI. Any later way to reach packs,
+#   rhythms or notes goes through what exists today (＋ Add, the tool page) and is shown to him first — or not done.

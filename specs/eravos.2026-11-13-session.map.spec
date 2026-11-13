@@ -75,3 +75,8 @@
   - OPEN, specced: specs/eravos.store-browse.spec (NEW — Browse, a tool's page, whole isolated zips, the interaction contract) · store.spec
     ADDENDUM 2026-11-13 (2)
   - BUILT 3.180 (SD1): specs/eravos.song-decomposition.spec — 301 songs into parts; 3,933 rhythms and 4,607 lines per tool (build/song-decompose.mjs)
+
+## 13:27:55Z (2026-11-13T13:27:55.379Z) — verbatim (after the Browse preview, SB1):
+  > no. i like the current ui. do not change it.
+  - RULE: the UI stays as it is — Browse not built (specs/eravos.store-browse.spec ADDENDUM 2026-11-13 — the Browse UI: NO); the preview kept
+    unmerged on branch claude/browse-preview. Data and no-UI work (contracts, announcements, decomposed songs, zips, import) continue.
