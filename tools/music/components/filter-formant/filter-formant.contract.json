@@ -1,0 +1,124 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "filter-formant",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "audio",
+ "kernel": "MusicParts.formantBands",
+ "ports": [
+  {
+   "id": "in",
+   "dir": "in",
+   "type": "audio",
+   "channels": 2,
+   "rate": "audio"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "audio",
+   "channels": 2,
+   "rate": "audio"
+  }
+ ],
+ "variables": [
+  {
+   "key": "A",
+   "type": "enum",
+   "options": [
+    "OO",
+    "OH",
+    "AH",
+    "EH",
+    "EE",
+    "UH",
+    "AE",
+    "IH",
+    "ER",
+    "YOI"
+   ],
+   "default": "AH",
+   "role": "tone",
+   "about": "the vowel at 0"
+  },
+  {
+   "key": "B",
+   "type": "enum",
+   "options": [
+    "OO",
+    "OH",
+    "AH",
+    "EH",
+    "EE",
+    "UH",
+    "AE",
+    "IH",
+    "ER",
+    "YOI"
+   ],
+   "default": "OO",
+   "role": "tone",
+   "about": "the vowel at 1"
+  },
+  {
+   "key": "pos",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "role": "shape",
+   "about": "morph from A to B"
+  },
+  {
+   "key": "shift",
+   "type": "number",
+   "min": -24,
+   "max": 24,
+   "default": 0,
+   "role": "pitch",
+   "unit": "semitones"
+  },
+  {
+   "key": "q",
+   "type": "number",
+   "min": 0,
+   "max": 20,
+   "default": 5,
+   "role": "tone"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "A",
+    "role": "tone",
+    "face": true
+   },
+   {
+    "key": "B",
+    "role": "tone",
+    "face": true
+   },
+   {
+    "key": "pos",
+    "role": "shape",
+    "face": true
+   },
+   {
+    "key": "shift",
+    "role": "pitch",
+    "face": false
+   },
+   {
+    "key": "q",
+    "role": "tone",
+    "face": false
+   }
+  ],
+  "needs_ui": [
+   "kit.knob",
+   "kit.segmented"
+  ]
+ }
+}

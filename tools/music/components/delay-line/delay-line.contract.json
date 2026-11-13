@@ -1,0 +1,229 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "delay-line",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "audio",
+ "kernel": "MusicParts.Delay",
+ "worklet": "eravos-delay",
+ "variables_from": "DELAY_PARAMS",
+ "ports": [
+  {
+   "id": "in",
+   "dir": "in",
+   "type": "audio",
+   "channels": 2,
+   "rate": "audio"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "audio",
+   "channels": 2,
+   "rate": "audio"
+  }
+ ],
+ "variables": [
+  {
+   "key": "time",
+   "type": "number",
+   "min": 0.001,
+   "max": 20,
+   "default": 0.375,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "time",
+   "unit": "s"
+  },
+  {
+   "key": "sync",
+   "type": "number",
+   "min": 0,
+   "max": 64,
+   "default": 0,
+   "audio_param": true,
+   "rate": "block",
+   "role": "time",
+   "unit": "beats"
+  },
+  {
+   "key": "bpm",
+   "type": "number",
+   "min": 20,
+   "max": 400,
+   "default": 120,
+   "audio_param": true,
+   "rate": "block",
+   "role": "rate"
+  },
+  {
+   "key": "feedback",
+   "type": "number",
+   "min": 0,
+   "max": 1.2,
+   "default": 0.4,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "depth"
+  },
+  {
+   "key": "damp",
+   "type": "number",
+   "min": 20,
+   "max": 22000,
+   "default": 8000,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "tone",
+   "unit": "Hz"
+  },
+  {
+   "key": "lowcut",
+   "type": "number",
+   "min": 1,
+   "max": 2000,
+   "default": 1,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "tone",
+   "unit": "Hz"
+  },
+  {
+   "key": "drive",
+   "type": "number",
+   "min": 0,
+   "max": 24,
+   "default": 0,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "drive",
+   "unit": "dB"
+  },
+  {
+   "key": "freeze",
+   "type": "boolean",
+   "min": 0,
+   "max": 1,
+   "default": false,
+   "audio_param": true,
+   "rate": "block",
+   "role": "mode"
+  },
+  {
+   "key": "mix",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0.35,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "mix"
+  },
+  {
+   "key": "mode",
+   "type": "enum",
+   "min": 0,
+   "max": 1,
+   "default": "tape",
+   "audio_param": true,
+   "rate": "block",
+   "options": [
+    "tape",
+    "digital"
+   ],
+   "role": "mode"
+  },
+  {
+   "key": "modDepth",
+   "type": "number",
+   "min": 0,
+   "max": 20,
+   "default": 0,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "depth",
+   "unit": "ms"
+  },
+  {
+   "key": "modRate",
+   "type": "number",
+   "min": 0.01,
+   "max": 10,
+   "default": 0.5,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "rate",
+   "unit": "Hz"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "time",
+    "role": "time",
+    "face": true
+   },
+   {
+    "key": "sync",
+    "role": "time",
+    "face": false
+   },
+   {
+    "key": "bpm",
+    "role": "rate",
+    "face": false
+   },
+   {
+    "key": "feedback",
+    "role": "depth",
+    "face": true
+   },
+   {
+    "key": "damp",
+    "role": "tone",
+    "face": false
+   },
+   {
+    "key": "lowcut",
+    "role": "tone",
+    "face": false
+   },
+   {
+    "key": "drive",
+    "role": "drive",
+    "face": false
+   },
+   {
+    "key": "freeze",
+    "role": "mode",
+    "face": false
+   },
+   {
+    "key": "mix",
+    "role": "mix",
+    "face": true
+   },
+   {
+    "key": "mode",
+    "role": "mode",
+    "face": false
+   },
+   {
+    "key": "modDepth",
+    "role": "depth",
+    "face": false
+   },
+   {
+    "key": "modRate",
+    "role": "rate",
+    "face": false
+   }
+  ],
+  "needs_ui": [
+   "kit.knob",
+   "kit.segmented",
+   "kit.toggle"
+  ]
+ }
+}

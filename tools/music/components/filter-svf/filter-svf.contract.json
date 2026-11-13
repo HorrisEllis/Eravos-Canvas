@@ -1,0 +1,143 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "filter-svf",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "audio",
+ "kernel": "MusicParts.SVF",
+ "worklet": "eravos-svf",
+ "variables_from": "SVF_PARAMS",
+ "ports": [
+  {
+   "id": "in",
+   "dir": "in",
+   "type": "audio",
+   "channels": 2,
+   "rate": "audio"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "audio",
+   "channels": 2,
+   "rate": "audio"
+  }
+ ],
+ "variables": [
+  {
+   "key": "frequency",
+   "type": "number",
+   "min": 16,
+   "max": 20000,
+   "default": 1000,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "tone",
+   "unit": "Hz"
+  },
+  {
+   "key": "detune",
+   "type": "number",
+   "min": -9600,
+   "max": 9600,
+   "default": 0,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "pitch",
+   "unit": "cents",
+   "about": "key-track, envelopes and LFOs sum here"
+  },
+  {
+   "key": "resonance",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "tone"
+  },
+  {
+   "key": "gain",
+   "type": "number",
+   "min": -36,
+   "max": 36,
+   "default": 0,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "level",
+   "unit": "dB"
+  },
+  {
+   "key": "mode",
+   "type": "enum",
+   "min": 0,
+   "max": 8,
+   "default": "lowpass",
+   "audio_param": true,
+   "rate": "block",
+   "options": [
+    "lowpass",
+    "highpass",
+    "bandpass",
+    "notch",
+    "peak",
+    "bell",
+    "lowshelf",
+    "highshelf",
+    "allpass"
+   ],
+   "role": "mode"
+  },
+  {
+   "key": "stages",
+   "type": "number",
+   "min": 1,
+   "max": 3,
+   "default": 1,
+   "audio_param": true,
+   "rate": "block",
+   "role": "shape",
+   "integer": true
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "frequency",
+    "role": "tone",
+    "face": true
+   },
+   {
+    "key": "detune",
+    "role": "pitch",
+    "face": false
+   },
+   {
+    "key": "resonance",
+    "role": "tone",
+    "face": true
+   },
+   {
+    "key": "gain",
+    "role": "level",
+    "face": false
+   },
+   {
+    "key": "mode",
+    "role": "mode",
+    "face": true
+   },
+   {
+    "key": "stages",
+    "role": "shape",
+    "face": false
+   }
+  ],
+  "needs_ui": [
+   "kit.knob",
+   "kit.segmented"
+  ]
+ }
+}

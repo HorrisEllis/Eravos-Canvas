@@ -1,0 +1,95 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "env-adsr",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "audio",
+ "kernel": "MusicParts.ADSR",
+ "ports": [
+  {
+   "id": "gate",
+   "dir": "in",
+   "type": "gate",
+   "rate": "audio"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "control",
+   "range": [
+    0,
+    1
+   ],
+   "rate": "audio"
+  }
+ ],
+ "variables": [
+  {
+   "key": "attack",
+   "type": "number",
+   "min": 0.0005,
+   "max": 10,
+   "default": 0.01,
+   "role": "time",
+   "unit": "s",
+   "code": "A"
+  },
+  {
+   "key": "decay",
+   "type": "number",
+   "min": 0.001,
+   "max": 10,
+   "default": 0.3,
+   "role": "time",
+   "unit": "s",
+   "code": "D"
+  },
+  {
+   "key": "sustain",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0.7,
+   "role": "level",
+   "code": "S"
+  },
+  {
+   "key": "release",
+   "type": "number",
+   "min": 0.001,
+   "max": 10,
+   "default": 0.5,
+   "role": "time",
+   "unit": "s",
+   "code": "Rl"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "attack",
+    "role": "time",
+    "face": true
+   },
+   {
+    "key": "decay",
+    "role": "time",
+    "face": true
+   },
+   {
+    "key": "sustain",
+    "role": "level",
+    "face": true
+   },
+   {
+    "key": "release",
+    "role": "time",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.knob"
+  ]
+ }
+}

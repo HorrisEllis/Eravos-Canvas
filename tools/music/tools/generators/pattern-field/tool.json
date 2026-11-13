@@ -30,6 +30,11 @@
       "bus_publish",
       "bus_subscribe",
       "registry_read"
+    ],
+    "components": [
+      "progression@1.0.0",
+      "pattern-field@1.0.0",
+      "scale-key@1.0.0"
     ]
   },
   "packs": {

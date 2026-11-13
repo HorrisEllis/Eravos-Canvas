@@ -18,6 +18,10 @@ jobs:
         run: node build/validate.mjs
       - name: The canvas is the host only (specs/eravos.bare-canvas.spec)
         run: node tests/bare-canvas.test.mjs
+      - name: Component contracts true to their code (ports, variables, UI element)
+        run: node build/component-contract.mjs
+      - name: Every tool announces its needs from its DAG
+        run: node build/tool-needs.mjs --check
       - name: No toys
         run: node tests/no-toys.mjs
       - name: No Playwright

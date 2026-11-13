@@ -1,0 +1,95 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "karplus-string",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "audio",
+ "kernel": "MusicParts.KString",
+ "ports": [
+  {
+   "id": "excite",
+   "dir": "in",
+   "type": "audio",
+   "channels": 1,
+   "rate": "audio"
+  },
+  {
+   "id": "pitch",
+   "dir": "in",
+   "type": "pitch",
+   "unit": "Hz",
+   "rate": "block"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "audio",
+   "channels": 1,
+   "rate": "audio"
+  }
+ ],
+ "variables": [
+  {
+   "key": "t60",
+   "type": "number",
+   "min": 0.05,
+   "max": 30,
+   "default": 3,
+   "role": "time",
+   "unit": "s"
+  },
+  {
+   "key": "bright",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0.5,
+   "role": "tone"
+  },
+  {
+   "key": "stretch",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "role": "tone"
+  },
+  {
+   "key": "detune",
+   "type": "number",
+   "min": -100,
+   "max": 100,
+   "default": 0,
+   "role": "pitch",
+   "unit": "cents"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "t60",
+    "role": "time",
+    "face": true
+   },
+   {
+    "key": "bright",
+    "role": "tone",
+    "face": true
+   },
+   {
+    "key": "stretch",
+    "role": "tone",
+    "face": true
+   },
+   {
+    "key": "detune",
+    "role": "pitch",
+    "face": false
+   }
+  ],
+  "needs_ui": [
+   "kit.knob"
+  ]
+ }
+}

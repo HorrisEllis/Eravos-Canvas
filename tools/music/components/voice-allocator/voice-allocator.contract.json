@@ -1,0 +1,99 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "voice-allocator",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "logic",
+ "kernel": "MusicParts.VoiceAllocator",
+ "ports": [
+  {
+   "id": "notes",
+   "dir": "in",
+   "type": "note",
+   "rate": "event"
+  },
+  {
+   "id": "voices",
+   "dir": "out",
+   "type": "data",
+   "rate": "event",
+   "about": "one result per note: voice, retrigger, stolen, glide"
+  }
+ ],
+ "variables": [
+  {
+   "key": "voices",
+   "type": "number",
+   "min": 1,
+   "max": 32,
+   "default": 8,
+   "role": "voice",
+   "integer": true
+  },
+  {
+   "key": "mode",
+   "type": "enum",
+   "options": [
+    "poly",
+    "mono",
+    "legato"
+   ],
+   "default": "poly",
+   "from": "VOICE_MODES",
+   "role": "mode"
+  },
+  {
+   "key": "steal",
+   "type": "enum",
+   "options": [
+    "oldest",
+    "quietest",
+    "same-note",
+    "lowest",
+    "highest"
+   ],
+   "default": "oldest",
+   "from": "VOICE_STEAL",
+   "role": "mode"
+  },
+  {
+   "key": "release",
+   "type": "number",
+   "min": 0,
+   "max": 30,
+   "default": 0,
+   "role": "time",
+   "unit": "s",
+   "code": "relSec"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "voices",
+    "role": "voice",
+    "face": true
+   },
+   {
+    "key": "mode",
+    "role": "mode",
+    "face": true
+   },
+   {
+    "key": "steal",
+    "role": "mode",
+    "face": false
+   },
+   {
+    "key": "release",
+    "role": "time",
+    "face": false
+   }
+  ],
+  "needs_ui": [
+   "kit.knob",
+   "kit.segmented"
+  ]
+ }
+}

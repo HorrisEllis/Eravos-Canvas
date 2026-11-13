@@ -1,0 +1,116 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "bbd-line",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "audio",
+ "kernel": "MusicParts.BBD",
+ "worklet": "eravos-bbd",
+ "variables_from": "BBD_PARAMS",
+ "ports": [
+  {
+   "id": "in",
+   "dir": "in",
+   "type": "audio",
+   "channels": 2,
+   "rate": "audio"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "audio",
+   "channels": 2,
+   "rate": "audio"
+  }
+ ],
+ "variables": [
+  {
+   "key": "time",
+   "type": "number",
+   "min": 0.0005,
+   "max": 0.5,
+   "default": 0.005,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "time",
+   "unit": "s"
+  },
+  {
+   "key": "stages",
+   "type": "number",
+   "min": 256,
+   "max": 4096,
+   "default": 1024,
+   "audio_param": true,
+   "rate": "block",
+   "role": "tone",
+   "integer": true
+  },
+  {
+   "key": "hiss",
+   "type": "number",
+   "min": -120,
+   "max": -40,
+   "default": -84,
+   "audio_param": true,
+   "rate": "block",
+   "role": "colour",
+   "unit": "dB"
+  },
+  {
+   "key": "bleed",
+   "type": "number",
+   "min": -120,
+   "max": -40,
+   "default": -120,
+   "audio_param": true,
+   "rate": "block",
+   "role": "colour",
+   "unit": "dB"
+  },
+  {
+   "key": "compand",
+   "type": "boolean",
+   "min": 0,
+   "max": 1,
+   "default": true,
+   "audio_param": true,
+   "rate": "block",
+   "role": "mode"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "time",
+    "role": "time",
+    "face": true
+   },
+   {
+    "key": "stages",
+    "role": "tone",
+    "face": true
+   },
+   {
+    "key": "hiss",
+    "role": "colour",
+    "face": true
+   },
+   {
+    "key": "bleed",
+    "role": "colour",
+    "face": false
+   },
+   {
+    "key": "compand",
+    "role": "mode",
+    "face": false
+   }
+  ],
+  "needs_ui": [
+   "kit.knob",
+   "kit.toggle"
+  ]
+ }
+}

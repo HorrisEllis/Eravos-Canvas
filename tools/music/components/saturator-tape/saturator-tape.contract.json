@@ -1,0 +1,146 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "saturator-tape",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "audio",
+ "kernel": "MusicParts.TapeSat",
+ "worklet": "eravos-saturator-tape",
+ "variables_from": "TAPESAT_PARAMS",
+ "ports": [
+  {
+   "id": "in",
+   "dir": "in",
+   "type": "audio",
+   "channels": 2,
+   "rate": "audio"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "audio",
+   "channels": 2,
+   "rate": "audio"
+  }
+ ],
+ "variables": [
+  {
+   "key": "drive",
+   "type": "number",
+   "min": 0,
+   "max": 24,
+   "default": 6,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "drive",
+   "unit": "dB"
+  },
+  {
+   "key": "bias",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0.2,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "colour"
+  },
+  {
+   "key": "bump",
+   "type": "number",
+   "min": 0,
+   "max": 6,
+   "default": 2,
+   "audio_param": true,
+   "rate": "block",
+   "role": "tone",
+   "unit": "dB"
+  },
+  {
+   "key": "bumpFreq",
+   "type": "number",
+   "min": 30,
+   "max": 200,
+   "default": 90,
+   "audio_param": true,
+   "rate": "block",
+   "role": "tone",
+   "unit": "Hz"
+  },
+  {
+   "key": "hf",
+   "type": "number",
+   "min": 2000,
+   "max": 24000,
+   "default": 14000,
+   "audio_param": true,
+   "rate": "block",
+   "role": "tone",
+   "unit": "Hz"
+  },
+  {
+   "key": "out",
+   "type": "number",
+   "min": -24,
+   "max": 6,
+   "default": 0,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "level",
+   "unit": "dB"
+  },
+  {
+   "key": "mix",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 1,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "mix"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "drive",
+    "role": "drive",
+    "face": true
+   },
+   {
+    "key": "bias",
+    "role": "colour",
+    "face": true
+   },
+   {
+    "key": "bump",
+    "role": "tone",
+    "face": false
+   },
+   {
+    "key": "bumpFreq",
+    "role": "tone",
+    "face": false
+   },
+   {
+    "key": "hf",
+    "role": "tone",
+    "face": false
+   },
+   {
+    "key": "out",
+    "role": "level",
+    "face": false
+   },
+   {
+    "key": "mix",
+    "role": "mix",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.knob"
+  ]
+ }
+}

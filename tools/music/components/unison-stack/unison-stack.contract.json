@@ -1,0 +1,132 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "unison-stack",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "logic",
+ "kernel": "MusicParts.UnisonStack",
+ "ports": [
+  {
+   "id": "layout",
+   "dir": "out",
+   "type": "data",
+   "rate": "block",
+   "about": "per voice: cents, pan, gain, phase — any source is played once per voice with them"
+  }
+ ],
+ "variables": [
+  {
+   "key": "voices",
+   "type": "number",
+   "min": 1,
+   "max": 16,
+   "default": 1,
+   "role": "voice",
+   "integer": true,
+   "code": "n"
+  },
+  {
+   "key": "detune",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "role": "pitch",
+   "about": "0…100 cents at the outermost voice"
+  },
+  {
+   "key": "curve",
+   "type": "enum",
+   "options": [
+    "linear",
+    "exp",
+    "supersaw"
+   ],
+   "default": "supersaw",
+   "from": "UNISON_CURVES",
+   "role": "shape"
+  },
+  {
+   "key": "spread",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "role": "width"
+  },
+  {
+   "key": "blend",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "role": "mix"
+  },
+  {
+   "key": "phase",
+   "type": "enum",
+   "options": [
+    "free",
+    "reset",
+    "seeded random"
+   ],
+   "default": "free",
+   "from": "UNISON_PHASES",
+   "role": "mode",
+   "code": "phaseMode"
+  },
+  {
+   "key": "seed",
+   "type": "number",
+   "min": 1,
+   "max": 2147483647,
+   "default": 1,
+   "role": "seed",
+   "integer": true
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "voices",
+    "role": "voice",
+    "face": true
+   },
+   {
+    "key": "detune",
+    "role": "pitch",
+    "face": true
+   },
+   {
+    "key": "curve",
+    "role": "shape",
+    "face": false
+   },
+   {
+    "key": "spread",
+    "role": "width",
+    "face": true
+   },
+   {
+    "key": "blend",
+    "role": "mix",
+    "face": false
+   },
+   {
+    "key": "phase",
+    "role": "mode",
+    "face": false
+   },
+   {
+    "key": "seed",
+    "role": "seed",
+    "face": false
+   }
+  ],
+  "needs_ui": [
+   "kit.knob",
+   "kit.segmented"
+  ]
+ }
+}

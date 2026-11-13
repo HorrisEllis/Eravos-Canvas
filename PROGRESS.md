@@ -2,6 +2,22 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.179 Component contracts; every tool announces its needs; the store, Browse and songs decomposed specced (2026-11-13)
+His words: "just begin. also songs decomposed one by one. maybe a tool store … like you click browse … a tool page per tool with the relevant
+dependancies and packs. rhythmes and notes per tool. like all tools zipped in a zip with all of its components, dag, etc. all isolated from
+each other. the canvas using a interaction contract." (13:11:29Z) — after "Each component of each tool has a element for the ui to synthesis."
+- CG1 (sound components): tools/music/components/<id>/<id>.contract.json for 23 of the 33 components with code — ports (typed from
+  tools/music/types.json), variables, UI element (controls with roles, what is on the face, the kit elements it needs). Five components'
+  variables generated from their AudioParams; build/component-contract.mjs checks every contract against its code (80 variables exactly,
+  49 by name) — four planted errors each caught (a range, an option, a port type, a name), and it caught two of my own while writing them.
+- The announcement: build/tool-needs.mjs writes needs.components (id@version, from the spec's DAG) and needs.elements into each tool.json —
+  18 tools; Retro DCO announces its 12 components and their 12 elements. --check in CI; schema knows both keys.
+- Specs: eravos.store-browse (Browse: domains → tools → a tool's page with NEEDS, PACKS, SOUNDS, RHYTHMS, NOTES; whole isolated tool zips;
+  the interaction contract — manifest, kernel hooks, announced kit elements, SDK), eravos.song-decomposition (every song into parts; rhythms
+  and notes per tool), store ADDENDUM (2), components ADDENDUM (3).
+- Proof: component-contract ✓ (23/33), tool-needs --check ✓, validate 259, P38 37/37, P139 7/7, P123 9/9, P119 3/3, P176 3/3, boundary 10/10,
+  components, library-tools 14/14; the catalog unchanged.
+
 ## 3.178 The Field leaves the canvas (BC1) — nothing he sees changes (2026-11-13)
 His words: "i feel the workshop should be a tool on its own. like can we make the canvas more bare?" · "yes that works".
 - canvas/runtime/workshop.{js,css} → tools/core/field/field.{js,css} (git mv: history kept). tools/core/ is a new tool-less, domain-free

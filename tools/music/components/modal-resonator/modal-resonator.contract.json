@@ -1,0 +1,82 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "modal-resonator",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "audio",
+ "kernel": "MusicParts.Modal",
+ "ports": [
+  {
+   "id": "in",
+   "dir": "in",
+   "type": "audio",
+   "channels": 1,
+   "rate": "audio"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "audio",
+   "channels": 1,
+   "rate": "audio"
+  }
+ ],
+ "variables": [
+  {
+   "key": "shape",
+   "type": "enum",
+   "options": [
+    "beam",
+    "bar",
+    "body"
+   ],
+   "default": "beam",
+   "role": "shape",
+   "code": "MODAL_SHAPES"
+  },
+  {
+   "key": "modes",
+   "type": "number",
+   "min": 1,
+   "max": 64,
+   "default": 8,
+   "role": "voice",
+   "integer": true,
+   "code": "freqs"
+  },
+  {
+   "key": "t60",
+   "type": "number",
+   "min": 0.01,
+   "max": 30,
+   "default": 2,
+   "role": "time",
+   "unit": "s",
+   "code": "t60s"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "shape",
+    "role": "shape",
+    "face": true
+   },
+   {
+    "key": "modes",
+    "role": "voice",
+    "face": true
+   },
+   {
+    "key": "t60",
+    "role": "time",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.knob",
+   "kit.segmented"
+  ]
+ }
+}

@@ -36,6 +36,9 @@
       "bus_publish",
       "bus_subscribe",
       "registry_read"
+    ],
+    "components": [
+      "wave-table@1.0.0"
     ]
   },
   "packs": {
