@@ -25,6 +25,11 @@
       { key: 'tempoX', type: 'enum', options: ['¼', '½', '¾', '1', '1½', '2', '3', '4', 'own'], default: '1', label: 'Speed', group: 'TEMPO', element: 'own:tempo', hint: 'this tool’s speed against the song: ½ = half time, 2 = double time, own = its own BPM below', settingsOnly: true },
       { key: 'tempoBpm', type: 'number', default: 120, min: 30, max: 300, step: 0.5, unit: 'BPM', label: 'Own BPM', group: 'TEMPO', element: 'own:tempo', hint: 'used when Speed is “own” — stays locked to the song’s start', settingsOnly: true },
     ]);
+    // 3.186 (his words, 2026-11-13: "Tempo. Pitch need more automation. Bpm."): Speed and Own BPM automate like every knob. The SDK gives each
+    // knob its input when a tool is defined, before this hook adds these two — so they get theirs here, the same way (knob.<key>, off the rail)
+    const STD = global.OrganismSDK && global.OrganismSDK.STD, audio = (desc.permissions || []).some(x => x === 'audio_out' || x === 'audio_in');
+    if (STD && STD.mod_in && audio && Array.isArray(desc._knobInputs)) ['tempoX', 'tempoBpm'].forEach(k => { if ((desc.hooks || []).some(h => h.hook_id === 'knob.' + k)) return;
+      desc._knobInputs.push(k); desc.hooks.push(Object.assign(STD.mod_in('knob.' + k, 'knob.' + k), { rail: false, knob: k, intent: 'move ' + (k === 'tempoX' ? 'Speed' : 'Own BPM') })); });
   });
   F.onDefine((desc) => {
     // v10 plugin JSON presets → factory presets (eravos.v10-conversion: "each FX organism seeds factory presets from its file")

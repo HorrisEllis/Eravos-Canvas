@@ -372,7 +372,10 @@
   function optionText(v) {
     if (typeof v !== 'string') return String(v);
     let first = true;   // title case: small joining words stay small after the first word (as in any title)
+    if (/^[ivxIVX]+([-+/\s]+[ivxIVX]+)+$/.test(v)) return v;   // numerals in sequence (i-iv-v-i): their case is their meaning
+    const roman = /(^|[^A-Za-z])[IVX]+([^A-Za-z]|$)/.test(v);   // an uppercase numeral beside lowercase ones (i-VI-III-VII): the case is the meaning — kept
     return v.split(/(\s+|-|\+|\/)/).map(t => { if (!t || /^(\s+|-|\+|\/)$/.test(t)) return t; const f = first; first = false;
+      if (roman && /^[ivx]+$/.test(t)) return t;
       if (WORDS[t] !== undefined) return WORDS[t]; if (!f && /^(and|of|for|in|on|or|to|the|a|an|at|by)$/.test(t)) return t; return /^[a-z][a-z']*$/.test(t) ? t[0].toUpperCase() + t.slice(1) : t; }).join('');
   }
   // ---------------------------------------------------------------- param panel bound to an organism view

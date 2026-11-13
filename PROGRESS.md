@@ -2,6 +2,20 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.186 Bassline 2.0 — time, notes, locks and rests (shown, waiting for his yes) (2026-11-13)
+His words: "I love the bassline, needs more depth and control. like tempo and the cord tool. bassline is high leverage." (12:31:19Z) · "Okay.
+The bassline tool. Way more depth. I like that tool. A lot." (15:58:04Z)
+- engine 2.0.0 (bass-gen.spec ADDENDUM 2026-11-13 (2)): TIME feel (half / normal / double), swing, phrase + answer · NOTES a pool (root, + fifth,
+  + octave, chord tones, scale, walking) left by tension, range, ahead (anticipation) · STEPS lock and rest lanes. Every one neutral by default.
+- Then his "It looks the same. Tempo. Pitch need more automation. Bpm.": the window gains TIME · PITCH — Own BPM, Swing, Answer, Pitch
+  (transpose −12..12, in scale steps or semitones), Tension, Range, Ahead knobs; Speed, Feel, Pool, Pitch in strips. Every knob automates:
+  Speed and Own BPM now carry knob inputs too (tools/music/domain.js — every music tool). The lanes stay on the Steps tab (no duplicates).
+- Found on the way: title case (3.184) turned progressions like i-VI-III-VII into I-VI-III-VII (minor read as major) — numerals in sequence
+  keep their case (canvas/runtime/ui-kit.js); P184 guards it.
+- Proof: bass-gen.test.js 26/26 (16 of 1.1 unchanged + 10 for 2.0: defaults = 1.1 bar for bar, each control does what it says, pitch moves
+  live, every knob has an automation input); P184 2/2, P183 2/2, P132 3/3, P49 10/10, P48 17/17, boundary 10/10; design check no worse.
+  Shown first: docs/previews/bassline-2-window.png, bassline-2-steps.png.
+
 ## 3.185 The full suite run: six failures of mine found and fixed (2026-11-13)
 The full in-page suite (1,600 tests) on today's main: 10 failed. Each re-run on main and on main of 2026-11-10 to find whose they are.
 - Mine, fixed here:
