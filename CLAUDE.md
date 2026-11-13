@@ -97,6 +97,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-13 | **Piano** (3.182): the approved face, built from its 7 components + voice-allocator in one worklet — tine, reed (modal), felt, upright, honky, grand (stretched strings), hammer, body, sympathetic strings, pedal, tremolo, tube; 10 factory presets; four level / headroom faults found by measuring, fixed and guarded | `tools/music/tools/genre-instruments/piano/`, `karplus-string` (KSTRING_SRC) | `piano` 49/49, P182 6/6, P163 32/32, design check clean |
 | 2026-11-13 | **CG1 finished** (3.181): 33 of 33 components with code carry a checked contract; a default stated in the code is checked too (5 hand-written defaults were wrong, fixed); 18 tools announce their components' UI elements | `tools/music/components/*/<id>.contract.json`, `build/component-contract.mjs` | `node build/component-contract.mjs` (CI) |
 | 2026-11-13 | **Songs decomposed** (3.180, SD1): 301 songs into parts — each part's tool, preset, bar-by-bar rhythm and line; per tool 3,933 rhythms and 4,607 lines (onsets / notes relative to the key; velocity not identity), each naming its songs | `build/song-decompose.mjs`, `tools/music/data/song-parts/`, `docs/song-decomposition.md` | `tests/song-parts.test.mjs`; deterministic (two runs identical); CI keeps it up to date |
 | 2026-11-13 | **Component contracts; tools announce their needs** (3.179, CG1): 23 sound components carry `<id>.contract.json` (ports, variables, UI element) checked against their code; 18 tool.json announce their components and elements from the DAG; specs: Browse, isolated tool zips, the interaction contract, songs decomposed | `build/component-contract.mjs`, `build/tool-needs.mjs`, `tools/music/types.json`, `specs/eravos.store-browse.spec`, `specs/eravos.song-decomposition.spec` | both checks in CI; P38 37/37, P139 7/7, boundary 10/10 |
@@ -207,5 +208,8 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 - Patterns for each tool with variety: presets, depth, curves, per-note editing — everything the timeline can do.
 - Delete the merged branch `claude/nice-dirac-t64qeo` (a session could not: deleting a remote branch needs his permission).
 - Emerge work (E1–E3) needs a session with push access to `HorrisEllis/Emerge`. E4: widen Emerge's "only kernel32" axiom for the UI host? (his call)
+- **The next high-leverage set** (2026-11-13, his "the next set of high leverage tools"): Piano ✓ (3.182) → Ensemble Organism (ready; UI preview
+  first) → the components that unlock the most (slew-lag, mpe-expression, relationship-graph, reverb-fdn, waveshaper; `docs/eco-graph.md`).
+- Piano: MIDI CC64 / CC67 straight to the pedal (the SDK carries notes, not controllers).
 - Wobble Bass sounds before any note in an offline headless render (found 3.130; left out of the P130 guard).
 - AE vowel: Wub Filter's third band −12 dB vs the table's −14 dB (his call).

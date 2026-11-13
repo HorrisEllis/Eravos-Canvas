@@ -48,4 +48,5 @@ Bell and Tremolo dim on the acoustic models; Sympathetic dims on tine and reed; 
 - [x] Surfaces are tokens only · [x] one accent · [x] kit parts at kit sizes · [x] no primary needed (keys) · [x] knob labels fit
 - [x] The preview was shown to him, and his answer is quoted here:
   > "yes" (2026-11-06, to the lofi previews and specs — Tape Memory, Piano, the Lofi setup, Bind on the lane)
-- [ ] After it is built: `node tests/design-check.mjs` reports it clean
+- [x] After it is built: `node tests/design-check.mjs` reports it clean (3.182 — 58 of 75 tools pass every rule, Piano among them)
+- Built 2026-11-13 (3.182): `docs/previews/piano-built.png` (playing, the same face)

@@ -1,8 +1,8 @@
 /* ERAVOS runtime — canvas-prefs.js (3.114). Domain-free.
  * Asked: "full settings were supposed to be built … the settings menu is still gone. a lot missing" · "can you make a colored border
- * around each tool, including the piano [roll] … or [two of them] are getting merged".
+ * around each tool, including [a tool's own windows] … or [two of them] are getting merged".
  * More of ⚙ Settings, each remembered on this computer:
- *   Canvas   Coloured border on every tool (and on a tool's own windows, like the piano roll) · Snap windows to each other
+ *   Canvas   Coloured border on every tool (and on the windows a tool opens of its own) · Snap windows to each other
  *   Keys     the keyboard shortcuts, in one place (the canvas's own; a domain adds its tools' with CanvasPrefs.addKeys(group, rows)), with a search
  *   Library  (the app) where your work lives, and buttons to open each folder
  * The canvas names no tool here: a border takes the window's own colour (--acc). */
@@ -11,7 +11,7 @@
   const doc = global.document; if (!doc) return;
   const root = doc.documentElement;
   const PREFS = [
-    { key: 'toolBorders', attr: 'toolBorders', def: 'on', label: 'Coloured border on every tool', hint: 'each window — and a tool’s own windows, like the piano roll — outlined in its colour, so they never run into each other' },
+    { key: 'toolBorders', attr: 'toolBorders', def: 'on', label: 'Coloured border on every tool', hint: 'each window — and the windows a tool opens of its own — outlined in its colour, so they never run into each other' },
     { key: 'snap', attr: 'snap', def: 'on', label: 'Snap windows to each other', hint: 'a window you drag or size lines up with the windows near it (hold Alt to place it freely either way)' },
   ];
   const get = (p) => { let v = null; try { v = global.localStorage.getItem('eravos.' + p.key); } catch (e) {} return v === 'on' || v === 'off' ? v : p.def; };

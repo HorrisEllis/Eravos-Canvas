@@ -70,7 +70,9 @@
   }
   // the loop's total phase delay at a frequency (tests: the tuning is exact at f0, and shorter above it when stretched)
   function kstringLoopDelay(N, eta, c, p, w) { return N + phaseDelay([eta, 1], [1, eta], w) + (c ? M * phaseDelay([c, 1], [1, c], w) : 0) + phaseDelay([1 - p], [1, -p], w); }
+  // the kernel as text a worklet can run: its own helpers with it (3.182, Piano) — the SAME functions, so what the tests prove is what plays
+  const KSTRING_SRC = `const M = ${M};\n${phaseDelay.toString()}\n${magnitude.toString()}\nconst KString = ${KString.toString()};`;
   root.MusicParts = root.MusicParts || {};
-  Object.assign(root.MusicParts, { KString, kstringLoopDelay });
-  if (typeof module !== 'undefined' && module.exports) module.exports = { KString, kstringLoopDelay, phaseDelay };
+  Object.assign(root.MusicParts, { KString, kstringLoopDelay, KSTRING_SRC });
+  if (typeof module !== 'undefined' && module.exports) module.exports = { KString, kstringLoopDelay, phaseDelay, KSTRING_SRC };
 })(typeof window !== 'undefined' ? window : globalThis);
