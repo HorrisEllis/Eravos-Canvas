@@ -97,6 +97,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-13 | **The Field leaves the canvas** (3.178, BC1): `canvas/runtime/workshop.*` → `tools/core/field/` (a domain-free domain loaded first: `"always"`); the canvas = the host (a guard lists its 35 files); validate + the guard in CI — nothing he sees changes | `tools/core/`, `canvas/runtime/catalog.js`, `tests/bare-canvas.test.mjs` | Field suites unchanged and green, P38 37/37, boundary 10/10 |
 | 2026-11-13 | **The Field; every song preview tested** (3.176, 3.177): the Workshop is called the Field; the notes map erases, lengthens, thickens (pitch width · loudness · voices); a tool's contract (`field` in tool.json) puts its own knobs first, the rest by stage · all 301 previews measured, levelled by loudness, 17 measured trims on 11 genres (median pinned 0.22 → 0.11 %) | `timeline.workshop.js`, `build/index-tools.mjs`, `data/song-preview.js`, `data/songbook-mix.js` | `tests/p175` 4/4, `p176` 3/3 · PR #172 |
 | 2026-11-13 | **The Workshop's layers, finished** (3.175): the eye turns a shape / modulator off in what plays, lock, amount 0–100 %, order (drag, Ctrl+[ ]), rename, duplicate, delete, reset, copy / paste across notes — one undo step each; a kind says what a layer can do (`layerOps`, `'@layer'`); the kind's own delete buttons gone; mod-tree 1.1 (a modulator's amount) | `canvas/runtime/workshop.{js,css}`, `timeline.workshop.js`, `components/mod-tree` | `tests/p174` 4/4 · PR #170 |
 | 2026-11-13 | **The machine songs** (3.174): 24 songs on his three shelves (lofi, synthwave, wobble bass — no new category), Floor Falls Out's arc and sound, everything wired (curves on effects and modulators, routes from any output, LFOs, the XY Pad, the Arp, the Drop Builder), measured beside FFO; the Song Engine reaches effects / modulators (existing genres byte-identical) | `data/eravos-now-songbook.js`, `data/song-engine.js` | `tests/p173` 6/6, P172 · PR #169 |
@@ -191,8 +192,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 - **Mutation, a bare canvas, dynamic UI** (2026-11-13, specced, nothing built): the compatibility graph and tools that mutate
   (`specs/eravos.compat-graph.spec`), the Field a tool and the canvas the host only (`specs/eravos.bare-canvas.spec`), UIs that merge when
   wired (`specs/eravos.ui-field.spec` ADDENDUM 2026-11-13), Bassline 2.0 (`bass-gen.spec` ADDENDUM). Not waiting for Emerge (v2 plan
-  ADDENDUM 2026-11-13). Order: BC1 → CG1 → CG2 → CG3 → the Field's swap / mutate UI (shown first) → Bassline 2.0. Map: `specs/eravos.2026-11-13-session.map.spec`.
-- `node build/validate.mjs` is not in CI (3.176's tool contracts merged failing it; fixed 2026-11-13) — add it to checks.yml.
+  ADDENDUM 2026-11-13). Order: BC1 ✓ → CG1 → CG2 → CG3 → the Field's swap / mutate UI (shown first) → Bassline 2.0. Map: `specs/eravos.2026-11-13-session.map.spec`.
 - Connecting with people (share as a link, remix with credit, play together, share packs) — pinned 2026-11-05.
 - Songs as a rhythm-exploring tool only (not usable for making music).
 - Patterns for each tool with variety: presets, depth, curves, per-note editing — everything the timeline can do.

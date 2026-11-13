@@ -6,6 +6,7 @@
   "type": "object",
   "required": ["schema", "id", "label", "version", "core", "ports"],
   "properties": {
+    "always": { "type": "boolean", "description": "loaded before any other domain, whatever is installed — shared parts every domain may use (tools/core: the Field). specs/eravos.bare-canvas.spec BC1" },
     "schema": { "const": "eravos.domain/1" },
     "id": { "type": "string" }, "label": { "type": "string" }, "version": { "type": "string" }, "icon": { "type": "string" },
     "core": { "type": "array", "items": { "type": "string" }, "description": "core/ files in load order (engines, theory, shared UI kit) — shared by the domain's tools, never inside a tool" },

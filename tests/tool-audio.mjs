@@ -17,7 +17,7 @@ const argv = process.argv.slice(2), opt = (k) => { const i = argv.indexOf(k); re
 const FILTER = argv.find((a, i) => !a.startsWith('--') && !(i > 0 && argv[i - 1].startsWith('--'))) || '';
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 const list = (dir, re) => fs.readdirSync(path.join(ROOT, dir)).filter(f => re.test(f)).map(f => dir + '/' + f);
-const skeleton = [...list('canvas/kernel', /\.js$/), ...list('canvas/runtime', /\.(js|css)$/), 'canvas/index.html', 'canvas/scripts.js'];
+const skeleton = [...list('canvas/kernel', /\.js$/), ...list('canvas/runtime', /\.(js|css)$/), 'canvas/index.html', 'canvas/scripts.js', ...list('tools/core', /\.js$/), ...list('tools/core/field', /\.(js|css)$/)];   // tools/core is domain-free too (bare-canvas BC1)
 const toolDirs = fs.readdirSync(path.join(ROOT, 'tools')).filter(d => fs.existsSync(path.join(ROOT, 'tools', d, 'tools')))
   .flatMap(d => fs.readdirSync(path.join(ROOT, 'tools', d, 'tools')).filter(c => fs.statSync(path.join(ROOT, 'tools', d, 'tools', c)).isDirectory())
   .flatMap(c => fs.readdirSync(path.join(ROOT, 'tools', d, 'tools', c)).filter(t => fs.existsSync(path.join(ROOT, 'tools', d, 'tools', c, t, 'tool.json'))).map(t => `tools/${d}/tools/${c}/${t}`)));

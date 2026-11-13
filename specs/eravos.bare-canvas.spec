@@ -61,6 +61,15 @@ BC2 — wired (new UI: a preview shown to him before it is built): a Field windo
   wired to several it is the merged surface (specs/eravos.ui-field.spec ADDENDUM 2026-11-13); opening from a note keeps working.
   The tool's side: a kind (Workshop.addKind) is the "editable" contract today; BC2 names it as a port type.
 
+## ADDENDUM 2026-11-13 (BC1 done) — the host list the guard reads (nothing above is changed)
+# his words (2026-11-13): "yes that works" (to: BC1 — the Field out of the canvas into tools/core/field/, nothing he sees changes)
+#   - moved: canvas/runtime/workshop.{js,css} → tools/core/field/field.{js,css}; tools/core/ is a tool-less, domain-free domain
+#     (domain.json "always": true — the Catalog loads a domain marked always before any other, whatever is installed; the canvas reads the
+#     flag and names no domain); ERAVOS_DOMAINS lists core first; the boundary test scans tools/core as it scans the canvas.
+#   - the guard: tests/bare-canvas.test.mjs (plain node, in CI) — every canvas/runtime/*.js is on the line below; a new file fails until listed.
+host_files: add-menu.js app-settings.js black-surfaces.js canvas-prefs.js canvas-wm.js catalog.js colour-field.js content-packs.js context-menu.js dep-graph.js desktop-bridge.js erv.js expansion.js glass-layer.js glass-link.js history.js icons.gen.js icons.js links.js mods-rack.js mods.js organism-factory.js organism-sdk.js pack-editor.js plain-errors.js preview.js recipes.js suites.js themes.js tool-page.js tool-settings.js ui-kit.js updates.js wire-system.js workspace.js
+#   (dep-graph, pack-editor, mods-rack are on the list until BC3 moves them; suites, colour-field, glass-layer until he decides — D4)
+
 ## the rule this adds (a guard, with BC1)
   tests/bare-canvas.test.js: every file in canvas/runtime is in the HOST list above (with its why); a new file fails until it is listed —
   so the canvas only grows by a decision. The list lives in this spec and the test reads it.

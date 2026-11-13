@@ -71,6 +71,15 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-13 · A part moved out of the host with nothing changed, and a rule that keeps it out — PR (BC1)
+- **His words (2026-11-13):** "i feel the workshop should be a tool on its own. like can we make the canvas more bare?" · "yes that works"
+- **His call:** the Field a tool of its own; a barer canvas.
+- **Built:** the Field moved out of the canvas into a domain-free shared domain loaded before any other (a flag the canvas reads without naming
+  a domain), with history kept; a guard that fails when a file is added to the canvas without a listed decision; manifest validation added to
+  CI after it was found missing (a schema failure had merged unnoticed).
+- **Proof:** every Field test unchanged and green; catalog 37/37; boundary 10/10; a fresh profile and a later install checked in the real page.
+- **Check:** `node tests/bare-canvas.test.mjs` · `node build/validate.mjs` · `node tests/run.mjs P150` … `P176` · `specs/eravos.bare-canvas.spec`
+
 ### 2026-11-13 · Decisions: tools that mutate, a bare canvas, not waiting for Emerge — mapped and specced before any code
 _Decisions and specs only: nothing below is built yet. Each line names who made the call._
 - **His words (2026-11-13, UTC):** "I love the bassline, needs more depth and control. like tempo and the cord tool. bassline is high

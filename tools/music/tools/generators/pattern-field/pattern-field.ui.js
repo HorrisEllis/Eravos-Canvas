@@ -1,5 +1,5 @@
 /* eravos.pattern-field UI — the window (a flat view of the shape and what emerges, the main controls, Open in Field) and the Field's
- * music PATTERN kind (canvas/runtime/workshop.js is domain-free; every word and picture of a pattern is here). 3.150, W1 flat. */
+ * music PATTERN kind (tools/core/field/field.js is domain-free; every word and picture of a pattern is here). 3.150, W1 flat. */
 (function () {
   'use strict';
   const PF = () => window.MusicParts.PF, TOOL = () => window.MusicParts.PF_TOOL;

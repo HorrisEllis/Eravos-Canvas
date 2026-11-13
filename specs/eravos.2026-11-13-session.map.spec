@@ -48,3 +48,7 @@
     docs/PROOF-OF-COMPETENCY.md (Decisions, 2026-11-13) and the register (docs/competence/)
   - the order he agreed to begin ("lets begin", after the order was proposed): BC1 the Field out of the canvas → CG1 ports as data → CG2 the
     graph → CG3 one mutant → the Field's swap / mutate UI shown first → Bassline 2.0 on the graph
+
+## (after 12:42:48Z) — verbatim:
+  > yes that works
+  - BUILT 3.178 (BC1): the Field → tools/core/field/; the canvas the host only (tests/bare-canvas.test.mjs); validate in CI

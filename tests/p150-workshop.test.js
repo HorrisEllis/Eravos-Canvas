@@ -1,4 +1,4 @@
-/* P150 — the Workshop surface (canvas/runtime/workshop.js), W1 flat. His words, 2026-11-07: "can you make it more like photoshop? or like a 3d
+/* P150 — the Workshop surface (tools/core/field/field.js), W1 flat. His words, 2026-11-07: "can you make it more like photoshop? or like a 3d
  * renderer? … this could be the build surface for emerge." · "Yeah, we can just start with this. The small, like just the flat". A kind from
  * no domain at all (a square whose size is its one value) proves the surface is agnostic: it opens, edits, undoes, keeps a history, closes. */
 window.__phase = 'P150';

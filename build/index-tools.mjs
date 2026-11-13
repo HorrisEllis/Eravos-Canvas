@@ -9,7 +9,7 @@ const CAT = { domains: [], tools: [], suites: [] };   // → tools/catalog.js: w
 for (const d of fs.readdirSync(DOM).filter(n => fs.statSync(path.join(DOM, n)).isDirectory())) {
   const toolsDir = path.join(DOM, d, 'tools');
   if (!fs.existsSync(path.join(DOM, d, 'domain.js')) && !fs.existsSync(toolsDir)) {   // a tool-less domain (dataflow): catalog entry only
-    const dj = path.join(DOM, d, 'domain.json'); if (fs.existsSync(dj) && fs.existsSync(path.join(DOM, d, 'index.js'))) { const dm = JSON.parse(fs.readFileSync(dj, 'utf8')); CAT.domains.push({ id: d, label: dm.label || d, icon: dm.icon || '', summary: dm.summary || '', ports: dm.ports || [], modes: dm.modes || [], starter: [], loader: `${d}/index.js`, toolless: true }); }
+    const dj = path.join(DOM, d, 'domain.json'); if (fs.existsSync(dj) && fs.existsSync(path.join(DOM, d, 'index.js'))) { const dm = JSON.parse(fs.readFileSync(dj, 'utf8')); CAT.domains.push({ id: d, label: dm.label || d, icon: dm.icon || '', summary: dm.summary || '', ports: dm.ports || [], modes: dm.modes || [], starter: [], loader: `${d}/index.js`, toolless: true, ...(dm.always ? { always: true } : {}) }); }
     continue;
   }
   fs.mkdirSync(toolsDir, { recursive: true });
