@@ -2,6 +2,18 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.184 The pedal off the display; options in title case — shown, waiting for his yes (2026-11-13)
+His words (with a screenshot): "overlap. why lowercase all the time also? like porffesssional anbd production grade, matching the themes. enterprise grade."
+- The overlap, measured: Piano's display ends at y 287 and the Sustain pedal's row starts at 287; the button (30 px in a 27 px row, −1.5 px
+  margin, 3 px ring) rides into the display's edge. The pedal now sits in the header beside Model (as Retro DCO's Hold) — no overlap, and
+  Piano ~30 px shorter (it helps the "cut off" on a short screen).
+- Lowercase: every setting's options are SHOWN in title case — UIKit.optionText (canvas, domain-free: all-lowercase words capitalised, small
+  joining words kept small mid-phrase, anything with digits / capitals / symbols as written; a tool may give optionLabels) and UIKit.words, where
+  a domain registers its acronyms (music, ui-music.js: SVF, LFO, FM, BPM, MIDI, PWM, HP, LP, DnB, UKG, VHS, file formats, Roman numerals). The
+  values are stored as before, so presets, songs and projects are unchanged.
+- Shown first (his rule): docs/previews/case-before-*.png / case-after-*.png (Piano, Retro DCO, Swarm). OPEN: the lowercase words tools draw
+  in their displays and hint lines — a second pass, shown first.
+
 ## 3.183 Element synthesis, ES1 — Piano's controls separated into elements; a face synthesised from them (preview) (2026-11-13)
 His words: "make sure you are seperating the elements for synthesis. i want to add the element synthesis" (14:28:04Z) · earlier: "Each
 component of each tool has a element for the ui to synthesis." (13:07:08Z).

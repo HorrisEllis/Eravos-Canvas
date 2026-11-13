@@ -5,6 +5,10 @@
   const doc = global.document;
   'use strict';
   const UI = global.UIKit, h = UI.h, Canvas = UI.Canvas, loop = UI.loop, Segmented = UI.Segmented, Button = UI.Button;
+  // 3.184 how music's words are written when an option is shown (the kit title-cases the rest): acronyms, Roman numerals, formats
+  if (UI.words) UI.words({ svf: 'SVF', lfo: 'LFO', fm: 'FM', am: 'AM', bpm: 'BPM', midi: 'MIDI', eq: 'EQ', pwm: 'PWM', adsr: 'ADSR', bbd: 'BBD', hp: 'HP', lp: 'LP', bp: 'BP',
+    hpf: 'HPF', lpf: 'LPF', hs: 'HS', ls: 'LS', sh: 'S&H', dnb: 'DnB', ukg: 'UKG', vhs: 'VHS', apc: 'APC', dj: 'DJ', xy: 'XY', ott: 'OTT', mp3: 'MP3', wav: 'WAV', ogg: 'OGG', png: 'PNG',
+    jpeg: 'JPEG', json: 'JSON', webm: 'WebM', webp: 'WebP', i: 'I', ii: 'II', iii: 'III', iv: 'IV', v: 'V', vi: 'VI', vii: 'VII' });
   function atTime(ac, t, fn) {
     const dt = Math.max(0, (t - ac.currentTime) * 1000);
     return setTimeout(fn, dt);

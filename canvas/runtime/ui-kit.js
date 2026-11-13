@@ -363,6 +363,18 @@
     global.requestAnimationFrame(frame);
     return () => { alive = false; };
   }
+  // ---------------------------------------------------------------- an option's text (3.184, his words: "why lowercase all the time also? like
+  // porffesssional anbd production grade, matching the themes. enterprise grade."): a setting's options are stored as written (presets, songs and
+  // projects keep them) and SHOWN in title case — each all-lowercase word capitalised, a word a domain registers shown its way (an acronym);
+  // anything else (digits, capitals, symbols) as written. A tool may give its own text (config optionLabels). The canvas names no word itself.
+  const WORDS = {};
+  function words(map) { Object.keys(map || {}).forEach(k => { WORDS[String(k).toLowerCase()] = map[k]; }); }
+  function optionText(v) {
+    if (typeof v !== 'string') return String(v);
+    let first = true;   // title case: small joining words stay small after the first word (as in any title)
+    return v.split(/(\s+|-|\+|\/)/).map(t => { if (!t || /^(\s+|-|\+|\/)$/.test(t)) return t; const f = first; first = false;
+      if (WORDS[t] !== undefined) return WORDS[t]; if (!f && /^(and|of|for|in|on|or|to|the|a|an|at|by)$/.test(t)) return t; return /^[a-z][a-z']*$/.test(t) ? t[0].toUpperCase() + t.slice(1) : t; }).join('');
+  }
   // ---------------------------------------------------------------- param panel bound to an organism view
   function paramControl(view, c, o) {
     o = o || {};
@@ -370,7 +382,7 @@
     let ctl;
     if (c.type === 'number' || c.type === 'integer') ctl = Knob(Object.assign({}, c, { value: view.state[c.key], onChange: send, big: o.big, size: o.size }));   // 3.48.2: the accent comes from where it sits (the window's --acc follows the sound)
     else if (c.type === 'boolean') ctl = Toggle({ label: c.label || c.key, value: view.state[c.key], onChange: send, hint: c.hint });
-    else if (c.type === 'enum') ctl = (c.options.length <= (o.segMax || 5) ? Segmented : Select)({ label: o.noLabel ? '' : (c.label || c.key), options: c.options, value: view.state[c.key], onChange: send, hint: c.hint });
+    else if (c.type === 'enum') ctl = (c.options.length <= (o.segMax || 5) ? Segmented : Select)({ label: o.noLabel ? '' : (c.label || c.key), options: c.options.map(v => (v && typeof v === 'object') ? v : { value: v, label: (c.optionLabels && c.optionLabels[v]) || optionText(v) }), value: view.state[c.key], onChange: send, hint: c.hint });
     else if (c.type === 'string') { const inp = h('input', { class: 'uk-text', value: view.state[c.key] || '' }); inp.addEventListener('change', () => send(inp.value)); inp.addEventListener('pointerdown', e => e.stopPropagation()); ctl = { el: h('label', { class: 'uk-field' }, [h('span', { text: c.label || c.key }), inp]), set: (v) => { inp.value = v; } }; }
     else return null;
     view.bind(c.key, (v) => ctl.set(v));
@@ -455,6 +467,6 @@
     return { stop() { if (ro) ro.disconnect(); ro = null; }, now: run };
   }
 
-  global.UIKit = { wheelStartedOn, h, fit, fmt, mapper, ask, Knob, Fader, Toggle, Select, Segmented, Button, NumberDrag, Canvas, loop, paramControl, paramPanel, presetBar, hint, mapPoint, toContent, drag,
+  global.UIKit = { words, optionText, wheelStartedOn, h, fit, fmt, mapper, ask, Knob, Fader, Toggle, Select, Segmented, Button, NumberDrag, Canvas, loop, paramControl, paramPanel, presetBar, hint, mapPoint, toContent, drag,
     extend(o) { Object.keys(o || {}).forEach(k => { if (!(k in global.UIKit)) global.UIKit[k] = o[k]; }); } };
 })(typeof window !== 'undefined' ? window : globalThis);

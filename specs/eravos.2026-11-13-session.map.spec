@@ -103,3 +103,11 @@
     or its own part); tools/core/elements/ synthesises a face from them (one card per element, in the sound's order, the same kit); the
     tempo controls every music tool carries name own:tempo; P183 guards it. PREVIEW: docs/previews/element-synthesis-piano.png (today's face
     beside the synthesised one) — today's stays until his yes.
+
+## (after 14:28:04Z) — verbatim, with a screenshot of Piano's Sustain pedal button over the display's edge:
+  > overlap. why lowercase all the time also? like porffesssional anbd production grade, matching the themes. enterprise grade.
+  - measured: the display ends where the pedal's row begins (y 287); the button (30 px, −1.5 px margin, a 3 px ring) rides into it
+  - 3.184 (SHOWN, not merged): the pedal moves into the header beside Model (no row under the display — Piano also ~30 px shorter); every
+    setting's options SHOWN in title case (values kept as stored: presets, songs, projects unchanged) — the kit capitalises, a domain registers
+    its acronyms (music: SVF, LFO, FM, BPM, MIDI, DnB, VHS, I–VII …). Before / after: docs/previews/case-{before,after}-{piano,retro-dco,swarm-oscillator}.png
+  - OPEN: lowercase text drawn inside displays and hint lines (each tool's own words) — a second pass, shown first

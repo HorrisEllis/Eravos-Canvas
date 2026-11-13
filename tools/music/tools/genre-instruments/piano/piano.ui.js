@@ -34,8 +34,8 @@
     deepBox.style.display = 'none';   // folded until More depth (the panel's own display beats [hidden])
     const deepB = UI.Button({ label: 'More depth ▸', hint: 'string detune, stretch, sympathetic strings, velocity curve, key-off thump, pedal noise, mic position, lid, tremolo on the beat', onClick: () => { const show = deepBox.style.display === 'none'; deepBox.style.display = show ? '' : 'none'; deepB.set(show ? 'Less ▴' : 'More depth ▸'); } });
     UI.instrumentPanel(view, { color: '#e7b49b', low: 48, high: 72, height: 56,
-      header: [UI.paramControl(view, cfg('model'), { segMax: 6 }).el],
-      top: [cv, h('div', { class: 'org-row', style: { gap: '6px' } }, [UI.paramControl(view, cfg('pedal')).el])],
+      header: [UI.paramControl(view, cfg('model'), { segMax: 6 }).el, UI.paramControl(view, cfg('pedal')).el],   // 3.184: the pedal beside Model (its own row under the display overlapped it)
+      top: [cv],
       middle: [face, h('div', { class: 'org-row' }, [deepB.el]), deepBox],
       keys: [],
       hint: 'Tine is the electric piano of soul and lofi, reed is the barkier one, felt is the soft muted upright. Bell brings out the tine’s ring; Tremolo moves it left and right.' });
