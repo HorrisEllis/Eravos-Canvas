@@ -161,7 +161,7 @@ registerProcessor('eravos-piano', EravosPiano);`;
       Object.assign(n('pedalNoise', 'Pedal noise', 'PLAY+', 0.1, 0, 1, 0.01, '', 'the dampers lifting and falling'), { element: 'own:pedal' }),
       Object.assign(n('micX', 'Mic X', 'MIC', 0.5, 0, 1, 0.01, '', 'over the hammers (bright) … far end (dark)'), { element: 'own:mic' }), Object.assign(n('micY', 'Mic Y', 'MIC', 0.5, 0, 1, 0.01, '', 'close … into the room (more body)'), { element: 'own:mic' }), Object.assign(n('lid', 'Lid', 'MIC', 0.7, 0, 1, 0.01, '', 'the grand’s lid: open is brighter'), { element: 'own:mic' }),
       { key: 'tremSync', type: 'enum', default: 'free', options: SYNC, label: 'Tremolo on the beat', group: 'MOVE+', hint: 'free: Trem rate · or locked to the song’s tempo', element: 'lfo' },
-      { key: 'pedal', type: 'boolean', default: false, label: 'Sustain pedal', group: 'PLAY', hint: 'notes ring after you let go; sympathetic strings open (bind a MIDI pedal with the MIDI Mapper)', element: 'own:pedal' },
+      { key: 'pedal', type: 'boolean', default: false, label: 'Hold', group: 'PLAY', hint: 'the sustain pedal: notes ring after you let go, until Hold is off; the other strings ring with them (bind a MIDI pedal with the MIDI Mapper)', element: 'own:pedal' },
     ],
     // presets are data beside the tool (packs/factory/pack.json) — never in the engine
     defaultPreset: 'Tine Classic',

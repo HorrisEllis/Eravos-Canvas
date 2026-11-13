@@ -25,7 +25,7 @@
       // tremolo
       const tr = P('trem'), pan = Math.sin(t * 2 * Math.PI * P('tremRate')) * tr; g.fillStyle = '#8f8f99'; g.fillText('L', px0, H - 4); g.fillText('R', px0 + pw - 6, H - 4);
       g.fillStyle = '#e7b49b'; g.fillRect(px0 + pw / 2 + pan * pw * 0.4 - 2, H - 12, 4, 6);
-      if (P('pedal')) { g.fillStyle = '#e7b49b'; g.fillText('PEDAL', W * 0.12, H - 4); }
+      if (P('pedal')) { g.fillStyle = '#e7b49b'; g.fillText('HOLD', W * 0.12, H - 4); }
     }, 30);
     const ctl = (k) => { const c = UI.paramControl(view, cfg(k), { size: 32 }); c.el.dataset.key = k; return c.el; };
     const card = (title, keys) => h('div', { class: 'uk-group' }, [h('div', { class: 'uk-group-title', text: title }), h('div', { class: 'uk-row' }, keys.map(ctl))]);

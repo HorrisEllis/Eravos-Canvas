@@ -111,3 +111,7 @@
     setting's options SHOWN in title case (values kept as stored: presets, songs, projects unchanged) — the kit capitalises, a domain registers
     its acronyms (music: SVF, LFO, FM, BPM, MIDI, DnB, VHS, I–VII …). Before / after: docs/previews/case-{before,after}-{piano,retro-dco,swarm-oscillator}.png
   - OPEN: lowercase text drawn inside displays and hint lines (each tool's own words) — a second pass, shown first
+
+## (after the before / after) — verbatim:
+  > okay why not hold? like the other piano tool?
+  - done in 3.184: Piano's pedal button labelled Hold (as Retro DCO / Retro Poly); hint: the sustain pedal; stored key `pedal` kept

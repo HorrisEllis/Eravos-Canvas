@@ -11,6 +11,8 @@ His words (with a screenshot): "overlap. why lowercase all the time also? like p
   joining words kept small mid-phrase, anything with digits / capitals / symbols as written; a tool may give optionLabels) and UIKit.words, where
   a domain registers its acronyms (music, ui-music.js: SVF, LFO, FM, BPM, MIDI, PWM, HP, LP, DnB, UKG, VHS, file formats, Roman numerals). The
   values are stored as before, so presets, songs and projects are unchanged.
+- His "why not hold? like the other piano tool?": the pedal's button is labelled Hold, as Retro DCO's and Retro Poly's (the same place, the same
+  word); its hint says it is the sustain pedal (notes ring until Hold is off). The stored key stays `pedal` — presets and projects unchanged.
 - Shown first (his rule): docs/previews/case-before-*.png / case-after-*.png (Piano, Retro DCO, Swarm). OPEN: the lowercase words tools draw
   in their displays and hint lines — a second pass, shown first.
 
