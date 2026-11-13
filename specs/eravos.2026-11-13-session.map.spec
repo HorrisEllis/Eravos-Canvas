@@ -144,3 +144,13 @@
     claims NONE (tests measure the sound, never a body); Feeling Engine folds into its outputs (feeling-engine.spec ADDENDUM 2026-11-13)
   - OPEN: the name (Feeling Song · Vagal · Calls) · "wail songs" = whale songs? · what he had before, to match by ear · its UI shown first
 
+## (after the Feeling Song spec) — verbatim:
+  > looks horrible. sounds horrible. no breathing. no song. a full drag on a tool and have it play the sounds like a four way grid. per song. look at all research into this, from all domains.
+  (asked whether the four-way grid = the whole window as one pad, a sound in each corner, blended by the drag, four corners per song)
+  > yes. i want love, anger which is low irratating pitch, sadness, like hanging tree or bite the hand that feeds you.
+  - SPECCED: feeling-song.spec ADDENDUM 2026-11-13 (2) — the pad, the four corners from the research (Morton 1977, Arnal 2015, Huron 2014,
+    Sethares, Juslin & Laukka 2003, Filippi 2017, Eerola & Vuoskoski 2011, Prophet VS); breath and song structure removed
+  - the research: docs/research/feelings-as-sound.md (emotion psychology, ethology, psychoacoustics, neuroscience, phonetics, ethnomusicology,
+    tuning theory, synthesis, game audio, the polyvagal debate)
+  - OPEN: which thing looked and sounded horrible (Embodiment Lab in the app?) · the name · "bite the hand" read right · the UI preview first
+

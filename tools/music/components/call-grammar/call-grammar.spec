@@ -14,3 +14,5 @@ rules:
 acceptance:
   - drift 0: every repeat identical; drift 0.5: similarity 0.6–0.95 between repeats; the same seed twice → the same pattern
   - a unit's pitch curve survives the round trip within 1 c
+# ADDENDUM 2026-11-13 (2): his "no song" — Feeling Song no longer stands on it (feeling-song.spec ADDENDUM 2026-11-13 (2)). Kept as a spec for
+#   any tool that wants phrase / theme structure; used by none yet.
