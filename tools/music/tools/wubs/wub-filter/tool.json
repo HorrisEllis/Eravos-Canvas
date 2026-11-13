@@ -36,6 +36,12 @@
       "audio_in",
       "bus_publish",
       "bus_subscribe"
+    ],
+    "components": [
+      "filter-formant@1.0.0"
+    ],
+    "elements": [
+      "filter-formant.element@1"
     ]
   },
   "packs": {

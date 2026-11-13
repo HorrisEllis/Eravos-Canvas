@@ -32,6 +32,34 @@
       "midi_in",
       "bus_publish",
       "bus_subscribe"
+    ],
+    "components": [
+      "osc-va@1.0.0",
+      "osc-sub@1.0.0",
+      "osc-noise@1.0.0",
+      "unison-stack@1.0.0",
+      "filter-svf@1.0.0",
+      "filter-ladder@1.0.0",
+      "env-adsr@1.0.0",
+      "lfo@1.0.0",
+      "random-source@1.0.0",
+      "bbd-line@1.0.0",
+      "ensemble-core@1.0.0",
+      "voice-allocator@1.0.0"
+    ],
+    "elements": [
+      "osc-va.element@1",
+      "osc-sub.element@1",
+      "osc-noise.element@1",
+      "unison-stack.element@1",
+      "filter-svf.element@1",
+      "filter-ladder.element@1",
+      "env-adsr.element@1",
+      "lfo.element@1",
+      "random-source.element@1",
+      "bbd-line.element@1",
+      "ensemble-core.element@1",
+      "voice-allocator.element@1"
     ]
   },
   "packs": {

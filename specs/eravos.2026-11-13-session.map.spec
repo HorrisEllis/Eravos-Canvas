@@ -65,3 +65,13 @@
   - RULE (specced): every tool announces what it needs — generated from its DAG: its components (each bringing its element), the canvas's
     kit elements, its domain — and the canvas imports it from the tool's zip: specs/eravos.store.spec ADDENDUM 2026-11-13 (S1 and S3 extended:
     the announcement; I1–I4: import from the zip) · specs/eravos.compat-graph.spec ADDENDUM 2026-11-13
+
+## 13:11:29Z (2026-11-13T13:11:29.305Z) — verbatim:
+  > just begin. also songs decomposed one by one. maybe a tool store. like i want to make a store for domains and tools. 
+  > like you click browse, and it opens a menu for browsing tools per domain, packs per tool, sounds and presets. a tool page per tool with the relevant dependancies and packs. rhythmes and notes per tool. like all tools zipped in a zip with all of its components, dag, etc. all isolated from each other. the canvas using a interaction contract.
+  - "just begin": BUILT 3.179 — CG1 for the 23 sound components (tools/music/components/<id>/<id>.contract.json: ports, variables, UI
+    element; build/component-contract.mjs checks each against its code) and every tool's announcement from its DAG (build/tool-needs.mjs:
+    needs.components + needs.elements in 18 tool.json)
+  - OPEN, specced: specs/eravos.store-browse.spec (NEW — Browse, a tool's page, whole isolated zips, the interaction contract) · store.spec
+    ADDENDUM 2026-11-13 (2)
+  - OPEN, specced: specs/eravos.song-decomposition.spec (NEW — every song into parts; rhythms and notes per tool)

@@ -1,0 +1,80 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "osc-sub",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "audio",
+ "kernel": "MusicParts.Sub",
+ "ports": [
+  {
+   "id": "pitch",
+   "dir": "in",
+   "type": "pitch",
+   "unit": "Hz",
+   "rate": "audio"
+  },
+  {
+   "id": "align",
+   "dir": "in",
+   "type": "control",
+   "range": [
+    0,
+    1
+   ],
+   "rate": "block",
+   "about": "line the sub up with a kick: its phase"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "audio",
+   "channels": 1,
+   "rate": "audio"
+  }
+ ],
+ "variables": [
+  {
+   "key": "octave",
+   "type": "enum",
+   "options": [
+    0,
+    -1,
+    -2
+   ],
+   "role": "pitch",
+   "code": "octave",
+   "default": -1
+  },
+  {
+   "key": "shape",
+   "type": "enum",
+   "options": [
+    "sine",
+    "triangle",
+    "square",
+    "rounded square"
+   ],
+   "default": "sine",
+   "from": "SUB_SHAPES",
+   "role": "shape"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "octave",
+    "role": "pitch",
+    "face": true
+   },
+   {
+    "key": "shape",
+    "role": "shape",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.segmented"
+  ]
+ }
+}

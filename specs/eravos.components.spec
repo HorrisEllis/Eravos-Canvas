@@ -61,3 +61,16 @@
 #   - element: in the spec: { version, controls: [{ key (a variable), role, face: true|false }], needs.ui: [kit elements] } — the tool's UI is
 #     synthesised from these (specs/eravos.ui-field.spec ADDENDUM 2026-11-13 (2)); the element never names a tool (it is the component's).
 #   - CG1 = ports + variables + element for each of the 33 components with code (Retro DCO's 12 first: its UI is the first synthesised).
+
+## ADDENDUM 2026-11-13 (3) — CG1 built for the sound components: the contract is a file beside the code
+#   his words (2026-11-13T13:11:29Z): "just begin."
+#   - where it lives: <id>.contract.json (schema eravos.component-contract/1) beside <id>.js — data, so it zips with the component and is read
+#     with no code run (store I1); the spec's prose line stays (axiom 9). Fields: id, version, domain, kind (audio | logic), kernel, worklet,
+#     variables_from (the exported *_PARAMS), ports [{ id, dir, type, channels, unit, range, rate }], variables [{ key, type, min, max, default,
+#     options, unit, role, audio_param, rate, code }], element { version, controls [{ key, role, face }], needs_ui }.
+#   - the domain's types and roles: tools/music/types.json (types, bridges, roles).
+#   - checked against the code (build/component-contract.mjs, in CI): AudioParams exactly (names, order, min, max, default, rate); enum options
+#     against their exported lists; every other variable's name in the code; ports' types in types.json; the element's controls = the variables.
+#     Honest limit: 49 variables (not AudioParams) are checked by name only — their ranges come from the code's header until a kernel exports them.
+#   - done: 23 of 33 components with code (all that make or shape sound). To write: the 10 data / logic ones (curve-edit, mod-tree, note-release,
+#     pattern-field, pattern-store, pitch-path, progression, scale-key, seed-registry, wave-table).

@@ -37,6 +37,10 @@
       "bus_subscribe",
       "filesystem_read",
       "registry_read"
+    ],
+    "components": [
+      "pitch-path@1.0.0",
+      "mod-tree@1.1.0"
     ]
   },
   "packs": {

@@ -31,6 +31,9 @@
       "audio_in",
       "bus_publish",
       "bus_subscribe"
+    ],
+    "components": [
+      "wave-table@1.0.0"
     ]
   },
   "packs": {

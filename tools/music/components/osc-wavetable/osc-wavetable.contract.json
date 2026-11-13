@@ -1,0 +1,58 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "osc-wavetable",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "audio",
+ "kernel": "MusicParts.WT",
+ "ports": [
+  {
+   "id": "pitch",
+   "dir": "in",
+   "type": "pitch",
+   "unit": "Hz",
+   "rate": "audio"
+  },
+  {
+   "id": "position",
+   "dir": "in",
+   "type": "control",
+   "range": [
+    0,
+    1
+   ],
+   "rate": "audio"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "audio",
+   "channels": 1,
+   "rate": "audio"
+  }
+ ],
+ "variables": [
+  {
+   "key": "pos",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "role": "shape",
+   "about": "morphs across the frames: sine → triangle → saw → square → pulse → formant"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "pos",
+    "role": "shape",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.knob"
+  ]
+ }
+}

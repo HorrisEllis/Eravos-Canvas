@@ -27,6 +27,24 @@
     "permissions": [
       "bus_publish",
       "bus_subscribe"
+    ],
+    "components": [
+      "saturator-tape@1.0.0",
+      "bitcrusher@1.0.0",
+      "delay-line@1.0.0",
+      "filter-svf@1.0.0",
+      "osc-noise@1.0.0",
+      "random-source@1.0.0",
+      "tape-transport@1.0.0"
+    ],
+    "elements": [
+      "saturator-tape.element@1",
+      "bitcrusher.element@1",
+      "delay-line.element@1",
+      "filter-svf.element@1",
+      "osc-noise.element@1",
+      "random-source.element@1",
+      "tape-transport.element@1"
     ]
   },
   "packs": {

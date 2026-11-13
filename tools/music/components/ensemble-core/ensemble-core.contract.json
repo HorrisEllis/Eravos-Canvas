@@ -1,0 +1,183 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "ensemble-core",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "audio",
+ "kernel": "MusicParts.Ensemble",
+ "worklet": "eravos-ensemble",
+ "variables_from": "ENSEMBLE_PARAMS",
+ "ports": [
+  {
+   "id": "in",
+   "dir": "in",
+   "type": "audio",
+   "channels": 1,
+   "rate": "audio",
+   "about": "mono, or the mean of two"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "audio",
+   "channels": 2,
+   "rate": "audio"
+  }
+ ],
+ "variables": [
+  {
+   "key": "taps",
+   "type": "number",
+   "min": 1,
+   "max": 8,
+   "default": 2,
+   "audio_param": true,
+   "rate": "block",
+   "role": "voice",
+   "integer": true
+  },
+  {
+   "key": "base",
+   "type": "number",
+   "min": 0.5,
+   "max": 40,
+   "default": 3.5,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "time",
+   "unit": "ms"
+  },
+  {
+   "key": "depth",
+   "type": "number",
+   "min": 0,
+   "max": 20,
+   "default": 1.85,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "depth",
+   "unit": "ms"
+  },
+  {
+   "key": "rate",
+   "type": "number",
+   "min": 0.01,
+   "max": 20,
+   "default": 0.513,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "rate",
+   "unit": "Hz"
+  },
+  {
+   "key": "depth2",
+   "type": "number",
+   "min": 0,
+   "max": 10,
+   "default": 0,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "depth",
+   "unit": "ms"
+  },
+  {
+   "key": "rate2",
+   "type": "number",
+   "min": 0.01,
+   "max": 20,
+   "default": 6,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "rate",
+   "unit": "Hz"
+  },
+  {
+   "key": "shape",
+   "type": "enum",
+   "min": 0,
+   "max": 1,
+   "default": "triangle",
+   "audio_param": true,
+   "rate": "block",
+   "options": [
+    "sine",
+    "triangle"
+   ],
+   "role": "shape"
+  },
+  {
+   "key": "spread",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 1,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "width"
+  },
+  {
+   "key": "mix",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0.5,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "mix"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "taps",
+    "role": "voice",
+    "face": false
+   },
+   {
+    "key": "base",
+    "role": "time",
+    "face": false
+   },
+   {
+    "key": "depth",
+    "role": "depth",
+    "face": true
+   },
+   {
+    "key": "rate",
+    "role": "rate",
+    "face": true
+   },
+   {
+    "key": "depth2",
+    "role": "depth",
+    "face": false
+   },
+   {
+    "key": "rate2",
+    "role": "rate",
+    "face": false
+   },
+   {
+    "key": "shape",
+    "role": "shape",
+    "face": false
+   },
+   {
+    "key": "spread",
+    "role": "width",
+    "face": false
+   },
+   {
+    "key": "mix",
+    "role": "mix",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.knob",
+   "kit.segmented"
+  ]
+ }
+}

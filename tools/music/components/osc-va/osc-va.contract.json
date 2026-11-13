@@ -1,0 +1,68 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "osc-va",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "audio",
+ "kernel": "MusicParts.VA",
+ "ports": [
+  {
+   "id": "pitch",
+   "dir": "in",
+   "type": "pitch",
+   "unit": "Hz",
+   "rate": "audio"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "audio",
+   "channels": 1,
+   "rate": "audio"
+  }
+ ],
+ "variables": [
+  {
+   "key": "shape",
+   "type": "enum",
+   "options": [
+    "saw",
+    "pulse",
+    "square",
+    "triangle"
+   ],
+   "default": "saw",
+   "from": "VA_SHAPES",
+   "role": "shape"
+  },
+  {
+   "key": "width",
+   "type": "number",
+   "min": 0.02,
+   "max": 0.98,
+   "default": 0.5,
+   "role": "tone",
+   "unit": "of a cycle",
+   "code": "w"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "shape",
+    "role": "shape",
+    "face": true
+   },
+   {
+    "key": "width",
+    "role": "tone",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.knob",
+   "kit.segmented"
+  ]
+ }
+}

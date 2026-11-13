@@ -1,0 +1,130 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "osc-noise",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "audio",
+ "kernel": "MusicParts.Noise",
+ "worklet": "eravos-noise",
+ "variables_from": "NOISE_PARAMS",
+ "ports": [
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "audio",
+   "channels": 2,
+   "rate": "audio"
+  }
+ ],
+ "variables": [
+  {
+   "key": "colour",
+   "type": "enum",
+   "min": 0,
+   "max": 5,
+   "default": "white",
+   "audio_param": true,
+   "rate": "block",
+   "options": [
+    "white",
+    "pink",
+    "brown",
+    "velvet",
+    "crackle",
+    "band-limited"
+   ],
+   "role": "colour"
+  },
+  {
+   "key": "density",
+   "type": "number",
+   "min": 1,
+   "max": 20000,
+   "default": 2000,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "rate",
+   "unit": "per second"
+  },
+  {
+   "key": "rate",
+   "type": "number",
+   "min": 0.01,
+   "max": 20000,
+   "default": 200,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "rate",
+   "unit": "Hz"
+  },
+  {
+   "key": "tilt",
+   "type": "number",
+   "min": -1,
+   "max": 1,
+   "default": 0,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "tone"
+  },
+  {
+   "key": "width",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 1,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "width"
+  },
+  {
+   "key": "level",
+   "type": "number",
+   "min": 0,
+   "max": 4,
+   "default": 0.5,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "level"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "colour",
+    "role": "colour",
+    "face": true
+   },
+   {
+    "key": "density",
+    "role": "rate",
+    "face": false
+   },
+   {
+    "key": "rate",
+    "role": "rate",
+    "face": false
+   },
+   {
+    "key": "tilt",
+    "role": "tone",
+    "face": true
+   },
+   {
+    "key": "width",
+    "role": "width",
+    "face": false
+   },
+   {
+    "key": "level",
+    "role": "level",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.knob",
+   "kit.segmented"
+  ]
+ }
+}

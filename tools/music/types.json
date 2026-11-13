@@ -1,0 +1,22 @@
+{
+ "schema": "eravos.types/1",
+ "domain": "music",
+ "about": "The music domain's port types (specs/eravos.compat-graph.spec › the model). The canvas compares names only; meaning lives here. 2026-11-13, CG1.",
+ "types": {
+  "audio":   "sound, sample by sample (channels said by the port)",
+  "control": "a control signal, sample or block rate (unit and range said by the port)",
+  "pitch":   "a frequency (unit Hz) or a note number (unit midi)",
+  "gate":    "0 or 1: held / let go",
+  "trigger": "an instant: reset, retrigger, an event",
+  "note":    "note events: on / off with note number and velocity",
+  "data":    "a value or structure handed over in code (a layout, a voice assignment), not a signal"
+ },
+ "bridges": [
+  { "from": "control", "to": "pitch", "how": "scale and offset into the pitch range (unit converted)" },
+  { "from": "gate", "to": "trigger", "how": "the rising edge" },
+  { "from": "note", "to": "pitch", "how": "the note number, as Hz or midi" },
+  { "from": "note", "to": "gate", "how": "held while the note is on" },
+  { "from": "audio", "to": "control", "how": "an envelope follower" }
+ ],
+ "roles": ["pitch", "tone", "level", "time", "rate", "depth", "shape", "mode", "space", "mix", "drive", "width", "seed", "voice", "colour"]
+}

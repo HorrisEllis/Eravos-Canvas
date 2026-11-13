@@ -1,0 +1,148 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "tape-transport",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "audio",
+ "kernel": "MusicParts.Transport",
+ "worklet": "eravos-tape-transport",
+ "variables_from": "TRANSPORT_PARAMS",
+ "ports": [
+  {
+   "id": "speed",
+   "dir": "out",
+   "type": "control",
+   "rate": "audio",
+   "channel": 0,
+   "about": "the speed the tape runs at"
+  },
+  {
+   "id": "lag",
+   "dir": "out",
+   "type": "control",
+   "unit": "s",
+   "rate": "audio",
+   "channel": 1,
+   "about": "how far the head has fallen behind: feed it to a delay-line time"
+  }
+ ],
+ "variables": [
+  {
+   "key": "speed",
+   "type": "number",
+   "min": -2,
+   "max": 2,
+   "default": 1,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "rate"
+  },
+  {
+   "key": "stop",
+   "type": "boolean",
+   "min": 0,
+   "max": 1,
+   "default": false,
+   "audio_param": true,
+   "rate": "block",
+   "role": "mode"
+  },
+  {
+   "key": "stopTime",
+   "type": "number",
+   "min": 0.02,
+   "max": 8,
+   "default": 0.8,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "time",
+   "unit": "s"
+  },
+  {
+   "key": "startTime",
+   "type": "number",
+   "min": 0.02,
+   "max": 8,
+   "default": 0.4,
+   "audio_param": true,
+   "rate": "audio",
+   "role": "time",
+   "unit": "s"
+  },
+  {
+   "key": "curve",
+   "type": "number",
+   "min": -1,
+   "max": 1,
+   "default": 0.3,
+   "audio_param": true,
+   "rate": "block",
+   "role": "shape"
+  },
+  {
+   "key": "maxLag",
+   "type": "number",
+   "min": 0.1,
+   "max": 20,
+   "default": 8,
+   "audio_param": true,
+   "rate": "block",
+   "role": "time",
+   "unit": "s"
+  },
+  {
+   "key": "rewind",
+   "type": "boolean",
+   "min": 0,
+   "max": 1,
+   "default": false,
+   "audio_param": true,
+   "rate": "block",
+   "role": "mode"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "speed",
+    "role": "rate",
+    "face": true
+   },
+   {
+    "key": "stop",
+    "role": "mode",
+    "face": true
+   },
+   {
+    "key": "stopTime",
+    "role": "time",
+    "face": true
+   },
+   {
+    "key": "startTime",
+    "role": "time",
+    "face": false
+   },
+   {
+    "key": "curve",
+    "role": "shape",
+    "face": false
+   },
+   {
+    "key": "maxLag",
+    "role": "time",
+    "face": false
+   },
+   {
+    "key": "rewind",
+    "role": "mode",
+    "face": false
+   }
+  ],
+  "needs_ui": [
+   "kit.knob",
+   "kit.toggle"
+  ]
+ }
+}

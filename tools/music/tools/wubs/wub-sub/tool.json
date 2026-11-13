@@ -35,6 +35,9 @@
       "bus_publish",
       "bus_subscribe",
       "registry_read"
+    ],
+    "components": [
+      "note-release@1.0.0"
     ]
   },
   "packs": {

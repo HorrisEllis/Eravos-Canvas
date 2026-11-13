@@ -33,6 +33,24 @@
       "midi_in",
       "bus_publish",
       "bus_subscribe"
+    ],
+    "components": [
+      "osc-va@1.0.0",
+      "osc-wavetable@1.0.0",
+      "oscillator-population@1.1.0",
+      "env-adsr@1.0.0",
+      "lfo@1.0.0",
+      "filter-svf@1.0.0",
+      "stereo-tools@1.0.0"
+    ],
+    "elements": [
+      "osc-va.element@1",
+      "osc-wavetable.element@1",
+      "oscillator-population.element@1",
+      "env-adsr.element@1",
+      "lfo.element@1",
+      "filter-svf.element@1",
+      "stereo-tools.element@1"
     ]
   },
   "packs": {

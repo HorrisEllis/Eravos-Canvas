@@ -97,6 +97,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-13 | **Component contracts; tools announce their needs** (3.179, CG1): 23 sound components carry `<id>.contract.json` (ports, variables, UI element) checked against their code; 18 tool.json announce their components and elements from the DAG; specs: Browse, isolated tool zips, the interaction contract, songs decomposed | `build/component-contract.mjs`, `build/tool-needs.mjs`, `tools/music/types.json`, `specs/eravos.store-browse.spec`, `specs/eravos.song-decomposition.spec` | both checks in CI; P38 37/37, P139 7/7, boundary 10/10 |
 | 2026-11-13 | **The Field leaves the canvas** (3.178, BC1): `canvas/runtime/workshop.*` → `tools/core/field/` (a domain-free domain loaded first: `"always"`); the canvas = the host (a guard lists its 35 files); validate + the guard in CI — nothing he sees changes | `tools/core/`, `canvas/runtime/catalog.js`, `tests/bare-canvas.test.mjs` | Field suites unchanged and green, P38 37/37, boundary 10/10 |
 | 2026-11-13 | **The Field; every song preview tested** (3.176, 3.177): the Workshop is called the Field; the notes map erases, lengthens, thickens (pitch width · loudness · voices); a tool's contract (`field` in tool.json) puts its own knobs first, the rest by stage · all 301 previews measured, levelled by loudness, 17 measured trims on 11 genres (median pinned 0.22 → 0.11 %) | `timeline.workshop.js`, `build/index-tools.mjs`, `data/song-preview.js`, `data/songbook-mix.js` | `tests/p175` 4/4, `p176` 3/3 · PR #172 |
 | 2026-11-13 | **The Workshop's layers, finished** (3.175): the eye turns a shape / modulator off in what plays, lock, amount 0–100 %, order (drag, Ctrl+[ ]), rename, duplicate, delete, reset, copy / paste across notes — one undo step each; a kind says what a layer can do (`layerOps`, `'@layer'`); the kind's own delete buttons gone; mod-tree 1.1 (a modulator's amount) | `canvas/runtime/workshop.{js,css}`, `timeline.workshop.js`, `components/mod-tree` | `tests/p174` 4/4 · PR #170 |
@@ -193,7 +194,10 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
   (`specs/eravos.compat-graph.spec`), the Field a tool and the canvas the host only (`specs/eravos.bare-canvas.spec`), UIs that merge when
   wired (`specs/eravos.ui-field.spec` ADDENDUM 2026-11-13), Bassline 2.0 (`bass-gen.spec` ADDENDUM). Not waiting for Emerge (v2 plan
   ADDENDUM 2026-11-13). Every component carries its own UI element; every tool announces its needs from its DAG and the canvas imports it from the zip
-  (`specs/eravos.store.spec` ADDENDUM 2026-11-13, I1–I4). ERAVOS 2's name: "Synthesis" proposed, to confirm. Order: BC1 ✓ → CG1 (ports + variables + element) → CG2 → CG3 → the Field's swap / mutate UI (shown first) → Bassline 2.0. Map: `specs/eravos.2026-11-13-session.map.spec`.
+  (`specs/eravos.store.spec` ADDENDUM 2026-11-13, I1–I4). ERAVOS 2's name: "Synthesis" proposed, to confirm. Order: BC1 ✓ → CG1 (ports + variables + element: 23 of 33 ✓) → CG2 → CG3 → the Field's swap / mutate UI (shown first) → Bassline 2.0. Map: `specs/eravos.2026-11-13-session.map.spec`.
+- **The store and Browse** (2026-11-13, specced): Browse (domains → tools → a tool's page: needs, packs, sounds, rhythms, notes), every tool a
+  whole isolated zip, the canvas only through the interaction contract (`specs/eravos.store-browse.spec`; preview first, SB1); songs decomposed
+  into rhythms and notes per tool (`specs/eravos.song-decomposition.spec`).
 - Connecting with people (share as a link, remix with credit, play together, share packs) — pinned 2026-11-05.
 - Songs as a rhythm-exploring tool only (not usable for making music).
 - Patterns for each tool with variety: presets, depth, curves, per-note editing — everything the timeline can do.

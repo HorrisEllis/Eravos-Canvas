@@ -165,3 +165,10 @@ open_gaps:
 #     (nothing to unpack; edits impossible) · D6 a component's element: one per component (proposed) or several (a compact and a full one)
 #   order: CG1 (ports + variables + element, as data, per component) = S1's component half → S1 for tools (the announcement, generated) →
 #     S2 the resolver → I1–I4 → the store repo (D1).
+
+# ---- ADDENDUM 2026-11-13 (2) — Browse, whole isolated tool zips, the interaction contract (nothing above is changed)
+#   his words (2026-11-13, verbatim): "maybe a tool store. like i want to make a store for domains and tools. like you click browse … all
+#   tools zipped in a zip with all of its components, dag, etc. all isolated from each other. the canvas using a interaction contract."
+#   → specs/eravos.store-browse.spec (Browse: domains → tools → a tool's page: needs, packs, sounds, rhythms, notes; the zip layout; the
+#   interaction contract). Refines I2 above: a tool's components travel INSIDE its zip (isolated, pinned by digest); identical digests may
+#   share one copy in memory. Components stay browsable units on their own.

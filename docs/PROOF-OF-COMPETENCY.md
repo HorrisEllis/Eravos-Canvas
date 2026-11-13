@@ -71,6 +71,25 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-13 · Contracts checked against code; tools announce what they need — PR (3.179)
+- **His words (2026-11-13):** "Each component of each tool has a element for the ui to synthesis." (13:07:08) · "Each tool needs that. Dag. It
+  has to anounce what it needs to the canvas." (13:08:14) · "just begin. … all tools zipped in a zip with all of its components, dag, etc. all
+  isolated from each other. the canvas using a interaction contract." (13:11:29)
+- **His calls:**
+  - every component carries a UI element
+  - every tool announces its needs from its DAG
+  - tools zipped whole and isolated
+  - the canvas meets tools only through an interaction contract
+  - a store you browse by domain, tool and pack
+  - songs decomposed
+- **Built:** a machine-checked contract per component (ports, variables, UI element). It is generated from the code where the code declares its parameters, and checked against the code everywhere else, so the data cannot drift from what plays. Each tool's announcement is generated from its dependency graph and checked in CI.
+- **Proof:**
+  - 23 of the 33 components with code carry a contract; 80 variables are checked exactly, and 49 by name only, as stated in the output.
+  - Four planted errors were caught, and the checker caught two of the author's own mistakes while the contracts were being written.
+  - 18 tools announce their components; no runtime change (the catalog is byte-identical; the catalog, tool and boundary suites are green).
+- **Check:** `node build/component-contract.mjs` · `node build/tool-needs.mjs --check` · `docs/component-contracts.md` ·
+  `specs/eravos.store-browse.spec` · `specs/eravos.song-decomposition.spec`
+
 ### 2026-11-13 · Decisions: a UI element per component; every tool announces its needs; the canvas imports from the zip — specs only
 _Decisions and specs only: nothing below is built yet._
 - **His words (2026-11-13, UTC):** "Each component of each tool has a element for the ui to synthesis. Should we call Eravos 2: synthesis,
