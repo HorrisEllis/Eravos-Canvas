@@ -2,6 +2,23 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.187 Feelings — one feeling fills the pad; drag to play it (2026-11-13)
+His words: "i also want a actual tool for irrational frequencies, and unconvential harmonic data, like dragging around to create a nervous
+system response using poly vegal. like feelings or emotions as frequencies. make patterns from feelings." · "a full drag on a tool and have
+it play the sounds like a four way grid" · "i want love, anger which is low irratating pitch, sadness, like hanging tree or bite the hand that
+feeds you" · "all one feeling" · "no capture button or return" · "resize to add more dynamic range." · "then build it."
+- tools/music/tools/embodiment/feelings/: the picker (Love · Anger · Sadness) and the pad, the whole window. Drag = sound, let go = it fades
+  as the feeling does. Up = more of the feeling (−34 → −5 dB, brighter, higher); across = its colour (love: fuller, wider · anger: the
+  loudness wobble 30 → 150 Hz · sadness: far, wide, bending). Harmonics auto (Love harmonic, Anger √2, Sadness φ) or any irrational set; Hold,
+  Pitch, Level on the tool page; x / y automate; a note plays the feeling at its pitch.
+- components/ratio-set (NEW): the irrational sets as shared data — equal to Embodiment Lab's seven (read from its code), plus φ series,
+  primes, stretched string, membrane; numbers → ratios.
+- The research behind each feeling: docs/research/feelings-as-sound.md.
+- Found in the app: the pad's touch was dropped (ui_hooks) — fixed; the window test fails without the fix.
+- Odd Couples: Hanging Tree Sorrow in the break of Hanging Tree Dub; an Anger preset. Icon: heart.
+- Proof: Feelings 11/11 (the sound measured); ratio-set 37 checks; contracts 34/34; P43 6/6, P63 11/11, P183 2/2, P58 18/18, boundary 10/10,
+  no-toys; design check: Feelings clean (59 of 76). Hear it: node docs/previews/feelings-built.shots.mjs → docs/previews/feelings-{love,anger,sadness}.wav (one slow drag each; not committed).
+
 ## 3.186 Bassline 2.0 — time, notes, locks and rests (shown, waiting for his yes) (2026-11-13)
 His words: "I love the bassline, needs more depth and control. like tempo and the cord tool. bassline is high leverage." (12:31:19Z) · "Okay.
 The bassline tool. Way more depth. I like that tool. A lot." (15:58:04Z)

@@ -1,0 +1,16 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "ratio-set",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "logic",
+ "kernel": "MusicParts.RATIOS",
+ "ports": [
+  { "id": "in", "dir": "in", "type": "data", "rate": "event", "about": "a set name, or any numbers" },
+  { "id": "out", "dir": "out", "type": "data", "rate": "event", "about": "[ratio, weight] pairs over the root" }
+ ],
+ "variables": [
+  { "key": "set", "type": "enum", "options": ["harmonic", "φ golden", "√2", "√3", "π/2", "e/2", "2^(1/φ)", "golden stack", "φ series", "primes", "stretched string", "membrane"], "default": "harmonic", "role": "tone", "code": "SETS" }
+ ],
+ "element": { "version": 1, "controls": [ { "key": "set", "role": "tone", "face": true } ], "needs_ui": ["kit.segmented"] }
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "eravos.pack/1",
+  "id": "feelings.factory",
+  "version": "1.0.0",
+  "label": "Factory",
+  "prefix": "",
+  "author": "James Brooks",
+  "tags": ["factory", "feelings"],
+  "for": "eravos.feelings",
+  "enabled": true,
+  "items": {
+    "eravos.feelings": {
+      "presets": {
+        "Love": { "params": { "feeling": "love", "harmonics": "auto", "root": 0, "x": 0.35, "y": 0.45 } },
+        "Love in φ": { "params": { "feeling": "love", "harmonics": "φ golden", "root": 0, "x": 0.5, "y": 0.4 } },
+        "Anger": { "params": { "feeling": "anger", "harmonics": "auto", "root": 0, "x": 0.55, "y": 0.6 } },
+        "Anger, membrane": { "params": { "feeling": "anger", "harmonics": "membrane", "root": -2, "x": 0.8, "y": 0.55 } },
+        "Sadness": { "params": { "feeling": "sadness", "harmonics": "auto", "root": 0, "x": 0.45, "y": 0.4 } },
+        "Sadness, far": { "params": { "feeling": "sadness", "harmonics": "e/2", "root": -3, "x": 0.9, "y": 0.35 } }
+      }
+    }
+  }
+}

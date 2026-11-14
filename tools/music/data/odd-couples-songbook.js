@@ -209,14 +209,15 @@
     { id: 'oc-hanging-dub', label: 'Odd Couples · Hanging Tree Dub', icon: '🌵', accent: '#a1887f', family: 'Odd Couples', bpm: [68, 72], roots: [4, 9], scales: ['phrygian', 'minor'], progs: [[1, 2, 1, 7], [1, 1, 6, 7]],
       tagline: 'A desert-goth organ drone at a sound system: dub echoes, a wub-sub floor, a synthwave chapel answering',
       drums: { main: ONEDROP, light: { rim: '....x.......x...' } }, leadRhythm: 'sparse', bar,
-      form: ODD({ intro: ['organ'], verse: ['drums', 'bass', 'organ'], build: ['organ', 'drums', 'chapel'], drop: ['drums', 'bass', 'organ', 'chapel', 'wub'], pat1: { wub: ['dubsub', 'sub'] }, brk: ['organ'], lift: 0 }),
+      form: ODD({ intro: ['organ'], verse: ['drums', 'bass', 'organ'], build: ['organ', 'drums', 'chapel'], drop: ['drums', 'bass', 'organ', 'chapel', 'wub'], pat1: { wub: ['dubsub', 'sub'] }, brk: ['organ', 'sorrow'], lift: 0 }),
       // measured in the song (tests: one render, every tool on its own channel): at 70 BPM the kit's accents land together at
       // +2.9 dBFS and the 5 s cathedral reverb feeds the master — the master input hit +6.9 dBFS. The kit sits 5 dB lower here.
       parts: { drums: Object.assign(KIT('Breaks & World', O('Steppers Machine')), { configure: { volume: 0.5 } }), forge: FORGE(O('Golden Steppers')), bass: { role: 'bass', organism: 'eravos.reese-bass', preset: O('Chapel Reese'), style: 'onedrop', name: 'Bass' },
         wub: { role: 'bass', organism: 'eravos.wub-osc', preset: O('Acid Saw Wub'), style: 'half', name: 'Wub' },
         organ: { role: 'chords', organism: 'eravos.organ', preset: ['Hanging Tree', O('Synthwave Chapel')], configure: { level: 0.45 }, style: 'sustain', voicing: 'triad', octave: 3, name: 'Organ' },   // held notes sustain since the organ fix: ≈4 dB down keeps the master clear
         chapel: { role: 'lead', organism: 'eravos.retro-poly', preset: O('Wobble Pad Glow'), octave: 5, name: 'Chapel' },
-        ladder: { role: 'chords', organism: 'eravos.retro-dco', preset: O('Chapel Ladder Pad'), style: 'sustain', voicing: 'triad', octave: 4, name: 'Ladder' } },
+        ladder: { role: 'chords', organism: 'eravos.retro-dco', preset: O('Chapel Ladder Pad'), style: 'sustain', voicing: 'triad', octave: 4, name: 'Ladder' },
+        sorrow: { role: 'bass', organism: 'eravos.feelings', preset: O('Hanging Tree Sorrow'), style: 'sustain', name: 'Sorrow' } },   // 2026-11-13 Feelings: sadness, like Hanging Tree, in the break
       fx: [{ organism: 'eravos.dub-station', preset: O('Cathedral Sound System'), on: 'organ' }, { organism: 'eravos.tape-memory', preset: O('Hanging Tree Copy'), on: 'ladder' }, { organism: 'eravos.fx-echo', preset: O('Cathedral Throw'), on: 'chapel' }, { organism: 'eravos.fx-eq', preset: O('Church Low Cut'), on: 'organ' }],
       mods: HER(O('Golden Gap')).concat([{ organism: 'eravos.wub-sub', preset: O('Cathedral Sub') }, { organism: 'eravos.embodiment-lab', preset: O('Hold Her Voice') }, { organism: 'eravos.master-fx', preset: O('Cathedral Master') }]),
       master: { compThresh: -16, compRatio: 3, reverbMix: 0.22 } },   // measured: −12 / 2 / 0.3 drove the master soft-clipper (≈400 samples a song) → ≈40

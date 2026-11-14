@@ -64,5 +64,5 @@ dag:
   layer 0: pattern-store ✓ · scale-key ✓ · seed-registry ✓
   tool: eravos.pattern-editor ← pattern-store + seed-registry + scale-key
   build order: pattern-store ✓ → scale-key ✓ → seed-registry ✓ → pattern-editor
-  shared with: pattern-store 24 · scale-key 14 · seed-registry 13  (other tools on each)
+  shared with: pattern-store 25 · scale-key 15 · seed-registry 13  (other tools on each)
   signal_dag check: every node is one of its components ✓

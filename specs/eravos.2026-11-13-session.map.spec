@@ -127,3 +127,42 @@
   - 3.186 (SHOWN, not merged): TIME · PITCH on the window itself — Own BPM, Swing, Answer, Pitch (transpose, scale steps / semitones), Tension,
     Range, Ahead; Speed, Feel, Pool, Pitch in. Every knob automates (Speed and Own BPM gained their inputs, every music tool). P184: numerals
     in sequence keep their case (i-VI-III-VII)
+
+## (after the Time · Pitch preview) — verbatim:
+  > Push. The. Next tool.
+  - "Push.": PR #186 merged (Bassline 2.0, CI green)
+  - "The next tool": Ensemble Organism (docs/eco-graph.md — 6 of 6 components built). SPEC FIRST: its depth audit (ADDENDUM 2026-11-13 — ports,
+    params, signal_dag, modes, decisions D1–D4); UI SHOWN FIRST: tools/music/planned/ensemble-organism.ui.md,
+    docs/previews/ensemble-organism-{preview,beside-mod-delay,more-depth}.png — built on his yes
+
+## (after "Push. The. Next tool.") — verbatim:
+  > i also want a actual tool for irrational frequencies, and unconvential harmonic data, like dragging around to create a nervous system response using poly vegal. like feelings or emotions as frequencies. make patterns from feelings.
+  >
+  > just spec this. i had it before and it was like wail songs, it was beautiful. i want thinking of trying to use it for embodiement
+  - SPECCED (not built): tools/music/planned/feeling-song.spec — the state field (ventral · sympathetic · dorsal, dragged), the cue map as data,
+    irrational and data harmonics (NEW component ratio-set), calls → phrases → themes (NEW component call-grammar), CAPTURE to patterns, RETURN,
+    claims NONE (tests measure the sound, never a body); Feeling Engine folds into its outputs (feeling-engine.spec ADDENDUM 2026-11-13)
+  - OPEN: the name (Feeling Song · Vagal · Calls) · "wail songs" = whale songs? · what he had before, to match by ear · its UI shown first
+
+## (after the Feeling Song spec) — verbatim:
+  > looks horrible. sounds horrible. no breathing. no song. a full drag on a tool and have it play the sounds like a four way grid. per song. look at all research into this, from all domains.
+  (asked whether the four-way grid = the whole window as one pad, a sound in each corner, blended by the drag, four corners per song)
+  > yes. i want love, anger which is low irratating pitch, sadness, like hanging tree or bite the hand that feeds you.
+  - SPECCED: feeling-song.spec ADDENDUM 2026-11-13 (2) — the pad, the four corners from the research (Morton 1977, Arnal 2015, Huron 2014,
+    Sethares, Juslin & Laukka 2003, Filippi 2017, Eerola & Vuoskoski 2011, Prophet VS); breath and song structure removed
+  - the research: docs/research/feelings-as-sound.md (emotion psychology, ethology, psychoacoustics, neuroscience, phonetics, ethnomusicology,
+    tuning theory, synthesis, game audio, the polyvagal debate)
+  - OPEN: which thing looked and sounded horrible (Embodiment Lab in the app?) · the name · "bite the hand" read right · the UI preview first
+
+## (after the research) — verbatim, in order:
+  > i didn't ask for that. show me the preview.
+  > bite the hand hand that feeds you. a song.
+  > no / no corners
+  > all one feeling
+  > no capture button or return
+  > resize to add more dynamic range.
+  > then build it.
+  - "bite the hand…": a song, like Hanging Tree — an example of sadness, not a fourth feeling
+  - PREVIEW (shown, reshaped by each answer): one feeling fills the pad; the picker; no buttons; the pad the whole window
+  - BUILT 3.187: Feelings (tools/music/tools/embodiment/feelings/) + components/ratio-set; feeling-song.spec ADDENDUM 2026-11-13 (3)
+
