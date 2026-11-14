@@ -171,7 +171,7 @@
         if (kind === 'intro' || kind === 'outro') { kit(N, { kick: 'X.......X.......', hat: '..x...x...x...x.' }); return n; }
         kit(N, { kick: 'X...X...X...X.x.', snare: '....X.......X...', clap: '....X.......X..o', hat: 'xxxxxxxxxxxxxxxx', crash: b % 8 === 0 ? 'X...............' : '' }, { ghost: 0.45 }); return n; }
       if (p === 'bass') { const r = at(deg, 1);   // 16ths; the drive set note by note (accents dirtier), the last beat of a phrase a fall
-        for (let s = 0; s < 16; s++) { if (b % 4 === 3 && s >= 12) { if (s === 12) N(12, 4, r, 1, { b: { from: 0, to: -12, shape: 'late', at: 0.3 } }); continue; } N(s, 0.85, s % 8 === 6 ? r + 12 : r, s % 4 ? 0.72 : 1, { p: { drive: s % 4 ? 8 : 18 } }); }
+        for (let s = 0; s < 16; s++) { if (b % 4 === 3 && s >= 12) { if (s === 12) N(12, 4, r, 1, { b: { from: 0, to: -12, shape: 'late', at: 0.3 } }); continue; } N(s, 0.85, s % 8 === 6 ? r + 12 : r, s % 4 ? 0.72 : 1, { p: { drive: s % 4 ? 3 : 7 } }); }
         return n; }
       if (p === 'stabs') { const c = chord(at, deg, 4, [2, 4, 7]); [0, 3, 6, 10].forEach((s, i) => N(s, 1, c.root, i ? 0.8 : 1, { x: { iv: c.iv, strum: 0, ht: 6, hv: 0.08, cond: i === 2 ? { every: 2, at: 1 } : undefined } })); N(14, 2, c.root, 0.7, { x: { iv: c.iv, rs: 'accel', rv: 'grow' }, rt: 4 }); return n; }
       if (p === 'lead') { const hi = at(deg + 4, 5), lo = at(deg, 5);
@@ -182,12 +182,12 @@
       return null; },
     curves(secs) { const L = lanes();
       secs.forEach(s => { const a = s.bar, e = s.bar + s.bars;
-        if (s.kind === 'build') { L.add('bass', 'cutoff', 'Bass opens', [[a, 300], [e - 0.05, 9000]]); L.add('fx2', 'mix', 'Glitch rises', [[a, 0], [e - 0.05, 0.8], [e, 0.15]]); L.add('mod1', 'posX', 'XY · X (bass drive)', [[a, 0], [e - 0.05, 1]]); }
+        if (s.kind === 'build') { L.add('bass', 'cutoff', 'Bass opens', [[a, 300], [e - 0.05, 3500]]); L.add('fx2', 'mix', 'Glitch rises', [[a, 0], [e - 0.05, 0.45], [e, 0.15]]); L.add('mod1', 'posX', 'XY · X (bass drive)', [[a, 0], [e - 0.05, 0.6]]); }
         else { L.add('bass', 'cutoff', 'Bass opens', [[a, s.kind === 'drop' ? 4200 : 1500]]); L.add('fx2', 'mix', 'Glitch rises', [[a, s.kind === 'drop' ? 0.2 : 0.05]]); L.add('mod1', 'posX', 'XY · X (bass drive)', [[a, s.kind === 'drop' ? 0.6 : 0.2]]); }
         L.add('stabs', 'cutoff', 'Stabs bite', s.kind === 'drop' ? swells(a, e, 1, 1200, 5200) : [[a, 1500]]);
         L.add('fx4', 'mix', 'Lead echo throws', s.kind === 'break' ? [[a, 0.6]] : [[a, 0.2], [e - 1, 0.2], [e - 0.05, 0.7]]);
         L.add('mod0', 'rate', 'Random speed', [[a, s.kind === 'drop' ? 8 : 4]]); L.add('mod1', 'posY', 'XY · Y (glitch)', [[a, s.kind === 'drop' ? 0.5 : 0.1]]);
-        if (s.kind === 'break') L.add('pad', 'bloom', 'Choir blooms', [[a, 0.2], [e - 0.05, 0.9]]); L.add('lead', 'lfoPitch', 'Lead vibrato', [[a, 4], [e - 0.05, s.kind === 'break' ? 50 : 15]]); L.add('fx0', 'drive', 'Bass grit', [[a, s.kind === 'drop' ? 0.75 : 0.45]]); L.add('fx1', 'amount', 'Bass OTT', [[a, s.kind === 'drop' ? 0.8 : 0.4]]); L.add('fx3', 'depth', 'Choir pump', [[a, s.kind === 'drop' ? 0.75 : 0.4]]); L.add('pad', 'shimmer', 'Choir shimmer', [[a, 0.2], [e - 0.05, s.kind === 'outro' ? 0.8 : 0.3]]); });
+        if (s.kind === 'break') L.add('pad', 'bloom', 'Choir blooms', [[a, 0.2], [e - 0.05, 0.9]]); L.add('lead', 'lfoPitch', 'Lead vibrato', [[a, 4], [e - 0.05, s.kind === 'break' ? 50 : 15]]); L.add('fx0', 'drive', 'Bass grit', [[a, s.kind === 'drop' ? 0.5 : 0.3]]); L.add('fx1', 'amount', 'Bass OTT', [[a, s.kind === 'drop' ? 0.55 : 0.3]]); L.add('fx3', 'depth', 'Choir pump', [[a, s.kind === 'drop' ? 0.75 : 0.4]]); L.add('pad', 'shimmer', 'Choir shimmer', [[a, 0.2], [e - 0.05, s.kind === 'outro' ? 0.8 : 0.3]]); });
       return L.done(); },
     fx: [{ organism: 'eravos.fx-destroyer', preset: 'Bass Grit (parallel)', on: 'bass' }, { organism: 'eravos.fx-squash', preset: 'OTT Growl', on: 'fx0' }, { organism: 'eravos.fx-glitch', preset: 'Stutter 1/16', on: 'stabs' },
       { organism: 'eravos.sidechain-compressor', preset: 'Kick-triggered', on: 'pad' }, { organism: 'eravos.fx-echo', preset: 'Dub Throw', on: 'lead' }],
@@ -644,6 +644,26 @@
       if (P.organism === 'eravos.pads') v = Math.min(v, 0.55); if (P.organism === 'eravos.sub-engine') v *= 0.5;
       P.configure[key] = Math.round(v * k * 1000) / 1000; }); }
   SE.genres().filter(g => GENRES.includes(g.id)).forEach(stage);
+  // fades (his words, 2026-11-14: "dont forget you can fade in" · "no not all" · "just ones that should."): only where a fade belongs — pads,
+  // keys and washes that come in at an intro, a riser that climbs through its build, the long tails of an outro. Drums and basses that should
+  // hit enter at full level. Per song: in (fades in where it first plays), out (fades out over the outro).
+  const FADES = {
+    'deepwave-nightdrive': { in: ['pad'], out: ['pad', 'bass'] }, 'deepwave-outrun': { in: ['pluck', 'riser'], out: ['pad', 'pluck'] },
+    'deepwave-darksynth': { in: ['pad', 'riser'], out: ['pad'] }, 'deepwave-dream': { in: ['pad', 'keys', 'swarm'], out: ['pad', 'keys', 'lead'] },
+    'deepwave-italo': { in: ['pad'], out: ['pad', 'bass'] }, 'deepwave-slowfunk': { in: ['keys', 'pad'], out: ['keys', 'pad'] },
+    'deepstep-og': { in: [], out: ['skank'] }, 'deepstep-wobble': { in: ['riser'], out: ['organ'] }, 'deepstep-talker': { in: ['pad'], out: ['pad'] },
+    'deepstep-riddim': { in: ['pad'], out: ['pad'] }, 'deepstep-melodic': { in: ['pad', 'riser', 'swarm'], out: ['piano'] }, 'deepstep-tearout': { in: ['swarm'], out: ['swarm'] },
+  };
+  function fades(G) { const own = G.curves, F = FADES[G.id] || { in: [], out: [] };
+    G.curves = (secs, r, o) => { const out = own ? own(secs, r, o) : [], has = new Set(out.map(c => c.part + '|' + c.key)), extra = new Map();
+      const add = (part, key, name, pts) => { const k = part + '|' + key; if (has.has(k)) return; if (!extra.has(k)) extra.set(k, { part, key, name, points: [] }); extra.get(k).points.push(...pts); };
+      const seen = new Set();
+      secs.forEach((s, i) => { const sec = G.form[i], a = s.bar, e = s.bar + s.bars;
+        sec.play.forEach(p => { const P = G.parts[p]; if (!P || P.organism === 'eravos.arp' || (!F.in.includes(p) && !F.out.includes(p))) return; const key = P.organism === 'eravos.pads' ? 'volume' : 'level', L = (P.configure || {})[key]; if (L == null) return;
+          if (!seen.has(p)) { seen.add(p); if (F.in.includes(p)) add(p, key, 'Fade in', [[a, L * 0.05], [a + Math.min(s.kind === 'build' ? s.bars : 4, s.bars) - 0.05, L]]); else add(p, key, 'Level', [[a, L]]); }
+          if (s.kind === 'outro' && F.out.includes(p)) add(p, key, 'Fade out', [[a, L], [e - 0.05, L * 0.03]]); }); });
+      return out.concat(Array.from(extra.values()).map(c => Object.assign(c, { points: c.points.sort((x, y) => x[0] - y[0]) }))); }; }
+  SE.genres().filter(g => GENRES.includes(g.id)).forEach(fades);
 
   // ===================================================================================================== the songs
   if (window.Songbook && window.Songbook.add) SONGS.forEach(s => window.Songbook.add(Object.assign({ tools: 'per-note knobs and knob curves · bends with their own LFO · chords from one note · plays on pass k · chance · ratchets · swing · curve lanes on tools, effects and modulators · LFO · XY Pad · a tool driving a tool' }, s)));

@@ -18,3 +18,12 @@
     (kits 0.55, subs halved, a measured trim per song): clipping ≤ 0.003 %, loudest sections −10.8 to −14 dB
   - then: merge #187 and #188, release
 
+## (after the gain staging) — verbatim:
+  > Turbo-Breakdown.mp3 at 0:57 is blown out. its fucked up. dont forget you can fade in.
+  - measured: 0:57 is the build — per-note bass drive up to 18 / 24 into grit and OTT, the filter opening to 9 kHz, the XY Pad adding drive,
+    the glitch to 80 %. FIXED: drive per note 3 / 7, the build opens to 3.5 kHz, glitch to 45 %, XY to 60 %, grit and OTT down
+  > no not all
+  > just ones that should.
+  - RULE: fades only where a fade belongs (pads, keys, washes at an intro; a riser through its build; the tails of an outro) — chosen per song
+    and part (FADES in data/deep-songbook.js); drums and basses that should hit enter at full level
+
