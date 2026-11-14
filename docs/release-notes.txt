@@ -1,3 +1,18 @@
+ERAVOS v0.2.23 (2026-11-14)
+
+Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.23.exe from the release.
+
+- 12 new deep songs, six very different ones on 80s · Synth and six on Dubstep & Wubs, each in its own style from the landmark records of
+  that style (how they are made, never their tunes): Nightdrive Talk, Outrun Key Change, Turbo Breakdown, Sunset Bloom, Sequence 84,
+  Galactic Warble · Request Line Space, Cockney Wobble, Talking Machines, Stop-Start Riddim, Halo Fall, Metal Tearout. Every one uses all
+  of ERAVOS: knobs and knob curves on single notes, bends with their own wobble, chords from one note, notes that play every other pass,
+  chance, ratchets that speed up, swing, curves on instruments, effects and modulators, the XY Pad, and tools driving other tools.
+- Feelings (new tool): pick Love, Anger or Sadness and drag on the pad to play it — up is more of the feeling, across is its colour. Anger
+  is low and rough, Sadness heavy and bending, Love pure and close; irrational harmonics (φ, √2 and more) to choose from.
+- Bassline 2.0: Time · Pitch on the window (its own BPM, swing, pitch in scale steps or semitones, feel, note pool, range, ahead), Lock and
+  Rest lanes; every knob automates, and Speed and Own BPM automate on every music tool.
+- Fixed: chord progressions like i-VI-III-VII keep their lowercase (minor) numerals.
+
 ERAVOS v0.2.22 (2026-11-13)
 
 Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.22.exe from the release.
