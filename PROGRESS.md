@@ -2,7 +2,6 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
-<<<<<<< HEAD
 ## 3.188 Deep songs, batch 1: six very different songs on 80s · Synth and six on Dubstep, each as deep as ERAVOS goes (2026-11-14)
 His words: "what next? the piano is hard for me but l love it. can you look at every major song of all synthwave, edm, dubstep, electronic, etc to make a wide contrast of songs per catagory that are as complex and deep as eravos can be. like per note edits, automation, tools wired to other tools, etc. curves, etc. as deep as possiblr"
 - The research first: docs/research/landmark-songs-techniques.md — the landmark records of each style and the technique each song takes
@@ -22,7 +21,6 @@ His words: "what next? the piano is hard for me but l love it. can you look at e
   where it exists); a song clipped 0.12 % (levels down); every song now played at its loudest: no fault, nothing clipping.
 - Proof: P188 18/18; P16 67/67 (every note in key), P172 1/1, P173 6/6, P44 29/29, P62 8/8, P58 18/18, boundary 10/10; songs decomposed
   again (313). Hear them: node docs/previews/deep-songs.render.mjs <dir> (whole songs, MP3).
-=======
 ## 3.187 Feelings — one feeling fills the pad; drag to play it (2026-11-13)
 His words: "i also want a actual tool for irrational frequencies, and unconvential harmonic data, like dragging around to create a nervous
 system response using poly vegal. like feelings or emotions as frequencies. make patterns from feelings." · "a full drag on a tool and have
@@ -39,7 +37,6 @@ feeds you" · "all one feeling" · "no capture button or return" · "resize to a
 - Odd Couples: Hanging Tree Sorrow in the break of Hanging Tree Dub; an Anger preset. Icon: heart.
 - Proof: Feelings 11/11 (the sound measured); ratio-set 37 checks; contracts 34/34; P43 6/6, P63 11/11, P183 2/2, P58 18/18, boundary 10/10,
   no-toys; design check: Feelings clean (59 of 76). Hear it: node docs/previews/feelings-built.shots.mjs → docs/previews/feelings-{love,anger,sadness}.wav (one slow drag each; not committed).
->>>>>>> origin/claude/ensemble-organism
 
 ## 3.186 Bassline 2.0 — time, notes, locks and rests (shown, waiting for his yes) (2026-11-13)
 His words: "I love the bassline, needs more depth and control. like tempo and the cord tool. bassline is high leverage." (12:31:19Z) · "Okay.
