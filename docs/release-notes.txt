@@ -1,3 +1,14 @@
+ERAVOS v0.2.24 (2026-11-14)
+
+Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.24.exe from the release.
+
+- The deep songs no longer overload. Turbo Breakdown's build is drums, choir and riser (the bass comes back at the drop), its bass and
+  OTT tamed; Talking Machines, Stop-Start Riddim and Metal Tearout have their OTT's makeup gain tamed; Halo Fall trimmed. Every song sits
+  around −13 to −15 dB with no clipping.
+- Fixed: Sequence 84 went silent partway (a modulator on top of a phaser's feedback ran it past 1). No song wires anything into a feedback
+  knob any more.
+- Nightdrive Talk: the talking lead no longer wobbles; only parts that should fade in or out do.
+
 ERAVOS v0.2.23 (2026-11-14)
 
 Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.23.exe from the release.
