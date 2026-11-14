@@ -78,7 +78,7 @@
         L.add('fx2', 'wear', 'Pad tape wear', [[a, s.kind === 'break' ? 0.75 : s.kind === 'outro' ? 0.4 : 0.2], [e - 0.05, s.kind === 'outro' ? 1 : s.kind === 'break' ? 0.85 : 0.2]]);
         L.add('mod0', 'rate', 'Pad drift speed', [[a, s.kind === 'break' ? 0.6 : 0.08]]);
         L.add('mod1', 'posX', 'XY · X (talk vowel)', s.kind === 'chorus' ? [[a, 0.2], [a + s.bars / 2, 0.8], [e - 0.05, 0.4]] : [[a, 0.3]]);
-        L.add('mod1', 'posY', 'XY · Y (echo feedback)', [[a, s.kind === 'break' ? 0.8 : 0.3]]);
+        L.add('mod1', 'posY', 'XY · Y (talk echo)', [[a, s.kind === 'break' ? 0.8 : 0.3]]);
         if (s.kind === 'chorus') L.add('brass', 'cutoff', 'Brass swells', swells(a, e, 2, 900, 3600));
         L.add('fx3', 'depth', 'Pad pump', [[a, s.kind === 'chorus' ? 0.6 : 0.3]]); L.add('talk', 'vibrato', 'Talk vibrato', [[a, 0], [e - 0.05, s.kind === 'chorus' ? 60 : 20]]);
         L.add('fx0', 'gateRange', 'Snare gate', [[a, s.kind === 'chorus' ? 60 : 40]]); L.add('bass', 'drive', 'Bass drive', [[a, s.kind === 'chorus' ? 8 : 3]]);
@@ -87,7 +87,7 @@
     fx: [{ organism: 'eravos.fx-dynamics', preset: '80s Gated Snare', on: 'drums' }, { organism: 'eravos.fx-echo', preset: '80s · Dotted Synthwave Delay', on: 'talk' },
       { organism: 'eravos.tape-memory', preset: 'Sunbleached Reel', on: 'pad' }, { organism: 'eravos.sidechain-compressor', preset: 'Half-time 1/2', on: 'fx2' }],
     mods: [{ organism: 'eravos.lfo', preset: '80s · Slow Juno Drift', to: 'pad', key: 'cutoff' }, { organism: 'eravos.xy-pad', configure: { maxX: 0.5, maxY: 0.5 } }],
-    routes: [{ from: 'mod1', out: 'x', to: 'talk', key: 'knob.formantShift' }, { from: 'mod1', out: 'y', to: 'fx1', key: 'feedback' }, { from: 'fx3', out: 'env', to: 'fx1', key: 'mix' }],
+    routes: [{ from: 'mod1', out: 'x', to: 'talk', key: 'knob.formantShift' }, { from: 'mod1', out: 'y', to: 'fx1', key: 'mix' }, { from: 'fx3', out: 'env', to: 'fx2', key: 'mix' }],
     master: { compThresh: -12, compRatio: 2.5, reverbMix: 0.2 },
   }, { id: 'dp-nightdrive', title: 'Nightdrive Talk', seed: 8801, mood: ['80s', 'dark'],
     listen: 'Half-time and slow: the lead talks — every note its own vowel, opening inside the note. The chorus lifts by opening the filters, not by adding drums.', drop: 'No drop: a third chorus where the Swarm blooms and locks.', voice: 'Her voice in the bridge, over the worn pad.' });
@@ -152,13 +152,13 @@
   //         breakdown and a blast back. The sidechain's envelope opens the lead; the XY Pad drives the bass and the glitch.
   add({ id: 'deepwave-darksynth', label: 'Darksynth (breakdown and blast)', icon: '🩸', accent: '#d0142c', family: 'Synth',
     bpm: [124, 128], roots: [1, 4, 6], scales: ['phrygian', 'minor'], progs: [[1, 2, 1, 7], [1, 1, 6, 7]], leadRhythm: 'sparse', drums: { main: {} },
-    tagline: 'Darksynth at full speed: a distorted 16th bass whose drive is set note by note, glitching stabs, a half-time breakdown and a blast back; the sidechain’s envelope opens the lead, the XY Pad drives the bass and the glitch',
-    form: [S('intro', 'intro', 8, ['pad', 'drums']), S('verse', 'verse', 16, ['drums', 'bass', 'stabs', 'pad']), S('build', 'build', 8, ['drums', 'bass', 'pad', 'riser']),
-      S('drop', 'drop', 16, ['drums', 'bass', 'stabs', 'lead', 'pad']), S('breakdown', 'break', 8, ['drums', 'pad', 'lead']), S('blast', 'build', 8, ['drums', 'bass', 'stabs', 'riser']),
+    tagline: 'Darksynth at full speed: a distorted 16th bass whose drive is set note by note, glitching stabs, a half-time breakdown and a blast back; the sidechain’s envelope opens the lead, the XY Pad opens the stabs and throws the glitch',
+    form: [S('intro', 'intro', 8, ['pad', 'drums']), S('verse', 'verse', 16, ['drums', 'bass', 'stabs', 'pad']), S('build', 'build', 8, ['drums', 'pad', 'riser']),
+      S('drop', 'drop', 16, ['drums', 'bass', 'stabs', 'lead', 'pad']), S('breakdown', 'break', 8, ['drums', 'pad', 'lead']), S('blast', 'build', 8, ['drums', 'stabs', 'riser']),
       S('drop 2', 'drop', 16, ['drums', 'bass', 'stabs', 'lead', 'pad']), S('outro', 'outro', 8, ['pad', 'drums'])],
     parts: {
-      drums: { role: 'drums', organism: 'eravos.pads', preset: 'Techno & Hard · Industrial', name: 'Drums' },
-      bass: { role: 'bass', organism: 'eravos.retro-dco', preset: 'Sub Growl', name: 'Bass (driven)', configure: { level: 0.7 } },
+      drums: { role: 'drums', organism: 'eravos.pads', preset: 'Techno & Hard · Industrial', name: 'Drums', configure: { volume: 0.4 } },
+      bass: { role: 'bass', organism: 'eravos.retro-dco', preset: 'Sub Growl', name: 'Bass (driven)', configure: { level: 0.35 } },   // measured alone at 0.99 peak in the drop (his: "still overloads")
       stabs: { role: 'chords', organism: 'eravos.retro-poly', preset: 'Darksynth Saw', name: 'Stabs', configure: { level: 0.45 } },
       lead: { role: 'lead', organism: 'eravos.retro-dco', preset: 'Coldwave Lead', name: 'Lead', configure: { level: 0.55 } },
       pad: { role: 'chords', organism: 'eravos.pad-forge', preset: 'Dark Choir', name: 'Choir', configure: { level: 0.35 } },
@@ -182,17 +182,18 @@
       return null; },
     curves(secs) { const L = lanes();
       secs.forEach(s => { const a = s.bar, e = s.bar + s.bars;
-        if (s.kind === 'build') { L.add('bass', 'cutoff', 'Bass opens', [[a, 300], [e - 0.05, 3500]]); L.add('fx2', 'mix', 'Glitch rises', [[a, 0], [e - 0.05, 0.45], [e, 0.15]]); L.add('mod1', 'posX', 'XY · X (bass drive)', [[a, 0], [e - 0.05, 0.6]]); }
-        else { L.add('bass', 'cutoff', 'Bass opens', [[a, s.kind === 'drop' ? 4200 : 1500]]); L.add('fx2', 'mix', 'Glitch rises', [[a, s.kind === 'drop' ? 0.2 : 0.05]]); L.add('mod1', 'posX', 'XY · X (bass drive)', [[a, s.kind === 'drop' ? 0.6 : 0.2]]); }
+        if (s.kind === 'build') { L.add('bass', 'cutoff', 'Bass opens', [[a, 300], [e - 0.05, 3500]]); L.add('fx2', 'mix', 'Glitch rises', [[a, 0], [e - 0.05, 0.45], [e, 0.15]]); L.add('mod1', 'posX', 'XY · X (stabs filter)', [[a, 0], [e - 0.05, 0.6]]); }
+        else { L.add('bass', 'cutoff', 'Bass opens', [[a, s.kind === 'drop' ? 4200 : 1500]]); L.add('fx2', 'mix', 'Glitch rises', [[a, s.kind === 'drop' ? 0.2 : 0.05]]); L.add('mod1', 'posX', 'XY · X (stabs filter)', [[a, s.kind === 'drop' ? 0.6 : 0.2]]); }
         L.add('stabs', 'cutoff', 'Stabs bite', s.kind === 'drop' ? swells(a, e, 1, 1200, 5200) : [[a, 1500]]);
         L.add('fx4', 'mix', 'Lead echo throws', s.kind === 'break' ? [[a, 0.6]] : [[a, 0.2], [e - 1, 0.2], [e - 0.05, 0.7]]);
         L.add('mod0', 'rate', 'Random speed', [[a, s.kind === 'drop' ? 8 : 4]]); L.add('mod1', 'posY', 'XY · Y (glitch)', [[a, s.kind === 'drop' ? 0.5 : 0.1]]);
-        if (s.kind === 'break') L.add('pad', 'bloom', 'Choir blooms', [[a, 0.2], [e - 0.05, 0.9]]); L.add('lead', 'lfoPitch', 'Lead vibrato', [[a, 4], [e - 0.05, s.kind === 'break' ? 50 : 15]]); L.add('fx0', 'drive', 'Bass grit', [[a, s.kind === 'drop' ? 0.5 : 0.3]]); L.add('fx1', 'amount', 'Bass OTT', [[a, s.kind === 'drop' ? 0.55 : 0.3]]); L.add('fx3', 'depth', 'Choir pump', [[a, s.kind === 'drop' ? 0.75 : 0.4]]); L.add('pad', 'shimmer', 'Choir shimmer', [[a, 0.2], [e - 0.05, s.kind === 'outro' ? 0.8 : 0.3]]); });
+        if (s.kind === 'break') L.add('pad', 'bloom', 'Choir blooms', [[a, 0.2], [e - 0.05, 0.9]]); L.add('lead', 'lfoPitch', 'Lead vibrato', [[a, 4], [e - 0.05, s.kind === 'break' ? 50 : 15]]); L.add('fx0', 'drive', 'Bass grit', [[a, s.kind === 'drop' ? 0.5 : 0.3]]); L.add('fx1', 'amount', 'Bass OTT', [[a, s.kind === 'drop' ? 0.55 : 0.3]]);
+        L.add('fx1', 'outGain', 'OTT out (its makeup tamed: his "still overloads")', [[a, -6]]); L.add('fx1', 'mix', 'OTT in parallel', [[a, 0.5]]); L.add('fx0', 'outGain', 'Grit out', [[a, -4]]); L.add('fx3', 'depth', 'Choir pump', [[a, s.kind === 'drop' ? 0.75 : 0.4]]); L.add('pad', 'shimmer', 'Choir shimmer', [[a, 0.2], [e - 0.05, s.kind === 'outro' ? 0.8 : 0.3]]); });
       return L.done(); },
     fx: [{ organism: 'eravos.fx-destroyer', preset: 'Bass Grit (parallel)', on: 'bass' }, { organism: 'eravos.fx-squash', preset: 'OTT Growl', on: 'fx0' }, { organism: 'eravos.fx-glitch', preset: 'Stutter 1/16', on: 'stabs' },
       { organism: 'eravos.sidechain-compressor', preset: 'Kick-triggered', on: 'pad' }, { organism: 'eravos.fx-echo', preset: 'Dub Throw', on: 'lead' }],
     mods: [{ organism: 'eravos.lfo', preset: 'Stepped Random 1/16', to: 'stabs', key: 'cutoff' }, { organism: 'eravos.xy-pad', configure: { maxX: 0.6, maxY: 0.5 } }],
-    routes: [{ from: 'mod1', out: 'x', to: 'bass', key: 'knob.drive' }, { from: 'mod1', out: 'y', to: 'fx2', key: 'mix' }, { from: 'fx3', out: 'env', to: 'lead', key: 'cutoff' }],
+    routes: [{ from: 'mod1', out: 'x', to: 'stabs', key: 'cutoff' }, { from: 'mod1', out: 'y', to: 'fx2', key: 'mix' }, { from: 'fx3', out: 'env', to: 'lead', key: 'cutoff' }],   // his ear: "still overloads" — measured, the XY Pad's drive on the bass was it
     master: { compThresh: -10, compRatio: 3.5, reverbMix: 0.12 },
   }, { id: 'dp-darksynth', title: 'Turbo Breakdown', seed: 8803, mood: ['80s', 'dark', 'heavy'],
     listen: 'Distorted 16ths whose drive is set note by note, stabs that glitch, a choir behind the pump.', drop: 'A half-time breakdown where the lead wobbles faster and faster, then a blast (an 8-hit roll that speeds up) back into the drop.', voice: 'Her voice alone in the breakdown.' });
@@ -242,7 +243,7 @@
     fx: [{ organism: 'eravos.fx-dynamics', preset: '80s Gated Snare', on: 'drums' }, { organism: 'eravos.fx-echo', preset: '80s · Gated Slap \'84', on: 'lead' },
       { organism: 'eravos.fx-moddelay', preset: '80s · Dimension D Wide', on: 'keys' }, { organism: 'eravos.tape-memory', preset: 'Sunbleached Reel', on: 'pad' }],
     mods: [{ organism: 'eravos.lfo', preset: '80s · Slow Juno Drift', to: 'pad', key: 'cutoff' }, { organism: 'eravos.xy-pad', configure: { maxX: 0.5, maxY: 0.4 } }],
-    routes: [{ from: 'mod1', out: 'x', to: 'keys', key: 'knob.trem' }, { from: 'mod1', out: 'y', to: 'fx1', key: 'mix' }, { from: 'fx3', out: 'dropout', to: 'fx1', key: 'feedback' }],
+    routes: [{ from: 'mod1', out: 'x', to: 'keys', key: 'knob.trem' }, { from: 'mod1', out: 'y', to: 'fx1', key: 'mix' }, { from: 'fx3', out: 'dropout', to: 'fx1', key: 'knob.wow' }],
     master: { compThresh: -13, compRatio: 2.2, reverbMix: 0.24 },
   }, { id: 'dp-dream', title: 'Sunset Bloom', seed: 8804, mood: ['80s', 'her', 'warm'],
     listen: 'Slow and lush: electric-piano chords strummed up and down from one note, a gated snare, a lead that breathes like a saxophone.', drop: 'No drop: the Swarm gathers in the interlude and the pad’s tape drops out, throwing the lead’s echo.', voice: 'Her voice in the interlude.' });
@@ -283,12 +284,12 @@
         L.add('keys', 'cutoff', 'Arp synth filter', [[a, 1500], [e - 0.05, s.kind === 'chorus' ? 5000 : 2500]]);
         L.add('fx1', 'feedback', 'Glass phaser', [[a, s.kind === 'break' ? 0.85 : 0.4]]); L.add('fx2', 'mix', 'Lead echo', [[a, 0.3]]);
         L.add('mod0', 'rate', 'Lead pump speed', [[a, s.kind === 'chorus' ? 8 : 2]]);
-        L.add('mod1', 'posX', 'XY · X (sequence resonance)', s.kind === 'break' ? [[a, 0.1], [e - 0.05, 1]] : [[a, 0.3]]); L.add('mod1', 'posY', 'XY · Y (phaser feedback)', [[a, 0.3], [e - 0.05, 0.6]]); L.add('bass', 'res', 'Sequence resonance', [[a, 4], [e - 0.05, s.kind === 'break' ? 14 : 6]]); L.add('pad', 'bloom', 'Glass bloom', [[a, 0.3], [e - 0.05, s.kind === 'chorus' ? 0.8 : 0.4]]); L.add('fx3', 'depth', 'Glass pump', [[a, s.kind === 'chorus' ? 0.7 : 0.4]]); L.add('lead', 'pwm', 'Lead pulse width motion', [[a, 0.2], [e - 0.05, 0.7]]); });
+        L.add('mod1', 'posX', 'XY · X (sequence resonance)', s.kind === 'break' ? [[a, 0.1], [e - 0.05, 1]] : [[a, 0.3]]); L.add('mod1', 'posY', 'XY · Y (glass bloom)', [[a, 0.3], [e - 0.05, 0.6]]); L.add('bass', 'res', 'Sequence resonance', [[a, 4], [e - 0.05, s.kind === 'break' ? 14 : 6]]); L.add('pad', 'bloom', 'Glass bloom', [[a, 0.3], [e - 0.05, s.kind === 'chorus' ? 0.8 : 0.4]]); L.add('fx3', 'depth', 'Glass pump', [[a, s.kind === 'chorus' ? 0.7 : 0.4]]); L.add('lead', 'pwm', 'Lead pulse width motion', [[a, 0.2], [e - 0.05, 0.7]]); });
       return L.done(); },
     fx: [{ organism: 'eravos.fx-filter', preset: 'Muffled Intro', on: 'bass' }, { organism: 'eravos.fx-phaser', preset: '80s · Small Stone Swirl', on: 'pad' },
       { organism: 'eravos.fx-echo', preset: 'Ping-pong 1/8.', on: 'lead' }, { organism: 'eravos.sidechain-compressor', preset: 'Club · House Pump 1/4 (deep)', on: 'fx1' }],
     mods: [{ organism: 'eravos.lfo', preset: 'Pump 1/4', to: 'lead', key: 'cutoff' }, { organism: 'eravos.xy-pad', configure: { maxX: 0.6, maxY: 0.5 } }],
-    routes: [{ from: 'mod1', out: 'x', to: 'fx0', key: 'res' }, { from: 'mod1', out: 'y', to: 'fx1', key: 'feedback' }, { from: 'fx3', out: 'env', to: 'fx2', key: 'mix' }],
+    routes: [{ from: 'mod1', out: 'x', to: 'fx0', key: 'res' }, { from: 'mod1', out: 'y', to: 'pad', key: 'knob.bloom' }, { from: 'fx3', out: 'env', to: 'fx2', key: 'mix' }   /* his ear (2026-11-14): the Y in the phaser's feedback ran away into NaN at the chorus's end */],
     master: { compThresh: -11, compRatio: 3, reverbMix: 0.15 },
   }, { id: 'dp-italo', title: 'Sequence 84', seed: 8805, mood: ['80s', 'party'],
     listen: 'The 16th octave sequence alone, then the kick: its filter opens over the whole song (one curve), every step its own accent.', drop: 'In the break the sequence closes to a whisper and its resonance climbs on the XY Pad.', voice: 'Her voice over the break.' });
@@ -372,12 +373,12 @@
         L.add('fx2', 'cutoff', 'Drums filter', s.kind === 'intro' ? [[a, 600], [e - 0.05, 6000], [e, 18000]] : [[a, 18000]]);
         L.add('fx1', 'rate', 'Wobble phaser speed', [[a, 0.2], [e - 0.05, 0.8]]); L.add('wub', 'cutoff', 'Wobble filter', [[a, 300], [e - 0.05, 900]]);
         L.add('mod0', 'depth', 'Skank filter sweep', [[a, s.kind === 'break' ? 0.8 : 0.3]]);
-        L.add('mod1', 'posX', 'XY · X (echo feedback)', [[a, s.kind === 'break' ? 0.9 : 0.2]]); L.add('mod1', 'posY', 'XY · Y (wobble filter)', [[a, 0.2], [e - 0.05, s.name === 'drop 2' ? 0.8 : 0.3]]); L.add('sub', 'drive', 'Sub warmth', [[a, s.name === 'drop 2' ? 0.3 : 0.1]]); L.add('skank', 'hardness', 'Skank attack', [[a, s.kind === 'break' ? 0.8 : 0.5]]); L.add('siren', 'drive', 'Siren grit', [[a, s.kind === 'break' ? 0.6 : 0.2]]); L.add('fx2', 'res', 'Drums filter peak', [[a, s.kind === 'intro' ? 6 : 0.7]]); L.add('fx3', 'depth', 'Echo breathes', [[a, s.kind === 'drop' ? 0.6 : 0.3]]); });
+        L.add('mod1', 'posX', 'XY · X (echo age)', [[a, s.kind === 'break' ? 0.9 : 0.2]]); L.add('mod1', 'posY', 'XY · Y (wobble filter)', [[a, 0.2], [e - 0.05, s.name === 'drop 2' ? 0.8 : 0.3]]); L.add('sub', 'drive', 'Sub warmth', [[a, s.name === 'drop 2' ? 0.3 : 0.1]]); L.add('skank', 'hardness', 'Skank attack', [[a, s.kind === 'break' ? 0.8 : 0.5]]); L.add('siren', 'drive', 'Siren grit', [[a, s.kind === 'break' ? 0.6 : 0.2]]); L.add('fx2', 'res', 'Drums filter peak', [[a, s.kind === 'intro' ? 6 : 0.7]]); L.add('fx3', 'depth', 'Echo breathes', [[a, s.kind === 'drop' ? 0.6 : 0.3]]); });
       return L.done(); },
     fx: [{ organism: 'eravos.fx-echo', preset: 'Dub Throw', on: 'skank' }, { organism: 'eravos.fx-phaser', preset: 'Dubstep Sweep 1/8', on: 'wub' },
       { organism: 'eravos.fx-filter', preset: 'Muffled Intro', on: 'drums' }, { organism: 'eravos.sidechain-compressor', preset: 'Half-time 1/2', on: 'fx0' }],
     mods: [{ organism: 'eravos.lfo', preset: 'Slow Filter Sweep 2 bars', to: 'skank', key: 'brightness' }, { organism: 'eravos.xy-pad', configure: { maxX: 0.4, maxY: 0.5 } }],
-    routes: [{ from: 'mod1', out: 'x', to: 'fx0', key: 'feedback' }, { from: 'mod1', out: 'y', to: 'wub', key: 'cutoff' }, { from: 'fx3', out: 'env', to: 'fx0', key: 'mix' }],
+    routes: [{ from: 'mod1', out: 'x', to: 'fx0', key: 'age' }, { from: 'mod1', out: 'y', to: 'wub', key: 'cutoff' }, { from: 'fx3', out: 'env', to: 'fx0', key: 'mix' }],
     master: { compThresh: -12, compRatio: 2.5, reverbMix: 0.1 },
   }, { id: 'ds-og', title: 'Request Line Space', seed: 8901, mood: ['dark', 'calm'],
     listen: 'Space first: a clean sub that slides, a skank thrown into the echo, one thing changing at a time over 32-bar drops.', drop: 'In the dub break the echo’s feedback climbs to the edge and the XY Pad rides it.', voice: 'Her voice in the dub break, into the echo.' });
@@ -469,7 +470,7 @@
       secs.forEach(s => { const a = s.bar, e = s.bar + s.bars;
         L.add('talk', 'fm', 'Talker FM', s.kind === 'drop' ? swells(a, e, 2, 3, 12) : [[a, 2]]); L.add('talk', 'drive', 'Talker drive', [[a, s.name === 'drop 2' ? 0.85 : 0.6]]);
         L.add('yoi', 'cutoff', 'Answer brightness', [[a, 1500], [e - 0.05, s.kind === 'drop' ? 6000 : 2000]]);
-        L.add('fx0', 'amount', 'Talker OTT', [[a, s.kind === 'drop' ? 0.8 : 0.3]]); L.add('fx1', 'repeats', 'Screech stutter', [[a, 2], [e - 0.05, s.kind === 'build' ? 16 : 4]]);
+        L.add('fx0', 'amount', 'Talker OTT', [[a, s.kind === 'drop' ? 0.8 : 0.3]]); L.add('fx0', 'outGain', 'OTT out (makeup tamed)', [[a, -6]]); L.add('fx0', 'mix', 'OTT in parallel', [[a, 0.6]]); L.add('fx1', 'repeats', 'Screech stutter', [[a, 2], [e - 0.05, s.kind === 'build' ? 16 : 4]]);
         L.add('fx3', 'depth', 'Pad pump', [[a, 0.7]]); L.add('pad', 'cutoff', 'Pad filter', s.kind === 'build' ? [[a, 600], [e - 0.05, 9000]] : [[a, 2200]]);
         L.add('mod0', 'rate', 'Random talk speed', [[a, s.kind === 'drop' ? 16 : 4]]);
         L.add('mod1', 'posX', 'XY · X (answer vowel)', s.kind === 'drop' ? swells(a, e, 4, 0.2, 0.9) : [[a, 0.3]]); L.add('mod1', 'posY', 'XY · Y (talker FM)', [[a, 0.2], [e - 0.05, s.kind === 'build' ? 1 : 0.5]]); L.add('talk', 'talk', 'Talker mouth', s.kind === 'drop' ? swells(a, e, 1, 0.3, 1) : [[a, 0.4]]); L.add('screech', 'index', 'Screech FM', [[a, 4], [e - 0.05, s.kind === 'build' ? 20 : 10]]); L.add('fx2', 'drive', 'Answer fold', [[a, s.name === 'drop 2' ? 0.8 : 0.5]]); });
@@ -513,7 +514,7 @@
     curves(secs) { const L = lanes();
       secs.forEach(s => { const a = s.bar, e = s.bar + s.bars;
         L.add('riddim', 'fmIndex', 'Riddim FM (the change, not the notes)', s.kind === 'drop' ? swells(a, e, 2, 2, 10) : [[a, 2]]); L.add('riddim', 'cutoff', 'Riddim filter', [[a, s.kind === 'drop' ? 3000 : 800], [e - 0.05, s.kind === 'drop' ? 5500 : 800]]);
-        L.add('fx0', 'amount', 'The wall', [[a, s.kind === 'drop' ? 0.85 : 0.2]]); L.add('fx1', 'depth', 'Gate', [[a, s.kind === 'drop' ? 0.75 : 0.2]]);
+        L.add('fx0', 'amount', 'The wall', [[a, s.kind === 'drop' ? 0.85 : 0.2]]); L.add('fx0', 'outGain', 'The wall’s out (makeup tamed)', [[a, -6]]); L.add('fx1', 'depth', 'Gate', [[a, s.kind === 'drop' ? 0.75 : 0.2]]);
         L.add('fx2', 'mix', 'Stair octave', [[a, 0.3], [e - 0.05, s.name === 'drop 2' ? 0.7 : 0.3]]); L.add('pad', 'cutoff', 'Pad filter', s.kind === 'build' ? [[a, 300], [e - 0.05, 9000]] : [[a, 1500]]);
         L.add('mod0', 'rate', 'Golden LFO speed', [[a, s.kind === 'drop' ? 2.4 : 0.6]]);
         L.add('mod1', 'posX', 'XY · X (riddim FM)', s.kind === 'build' ? [[a, 0], [e - 0.05, 1]] : [[a, 0.3]]); L.add('mod1', 'posY', 'XY · Y (the wall)', [[a, s.kind === 'drop' ? 0.7 : 0.1]]); L.add('stair', 'fm', 'Stair FM', [[a, 3], [e - 0.05, s.name === 'drop 2' ? 12 : 3]]); L.add('sub', 'drive', 'Sub drive', [[a, s.kind === 'drop' ? 0.25 : 0.05]]); L.add('pad', 'bloom', 'Pad bloom', [[a, 0.2], [e - 0.05, s.kind === 'break' ? 0.9 : 0.3]]); L.add('fx2', 'drive', 'Stair rectifier', [[a, 0.4], [e - 0.05, s.name === 'drop 2' ? 0.8 : 0.4]]); });
@@ -579,7 +580,7 @@
     fx: [{ organism: 'eravos.sidechain-compressor', preset: 'Classic 1/4 Pump', on: 'saws' }, { organism: 'eravos.fx-echo', preset: 'Future Pluck Echo', on: 'lead' },
       { organism: 'eravos.fx-moddelay', preset: 'Slow Shimmer', on: 'piano' }, { organism: 'eravos.fx-destroyer', preset: 'Growl Fold · sub stays clean', on: 'growl' }],
     mods: [{ organism: 'eravos.lfo', preset: 'Slow Filter Sweep 2 bars', to: 'saws', key: 'cutoff' }, { organism: 'eravos.xy-pad', configure: { maxX: 0.5, maxY: 0.4 } }],
-    routes: [{ from: 'fx0', out: 'env', to: 'growl', key: 'cutoff' }, { from: 'mod1', out: 'x', to: 'lead', key: 'cutoff' }, { from: 'mod1', out: 'y', to: 'fx2', key: 'mix' }, { from: 'swarm', out: 'coherence', to: 'fx1', key: 'feedback' }],
+    routes: [{ from: 'fx0', out: 'env', to: 'growl', key: 'cutoff' }, { from: 'mod1', out: 'x', to: 'lead', key: 'cutoff' }, { from: 'mod1', out: 'y', to: 'fx2', key: 'mix' }, { from: 'swarm', out: 'coherence', to: 'fx1', key: 'mix' }],
     master: { compThresh: -11, compRatio: 3, reverbMix: 0.16 },
   }, { id: 'ds-melodic', title: 'Halo Fall', seed: 8905, mood: ['her', 'warm'],
     listen: 'A grand piano alone, the pedal held, its chords strummed up from one note. Then saws pumping against a growl that answers on beat four.', drop: 'The lead cries — bends and a vibrato that blooms; in drop 2 the Swarm locks and its coherence feeds the lead’s echo.', voice: 'Her voice in the pauses, over the piano.' });
@@ -618,7 +619,7 @@
       secs.forEach(s => { const a = s.bar, e = s.bar + s.bars;
         L.add('metal', 'comb', 'Metal comb', s.kind === 'drop' ? swells(a, e, 2, 0.1, 0.8) : [[a, 0.2]]); L.add('screech', 'fmIndex', 'Screech FM', [[a, 4], [e - 0.05, s.name === 'drop 2' ? 11 : 7]]);
         L.add('clang', 'index', 'Clang index', [[a, 8], [e - 0.05, 20]]); L.add('fx0', 'chaos', 'Glitch chaos', [[a, s.kind === 'drop' ? 0.5 : 0.1]]);
-        L.add('fx1', 'amount', 'OTT', [[a, s.kind === 'drop' ? 0.85 : 0.3]]); L.add('fx2', 'drive', 'Screech destruction', [[a, s.name === 'drop 2' ? 0.85 : 0.6]]);
+        L.add('fx1', 'amount', 'OTT', [[a, s.kind === 'drop' ? 0.85 : 0.3]]); L.add('fx1', 'outGain', 'OTT out (makeup tamed)', [[a, -6]]); L.add('fx1', 'mix', 'OTT in parallel', [[a, 0.6]]); L.add('fx2', 'drive', 'Screech destruction', [[a, s.name === 'drop 2' ? 0.85 : 0.6]]);
         L.add('swarm', 'restless', 'Swarm restless', [[a, s.kind === 'break' ? 0.2 : 0.6], [e - 0.05, s.kind === 'break' ? 0.9 : 0.6]]); L.add('mod0', 'rate', 'Random speed', [[a, s.kind === 'drop' ? 12 : 3]]);
         L.add('mod1', 'posX', 'XY · X (metal comb)', s.kind === 'build' ? [[a, 0], [e - 0.05, 1]] : [[a, 0.4]]); L.add('mod1', 'posY', 'XY · Y (screech vowel)', s.kind === 'drop' ? swells(a, e, 4, 0.1, 0.9) : [[a, 0.2]]); L.add('sub', 'drive', 'Sub drive', [[a, s.kind === 'drop' ? 0.3 : 0.05]]); L.add('metal', 'fm', 'Metal FM', s.kind === 'drop' ? swells(a, e, 1, 4, 16) : [[a, 4]]); L.add('fx3', 'thresh', 'Clang glue', [[a, s.kind === 'drop' ? -24 : -12]]); });
       return L.done(); },
@@ -634,7 +635,7 @@
   // "the rest sounds blown out" — measured: every kit alone at full scale, the subs as loud as the whole mix, the mixes −7 to −11 dB rms
   // against the master's −14). Every kit to 0.55, every sub halved, then each song's TRIM (dB, measured) on every part's level.
   const TRIM = { 'deepwave-nightdrive': -3.5, 'deepwave-outrun': -2.5, 'deepwave-darksynth': -5, 'deepwave-dream': 0, 'deepwave-italo': -1.5, 'deepwave-slowfunk': -3.5,
-    'deepstep-og': -5.5, 'deepstep-wobble': -4, 'deepstep-talker': -4, 'deepstep-riddim': -3, 'deepstep-melodic': -4, 'deepstep-tearout': -5 };   // measured at each song's loudest 4 bars → −14 dB
+    'deepstep-og': -5.5, 'deepstep-wobble': -4, 'deepstep-talker': -4, 'deepstep-riddim': -4, 'deepstep-melodic': -5, 'deepstep-tearout': -7 };   // measured at each song's loudest 4 bars → −14 dB
   const DEFS = () => window.OrganismFactory && window.OrganismFactory.def;
   const lvlOf = (P) => { const d = DEFS() && DEFS()(P.organism), c = d && (d.config || []).find(x => x.key === (P.organism === 'eravos.pads' ? 'volume' : 'level')); return c ? c.default : 0.8; };
   function stage(G) { const k = Math.pow(10, (TRIM[G.id] || 0) / 20);

@@ -27,3 +27,9 @@
   - RULE: fades only where a fade belongs (pads, keys, washes at an intro; a riser through its build; the tails of an outro) — chosen per song
     and part (FADES in data/deep-songbook.js); drums and basses that should hit enter at full level
 
+## (after 0.2.23) — verbatim:
+  > still overloads.
+  - MEASURED and FIXED (0.2.24): Turbo's build was the bass alone with the XY Pad driving it; OTT's makeup pushed peaks to 0.99 — the bass out of
+    the builds, OTT out −6 dB / half wet, the XY Pad onto the stabs; the same OTT fix on three dubstep songs; Sequence 84's NaN (a wire on top of
+    a phaser's feedback) — no wire drives a feedback knob (P188 guards it)
+

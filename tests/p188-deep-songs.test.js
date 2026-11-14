@@ -43,6 +43,10 @@ describe('P188 deep songs: a wide contrast per shelf, each as deep as ERAVOS goe
       const sounds = gs.map(g => Object.values(g.parts).filter(p => p.role !== 'drums').map(p => p.organism + '·' + [].concat(p.preset || '')[0]).sort().join(',')); assert.equal(new Set(sounds).size, gs.length, re + ': six palettes'); });
     const bpms = SongEngine.genres().filter(g => /^deepwave-/.test(g.id)).map(g => g.bpm[0]); assert.ok(Math.max(...bpms) - Math.min(...bpms) >= 30, '80s tempos ' + bpms.join(' '));
   });
+  it('no wire drives a feedback knob (a modulator on top of a feedback curve passed 1 and ran away into NaN — Sequence 84, 2026-11-14)', () => {
+    const bad = []; songs().forEach(s => write(s).filter(x => x.op === 'modulate' && /feedback/i.test(String(x.key))).forEach(x => bad.push(s.title + ': ' + x.from + ' → ' + x.to + ' · ' + x.key)));
+    assert.equal(bad.join(' · '), '', 'wires into feedback');
+  });
   it('none is hidden as a repeat of another song', () => { const hidden = Songbook.same().filter(x => DS().songs.includes(x.id)); assert.equal(hidden.length, 0, hidden.map(x => x.title).join(' | ')); });
   it('every song writes on the canvas with no fault (tools mounted, wired, modulated, lanes added)', async () => {
     for (const s of songs()) { const rec = Recipes.get('eravos.recipe.engine.' + s.genre); rec._pinned = s.seed;

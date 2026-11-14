@@ -3,7 +3,7 @@
 His words (2026-11-13): "also songs decomposed one by one." · "rhythmes and notes per tool." — specs/eravos.song-decomposition.spec.
 
 313 songs taken apart (312 from the Song Engine, 1 from recipes); none failed.
-87994 part-bars → 4034 distinct rhythms and 4790 distinct lines across 23 tools (the same content kept once; each names the songs it came from).
+87978 part-bars → 4034 distinct rhythms and 4789 distinct lines across 23 tools (the same content kept once; each names the songs it came from).
 
 | tool | rhythms | lines | bars played |
 |---|---:|---:|---:|
@@ -18,7 +18,7 @@ His words (2026-11-13): "also songs decomposed one by one." · "rhythmes and not
 | eravos.reese-bass | 15 | 102 | 2464 |
 | eravos.organ | 7 | 101 | 2392 |
 | eravos.wub-osc | 15 | 92 | 1774 |
-| eravos.retro-dco | 21 | 126 | 1684 |
+| eravos.retro-dco | 21 | 125 | 1668 |
 | eravos.syn-partials | 16 | 86 | 1630 |
 | eravos.syn-osc | 13 | 104 | 1384 |
 | eravos.swarm-oscillator | 5 | 37 | 825 |
