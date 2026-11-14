@@ -51,7 +51,7 @@
       bass: { role: 'bass', organism: 'eravos.retro-dco', preset: 'Analog Machine Bass', name: 'Bass (Retro DCO)', configure: { level: 0.8 } },
       sub: { role: 'bass', organism: 'eravos.sub-engine', preset: 'Deep Sine', name: 'Sub', configure: { level: 0.45 } },
       pad: { role: 'chords', organism: 'eravos.retro-poly', preset: '80s · Blade Runner Pad', name: 'Pad', configure: { level: 0.35 } },
-      talk: { role: 'lead', organism: 'eravos.wobble-bass', preset: 'Yoi Drawn Talker', name: 'Talking lead (Wobble Bass)', configure: { octave: 1, depth: 0, level: 0.45 } },
+      talk: { role: 'lead', organism: 'eravos.wobble-bass', preset: 'Yoi Drawn Talker', name: 'Talking lead (Wobble Bass)', configure: { octave: 1, depth: 0, lfoSync: false, lfoHz: 0.02, ampMod: 0, drive: 0.15, shaper: 0, res: 4, level: 0.45 } },   // his ear (2026-11-14): "around .57 seconds, it sounds bad with the wobble" — the preset's drawn 1/8 LFO stopped; the talking is the vowel per note
       brass: { role: 'chords', organism: 'eravos.retro-dco', preset: 'Five-Voice Brass Swell', name: 'Brass', configure: { level: 0.55 } },
       swarm: { role: 'chords', organism: 'eravos.swarm-oscillator', preset: 'Blooming Chord', name: 'Swarm', configure: { level: 0.3 } },
     },
@@ -87,7 +87,7 @@
     fx: [{ organism: 'eravos.fx-dynamics', preset: '80s Gated Snare', on: 'drums' }, { organism: 'eravos.fx-echo', preset: '80s · Dotted Synthwave Delay', on: 'talk' },
       { organism: 'eravos.tape-memory', preset: 'Sunbleached Reel', on: 'pad' }, { organism: 'eravos.sidechain-compressor', preset: 'Half-time 1/2', on: 'fx2' }],
     mods: [{ organism: 'eravos.lfo', preset: '80s · Slow Juno Drift', to: 'pad', key: 'cutoff' }, { organism: 'eravos.xy-pad', configure: { maxX: 0.5, maxY: 0.5 } }],
-    routes: [{ from: 'mod1', out: 'x', to: 'talk', key: 'knob.formantShift' }, { from: 'mod1', out: 'y', to: 'fx1', key: 'feedback' }, { from: 'fx3', out: 'env', to: 'bass', key: 'cutoff' }],
+    routes: [{ from: 'mod1', out: 'x', to: 'talk', key: 'knob.formantShift' }, { from: 'mod1', out: 'y', to: 'fx1', key: 'feedback' }, { from: 'fx3', out: 'env', to: 'fx1', key: 'mix' }],
     master: { compThresh: -12, compRatio: 2.5, reverbMix: 0.2 },
   }, { id: 'dp-nightdrive', title: 'Nightdrive Talk', seed: 8801, mood: ['80s', 'dark'],
     listen: 'Half-time and slow: the lead talks — every note its own vowel, opening inside the note. The chorus lifts by opening the filters, not by adding drums.', drop: 'No drop: a third chorus where the Swarm blooms and locks.', voice: 'Her voice in the bridge, over the worn pad.' });
@@ -629,6 +629,21 @@
     master: { compThresh: -9, compRatio: 4, reverbMix: 0.06 },
   }, { id: 'ds-tearout', title: 'Metal Tearout', seed: 8906, mood: ['heavy', 'dark'],
     listen: 'Three basses take turns every half bar — metal, screech, clang — each hit its own FM, fold and comb.', drop: 'Machine-gun ratchets that speed up; the clang’s gain reduction drives the glitch’s chaos.', voice: 'Her voice in the pause, alone with the falling sub.' });
+
+  // ===================================================================================================== gain staging (his ear, 2026-11-14:
+  // "the rest sounds blown out" — measured: every kit alone at full scale, the subs as loud as the whole mix, the mixes −7 to −11 dB rms
+  // against the master's −14). Every kit to 0.55, every sub halved, then each song's TRIM (dB, measured) on every part's level.
+  const TRIM = { 'deepwave-nightdrive': -3.5, 'deepwave-outrun': -2.5, 'deepwave-darksynth': -5, 'deepwave-dream': 0, 'deepwave-italo': -1.5, 'deepwave-slowfunk': -3.5,
+    'deepstep-og': -5.5, 'deepstep-wobble': -4, 'deepstep-talker': -4, 'deepstep-riddim': -3, 'deepstep-melodic': -4, 'deepstep-tearout': -5 };   // measured at each song's loudest 4 bars → −14 dB
+  const DEFS = () => window.OrganismFactory && window.OrganismFactory.def;
+  const lvlOf = (P) => { const d = DEFS() && DEFS()(P.organism), c = d && (d.config || []).find(x => x.key === (P.organism === 'eravos.pads' ? 'volume' : 'level')); return c ? c.default : 0.8; };
+  function stage(G) { const k = Math.pow(10, (TRIM[G.id] || 0) / 20);
+    Object.keys(G.parts).forEach(id => { const P = G.parts[id]; if (P.organism === 'eravos.arp') return;   // the Arp makes no sound
+      const key = P.organism === 'eravos.pads' ? 'volume' : 'level'; P.configure = Object.assign({}, P.configure || {});
+      let v = P.configure[key] !== undefined ? P.configure[key] : lvlOf(P);
+      if (P.organism === 'eravos.pads') v = Math.min(v, 0.55); if (P.organism === 'eravos.sub-engine') v *= 0.5;
+      P.configure[key] = Math.round(v * k * 1000) / 1000; }); }
+  SE.genres().filter(g => GENRES.includes(g.id)).forEach(stage);
 
   // ===================================================================================================== the songs
   if (window.Songbook && window.Songbook.add) SONGS.forEach(s => window.Songbook.add(Object.assign({ tools: 'per-note knobs and knob curves · bends with their own LFO · chords from one note · plays on pass k · chance · ratchets · swing · curve lanes on tools, effects and modulators · LFO · XY Pad · a tool driving a tool' }, s)));

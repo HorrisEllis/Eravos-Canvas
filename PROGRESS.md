@@ -19,6 +19,11 @@ His words: "what next? the piano is hard for me but l love it. can you look at e
   Pad's X and Y, and a tool or effect driving another (sidechain envelopes, tape dropouts, Swarm coherence, Dynamics' gain reduction).
 - Found by the test, fixed: half the wires first named knob inputs a tool does not have (a tool's own input — cutoff, mix, feedback — is used
   where it exists); a song clipped 0.12 % (levels down); every song now played at its loudest: no fault, nothing clipping.
+- His ear (2026-11-14): "Nightdrive-Talk.mp3 around .57 seconds, it sounds bad with the wobble. the rest sounds blown out." — measured part by
+  part: the talker's preset wobbled its vowel on a drawn 1/8 LFO (≈ 3 Hz at 89 BPM), the sub alone was as loud as the whole mix (−8.7 dB),
+  every kit alone peaked at full scale, the mixes ran −7 to −11 dB into the master. Fixed: the talker's LFO stopped (the talking is the vowel
+  per note), its drive and resonance tamed, the pump off the bass filter; every kit 0.55, every sub halved, a measured trim per song —
+  loudest sections now −10.8 to −14 dB, clipping ≤ 0.003 % (was up to 0.034 %), Nightdrive's verse −12.6 dB with the sub at −17.6.
 - Proof: P188 18/18; P16 67/67 (every note in key), P172 1/1, P173 6/6, P44 29/29, P62 8/8, P58 18/18, boundary 10/10; songs decomposed
   again (313). Hear them: node docs/previews/deep-songs.render.mjs <dir> (whole songs, MP3).
 ## 3.187 Feelings — one feeling fills the pad; drag to play it (2026-11-13)
