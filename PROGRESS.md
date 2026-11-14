@@ -2,6 +2,26 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.188 Deep songs, batch 1: six very different songs on 80s · Synth and six on Dubstep, each as deep as ERAVOS goes (2026-11-14)
+His words: "what next? the piano is hard for me but l love it. can you look at every major song of all synthwave, edm, dubstep, electronic, etc to make a wide contrast of songs per catagory that are as complex and deep as eravos can be. like per note edits, automation, tools wired to other tools, etc. curves, etc. as deep as possiblr"
+- The research first: docs/research/landmark-songs-techniques.md — the landmark records of each style and the technique each song takes
+  (technique only, never a melody). Spec: specs/eravos.deep-songs.spec (the depth checklist, the batches, the acceptance).
+- data/deep-songbook.js: one song per sub-style, each its own form, tempo, groove and palette, on the shelves that exist (no new category).
+  80s · Synth: Nightdrive Talk (half-time, a lead that talks: its vowel opening inside every note) · Outrun Key Change (octave bass, the Arp on
+  a pluck, a fuzzed solo, the last chorus up a whole step as a Pitch curve on every instrument) · Turbo Breakdown (darksynth, drive set note by
+  note, a half-time breakdown and a blast) · Sunset Bloom (dreamwave, electric piano strummed from one note, a sax-like lead that breathes) ·
+  Sequence 84 (the Moroder sequence, its filter opening over the whole song) · Galactic Warble (slow-motion funk, swung, a melt where the
+  tapes slow). Dubstep: Request Line Space (the original sound, space, one change at a time) · Cockney Wobble (a wobble rate per note, speeding
+  up inside the note) · Talking Machines (two basses in conversation) · Stop-Start Riddim (one figure, one change a bar, the FM moving) ·
+  Halo Fall (melodic: piano, pumping saws, a crying lead) · Metal Tearout (three basses switching every half bar).
+- Every song uses every per-note kind (a knob on the note, a knob curve inside it, a bend with its own LFO, a chord from one note, plays on pass
+  k, chance, ratchets that speed up / slow down, microtiming, humanize), ≥ 12 curve lanes on instruments, effects and the XY Pad, an LFO, the XY
+  Pad's X and Y, and a tool or effect driving another (sidechain envelopes, tape dropouts, Swarm coherence, Dynamics' gain reduction).
+- Found by the test, fixed: half the wires first named knob inputs a tool does not have (a tool's own input — cutoff, mix, feedback — is used
+  where it exists); a song clipped 0.12 % (levels down); every song now played at its loudest: no fault, nothing clipping.
+- Proof: P188 18/18; P16 67/67 (every note in key), P172 1/1, P173 6/6, P44 29/29, P62 8/8, P58 18/18, boundary 10/10; songs decomposed
+  again (313). Hear them: node docs/previews/deep-songs.render.mjs <dir> (whole songs, MP3).
+
 ## 3.186 Bassline 2.0 — time, notes, locks and rests (shown, waiting for his yes) (2026-11-13)
 His words: "I love the bassline, needs more depth and control. like tempo and the cord tool. bassline is high leverage." (12:31:19Z) · "Okay.
 The bassline tool. Way more depth. I like that tool. A lot." (15:58:04Z)
