@@ -62,7 +62,7 @@ dag:
   layer 0: filter-comb · filter-formant ✓
   tool: eravos.wub-filter ← filter-formant + filter-comb
   build order: filter-comb → filter-formant ✓ → wub-filter
-  shared with: filter-comb 5 · filter-formant 7  (other tools on each)
+  shared with: filter-comb 5 · filter-formant 8  (other tools on each)
   in it now: filter-formant
   comes out of it: filter-comb
   planned: —

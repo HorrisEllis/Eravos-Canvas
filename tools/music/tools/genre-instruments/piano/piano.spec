@@ -65,7 +65,7 @@ dag:
   layer 0: env-adsr ✓ · filter-svf ✓ · karplus-string ✓ · lfo ✓ · modal-resonator ✓ · saturator-tube ✓ · stereo-tools ✓ · voice-allocator ✓
   tool: eravos.piano ← modal-resonator + karplus-string + filter-svf + env-adsr + lfo + stereo-tools + saturator-tube + voice-allocator
   build order: env-adsr ✓ → filter-svf ✓ → karplus-string ✓ → lfo ✓ → modal-resonator ✓ → saturator-tube ✓ → stereo-tools ✓ → voice-allocator ✓ → piano
-  shared with: env-adsr 21 · filter-svf 41 · karplus-string 2 · lfo 28 · modal-resonator 4 · saturator-tube 3 · stereo-tools 17 · voice-allocator 5  (other tools on each)
+  shared with: env-adsr 21 · filter-svf 41 · karplus-string 2 · lfo 29 · modal-resonator 5 · saturator-tube 3 · stereo-tools 18 · voice-allocator 5  (other tools on each)
   in it now: modal-resonator · karplus-string · filter-svf · env-adsr · lfo · stereo-tools · saturator-tube · voice-allocator
   comes out of it: —
   planned: —

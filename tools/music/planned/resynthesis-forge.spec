@@ -38,4 +38,4 @@ dag:
   layer 0: modulation-estimator · onset-detector · osc-additive · osc-wavetable ✓ · partial-tracker · pitch-tracker
   tool: eravos.resynthesis-forge ← partial-tracker + osc-additive + osc-wavetable + onset-detector + pitch-tracker + modulation-estimator
   build order: modulation-estimator → onset-detector → osc-additive → osc-wavetable ✓ → partial-tracker → pitch-tracker → resynthesis-forge
-  shared with: modulation-estimator 2 · onset-detector 12 · osc-additive 7 · osc-wavetable 11 · partial-tracker 2 · pitch-tracker 5  (other tools on each)
+  shared with: modulation-estimator 2 · onset-detector 12 · osc-additive 7 · osc-wavetable 12 · partial-tracker 2 · pitch-tracker 5  (other tools on each)

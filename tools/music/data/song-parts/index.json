@@ -46,6 +46,12 @@
    "lines": 11,
    "bars": 480
   },
+  "eravos.feelings": {
+   "file": "feelings.json",
+   "rhythms": 1,
+   "lines": 5,
+   "bars": 40
+  },
   "eravos.organ": {
    "file": "organ.json",
    "rhythms": 7,

@@ -43,7 +43,7 @@ dag:
   layer 1: pattern-field ✓
   tool: eravos.pattern-field ← progression + pattern-field + scale-key
   build order: progression ✓ → scale-key ✓ → pattern-field ✓ → pattern-field
-  shared with: progression 3 · scale-key 14 · pattern-field 1  (other tools on each)
+  shared with: progression 3 · scale-key 15 · pattern-field 1  (other tools on each)
   in it now: progression · pattern-field · scale-key
   comes out of it: —
   planned: —
