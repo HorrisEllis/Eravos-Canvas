@@ -1,0 +1,112 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.piano",
+  "version": "1.0.0",
+  "label": "Piano",
+  "icon": "🎹",
+  "accent": "#e7b49b",
+  "domain": "music",
+  "category": "sound-sources",
+  "summary": "Electric and acoustic pianos, modelled live: a hammer, a tine or reed or string, a body. No samples.",
+  "tags": [
+    "sound-sources",
+    "piano",
+    "keys",
+    "lofi",
+    "electric piano"
+  ],
+  "files": {
+    "engine": "piano.engine.js",
+    "ui": "piano.ui.js",
+    "preview": "preview.png",
+    "spec": "piano.spec",
+    "tests": "piano.test.js",
+    "thumb": "thumb.png"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "midi_in",
+      "bus_publish",
+      "bus_subscribe"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory",
+      "lofi"
+    ]
+  },
+  "works_with": [
+    "eravos.acid-synth",
+    "eravos.arp",
+    "eravos.bass-drop-builder",
+    "eravos.bass-forge",
+    "eravos.bass-gen",
+    "eravos.breath",
+    "eravos.channel",
+    "eravos.chord-gen",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.coven",
+    "eravos.curve-synth",
+    "eravos.drum-forge",
+    "eravos.dub-station",
+    "eravos.edm-lab",
+    "eravos.embodiment-lab",
+    "eravos.fx-box",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.fx-squash",
+    "eravos.granular",
+    "eravos.groove-gen",
+    "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.master-fx",
+    "eravos.organ",
+    "eravos.pad-forge",
+    "eravos.pads",
+    "eravos.particle-field",
+    "eravos.ratio-lattice",
+    "eravos.recursive-spectra",
+    "eravos.reese-bass",
+    "eravos.retro-poly",
+    "eravos.sample-player",
+    "eravos.sidechain-compressor",
+    "eravos.song-recorder",
+    "eravos.sub-engine",
+    "eravos.suite-hub",
+    "eravos.supersaw",
+    "eravos.swarm-oscillator",
+    "eravos.syn-env",
+    "eravos.syn-osc",
+    "eravos.syn-partials",
+    "eravos.tape-memory",
+    "eravos.timeline",
+    "eravos.wobble-bass",
+    "eravos.wub-filter",
+    "eravos.wub-osc",
+    "eravos.wub-rate",
+    "eravos.wub-sub",
+    "eravos.xen-synth",
+    "eravos.xy-pad"
+  ],
+  "conflicts": [],
+  "status": "built"
+}

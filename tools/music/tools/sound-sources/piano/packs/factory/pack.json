@@ -1,0 +1,187 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "piano.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "piano",
+  "keys"
+ ],
+ "for": "eravos.piano",
+ "items": {
+  "eravos.piano": {
+   "presets": {
+    "Tine Classic": {
+     "params": {
+      "model": "tine",
+      "hardness": 0.45,
+      "brightness": 0.5,
+      "bell": 0.35,
+      "decay": 3.5,
+      "release": 0.4,
+      "resonance": 0.3,
+      "trem": 0.25,
+      "tremRate": 4.5,
+      "drive": 0.15,
+      "width": 0.6,
+      "level": 0.7
+     }
+    },
+    "Tine Phaser": {
+     "params": {
+      "model": "tine",
+      "hardness": 0.55,
+      "brightness": 0.6,
+      "bell": 0.5,
+      "decay": 4,
+      "release": 0.5,
+      "resonance": 0.35,
+      "trem": 0.6,
+      "tremRate": 3.2,
+      "drive": 0.25,
+      "width": 0.8,
+      "level": 0.7
+     }
+    },
+    "Reed Bark": {
+     "params": {
+      "model": "reed",
+      "hardness": 0.7,
+      "brightness": 0.65,
+      "bell": 0.4,
+      "decay": 2.2,
+      "release": 0.25,
+      "resonance": 0.25,
+      "trem": 0.35,
+      "tremRate": 5.5,
+      "drive": 0.55,
+      "width": 0.5,
+      "level": 0.7
+     }
+    },
+    "Concert Grand": {
+     "params": {
+      "model": "grand",
+      "hardness": 0.5,
+      "brightness": 0.55,
+      "decay": 8,
+      "release": 0.5,
+      "resonance": 0.45,
+      "drive": 0.05,
+      "width": 0.7,
+      "level": 0.7,
+      "detune": 0.15,
+      "inharm": 0.5,
+      "sympathetic": 0.35,
+      "lid": 0.9,
+      "micY": 0.45
+     }
+    },
+    "Pop Bright": {
+     "params": {
+      "model": "grand",
+      "hardness": 0.75,
+      "brightness": 0.8,
+      "decay": 5,
+      "release": 0.3,
+      "resonance": 0.35,
+      "drive": 0.12,
+      "width": 0.8,
+      "level": 0.7,
+      "detune": 0.2,
+      "inharm": 0.45,
+      "sympathetic": 0.2,
+      "lid": 1,
+      "micY": 0.25
+     }
+    },
+    "Felt Lullaby": {
+     "params": {
+      "model": "felt",
+      "hardness": 0.15,
+      "brightness": 0.3,
+      "decay": 4,
+      "release": 0.6,
+      "resonance": 0.4,
+      "drive": 0.08,
+      "width": 0.5,
+      "level": 0.75,
+      "detune": 0.1,
+      "inharm": 0.4,
+      "sympathetic": 0.4,
+      "keyOff": 0.4,
+      "pedalNoise": 0.25
+     }
+    },
+    "Upright Jazz": {
+     "params": {
+      "model": "upright",
+      "hardness": 0.45,
+      "brightness": 0.45,
+      "decay": 4.5,
+      "release": 0.35,
+      "resonance": 0.4,
+      "drive": 0.1,
+      "width": 0.5,
+      "level": 0.7,
+      "detune": 0.25,
+      "inharm": 0.55,
+      "sympathetic": 0.3
+     }
+    },
+    "Honky Saloon": {
+     "params": {
+      "model": "honky",
+      "hardness": 0.65,
+      "brightness": 0.65,
+      "decay": 3.5,
+      "release": 0.3,
+      "resonance": 0.5,
+      "drive": 0.2,
+      "width": 0.6,
+      "level": 0.7,
+      "detune": 0.6,
+      "inharm": 0.5,
+      "sympathetic": 0.25
+     }
+    },
+    "Lo-fi Keys": {
+     "params": {
+      "model": "tine",
+      "hardness": 0.3,
+      "brightness": 0.3,
+      "bell": 0.25,
+      "decay": 3,
+      "release": 0.5,
+      "resonance": 0.35,
+      "trem": 0.4,
+      "tremRate": 3.8,
+      "drive": 0.35,
+      "width": 0.5,
+      "level": 0.7
+     }
+    },
+    "Gospel Organ-ish Piano Stack": {
+     "params": {
+      "model": "upright",
+      "hardness": 0.6,
+      "brightness": 0.6,
+      "decay": 12,
+      "release": 1.2,
+      "resonance": 0.55,
+      "drive": 0.3,
+      "width": 0.9,
+      "level": 0.65,
+      "detune": 0.35,
+      "inharm": 0.35,
+      "sympathetic": 0.6,
+      "pedal": true
+     }
+    }
+   }
+  }
+ }
+}

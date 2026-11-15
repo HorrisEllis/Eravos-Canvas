@@ -1,0 +1,68 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "piano.lofi",
+ "version": "1.0.0",
+ "label": "Lofi",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "lofi",
+  "piano",
+  "keys"
+ ],
+ "for": "eravos.piano",
+ "items": {
+  "eravos.piano": {
+   "presets": {
+    "Lofi Tine": {
+     "params": {
+      "model": "tine",
+      "hardness": 0.25,
+      "brightness": 0.28,
+      "bell": 0.2,
+      "decay": 3,
+      "release": 0.6,
+      "resonance": 0.35,
+      "trem": 0.35,
+      "tremRate": 3.5,
+      "drive": 0.4,
+      "width": 0.5,
+      "level": 0.65
+     }
+    },
+    "Lofi Felt": {
+     "params": {
+      "model": "felt",
+      "hardness": 0.12,
+      "brightness": 0.25,
+      "decay": 3.5,
+      "release": 0.7,
+      "resonance": 0.45,
+      "drive": 0.25,
+      "width": 0.45,
+      "level": 0.75,
+      "keyOff": 0.5,
+      "pedalNoise": 0.3,
+      "sympathetic": 0.3
+     }
+    },
+    "Lofi Reed": {
+     "params": {
+      "model": "reed",
+      "hardness": 0.35,
+      "brightness": 0.35,
+      "bell": 0.2,
+      "decay": 2.5,
+      "release": 0.4,
+      "resonance": 0.3,
+      "trem": 0.3,
+      "tremRate": 4.8,
+      "drive": 0.45,
+      "width": 0.45,
+      "level": 0.65
+     }
+    }
+   }
+  }
+ }
+}

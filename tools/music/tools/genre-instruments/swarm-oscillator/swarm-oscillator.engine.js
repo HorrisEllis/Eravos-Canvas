@@ -25,8 +25,8 @@
     .concat([{ name: 'couplingMod', defaultValue: 0, minValue: -1, maxValue: 1, automationRate: 'a-rate' }, { name: 'cutoffMod', defaultValue: 0, minValue: -9600, maxValue: 9600, automationRate: 'a-rate' },
       { name: 'snap', defaultValue: 0, minValue: 0, maxValue: 1e9, automationRate: 'a-rate' }])
     .concat([].concat(...Array.from({ length: SLOTS }, (_, i) => [{ name: 'trig' + i, defaultValue: 0, minValue: 0, maxValue: 1e9, automationRate: 'a-rate' },
-      { name: 'gate' + i, defaultValue: 0, minValue: 0, maxValue: 1, automationRate: 'a-rate' }, { name: 'note' + i, defaultValue: 60, minValue: 0, maxValue: 127, automationRate: 'k-rate' },
-      { name: 'vel' + i, defaultValue: 0.8, minValue: 0, maxValue: 1, automationRate: 'k-rate' }])));
+      { name: 'gate' + i, defaultValue: 0, minValue: 0, maxValue: 1, automationRate: 'a-rate' }, { name: 'note' + i, defaultValue: 60, minValue: 0, maxValue: 127, automationRate: 'a-rate' },
+      { name: 'vel' + i, defaultValue: 0.8, minValue: 0, maxValue: 1, automationRate: 'a-rate' }])));
   const PROC = `
 const SET = ${JSON.stringify(SET)}, SLOTS = ${SLOTS};
 class EravosSwarm extends AudioWorkletProcessor {
@@ -75,15 +75,15 @@ class EravosSwarm extends AudioWorkletProcessor {
       const sl = this.slots[q], tg = params['trig' + q], gt = params['gate' + q];
       const quiet = sl.amp.done && tg.length === 1 && tg[0] === sl.trig && gt.length === 1 && gt[0] < 0.5 && sl.gate < 0.5;
       if (quiet) { sl.snapSeen = sn[sn.length - 1]; continue; }   // a silent slot keeps up with Lock on beat (no snap when it starts)
-      const pop = sl.pop, sub = s.sub;
+      const pop = sl.pop, sub = s.sub, rn = Math.sqrt(pop.n), coh = pop.R, norm = 1 / (rn * (1 + (rn - 1) * coh * coh));   // 1/√n apart, 1/n locked: in phase the voices add up, so the level follows the coherence (found 3.136)
       for (let j = 0; j < B; j++) {
         const t = tg.length > 1 ? tg[j] : tg[0], g = gt.length > 1 ? gt[j] : gt[0];
-        if (t !== sl.trig) { sl.trig = t; this.start(sl, params['note' + q][0], params['vel' + q][0]); sl.amp.gate(true); sl.fenv.gate(true); sl.gate = 1; }
+        if (t !== sl.trig) { sl.trig = t; const np = params['note' + q], vp = params['vel' + q]; /* a-rate: a note that starts mid-block reads its own pitch */ this.start(sl, np.length > 1 ? np[j] : np[0], vp.length > 1 ? vp[j] : vp[0]); sl.amp.gate(true); sl.fenv.gate(true); sl.gate = 1; }
         else if (g < 0.5 && sl.gate >= 0.5) { sl.gate = 0; sl.amp.gate(false); sl.fenv.gate(false); }
         const sv = sn.length > 1 ? sn[j] : sn[0]; if (sv !== sl.snapSeen) { sl.snapSeen = sv; pop.snap(); }
         if ((j & 31) === 0) pop.set({ coupling: Math.max(0, Math.min(1, K0 + (cm.length > 1 ? cm[j] : cm[0]))) });
         pop.step(sl.f0, sr);
-        const n = pop.n, norm = 1 / Math.sqrt(n); let l = 0, r = 0;
+        const n = pop.n; let l = 0, r = 0;
         for (let i = 0; i < n; i++) {
           const ph = pop.phase(i), dt = pop.dt(i), x = shape === 3 ? wt.sample(s.table, ph, dt) : shape === 0 ? va.saw(ph, dt) : shape === 1 ? va.pulse(ph, dt, 0.3) : va.tri(ph);
           l += x * sl.gL[i]; r += x * sl.gR[i];
@@ -99,7 +99,7 @@ class EravosSwarm extends AudioWorkletProcessor {
       if (sl.amp.level > loudA) { loudA = sl.amp.level; loud = sl; }
     }
     this.mono.process(L, R, B);
-    const g = s.level * 0.17; for (let j = 0; j < B; j++) { L[j] *= g; if (R !== L) R[j] *= g; }
+    const g = s.level * 0.14; for (let j = 0; j < B; j++) { L[j] *= g; if (R !== L) R[j] *= g; }
     // coherence: the loudest note's swarm, smoothed (an audio-rate modulation signal, 0…1)
     const target = loud ? loud.pop.R : this.coh; this.coh += (target - this.coh) * 0.05;
     if (cohOut) cohOut.fill(this.coh);

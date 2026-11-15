@@ -31,6 +31,11 @@ describe('Swarm Oscillator — the swarm plays, locks, and says how locked it is
     const a = Math.floor(1.6 * lock.sr), b = Math.floor(2.0 * lock.sr), L = mean(lock.coh, a, b), F = mean(free.coh, a, b);
     assert.gt(L, 0.9, 'locked: coherence ' + L.toFixed(3)); assert.lt(F, L - 0.3, 'free: coherence ' + F.toFixed(3) + ' (well under locked)');
   });
+  it('a note that starts inside an audio block plays its own pitch (found 3.136: note was k-rate, so it took the last note’s)', async () => {
+    const r = await play({ voices: 1, spread: 0, drift: 0, cutoff: 18000, attack: 0.001 }, 1.2, 69), sr = r.sr, f = 440;   // starts at 0.02 s: mid-block
+    const amp = (hz) => { const w = 2 * Math.PI * hz / sr, cw = 2 * Math.cos(w); let s1 = 0, s2 = 0; for (let j = Math.floor(0.2 * sr); j < Math.floor(0.8 * sr); j++) { const s0 = r.audio[j] + cw * s1 - s2; s2 = s1; s1 = s0; } return Math.sqrt(Math.max(0, s1 * s1 + s2 * s2 - cw * s1 * s2)); };
+    assert.gt(amp(f), amp(f * Math.pow(2, -9 / 12)) * 10, 'A4 asked, A4 heard (not C4, the default)');
+  });
   it('every mode and shape plays clean', async () => {
     for (const [mode, shape] of [['harmonic', 'tri'], ['chaotic', 'pulse'], ['coupled', 'table']]) {
       const r = await play({ mode, shape, cluster: 1, voices: 8 }, 1.0);

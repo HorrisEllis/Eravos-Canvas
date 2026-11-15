@@ -12,7 +12,8 @@
  *              string, a piano's stretch. Kept inside the loop length (low notes take the full amount; very high ones are eased off)
  *     detune   cents (for a second or third string of the same note)
  *   reset() · energy. 20 Hz – 5 kHz. Real-time safe: tick() allocates nothing (the line is sized once to 20 Hz at the rate).
- *   MusicParts.KString() · MusicParts.kstringLoopDelay(o) (the phase delay of the loop at a frequency, for tests and tools)
+ *   MusicParts.KString() · MusicParts.kstringLoopDelay(o) (the phase delay of the loop at a frequency, for tests and tools) ·
+ *   MusicParts.KSTRING_SRC() the kernel's text with the helpers it names, for a worklet (proved to run on its own in the test)
  * A component imports no tool (eravos.components). */
 (function (root) {
   'use strict';
@@ -71,6 +72,8 @@
   // the loop's total phase delay at a frequency (tests: the tuning is exact at f0, and shorter above it when stretched)
   function kstringLoopDelay(N, eta, c, p, w) { return N + phaseDelay([eta, 1], [1, eta], w) + (c ? M * phaseDelay([c, 1], [1, c], w) : 0) + phaseDelay([1 - p], [1, -p], w); }
   root.MusicParts = root.MusicParts || {};
-  Object.assign(root.MusicParts, { KString, kstringLoopDelay });
-  if (typeof module !== 'undefined' && module.exports) module.exports = { KString, kstringLoopDelay, phaseDelay };
+  // what KString's text refers to outside itself — a worklet that stringifies KString includes these first (KSTRING_SRC does)
+  const KSTRING_SRC = () => `const M = ${M};\nconst phaseDelay = ${phaseDelay};\nconst magnitude = ${magnitude};\nconst KString = ${KString};`;
+  Object.assign(root.MusicParts, { KString, kstringLoopDelay, KSTRING_SRC });
+  if (typeof module !== 'undefined' && module.exports) module.exports = { KString, kstringLoopDelay, phaseDelay, KSTRING_SRC };
 })(typeof window !== 'undefined' ? window : globalThis);

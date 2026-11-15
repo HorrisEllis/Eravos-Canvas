@@ -48,11 +48,11 @@
       "notes": false
     },
     {
-      "tool": "eravos.retro-poly",
+      "tool": "eravos.piano",
       "role": "keys",
       "required": true,
-      "preset": "Lofi Keys",
-      "why": "soft electric-piano-like keys (the Piano replaces it once built)"
+      "preset": "Lofi Tine",
+      "why": "the electric piano of lofi — a tine, soft hammer, tremolo and a little tube, modelled live (Retro Poly held this place until Piano was built)"
     },
     {
       "tool": "eravos.fx-filter",
@@ -135,8 +135,8 @@
         "chordg.hook.note_out"
       ],
       "to": [
-        "eravos.retro-poly",
-        "rp.hook.note_in"
+        "eravos.piano",
+        "pia.hook.note_in"
       ]
     },
     {
@@ -161,8 +161,8 @@
     },
     {
       "from": [
-        "eravos.retro-poly",
-        "rp.hook.audio_out"
+        "eravos.piano",
+        "pia.hook.audio_out"
       ],
       "to": [
         "eravos.fx-filter",
@@ -307,9 +307,6 @@
       "eravos.bass-gen": {
         "preset": "Lofi Study"
       },
-      "eravos.retro-poly": {
-        "preset": "Lofi Keys"
-      },
       "eravos.fx-filter": {
         "preset": "Lofi Low"
       },
@@ -318,6 +315,9 @@
       },
       "eravos.tape-memory": {
         "preset": "Lofi Study"
+      },
+      "eravos.piano": {
+        "preset": "Lofi Tine"
       }
     },
     "Rainy": {
@@ -330,9 +330,6 @@
       "eravos.bass-gen": {
         "preset": "Lofi Rainy"
       },
-      "eravos.retro-poly": {
-        "preset": "Lofi Felt Keys"
-      },
       "eravos.fx-filter": {
         "preset": "Lofi Underwater"
       },
@@ -341,6 +338,9 @@
       },
       "eravos.tape-memory": {
         "preset": "Lofi Rainy"
+      },
+      "eravos.piano": {
+        "preset": "Lofi Felt"
       }
     },
     "Late Night": {
@@ -353,9 +353,6 @@
       "eravos.bass-gen": {
         "preset": "Lofi Late Night"
       },
-      "eravos.retro-poly": {
-        "preset": "Lofi Felt Keys"
-      },
       "eravos.fx-filter": {
         "preset": "Lofi Low"
       },
@@ -364,6 +361,9 @@
       },
       "eravos.tape-memory": {
         "preset": "Lofi Late Night"
+      },
+      "eravos.piano": {
+        "preset": "Lofi Felt"
       }
     }
   }
