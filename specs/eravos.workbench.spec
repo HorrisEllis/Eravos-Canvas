@@ -115,3 +115,11 @@ decisions:
   WB_D2_primitive_level:
     status: OPEN (his)
     readings: "Primitives as their own gated parts now (WB6), or only once components are written in Emerge (v2)?"
+
+## ADDENDUM 2026-11-15 (2) — the levels, his (nothing above is changed)
+# his words (05:36, verbatim): "primitives are the smallest piece of a component, then component the smallest piece of the tool, then tool of
+#   the suite or toolbox maybe? then of the miniworld? this is gigantic." · "no shows wobble bass litterally broken apart like a diagram and
+#   wires hooking into each component to the core/engine. like each component has its own ui element seperate from the main ui."
+levels: "primitive → component → tool → suite / toolbox (name his) → miniworld. the_model.levels is read this way; 'setup' stays the word for a system of whole tools until he names it."
+preview: "board 'Field · Wobble Bass broken apart' — each component's own UI element cut from Wobble's real face, wired into the core (the engine keeps only the voice, the signal order, the AudioParams, the tempo lock)."
+open: "WB_D3 (his): 'suite' or 'toolbox' for the level above a tool; what a miniworld holds (a domain? a world of toolboxes?)."
