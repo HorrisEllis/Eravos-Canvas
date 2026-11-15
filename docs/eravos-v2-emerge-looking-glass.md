@@ -150,3 +150,61 @@ His words (2026-11-13): "Each component of each tool has a element for the ui to
   composed by the compiler from its components' elements, as v1 composes it from the DAG (specs/eravos.ui-field.spec ADDENDUM 2026-11-13 (2)).
   The announcement (a tool's needs from its DAG) and import from the zip are v1 work (specs/eravos.store.spec ADDENDUM 2026-11-13) that
   carries over unchanged as the v2 package format.
+
+## ADDENDUM 2026-11-15 — the workbench, the stores, dynamic mutation; engines and shared components first; what merges
+
+His words (2026-11-14/15, in order): "each tool has each ui element its own file per element… synthesize whats compatable. do not
+synthesize the rest" · "the canvas is the workbench… circuit board… explode each tool… using the null to prevent overflow" · "each
+component gated, with a clear boundary, per primitive… maybe eravos v2?" · "primitives are the smallest piece… miniworld" · "this is
+looking glass. snap off" · "then we need a component store. primitive store." · "Not all the tools are necessarily useful… just give me an
+index." · (2026-11-15 14:01) "Consolidate tools that aren't useful. Continue with the engines and shared components first maintain styles,
+ui per component, etc. I want the dynamic mutation" · (14:52) Eravos 2 is the v2; this is its update.
+
+### The model (full spec: `specs/eravos.workbench.spec`, PR #192; previews `docs/previews/workbench/`)
+- **Five levels, each gated with a clear boundary:** primitive (one node or one control) → component (a gated group of primitives with typed
+  ports and its own UI element file) → tool (a DAG of components) → suite / toolbox (tools wired, their shared UI merged) → miniworld (a
+  whole working setup saved as one).
+- **The workbench is the canvas** (Looking Glass in v2): open a tool in the real Workshop, press Explode and it comes apart into its
+  components with the wires still drawn into the engine; snap a part off onto a blank tool surface and it is a tool of its own; snap parts
+  together and the UI is synthesised from what fits. Only what is relevant to the bench is on screen.
+- **Null as the guard:** every change is proven against its twin (default = today's sound, exactly). Overflow and clashes are caught by
+  friction — sigma (how far a part's output strays from its declared range), gap (a port expecting what nothing gives) and tension (two
+  parts fighting for one control). A merge that adds friction is refused, not shipped.
+- **Stores:** a primitive store and a component store (each part with its spec, its UI element, its null proof and its lineage); tools,
+  suites and miniworlds publish into them. Schemas, templates and the design philosophy ride with each entry, so a new tool can be
+  assembled from the stores with little or no new code.
+
+### Dynamic mutation (what "I want the dynamic mutation" asks for)
+- The mutation ops from ADDENDUM 2026-11-13 (swap · insert · rewire · graft · vary) run **live on the bench**: as parts are wired, the
+  compatibility graph offers what fits; a mutant plays at once, its UI re-synthesised from its components' elements.
+- Each mutant is gated: types fit → plays without blowing up (peak and noise floor held) → friction under the bar → the novelty gate says
+  whether it is new. His ear decides the rest; a kept mutant goes to the store with its lineage.
+
+### The order — engines and shared components first
+1. **Shared components out of the engines** — the pieces several tools re-implement become one component each, every extraction nulled
+   against the tool as it was, styles and each component's UI element kept: the growl/amp chain (Wobble Bass 4.2's Amp: clean mono sub
+   split · driven mids · second filter · mud/presence EQ · glue · limiter), the sub (Deep Sub / Sub Engine), the clipper and ceiling,
+   mono-below, squash, LFO + wub sequence, the filter bank, the unison stack.
+2. **Engines rebuilt on them** — Wobble Bass, Reese Bass (taking in Deep Sub, RD1), Bassline, Bass Forge; each proven unchanged at default.
+3. **Bench + stores** (WB phases) → **dynamic mutation** on the bench.
+
+### What merges (from `docs/TOOL-INDEX.md`; "sounds like" = measured similarity) — merge, don't delete: each becomes a mode or component
+| Tool | Into | Why |
+|---|---|---|
+| Deep Sub | Reese Bass (SUB section) | 87 % alike; his ask (RD1) |
+| Suite | Dynamics | 100 % alike |
+| Glitch | Dynamics (or an FX Box mode) | 75 % alike |
+| Channel, Squash | EQ (a channel strip with squash) | 60–63 % alike |
+| EQ, Dynamics | the mix chain (one strip: EQ → dynamics → sidechain) | 56–67 % alike |
+| EDM Lab | Groove + Bassline + Chords | it repeats them; made consistent first (GF1, previews first) |
+| Odd Couples (packs, presets, songs) | — removed 2026-11-15 | his ask |
+Every merge: the merged tool reproduces each old tool's presets to the null floor, or it does not land.
+
+### v1 → v2, added
+| v1 | v2 (Emerge + Looking Glass) |
+|---|---|
+| a primitive / component with its UI element file | a typed definition with its Looking Glass element |
+| explode / snap on the canvas | a layer operation in Looking Glass |
+| the stores (specs + elements + null proofs) | packages with provenance |
+| friction (sigma · gap · tension) at test time | checked at compile time where it can be |
+| a mutant's gate (plays, peak, noise, novelty) | the compiler's check plus the same listening gate |
