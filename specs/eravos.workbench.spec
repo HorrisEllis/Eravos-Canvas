@@ -123,3 +123,16 @@ decisions:
 levels: "primitive → component → tool → suite / toolbox (name his) → miniworld. the_model.levels is read this way; 'setup' stays the word for a system of whole tools until he names it."
 preview: "board 'Field · Wobble Bass broken apart' — each component's own UI element cut from Wobble's real face, wired into the core (the engine keeps only the voice, the signal order, the AudioParams, the tempo lock)."
 open: "WB_D3 (his): 'suite' or 'toolbox' for the level above a tool; what a miniworld holds (a domain? a world of toolboxes?)."
+
+## ADDENDUM 2026-11-15 (3) — the field as the boundary, layers, snap, Looking Glass, the drawbridge (his words; nothing above is changed)
+# his words (06:12, verbatim): "It is almost perfect but it needs to use the workshop tool rememeber opened in the canvas" · "what if the constraint
+#   relational field, is used as a boundary for each mutation. we also need some blank tool surfaces for the ui background, the component elements
+#   are for the foreground, then we can have a layer for every new gated aspect." · "this is looking glass." · "it would also be cool to 'snap off'
+#   components and snap components together." · "how fucking valuable would this be? especially build on eravos, possible using cos as the nexus
+#   system?" · "this is why each ui uses a interaction contract, what if we use cie-eg the drawbridge like we do in nexus."
+boundary: "a mutation happens inside the constraint relational field: the field's constraints (types, ranges, roles, signal order, layout) are the walls; a mutant outside them is not offered. The friction scores (sigma / gap / tension) are measured against the same field."
+layers: "background = blank tool surfaces (the window with its elements lifted off); foreground = component elements; one layer per gated aspect (types, ranges, rate, order, role) — shown and hidden like any Workshop layer."
+snap: "snap off: one component lifts out of the tool (its wire to the core stays visible); snap together: a component dropped on a tool's surface passes its gate and wires in. Previewed: 'Workshop · Wobble Bass › components (explode · snap)'."
+looking_glass: "UI as typed data, layers as a runtime operation, isolation through the interaction contract — this is Looking Glass's own spec (SPEC.md §2.1–2.3). v1 builds it in the Workshop; Looking Glass makes it native."
+drawbridge: "each element talks to its core only through the interaction contract, crossed by CIE-EG (the drawbridge Nexus uses): the element never knows the engine, so it can be snapped onto any tool whose contract accepts it. Reading, to confirm: Eravos's interaction contract is crossed by the same CIE-EG as Nexus, not a second one."
+cos: "OPEN (his): Eravos as a COS system (a compartment with its registry), so the workbench is one more Nexus system. Not mapped yet."
