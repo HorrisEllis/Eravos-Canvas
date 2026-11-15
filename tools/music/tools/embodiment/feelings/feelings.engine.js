@@ -19,20 +19,26 @@
   const R = () => (window.MusicParts && window.MusicParts.RATIOS);
   const hz = (n) => 440 * Math.pow(2, (n - 69) / 12), db = (d) => Math.pow(10, d / 20), lerp = (a, b, t) => a + (b - a) * t;
   // the three feelings as data: what each sounds like at (x, y); x 0 = left, y 0 = bottom (1 = top: more of the feeling)
+  // 0.2.0 (2026-11-15) — his: "the feelings tool isn't working. Like the field isn't changing the tone and depth. Anger sounds messed up and the
+  // third one doesn't work." Measured on 0.1.0: the pad moved the loudness (≈35 dB) but hardly the tone — the brightness moved 223→375 Hz for
+  // Love, 71→77 Hz across for Sadness; Sadness sat around 70 Hz (under what a laptop or phone plays: "doesn't work"); Anger's 55 Hz root with
+  // a deep 30–150 Hz wobble and a hard drive turned to mush. Now: Up opens the tone over a decade (exponential cutoff) as well as the level;
+  // Across moves the colour and the depth (partials, celeste, space, width, and for Anger its wobble rate and bite); each feeling sits where
+  // it is heard (Anger an octave up: still low and harsh, Sadness an octave up: still dark and sagging).
   const FEEL = {
     love: { root: 57, set: 'harmonic', attack: 0.22, release: 1.4,
-      at: (x, y) => ({ semis: 7 * y, amps: [1, 0.12 + 0.3 * x, 0.04 + 0.16 * x, 0.02 + 0.08 * x, 0.04 * x, 0.02 * x], growl: 0, drive: 0, rough: 0, roughHz: 0,
-        celeste: 1.5 + 6 * x, vib: 5, vibHz: 4.8, sag: 0, cutoff: 900 + 3200 * y, wet: 0.2 + 0.12 * x, width: 0.15 + 0.55 * x, levelDb: lerp(-34, -5, y) }) },
-    anger: { root: 33, set: '√2', attack: 0.012, release: 0.22,
-      at: (x, y) => ({ semis: 5 * y, amps: [1, 0.75, 0.6, 0.45, 0.35, 0.28], growl: 0.55 + 0.45 * y, drive: 0.35 + 0.65 * y, rough: 0.45 + 0.5 * y, roughHz: lerp(30, 150, x),
-        celeste: 9, vib: 0, vibHz: 0, sag: 0, cutoff: 260 + 1900 * y, wet: 0.05, width: 0.1, levelDb: lerp(-32, -4, y) }) },
-    sadness: { root: 38, set: 'φ golden', attack: 0.6, release: 2.8,
-      at: (x, y) => ({ semis: -5 * (1 - y), amps: [1, 0.42, 0.24, 0.12, 0.06, 0.03], growl: 0, drive: 0.05, rough: 0, roughHz: 0,
-        celeste: 4 + 10 * x, vib: 10 + 70 * x, vibHz: 0.07 + 0.05 * x, sag: -(15 + 45 * x), cutoff: 320 + 1500 * y, wet: 0.3 + 0.55 * x, width: 0.3 + 0.6 * x, levelDb: lerp(-36, -7, y) }) },
+      at: (x, y) => ({ semis: 7 * y, amps: [1, (0.12 + 0.4 * x) * (0.5 + y), (0.04 + 0.26 * x) * (0.4 + 1.4 * y), (0.02 + 0.16 * x) * (0.3 + 1.8 * y), (0.02 + 0.08 * x) * 2 * y, (0.01 + 0.04 * x) * 2.5 * y], growl: 0, drive: 0, rough: 0, roughHz: 0,
+        celeste: 1.5 + 9 * x, vib: 5, vibHz: 4.8, sag: 0, cutoff: 650 * Math.pow(14, y), wet: 0.12 + 0.4 * x, width: 0.1 + 0.8 * x, levelDb: lerp(-30, -5, y) }) },
+    anger: { root: 45, set: '√2', attack: 0.012, release: 0.22,
+      at: (x, y) => ({ semis: 5 * y, amps: [1, 0.55 + 0.3 * x, 0.4 + 0.3 * x, 0.3 + 0.25 * x, 0.2 + 0.2 * x, 0.12 + 0.18 * x], growl: 0.4 + 0.4 * y, drive: 0.2 + 0.4 * y + 0.2 * x, rough: 0.3 + 0.3 * y + 0.2 * x, roughHz: lerp(30, 150, x),
+        celeste: 6 + 6 * x, vib: 0, vibHz: 0, sag: 0, cutoff: 420 * Math.pow(12, y), wet: 0.05 + 0.1 * x, width: 0.05 + 0.25 * x, levelDb: lerp(-30, -5, y) }) },
+    sadness: { root: 55, set: 'φ golden', attack: 0.6, release: 2.8,
+      at: (x, y) => ({ semis: -5 * (1 - y), amps: [1, (0.42 + 0.25 * x) * (0.5 + y), (0.24 + 0.22 * x) * (0.3 + 1.8 * y), (0.12 + 0.18 * x) * (0.2 + 2.8 * y), (0.06 + 0.12 * x) * 3.5 * y, (0.03 + 0.08 * x) * 4 * y], growl: 0, drive: 0.05, rough: 0, roughHz: 0,
+        celeste: 4 + 12 * x, vib: 10 + 70 * x, vibHz: 0.07 + 0.05 * x, sag: -(15 + 45 * x), cutoff: 380 * Math.pow(10, y), wet: 0.3 + 0.55 * x, width: 0.3 + 0.65 * x, levelDb: lerp(-36, -6, y) }) },
   };
   const FEELINGS = Object.keys(FEEL);
   OrganismFactory.define({
-    id: 'eravos.feelings', domain: 'music', version: '0.1.0', label: 'Feelings', icon: '◇', accent: '#7fb8ff',
+    id: 'eravos.feelings', domain: 'music', version: '0.2.0', label: 'Feelings', icon: '◇', accent: '#7fb8ff',
     category: 'Xenharmonic', blurb: 'One feeling fills the pad — drag to play it: love, anger, sadness.',
     size: { w: 900, h: 820 }, minSize: { w: 420, h: 420 },
     permissions: ['audio_out', 'bus_publish', 'bus_subscribe'],
@@ -55,7 +61,7 @@
       // ---------------------------------------------------------------- the chain
       // partials (sine pairs, celeste) + growl (saw) → drive → rough (AM) → lp → gate → dry + space → level → comp → ceiling → out
       const bus = node(ac.createGain()), driveIn = node(ac.createGain()), shaper = node(ac.createWaveShaper()), driveOut = node(ac.createGain()), driveDry = node(ac.createGain());
-      shaper.curve = Float32Array.from({ length: 2049 }, (_, i) => Math.tanh(3 * (i / 1024 - 1))); shaper.oversample = '2x';
+      shaper.curve = Float32Array.from({ length: 2049 }, (_, i) => Math.tanh(3 * (i / 1024 - 1))); shaper.oversample = '4x';
       bus.connect(driveDry); bus.connect(driveIn); driveIn.connect(shaper); shaper.connect(driveOut);
       const rough = node(ac.createGain()), roughOsc = node(ac.createOscillator()), roughDepth = node(ac.createGain()); roughOsc.frequency.value = 60; roughDepth.gain.value = 0;
       roughOsc.connect(roughDepth); roughDepth.connect(rough.gain); roughOsc.start(); driveDry.connect(rough); driveOut.connect(rough);
@@ -117,7 +123,7 @@
       ctx.onSilence((p) => { touching = false; noteHeld = 0; sound(false, p && p.time, 'hard'); });
       ['x', 'y', 'speed', 'root', 'level', 'harmonics'].forEach(k => P.onChange(k, () => apply()));
       P.onChange('feeling', () => apply(0.25)); P.onChange('hold', () => refresh());
-      ctx.latency = dsp.osLatency(ac, '2x') * 2 + 0.008;
+      ctx.latency = dsp.osLatency(ac, '4x') + dsp.osLatency(ac, '2x') + 0.008;
       apply(0.001); refresh();
       ctx.internals = { gate, level, roughOsc, roughDepth, growl, parts, FEEL, apply, get sounding() { return shouldSound(); } };
       return {};

@@ -2,6 +2,16 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.188 Feelings 0.2 — the pad moves the tone and depth; Anger cleaned up; Sadness heard (2026-11-15)
+His words: "the feelings tool isn't working. Like the field isn't changing the tone and depth. Anger sounds messed up and the third one doesn't work."
+- Measured on 0.1.0 first: Up moved the level (≈35 dB) but the brightness only 1.5–1.7×; Across moved the brightness 3–9 %; Sadness sat around
+  70 Hz and Anger had 62 % of its energy under 150 Hz — below what a laptop or phone plays, so the third "didn't work".
+- Now: Up opens the tone over a decade and brings in the upper partials as well as the level; Across moves colour and depth (partials,
+  celeste, space, width; Anger its wobble rate and bite); Anger sits at 110 Hz (still low, harsh, its 30–150 Hz wobble kept), gentler
+  drive, 4× oversampled; Sadness an octave up, still dark and sagging.
+- Proof: feelings.test.js 14/14; three new tests fail on 0.1.0 (Up brightness 1.48× < 2, Across 9 % < 25 %, Anger 62 % under 150 Hz) and
+  pass now. The anger wobble test now reads sidebands (note + rate), since the note itself sits inside 30–150 Hz.
+
 ## 3.188 Deep songs, batch 1: six very different songs on 80s · Synth and six on Dubstep, each as deep as ERAVOS goes (2026-11-14)
 His words: "what next? the piano is hard for me but l love it. can you look at every major song of all synthwave, edm, dubstep, electronic, etc to make a wide contrast of songs per catagory that are as complex and deep as eravos can be. like per note edits, automation, tools wired to other tools, etc. curves, etc. as deep as possiblr"
 - The research first: docs/research/landmark-songs-techniques.md — the landmark records of each style and the technique each song takes
