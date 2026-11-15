@@ -136,3 +136,15 @@ snap: "snap off: one component lifts out of the tool (its wire to the core stays
 looking_glass: "UI as typed data, layers as a runtime operation, isolation through the interaction contract — this is Looking Glass's own spec (SPEC.md §2.1–2.3). v1 builds it in the Workshop; Looking Glass makes it native."
 drawbridge: "each element talks to its core only through the interaction contract, crossed by CIE-EG (the drawbridge Nexus uses): the element never knows the engine, so it can be snapped onto any tool whose contract accepts it. Reading, to confirm: Eravos's interaction contract is crossed by the same CIE-EG as Nexus, not a second one."
 cos: "OPEN (his): Eravos as a COS system (a compartment with its registry), so the workbench is one more Nexus system. Not mapped yet."
+
+## ADDENDUM 2026-11-15 (4) — the component store and the primitive store (his words; nothing above is changed)
+# his words (06:43, verbatim): "alright then we need a component store. primitive store." · before it (06:38): "only what is relevant to the
+#   workbench is on the ui. remove any noise"
+stands_on: "specs/eravos.store.spec (zips, manifests with needs, the resolver S1–S2, the store repo D1) — the stores below are its shelves for the two smallest levels, not a second store. The Browse UI rejected on 2026-11-13 was for whole tools on the canvas; this is the workbench's drawer, previewed first."
+component_store: "every component as a card: its real contract (ports in / out, its settings), its element if it has one, and whether it fits the tool on the bench — read from types: in its DAG · insert in the chain (audio in and out) · modulates a knob (control out) · needs a bridge. Drag onto the bench: it passes the gate (types, order, role) or it doesn't land; it lands with its element in the face; at rest the tool nulls against itself."
+primitive_store: "the smallest gated pieces, found inside the kernels today, written again in each: phase accumulator, PolyBLEP step, tanh soft clip, seeded random, one-pole smoother, ZDF integrator, fractional read, ring buffer (found by reading the code; to confirm when extracted). Extracting one = one piece with its own gate and tests; every component using it nulls against itself after the swap."
+counts_2026_11_15: "components: 33 with code and a checked contract, 111 mapped. primitives: 8 found, none extracted."
+phases:
+  WB7_component_store: { depends_on: [WB2_the_gate], files: [tools/core/store/components.js], exit_test: "the drawer lists every component from its contract; the fits filter agrees with the gate checker on every card" }
+  WB8_primitive_store: { depends_on: [WB7_component_store], files: [tools/music/primitives/], exit_test: "one primitive (the one-pole smoother) extracted; the 13 components that hold it pass their tests and null against themselves" }
+preview: "board 'Workbench · the store (components · primitives)' on the Idea Lab canvas"
