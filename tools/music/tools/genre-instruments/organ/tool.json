@@ -1,7 +1,7 @@
 {
   "schema": "eravos.tool/1",
   "id": "eravos.organ",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "label": "Gothic Organ",
   "icon": "⛪",
   "accent": "#8a2be2",

@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.187 Gothic Organ 1.2 — irrational ranks (2026-11-15)
+His words: "Gothic Organ … was supposed to be like the hangining tree by queens of the stone age. like the beginning irrational freqeuncies." ·
+"All right. Yeah, so do it. … start it."
+- IRRATIONAL ranks beside the drawbars: partials at irrational ratios of the note that never line up, so they beat and drift. Ratios: hanging
+  (√2 φ √3 √5 e), bell (struck-bar modes), glass (π-based). Irrational (level), Ratios, Drift (each partial wanders on its own slow LFO, in cents).
+- Every irrational pipe exists on every note, silent at 0 (the drawbars' rule, 3.164), so the organ at Irrational 0 is today's organ, and the
+  knob, the ratio set and the drift reach a held note (axiom 4).
+- Proof: organ.test.js — at Irrational 1 a partial sits at 220·√2 Hz (20+ dB over the octave, 12+ dB over 30 cents off); at 0 that partial is
+  40+ dB down and every irrational pipe's gain is exactly 0 (adds nothing). Gothic Organ suite 21/21, organ 43/43 (P163 knob follow
+  included), design check no worse, no-toys, 263 manifests valid.
+- Not run: the null render — its record pass hung on preset 17 of 19 (Funeral Dancehall) for 18 minutes in this environment; the
+  gain-exactly-0 test stands in for it. Shown first: not yet — the three knobs are on the face's More panel (an addition, today's sound the default).
+
 ## 3.186 Bassline 2.0 — time, notes, locks and rests (shown, waiting for his yes) (2026-11-13)
 His words: "I love the bassline, needs more depth and control. like tempo and the cord tool. bassline is high leverage." (12:31:19Z) · "Okay.
 The bassline tool. Way more depth. I like that tool. A lot." (15:58:04Z)
