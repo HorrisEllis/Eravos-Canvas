@@ -420,6 +420,44 @@
                         "minimum": 0,
                         "maximum": 1
                       },
+                      "ampOn": {
+                        "type": "boolean"
+                      },
+                      "character": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "ampDrive": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 30
+                      },
+                      "ampSplit": {
+                        "type": "number",
+                        "minimum": 60,
+                        "maximum": 250
+                      },
+                      "wow": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "mudCut": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 12
+                      },
+                      "presence": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 12
+                      },
+                      "glue": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
                       "monoBelow": {
                         "type": "number",
                         "minimum": 0,

@@ -305,3 +305,38 @@ describe('Wobble Bass 4.0 · full depth (filter, envelope, growl, LFO 2, output)
     assert.lt(Math.abs(db(Math.sqrt(side(wide, false)), Math.sqrt(side(mono, false)))), 6, 'high side kept');
   });
 });
+
+describe('Wobble Bass 4.2 · Amp — the growl chain, the sub kept clean and centered', () => {
+  const rig = (secs, params) => { const U = TH.universe(secs || 1), w = TH.spawn(U, 'eravos.wobble-bass'), c = OrganismFactory.handle(w).ctx; Object.keys(params || {}).forEach(k => c.params.set(k, params[k])); return { U, w, c }; };
+  const play = async (params, o) => { o = o || {}; const { U, c } = rig(o.secs || 1, Object.assign({ depth: 0, ampMod: 0 }, params)); c.internals.finalOut.disconnect(); c.internals.finalOut.connect(U.ctx.destination);
+    c.noteOn(o.note || 45, o.vel || 0.9, 0.05, { duration: o.dur || 0.8 }); return { buf: await TH.render(U), c }; };
+  const db = (a, b) => 20 * Math.log10((a + 1e-12) / (b + 1e-12));
+  // the low end of a channel (moving average ≈ under 120 Hz) and of L−R
+  const lows = (buf, side) => { const L = buf.getChannelData(0), R = buf.getChannelData(1), N = Math.round(buf.sampleRate / 120); let acc = 0, q = [], e = 0;
+    for (let i = 9600; i < 33600; i++) { const v = side ? L[i] - R[i] : (L[i] + R[i]) / 2; acc += v; q.push(v); if (q.length > N) acc -= q.shift(); const l = acc / q.length; e += l * l; } return Math.sqrt(e / 24000); };
+  const bright = (buf) => { const d = buf.getChannelData(0).subarray(9600, 33600); let x = 0, y = 0; for (let i = 1; i < d.length; i++) { x += d[i] * d[i]; y += (d[i] - d[i - 1]) ** 2; } return Math.sqrt(y / (x + 1e-20)); };
+  it('off by default: after notes the straight path is at exactly 1 and the amp at exactly 0 (every preset as it was)', async () => {
+    const { buf, c } = await play({}); const I = c.internals;
+    assert.ok(TH.rms(buf, 0.1, 0.8) > 0.01, 'it plays');
+    assert.equal(I.amDry.gain.value, 1); assert.equal(I.amWet.gain.value, 0);
+  });
+  it('on, pushed hard: the sub stays in the center — at the 55 Hz fundamental the side is far below the amp-off side', async () => {
+    const mag = (buf, f, side) => { const L = buf.getChannelData(0), R = buf.getChannelData(1); let re = 0, im = 0; for (let i = 9600; i < 33600; i++) { const v = side ? L[i] - R[i] : (L[i] + R[i]) / 2, w = 2 * Math.PI * f * i / buf.sampleRate; re += v * Math.cos(w); im += v * Math.sin(w); } return Math.hypot(re, im); };
+    const S = { voices: '8', width: 1, spread: 25 }, off = (await play(S)).buf, on = (await play(Object.assign({ ampOn: true, character: 1, ampDrive: 24 }, S))).buf;
+    assert.gt(db(mag(on, 55, false), mag(on, 55, true)), 20, 'on: mid ' + mag(on, 55, false) + ' side ' + mag(on, 55, true));
+    assert.gt(db(mag(off, 55, true), mag(on, 55, true)), 10, 'side at 55 Hz: off ' + mag(off, 55, true) + ' on ' + mag(on, 55, true));
+  });
+  it('Character moves the tone: gainy is brighter than soft at the same drive, and both play', async () => {
+    const soft = (await play({ ampOn: true, character: 0, ampDrive: 15 })).buf, gainy = (await play({ ampOn: true, character: 1, ampDrive: 15 })).buf;
+    assert.ok(TH.rms(soft, 0.1, 0.8) > 0.01 && TH.rms(gainy, 0.1, 0.8) > 0.01, 'both play');
+    assert.gt(bright(gainy) / bright(soft), 1.15, 'gainy ' + bright(gainy) + ' soft ' + bright(soft));
+  });
+  it('loud but held: level 1.5, drive 30, glue full never goes over full scale', async () => {
+    const { buf } = await play({ level: 1.5, drive: 1, ampOn: true, character: 1, ampDrive: 30, glue: 1 });
+    assert.ok(TH.peak(buf, 0, 1) <= 1.0, 'peak ' + TH.peak(buf, 0, 1));
+  });
+  it('clear: once the note has gone, the amp adds no hiss (tail under −80 dB)', async () => {
+    const { buf } = await play({ ampOn: true, character: 1, ampDrive: 30, release: 0.01 }, { secs: 2, dur: 0.6 });
+    assert.lt(20 * Math.log10(TH.rms(buf, 1.6, 2) + 1e-12), -80, 'tail rms ' + TH.rms(buf, 1.6, 2));
+  });
+});

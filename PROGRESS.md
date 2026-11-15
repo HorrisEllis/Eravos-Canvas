@@ -2,7 +2,15 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
-## 3.188 Feelings 0.2 — the pad moves the tone and depth; Anger cleaned up; Sadness heard (2026-11-15)
+## 3.190 Wobble Bass 4.2 — Amp: the growl chain, centered and clear (2026-11-15)
+His words: "I was saying his sounded centered. Ours rough. … Like I want to make it sound exactly like that. It's one way I quality check it."
+- A new AMP stage (off by default, so nothing changes until it is switched on): the sub split off at 130–140 Hz and folded to the
+  center untouched; only the growl above it is driven (4× oversampled), wobbled by a second filter (Wow), the boxy 300 Hz cut,
+  presence lifted, the fizz rolled off, the drive's own low by-products high-passed out, then glued and limited.
+- Character: soft → sharp → gainy on one knob. Glue holds it loud without passing full scale; no added hiss (tail < −80 dB).
+- New preset "Centered Growl Chain"; 5 tests (null when off, centered sub, Character, peak held, noise floor).
+
+## 3.189 Feelings 0.2 — the pad moves the tone and depth; Anger cleaned up; Sadness heard (2026-11-15)
 His words: "the feelings tool isn't working. Like the field isn't changing the tone and depth. Anger sounds messed up and the third one doesn't work."
 - Measured on 0.1.0 first: Up moved the level (≈35 dB) but the brightness only 1.5–1.7×; Across moved the brightness 3–9 %; Sadness sat around
   70 Hz and Anger had 62 % of its energy under 150 Hz — below what a laptop or phone plays, so the third "didn't work".

@@ -109,7 +109,7 @@
   }
 
   OrganismFactory.define({
-    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '4.1.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
+    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '4.2.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
     category: 'Bass', blurb: 'Dubstep wobble / talking "yoi" bass locked to the tempo. The drop.',
     size: { w: 1100, h: 640 }, minSize: { w: 420, h: 380 },   // 3.58 wide: the cards sit side by side; narrower stacks them
     slots: [{ id: 'growl', label: 'the growl (the sub stays clean)', wire_type: 'audio', hint: 'empty — a Destroyer, Phaser or Echo here works on the wub only; the sub underneath stays clean and in time' }],
@@ -201,6 +201,15 @@
       { key: 'lfo2Div', type: 'enum', options: DIVS, default: '1/1', label: 'LFO 2 rate', group: 'LFO 2' },
       { key: 'lfo2Hz', type: 'number', default: 0.5, min: 0.02, max: 20, step: 0.01, unit: 'Hz', label: 'LFO 2 free', group: 'LFO 2' },
       { key: 'lfo2Depth', type: 'number', default: 0.3, min: 0, max: 1, step: 0.01, label: 'LFO 2 depth', group: 'LFO 2', hint: 'pitch ±1 oct · cutoff ±4 oct · FM ±6 · volume ±50 % at full' },
+      // 4.2 AMP: the resampled growl chain (Bun Dem's order) — off by default, so every preset sounds as it did
+      { key: 'ampOn', type: 'boolean', default: false, label: 'Amp', group: 'AMP', hint: 'the growl through an amp: the sub split off clean and mono, the rest driven, a second wobbling filter, mud cut, presence, then glued' },
+      { key: 'character', type: 'number', default: 0.5, min: 0, max: 1, step: 0.01, label: 'Character', group: 'AMP', hint: 'soft (round, warm) → sharp (bite, presence) → gainy (pushed hard, still clear)' },
+      { key: 'ampDrive', type: 'number', default: 9, min: 0, max: 30, step: 0.5, unit: 'dB', label: 'Amp drive', group: 'AMP' },
+      { key: 'ampSplit', type: 'number', default: 140, min: 60, max: 250, step: 1, unit: 'Hz', label: 'Sub split', group: 'AMP', hint: 'below this the sub stays clean and centered; only above it is driven' },
+      { key: 'wow', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Wow', group: 'AMP', hint: 'a second filter that wobbles with the first, after the drive (the "two auto filters + WOW" of the growl chain)' },
+      { key: 'mudCut', type: 'number', default: 4, min: 0, max: 12, step: 0.5, unit: 'dB', label: 'Mud cut', group: 'AMP', hint: 'takes the boxy 250–350 Hz out: what makes a growl sound rough instead of centered' },
+      { key: 'presence', type: 'number', default: 3, min: 0, max: 12, step: 0.5, unit: 'dB', label: 'Presence', group: 'AMP' },
+      { key: 'glue', type: 'number', default: 0.5, min: 0, max: 1, step: 0.01, label: 'Glue', group: 'AMP', hint: 'a compressor then a limiter: the growl held steady and loud without clipping' },
       // 4.0 depth: the output
       { key: 'monoBelow', type: 'number', default: 0, min: 0, max: 400, step: 1, unit: 'Hz', label: 'Mono below', group: 'OUTPUT', hint: 'the low end in mono under this frequency, the width above it stays (0 = off): a clean, centred bass in any club' },
       { key: 'clipOn', type: 'boolean', default: false, label: 'Clipper', group: 'OUTPUT', hint: 'a hard clipper at the very end: nothing goes over the ceiling (loud, and it never blows up the mix)' },
@@ -326,11 +335,51 @@
         sqBands.forEach((b, i) => { if (i === 0) { b.drv.gain.setTargetAtTime(0.25, t, 0.01); b.mk.gain.setTargetAtTime(Math.tanh(1.5) / 1.5 / 0.25, t, 0.01); return; } const d = 1 + x * [0, 5, 3][i]; b.drv.gain.setTargetAtTime(d, t, 0.01); b.mk.gain.setTargetAtTime([0, 0.75, 0.5][i] / (0.6 + 0.4 * Math.sqrt(d)), t, 0.01); });
       }
       [dcBlock, fizz, subLP].forEach(n => ctx.track(n));
-      // 4.0 output clipper: level → [straight, its switch at exactly 1] or [× 1/ceiling → hard clip → × ceiling] → out
+      // 4.2 AMP: level → [straight, its switch at exactly 1] or [sub split clean+mono | mids: drive (4x) → wow → mud cut → presence → de-fizz] → glue → limiter → ampOut
+      const ampOut = ac.createGain(), amDry = ac.createGain(), amWet = ac.createGain(); ampOut.gain.value = 1; amDry.gain.value = 1; amWet.gain.value = 0;
+      level.connect(amDry); amDry.connect(ampOut);
+      const bq = (type, f, q, g) => { const b = ac.createBiquadFilter(); b.type = type; b.frequency.value = f; b.Q.value = q == null ? 0.707 : q; if (g != null) b.gain.value = g; ctx.track(b); return b; };
+      const amHc1 = bq('highpass', 140), amHc2 = bq('highpass', 140);   // the drive's own low by-products (difference tones of the wide voices) taken out again: the low end stays the clean sub
+      const amLo1 = bq('lowpass', 140), amLo2 = bq('lowpass', 140), amHi1 = bq('highpass', 140), amHi2 = bq('highpass', 140);   // Linkwitz–Riley 4: the two bands sum flat
+      const amMono = ac.createGain(); amMono.channelCount = 1; amMono.channelCountMode = 'explicit'; amMono.channelInterpretation = 'speakers';   // the sub folded to the center
+      const amPre = ac.createGain(), amSh = ac.createWaveShaper(), amPost = ac.createGain(); amSh.oversample = '4x';
+      const amWow = bq('peaking', 900, 2.5, 0), amMud = bq('peaking', 300, 1.1, 0), amPres = bq('peaking', 2800, 0.9, 0), amAir = bq('lowpass', 11000, 0.6);
+      const amSum = ac.createGain(), amComp = ac.createDynamicsCompressor(), amLim = ac.createDynamicsCompressor(), amMk = ac.createGain();
+      amLim.threshold.value = -1.5; amLim.knee.value = 0; amLim.ratio.value = 20; amLim.attack.value = 0.001; amLim.release.value = 0.06;
+      // the limiter's own overshoot caught: straight up to 0.85, then a smooth knee that never passes 0.99
+      const amSafe = ac.createWaveShaper(); amSafe.oversample = 'none';   // no oversampling here: its anti-alias filter would ring past the knee
+      { const n = 4097, c = new Float32Array(n); for (let i = 0; i < n; i++) { const x = (i / (n - 1)) * 4 - 2, a = Math.abs(x); c[i] = Math.sign(x) * (a <= 0.85 ? a : 0.85 + 0.14 * Math.tanh((a - 0.85) / 0.14)); } amSafe.curve = c; }
+      ctx.track(amSafe);
+      level.connect(amLo1); amLo1.connect(amLo2); amLo2.connect(amMono); amMono.connect(amSum);
+      level.connect(amHi1); amHi1.connect(amHi2); amHi2.connect(amPre); amPre.connect(amSh); amSh.connect(amPost); amPost.connect(amWow); amWow.connect(amMud); amMud.connect(amPres); amPres.connect(amAir); amAir.connect(amHc1); amHc1.connect(amHc2); amHc2.connect(amSum);
+      amSum.connect(amComp); amComp.connect(amMk); amMk.connect(amLim); amLim.connect(amSafe); amSafe.connect(amWet); amWet.connect(ampOut);
+      const amWowDepth = ac.createGain(); amWowDepth.gain.value = 0; amWowDepth.connect(amWow.detune);
+      [ampOut, amDry, amWet, amMono, amPre, amSh, amPost, amSum, amComp, amLim, amMk, amWowDepth].forEach(n => ctx.track(n));
+      let amCurveK = -1;
+      function ampCurve(ch) {   // soft: arctan-round · gainy: tanh pushed toward a rounded square — always odd-symmetric (no DC, no fizz from asymmetry)
+        const k = 1 + 7 * ch * ch; if (Math.abs(k - amCurveK) < 1e-3) return; amCurveK = k;
+        const n = 4097, c = new Float32Array(n), soft = 1 - ch;
+        for (let i = 0; i < n; i++) { const x = (i / (n - 1)) * 2 - 1; c[i] = soft * (Math.atan(2 * x) / Math.atan(2)) + (1 - soft) * (Math.tanh(k * x) / Math.tanh(k)); }
+        amSh.curve = c;
+      }
+      function applyAmp() {
+        const on = !!P.get('ampOn'), t = ac.currentTime, ch = P.get('character'), f = P.get('ampSplit'), dr = Math.pow(10, P.get('ampDrive') / 20) * (0.6 + 0.8 * ch), g = P.get('glue');
+        amDry.gain.setTargetAtTime(on ? 0 : 1, t, 0.004); amWet.gain.setTargetAtTime(on ? 1 : 0, t, 0.004);
+        [amLo1, amLo2, amHi1, amHi2, amHc1, amHc2].forEach(b => b.frequency.setTargetAtTime(f, t, 0.01));
+        ampCurve(ch);
+        amPre.gain.setTargetAtTime(dr, t, 0.01); amPost.gain.setTargetAtTime(0.5 / Math.min(1, Math.tanh(dr * 0.5) + 0.25), t, 0.01);   // made up so drive moves tone, not level
+        amWow.gain.setTargetAtTime(P.get('wow') * 12, t, 0.01); amWowDepth.gain.setTargetAtTime(P.get('wow') * 4800, t, 0.01);   // lfoBus ±0.5 → ±2 octaves
+        amMud.gain.setTargetAtTime(-P.get('mudCut'), t, 0.01);
+        amPres.gain.setTargetAtTime(P.get('presence') * (0.5 + ch), t, 0.01); amPres.frequency.setTargetAtTime(2200 + 1800 * ch, t, 0.01);
+        amAir.frequency.setTargetAtTime(9000 + 5000 * (1 - ch * 0.5), t, 0.01);   // gainy: the fizz above ~11.5 kHz rolled off
+        amComp.threshold.setTargetAtTime(-6 - 22 * g, t, 0.01); amComp.ratio.setTargetAtTime(1.5 + 4.5 * g, t, 0.01); amComp.attack.setTargetAtTime(0.01, t, 0.01); amComp.release.setTargetAtTime(0.12, t, 0.01); amComp.knee.setTargetAtTime(12, t, 0.01);
+        amMk.gain.setTargetAtTime(Math.pow(10, (6 * g) / 20), t, 0.01);
+      }
+      // 4.0 output clipper: ampOut → [straight, its switch at exactly 1] or [× 1/ceiling → hard clip → × ceiling] → out
       const outNode = ac.createGain(), clDry = ac.createGain(), clWet = ac.createGain(), clPre = ac.createGain(), clSh = ac.createWaveShaper(), clPost = ac.createGain();
       outNode.gain.value = 1; clDry.gain.value = 1; clWet.gain.value = 0;
       { const n = 2049, c = new Float32Array(n); for (let i = 0; i < n; i++) c[i] = Math.max(-1, Math.min(1, ((i / (n - 1)) * 2 - 1) * 4)); clSh.curve = c; }   // ±0.25 in → ±1 out: the knee at 1/4
-      level.connect(clDry); clDry.connect(outNode); level.connect(clPre); clPre.connect(clSh); clSh.connect(clPost); clPost.connect(clWet); clWet.connect(outNode);
+      ampOut.connect(clDry); clDry.connect(outNode); ampOut.connect(clPre); clPre.connect(clSh); clSh.connect(clPost); clPost.connect(clWet); clWet.connect(outNode);
       [outNode, clDry, clWet, clPre, clSh, clPost].forEach(n => ctx.track(n));
       function applyClip() {
         const on = !!P.get('clipOn'), c = Math.pow(10, P.get('ceiling') / 20), t = ac.currentTime;
@@ -368,6 +417,7 @@
       let lfo = null;
       const waves = {};
       // drawn shapes carry a DC term the oscillator cannot (PeriodicWave drops n = 0) → a ConstantSource adds it back
+      lfoBus.connect(amWowDepth);   // 4.2 the second filter wobbles with the first
       const drawDc = ac.createConstantSource(); drawDc.offset.value = 0; drawDc.connect(lfoBus); drawDc.start(); ctx.track(drawDc);
       const wave = (s, ph) => {
         if (s === 'draw') { const pts = cleanPts(P.get('shapePts')) || [[0, -1, 0], [0.5, 1, 0]], k = 'draw@' + JSON.stringify(pts) + (ph || 0).toFixed(2); return waves[k] || (waves[k] = drawWave(ac, pts, ph || 0)); }
@@ -472,6 +522,7 @@
       ['fmRatio', 'fmFine'].forEach(k => P.onChange(k, () => fmOsc.frequency.setTargetAtTime(curF * ratioOf(), ac.currentTime, 0.01)));
       P.onChange('subWave', (v) => { sub.type = v || 'sine'; });
       ['clipOn', 'ceiling'].forEach(k => P.onChange(k, applyClip)); applyClip();
+      ['ampOn', 'character', 'ampDrive', 'ampSplit', 'wow', 'mudCut', 'presence', 'glue'].forEach(k => P.onChange(k, applyAmp)); applyAmp();
       P.onChange('velCutoff', (v) => { if (!v) velBus.offset.setValueAtTime(0, ac.currentTime); });
       P.onChange('keyTrack', () => { keyBus.offset.setTargetAtTime(keyCents(curF), ac.currentTime, 0.01); });
       P.onChange('squash', applySquash);
@@ -600,7 +651,7 @@
       });
       ctx.shapeAt = (x) => drawFn(cleanPts(P.get('shapePts')) || [[0, -1, 0], [0.5, 1, 0]])(((x % 1) + 1) % 1);
       ctx.stateExtra = () => ({ vowels: VOWELS, key: ctx.key, divs: DIVS, shapes: SHAPES });
-      ctx.internals = { wt, combOut, cd1, msWet, finalOut, lp1, lp2, lp3, s12, s24, s36, lpOut, keyBus, envBus, velBus, lfo2, l2Pitch, l2Cut, l2Vol, l2Fm, ringVca, ringDepth, clWet, extra, outNode, bands, lfoBus, amp, uni, trem, vibG, noiseG, panA, panB, saw2, sub, drawDc, lfoLog, get lfo() { return lfo; }, get frozen() { return frozen; } };
+      ctx.internals = { amDry, amWet, amMono, amLo2, amHi2, amLim, ampOut, wt, combOut, cd1, msWet, finalOut, lp1, lp2, lp3, s12, s24, s36, lpOut, keyBus, envBus, velBus, lfo2, l2Pitch, l2Cut, l2Vol, l2Fm, ringVca, ringDepth, clWet, extra, outNode, bands, lfoBus, amp, uni, trem, vibG, noiseG, panA, panB, saw2, sub, drawDc, lfoLog, get lfo() { return lfo; }, get frozen() { return frozen; } };
       return {};
     },
   });
