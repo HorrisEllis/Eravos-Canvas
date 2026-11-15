@@ -41,8 +41,7 @@
       "presets"
     ],
     "shipped": [
-      "factory",
-      "odd-couples"
+      "factory"
     ]
   },
   "works_with": [

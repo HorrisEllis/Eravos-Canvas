@@ -216,7 +216,7 @@
     ['reggae', 'Reggae & Dancehall', /^(reggae|dancehall|bun-dem)/],
     ['synth', 'Synth & Dark', /^(synthwave|darkwave|witch-house|hanging-tree)($|-)/],
     ['chill', 'Chill & Ambient', /^(lofi|ambient|am-)/],
-    ['lost-love', 'Lost Love', /^ll-/], ['for-her', 'For Her', /^her-/], ['odd-couples', 'Odd Couples', /^oc-/], ['synthesis', 'Synthesis', /^syn-/]];
+    ['lost-love', 'Lost Love', /^ll-/], ['for-her', 'For Her', /^her-/], ['synthesis', 'Synthesis', /^syn-/]];
   const familyOf = (genre) => (FAMILIES.find(f => f[2].test(genre)) || ['other', 'More'])[0];
   const familyLabel = (id) => (FAMILIES.find(f => f[0] === id) || [0, 'More'])[1];
   const QUICK = [['deep', '🕳 Deep drops', { family: 'deep' }], ['curve', '📈 Curves', { type: 'curve' }], ['tension', '🔺 Tension', { type: 'tension' }],

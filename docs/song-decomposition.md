@@ -2,34 +2,30 @@
 
 His words (2026-11-13): "also songs decomposed one by one." · "rhythmes and notes per tool." — specs/eravos.song-decomposition.spec.
 
-313 songs taken apart (312 from the Song Engine, 1 from recipes); none failed.
-87978 part-bars → 4034 distinct rhythms and 4789 distinct lines across 23 tools (the same content kept once; each names the songs it came from).
+259 songs taken apart (258 from the Song Engine, 1 from recipes); none failed.
+70164 part-bars → 3183 distinct rhythms and 3594 distinct lines across 19 tools (the same content kept once; each names the songs it came from).
 
 | tool | rhythms | lines | bars played |
 |---|---:|---:|---:|
-| eravos.pads | 3216 | 0 | 22636 |
-| eravos.pad-forge | 21 | 419 | 16688 |
-| eravos.sub-engine | 17 | 209 | 9884 |
-| eravos.retro-poly | 51 | 783 | 6602 |
-| eravos.supersaw | 67 | 897 | 6522 |
-| eravos.wobble-bass | 31 | 212 | 4109 |
-| eravos.bass-forge | 29 | 409 | 2971 |
-| eravos.coven | 22 | 336 | 2720 |
-| eravos.reese-bass | 15 | 102 | 2464 |
-| eravos.organ | 7 | 101 | 2392 |
-| eravos.wub-osc | 15 | 92 | 1774 |
+| eravos.pads | 2765 | 0 | 18108 |
+| eravos.pad-forge | 17 | 330 | 15200 |
+| eravos.sub-engine | 17 | 185 | 7988 |
+| eravos.supersaw | 67 | 889 | 6482 |
+| eravos.retro-poly | 45 | 561 | 5378 |
+| eravos.wobble-bass | 31 | 203 | 3349 |
+| eravos.bass-forge | 27 | 394 | 2531 |
 | eravos.retro-dco | 21 | 125 | 1668 |
-| eravos.syn-partials | 16 | 86 | 1630 |
-| eravos.syn-osc | 13 | 104 | 1384 |
+| eravos.reese-bass | 13 | 82 | 1624 |
+| eravos.coven | 22 | 324 | 1600 |
+| eravos.syn-partials | 16 | 78 | 1336 |
+| eravos.wub-osc | 15 | 75 | 1214 |
+| eravos.syn-osc | 12 | 93 | 1160 |
 | eravos.swarm-oscillator | 5 | 37 | 825 |
-| eravos.acid-synth | 392 | 521 | 760 |
-| eravos.xen-synth | 7 | 163 | 744 |
-| eravos.curve-synth | 11 | 142 | 623 |
+| eravos.organ | 5 | 65 | 744 |
 | eravos.arp | 2 | 13 | 492 |
-| eravos.embodiment-lab | 1 | 11 | 480 |
-| eravos.piano | 6 | 22 | 410 |
-| eravos.drum-forge | 68 | 0 | 160 |
-| eravos.feelings | 1 | 5 | 40 |
+| eravos.piano | 5 | 12 | 250 |
+| eravos.acid-synth | 97 | 124 | 200 |
+| eravos.curve-synth | 1 | 4 | 15 |
 
 Not decomposed into notes: Make a song for her (recipe — its notes come from a sequencer starter, not clips; its tools are listed).
 
