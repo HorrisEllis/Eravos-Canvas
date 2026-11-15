@@ -88,3 +88,28 @@ decisions:
 order: >-
   Coder's reading, to confirm: BW0 (maps) → RD1 (measured duplicate, sound-only, proves itself with the null) and GO1 (one engine, null-safe)
   side by side → GF1 (previews first, his eye decides) → WB2s once he answers WB_S1.
+
+## ADDENDUM 2026-11-15 09:50 — his answer to WB_S1, and the Song Recorder (nothing above is changed)
+# his words (verbatim): "I want more like full dynamic range. Like I want like nothing that it cannot do wobble wise. … I want like sharper, but I
+#   want softer as well, right? Like I want like grittier, like gainier, but I want like clearer and like more like … signal to noise … like it's
+#   running through an amp or something" · "Also, the song recorder would be nice. Be able to open that song in the workshop and be able to
+#   actually like fully edit that"
+WB_S1: "ANSWERED — both ends: (a) and (b) are one range, not a choice."
+WB2s_full_range:
+  what: >-
+    An AMP stage on Wobble Bass that goes from soft to savage while staying clear: split the signal (multiband-splitter) so the sub and body stay
+    clean and centred while only the mids and top are driven; drive through the existing waveshaper / clipper / saturator-tube; a cabinet
+    (filter-svf) that rounds or opens the top; a noise floor held under −80 dB at every setting (clarity = no hiss, no aliasing: oversampled
+    shaping). One CHARACTER control sweeps soft (round, low drive, dark cab) → sharp (bright cab) → gainy (high drive on the mids) without
+    moving the sub, plus WIDTH (stereo-tools) for the top band only so the centre he likes stays mono.
+  depends_on: [BW0_maps_and_dags]
+  stands_on: "waveshaper (planned), clipper (comes out of Wobble), saturator-tube ✓, multiband-splitter (planned), filter-svf ✓, stereo-tools ✓"
+  files: [tools/music/tools/bass/wobble-bass/wobble-bass.engine.js, tools/music/tools/bass/wobble-bass/wobble-bass.spec]
+  exit_test: "CHARACTER at its default nulls against today (every preset); at every CHARACTER the band under 120 Hz stays within 1 dB of today's and mono; the noise floor with no note is under −80 dB; a preview of the AMP card shown first"
+SR1_song_into_the_workshop:
+  what: "A take from the Song Recorder opens in the Workshop: its tracks as layers, its notes as notes (the Workshop's notes kind), every part editable and played back through the same tools."
+  depends_on: []
+  stands_on: "the Workshop's notes kind (W2a, 3.152) and layers (3.175); the Song Recorder (arrange/song-recorder); .erv layers (3.133)"
+  files: [tools/music/tools/arrange/song-recorder/, tools/music/tools/arrange/timeline/timeline.workshop.js]
+  exit_test: "a recorded take opens in the Workshop, a note moved there plays moved, and saving gives the take back changed"
+  open: "his WAV (my_song.wav) is audio, not notes: opening audio as editable notes needs audio-to-notes (pitch + onset detection) — mapped as its own phase if he wants it (SR2)."
