@@ -1,7 +1,7 @@
 {
  "schema": "eravos.pack/1",
  "id": "reese-bass.factory",
- "version": "1.0.0",
+ "version": "1.1.0",
  "label": "Factory",
  "prefix": "",
  "author": "James Brooks",
@@ -202,6 +202,47 @@
       "sub": 0.9,
       "subOct": "-1",
       "subWarm": 0.7
+     }
+    },
+    "Deep Sub 808 Reese": {
+     "params": {
+      "voices": 4,
+      "detune": 12,
+      "width": 0.6,
+      "octave": -1,
+      "cutoff": 320,
+      "res": 1.5,
+      "envAmt": 1.4,
+      "combMix": 0.2,
+      "dist": 0.35,
+      "sub": 0.9,
+      "subOct": "-1",
+      "subWarm": 0.3,
+      "subShape": 0.15,
+      "subDrop": 12,
+      "subDropTime": 0.07,
+      "subSustain": 0.6,
+      "subDecay": 0.9,
+      "subClick": 0.35,
+      "subFloor": 28
+     }
+    },
+    "Deep Sub Square Reese": {
+     "params": {
+      "voices": 5,
+      "detune": 16,
+      "width": 0.75,
+      "octave": -1,
+      "cutoff": 420,
+      "res": 2,
+      "envAmt": 1.2,
+      "combMix": 0.35,
+      "dist": 0.45,
+      "sub": 0.75,
+      "subOct": "-1",
+      "subWarm": 0.2,
+      "subShape": 0.8,
+      "subFloor": 30
      }
     }
    }

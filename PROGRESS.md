@@ -2,6 +2,13 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.191 Reese Bass 2.1 — Deep Sub inside the Reese (2026-11-15)
+His words: "expand the reese bass to encompass the deep sub" · (14:01) "Then Reese bass."
+- A DEEP SUB section on the Reese: Sub shape, Sub drop + Drop time, Sub sustain + Sub decay, Sub click, Sub floor — each off until
+  moved, so every Reese preset sounds as it did (switches proven at exactly 1/0; the Reese's random phases rule out an exact null render).
+- Two presets: Deep Sub 808 Reese (drop, click, a sub that falls away under the held Reese) and Deep Sub Square Reese.
+- 7 tests. Sub Engine stays until its presets are reproduced on the Reese (then it merges, per the Eravos 2 list).
+
 ## 3.190 Wobble Bass 4.2 — Amp: the growl chain, centered and clear (2026-11-15)
 His words: "I was saying his sounded centered. Ours rough. … Like I want to make it sound exactly like that. It's one way I quality check it."
 - A new AMP stage (off by default, so nothing changes until it is switched on): the sub split off at 130–140 Hz and folded to the

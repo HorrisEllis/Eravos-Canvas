@@ -1,4 +1,4 @@
-/* eravos.reese-bass 2.0.0 — Reese Bass (P2) · resolves F-11(reese)
+/* eravos.reese-bass 2.1.0 — Reese Bass (P2) · resolves F-11(reese)
  * Detuned saw stack with random start phase per note → M/S width → 24 dB LP (env + audio-rate
  * random-walk drift) → feedback COMB (neuro flange, swept) → asymmetric drive (4×) ; mono sub
  * bypasses width + comb. Monophonic legato. The movement is the instrument. */
@@ -7,7 +7,7 @@
   const S = OrganismSDK.STD;
   const DIVS = ['4/1', '2/1', '1/1', '1/2', '1/4', '1/8', '1/16'];
   OrganismFactory.define({
-    id: 'eravos.reese-bass', preview: 'bass', domain: 'music', version: '2.0.0', label: 'Reese Bass', icon: '🔈', accent: '#ff2266', phase: 'P2',
+    id: 'eravos.reese-bass', preview: 'bass', domain: 'music', version: '2.1.0', label: 'Reese Bass', icon: '🔈', accent: '#ff2266', phase: 'P2',
     category: 'Bass', blurb: 'Huge rolling drum & bass / neuro bass — detuned saws that breathe and flange.',
     size: { w: 540, h: 400 }, minSize: { w: 420, h: 320 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
@@ -40,6 +40,14 @@
       { key: 'keepRange', type: 'boolean', default: true, label: 'Keep in range', group: 'DRIVE+SUB', hint: 'the sub never under 30 Hz, the note never under 25 Hz — lifted by octaves, so it is heard (3.77 sound audit)' },
       { key: 'subOct', type: 'enum', options: ['0', '-1', '-2'], default: '-1', label: 'Sub oct', group: 'DRIVE+SUB', hint: 'the sub against the stack: −1 = an octave under (as before), −2 = two octaves (very deep), 0 = the same pitch' },
       { key: 'subWarm', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Sub harmonics', group: 'DRIVE+SUB', hint: 'adds overtones above the sub so a very deep note is still heard on laptop speakers, phones and headphones (needs Sub above 0)' },
+      // 2.1 DEEP SUB — Deep Sub's sub, inside the Reese (RD1). Every control starts where today's sub is (sine, no drop, held, no click, no floor)
+      { key: 'subShape', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Sub shape', group: 'DEEP SUB', hint: '0 sine · 0.5 triangle · 1 rounded square: more shape, more of the sub heard on small speakers' },
+      { key: 'subDrop', type: 'number', default: 0, min: 0, max: 36, step: 0.5, unit: 'st', label: 'Sub drop', group: 'DEEP SUB', hint: '808 punch: each new note the sub starts this far above and falls to the note' },
+      { key: 'subDropTime', type: 'number', default: 0.06, min: 0.005, max: 2, step: 0.001, unit: 's', label: 'Drop time', group: 'DEEP SUB' },
+      { key: 'subSustain', type: 'number', default: 1, min: 0, max: 1, step: 0.01, label: 'Sub sustain', group: 'DEEP SUB', hint: 'below 1 the sub falls to this after each note starts while the Reese holds (a punchy sub under a long Reese)' },
+      { key: 'subDecay', type: 'number', default: 0.8, min: 0.02, max: 6, step: 0.01, unit: 's', label: 'Sub decay', group: 'DEEP SUB' },
+      { key: 'subClick', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Sub click', group: 'DEEP SUB', hint: 'a short knock at the start of each note: the sub cuts through on a phone' },
+      { key: 'subFloor', type: 'number', default: 0, min: 0, max: 45, step: 1, unit: 'Hz', label: 'Sub floor', group: 'DEEP SUB', hint: 'cuts the sub under this (0 = off): rumble a speaker cannot play only eats headroom' },
       { key: 'glide', type: 'number', default: 0.08, min: 0, max: 2, step: 0.001, unit: 's', label: 'Glide', group: 'DRIVE+SUB' },
       { key: 'attack', type: 'number', default: 0.01, min: 0.001, max: 6, step: 0.001, unit: 's', label: 'Attack', group: 'DRIVE+SUB' },
       { key: 'release', type: 'number', default: 0.3, min: 0.01, max: 10, step: 0.01, unit: 's', label: 'Release', group: 'DRIVE+SUB' },
@@ -67,7 +75,33 @@
       const dsum = ac.createGain(); dry.connect(dsum); wet.connect(dsum);
       const sh = ac.createWaveShaper(); sh.oversample = '4x'; dsum.connect(sh);
       const sub = ac.createOscillator(); sub.type = 'sine'; sub.start(); ctx.track(sub);
-      const subG = ac.createGain(); sub.connect(subG);
+      const subG = ac.createGain();
+      // 2.1 DEEP SUB: sine (as before, at exactly 1) + triangle + rounded square (both at exactly 0 until Shape moves) → sub envelope
+      // (held at exactly 1 until Sustain < 1) → floor (straight at exactly 1, high-pass at exactly 0 until Floor > 0) → subG
+      const subTri = ac.createOscillator(), subSq = ac.createOscillator(); subTri.type = 'triangle'; subSq.type = 'square';
+      [subTri, subSq].forEach(o => { o.frequency.value = 55; o.start(); ctx.track(o); });
+      const subOscs = [sub, subTri, subSq];
+      const subFq = {}; ['cancelScheduledValues', 'setValueAtTime', 'exponentialRampToValueAtTime', 'setTargetAtTime'].forEach(m => { subFq[m] = (...a) => { subOscs.forEach(o => o.frequency[m](...a)); return subFq; }; });
+      const gS = ac.createGain(), gT = ac.createGain(), gQ = ac.createGain(), sqLP = ac.createBiquadFilter(), subMix = ac.createGain(), subEnv = ac.createGain();
+      gS.gain.value = 1; gT.gain.value = 0; gQ.gain.value = 0; sqLP.type = 'lowpass'; sqLP.Q.value = 0.5; sqLP.frequency.value = 200; subEnv.gain.value = 1;
+      sub.connect(gS); subTri.connect(gT); subSq.connect(sqLP); sqLP.connect(gQ); [gS, gT, gQ].forEach(g => g.connect(subMix)); subMix.connect(subEnv);
+      const flDry = ac.createGain(), flWet = ac.createGain(), flHP1 = ac.createBiquadFilter(), flHP2 = ac.createBiquadFilter(); flDry.gain.value = 1; flWet.gain.value = 0;
+      flHP1.type = flHP2.type = 'highpass'; flHP1.Q.value = flHP2.Q.value = 0.707; flHP1.frequency.value = flHP2.frequency.value = 30;
+      subEnv.connect(flDry); flDry.connect(subG); subEnv.connect(flHP1); flHP1.connect(flHP2); flHP2.connect(flWet); flWet.connect(subG);
+      const clickBus = ac.createGain(); clickBus.connect(subG);
+      [gS, gT, gQ, sqLP, subMix, subEnv, flDry, flWet, flHP1, flHP2, clickBus].forEach(n => ctx.track(n));
+      let heldNow = () => false;   // set once the note state exists (below)
+      function applyDeep() {
+        const sh = P.get('subShape'), t = ac.currentTime, on = P.get('subFloor') > 0;
+        const wS = sh === 0 ? 1 : Math.max(0, 1 - 2 * sh), wT = 1 - Math.abs(2 * sh - 1), wQ = Math.max(0, 2 * sh - 1);
+        gS.gain.setTargetAtTime(wS, t, 0.01); gT.gain.setTargetAtTime(sh === 0 ? 0 : wT * 1.05, t, 0.01); gQ.gain.setTargetAtTime(wQ * 0.85, t, 0.01);
+        flDry.gain.setTargetAtTime(on ? 0 : 1, t, 0.004); flWet.gain.setTargetAtTime(on ? 1 : 0, t, 0.004);
+        if (on) [flHP1, flHP2].forEach(b => b.frequency.setTargetAtTime(P.get('subFloor'), t, 0.01));
+        const ss = P.get('subSustain');
+        if (ss >= 1) { subEnv.gain.cancelScheduledValues(t); subEnv.gain.setTargetAtTime(1, t, 0.01); }
+        else if (heldNow(t)) { subEnv.gain.cancelScheduledValues(t); subEnv.gain.setTargetAtTime(ss, t, 0.02); }   // a held note follows the knob
+      }
+      ['subShape', 'subFloor', 'subSustain'].forEach(k => P.onChange(k, applyDeep)); applyDeep();
       const SUBK = { '0': 1, '-1': 0.5, '-2': 0.25 }, subHz = (h) => { const x = h * (SUBK[P.get('subOct')] || 0.5); return P.get('keepRange') !== false ? dsp.keepRange(x, 30) : x; };   // 3.51 Sub oct · 3.77 never under 30 Hz
       // 3.51 Sub harmonics: a symmetric soft clip of the clean sub → 3rd/5th overtones (82 Hz for a 27 Hz note) the ear rebuilds the low note from
       const warmSh = ac.createWaveShaper(), warmG = ac.createGain(); warmG.gain.value = 0; ctx.track(warmSh); ctx.track(warmG);
@@ -85,6 +119,7 @@
 
       let stack = []; // {o, pan}
       let held = null, curHz = 55;
+      heldNow = (t) => !!held && held.off > t;
       function buildStack(t, hz) {
         stack.forEach(v => { try { v.o.stop(t + 0.02); } catch (e) {} });
         const old = stack; old.forEach(v => { v.o.onended = () => { try { v.o.disconnect(); v.pan.disconnect(); v.g.disconnect(); v.wm.disconnect(); } catch (e) {} ctx.untrack(v.o); }; });
@@ -144,12 +179,21 @@
         if (legato) {
           const gl = Math.max(0.005, P.get('glide'));
           stack.forEach(v => { v.o.frequency.cancelScheduledValues(tp); v.o.frequency.setValueAtTime(curHz, tp); v.o.frequency.exponentialRampToValueAtTime(hz, tp + gl); });
-          sub.frequency.cancelScheduledValues(tp); sub.frequency.setValueAtTime(subHz(curHz), tp); sub.frequency.exponentialRampToValueAtTime(subHz(hz), tp + gl);
+          subFq.cancelScheduledValues(tp); subFq.setValueAtTime(subHz(curHz), tp); subFq.exponentialRampToValueAtTime(subHz(hz), tp + gl);
           const g = amp.gain, v = envAt(t); g.cancelScheduledValues(t); g.setValueAtTime(v, t);
           if (t < env.t0 + env.att) g.linearRampToValueAtTime(env.peak, env.t0 + env.att); else g.setValueAtTime(env.peak, t + 0.002);
         } else {
           buildStack(tp, hz);
-          sub.frequency.cancelScheduledValues(tp); sub.frequency.setValueAtTime(subHz(hz), tp);
+          const sf = subHz(hz), dp = P.get('subDrop');
+          subFq.cancelScheduledValues(tp);
+          if (dp > 0) { subFq.setValueAtTime(sf * Math.pow(2, dp / 12), tp); subFq.exponentialRampToValueAtTime(sf, tp + P.get('subDropTime')); } else subFq.setValueAtTime(sf, tp);
+          sqLP.frequency.setValueAtTime(Math.max(60, sf * 3.5), tp);
+          const ss = P.get('subSustain');
+          if (ss < 1) { const e = subEnv.gain; e.cancelScheduledValues(tp); e.setValueAtTime(1, tp); e.setTargetAtTime(ss, tp + 0.005, P.get('subDecay') / 3); }
+          const ck = P.get('subClick');
+          if (ck > 0) { const o = ac.createOscillator(), g = ac.createGain(); o.frequency.setValueAtTime(sf * 16, tp); o.frequency.exponentialRampToValueAtTime(sf * 2, tp + 0.012);
+            g.gain.setValueAtTime(0, tp); g.gain.linearRampToValueAtTime(ck * 0.45 * (0.5 + 0.5 * vel), tp + 0.0005); g.gain.setTargetAtTime(0, tp + 0.001, 0.006);
+            o.connect(g); g.connect(clickBus); o.start(tp); o.stop(tp + 0.06); o.onended = () => { try { o.disconnect(); g.disconnect(); } catch (e) {} }; }
           env = { t0: t, att: Math.max(0.001, P.get('attack')), peak: 0.5 + 0.5 * vel };
           amp.gain.cancelScheduledValues(t); amp.gain.setValueAtTime(0, t); amp.gain.linearRampToValueAtTime(env.peak, t + env.att);
           // filter env
@@ -166,15 +210,16 @@
         if (!held || held.off <= ac.currentTime) return;
         const hz = noteHz(held.note), t = ac.currentTime;
         stack.forEach(v => { v.o.frequency.cancelScheduledValues(t); v.o.frequency.setValueAtTime(curHz, t); v.o.frequency.exponentialRampToValueAtTime(hz, t + 0.03); });
-        sub.frequency.cancelScheduledValues(t); sub.frequency.setValueAtTime(subHz(curHz), t); sub.frequency.exponentialRampToValueAtTime(subHz(hz), t + 0.03);
+        subFq.cancelScheduledValues(t); subFq.setValueAtTime(subHz(curHz), t); subFq.exponentialRampToValueAtTime(subHz(hz), t + 0.03);
         curHz = hz;
       }));
-      P.onChange('subOct', () => { if (held && held.off > ac.currentTime) sub.frequency.setTargetAtTime(subHz(curHz), ac.currentTime, 0.02); });
+      P.onChange('subOct', () => { if (held && held.off > ac.currentTime) subFq.setTargetAtTime(subHz(curHz), ac.currentTime, 0.02); });
       ctx.noteOn = noteOn;
       ctx.onNote((p) => noteOn(p.note, p.velocity, p.time, { duration: p.duration }));
       ctx.onMidi((p) => { if (p.on) noteOn(p.note, p.velocity, ac.currentTime); else noteOff(p.note); });
       ctx.audition = (p) => noteOn(p.note || 45, 0.9, ac.currentTime, { duration: p.duration || 1.5 });
       ctx.auditionOff = (p) => noteOff(p.note || 45);
+      ctx.internals = { gS, gT, gQ, subEnv, flDry, flWet, sub, subTri, subSq };
       return {};
     },
   });
