@@ -110,3 +110,18 @@ acceptance (CG0): this spec, the map's numbers reproducible: grep the specs' dep
 #   - a kept mutant is a tool like any other: its manifest announces needs (components, elements, ui, domain) generated from its DAG, and it
 #     is zipped and imported by the canvas like any tool (specs/eravos.store.spec ADDENDUM 2026-11-13).
 #   - CG1 now writes ports + variables + element (specs/eravos.components.spec ADDENDUM 2026-11-13 (2)).
+
+## ADDENDUM 2026-11-16 — CG2 built: the graph, the checker and the mutation ops (pure, no UI) (nothing above is changed)
+# his words (2026-11-16, verbatim): "I've been trying to decide between Bravos, because I want that mutation done. I want that. Imagine it'll be
+#   unlimited possibilities. And we're close."
+#   - tools/core/compat/compat.js (domain-free, pure; window.Compat and require): fit · slot · covers · graph · check · swap · insert · rewire ·
+#     vary · remove · mutate (seeded). build/compat-graph.mjs → docs/compat-graph.md (--check in CI). tests/compat.test.mjs: 36 checks on the
+#     real 34 contracts.
+#   - D5 refined from the data: exact-slot siblings are few (11 audio processors share in:audio|out:audio; ratio-set · seed-registry), so a
+#     SWAP target is a STAND-IN: it has every port the replaced component is wired by (same direction, type, rate) and asks for no audio input
+#     the replaced one did not have — so osc-wavetable and osc-sub stand in for osc-va (their extra inputs idle), and a filter never stands in
+#     for a source (with nothing to process it is silent).
+#   - mutate() offers only mutants that pass check(), each one step from its parent, all different, with lineage { from, ops, by, seed }.
+#   - not yet: CG2's test that the tool-level graph agrees with WireSystem on every built tool (the tool level), and CG3 (a mutant assembled,
+#     rendered and measured by the novelty gate).
+
