@@ -2,6 +2,15 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.193 CG3 — mutants that play (2026-11-16)
+His words: "I want that mutation done." · "So, and the engine is the core, correct? With the components."
+- A tool's DAG now becomes one running engine made only of its components' own kernels (tools/core/compat/assemble.js + the music
+  adapters). The proof it adds nothing: an oscillator into a filter, assembled, equals the two kernels run by hand to the last sample.
+- build/mutants.mjs mutates a parent voice (saw → 24 dB filter → tube → stereo), renders every mutant, and offers only the ones that play
+  cleanly and sound different. Seed 7: 5 of 6 offered (a swapped sub oscillator, tape saturation in two places, a pulse wave, a 12 dB filter);
+  the one not offered changed nothing audible. Other seeds caught clipping mutants and refused them.
+- tests/mutants.test.mjs: 20 checks (CI). Next: CG4, ⚄ MUTATE on the bench (preview first).
+
 ## 3.192 CG2 — the compatibility graph and the mutation ops (2026-11-16)
 His words: "I want that mutation done. I want that. Imagine it'll be unlimited possibilities. And we're close."
 - tools/core/compat/compat.js: a pure, domain-free checker over the CG1 contracts — what feeds what (directly or through a declared bridge),

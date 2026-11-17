@@ -125,3 +125,17 @@ acceptance (CG0): this spec, the map's numbers reproducible: grep the specs' dep
 #   - not yet: CG2's test that the tool-level graph agrees with WireSystem on every built tool (the tool level), and CG3 (a mutant assembled,
 #     rendered and measured by the novelty gate).
 
+## ADDENDUM 2026-11-16 (2) — CG3 built: a mutant assembled into one engine, rendered, measured (nothing above is changed)
+#   - tools/core/compat/assemble.js (domain-free): a DAG → ONE engine; each node is its component's own kernel through the domain's adapter,
+#     run block by block in wire order; an unwired pitch / gate in-port is the tool's note in; bridges from the domain. Proven: osc-va →
+#     filter-svf assembled = the same two kernels run by hand, sample for sample (difference 0).
+#   - tools/music/compat/adapters.js: the six process(ins, outs, n, P) processors (one adapter), osc-va, osc-sub, env-adsr, stereo-tools.
+#     A component with no adapter is not assembled (and so never offered); adapters for the rest come as each is needed.
+#   - build/mutants.mjs → docs/mutants.md (+ WAVs with --wav): a parent voice, mutate() into parts that can be assembled, each rendered
+#     (four bass notes, offline) and measured. OFFERED (D4 refined from the data) = it plays cleanly (finite, not silent, not pinned) AND it
+#     is heard to differ from its parent (fingerprint distance ≥ 0.005). Caught on real seeds: removing the saturator lets a resonant filter
+#     peak past full scale (pinned 3.6 % → refused); a pulse width on a saw is inaudible (0.000 → not offered).
+#   - known limits: the fingerprint is mono (a width change measures 0); the nearest-sound column compares against baseline renders of a
+#     different phrase (a lead to listen to); the harness gates the sound itself (no VCA component has a contract yet).
+#   - tests/mutants.test.mjs: 20 checks (CI).
+

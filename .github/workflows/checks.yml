@@ -24,6 +24,8 @@ jobs:
         run: node build/tool-needs.mjs --check
       - name: The compatibility graph and mutation ops (CG2)
         run: node tests/compat.test.mjs
+      - name: Mutants build into one engine from their components and play (CG3)
+        run: node tests/mutants.test.mjs
       - name: No toys
         run: node tests/no-toys.mjs
       - name: No Playwright

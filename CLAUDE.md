@@ -204,7 +204,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
   (`specs/eravos.compat-graph.spec`), the Field a tool and the canvas the host only (`specs/eravos.bare-canvas.spec`), UIs that merge when
   wired (`specs/eravos.ui-field.spec` ADDENDUM 2026-11-13), Bassline 2.0 (`bass-gen.spec` ADDENDUM). Not waiting for Emerge (v2 plan
   ADDENDUM 2026-11-13). Every component carries its own UI element; every tool announces its needs from its DAG and the canvas imports it from the zip
-  (`specs/eravos.store.spec` ADDENDUM 2026-11-13, I1–I4). ERAVOS 2's name: "Synthesis" proposed, to confirm. Order: BC1 ✓ → CG1 ✓ (33 of 33) → CG2 ✓ (3.192: graph, checker, mutation ops) → CG3 → the Field's swap / mutate UI (shown first) → Bassline 2.0. Map: `specs/eravos.2026-11-13-session.map.spec`.
+  (`specs/eravos.store.spec` ADDENDUM 2026-11-13, I1–I4). ERAVOS 2's name: "Synthesis" proposed, to confirm. Order: BC1 ✓ → CG1 ✓ (33 of 33) → CG2 ✓ (3.192: graph, checker, mutation ops) → CG3 ✓ (3.193: assembled, rendered, offered only if it plays and is heard) → the Field's swap / mutate UI (shown first) → Bassline 2.0. Map: `specs/eravos.2026-11-13-session.map.spec`.
 - **The store** (2026-11-13, specced; the Browse UI rejected — see Next): every tool a
   whole isolated zip, the canvas only through the interaction contract (`specs/eravos.store-browse.spec`; preview first, SB1); songs decomposed
   into rhythms and notes per tool (SD1 ✓ 3.180).
