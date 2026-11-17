@@ -154,7 +154,7 @@
       if (op === 'swap') { const n = pick(dag.nodes), s = sibsOf(n.component); if (s.length) r = swap(dag, n.id, pick(s), contracts, types); }
       else if (op === 'insert' && dag.edges.length) { const i = Math.floor(R() * dag.edges.length), c = pick(contracts); r = insert(dag, i, c.id, contracts, types); }
       else if (op === 'vary') { const n = pick(dag.nodes), c = C[n.component], vs = (c.variables || []).filter(v => v.type === 'number' || (v.type === 'enum' && v.options));
-        if (vs.length) { const v = pick(vs), x = v.type === 'number' ? (v.integer ? v.min + Math.floor(R() * (v.max - v.min + 1)) : +(v.min + (v.max - v.min) * R()).toPrecision(4)) : pick(v.options); r = vary(dag, n.id, v.key, x, contracts, types); } }
+        if (vs.length) { const v = pick(vs), x = v.type === 'number' ? (v.integer ? v.min + Math.floor(R() * (v.max - v.min + 1)) : +(v.min + (v.max - v.min) * R()).toPrecision(4)) : pick(v.options); const cur = n.vars && n.vars[v.key] !== undefined ? n.vars[v.key] : v.default; if (x !== cur) r = vary(dag, n.id, v.key, x, contracts, types); } }   // a value it already has is no mutation
       else if (op === 'rewire' && dag.edges.length) { const i = Math.floor(R() * dag.edges.length), n = pick(dag.nodes), ins = (C[n.component].ports || []).filter(p => p.dir === 'in');
         if (ins.length) { const to = `${n.id}.${pick(ins).id}`; if (to !== dag.edges[i].to) r = rewire(dag, i, to, contracts, types); } }
       else if (op === 'remove') { const n = pick(dag.nodes); r = remove(dag, n.id, contracts, types); }
