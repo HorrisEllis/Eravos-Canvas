@@ -66,6 +66,7 @@
       Object.keys(n.vars || {}).forEach(k => { const v = (c.variables || []).find(x => x.key === k), x = n.vars[k];
         if (!v) { why.push(`node ${n.id}: ${n.component} has no variable ${k}`); return; }
         if (v.type === 'number' && (typeof x !== 'number' || !isFinite(x) || x < v.min || x > v.max)) why.push(`node ${n.id}: ${k} = ${x} is outside ${v.min}…${v.max}`);
+        if (v.type === 'number' && v.integer && Number.isFinite(x) && !Number.isInteger(x)) why.push(`node ${n.id}: ${k} = ${x} must be a whole number`);
         if (v.type === 'enum' && v.options && !v.options.includes(x)) why.push(`node ${n.id}: ${k} = ${x} is not one of ${v.options.join(', ')}`); });
     });
     const at = (ref) => { const [nid, pid] = String(ref).split('.'); const n = N[nid]; return n && C[n.component] ? { n, p: portOf(C[n.component], pid) } : null; };
@@ -98,7 +99,7 @@
     d.edges.forEach(e => { const [a, pa] = e.from.split('.'), [b, pb] = e.to.split('.'); if (a === nodeId) e.from = `${a}.${remap(pa)}`; if (b === nodeId) e.to = `${b}.${remap(pb)}`; });
     d.outs = (d.outs || []).map(r => { const [a, pa] = r.split('.'); return a === nodeId ? `${a}.${remap(pa)}` : r; });
     const vars = {}; Object.keys(n.vars || {}).forEach(k => { const v = (to.variables || []).find(x => x.key === k); if (!v) return; let x = n.vars[k];
-      if (v.type === 'number') x = Math.min(v.max, Math.max(v.min, x)); if (v.type === 'enum' && v.options && !v.options.includes(x)) return; vars[k] = x; });
+      if (v.type === 'number') { x = Math.min(v.max, Math.max(v.min, x)); if (v.integer) x = Math.round(x); } if (v.type === 'enum' && v.options && !v.options.includes(x)) return; vars[k] = x; });
     n.component = compId; n.vars = vars;
     return done(d, { op: 'swap', node: nodeId, from: from.id, to: compId }, contracts, types);
   }
@@ -153,7 +154,7 @@
       if (op === 'swap') { const n = pick(dag.nodes), s = sibsOf(n.component); if (s.length) r = swap(dag, n.id, pick(s), contracts, types); }
       else if (op === 'insert' && dag.edges.length) { const i = Math.floor(R() * dag.edges.length), c = pick(contracts); r = insert(dag, i, c.id, contracts, types); }
       else if (op === 'vary') { const n = pick(dag.nodes), c = C[n.component], vs = (c.variables || []).filter(v => v.type === 'number' || (v.type === 'enum' && v.options));
-        if (vs.length) { const v = pick(vs), x = v.type === 'number' ? +(v.min + (v.max - v.min) * R()).toPrecision(4) : pick(v.options); r = vary(dag, n.id, v.key, x, contracts, types); } }
+        if (vs.length) { const v = pick(vs), x = v.type === 'number' ? (v.integer ? v.min + Math.floor(R() * (v.max - v.min + 1)) : +(v.min + (v.max - v.min) * R()).toPrecision(4)) : pick(v.options); r = vary(dag, n.id, v.key, x, contracts, types); } }
       else if (op === 'rewire' && dag.edges.length) { const i = Math.floor(R() * dag.edges.length), n = pick(dag.nodes), ins = (C[n.component].ports || []).filter(p => p.dir === 'in');
         if (ins.length) { const to = `${n.id}.${pick(ins).id}`; if (to !== dag.edges[i].to) r = rewire(dag, i, to, contracts, types); } }
       else if (op === 'remove') { const n = pick(dag.nodes); r = remove(dag, n.id, contracts, types); }

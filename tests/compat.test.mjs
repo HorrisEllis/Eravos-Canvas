@@ -44,6 +44,8 @@ const ins = Compat.insert(V, 1, 'saturator-tube', contracts, types); ok(!ins.err
 ok(Compat.insert(V, 1, 'env-adsr', contracts, types).error, 'an envelope cannot sit on an audio edge');
 ok(Compat.vary(V, 'flt', 'resonance', 0.9, contracts, types).dag, 'vary inside the range');
 ok(Compat.vary(V, 'flt', 'resonance', 5, contracts, types).error, 'vary outside the range is refused');
+ok(Compat.vary(V, 'flt', 'stages', 1.5, contracts, types).error, 'a whole-number setting refuses 1.5');
+ok(Compat.mutate(V, contracts, types, { seed: 3, count: 40, ops: ['vary'] }).every(m => Compat.check(m.dag, contracts, types).ok), 'forty varied mutants all check (whole numbers stay whole)');
 const rm = Compat.remove(V, 'flt', contracts, types); ok(!rm.error && rm.dag.edges.some(e => e.from === 'osc.out' && e.to === 'st.in'), 'remove the filter joins osc → stereo');
 ok(Compat.remove(V, 'st', contracts, types).error, 'the tool\'s output cannot be removed');
 ok(JSON.stringify(V) === before, 'the parent DAG is never changed');
