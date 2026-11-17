@@ -2,6 +2,14 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.194 WD1 — Wobble Bass broken down, part 1: the Amp chain is a component (2026-11-16)
+His words: "the tools need to be broken down as well into their respective components, like the ones that existed before started doing the mutation."
+- components/amp-chain: Wobble Bass 4.2's AMP stage moved out unchanged (same nodes, wires, values) with its contract (ports in / mod / out,
+  8 variables, its UI element) and spec. Wobble Bass now calls it.
+- Proof: null render 34 / 34 Wobble Bass presets against the baseline recorded before the move (gate −60 dB); amp-chain.test.mjs 16 checks
+  (the graph in order, off at exactly 1 / 0, every value set); Wobble 45 / 45; contracts 35 / 35; tool needs announce it.
+- The track (written, gated): CG2 ✓ → CG3 ✓ → WD1 ✓ → WD2 the sub → WD3 the output stage → WD4 squash → WD5 LFO + wub seq → WD6 FM growl → CG4.
+
 ## 3.191 Reese Bass 2.1 — Deep Sub inside the Reese (2026-11-15)
 His words: "expand the reese bass to encompass the deep sub" · (14:01) "Then Reese bass."
 - A DEEP SUB section on the Reese: Sub shape, Sub drop + Drop time, Sub sustain + Sub decay, Sub click, Sub floor — each off until
