@@ -1,14 +1,14 @@
 {
  "schema": "eravos.song-parts/1",
  "about": "songs decomposed (build/song-decompose.mjs — do not edit): per tool, the rhythms and lines it plays across the songs",
- "songs": 313,
+ "songs": 259,
  "failed": [],
  "tools": {
   "eravos.acid-synth": {
    "file": "acid-synth.json",
-   "rhythms": 392,
-   "lines": 521,
-   "bars": 760
+   "rhythms": 97,
+   "lines": 124,
+   "bars": 200
   },
   "eravos.arp": {
    "file": "arp.json",
@@ -18,69 +18,51 @@
   },
   "eravos.bass-forge": {
    "file": "bass-forge.json",
-   "rhythms": 29,
-   "lines": 409,
-   "bars": 2971
+   "rhythms": 27,
+   "lines": 394,
+   "bars": 2531
   },
   "eravos.coven": {
    "file": "coven.json",
    "rhythms": 22,
-   "lines": 336,
-   "bars": 2720
+   "lines": 324,
+   "bars": 1600
   },
   "eravos.curve-synth": {
    "file": "curve-synth.json",
-   "rhythms": 11,
-   "lines": 142,
-   "bars": 623
-  },
-  "eravos.drum-forge": {
-   "file": "drum-forge.json",
-   "rhythms": 68,
-   "lines": 0,
-   "bars": 160
-  },
-  "eravos.embodiment-lab": {
-   "file": "embodiment-lab.json",
    "rhythms": 1,
-   "lines": 11,
-   "bars": 480
-  },
-  "eravos.feelings": {
-   "file": "feelings.json",
-   "rhythms": 1,
-   "lines": 5,
-   "bars": 40
+   "lines": 4,
+   "bars": 15
   },
   "eravos.organ": {
    "file": "organ.json",
-   "rhythms": 7,
-   "lines": 101,
-   "bars": 2392
+   "rhythms": 5,
+   "lines": 65,
+   "bars": 744
   },
   "eravos.pad-forge": {
    "file": "pad-forge.json",
-   "rhythms": 21,
-   "lines": 419,
-   "bars": 16688
+   "rhythms": 17,
+   "lines": 330,
+   "bars": 15200
   },
   "eravos.pads": {
    "file": "pads.json",
-   "rhythms": 3216,
+   "rhythms": 2765,
    "lines": 0,
-   "bars": 22636
+   "bars": 18108
   },
   "eravos.piano": {
    "file": "piano.json",
-   "rhythms": 6,
-   "lines": 22,
-   "bars": 410
+   "rhythms": 5,
+   "lines": 12,
+   "bars": 250
   },
   "eravos.reese-bass": {
    "file": "reese-bass.json",
-   "rhythms": 15,
-   "lines": 102,
-   "bars": 2464
+   "rhythms": 13,
+   "lines": 82,
+   "bars": 1624
   },
   "eravos.retro-dco": {
    "file": "retro-dco.json",
@@ -90,21 +72,21 @@
   },
   "eravos.retro-poly": {
    "file": "retro-poly.json",
-   "rhythms": 51,
-   "lines": 783,
-   "bars": 6602
+   "rhythms": 45,
+   "lines": 561,
+   "bars": 5378
   },
   "eravos.sub-engine": {
    "file": "sub-engine.json",
    "rhythms": 17,
-   "lines": 209,
-   "bars": 9884
+   "lines": 185,
+   "bars": 7988
   },
   "eravos.supersaw": {
    "file": "supersaw.json",
    "rhythms": 67,
-   "lines": 897,
-   "bars": 6522
+   "lines": 889,
+   "bars": 6482
   },
   "eravos.swarm-oscillator": {
    "file": "swarm-oscillator.json",
@@ -114,33 +96,27 @@
   },
   "eravos.syn-osc": {
    "file": "syn-osc.json",
-   "rhythms": 13,
-   "lines": 104,
-   "bars": 1384
+   "rhythms": 12,
+   "lines": 93,
+   "bars": 1160
   },
   "eravos.syn-partials": {
    "file": "syn-partials.json",
    "rhythms": 16,
-   "lines": 86,
-   "bars": 1630
+   "lines": 78,
+   "bars": 1336
   },
   "eravos.wobble-bass": {
    "file": "wobble-bass.json",
    "rhythms": 31,
-   "lines": 212,
-   "bars": 4109
+   "lines": 203,
+   "bars": 3349
   },
   "eravos.wub-osc": {
    "file": "wub-osc.json",
    "rhythms": 15,
-   "lines": 92,
-   "bars": 1774
-  },
-  "eravos.xen-synth": {
-   "file": "xen-synth.json",
-   "rhythms": 7,
-   "lines": 163,
-   "bars": 744
+   "lines": 75,
+   "bars": 1214
   }
  }
 }

@@ -138,6 +138,41 @@
                         "minimum": 0,
                         "maximum": 1
                       },
+                      "subShape": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "subDrop": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 36
+                      },
+                      "subDropTime": {
+                        "type": "number",
+                        "minimum": 0.005,
+                        "maximum": 2
+                      },
+                      "subSustain": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "subDecay": {
+                        "type": "number",
+                        "minimum": 0.02,
+                        "maximum": 6
+                      },
+                      "subClick": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "subFloor": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 45
+                      },
                       "glide": {
                         "type": "number",
                         "minimum": 0,

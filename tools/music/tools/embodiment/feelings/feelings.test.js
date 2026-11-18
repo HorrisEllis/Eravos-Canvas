@@ -9,7 +9,7 @@ describe('Feelings — one feeling fills the pad; drag to play it', () => {
     Object.entries(params || {}).forEach(([k, v]) => c.params.set(k, v));
     K.audio.chain.out.gain.value = 0; K.audio.ports(a).filter(x => x.kind === 'audio' && x.direction === 'out').forEach(x => x.node.connect(ctx.destination));
     if (script) script(c, ctx);
-    const b = await ctx.startRendering(); return { L: b.getChannelData(0), sr };
+    const b = await ctx.startRendering(); return { L: b.getChannelData(0), R: b.getChannelData(1), sr };
   }
   const rms = (d, a, b) => { let s = 0; for (let i = a; i < b; i++) s += d[i] * d[i]; return Math.sqrt(s / Math.max(1, b - a)); };
   const peak = (d) => { let m = 0; for (const x of d) { if (!isFinite(x)) return Infinity; m = Math.max(m, Math.abs(x)); } return m; };
@@ -45,12 +45,16 @@ describe('Feelings — one feeling fills the pad; drag to play it', () => {
       const d = dB(rms(hi.L, S(hi, 1), S(hi, 2))) - dB(rms(lo.L, S(lo, 1), S(lo, 2))); assert.gt(d, 18, feeling + ': ' + d.toFixed(1) + ' dB from bottom to top');
     }
   });
-  it('anger irritates: its loudness wobbles inside 30–150 Hz and follows across; love does not', async () => {
-    const at = async (x) => { const r = await play({ feeling: 'anger', x, y: 0.7, hold: true }, 2); return wobble(r.L, S(r, 0.8), S(r, 1.9), r.sr); };
-    const a0 = await at(0), a1 = await at(1), lv = (() => 0)();
-    assert.ok(Math.abs(a0.at - 30) <= 4, 'left: the wobble at 30 Hz (' + a0.at + ')'); assert.ok(Math.abs(a1.at - 150) <= 6, 'right: at 150 Hz (' + a1.at + ')');
-    const r = await play({ feeling: 'love', x: 0.5, y: 0.7, hold: true }, 2), l = wobble(r.L, S(r, 0.8), S(r, 1.9), r.sr), mid = await at(0.5);
-    assert.gt(mid.band, l.band * 6, 'anger’s 30–150 Hz wobble ≥ 6× love’s');
+  it('anger irritates: its loudness wobbles inside 30–150 Hz and follows across (sidebands at the note ± the wobble); love does not', async () => {
+    // 0.2.0: Anger sits an octave up (110 Hz), so its own pitch is inside 30–150 Hz too and an envelope reading finds the note, not the wobble.
+    // Measured instead where amplitude modulation shows: a sideband at the note + the wobble rate, against the note itself.
+    const f0 = 440 * Math.pow(2, (45 + 5 * 0.7 - 69) / 12);
+    const side = async (feeling, x, rate) => { const r = await play({ feeling, x, y: 0.7, hold: true }, 2), a = S(r, 0.8), n = 16384; const base = feeling === 'anger' ? f0 : 440 * Math.pow(2, (57 + 7 * 0.7 - 69) / 12);
+      return dB(goertzel(r.L, a, n, base + rate, r.sr)) - dB(goertzel(r.L, a, n, base, r.sr)); };
+    const c = [0, 1].map(x => FeelingsData.FEEL.anger.at(x, 0.7).roughHz);
+    const a30 = await side('anger', 0, 30), a150 = await side('anger', 1, 150), l = await side('love', 0.5, 90);
+    assert.gt(a30, -26, 'anger left: sideband at note + 30 Hz ' + a30.toFixed(1) + ' dB'); assert.gt(a150, -26, 'anger right: sideband at note + 150 Hz ' + a150.toFixed(1) + ' dB');
+    assert.lt(l, Math.min(a30, a150) - 12, 'love has no such wobble (' + l.toFixed(1) + ' dB)');
   });
   it('anger is low: far more of its energy under 150 Hz than love', async () => {
     const low = (r) => goertzel(r.L, S(r, 1), 8192, 55, r.sr) + goertzel(r.L, S(r, 1), 8192, 110, r.sr), all = (r) => rms(r.L, S(r, 1), S(r, 1) + 8192) * 8192;
@@ -61,5 +65,23 @@ describe('Feelings — one feeling fills the pad; drag to play it', () => {
     const r = await play({ feeling: 'sadness', y: 0.05, hold: true }, 4, (c, ctx) => { ctx.suspend(1.6).then(() => { c.params.set('y', 1); ctx.resume(); }); });
     assert.gt(dB(rms(r.L, S(r, 3), S(r, 3.9))) - dB(rms(r.L, S(r, 0.8), S(r, 1.5))), 15, 'Up moved mid-sound: louder by > 15 dB');
     for (const feeling of ['love', 'anger', 'sadness']) for (const x of [0, 1]) { const q = await play({ feeling, x, y: 1, speed: 1, level: 1, hold: true }, 2); assert.lt(peak(q.L), 0.73, feeling + ' x ' + x + ' peak ' + peak(q.L).toFixed(3)); }
+  });
+  // 0.2.0 — his: "the field isn't changing the tone and depth. Anger sounds messed up and the third one doesn't work." These fail on 0.1.0.
+  function centroid(r) { const a = S(r, 1.2), n = 2048, re = new Float64Array(n); for (let i = 0; i < n; i++) re[i] = r.L[a + i] * (0.5 - 0.5 * Math.cos(2 * Math.PI * i / n));
+    let num = 0, den = 0; for (let k = 1; k < n / 2; k++) { let x = 0, y = 0; const w = 2 * Math.PI * k / n; for (let i = 0; i < n; i++) { x += re[i] * Math.cos(w * i); y += re[i] * Math.sin(w * i); } const m = x * x + y * y; num += m * k * r.sr / n; den += m; } return num / (den + 1e-20); }
+  it('up opens the tone, not only the level: brightness at the top ≥ 2× the bottom (0.1.0: 1.7×), every feeling', async () => {
+    for (const feeling of ['love', 'anger', 'sadness']) { const lo = centroid(await play({ feeling, x: 0.5, y: 0, hold: true }, 2)), hi = centroid(await play({ feeling, x: 0.5, y: 1, hold: true }, 2));
+      assert.gt(hi / lo, 2, feeling + ': ' + lo.toFixed(0) + ' → ' + hi.toFixed(0) + ' Hz'); }
+  });
+  it('across moves the colour and the depth: brightness or width changes ≥ 25 % from left to right, every feeling', async () => {
+    const width = (r) => { const a = S(r, 1.2), b = S(r, 1.9); let m = 0, d = 0; for (let i = a; i < b; i++) { m += (r.L[i] + r.R[i]) ** 2; d += (r.L[i] - r.R[i]) ** 2; } return Math.sqrt(d / (m + 1e-20)); };
+    for (const feeling of ['love', 'anger', 'sadness']) { const l = await play({ feeling, x: 0, y: 0.6, hold: true }, 2), r = await play({ feeling, x: 1, y: 0.6, hold: true }, 2);
+      const dc = Math.abs(centroid(r) / centroid(l) - 1), dw = Math.abs(width(r) - width(l)) / Math.max(0.05, width(l));
+      assert.gt(Math.max(dc, dw), 0.25, feeling + ': brightness ' + (dc * 100).toFixed(0) + ' %, width ' + (dw * 100).toFixed(0) + ' %'); }
+  });
+  it('every feeling is heard on small speakers: at the pad’s middle most of its energy is above 150 Hz', async () => {
+    for (const feeling of ['love', 'anger', 'sadness']) { const r = await play({ feeling, x: 0.5, y: 0.5, hold: true }, 2), a = S(r, 1), n = 8192;
+      let low = 0; for (let f = 20; f <= 150; f += 5) low += goertzel(r.L, a, n, f, r.sr) ** 2; let all = 0; for (let f = 20; f <= 8000; f += 5) all += goertzel(r.L, a, n, f, r.sr) ** 2;
+      assert.lt(low / all, 0.5, feeling + ': ' + (100 * low / all).toFixed(0) + ' % under 150 Hz'); }
   });
 });

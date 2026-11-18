@@ -109,7 +109,7 @@
   }
 
   OrganismFactory.define({
-    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '4.1.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
+    id: 'eravos.wobble-bass', preview: 'bass', domain: 'music', version: '4.2.0', label: 'Wobble Bass', icon: '🔊', accent: '#ff2266', phase: 'P2',
     category: 'Bass', blurb: 'Dubstep wobble / talking "yoi" bass locked to the tempo. The drop.',
     size: { w: 1100, h: 640 }, minSize: { w: 420, h: 380 },   // 3.58 wide: the cards sit side by side; narrower stacks them
     slots: [{ id: 'growl', label: 'the growl (the sub stays clean)', wire_type: 'audio', hint: 'empty — a Destroyer, Phaser or Echo here works on the wub only; the sub underneath stays clean and in time' }],
@@ -201,6 +201,15 @@
       { key: 'lfo2Div', type: 'enum', options: DIVS, default: '1/1', label: 'LFO 2 rate', group: 'LFO 2' },
       { key: 'lfo2Hz', type: 'number', default: 0.5, min: 0.02, max: 20, step: 0.01, unit: 'Hz', label: 'LFO 2 free', group: 'LFO 2' },
       { key: 'lfo2Depth', type: 'number', default: 0.3, min: 0, max: 1, step: 0.01, label: 'LFO 2 depth', group: 'LFO 2', hint: 'pitch ±1 oct · cutoff ±4 oct · FM ±6 · volume ±50 % at full' },
+      // 4.2 AMP: the resampled growl chain (Bun Dem's order) — off by default, so every preset sounds as it did
+      { key: 'ampOn', type: 'boolean', default: false, label: 'Amp', group: 'AMP', hint: 'the growl through an amp: the sub split off clean and mono, the rest driven, a second wobbling filter, mud cut, presence, then glued' },
+      { key: 'character', type: 'number', default: 0.5, min: 0, max: 1, step: 0.01, label: 'Character', group: 'AMP', hint: 'soft (round, warm) → sharp (bite, presence) → gainy (pushed hard, still clear)' },
+      { key: 'ampDrive', type: 'number', default: 9, min: 0, max: 30, step: 0.5, unit: 'dB', label: 'Amp drive', group: 'AMP' },
+      { key: 'ampSplit', type: 'number', default: 140, min: 60, max: 250, step: 1, unit: 'Hz', label: 'Sub split', group: 'AMP', hint: 'below this the sub stays clean and centered; only above it is driven' },
+      { key: 'wow', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Wow', group: 'AMP', hint: 'a second filter that wobbles with the first, after the drive (the "two auto filters + WOW" of the growl chain)' },
+      { key: 'mudCut', type: 'number', default: 4, min: 0, max: 12, step: 0.5, unit: 'dB', label: 'Mud cut', group: 'AMP', hint: 'takes the boxy 250–350 Hz out: what makes a growl sound rough instead of centered' },
+      { key: 'presence', type: 'number', default: 3, min: 0, max: 12, step: 0.5, unit: 'dB', label: 'Presence', group: 'AMP' },
+      { key: 'glue', type: 'number', default: 0.5, min: 0, max: 1, step: 0.01, label: 'Glue', group: 'AMP', hint: 'a compressor then a limiter: the growl held steady and loud without clipping' },
       // 4.0 depth: the output
       { key: 'monoBelow', type: 'number', default: 0, min: 0, max: 400, step: 1, unit: 'Hz', label: 'Mono below', group: 'OUTPUT', hint: 'the low end in mono under this frequency, the width above it stays (0 = off): a clean, centred bass in any club' },
       { key: 'clipOn', type: 'boolean', default: false, label: 'Clipper', group: 'OUTPUT', hint: 'a hard clipper at the very end: nothing goes over the ceiling (loud, and it never blows up the mix)' },
@@ -326,11 +335,16 @@
         sqBands.forEach((b, i) => { if (i === 0) { b.drv.gain.setTargetAtTime(0.25, t, 0.01); b.mk.gain.setTargetAtTime(Math.tanh(1.5) / 1.5 / 0.25, t, 0.01); return; } const d = 1 + x * [0, 5, 3][i]; b.drv.gain.setTargetAtTime(d, t, 0.01); b.mk.gain.setTargetAtTime([0, 0.75, 0.5][i] / (0.6 + 0.4 * Math.sqrt(d)), t, 0.01); });
       }
       [dcBlock, fizz, subLP].forEach(n => ctx.track(n));
-      // 4.0 output clipper: level → [straight, its switch at exactly 1] or [× 1/ceiling → hard clip → × ceiling] → out
+      // 4.2 AMP (components/amp-chain, extracted WD1): level → [straight, its switch at exactly 1] or [the amp] → ampOut
+      const AMP = MusicParts.ampChain(ac, level, (n) => ctx.track(n)), ampOut = AMP.out, amWowDepth = AMP.mod, { amDry, amWet, amMono, amLo2, amHi2, amLim } = AMP.nodes;
+      function applyAmp() {
+        AMP.set({ on: P.get('ampOn'), character: P.get('character'), drive: P.get('ampDrive'), split: P.get('ampSplit'), wow: P.get('wow'), mudCut: P.get('mudCut'), presence: P.get('presence'), glue: P.get('glue') }, ac.currentTime);
+      }
+      // 4.0 output clipper: ampOut → [straight, its switch at exactly 1] or [× 1/ceiling → hard clip → × ceiling] → out
       const outNode = ac.createGain(), clDry = ac.createGain(), clWet = ac.createGain(), clPre = ac.createGain(), clSh = ac.createWaveShaper(), clPost = ac.createGain();
       outNode.gain.value = 1; clDry.gain.value = 1; clWet.gain.value = 0;
       { const n = 2049, c = new Float32Array(n); for (let i = 0; i < n; i++) c[i] = Math.max(-1, Math.min(1, ((i / (n - 1)) * 2 - 1) * 4)); clSh.curve = c; }   // ±0.25 in → ±1 out: the knee at 1/4
-      level.connect(clDry); clDry.connect(outNode); level.connect(clPre); clPre.connect(clSh); clSh.connect(clPost); clPost.connect(clWet); clWet.connect(outNode);
+      ampOut.connect(clDry); clDry.connect(outNode); ampOut.connect(clPre); clPre.connect(clSh); clSh.connect(clPost); clPost.connect(clWet); clWet.connect(outNode);
       [outNode, clDry, clWet, clPre, clSh, clPost].forEach(n => ctx.track(n));
       function applyClip() {
         const on = !!P.get('clipOn'), c = Math.pow(10, P.get('ceiling') / 20), t = ac.currentTime;
@@ -368,6 +382,7 @@
       let lfo = null;
       const waves = {};
       // drawn shapes carry a DC term the oscillator cannot (PeriodicWave drops n = 0) → a ConstantSource adds it back
+      lfoBus.connect(amWowDepth);   // 4.2 the second filter wobbles with the first
       const drawDc = ac.createConstantSource(); drawDc.offset.value = 0; drawDc.connect(lfoBus); drawDc.start(); ctx.track(drawDc);
       const wave = (s, ph) => {
         if (s === 'draw') { const pts = cleanPts(P.get('shapePts')) || [[0, -1, 0], [0.5, 1, 0]], k = 'draw@' + JSON.stringify(pts) + (ph || 0).toFixed(2); return waves[k] || (waves[k] = drawWave(ac, pts, ph || 0)); }
@@ -472,6 +487,7 @@
       ['fmRatio', 'fmFine'].forEach(k => P.onChange(k, () => fmOsc.frequency.setTargetAtTime(curF * ratioOf(), ac.currentTime, 0.01)));
       P.onChange('subWave', (v) => { sub.type = v || 'sine'; });
       ['clipOn', 'ceiling'].forEach(k => P.onChange(k, applyClip)); applyClip();
+      ['ampOn', 'character', 'ampDrive', 'ampSplit', 'wow', 'mudCut', 'presence', 'glue'].forEach(k => P.onChange(k, applyAmp)); applyAmp();
       P.onChange('velCutoff', (v) => { if (!v) velBus.offset.setValueAtTime(0, ac.currentTime); });
       P.onChange('keyTrack', () => { keyBus.offset.setTargetAtTime(keyCents(curF), ac.currentTime, 0.01); });
       P.onChange('squash', applySquash);
@@ -600,7 +616,7 @@
       });
       ctx.shapeAt = (x) => drawFn(cleanPts(P.get('shapePts')) || [[0, -1, 0], [0.5, 1, 0]])(((x % 1) + 1) % 1);
       ctx.stateExtra = () => ({ vowels: VOWELS, key: ctx.key, divs: DIVS, shapes: SHAPES });
-      ctx.internals = { wt, combOut, cd1, msWet, finalOut, lp1, lp2, lp3, s12, s24, s36, lpOut, keyBus, envBus, velBus, lfo2, l2Pitch, l2Cut, l2Vol, l2Fm, ringVca, ringDepth, clWet, extra, outNode, bands, lfoBus, amp, uni, trem, vibG, noiseG, panA, panB, saw2, sub, drawDc, lfoLog, get lfo() { return lfo; }, get frozen() { return frozen; } };
+      ctx.internals = { amDry, amWet, amMono, amLo2, amHi2, amLim, ampOut, wt, combOut, cd1, msWet, finalOut, lp1, lp2, lp3, s12, s24, s36, lpOut, keyBus, envBus, velBus, lfo2, l2Pitch, l2Cut, l2Vol, l2Fm, ringVca, ringDepth, clWet, extra, outNode, bands, lfoBus, amp, uni, trem, vibG, noiseG, panA, panB, saw2, sub, drawDc, lfoLog, get lfo() { return lfo; }, get frozen() { return frozen; } };
       return {};
     },
   });

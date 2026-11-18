@@ -12,12 +12,6 @@
   'use strict';
   const SE = window.SongEngine; if (!SE) return;
   const TRIMS = [
-    ['oc-breathing-dnb', 'eravos.sub-engine', 0.5, 'pinned 0.39 → ~0.2 (sub); the Reese trimmed too'], ['oc-breathing-dnb', 'eravos.reese-bass', 0.75, 'the second-hottest part'],
-    ['oc-acid-seance', 'eravos.sub-engine', 0.5, 'pinned 0.25 → 0.15'], ['oc-acid-seance', 'eravos.acid-synth', 0.75, 'the acid line drove the rest'],
-    ['oc-funeral-dancehall', 'eravos.sub-engine', 0.5, 'pinned 0.24 → 0.15'],
-    ['oc-cathedral-riddim', 'eravos.sub-engine', 0.5, 'pinned 0.24 → ~0.18 (spread over wub, sub, drums)'], ['oc-cathedral-riddim', 'eravos.wub-osc', 0.55, 'the wub carried most of it'],
-    ['oc-machine-choir', 'eravos.wobble-bass', 0.6, 'pinned 0.30 → 0.03 without the wobble'],
-    ['oc-hanging-dub', 'eravos.wub-osc', 0.5, 'pinned 0.23 → 0.05 without the wub'], ['oc-hanging-dub', 'eravos.organ', 0.4, 'the organ: 0.23 → 0.09 without it'],
     ['reese-vs-wub', 'eravos.sub-engine', 0.5, 'pinned 0.41 → 0.17'], ['reese-vs-wub', 'eravos.reese-bass', 0.75, 'the Reese: 0.38 → 0.06 without it'],
     ['halftime-reese', 'eravos.sub-engine', 0.5, 'pinned 0.27 → 0.13'],
     ['drumstep', 'eravos.sub-engine', 0.5, 'pinned 0.23 → 0.12'],

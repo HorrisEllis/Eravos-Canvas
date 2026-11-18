@@ -1,0 +1,147 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "amp-chain",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "audio",
+ "kernel": "MusicParts.ampChain",
+ "ports": [
+  {
+   "id": "in",
+   "dir": "in",
+   "type": "audio",
+   "channels": 2,
+   "rate": "audio"
+  },
+  {
+   "id": "mod",
+   "dir": "in",
+   "type": "control",
+   "rate": "audio"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "audio",
+   "channels": 2,
+   "rate": "audio"
+  }
+ ],
+ "variables": [
+  {
+   "key": "on",
+   "type": "boolean",
+   "default": false,
+   "role": "mode"
+  },
+  {
+   "key": "character",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0.5,
+   "role": "colour"
+  },
+  {
+   "key": "drive",
+   "type": "number",
+   "min": 0,
+   "max": 30,
+   "default": 9,
+   "role": "drive",
+   "unit": "dB"
+  },
+  {
+   "key": "split",
+   "type": "number",
+   "min": 60,
+   "max": 250,
+   "default": 140,
+   "role": "tone",
+   "unit": "Hz"
+  },
+  {
+   "key": "wow",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "role": "depth"
+  },
+  {
+   "key": "mudCut",
+   "type": "number",
+   "min": 0,
+   "max": 12,
+   "default": 4,
+   "role": "tone",
+   "unit": "dB"
+  },
+  {
+   "key": "presence",
+   "type": "number",
+   "min": 0,
+   "max": 12,
+   "default": 3,
+   "role": "tone",
+   "unit": "dB"
+  },
+  {
+   "key": "glue",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0.5,
+   "role": "level"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "on",
+    "role": "mode",
+    "face": true
+   },
+   {
+    "key": "character",
+    "role": "colour",
+    "face": true
+   },
+   {
+    "key": "drive",
+    "role": "drive",
+    "face": true
+   },
+   {
+    "key": "split",
+    "role": "tone",
+    "face": false
+   },
+   {
+    "key": "wow",
+    "role": "depth",
+    "face": false
+   },
+   {
+    "key": "mudCut",
+    "role": "tone",
+    "face": false
+   },
+   {
+    "key": "presence",
+    "role": "tone",
+    "face": false
+   },
+   {
+    "key": "glue",
+    "role": "level",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.toggle",
+   "kit.knob"
+  ]
+ }
+}

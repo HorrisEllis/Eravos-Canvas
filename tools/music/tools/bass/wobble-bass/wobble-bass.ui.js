@@ -159,6 +159,7 @@ OrganismFactory.reg('eravos.wobble-bass', function (view) {
     ['slope', 'filterMode', (v) => v !== 'formant', 'Slope works in the LP / HP / BP / notch filters'],
     ['keyTrack', 'filterMode', (v) => v !== 'formant', 'Key track works in the LP / HP / BP / notch filters'],
     ['decay', 'sustain', (v) => v < 1, 'lower Sustain first'], ['ceiling', 'clipOn', (v) => !!v, 'turn the Clipper on'],
+    ...['character', 'ampDrive', 'ampSplit', 'wow', 'mudCut', 'presence', 'glue'].map(k => [k, 'ampOn', (v) => !!v, 'turn the Amp on']),
     ['lfo2Shape', 'lfo2Dest', (v) => v !== 'off', 'pick where LFO 2 goes'], ['lfo2Depth', 'lfo2Dest', (v) => v !== 'off', 'pick where LFO 2 goes'],
     ['wtTable', 'wtMix', (v) => v > 0, 'turn Wavetable up first'], ['wtPos', 'wtMix', (v) => v > 0, 'turn Wavetable up first'],
     ['lfo2Div', 'lfo2Sync', (v) => !!v, 'LFO 2 rate works with its Sync on'], ['lfo2Hz', 'lfo2Sync', (v) => !v, 'LFO 2 free works with its Sync off'],
@@ -202,6 +203,7 @@ OrganismFactory.reg('eravos.wobble-bass', function (view) {
     group('ENVELOPE+ — decay and sustain', ['decay', 'sustain']),
     group('LFO 2 — a second motion', ['lfo2Dest', 'lfo2Shape', 'lfo2Sync', 'lfo2Div', 'lfo2Hz', 'lfo2Depth']),
     group('WAVETABLE — a third voice', ['wtMix', 'wtTable', 'wtPos']),
+    group('AMP — the growl through an amp, sub kept clean', ['ampOn', 'character', 'ampDrive', 'ampSplit', 'wow', 'mudCut', 'presence', 'glue']),
     group('OUTPUT — mono low end, clipper', ['monoBelow', 'clipOn', 'ceiling']),
   ];
   const deepBox = h('div', { class: 'wb-deep', hidden: true }, deep.map(gEl => { Object.assign(gEl.style, { margin: '0 0 8px', breakInside: 'avoid' }); return gEl; }));
