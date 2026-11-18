@@ -2,71 +2,18 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
-## 3.193 CG3 — mutants that play (2026-11-16)
-His words: "I want that mutation done." · "So, and the engine is the core, correct? With the components."
-- A tool's DAG now becomes one running engine made only of its components' own kernels (tools/core/compat/assemble.js + the music
-  adapters). The proof it adds nothing: an oscillator into a filter, assembled, equals the two kernels run by hand to the last sample.
-- build/mutants.mjs mutates a parent voice (saw → 24 dB filter → tube → stereo), renders every mutant, and offers only the ones that play
-  cleanly and sound different. Seed 7: 5 of 6 offered (a swapped sub oscillator, tape saturation in two places, a pulse wave, a 12 dB filter);
-  the one not offered changed nothing audible. Other seeds caught clipping mutants and refused them.
-- tests/mutants.test.mjs: 20 checks (CI). Next: CG4, ⚄ MUTATE on the bench (preview first).
-
-## 3.192 CG2 — the compatibility graph and the mutation ops (2026-11-16)
-His words: "I want that mutation done. I want that. Imagine it'll be unlimited possibilities. And we're close."
-- tools/core/compat/compat.js: a pure, domain-free checker over the CG1 contracts — what feeds what (directly or through a declared bridge),
-  who can stand in for whom, whether a tool's DAG holds (known parts, fitting edges, variables in range, no loop unless marked feedback),
-  and the ops: swap, insert, rewire, vary, remove, and a seeded mutate that only offers mutants that check.
-- docs/compat-graph.md (generated, checked in CI): 34 components, 285 connections that fit, stand-ins per component, bridges used.
-- tests/compat.test.mjs: 36 checks on the real contracts (in CI).
-- Next: CG3 — one mutant assembled into an engine, rendered, and measured by the novelty gate.
-
-## 3.188 Deep songs, batch 1: six very different songs on 80s · Synth and six on Dubstep, each as deep as ERAVOS goes (2026-11-14)
-His words: "what next? the piano is hard for me but l love it. can you look at every major song of all synthwave, edm, dubstep, electronic, etc to make a wide contrast of songs per catagory that are as complex and deep as eravos can be. like per note edits, automation, tools wired to other tools, etc. curves, etc. as deep as possiblr"
-- The research first: docs/research/landmark-songs-techniques.md — the landmark records of each style and the technique each song takes
-  (technique only, never a melody). Spec: specs/eravos.deep-songs.spec (the depth checklist, the batches, the acceptance).
-- data/deep-songbook.js: one song per sub-style, each its own form, tempo, groove and palette, on the shelves that exist (no new category).
-  80s · Synth: Nightdrive Talk (half-time, a lead that talks: its vowel opening inside every note) · Outrun Key Change (octave bass, the Arp on
-  a pluck, a fuzzed solo, the last chorus up a whole step as a Pitch curve on every instrument) · Turbo Breakdown (darksynth, drive set note by
-  note, a half-time breakdown and a blast) · Sunset Bloom (dreamwave, electric piano strummed from one note, a sax-like lead that breathes) ·
-  Sequence 84 (the Moroder sequence, its filter opening over the whole song) · Galactic Warble (slow-motion funk, swung, a melt where the
-  tapes slow). Dubstep: Request Line Space (the original sound, space, one change at a time) · Cockney Wobble (a wobble rate per note, speeding
-  up inside the note) · Talking Machines (two basses in conversation) · Stop-Start Riddim (one figure, one change a bar, the FM moving) ·
-  Halo Fall (melodic: piano, pumping saws, a crying lead) · Metal Tearout (three basses switching every half bar).
-- Every song uses every per-note kind (a knob on the note, a knob curve inside it, a bend with its own LFO, a chord from one note, plays on pass
-  k, chance, ratchets that speed up / slow down, microtiming, humanize), ≥ 12 curve lanes on instruments, effects and the XY Pad, an LFO, the XY
-  Pad's X and Y, and a tool or effect driving another (sidechain envelopes, tape dropouts, Swarm coherence, Dynamics' gain reduction).
-- Found by the test, fixed: half the wires first named knob inputs a tool does not have (a tool's own input — cutoff, mix, feedback — is used
-  where it exists); a song clipped 0.12 % (levels down); every song now played at its loudest: no fault, nothing clipping.
-- His ear (2026-11-14): "Nightdrive-Talk.mp3 around .57 seconds, it sounds bad with the wobble. the rest sounds blown out." — measured part by
-  part: the talker's preset wobbled its vowel on a drawn 1/8 LFO (≈ 3 Hz at 89 BPM), the sub alone was as loud as the whole mix (−8.7 dB),
-  every kit alone peaked at full scale, the mixes ran −7 to −11 dB into the master. Fixed: the talker's LFO stopped (the talking is the vowel
-  per note), its drive and resonance tamed, the pump off the bass filter; every kit 0.55, every sub halved, a measured trim per song —
-  loudest sections now −10.8 to −14 dB, clipping ≤ 0.003 % (was up to 0.034 %), Nightdrive's verse −12.6 dB with the sub at −17.6.
-- His ear again (2026-11-14): "Turbo-Breakdown.mp3 at 0:57 is blown out." · "still overloads." — measured part by part: the build was the bass
-  alone, the XY Pad's drive route on it climbing to +14; then OTT's makeup gain pushing the bass's peaks to 0.99 whatever went in. Fixed: the
-  bass out of the build and the blast (it returns at the drop), the XY Pad onto the stabs' filter, OTT's out −6 dB and half wet, the grit's
-  out −4 dB, bass and kit down; Turbo's drops −13.4 dB, peak 0.78. Talking Machines, Stop-Start Riddim, Metal Tearout: the same OTT fix.
-- Found while re-rendering: Sequence 84 turned to NaN at bar 48 — the XY Pad's Y on top of the phaser's feedback curve passed 1. Every wire
-  into a feedback (echo or phaser) moved to a safe knob; P188 now guards it (no wire drives a feedback knob). Full render: no NaN.
-- "dont forget you can fade in" · "no not all" · "just ones that should.": fades chosen per song and part (pads, keys, risers, tails).
-- Proof: P188 18/18; P16 67/67 (every note in key), P172 1/1, P173 6/6, P44 29/29, P62 8/8, P58 18/18, boundary 10/10; songs decomposed
-  again (313). Hear them: node docs/previews/deep-songs.render.mjs <dir> (whole songs, MP3).
-## 3.187 Feelings — one feeling fills the pad; drag to play it (2026-11-13)
-His words: "i also want a actual tool for irrational frequencies, and unconvential harmonic data, like dragging around to create a nervous
-system response using poly vegal. like feelings or emotions as frequencies. make patterns from feelings." · "a full drag on a tool and have
-it play the sounds like a four way grid" · "i want love, anger which is low irratating pitch, sadness, like hanging tree or bite the hand that
-feeds you" · "all one feeling" · "no capture button or return" · "resize to add more dynamic range." · "then build it."
-- tools/music/tools/embodiment/feelings/: the picker (Love · Anger · Sadness) and the pad, the whole window. Drag = sound, let go = it fades
-  as the feeling does. Up = more of the feeling (−34 → −5 dB, brighter, higher); across = its colour (love: fuller, wider · anger: the
-  loudness wobble 30 → 150 Hz · sadness: far, wide, bending). Harmonics auto (Love harmonic, Anger √2, Sadness φ) or any irrational set; Hold,
-  Pitch, Level on the tool page; x / y automate; a note plays the feeling at its pitch.
-- components/ratio-set (NEW): the irrational sets as shared data — equal to Embodiment Lab's seven (read from its code), plus φ series,
-  primes, stretched string, membrane; numbers → ratios.
-- The research behind each feeling: docs/research/feelings-as-sound.md.
-- Found in the app: the pad's touch was dropped (ui_hooks) — fixed; the window test fails without the fix.
-- Odd Couples: Hanging Tree Sorrow in the break of Hanging Tree Dub; an Anger preset. Icon: heart.
-- Proof: Feelings 11/11 (the sound measured); ratio-set 37 checks; contracts 34/34; P43 6/6, P63 11/11, P183 2/2, P58 18/18, boundary 10/10,
-  no-toys; design check: Feelings clean (59 of 76). Hear it: node docs/previews/feelings-built.shots.mjs → docs/previews/feelings-{love,anger,sadness}.wav (one slow drag each; not committed).
+## 3.187 Gothic Organ 1.2 — irrational ranks (2026-11-15)
+His words: "Gothic Organ … was supposed to be like the hangining tree by queens of the stone age. like the beginning irrational freqeuncies." ·
+"All right. Yeah, so do it. … start it."
+- IRRATIONAL ranks beside the drawbars: partials at irrational ratios of the note that never line up, so they beat and drift. Ratios: hanging
+  (√2 φ √3 √5 e), bell (struck-bar modes), glass (π-based). Irrational (level), Ratios, Drift (each partial wanders on its own slow LFO, in cents).
+- Every irrational pipe exists on every note, silent at 0 (the drawbars' rule, 3.164), so the organ at Irrational 0 is today's organ, and the
+  knob, the ratio set and the drift reach a held note (axiom 4).
+- Proof: organ.test.js — at Irrational 1 a partial sits at 220·√2 Hz (20+ dB over the octave, 12+ dB over 30 cents off); at 0 that partial is
+  40+ dB down and every irrational pipe's gain is exactly 0 (adds nothing). Gothic Organ suite 21/21, organ 43/43 (P163 knob follow
+  included), design check no worse, no-toys, 263 manifests valid.
+- Not run: the null render — its record pass hung on preset 17 of 19 (Funeral Dancehall) for 18 minutes in this environment; the
+  gain-exactly-0 test stands in for it. Shown first: not yet — the three knobs are on the face's More panel (an addition, today's sound the default).
 
 ## 3.186 Bassline 2.0 — time, notes, locks and rests (shown, waiting for his yes) (2026-11-13)
 His words: "I love the bassline, needs more depth and control. like tempo and the cord tool. bassline is high leverage." (12:31:19Z) · "Okay.

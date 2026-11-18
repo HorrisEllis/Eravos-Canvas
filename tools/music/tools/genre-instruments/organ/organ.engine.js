@@ -16,7 +16,7 @@
   const RATIOS = [0.5, 1.5, 1, 2, 3, 4, 5, 6, 8], FEET = ["16'", "5⅓'", "8'", "4'", "2⅔'", "2'", "1⅗'", "1⅓'", "1'"];
   const DB = FEET.map((f, i) => ({ key: 'd' + i, type: 'integer', default: [8, 0, 8, 6, 0, 4, 0, 0, 2][i], min: 0, max: 8, label: f, group: 'DRAWBARS' }));
   OrganismFactory.define({
-    id: 'eravos.organ', preview: 'chord', domain: 'music', version: '1.1.0', label: 'Gothic Organ', icon: '⛪', accent: '#8a2be2', phase: 'P14',
+    id: 'eravos.organ', preview: 'chord', domain: 'music', version: '1.2.0', label: 'Gothic Organ', icon: '⛪', accent: '#8a2be2', phase: 'P14',
     category: 'Genre instruments', blurb: 'Dark organ: 9 drawbars, pipe tones, percussion, tube amp, spinning rotary speaker, beat-locked pulse, gothic chords, cathedral space.',
     size: { w: 600, h: 700 }, minSize: { w: 440, h: 460 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
@@ -46,6 +46,12 @@
       { key: 'chord', type: 'boolean', default: false, label: 'Gothic chord', group: 'GOTHIC', hint: 'each key plays a heavily detuned minor triad' },
       { key: 'scrape', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Eerie scrape', group: 'GOTHIC' },
       { key: 'pedal', type: 'boolean', default: true, label: 'Pedal', group: 'GOTHIC', hint: "16' + 32' under the lowest note" },
+      // 3.187 IRRATIONAL ranks — James, 2026-11-15: "was supposed to be like the hangining tree by queens of the stone age. like the beginning
+      // irrational freqeuncies." Partials at irrational ratios of the note (they never line up, so they beat and drift). Every pipe exists, silent
+      // at 0 (like the drawbars, 3.164), so the organ at Irrational 0 is today's organ, sample for sample, and the knob reaches held notes.
+      { key: 'irr', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Irrational', group: 'IRRATIONAL', hint: 'partials at irrational ratios: they never line up, they beat and drift' },
+      { key: 'irrSet', type: 'enum', options: ['hanging', 'bell', 'glass'], default: 'hanging', label: 'Ratios', group: 'IRRATIONAL', hint: 'hanging: √2 φ √3 √5 e · bell: struck-bar modes · glass: π-based' },
+      { key: 'irrDrift', type: 'number', default: 0.3, min: 0, max: 1, step: 0.01, label: 'Drift', group: 'IRRATIONAL', hint: 'each irrational partial wanders slowly, on its own' },
       { key: 'space', type: 'number', default: 0.55, min: 0, max: 1, step: 0.01, label: 'Cathedral', group: 'SPACE' },
       { key: 'dark', type: 'number', default: 2600, min: 400, max: 12000, step: 1, unit: 'Hz', label: 'Darkness', group: 'SPACE' },
       { key: 'attack', type: 'number', default: 0.08, min: 0.001, max: 6, step: 0.001, unit: 's', label: 'Attack', group: 'SPACE' },
@@ -116,11 +122,17 @@
       function updateWind() { const n = voices.filter(v => v.off === Infinity).length; dsp.setSmooth(wG.gain, P.get('wind') * 0.05 * Math.min(3, n), ac, 0.15); }
       const PIPES = { principal: [1, 0.38, 0.17, 0.09, 0.05, 0.03], flute: [1, 0.08, 0.12, 0.02], string: [1, 0.55, 0.42, 0.32, 0.25, 0.2, 0.15, 0.12, 0.1, 0.08] };
       const WAVES = {}; Object.keys(PIPES).forEach(k => { const h = PIPES[k], re = new Float32Array(h.length + 1), im = new Float32Array(h.length + 1); h.forEach((a, i) => { im[i + 1] = a; }); WAVES[k] = ac.createPeriodicWave(re, im); });
+      const IRR = { hanging: [Math.SQRT2, (1 + Math.sqrt(5)) / 2, Math.sqrt(3), Math.sqrt(5), Math.E], bell: [2.756, 5.404, 8.933, 13.345, 19.935], glass: [Math.PI / 2, Math.sqrt(2 * Math.PI), Math.PI, Math.PI * Math.SQRT2, Math.PI * Math.PI / 2] };
+      const irrLevel = () => Math.pow(P.get('irr'), 1.5) * 0.07;
+      // one slow wanderer per partial, shared by every voice (0.031–0.113 Hz, never in step): its depth is Drift, in cents
+      const irrDriftG = [0, 1, 2, 3, 4].map((k) => { const o = node(ac.createOscillator()), g = node(ac.createGain()); o.frequency.value = [0.031, 0.047, 0.067, 0.083, 0.113][k]; g.gain.value = P.get('irrDrift') * 14; o.connect(g); o.start(); return g; });
       function rank(f, nodes, dst, t) {
         const cel = P.get('celeste'), parts = [];
         for (let i = 0; i < 9; i++) { const lv = P.get('d' + i); const fr = f * RATIOS[i]; if (fr > ac.sampleRate * 0.45) continue; const o = ac.createOscillator(); const pw = WAVES[P.get('pipe')]; if (pw && fr * 10 < ac.sampleRate * 0.45) o.setPeriodicWave(pw); o.frequency.value = fr; o.detune.value = (i % 2 ? -1 : 1) * cel * (i === 2 ? 1 : 0.7); const g = ac.createGain(); g.gain.value = Math.pow(lv / 8, 1.5) * 0.11; g._bar = i; o._cel = (i % 2 ? -1 : 1) * (i === 2 ? 1 : 0.7); o.connect(g); g.connect(dst); o.start(t); nodes.push(o, g); parts.push(o); }
         const rd = P.get('reed'); if (rd > 0) { const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = Math.min(6000, f * 5); bp.Q.value = 1.2; const g = ac.createGain(); g.gain.value = rd * 0.12; o.connect(bp); bp.connect(g); g.connect(dst); o.start(t); nodes.push(o, bp, g); }
         const sc = P.get('scrape'); if (sc > 0) [1, 1.003, 0.997].forEach((k, j) => { const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f * 2 * k; const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = f * 2 * k; bp.Q.value = 8; const g = ac.createGain(); g.gain.value = sc * 0.07; const tr = ac.createOscillator(), trg = ac.createGain(); tr.frequency.value = 0.6 + j * 0.15; trg.gain.value = sc * 0.03; tr.connect(trg); trg.connect(g.gain); o.connect(bp); bp.connect(g); g.connect(dst); o.start(t); tr.start(t); nodes.push(o, bp, g, tr, trg); });
+        { const set = IRR[P.get('irrSet')] || IRR.hanging, lv = irrLevel();
+          set.forEach((r, k) => { const fr = f * r; if (fr > ac.sampleRate * 0.45) return; const o = ac.createOscillator(); o.frequency.value = fr; irrDriftG[k].connect(o.detune); const g = ac.createGain(); g.gain.value = lv / Math.sqrt(k + 1); g._irr = k; o._irrRatio = r; o.connect(g); g.connect(dst); o.start(t); nodes.push(o, g); }); }
         return parts;
       }
       // 3.41: perc and chiff end on their own (0.7 s / 0.1 s). They used to sit in the voice's node list, where release() pushed their
@@ -155,6 +167,9 @@
       // 3.164 the drawbars and celeste follow sounding notes (axiom 4). Every note has a pipe for every drawbar, silent while the drawbar is
       // closed, so a drawbar can be pulled out in the middle of a note (as on the instrument).
       for (let i = 0; i < 9; i++) P.onChange('d' + i, (lv) => { const now = ac.currentTime; voices.concat(pedalV ? [pedalV] : []).forEach(v => (v.nodes || []).forEach(n => { if (n._bar === i && n.gain) n.gain.setTargetAtTime(Math.pow(lv / 8, 1.5) * 0.11, now, 0.015); })); });
+      P.onChange('irr', () => { const now = ac.currentTime, lv = irrLevel(); voices.forEach(v => (v.nodes || []).forEach(n => { if (n._irr !== undefined) n.gain.setTargetAtTime(lv / Math.sqrt(n._irr + 1), now, 0.03); })); });
+      P.onChange('irrDrift', (d) => { const now = ac.currentTime; irrDriftG.forEach(g => g.gain.setTargetAtTime(d * 14, now, 0.1)); });
+      P.onChange('irrSet', () => { const now = ac.currentTime, set = IRR[P.get('irrSet')] || IRR.hanging; voices.forEach(v => { let k = 0; (v.nodes || []).forEach(n => { if (n._irrRatio !== undefined && n.frequency) { const base = n.frequency.value / n._irrRatio; n._irrRatio = set[k % set.length]; n.frequency.setTargetAtTime(base * n._irrRatio, now, 0.05); k++; } }); }); });
       P.onChange('celeste', (c) => { const now = ac.currentTime; voices.concat(pedalV ? [pedalV] : []).forEach(v => (v.nodes || []).forEach(n => { if (n._cel !== undefined && n.detune) n.detune.setTargetAtTime(n._cel * c, now, 0.015); })); });
       ['dark', 'tremRate', 'tremDepth', 'breathPeriod', 'breathDepth', 'space', 'level', 'wind'].forEach(k => P.onChange(k, apply)); ['drive', 'ampTone', 'pulse', 'rotary'].forEach(k => P.onChange(k, applyAmp)); P.onChange('rotorSpeed', rotorSpeed); ['pulseRate', 'pulseShape'].forEach(k => P.onChange(k, () => pulseStart(ac.currentTime))); rotorSpeed(); P.onChange('pedal', () => updatePedal(ac.currentTime)); apply();
       // 3.39: with Amp drive on, the whole organ passes the 2x shaper (128 samples) — notes start that much early (off: no shaper)
