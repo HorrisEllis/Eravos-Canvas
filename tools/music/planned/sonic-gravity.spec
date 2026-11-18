@@ -41,4 +41,4 @@ dag:
   layer 0: pattern-store ✓ · relationship-graph · scale-key ✓ · slew-lag
   tool: eravos.sonic-gravity ← relationship-graph + scale-key + pattern-store + slew-lag
   build order: pattern-store ✓ → relationship-graph → scale-key ✓ → slew-lag → sonic-gravity
-  shared with: pattern-store 24 · relationship-graph 12 · scale-key 14 · slew-lag 10  (other tools on each)
+  shared with: pattern-store 25 · relationship-graph 12 · scale-key 15 · slew-lag 11  (other tools on each)

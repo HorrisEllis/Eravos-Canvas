@@ -67,7 +67,7 @@ dag:
   layer 0: note-release ✓ · osc-wavetable ✓
   tool: eravos.syn-osc ← note-release + osc-wavetable
   build order: note-release ✓ → osc-wavetable ✓ → syn-osc
-  shared with: note-release 4 · osc-wavetable 11  (other tools on each)
+  shared with: note-release 4 · osc-wavetable 12  (other tools on each)
   in it now: note-release
   comes out of it: osc-wavetable
   planned: —

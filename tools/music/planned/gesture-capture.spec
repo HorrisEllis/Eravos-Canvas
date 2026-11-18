@@ -36,4 +36,4 @@ dag:
   layer 0: mod-ops · mpe-expression · pattern-store ✓ · slew-lag
   tool: eravos.gesture-capture ← pattern-store + slew-lag + mod-ops + mpe-expression
   build order: mod-ops → mpe-expression → pattern-store ✓ → slew-lag → gesture-capture
-  shared with: mod-ops 6 · mpe-expression 3 · pattern-store 24 · slew-lag 10  (other tools on each)
+  shared with: mod-ops 6 · mpe-expression 3 · pattern-store 25 · slew-lag 11  (other tools on each)

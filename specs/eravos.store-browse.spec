@@ -75,6 +75,12 @@
 open gaps: credit and authors (connecting with people, S7); paid / free (not asked); how a pack for a tool you do not have is shown
   (proposed: listed, with "needs <tool>").
 
+# ---- ADDENDUM 2026-11-13 — SB1: the preview, shown to him (nothing above is changed; nothing built)
+#   docs/previews/store-browse.preview.js + store-browse.shots.mjs → docs/previews/browse-1-domains … browse-7-notes.png: the ＋ Add menu's own
+#   layout and classes (rail · main · detail), real data — the catalog's 5 domains and tools, Retro DCO's announcement (12 components, 12
+#   elements), its 12 component contracts drawn as its DAG with each element's face controls, its 2 packs and 12 presets, and its 14 rhythms /
+#   95 lines decomposed from 24 songs. Waiting for his yes before SB2–SB3.
+
 # ---- ADDENDUM 2026-11-13 — the Browse UI: NO (his words; nothing above is changed)
 #   his words (2026-11-13T13:27:55Z, verbatim): "no. i like the current ui. do not change it."
 #   The SB1 preview (a Browse window: domains → tools → a tool's page with Needs, Packs, Sounds, Rhythms, Notes) was shown and rejected.
@@ -82,3 +88,8 @@ open gaps: credit and authors (connecting with people, S7); paid / free (not ask
 #   lost); SB3 (building it) is withdrawn. What does not change the look stays: the data under it (component contracts, each tool's announcement,
 #   songs decomposed) and the zip / import / interaction-contract work (SB4, store I1–I4), which has no UI. Any later way to reach packs,
 #   rhythms or notes goes through what exists today (＋ Add, the tool page) and is shown to him first — or not done.
+
+# ---- ADDENDUM 2026-11-14 — the SB1 preview's files merged as a record (nothing above is changed)
+#   his words (2026-11-14): "Merge other branches". claude/browse-preview held only the preview (pictures, the preview script, this spec's SB1
+#   note) — no app code. It is in main now so nothing is lost; the decision above stands: the Browse UI was rejected ("no. i like the current
+#   ui. do not change it."), nothing of it is built or loaded, SB3 stays withdrawn.

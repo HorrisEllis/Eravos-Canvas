@@ -166,7 +166,7 @@ dag:
   layer 1: pattern-field ✓
   tool: eravos.timeline ← pitch-path + mod-tree + pattern-field + curve-edit
   build order: curve-edit ✓ → mod-tree ✓ → pitch-path ✓ → scale-key ✓ → pattern-field ✓ → timeline
-  shared with: curve-edit 0 · mod-tree 0 · pitch-path 0 · scale-key 14 · pattern-field 1  (other tools on each)
+  shared with: curve-edit 0 · mod-tree 1 · pitch-path 1 · scale-key 15 · pattern-field 1  (other tools on each)
   in it now: pitch-path · mod-tree · pattern-field · curve-edit
   comes out of it: —
   planned: —

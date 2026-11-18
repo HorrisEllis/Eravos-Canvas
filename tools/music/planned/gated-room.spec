@@ -36,4 +36,4 @@ dag:
   layer 0: compressor · ducker · early-reflections · eq-parametric · gate-expander · reverb-fdn
   tool: eravos.gated-room ← reverb-fdn + early-reflections + gate-expander + compressor + eq-parametric + ducker
   build order: compressor → ducker → early-reflections → eq-parametric → gate-expander → reverb-fdn → gated-room
-  shared with: compressor 4 · ducker 15 · early-reflections 3 · eq-parametric 13 · gate-expander 0 · reverb-fdn 11  (other tools on each)
+  shared with: compressor 4 · ducker 15 · early-reflections 3 · eq-parametric 13 · gate-expander 0 · reverb-fdn 12  (other tools on each)

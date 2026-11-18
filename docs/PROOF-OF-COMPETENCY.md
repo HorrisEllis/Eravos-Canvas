@@ -71,6 +71,29 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-13 · Feelings: a tool from his words to a played instrument in one day, through four rejected or reshaped designs — PR (3.187)
+- **His words (2026-11-13):** "i also want a actual tool for irrational frequencies, and unconvential harmonic data, like dragging around …
+  like feelings or emotions as frequencies" · "a full drag on a tool and have it play the sounds like a four way grid" · "i want love, anger
+  which is low irratating pitch, sadness, like hanging tree or bite the hand that feeds you" · "all one feeling" · "no capture button or
+  return" · "resize to add more dynamic range." · "then build it."
+- **His call:** each design decision. A spec with a state triangle and breathing was rejected ("looks horrible. sounds horrible. no
+  breathing. no song."). A pad with four corners was rejected ("no corners"). He chose "all one feeling", removed the buttons, and asked for a bigger pad.
+- **Built (by the AI coder, to his direction):**
+  - A playable pad. The whole window is one feeling, and the drag moves it: up gives more of the feeling, across gives its own colour.
+  - Three feelings, each drawn from published research: anger is low and harsh with its loudness wobbling at 30–150 Hz (Morton 1977; Arnal 2015), sadness bends, and love is pure and close.
+  - The ratio-set component: the irrational sets as shared code. It is proved equal to Embodiment Lab's sets, not copied from them.
+- **Proof:**
+  - Feelings passes 11/11, with every acceptance measured in the sound:
+    - more than 18 dB from bottom to top
+    - anger's wobble lands at 30 Hz on the left and 150 Hz on the right
+    - anger has 4× love's low energy
+    - a move while it sounds reaches it
+    - peak ≤ 0.72
+  - A dropped-touch bug was found by playing it in the app, fixed, and guarded by a test that fails without the fix.
+  - ratio-set passes 37 checks, and the design check is clean.
+- **Check:** `node tests/run.mjs Feelings` · `node tools/music/components/ratio-set/ratio-set.test.mjs` · `node docs/previews/feelings-built.shots.mjs` (renders the WAVs) ·
+  `docs/research/feelings-as-sound.md`
+
 ### 2026-11-13 · Accountability: the full suite run, my own regressions found and fixed — PR (3.185)
 - **What happened:** a full run of the 1,600 in-page tests found 10 failures. I re-ran each failing suite on current main and on main from 2026-11-10 to find out which change caused it.
 - **Mine, now fixed:** six failures introduced by my work on 2026-11-12 and 2026-11-13, fixed at the cause:
