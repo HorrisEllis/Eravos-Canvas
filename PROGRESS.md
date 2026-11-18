@@ -2,6 +2,24 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.193 CG3 — mutants that play (2026-11-16)
+His words: "I want that mutation done." · "So, and the engine is the core, correct? With the components."
+- A tool's DAG now becomes one running engine made only of its components' own kernels (tools/core/compat/assemble.js + the music
+  adapters). The proof it adds nothing: an oscillator into a filter, assembled, equals the two kernels run by hand to the last sample.
+- build/mutants.mjs mutates a parent voice (saw → 24 dB filter → tube → stereo), renders every mutant, and offers only the ones that play
+  cleanly and sound different. Seed 7: 5 of 6 offered (a swapped sub oscillator, tape saturation in two places, a pulse wave, a 12 dB filter);
+  the one not offered changed nothing audible. Other seeds caught clipping mutants and refused them.
+- tests/mutants.test.mjs: 20 checks (CI). Next: CG4, ⚄ MUTATE on the bench (preview first).
+
+## 3.192 CG2 — the compatibility graph and the mutation ops (2026-11-16)
+His words: "I want that mutation done. I want that. Imagine it'll be unlimited possibilities. And we're close."
+- tools/core/compat/compat.js: a pure, domain-free checker over the CG1 contracts — what feeds what (directly or through a declared bridge),
+  who can stand in for whom, whether a tool's DAG holds (known parts, fitting edges, variables in range, no loop unless marked feedback),
+  and the ops: swap, insert, rewire, vary, remove, and a seeded mutate that only offers mutants that check.
+- docs/compat-graph.md (generated, checked in CI): 34 components, 285 connections that fit, stand-ins per component, bridges used.
+- tests/compat.test.mjs: 36 checks on the real contracts (in CI).
+- Next: CG3 — one mutant assembled into an engine, rendered, and measured by the novelty gate.
+
 ## 3.188 Deep songs, batch 1: six very different songs on 80s · Synth and six on Dubstep, each as deep as ERAVOS goes (2026-11-14)
 His words: "what next? the piano is hard for me but l love it. can you look at every major song of all synthwave, edm, dubstep, electronic, etc to make a wide contrast of songs per catagory that are as complex and deep as eravos can be. like per note edits, automation, tools wired to other tools, etc. curves, etc. as deep as possiblr"
 - The research first: docs/research/landmark-songs-techniques.md — the landmark records of each style and the technique each song takes
