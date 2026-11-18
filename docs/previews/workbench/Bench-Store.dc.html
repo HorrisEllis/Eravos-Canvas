@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Workbench · the store</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1700px; height: 1060px; box-sizing: border-box; position: relative; background: #04070C; color: #D8F6FF; font-family: 'DM Mono', monospace; font-size: 11px; overflow: hidden">
+<div style="position: absolute; left: 0; top: 0; right: 0; height: 40px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid #0F1A26">
+<span style="color: #D8F6FF; font-size: 12px; letter-spacing: 2px">Store</span>
+<button type="button" onClick="{{toComp}}" style="{{compBtn}}">COMPONENTS</button>
+<button type="button" onClick="{{toPrim}}" style="{{primBtn}}">PRIMITIVES</button>
+<button type="button" onClick="{{toggleFits}}" style="{{fitsBtn}}">{{fitsLabel}}</button>
+<span style="color: #6E8BA3; font-size: 10px; letter-spacing: 1px">{{count}}</span>
+<span style="margin-left: auto; color: #6E8BA3; font-size: 10px; letter-spacing: 1px">drag onto the bench to snap · it passes the gate or it doesn't land</span>
+</div>
+<div style="position: absolute; left: 0; top: 40px; width: 1060px; bottom: 0; border-right: 1px solid #0F1A26; overflow: hidden; padding: 14px; box-sizing: border-box">
+<sc-if value="{{isComp}}" hint-placeholder-val="{{true}}">
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{cards}}" as="c" hint-placeholder-count="12">
+<div style="border: 1px solid #1B2A3A; background: #060A12; padding: 10px; display: flex; flex-direction: column; gap: 5px; height: 136px; box-sizing: border-box; overflow: hidden">
+<div style="display: flex; justify-content: space-between; gap: 6px"><span style="color: #D8F6FF; font-size: 12px">{{c.name}}</span><span style="color: #4E6A80; font-size: 9px">{{c.stage}}</span></div>
+<span style="{{c.fitStyle}}">{{c.fit}}</span>
+<sc-if value="{{c.hasThumb}}" hint-placeholder-val="{{false}}"><img src="{{c.thumb}}" alt="its UI element" style="height: 34px; max-width: 100%; object-fit: cover; object-position: left top; display: block; border: 1px solid #1F2733"></sc-if>
+<span style="color: #3DDC97; font-size: 9px">in &#160;{{c.ins}}</span>
+<span style="color: #FF6B9A; font-size: 9px">out {{c.outs}}</span>
+<span style="color: #4E6A80; font-size: 9px; white-space: nowrap; overflow: hidden">{{c.vars}}</span>
+</div>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{isPrim}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; color: #6E8BA3; font-size: 10px; line-height: 1.6">
+<span style="color: #D8F6FF">The smallest gated pieces: what a component is made of.</span>
+<span>Today they live inside each component's kernel, written again in each. Found by reading the code; each becomes its own piece with its own gate when it is extracted, and every component that uses it nulls against itself after the swap.</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{prims}}" as="p" hint-placeholder-count="8">
+<div style="border: 1px dashed #7A8FA3; background: #060A12; padding: 12px; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between"><span style="color: #D8F6FF; font-size: 13px">{{p.name}}</span><span style="color: #7A8FA3; font-size: 9px">○ INSIDE KERNELS · NOT EXTRACTED</span></div>
+<span style="color: #B8CFE0; font-size: 10px">{{p.what}}</span>
+<span style="color: #4E6A80; font-size: 9px">found in &#160;{{p.found}}</span>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</div>
+<div style="position: absolute; left: 1060px; top: 40px; right: 0; bottom: 0; padding: 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+<span style="color: #6E8BA3; font-size: 10px; letter-spacing: 2px">ON THE BENCH</span>
+<div style="position: relative; width: 600px; height: 449px">
+<img src="/_blob/c553de4b8969c0f62a8e4ca83124e0c7" alt="Wobble Bass on the bench" style="width: 600px; height: 449px; display: block; opacity: 0.9">
+<div style="position: absolute; left: 196px; top: 330px; width: 200px; height: 60px; border: 2px dashed #3DDC97; background: #3DDC9714; display: flex; align-items: center; justify-content: center; color: #3DDC97; font-size: 10px; letter-spacing: 1px">drop · after the filter</div>
+</div>
+<div style="border: 1px solid #3DDC97; background: #060A12; padding: 12px; display: flex; flex-direction: column; gap: 6px; font-size: 10px; color: #B8CFE0">
+<span style="color: #D8F6FF; font-size: 12px">delay-line → Wobble Bass</span>
+<span><span style="color: #3DDC97">✓ types</span> &#160;audio → audio</span>
+<span><span style="color: #3DDC97">✓ order</span> &#160;placed after the filter, before the amp (its stage: space)</span>
+<span><span style="color: #3DDC97">✓ role</span> &#160;nothing in Wobble has its role: no tension</span>
+<span><span style="color: #00D4FF">+ face</span> &#160;its element joins the face: time · feedback · mix …</span>
+<span><span style="color: #7A8FA3">null</span> &#160;at mix 0 the tool must null against Wobble Bass (to run)</span>
+</div>
+<span style="color: #4E6A80; font-size: 9px; line-height: 1.6">Illustrative: the gate checker (WB2) and the drop are not built. Ports and settings on every card are the components' real, checked contracts; fits are read from the types alone.</span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1700,"height":1060}}'>
+const CARDS = [{"name": "filter-formant", "stage": "filter", "ins": "in:audio", "outs": "out:audio", "vars": "A, B, pos, shift, q", "fit": "IN ITS DAG", "fc": "#FF2266", "fits": true, "thumb": "/_blob/912dec1ab62bd1a75a0afdfe3a35993f"}, {"name": "filter-svf", "stage": "filter", "ins": "in:audio", "outs": "out:audio", "vars": "frequency, detune, resonance, gain, mode +1", "fit": "IN ITS DAG", "fc": "#FF2266", "fits": true, "thumb": "/_blob/871436a3eb0cf83b56616c8555aca2bb"}, {"name": "lfo", "stage": "mod", "ins": "reset:trigger", "outs": "out:control", "vars": "shape, rate, phase, fade, unipolar", "fit": "IN ITS DAG", "fc": "#FF2266", "fits": true, "thumb": "/_blob/a82305cb07cf2ca5b6998eeb9b706a15"}, {"name": "note-release", "stage": "amp", "ins": "off:note", "outs": "gain:control", "vars": "release", "fit": "IN ITS DAG", "fc": "#FF2266", "fits": true, "thumb": "/_blob/9651b71d06ec14f1a0887cad167e2c86"}, {"name": "osc-sub", "stage": "source", "ins": "pitch:pitch \u00b7 align:control", "outs": "out:audio", "vars": "octave, shape", "fit": "IN ITS DAG", "fc": "#FF2266", "fits": true, "thumb": "/_blob/7d24b866866cb9b559921422033c99fb"}, {"name": "osc-va", "stage": "source", "ins": "pitch:pitch", "outs": "out:audio", "vars": "shape, width", "fit": "IN ITS DAG", "fc": "#FF2266", "fits": true, "thumb": "/_blob/381da63d193adaa283687bbffc7f9fcf"}, {"name": "osc-wavetable", "stage": "source", "ins": "pitch:pitch \u00b7 position:control", "outs": "out:audio", "vars": "pos", "fit": "IN ITS DAG", "fc": "#FF2266", "fits": true, "thumb": ""}, {"name": "stereo-tools", "stage": "out", "ins": "in:audio", "outs": "out:audio", "vars": "width, hz", "fit": "IN ITS DAG", "fc": "#FF2266", "fits": true, "thumb": "/_blob/a97f10cfc378ee04b43313c46b5c4d89"}, {"name": "unison-stack", "stage": "source", "ins": "\u2014", "outs": "layout:data", "vars": "voices, detune, curve, spread, blend +2", "fit": "IN ITS DAG", "fc": "#FF2266", "fits": true, "thumb": "/_blob/b7b6101f8d58cda3f9eb4dad30f6311c"}, {"name": "bbd-line", "stage": "space", "ins": "in:audio", "outs": "out:audio", "vars": "time, stages, hiss, bleed, compand", "fit": "FITS \u00b7 INSERT IN THE CHAIN", "fc": "#3DDC97", "fits": true, "thumb": ""}, {"name": "bitcrusher", "stage": "shape", "ins": "in:audio", "outs": "out:audio", "vars": "bits, rate, aa, jitter, dither +1", "fit": "FITS \u00b7 INSERT IN THE CHAIN", "fc": "#3DDC97", "fits": true, "thumb": ""}, {"name": "delay-line", "stage": "space", "ins": "in:audio", "outs": "out:audio", "vars": "time, sync, bpm, feedback, damp +7", "fit": "FITS \u00b7 INSERT IN THE CHAIN", "fc": "#3DDC97", "fits": true, "thumb": ""}, {"name": "ensemble-core", "stage": "space", "ins": "in:audio", "outs": "out:audio", "vars": "taps, base, depth, rate, depth2 +4", "fit": "FITS \u00b7 INSERT IN THE CHAIN", "fc": "#3DDC97", "fits": true, "thumb": ""}, {"name": "filter-ladder", "stage": "filter", "ins": "in:audio", "outs": "out:audio", "vars": "frequency, detune, resonance, drive, bass +1", "fit": "FITS \u00b7 INSERT IN THE CHAIN", "fc": "#3DDC97", "fits": true, "thumb": ""}, {"name": "karplus-string", "stage": "source", "ins": "excite:audio \u00b7 pitch:pitch", "outs": "out:audio", "vars": "t60, bright, stretch, detune", "fit": "FITS \u00b7 INSERT IN THE CHAIN", "fc": "#3DDC97", "fits": true, "thumb": ""}, {"name": "modal-resonator", "stage": "filter", "ins": "in:audio", "outs": "out:audio", "vars": "shape, modes, t60", "fit": "FITS \u00b7 INSERT IN THE CHAIN", "fc": "#3DDC97", "fits": true, "thumb": ""}, {"name": "saturator-tape", "stage": "shape", "ins": "in:audio", "outs": "out:audio", "vars": "drive, bias, bump, bumpFreq, hf +2", "fit": "FITS \u00b7 INSERT IN THE CHAIN", "fc": "#3DDC97", "fits": true, "thumb": ""}, {"name": "saturator-tube", "stage": "shape", "ins": "in:audio", "outs": "out:audio", "vars": "drive, bias, tone, out, mix", "fit": "FITS \u00b7 INSERT IN THE CHAIN", "fc": "#3DDC97", "fits": true, "thumb": ""}, {"name": "env-adsr", "stage": "mod", "ins": "gate:gate", "outs": "out:control", "vars": "attack, decay, sustain, release", "fit": "FITS \u00b7 MODULATES A KNOB", "fc": "#00D4FF", "fits": true, "thumb": ""}, {"name": "random-source", "stage": "mod", "ins": "\u2014", "outs": "value:control \u00b7 events:gate", "vars": "rate, smooth, dist, a, b +6", "fit": "FITS \u00b7 MODULATES A KNOB", "fc": "#00D4FF", "fits": true, "thumb": ""}, {"name": "tape-transport", "stage": "mod", "ins": "\u2014", "outs": "speed:control \u00b7 lag:control", "vars": "speed, stop, stopTime, startTime, curve +2", "fit": "FITS \u00b7 MODULATES A KNOB", "fc": "#00D4FF", "fits": true, "thumb": ""}, {"name": "curve-edit", "stage": "mod", "ins": "curve:curve \u00b7 stroke:curve", "outs": "out:curve", "vars": "", "fit": "NEEDS A BRIDGE", "fc": "#FFAA00", "fits": false, "thumb": ""}, {"name": "osc-noise", "stage": "source", "ins": "\u2014", "outs": "out:audio", "vars": "colour, density, rate, tilt, width +1", "fit": "NEEDS A BRIDGE", "fc": "#FFAA00", "fits": false, "thumb": ""}, {"name": "pitch-path", "stage": "pitch", "ins": "path:curve", "outs": "out:pitch", "vars": "win, eps, max", "fit": "NEEDS A BRIDGE", "fc": "#FFAA00", "fits": false, "thumb": ""}, {"name": "voice-allocator", "stage": "voice", "ins": "notes:note", "outs": "voices:data", "vars": "voices, mode, steal, release", "fit": "NEEDS A BRIDGE", "fc": "#FFAA00", "fits": false, "thumb": ""}];
+const PRIMS = [{"name": "phase accumulator", "what": "the running phase every oscillator and LFO turns", "found": "lfo \u00b7 osc-sub \u00b7 bitcrusher \u00b7 mod-tree \u00b7 random-source"}, {"name": "PolyBLEP step", "what": "band-limits a hard edge (saw, square)", "found": "osc-va \u00b7 osc-sub"}, {"name": "tanh soft clip", "what": "the curve a saturator bends through", "found": "osc-sub \u00b7 saturator-tape \u00b7 saturator-tube"}, {"name": "seeded random", "what": "one seed, the same sequence every time", "found": "lfo \u00b7 osc-noise \u00b7 bbd-line \u00b7 bitcrusher \u00b7 mod-tree \u2026"}, {"name": "one-pole smoother", "what": "the exp(\u22121/\u03c4) step that slews a value", "found": "filter-svf \u00b7 filter-ladder \u00b7 delay-line \u00b7 karplus-string \u00b7 bbd-line \u2026"}, {"name": "ZDF integrator", "what": "the zero-delay trapezoid every analogue-style filter stands on", "found": "filter-svf \u00b7 filter-ladder"}, {"name": "fractional read", "what": "reads between two samples of a buffer", "found": "delay-line \u00b7 osc-wavetable"}, {"name": "ring buffer", "what": "the circular memory a delay writes into", "found": "delay-line \u00b7 bbd-line \u00b7 karplus-string \u2026"}];
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { tab: 'components', fits: false }; }
+  renderVals() {
+    const comp = this.state.tab === 'components', fits = !!this.state.fits;
+    const tabBtn = (on) => 'border: 1px solid ' + (on ? '#00D4FF' : '#1B2A3A') + '; color: ' + (on ? '#00D4FF' : '#6E8BA3') + '; background: ' + (on ? '#06202C' : 'none') + '; padding: 5px 12px; font: 500 10px DM Mono, monospace; letter-spacing: 2px; cursor: pointer';
+    const cards = CARDS.filter((c) => !fits || c.fits).map((c) => ({ ...c, fitStyle: 'color: ' + c.fc + '; font-size: 9px; letter-spacing: 1px', hasThumb: !!c.thumb }));
+    return {
+      isComp: comp, isPrim: !comp, cards, prims: PRIMS,
+      toComp: () => this.setState({ tab: 'components' }), toPrim: () => this.setState({ tab: 'primitives' }),
+      toggleFits: () => this.setState({ fits: !fits }),
+      compBtn: tabBtn(comp), primBtn: tabBtn(!comp), fitsBtn: tabBtn(fits),
+      fitsLabel: fits ? 'FITS WOBBLE BASS ✓' : 'FITS WOBBLE BASS',
+      count: comp ? (cards.length + ' shown · 33 built · 111 mapped') : (PRIMS.length + ' found inside kernels · none extracted yet')
+    };
+  }
+}
+</script>
+</body>
+</html>

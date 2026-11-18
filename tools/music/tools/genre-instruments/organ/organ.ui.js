@@ -24,6 +24,6 @@ OrganismFactory.reg('eravos.organ', function (view) {
   UI.instrumentPanel(view, { color: '#8a2be2', low: 36, high: 72, height: 60,
     header: [UI.paramControl(view, cfg('rotorSpeed')).el, UI.paramControl(view, cfg('chord')).el, UI.paramControl(view, cfg('pedal')).el],
     top: [h('div', { style: { display: 'grid', gridTemplateColumns: '1fr 150px', gap: '8px' } }, [bars, win])],
-    keys: ['pipe', 'perc', 'percHarm', 'drive', 'ampTone', 'rotary', 'pulse', 'pulseRate', 'pulseShape', 'celeste', 'chiff', 'wind', 'reed', 'tremRate', 'tremDepth', 'breathPeriod', 'breathDepth', 'scrape', 'space', 'dark', 'attack', 'release', 'level'],
+    keys: ['pipe', 'perc', 'percHarm', 'drive', 'ampTone', 'rotary', 'pulse', 'pulseRate', 'pulseShape', 'celeste', 'chiff', 'wind', 'reed', 'tremRate', 'tremDepth', 'breathPeriod', 'breathDepth', 'scrape', 'irr', 'irrSet', 'irrDrift', 'space', 'dark', 'attack', 'release', 'level'],
     hint: 'Rotor slow/fast spins the speaker up or down like the real thing. Pulse throbs locked to the beat; Amp drive pushes it through a tube amp. Pull the drawbars down to open each rank. Celeste detunes alternate ranks (the haunted beating); Breath swells the whole organ slowly; Gothic chord turns every key into a detuned minor triad.' });
 });
