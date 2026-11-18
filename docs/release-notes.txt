@@ -1,3 +1,17 @@
+ERAVOS v0.2.25 (2026-11-18)
+
+Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.25.exe from the release.
+
+- Wobble Bass 4.2: Amp — a growl chain with the sub kept clean and centered (off by default): oversampled drive with a Character curve
+  (soft → gainy), a second filter riding the LFO (Wow), mud cut, presence, de-fizz, glue and a limiter. New preset: Centered Growl Chain.
+  The chain is now its own component, sound unchanged (34 of 34 presets null).
+- Reese Bass 2.1: Deep Sub inside the Reese — sub shape, drop, sustain / decay, click and floor, each off until moved; two Deep Sub presets.
+- Gothic Organ 1.2: irrational ranks (hanging, bell, glass) — silent at 0, and they reach notes already held.
+- Feelings 0.2: the pad now moves the tone and depth, Anger cleaned up, Sadness heard.
+- The Odd Couples packs, presets and songs are removed.
+- Underneath (no new UI): the compatibility graph, mutation, and mutants assembled from their components that are offered only if they
+  play and are heard.
+
 ERAVOS v0.2.24 (2026-11-14)
 
 Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.24.exe from the release.
