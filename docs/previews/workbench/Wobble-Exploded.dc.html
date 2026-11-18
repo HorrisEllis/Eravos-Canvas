@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Workshop · Wobble Bass › components</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Bebas+Neue&amp;display=swap">
+<style>
+body{margin:0}
+.piece{transition: left 2.8s cubic-bezier(.22,.8,.25,1), top 2.8s cubic-bezier(.22,.8,.25,1), outline-color 1.2s ease; cursor: pointer;}
+.fade{transition: opacity 1.4s ease;}
+.tb{border: 1px solid #1B2A3A; color: #6E8BA3; padding: 4px 10px; font-size: 10px; letter-spacing: 2px; background: none; font-family: 'DM Mono', monospace; cursor: pointer}
+.lab{color: #4E6A80; font-size: 10px; letter-spacing: 2px}
+</style>
+</helmet>
+<div style="width: 1700px; height: 1300px; box-sizing: border-box; position: relative; background: #04070C; color: #D8F6FF; font-family: 'DM Mono', monospace; overflow: hidden; font-size: 11px">
+<div style="position: absolute; left: 0; top: 0; right: 0; height: 40px; z-index: 5; background: #04070CE6; display: flex; align-items: center; gap: 12px; padding: 0 14px; border-bottom: 1px solid #0F1A26">
+<span style="color: #D8F6FF; font-size: 12px; letter-spacing: 2px">Wobble Bass</span>
+<button type="button" onClick="{{explode}}" style="{{explodedBtn}}">EXPLODE</button>
+<button type="button" onClick="{{flat}}" style="{{flatBtn}}">ASSEMBLE</button>
+<span style="color: #6E8BA3; font-size: 10px; letter-spacing: 1px">{{hint}}</span>
+</div>
+<div style="position: absolute; left: 0; top: 0; width: 1700px; height: 1300px">
+<img src="/_blob/5c9f487b4606647d3dd3bc9133884421" alt="the blank tool surface: Wobble Bass's window with every element lifted off, the background layer" class="fade" style="{{surfaceStyle}}">
+<sc-for list="{{pieces}}" as="p" hint-placeholder-count="22">
+<div class="fade" style="{{p.wireStyle}}">
+<svg width="1700" height="1300" viewBox="0 0 1700 1300" aria-hidden="true"><path d="{{p.d}}" fill="none" stroke="{{p.col}}" stroke-opacity="0.75" stroke-width="2" stroke-dasharray="{{p.dasharray}}"></path><circle cx="{{p.bx}}" cy="{{p.by}}" r="4" fill="{{p.col}}"></circle></svg>
+</div>
+</sc-for>
+<div class="fade" style="{{coreStyle}}">
+<span style="font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 5px; color: #D8F6FF">WOBBLE BASS · CORE</span>
+<span style="color: #FF2266; font-size: 10px">wobble-bass.engine.js · the worklet</span>
+<span style="color: #B8CFE0; font-size: 10px; line-height: 1.5">the voice · the signal order · the AudioParams · the tempo lock</span>
+</div>
+<sc-for list="{{pieces}}" as="p" hint-placeholder-count="22">
+<button type="button" class="piece" aria-label="{{p.label}}" style="{{p.style}}" onClick="{{p.onPick}}">
+<img src="{{p.url}}" alt="{{p.label}}" style="{{p.imgStyle}}">
+<span class="fade" style="{{p.tagStyle}}">{{p.tag}}</span>
+</button>
+</sc-for>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1700,"height":1300}}'>
+const PIECES = [{"id": "preset", "comp": "packs", "sub": "presets \u00b7 data beside the tool", "url": "/_blob/b3cf47f01d0afec3bfe7ef2284a5b248", "w": 232, "h": 32, "hx": 308, "hy": 166, "ex": 138, "ey": 106, "col": "#CC44FF", "mark": "PACK", "dash": false, "d": "M254 138 C 505 138, 505 540, 756 540", "bx": 756, "by": 540, "lines": ["data, never in the engine", "loads into every component"], "delay": 0.0}, {"id": "shape-tabs", "comp": "lfo", "sub": "shape", "url": "/_blob/19cc71c8f590f391fe553ca9cba84989", "w": 240, "h": 42, "hx": 1142, "hy": 160, "ex": 1312, "ey": 100, "col": "#3DDC97", "mark": "\u2713 BUILT", "dash": false, "d": "M1432 142 C 1187 142, 1187 540, 942 540", "bx": 942, "by": 540, "lines": ["shape: 7 options (contract)"], "delay": 0.06}, {"id": "lfo-rate", "comp": "lfo", "sub": "rate grid \u00b7 sync \u00b7 retrig", "url": "/_blob/a82305cb07cf2ca5b6998eeb9b706a15", "w": 350, "h": 222, "hx": 312, "hy": 210, "ex": 142, "ey": 180, "col": "#3DDC97", "mark": "\u2713 BUILT", "dash": false, "d": "M492 291 C 630 291, 630 540, 767 540", "bx": 767, "by": 540, "lines": ["in  reset \u00b7 trigger \u00b7 block", "out out \u00b7 control \u22121\u20261 \u00b7 audio", "rate 0.01\u201350 Hz \u00b7 phase 0\u20131 \u00b7 fade 0\u201310 s"], "delay": 0.12}, {"id": "perform", "comp": "own:perform", "sub": "XY \u00b7 rate \u00d7 \u00b7 mouth Hz", "url": "/_blob/da7bb03fa5187867cbd9eba348ea8365", "w": 350, "h": 183, "hx": 312, "hy": 442, "ex": 142, "ey": 452, "col": "#B8CFE0", "mark": "OWN", "dash": false, "d": "M492 544 C 596 544, 596 585, 700 585", "bx": 700, "by": 585, "lines": ["Wobble's own: drives lfo rate + filter cutoff"], "delay": 0.18}, {"id": "env-shape", "comp": "env-msseg", "sub": "drawn shape \u00b7 yoi \u00b7 talk", "url": "/_blob/d442d6db1b20762634309360a607b8b3", "w": 350, "h": 215, "hx": 312, "hy": 635, "ex": 142, "ey": 685, "col": "#7A8FA3", "mark": "\u25cb PLANNED", "dash": true, "d": "M492 792 C 596 792, 596 689, 700 689", "bx": 700, "by": 689, "lines": ["not built: contract to write"], "delay": 0.24}, {"id": "step-mod", "comp": "step-mod", "sub": "wub seq \u00b7 steps", "url": "/_blob/12bd16298d2221bb506aff2bd7d7cb1f", "w": 352, "h": 307, "hx": 670, "hy": 210, "ex": 670, "ey": 160, "col": "#7A8FA3", "mark": "\u25cb PLANNED", "dash": true, "d": "M846 467 C 846 504, 848 504, 848 540", "bx": 848, "by": 540, "lines": ["not built: contract to write"], "delay": 0.3}, {"id": "filter-formant", "comp": "filter-formant", "sub": "vowels A \u00b7 B", "url": "/_blob/912dec1ab62bd1a75a0afdfe3a35993f", "w": 352, "h": 73, "hx": 670, "hy": 525, "ex": 670, "ey": 740, "col": "#FF2266", "mark": "\u25cf IN IT", "dash": false, "d": "M846 740 C 846 715, 848 715, 848 690", "bx": 848, "by": 690, "lines": ["in  in \u00b7 audio", "out out \u00b7 audio", "A \u00b7 B \u00b7 pos \u00b7 shift \u00b7 q"], "delay": 0.36}, {"id": "rate-beyond", "comp": "lfo", "sub": "rate bend \u00b7 phase \u00b7 depth", "url": "/_blob/fddca330f2caebfaa5fc744b4a699240", "w": 352, "h": 93, "hx": 670, "hy": 605, "ex": 670, "ey": 850, "col": "#3DDC97", "mark": "\u2713 BUILT", "dash": false, "d": "M846 850 C 846 770, 849 770, 849 690", "bx": 849, "by": 690, "lines": ["phase 0\u20131 \u00b7 depth (Wobble's scale)"], "delay": 0.42}, {"id": "mouth", "comp": "filter-svf", "sub": "cutoff \u00b7 reso", "url": "/_blob/871436a3eb0cf83b56616c8555aca2bb", "w": 352, "h": 91, "hx": 670, "hy": 705, "ex": 670, "ey": 980, "col": "#3DDC97", "mark": "\u2713 BUILT", "dash": false, "d": "M846 980 C 846 835, 849 835, 849 690", "bx": 849, "by": 690, "lines": ["in  in \u00b7 audio", "out out \u00b7 audio", "frequency \u00b7 detune \u00b7 resonance \u00b7 mode \u00b7 stages"], "delay": 0.48}, {"id": "fm", "comp": "osc-fm-operator", "sub": "FM \u00b7 ratio \u00b7 FM wub", "url": "/_blob/573ee3519263fef68282d58e917c9ee3", "w": 268, "h": 80, "hx": 1032, "hy": 212, "ex": 1202, "ey": 167, "col": "#00D4FF", "mark": "\u2197 COMES OUT", "dash": false, "d": "M1336 247 C 1143 247, 1143 540, 949 540", "bx": 949, "by": 540, "lines": ["inside Wobble now: contract to write"], "delay": 0.54}, {"id": "grit", "comp": "waveshaper", "sub": "grit \u00b7 drive \u00b7 type", "url": "/_blob/d4794a426d7c4f7280141f2741c1fee7", "w": 348, "h": 66, "hx": 1032, "hy": 292, "ex": 1202, "ey": 272, "col": "#7A8FA3", "mark": "\u25cb PLANNED", "dash": true, "d": "M1202 305 C 1069 305, 1069 540, 935 540", "bx": 935, "by": 540, "lines": ["not built: contract to write"], "delay": 0.6}, {"id": "squash", "comp": "clipper", "sub": "squash", "url": "/_blob/0439d29f9a1cab2503452e7d5304a2f4", "w": 67, "h": 67, "hx": 1035, "hy": 358, "ex": 1205, "ey": 363, "col": "#00D4FF", "mark": "\u2197 COMES OUT", "dash": false, "d": "M1205 396 C 1088 396, 1088 540, 972 540", "bx": 972, "by": 540, "lines": ["inside Wobble now: contract to write"], "delay": 0.66}, {"id": "pitch", "comp": "own:pitch", "sub": "bends \u00b7 dives \u00b7 glide", "url": "/_blob/7beb43f2b8a30b28725fa34a3ffd8ade", "w": 350, "h": 92, "hx": 1030, "hy": 442, "ex": 1200, "ey": 472, "col": "#B8CFE0", "mark": "OWN", "dash": false, "d": "M1200 518 C 1100 518, 1100 573, 1000 573", "bx": 1000, "by": 573, "lines": ["Wobble's own"], "delay": 0.72}, {"id": "osc-va", "comp": "osc-va", "sub": "square", "url": "/_blob/381da63d193adaa283687bbffc7f9fcf", "w": 128, "h": 70, "hx": 1032, "hy": 558, "ex": 1182, "ey": 618, "col": "#3DDC97", "mark": "\u2713 BUILT", "dash": false, "d": "M1182 653 C 1091 653, 1091 632, 1000 632", "bx": 1000, "by": 632, "lines": ["in  pitch \u00b7 audio", "out out \u00b7 audio", "shape \u00b7 width"], "delay": 0.78}, {"id": "osc-sub", "comp": "osc-sub", "sub": "sub \u00b7 in phase", "url": "/_blob/7d24b866866cb9b559921422033c99fb", "w": 150, "h": 70, "hx": 1160, "hy": 558, "ex": 1345, "ey": 618, "col": "#3DDC97", "mark": "\u2713 BUILT", "dash": false, "d": "M1345 653 C 1172 653, 1172 627, 1000 627", "bx": 1000, "by": 627, "lines": ["in  pitch \u00b7 audio \u00b7 align \u00b7 control", "out out \u00b7 audio", "octave \u00b7 shape"], "delay": 0.84}, {"id": "unison", "comp": "unison-stack", "sub": "unison", "url": "/_blob/b7b6101f8d58cda3f9eb4dad30f6311c", "w": 73, "h": 70, "hx": 1305, "hy": 558, "ex": 1525, "ey": 618, "col": "#3DDC97", "mark": "\u2713 BUILT", "dash": false, "d": "M1525 653 C 1262 653, 1262 623, 1000 623", "bx": 1000, "by": 623, "lines": ["out layout \u00b7 data \u00b7 block", "voices \u00b7 detune \u00b7 curve \u00b7 spread \u00b7 blend"], "delay": 0.9}, {"id": "width", "comp": "stereo-tools", "sub": "width", "url": "/_blob/a97f10cfc378ee04b43313c46b5c4d89", "w": 57, "h": 60, "hx": 1035, "hy": 628, "ex": 1185, "ey": 733, "col": "#00D4FF", "mark": "\u2197 COMES OUT", "dash": false, "d": "M1185 763 C 1092 763, 1092 681, 1000 681", "bx": 1000, "by": 681, "lines": ["in  in \u00b7 audio", "out out \u00b7 audio", "width \u00b7 hz"], "delay": 0.96}, {"id": "noise", "comp": "own:noise", "sub": "noise", "url": "/_blob/da0747778fe51a074a37381b8245ab97", "w": 56, "h": 60, "hx": 1090, "hy": 628, "ex": 1270, "ey": 733, "col": "#B8CFE0", "mark": "OWN", "dash": false, "d": "M1270 763 C 1135 763, 1135 668, 1000 668", "bx": 1000, "by": 668, "lines": ["Wobble's own (osc-noise exists)"], "delay": 1.02}, {"id": "volwub", "comp": "own:vol-wub", "sub": "vol wub", "url": "/_blob/258491ad1deb372d4a5b695cb63a03ed", "w": 53, "h": 60, "hx": 1145, "hy": 628, "ex": 1355, "ey": 733, "col": "#B8CFE0", "mark": "OWN", "dash": false, "d": "M1355 763 C 1178 763, 1178 659, 1000 659", "bx": 1000, "by": 659, "lines": ["Wobble's own"], "delay": 1.08}, {"id": "release", "comp": "note-release", "sub": "attack \u00b7 release", "url": "/_blob/9651b71d06ec14f1a0887cad167e2c86", "w": 112, "h": 60, "hx": 1196, "hy": 628, "ex": 1436, "ey": 733, "col": "#FF2266", "mark": "\u25cf IN IT", "dash": false, "d": "M1436 763 C 1218 763, 1218 653, 1000 653", "bx": 1000, "by": 653, "lines": ["in  off \u00b7 note \u00b7 event", "out gain \u00b7 control \u00b7 audio", "release"], "delay": 1.14}, {"id": "level", "comp": "own:level", "sub": "level", "url": "/_blob/7189a29d27a965a098fcce2b5629f57d", "w": 73, "h": 60, "hx": 1305, "hy": 628, "ex": 1575, "ey": 733, "col": "#B8CFE0", "mark": "OWN", "dash": false, "d": "M1575 763 C 1288 763, 1288 646, 1000 646", "bx": 1000, "by": 646, "lines": ["Wobble's own"], "delay": 1.2}, {"id": "keys", "comp": "own:keys", "sub": "every key its own note", "url": "/_blob/c387f692beca52231471f08eca5bc963", "w": 1084, "h": 64, "hx": 308, "hy": 858, "ex": 308, "ey": 1188, "col": "#B8CFE0", "mark": "OWN", "dash": false, "d": "M850 1188 C 850 939, 850 939, 850 690", "bx": 850, "by": 690, "lines": ["Wobble's own: pitch + gate out"], "delay": 1.26}];
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { exploded: false, flip: {}, sel: 'lfo-rate' }; }
+  renderVals() {
+    const e = !!this.state.exploded, flip = this.state.flip || {};
+    const isOut = (p) => e ? !flip[p.id] : !!flip[p.id];
+    const outCount = PIECES.filter(isOut).length;
+    const any = outCount > 0;
+    const pick = (p) => () => { const f = Object.assign({}, flip); f[p.id] = !f[p.id]; this.setState({ flip: f, sel: p.id }); };
+    const pieces = PIECES.map((p, i) => { const o = isOut(p); return {
+      url: p.url, label: p.comp + ' · ' + p.sub, onPick: pick(p),
+      style: 'padding: 0; border: 0; background: none; position: absolute; left: ' + (o ? p.ex : p.hx) + 'px; top: ' + (o ? p.ey : p.hy) + 'px; width: ' + p.w + 'px; height: ' + p.h + 'px; outline: 1px ' + (p.dash ? 'dashed ' : 'dashed ') + (o ? p.col : 'transparent') + '; outline-offset: 5px; transition-delay: ' + (o && e ? p.delay : 0) + 's' + (this.state.sel === p.id && o ? '; box-shadow: 0 0 0 2px ' + p.col : ''),
+      imgStyle: 'display: block; width: ' + p.w + 'px; height: ' + p.h + 'px',
+      tagStyle: 'position: absolute; left: -5px; top: -22px; white-space: nowrap; font: 500 10px DM Mono, monospace; letter-spacing: 1px; color: ' + p.col + '; opacity: ' + (o ? 1 : 0) + '; transition-delay: ' + (o ? 2.2 : 0) + 's',
+      tag: p.comp + ' · ' + p.sub + '  ' + p.mark,
+      wireStyle: 'position: absolute; left: 0; top: 0; pointer-events: none; opacity: ' + (o ? 1 : 0) + '; transition-delay: ' + (o ? 2.2 : 0) + 's',
+      d: p.d, col: p.col, bx: p.bx, by: p.by, dasharray: p.dash ? '6 4' : 'none'
+    }; });
+    const s = PIECES.find((p) => p.id === this.state.sel) || PIECES[2];
+    const layers = PIECES.map((p) => ({ url: p.url, name: p.comp, sub: p.sub, col: p.col, mark: p.mark, eye: isOut(p) ? '◉ off' : '◎ in', pick: () => this.setState({ sel: p.id }), rowStyle: 'width: 100%; border: 0; border-bottom: 1px solid #0B1420; text-align: left; font-family: DM Mono, monospace; color: inherit; display: grid; grid-template-columns: 54px 1fr 54px; gap: 8px; align-items: center; padding: 5px 10px; border-bottom: 1px solid #0B1420; cursor: pointer; background: ' + (this.state.sel === p.id ? '#06202C' : 'transparent') }));
+    const btn = (on) => 'border: 1px solid ' + (on ? '#00D4FF' : '#1B2A3A') + '; color: ' + (on ? '#00D4FF' : '#6E8BA3') + '; padding: 4px 10px; font-size: 10px; letter-spacing: 2px; background: ' + (on ? '#06202C' : 'none') + '; font-family: DM Mono, monospace; cursor: pointer';
+    return {
+      pieces, layers,
+      explode: () => this.setState({ exploded: true, flip: {} }),
+      flat: () => this.setState({ exploded: false, flip: {} }),
+      explodedBtn: btn(e), flatBtn: btn(!e),
+      selTitle: s.comp.toUpperCase(), selSub: s.sub + ' · ' + s.mark, selLines: s.lines.map((t) => ({ t })), selCol: 'color: ' + s.col,
+      coreStyle: 'position: absolute; left: 700px; top: 540px; width: 300px; height: 150px; box-sizing: border-box; background: #060A12; border: 2px solid #FF2266; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 14px 18px; opacity: ' + (any ? 1 : 0) + '; transition-delay: ' + (any ? 1.4 : 0) + 's',
+      surfaceStyle: 'position: absolute; left: 300px; top: 120px; width: 1100px; height: 824px; display: block; opacity: ' + (e ? 0 : 1) + '; transition-delay: ' + (e ? 0.4 : 0) + 's',
+      status: 'COMPONENTS 22 · GATED 22 · NULL 2 OF 22 · OFF ' + outCount,
+      hint: e || any ? 'click a piece to snap it back in' : 'click a piece to snap it off'
+    };
+  }
+}
+</script>
+</body>
+</html>
