@@ -39,4 +39,4 @@ dag:
   layer 0: filter-bank · filter-formant ✓ · grain-cloud · pitch-shifter · pitch-tracker · vocal-tract
   tool: eravos.voice-architect ← vocal-tract + filter-bank + filter-formant + pitch-shifter + grain-cloud + pitch-tracker
   build order: filter-bank → filter-formant ✓ → grain-cloud → pitch-shifter → pitch-tracker → vocal-tract → voice-architect
-  shared with: filter-bank 4 · filter-formant 7 · grain-cloud 7 · pitch-shifter 11 · pitch-tracker 5 · vocal-tract 0  (other tools on each)
+  shared with: filter-bank 4 · filter-formant 8 · grain-cloud 7 · pitch-shifter 11 · pitch-tracker 5 · vocal-tract 0  (other tools on each)

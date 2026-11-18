@@ -2,33 +2,34 @@
 
 His words (2026-11-13): "also songs decomposed one by one." · "rhythmes and notes per tool." — specs/eravos.song-decomposition.spec.
 
-301 songs taken apart (300 from the Song Engine, 1 from recipes); none failed.
-84548 part-bars → 3934 distinct rhythms and 4617 distinct lines across 22 tools (the same content kept once; each names the songs it came from).
+313 songs taken apart (312 from the Song Engine, 1 from recipes); none failed.
+87978 part-bars → 4034 distinct rhythms and 4789 distinct lines across 23 tools (the same content kept once; each names the songs it came from).
 
 | tool | rhythms | lines | bars played |
 |---|---:|---:|---:|
-| eravos.pads | 3168 | 0 | 21748 |
-| eravos.pad-forge | 20 | 411 | 16504 |
-| eravos.sub-engine | 17 | 197 | 9560 |
-| eravos.supersaw | 65 | 884 | 6330 |
-| eravos.retro-poly | 42 | 759 | 6062 |
-| eravos.wobble-bass | 20 | 184 | 3856 |
-| eravos.bass-forge | 21 | 395 | 2904 |
+| eravos.pads | 3216 | 0 | 22636 |
+| eravos.pad-forge | 21 | 419 | 16688 |
+| eravos.sub-engine | 17 | 209 | 9884 |
+| eravos.retro-poly | 51 | 783 | 6602 |
+| eravos.supersaw | 67 | 897 | 6522 |
+| eravos.wobble-bass | 31 | 212 | 4109 |
+| eravos.bass-forge | 29 | 409 | 2971 |
 | eravos.coven | 22 | 336 | 2720 |
 | eravos.reese-bass | 15 | 102 | 2464 |
-| eravos.organ | 5 | 97 | 2320 |
-| eravos.wub-osc | 11 | 82 | 1722 |
+| eravos.organ | 7 | 101 | 2392 |
+| eravos.wub-osc | 15 | 92 | 1774 |
+| eravos.retro-dco | 21 | 125 | 1668 |
 | eravos.syn-partials | 16 | 86 | 1630 |
 | eravos.syn-osc | 13 | 104 | 1384 |
-| eravos.retro-dco | 14 | 95 | 1224 |
-| eravos.swarm-oscillator | 5 | 36 | 800 |
+| eravos.swarm-oscillator | 5 | 37 | 825 |
+| eravos.acid-synth | 392 | 521 | 760 |
 | eravos.xen-synth | 7 | 163 | 744 |
-| eravos.acid-synth | 391 | 517 | 712 |
-| eravos.curve-synth | 11 | 138 | 608 |
+| eravos.curve-synth | 11 | 142 | 623 |
+| eravos.arp | 2 | 13 | 492 |
 | eravos.embodiment-lab | 1 | 11 | 480 |
-| eravos.arp | 1 | 10 | 456 |
+| eravos.piano | 6 | 22 | 410 |
 | eravos.drum-forge | 68 | 0 | 160 |
-| eravos.piano | 1 | 10 | 160 |
+| eravos.feelings | 1 | 5 | 40 |
 
 Not decomposed into notes: Make a song for her (recipe — its notes come from a sequencer starter, not clips; its tools are listed).
 

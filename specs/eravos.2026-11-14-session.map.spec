@@ -1,0 +1,35 @@
+# spec_id: eravos.2026-11-14-session · status: mapped (each line: built / rule / open) · author: James Brooks
+# His words, verbatim. The same list across sessions: docs/HIS-WORDS-MAP.md (N-X44 …) · the evidence register: docs/competence/.
+
+## (2026-11-14) — verbatim:
+  > what next? the piano is hard for me but l love it. can you look at every major song of all synthwave, edm, dubstep, electronic, etc to make a wide contrast of songs per catagory that are as complex and deep as eravos can be. like per note edits, automation, tools wired to other tools, etc. curves, etc. as deep as possiblr
+  - SPEC: specs/eravos.deep-songs.spec · RESEARCH: docs/research/landmark-songs-techniques.md (technique only)
+  - BUILT 3.188 (batch 1): tools/music/data/deep-songbook.js — 80s · Synth ×6, Dubstep ×6, each its own sub-style and form, every per-note
+    kind, ≥ 12 lanes, LFO, XY Pad, a tool driving a tool; tests/p188 18/18
+  - OPEN: batch 2 (House · Garage, Techno · Trance · Hard, Trap · Phonk · Future) · batch 3 (Drum & Bass, Chill · Ambient, Dark · Goth,
+    Reggae · Dub) — each heard first · the piano "is hard for me but l love it": what is hard is his to say (a gentler layout shown first)
+
+## (after the first renders) — verbatim:
+  > dead silent for me
+  - the MP3s were 32 kHz (the render's rate); re-encoded at 44.1 kHz and sent again (the content measured −11.8 dB, not silent)
+  > merge, push, and release when complete
+  > Nightdrive-Talk.mp3 around .57 seconds, it sounds bad with the wobble. the rest sounds blown out.
+  - FIXED (3.188): the talker's drawn 1/8 LFO stopped, its drive / resonance tamed, the pump off the bass filter; gain staging for all twelve
+    (kits 0.55, subs halved, a measured trim per song): clipping ≤ 0.003 %, loudest sections −10.8 to −14 dB
+  - then: merge #187 and #188, release
+
+## (after the gain staging) — verbatim:
+  > Turbo-Breakdown.mp3 at 0:57 is blown out. its fucked up. dont forget you can fade in.
+  - measured: 0:57 is the build — per-note bass drive up to 18 / 24 into grit and OTT, the filter opening to 9 kHz, the XY Pad adding drive,
+    the glitch to 80 %. FIXED: drive per note 3 / 7, the build opens to 3.5 kHz, glitch to 45 %, XY to 60 %, grit and OTT down
+  > no not all
+  > just ones that should.
+  - RULE: fades only where a fade belongs (pads, keys, washes at an intro; a riser through its build; the tails of an outro) — chosen per song
+    and part (FADES in data/deep-songbook.js); drums and basses that should hit enter at full level
+
+## (after 0.2.23) — verbatim:
+  > still overloads.
+  - MEASURED and FIXED (0.2.24): Turbo's build was the bass alone with the XY Pad driving it; OTT's makeup pushed peaks to 0.99 — the bass out of
+    the builds, OTT out −6 dB / half wet, the XY Pad onto the stabs; the same OTT fix on three dubstep songs; Sequence 84's NaN (a wire on top of
+    a phaser's feedback) — no wire drives a feedback knob (P188 guards it)
+

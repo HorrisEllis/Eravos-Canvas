@@ -39,4 +39,4 @@ dag:
   layer 0: chaos-attractor · markov-chain · probability-gate · random-source ✓ · scale-key ✓ · seed-registry ✓
   tool: eravos.controlled-chaos ← random-source + chaos-attractor + markov-chain + probability-gate + seed-registry + scale-key
   build order: chaos-attractor → markov-chain → probability-gate → random-source ✓ → scale-key ✓ → seed-registry ✓ → controlled-chaos
-  shared with: chaos-attractor 4 · markov-chain 3 · probability-gate 9 · random-source 7 · scale-key 14 · seed-registry 13  (other tools on each)
+  shared with: chaos-attractor 4 · markov-chain 3 · probability-gate 9 · random-source 8 · scale-key 15 · seed-registry 13  (other tools on each)
