@@ -1,0 +1,24 @@
+/* ERAVOS core — field/board.css: a tool exploded on the canvas (board.js). The board's own language: dark ground, each part in a dashed gate
+ * frame in its status colour, its label above, wired to the core. The parts inside are the tool's own live face, unchanged. */
+.fb-board{position:absolute;pointer-events:none;color:#D8F6FF;font-family:'DM Mono',monospace}
+.fb-board .fb-gate,.fb-board .fb-lab,.fb-board .fb-core{pointer-events:auto}
+.fb-wires{position:absolute;left:0;top:0;overflow:visible}
+.fb-late{opacity:0;transition:opacity 1.4s ease}
+.fb-board.apart .fb-late{opacity:1;transition-delay:2.2s}
+.fb-head{position:absolute;left:0;top:0;right:0}
+.fb-head > div{position:relative!important}
+.fb-core{position:absolute;left:740px;top:560px}
+.fb-core > div{position:static!important;left:auto!important;top:auto!important}
+.fb-legend > div{position:absolute}
+.fb-since{position:absolute;font:500 10px 'DM Mono',monospace;letter-spacing:2px;color:#4E6A80;white-space:nowrap}
+.fb-gate{position:absolute;padding:6px;border:1px dashed color-mix(in srgb,var(--c) 55%,transparent);background:#04070C;
+  transition:transform 2.8s cubic-bezier(.22,.8,.25,1),border-color 1.2s ease}
+.fb-board:not(.apart) .fb-gate{border-color:transparent}
+.fb-gate.lifting{transition:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 30%,transparent);z-index:5}
+.fb-lab{position:absolute;left:0;top:-24px;font:500 10px 'DM Mono',monospace;letter-spacing:1px;white-space:nowrap;cursor:grab;user-select:none;opacity:0;transition:opacity 1.4s ease}
+.fb-board.apart .fb-lab{opacity:1;transition-delay:2.2s}
+.fb-lab span{opacity:.7}
+.fb-inner{display:block}
+.fb-inner.row{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+.fb-inner > .wb-card,.fb-inner > .uk-group{margin:0!important}
+.wm-win.fb-away{visibility:hidden;pointer-events:none}

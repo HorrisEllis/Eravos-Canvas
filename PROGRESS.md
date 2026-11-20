@@ -2,6 +2,21 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.196 A tool exploded on the canvas, live — Wobble Bass in the Field board, editable (2026-11-20)
+His words: "okay now let me edit and change the wobble base. also i feel it should be a canvas in itself. so i can scroll around"
+- tools/core/field/board.js (window.FieldBoard, domain-free): a tool's live window lifted apart onto the canvas itself — each part (a card by
+  its title, controls by their data-key, a selector) moved (not copied) into its gate frame, labelled, wired to the tool's core; the board's
+  header, core and legend; the whole tool first, then each gate flies from where its parts were in the window (FLIP). Everything stays live:
+  turn a knob, draw the shape, play the keys. Pan, zoom and scroll as everywhere on the canvas. Drag a gate by its label (kept per tool);
+  a live part taller than the board's picture pushes the gate under it down. Right-click the board or the window: put it back together.
+- Wobble Bass: wobble-bass.board.js (files.extra), GENERATED from the board file by docs/previews/workbench/build-field.mjs --data — the
+  22 pieces' places, labels, gates and wires are the board's own; below it, what it has grown since that board (FILTER+, GROWL+, ENVELOPE+,
+  LFO 2, WAVETABLE, AMP = amp-chain, OUTPUT), every part live.
+- Proof: tests/p196 1/1 (29 parts found, the same live controls moved, a control in a gate still sets the tool, put back where they were);
+  boundary 10/10, bare-canvas, validate, Wobble 49/49, P102, P63, P119, P16; screenshots docs/previews/workbench/field-live-*.png
+  (node docs/previews/workbench/field-live.shots.mjs).
+- Not yet: swapping Wobble Bass's components (its sound is still its own engine — the WD track, CG7); the colours are the app's theme (live parts).
+
 ## 3.194 WD1 — Wobble Bass broken down, part 1: the Amp chain is a component (2026-11-16)
 His words: "the tools need to be broken down as well into their respective components, like the ones that existed before started doing the mutation."
 - components/amp-chain: Wobble Bass 4.2's AMP stage moved out unchanged (same nodes, wires, values) with its contract (ports in / mod / out,

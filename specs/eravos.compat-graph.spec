@@ -256,3 +256,15 @@ acceptance (CG0): this spec, the map's numbers reproducible: grep the specs' dep
 #   using this for learning, one component at a time?"): TOOL › learn — a bare oscillator on the bench, then one component at a time: what
 #   fits after the output (the graph), each explained from its own contract (what it takes, gives, which roles it shapes, which controls to
 #   move first), heard without it and with it (A / B), then added; any domain's components teach themselves the same way.
+
+## ADDENDUM 2026-11-20 (5) — a tool exploded on the canvas, live (nothing above is changed)
+# his words (2026-11-20, verbatim): "why 10?" · "okay now let me edit and change the wobble base. also i feel it should be a canvas in itself.
+#   so i can scroll around"
+# built (3.196): tools/core/field/board.js — a tool's LIVE window lifted apart onto the canvas (its world: pan, zoom, scroll) as its board: the
+#   parts moved into gates, labelled, wired to the core, the whole tool first then blown apart; every part still plays and edits the tool (its
+#   own engine); gates move by their labels; put back together from the menu. A tool offers it with <tool>.board.js (its content); Wobble
+#   Bass's is generated from the board file (build-field.mjs --data). Editing its SOUND parts here is real now; SWAPPING them waits on CG7
+#   (its parts as components with adapters, its DAG as data, the null against its engine).
+# why 10 (answered): 10 components have adapters; 12 more sound parts need only an adapter each (filter-formant, amp-chain, bbd-line,
+#   ensemble-core, modal-resonator, karplus-string, osc-noise, osc-wavetable, lfo, random-source, tape-transport, oscillator-population);
+#   13 are logic (notes, patterns, harmony, curves, data) and need a note / data node; settings are not yet modulation inputs.
