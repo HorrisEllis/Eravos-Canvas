@@ -14,8 +14,8 @@ describe('P200 mutate any tool, any document', () => {
       const board = document.querySelector('.fb-board[data-instance="' + a + '"]'), gs = [...board.querySelectorAll('.fb-gate')].map(g => g.getBoundingClientRect()).concat([board.querySelector('.fb-core').getBoundingClientRect()]);
       let ov = 0; for (let i = 0; i < gs.length; i++) for (let j = i + 1; j < gs.length; j++) { const A = gs[i], B = gs[j]; if (A.left < B.right - 2 && B.left < A.right - 2 && A.top < B.bottom - 2 && B.top < A.bottom - 2) ov++; }
       assert.equal(ov, 0, 'no gate covers another or the core');
-      const chip = board.querySelector('.fb-swap'); assert.ok(chip && /svf 24/.test(chip.textContent) && /VCF/.test(chip.closest('.fb-gate').textContent), 'the filter socket ⇄ on the VCF gate');
-      h.view.emit('config_change', { key: 'filter', value: 'ladder' }); await TH.sleep(30); assert.ok(/ladder/.test(chip.textContent), 'the chip follows the swap');
+      const chip = [...board.querySelectorAll('.fb-gate.fb-comp')].filter(g => /VCF/.test(g.textContent)).map(g => g.querySelector('.fb-tile'))[0]; assert.ok(chip && /svf 24|SVF/.test(chip.textContent), 'the VCF box carries its filter as a tile: ' + (chip && chip.textContent));
+      h.view.emit('config_change', { key: 'filter', value: 'ladder' }); await TH.sleep(60); assert.ok(/ladder/.test(chip.textContent), 'the tile follows the swap');
       const dock = board.querySelector('.fm-dock'); assert.ok(dock, '⚄ MUTATE on its board');
       const before = JSON.stringify(h.ctx.params.all ? h.ctx.params.all() : {}); dock.mutateNow(); await TH.sleep(30);
       assert.ok(/→/.test(dock.querySelector('.fm-line').textContent), 'it says what it changed: ' + dock.querySelector('.fm-line').textContent);

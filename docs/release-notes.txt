@@ -1,3 +1,18 @@
+ERAVOS v0.2.28 (2026-11-21)
+
+Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.28.exe from the release.
+
+- Swap components between tools, blown up on the canvas: right-click a tool › ✦ Explode on the canvas (do it with two). Each component box
+  carries its component as a tile — drag it onto another box, in the same tool or the other one (the boxes it fits light up), and that box
+  takes it with its settings: Retro DCO's ladder into Wobble Bass's mouth, its Juno chorus after Wobble Bass's amp, Wobble Bass's wobble into
+  Retro DCO's LFO. ✕ deletes a component; the PARTS tray holds new ones to drag in. What is in a box shows as its own controls.
+- ⚄ MUTATE on every tool blown up on the canvas (and on the Workshop's board): it learns what you keep and throw, never the same twice, and
+  can pull parts from another tool blown up beside it.
+- Any tool can be blown up on the canvas now, not only Wobble Bass.
+- Wobble Bass: more parts can go in — noise colours, an echo, the Juno chorus after the amp. Nothing changes until you put one in (every
+  preset sounds as before).
+- New: Wobble Builder (＋ Add › Bass) — a wobble from shared parts that can synthesize a tool of its own.
+
 ERAVOS v0.2.27 (2026-11-20)
 
 Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.27.exe from the release.

@@ -176,6 +176,23 @@
                       "pedal": {
                         "type": "boolean"
                       },
+                      "irr": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "irrSet": {
+                        "enum": [
+                          "hanging",
+                          "bell",
+                          "glass"
+                        ]
+                      },
+                      "irrDrift": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
                       "space": {
                         "type": "number",
                         "minimum": 0,

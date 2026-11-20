@@ -82,7 +82,8 @@
       drag(lab, g, p, toolId, instanceId);
     });
     if (L.auto) { placeAuto({ gates, core, board, svg, head }); gates.forEach(x => { const u = user[x.p.id]; if (u) { x.g.style.left = (u.x - 6) + 'px'; x.g.style.top = (u.y - 6) + 'px'; } }); }   // where he moved a gate wins
-    sockets(instanceId).forEach(sk => { const holds = (k) => k && gates.find(gg => gg.g.querySelector('[data-key="' + k + '"]')), x = holds(sk.near) || holds(sk.key) || (sk.group && gates.find(gg => String((gg.p.take && gg.p.take.title) || '').toUpperCase().split(/[ —-]/)[0] === String(sk.group).toUpperCase())); if (x) swapChip(instanceId, x, sk); });   // …else the gate of its group   // on the gate of the part it stands in for (near), else where the socket is
+    components(instanceId, toolId, gates);   // every component box: a click picks a new one or another tool's
+    // (2026-11-20: no ⇄ chips — each component box carries its component as a tile: drag it, ✕ it, drop a new one from the tray)
     // a live part can be taller than the picture on the board it replaces: a gate that would cover the one under it pushes that one down
     // (only the board's own places — a gate he moved stays where he put it)
     const placed = L.auto ? [] : gates.filter(x => !user[x.p.id]).sort((a, b) => a.g.offsetTop - b.g.offsetTop);
@@ -111,7 +112,7 @@
     A(head, [{ opacity: 0, transform: 'translateY(-18px)' }, { opacity: 1, transform: 'none' }], { duration: T(800), delay: T(1750), easing: EASE.out });
     [legend, since].filter(Boolean).forEach(el => A(el, [{ opacity: 0 }, { opacity: 1 }], { duration: T(900), delay: T(2500), easing: 'ease-out' }));
     drawWires(st, T(1900));
-    mutateDock(instanceId, st, T);
+    mutateDock(instanceId, st, T); tray(instanceId, st, T);
     const view = fitView(board), cam = view ? glideTo(view, T(1300)) : Promise.resolve();
     board.addEventListener('contextmenu', (e) => { if (e.target.closest('.fb-inner')) return; e.preventDefault(); e.stopPropagation(); const CM = global.ContextMenu;
       if (CM && CM.show) CM.show(e.clientX, e.clientY, [{ label: '◱ Put it back together', hint: 'every part back into its window (Esc)', run: () => assemble(instanceId) },
@@ -164,14 +165,14 @@
     document.removeEventListener('keydown', st.onKey);
     const finish = () => {
       st.took.slice().reverse().forEach(({ e, ph, hidden, display }) => { if (ph.parentNode) { ph.parentNode.insertBefore(e, ph); ph.remove(); } e.hidden = hidden; e.style.display = display; });
-      st.gates.forEach(x => { if (x.swap) x.swap.remove(); }); st.board.remove(); st.win.classList.remove('fb-away'); open.delete(instanceId);
+      st.gates.forEach(x => { if (x.swap) x.swap.remove(); if (x.block) x.block.remove(); if (x.tile) x.tile.remove(); }); st.board.remove(); st.win.classList.remove('fb-away'); open.delete(instanceId);
       [st.anims.win].concat(st.anims.scene || []).forEach(a => { if (a) a.cancel(); });
       return true;
     };
     if (now) { const r = finish(); if (wm && wm.applyView) { wm.view = Object.assign({}, st.before); wm.applyView(); } st.leaving = Promise.resolve(r); return st.leaving; }
     st.board.getAnimations({ subtree: true }).filter(finite).forEach(a => a.finish());   // whatever is still landing, landed
     // the late things go first, then every part flies back into the window as it re-forms, the rest of the canvas returns, the camera glides home
-    const late = [].slice.call(st.svg.children).concat([st.core, st.head, st.legend, st.since, st.dock], st.gates.map(x => x.lab)).filter(Boolean);
+    const late = [].slice.call(st.svg.children).concat([st.core, st.head, st.legend, st.since, st.dock, st.tray], st.gates.map(x => x.lab)).filter(Boolean);
     late.forEach(el => A(el, [{ opacity: getComputedStyle(el).opacity }, { opacity: 0 }], { duration: T(320), easing: 'ease-in', fill: 'forwards' }));
     const z = (wm.view && wm.view.z) || 1;
     const flights = st.gates.map((x, n) => {
@@ -194,18 +195,137 @@
   const sockets = (id) => cfg(id).filter(c => c.socket && c.type === 'enum');
   const val = (id, k) => { const r = rec(id); return r && r.ctx && r.ctx.params ? r.ctx.params.get(k) : undefined; };
   const FM = () => global.FieldMutate;
-  function swapChip(id, x, sk) {
-    const chip = h('button', 'fb-swap'); chip.type = 'button'; chip.title = 'swap the part in the ' + sk.socket + ' socket';
-    const show = () => { chip.textContent = '⇄ ' + val(id, sk.key); }; show();
-    chip.addEventListener('pointerdown', (e) => e.stopPropagation());
-    chip.addEventListener('click', (e) => { e.stopPropagation(); const CM = global.ContextMenu, r = chip.getBoundingClientRect(), cur = val(id, sk.key), t = FM().toolTarget(id);
-      const items = sk.options.map(op => ({ label: (op === cur ? '● ' : '○ ') + op, hint: op === sk.default ? 'its own part' : 'a shared component, in its place, live', run: () => { t.set({ [sk.key]: op }); t.hear(); } }));
-      if (CM && CM.show) CM.show(r.left, r.bottom + 4, items, sk.label || sk.socket); });
-    x.lab.appendChild(chip); const R = rec(id); if (R && R.view && R.view.bind) R.view.bind(sk.key, () => setTimeout(show, 0)); x.swap = chip;
+
+  // ---- COMPONENT BOXES (2026-11-20, his: "when you blow up a tool on the canvas … you click on the component' box and can pick a new one or one
+  // from another tool. then uses the ui element for the compoenent as a block"). A gate that holds a component — a socket of the tool's own
+  // (config { socket }) or a slot the domain's exchange knows (FieldBoard.setExchange: which parts a tool has, where, what each takes) — opens a
+  // picker on a click: SWAP FOR (a new component in its place) · FROM <another tool on the canvas> (that tool's part, its settings carried over).
+  // What is picked shows in the box as its block: the component's own controls (the tool's settings that belong to that part). One undo step.
+  let exchange = null;
+  const setExchange = (x) => { exchange = x; };
+  const paramsOf = (id) => { const r = rec(id); try { return (r && r.ctx.serialize().params) || {}; } catch (e) { return {}; } };
+  const slotsOf = (id) => { const r = rec(id); return r && exchange && exchange.has(r.id) ? exchange.slots(r.id, paramsOf(id)) : []; };
+  function gateFor(gates, find) {
+    if (!find) return null;
+    for (const k of [].concat(find.near || [])) { const x = gates.find(gg => gg.g.querySelector('[data-key="' + k + '"]')); if (x) return x; }
+    if (find.title) { const re = new RegExp(find.title, 'i'); return gates.find(gg => re.test(String((gg.p.take && gg.p.take.title) || '').trim()) || re.test(gg.lab.textContent.trim())) || null; }
+    return null;
+  }
+  function others(id) {   // the other tools on the canvas whose parts the exchange knows
+    const r = rec(id), K = r && r.K, list = K && K.registry ? K.registry.list() : [];
+    return list.filter(x => x.instance_id !== id && !(x.descriptor && x.descriptor.system) && exchange && exchange.has(x.organism_id)).map(x => ({ id: x.instance_id, label: (x.descriptor && x.descriptor.label) || x.organism_id }));
+  }
+  function components(id, toolId, gates) {
+    const sks = sockets(id), slots = slotsOf(id);
+    const holds = (sk) => { const near = (k) => k && gates.find(gg => gg.g.querySelector('[data-key="' + k + '"]')); return near(sk.near) || near(sk.key) || (sk.group && gates.find(gg => String((gg.p.take && gg.p.take.title) || '').toUpperCase().split(/[ —-]/)[0] === String(sk.group).toUpperCase())); };
+    gates.forEach(x => { x.socket = null; x.slot = null; });
+    sks.forEach(sk => { const x = holds(sk); if (x && !x.socket) x.socket = sk; });
+    slots.forEach(sl => { const x = gateFor(gates, sl.find); if (x && !x.slot) x.slot = sl.id; });
+    gates.filter(x => x.socket || x.slot).forEach(x => {
+      x.g.classList.add('fb-comp'); x.inst = id; tile(id, x); block(id, x);
+      const R = rec(id); if (R && R.view && R.view.bind) [x.socket && x.socket.key].concat(cfg(id).filter(c => c.part).map(c => c.key)).filter(Boolean).forEach(k => R.view.bind(k, () => setTimeout(() => { tile(id, x); }, 0)));
+    });
+  }
+  // what is in a box, as a part: the exchange's reading (another tool can take it), else the socket's component
+  function partIn(id, x) {
+    const sl = x.slot && slotsOf(id).find(s2 => s2.id === x.slot), sk = x.socket, comp = sk ? val(id, sk.key) : null;
+    if (sl && sl.part) return { part: sl.part, label: sl.part.label, own: sl.own, clearable: sl.clearable };
+    if (sk) return { comp, label: comp, own: comp === sk.default, clearable: comp !== sk.default };
+    return { label: 'empty', empty: true, clearable: false };
+  }
+  // the TILE: the component in the box — drag it onto another box (this tool's or another blown-up tool's), ✕ deletes it
+  function tile(id, x) {
+    if (!x.tile) { x.tile = h('div', 'fb-tile'); x.g.insertBefore(x.tile, x.g.children[1] || null); }
+    const p = partIn(id, x), grip = h('span', 'fb-grip', '⠿'), name = h('span', 'fb-tname', (p.own && !p.empty ? 'own · ' : '') + p.label);
+    x.tile.replaceChildren(grip, name); x.tile.classList.toggle('empty', !!p.empty); x.tile.title = p.empty ? 'empty — drop a part here' : 'drag it onto another box (here or on another tool) · ✕ deletes it';
+    if (p.clearable) { const del = h('button', 'fb-del', '✕'); del.type = 'button'; del.title = 'delete it — back to the tool\'s own part, or empty';
+      del.addEventListener('pointerdown', (e) => e.stopPropagation()); del.addEventListener('click', (e) => { e.stopPropagation(); remove(id, x); }); x.tile.appendChild(del); }
+    if (!p.empty) grip.parentNode.onpointerdown = (e) => { if (e.button !== 0 || e.target.closest('.fb-del')) return; e.stopPropagation(); e.preventDefault(); carry(e, { from: id, x, part: p.part, comp: p.comp, label: p.label }); };
+    else x.tile.onpointerdown = null;
+  }
+  function remove(id, x) {
+    const r = rec(id), t = FM().toolTarget(id), sk = x.socket, patch = x.slot && exchange ? exchange.clear(r.id, x.slot) : null;
+    const pt = patch || (sk ? { [sk.key]: sk.default } : null); if (!pt) return;
+    t.set(pt); x.origin = null; t.hear(); setTimeout(() => { tile(id, x); block(id, x); }, 0);
+    A(x.g, [{ opacity: 1 }, { opacity: 0.55, offset: 0.3 }, { opacity: 1 }], { duration: 500, fill: 'none' });
+  }
+  // what a box can take from a carried thing → the patch (or null: it does not fit there)
+  function fits(src, id, x) {
+    if (src.from === id && src.x === x) return null;
+    const r = rec(id), sk = x.socket;
+    if (src.part && x.slot && exchange) { const sl = slotsOf(id).find(s2 => s2.id === x.slot); if (sl && sl.kinds.includes(src.part.kind)) return exchange.take(r.id, x.slot, src.part, paramsOf(id)); }
+    if (src.comp && sk && sk.options.includes(src.comp)) return { [sk.key]: src.comp };
+    return null;
+  }
+  // carry: a ghost of the tile follows the pointer; the boxes it fits light up, the rest dim; let go over one → it takes it (one undo step)
+  function carry(e, src) {
+    const ghost = h('div', 'fb-ghost', '⠿ ' + src.label); document.body.appendChild(ghost);
+    const all = [...open.entries()].flatMap(([inst, st]) => st.gates.filter(g => g.g.classList.contains('fb-comp')).map(g => ({ inst, g })));
+    const ok = all.map(o => ({ o, patch: fits(src, o.inst, o.g) }));
+    ok.forEach(({ o, patch }) => o.g.g.classList.add(patch ? 'fb-can' : 'fb-cannot'));
+    let over = null;
+    const move = (ev) => { ghost.style.left = (ev.clientX + 12) + 'px'; ghost.style.top = (ev.clientY + 10) + 'px';
+      ghost.style.display = 'none'; const el = document.elementFromPoint(ev.clientX, ev.clientY); ghost.style.display = '';
+      const g = el && el.closest('.fb-gate.fb-comp'), hit = g && ok.find(k => k.o.g.g === g && k.patch);
+      if (over && over !== hit) over.o.g.g.classList.remove('fb-over'); over = hit || null; if (over) over.o.g.g.classList.add('fb-over'); };
+    const up = () => { document.removeEventListener('pointermove', move, true); document.removeEventListener('pointerup', up, true); ghost.remove();
+      ok.forEach(({ o }) => o.g.g.classList.remove('fb-can', 'fb-cannot', 'fb-over'));
+      if (!over) return; const { o, patch } = over, t = FM().toolTarget(o.inst); t.set(patch);
+      o.g.origin = src.from && src.from !== o.inst && rec(src.from) ? { from: (rec(src.from).def.label || ''), part: src.label } : null; t.hear();
+      setTimeout(() => { tile(o.inst, o.g); block(o.inst, o.g); }, 0); flash(o.g, src.from && src.from !== o.inst ? src.from : null, src.x); };
+    move(e); document.addEventListener('pointermove', move, true); document.addEventListener('pointerup', up, true);
+  }
+  // the PARTS tray: new components this tool's boxes take — drag one onto a box to change what is in it
+  function tray(id, st, T) {
+    const comps = []; sockets(id).forEach(sk => sk.options.filter(o => o !== sk.default && o !== 'none').forEach(o => { if (!comps.includes(o)) comps.push(o); }));
+    if (!comps.length) return;
+    const box = h('div', 'fb-tray'), head = h('div', 'fb-trayh', 'PARTS — drag one onto a box'); box.appendChild(head);
+    comps.forEach(c => { const tl = h('div', 'fb-ttile', '⠿ ' + c); tl.title = 'drag onto a box that takes it'; tl.addEventListener('pointerdown', (e) => { if (e.button !== 0) return; e.stopPropagation(); e.preventDefault(); carry(e, { from: null, comp: c, label: c }); }); box.appendChild(tl); });
+    const ref = st.dock || st.core; box.style.cssText = 'left:' + ref.offsetLeft + 'px;top:' + (ref.offsetTop + ref.offsetHeight + 16) + 'px;width:' + Math.max(380, ref.offsetWidth) + 'px';
+    st.board.appendChild(box); st.tray = box; settle(id);
+    A(box, [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: T(700), delay: T(2400), easing: EASE.out });
+  }
+  function block(id, x) {   // the component in the box, as its block: its own controls (the tool's settings that belong to that part)
+    if (x.block) { x.block.remove(); x.block = null; }
+    const r = rec(id), UI = global.UIKit, sk = x.socket; if (!r || !r.view || !UI || !sk) { if (x.origin) badge(x); return; }
+    const comp = val(id, sk.key), own = cfg(id).filter(c => c.part && [].concat(c.part).includes(comp) && !c.socket); if (comp === sk.default || comp === 'none' || !own.length) { if (x.origin) badge(x); return; }
+    const head = h('div', 'fb-bhead'); head.textContent = comp + (x.origin ? ' · from ' + x.origin.from : '');
+    const row = h('div', 'fb-brow'); own.forEach(c => { const ctl = UI.paramControl(r.view, c, { size: 26 }); if (ctl) { ctl.el.dataset.key = c.key; row.appendChild(ctl.el); } });
+    x.block = h('div', 'fb-block'); x.block.append(head, row); x.g.appendChild(x.block);
+    settle(id);
+  }
+  function settle(id) {   // a box that grew (its block) pushes the boxes under it down, so nothing covers anything; the wires follow
+    const st = open.get(id); if (!st) return;
+    [st.dock, st.tray].filter(Boolean).forEach(o => { const ob = o.offsetTop + o.offsetHeight + 26;   // the dock and the tray are solid: a box under them moves below
+      st.gates.forEach(l => { if (l.g.offsetLeft < o.offsetLeft + o.offsetWidth && l.g.offsetLeft + l.g.offsetWidth > o.offsetLeft && l.g.offsetTop < ob && l.g.offsetTop + l.g.offsetHeight > o.offsetTop) l.g.style.top = ob + 'px'; }); });
+    for (let pass = 0; pass < 4; pass++) { let movedAny = false; const gs = st.gates.slice().sort((a, b) => a.g.offsetTop - b.g.offsetTop);
+      gs.forEach((u, i) => { const ub = u.g.offsetTop + u.g.offsetHeight + 26;
+        gs.slice(i + 1).forEach(l => { if (l.g.offsetLeft < u.g.offsetLeft + u.g.offsetWidth && l.g.offsetLeft + l.g.offsetWidth > u.g.offsetLeft && l.g.offsetTop < ub && l.g.offsetTop >= u.g.offsetTop) { l.g.style.top = ub + 'px'; movedAny = true; } }); });
+      if (!movedAny) break; }
+    const bottom = Math.max(...st.gates.map(x => x.g.offsetTop + x.g.offsetHeight)) + 200; if (bottom > st.board.offsetHeight) { st.board.style.height = bottom + 'px'; st.svg.setAttribute('height', bottom); }
+    st.dragged = true; wires(st);
+  }
+  function badge(x) { const b = h('div', 'fb-block'); const hd = h('div', 'fb-bhead'); hd.textContent = '⇄ ' + x.origin.part + ' · from ' + x.origin.from; b.appendChild(hd); x.block = b; x.g.appendChild(b); const st = [...open.entries()].find(([, v]) => v.gates.includes(x)); if (st) settle(st[0]); }
+  function flash(x, fromId, fromSlot) {   // the box takes its new part: it lights; from a tool exploded beside it, a wire draws across for a moment
+    A(x.g, [{ boxShadow: '0 0 0 0 transparent' }, { boxShadow: '0 0 0 3px var(--c), 0 0 30px var(--c)', offset: 0.3 }, { boxShadow: '0 0 0 0 transparent' }], { duration: 900, fill: 'none' });
+    const fs = fromId && open.get(fromId), wm = WM(); if (!fs || !wm || !wm.world || !fromSlot) return;
+    const fx = fromSlot.g ? fromSlot : fs.gates.find(gg => gg.slot === fromSlot.id); if (!fx) return;
+    const wr = wm.world.getBoundingClientRect(), z = (wm.view && wm.view.z) || 1, c = (el) => { const r2 = el.getBoundingClientRect(); return [(r2.left + r2.width / 2 - wr.left) / z, (r2.top + r2.height / 2 - wr.top) / z]; };
+    const [x1, y1] = c(fx.g), [x2, y2] = c(x.g), svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'fb-across'); svg.style.cssText = 'position:absolute;left:0;top:0;overflow:visible;pointer-events:none;z-index:1000001';
+    const pa = document.createElementNS(NS, 'path'), m = (x1 + x2) / 2; pa.setAttribute('d', `M${x1} ${y1} C ${m} ${y1 - 120}, ${m} ${y2 - 120}, ${x2} ${y2}`); pa.setAttribute('fill', 'none'); pa.setAttribute('stroke', getComputedStyle(x.g).getPropertyValue('--c') || '#00D4FF'); pa.setAttribute('stroke-width', '2');
+    svg.appendChild(pa); wm.world.appendChild(svg); let len = 0; try { len = pa.getTotalLength(); } catch (e) {}
+    const an = A(pa, [{ strokeDasharray: len + ' ' + len, strokeDashoffset: len, opacity: 1 }, { strokeDasharray: len + ' ' + len, strokeDashoffset: 0, opacity: 1, offset: 0.5 }, { strokeDasharray: len + ' ' + len, strokeDashoffset: 0, opacity: 0 }], { duration: 1600, fill: 'forwards' });
+    (an ? an.finished : Promise.resolve()).catch(() => {}).then(() => svg.remove());
+  }
+  // MUTATE can take another tool's part too (the domain's exchange: a part that fits one of this tool's component boxes)
+  function extraFor(id) {
+    return (rnd) => { const mine = slotsOf(id), offers = []; others(id).forEach(o => slotsOf(o.id).forEach(s2 => { if (!s2.part) return; mine.filter(m => m.kinds.includes(s2.part.kind)).forEach(m => offers.push({ o, s2, m })); }));
+      if (!offers.length) return null; const pk = offers[Math.floor(rnd() * offers.length)], patch = exchange.take(rec(id).id, pk.m.id, pk.s2.part, paramsOf(id));
+      return patch ? { patch, words: pk.m.label + ' ← ' + pk.s2.part.label + ' (' + pk.o.label + ')' } : null; };
   }
   function mutateDock(id, st, T) {
     const t = FM() && FM().toolTarget(id); if (!t || !t.list().some(c => FM().usable(t, c))) return;
-    const dock = FM().dock(t, { hint: (sockets(id).length ? 'swaps parts and moves a few settings' : 'moves a few of its settings') + ' — played at once; keep it or throw it',
+    const dock = FM().dock(t, { extra: extraFor(id), hint: (sockets(id).length ? 'swaps parts and moves a few settings' : 'moves a few of its settings') + ' — played at once; keep it or throw it',
       onMutate: () => A(dock, [{ boxShadow: '0 0 0 0 rgba(0,212,255,0)' }, { boxShadow: '0 0 30px 2px rgba(0,212,255,.45)', offset: 0.3 }, { boxShadow: '0 0 0 0 rgba(0,212,255,0)' }], { duration: T(900), fill: 'none' }) });
     dock.classList.add('fb-mut'); const core = st.core;
     dock.style.cssText = 'left:' + core.offsetLeft + 'px;top:' + (core.offsetTop + core.offsetHeight + 18) + 'px;width:' + Math.max(380, core.offsetWidth) + 'px';
@@ -247,5 +367,5 @@
     return true;
   }
   if (!hook()) document.addEventListener('DOMContentLoaded', hook);
-  global.FieldBoard = { define, has, explode, assemble, isOpen, boards, sockets, learned: (toolId) => FM().learned(toolId), mutate: (id) => FM().mutate(FM().toolTarget(id)) };
+  global.FieldBoard = { define, has, explode, assemble, isOpen, boards, sockets, setExchange, get exchange() { return exchange; }, learned: (toolId) => FM().learned(toolId), mutate: (id) => FM().mutate(FM().toolTarget(id)) };
 })(window);

@@ -292,3 +292,23 @@ be able to do that. then the workshop or field. like i want full mutation, like 
   heard through the kind's own ▶ HEAR; the dock kept across redraws.
 - Open: more sockets need parts moved out of tools' own code first (each proven by the null render); a mutation is not yet measured for loudness
   before it is offered (the guards keep level out; a part's own trims keep it under full scale).
+
+## ADDENDUM 2026-11-20 (7) — components swapped between tools blown up on the canvas (his words: "Give Eravos the tools to swap tools components
+when they are blown up on the canvas. Like give me the ability to mutate or synthesize tools together." · "when you blow up a tool on the canvas,
+thast what i want it  to look like. like you click on the component' box and can pick a new one or one from another tool. then uses the ui element
+for the compoenent as a block")
+- Before it, rejected (kept as a lesson): a COMBINE card in the Wobble Builder and a right-click that opened a new builder window — "Didn't ask for
+  it." The swap belongs on the blown-up board itself; no new window, no new face. That work is set aside (git stash), its engine parts reused.
+- COMPONENT BOXES (tools/core/field/board.js, domain-free): a gate that holds a component — a socket of the tool's own (config { socket }) or a
+  slot the domain's exchange knows — is a component box. No menus (his: "drag components, delete them, change them. not drop down menus"):
+  each box carries its component as a TILE — drag it onto another box (this tool's or another blown-up tool's: the boxes it fits light up, the
+  rest dim; let go → that box takes it, with its settings) · ✕ on the tile deletes it (back to the tool's own part, or empty) · the PARTS tray
+  holds new components: drag one onto a box to change it. What is in a box shows as its BLOCK (the component's own controls); a box that grows
+  pushes the boxes under it down (the dock and the tray are solid); from another tool a wire draws across for a moment. One undo step; heard
+  at once. ⚄ MUTATE can take the other tools' parts too (FieldMutate extra).
+- The exchange (tools/music/data/part-exchange.js → FieldBoard.setExchange): per tool, its slots (where on its board, what is in it now as a part
+  in one common form, what kinds it takes, how a part becomes its settings). Wobble Bass: mouth, grit, noise, after the amp, wobble. Retro DCO:
+  VCF, chorus, noise, LFO. A tool is read through its saved settings, never its internals.
+- Wobble Bass's insert takes ensemble-core (the Juno chorus; peMode, peMix); the adapters run ensemble-core and osc-noise.
+- Proof: P203 1/1; null render Wobble Bass 34/34, Retro DCO 12/12 against main.
+- Next, shown first: SYNTHESIZE two blown-up tools together into a tool of its own.

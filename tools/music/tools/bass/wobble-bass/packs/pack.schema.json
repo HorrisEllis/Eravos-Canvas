@@ -471,6 +471,165 @@
                         "minimum": -24,
                         "maximum": 0
                       },
+                      "partFilter": {
+                        "enum": [
+                          "own",
+                          "filter-svf",
+                          "filter-ladder"
+                        ]
+                      },
+                      "pfSvfMode": {
+                        "enum": [
+                          "lowpass",
+                          "highpass",
+                          "bandpass",
+                          "notch",
+                          "peak",
+                          "bell",
+                          "lowshelf",
+                          "highshelf",
+                          "allpass"
+                        ]
+                      },
+                      "pfStages": {
+                        "type": "number",
+                        "minimum": 1,
+                        "maximum": 3
+                      },
+                      "pfLadMode": {
+                        "enum": [
+                          "lp24",
+                          "lp12",
+                          "bp12",
+                          "hp12",
+                          "hp24"
+                        ]
+                      },
+                      "pfLadDrive": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 24
+                      },
+                      "pfBass": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "partDrive": {
+                        "enum": [
+                          "own",
+                          "saturator-tube",
+                          "saturator-tape",
+                          "bitcrusher"
+                        ]
+                      },
+                      "pdDrive": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 24
+                      },
+                      "pdBias": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "pdTone": {
+                        "type": "number",
+                        "minimum": -1,
+                        "maximum": 1
+                      },
+                      "pdBump": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 6
+                      },
+                      "pdBits": {
+                        "type": "number",
+                        "minimum": 2,
+                        "maximum": 24
+                      },
+                      "pdRate": {
+                        "type": "number",
+                        "minimum": 600,
+                        "maximum": 48000
+                      },
+                      "pdMix": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "partNoise": {
+                        "enum": [
+                          "own",
+                          "osc-noise"
+                        ]
+                      },
+                      "pnColour": {
+                        "enum": [
+                          "white",
+                          "pink",
+                          "brown",
+                          "velvet",
+                          "crackle",
+                          "band"
+                        ]
+                      },
+                      "pnDensity": {
+                        "type": "number",
+                        "minimum": 20,
+                        "maximum": 20000
+                      },
+                      "pnRate": {
+                        "type": "number",
+                        "minimum": 20,
+                        "maximum": 20000
+                      },
+                      "pnTilt": {
+                        "type": "number",
+                        "minimum": -1,
+                        "maximum": 1
+                      },
+                      "partInsert": {
+                        "enum": [
+                          "none",
+                          "delay-line",
+                          "filter-svf",
+                          "saturator-tube",
+                          "saturator-tape",
+                          "bitcrusher"
+                        ]
+                      },
+                      "piTime": {
+                        "enum": [
+                          "1/16",
+                          "1/8",
+                          "1/8.",
+                          "1/4",
+                          "1/4.",
+                          "1/2"
+                        ]
+                      },
+                      "piFeedback": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 0.9
+                      },
+                      "piDamp": {
+                        "type": "number",
+                        "minimum": 500,
+                        "maximum": 16000
+                      },
+                      "piMix": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 0.8
+                      },
+                      "piMode": {
+                        "enum": [
+                          "tape",
+                          "digital"
+                        ]
+                      },
                       "mods": {},
                       "_react": {},
                       "tempoX": {

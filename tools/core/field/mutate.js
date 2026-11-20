@@ -12,8 +12,8 @@
  * A mutation: some sockets swapped (each new part's own settings rolled fresh), a few other settings moved — near where they are, not anywhere
  * (a mutation, not a randomise). Learning: a kept mutation's choices (a part, an option) and the settings it moved weigh more next time; a thrown
  * one's less. Never the same state twice (its signature remembered). A domain can keep settings out (FieldMutate.guards: (setting, target) → false).
- *   FieldMutate.mutate(target, { rnd, moves }) → { patch, prev, sig, words } | null · .judge(target, m, keep) · .learned(id) · .forget(id)
- *   FieldMutate.dock(target, { onMutate }) → an element: ⚄ MUTATE · ✓ KEEP · ✗ THROW, what changed, what it has learned
+ *   FieldMutate.mutate(target, { rnd, moves, extra?(rnd) → { patch, words } (a part from another tool) }) → { patch, prev, sig, words } | null · .judge(target, m, keep) · .learned(id) · .forget(id)
+ *   FieldMutate.dock(target, { onMutate, kit?, primary? }) → an element (kit: a tool window's UI kit — its buttons then): ⚄ MUTATE · ✓ KEEP · ✗ THROW, what changed, what it has learned
  *   FieldMutate.toolTarget(instanceId) → the target of a tool on the canvas (its settings; set = as if turned by hand) */
 (function (global) {
   'use strict';
@@ -52,6 +52,8 @@
       swap.forEach(s => { const cur = t.get(s.key), others = s.options.filter(x => x !== cur); if (!others.length) return; const p = pick(others, (x) => W(L, s.key + '=' + x), rnd); patch[s.key] = p;
         const own = all.filter(c => c.part && [].concat(c.part).includes(p) && (!c.of || c.of === s.key)); own.forEach(c => { patch[c.key] = roll(c, rnd, L); });
         words.push((s.socket || s.label || s.key) + ' → ' + p + (own.length ? ' (' + own.map(c => (c.label || c.key) + ' ' + show(c, patch[c.key])).join(', ') + ')' : '')); });
+      // another tool's part (o.extra: the Field board, when another tool is exploded beside this one) — counted with the swaps
+      if (o.extra && rnd() < 0.6) { const x = o.extra(rnd); if (x && x.patch) { Object.keys(x.patch).forEach(k => { patch[k] = x.patch[k]; }); words.push(x.words); } }
       // the rest: a few settings moved, those that were kept before more often (a part's settings only while it is in its socket)
       const free = all.filter(c => !c.socket && !(c.key in patch) && (!c.part || (owner(c) && [].concat(c.part).includes(val(owner(c).key)))));
       const n = Math.min(free.length, o.moves || (swap.length ? 1 + Math.floor(rnd() * 3) : 2 + Math.floor(rnd() * 4))), moved = [];
@@ -75,15 +77,17 @@
   // the dock: one look wherever it sits (the Field board, the Workshop board, a window's menu)
   function dock(t, opt) {
     opt = opt || {}; const doc = global.document, h = (tag, cls, txt) => { const e = doc.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
-    const box = h('div', 'fm-dock'), row = h('div', 'fm-row'), go = h('button', 'fm-go', '⚄ MUTATE'), kp = h('button', 'fm-keep', '✓ KEEP'), th = h('button', 'fm-throw', '✗ THROW'), line = h('div', 'fm-line'), tally = h('div', 'fm-tally');
-    [go, kp, th].forEach(b => { b.type = 'button'; b.addEventListener('pointerdown', (e) => e.stopPropagation()); }); row.append(go, kp, th); box.append(row, line, tally);
+    // in a tool's window (opt.kit: its UI kit) the buttons are the kit's — the tool's own colour, its sizes (DESIGN-GUIDE: one kit everywhere)
+    const K = opt.kit, btn = (cls, label) => { if (K && K.Button) { const b = K.Button({ label, kind: cls === 'fm-go' && opt.primary ? 'primary' : '' }).el; b.classList.add(cls); return b; } const b = h('button', cls, label); b.type = 'button'; return b; };
+    const box = h('div', 'fm-dock' + (K ? ' fm-kit' : '')), row = h('div', 'fm-row'), go = btn('fm-go', '⚄ MUTATE'), kp = btn('fm-keep', '✓ KEEP'), th = btn('fm-throw', '✗ THROW'), line = h('div', 'fm-line'), tally = h('div', 'fm-tally');
+    [go, kp, th].forEach(b => b.addEventListener('pointerdown', (e) => e.stopPropagation())); row.append(go, kp, th); box.append(row, line, tally);
     let cur = null;
     const count = () => { const L = learned(t.id); tally.textContent = L.kept + ' kept · ' + L.thrown + ' thrown · ' + L.seen.length + ' tried — it learns from each, never the same twice'; };
     const pending = (on) => { kp.disabled = th.disabled = !on; box.classList.toggle('pending', on); };
     line.textContent = opt.hint || 'a new combination, played at once — keep it or throw it'; pending(false); count();
     go.addEventListener('click', () => {
       if (cur) judge(t, cur, true);   // mutating again keeps the one before (it stays)
-      const m = mutate(t); if (!m) { line.textContent = 'nothing left to try here'; return; }
+      const m = mutate(t, { extra: opt.extra }); if (!m) { line.textContent = 'nothing left to try here'; return; }
       cur = m; apply(t, m); line.textContent = m.words.join(' · '); pending(true); count(); if (opt.onMutate) opt.onMutate(m);
     });
     kp.addEventListener('click', () => { if (!cur) return; judge(t, cur, true); cur = null; pending(false); line.textContent = 'kept — it stays (save it as a preset to keep it by name)'; count(); });

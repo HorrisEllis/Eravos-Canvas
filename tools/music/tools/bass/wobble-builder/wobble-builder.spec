@@ -70,8 +70,11 @@ acceptance:
 dag:
   components: 11 it stands on · 11 of 11 built (✓)
   layer 0: bitcrusher ✓ · delay-line ✓ · env-adsr ✓ · filter-ladder ✓ · filter-svf ✓ · lfo ✓ · osc-sub ✓ · osc-va ✓ · saturator-tape ✓ · saturator-tube ✓ · stereo-tools ✓
-  tool: eravos.wobble-builder ← osc-va + osc-sub + lfo + filter-svf + filter-ladder + saturator-tube + saturator-tape + bitcrusher + delay-line + stereo-tools + env-adsr
+  tool: eravos.wobble-builder ← filter-svf + filter-ladder + saturator-tape + saturator-tube + bitcrusher + delay-line + osc-va + osc-sub + env-adsr + stereo-tools + lfo
   build order: bitcrusher ✓ → delay-line ✓ → env-adsr ✓ → filter-ladder ✓ → filter-svf ✓ → lfo ✓ → osc-sub ✓ → osc-va ✓ → saturator-tape ✓ → saturator-tube ✓ → stereo-tools ✓ → wobble-builder
   shared with: bitcrusher 5 · delay-line 17 · env-adsr 22 · filter-ladder 5 · filter-svf 42 · lfo 30 · osc-sub 11 · osc-va 27 · saturator-tape 6 · saturator-tube 5 · stereo-tools 19  (other tools on each)
+  in it now: filter-svf · filter-ladder · saturator-tape · saturator-tube · bitcrusher · delay-line · osc-va · osc-sub · env-adsr · stereo-tools · lfo
+  comes out of it: —
+  planned: —
   signal_dag check: every node is one of its components ✓
   signal_dag check: components with no place in the flow yet: filter-ladder, saturator-tape, bitcrusher, delay-line

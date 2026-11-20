@@ -22,3 +22,22 @@
 .fb-swap{margin-left:8px;padding:1px 8px;border-radius:999px;border:1px solid #00D4FF;background:#04070C;color:#00D4FF;font:500 10px 'DM Mono',monospace;letter-spacing:1px;cursor:pointer}
 .fb-swap:hover{background:#00D4FF;color:#04070C}
 .fb-mut{position:absolute}
+/* component boxes (2026-11-20): a click on the box picks a new component or one from another tool; what is in it shows as its block */
+.fb-block{margin-top:8px;padding:6px 8px 8px;border-top:1px dashed color-mix(in srgb,var(--c) 55%,transparent);min-width:340px;max-width:460px;box-sizing:border-box}
+.fb-bhead{font:500 10px 'DM Mono',monospace;letter-spacing:1px;color:var(--c);margin-bottom:4px}
+.fb-brow{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+/* the tile: the component in a box — drag it, ✕ it (2026-11-20: "drag components, delete them, change them. not drop down menus") */
+.fb-tile{display:flex;align-items:center;gap:6px;margin:0 0 6px;padding:3px 6px;border:1px solid color-mix(in srgb,var(--c) 70%,transparent);background:#04070C;font:500 10px 'DM Mono',monospace;letter-spacing:1px;color:var(--c);cursor:grab;user-select:none;width:max-content;max-width:100%}
+.fb-tile.empty{border-style:dashed;opacity:.6;cursor:default}
+.fb-grip{opacity:.7}
+.fb-tname{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fb-del{margin-left:4px;padding:0 5px;border:0;background:none;color:var(--c);font:500 11px 'DM Mono',monospace;cursor:pointer;opacity:.7}
+.fb-del:hover{opacity:1;color:#FF5A6E}
+.fb-ghost{position:fixed;z-index:3000000;pointer-events:none;padding:4px 8px;border:1px solid #00D4FF;background:#04070CEE;color:#00D4FF;font:500 11px 'DM Mono',monospace;letter-spacing:1px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+.fb-gate.fb-can{box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 60%,transparent)}
+.fb-gate.fb-over{box-shadow:0 0 0 3px var(--c),0 0 28px color-mix(in srgb,var(--c) 60%,transparent)}
+.fb-gate.fb-cannot{opacity:.35}
+.fb-tray{position:absolute;padding:10px 12px;border:1px dashed color-mix(in srgb,#00D4FF 45%,transparent);background:#04070C;display:flex;flex-wrap:wrap;gap:6px;pointer-events:auto}
+.fb-trayh{width:100%;font:500 10px 'DM Mono',monospace;letter-spacing:2px;color:#4E6A80}
+.fb-ttile{padding:4px 8px;border:1px solid #1B2A3A;color:#B8CFE0;font:500 10px 'DM Mono',monospace;letter-spacing:1px;cursor:grab;user-select:none}
+.fb-ttile:hover{border-color:#00D4FF;color:#00D4FF}
