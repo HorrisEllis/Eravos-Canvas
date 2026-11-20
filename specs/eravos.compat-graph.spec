@@ -139,3 +139,44 @@ acceptance (CG0): this spec, the map's numbers reproducible: grep the specs' dep
 #     different phrase (a lead to listen to); the harness gates the sound itself (no VCA component has a contract yet).
 #   - tests/mutants.test.mjs: 20 checks (CI).
 
+
+## ADDENDUM 2026-11-20 — CG4 preview; a whole tool, not endless mutation; learning, friction, regression; the real tools (nothing above is changed)
+# his words (2026-11-20, verbatim):
+#   "yes go ahead, show me the preview. i want to be able to start mutating new tools."
+#   "okay it isn't letting me select the second slot. i like the ui though, i want to edit, not just create from scratch.
+#    but also the preview, like taking a tool that exists, and swapping components. whats the browser for?"
+#   "the wobble bass, and the wubs, and retro. okay but it needs to synthesize into a full tool. not just mutate endlessly"
+#   "also should learn from each discard right? also. null render used for creating friction, and repitition. so tools dont just replicate
+#    over and over, also regression gate"
+# the preview (docs/previews/mutate/mutate.html, built by build.mjs from the real engine; shown, waiting for his yes):
+#   EDIT   the bench holds one tool (the start voice, a mutant opened to edit, a kept tool); a component's every setting, live; SWAP FOR / remove
+#          / reset; ＋ on a wire inserts what fits; undo / redo. Every edit is the engine's own op (check()) and one undo step.
+#   MUTATE a pool (18, up to three batches) → the gates → ranked by what he taught it → five + one wildcard (so it keeps exploring).
+#   LEARN  every verdict is data: keep +1 · open to edit +0.5 · throw away −1, on what the mutant was (op, part, how far it moved); the sum ranks
+#          the next pool; each card says why it was offered; FORGET clears it. (Open: the weights, the wildcard share — his ear decides.)
+#   FRICTION — the null as a repetition gate: each mutant's render, level-matched, subtracted from everything already seen (the tool, kept tools,
+#          thrown-away ones, mutants already shown, others in the pool); nulls deeper than −30 dB = a REPEAT, never offered. Found at once: a
+#          rewire that leaves a filter unfed is the same sound as removing it (−∞ dB).
+#   REGRESSION — a kept / synthesized tool stores its render (the bass line, 4 kHz, 16-bit); every time it is shown it is rendered again and
+#          nulled against it: deeper than −60 dB ✓, otherwise ⚠ REGRESSION (a component's change reached a tool he kept).
+#   SYNTHESIZE — the end, not more mutating: the bench becomes a whole tool — its face from its parts' elements (contract `element`: face
+#          controls first, in signal order, the rest behind More depth; the same rule as ES1, tools/core/elements), its keys, its tool file
+#          (needs.components + elements, config per node, faceKeys, the DAG, lineage, gates + the null baseline). Saved: kept + the file.
+#   the "browser": the preview is a web page only so it can be tried before it is built; nothing in mutation needs one.
+# phases (each its own PR, proved before the next):
+#   CG4a  the preview above                                                                                      (2026-11-20, shown)
+#   CG4b  in the app, on his yes: the Field gets the bench (edit, mutate, learn, the two gates); kept tools and verdicts in Documents\ERAVOS
+#   CG6   SYNTHESIZE for real: a kept tool → Documents\ERAVOS\tools\mine.<id>\ (tool.json + the DAG + lineage); its engine = the assembled DAG
+#         run inside ONE AudioWorklet (assemble.js is plain JS for that), every setting an AudioParam (axiom 4); its face = ElementSynthesis;
+#         it opens on the canvas, wires, takes notes from keys / MIDI / the Timeline like any tool. Gate: the worklet nulls against the offline
+#         render (the same engine), and the regression baseline is stored with it.
+#   CG7   the real tools on the bench, his order: Wobble Bass, the wubs, Retro DCO. A tool opens only when (1) every part it is made of is a
+#         component with an adapter, (2) its DAG is written as data, and (3) the DAG assembled nulls against the tool's own engine (the null
+#         render) — so a swap changes THE tool, not a copy that sounds near it. What each needs today:
+#           Wobble Bass  0 of 3 announced parts assemble (filter-formant, amp-chain, note-release) and most of its sound is still its own code —
+#                        the WD track first: WD2 the sub · WD3 the output stage · WD4 squash · WD5 LFO + wub seq · WD6 FM growl, each moved out
+#                        unchanged and proven by the null render (as WD1 amp-chain); then the adapters; then the DAG.
+#           the wubs     Wub Osc, Wub Sub (note-release), Wub Filter (filter-formant), Wub Rate (wave-table) — the same parts as Wobble Bass's
+#                        decomposition; they follow it.
+#           Retro DCO    5 of 11 assemble (osc-va, osc-sub, filter-svf, filter-ladder, env-adsr); adapters for osc-noise, unison-stack, lfo,
+#                        random-source, bbd-line, ensemble-core; voice allocation (logic, not a node); then the DAG and the null.

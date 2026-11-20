@@ -107,6 +107,31 @@ details.offs{margin-top:12px;color:var(--faint)} details.offs summary{cursor:poi
 .tool.ready{border-color:var(--on)}
 .foot{color:var(--faint);font-size:10px;line-height:1.7;margin-top:18px;border-top:1px solid var(--line2);padding-top:10px}
 .foot b{color:var(--soft);font-weight:400}
+/* the synthesized tool: a window like every ERAVOS tool — its face from its parts' elements, its keys */
+#synthWrap{position:fixed;inset:0;z-index:50;background:#020408E6;overflow:auto;padding:28px 16px}
+#synthBox{max-width:1080px;margin:0 auto;border:1px solid var(--line);border-top:2px solid var(--core);background:#05080F}
+.sbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 14px;border-bottom:1px solid var(--line2)}
+.sic{color:var(--core);font-size:14px} #sName{font-size:13px;letter-spacing:1px} .sv{color:var(--faint);font-size:10px}
+.sface{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;padding:14px}
+.el{border:1px solid var(--line2);background:var(--panel);padding:10px 12px 12px}
+.el .eh{display:flex;justify-content:space-between;font-size:10px;letter-spacing:2px;color:var(--c);margin-bottom:8px}
+.el .eh span:last-child{color:var(--faint);letter-spacing:1px}
+.knobs{display:flex;flex-wrap:wrap;gap:10px 12px}
+.knob{display:flex;flex-direction:column;align-items:center;width:58px;cursor:ns-resize;user-select:none;touch-action:none}
+.knob svg{display:block} .knob .kv{font-size:10px;color:var(--soft);margin-top:1px;white-space:nowrap} .knob .kl{font-size:9px;color:var(--dim);letter-spacing:1px}
+.el .seg{margin-top:4px}
+.more{grid-column:1/-1;color:var(--dim);font-size:10px;letter-spacing:2px;cursor:pointer;background:none;border:0;text-align:left;padding:2px 0}
+.skeys{position:relative;height:96px;margin:0 14px 12px;border:1px solid var(--line2);user-select:none;touch-action:none}
+.wk{position:absolute;top:0;bottom:0;background:#E8EEF3;border-right:1px solid #9AA5AF;cursor:pointer}
+.wk.on,.bk.on{background:var(--core)!important}
+.bk{position:absolute;top:0;height:58%;background:#0B0F16;border:1px solid #000;z-index:2;cursor:pointer}
+.wk i{position:absolute;bottom:4px;left:0;right:0;text-align:center;font-style:normal;font-size:8px;color:#556}
+.sfoot{padding:0 14px 14px;color:var(--faint);font-size:10px;line-height:1.7}
+.sfoot b{color:var(--soft);font-weight:400}
+#sFile{margin:0 14px 14px;padding:10px;background:#020408;border:1px solid var(--line2);color:var(--soft);font-size:10px;max-height:360px;overflow:auto;white-space:pre-wrap}
+.lrn{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:var(--dim);line-height:1.7}
+.lrn b{font-weight:400} .lrn b.p{color:var(--ok)} .lrn b.n{color:var(--no)}
+.reg{font-size:10px} .reg.ok{color:var(--ok)} .reg.bad{color:var(--no)}
 #toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#0B1522;border:1px solid var(--line);padding:7px 14px;color:var(--soft);font-size:11px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:40}
 </style></head><body>
 <div id="bar">
@@ -128,6 +153,7 @@ details.offs{margin-top:12px;color:var(--faint)} details.offs summary{cursor:poi
         <button class="tb" id="undo">↶ UNDO</button><button class="tb" id="redo">↷ REDO</button>
         <label class="tb" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="auto" checked style="margin:0">HEAR EACH EDIT</label>
         <button class="tb on" id="save">KEEP AS A NEW TOOL</button>
+        <button class="tb hot" id="synth">◆ SYNTHESIZE INTO A TOOL</button>
       </div>
       <div class="lab">the tool, exploded · <b>click a component</b> to edit it, swap it or remove it · <b>＋</b> on a wire to put a component there</div>
       <div id="boardWrap"><div id="board"></div></div>
@@ -144,6 +170,9 @@ details.offs{margin-top:12px;color:var(--faint)} details.offs summary{cursor:poi
     <h2>KEPT</h2>
     <div class="lab">your tools · <b>open</b> to edit · <b>⚄</b> to mutate from it</div>
     <div id="keptList"></div>
+    <h2 style="margin-top:22px">LEARNED</h2>
+    <div class="lab">from what you keep, open and throw away · it ranks the mutants · one wildcard each time</div>
+    <div id="learned"></div>
     <h2 style="margin-top:22px">START FROM</h2>
     <div class="lab">a tool opens on the bench once every part of it can be assembled</div>
     <div id="tools"></div>
@@ -151,6 +180,14 @@ details.offs{margin-top:12px;color:var(--faint)} details.offs summary{cursor:poi
   </aside>
 </main>
 <div id="toast"></div>
+<div id="synthWrap" hidden><div id="synthBox">
+  <div class="sbar"><span class="sic">◆</span><span id="sName"></span><span class="sv" id="sVer"></span><span class="spacer"></span>
+    <button class="tb" id="sJson">TOOL FILE</button><button class="tb on" id="sSave">⤓ SAVE THE TOOL</button><button class="tb" id="sClose">✕ BACK TO THE BENCH</button></div>
+  <div class="sface" id="sFace"></div>
+  <div class="skeys" id="sKeys"></div>
+  <div class="sfoot" id="sFoot"></div>
+  <pre id="sFile" hidden></pre>
+</div></div>
 
 <!--INLINE-->
 
@@ -196,8 +233,8 @@ function play(dag, phraseKey) {
 // ---- audio out ----
 let AC = null, src = null, playingId = null;
 function stop() { if (src) { try { src.stop(); } catch (e) {} src = null; } playingId = null; document.querySelectorAll('.mut.playing').forEach(x => x.classList.remove('playing')); setPlayBtn(); }
-function hear(dag, id, then) {
-  if (playingId === id && !then) { stop(); return; }
+function hear(dag, id, then, restart) {
+  if (playingId === id && !then && !restart) { stop(); return; }
   stop(); AC = AC || new (window.AudioContext || window.webkitAudioContext)({ sampleRate: SR }); if (AC.state === 'suspended') AC.resume();
   const r = play(dag, phraseSel.value); if (!r.L) { toast('it does not build: ' + (r.why || []).join('; ')); return; }
   const buf = AC.createBuffer(2, r.L.length, SR), k = r.peak > 0 ? 0.89 / r.peak : 1;   // every sound heard at the same level (as the WAVs)
@@ -225,7 +262,7 @@ function apply(r, label) {     // every edit: through the engine's own op (check
   drawBench(); if (label) toast(label); hearSoon(); return true;
 }
 let hearT = null;
-function hearSoon() { if (!autoBox.checked) return; clearTimeout(hearT); hearT = setTimeout(() => hear(bench.dag, 'bench', true), 180); }
+function hearSoon() { if (!autoBox.checked) return; clearTimeout(hearT); hearT = setTimeout(() => hear(bench.dag, 'bench', null, true), 180); }
 function undo() { if (!hist.length) return; fut.push({ dag: bench.dag, ops: bench.ops }); const h = hist.pop(); bench.dag = h.dag; bench.ops = h.ops; if (sel && !bench.dag.nodes.some(n => n.id === sel)) sel = null; drawBench(); hearSoon(); }
 function redo() { if (!fut.length) return; hist.push({ dag: bench.dag, ops: bench.ops }); const h = fut.pop(); bench.dag = h.dag; bench.ops = h.ops; drawBench(); hearSoon(); }
 const isEdited = () => JSON.stringify(bench.dag) !== bench.savedAt;
@@ -332,16 +369,65 @@ function drawInsp() {
 }
 
 // ---- mutate ----
+// ---- the null: two renders, level-matched, subtracted. −∞ dB = the same sound; ~0 dB or above = nothing alike.
+// FRICTION: a mutant that nulls against anything already seen (the tool, a kept tool, a thrown one, another mutant) is a REPEAT, never offered.
+const NULL_REPEAT = -30;
+function nullDb(a, b) {
+  const n = Math.min(a.length, b.length); let ea = 0, eb = 0; for (let i = 0; i < n; i++) { ea += a[i] * a[i]; eb += b[i] * b[i]; }
+  if (!ea || !eb) return 0; const ka = 1 / Math.sqrt(ea), kb = 1 / Math.sqrt(eb); let r = 0; for (let i = 0; i < n; i++) { const d = a[i] * ka - b[i] * kb; r += d * d; }
+  return r > 0 ? 10 * Math.log10(r) : -Infinity;
+}
+const fmtDb = (x) => x === -Infinity ? '−∞ dB' : (x > 0 ? '+' : '') + x.toFixed(1) + ' dB';
+const ld = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? d : v; } catch (e) { return d; } };
+const st = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+
+// ---- LEARN: every verdict is data. keep +1 · open to edit +0.5 · throw away −1, on what the mutant was (the op, the part, how far it moved).
+let verdicts = ld('eravos.field.mutate.verdicts', []);
+const compOf = (dag, id) => { const n = dag.nodes.find(x => x.id === id); return n ? n.component : id; };
+function feats(m) {
+  const o = m.op, part = o.op === 'swap' ? o.to : o.op === 'insert' ? o.component : o.op === 'vary' ? compOf(m.dag, o.node) + '.' + o.key : o.op === 'remove' ? compOf(m.parentDag || bench.dag, o.node) : compOf(m.dag, o.to.split('.')[0]);
+  const far = m.fromParent == null ? null : m.fromParent < 0.05 ? 'a little' : m.fromParent < 0.15 ? 'clearly' : 'a lot';
+  return ['op:' + o.op, 'part:' + part, far && 'moves:' + far].filter(Boolean);
+}
+function weights() { const w = {}; verdicts.forEach(v => v.f.forEach(f => { w[f] = (w[f] || 0) + v.v; })); return w; }
+function verdict(m, v) { verdicts.push({ at: new Date().toISOString(), f: feats(m), v, op: m.op, dag: v < 0 ? m.dag : undefined }); if (verdicts.length > 400) verdicts = verdicts.slice(-400); st('eravos.field.mutate.verdicts', verdicts); drawLearned(); }
+const featWords = (f) => f.replace('op:', '').replace('part:', '').replace('moves:', 'moves ');
+
 function measure(m) {
   const id = 'm' + (++mutCount), parent = play(bench.dag, 'bass'), r = play(m.dag, 'bass');
   const fromParent = r.fp && parent.fp ? dist(me(r.fp), me(parent.fp)) : null, heard = fromParent != null && fromParent >= SAME;
-  return { id, n: m.n, op: m.lineage.ops[0], dag: m.dag, r, fromParent, heard, offered: r.ok && heard, near: r.fp ? nearest(r.fp) : null, from: { name: bench.name, ops: bench.ops } };
+  return { id, n: m.n, op: m.lineage.ops[0], dag: m.dag, parentDag: bench.dag, r, fromParent, heard, offered: r.ok && heard, why: !r.ok ? 'does not play: ' + (r.why || []).join('; ') : !heard ? 'no one could hear the change' : '',
+    near: r.fp ? nearest(r.fp) : null, from: { name: bench.name, ops: bench.ops } };
+}
+let seenMutants = [];
+function seenSet() {   // what a new mutant must not repeat: the tool, your kept tools, what you threw away, the mutants already shown
+  return [{ what: 'the tool on the bench', dag: bench.dag }].concat(kept.slice(0, 20).map(k => ({ what: 'kept: ' + k.name, dag: k.dag })),
+    verdicts.filter(v => v.v < 0 && v.dag).slice(-20).map(v => ({ what: 'thrown away: ' + sayPlain(v.op), dag: v.dag })), seenMutants.slice(-30));
 }
 function doMutate() {
-  stop(); const t0 = performance.now();
-  const M = Compat.mutate(bench.dag, can, types, { seed, count: 6, from: bench.name });
-  mutants = M.map((m, i) => measure(Object.assign(m, { n: seed + '·' + (i + 1) }))); seed++;
-  document.getElementById('mutLab').innerHTML = 'from <b>' + bench.name + '</b> · seed ' + (seed - 1) + ' · ' + mutants.filter(m => m.offered).length + ' of ' + mutants.length + ' offered · checked, built, played and measured in ' + Math.round(performance.now() - t0) + ' ms · <b>⚄ again</b> for others · <b>open</b> one to keep editing it';
+  stop(); const t0 = performance.now(), w = weights();
+  const seen = seenSet(), taken = [], pool = [];
+  for (let k = 0; k < 3 && pool.filter(m => m.offered).length < 6; k++) {   // the gates are friction: when few pass, make another batch (up to three)
+    const batch = Compat.mutate(bench.dag, can, types, { seed: seed + k * 1000, count: 18, from: bench.name }).filter(m => !pool.some(x => JSON.stringify(x.dag) === JSON.stringify(m.dag)))
+      .map((m, i) => measure(Object.assign(m, { n: seed + '·' + (pool.length + i + 1) })));
+    pool.push(...batch); gate(batch);
+  }
+  function gate(batch) { batch.forEach(m => {     // the null against everything seen: a repeat is friction, not a new tool
+    if (!m.offered || !m.r.mono) return;
+    let best = { db: Infinity, what: '' };
+    seen.concat(taken).forEach(x => { const o = x.r || play(x.dag, 'bass'); if (!o.mono) return; const db = nullDb(m.r.mono, o.mono); if (db < best.db) best = { db, what: x.what }; });
+    m.nullTo = best; if (best.db < NULL_REPEAT) { m.offered = false; m.why = 'repeats ' + best.what + ' (nulls to ' + fmtDb(best.db) + ')'; }
+    else taken.push({ what: 'mutant ' + m.n, dag: m.dag, r: m.r });
+    m.score = feats(m).reduce((a, f) => a + (w[f] || 0), 0);
+  }); }
+  const ok = pool.filter(m => m.offered).sort((a, b) => b.score - a.score), pick = ok.slice(0, 5), rest = ok.slice(5);
+  if (rest.length) { const wild = rest[Math.floor(rest.length * ((seed * 0.618) % 1))]; wild.wild = true; pick.push(wild); }   // one wildcard, so it keeps exploring
+  const ranked = rest.filter(m => !m.wild).length;
+  mutants = pick.concat(pool.filter(m => !m.offered)); seed++;
+  seenMutants = seenMutants.concat(pick.map(m => ({ what: 'mutant ' + m.n, dag: m.dag, r: m.r }))).slice(-60);
+  const nv = verdicts.length;
+  document.getElementById('mutLab').innerHTML = 'from <b>' + bench.name + '</b> · seed ' + (seed - 1) + ' · ' + pool.length + ' made, ' + pool.filter(m => !m.offered).length + ' failed a gate, ' + ranked + ' ranked lower' +
+    (nv ? ' by what you kept and threw away (' + nv + ' verdicts)' : '') + ' · ' + pick.length + ' offered · ' + Math.round(performance.now() - t0) + ' ms';
   drawMutants(); document.getElementById('grid').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 function wave(cv, r) {
@@ -350,21 +436,28 @@ function wave(cv, r) {
   for (let x = 0; x < w; x++) { let lo = 1, hi = -1; for (let i = Math.floor(x * step); i < Math.floor((x + 1) * step); i++) { const v = r.mono[i] * k; if (v < lo) lo = v; if (v > hi) hi = v; } g.fillRect(x, h / 2 - hi * h / 2, 1, Math.max(1, (hi - lo) * h / 2)); }
 }
 function nameFor(base, op) { return base + ' · ' + (op.op === 'swap' ? op.to : op.op === 'insert' ? '+ ' + op.component : op.op === 'remove' ? 'no ' + op.node : op.op === 'vary' ? op.node + ' ' + op.key : op.from.split('.')[0] + ' → ' + op.to.split('.')[0]); }
+function whyOffered(m) {
+  if (m.wild) return 'a wildcard — ranked low, offered so it keeps learning';
+  const w = weights(), fs = feats(m).filter(f => w[f]).sort((a, b) => Math.abs(w[b]) - Math.abs(w[a])).slice(0, 2);
+  return fs.length ? fs.map(f => (w[f] > 0 ? 'you kept ' : 'you threw away ') + featWords(f) + ' (' + (w[f] > 0 ? '+' : '') + w[f] + ')').join(' · ') : 'nothing learned about it yet';
+}
 function card(m) {
   const d = document.createElement('div'); d.className = 'mut' + (m.offered ? '' : ' off'); d.dataset.mut = m.id;
   const hit = hitNode(m.op), comps = inOrder(m.dag).map(n => '<span class="k' + (n.id === hit ? ' hit' : '') + '">' + n.component + '</span>').join('<span>→</span>'), f = (x) => x == null ? '—' : x.toFixed(3);
-  d.innerHTML = '<div class="top"><span class="num">MUTANT ' + m.n + '</span><span class="by">⚄ MUTATE</span></div>' +
+  d.innerHTML = '<div class="top"><span class="num">MUTANT ' + m.n + '</span><span class="by">' + (m.wild ? '⚄ WILDCARD' : '⚄ MUTATE') + '</span></div>' +
     '<div class="what">' + say(m.op) + '</div><div class="chain">' + comps + '</div><canvas class="wave"></canvas>' +
     '<div class="meas"><span>plays</span><b class="' + (m.r.ok ? 'yes' : 'no') + '">' + (m.r.ok ? 'yes · ' + m.r.rmsDb.toFixed(1) + ' dB' : 'no — ' + (m.r.why || []).join('; ')) + '</b>' +
     '<span>heard as new</span><b class="' + (m.heard ? 'yes' : 'no') + '">' + (m.heard ? 'yes' : 'no') + ' · ' + f(m.fromParent) + ' from ' + m.from.name + '</b>' +
-    '<span>nearest</span><b>' + (m.near ? m.near.nn.label + ' · ' + m.near.nn.preset + ' (' + f(m.near.d) + ', ' + m.near.verdict + ')' : '—') + '</b></div>' +
+    '<span>null to seen</span><b class="' + (m.nullTo && m.nullTo.db < NULL_REPEAT ? 'no' : '') + '">' + (m.nullTo ? fmtDb(m.nullTo.db) + ' vs ' + m.nullTo.what : '—') + '</b>' +
+    '<span>nearest</span><b>' + (m.near ? m.near.nn.label + ' · ' + m.near.nn.preset + ' (' + f(m.near.d) + ', ' + m.near.verdict + ')' : '—') + '</b>' +
+    (m.offered ? '<span>why offered</span><b>' + whyOffered(m) + '</b>' : '<span>not offered</span><b class="no">' + m.why + '</b>') + '</div>' +
     '<div class="row"><button class="tb" data-a="play">▶ PLAY</button><button class="tb" data-a="ab">A / B</button>' +
-    (m.offered ? '<button class="tb on" data-a="open">✎ OPEN TO EDIT</button><button class="tb" data-a="keep">KEEP</button>' : '') + '<button class="tb" data-a="throw">✕</button></div>';
+    (m.offered ? '<button class="tb on" data-a="open">✎ OPEN TO EDIT</button><button class="tb" data-a="keep">KEEP</button>' : '') + '<button class="tb" data-a="throw">' + (m.offered ? '✕ THROW AWAY' : '✕') + '</button></div>';
   d.querySelector('[data-a=play]').onclick = () => hear(m.dag, m.id);
   d.querySelector('[data-a=ab]').onclick = () => hear(bench.dag, 'bench', () => setTimeout(() => hear(m.dag, m.id), 250));
-  const ob = d.querySelector('[data-a=open]'); if (ob) ob.onclick = () => { open({ name: nameFor(m.from.name, m.op), dag: m.dag, ops: m.from.ops.concat([m.op]) }); bench.savedAt = ''; drawBench(); window.scrollTo({ top: 0, behavior: 'smooth' }); toast('mutant ' + m.n + ' is on the bench — edit it, then keep it'); };
-  const kb = d.querySelector('[data-a=keep]'); if (kb) kb.onclick = () => { keepAs(nameFor(m.from.name, m.op), m.dag, m.from.ops.concat([m.op]), m); mutants = mutants.filter(x => x !== m); drawMutants(); };
-  d.querySelector('[data-a=throw]').onclick = () => { if (playingId === m.id) stop(); mutants = mutants.filter(x => x !== m); drawMutants(); };
+  const ob = d.querySelector('[data-a=open]'); if (ob) ob.onclick = () => { verdict(m, 0.5); open({ name: nameFor(m.from.name, m.op), dag: m.dag, ops: m.from.ops.concat([m.op]) }); bench.savedAt = ''; drawBench(); window.scrollTo({ top: 0, behavior: 'smooth' }); toast('mutant ' + m.n + ' is on the bench — edit it, then keep it'); };
+  const kb = d.querySelector('[data-a=keep]'); if (kb) kb.onclick = () => { verdict(m, 1); keepAs(nameFor(m.from.name, m.op), m.dag, m.from.ops.concat([m.op]), m); mutants = mutants.filter(x => x !== m); drawMutants(); };
+  d.querySelector('[data-a=throw]').onclick = () => { if (m.offered) verdict(m, -1); if (playingId === m.id) stop(); mutants = mutants.filter(x => x !== m); drawMutants(); };
   requestAnimationFrame(() => wave(d.querySelector('canvas'), m.r));
   return d;
 }
@@ -373,18 +466,25 @@ function drawMutants() {
   const on = mutants.filter(m => m.offered), no = mutants.filter(m => !m.offered);
   on.forEach(m => grid.appendChild(card(m)));
   if (no.length) { const det = document.createElement('details'); det.className = 'offs';
-    det.innerHTML = '<summary>NOT OFFERED (' + no.length + ') — it does not play cleanly, or no one could hear the change</summary><div class="g2" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:10px"></div>';
+    det.innerHTML = '<summary>NOT OFFERED (' + no.length + ') — it does not play cleanly, no one could hear the change, or it nulls against something already seen</summary><div class="g2" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:10px"></div>';
     offs.appendChild(det); no.forEach(m => det.querySelector('.g2').appendChild(card(m))); }
 }
 
 // ---- keep: a tool of your own (its DAG, its lineage, what was measured) ----
+function sig(r) { if (!r.mono) return null; const k = r.peak > 0 ? 1 / r.peak : 1, n = Math.floor(r.mono.length / 12), a = new Int16Array(n); for (let i = 0; i < n; i++) a[i] = Math.round(Math.max(-1, Math.min(1, r.mono[i * 12] * k)) * 32767);
+  let b = ''; const u = new Uint8Array(a.buffer); for (let i = 0; i < u.length; i += 8192) b += String.fromCharCode.apply(null, u.subarray(i, i + 8192)); return btoa(b); }
+function unsig(s) { const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); const a = new Int16Array(u.buffer), f = new Float32Array(a.length); for (let i = 0; i < a.length; i++) f[i] = a[i] / 32767; return f; }
+function regression(k) {   // the kept tool rendered now, nulled against its render when kept: the same parts and settings must make the same sound
+  if (!k.render) return null; const r = play(k.dag, 'bass'); if (!r.mono) return { db: 0, ok: false };
+  const now = unsig(sig(r)), then = unsig(k.render), db = nullDb(now, then); return { db, ok: db < -60 };
+}
 function keepAs(name, dag, ops, m) {
   const r = play(dag, 'bass'), k = { id: 'k' + Date.now().toString(36) + Math.floor(Math.random() * 1e3), name, dag: clone(dag), ops: clone(ops), at: new Date().toISOString(),
-    measured: { rmsDb: r.rmsDb, nearest: r.fp ? (() => { const n = nearest(r.fp); return { tool: n.nn.label, preset: n.nn.preset, d: +n.d.toFixed(3), verdict: n.verdict }; })() : null } };
+    render: sig(r), measured: { rmsDb: r.rmsDb, nearest: r.fp ? (() => { const n = nearest(r.fp); return { tool: n.nn.label, preset: n.nn.preset, d: +n.d.toFixed(3), verdict: n.verdict }; })() : null } };
   kept.unshift(k); save(); drawKept(); toast('kept: ' + name); return k;
 }
 document.getElementById('save').onclick = () => {
-  if (bench.keptId && kept.some(k => k.id === bench.keptId)) { const k = kept.find(k => k.id === bench.keptId); k.dag = clone(bench.dag); k.ops = clone(bench.ops); k.name = bench.name; k.at = new Date().toISOString(); save(); bench.savedAt = JSON.stringify(bench.dag); drawKept(); drawBench(); toast('saved ' + k.name); return; }
+  if (bench.keptId && kept.some(k => k.id === bench.keptId)) { const k = kept.find(k => k.id === bench.keptId); k.dag = clone(bench.dag); k.ops = clone(bench.ops); k.name = bench.name; k.at = new Date().toISOString(); k.render = sig(play(k.dag, 'bass')); save(); bench.savedAt = JSON.stringify(bench.dag); drawKept(); drawBench(); toast('saved ' + k.name); return; }
   const k = keepAs(bench.name, bench.dag, bench.ops); bench.keptId = k.id; bench.savedAt = JSON.stringify(bench.dag); drawBench();
 };
 function drawKept() {
@@ -393,9 +493,10 @@ function drawKept() {
   kept.forEach(k => {
     const d = document.createElement('div'); d.className = 'kp' + (bench && bench.keptId === k.id ? ' cur' : '');
     d.innerHTML = '<div class="nm"></div><div class="ln">' + (k.ops.length ? k.ops.slice(-6).map((o, i) => (k.ops.length - Math.min(6, k.ops.length) + i + 1) + '. ' + say(o)).join('<br>') : 'no changes') + '</div>' +
-      '<div class="ln">' + inOrder(k.dag).map(n => n.component).join(' → ') + '</div>' +
+      '<div class="ln">' + inOrder(k.dag).map(n => n.component).join(' → ') + '</div><div class="reg"></div>' +
       '<div class="row"><button class="tb" data-a="play">▶</button><button class="tb on" data-a="open">✎ OPEN</button><button class="tb" data-a="from">⚄ MUTATE FROM IT</button><button class="tb" data-a="del" title="delete">✕</button></div>';
     d.querySelector('.nm').textContent = k.name;
+    const rg = regression(k), re = d.querySelector('.reg'); if (rg) { re.className = 'reg ' + (rg.ok ? 'ok' : 'bad'); re.textContent = rg.ok ? '✓ regression gate: nulls against its render when kept (' + fmtDb(rg.db) + ')' : '⚠ REGRESSION: sounds different from when kept (null ' + fmtDb(rg.db) + ')'; }
     d.querySelector('[data-a=play]').onclick = () => hear(k.dag, k.id);
     d.querySelector('[data-a=open]').onclick = () => { open({ keptId: k.id, name: k.name, dag: k.dag, ops: k.ops }); window.scrollTo({ top: 0, behavior: 'smooth' }); };
     d.querySelector('[data-a=from]').onclick = () => { open({ keptId: k.id, name: k.name, dag: k.dag, ops: k.ops }); doMutate(); };
@@ -403,6 +504,112 @@ function drawKept() {
     L.appendChild(d);
   });
 }
+
+function drawLearned() {
+  const L = document.getElementById('learned'); if (!L) return; const w = weights(), ks = Object.keys(w).filter(k => w[k]).sort((a, b) => w[b] - w[a]);
+  if (!ks.length) { L.innerHTML = '<div class="empty">nothing yet. each KEEP, OPEN and THROW AWAY teaches it what you go for.</div>'; return; }
+  const row = (k) => '<div class="lrn"><span>' + featWords(k) + '</span><b class="' + (w[k] > 0 ? 'p' : 'n') + '">' + (w[k] > 0 ? '+' : '') + w[k] + '</b></div>';
+  L.innerHTML = '<div class="empty" style="margin-top:6px">' + verdicts.length + ' verdicts</div>' + ks.slice(0, 5).map(row).join('') + (ks.length > 5 ? '<div class="lrn"><span>…</span></div>' + ks.slice(-3).filter(k => w[k] < 0 && ks.indexOf(k) >= 5).map(row).join('') : '') +
+    '<div class="row" style="margin-top:6px"><button class="tb" id="forget">FORGET WHAT IT LEARNED</button></div>';
+  document.getElementById('forget').onclick = () => { verdicts = []; st('eravos.field.mutate.verdicts', verdicts); drawLearned(); };
+}
+
+// ---- SYNTHESIZE: the bench becomes a whole tool — its face from its parts' elements (in signal order, the face controls first, the rest
+// behind More depth), its keys, its tool file (what it is made of, its DAG, its lineage, its render for the regression gate). The end, not more mutating.
+const slug = (t) => String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'tool';
+function toolFile() {
+  const order = inOrder(bench.dag), r = play(bench.dag, 'bass');
+  return { schema: 'eravos.tool/1 (draft — synthesized)', id: 'mine.' + slug(bench.name), label: bench.name, category: 'Mine', icon: '◆',
+    needs: { components: [...new Set(order.map(n => n.component + '@' + (C[n.component].version || '1.0.0')))], elements: [...new Set(order.map(n => n.component + '.element@1'))] },
+    config: order.flatMap(n => (C[n.component].variables || []).filter(v => v.type === 'number' || v.type === 'enum' || v.type === 'boolean').map(v => ({ key: n.id + '.' + v.key, element: n.component, node: n.id,
+      type: v.type, min: v.min, max: v.max, options: v.options, unit: v.unit, default: n.vars && n.vars[v.key] !== undefined ? n.vars[v.key] : v.default }))),
+    faceKeys: order.flatMap(n => (((C[n.component].element || {}).controls) || []).filter(c => c.face).map(c => n.id + '.' + c.key)),
+    dag: bench.dag, lineage: { from: 'Saw voice', ops: bench.ops, by: 'him + mutate', at: new Date().toISOString() },
+    gates: { render: 'bass line, 48 kHz', null_baseline: sig(r) ? '(stored: the regression gate nulls against it)' : null, rmsDb: +r.rmsDb.toFixed(2) } };
+}
+function knob(v, x, onSet) {
+  const s = slider(v), el = document.createElement('div'); el.className = 'knob'; el.title = (v.about || v.key) + ' · drag up / down · double-click: default';
+  let val = x; const draw = () => { const t = s.toS(val), a0 = 135, a1 = 135 + 270 * t, R = 17, P = (a) => [24 + R * Math.cos(a * Math.PI / 180), 24 + R * Math.sin(a * Math.PI / 180)], [x0, y0] = P(a0), [x1, y1] = P(a1), [xe, ye] = P(405);
+    el.innerHTML = '<svg width="48" height="44" viewBox="0 0 48 44"><path d="M' + x0 + ' ' + y0 + ' A' + R + ' ' + R + ' 0 1 1 ' + xe + ' ' + ye + '" fill="none" stroke="#1B2A3A" stroke-width="3.5" stroke-linecap="round"/>' +
+      (t > 0.002 ? '<path d="M' + x0 + ' ' + y0 + ' A' + R + ' ' + R + ' 0 ' + (270 * t > 180 ? 1 : 0) + ' 1 ' + x1 + ' ' + y1 + '" fill="none" stroke="var(--c)" stroke-width="3.5" stroke-linecap="round"/>' : '') +
+      '<circle cx="' + x1 + '" cy="' + y1 + '" r="2.6" fill="#D8F6FF"/></svg><span class="kv">' + fmtN(val, v) + '</span><span class="kl">' + v.key + '</span>'; };
+  draw(); let y = null, t0 = 0;
+  el.onpointerdown = (e) => { y = e.clientY; t0 = s.toS(val); el.setPointerCapture(e.pointerId); };
+  el.onpointermove = (e) => { if (y == null) return; val = s.fromS(Math.max(0, Math.min(1, t0 + (y - e.clientY) / 160))); draw(); };
+  el.onpointerup = () => { if (y == null) return; y = null; onSet(val); };
+  el.ondblclick = () => { val = v.default; draw(); onSet(val); };
+  return el;
+}
+let synthOpen = false;
+function drawSynth() {
+  if (!synthOpen) return;
+  const order = inOrder(bench.dag), face = document.getElementById('sFace'); face.innerHTML = '';
+  document.getElementById('sName').textContent = bench.name; document.getElementById('sVer').textContent = 'synthesized from ' + order.length + ' parts · ' + bench.ops.length + ' changes from Saw voice';
+  const more = [];
+  order.forEach(n => {
+    const c = C[n.component], col = kindCol(n.component), ctl = ((c.element || {}).controls) || [], vs = (c.variables || []).filter(v => v.type === 'number' || v.type === 'enum' || v.type === 'boolean');
+    const mk = (keys, title) => { const el = document.createElement('div'); el.className = 'el'; el.style.setProperty('--c', col);
+      el.innerHTML = '<div class="eh"><span>' + title + '</span><span>' + n.component + '</span></div><div class="knobs"></div>'; const K = el.querySelector('.knobs');
+      keys.forEach(k => { const v = vs.find(q => q.key === k); if (!v) return; const x = n.vars && n.vars[k] !== undefined ? n.vars[k] : v.default;
+        const set = (val) => { apply(Compat.vary(bench.dag, n.id, k, val, can, types)); drawSynth(); };
+        if (v.type === 'number') K.appendChild(knob(v, x, set));
+        else { const w = document.createElement('div'); w.style.cssText = 'display:flex;flex-direction:column;gap:3px'; w.innerHTML = '<span class="kl" style="font-size:9px;color:var(--dim);letter-spacing:1px">' + k + '</span><div class="seg"></div>';
+          (v.type === 'enum' ? v.options : [true, false]).forEach(o => { const b = document.createElement('button'); b.textContent = v.type === 'enum' ? o : (o ? 'on' : 'off'); if (o === x) b.className = 'on'; b.onclick = () => set(o); w.querySelector('.seg').appendChild(b); }); K.appendChild(w); } });
+      return el; };
+    const fk = ctl.filter(q => q.face).map(q => q.key), rest = vs.map(v => v.key).filter(k => !fk.includes(k));
+    face.appendChild(mk(fk.length ? fk : vs.slice(0, 3).map(v => v.key), n.id.toUpperCase() + ' · ' + n.component.replace(/-/g, ' ').toUpperCase()));
+    if (rest.length) more.push(mk(rest, n.id.toUpperCase() + ' · MORE'));
+  });
+  if (more.length) { const b = document.createElement('button'); b.className = 'more'; b.textContent = (synthMore ? '▾' : '▸') + ' MORE DEPTH (' + more.reduce((a, e) => a + e.querySelectorAll('.knob,.seg').length, 0) + ' more settings)';
+    b.onclick = () => { synthMore = !synthMore; drawSynth(); }; face.appendChild(b); if (synthMore) more.forEach(e => face.appendChild(e)); }
+  const f = toolFile(); document.getElementById('sFile').textContent = JSON.stringify(Object.assign({}, f, { gates: Object.assign({}, f.gates) }), null, 2);
+  const rg = (kept.find(k => k.id === bench.keptId) && regression(kept.find(k => k.id === bench.keptId))) || null;
+  document.getElementById('sFoot').innerHTML = 'face: <b>' + f.faceKeys.length + '</b> controls from the parts\' elements, ' + (f.config.length - f.faceKeys.length) + ' more behind More depth · made of <b>' + f.needs.components.join(', ') + '</b><br>' +
+    'gates: types fit ✓ · builds ✓ · plays ' + (play(bench.dag, 'bass').ok ? '✓' : '✗') + ' · null against your kept tools: ' + nullAgainstKept() + (rg ? ' · regression ' + (rg.ok ? '✓ ' + fmtDb(rg.db) : '⚠ ' + fmtDb(rg.db)) : '') + '<br>' +
+    'play the keys (or your computer keyboard: A W S E D F T G Y H U J K). built into ERAVOS, SAVE puts this tool in Documents\\ERAVOS\\tools\\' + f.id + ' — it opens on the canvas, wires like any tool, its knobs move while it plays.';
+}
+let synthMore = false;
+function nullAgainstKept() { const r = play(bench.dag, 'bass'); if (!r.mono) return '—'; let best = { db: Infinity, name: '' };
+  kept.filter(k => k.id !== bench.keptId).forEach(k => { const o = play(k.dag, 'bass'); if (o.mono) { const db = nullDb(r.mono, o.mono); if (db < best.db) best = { db, name: k.name }; } });
+  return best.name ? (best.db < NULL_REPEAT ? '⚠ the same as ' + best.name + ' (' + fmtDb(best.db) + ')' : '✓ nearest ' + best.name + ' ' + fmtDb(best.db)) : 'nothing kept to compare'; }
+// the keys: each press renders the note through the assembled tool, held until let go
+const noteCache = new Map(); let held = null;
+function renderNote(dag, hz) {
+  const key = hz + '|' + JSON.stringify(dag); if (noteCache.has(key)) return noteCache.get(key);
+  const E = assemble(dag, contracts, domain, { sr: SR }); if (!E.ok) return null; const { L, R } = E.render(3, [{ t: 0, dur: 3, hz }]);
+  let pk = 0; for (let i = 0; i < L.length; i++) { if (!Number.isFinite(L[i])) L[i] = 0; if (!Number.isFinite(R[i])) R[i] = 0; pk = Math.max(pk, Math.abs(L[i]), Math.abs(R[i])); }
+  const g = Math.min(1, 0.005 * SR); for (let i = 0; i < g; i++) { L[i] *= i / g; R[i] *= i / g; }
+  const o = { L, R, k: pk > 0 ? 0.7 / pk : 1 }; if (noteCache.size > 60) noteCache.delete(noteCache.keys().next().value); noteCache.set(key, o); return o;
+}
+function noteOn(hz, el) {
+  noteOff(); AC = AC || new (window.AudioContext || window.webkitAudioContext)({ sampleRate: SR }); if (AC.state === 'suspended') AC.resume();
+  const o = renderNote(bench.dag, hz); if (!o) return; const buf = AC.createBuffer(2, o.L.length, SR); buf.getChannelData(0).set(o.L); buf.getChannelData(1).set(o.R);
+  const sN = AC.createBufferSource(), gN = AC.createGain(); sN.buffer = buf; gN.gain.value = o.k; sN.connect(gN).connect(AC.destination); sN.start(); held = { sN, gN, el }; if (el) el.classList.add('on');
+}
+function noteOff() { if (!held) return; const { sN, gN, el } = held; const t = AC.currentTime; gN.gain.setValueAtTime(gN.gain.value, t); gN.gain.linearRampToValueAtTime(0, t + 0.06); sN.stop(t + 0.08); if (el) el.classList.remove('on'); held = null; }
+function drawKeys() {
+  const K = document.getElementById('sKeys'); K.innerHTML = ''; const names = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'], white = [], black = [];
+  for (let i = 0; i <= 24; i++) { const nm = names[i % 12], hz = 55 * Math.pow(2, i / 12); (nm.includes('#') ? black : white).push({ i, nm, hz, oct: 1 + Math.floor((i + 9) / 12) }); }
+  const W = 100 / white.length;
+  white.forEach((k, j) => { const e = document.createElement('div'); e.className = 'wk'; e.style.left = (j * W) + '%'; e.style.width = W + '%'; e.innerHTML = k.nm === 'A' || k.nm === 'C' ? '<i>' + k.nm + k.oct + '</i>' : ''; k.el = e; K.appendChild(e); });
+  black.forEach(k => { const j = white.filter(w => w.i < k.i).length; const e = document.createElement('div'); e.className = 'bk'; e.style.left = (j * W - W * 0.32) + '%'; e.style.width = (W * 0.64) + '%'; k.el = e; K.appendChild(e); });
+  white.concat(black).forEach(k => { k.el.onpointerdown = (e) => { e.preventDefault(); noteOn(k.hz, k.el); }; k.el.onpointerup = k.el.onpointerleave = () => { if (held && held.el === k.el) noteOff(); }; });
+  drawKeys.map = white.concat(black).sort((a, b) => a.i - b.i);
+}
+const KB = 'awsedftgyhujk';
+document.addEventListener('keydown', (e) => { if (!synthOpen || e.repeat || e.target.tagName === 'INPUT') return; const i = KB.indexOf(e.key.toLowerCase()); if (i >= 0 && drawKeys.map) { const k = drawKeys.map[i + 3]; if (k) noteOn(k.hz, k.el); } else if (e.key === 'Escape') closeSynth(); });
+document.addEventListener('keyup', (e) => { if (synthOpen && KB.indexOf(e.key.toLowerCase()) >= 0) noteOff(); });
+function openSynth() { stop(); synthOpen = true; document.getElementById('synthWrap').hidden = false; document.body.style.overflow = 'hidden'; drawKeys(); drawSynth(); }
+function closeSynth() { noteOff(); synthOpen = false; document.getElementById('synthWrap').hidden = true; document.body.style.overflow = ''; drawBench(); }
+document.getElementById('synth').onclick = openSynth; document.getElementById('sClose').onclick = closeSynth;
+document.getElementById('sJson').onclick = () => { const f = document.getElementById('sFile'); f.hidden = !f.hidden; };
+document.getElementById('sSave').onclick = () => {
+  const f = toolFile(); f.gates.null_baseline = sig(play(bench.dag, 'bass'));
+  if (!(bench.keptId && kept.some(k => k.id === bench.keptId))) { const k = keepAs(bench.name, bench.dag, bench.ops); bench.keptId = k.id; } else document.getElementById('save').click();
+  bench.savedAt = JSON.stringify(bench.dag);
+  try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(f, null, 2)], { type: 'application/json' })); a.download = f.id + '.tool.json'; document.body.appendChild(a); a.click(); a.remove(); } catch (e) {}
+  toast('saved: ' + f.id + ' (kept here, and its tool file downloaded)'); drawSynth();
+};
 
 // ---- start from: the real tools, and how much of each can be assembled today ----
 function drawTools() {
@@ -441,12 +648,12 @@ function drawBench() {
   document.getElementById('undo').disabled = !hist.length; document.getElementById('redo').disabled = !fut.length;
   drawCrumbs(); drawBoard(); drawInsp(); drawKept();
 }
-function drawAll() { drawBench(); drawMutants(); drawTools(); }
+function drawAll() { drawBench(); drawMutants(); drawTools(); drawLearned(); }
 document.getElementById('foot').innerHTML = 'parts that can be assembled today: <b>' + can.length + ' of ' + contracts.length + '</b> components — a tool opens here once every part it is made of can be; each part joins when its adapter is written (no sound re-made: the adapter calls the part\'s own tested kernel).<br>' +
   'every edit and every mutant goes through the same checks: the types fit, it builds, it plays (finite, not silent, not pinned). "nearest" is advisory: your ear decides.<br>' +
   'preview: kept tools stay in this page (this device). built into ERAVOS, they are tools in Documents\\ERAVOS\\tools that open on the canvas.';
 open(START); drawTools();
-window.__mutate = { doMutate, get mutants() { return mutants; }, get kept() { return kept; }, get bench() { return bench; }, apply, undo, redo, open };
+window.__mutate = { openSynth, closeSynth, get verdicts() { return verdicts; }, nullDb, toolFile, doMutate, get mutants() { return mutants; }, get kept() { return kept; }, get bench() { return bench; }, apply, undo, redo, open };
 })();
 </script>
 </body></html>
