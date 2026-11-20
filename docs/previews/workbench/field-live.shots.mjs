@@ -24,6 +24,6 @@ console.log('cutoff now', await p.evaluate(() => OrganismFactory.handle(window._
 // scroll the canvas down (the wheel, as everywhere) to what it has grown since the board
 for (let i = 0; i < 2; i++) await p.evaluate(() => { const c = CanvasWM.canvas, r = c.getBoundingClientRect(); c.dispatchEvent(new WheelEvent('wheel', { bubbles: true, cancelable: true, deltaY: 220, clientX: r.x + 40, clientY: r.y + 40 })); });
 await p.waitForTimeout(500); await p.screenshot({ path: OUT('field-live-scrolled.png') });
-await p.evaluate(() => { localStorage.removeItem('eravos.fieldboard.eravos.wobble-bass'); FieldBoard.assemble(window.__wb); });
+await p.evaluate(async () => { localStorage.removeItem('eravos.fieldboard.eravos.wobble-bass'); await FieldBoard.assemble(window.__wb); });
 console.log('back in its window:', await p.evaluate(() => !!CanvasWM.windowOf(window.__wb).querySelector('[data-key="cutoff"]')), 'errors', errs);
 await b.close();

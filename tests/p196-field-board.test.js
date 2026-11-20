@@ -25,10 +25,10 @@ describe('P196 a tool exploded on the canvas — live, editable, put back', () =
       const before = h.ctx.params.get('res'); h.view.emit('config_change', { key: 'res', value: 3.3 });   // what a knob in a gate sends
       await new Promise(r => setTimeout(r, 50)); assert.equal(h.ctx.params.get('res'), 3.3, 'a control in a gate still sets the tool (was ' + before + ')');
       assert.ok(FieldBoard.isOpen(a), 'open');
-      assert.ok(FieldBoard.assemble(a), 'put back together');
+      assert.ok(await FieldBoard.assemble(a), 'put back together (the flight home lands, then every part is in its window)');
       assert.ok(win.contains(cutoff) && win.contains(keys) && win.contains(shape), 'every part back in its window');
       assert.ok(!document.querySelector('.fb-board[data-instance="' + a + '"]') && !win.classList.contains('fb-away'), 'the board gone, the window back');
       assert.ok(!win.querySelector('.wb-deep').contains(cutoff), 'parts went back where they came from');
-    } finally { if (FieldBoard.isOpen(a)) FieldBoard.assemble(a); OrganismFactory.close(a); }
+    } finally { if (FieldBoard.isOpen(a)) await FieldBoard.assemble(a, { now: true }); OrganismFactory.close(a); }
   });
 });

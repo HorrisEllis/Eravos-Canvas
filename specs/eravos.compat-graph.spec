@@ -268,3 +268,11 @@ acceptance (CG0): this spec, the map's numbers reproducible: grep the specs' dep
 # why 10 (answered): 10 components have adapters; 12 more sound parts need only an adapter each (filter-formant, amp-chain, bbd-line,
 #   ensemble-core, modal-resonator, karplus-string, osc-noise, osc-wavetable, lfo, random-source, tape-transport, oscillator-population);
 #   13 are logic (notes, patterns, harmony, curves, data) and need a note / data node; settings are not yet modulation inputs.
+
+## ADDENDUM 2026-11-20 (6) — the Field opens and closes as one animated scene (nothing above is changed)
+# his words (2026-11-20, verbatim): "Okay field is full screen. What about animated transition for the dynamic canvas changing. Like opening the
+#   field dynamically changes the ui. Animated and beautiful."
+# built (3.197), shown first as a video (docs/previews/workbench/field-transition.mp4): full screen (the bar slides away, the canvas takes the
+#   screen); the rest of the canvas softens back; the camera glides; the tool's parts lift and fly to the board, nearest the core first; the core
+#   blooms; wires draw in; labels, header, legend come up. Esc or right-click: the reverse. Every motion a Web Animation (seekable, so a recording
+#   is exact); reduced motion → the end state at once. Rule kept: the look of the board is the board's; the motion is an addition, shown first.

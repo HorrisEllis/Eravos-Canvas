@@ -2,6 +2,21 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.197 The Field opens and closes as one animated scene — shown first, as a video (2026-11-20)
+His words: "Okay field is full screen. What about animated transition for the dynamic canvas changing. Like opening the field dynamically
+changes the ui. Animated and beautiful."
+- tools/core/field/board.js: every motion a Web Animation (seekable; reduced motion → the end at once). Opening: the bar slides away and the
+  canvas takes the whole screen; every other window, the cables and the dock soften back (fade + blur); the camera glides to frame the board;
+  the tool's frame dissolves while its parts lift (rise + scale + shadow) and fly to their places, nearest the core first, settling as they land;
+  the core blooms; each wire draws itself into the core; labels, header and legend come up (~3.4 s). Closing (right-click, or Esc): the
+  same in reverse — wires and labels go, the parts fly home as the window re-forms, the canvas and the bar return, the camera glides back.
+- Found while filming, fixed: the board sat under the windows (the parts were hidden behind their own window for the first half second); each
+  part's start was measured after the parts before it had left (the window reflowed — the keyboard flew from the top); parts hidden behind More
+  depth started at the screen's corner (now they rise out of the window's foot, fading in); finish() on the face's endless CSS animations threw.
+- Video: docs/previews/workbench/field-transition.mp4 (node docs/previews/workbench/field-transition.video.mjs — each frame the animations
+  seeked to that moment, 30 fps); frames: field-transition-open.png, field-transition-close.png.
+- Proof: P196 1/1 (assemble now awaits the flight home); boundary 10/10; bare-canvas; validate; Wobble 49/49; P102; P119.
+
 ## 3.196 A tool exploded on the canvas, live — Wobble Bass in the Field board, editable (2026-11-20)
 His words: "okay now let me edit and change the wobble base. also i feel it should be a canvas in itself. so i can scroll around"
 - tools/core/field/board.js (window.FieldBoard, domain-free): a tool's live window lifted apart onto the canvas itself — each part (a card by
