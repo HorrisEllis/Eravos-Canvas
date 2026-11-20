@@ -385,3 +385,10 @@
     quiet: ['audio signal out', 'play notes', 'play midi', 'follow'],   // intents that only repeat the name: not shown under it
   });
 })(typeof window !== 'undefined' ? window : globalThis);
+// 2026-11-20 — what a mutation never moves on a music tool (tools/core/field/mutate.js): how loud it is, its tempo, its key and octave (it stays
+// in the song), and switches that are about playing it, not its sound. Everything else mutates.
+(function (g) {
+  if (!g.FieldMutate) return;
+  const KEEP = /^(level|volume|gain|master|masterGain|outGain|ceiling|bpm|ownBpm|tempo|speed|transpose|octave|key|root|scale|follow|keepRange|hold|loop|midiChannel|channel|sync|lfoSync|retrig|stopped|latch|freeze|mute|bypass|solo|record|armed)$/;
+  g.FieldMutate.guards.push((c) => !KEEP.test(c.key));
+})(typeof window !== 'undefined' ? window : globalThis);

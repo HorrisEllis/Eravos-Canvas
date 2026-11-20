@@ -140,6 +140,19 @@
       hist.push({ label: (label || key) + (value !== null && typeof value === 'object' ? '' : ' · ' + (typeof value === 'number' ? +value.toFixed(3) : String(value))), doc: clone(d) }); if (hist.length > 200) hist.splice(1, 1);
       if (o.onChange) { try { o.onChange(clone(d)); } catch (e) { console.error(e); } } render();
     }
+    function editMany(patch, label) {   // several settings as ONE undo step (a mutation, its throw)
+      past.push(clone(d)); future = []; Object.keys(patch).forEach(k => { d = K.set(d, k, patch[k]) || d; });
+      if (d && d.__sel !== undefined) { d = Object.assign({}, d); delete d.__sel; }
+      hist.push({ label: label || 'MUTATE', doc: clone(d) }); if (hist.length > 200) hist.splice(1, 1);
+      if (o.onChange) { try { o.onChange(clone(d)); } catch (e) { console.error(e); } } render();
+    }
+    // 2026-11-20 (his: "then the workshop or field. like i want full mutation"): the document as a mutation target (tools/core/field/mutate.js, shared
+    // with the Field board) — every field of every layer; set = one undo step; heard through the kind's own ▶ HEAR action when it has one
+    const mtarget = { id: 'ws.' + K.id,
+      list: () => { const out = [], seen = new Set(); layers().forEach(l => (l.fields || []).forEach(f => { if (!f.key || String(f.key)[0] === '@' || seen.has(f.key)) return; seen.add(f.key); out.push(Object.assign({}, f, { label: (l.label ? l.label + ' · ' : '') + (f.label || f.key) })); })); return out; },
+      get: (k) => K.get(d, k), set: (p) => editMany(p, 'MUTATE'),
+      hear: () => { const a = (K.actions ? K.actions(clone(d), { selected }) || [] : []).find(x => /HEAR/i.test(x.label || '')); if (a && a.run) a.run(clone(d)); } };
+    let wsDock = null;
     function restore(x, label) { d = clone(x); if (o.onChange) { try { o.onChange(clone(d)); } catch (e) { console.error(e); } } hist.push({ label, doc: clone(d) }); render(); }
     function undo() { if (!past.length) return false; future.push(clone(d)); restore(past.pop(), 'UNDO'); return true; }
     function redo() { if (!future.length) return false; past.push(clone(d)); restore(future.pop(), 'REDO'); return true; }
@@ -237,6 +250,10 @@
         c.forEach(gx => { gx.g.style.cssText += ';left:' + x + 'px;top:' + y + 'px;width:' + GW + 'px'; gx.side = ci < left ? 'l' : 'r'; y += gx.g.offsetHeight + GAP; }); });
       const W = CX + CW + 70 + (cols - left) * (GW + 70) + 20; stage.style.width = W + 'px'; stage.style.height = Hh + 'px'; svg.setAttribute('width', W); svg.setAttribute('height', Hh);
       const ch = core.offsetHeight, NS = 'http://www.w3.org/2000/svg';
+      if (global.FieldMutate && mtarget.list().some(c => global.FieldMutate.usable(mtarget, c))) {   // ⚄ MUTATE under the core, the same dock as the Field's (kept across redraws: a mutation waits for keep / throw)
+        if (!wsDock) wsDock = global.FieldMutate.dock(mtarget, { hint: 'moves a few settings of its layers — heard at once; keep it or throw it' });
+        wsDock.classList.add('ws-bmut'); wsDock.style.cssText = 'position:absolute;left:' + CX + 'px;top:' + (CY + ch + 18) + 'px;width:' + CW + 'px'; stage.appendChild(wsDock);
+        if (CY + ch + 18 + 160 > Hh) { stage.style.height = (CY + ch + 200) + 'px'; svg.setAttribute('height', CY + ch + 200); } }
       gates.forEach((gx, i) => { const g = gx.g, y1 = g.offsetTop + Math.min(40, g.offsetHeight / 2), x1 = gx.side === 'l' ? g.offsetLeft + GW : g.offsetLeft, x2 = gx.side === 'l' ? CX : CX + CW;
         const same = gates.filter(o2 => o2.side === gx.side), k = same.indexOf(gx), y2 = CY + 16 + (ch - 32) * ((k + 0.5) / same.length), m = (x1 + x2) / 2;
         const pa = doc.createElementNS(NS, 'path'); pa.setAttribute('d', `M${x1} ${y1} C ${m} ${y1}, ${m} ${y2}, ${x2} ${y2}`); pa.setAttribute('fill', 'none'); pa.setAttribute('stroke', gx.col); pa.setAttribute('stroke-opacity', gx.l.id === selected ? '0.95' : '0.55'); pa.setAttribute('stroke-width', gx.l.id === selected ? '2' : '1.4'); svg.appendChild(pa);
@@ -492,7 +509,7 @@
     global.addEventListener('keydown', onKey, true); global.addEventListener('resize', onResize);
     doc.body.appendChild(root); doc.documentElement.classList.add('ws-open'); render(); global.requestAnimationFrame(draw);
     if (global.FieldMotion) motion = global.FieldMotion.enterApp(root, parts, { core: vp, from: o.from });
-    const api = { el: root, doc: () => clone(d), set: (k, v, label) => edit(k, v, label), select: (id) => { selected = id; render(); }, undo, redo, history: () => hist.map(h2 => h2.label), close, kind: K.id,
+    const api = { el: root, doc: () => clone(d), set: (k, v, label) => edit(k, v, label), setMany: (p, label) => editMany(p, label), mutation: () => mtarget, get dock() { return wsDock; }, select: (id) => { selected = id; render(); }, undo, redo, history: () => hist.map(h2 => h2.label), close, kind: K.id,
       get selected() { return selected; }, keys: () => keyList(), tools: () => TOOLS.map(t => t[0]),
       drag: (t, pts, o3) => { const r = cv.getBoundingClientRect(); const res = K.drag ? K.drag(d, t, pts, r.width, r.height, Object.assign({ selected, phase: 'end' }, o3 || {})) : null; if (res && res.key !== undefined) edit(res.key, res.value, res.label); return !!res; }, get hidden() { return Array.from(hidden); }, tool: (t) => { if (t) { tool = t; render(); } return tool; },
       // W3a: the viewport (for tests and the kind's own buttons)

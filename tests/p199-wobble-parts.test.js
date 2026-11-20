@@ -11,7 +11,7 @@ describe('P199 Wobble Bass — swap a component in, mutate, keep or throw', () =
     try {
       await TH.sleep(300);
       assert.equal(P.get('partFilter'), 'own', 'its own filter by default'); assert.equal(P.get('partDrive'), 'own', 'its own drive by default');
-      assert.deepEqual(h.ctx.parts.built, { filter: [], drive: [] }, 'nothing new built while its own parts play');
+      assert.deepEqual(h.ctx.parts.built, { filter: [], drive: [], noise: [], insert: [] }, 'nothing new built while its own parts play');
       assert.equal(I.ownF.gain.value, 1, 'its own filter path at exactly 1'); assert.equal(I.ownD.gain.value, 1, 'its own drive path at exactly 1');
       h.view.emit('config_change', { key: 'partFilter', value: 'filter-ladder' }); assert.ok(await h.ctx.parts.ready('filter'), 'the ladder is built');
       await TH.sleep(120);
@@ -20,20 +20,20 @@ describe('P199 Wobble Bass — swap a component in, mutate, keep or throw', () =
       // the board: chips where the parts are, the dock under the core
       const r = FieldBoard.explode(a, 'eravos.wobble-bass'); assert.deepEqual(r.missing, [], 'every piece found');
       const chips = [...document.querySelectorAll('.fb-swap')].map(c => c.closest('.fb-gate').dataset.piece).sort();
-      assert.deepEqual(chips, ['filter-vowels', 'grit'], 'a ⇄ chip on the filter gate and the drive gate: ' + chips);
-      assert.ok(document.querySelector('.fb-mut .fb-mgo'), '⚄ MUTATE under the core');
+      assert.ok(['filter-vowels', 'grit'].every(x => chips.includes(x)) && chips.length === 4, 'a ⇄ chip on the gate of each part a socket stands in for (filter, drive, noise, insert): ' + chips);
+      assert.ok(document.querySelector('.fb-mut .fm-go'), '⚄ MUTATE under the core');
       const hist = Kernel.history ? Kernel.history.state().undo : null;
-      document.querySelector('.fb-mgo').click(); await TH.sleep(80);
-      const m1 = { f: P.get('partFilter'), d: P.get('partDrive') };
-      assert.ok(m1.f !== 'own' || m1.d !== 'own', 'a mutation swaps at least one part in: ' + JSON.stringify(m1));
-      assert.ok(!document.querySelector('.fb-mk').disabled && !document.querySelector('.fb-mt').disabled, 'keep / throw offered');
-      assert.ok(/→/.test(document.querySelector('.fb-mline').textContent), 'it says what changed: ' + document.querySelector('.fb-mline').textContent);
-      document.querySelector('.fb-mt').click(); await TH.sleep(80);
-      assert.equal(P.get('partFilter'), 'own', 'thrown: back to before'); assert.equal(P.get('partDrive'), 'own', 'thrown: back to before');
+      document.querySelector('.fm-go').click(); await TH.sleep(80);
+      assert.ok(/→/.test(document.querySelector('.fm-line').textContent), 'a mutation changed something');
+      assert.ok(!document.querySelector('.fm-keep').disabled && !document.querySelector('.fm-throw').disabled, 'keep / throw offered');
+      assert.ok(/→/.test(document.querySelector('.fm-line').textContent), 'it says what changed: ' + document.querySelector('.fm-line').textContent);
+      const before = JSON.stringify(Object.fromEntries(['partFilter', 'partDrive', 'partNoise', 'partInsert', 'cutoff', 'res', 'drive'].map(k => [k, 0])));
+      document.querySelector('.fm-throw').click(); await TH.sleep(80);
+      assert.equal(P.get('partFilter'), 'own', 'thrown: back to before'); assert.equal(P.get('partDrive'), 'own', 'thrown: back to before'); assert.equal(P.get('partNoise'), 'own', 'thrown: back to before'); assert.equal(P.get('partInsert'), 'none', 'thrown: back to before');
       let L = FieldBoard.learned('eravos.wobble-bass'); assert.equal(L.thrown, 1, 'it learned the throw'); assert.equal(L.seen.length, 1, 'and remembers it was tried');
       assert.ok(Object.values(L.w).some(v => v < 0), 'the thrown choices weigh less');
       const sigs = new Set(); for (let i = 0; i < 12; i++) { const m = FieldBoard.mutate(a, 'eravos.wobble-bass'); assert.ok(m, 'a mutation'); assert.ok(!sigs.has(m.sig) && !L.seen.includes(m.sig), 'never the same twice'); sigs.add(m.sig); }
-      document.querySelector('.fb-mgo').click(); await TH.sleep(80); document.querySelector('.fb-mk').click();
+      document.querySelector('.fm-go').click(); await TH.sleep(80); document.querySelector('.fm-keep').click();
       L = FieldBoard.learned('eravos.wobble-bass'); assert.equal(L.kept, 1, 'it learned the keep'); assert.ok(Object.values(L.w).some(v => v > 0), 'the kept choices weigh more');
       if (hist != null) assert.ok(Kernel.history.state().undo > hist, 'mutations are undo steps');
       await FieldBoard.assemble(a, { now: true }); assert.equal(document.querySelectorAll('.fb-swap').length, 0, 'put back: the chips go with the board');

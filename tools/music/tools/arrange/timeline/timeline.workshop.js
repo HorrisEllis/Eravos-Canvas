@@ -425,7 +425,7 @@
       if (shapeAt(d)) return shapeLayers(d, a);
       const T = (a.sh && a.sh.t) || {};
       const L = [
-        { id: 'pattern', group: 'PATTERN', type: 'events', label: 'Note ' + ((d.sel | 0) + 1) + ' of ' + N, sub: 'click a note in the view to open it', fields: [{ key: 'sel', label: 'Note', type: 'number', min: 1, max: N, step: 1 }] },
+        { id: 'pattern', group: 'PATTERN', type: 'events', label: 'Note ' + ((d.sel | 0) + 1) + ' of ' + N, sub: 'click a note in the view to open it', fields: [{ key: 'sel', label: 'Note', mutate: false, type: 'number', min: 1, max: N, step: 1 }] },
         { id: 'timing', group: 'THIS NOTE', type: 'value', label: 'Timing', sub: 'start ' + a.s + ' · length ' + a.l + ' (16ths)', fields: [{ key: 's', label: 'Start', type: 'number', min: 0, step: 0.25, unit: '16ths' }, { key: 'l', label: 'Length', type: 'number', min: 0.25, step: 0.25, unit: '16ths' }, { key: 'mt', label: 'Nudge', type: 'number', min: -50, max: 50, step: 1, unit: '%' }] },
         { id: 'pitch', group: 'THIS NOTE', type: 'value', label: d.drums ? 'Pad' : 'Pitch', sub: d.drums ? 'pad ' + a.n : nameOf(a.n), fields: [{ key: 'n', label: d.drums ? 'Pad' : 'Pitch', type: 'number', min: 0, max: 127, step: 1 }] },
         { id: 'velocity', group: 'THIS NOTE', type: 'value', label: 'Velocity', sub: String(Math.round(a.v * 127)), fields: [{ key: 'v', label: 'Velocity', type: 'number', min: 1, max: 127, step: 1 }] },

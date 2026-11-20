@@ -208,7 +208,7 @@ OrganismFactory.reg('eravos.wobble-bass', function (view) {
     group('WAVETABLE — a third voice', ['wtMix', 'wtTable', 'wtPos']),
     group('AMP — the growl through an amp, sub kept clean', ['ampOn', 'character', 'ampDrive', 'ampSplit', 'wow', 'mudCut', 'presence', 'glue']),
     group('OUTPUT — mono low end, clipper', ['monoBelow', 'clipOn', 'ceiling']),
-    group('PARTS — swap in a shared component', ['partFilter', 'pfSvfMode', 'pfStages', 'pfLadMode', 'pfLadDrive', 'pfBass', 'partDrive', 'pdDrive', 'pdBias', 'pdTone', 'pdBump', 'pdBits', 'pdRate', 'pdMix']),
+    group('PARTS — swap in a shared component', ['partFilter', 'pfSvfMode', 'pfStages', 'pfLadMode', 'pfLadDrive', 'pfBass', 'partDrive', 'pdDrive', 'pdBias', 'pdTone', 'pdBump', 'pdBits', 'pdRate', 'pdMix', 'partNoise', 'pnColour', 'pnDensity', 'pnRate', 'pnTilt', 'partInsert', 'piTime', 'piFeedback', 'piDamp', 'piMix', 'piMode']),
   ];
   const deepBox = h('div', { class: 'wb-deep', hidden: true }, deep.map(gEl => { Object.assign(gEl.style, { margin: '0 0 8px', breakInside: 'avoid' }); return gEl; }));
   const deepB = UI.Button({ label: 'More depth ▸', hint: 'slope, key tracking, a filter envelope, ADSR, ring mod, unison voices, a wavetable, a second LFO, mono low end, a clipper', onClick: () => { deepBox.hidden = !deepBox.hidden; deepB.set(deepBox.hidden ? 'More depth ▸' : 'More depth ▾'); } });

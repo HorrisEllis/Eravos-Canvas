@@ -51,7 +51,8 @@
   }
 
   function explode(instanceId, toolId) {
-    const L = boards.get(toolId), wm = WM(), win = wm && wm.windowOf(instanceId); if (!L || !win || open.has(instanceId)) return null;
+    const wm = WM(), win = wm && wm.windowOf(instanceId); if (!win || open.has(instanceId)) return null;
+    const L = boards.get(toolId) || autoLayout(win, rec(instanceId)); if (!L.pieces.length) return null;
     const k = reduced() ? 0 : 1, T = (ms) => ms * k;
     const z = (wm.view && wm.view.z) || 1, bx = win.offsetLeft, by = win.offsetTop, user = moved(toolId), before = Object.assign({}, wm.view);
     const all = L.pieces.concat(L.more || []), H = Math.max(L.size[1], ...all.map(p => p.y + 340));
@@ -71,6 +72,7 @@
       return { p, parts, was: rs.length ? union(rs) : parts.length ? { left: wrW.left + wrW.width / 2 - 120, top: wrW.bottom - 60, right: 0, bottom: 0, hidden: true } : null }; });
     found.forEach(({ p, parts, was }, i) => {
       if (!parts.length) { missing.push(p.id); return; }
+      if (L.auto && !p.w) p.w = was && !was.hidden ? Math.max(160, Math.min(520, Math.round((was.right - was.left) / z))) : 380;   // as wide as it was in the window
       const at = user[p.id] || { x: p.x, y: p.y }, g = h('div', 'fb-gate' + (p.dash ? ' dash' : '')); g.dataset.piece = p.id; g.style.setProperty('--c', p.col);
       g.style.cssText += ';left:' + (at.x - 6) + 'px;top:' + (at.y - 6) + 'px;min-width:' + ((p.frame ? p.frame[2] : p.w + 12)) + 'px';
       const lab = h('div', 'fb-lab', esc(p.label.text) + ' &#160;<span>' + esc(p.label.status) + '</span>'); lab.style.color = p.col; g.appendChild(lab);
@@ -79,10 +81,11 @@
       board.appendChild(g); gates.push({ p, g, lab, was, wasW: was && toWorld(was), i });
       drag(lab, g, p, toolId, instanceId);
     });
-    sockets(instanceId).forEach(sk => { const holds = (k) => k && gates.find(gg => gg.g.querySelector('[data-key="' + k + '"]')), x = holds(sk.near) || holds(sk.key); if (x) swapChip(instanceId, x, sk); });   // on the gate of the part it stands in for (near), else where the socket is
+    if (L.auto) { placeAuto({ gates, core, board, svg, head }); gates.forEach(x => { const u = user[x.p.id]; if (u) { x.g.style.left = (u.x - 6) + 'px'; x.g.style.top = (u.y - 6) + 'px'; } }); }   // where he moved a gate wins
+    sockets(instanceId).forEach(sk => { const holds = (k) => k && gates.find(gg => gg.g.querySelector('[data-key="' + k + '"]')), x = holds(sk.near) || holds(sk.key) || (sk.group && gates.find(gg => String((gg.p.take && gg.p.take.title) || '').toUpperCase().split(/[ —-]/)[0] === String(sk.group).toUpperCase())); if (x) swapChip(instanceId, x, sk); });   // …else the gate of its group   // on the gate of the part it stands in for (near), else where the socket is
     // a live part can be taller than the picture on the board it replaces: a gate that would cover the one under it pushes that one down
     // (only the board's own places — a gate he moved stays where he put it)
-    const placed = gates.filter(x => !user[x.p.id]).sort((a, b) => a.g.offsetTop - b.g.offsetTop);
+    const placed = L.auto ? [] : gates.filter(x => !user[x.p.id]).sort((a, b) => a.g.offsetTop - b.g.offsetTop);
     placed.forEach((x, i) => { const r = { l: x.g.offsetLeft, t: x.g.offsetTop, r: x.g.offsetLeft + x.g.offsetWidth, b: x.g.offsetTop + x.g.offsetHeight };
       placed.slice(i + 1).forEach(y => { const o = { l: y.g.offsetLeft, r: y.g.offsetLeft + y.g.offsetWidth }; if (o.l < r.r && o.r > r.l && y.g.offsetTop < r.b + 26 && y.g.offsetTop >= r.t) { y.g.style.top = (r.b + 26) + 'px'; y.pushed = true; } }); });
     win.classList.add('fb-away');
@@ -185,87 +188,64 @@
     st.leaving = Promise.all(flights.map(a => a.finished).concat([home, winIn, new Promise(r => setTimeout(r, T(1900)))])).then(finish, finish);
     return st.leaving;
   }
-  // ---- SOCKETS AND MUTATION (all from the tool's own settings: nothing here knows a part or a tool)
+  // ---- SOCKETS AND MUTATION (all from the tool's own settings: nothing here knows a part or a tool; the mutation is FieldMutate's, shared)
   const rec = (id) => global.OrganismFactory && global.OrganismFactory.handle(id);
   const cfg = (id) => { const r = rec(id); return (r && r.def && r.def.config) || []; };
   const sockets = (id) => cfg(id).filter(c => c.socket && c.type === 'enum');
-  const varsOf = (id, part) => cfg(id).filter(c => c.part && [].concat(c.part).includes(part));
   const val = (id, k) => { const r = rec(id); return r && r.ctx && r.ctx.params ? r.ctx.params.get(k) : undefined; };
-  function setMany(id, patch) {   // as if turned by hand, together: one undo step
-    const r = rec(id); if (!r || !r.view) return; Object.keys(patch).forEach(k => r.view.emit('config_change', { key: k, value: patch[k] }));
-  }
-  const learnKey = (toolId) => 'eravos.mutate.' + toolId;
-  const learned = (toolId) => { try { const o = JSON.parse(localStorage.getItem(learnKey(toolId)) || '{}'); return { w: o.w || {}, seen: o.seen || [], kept: o.kept || 0, thrown: o.thrown || 0 }; } catch (e) { return { w: {}, seen: [], kept: 0, thrown: 0 }; } };
-  const keepLearned = (toolId, L) => { try { L.seen = L.seen.slice(-400); localStorage.setItem(learnKey(toolId), JSON.stringify(L)); } catch (e) {} };
-  function pick(opts, w, k, rnd) {   // weighted by what was kept (up) and thrown (down)
-    const ws = opts.map(o => Math.exp(Math.max(-3, Math.min(3, (w[k + '=' + o] || 0) * 0.5)))), tot = ws.reduce((a, b) => a + b, 0); let r = rnd() * tot;
-    for (let i = 0; i < opts.length; i++) { r -= ws[i]; if (r <= 0) return opts[i]; } return opts[opts.length - 1];
-  }
-  function roll(c, rnd, w) {
-    if (c.type === 'enum') return pick(c.options, w, c.key, rnd);
-    if (c.type === 'boolean') return rnd() < 0.5;
-    const lo = +c.min, hi = +c.max, st = +c.step || 0, x = lo + (hi - lo) * rnd(); return st ? Math.round(Math.round((x - lo) / st) * st * 1e6) / 1e6 + lo : x;
-  }
-  function mutate(id, toolId, o) {   // → { patch, prev, sig, words } or null — never one already seen, never every socket on its own part
-    const sks = sockets(id); if (!sks.length) return null; const L = learned(toolId), rnd = (o && o.rnd) || Math.random;
-    for (let tries = 0; tries < 60; tries++) {
-      const patch = {}, words = [];
-      sks.forEach(sk => {
-        const cur = val(id, sk.key), part = rnd() < 0.8 ? pick(sk.options.filter(x => x !== sk.default), L.w, sk.key, rnd) : cur; patch[sk.key] = part;
-        const vs = varsOf(id, part); vs.forEach(c => { patch[c.key] = roll(c, rnd, L.w); });
-        words.push(sk.socket + ' → ' + part + (vs.length ? ' (' + vs.map(c => (c.label || c.key) + ' ' + (typeof patch[c.key] === 'number' ? +patch[c.key].toFixed(2) : patch[c.key]) + (c.unit ? ' ' + c.unit : '')).join(', ') + ')' : ''));
-      });
-      if (sks.every(sk => patch[sk.key] === sk.default)) continue;
-      const sig = Object.keys(patch).sort().map(k => k + '=' + (typeof patch[k] === 'number' ? +patch[k].toPrecision(2) : patch[k])).join('&');
-      if (L.seen.includes(sig)) continue;
-      const prev = {}; Object.keys(patch).forEach(k => { prev[k] = val(id, k); });
-      return { patch, prev, sig, words };
-    }
-    return null;
-  }
-  function judge(toolId, m, keep) {   // learn: the parts and choices of a kept one come up more often, a thrown one's less
-    const L = learned(toolId), d = keep ? 1 : -1;
-    Object.keys(m.patch).forEach(k => { const v = m.patch[k]; if (typeof v === 'string') L.w[k + '=' + v] = (L.w[k + '=' + v] || 0) + d; });
-    if (keep) L.kept++; else L.thrown++; keepLearned(toolId, L); return L;
-  }
+  const FM = () => global.FieldMutate;
   function swapChip(id, x, sk) {
     const chip = h('button', 'fb-swap'); chip.type = 'button'; chip.title = 'swap the part in the ' + sk.socket + ' socket';
     const show = () => { chip.textContent = '⇄ ' + val(id, sk.key); }; show();
     chip.addEventListener('pointerdown', (e) => e.stopPropagation());
-    chip.addEventListener('click', (e) => { e.stopPropagation(); const CM = global.ContextMenu, r = chip.getBoundingClientRect(), cur = val(id, sk.key);
-      const items = sk.options.map(op => ({ label: (op === cur ? '● ' : '○ ') + op, hint: op === sk.default ? 'its own part' : 'a shared component, in its place, live', run: () => { setMany(id, { [sk.key]: op }); audition(id); } }));
+    chip.addEventListener('click', (e) => { e.stopPropagation(); const CM = global.ContextMenu, r = chip.getBoundingClientRect(), cur = val(id, sk.key), t = FM().toolTarget(id);
+      const items = sk.options.map(op => ({ label: (op === cur ? '● ' : '○ ') + op, hint: op === sk.default ? 'its own part' : 'a shared component, in its place, live', run: () => { t.set({ [sk.key]: op }); t.hear(); } }));
       if (CM && CM.show) CM.show(r.left, r.bottom + 4, items, sk.label || sk.socket); });
     x.lab.appendChild(chip); const R = rec(id); if (R && R.view && R.view.bind) R.view.bind(sk.key, () => setTimeout(show, 0)); x.swap = chip;
   }
-  function audition(id) { const r = rec(id); if (r && r.ctx && r.ctx.audition) try { r.ctx.audition({ note: 45, velocity: 0.9, duration: 1.4 }); } catch (e) {} }
   function mutateDock(id, st, T) {
-    if (!sockets(id).length) return;
-    const dock = h('div', 'fb-mut'), core = st.core, go = h('button', 'fb-mgo', '⚄ MUTATE'), keep = h('button', 'fb-mk', '✓ KEEP'), toss = h('button', 'fb-mt', '✗ THROW'), line = h('div', 'fb-mline'), tally = h('div', 'fb-mtally');
-    [go, keep, toss].forEach(b => { b.type = 'button'; b.addEventListener('pointerdown', (e) => e.stopPropagation()); });
+    const t = FM() && FM().toolTarget(id); if (!t || !t.list().some(c => FM().usable(t, c))) return;
+    const dock = FM().dock(t, { hint: (sockets(id).length ? 'swaps parts and moves a few settings' : 'moves a few of its settings') + ' — played at once; keep it or throw it',
+      onMutate: () => A(dock, [{ boxShadow: '0 0 0 0 rgba(0,212,255,0)' }, { boxShadow: '0 0 30px 2px rgba(0,212,255,.45)', offset: 0.3 }, { boxShadow: '0 0 0 0 rgba(0,212,255,0)' }], { duration: T(900), fill: 'none' }) });
+    dock.classList.add('fb-mut'); const core = st.core;
     dock.style.cssText = 'left:' + core.offsetLeft + 'px;top:' + (core.offsetTop + core.offsetHeight + 18) + 'px;width:' + Math.max(380, core.offsetWidth) + 'px';
-    const row = h('div', 'fb-mrow'); row.append(go, keep, toss); dock.append(row, line, tally); st.board.appendChild(dock); st.dock = dock;
-    const count = () => { const L = learned(st.toolId); tally.textContent = L.kept + ' kept · ' + L.thrown + ' thrown · ' + L.seen.length + ' tried — it learns from each, never the same twice'; };
-    const pending = (on) => { keep.disabled = toss.disabled = !on; dock.classList.toggle('pending', on); };
-    pending(false); count(); line.textContent = 'a new combination of parts and their settings, played at once';
-    go.addEventListener('click', () => {
-      if (st.mut) judge(st.toolId, st.mut, true);   // mutating again keeps the one before (it stays in the tool)
-      const m = mutate(id, st.toolId); if (!m) { line.textContent = 'every combination near here has been tried'; return; }
-      const L = learned(st.toolId); L.seen.push(m.sig); keepLearned(st.toolId, L);
-      st.mut = m; setMany(id, m.patch); audition(id); line.textContent = m.words.join(' · '); pending(true); count();
-      A(dock, [{ boxShadow: '0 0 0 0 rgba(0,212,255,0)' }, { boxShadow: '0 0 30px 2px rgba(0,212,255,.45)', offset: 0.3 }, { boxShadow: '0 0 0 0 rgba(0,212,255,0)' }], { duration: T(900), fill: 'none' });
-    });
-    keep.addEventListener('click', () => { if (!st.mut) return; judge(st.toolId, st.mut, true); st.mut = null; pending(false); line.textContent = 'kept — it is the tool now (save it as a preset to keep it by name)'; count(); });
-    toss.addEventListener('click', () => { if (!st.mut) return; judge(st.toolId, st.mut, false); setMany(id, st.mut.prev); st.mut = null; pending(false); audition(id); line.textContent = 'thrown — back to before; that combination comes up less'; count(); });
+    st.board.appendChild(dock); st.dock = dock;
     A(dock, [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: T(700), delay: T(2300), easing: EASE.out });
+  }
+  // ---- A BOARD FOR ANY TOOL (2026-11-20, his: "then i want each tool to be able to be able to do that"): a tool with no board of its own is
+  // exploded from its window — every section (a titled group or card, outermost only) and its keys, each in a gate, half each side of its core.
+  function autoLayout(win, r) {
+    const titles = [].slice.call(win.querySelectorAll('.uk-group-title')).map(t => t.parentElement).filter(Boolean);
+    const outer = titles.filter(e => !titles.some(o => o !== e && o.contains(e)));
+    const seen = new Set(), pieces = [];
+    outer.forEach((e, i) => { const t = e.querySelector('.uk-group-title').textContent.trim(); if (!t || seen.has(t)) return; seen.add(t);
+      pieces.push({ id: 'auto-' + i, take: { title: t }, x: 0, y: 0, w: 0, col: '', dash: false, label: { text: t.toLowerCase(), status: '' } }); });
+    if (win.querySelector('.uk-keys')) pieces.push({ id: 'auto-keys', take: { sel: '.uk-keys' }, x: 0, y: 0, w: 0, col: '', label: { text: 'keys · every key its own note', status: '' } });
+    const label = (r && r.def && r.def.label) || 'the tool', blurb = (r && r.def && (r.def.blurb || r.def.summary)) || '';
+    const BCOL = ['#00D4FF', '#3DDC97', '#CC44FF', '#FFCC00', '#FF2266', '#9FB3C8', '#00FF88', '#FF8A3D'];
+    pieces.forEach((p, i) => { p.col = BCOL[i % BCOL.length]; });
+    return { auto: true, title: label.toUpperCase(), size: [1600, 1000], pieces, more: [],
+      header: '<div style="font:500 11px DM Mono,monospace;letter-spacing:2px;color:#4E6A80;white-space:nowrap"><b style="font:600 18px DM Mono,monospace;letter-spacing:6px;color:#00D4FF;margin-right:16px">FIELD</b>' + esc(label.toUpperCase()) + ' · EXPLODED · every part apart, live, wired to its core</div>',
+      core: '<div style="width:300px;padding:16px 18px;border:2px solid ' + esc((r && r.def && r.def.accent) || '#FF2266') + ';background:#04070C"><div style="font:500 24px DM Mono,monospace;letter-spacing:4px;color:#EAF6FF">' + esc(label.toUpperCase()) + '</div><div style="font:500 13px DM Mono,monospace;letter-spacing:3px;color:#9FB3C8;margin:4px 0 8px">· CORE</div><div style="font:400 11px DM Mono,monospace;line-height:1.5;color:#B8CFE0">' + esc(blurb) + '</div></div>' };
+  }
+  function placeAuto(st) {   // after the parts are in their gates (their real sizes): half each side of the core, in columns, in the window's order
+    const gs = st.gates, GAP = 46, COLG = 80, maxH = 900, half = Math.ceil(gs.length / 2), sides = [gs.slice(0, half), gs.slice(half)];
+    const cols = (list) => { const out = [[]]; let hgt = 0; list.forEach(x => { const gh = x.g.offsetHeight + GAP; if (hgt + gh > maxH && out[out.length - 1].length) { out.push([]); hgt = 0; } out[out.length - 1].push(x); hgt += gh; }); return out.filter(c => c.length); };
+    const L = cols(sides[0]).reverse(), R = cols(sides[1]), wOf = (c) => Math.max(...c.map(x => x.g.offsetWidth)), hOf = (c) => c.reduce((a, x) => a + x.g.offsetHeight + GAP, 0);
+    const H = Math.max(600, ...L.concat(R).map(hOf)) + 120, cw = st.core.offsetWidth || 300, ch = st.core.offsetHeight || 160;
+    let x = 40; L.forEach(c => { let y = 90 + (H - 90 - hOf(c)) / 2; c.forEach(g => { g.g.style.left = x + 'px'; g.g.style.top = y + 'px'; y += g.g.offsetHeight + GAP; }); x += wOf(c) + COLG; });
+    const cx = x + 20; st.core.style.left = cx + 'px'; st.core.style.top = (90 + (H - 90) / 2 - ch / 2 - 60) + 'px'; x = cx + cw + COLG + 20;
+    R.forEach(c => { let y = 90 + (H - 90 - hOf(c)) / 2; c.forEach(g => { g.g.style.left = x + 'px'; g.g.style.top = y + 'px'; y += g.g.offsetHeight + GAP; }); x += wOf(c) + COLG; });
+    st.board.style.width = x + 'px'; st.board.style.height = (H + 260) + 'px'; st.svg.setAttribute('width', x); st.svg.setAttribute('height', H + 260); st.head.style.left = '40px'; st.head.style.top = '30px';
   }
   // the window's menu offers it, for a tool that has a board
   function hook() {
     const CM = global.ContextMenu; if (!CM || !CM.contribute) return false;
-    CM.contribute(({ rec }) => !rec || !has(rec.id) ? [] : [isOpen(rec.instanceId)
+    CM.contribute(({ rec }) => !rec || !WM() || !WM().windowOf(rec.instanceId) ? [] : [isOpen(rec.instanceId)
       ? { label: '◱ Put it back together', hint: 'every part back into its window', run: () => assemble(rec.instanceId) }
       : { label: '✦ Explode on the canvas', hint: 'every part of it apart, wired to its core — all of it still live: play it, turn it, move the pieces', run: () => explode(rec.instanceId, rec.id) }]);
     return true;
   }
   if (!hook()) document.addEventListener('DOMContentLoaded', hook);
-  global.FieldBoard = { define, has, explode, assemble, isOpen, boards, sockets, mutate, judge, learned };
+  global.FieldBoard = { define, has, explode, assemble, isOpen, boards, sockets, learned: (toolId) => FM().learned(toolId), mutate: (id) => FM().mutate(FM().toolTarget(id)) };
 })(window);

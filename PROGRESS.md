@@ -2,6 +2,20 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.201 Mutation everywhere: every tool, every socket, the Workshop (2026-11-20) — shown first, not merged
+His words: "need to be able to swap them out. then i want each tool to be able to be able to do that. then the workshop or field. like i want full
+mutation, like keep going"
+- tools/core/field/mutate.js (new, domain-free): one mutation for every target — a tool's settings, a Workshop document. Sockets swapped, a few
+  settings nudged, learns from keep / throw ('@key', 'key=value'), never the same state twice, one undo step; guards (music: level, tempo, key,
+  octave, playing switches never move; mutate: false).
+- board.js: any tool explodes on the canvas — autoLayout from its window (titled sections + keys, around its core, real sizes, no overlaps);
+  ⚄ MUTATE under every core; ⇄ chips by near / key / group; the window's glow hides while it is apart (glass-layer).
+- Wobble Bass: noise (osc-noise) and insert (delay-line, filter-svf, tube, tape, bitcrusher) sockets, one mechanism for all four.
+- Retro DCO's filter and Piano's model are sockets (⇄ on their gates).
+- The Workshop BOARD: ⚄ MUTATE under the document's core (editMany: one undo step; heard by the kind's ▶ HEAR); the note selector kept out.
+- Proof: P199 1/1, P200 2/2; null render Wobble 34/34, Retro DCO 12/12, Piano 11/11; every Wobble part measured playing; auto boards for Retro
+  DCO, Piano, Tape Memory, Swarm, Supersaw: every section found, 0 overlaps.
+
 ## 3.200 Wobble Bass: swap a component in, mutate, keep or throw (2026-11-20) — shown first, not merged
 His words: "okay now i want to be able to mutate, and swap components for the wobble bass."
 - wobble-bass.engine.js 4.3 PARTS: two sockets. filter: own · filter-svf · filter-ladder; drive: own · saturator-tube · saturator-tape ·
