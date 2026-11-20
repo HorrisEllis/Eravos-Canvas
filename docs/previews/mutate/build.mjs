@@ -19,6 +19,13 @@ const baseline = { D: B.D, lo: B.lo, hi: B.hi, twin: B.twin, close: B.close,
 const nc = rd('build/novelty-core.mjs').replace(/^export (const|function) (\w+)/gm, '$1 $2');
 const ncNames = [...rd('build/novelty-core.mjs').matchAll(/^export (?:const|function) (\w+)/gm)].map(m => m[1]);
 
+// the real tools and the components each announces (tool.json needs.components, build/tool-needs.mjs) — the sound tools only
+// (at least two parts, one of them audio); voice-allocator is note logic, not a sound part
+const audio = new Set(contracts.filter(c => c.kind === 'audio').map(c => c.id)), tools = [];
+(function walk(d) { for (const f of fs.readdirSync(d)) { const p = path.join(d, f); if (fs.statSync(p).isDirectory()) walk(p); else if (f === 'tool.json') {
+  const j = JSON.parse(fs.readFileSync(p, 'utf8')), comps = ((j.needs || {}).components || []).map(x => x.split('@')[0]).filter(c => c !== 'voice-allocator');
+  if (comps.length >= 2 && comps.some(c => audio.has(c))) tools.push({ id: j.id, label: j.label || j.id, components: comps }); } } })(path.join(ROOT, 'tools/music/tools'));
+
 const parts = [];
 const cdir = path.join(ROOT, 'tools/music/components');
 for (const id of fs.readdirSync(cdir).sort()) {
@@ -26,7 +33,7 @@ for (const id of fs.readdirSync(cdir).sort()) {
   if (fs.existsSync(path.join(ROOT, f))) parts.push(tag(f, 'try {\n' + rd(f) + '\n} catch (e) { /* a logic component that needs a page */ }'));
 }
 const inline = [
-  tag('data', 'window.__MUTATE_DATA = ' + JSON.stringify({ types, contracts, baseline, parent: PARENT }) + ';'),
+  tag('data', 'window.__MUTATE_DATA = ' + JSON.stringify({ types, contracts, baseline, parent: PARENT, tools }) + ';'),
   ...parts,
   tag('tools/core/compat/compat.js', rd('tools/core/compat/compat.js')),
   tag('tools/core/compat/assemble.js', rd('tools/core/compat/assemble.js')),
