@@ -126,3 +126,25 @@ html.ws-open .cm-item { font: inherit !important; text-transform: uppercase; let
 .ws-amount .ws-range { flex: 1 1 auto; accent-color: var(--wc); }
 .ws-lfoot .ws-del { margin-left: auto; }
 .ws-out { pointer-events: none; }   /* a closed Workshop flying home (FieldMotion.leaveApp): seen, not touched, not .ws-app */
+/* THE BOARD (2026-11-20): the document exploded — each layer in a gate, live, wired to its core; a canvas of its own (field.js drawBoard) */
+.ws-board { position: absolute; inset: 0; overflow: hidden; display: none; cursor: grab; background: radial-gradient(circle at 50% 50%, #050912 0%, #030508 70%); }
+.ws-board.panning { cursor: grabbing; }
+.ws-vp.boardview .ws-board { display: block; }
+.ws-vp.boardview .ws-canvas { visibility: hidden; }
+.ws-bstage { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.ws-bwires { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+.ws-bcore { position: absolute; box-sizing: border-box; background: #060a12; border: 2px solid var(--wc); box-shadow: 0 0 0 6px #030508, 0 0 0 7px rgba(0,212,255,.3); padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; text-transform: uppercase; }
+.ws-bct { font: 400 22px var(--wdisp); letter-spacing: .3em; color: #d8f6ff; line-height: 1.1; }
+.ws-bcs { color: var(--wc); font: 400 9.5px var(--wmono); letter-spacing: .1em; }
+.ws-bcx { display: flex; flex-wrap: wrap; gap: 4px 12px; color: var(--wt2); font: 400 9.5px var(--wmono); } .ws-bcx b { color: var(--wt); font-weight: 400; }
+.ws-gate { position: absolute; box-sizing: border-box; background: #04070c; border: 1px dashed color-mix(in srgb, var(--gc) 55%, transparent); padding: 8px 10px 10px; cursor: default; }
+.ws-gate.sel { border-style: solid; border-color: var(--gc); box-shadow: 0 0 0 3px color-mix(in srgb, var(--gc) 22%, transparent); }
+.ws-gate.off { opacity: .45; }
+.ws-glab { position: absolute; left: -1px; top: -19px; white-space: nowrap; font: 500 9.5px var(--wmono); letter-spacing: .1em; color: var(--gc); }
+.ws-glab i { font-style: normal; opacity: .6; }
+.ws-gtop { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+.ws-gtop .ws-thumb { width: 96px; height: 48px; border: 1px solid var(--wl); flex: none; }
+.ws-gsub { color: var(--wt2); font: 400 9.5px var(--wmono); letter-spacing: .06em; }
+.ws-gfields { display: flex; flex-direction: column; gap: 6px; }
+.ws-gfields .ws-f { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ws-ghint { color: var(--wt3); font: 400 9px var(--wmono); }

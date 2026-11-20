@@ -60,7 +60,7 @@
     let d = clone(doc0 || {}), selected = null, note = '', past = [], future = [], hist = [{ label: 'OPENED', doc: clone(d) }];
     const root = el('div', 'ws-app', [], { role: 'dialog', 'aria-label': K.label });
     const bar = el('div', 'ws-bar'), opts = el('div', 'ws-opts'), strip = el('div', 'ws-strip'), tabs = el('div', 'ws-tabs'), vp = el('div', 'ws-vp');
-    const cv = el('canvas', 'ws-canvas'), vph = el('div', 'ws-vph'), hintline = el('div', 'ws-hintline'); vp.append(cv, hintline);   // W3h a line saying what to do here
+    const cv = el('canvas', 'ws-canvas'), vph = el('div', 'ws-vph'), hintline = el('div', 'ws-hintline'), brd = el('div', 'ws-board'); vp.append(cv, brd, hintline);   // brd: the exploded BOARD (2026-11-20)   // W3h a line saying what to do here
     // W3a the viewport: 2D (the kind's draw) or 3D (the kind's layers as planes; K.drawLayer) — orbit, top, front, exploded / flat, wire / lit
     let mode = '2d', exploded = true, wire = false, cam = { yaw: -0.55, pitch: 0.62, zoom: 1 }, stroke = null, orbit = null;
     const offs = new Map(); let planes = [];   // W3h the 3D planes as drawn (a click picks one)
@@ -145,6 +145,7 @@
     function redo() { if (!future.length) return false; past.push(clone(d)); restore(future.pop(), 'REDO'); return true; }
 
     function draw() {
+      vp.classList.toggle('boardview', mode === 'board'); if (mode === 'board') { drawBoard(); return; } boardWas = false;
       const r = vp.getBoundingClientRect(), dpr = Math.min(2, global.devicePixelRatio || 1), W = Math.max(50, r.width), H = Math.max(50, r.height);
       if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
       const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
@@ -199,11 +200,81 @@
       ax.forEach(([x, y, z, c, t]) => { const q = proj(W, H, x * 0.12 / cam.zoom, y * 0.12 / cam.zoom, z * 0.12 / cam.zoom); const dx = q[0] - o0[0], dy = q[1] - o0[1], k = 24 / Math.max(1e-6, Math.hypot(dx, dy) || 1) * Math.min(1, Math.hypot(dx, dy) / 8);
         g.strokeStyle = c; g.beginPath(); g.moveTo(gx, gy); g.lineTo(gx + dx * k, gy + dy * k); g.stroke(); g.fillStyle = c; g.fillText(t, gx + dx * k + 3, gy + dy * k + 3); });
     }
+    // ---- THE BOARD (2026-11-20, his words: "Love that. Now the exploded view. Of the notes. Agnostic"): the document exploded like the Field's
+    // board — every layer the kind gives, in its own gate (its group's colour, its label, its thumbnail, its LIVE fields: field(), the same edit,
+    // one undo step), wired into a core (the document: its title, its status). A canvas of its own: drag the background, wheel to zoom.
+    // Entering it, the layers fly out of their rows in LAYERS (FieldMotion, shared with the Field). Any kind: nothing here names one.
+    const BCOL = ['#00d4ff', '#00ff88', '#cc44ff', '#ffcc00', '#ff2266', '#9fb3c8', '#3ddc97', '#ff8a3d'];
+    let bview = null, boardWas = false;
+    function drawBoard() {
+      const enter = !boardWas; boardWas = true; const L = layers(), MO = global.FieldMotion;
+      const rows = enter ? new Map([].slice.call(lays.querySelectorAll('.ws-lay')).map(r => [r.dataset.id, r.getBoundingClientRect()])) : null;
+      const groups = []; L.forEach(l => { const gname = l.group || ''; if (!groups.includes(gname)) groups.push(gname); });
+      const stage = el('div', 'ws-bstage'), svg = doc.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('class', 'ws-bwires'); stage.appendChild(svg);
+      const title = (o.title || (K.title ? K.title(d) : K.label)), stat = K.status ? K.status(d) : [];
+      const core = el('div', 'ws-bcore', [el('div', 'ws-bct', [], { text: String(title).toUpperCase() + ' · CORE' }), el('div', 'ws-bcs', [], { text: (K.stations ? K.stations(d) : [K.label]).join(' › ') }),
+        el('div', 'ws-bcx', stat.map(([k, v]) => el('span', '', [k + ' ', el('b', '', [], { text: String(v) })])))]);
+      stage.appendChild(core);
+      const gates = L.map(l => {
+        const col = BCOL[groups.indexOf(l.group || '') % BCOL.length], fs = (l.fields || []).filter(f => f.key !== '@amount');
+        const g = el('div', 'ws-gate' + (l.id === selected ? ' sel' : '') + (hidden.has(l.id) ? ' off' : ''), [
+          el('div', 'ws-glab', [((l.group ? l.group + ' · ' : '') + l.label).toUpperCase(), el('i', '', [], { text: '  ' + (l.type || 'value') })]),
+          el('div', 'ws-gtop', [thumb(l), el('div', 'ws-gsub', [], { text: l.sub || '' })]),
+          fs.length ? el('div', 'ws-gfields', fs.map(f => field(f, true))) : el('div', 'ws-ghint', [], { text: 'nothing to set — right-click its row in LAYERS for what it can do' })]);
+        g.style.setProperty('--gc', col); g.dataset.id = l.id;
+        g.addEventListener('pointerdown', (e) => { if (e.target.closest('input,select,button,label')) return; e.stopPropagation(); if (selected !== l.id) { selected = l.id; render(); } });
+        stage.appendChild(g); return { l, g, col };
+      });
+      brd.replaceChildren(stage);
+      // the layout: the core in the middle, the gates in columns either side of it (as many as it takes), in the kind's order
+      // half the layers each side of the core (in the kind's order: the first half left, read top to bottom), each side in as many even columns as it takes
+      const GW = 280, GAP = 34, per = Math.max(3, Math.ceil(Math.sqrt(gates.length * 1.1))), half = Math.ceil(gates.length / 2), sides = [gates.slice(0, half), gates.slice(half)];
+      const split = (list) => { const n = Math.max(1, Math.ceil(list.length / per)), k = Math.ceil(list.length / n); return Array.from({ length: n }, (_, i) => list.slice(i * k, (i + 1) * k)).filter(c => c.length); };
+      const lcols = split(sides[0]).reverse(), rcols = split(sides[1]), colsOf = lcols.concat(rcols), cols = colsOf.length, left = lcols.length;   // the left side's first column sits next to the core
+      const heights = colsOf.map(c => c.reduce((a, x) => a + x.g.offsetHeight + GAP, 0)), Hh = Math.max(360, ...heights) + 60, CW = 300, CX = left * (GW + 70) + 40, CY = Hh / 2 - 90;
+      core.style.cssText = 'left:' + CX + 'px;top:' + CY + 'px;width:' + CW + 'px';
+      colsOf.forEach((c, ci) => { const x = ci < left ? 40 + ci * (GW + 70) : CX + CW + 70 + (ci - left) * (GW + 70); let y = (Hh - heights[ci]) / 2 + GAP;
+        c.forEach(gx => { gx.g.style.cssText += ';left:' + x + 'px;top:' + y + 'px;width:' + GW + 'px'; gx.side = ci < left ? 'l' : 'r'; y += gx.g.offsetHeight + GAP; }); });
+      const W = CX + CW + 70 + (cols - left) * (GW + 70) + 20; stage.style.width = W + 'px'; stage.style.height = Hh + 'px'; svg.setAttribute('width', W); svg.setAttribute('height', Hh);
+      const ch = core.offsetHeight, NS = 'http://www.w3.org/2000/svg';
+      gates.forEach((gx, i) => { const g = gx.g, y1 = g.offsetTop + Math.min(40, g.offsetHeight / 2), x1 = gx.side === 'l' ? g.offsetLeft + GW : g.offsetLeft, x2 = gx.side === 'l' ? CX : CX + CW;
+        const same = gates.filter(o2 => o2.side === gx.side), k = same.indexOf(gx), y2 = CY + 16 + (ch - 32) * ((k + 0.5) / same.length), m = (x1 + x2) / 2;
+        const pa = doc.createElementNS(NS, 'path'); pa.setAttribute('d', `M${x1} ${y1} C ${m} ${y1}, ${m} ${y2}, ${x2} ${y2}`); pa.setAttribute('fill', 'none'); pa.setAttribute('stroke', gx.col); pa.setAttribute('stroke-opacity', gx.l.id === selected ? '0.95' : '0.55'); pa.setAttribute('stroke-width', gx.l.id === selected ? '2' : '1.4'); svg.appendChild(pa);
+        const a = doc.createElementNS(NS, 'circle'); a.setAttribute('cx', x1); a.setAttribute('cy', y1); a.setAttribute('r', 4); a.setAttribute('fill', '#030508'); a.setAttribute('stroke', gx.col); a.setAttribute('stroke-width', '1.4'); svg.appendChild(a);
+        const b = doc.createElementNS(NS, 'circle'); b.setAttribute('cx', x2); b.setAttribute('cy', y2); b.setAttribute('r', 3); b.setAttribute('fill', gx.col); svg.appendChild(b); gx.wire = pa; });
+      // the view: fitted on entering, kept while he edits
+      const R = vp.getBoundingClientRect(); if (enter || !bview) { const z = Math.max(0.25, Math.min(1, (R.width - 40) / W, (R.height - 70) / Hh)); bview = { z, x: (R.width - W * z) / 2, y: Math.max(48, (R.height - Hh * z) / 2) }; }
+      stage.style.transform = `translate(${bview.x}px,${bview.y}px) scale(${bview.z})`;
+      if (!enter || !MO || MO.still()) return;
+      // exploding: each layer flies out of its row in LAYERS into its gate; the core blooms; the wires draw themselves in
+      const z = bview.z, A = MO.A, E = MO.EASE, cc = { x: CX + CW / 2, y: CY + ch / 2 };
+      gates.slice().sort((a, b) => Math.hypot(a.g.offsetLeft - cc.x, a.g.offsetTop - cc.y) - Math.hypot(b.g.offsetLeft - cc.x, b.g.offsetTop - cc.y)).forEach((gx, n) => {
+        const from = rows.get(gx.l.id), now = gx.g.getBoundingClientRect(), d0 = 120 + n * 45;
+        const dx = from ? (from.left - now.left) / z : 0, dy = from ? (from.top - now.top) / z : 0, s = from ? Math.max(0.2, Math.min(1, from.width / now.width)) : 0.6;
+        A(gx.g, [{ transform: `translate(${dx}px,${dy}px) scale(${s})`, opacity: from ? 1 : 0, transformOrigin: '0 0', offset: 0, easing: E.out },
+          { transform: `translate(${dx * 0.15}px,${dy * 0.15 - 14}px) scale(1.03)`, opacity: 1, transformOrigin: '0 0', offset: 0.45, easing: E.land },
+          { transform: 'none', opacity: 1, transformOrigin: '0 0' }], { duration: 1250, delay: d0 });
+        let len = 0; try { len = gx.wire.getTotalLength(); } catch (e) {}
+        if (len) A(gx.wire, [{ strokeDasharray: len + ' ' + len, strokeDashoffset: len }, { strokeDasharray: len + ' ' + len, strokeDashoffset: 0 }], { duration: 800, delay: 1100 + n * 30, easing: E.glide });
+      });
+      A(core, [{ opacity: 0, transform: 'scale(.85)' }, { opacity: 1, transform: 'scale(1.03)', offset: 0.6 }, { opacity: 1, transform: 'scale(1)' }], { duration: 1000, delay: 700, easing: E.out });
+      [].slice.call(svg.querySelectorAll('circle')).forEach((c2, n) => A(c2, [{ opacity: 0 }, { opacity: 1 }], { duration: 400, delay: 1300 + Math.floor(n / 2) * 30 }));
+      [].slice.call(stage.querySelectorAll('.ws-glab')).forEach((lb, n) => A(lb, [{ opacity: 0 }, { opacity: 1 }], { duration: 500, delay: 1500 + n * 20 }));
+    }
+    // the board is a canvas of its own: drag the background to move around it, the wheel zooms where it points
+    let bpan = null;
+    brd.addEventListener('pointerdown', (e) => { if (e.button !== 0 || e.target.closest('.ws-gate')) return; bpan = { x: e.clientX, y: e.clientY, vx: bview.x, vy: bview.y }; try { brd.setPointerCapture(e.pointerId); } catch (er) {} brd.classList.add('panning'); });
+    brd.addEventListener('pointermove', (e) => { if (!bpan) return; bview.x = bpan.vx + e.clientX - bpan.x; bview.y = bpan.vy + e.clientY - bpan.y; const st = brd.firstElementChild; if (st) st.style.transform = `translate(${bview.x}px,${bview.y}px) scale(${bview.z})`; });
+    ['pointerup', 'pointercancel'].forEach(t => brd.addEventListener(t, () => { bpan = null; brd.classList.remove('panning'); }));
+    brd.addEventListener('wheel', (e) => { if (!bview || e.target.closest('select')) return; e.preventDefault(); const r = brd.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top, z0 = bview.z, z1 = Math.max(0.2, Math.min(2.5, z0 * (e.deltaY < 0 ? 1.1 : 1 / 1.1)));
+      bview.x = mx - (mx - bview.x) * z1 / z0; bview.y = my - (my - bview.y) * z1 / z0; bview.z = z1; const st = brd.firstElementChild; if (st) st.style.transform = `translate(${bview.x}px,${bview.y}px) scale(${bview.z})`; }, { passive: false });
     function chips() {
       hintline.textContent = K.hint ? (K.hint(d, { tool, mode, selected }) || '') : '';   // W3h the help line follows the view
-      if (!K.drawLayer) { vph.replaceChildren(); return; }
       const chip = (t, on, fn, title) => el('button', 'ws-chip' + (on ? ' on' : ''), [], { type: 'button', text: t, title: title || '', onclick: () => { fn(); chips(); draw(); } });
-      vph.replaceChildren(chip('2D', mode === '2d', () => { mode = '2d'; }), chip('3D', mode === '3d', () => { mode = '3d'; }), el('span', 'ws-vs'),
+      const BOARD = chip('BOARD', mode === 'board', () => { mode = 'board'; }, 'every layer apart, live, wired to the document — drag to move around, wheel to zoom');
+      if (mode === 'board') hintline.textContent = 'BOARD · every layer apart, live · drag the background to move · wheel to zoom · click a gate to select its layer';
+      if (!K.drawLayer) { vph.replaceChildren(chip('VIEW', mode !== 'board', () => { mode = '2d'; }), BOARD); return; }
+      vph.replaceChildren(chip('2D', mode === '2d', () => { mode = '2d'; }), chip('3D', mode === '3d', () => { mode = '3d'; }), BOARD, el('span', 'ws-vs'),
         chip('TOP', mode === '3d' && cam.pitch > 1.5, () => { mode = '3d'; cam.pitch = Math.PI / 2 - 0.001; cam.yaw = 0; }, 'look down on the stack'),
         chip('FRONT', mode === '3d' && Math.abs(cam.yaw) < 0.01 && cam.pitch < 0.3, () => { mode = '3d'; cam.pitch = 0.18; cam.yaw = 0; }, 'look at it from the front'),
         chip('ORBIT', false, () => { mode = '3d'; cam = { yaw: -0.55, pitch: 0.62, zoom: 1 }; }, 'back to the turned view (Alt-drag to turn, wheel to zoom)'), el('span', 'ws-vs'),

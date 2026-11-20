@@ -366,3 +366,10 @@ W3h  AT HAND      ⤓ save to the note library · ▶ play it · ✕ close — a
 #   it to their places, the viewport blooms last, the canvas behind softens and the bar goes; Esc / close flies it home and the canvas returns.
 #   close() is immediate for callers (a copy flies). Shown as a video first (docs/previews/workbench/workshop-transition.mp4). Open: what he
 #   meant after "but".
+
+## ADDENDUM 2026-11-20 (2) — the exploded BOARD, for any kind (nothing above is changed)
+# his words (2026-11-20, verbatim): "Love that. Now the exploded view. Of the notes. Agnostic"
+# built (3.199), shown first as a video (docs/previews/workbench/workshop-board.mp4): BOARD beside 2D / 3D, for every kind. A gate per layer
+#   (group colour, GROUP · LAYER, thumbnail, live fields via field() — one undo step an edit), half each side of a core (the document: title,
+#   path, status), wired in; drag / wheel move and zoom the board; a gate clicked selects its layer; entering, the layers fly out of their LAYERS
+#   rows (FieldMotion). Nothing in it names a kind: the notes, an instrument, a pattern, a step — whatever the kind's layers are.

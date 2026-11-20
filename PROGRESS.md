@@ -2,6 +2,17 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.199 The Workshop's exploded BOARD — any document, every layer apart, live (2026-11-20) — shown first, not merged
+His words: "Love that. Now the exploded view. Of the notes. Agnostic"
+- tools/core/field/field.js (domain-free): BOARD beside 2D / 3D (for every kind, also those with no 3D). The document exploded like the Field's
+  board: a gate per layer the kind gives (its group's colour, "GROUP · LAYER", its thumbnail, its live fields — field(), so an edit on the board
+  is the same edit, one undo step), half each side of a core (the document: title, path, status), wired in. A canvas of its own: drag the
+  background, wheel zooms where it points; a gate clicked selects its layer. Entering, every layer flies out of its row in LAYERS into its gate,
+  the core blooms, the wires draw in (FieldMotion, shared).
+- The notes: 13 layers → 13 gates, 27 live fields; a field edited on the board → one undo step, the core follows.
+- Proof: tests/p198 1/1 (a kind from no domain: gates, live fields, core, wires, select, zoom, back); P150–P175, P196, P197, Timeline 33/33,
+  Pattern, Step, boundary 10/10, bare-canvas. Video: docs/previews/workbench/workshop-board.mp4 (workshop-board.video.mjs).
+
 ## 3.198 The Workshop opens and closes like the Field — one motion, shared (2026-11-20)
 His words: "I like that. But do that with the workshop as well. It's supposed to be the same thing, but" (the message ends there — asked).
 - tools/core/field/motion.js (window.FieldMotion, domain-free): the motion moved out of board.js so the Field board and the Workshop share it
