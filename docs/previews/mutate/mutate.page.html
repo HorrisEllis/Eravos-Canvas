@@ -132,6 +132,20 @@ details.offs{margin-top:12px;color:var(--faint)} details.offs summary{cursor:poi
 .lrn{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:var(--dim);line-height:1.7}
 .lrn b{font-weight:400} .lrn b.p{color:var(--ok)} .lrn b.n{color:var(--no)}
 .reg{font-size:10px} .reg.ok{color:var(--ok)} .reg.bad{color:var(--no)}
+#xWrap{overflow:hidden;margin-top:8px;border:1px solid var(--line2)}
+#xStage{position:relative;width:1700px;height:1300px;transform-origin:0 0;background:#04070C}
+#xStage .piece{position:absolute;padding:0;border:0;background:none;cursor:pointer;outline:1px dashed transparent;outline-offset:5px;
+  transition:left 2.8s cubic-bezier(.22,.8,.25,1),top 2.8s cubic-bezier(.22,.8,.25,1),outline-color 1.2s ease}
+#xStage .piece img{display:block}
+#xStage.still *{transition:none!important}
+#xStage .fade{transition:opacity 1.4s ease}
+#xStage .tag{position:absolute;left:-5px;top:-22px;white-space:nowrap;font:500 10px 'DM Mono',monospace;letter-spacing:1px}
+#xStage .wire{position:absolute;left:0;top:0;pointer-events:none}
+#xCore{position:absolute;left:700px;top:540px;width:300px;height:150px;box-sizing:border-box;background:#060A12;border:2px solid var(--core);display:flex;flex-direction:column;justify-content:center;gap:6px;padding:14px 18px}
+#xSurface{position:absolute;left:300px;top:120px;width:1100px;height:824px;display:block}
+.mark{display:inline-block;border:1px solid currentColor;padding:1px 6px;font-size:10px;letter-spacing:1px}
+.pl{display:grid;grid-template-columns:auto 1fr;gap:2px 14px;font-size:10px;color:var(--dim);margin-top:8px}
+.pl b{font-weight:400;color:var(--soft)}
 #toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#0B1522;border:1px solid var(--line);padding:7px 14px;color:var(--soft);font-size:11px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:40}
 </style></head><body>
 <div id="bar">
@@ -150,13 +164,15 @@ details.offs{margin-top:12px;color:var(--faint)} details.offs summary{cursor:poi
       <div class="benchHead">
         <input id="toolName" aria-label="the tool's name" spellcheck="false">
         <span id="edited"></span><span class="spacer"></span>
+        <span id="xBtns" style="display:none;gap:6px"><button class="tb" id="xEx">EXPLODE</button><button class="tb" id="xAs">ASSEMBLE</button><button class="tb" id="xBack">← BACK TO THE BENCH</button></span>
         <button class="tb" id="undo">↶ UNDO</button><button class="tb" id="redo">↷ REDO</button>
         <label class="tb" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="auto" checked style="margin:0">HEAR EACH EDIT</label>
         <button class="tb on" id="save">KEEP AS A NEW TOOL</button>
         <button class="tb hot" id="synth">◆ SYNTHESIZE INTO A TOOL</button>
       </div>
-      <div class="lab">the tool, exploded · <b>click a component</b> to edit it, swap it or remove it · <b>＋</b> on a wire to put a component there</div>
+      <div class="lab" id="benchLab">the tool, exploded · <b>click a component</b> to edit it, swap it or remove it · <b>＋</b> on a wire to put a component there</div>
       <div id="boardWrap"><div id="board"></div></div>
+      <div id="xWrap" style="display:none"><div id="xStage"></div></div>
       <div id="insp"></div>
     </section>
     <section style="padding-top:4px">
@@ -611,17 +627,77 @@ document.getElementById('sSave').onclick = () => {
   toast('saved: ' + f.id + ' (kept here, and its tool file downloaded)'); drawSynth();
 };
 
+// ---- a tool that cannot be assembled yet opens EXPLODED: the whole tool, then its pieces apart, wired to its core (the board of 2026-11-15,
+// unchanged). Click a piece: what it is, what it carries, what it could become, what it waits on. Editing it needs its parts as components.
+const XW = D.wobble, FULLG = Compat.graph(contracts, types);
+let view = null;
+function openExploded() { stop(); closeSynth && synthOpen && closeSynth(); view = { exploded: false, flip: {}, sel: null }; drawBench(); window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => { if (view && !view.exploded) { view.exploded = true; drawX(); } }, 900); }
+function closeExploded() { view = null; drawBench(); }
+let xEls = null;
+function buildX() {
+  const S = document.getElementById('xStage'); S.innerHTML = '<img id="xSurface" class="fade" alt="Wobble Bass, every element lifted off: the blank surface"><div id="xWires"></div>' +
+    '<div id="xCore" class="fade"><span style="font-family:\'Bebas Neue\',sans-serif;font-size:26px;letter-spacing:5px">WOBBLE BASS · CORE</span><span style="color:var(--core);font-size:10px">wobble-bass.engine.js · the worklet</span>' +
+    '<span style="color:#B8CFE0;font-size:10px;line-height:1.5">the voice · the signal order · the AudioParams · the tempo lock</span></div><div id="xPieces"></div>';
+  S.querySelector('#xSurface').src = XW.surface;
+  xEls = XW.pieces.map(p => {
+    const w = document.createElement('div'); w.className = 'wire fade';
+    w.innerHTML = '<svg width="1700" height="1300" viewBox="0 0 1700 1300" aria-hidden="true"><path d="' + p.d + '" fill="none" stroke="' + p.col + '" stroke-opacity="0.75" stroke-width="2"' + (p.dash ? ' stroke-dasharray="6 4"' : '') + '/><circle cx="' + p.bx + '" cy="' + p.by + '" r="4" fill="' + p.col + '"/></svg>';
+    S.querySelector('#xWires').appendChild(w);
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'piece'; b.setAttribute('aria-label', p.comp + ' · ' + p.sub); b.style.width = p.w + 'px'; b.style.height = p.h + 'px';
+    b.innerHTML = '<img alt="" width="' + p.w + '" height="' + p.h + '"><span class="tag fade"></span>'; b.querySelector('img').src = p.url;
+    const t = b.querySelector('.tag'); t.textContent = p.comp + ' · ' + p.sub + '  ' + p.mark; t.style.color = p.col;
+    b.onclick = () => { if (view.sel === p.id || !view.exploded) view.flip[p.id] = !view.flip[p.id]; view.sel = p.id; drawX(); drawXInsp(); };
+    S.querySelector('#xPieces').appendChild(b); return { p, w, b, t };
+  });
+}
+function fitX() { const W = document.getElementById('xWrap'), k = Math.min(1, (W.clientWidth || 1100) / 1700); document.getElementById('xStage').style.transform = 'scale(' + k + ')'; W.style.height = (1300 * k) + 'px'; }
+function drawX() {
+  const first = !xEls; if (first) buildX(); fitX(); const S = document.getElementById('xStage'); if (first) S.classList.add('still');
+  const e = view.exploded, out = (p) => e ? !view.flip[p.id] : !!view.flip[p.id], any = XW.pieces.some(out);
+  xEls.forEach(({ p, w, b, t }) => { const o = out(p);
+    b.style.left = (o ? p.ex : p.hx) + 'px'; b.style.top = (o ? p.ey : p.hy) + 'px'; b.style.outlineColor = o ? p.col : 'transparent'; b.style.transitionDelay = (o && e ? p.delay : 0) + 's';
+    b.style.boxShadow = view.sel === p.id && o ? '0 0 0 3px ' + p.col + '55' : 'none';
+    t.style.opacity = o ? 1 : 0; t.style.transitionDelay = (o ? 2.2 : 0) + 's'; w.style.opacity = o ? 1 : 0; w.style.transitionDelay = (o ? 2.2 : 0) + 's'; });
+  const c = document.getElementById('xCore'); c.style.opacity = any ? 1 : 0; c.style.transitionDelay = (any ? 1.4 : 0) + 's';
+  const sf = document.getElementById('xSurface'); sf.style.opacity = e ? 0 : 1; sf.style.transitionDelay = (e ? 0.4 : 0) + 's';
+  document.getElementById('xEx').classList.toggle('on', e); document.getElementById('xAs').classList.toggle('on', !e);
+  if (first) { void S.offsetWidth; requestAnimationFrame(() => S.classList.remove('still')); }
+}
+const WAITS = { '✓ BUILT': 'the part exists as a component; Wobble Bass still does it inside its own engine — it moves out unchanged, proven by the null render, and then it can be edited and swapped here',
+  '● IN IT': 'already its own component inside Wobble Bass, null-proven — it needs an adapter to be assembled here',
+  '↗ COMES OUT': 'inside Wobble Bass now: its contract is to write, then it moves out (the WD track), proven by the null render',
+  '○ PLANNED': 'not built yet: the component and its contract are to write', 'OWN': 'Wobble Bass\'s own part — it stays in the tool (or becomes a component if another tool needs it)',
+  'PACK': 'data beside the tool, never in its engine — presets load into every component' };
+function drawXInsp() {
+  const p = view.sel && XW.pieces.find(x => x.id === view.sel);
+  if (!p) { insp.innerHTML = '<div class="why" style="font-size:11px;line-height:1.7">Wobble Bass, opened exploded: every element of its face lifted off and wired to its core, as on the board of 2026-11-15 (Wobble Bass 4.1.0 — since then its AMP stage moved out as the amp-chain component, WD1). ' +
+    '<b style="color:var(--soft);font-weight:400">Click a piece</b> to see what it is and what it waits on; click it again to snap it off or back in. It cannot be edited or mutated yet: '
+    + XW.pieces.filter(x => x.mark === '✓ BUILT' || x.mark === '● IN IT').length + ' of ' + XW.pieces.length + ' pieces are components, none can be assembled into Wobble Bass yet. The way there: WD2 the sub · WD3 the output stage · WD4 squash · WD5 LFO + wub seq · WD6 FM growl — each moved out unchanged and proven by the null render.</div>'; return; }
+  const c = C[p.comp], sib = c ? (FULLG.standIns[p.comp] || []) : [];
+  insp.style.setProperty('--c', p.col);
+  insp.innerHTML = '<div class="hd"><span class="t" style="color:' + p.col + '">' + p.comp.replace('own:', '').toUpperCase() + '</span><span class="s">' + p.sub + ' &nbsp; <span class="mark" style="color:' + p.col + '">' + p.mark + '</span></span></div>' +
+    '<div class="why" style="font-size:11px;color:var(--soft)">' + p.lines.join(' · ') + '</div>' +
+    '<div class="pl"><span>waits on</span><b>' + (WAITS[p.mark] || '') + '</b>' +
+    (c ? '<span>ports</span><b>' + c.ports.map(q => q.dir + ' ' + q.id + ' (' + q.type + ')').join(' · ') + '</b>' +
+      '<span>settings</span><b>' + (c.variables || []).map(v => v.key + (v.type === 'number' ? ' ' + fmtN(v.min) + '–' + fmtN(v.max, v) : v.type === 'enum' ? ' [' + v.options.length + ']' : '')).join(' · ') + '</b>' +
+      '<span>could swap for</span><b>' + (sib.length ? sib.join(' · ') : 'nothing that fits its slot yet') + '</b>' : '<span>component</span><b>' + (p.comp.startsWith('own:') ? 'none — Wobble Bass\'s own' : p.comp === 'packs' ? 'none — data' : 'no contract yet (' + p.comp + ')') + '</b>') + '</div>';
+}
+document.getElementById('xEx').onclick = () => { view.exploded = true; view.flip = {}; drawX(); };
+document.getElementById('xAs').onclick = () => { view.exploded = false; view.flip = {}; drawX(); };
+document.getElementById('xBack').onclick = closeExploded;
+addEventListener('resize', () => { if (view) fitX(); });
+
 // ---- start from: the real tools, and how much of each can be assembled today ----
 function drawTools() {
   const T = document.getElementById('tools'); T.innerHTML = '';
   const row = (name, have, all, missing, ready, onOpen, note) => { const d = document.createElement('div'); d.className = 'tool' + (ready ? ' ready' : '');
     d.innerHTML = '<div class="nm"><span></span><span>' + have + ' of ' + all + ' parts ready</span></div><div class="bar"><i style="width:' + Math.round(100 * have / Math.max(1, all)) + '%"></i></div><div class="ln"></div>' + (ready ? '<div class="row"><button class="tb on">✎ OPEN ON THE BENCH</button></div>' : '');
     d.querySelector('.nm span').textContent = name; d.querySelector('.ln').textContent = note || (missing.length ? 'needs: ' + missing.join(', ') : '');
-    if (ready) d.querySelector('button').onclick = onOpen; T.appendChild(d); };
+    if (ready) d.querySelector('button').onclick = onOpen; if (!ready && note === 'X') { d.querySelector('.ln').textContent = 'needs: ' + missing.join(', ') + ' — opens EXPLODED to understand it'; const r = document.createElement('div'); r.className = 'row'; r.innerHTML = '<button class="tb on">◎ OPEN EXPLODED</button>'; r.querySelector('button').onclick = openExploded; d.appendChild(r); d.classList.add('ready'); } T.appendChild(d); };
   row(START.name, START.dag.nodes.length, START.dag.nodes.length, [], true, () => open(START), 'osc-va → filter-svf → saturator-tube → stereo-tools (the CG3 voice)');
   D.tools.map(t => { const missing = t.components.filter(c => !domain.adapters[c] && c !== 'voice-allocator'); return Object.assign({ missing, have: t.components.length - missing.length }, t); })
     .sort((a, b) => (b.have / b.components.length) - (a.have / a.components.length) || b.have - a.have)
-    .forEach(t => row(t.label, t.have, t.components.length, t.missing, false, null));
+    .forEach(t => row(t.label, t.have, t.components.length, t.missing, false, null, t.id === 'eravos.wobble-bass' ? 'X' : null));
 }
 
 // ---- the bar, the bench ----
@@ -642,6 +718,13 @@ function drawCrumbs() {
   cr.innerHTML = '<span class="c">' + (bench.ops.length ? 'SAW VOICE' : bench.name.toUpperCase()) + '</span>' + (skip ? '<span>› … ' + skip + ' more</span>' : '') + ops.map((o, i) => { const t = sayPlain(o).toUpperCase(); return '<span>›</span><span class="c' + (i === ops.length - 1 ? ' cur' : '') + '" title="' + t + '">' + (t.length > 26 ? t.slice(0, 25) + '…' : t) + '</span>'; }).join('');
 }
 function drawBench() {
+  const X = !!view, show = (id, on) => { document.getElementById(id).style.display = on ? '' : 'none'; }; show('boardWrap', !X); show('xWrap', X); document.getElementById('xBtns').style.display = X ? 'flex' : 'none';
+  ['undo', 'redo', 'save', 'synth'].forEach(id => show(id, !X)); document.getElementById('auto').parentNode.style.display = X ? 'none' : 'flex';
+  const mb = document.getElementById('mutate'); mb.disabled = X; mb.title = X ? 'Wobble Bass can be mutated once its parts are components it is assembled from (the WD track)' : '';
+  if (X) { nameIn.value = 'Wobble Bass 4.1.0'; nameIn.readOnly = true; nameIn.style.width = '300px'; document.getElementById('edited').textContent = 'EXPLODED · TO UNDERSTAND IT';
+    document.getElementById('benchLab').innerHTML = 'the whole tool, then its pieces apart, wired to its core · <b>click a piece</b> to see what it is · again to snap it off or back in';
+    document.getElementById('crumbs').innerHTML = '<span class="c cur">WOBBLE BASS · EXPLODED</span>'; drawX(); drawXInsp(); drawKept(); return; }
+  nameIn.readOnly = false; document.getElementById('benchLab').innerHTML = 'the tool, exploded · <b>click a component</b> to edit it, swap it or remove it · <b>＋</b> on a wire to put a component there';
   nameIn.value = bench.name; nameIn.style.width = Math.max(140, bench.name.length * 15 + 20) + 'px';
   const ed = isEdited(); document.getElementById('edited').textContent = ed ? (bench.keptId ? '● CHANGED SINCE SAVED' : '● NOT KEPT YET') : (bench.keptId ? '✓ SAVED' : '');
   const sv = document.getElementById('save'); sv.textContent = bench.keptId ? 'SAVE' : 'KEEP AS A NEW TOOL'; sv.disabled = bench.keptId ? !ed : false;
@@ -653,7 +736,8 @@ document.getElementById('foot').innerHTML = 'parts that can be assembled today: 
   'every edit and every mutant goes through the same checks: the types fit, it builds, it plays (finite, not silent, not pinned). "nearest" is advisory: your ear decides.<br>' +
   'preview: kept tools stay in this page (this device). built into ERAVOS, they are tools in Documents\\ERAVOS\\tools that open on the canvas.';
 open(START); drawTools();
-window.__mutate = { openSynth, closeSynth, get verdicts() { return verdicts; }, nullDb, toolFile, doMutate, get mutants() { return mutants; }, get kept() { return kept; }, get bench() { return bench; }, apply, undo, redo, open };
+if (/wobble/.test(location.hash)) openExploded();
+window.__mutate = { openExploded, get view() { return view; }, openSynth, closeSynth, get verdicts() { return verdicts; }, nullDb, toolFile, doMutate, get mutants() { return mutants; }, get kept() { return kept; }, get bench() { return bench; }, apply, undo, redo, open };
 })();
 </script>
 </body></html>

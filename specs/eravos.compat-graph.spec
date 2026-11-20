@@ -180,3 +180,20 @@ acceptance (CG0): this spec, the map's numbers reproducible: grep the specs' dep
 #                        decomposition; they follow it.
 #           Retro DCO    5 of 11 assemble (osc-va, osc-sub, filter-svf, filter-ladder, env-adsr); adapters for osc-noise, unison-stack, lfo,
 #                        random-source, bbd-line, ensemble-core; voice allocation (logic, not a node); then the DAG and the null.
+
+## ADDENDUM 2026-11-20 (2) — a tool opens exploded; the editor for a tool's UI (nothing above is changed)
+# his words (2026-11-20, verbatim): "what if we have a editor for the tool ui. like want to be able to understand the tool. like modulator, lfo,
+#   like i built the tool but no way to manipulate the wave like the wobblebase, like not just knobs, but i assume that will be built, now show
+#   me opening the wobble bass exactly like the preview was originally"
+# built in the preview: a tool that cannot be assembled yet opens EXPLODED — Wobble Bass from the board of 2026-11-15 unchanged (its pieces,
+#   positions, wires, timing; the pieces cut from its own face): whole, then apart, wired to its core; a piece clicked says what it is, its
+#   ports and settings (from its contract), what could stand in for it (the full graph), and what it waits on (BUILT → moves out, null-proven;
+#   IN IT → an adapter; COMES OUT → a contract, then out; PLANNED → to build; OWN; PACK). Not editable or mutable until it can be assembled (CG7).
+# the editor for a tool's UI (open — a preview first, on his word): to UNDERSTAND a tool, each element shows what it does, not only knobs:
+#   - the wave: an oscillator's element draws its waveform (and a wavetable's frames); a shaper its transfer curve; drawn and dragged to edit
+#   - the filter: its response curve, cutoff and resonance dragged on it (as Wobble Bass's MOUTH is heard, seen)
+#   - the modulators: an LFO / env-msseg / step-mod element draws its shape over time, drawn by hand (Wobble Bass's SHAPE and WUB SEQ are the
+#     model), and where it goes: modulation drawn as wires from the modulator to the settings it moves, with depth on the wire
+#   - each such view is part of the component's element (contract `element`), so every tool holding the component gets it, and a synthesized
+#     tool's face has it (ES1 + CG6); layout of a face editable (move, resize, hide an element) — the UI-field constraint layout
+#     (specs/eravos.ui-field.spec) as the rule that keeps it consistent

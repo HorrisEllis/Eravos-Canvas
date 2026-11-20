@@ -26,6 +26,12 @@ const audio = new Set(contracts.filter(c => c.kind === 'audio').map(c => c.id)),
   const j = JSON.parse(fs.readFileSync(p, 'utf8')), comps = ((j.needs || {}).components || []).map(x => x.split('@')[0]).filter(c => c !== 'voice-allocator');
   if (comps.length >= 2 && comps.some(c => audio.has(c))) tools.push({ id: j.id, label: j.label || j.id, components: comps }); } } })(path.join(ROOT, 'tools/music/tools'));
 
+// Wobble Bass, exploded: the board of 2026-11-15 (docs/previews/workbench/Wobble-Exploded.dc.html) — its pieces, positions, wires and
+// timing exactly as they were, the pieces cut from Wobble Bass's own face (the PNGs beside it), inlined
+const WB = path.join(ROOT, 'docs/previews/workbench'), png = (f) => 'data:image/png;base64,' + fs.readFileSync(path.join(WB, f)).toString('base64');
+const wobble = { pieces: JSON.parse(fs.readFileSync(path.join(WB, 'Wobble-Exploded.dc.html'), 'utf8').match(/const PIECES = (\[.*?\]);\n/s)[1])
+  .map(x => Object.assign(x, { url: png((x.id === 'filter-formant' ? 'filter-vowels' : x.id) + '.png') })), surface: png('blank-surface2.png') };
+
 const parts = [];
 const cdir = path.join(ROOT, 'tools/music/components');
 for (const id of fs.readdirSync(cdir).sort()) {
@@ -33,7 +39,7 @@ for (const id of fs.readdirSync(cdir).sort()) {
   if (fs.existsSync(path.join(ROOT, f))) parts.push(tag(f, 'try {\n' + rd(f) + '\n} catch (e) { /* a logic component that needs a page */ }'));
 }
 const inline = [
-  tag('data', 'window.__MUTATE_DATA = ' + JSON.stringify({ types, contracts, baseline, parent: PARENT, tools }) + ';'),
+  tag('data', 'window.__MUTATE_DATA = ' + JSON.stringify({ types, contracts, baseline, parent: PARENT, tools, wobble }) + ';'),
   ...parts,
   tag('tools/core/compat/compat.js', rd('tools/core/compat/compat.js')),
   tag('tools/core/compat/assemble.js', rd('tools/core/compat/assemble.js')),
