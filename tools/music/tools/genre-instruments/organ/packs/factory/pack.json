@@ -436,6 +436,37 @@
       "release": 0.8,
       "level": 0.6
      }
+    },
+    "Dub Bubble Hammond": {
+     "params": {
+      "d0": 8,
+      "d1": 8,
+      "d2": 8,
+      "d3": 0,
+      "d4": 0,
+      "d5": 0,
+      "d6": 0,
+      "d7": 0,
+      "d8": 0,
+      "pipe": "tonewheel",
+      "perc": 0.7,
+      "percHarm": "2nd",
+      "drive": 0.2,
+      "ampTone": 6000,
+      "rotary": 0.6,
+      "rotorSpeed": "fast",
+      "pulse": 0,
+      "celeste": 3,
+      "chiff": 0.2,
+      "reed": 0.2,
+      "tremDepth": 0,
+      "breathDepth": 0,
+      "attack": 0.005,
+      "release": 0.08,
+      "space": 0.2,
+      "dark": 6000,
+      "pedal": false
+     }
     }
    }
   }

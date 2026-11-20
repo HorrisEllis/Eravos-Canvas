@@ -41,6 +41,14 @@
       "tension": 0.9,
       "chordBars": 2
      }
+    },
+    "Dub Siren Cluster": {
+     "params": {
+      "progression": "i-i-VI-VII",
+      "tension": 0.95,
+      "chordBars": 4,
+      "octave": 2
+     }
     }
    }
   }

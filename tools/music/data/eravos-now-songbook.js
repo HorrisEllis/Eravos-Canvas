@@ -113,7 +113,7 @@
       riser: { role: 'lead', organism: 'eravos.retro-dco', preset: 'Sync Sweep', octave: 4, name: 'Riser (Retro DCO)', configure: { level: 0.5 } },
     },
     fx: [{ organism: 'eravos.fx-destroyer', preset: ['Fold Growl', 'Bass Grit (parallel)'], on: 'growl' }, { organism: 'eravos.tape-memory', preset: ['Chewed Tape', 'Third Generation Dub'], on: 'pad' },
-      { organism: 'eravos.sidechain-compressor', preset: 'Odd · Wobble Breathes With Kick', on: 'fx0' }, { organism: 'eravos.fx-echo', preset: 'Dub Throw', on: 'screech' }],
+      { organism: 'eravos.sidechain-compressor', preset: 'Kick Breath', on: 'fx0' }, { organism: 'eravos.fx-echo', preset: 'Dub Throw', on: 'screech' }],
     mods: [{ organism: 'eravos.bass-drop-builder', preset: 'Long build 8/8/1/16',
       configure: { tensionBars: 0, buildBars: 8, pauseBars: 1, dropBars: 16, subDive: 0.9, subFrom: 62, subTo: 29, subLen: 3, spaceTail: 0.75, spaceSize: 6, spaceDuck: 0.6, crossover: 140, spaceWidth: 0.9, swell: 0.7, swellBeats: 2, orbit: 0.5, orbitBars: 2 } },
       { organism: 'eravos.lfo', preset: 'Slow Filter Sweep 2 bars', to: 'talk', key: 'cutoff' }, { organism: 'eravos.xy-pad', configure: { maxX: 0.18, maxY: 0.6 } }],

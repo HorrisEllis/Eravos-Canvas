@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wobble Bass Exploded</title>
+<!-- Standalone copy of Wobble-Exploded.dc.html (the design-canvas board of 2026-11-15): same pieces, positions, wires and timing;
+     opens in any browser. Images are the PNGs beside it. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap">
+<style>
+:root{--bg:#04070C;--ink:#D8F6FF;--dim:#6E8BA3;--line:#1B2A3A;--core:#FF2266;--on:#00D4FF}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace}
+#bar{position:sticky;top:0;z-index:5;height:40px;display:flex;align-items:center;gap:12px;padding:0 14px;background:#04070CE6;border-bottom:1px solid #0F1A26;font-size:11px;flex-wrap:wrap}
+#bar b{font-weight:400;font-size:12px;letter-spacing:2px}
+.tb{border:1px solid var(--line);color:var(--dim);padding:4px 10px;font-size:10px;letter-spacing:2px;background:none;font-family:inherit;cursor:pointer}
+.tb.on{border-color:var(--on);color:var(--on);background:#06202C}
+#hint{color:var(--dim);font-size:10px;letter-spacing:1px}
+#wrap{overflow:hidden}
+#stage{position:relative;width:1700px;height:1300px;transform-origin:0 0;font-size:11px}
+.piece{position:absolute;padding:0;border:0;background:none;cursor:pointer;outline:1px dashed transparent;outline-offset:5px;
+  transition:left 2.8s cubic-bezier(.22,.8,.25,1),top 2.8s cubic-bezier(.22,.8,.25,1),outline-color 1.2s ease}
+.piece img{display:block}
+.fade{transition:opacity 1.4s ease}
+.tag{position:absolute;left:-5px;top:-22px;white-space:nowrap;font:500 10px 'DM Mono',monospace;letter-spacing:1px}
+.wire{position:absolute;left:0;top:0;pointer-events:none}
+#core{position:absolute;left:700px;top:540px;width:300px;height:150px;box-sizing:border-box;background:#060A12;border:2px solid var(--core);
+  display:flex;flex-direction:column;justify-content:center;gap:6px;padding:14px 18px}
+#surface{position:absolute;left:300px;top:120px;width:1100px;height:824px;display:block}
+</style></head><body>
+<div id="bar"><b>Wobble Bass</b><button class="tb" id="ex">EXPLODE</button><button class="tb on" id="as">ASSEMBLE</button><span id="hint"></span></div>
+<div id="wrap"><div id="stage">
+<img id="surface" class="fade" alt="the blank tool surface: Wobble Bass's window with every element lifted off" src="blank-surface2.png">
+<div id="wires"></div>
+<div id="core" class="fade"><span style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:5px">WOBBLE BASS · CORE</span>
+<span style="color:var(--core);font-size:10px">wobble-bass.engine.js · the worklet</span>
+<span style="color:#B8CFE0;font-size:10px;line-height:1.5">the voice · the signal order · the AudioParams · the tempo lock</span></div>
+<div id="pieces"></div>
+</div></div>
+<script>
+const PIECES = [{"id": "preset", "comp": "packs", "sub": "presets \u00b7 data beside the tool", "url": "preset.png", "w": 232, "h": 32, "hx": 308, "hy": 166, "ex": 138, "ey": 106, "col": "#CC44FF", "mark": "PACK", "dash": false, "d": "M254 138 C 505 138, 505 540, 756 540", "bx": 756, "by": 540, "lines": ["data, never in the engine", "loads into every component"], "delay": 0.0}, {"id": "shape-tabs", "comp": "lfo", "sub": "shape", "url": "shape-tabs.png", "w": 240, "h": 42, "hx": 1142, "hy": 160, "ex": 1312, "ey": 100, "col": "#3DDC97", "mark": "\u2713 BUILT", "dash": false, "d": "M1432 142 C 1187 142, 1187 540, 942 540", "bx": 942, "by": 540, "lines": ["shape: 7 options (contract)"], "delay": 0.06}, {"id": "lfo-rate", "comp": "lfo", "sub": "rate grid \u00b7 sync \u00b7 retrig", "url": "lfo-rate.png", "w": 350, "h": 222, "hx": 312, "hy": 210, "ex": 142, "ey": 180, "col": "#3DDC97", "mark": "\u2713 BUILT", "dash": false, "d": "M492 291 C 630 291, 630 540, 767 540", "bx": 767, "by": 540, "lines": ["in  reset \u00b7 trigger \u00b7 block", "out out \u00b7 control \u22121\u20261 \u00b7 audio", "rate 0.01\u201350 Hz \u00b7 phase 0\u20131 \u00b7 fade 0\u201310 s"], "delay": 0.12}, {"id": "perform", "comp": "own:perform", "sub": "XY \u00b7 rate \u00d7 \u00b7 mouth Hz", "url": "perform.png", "w": 350, "h": 183, "hx": 312, "hy": 442, "ex": 142, "ey": 452, "col": "#B8CFE0", "mark": "OWN", "dash": false, "d": "M492 544 C 596 544, 596 585, 700 585", "bx": 700, "by": 585, "lines": ["Wobble's own: drives lfo rate + filter cutoff"], "delay": 0.18}, {"id": "env-shape", "comp": "env-msseg", "sub": "drawn shape \u00b7 yoi \u00b7 talk", "url": "env-shape.png", "w": 350, "h": 215, "hx": 312, "hy": 635, "ex": 142, "ey": 685, "col": "#7A8FA3", "mark": "\u25cb PLANNED", "dash": true, "d": "M492 792 C 596 792, 596 689, 700 689", "bx": 700, "by": 689, "lines": ["not built: contract to write"], "delay": 0.24}, {"id": "step-mod", "comp": "step-mod", "sub": "wub seq \u00b7 steps", "url": "step-mod.png", "w": 352, "h": 307, "hx": 670, "hy": 210, "ex": 670, "ey": 160, "col": "#7A8FA3", "mark": "\u25cb PLANNED", "dash": true, "d": "M846 467 C 846 504, 848 504, 848 540", "bx": 848, "by": 540, "lines": ["not built: contract to write"], "delay": 0.3}, {"id": "filter-formant", "comp": "filter-formant", "sub": "vowels A \u00b7 B", "url": "filter-vowels.png", "w": 352, "h": 73, "hx": 670, "hy": 525, "ex": 670, "ey": 740, "col": "#FF2266", "mark": "\u25cf IN IT", "dash": false, "d": "M846 740 C 846 715, 848 715, 848 690", "bx": 848, "by": 690, "lines": ["in  in \u00b7 audio", "out out \u00b7 audio", "A \u00b7 B \u00b7 pos \u00b7 shift \u00b7 q"], "delay": 0.36}, {"id": "rate-beyond", "comp": "lfo", "sub": "rate bend \u00b7 phase \u00b7 depth", "url": "rate-beyond.png", "w": 352, "h": 93, "hx": 670, "hy": 605, "ex": 670, "ey": 850, "col": "#3DDC97", "mark": "\u2713 BUILT", "dash": false, "d": "M846 850 C 846 770, 849 770, 849 690", "bx": 849, "by": 690, "lines": ["phase 0\u20131 \u00b7 depth (Wobble's scale)"], "delay": 0.42}, {"id": "mouth", "comp": "filter-svf", "sub": "cutoff \u00b7 reso", "url": "mouth.png", "w": 352, "h": 91, "hx": 670, "hy": 705, "ex": 670, "ey": 980, "col": "#3DDC97", "mark": "\u2713 BUILT", "dash": false, "d": "M846 980 C 846 835, 849 835, 849 690", "bx": 849, "by": 690, "lines": ["in  in \u00b7 audio", "out out \u00b7 audio", "frequency \u00b7 detune \u00b7 resonance \u00b7 mode \u00b7 stages"], "delay": 0.48}, {"id": "fm", "comp": "osc-fm-operator", "sub": "FM \u00b7 ratio \u00b7 FM wub", "url": "fm.png", "w": 268, "h": 80, "hx": 1032, "hy": 212, "ex": 1202, "ey": 167, "col": "#00D4FF", "mark": "\u2197 COMES OUT", "dash": false, "d": "M1336 247 C 1143 247, 1143 540, 949 540", "bx": 949, "by": 540, "lines": ["inside Wobble now: contract to write"], "delay": 0.54}, {"id": "grit", "comp": "waveshaper", "sub": "grit \u00b7 drive \u00b7 type", "url": "grit.png", "w": 348, "h": 66, "hx": 1032, "hy": 292, "ex": 1202, "ey": 272, "col": "#7A8FA3", "mark": "\u25cb PLANNED", "dash": true, "d": "M1202 305 C 1069 305, 1069 540, 935 540", "bx": 935, "by": 540, "lines": ["not built: contract to write"], "delay": 0.6}, {"id": "squash", "comp": "clipper", "sub": "squash", "url": "squash.png", "w": 67, "h": 67, "hx": 1035, "hy": 358, "ex": 1205, "ey": 363, "col": "#00D4FF", "mark": "\u2197 COMES OUT", "dash": false, "d": "M1205 396 C 1088 396, 1088 540, 972 540", "bx": 972, "by": 540, "lines": ["inside Wobble now: contract to write"], "delay": 0.66}, {"id": "pitch", "comp": "own:pitch", "sub": "bends \u00b7 dives \u00b7 glide", "url": "pitch.png", "w": 350, "h": 92, "hx": 1030, "hy": 442, "ex": 1200, "ey": 472, "col": "#B8CFE0", "mark": "OWN", "dash": false, "d": "M1200 518 C 1100 518, 1100 573, 1000 573", "bx": 1000, "by": 573, "lines": ["Wobble's own"], "delay": 0.72}, {"id": "osc-va", "comp": "osc-va", "sub": "square", "url": "osc-va.png", "w": 128, "h": 70, "hx": 1032, "hy": 558, "ex": 1182, "ey": 618, "col": "#3DDC97", "mark": "\u2713 BUILT", "dash": false, "d": "M1182 653 C 1091 653, 1091 632, 1000 632", "bx": 1000, "by": 632, "lines": ["in  pitch \u00b7 audio", "out out \u00b7 audio", "shape \u00b7 width"], "delay": 0.78}, {"id": "osc-sub", "comp": "osc-sub", "sub": "sub \u00b7 in phase", "url": "osc-sub.png", "w": 150, "h": 70, "hx": 1160, "hy": 558, "ex": 1345, "ey": 618, "col": "#3DDC97", "mark": "\u2713 BUILT", "dash": false, "d": "M1345 653 C 1172 653, 1172 627, 1000 627", "bx": 1000, "by": 627, "lines": ["in  pitch \u00b7 audio \u00b7 align \u00b7 control", "out out \u00b7 audio", "octave \u00b7 shape"], "delay": 0.84}, {"id": "unison", "comp": "unison-stack", "sub": "unison", "url": "unison.png", "w": 73, "h": 70, "hx": 1305, "hy": 558, "ex": 1525, "ey": 618, "col": "#3DDC97", "mark": "\u2713 BUILT", "dash": false, "d": "M1525 653 C 1262 653, 1262 623, 1000 623", "bx": 1000, "by": 623, "lines": ["out layout \u00b7 data \u00b7 block", "voices \u00b7 detune \u00b7 curve \u00b7 spread \u00b7 blend"], "delay": 0.9}, {"id": "width", "comp": "stereo-tools", "sub": "width", "url": "width.png", "w": 57, "h": 60, "hx": 1035, "hy": 628, "ex": 1185, "ey": 733, "col": "#00D4FF", "mark": "\u2197 COMES OUT", "dash": false, "d": "M1185 763 C 1092 763, 1092 681, 1000 681", "bx": 1000, "by": 681, "lines": ["in  in \u00b7 audio", "out out \u00b7 audio", "width \u00b7 hz"], "delay": 0.96}, {"id": "noise", "comp": "own:noise", "sub": "noise", "url": "noise.png", "w": 56, "h": 60, "hx": 1090, "hy": 628, "ex": 1270, "ey": 733, "col": "#B8CFE0", "mark": "OWN", "dash": false, "d": "M1270 763 C 1135 763, 1135 668, 1000 668", "bx": 1000, "by": 668, "lines": ["Wobble's own (osc-noise exists)"], "delay": 1.02}, {"id": "volwub", "comp": "own:vol-wub", "sub": "vol wub", "url": "volwub.png", "w": 53, "h": 60, "hx": 1145, "hy": 628, "ex": 1355, "ey": 733, "col": "#B8CFE0", "mark": "OWN", "dash": false, "d": "M1355 763 C 1178 763, 1178 659, 1000 659", "bx": 1000, "by": 659, "lines": ["Wobble's own"], "delay": 1.08}, {"id": "release", "comp": "note-release", "sub": "attack \u00b7 release", "url": "release.png", "w": 112, "h": 60, "hx": 1196, "hy": 628, "ex": 1436, "ey": 733, "col": "#FF2266", "mark": "\u25cf IN IT", "dash": false, "d": "M1436 763 C 1218 763, 1218 653, 1000 653", "bx": 1000, "by": 653, "lines": ["in  off \u00b7 note \u00b7 event", "out gain \u00b7 control \u00b7 audio", "release"], "delay": 1.14}, {"id": "level", "comp": "own:level", "sub": "level", "url": "level.png", "w": 73, "h": 60, "hx": 1305, "hy": 628, "ex": 1575, "ey": 733, "col": "#B8CFE0", "mark": "OWN", "dash": false, "d": "M1575 763 C 1288 763, 1288 646, 1000 646", "bx": 1000, "by": 646, "lines": ["Wobble's own"], "delay": 1.2}, {"id": "keys", "comp": "own:keys", "sub": "every key its own note", "url": "keys.png", "w": 1084, "h": 64, "hx": 308, "hy": 858, "ex": 308, "ey": 1188, "col": "#B8CFE0", "mark": "OWN", "dash": false, "d": "M850 1188 C 850 939, 850 939, 850 690", "bx": 850, "by": 690, "lines": ["Wobble's own: pitch + gate out"], "delay": 1.26}];
+const S = { exploded: false, flip: {}, sel: null };
+const NS = 'http://www.w3.org/2000/svg', W = document.getElementById('wires'), PC = document.getElementById('pieces');
+const els = PIECES.map(p => {
+  const w = document.createElement('div'); w.className = 'wire fade';
+  w.innerHTML = '<svg width="1700" height="1300" viewBox="0 0 1700 1300" aria-hidden="true"><path d="' + p.d + '" fill="none" stroke="' + p.col +
+    '" stroke-opacity="0.75" stroke-width="2"' + (p.dash ? ' stroke-dasharray="6 4"' : '') + '/><circle cx="' + p.bx + '" cy="' + p.by + '" r="4" fill="' + p.col + '"/></svg>';
+  W.appendChild(w);
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'piece'; b.setAttribute('aria-label', p.comp + ' · ' + p.sub);
+  b.style.width = p.w + 'px'; b.style.height = p.h + 'px';
+  b.innerHTML = '<img alt="" width="' + p.w + '" height="' + p.h + '"><span class="tag fade"></span>';
+  b.querySelector('img').src = p.url; const t = b.querySelector('.tag'); t.textContent = p.comp + ' · ' + p.sub + '  ' + p.mark; t.style.color = p.col;
+  b.onclick = () => { S.flip[p.id] = !S.flip[p.id]; S.sel = p.id; render(); };
+  PC.appendChild(b); return { p, w, b, t };
+});
+function render() {
+  const e = S.exploded, out = (p) => e ? !S.flip[p.id] : !!S.flip[p.id], any = PIECES.some(out);
+  els.forEach(({ p, w, b, t }) => { const o = out(p);
+    b.style.left = (o ? p.ex : p.hx) + 'px'; b.style.top = (o ? p.ey : p.hy) + 'px';
+    b.style.outlineColor = o ? p.col : 'transparent'; b.style.transitionDelay = (o && e ? p.delay : 0) + 's';
+    b.style.boxShadow = S.sel === p.id && o ? '0 0 0 3px ' + p.col + '44' : 'none';
+    t.style.opacity = o ? 1 : 0; t.style.transitionDelay = (o ? 2.2 : 0) + 's';
+    w.style.opacity = o ? 1 : 0; w.style.transitionDelay = (o ? 2.2 : 0) + 's'; });
+  const c = document.getElementById('core'); c.style.opacity = any ? 1 : 0; c.style.transitionDelay = (any ? 1.4 : 0) + 's';
+  const sf = document.getElementById('surface'); sf.style.opacity = e ? 0 : 1; sf.style.transitionDelay = (e ? 0.4 : 0) + 's';
+  document.getElementById('ex').classList.toggle('on', e); document.getElementById('as').classList.toggle('on', !e);
+  document.getElementById('hint').textContent = e || any ? 'click a piece to snap it back in' : 'click a piece to snap it off';
+}
+document.getElementById('ex').onclick = () => { S.exploded = true; S.flip = {}; render(); };
+document.getElementById('as').onclick = () => { S.exploded = false; S.flip = {}; render(); };
+function fit() { const k = Math.min(1, (innerWidth) / 1700); const st = document.getElementById('stage'); st.style.transform = 'scale(' + k + ')';
+  document.getElementById('wrap').style.height = (1300 * k) + 'px'; }
+addEventListener('resize', fit); fit(); render();
+if (/explode/.test(location.hash)) setTimeout(() => document.getElementById('ex').click(), 600);
+</script></body></html>

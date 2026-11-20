@@ -30,7 +30,7 @@
       "tool": "eravos.chord-gen",
       "role": "key",
       "required": true,
-      "preset": "Odd · Dub Siren Cluster",
+      "preset": "Dub Siren Cluster",
       "why": "the chords the bass follows",
       "notes": false
     },
@@ -38,7 +38,7 @@
       "tool": "eravos.bass-gen",
       "role": "bassline",
       "required": true,
-      "preset": "Odd · Reggae One Drop",
+      "preset": "Reggae One Drop",
       "why": "the reggae bassline",
       "notes": false
     },
@@ -264,16 +264,16 @@
         "preset": "Steppers Dub"
       },
       "eravos.sub-engine": {
-        "preset": "Odd · Steppers Sub"
+        "preset": "Steppers Sub"
       },
       "eravos.pads": {
-        "preset": "Odd · Steppers Machine"
+        "preset": "Steppers Machine"
       },
       "eravos.sidechain-compressor": {
-        "preset": "Odd · Steppers Pump 1/4"
+        "preset": "Steppers Pump 1/4"
       },
       "eravos.fx-echo": {
-        "preset": "Odd · Steppers Tape"
+        "preset": "Steppers Tape"
       }
     },
     "Bun Dem": {

@@ -177,6 +177,21 @@
       "width": 0.7,
       "level": 0.65
      }
+    },
+    "Dub Honky Skank": {
+     "params": {
+      "model": "honky",
+      "hardness": 0.7,
+      "brightness": 0.6,
+      "decay": 2.2,
+      "release": 0.15,
+      "resonance": 0.3,
+      "detune": 0.7,
+      "inharm": 0.6,
+      "drive": 0.3,
+      "width": 0.5,
+      "level": 0.6
+     }
     }
    }
   }

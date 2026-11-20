@@ -65,6 +65,16 @@
       "depth": 0.25,
       "polarity": "bipolar"
      }
+    },
+    "Golden LFO": {
+     "params": {
+      "shape": "triangle",
+      "sync": false,
+      "div": "2/1",
+      "depth": 0.8,
+      "polarity": "unipolar+",
+      "rate": 0.618
+     }
     }
    }
   }

@@ -207,6 +207,33 @@
        ]
       ]
      }
+    },
+    "Séance Lattice": {
+     "params": {
+      "primeZ": 7,
+      "timbre": "glass",
+      "baseHz": 98,
+      "level": 0.3
+     },
+     "extra": {
+      "nodes": [
+       [
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        -1,
+        0
+       ],
+       [
+        -1,
+        0,
+        0
+       ]
+      ]
+     }
     }
    }
   }

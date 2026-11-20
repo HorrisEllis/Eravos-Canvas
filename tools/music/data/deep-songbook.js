@@ -332,7 +332,7 @@
       return L.done(); },
     fx: [{ organism: 'eravos.tape-memory', preset: 'Tracking Error', on: 'keys' }, { organism: 'eravos.tape-memory', preset: 'Chewed Tape', on: 'pad' },
       { organism: 'eravos.sidechain-compressor', preset: 'Lofi Gentle Pump', on: 'fx1' }, { organism: 'eravos.fx-moddelay', preset: 'Juno Wide', on: 'lead' }],
-    mods: [{ organism: 'eravos.lfo', preset: 'Odd · Golden LFO', to: 'keys', key: 'cutoff' }, { organism: 'eravos.xy-pad', configure: { maxX: 0.6, maxY: 0.5 } }],
+    mods: [{ organism: 'eravos.lfo', preset: 'Golden LFO', to: 'keys', key: 'cutoff' }, { organism: 'eravos.xy-pad', configure: { maxX: 0.6, maxY: 0.5 } }],
     routes: [{ from: 'mod1', out: 'x', to: 'fx0', key: 'knob.wow' }, { from: 'mod1', out: 'y', to: 'lead', key: 'cutoff' }, { from: 'fx0', out: 'dropout', to: 'fx3', key: 'mix' }],
     master: { compThresh: -13, compRatio: 2.4, reverbMix: 0.16 },
   }, { id: 'dp-slowfunk', title: 'Galactic Warble', seed: 8806, mood: ['80s', 'warm', 'calm'],
@@ -349,7 +349,7 @@
     parts: {
       drums: { role: 'drums', organism: 'eravos.pads', preset: 'Bass Music · 140 Half-Time Dub', name: 'Drums' },
       sub: { role: 'bass', organism: 'eravos.sub-engine', preset: 'Dubstep Sub Layer', name: 'Sub', configure: { level: 0.7 } },
-      skank: { role: 'chords', organism: 'eravos.piano', preset: 'Odd · Dub Honky Skank', name: 'Skank', configure: { level: 0.4 } },
+      skank: { role: 'chords', organism: 'eravos.piano', preset: 'Dub Honky Skank', name: 'Skank', configure: { level: 0.4 } },
       siren: { role: 'lead', organism: 'eravos.curve-synth', preset: 'Siren', name: 'Siren', configure: { level: 0.3 } },
       wub: { role: 'bass', organism: 'eravos.wobble-bass', preset: 'Sub Pressure', name: 'Wobble (low)', configure: { level: 0.45 } },
     },
@@ -394,7 +394,7 @@
       drums: { role: 'drums', organism: 'eravos.pads', preset: 'Heavy (Dubstep/Trap)', name: 'Drums' },
       sub: { role: 'bass', organism: 'eravos.sub-engine', preset: 'Dubstep Sub Layer', name: 'Sub', configure: { level: 0.55 } },
       wub: { role: 'bass', organism: 'eravos.wobble-bass', preset: 'Classic Wub 1/8', name: 'Wobble', configure: { level: 0.6 } },
-      organ: { role: 'chords', organism: 'eravos.organ', preset: 'Odd · Dub Bubble Hammond', name: 'Organ bubble', configure: { level: 0.35 } },
+      organ: { role: 'chords', organism: 'eravos.organ', preset: 'Dub Bubble Hammond', name: 'Organ bubble', configure: { level: 0.35 } },
       riser: { role: 'lead', organism: 'eravos.wub-osc', preset: 'Slide Lead (+1 oct)', name: 'Riser', configure: { level: 0.35 } },
     },
     bar(cx) { const { partKey: p, kind, b, deg, sec } = cx, { n, N, at } = pen(cx), last = b === sec.bars - 1;
@@ -419,7 +419,7 @@
         L.add('fx2', 'mix', 'Organ echo', [[a, s.kind === 'break' ? 0.55 : 0.25]]); L.add('mod0', 'depth', 'Grit wobble depth', [[a, s.kind === 'drop' ? 0.6 : 0.1]]);
         L.add('mod1', 'posX', 'XY · X (wobble FM)', s.kind === 'build' ? [[a, 0], [e - 0.05, 1]] : [[a, s.kind === 'drop' ? 0.4 : 0]]); L.add('mod1', 'posY', 'XY · Y (wobble vowel)', [[a, 0.2], [e - 0.05, s.kind === 'drop' ? 0.8 : 0.2]]); L.add('sub', 'drive', 'Sub drive', [[a, s.name === 'drop 2' ? 0.3 : 0.1]]); L.add('organ', 'rotary', 'Organ rotor', [[a, s.kind === 'break' ? 0.8 : 0.3]]); L.add('riser', 'index', 'Riser FM', [[a, 2], [e - 0.05, s.kind === 'build' ? 16 : 2]]); L.add('fx2', 'feedback', 'Organ echo feedback', [[a, s.kind === 'break' ? 0.75 : 0.45]]); L.add('wub', 'squash', 'Wobble squash', [[a, s.kind === 'drop' ? 0.6 : 0.2]]); });
       return L.done(); },
-    fx: [{ organism: 'eravos.fx-destroyer', preset: 'Wub Grit · sub stays clean', on: 'wub' }, { organism: 'eravos.sidechain-compressor', preset: 'Odd · Wobble Breathes With Kick', on: 'fx0' },
+    fx: [{ organism: 'eravos.fx-destroyer', preset: 'Wub Grit · sub stays clean', on: 'wub' }, { organism: 'eravos.sidechain-compressor', preset: 'Kick Breath', on: 'fx0' },
       { organism: 'eravos.fx-echo', preset: 'Dub Throw', on: 'organ' }],
     mods: [{ organism: 'eravos.lfo', preset: 'Wobble 1/8', to: 'fx0', key: 'drive' }, { organism: 'eravos.xy-pad', configure: { maxX: 0.3, maxY: 0.5 } }],
     routes: [{ from: 'mod1', out: 'x', to: 'wub', key: 'knob.fmIndex' }, { from: 'mod1', out: 'y', to: 'wub', key: 'knob.formantShift' }, { from: 'fx1', out: 'env', to: 'fx2', key: 'mix' }],
@@ -520,7 +520,7 @@
         L.add('mod1', 'posX', 'XY · X (riddim FM)', s.kind === 'build' ? [[a, 0], [e - 0.05, 1]] : [[a, 0.3]]); L.add('mod1', 'posY', 'XY · Y (the wall)', [[a, s.kind === 'drop' ? 0.7 : 0.1]]); L.add('stair', 'fm', 'Stair FM', [[a, 3], [e - 0.05, s.name === 'drop 2' ? 12 : 3]]); L.add('sub', 'drive', 'Sub drive', [[a, s.kind === 'drop' ? 0.25 : 0.05]]); L.add('pad', 'bloom', 'Pad bloom', [[a, 0.2], [e - 0.05, s.kind === 'break' ? 0.9 : 0.3]]); L.add('fx2', 'drive', 'Stair rectifier', [[a, 0.4], [e - 0.05, s.name === 'drop 2' ? 0.8 : 0.4]]); });
       return L.done(); },
     fx: [{ organism: 'eravos.fx-squash', preset: 'Riddim Wall', on: 'riddim' }, { organism: 'eravos.sidechain-compressor', preset: 'Hard Gate 1/8', on: 'fx0' }, { organism: 'eravos.fx-destroyer', preset: 'Octave Rectifier', on: 'stair' }],
-    mods: [{ organism: 'eravos.lfo', preset: 'Odd · Golden LFO', to: 'riddim', key: 'knob.formantShift' }, { organism: 'eravos.xy-pad', configure: { maxX: 0.4, maxY: 0.5 } }],
+    mods: [{ organism: 'eravos.lfo', preset: 'Golden LFO', to: 'riddim', key: 'knob.formantShift' }, { organism: 'eravos.xy-pad', configure: { maxX: 0.4, maxY: 0.5 } }],
     routes: [{ from: 'mod1', out: 'x', to: 'riddim', key: 'knob.fmIndex' }, { from: 'mod1', out: 'y', to: 'fx0', key: 'amount' }, { from: 'fx1', out: 'env', to: 'stair', key: 'knob.cutoff' }],
     master: { compThresh: -9, compRatio: 3.5, reverbMix: 0.06 },
   }, { id: 'ds-riddim', title: 'Stop-Start Riddim', seed: 8904, mood: ['heavy'],
