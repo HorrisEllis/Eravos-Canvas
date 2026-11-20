@@ -71,6 +71,24 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-20 · The Field: his board made live and editable on the canvas, opening as one animated scene; the Workshop given the same motion — release 0.2.26 (3.196–3.198)
+- **His words (2026-11-20):** "okay now let me edit and change the wobble base. also i feel it should be a canvas in itself. so i can scroll
+  around" · "im saying that exactly. i already critisist the other one immensly. do not deviate" · "What about animated transition for the
+  dynamic canvas changing. Like opening the field dynamically changes the ui. Animated and beautiful." · "I like that. But do that with the
+  workshop as well. It's supposed to be the same thing, but"
+- **His call:** the look. Several re-drawn versions of the Field were rejected ("i don't see the ui i want"); he required his own board,
+  exactly. His verdict on the result is recorded verbatim in `docs/HIS-WORDS-MAP.md` (N-X69), including that the first outputs were bad and
+  his repeated constraints made it.
+- **Built (by the AI coder, to his direction):**
+  - `tools/core/field/board.js`: a tool's live window lifted apart onto the canvas as his board (the layout generated from his board file,
+    not retyped); the parts are moved, not copied, so every control still edits the tool.
+  - `tools/core/field/motion.js`: one shared motion (Web Animations, seekable) — the Field's scene and the Workshop's open / close.
+- **Proof:** P196 1/1 and P197 1/1 (new); every Workshop suite (P150–P175), Timeline 33/33, Wobble 49/49, boundary 10/10, bare-canvas.
+  Faults found by filming the real app frame by frame and fixed before he saw them: the board under the windows, start points measured after
+  the window reflowed, hidden parts starting at the screen's corner, finish() on endless animations.
+- **Where to check:** `docs/previews/workbench/field-transition.mp4`, `workshop-transition.mp4` (regenerate with their `.video.mjs`);
+  `node tests/run.mjs P196` · `P197`; register entries R-2026-11-20-71 … 74.
+
 ### 2026-11-13 · Feelings: a tool from his words to a played instrument in one day, through four rejected or reshaped designs — PR (3.187)
 - **His words (2026-11-13):** "i also want a actual tool for irrational frequencies, and unconvential harmonic data, like dragging around …
   like feelings or emotions as frequencies" · "a full drag on a tool and have it play the sounds like a four way grid" · "i want love, anger

@@ -1,3 +1,17 @@
+ERAVOS v0.2.26 (2026-11-20)
+
+Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.26.exe from the release.
+
+- The Field: right-click Wobble Bass › ✦ Explode on the canvas. The whole tool blows apart into its board — every part in its gate, wired
+  to its core — on the canvas itself (pan, zoom, scroll). Every part is the live control: turn it, draw the shape, play the keys. Drag a gate
+  by its label; below the board, everything Wobble Bass has grown since. Right-click or Esc puts it back together.
+- Opening and closing the Field is one animated scene: full screen, the rest of the canvas softens back, the camera glides, the parts lift and
+  fly to their places, the core blooms, the wires draw in. Closing plays it in reverse.
+- The Workshop opens and closes the same way: it grows out of the note (or button) you pressed and flies home into it when you close it.
+- Fixed: songs and setups (Gothic, Sound System, Xen) that still used presets removed with Odd Couples — their settings are back, under plain
+  names, and nothing sounds different.
+- If your system has "reduce motion" on, the Field and the Workshop open and close at once.
+
 ERAVOS v0.2.25 (2026-11-18)
 
 Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.25.exe from the release.
