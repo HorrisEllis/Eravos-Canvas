@@ -222,3 +222,37 @@ acceptance (CG0): this spec, the map's numbers reproducible: grep the specs' dep
 #     so every tool holding it can use it; a synthesized tool's face picks variants (by him, or mutated, and the same verdicts teach it).
 # next: shown on THIS board first — (1) right-click a piece › SWAP FOR / STYLE / MUTATE (the canvas's own menu, nothing on the board until asked);
 #   (2) a piece's style variants; (3) blocks. Wobble Bass's pieces become editable as the WD track makes them components (CG7).
+
+## ADDENDUM 2026-11-20 (4) — the Field page kept, extended: a nav menu, a big MUTATE, components swapped on the spot, any domain, UI elements
+## edited / uploaded / created, cores mixed with a stability warning, on disk, packs / mod schemas / templates made from it (nothing above is changed)
+# his words (2026-11-20, verbatim, with his screenshot of the Field page, Wobble Bass exploded): "yes, love it but then the rest of the ui, keep
+#   everything but add the navmenu. bit mutate button, edit components, i want this able to create any tool, for any sound. you swap them out on
+#   the spot. then i want to be able to upload, edit, change, and maybe create ui elements. that way we can test the image manipulation domain.
+#   like each component also has the hooks. agnostic. like other domain components will also be able to be added. not static, only the engine or
+#   the core right? maybe even mutate cores? like mix and max, as long as it mutates cleanly, maybe a prompt that warns if it could be unstable.
+#   these need to save on disk by the way just like the rest, also would need to be able to generate packs and mod schemas and templates, with it
+#   and for it potentially."
+# the page is KEPT (nothing removed or restyled); added:
+#   NAV MENU   FIELD (save / open the library on disk) · TOOL (new from a template, synthesize, export / import its file) · EDIT (undo / redo)
+#              · COMPONENTS (every component of every domain, by its contract: add it, swap on the spot; the ones with no adapter shown, not
+#              offered) · MUTATE (the tool, its UI, mix cores) · MAKE (a pack, a mod schema, a template) · VIEW (board / chain)
+#   MUTATE     the big button; MUTATE ▸ the UI (each element's style, seeded, inside the fixed design rules — ADDENDUM (3))
+#   THE BOARD  any assembled tool drawn as the board: each component in its gate frame, labelled (order · component · status), its live element
+#              inside, wired to the CORE; click a label → swap it there and then (heard at once); Wobble Bass opens as the exact board (rule).
+#   ELEMENTS   per component: its style (knobs · faders · compact), an uploaded image as its face (a skin), the image's adjustments — brightness,
+#              contrast, hue, saturation, blur, invert: the image-manipulation domain's first components, tried on UI elements (preview: done
+#              with the browser's own filters; as a domain, each becomes a component with a contract and hooks like any other)
+#   CORES      MUTATE ▸ mix cores: graft a kept tool into this one — in parallel (both into a new output) or in series (this one into the other's
+#              chain); every mix is checked for stability (not finite · pinned · DC · energy growing · a feedback loop) and a warning asks first
+#   DISK       everything kept (tools, verdicts, element skins, packs, templates) saves to disk: the preview downloads / opens one library file;
+#              in the app it is Documents\ERAVOS\field\ (tools in Documents\ERAVOS\tools\mine.<id>\, as CG6)
+#   MAKE       a PACK (eravos.pack/1, schemas/pack.schema.json): presets made by varying the tool, each gated (plays, heard, not a repeat by the
+#              null), ranked by what he taught it · a MOD SCHEMA: the tool's insert slots (Mods: descriptor.slots, one after each component) and
+#              its settings as a JSON schema (what a pack / a mod may set) · a TEMPLATE: the tool as a starting point (START FROM › templates;
+#              templates/tool-sound shape when written to disk)
+# agnostic: the graph, the checker, assemble and the Field are domain-free; a component of any domain joins by its contract (ports, variables,
+#   element) and its domain's adapter + types; the CORE is the only part a tool keeps as its own — everything around it is components.
+# LEARN (his words, 2026-11-20: "yes. like eravos is meant to be as fluid and dynamic as possible. this is high leverage as hell. think about
+#   using this for learning, one component at a time?"): TOOL › learn — a bare oscillator on the bench, then one component at a time: what
+#   fits after the output (the graph), each explained from its own contract (what it takes, gives, which roles it shapes, which controls to
+#   move first), heard without it and with it (A / B), then added; any domain's components teach themselves the same way.

@@ -40,7 +40,7 @@ h2{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:20px;letter-spa
 #edited{color:var(--env);font-size:10px;letter-spacing:2px}
 #boardWrap{overflow-x:auto;padding:8px 0 4px}
 #board{position:relative}
-#board svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+#board > svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
 .node{position:absolute;width:184px;border:1px dashed var(--c);background:var(--panel);padding:8px 10px 9px;cursor:pointer;text-align:left;color:var(--ink)}
 .node:hover{box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 25%,transparent)}
 .node.sel{border-style:solid;box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 40%,transparent)}
@@ -117,7 +117,7 @@ details.offs{margin-top:12px;color:var(--faint)} details.offs summary{cursor:poi
 .el .eh{display:flex;justify-content:space-between;font-size:10px;letter-spacing:2px;color:var(--c);margin-bottom:8px}
 .el .eh span:last-child{color:var(--faint);letter-spacing:1px}
 .knobs{display:flex;flex-wrap:wrap;gap:10px 12px}
-.knob{display:flex;flex-direction:column;align-items:center;width:58px;cursor:ns-resize;user-select:none;touch-action:none}
+.knob{display:flex;flex-direction:column;align-items:center;min-width:58px;cursor:ns-resize;user-select:none;touch-action:none}
 .knob svg{display:block} .knob .kv{font-size:10px;color:var(--soft);margin-top:1px;white-space:nowrap} .knob .kl{font-size:9px;color:var(--dim);letter-spacing:1px}
 .el .seg{margin-top:4px}
 .more{grid-column:1/-1;color:var(--dim);font-size:10px;letter-spacing:2px;cursor:pointer;background:none;border:0;text-align:left;padding:2px 0}
@@ -133,7 +133,11 @@ details.offs{margin-top:12px;color:var(--faint)} details.offs summary{cursor:poi
 .lrn b{font-weight:400} .lrn b.p{color:var(--ok)} .lrn b.n{color:var(--no)}
 .reg{font-size:10px} .reg.ok{color:var(--ok)} .reg.bad{color:var(--no)}
 #xWrap{overflow:hidden;margin-top:8px;border:1px solid var(--line2)}
-#xStage{position:relative;width:1700px;height:1300px;transform-origin:0 0;background:#04070C}
+#xStage{position:relative;width:1800px;height:1320px;transform-origin:0 0;background:#04070C}
+#xStage .pc{transition:left 2.8s cubic-bezier(.22,.8,.25,1),top 2.8s cubic-bezier(.22,.8,.25,1),border-color 1.2s ease}
+#xStage .apart,#xStage #surface{transition:opacity 1.4s ease}
+#xStage .whole .pc{border-color:transparent!important}
+#xStage .still,#xStage .still *{transition:none!important}
 #xStage .piece{position:absolute;padding:0;border:0;background:none;cursor:pointer;outline:1px dashed transparent;outline-offset:5px;
   transition:left 2.8s cubic-bezier(.22,.8,.25,1),top 2.8s cubic-bezier(.22,.8,.25,1),outline-color 1.2s ease}
 #xStage .piece img{display:block}
@@ -146,17 +150,53 @@ details.offs{margin-top:12px;color:var(--faint)} details.offs summary{cursor:poi
 .mark{display:inline-block;border:1px solid currentColor;padding:1px 6px;font-size:10px;letter-spacing:1px}
 .pl{display:grid;grid-template-columns:auto 1fr;gap:2px 14px;font-size:10px;color:var(--dim);margin-top:8px}
 .pl b{font-weight:400;color:var(--soft)}
+#nav{display:flex;gap:0}
+#nav button{background:none;border:0;color:var(--dim);font-size:10px;letter-spacing:2px;padding:6px 9px;cursor:pointer}
+#nav button:hover,#nav button.open{color:var(--ink);background:#0B1522}
+.tb.big{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;padding:6px 22px;border-width:2px}
+#menu{position:fixed;z-index:60;min-width:240px;max-width:340px;max-height:70vh;overflow:auto;background:#070C15;border:1px solid var(--line);box-shadow:0 10px 34px #000c;display:none;padding:5px 0}
+#menu .h{padding:6px 12px 4px;color:var(--faint);font-size:9px;letter-spacing:2px}
+#menu button{display:flex;justify-content:space-between;gap:12px;width:100%;text-align:left;border:0;background:none;color:var(--soft);padding:5px 12px;font-size:11px;cursor:pointer}
+#menu button:hover:not(:disabled){background:#0C1726;color:var(--ink)}
+#menu button:disabled{color:var(--faint);cursor:default}
+#menu button span:last-child{color:var(--faint);font-size:10px}
+#menu hr{border:0;border-top:1px solid var(--line2);margin:4px 0}
+#modalWrap{position:fixed;inset:0;z-index:70;background:#020408D0;display:flex;align-items:flex-start;justify-content:center;padding:60px 16px;overflow:auto}
+#modalWrap[hidden]{display:none}
+#modal{width:min(640px,100%);background:#05080F;border:1px solid var(--line);border-top:2px solid var(--core);padding:16px 18px}
+#modal h3{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:22px;letter-spacing:4px;margin:0 0 8px}
+#modal .warn{color:var(--env);font-size:11px;line-height:1.7}
+#modal ul{margin:8px 0;padding-left:18px;color:var(--soft);font-size:11px;line-height:1.7}
+#modal .acts2{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+#modal pre{background:#020408;border:1px solid var(--line2);padding:8px;max-height:260px;overflow:auto;font-size:10px;color:var(--soft);white-space:pre-wrap}
+/* the board, for any assembled tool: the Field's own language — gate frames, labels, live elements, wired to the core */
+.gate{position:absolute;border:1px dashed var(--c);background:#060A12;padding:10px 12px 10px}
+.gate.sel{border-style:solid;box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 35%,transparent)}
+.gate .glab{position:absolute;left:-1px;top:-20px;white-space:nowrap;font:500 10px 'DM Mono',monospace;letter-spacing:1px;color:var(--c);cursor:pointer;background:none;border:0;padding:0}
+.gate .glab:hover{text-decoration:underline}
+.gate .ghd{font-size:10px;letter-spacing:2px;color:var(--soft);margin-bottom:6px;display:flex;justify-content:space-between;gap:8px}
+.gate .skin{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.55;pointer-events:none}
+.gate .knobs{position:relative}
+.fad{display:flex;flex-direction:column;gap:2px;width:100%;font-size:9px;color:var(--dim)}
+.fad input{width:100%;accent-color:var(--c)}
+.cmp{display:flex;justify-content:space-between;width:100%;font-size:10px;color:var(--dim)} .cmp b{color:var(--c);font-weight:400}
+.fcore{position:absolute;box-sizing:border-box;background:#060A12;border:2px solid var(--core);display:flex;flex-direction:column;justify-content:center;gap:5px;padding:12px 16px}
+.fcore .t{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:5px;color:var(--ink);line-height:1}
+.fcore .s{color:var(--core);font-size:10px} .fcore .c2{color:#B8CFE0;font-size:10px;line-height:1.5}
+.learn{border:1px solid var(--env);background:#0E0B05;padding:10px 12px;margin-top:8px;font-size:11px;color:var(--soft);line-height:1.6}
+.learn b{color:var(--env);font-weight:400}
 #toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#0B1522;border:1px solid var(--line);padding:7px 14px;color:var(--soft);font-size:11px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:40}
 </style></head><body>
 <div id="bar">
-  <span class="brand">FIELD</span><span class="sep">·</span>
+  <span class="brand">FIELD</span>
+  <nav id="nav" aria-label="the Field's menu"></nav><span class="sep">·</span>
   <div id="crumbs"></div>
   <span class="spacer"></span>
   <select class="tb" id="phrase" aria-label="what the tool plays">
     <option value="bass">BASS LINE</option><option value="hold">ONE LONG NOTE</option><option value="high">TWO OCTAVES UP</option>
   </select>
   <button class="tb" id="playCur">▶ PLAY</button>
-  <button class="tb hot" id="mutate">⚄ MUTATE</button>
+  <button class="tb hot big" id="mutate">⚄ MUTATE</button>
 </div>
 <main>
   <div>
@@ -173,6 +213,7 @@ details.offs{margin-top:12px;color:var(--faint)} details.offs summary{cursor:poi
       <div class="lab" id="benchLab">the tool, exploded · <b>click a component</b> to edit it, swap it or remove it · <b>＋</b> on a wire to put a component there</div>
       <div id="boardWrap"><div id="board"></div></div>
       <div id="xWrap" style="display:none"><div id="xStage"></div></div>
+      <div id="learnBox"></div>
       <div id="insp"></div>
     </section>
     <section style="padding-top:4px">
@@ -196,6 +237,9 @@ details.offs{margin-top:12px;color:var(--faint)} details.offs summary{cursor:poi
   </aside>
 </main>
 <div id="toast"></div>
+<div id="menu" role="menu"></div>
+<div id="modalWrap" hidden><div id="modal"></div></div>
+<input type="file" id="fileIn" hidden>
 <div id="synthWrap" hidden><div id="synthBox">
   <div class="sbar"><span class="sic">◆</span><span id="sName"></span><span class="sv" id="sVer"></span><span class="spacer"></span>
     <button class="tb" id="sJson">TOOL FILE</button><button class="tb on" id="sSave">⤓ SAVE THE TOOL</button><button class="tb" id="sClose">✕ BACK TO THE BENCH</button></div>
@@ -226,6 +270,8 @@ const me = (v) => ({ v, n: NC.norm(v, B.lo, B.hi) });
 const base = B.items.map(x => Object.assign({}, x, { n: NC.norm(x.v, B.lo, B.hi) }));
 const nearest = (v) => { let d = 9, nn = null; for (const x of base) { const e = dist(me(v), x); if (e < d) { d = e; nn = x; } } return { d, nn, verdict: d < B.twin ? 'TWIN' : d < B.close ? 'CLOSE' : 'novel' }; };
 const clone = (x) => JSON.parse(JSON.stringify(x));
+const ld = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? d : v; } catch (e) { return d; } };
+const st = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
 const toast = (t) => { const e = document.getElementById('toast'); e.textContent = t; e.style.opacity = 1; clearTimeout(toast.t); toast.t = setTimeout(() => { e.style.opacity = 0; }, 2200); };
 
 // ---- render: the same harness as build/mutants.mjs play() ----
@@ -266,6 +312,7 @@ let bench = null, hist = [], fut = [], sel = null, seed = 1, mutants = [], kept 
 try { const s = JSON.parse(localStorage.getItem('eravos.field.mutate.kept') || '[]'); if (Array.isArray(s)) kept = s.filter(k => k && k.dag && k.dag.nodes); } catch (e) {}
 const save = () => { try { localStorage.setItem('eravos.field.mutate.kept', JSON.stringify(kept)); } catch (e) {} };
 function open(t) {     // put a tool on the bench to edit: the start tool, a mutant, or a kept one
+  learning = false; view = null;
   stop(); bench = { keptId: t.keptId || null, name: t.name, dag: clone(t.dag), ops: clone(t.ops || []), savedAt: JSON.stringify(t.dag) };
   hist = []; fut = []; sel = null; drawAll();
 }
@@ -286,10 +333,10 @@ const isEdited = () => JSON.stringify(bench.dag) !== bench.savedAt;
 const kindCol = (cid) => /^osc-/.test(cid) ? 'var(--osc)' : /^filter-/.test(cid) ? 'var(--flt)' : /^saturator-|bitcrusher/.test(cid) ? 'var(--sat)' : /delay/.test(cid) ? 'var(--dly)' : /^env-/.test(cid) ? 'var(--env)' : 'var(--st)';
 const cssVar = (v) => getComputedStyle(document.documentElement).getPropertyValue(v.slice(4, -1)).trim() || '#9FB3C8';
 const fmtN = (x, v) => { if (typeof x !== 'number') return String(x); const a = Math.abs(x), s = a >= 1000 ? (x / 1000).toFixed(a >= 10000 ? 1 : 2) + 'k' : a >= 100 ? x.toFixed(0) : a >= 10 ? x.toFixed(1) : +x.toPrecision(3) + ''; return s + (v && v.unit ? ' ' + v.unit : ''); };
-const say = (op) => op.op === 'swap' ? 'swap <em>' + op.from + '</em> → <em>' + op.to + '</em>' : op.op === 'insert' ? 'insert <em>' + op.component + '</em> between ' + op.between.join(' → ')
+const say = (op) => op.op === 'graft' ? 'mixed cores with <em>' + op.with + '</em> (' + op.how + ')' : op.op === 'swap' ? 'swap <em>' + op.from + '</em> → <em>' + op.to + '</em>' : op.op === 'insert' ? 'insert <em>' + op.component + '</em> between ' + op.between.join(' → ')
   : op.op === 'vary' ? op.node + '.<em>' + op.key + '</em> → <em>' + (typeof op.value === 'number' ? fmtN(op.value) : op.value) + '</em>' : op.op === 'rewire' ? 'rewire ' + op.from + ': ' + op.was + ' → <em>' + op.to + '</em>' : 'remove <em>' + op.node + '</em>';
 const sayPlain = (op) => say(op).replace(/<\/?em>/g, '');
-const hitNode = (op) => op.op === 'insert' ? op.node : op.op === 'rewire' ? op.to.split('.')[0] : op.node;
+const hitNode = (op) => op.op === 'graft' ? null : op.op === 'insert' ? op.node : op.op === 'rewire' ? op.to.split('.')[0] : op.node;
 const newId = (dag, base) => { const b = base.replace(/^(osc|filter|saturator|stereo|env|delay)-?/, '').slice(0, 5) || 'n'; let i = 2, id = b; while (dag.nodes.some(n => n.id === id)) id = b + i++; return id; };
 
 // ---- the board: the tool exploded, columns by depth ----
@@ -304,7 +351,7 @@ function layout(dag) {
 }
 const inOrder = (dag) => { const L = layout(dag); return dag.nodes.slice().sort((a, b) => (L.pos[a.id].x - L.pos[b.id].x) || (L.pos[a.id].y - L.pos[b.id].y)); };
 let selEdge = null;
-function drawBoard() {
+function drawChain() {
   const dag = bench.dag, Lt = layout(dag); board.innerHTML = '';
   const W = 10 + Lt.ncol * Lt.CW + 110, H = 30 + Lt.nrow * Lt.RH - 20; board.style.width = W + 'px'; board.style.height = H + 'px';
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('width', W); svg.setAttribute('height', H); board.appendChild(svg);
@@ -339,6 +386,197 @@ function drawBoard() {
   if (els[on]) { const A = R(on); edge(A.x + A.w, A.y + A.h / 2, out.offsetLeft, out.offsetTop + 23, '#FF2266'); }
 }
 
+let fieldView = 'board';
+let styles = ld('eravos.field.styles', {}), skins = ld('eravos.field.skins', {});   // per component: its element's style, its face image + the image's adjustments
+const saveLooks = () => { st('eravos.field.styles', styles); st('eravos.field.skins', skins); };
+function drawBoard() { if (fieldView === 'chain') return drawChain(); drawField(); }
+const STATUS = (cid) => domain.adapters[cid] ? '✓ built' : C[cid] ? '○ no adapter' : '○ planned';
+function elementInto(K, n, compact) {   // a component's live element: its face controls (contract `element`) in its chosen style
+  const c = C[n.component], col = kindCol(n.component), vs = (c.variables || []).filter(v => v.type === 'number' || v.type === 'enum' || v.type === 'boolean');
+  const face = ((((c.element || {}).controls) || []).filter(q => q.face).map(q => q.key)), keys = (face.length ? face : vs.slice(0, 3).map(v => v.key)), style = styles[n.component] || 'knobs';
+  K.style.setProperty('--c', col); K.style.display = 'flex'; K.style.flexWrap = 'wrap'; K.style.gap = style === 'knobs' ? '8px 10px' : '6px';
+  keys.forEach(k => { const v = vs.find(q => q.key === k); if (!v) return; const x = n.vars && n.vars[k] !== undefined ? n.vars[k] : v.default;
+    const set = (val) => apply(Compat.vary(bench.dag, n.id, k, val, can, types));
+    if (v.type === 'number' && style === 'knobs') K.appendChild(knob(v, x, set));
+    else if (v.type === 'number' && style === 'faders') { const sl = slider(v), w = document.createElement('div'); w.className = 'fad'; w.innerHTML = '<span>' + k + ' · <b style="color:var(--soft);font-weight:400">' + fmtN(x, v) + '</b></span><input type="range" min="0" max="1000" value="' + Math.round(sl.toS(x) * 1000) + '">';
+      const inp = w.querySelector('input'); inp.oninput = () => { w.querySelector('b').textContent = fmtN(sl.fromS(inp.value / 1000), v); }; inp.onchange = () => set(sl.fromS(inp.value / 1000)); K.appendChild(w); }
+    else if (v.type === 'number') { const w = document.createElement('div'); w.className = 'cmp'; w.innerHTML = '<span>' + k + '</span><b>' + fmtN(x, v) + '</b>'; K.appendChild(w); }
+    else { const w = document.createElement('div'); w.style.cssText = 'display:flex;flex-direction:column;gap:2px'; w.innerHTML = '<span style="font-size:9px;color:var(--dim);letter-spacing:1px">' + k + '</span><div class="seg"></div>';
+      (v.type === 'enum' ? v.options : [true, false]).forEach(o => { const b = document.createElement('button'); b.textContent = v.type === 'enum' ? o : (o ? 'on' : 'off'); if (o === x) b.className = 'on'; b.onclick = (e) => { e.stopPropagation(); set(o); }; w.querySelector('.seg').appendChild(b); }); K.appendChild(w); } });
+}
+function drawField() {
+  const dag = bench.dag, order = inOrder(dag), n = order.length; board.innerHTML = '';
+  const GW = 236, CW = 300, CH = 150, left = order.slice(0, Math.ceil(n / 2)), right = order.slice(Math.ceil(n / 2)), rowH = (k) => 190;
+  const H = Math.max(CH + 120, Math.max(left.length, right.length) * 190 + 40), W = GW * 2 + CW + 260; board.style.width = W + 'px'; board.style.height = H + 'px';
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('width', W); svg.setAttribute('height', H); board.appendChild(svg);
+  const cx = GW + 130, cy = Math.round(H / 2 - CH / 2), core = document.createElement('div'); core.className = 'fcore'; core.style.cssText = 'left:' + cx + 'px;top:' + cy + 'px;width:' + CW + 'px;height:' + CH + 'px';
+  core.innerHTML = '<span class="t">' + bench.name.toUpperCase().replace(/</g, '') + ' · CORE</span><span class="s">assembled from ' + n + ' components · ' + (bench.ops.length ? bench.ops.length + ' changes' : 'as made') + '</span><span class="c2">' + order.map(x => x.id).join(' → ') + ' → out</span>';
+  board.appendChild(core);
+  const place = (list, side) => list.forEach((nd, i) => {
+    const c = C[nd.component], col = kindCol(nd.component), g = document.createElement('div'), x = side ? cx + CW + 130 : 0, y = 30 + i * 190;
+    g.className = 'gate' + (sel === nd.id ? ' sel' : ''); g.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + GW + 'px;--c:' + col;
+    const sk = skins[nd.component];
+    g.innerHTML = (sk ? '<div class="skin" style="background-image:url(' + sk.src + ');filter:' + skinFilter(sk) + '"></div>' : '') +
+      '<button class="glab" title="swap it here">' + (order.indexOf(nd) + 1) + ' · ' + nd.component + ' · ' + (c.kind || '') + '  ' + STATUS(nd.component) + ' ▾</button>' +
+      '<div class="ghd"><span>' + nd.id.toUpperCase() + '</span><span style="color:var(--faint)">' + (styles[nd.component] || 'knobs') + '</span></div><div class="knobs"></div>';
+    elementInto(g.querySelector('.knobs'), nd);
+    g.onclick = (e) => { if (e.target.closest('.knob,.seg,.fad,.glab')) return; sel = sel === nd.id ? null : nd.id; selEdge = null; drawBench(); };
+    g.querySelector('.glab').onclick = (e) => { e.stopPropagation(); swapMenu(nd, e.currentTarget); };
+    board.appendChild(g);
+    requestAnimationFrame(() => { const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'), x1 = side ? x : x + GW, y1 = y + g.offsetHeight / 2, x2 = side ? cx + CW : cx, y2 = cy + 20 + (CH - 40) * ((i + 0.5) / list.length);
+      p.setAttribute('d', `M${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}`); p.setAttribute('fill', 'none'); p.setAttribute('stroke', cssVar(col)); p.setAttribute('stroke-opacity', '0.75'); p.setAttribute('stroke-width', '1.6');
+      if (!domain.adapters[nd.component]) p.setAttribute('stroke-dasharray', '6 4'); svg.appendChild(p);
+      [[x1, y1, 4, true], [x2, y2, 3, false]].forEach(([a, b, r, hollow]) => { const ci = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); ci.setAttribute('cx', a); ci.setAttribute('cy', b); ci.setAttribute('r', r);
+        ci.setAttribute('fill', hollow ? '#04070C' : cssVar(col)); if (hollow) { ci.setAttribute('stroke', cssVar(col)); ci.setAttribute('stroke-width', '1.6'); } svg.appendChild(ci); }); });
+  });
+  place(left, 0); place(right, 1);
+}
+const skinFilter = (sk) => 'brightness(' + (sk.b || 1) + ') contrast(' + (sk.c || 1) + ') hue-rotate(' + (sk.h || 0) + 'deg) saturate(' + (sk.s == null ? 1 : sk.s) + ') blur(' + (sk.bl || 0) + 'px) invert(' + (sk.i || 0) + ')';
+
+// ---- menus: one dropdown for the nav and for a piece's label ----
+const menuEl = document.getElementById('menu');
+function menu(anchor, items) {
+  menuEl.innerHTML = ''; items.forEach(it => { if (it === '-') { menuEl.appendChild(document.createElement('hr')); return; } if (it.h) { const h = document.createElement('div'); h.className = 'h'; h.textContent = it.h; menuEl.appendChild(h); return; }
+    const b = document.createElement('button'); b.innerHTML = '<span>' + it.t + '</span><span>' + (it.k || '') + '</span>'; b.disabled = !!it.off; if (it.off && it.why) b.title = it.why;
+    b.onclick = (e) => { e.stopPropagation(); closeMenu(); it.do(); }; menuEl.appendChild(b); });
+  const r = anchor.getBoundingClientRect(); menuEl.style.display = 'block'; menuEl.style.left = Math.max(4, Math.min(innerWidth - menuEl.offsetWidth - 4, r.left)) + 'px';
+  menuEl.style.top = Math.min(innerHeight - menuEl.offsetHeight - 4, r.bottom + 4) + 'px'; menu.anchor = anchor; anchor.classList.add('open');
+}
+function closeMenu() { menuEl.style.display = 'none'; if (menu.anchor) menu.anchor.classList.remove('open'); menu.anchor = null; }
+document.addEventListener('click', (e) => { if (menuEl.style.display === 'block' && !menuEl.contains(e.target) && e.target !== menu.anchor) closeMenu(); });
+function swapMenu(nd, anchor) {    // on the spot: swap it, insert after it, remove it, its style
+  const sibs = (G.standIns[nd.component] || []).map(x => ({ x, r: Compat.swap(bench.dag, nd.id, x, can, types) })).filter(o => !o.r.error), rm = Compat.remove(bench.dag, nd.id, can, types);
+  const outE = bench.dag.edges.findIndex(e => e.from.split('.')[0] === nd.id), ins = outE >= 0 ? can.map(c => ({ c, r: Compat.insert(bench.dag, outE, c.id, can, types, newId(bench.dag, c.id)) })).filter(o => !o.r.error) : [];
+  menu(anchor, [{ h: 'SWAP ' + nd.id.toUpperCase() + ' FOR' }].concat(sibs.length ? sibs.map(o => ({ t: o.x, k: 'swap', do: () => { apply(o.r, nd.id + ' is now ' + o.x); } })) : [{ t: 'nothing that fits its slot yet', off: true }],
+    ['-', { h: 'INSERT AFTER ' + nd.id.toUpperCase() }], ins.length ? ins.map(o => ({ t: o.c.id, k: '＋', do: () => { if (apply(o.r, 'inserted ' + o.c.id)) { sel = o.r.op.node; drawBench(); } } })) : [{ t: 'nothing fits after it', off: true }],
+    ['-', { h: 'ITS ELEMENT' }], ['knobs', 'faders', 'compact'].map(st2 => ({ t: 'style: ' + st2, k: (styles[nd.component] || 'knobs') === st2 ? '●' : '', do: () => { styles[nd.component] = st2; saveLooks(); drawBench(); } })),
+    [{ t: 'upload an image as its face…', do: () => uploadSkin(nd.component) }], skins[nd.component] ? [{ t: 'remove its image', do: () => { delete skins[nd.component]; saveLooks(); drawBench(); } }] : [],
+    ['-', { t: rm.error ? 'remove — ' + rm.error : 'remove ' + nd.id + ' (wire around it)', off: !!rm.error, do: () => apply(rm, 'removed ' + nd.id) }]));
+}
+// ---- element images: upload, then the image domain's first adjustments (preview: the browser's own filters) ----
+const fileIn = document.getElementById('fileIn');
+function pickFile(accept, then) { fileIn.accept = accept; fileIn.value = ''; fileIn.onchange = () => { const f = fileIn.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => then(rd.result, f); if (/image/.test(accept)) rd.readAsDataURL(f); else rd.readAsText(f); }; fileIn.click(); }
+function uploadSkin(cid) { pickFile('image/*', (src) => { shrink(src, (small) => { skins[cid] = { src: small, b: 1, c: 1, h: 0, s: 1, bl: 0, i: 0 }; saveLooks(); sel = (bench.dag.nodes.find(n => n.component === cid) || {}).id || sel; drawBench(); toast('image set as ' + cid + '\'s face'); }); }); }
+function shrink(src, then) { const im = new Image(); im.onload = () => { const k = Math.min(1, 480 / Math.max(im.width, im.height)), cv = document.createElement('canvas'); cv.width = Math.round(im.width * k); cv.height = Math.round(im.height * k); cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height); then(cv.toDataURL('image/jpeg', 0.85)); }; im.onerror = () => then(src); im.src = src; }
+
+// ---- modal: warnings, packs, schemas ----
+function modal(html, wire) { const W = document.getElementById('modalWrap'), M = document.getElementById('modal'); M.innerHTML = html; W.hidden = false; const close = () => { W.hidden = true; }; M.querySelectorAll('[data-close]').forEach(b => b.onclick = close); if (wire) wire(M, close); }
+function download(name, obj) { try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2)], { type: 'application/json' })); a.download = name; document.body.appendChild(a); a.click(); a.remove(); } catch (e) {} }
+
+// ---- STABILITY: what could make a core unstable, measured before it is accepted ----
+function stability(dag) {
+  const risks = [], E = assemble(dag, contracts, domain, { sr: SR }); if (!E.ok) return ['it does not build: ' + E.why.join('; ')];
+  const { L } = E.render(3, [{ t: 0.05, dur: 2.9, hz: 55 }]); let nan = 0, pin = 0, sum = 0; const blk = Math.floor(SR * 0.5), rms = [];
+  for (let i = 0; i < L.length; i++) { const v = L[i]; if (!Number.isFinite(v)) { nan++; continue; } if (Math.abs(v) >= 0.999) pin++; sum += v; }
+  for (let b = 0; b + blk <= L.length; b += blk) { let q = 0; for (let i = b; i < b + blk; i++) { const v = Number.isFinite(L[i]) ? L[i] : 0; q += v * v; } rms.push(Math.sqrt(q / blk)); }
+  if (nan) risks.push(nan + ' samples not finite (it blows up)');
+  if (pin / L.length > 0.01) risks.push('pinned at full scale ' + (100 * pin / L.length).toFixed(1) + ' % of the time');
+  if (Math.abs(sum / L.length) > 0.05) risks.push('DC offset ' + (sum / L.length).toFixed(3) + ' (the speaker pushed one way)');
+  if (rms.length > 3 && rms[rms.length - 1] > 2.8 * (rms[1] || 1e-9) && rms[rms.length - 1] > 0.05) risks.push('energy growing under a held note (' + (20 * Math.log10(rms[rms.length - 1] / (rms[1] || 1e-9))).toFixed(1) + ' dB) — a runaway');
+  if (dag.edges.some(e => e.feedback)) risks.push('a feedback loop — stable now, can run away when a setting moves');
+  return risks;
+}
+function guarded(r, label) {    // a mix of cores is checked first; a risk asks before it is applied
+  if (!r || r.error) { toast(r ? r.error : 'that does not fit'); return; }
+  const risks = stability(r.dag); if (!risks.length) { apply(r, label + ' — checked: stable'); return; }
+  modal('<h3>THIS COULD BE UNSTABLE</h3><div class="warn">' + label + ' builds and plays, but:</div><ul>' + risks.map(x => '<li>' + x + '</li>').join('') + '</ul><div class="why">keep it and listen with the level down, or cancel. undo takes it back either way.</div>' +
+    '<div class="acts2"><button class="tb" data-close>CANCEL</button><button class="tb hot" id="goAnyway">APPLY ANYWAY</button></div>', (M, close) => { M.querySelector('#goAnyway').onclick = () => { close(); apply(r, label + ' (warned)'); }; });
+}
+// ---- MIX CORES: graft another tool into this one, in parallel or in series ----
+function prefixed(dag, px) { const m = (ref) => px + ref; return { nodes: dag.nodes.map(n => Object.assign({}, n, { id: px + n.id })), edges: dag.edges.map(e => Object.assign({}, e, { from: m(e.from), to: m(e.to) })), outs: dag.outs.map(m) }; }
+function mixCores(other, how) {
+  const A = clone(bench.dag), Bd = prefixed(other.dag, 'b'), dag = { nodes: A.nodes.concat(Bd.nodes), edges: A.edges.concat(Bd.edges), outs: [] };
+  if (how === 'parallel') { const id = newId(dag, 'stereo-tools'); dag.nodes.push({ id, component: 'stereo-tools' }); dag.edges.push({ from: A.outs[0], to: id + '.in' }, { from: Bd.outs[0], to: id + '.in' }); dag.outs = [id + '.out']; }
+  else {   // series: this tool's sound into the other's chain, where its own source fed it (the other's sources leave)
+    const srcs = Bd.nodes.filter(n => !Bd.edges.some(e => e.to.split('.')[0] === n.id)).map(n => n.id), first = Bd.edges.filter(e => srcs.includes(e.from.split('.')[0]));
+    if (!first.length) return { error: other.name + ' has nothing after its source to feed' };
+    dag.nodes = dag.nodes.filter(n => !srcs.includes(n.id)); dag.edges = dag.edges.filter(e => !srcs.includes(e.from.split('.')[0])).concat(first.map(e => ({ from: A.outs[0], to: e.to }))); dag.outs = Bd.outs;
+  }
+  const ck = Compat.check(dag, can, types); return ck.ok ? { dag, op: { op: 'graft', with: other.name, how } } : { error: ck.why.join('; ') };
+}
+// ---- the library on disk: kept tools, verdicts, element looks, templates, packs ----
+let templates = ld('eravos.field.templates', []), packs = ld('eravos.field.packs', []);
+function library() { return { schema: 'eravos.field-library/1', at: new Date().toISOString(), kept, verdicts, styles, skins, templates, packs }; }
+function openLibrary(txt) { try { const L = JSON.parse(txt); if (L.schema !== 'eravos.field-library/1') throw new Error('not a Field library');
+  kept = L.kept || []; verdicts = L.verdicts || []; styles = L.styles || {}; skins = L.skins || {}; templates = L.templates || []; packs = L.packs || [];
+  save(); st('eravos.field.mutate.verdicts', verdicts); saveLooks(); st('eravos.field.templates', templates); st('eravos.field.packs', packs); drawAll(); toast('library opened: ' + kept.length + ' tools, ' + templates.length + ' templates, ' + packs.length + ' packs'); } catch (e) { toast('could not open it: ' + e.message); } }
+// ---- MAKE: a pack, a mod schema, a template ----
+const toolId = () => 'mine.' + slug(bench.name);
+function makePack() {
+  const w = weights(), seenR = [play(bench.dag, 'bass')], out = [];
+  for (let k = 0; out.length < 6 && k < 40; k++) {
+    let d = bench.dag; const ops = []; for (let j = 0; j < 3; j++) { const m = Compat.mutate(d, can, types, { seed: seed * 101 + k * 7 + j, count: 1, ops: ['vary'] })[0]; if (m) { d = m.dag; ops.push(m.lineage.ops[0]); } }
+    const r = play(d, 'bass'); if (!r.ok || !r.mono) continue; if (seenR.some(o => o.mono && nullDb(r.mono, o.mono) < NULL_REPEAT)) continue;
+    const score = ops.reduce((a, o) => a + feats({ op: o, dag: d }).reduce((b, f) => b + (w[f] || 0), 0), 0); seenR.push(r); out.push({ dag: d, ops, score });
+  }
+  out.sort((a, b) => b.score - a.score);
+  const params = (d) => { const p = {}; d.nodes.forEach(n => Object.keys(n.vars || {}).forEach(k => { p[n.id + '.' + k] = n.vars[k]; })); return p; };
+  const names = out.map((o, i) => bench.name + ' ' + String.fromCharCode(65 + i) + ' · ' + [...new Set(o.ops.map(op => op.key))].join(' · '));
+  const pack = { schema: 'eravos.pack/1', id: slug(bench.name) + '.field-' + Date.now().toString(36), version: '1.0.0', label: bench.name + ' — made in the Field', prefix: '', author: 'Field (mutate, gated)', tags: ['field', 'generated'], for: toolId(),
+    items: { [toolId()]: { presets: Object.fromEntries(out.map((o, i) => [names[i], { params: params(o.dag) }])) } } };
+  modal('<h3>A PACK FROM ' + bench.name.toUpperCase() + '</h3><div class="why">' + out.length + ' presets, each the tool with three settings varied, each played, heard, and not a repeat of another (the null) — ranked by what you taught it. eravos.pack/1, like every pack.</div><div id="pk"></div>' +
+    '<div class="acts2"><button class="tb" data-close>CLOSE</button><button class="tb on" id="pkSave">⤓ SAVE THE PACK</button></div>', (M, close) => {
+    const P = M.querySelector('#pk'); out.forEach((o, i) => { const r = document.createElement('div'); r.className = 'row'; r.style.cssText = 'align-items:center;margin-top:6px'; r.innerHTML = '<button class="tb">▶</button><button class="tb">✎ OPEN</button><span style="font-size:11px;color:var(--soft)"></span>';
+      r.querySelector('span').textContent = names[i]; r.children[0].onclick = () => hear(o.dag, 'pk' + i); r.children[1].onclick = () => { close(); open({ name: names[i], dag: o.dag, ops: bench.ops.concat(o.ops) }); bench.savedAt = ''; drawBench(); }; P.appendChild(r); });
+    M.querySelector('#pkSave').onclick = () => { packs.unshift(pack); st('eravos.field.packs', packs); download(pack.id + '.pack.json', pack); close(); toast('pack saved: ' + out.length + ' presets'); }; });
+}
+function modSchema() {
+  const order = inOrder(bench.dag), id = toolId();
+  const props = {}; order.forEach(n => (C[n.component].variables || []).forEach(v => { props[n.id + '.' + v.key] = v.type === 'number' ? { type: 'number', minimum: v.min, maximum: v.max, default: v.default, description: (v.role || '') + (v.unit ? ' · ' + v.unit : '') } : v.type === 'enum' ? { enum: v.options, default: v.default } : { type: 'boolean', default: v.default }; }));
+  return { schema: 'eravos.mod-schema/1 (draft)', tool: id,
+    slots: order.map(n => ({ id: 'after-' + n.id, label: 'after ' + n.id, wire_type: 'audio', accepts: { provides: 'audio' }, max: 4 })),
+    params: { $schema: 'https://json-schema.org/draft/2020-12/schema', title: 'what a pack or a mod may set on ' + bench.name, type: 'object', properties: props, additionalProperties: false },
+    note: 'Mods (canvas/runtime/mods.js): a slot hosts a chain of other tools; send → mods → return. One audio insert after each component.' };
+}
+function makeTemplate() { const t = { schema: 'eravos.field-template/1', name: bench.name, dag: clone(bench.dag), parts: inOrder(bench.dag).map(n => n.component), at: new Date().toISOString() }; templates.unshift(t); st('eravos.field.templates', templates); drawTools(); download(slug(bench.name) + '.template.json', t); toast('template made: ' + t.name + ' (START FROM › templates)'); }
+
+// ---- LEARN: build a tool one component at a time — each explained by its own contract, heard without it and with it ----
+const LEARN_ORDER = ['filter-svf', 'saturator-tube', 'env-adsr', 'filter-ladder', 'bitcrusher', 'saturator-tape', 'delay-line', 'stereo-tools', 'osc-sub'];
+let learning = false;
+function startLearning() { open({ name: 'My first tool', dag: { nodes: [{ id: 'osc', component: 'osc-va' }], edges: [], outs: ['osc.out'] }, ops: [] }); learning = true; sel = 'osc'; drawBench(); toast('learn: one component at a time'); }
+function nextFits() { const out = bench.dag.outs[0], [on] = out.split('.'), oc = C[(bench.dag.nodes.find(n => n.id === on) || {}).component];
+  return can.filter(c => c.id !== 'osc-va').map(c => { const id = newId(bench.dag, c.id), d = clone(bench.dag), inP = (c.ports || []).find(p => p.dir === 'in' && p.type === 'audio'), outP = (c.ports || []).find(p => p.dir === 'out' && p.type === 'audio');
+    if (!inP || !outP) return null; d.nodes.push({ id, component: c.id }); d.edges.push({ from: out, to: id + '.' + inP.id }); d.outs = [id + '.' + outP.id]; const ck = Compat.check(d, can, types); return ck.ok ? { c, r: { dag: d, op: { op: 'insert', component: c.id, node: id, between: [out, 'out'] } } } : null; })
+    .filter(Boolean).sort((a, b) => (LEARN_ORDER.indexOf(a.c.id) + 99) % 99 - (LEARN_ORDER.indexOf(b.c.id) + 99) % 99); }
+function explain(c) { const ins = c.ports.filter(p => p.dir === 'in').map(p => p.id + ' (' + p.type + ')'), outs = c.ports.filter(p => p.dir === 'out').map(p => p.id + ' (' + p.type + ')'), face = ((c.element || {}).controls || []).filter(q => q.face);
+  const roles = [...new Set((c.variables || []).map(v => v.role).filter(Boolean))];
+  return '<b>' + c.id + '</b> — ' + (/^[aeiou]/.test(c.kind || '') ? 'an ' : 'a ') + (c.kind || '') + ' part. it takes ' + (ins.join(', ') || 'nothing') + ' and gives ' + (outs.join(', ') || 'nothing') + '. it shapes ' + (roles.join(', ') || 'the sound') + '. move ' + (face.map(q => '<b>' + q.key + '</b>').join(', ') || 'its settings') + ' first.'; }
+function drawLearn() {
+  const L = document.getElementById('learnBox'); if (!L) return; if (!learning) { L.innerHTML = ''; return; }
+  const fits = nextFits(), last = bench.dag.nodes[bench.dag.nodes.length - 1];
+  L.innerHTML = '<div class="learn">LEARNING · step ' + bench.dag.nodes.length + ' — ' + explain(C[last.component]) + '<br>next, one at a time — what fits after <b>' + last.id + '</b>:<div class="row" style="margin-top:6px" id="lfits"></div><div id="lone" style="margin-top:6px"></div>' +
+    '<div class="row" style="margin-top:6px"><button class="tb" id="lstop">STOP LEARNING</button></div></div>';
+  const F = L.querySelector('#lfits'); fits.slice(0, 8).forEach(o => { const b = document.createElement('button'); b.className = 'chip'; b.textContent = '＋ ' + o.c.id; b.onclick = () => {
+    L.querySelector('#lone').innerHTML = '<div style="color:var(--soft)">' + explain(o.c) + '</div><div class="row" style="margin-top:6px"><button class="tb" id="lwo">▶ WITHOUT IT</button><button class="tb" id="lw">▶ WITH IT</button><button class="tb on" id="ladd">ADD IT</button></div>';
+    L.querySelector('#lwo').onclick = () => hear(bench.dag, 'lwo'); L.querySelector('#lw').onclick = () => hear(o.r.dag, 'lw'); L.querySelector('#ladd').onclick = () => { if (apply(o.r, 'added ' + o.c.id)) { sel = o.r.op.node; drawBench(); } }; }; F.appendChild(b); });
+  L.querySelector('#lstop').onclick = () => { learning = false; drawLearn(); };
+}
+
+// ---- the nav menu ----
+const NAV = {
+  FIELD: () => [{ t: 'save the library to disk', k: '⤓', do: () => { download('eravos-field-library.json', library()); toast('saved to disk: ' + kept.length + ' tools, ' + templates.length + ' templates, ' + packs.length + ' packs'); } },
+    { t: 'open a library from disk…', do: () => pickFile('application/json,.json', (txt) => openLibrary(txt)) }, '-', { h: 'IN THE APP: Documents\\ERAVOS\\field\\ (tools in …\\tools\\mine.<id>\\)' }],
+  TOOL: () => [{ t: 'learn: build one component at a time', k: '★', do: startLearning }, { t: 'start from the saw voice', do: () => open(START) }].concat(templates.length ? [{ h: 'TEMPLATES' }].concat(templates.slice(0, 8).map(t => ({ t: t.name, k: t.parts.length + ' parts', do: () => open({ name: t.name, dag: t.dag, ops: [] }) }))) : [],
+    ['-', { t: '◆ synthesize into a tool', do: () => openSynth() }, { t: 'export its tool file', k: '⤓', do: () => download(toolId() + '.tool.json', toolFile()) },
+      { t: 'import a tool file…', do: () => pickFile('application/json,.json', (txt) => { try { const f = JSON.parse(txt); if (!f.dag) throw 0; open({ name: f.label || 'imported', dag: f.dag, ops: (f.lineage || {}).ops || [] }); toast('opened ' + (f.label || 'the tool')); } catch (e) { toast('not a tool file'); } }) },
+      '-', { t: 'open Wobble Bass exploded', do: openExploded }]),
+  EDIT: () => [{ t: 'undo', k: 'Ctrl+Z', off: !hist.length, do: undo }, { t: 'redo', k: 'Ctrl+Y', off: !fut.length, do: redo }, { t: 'every setting back to its default', do: () => { const d = clone(bench.dag); d.nodes.forEach(n => { n.vars = {}; }); apply({ dag: d, op: { op: 'vary', node: '*', key: '*', value: 'defaults' } }, 'all settings reset'); } }],
+  COMPONENTS: () => { const by = {}; contracts.forEach(c => { (by[c.domain || 'music'] = by[c.domain || 'music'] || []).push(c); });
+    const tgt = sel ? bench.dag.edges.findIndex(e => e.from.split('.')[0] === sel) : bench.dag.edges.length - 1;
+    return [{ h: 'ADD — ' + (sel ? 'after ' + sel : 'before the output') + ' (select a component to choose where)' }].concat(...Object.keys(by).map(dm => [{ h: dm.toUpperCase() + ' · ' + by[dm].length + ' components' }].concat(by[dm].map(c => {
+      const ok = domain.adapters[c.id], r = ok && tgt >= 0 ? Compat.insert(bench.dag, tgt, c.id, can, types, newId(bench.dag, c.id)) : null;
+      return { t: c.id, k: !ok ? 'no adapter yet' : r && !r.error ? '＋ ' + c.kind : 'does not fit here', off: !ok || !r || !!r.error, do: () => { if (apply(r, 'added ' + c.id)) { sel = r.op.node; drawBench(); } } }; }))),
+      ['-', { h: 'OTHER DOMAINS: a domain\'s components join here by their contract (ports, variables, element) and its adapter' }]); },
+  MUTATE: () => [{ t: '⚄ mutate the tool', do: doMutate }, { t: '⚄ mutate its UI (each element\'s style)', do: () => { const opts = ['knobs', 'faders', 'compact']; let k = seed * 13; bench.dag.nodes.forEach(n => { styles[n.component] = opts[(k = (k * 1103515245 + 12345) % 2147483648) % 3]; }); seed++; saveLooks(); drawBench(); toast('the UI mutated — the design rules held (black surfaces, the reactive colours, the kit)'); } },
+    '-', { h: 'MIX CORES — graft another tool in (checked for stability first)' }].concat(...kept.concat(templates.map(t => ({ name: t.name, dag: t.dag }))).concat([START]).filter(k => JSON.stringify(k.dag) !== JSON.stringify(bench.dag)).slice(0, 8).map(k => [
+      { t: k.name + ' — in parallel', do: () => guarded(mixCores(k, 'parallel'), 'mixed with ' + k.name + ' in parallel') }, { t: k.name + ' — in series', do: () => guarded(mixCores(k, 'series'), 'mixed into ' + k.name + ' in series') }]),
+    ['-', { t: 'forget what it learned', do: () => { verdicts = []; st('eravos.field.mutate.verdicts', verdicts); drawLearned(); toast('forgotten'); } }]),
+  MAKE: () => [{ t: 'a pack from this tool', k: 'eravos.pack/1', do: makePack }, { t: 'a mod schema for it', k: 'slots + params', do: () => { const m = modSchema(); modal('<h3>MOD SCHEMA · ' + bench.name.toUpperCase() + '</h3><div class="why">' + m.slots.length + ' insert slots (one after each component) and ' + Object.keys(m.params.properties).length + ' settings a pack or a mod may set.</div><pre></pre><div class="acts2"><button class="tb" data-close>CLOSE</button><button class="tb on" id="msSave">⤓ SAVE</button></div>', (M, close) => { M.querySelector('pre').textContent = JSON.stringify(m, null, 2); M.querySelector('#msSave').onclick = () => { download(toolId() + '.mod-schema.json', m); close(); }; }); } },
+    { t: 'a template from it', k: 'START FROM', do: makeTemplate }],
+  VIEW: () => [{ t: 'the board (parts wired to the core)', k: fieldView === 'board' ? '●' : '', do: () => { fieldView = 'board'; drawBench(); } }, { t: 'the signal chain', k: fieldView === 'chain' ? '●' : '', do: () => { fieldView = 'chain'; drawBench(); } }, '-', { t: 'Wobble Bass, exploded', do: openExploded }]
+};
+Object.keys(NAV).forEach(k => { const b = document.createElement('button'); b.textContent = k; b.onclick = (e) => { e.stopPropagation(); if (menu.anchor === b) { closeMenu(); return; } closeMenu(); menu(b, NAV[k]()); }; document.getElementById('nav').appendChild(b); });
+
 // ---- the inspector: every setting of the selected component, and what it can become ----
 const insp = document.getElementById('insp');
 function slider(v) {   // a range control in the variable's own units; wide ranges (Hz, ms) move on a log scale
@@ -371,16 +609,22 @@ function drawInsp() {
   const sibs = (G.standIns[n.component] || []).map(s => ({ s, r: Compat.swap(bench.dag, n.id, s, can, types) })).filter(x => !x.r.error), rm = Compat.remove(bench.dag, n.id, can, types);
   h += '<div class="acts"><div class="row"><span class="w">SWAP FOR</span>' + (sibs.length ? sibs.map(x => '<button class="chip" data-sw="' + x.s + '">' + x.s + '</button>').join('') : '<span class="why">nothing that fits this slot can be assembled yet</span>') + '</div>' +
     '<div class="row"><span class="w">REMOVE</span>' + (rm.error ? '<span class="why">' + rm.error + '</span>' : '<button class="chip" data-rm="1">remove ' + n.id + ' — wire around it</button>') + '</div>' +
-    '<div class="row"><span class="w">RESET</span><button class="chip" data-reset="1">every setting of ' + n.id + ' back to its default</button></div></div>';
+    '<div class="row"><span class="w">RESET</span><button class="chip" data-reset="1">every setting of ' + n.id + ' back to its default</button></div>' +
+    '<div class="row"><span class="w">ELEMENT</span>' + ['knobs', 'faders', 'compact'].map(x => '<button class="chip" data-style="' + x + '"' + ((styles[n.component] || 'knobs') === x ? ' style="border-color:var(--on);color:var(--on)"' : '') + '>' + x + '</button>').join('') + '<button class="chip" data-up="1">upload an image as its face…</button></div>' +
+    (skins[n.component] ? '<div class="row"><span class="w">IMAGE</span>' + [['b', 'brightness', 0, 2, 1], ['c', 'contrast', 0, 2, 1], ['h', 'hue', -180, 180, 0], ['s', 'saturation', 0, 2, 1], ['bl', 'blur', 0, 8, 0], ['i', 'invert', 0, 1, 0]].map(a => '<label class="fad" style="width:120px"><span>' + a[1] + '</span><input type="range" data-img="' + a[0] + '" min="' + a[2] + '" max="' + a[3] + '" step="0.01" value="' + (skins[n.component][a[0]] == null ? a[4] : skins[n.component][a[0]]) + '"></label>').join('') + '<button class="chip" data-unskin="1">remove the image</button></div><div class="why" style="margin-left:98px">the image domain\'s first components, tried on a UI element (preview: the browser\'s own filters)</div>' : '') + '</div>';
   insp.innerHTML = h;
   const setVar = (k, val, live) => { const r = Compat.vary(bench.dag, n.id, k, val, can, types); if (live && r && !r.error) { apply(r); } else apply(r); };
-  insp.querySelectorAll('input[type=range]').forEach(inp => { const v = vs.find(q => q.key === inp.dataset.k), s = slider(v);
+  insp.querySelectorAll('input[type=range][data-k]').forEach(inp => { const v = vs.find(q => q.key === inp.dataset.k), s = slider(v);
     inp.oninput = () => { const x = s.fromS(inp.value / 1000); inp.previousSibling.querySelector('b').textContent = fmtN(x, v); };
     inp.onchange = () => setVar(v.key, s.fromS(inp.value / 1000), true); });
   insp.querySelectorAll('[data-o]').forEach(b => b.onclick = () => setVar(b.dataset.k, b.dataset.o));
   insp.querySelectorAll('[data-b]').forEach(b => b.onclick = () => setVar(b.dataset.k, b.dataset.b === '1'));
   insp.querySelectorAll('[data-sw]').forEach(b => b.onclick = () => { const x = sibs.find(o => o.s === b.dataset.sw); apply(x.r, n.id + ' is now ' + x.s); });
   const rb = insp.querySelector('[data-rm]'); if (rb) rb.onclick = () => apply(rm, 'removed ' + n.id);
+  insp.querySelectorAll('[data-style]').forEach(b => b.onclick = () => { styles[n.component] = b.dataset.style; saveLooks(); drawBench(); });
+  const up = insp.querySelector('[data-up]'); if (up) up.onclick = () => uploadSkin(n.component);
+  insp.querySelectorAll('[data-img]').forEach(r => r.oninput = () => { skins[n.component][r.dataset.img] = +r.value; const sk = document.querySelector('.gate.sel .skin'); if (sk) sk.style.filter = skinFilter(skins[n.component]); }); insp.querySelectorAll('[data-img]').forEach(r => r.onchange = saveLooks);
+  const us = insp.querySelector('[data-unskin]'); if (us) us.onclick = () => { delete skins[n.component]; saveLooks(); drawBench(); };
   insp.querySelector('[data-reset]').onclick = () => { const d = clone(bench.dag), m = d.nodes.find(x => x.id === n.id); m.vars = {}; const ck = Compat.check(d, can, types); apply(ck.ok ? { dag: d, op: { op: 'vary', node: n.id, key: '*', value: 'defaults' } } : { error: ck.why.join('; ') }, n.id + ' reset'); };
 }
 
@@ -394,8 +638,6 @@ function nullDb(a, b) {
   return r > 0 ? 10 * Math.log10(r) : -Infinity;
 }
 const fmtDb = (x) => x === -Infinity ? '−∞ dB' : (x > 0 ? '+' : '') + x.toFixed(1) + ' dB';
-const ld = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? d : v; } catch (e) { return d; } };
-const st = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
 
 // ---- LEARN: every verdict is data. keep +1 · open to edit +0.5 · throw away −1, on what the mutant was (the op, the part, how far it moved).
 let verdicts = ld('eravos.field.mutate.verdicts', []);
@@ -634,34 +876,23 @@ let view = null;
 function openExploded() { stop(); closeSynth && synthOpen && closeSynth(); view = { exploded: false, flip: {}, sel: null }; drawBench(); window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => { if (view && !view.exploded) { view.exploded = true; drawX(); } }, 900); }
 function closeExploded() { view = null; drawBench(); }
 let xEls = null;
+// the exact board (Wobble-Broken.dc.html, as Wobble-Field.html): its markup, not redrawn; the whole tool first, then blown apart into it
 function buildX() {
-  const S = document.getElementById('xStage'); S.innerHTML = '<img id="xSurface" class="fade" alt="Wobble Bass, every element lifted off: the blank surface"><div id="xWires"></div>' +
-    '<div id="xCore" class="fade"><span style="font-family:\'Bebas Neue\',sans-serif;font-size:26px;letter-spacing:5px">WOBBLE BASS · CORE</span><span style="color:var(--core);font-size:10px">wobble-bass.engine.js · the worklet</span>' +
-    '<span style="color:#B8CFE0;font-size:10px;line-height:1.5">the voice · the signal order · the AudioParams · the tempo lock</span></div><div id="xPieces"></div>';
-  S.querySelector('#xSurface').src = XW.surface;
-  xEls = XW.pieces.map(p => {
-    const w = document.createElement('div'); w.className = 'wire fade';
-    w.innerHTML = '<svg width="1700" height="1300" viewBox="0 0 1700 1300" aria-hidden="true"><path d="' + p.d + '" fill="none" stroke="' + p.col + '" stroke-opacity="0.75" stroke-width="2"' + (p.dash ? ' stroke-dasharray="6 4"' : '') + '/><circle cx="' + p.bx + '" cy="' + p.by + '" r="4" fill="' + p.col + '"/></svg>';
-    S.querySelector('#xWires').appendChild(w);
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'piece'; b.setAttribute('aria-label', p.comp + ' · ' + p.sub); b.style.width = p.w + 'px'; b.style.height = p.h + 'px';
-    b.innerHTML = '<img alt="" width="' + p.w + '" height="' + p.h + '"><span class="tag fade"></span>'; b.querySelector('img').src = p.url;
-    const t = b.querySelector('.tag'); t.textContent = p.comp + ' · ' + p.sub + '  ' + p.mark; t.style.color = p.col;
-    b.onclick = () => { if (view.sel === p.id || !view.exploded) view.flip[p.id] = !view.flip[p.id]; view.sel = p.id; drawX(); drawXInsp(); };
-    S.querySelector('#xPieces').appendChild(b); return { p, w, b, t };
-  });
+  const S = document.getElementById('xStage'); S.innerHTML = XW.board; xEls = [].slice.call(S.querySelectorAll('.pc'));
+  xEls.forEach(img => { img.style.cursor = 'pointer'; img.onclick = (e) => { e.stopPropagation(); const id = img.dataset.png.replace('.png', '').replace('filter-vowels', 'filter-formant');
+    if (view.sel === id) view.flip[id] = !view.flip[id]; view.sel = id; drawX(); drawXInsp(); }; });
 }
-function fitX() { const W = document.getElementById('xWrap'), k = Math.min(1, (W.clientWidth || 1100) / 1700); document.getElementById('xStage').style.transform = 'scale(' + k + ')'; W.style.height = (1300 * k) + 'px'; }
+function fitX() { const W = document.getElementById('xWrap'), k = Math.min(1, (W.clientWidth || 1100) / 1800); document.getElementById('xStage').style.transform = 'scale(' + k + ')'; W.style.height = (1320 * k) + 'px'; }
 function drawX() {
-  const first = !xEls; if (first) buildX(); fitX(); const S = document.getElementById('xStage'); if (first) S.classList.add('still');
-  const e = view.exploded, out = (p) => e ? !view.flip[p.id] : !!view.flip[p.id], any = XW.pieces.some(out);
-  xEls.forEach(({ p, w, b, t }) => { const o = out(p);
-    b.style.left = (o ? p.ex : p.hx) + 'px'; b.style.top = (o ? p.ey : p.hy) + 'px'; b.style.outlineColor = o ? p.col : 'transparent'; b.style.transitionDelay = (o && e ? p.delay : 0) + 's';
-    b.style.boxShadow = view.sel === p.id && o ? '0 0 0 3px ' + p.col + '55' : 'none';
-    t.style.opacity = o ? 1 : 0; t.style.transitionDelay = (o ? 2.2 : 0) + 's'; w.style.opacity = o ? 1 : 0; w.style.transitionDelay = (o ? 2.2 : 0) + 's'; });
-  const c = document.getElementById('xCore'); c.style.opacity = any ? 1 : 0; c.style.transitionDelay = (any ? 1.4 : 0) + 's';
-  const sf = document.getElementById('xSurface'); sf.style.opacity = e ? 0 : 1; sf.style.transitionDelay = (e ? 0.4 : 0) + 's';
+  const first = !xEls; if (first) buildX(); fitX(); const S = document.getElementById('xStage'), Bd = S.firstElementChild; if (first) Bd.classList.add('still');
+  const e = view.exploded, idOf = (img) => img.dataset.png.replace('.png', '').replace('filter-vowels', 'filter-formant'), out = (img) => e ? !view.flip[idOf(img)] : !!view.flip[idOf(img)];
+  Bd.classList.toggle('whole', !e);
+  xEls.forEach(img => { const o = out(img); img.style.left = (o ? img.dataset.x : img.dataset.hx) + 'px'; img.style.top = (o ? img.dataset.y : img.dataset.hy) + 'px'; img.style.transitionDelay = o && e ? img.dataset.delay + 's' : '0s';
+    img.style.boxShadow = view.sel === idOf(img) ? '0 0 0 3px #00D4FF88' : 'none'; });
+  [].forEach.call(Bd.querySelectorAll('.apart'), el => { el.style.opacity = e ? 1 : 0; el.style.transitionDelay = e ? '2.2s' : '0s'; });
+  const sf = Bd.querySelector('#surface'); if (sf) { sf.style.opacity = e ? 0 : 1; sf.style.transitionDelay = e ? '0.4s' : '0s'; }
   document.getElementById('xEx').classList.toggle('on', e); document.getElementById('xAs').classList.toggle('on', !e);
-  if (first) { void S.offsetWidth; requestAnimationFrame(() => S.classList.remove('still')); }
+  if (first) { void Bd.offsetWidth; requestAnimationFrame(() => Bd.classList.remove('still')); }
 }
 const WAITS = { '✓ BUILT': 'the part exists as a component; Wobble Bass still does it inside its own engine — it moves out unchanged, proven by the null render, and then it can be edited and swapped here',
   '● IN IT': 'already its own component inside Wobble Bass, null-proven — it needs an adapter to be assembled here',
@@ -729,7 +960,7 @@ function drawBench() {
   const ed = isEdited(); document.getElementById('edited').textContent = ed ? (bench.keptId ? '● CHANGED SINCE SAVED' : '● NOT KEPT YET') : (bench.keptId ? '✓ SAVED' : '');
   const sv = document.getElementById('save'); sv.textContent = bench.keptId ? 'SAVE' : 'KEEP AS A NEW TOOL'; sv.disabled = bench.keptId ? !ed : false;
   document.getElementById('undo').disabled = !hist.length; document.getElementById('redo').disabled = !fut.length;
-  drawCrumbs(); drawBoard(); drawInsp(); drawKept();
+  drawCrumbs(); drawBoard(); drawInsp(); drawKept(); drawLearn();
 }
 function drawAll() { drawBench(); drawMutants(); drawTools(); drawLearned(); }
 document.getElementById('foot').innerHTML = 'parts that can be assembled today: <b>' + can.length + ' of ' + contracts.length + '</b> components — a tool opens here once every part it is made of can be; each part joins when its adapter is written (no sound re-made: the adapter calls the part\'s own tested kernel).<br>' +
@@ -737,7 +968,7 @@ document.getElementById('foot').innerHTML = 'parts that can be assembled today: 
   'preview: kept tools stay in this page (this device). built into ERAVOS, they are tools in Documents\\ERAVOS\\tools that open on the canvas.';
 open(START); drawTools();
 if (/wobble/.test(location.hash)) openExploded();
-window.__mutate = { openExploded, get view() { return view; }, openSynth, closeSynth, get verdicts() { return verdicts; }, nullDb, toolFile, doMutate, get mutants() { return mutants; }, get kept() { return kept; }, get bench() { return bench; }, apply, undo, redo, open };
+window.__mutate = { startLearning, nextFits, mixCores, stability, makePack, modSchema, makeTemplate, library, openLibrary, get styles() { return styles; }, get skins() { return skins; }, get templates() { return templates; }, openExploded, get view() { return view; }, openSynth, closeSynth, get verdicts() { return verdicts; }, nullDb, toolFile, doMutate, get mutants() { return mutants; }, get kept() { return kept; }, get bench() { return bench; }, apply, undo, redo, open };
 })();
 </script>
 </body></html>

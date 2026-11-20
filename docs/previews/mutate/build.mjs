@@ -6,6 +6,7 @@
 import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
 import { load } from '../../../build/compat-graph.mjs';
 import { PARENT } from '../../../build/mutants.mjs';
+import { boardBody } from '../workbench/build-field.mjs';
 const HERE = path.dirname(fileURLToPath(import.meta.url)), ROOT = path.resolve(HERE, '../../..');
 const rd = (f) => fs.readFileSync(path.join(ROOT, f), 'utf8');
 const safe = (js) => js.replace(/<\/script/gi, '<\\/script');
@@ -30,7 +31,8 @@ const audio = new Set(contracts.filter(c => c.kind === 'audio').map(c => c.id)),
 // timing exactly as they were, the pieces cut from Wobble Bass's own face (the PNGs beside it), inlined
 const WB = path.join(ROOT, 'docs/previews/workbench'), png = (f) => 'data:image/png;base64,' + fs.readFileSync(path.join(WB, f)).toString('base64');
 const wobble = { pieces: JSON.parse(fs.readFileSync(path.join(WB, 'Wobble-Exploded.dc.html'), 'utf8').match(/const PIECES = (\[.*?\]);\n/s)[1])
-  .map(x => Object.assign(x, { url: png((x.id === 'filter-formant' ? 'filter-vowels' : x.id) + '.png') })), surface: png('blank-surface2.png') };
+  .map(x => Object.assign(x, { url: null })),   // the pictures come with the board
+  board: boardBody(true) };   // the exact board (Wobble-Broken.dc.html), as Wobble-Field.html
 
 const parts = [];
 const cdir = path.join(ROOT, 'tools/music/components');

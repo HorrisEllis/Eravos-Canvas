@@ -8,7 +8,9 @@ import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const src = fs.readFileSync(path.join(HERE, 'Wobble-Broken.dc.html'), 'utf8');
 const ex = JSON.parse(fs.readFileSync(path.join(HERE, 'Wobble-Exploded.dc.html'), 'utf8').match(/const PIECES = (\[.*?\]);\n/s)[1]);
-const inline = process.argv.includes('--inline'), out = inline ? process.argv[process.argv.indexOf('--inline') + 1] : path.join(HERE, 'Wobble-Field.html');
+const cli = import.meta.url === `file://${process.argv[1]}`;
+export function boardBody(asInline) {
+const inline = !!asInline;
 
 // the PNGs by size
 const size = (f) => { const b = fs.readFileSync(path.join(HERE, f)); return b.readUInt32BE(16) + 'x' + b.readUInt32BE(20); };
@@ -25,7 +27,7 @@ body = body.replace(/<img([^>]*?)src="\/_blob\/[0-9a-f]+"([^>]*?)style="([^"]*)"
   if (!f) throw new Error('no PNG of ' + w + 'x' + h);
   const H = home[f]; if (!H) throw new Error('no home for ' + f); n++;
   const x = +style.match(/left: (\d+)px/)[1], y = +style.match(/top: (\d+)px/)[1];
-  return `<img${a}src="${url(f)}"${b}style="${style}" class="pc" data-x="${x}" data-y="${y}" data-hx="${H.x}" data-hy="${H.y}" data-delay="${H.delay}"${c}>`;
+  return `<img${a}src="${url(f)}"${b}style="${style}" class="pc" data-png="${f}" data-x="${x}" data-y="${y}" data-hx="${H.x}" data-hy="${H.y}" data-delay="${H.delay}"${c}>`;
 });
 if (n !== 22) throw new Error('expected 22 pieces, found ' + n);
 // everything that only belongs to the board apart (wires, gate frames, labels, the core, the legend) fades in after the pieces land
@@ -36,6 +38,10 @@ body = body.replace(/<svg width="1800"/, '<svg class="apart" width="1800"')
 // the whole tool's blank surface, under the pieces, at the face's place
 body = body.replace(/(<svg class="apart")/, `<img id="surface" src="${url('blank-surface2.png')}" alt="Wobble Bass, every element lifted off: the blank surface" style="position: absolute; left: ${SX}px; top: ${SY}px; width: 1100px; height: 824px; display: block">$1`);
 
+return body;
+}
+const wantInline = cli && process.argv.includes('--inline'), out = wantInline ? process.argv[process.argv.indexOf('--inline') + 1] : path.join(HERE, 'Wobble-Field.html');
+const body = boardBody(wantInline);
 const page = `<!doctype html>
 <html lang="en">
 <head>
@@ -80,5 +86,5 @@ ${body}
 </body>
 </html>
 `;
-fs.writeFileSync(out, page);
-console.log('wrote', path.relative(process.cwd(), out), (page.length / 1024).toFixed(0) + ' KB,', n, 'pieces');
+if (cli) fs.writeFileSync(out, page);
+if (cli) console.log('wrote', path.relative(process.cwd(), out), (page.length / 1024).toFixed(0) + ' KB, 22 pieces');
