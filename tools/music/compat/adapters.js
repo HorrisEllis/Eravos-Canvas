@@ -2,7 +2,8 @@
  * assembled engine (tools/core/compat/assemble.js): its ports in and out as buffers, its variables as the kernel's own parameters. No sound
  * is re-implemented here — each adapter only calls the component's tested kernel (eravos.components: never copy a component).
  *   MusicAdapters(MP) → { adapters, bridges }   MP: the kernels (window.MusicParts in a page; the components' modules in node)
- * Today: the eight audio processors that share process(ins, outs, n, P) (one adapter for all), osc-va, osc-sub, env-adsr, stereo-tools.
+ * Today: the eight audio processors that share process(ins, outs, n, P) (one adapter for all; a control wired into a port named like a kernel
+ * param — a filter's detune — rides on it), osc-va, osc-sub, env-adsr, lfo (2026-11-20: the wobble, restarted per note), stereo-tools.
  * A component without an adapter cannot be assembled yet — assemble() says so and the mutant is not offered. */
 (function (root) {
   'use strict';
@@ -19,7 +20,11 @@
       adapters[id] = (sr, c, vars) => {
         const k = MP[K](); k.setRate(sr); const P = {};
         MP[PA].forEach(p => { const v = (c.variables || []).find(x => x.key === p.name); P[p.name] = [v ? asNum(v, vars[p.name]) : p.defaultValue]; });
-        return { run(ins, outs, n) { const i = ins.in.map(b => b.subarray(0, n)), o = outs.out.map(b => b.subarray(0, n)); k.process(i, o, n, P); } };
+        // a control wired into a port named like one of the kernel's params (a filter's detune: the wobble) rides on that param, sample by sample
+        const mods = (c.ports || []).filter(pt => pt.dir === 'in' && pt.id !== 'in' && P[pt.id]).map(pt => ({ id: pt.id, base: P[pt.id][0], buf: new Float32Array(4096) }));
+        return { run(ins, outs, n) { const i = ins.in.map(b => b.subarray(0, n)), o = outs.out.map(b => b.subarray(0, n));
+          mods.forEach(m => { const src = ins[m.id] && ins[m.id][0]; if (!src) return; const b = m.buf.subarray(0, n); for (let j = 0; j < n; j++) b[j] = m.base + src[j]; P[m.id] = b; });
+          k.process(i, o, n, P); } };
       };
     });
     if (MP.VA) adapters['osc-va'] = (sr, c, vars) => {
@@ -30,6 +35,10 @@
     if (MP.Sub) adapters['osc-sub'] = (sr, c, vars) => {
       const k = MP.Sub(), shape = asNum(c.variables.find(v => v.key === 'shape'), vars.shape), oct = +vars.octave;
       return { run(ins, outs, n) { const hz = ins.pitch[0], o = outs.out[0]; for (let j = 0; j < n; j++) o[j] = k.next(hz[j], sr, oct, shape); } };
+    };
+    if (MP.LFO) adapters['lfo'] = (sr, c, vars) => {   // the wobble: −1…1 (or 0…1), restarted on each note (its gate rising), unless free
+      const k = MP.LFO(), shape = asNum(c.variables.find(v => v.key === 'shape'), vars.shape); k.set({ shape, rate: +vars.rate, phase: +vars.phase, fade: +vars.fade, unipolar: !!vars.unipolar }, sr); k.reset(); let was = 0;
+      return { run(ins, outs, n, ctx) { const o = outs.out[0], g = ctx && ctx.gate; for (let j = 0; j < n; j++) { const on = g && g[j] >= 0.5 ? 1 : 0; if (on && !was) k.reset(); was = on; o[j] = k.next(); } } };
     };
     if (MP.ADSR) adapters['env-adsr'] = (sr, c, vars) => {
       const k = MP.ADSR(); k.set(+vars.attack, +vars.decay, +vars.sustain, +vars.release, sr); let was = 0;

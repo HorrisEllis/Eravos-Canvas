@@ -16,6 +16,14 @@
    "rate": "audio"
   },
   {
+   "id": "detune",
+   "dir": "in",
+   "type": "control",
+   "unit": "cents",
+   "rate": "audio",
+   "about": "added to the detune setting, sample by sample: a wobble (an LFO), an envelope, key tracking (2026-11-20)"
+  },
+  {
    "id": "out",
    "dir": "out",
    "type": "audio",
