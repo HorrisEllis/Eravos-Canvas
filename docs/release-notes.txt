@@ -1,3 +1,17 @@
+ERAVOS v0.2.27 (2026-11-20)
+
+Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.27.exe from the release.
+
+- Wobble Bass 4.3: swap a part, mutate it. Its filter and its drive are sockets: keep its own, or put a shared component in their place, live —
+  filter-svf or filter-ladder for the filter (the wobble still drives it), saturator-tube, saturator-tape or the bitcrusher for the drive. In
+  More depth ▸ PARTS, or on the exploded board: the ⇄ chip on the FILTER and GRIT gates.
+- ⚄ MUTATE on Wobble Bass's exploded board (under the core): a new combination of parts and their settings, played at once. ✓ KEEP keeps it,
+  ✗ THROW puts it back. It learns from both — what you keep comes up more, what you throw less — and never offers the same one twice.
+  Every mutation is one undo step.
+- Nothing changes until you swap: with its own parts every preset sounds exactly as before (measured: all 34 presets).
+- The Workshop's BOARD: any document (the notes, a pattern) exploded the same way — every layer in its own gate with its live fields, wired
+  to the document. Drag and scroll around it.
+
 ERAVOS v0.2.26 (2026-11-20)
 
 Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.26.exe from the release.
