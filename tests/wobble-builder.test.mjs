@@ -34,3 +34,37 @@ for (const mouth of ['filter-svf', 'filter-ladder']) {
   const b = brightness(o.L, 1600), a1 = b.slice(1, 9), a2 = b.slice(25, 33); let d = 0; for (let i = 0; i < a1.length; i++) d += Math.abs(a1[i] - a2[i]) / a1[i];
   ok(d / a1.length < 0.1, `each note restarts the wobble (difference ${(d / a1.length).toFixed(3)})`); }
 console.log(`wobble-builder ground: ${n} checks pass`);
+
+// ---- WB1 (2026-11-20): the tool's own model and Voice — the ONE function that plays offline (here) and in the worklet
+{
+  const WB = require(path.join(ROOT, 'tools/music/tools/bass/wobble-builder/wobble-builder.engine.js'));
+  const A = require(path.join(ROOT, 'tools/core/compat/assemble.js')), MA = MusicAdapters;
+  for (const c of ['saturator-tape', 'bitcrusher', 'delay-line']) Object.assign(MP, require(path.join(ROOT, `tools/music/components/${c}/${c}.js`)));
+  const s = WB.defaults(), d = WB.dag(s, 140), notes = [{ t: 0.02, dur: 0.8, hz: 55 }, { t: 0.9, dur: 0.6, hz: 73.42 }];
+  // 1. the Voice = the assembled chain + the gate's envelope + the level (what the preview played), sample for sample
+  const v = WB.Voice(A, MA, MP, contracts, SR).render(d, notes, 1.6, s.level, 0);
+  ok(v.ok, 'the Classic Wobble builds');
+  const raw = assemble(JSON.parse(JSON.stringify(d)), contracts, domain, { sr: SR }).render(1.6, notes); let g = 0, worst = 0;
+  for (let i = 0; i < raw.L.length; i++) { const t = i / SR, on = notes.some(x => t >= x.t && t < x.t + x.dur); g = on ? Math.min(1, g + 1 / (0.004 * SR)) : Math.max(0, g - 1 / (0.05 * SR)); worst = Math.max(worst, Math.abs(raw.L[i] * g * s.level - v.L[i])); }
+  ok(worst < 1e-6, `the Voice plays exactly the assembled chain (worst difference ${worst.toExponential(2)})`);
+  // 2. every slot × every part builds, plays, stays under full scale
+  for (const [k, opts] of [['drive', WB.K.drive.options], ['mouth', WB.K.mouth.options], ['fx', WB.K.fx.options]]) for (const o of opts) {
+    const s2 = Object.assign({}, s, { [k]: o }), r = WB.Voice(A, MA, MP, contracts, SR).render(WB.dag(s2, 140), notes, 1.6, s2.level, 0); let pk = 0, bad = 0;
+    for (let i = 0; i < r.L.length; i++) { if (!isFinite(r.L[i])) bad++; pk = Math.max(pk, Math.abs(r.L[i]), Math.abs(r.R[i])); }
+    ok(r.ok && !bad && pk > 0.02 && pk < 1, `${k} = ${o}: plays, under full scale (peak ${pk.toFixed(3)})`);
+  }
+  // 3. a knob while it plays: the part takes it in place (no rebuild) — no jump at the change bigger than the sound's own steps
+  { const V = WB.Voice(A, MA, MP, contracts, SR); V.load(d); const L = new Float32Array(128), R = new Float32Array(128), hz = new Float32Array([55]), gt = new Float32Array([1]); let prev = 0, jumpBefore = 0, jumpAt = 0;
+    for (let b = 0; b < 200; b++) { if (b === 120) { const d2 = WB.dag(Object.assign({}, s, { cutoff: 900, reso: 0.3 }), 140); ok(d2.nodes.every((x, i) => V.set(x.id, x.vars) !== false), 'every part takes new settings in place'); }
+      V.process(L, R, 128, hz, gt, 0.8, 0); for (let j = 0; j < 128; j++) { const dj = Math.abs(L[j] - prev); prev = L[j]; if (b >= 100 && b < 120) jumpBefore = Math.max(jumpBefore, dj); if (b === 120) jumpAt = Math.max(jumpAt, dj); } }
+    ok(jumpAt <= jumpBefore * 1.5 + 1e-3, `no click when a knob moves (largest step ${jumpAt.toFixed(3)} vs ${jumpBefore.toFixed(3)} before)`); }
+  // 4. a slot swapped while it plays: the new chain cross-fades in (no step over the sound's own)
+  { const V = WB.Voice(A, MA, MP, contracts, SR); V.load(d); const L = new Float32Array(128), R = new Float32Array(128), hz = new Float32Array([55]), gt = new Float32Array([1]); let prev = 0, before = 0, at = 0;
+    for (let b = 0; b < 200; b++) { if (b === 120) V.load(WB.dag(Object.assign({}, s, { mouth: 'filter-ladder', drive: 'bitcrusher' }), 140));
+      V.process(L, R, 128, hz, gt, 0.8, 0); for (let j = 0; j < 128; j++) { const dj = Math.abs(L[j] - prev); prev = L[j]; if (b >= 100 && b < 120) before = Math.max(before, dj); if (b >= 120 && b < 124) at = Math.max(at, dj); } }
+    ok(at <= Math.max(before * 2, 0.2), `a slot swap cross-fades (largest step ${at.toFixed(3)} vs ${before.toFixed(3)} before)`); }
+  // 5. the worklet's text is whole: it evaluates on its own (no page) and its processor class is there
+  { const src = WB.source(MP, A, MA); let reg = null; new Function('AudioWorkletProcessor', 'registerProcessor', 'sampleRate', 'globalThis', src)(class {}, (n, c) => { reg = [n, c]; }, SR, {});
+    ok(reg && reg[0] === 'eravos-wobble-builder', 'the worklet source stands alone and registers its processor'); }
+  console.log(`wobble-builder tool: ${n} checks pass in all`);
+}

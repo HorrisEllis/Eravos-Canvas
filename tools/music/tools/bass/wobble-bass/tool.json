@@ -127,6 +127,7 @@
     "eravos.syn-partials",
     "eravos.tape-memory",
     "eravos.timeline",
+    "eravos.wobble-builder",
     "eravos.wub-filter",
     "eravos.wub-osc",
     "eravos.wub-rate",

@@ -83,6 +83,7 @@
     "eravos.syn-partials",
     "eravos.tape-memory",
     "eravos.wobble-bass",
+    "eravos.wobble-builder",
     "eravos.wub-osc",
     "eravos.wub-rate",
     "eravos.wub-sub",

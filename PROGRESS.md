@@ -2,6 +2,18 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.203 The Wobble Builder, built (2026-11-20) — not merged
+His words: "yes build it." (to the preview, 3.202)
+- WB1 one engine: assemble.js streams (block / set / amount; render bit-identical to before), every adapter takes new settings in place (no
+  click), Assemble.SRC + MusicAdapters.SRC + the kernels' text = one AudioWorklet; Voice() plays offline and live (the same function).
+  Live = offline: −148 dB in a bare context; ≤ −60 dB at the tool's engine (the canvas's 5 Hz port DC block comes after, for every tool).
+- WB2 the window, all kit (design check clean for the new tool; the shared MUTATE dock now takes a tool's kit — its buttons, its colour).
+- WB3 SYNTHESIZE: regression + novelty gates → a real tool (eravos.wb-<name>), defined at every start, in ＋ Add › Bass; a twin refused.
+- Measured on the real canvas (docs/previews/wobble-builder/built.shots.mjs): swaps, a mutation, "Gutter Mouth" made (novel, nearest
+  Feelings · Longing 0.216) and opened beside it, made again → refused; the builder explodes on the Field (11 pieces, none missing).
+- Tests: P202 4/4 (live = offline, a knob live, a slot live, SYNTHESIZE + twin) · the tool contract 4/4 · tests/wobble-builder.test.mjs 26.
+- Open: a made tool as a file in Documents\ERAVOS\tools; mod in / wobble out; WB4 adapters.
+
 ## 3.202 The Wobble Builder — spec, its ground, the UI preview (2026-11-20) — shown first, not built
 His words: "I want to make like a wobble synthsize tool." → "A wobble builder" (his pick: a tool that synthesizes NEW wobble instruments).
 - Spec first (axiom 8): tools/music/planned/wobble-builder.spec — slots SOURCE · DRIVE · MOUTH · WOBBLE · FX · SUB · OUT, each a shared component;

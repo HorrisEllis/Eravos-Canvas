@@ -149,14 +149,16 @@ html.ws-open .cm-item { font: inherit !important; text-transform: uppercase; let
 .ws-gfields .ws-f { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .ws-ghint { color: var(--wt3); font: 400 9px var(--wmono); }
 /* the mutation dock (mutate.js, shared: the Field board, the Workshop board) — 2026-11-20 */
-.fm-dock{padding:12px 14px;border:1px dashed color-mix(in srgb,#00D4FF 55%,transparent);background:#04070C;border-radius:4px;color:#D8F6FF;font-family:'DM Mono',monospace;box-sizing:border-box}
+.fm-dock:not(.fm-kit){padding:12px 14px;border:1px dashed color-mix(in srgb,#00D4FF 55%,transparent);background:#04070C;border-radius:4px;color:#D8F6FF;font-family:'DM Mono',monospace;box-sizing:border-box}
 .fm-row{display:flex;gap:8px;align-items:center}
-.fm-dock button{font:700 11px 'DM Mono',monospace;letter-spacing:1.4px;padding:8px 14px;border-radius:999px;cursor:pointer;border:1px solid #1c2530;background:#0b0f15;color:#D8F6FF}
-.fm-dock .fm-go{flex:1;padding:12px 18px;font-size:14px;letter-spacing:3px;border:0;color:#fff;background:linear-gradient(90deg,#8844ff,#ff6fa8);box-shadow:0 4px 18px rgba(255,111,168,.3),inset 0 1px 0 rgba(255,255,255,.3)}
-.fm-dock .fm-go:hover{box-shadow:0 6px 26px rgba(255,111,168,.55),inset 0 1px 0 rgba(255,255,255,.4)}
-.fm-dock .fm-keep:not(:disabled):hover{border-color:#3DDC97;color:#3DDC97}
-.fm-dock .fm-throw:not(:disabled):hover{border-color:#FF2266;color:#FF2266}
+.fm-dock:not(.fm-kit) button{font:700 11px 'DM Mono',monospace;letter-spacing:1.4px;padding:8px 14px;border-radius:999px;cursor:pointer;border:1px solid #1c2530;background:#0b0f15;color:#D8F6FF}
+.fm-dock:not(.fm-kit) .fm-go{flex:1;padding:12px 18px;font-size:14px;letter-spacing:3px;border:0;color:#fff;background:linear-gradient(90deg,#8844ff,#ff6fa8);box-shadow:0 4px 18px rgba(255,111,168,.3),inset 0 1px 0 rgba(255,255,255,.3)}
+.fm-dock:not(.fm-kit) .fm-go:hover{box-shadow:0 6px 26px rgba(255,111,168,.55),inset 0 1px 0 rgba(255,255,255,.4)}
+.fm-dock:not(.fm-kit) .fm-keep:not(:disabled):hover{border-color:#3DDC97;color:#3DDC97}
+.fm-dock:not(.fm-kit) .fm-throw:not(:disabled):hover{border-color:#FF2266;color:#FF2266}
 .fm-dock button:disabled{opacity:.35;cursor:default}
 .fm-line{margin-top:9px;font:500 11px 'DM Mono',monospace;line-height:1.5;color:#B8CFE0}
 .fm-dock.pending .fm-line{color:#00D4FF}
 .fm-tally{margin-top:4px;font:500 10px 'DM Mono',monospace;letter-spacing:1px;color:#4E6A80}
+.fm-dock.fm-kit .fm-row{flex-wrap:wrap}
+.fm-dock.fm-kit .fm-line{color:var(--dim)}

@@ -71,6 +71,17 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-20 · The Wobble Builder: a tool that makes tools, from shared parts, live, with a twin refused (3.202–3.203)
+- **His words (2026-11-20):** "I want to make like a wobble synthsize tool." · (his pick) "A wobble builder" · "yes build it."
+- **His call:** the idea and the choice of kind; the preview approved before the build.
+- **Built (by the AI coder, to his direction):** a component-assembled instrument running live as one AudioWorklet built from the components'
+  own kernel text and the shared assembler (refactored to stream, bit-identical); settings that reach the sound in place; slot swaps
+  cross-faded; a kit window; SYNTHESIZE behind a regression gate and a novelty gate against every sound in ERAVOS.
+- **Proof:** live = offline (the worklet against the offline Voice: −148 dB bare, ≤ −60 dB at the engine); assemble render bit-identical before /
+  after (0 difference); P202 4/4; the tool contract 4/4; 26 node checks (every slot × part plays under full scale, no click on a knob, a swap
+  cross-fades, the worklet text stands alone); design check clean; on the canvas a novel tool made, opened, and its twin refused.
+- **Where to check:** `node tests/run.mjs P202`; `node tests/wobble-builder.test.mjs`; `node docs/previews/wobble-builder/built.shots.mjs`.
+
 ### 2026-11-20 · Mutation everywhere: one shared mechanism for every tool, its parts and the Workshop's documents (3.201)
 - **His words (2026-11-20):** "need to be able to swap them out. then i want each tool to be able to be able to do that. then the workshop or field. like i want full mutation, like keep going"
 - **His call:** the ask; shown first, not merged.
