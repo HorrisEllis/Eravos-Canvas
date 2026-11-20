@@ -71,6 +71,16 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-20 · Wobble Bass: shared components swapped into a live instrument, mutated, kept or thrown — the sound unchanged until he swaps (3.200)
+- **His words (2026-11-20):** "okay now i want to be able to mutate, and swap components for the wobble bass."
+- **His call:** the ask; shown first, not merged.
+- **Built (by the AI coder, to his direction):** two sockets in Wobble Bass's engine (filter, drive) that take five shared components, each built
+  from its tested kernel the first time it is chosen; the swap and mutation on the Field board, generic (settings mark sockets and parts): ⇄ on
+  the gate a part replaces, ⚄ MUTATE, ✓ KEEP / ✗ THROW, learning from both, never repeating.
+- **Proof:** null render 34 of 34 presets PASS (−60 dB) against the code before; `tests/p199` 1/1; Wobble 49/49; each part measured playing on
+  the real canvas (no non-finite sample, peaks 0.54–0.80).
+- **Where to check:** `node tests/run.mjs P199`; `node docs/previews/workbench/wobble-mutate.shots.mjs`; `docs/previews/workbench/wobble-mutate-*.png`.
+
 ### 2026-11-20 · The Workshop's exploded board: one agnostic view for every kind of document (3.199)
 - **His words (2026-11-20):** "Love that. Now the exploded view. Of the notes. Agnostic" · "merge it."
 - **His call:** the idea and the rule (agnostic); merged on his word after the video.

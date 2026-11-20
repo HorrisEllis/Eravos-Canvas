@@ -51,7 +51,7 @@ dag:
   layer 0: saturator-tape ✓
   tool: eravos.fx-echo ← saturator-tape
   build order: saturator-tape ✓ → fx-echo
-  shared with: saturator-tape 4  (other tools on each)
+  shared with: saturator-tape 5  (other tools on each)
   in it now: —
   comes out of it: saturator-tape
   planned: —

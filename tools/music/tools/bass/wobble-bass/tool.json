@@ -39,11 +39,21 @@
     "components": [
       "filter-formant@1.0.0",
       "amp-chain@1.0.0",
+      "filter-svf@1.0.0",
+      "filter-ladder@1.0.0",
+      "saturator-tube@1.0.0",
+      "saturator-tape@1.0.0",
+      "bitcrusher@1.0.0",
       "note-release@1.0.0"
     ],
     "elements": [
       "filter-formant.element@1",
       "amp-chain.element@1",
+      "filter-svf.element@1",
+      "filter-ladder.element@1",
+      "saturator-tube.element@1",
+      "saturator-tape.element@1",
+      "bitcrusher.element@1",
       "note-release.element@1"
     ]
   },

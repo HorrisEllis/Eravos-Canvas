@@ -214,6 +214,23 @@
       { key: 'monoBelow', type: 'number', default: 0, min: 0, max: 400, step: 1, unit: 'Hz', label: 'Mono below', group: 'OUTPUT', hint: 'the low end in mono under this frequency, the width above it stays (0 = off): a clean, centred bass in any club' },
       { key: 'clipOn', type: 'boolean', default: false, label: 'Clipper', group: 'OUTPUT', hint: 'a hard clipper at the very end: nothing goes over the ceiling (loud, and it never blows up the mix)' },
       { key: 'ceiling', type: 'number', default: -0.3, min: -24, max: 0, step: 0.1, unit: 'dB', label: 'Ceiling', group: 'OUTPUT' },
+      // 4.3 PARTS (2026-11-20, his: "i want to be able to mutate, and swap components for the wobble bass"): two sockets where a shared component stands in
+      // for Wobble Bass's own part, live. 'own' (the default) builds nothing new — every preset sounds exactly as it did. The wobble, the filter bus
+      // (key track, envelope, velocity, LFO 2) and the cutoff input all reach a swapped-in filter through its detune; Cutoff and Reso stay its knobs.
+      { key: 'partFilter', type: 'enum', options: ['own', 'filter-svf', 'filter-ladder'], default: 'own', label: 'Filter part', group: 'PARTS', socket: 'filter', near: 'filterMode', hint: 'own = Wobble Bass\'s own filter (lowpass / formant / comb) · filter-svf = the zero-delay state-variable filter (9 modes) · filter-ladder = the 4-pole ladder, drive inside its loop' },
+      { key: 'pfSvfMode', type: 'enum', options: ['lowpass', 'highpass', 'bandpass', 'notch', 'peak', 'bell', 'lowshelf', 'highshelf', 'allpass'], default: 'lowpass', label: 'SVF mode', group: 'PARTS', part: 'filter-svf' },
+      { key: 'pfStages', type: 'number', default: 2, min: 1, max: 3, step: 1, label: 'SVF poles ×2', group: 'PARTS', part: 'filter-svf', hint: '1 = 12 dB · 2 = 24 dB · 3 = 36 dB per octave' },
+      { key: 'pfLadMode', type: 'enum', options: ['lp24', 'lp12', 'bp12', 'hp12', 'hp24'], default: 'lp24', label: 'Ladder tap', group: 'PARTS', part: 'filter-ladder' },
+      { key: 'pfLadDrive', type: 'number', default: 6, min: 0, max: 24, step: 0.5, unit: 'dB', label: 'Ladder drive', group: 'PARTS', part: 'filter-ladder' },
+      { key: 'pfBass', type: 'number', default: 0.5, min: 0, max: 1, step: 0.01, label: 'Ladder bass', group: 'PARTS', part: 'filter-ladder', hint: 'gives back the low end resonance takes away' },
+      { key: 'partDrive', type: 'enum', options: ['own', 'saturator-tube', 'saturator-tape', 'bitcrusher'], default: 'own', label: 'Drive part', group: 'PARTS', socket: 'drive', near: 'drive', hint: 'own = Wobble Bass\'s own pre-drive (Drive, Grit) · saturator-tube = triode-like, asymmetric · saturator-tape = tape, with its head bump · bitcrusher = bits and rate' },
+      { key: 'pdDrive', type: 'number', default: 8, min: 0, max: 24, step: 0.5, unit: 'dB', label: 'Part drive', group: 'PARTS', part: ['saturator-tube', 'saturator-tape'] },
+      { key: 'pdBias', type: 'number', default: 0.3, min: 0, max: 1, step: 0.01, label: 'Part bias', group: 'PARTS', part: ['saturator-tube', 'saturator-tape'], hint: 'asymmetry: even harmonics' },
+      { key: 'pdTone', type: 'number', default: 0, min: -1, max: 1, step: 0.01, label: 'Tube tone', group: 'PARTS', part: 'saturator-tube' },
+      { key: 'pdBump', type: 'number', default: 2, min: 0, max: 6, step: 0.1, unit: 'dB', label: 'Tape bump', group: 'PARTS', part: 'saturator-tape' },
+      { key: 'pdBits', type: 'number', default: 8, min: 2, max: 24, step: 1, label: 'Bits', group: 'PARTS', part: 'bitcrusher' },
+      { key: 'pdRate', type: 'number', default: 12000, min: 600, max: 48000, step: 10, unit: 'Hz', label: 'Crush rate', group: 'PARTS', part: 'bitcrusher' },
+      { key: 'pdMix', type: 'number', default: 1, min: 0, max: 1, step: 0.01, label: 'Part mix', group: 'PARTS', part: ['saturator-tube', 'saturator-tape', 'bitcrusher'] },
     ],
     ui_hooks: ['shape_pts', 'wub_seq'],
     lib: { drawFn, cleanPts, parseCell, DIVS, SHAPES },   // shared with the window (same folder) so the drawing IS the sound
@@ -242,10 +259,12 @@
       // pre-drive
       const pre = ac.createGain(), preSh = ac.createWaveShaper(); preSh.oversample = '4x';
       ringVca.connect(pre); pre.connect(preSh);
+      // 4.3 the DRIVE socket: preSh → ownD (exactly 1) → drvBus; a swapped-in part: pre → it → cdG → drvBus (made when first chosen)
+      const ownD = ac.createGain(), drvBus = ac.createGain(); ownD.gain.value = 1; drvBus.gain.value = 1; preSh.connect(ownD); ownD.connect(drvBus); [ownD, drvBus].forEach(n => ctx.track(n));
       const driveMod = ctx.modBus('drive', { min: 0, max: 1 }); const driveModG = ac.createGain(); driveModG.gain.value = 4; driveMod.connect(driveModG); driveModG.connect(pre.gain);
       // lowpass path
       const lp1 = ac.createBiquadFilter(), lp2 = ac.createBiquadFilter(), lp3 = ac.createBiquadFilter(); lp1.type = lp2.type = lp3.type = 'lowpass';
-      preSh.connect(lp1); lp1.connect(lp2);
+      drvBus.connect(lp1); lp1.connect(lp2);
       // 4.0 slope: 12 = lp1 alone · 24 = lp1 → lp2 (the original path, its switch at exactly 1) · 36 = → lp3
       const lpOut = ac.createGain(), s12 = ac.createGain(), s24 = ac.createGain(), s36 = ac.createGain(); s12.gain.value = 0; s24.gain.value = 1; s36.gain.value = 0;
       lp1.connect(s12); s12.connect(lpOut); lp2.connect(s24); s24.connect(lpOut); lp2.connect(lp3); lp3.connect(s36); s36.connect(lpOut);
@@ -255,13 +274,13 @@
       const keyBus = ac.createConstantSource(), envBus = ac.createConstantSource(), velBus = ac.createConstantSource();
       [keyBus, envBus, velBus].forEach(c => { c.offset.value = 0; c.connect(fDet); c.start(); ctx.track(c); });
       // formant path
-      const formIn = ac.createGain(), formOut = ac.createGain(); preSh.connect(formIn);
+      const formIn = ac.createGain(), formOut = ac.createGain(); drvBus.connect(formIn);
       const bands = MusicParts.formantBands(ac, formIn, formOut, 3);   // components/filter-formant
       const formMakeup = ac.createGain(); formOut.connect(formMakeup);
       const filtSel = ac.createGain(); lpOut.connect(filtSel); formMakeup.connect(filtSel);
       // 4.1 comb (+ / −): x + g·x[n−D] + g²·x[n−2D], D = 1/cutoff; the wobble shortens D (raises the comb) by up to Depth octaves
       const combIn = ac.createGain(), cd1 = ac.createDelay(0.06), cd2 = ac.createDelay(0.11), cg1 = ac.createGain(), cg2 = ac.createGain(), combOut = ac.createGain();
-      combOut.gain.value = 0; preSh.connect(combIn); combIn.connect(combOut); combIn.connect(cd1); combIn.connect(cd2); cd1.connect(cg1); cd2.connect(cg2); cg1.connect(combOut); cg2.connect(combOut); combOut.connect(filtSel);
+      combOut.gain.value = 0; drvBus.connect(combIn); combIn.connect(combOut); combIn.connect(cd1); combIn.connect(cd2); cd1.connect(cg1); cd2.connect(cg2); cg1.connect(combOut); cg2.connect(combOut); combOut.connect(filtSel);
       const combMod1 = ac.createGain(), combMod2 = ac.createGain(); combMod1.gain.value = 0; combMod2.gain.value = 0; combMod1.connect(cd1.delayTime); combMod2.connect(cd2.delayTime);
       [combIn, cd1, cd2, cg1, cg2, combOut, combMod1, combMod2].forEach(n => ctx.track(n));
       // 4.1 wavetable: two oscillators on the two nearest frames, crossfaded by Position; made when first turned up
@@ -288,7 +307,9 @@
       // P14 fix ("blown speaker"): only the filtered mid layer is distorted. The sub joins AFTER the shaper, clean;
       // the distorted layer is DC-blocked + high-passed so it never fights the sub, and its fizz is rolled off.
       const post = ac.createWaveShaper(); post.oversample = '4x';
-      const postIn = ac.createGain(); filtSel.connect(postIn); postIn.connect(post);
+      const postIn = ac.createGain(); postIn.connect(post);
+      // 4.3 the FILTER socket: filtSel → ownF (exactly 1) → postIn; a swapped-in filter: drvBus → it → cfG → postIn
+      const ownF = ac.createGain(); ownF.gain.value = 1; filtSel.connect(ownF); ownF.connect(postIn); ctx.track(ownF);
       const dcBlock = ac.createBiquadFilter(); dcBlock.type = 'highpass'; dcBlock.frequency.value = 85; dcBlock.Q.value = 0.6;
       const fizz = ac.createBiquadFilter(); fizz.type = 'lowpass'; fizz.frequency.value = 9500; fizz.Q.value = 0.5;
       const amp = ac.createGain(); amp.gain.value = 0;
@@ -375,6 +396,38 @@
       const depthG = ac.createGain(); uni.connect(depthG); depthG.connect(lp1.detune); depthG.connect(lp2.detune); depthG.connect(lp3.detune);
       const depthMod = ctx.modBus('depth', { min: 0, max: 7200 }); depthMod.connect(depthG.gain);
       const cutMod = ctx.modBus('cutoff', { min: -4800, max: 4800 }); cutMod.connect(lp1.detune); cutMod.connect(lp2.detune); cutMod.connect(lp3.detune);
+      // 4.3 PARTS: build a part when first chosen (its worklet is the component's tested kernel), crossfade to it, keep it for going back
+      const parts = { filter: {}, drive: {} }, pend = {};
+      const RES = () => Math.min(0.97, Math.max(0, (P.get('res') - 0.5) / 20));
+      const MAKE = { 'filter-svf': (a) => MusicParts.svf(a), 'filter-ladder': (a) => MusicParts.ladder(a), 'saturator-tube': (a) => MusicParts.saturatorTube(a), 'saturator-tape': (a) => MusicParts.saturatorTape(a), 'bitcrusher': (a) => MusicParts.bitcrusher(a) };
+      function partNode(sock, id) {
+        if (parts[sock][id]) return Promise.resolve(parts[sock][id]); if (pend[id]) return pend[id];
+        const mk = MAKE[id]; if (!mk) return Promise.resolve(null);
+        return (pend[id] = Promise.resolve(mk(ac)).then(node => {
+          const g = ac.createGain(); g.gain.value = 0; node.connect(g); ctx.track(node); ctx.track(g);
+          if (sock === 'filter') { drvBus.connect(node); g.connect(postIn); const det = node.parameters.get('detune'); [depthG, fDet, cutMod].forEach(src => src.connect(det)); }
+          else { pre.connect(node); g.connect(drvBus); }
+          parts[sock][id] = { node, g }; setParts(); return parts[sock][id];
+        }).catch(e => { ctx.fault('RUNTIME_003', 'wobble bass part ' + id + ': ' + e.message); return null; }));
+      }
+      function setParts() {
+        const t = ac.currentTime, pv = (n, k, v) => { const prm = n.parameters.get(k); if (prm) prm.setTargetAtTime(v, t, 0.01); };
+        const fId = P.get('partFilter'), dId = P.get('partDrive');
+        Object.keys(parts.filter).forEach(id => { const x = parts.filter[id], n = x.node; x.g.gain.setTargetAtTime(id === fId ? 1 : 0, t, 0.006);
+          pv(n, 'frequency', P.get('cutoff')); pv(n, 'resonance', RES());
+          if (id === 'filter-svf') { n.parameters.get('mode').setValueAtTime(Math.max(0, MusicParts.SVF_MODES.indexOf(P.get('pfSvfMode'))), t); n.parameters.get('stages').setValueAtTime(P.get('pfStages'), t); }
+          else { n.parameters.get('mode').setValueAtTime(Math.max(0, ['lp24', 'lp12', 'bp12', 'hp12', 'hp24'].indexOf(P.get('pfLadMode'))), t); pv(n, 'drive', P.get('pfLadDrive')); pv(n, 'bass', P.get('pfBass')); } });
+        ownF.gain.setTargetAtTime(fId === 'own' || !parts.filter[fId] ? 1 : 0, t, 0.006);
+        Object.keys(parts.drive).forEach(id => { const x = parts.drive[id], n = x.node; x.g.gain.setTargetAtTime(id === dId ? 1 : 0, t, 0.006);
+          if (id === 'bitcrusher') { pv(n, 'bits', P.get('pdBits')); pv(n, 'rate', P.get('pdRate')); pv(n, 'mix', P.get('pdMix')); n.parameters.get('aa').setValueAtTime(1, t); }
+          else { const dr = P.get('pdDrive'); pv(n, 'drive', dr); pv(n, 'bias', P.get('pdBias')); pv(n, 'mix', P.get('pdMix')); pv(n, 'out', -Math.min(12, dr * 0.5));   // trimmed as the drive comes in: a hot part stays under full scale
+            if (id === 'saturator-tube') pv(n, 'tone', P.get('pdTone')); else pv(n, 'bump', P.get('pdBump')); } });
+        ownD.gain.setTargetAtTime(dId === 'own' || !parts.drive[dId] ? 1 : 0, t, 0.006);
+      }
+      function wantParts() { const f = P.get('partFilter'), d = P.get('partDrive'); if (f !== 'own') partNode('filter', f); if (d !== 'own') partNode('drive', d); setParts(); }
+      ['partFilter', 'partDrive', 'pfSvfMode', 'pfStages', 'pfLadMode', 'pfLadDrive', 'pfBass', 'pdDrive', 'pdBias', 'pdTone', 'pdBump', 'pdBits', 'pdRate', 'pdMix', 'cutoff', 'res'].forEach(k => P.onChange(k, wantParts));
+      if (P.get('partFilter') !== 'own' || P.get('partDrive') !== 'own') wantParts();
+      ctx.parts = { ready: (sock) => { const id = P.get(sock === 'filter' ? 'partFilter' : 'partDrive'); return id === 'own' ? Promise.resolve(true) : partNode(sock, id).then(Boolean); }, get built() { return { filter: Object.keys(parts.filter), drive: Object.keys(parts.drive) }; } };
       // 2.1: tremolo + vibrato ride the same LFO
       const tremDepth = ac.createGain(), tremAl = ac.createDelay(0.05); tremDepth.gain.value = 0; tremAl.delayTime.value = FILT_LAT; uni.connect(tremDepth); tremDepth.connect(tremAl); tremAl.connect(trem.gain); ctx.track(tremAl);
       const vibG = ac.createGain(); vibG.gain.value = 0; lfoBus.connect(vibG); [saw, saw2, sq].forEach(o => vibG.connect(o.detune)); vibG.connect(pitchBus);
@@ -616,7 +669,7 @@
       });
       ctx.shapeAt = (x) => drawFn(cleanPts(P.get('shapePts')) || [[0, -1, 0], [0.5, 1, 0]])(((x % 1) + 1) % 1);
       ctx.stateExtra = () => ({ vowels: VOWELS, key: ctx.key, divs: DIVS, shapes: SHAPES });
-      ctx.internals = { amDry, amWet, amMono, amLo2, amHi2, amLim, ampOut, wt, combOut, cd1, msWet, finalOut, lp1, lp2, lp3, s12, s24, s36, lpOut, keyBus, envBus, velBus, lfo2, l2Pitch, l2Cut, l2Vol, l2Fm, ringVca, ringDepth, clWet, extra, outNode, bands, lfoBus, amp, uni, trem, vibG, noiseG, panA, panB, saw2, sub, drawDc, lfoLog, get lfo() { return lfo; }, get frozen() { return frozen; } };
+      ctx.internals = { ownF, ownD, drvBus, parts, amDry, amWet, amMono, amLo2, amHi2, amLim, ampOut, wt, combOut, cd1, msWet, finalOut, lp1, lp2, lp3, s12, s24, s36, lpOut, keyBus, envBus, velBus, lfo2, l2Pitch, l2Cut, l2Vol, l2Fm, ringVca, ringDepth, clWet, extra, outNode, bands, lfoBus, amp, uni, trem, vibG, noiseG, panA, panB, saw2, sub, drawDc, lfoLog, get lfo() { return lfo; }, get frozen() { return frozen; } };
       return {};
     },
   });

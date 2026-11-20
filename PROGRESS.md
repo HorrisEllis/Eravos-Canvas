@@ -2,6 +2,20 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.200 Wobble Bass: swap a component in, mutate, keep or throw (2026-11-20) — shown first, not merged
+His words: "okay now i want to be able to mutate, and swap components for the wobble bass."
+- wobble-bass.engine.js 4.3 PARTS: two sockets. filter: own · filter-svf · filter-ladder; drive: own · saturator-tube · saturator-tape ·
+  bitcrusher; each part's own settings (mode, poles, tap, drive, bias, tone, bump, bits, rate, mix). The wobble, the filter bus and the cutoff input
+  reach a swapped-in filter through its detune. 'own' by default builds nothing — null render 34 of 34 presets PASS against the code before.
+- tools/core/field/board.js (domain-free): a tool's settings say what is a socket ({ socket, near }) and what belongs to a part ({ part }); on its
+  board a ⇄ chip on the gate of the part it replaces (FILTER + VOWELS, GRIT), ⚄ MUTATE under the core (parts + their settings, played at once,
+  one undo step), ✓ KEEP / ✗ THROW (back to before). Learns: what was kept comes up more, what was thrown less; never the same combination twice.
+- The PARTS group in More depth (a new group: nothing on the face moved) and a PARTS gate on the board (since-the-board row).
+- Measured on the real canvas (docs/previews/workbench/wobble-mutate.shots.mjs): every part plays, no non-finite sample, peaks 0.54–0.80.
+- Tests: P199 1/1; P196 P197 P198 boundary green; Wobble 49/49; bare canvas, no-toys, validate.
+- Open: the parts run at 1× (Wobble's own drive is 4× oversampled: 192 samples) — the wobble a little earlier against a swapped-in filter. More
+  sockets (oscillators, sub, LFO, squash, output) wait for the WD track.
+
 ## 3.199 The Workshop's exploded BOARD — any document, every layer apart, live (2026-11-20) — shown first, not merged
 His words: "Love that. Now the exploded view. Of the notes. Agnostic"
 - tools/core/field/field.js (domain-free): BOARD beside 2D / 3D (for every kind, also those with no 3D). The document exploded like the Field's
