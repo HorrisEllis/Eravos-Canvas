@@ -82,5 +82,5 @@ dag:
   layer 0: bbd-line ✓ · delay-line ✓ · ensemble-core ✓ · lfo ✓ · saturator-tape ✓ · stereo-tools ✓
   tool: eravos.ensemble-organism ← ensemble-core + bbd-line + delay-line + lfo + stereo-tools + saturator-tape
   build order: bbd-line ✓ → delay-line ✓ → ensemble-core ✓ → lfo ✓ → saturator-tape ✓ → stereo-tools ✓ → ensemble-organism
-  shared with: bbd-line 2 · delay-line 16 · ensemble-core 5 · lfo 29 · saturator-tape 5 · stereo-tools 18  (other tools on each)
+  shared with: bbd-line 2 · delay-line 17 · ensemble-core 5 · lfo 30 · saturator-tape 6 · stereo-tools 19  (other tools on each)
   signal_dag check: every node is one of its components ✓

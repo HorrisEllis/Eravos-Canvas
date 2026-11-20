@@ -36,4 +36,4 @@ dag:
   layer 0: delay-line ✓ · env-msseg · filter-svf ✓ · osc-noise ✓ · osc-va ✓ · pitch-shifter · reverb-fdn · unison-stack ✓
   tool: eravos.riser-forge ← osc-noise + osc-va + filter-svf + env-msseg + pitch-shifter + reverb-fdn + delay-line + unison-stack
   build order: delay-line ✓ → env-msseg → filter-svf ✓ → osc-noise ✓ → osc-va ✓ → pitch-shifter → reverb-fdn → unison-stack ✓ → riser-forge
-  shared with: delay-line 16 · env-msseg 14 · filter-svf 41 · osc-noise 8 · osc-va 26 · pitch-shifter 11 · reverb-fdn 12 · unison-stack 15  (other tools on each)
+  shared with: delay-line 17 · env-msseg 14 · filter-svf 42 · osc-noise 8 · osc-va 27 · pitch-shifter 11 · reverb-fdn 12 · unison-stack 15  (other tools on each)

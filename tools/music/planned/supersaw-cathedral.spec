@@ -60,4 +60,4 @@ dag:
   layer 0: ducker · ensemble-core ✓ · env-adsr ✓ · filter-svf ✓ · osc-va ✓ · reverb-fdn · stereo-tools ✓ · unison-stack ✓
   tool: eravos.supersaw-cathedral ← osc-va + unison-stack + filter-svf + ensemble-core + reverb-fdn + ducker + stereo-tools + env-adsr
   build order: ducker → ensemble-core ✓ → env-adsr ✓ → filter-svf ✓ → osc-va ✓ → reverb-fdn → stereo-tools ✓ → unison-stack ✓ → supersaw-cathedral
-  shared with: ducker 15 · ensemble-core 5 · env-adsr 21 · filter-svf 41 · osc-va 26 · reverb-fdn 12 · stereo-tools 18 · unison-stack 15  (other tools on each)
+  shared with: ducker 15 · ensemble-core 5 · env-adsr 22 · filter-svf 42 · osc-va 27 · reverb-fdn 12 · stereo-tools 19 · unison-stack 15  (other tools on each)

@@ -123,7 +123,7 @@ dag:
   layer 0: filter-allpass-chain · filter-svf ✓ · lfo ✓ · multiband-splitter · osc-va ✓ · osc-wavetable ✓ · saturator-tube ✓ · stereo-tools ✓ · unison-stack ✓
   tool: eravos.reese-bass ← osc-va + osc-wavetable + unison-stack + filter-svf + filter-allpass-chain + multiband-splitter + stereo-tools + lfo + saturator-tube
   build order: filter-allpass-chain → filter-svf ✓ → lfo ✓ → multiband-splitter → osc-va ✓ → osc-wavetable ✓ → saturator-tube ✓ → stereo-tools ✓ → unison-stack ✓ → reese-bass
-  shared with: filter-allpass-chain 5 · filter-svf 41 · lfo 29 · multiband-splitter 10 · osc-va 26 · osc-wavetable 12 · saturator-tube 4 · stereo-tools 18 · unison-stack 15  (other tools on each)
+  shared with: filter-allpass-chain 5 · filter-svf 42 · lfo 30 · multiband-splitter 10 · osc-va 27 · osc-wavetable 12 · saturator-tube 5 · stereo-tools 19 · unison-stack 15  (other tools on each)
   in it now: —
   comes out of it: —
   planned: osc-va · osc-wavetable · unison-stack · filter-svf · filter-allpass-chain · multiband-splitter · stereo-tools · lfo · saturator-tube

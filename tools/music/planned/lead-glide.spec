@@ -36,4 +36,4 @@ dag:
   layer 0: delay-line ✓ · env-adsr ✓ · filter-ladder ✓ · lfo ✓ · mpe-expression · osc-va ✓ · osc-wavetable ✓ · slew-lag · unison-stack ✓
   tool: eravos.lead-glide ← osc-va + osc-wavetable + unison-stack + filter-ladder + env-adsr + lfo + slew-lag + mpe-expression + delay-line
   build order: delay-line ✓ → env-adsr ✓ → filter-ladder ✓ → lfo ✓ → mpe-expression → osc-va ✓ → osc-wavetable ✓ → slew-lag → unison-stack ✓ → lead-glide
-  shared with: delay-line 16 · env-adsr 21 · filter-ladder 4 · lfo 29 · mpe-expression 3 · osc-va 26 · osc-wavetable 12 · slew-lag 11 · unison-stack 15  (other tools on each)
+  shared with: delay-line 17 · env-adsr 22 · filter-ladder 5 · lfo 30 · mpe-expression 3 · osc-va 27 · osc-wavetable 12 · slew-lag 11 · unison-stack 15  (other tools on each)

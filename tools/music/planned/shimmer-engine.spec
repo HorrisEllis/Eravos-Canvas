@@ -36,4 +36,4 @@ dag:
   layer 0: delay-line ✓ · filter-svf ✓ · lfo ✓ · pitch-shifter · reverb-fdn
   tool: eravos.shimmer-engine ← reverb-fdn + pitch-shifter + filter-svf + delay-line + lfo
   build order: delay-line ✓ → filter-svf ✓ → lfo ✓ → pitch-shifter → reverb-fdn → shimmer-engine
-  shared with: delay-line 16 · filter-svf 41 · lfo 29 · pitch-shifter 11 · reverb-fdn 12  (other tools on each)
+  shared with: delay-line 17 · filter-svf 42 · lfo 30 · pitch-shifter 11 · reverb-fdn 12  (other tools on each)
