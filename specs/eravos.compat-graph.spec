@@ -197,3 +197,28 @@ acceptance (CG0): this spec, the map's numbers reproducible: grep the specs' dep
 #   - each such view is part of the component's element (contract `element`), so every tool holding the component gets it, and a synthesized
 #     tool's face has it (ES1 + CG6); layout of a face editable (move, resize, hide an element) — the UI-field constraint layout
 #     (specs/eravos.ui-field.spec) as the rule that keeps it consistent
+
+## ADDENDUM 2026-11-20 (3) — the Field is the board, exactly; engines for every combination; the UI mutates inside the design rules (nothing above is changed)
+# his words (2026-11-20, verbatim):
+#   "like they all needs a engine right? like could have unlimited combinations. but i want the ui to mutate also. like deterministic aspecs like
+#    that relate to the design philosopy, and reactive colors stay consistent across the tools, but should also be able to edit the ui, with
+#    different knobs, different styles of ui elements per component, also like blocks."
+#   "i don't see the ui i want. im not saying like the original, im saying that exactly. i already critisist the other one immensly. do not deviate"
+# RULE: the Field's UI is the board "Field · Wobble Bass broken apart" (docs/previews/workbench/Wobble-Broken.dc.html, 2026-11-15) EXACTLY —
+#   header (FIELD · tool · EXPLODED · primitive → component → tool → suite / toolbox → miniworld), each component's own UI element in its dashed
+#   gate frame with its label and status, wired into the CORE, the legend. Wobble-Field.html is that markup copied (not redrawn), entered from the
+#   whole tool blown apart into it. Nothing is restyled; anything added (a menu, a control, a panel) is shown to him first as an addition on it.
+#   The mutate page (docs/previews/mutate/) is NOT the Field's UI: kept only as the engine's test bench (CG2/CG3/gates in a browser).
+# ENGINES: every combination needs one, and none is written by hand — a combination's engine is its DAG assembled from its components' own
+#   tested kernels (assemble.js; in the app inside one AudioWorklet, CG6). Unlimited combinations, one mechanism; the gates (types, builds,
+#   plays, the null as friction, the regression gate) decide which are offered.
+# THE UI MUTATES TOO, in two layers:
+#   FIXED (deterministic, from the design philosophy — never mutated): docs/DESIGN-GUIDE.md's rules (S/C/K/W/N), black surfaces (only colours
+#     are coloured), the reactive colours one system across every tool (the Beat colour, the theme's accents), the kit's tokens and sizes,
+#     the gate frames and wires of the Field. tests/design-check.mjs holds a mutated UI to them like any tool (D1–D6 clean).
+#   FREE (mutated and edited, per component element): the knob style (the kit's knob, an arc, a fader, a step row, a drawn curve), the element's
+#     style variant (compact · full · graph — e.g. an LFO as a rate grid, a drawn shape, or a spectrum), and blocks — elements as blocks that move,
+#     group, resize, hide (the UI-field constraint layout keeps them consistent). Each variant belongs to the component's element (its contract),
+#     so every tool holding it can use it; a synthesized tool's face picks variants (by him, or mutated, and the same verdicts teach it).
+# next: shown on THIS board first — (1) right-click a piece › SWAP FOR / STYLE / MUTATE (the canvas's own menu, nothing on the board until asked);
+#   (2) a piece's style variants; (3) blocks. Wobble Bass's pieces become editable as the WD track makes them components (CG7).
