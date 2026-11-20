@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Field Mutate</title>
+<!-- CG4 preview (specs/eravos.compat-graph.spec): ⚄ MUTATE, SWAP FOR…, REMOVE, keep / throw away, mutate from a kept one.
+     Built by docs/previews/mutate/build.mjs from the REAL code — tools/core/compat/{compat,assemble}.js, tools/music/compat/adapters.js,
+     every component's own kernel, the contracts, tools/music/types.json, tests/audio-measure.js, docs/novelty-baseline.json.
+     Nothing here re-implements a sound or a rule: the page only lays them out. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap">
+<style>
+:root{--bg:#04070C;--panel:#060A12;--ink:#D8F6FF;--soft:#B8CFE0;--dim:#6E8BA3;--faint:#4E6A80;--line:#1B2A3A;--line2:#0F1A26;
+  --core:#FF2266;--on:#00D4FF;--osc:#39E5A0;--flt:#FF2266;--sat:#00D4FF;--dly:#CC44FF;--st:#9FB3C8;--env:#FFB84D;--ok:#39E5A0;--no:#FF5A6E}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'DM Mono','Segoe UI Symbol','Noto Sans Symbols 2','Apple Symbols',monospace;font-size:11px}
+button,select,input{font-family:inherit}
+#bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 16px;background:#04070CEE;border-bottom:1px solid var(--line2)}
+#bar .brand{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:var(--on)}
+#bar .sep{color:var(--faint)}
+.tb{border:1px solid var(--line);color:var(--dim);padding:5px 11px;font-size:10px;letter-spacing:2px;background:none;cursor:pointer;white-space:nowrap}
+.tb:hover{border-color:var(--dim);color:var(--ink)}
+.tb.on{border-color:var(--on);color:var(--on);background:#06202C}
+.tb.hot{border-color:var(--core);color:#fff;background:#3A0716}
+.tb.hot:hover{background:#550A20}
+.tb:disabled{opacity:.35;cursor:default}
+select.tb{appearance:none;padding-right:11px}
+#crumbs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;color:var(--dim);font-size:10px;letter-spacing:1px}
+#crumbs .c{color:var(--soft)}
+#crumbs .c.cur{color:var(--ink)}
+.spacer{flex:1}
+main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:0;min-height:calc(100vh - 50px)}
+@media (max-width:900px){main{grid-template-columns:1fr}#kept{border-left:0;border-top:1px solid var(--line2)}}
+section{padding:14px 16px}
+.lab{color:var(--faint);font-size:10px;letter-spacing:2px;text-transform:uppercase}
+.lab b{color:var(--soft);font-weight:500}
+h2{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:20px;letter-spacing:4px;margin:0 0 2px;color:var(--ink)}
+/* the tool, exploded: components in gate frames, wired in signal order */
+#boardWrap{overflow-x:auto;padding:8px 0 4px}
+#board{position:relative}
+#board svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.node{position:absolute;width:184px;border:1px dashed var(--c);outline:0;background:var(--panel);padding:8px 10px 9px;cursor:pointer;text-align:left;color:var(--ink)}
+.node:hover,.node.sel{box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 30%,transparent)}
+.node .tag{position:absolute;left:-1px;top:-19px;font-size:10px;letter-spacing:1px;color:var(--c);white-space:nowrap}
+.node .nm{font-size:12px;letter-spacing:1px;color:var(--ink);margin-bottom:5px}
+.node .v{display:flex;justify-content:space-between;gap:8px;color:var(--dim);font-size:10px;line-height:1.55}
+.node .v span:last-child{color:var(--soft)}
+.node .v.set span:last-child{color:var(--c)}
+.node .note{display:inline-block;margin-top:5px;font-size:9px;letter-spacing:1px;color:var(--env);border:1px solid #4A3A1A;padding:1px 5px}
+.node.changed{border-style:solid;box-shadow:0 0 0 3px color-mix(in srgb,var(--core) 35%,transparent)}
+.out{position:absolute;width:84px;height:46px;border:2px solid var(--core);background:var(--panel);display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
+#pop{position:fixed;z-index:30;min-width:210px;background:#070C15;border:1px solid var(--line);box-shadow:0 8px 30px #000a;display:none;padding:6px 0}
+#pop .h{padding:4px 12px 6px;color:var(--faint);font-size:10px;letter-spacing:2px}
+#pop button{display:block;width:100%;text-align:left;border:0;background:none;color:var(--soft);padding:5px 12px;font-size:11px;cursor:pointer}
+#pop button:hover{background:#0C1726;color:var(--ink)}
+#pop .why{padding:4px 12px;color:var(--faint);font-size:10px;max-width:260px}
+/* mutants */
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:10px}
+.mut{border:1px solid var(--line);background:var(--panel);padding:10px 12px;display:flex;flex-direction:column;gap:7px;position:relative}
+.mut.playing{border-color:var(--on)}
+.mut.off{opacity:.5}
+.mut .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.mut .num{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:var(--ink)}
+.mut .by{font-size:9px;letter-spacing:2px;color:var(--faint)}
+.mut .what{font-size:12px;color:var(--ink);line-height:1.45}
+.mut .what em{font-style:normal;color:var(--core)}
+.chain{display:flex;flex-wrap:wrap;gap:3px;align-items:center;font-size:9px;color:var(--faint)}
+.chain span.k{border:1px solid var(--line);padding:1px 5px;color:var(--dim)}
+.chain span.k.hit{border-color:var(--core);color:#fff;background:#3A0716}
+canvas.wave{width:100%;height:42px;display:block;background:#03060A;border:1px solid var(--line2)}
+.meas{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:10px;color:var(--dim)}
+.meas b{font-weight:400;color:var(--soft)}
+.yes{color:var(--ok)!important}.no{color:var(--no)!important}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+details.offs{margin-top:12px;color:var(--faint)}
+details.offs summary{cursor:pointer;letter-spacing:2px;font-size:10px}
+/* kept */
+#kept{border-left:1px solid var(--line2);padding:14px 16px}
+.kp{border:1px dashed var(--line);padding:9px 10px;margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.kp.cur{border-color:var(--on);border-style:solid}
+.kp input{background:none;border:0;border-bottom:1px solid var(--line);color:var(--ink);font:inherit;font-size:12px;letter-spacing:1px;padding:2px 0;width:100%}
+.kp .ln{font-size:10px;color:var(--dim);line-height:1.5}
+.empty{color:var(--faint);font-size:10px;line-height:1.6;margin-top:10px}
+.foot{color:var(--faint);font-size:10px;line-height:1.7;margin-top:18px;border-top:1px solid var(--line2);padding-top:10px}
+.foot b{color:var(--soft);font-weight:400}
+</style></head><body>
+<div id="bar">
+  <span class="brand">FIELD</span><span class="sep">·</span>
+  <div id="crumbs"></div>
+  <span class="spacer"></span>
+  <select class="tb" id="phrase" aria-label="what the tool plays">
+    <option value="bass">BASS LINE</option><option value="hold">ONE LONG NOTE</option><option value="high">TWO OCTAVES UP</option>
+  </select>
+  <button class="tb" id="playCur">▶ PLAY THE TOOL</button>
+  <button class="tb hot" id="mutate">⚄ MUTATE</button>
+</div>
+<main>
+  <div>
+    <section>
+      <h2 id="curName">THE TOOL</h2>
+      <div class="lab">exploded · each component in its gate, wired in signal order · <b>click a component</b> to swap it for one that fits, or remove it</div>
+      <div id="boardWrap"><div id="board"></div></div>
+    </section>
+    <section style="padding-top:4px">
+      <h2>MUTANTS</h2>
+      <div class="lab" id="mutLab">press <b>⚄ MUTATE</b> — each mutant is one step from the tool, checked, built from its components and played before it is offered</div>
+      <div id="grid"></div>
+      <div id="offs"></div>
+    </section>
+  </div>
+  <aside id="kept">
+    <h2>KEPT</h2>
+    <div class="lab">a mutant you keep is a new tool · <b>mutate from it</b> to keep going</div>
+    <div id="keptList"></div>
+    <div class="foot" id="foot"></div>
+  </aside>
+</main>
+<div id="pop"></div>
+
+<!--INLINE-->
+
+<script>
+(function () {
+'use strict';
+const D = window.__MUTATE_DATA, MP = window.MusicParts || {}, Compat = window.Compat, assemble = window.Assemble.assemble, AM = window.AudioMeasure;
+const domain = window.MusicAdapters(MP), types = D.types, contracts = D.contracts, C = {};
+contracts.forEach(c => { C[c.id] = c; });
+const can = contracts.filter(c => domain.adapters[c.id]);          // only parts that can be assembled today (as build/mutants.mjs)
+const G = Compat.graph(can, types);
+const SR = 48000, SECS = 2.8, SAME = 0.005;
+const PHRASES = {
+  bass: [55, 65.41, 73.42, 49].map((hz, i) => ({ t: 0.05 + i * 0.65, dur: 0.6, hz })),   // build/mutants.mjs PHRASE — the verdicts use this one
+  hold: [{ t: 0.05, dur: 2.6, hz: 55 }],
+  high: [55, 65.41, 73.42, 49].map((hz, i) => ({ t: 0.05 + i * 0.65, dur: 0.6, hz: hz * 4 }))
+};
+// the novelty measure — build/novelty-core.mjs, verbatim (inlined by build.mjs as NoveltyCore)
+const NC = window.NoveltyCore, B = D.baseline, dist = NC.makeDist(NC.groupsFor(B.D));
+const me = (v) => ({ v, n: NC.norm(v, B.lo, B.hi) });
+const base = B.items.filter(x => x.kind !== 'effect').map(x => Object.assign({}, x, { n: NC.norm(x.v, B.lo, B.hi) }));
+const nearest = (v) => { let d = 9, nn = null; for (const x of base) { const e = dist(me(v), x); if (e < d) { d = e; nn = x; } } return { d, nn, verdict: d < B.twin ? 'TWIN' : d < B.close ? 'CLOSE' : 'novel' }; };
+
+// ---- render: the same harness as build/mutants.mjs play() ----
+const cache = new Map();
+function play(dag, phraseKey) {
+  const key = phraseKey + '|' + JSON.stringify(dag); if (cache.has(key)) return cache.get(key);
+  const notes = PHRASES[phraseKey], E = assemble(dag, contracts, domain, { sr: SR });
+  if (!E.ok) { const r = { ok: false, why: E.why }; cache.set(key, r); return r; }
+  const { L, R } = E.render(SECS, notes);
+  let g = 0; const up = 1 / (0.005 * SR), dn = 1 / (0.04 * SR);
+  for (let i = 0; i < L.length; i++) { const t = i / SR, on = notes.some(x => t >= x.t && t < x.t + x.dur); g = on ? Math.min(1, g + up) : Math.max(0, g - dn); L[i] *= g; R[i] *= g; }
+  let nan = 0, peak = 0, pinned = 0, q = 0;
+  for (let i = 0; i < L.length; i++) { const a = L[i], b = R[i]; if (!Number.isFinite(a) || !Number.isFinite(b)) { nan++; L[i] = 0; R[i] = 0; continue; } const m = Math.max(Math.abs(a), Math.abs(b)); if (m > peak) peak = m; if (m >= 0.999) pinned++; q += 0.5 * (a * a + b * b); }
+  const rmsDb = 20 * Math.log10(Math.sqrt(q / L.length) + 1e-12), mono = new Float32Array(L.length); for (let i = 0; i < L.length; i++) mono[i] = 0.5 * (L[i] + R[i]);
+  const why = []; if (nan) why.push(nan + ' samples not finite'); if (rmsDb < -50) why.push('silent (' + rmsDb.toFixed(1) + ' dB)'); if (pinned / L.length > 0.01) why.push('pinned ' + (100 * pinned / L.length).toFixed(1) + ' %');
+  const fp = !nan && rmsDb > -90 ? AM.fingerprint(mono, SR, 0.1, 2.7) : null;
+  const r = { ok: !why.length, why, peak, rmsDb, L, R, mono, fp: fp && fp.frames > 4 ? fp.v : null }; cache.set(key, r); return r;
+}
+
+// ---- audio out ----
+let AC = null, src = null, playingId = null;
+function stop() { if (src) { try { src.stop(); } catch (e) {} src = null; } playingId = null; document.querySelectorAll('.mut.playing').forEach(x => x.classList.remove('playing')); setPlayBtn(); }
+function hear(dag, id, then) {
+  if (playingId === id) { stop(); return; }
+  stop(); AC = AC || new (window.AudioContext || window.webkitAudioContext)({ sampleRate: SR }); if (AC.state === 'suspended') AC.resume();
+  const r = play(dag, phraseSel.value); if (!r.L) return;
+  const buf = AC.createBuffer(2, r.L.length, SR), k = r.peak > 0 ? 0.89 / r.peak : 1;   // every mutant heard at the same level (as the WAVs)
+  const l = buf.getChannelData(0), rr = buf.getChannelData(1); for (let i = 0; i < r.L.length; i++) { l[i] = r.L[i] * k * 0.8; rr[i] = r.R[i] * k * 0.8; }
+  src = AC.createBufferSource(); src.buffer = buf; src.connect(AC.destination); playingId = id;
+  src.onended = () => { if (playingId === id) { playingId = null; src = null; document.querySelectorAll('.mut.playing').forEach(x => x.classList.remove('playing')); setPlayBtn(); if (then) then(); } };
+  src.start(); const el = document.querySelector('[data-mut="' + id + '"]'); if (el) el.classList.add('playing'); setPlayBtn();
+}
+
+// ---- state ----
+const ROOT_DAG = D.parent;
+let cur = { id: 'root', name: 'Saw voice', dag: ROOT_DAG, ops: [] };   // the tool on the bench
+let seed = 1, mutants = [], kept = [], selNode = null, mutCount = 0;
+try { const s = JSON.parse(localStorage.getItem('eravos.field.mutate.kept') || '[]'); if (Array.isArray(s)) kept = s; } catch (e) {}
+const save = () => { try { localStorage.setItem('eravos.field.mutate.kept', JSON.stringify(kept)); } catch (e) {} };
+
+const kindCol = (cid) => /^osc-/.test(cid) ? 'var(--osc)' : /^filter-/.test(cid) ? 'var(--flt)' : /^saturator-|bitcrusher/.test(cid) ? 'var(--sat)' : /delay/.test(cid) ? 'var(--dly)' : /^env-/.test(cid) ? 'var(--env)' : 'var(--st)';
+const fmt = (v, x) => x === undefined ? '—' : typeof x === 'number' ? (Math.abs(x) >= 1000 ? (x / 1000).toFixed(x % 1000 ? 2 : 0) + 'k' : +x.toPrecision(3)) + (v.unit && v.unit !== 'Hz' ? '' : v.unit === 'Hz' ? ' Hz' : '') : String(x);
+const say = (op) => op.op === 'swap' ? 'swap <em>' + op.from + '</em> → <em>' + op.to + '</em>' : op.op === 'insert' ? 'insert <em>' + op.component + '</em> between ' + op.between.join(' → ')
+  : op.op === 'vary' ? 'vary ' + op.node + '.<em>' + op.key + '</em> → <em>' + op.value + '</em>' : op.op === 'rewire' ? 'rewire ' + op.from + ': ' + op.was + ' → <em>' + op.to + '</em>' : 'remove <em>' + op.node + '</em>';
+const sayPlain = (op) => say(op).replace(/<\/?em>/g, '');
+const inOrder = (dag) => { const L = layout(dag); return dag.nodes.slice().sort((a, b) => (L.pos[a.id].x - L.pos[b.id].x) || (L.pos[a.id].y - L.pos[b.id].y)); };
+const hitNode = (op) => op.op === 'insert' ? op.node : op.op === 'rewire' ? op.to.split('.')[0] : op.node;
+
+// ---- the board: the DAG exploded, columns by depth ----
+const board = document.getElementById('board');
+function layout(dag) {
+  const depth = {}, ids = dag.nodes.map(n => n.id), inE = {}; ids.forEach(i => { depth[i] = 0; inE[i] = []; });
+  dag.edges.filter(e => !e.feedback).forEach(e => inE[e.to.split('.')[0]].push(e.from.split('.')[0]));
+  for (let k = 0; k < ids.length; k++) ids.forEach(i => inE[i].forEach(a => { depth[i] = Math.max(depth[i], depth[a] + 1); }));
+  const cols = {}; ids.forEach(i => { (cols[depth[i]] = cols[depth[i]] || []).push(i); });
+  const pos = {}, CW = 236, RH = 170; Object.keys(cols).forEach(c => cols[c].forEach((i, r) => { pos[i] = { x: 10 + c * CW, y: 30 + r * RH }; }));
+  return { pos, ncol: Object.keys(cols).length, nrow: Math.max(...Object.values(cols).map(a => a.length)), CW, RH };
+}
+function drawBoard(dag, hit) {
+  const Lt = layout(dag); board.innerHTML = '';
+  const W = 10 + Lt.ncol * Lt.CW + 110, H = 30 + Lt.nrow * Lt.RH; board.style.width = W + 'px'; board.style.height = H + 'px';
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('width', W); svg.setAttribute('height', H); board.appendChild(svg);
+  const els = {};
+  dag.nodes.forEach(n => {
+    const c = C[n.component], col = kindCol(n.component), p = Lt.pos[n.id], b = document.createElement('button');
+    b.type = 'button'; b.className = 'node' + (hit === n.id ? ' changed' : '') + (selNode === n.id ? ' sel' : ''); b.style.setProperty('--c', col); b.style.left = p.x + 'px'; b.style.top = p.y + 'px';
+    const vs = (c.variables || []).filter(v => v.type === 'number' || v.type === 'enum' || v.type === 'boolean');
+    const set = vs.filter(v => n.vars && n.vars[v.key] !== undefined), rest = vs.filter(v => !(n.vars && n.vars[v.key] !== undefined));
+    const show = set.concat(rest).slice(0, 4);
+    const hears = (c.ports || []).filter(pt => pt.dir === 'in' && (pt.type === 'pitch' || pt.type === 'gate') && !dag.edges.some(e => e.to === n.id + '.' + pt.id));
+    b.innerHTML = '<span class="tag">' + n.component + ' · ' + (c.kind || '') + '  ✓ built</span><div class="nm">' + n.id.toUpperCase() + '</div>' +
+      show.map(v => { const x = n.vars && n.vars[v.key] !== undefined ? n.vars[v.key] : v.default; return '<div class="v' + (set.includes(v) ? ' set' : '') + '"><span>' + v.key + '</span><span>' + fmt(v, x) + '</span></div>'; }).join('') +
+      (hears.length ? '<span class="note">♪ HEARS THE NOTE</span>' : '');
+    b.onclick = (ev) => { ev.stopPropagation(); openPop(n, b); };
+    board.appendChild(b); els[n.id] = b;
+  });
+  const out = document.createElement('div'); out.className = 'out'; out.textContent = 'OUT';
+  const [on] = (dag.outs[0] || '').split('.'), op = Lt.pos[on] || { x: 10, y: 30 }; out.style.left = (10 + Lt.ncol * Lt.CW) + 'px'; out.style.top = (op.y + 30) + 'px'; board.appendChild(out);
+  requestAnimationFrame(() => {
+    const edge = (x1, y1, x2, y2, col, dash) => { const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'), m = (x1 + x2) / 2;
+      p.setAttribute('d', `M${x1} ${y1} C ${m} ${y1}, ${m} ${y2}, ${x2} ${y2}`); p.setAttribute('fill', 'none'); p.setAttribute('stroke', col); p.setAttribute('stroke-width', '2'); p.setAttribute('stroke-opacity', '0.8'); if (dash) p.setAttribute('stroke-dasharray', '6 4'); svg.appendChild(p);
+      const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); c.setAttribute('cx', x2); c.setAttribute('cy', y2); c.setAttribute('r', 3.5); c.setAttribute('fill', col); svg.appendChild(c); };
+    const R = (id) => { const e = els[id]; return { x: e.offsetLeft, y: e.offsetTop, w: e.offsetWidth, h: e.offsetHeight }; };
+    dag.edges.forEach(e => { const a = e.from.split('.')[0], z = e.to.split('.')[0], A = R(a), Z = R(z), port = e.to.split('.')[1];
+      edge(A.x + A.w, A.y + A.h / 2, Z.x, Z.y + Z.h / 2 + (port === 'in' ? 0 : 14), getComputedStyle(els[a]).getPropertyValue('--c').trim() ? cssCol(kindCol(C[dag.nodes.find(n => n.id === a).component])) : '#9FB3C8', !!e.feedback); });
+    if (els[on]) { const A = R(on); edge(A.x + A.w, A.y + A.h / 2, out.offsetLeft, out.offsetTop + 23, '#FF2266'); }
+  });
+}
+const cssCol = (v) => getComputedStyle(document.documentElement).getPropertyValue(v.slice(4, -1)).trim() || '#9FB3C8';
+
+// ---- SWAP FOR… / REMOVE on a component ----
+const pop = document.getElementById('pop');
+function openPop(n, el) {
+  selNode = n.id; const r = el.getBoundingClientRect(), sibs = (G.standIns[n.component] || []);
+  let h = '<div class="h">' + n.id.toUpperCase() + ' · ' + n.component + '</div><div class="h">SWAP FOR…</div>';
+  const opts = sibs.map(s => ({ s, r: Compat.swap(cur.dag, n.id, s, can, types) })).filter(x => !x.r.error);
+  h += opts.length ? opts.map(x => '<button data-swap="' + x.s + '">' + x.s + '</button>').join('') : '<div class="why">nothing that fits this slot can be assembled yet</div>';
+  const rm = Compat.remove(cur.dag, n.id, can, types);
+  h += '<div class="h" style="margin-top:6px">OR</div>' + (rm.error ? '<div class="why">remove: ' + rm.error + '</div>' : '<button data-rm="1">remove ' + n.id + ' (wire around it)</button>');
+  pop.innerHTML = h; pop.style.display = 'block';
+  pop.style.left = Math.min(innerWidth - 230, r.left) + 'px'; pop.style.top = Math.min(innerHeight - pop.offsetHeight - 8, r.bottom + 6) + 'px';
+  pop.querySelectorAll('[data-swap]').forEach(b => b.onclick = () => { const x = opts.find(o => o.s === b.dataset.swap); closePop(); addMine(x.r); });
+  const rb = pop.querySelector('[data-rm]'); if (rb) rb.onclick = () => { closePop(); addMine(rm); };
+  drawBoard(cur.dag);
+}
+function closePop() { pop.style.display = 'none'; selNode = null; }
+document.addEventListener('click', (e) => { if (pop.style.display === 'block' && !pop.contains(e.target)) { closePop(); drawBoard(cur.dag); } });
+let mine = 0;
+function addMine(r) { const m = measure({ dag: r.dag, lineage: { ops: [r.op], by: 'you' }, n: 'YOURS ' + (++mine) }); mutants.unshift(m); drawMutants(); }
+
+// ---- mutate ----
+function measure(m) {
+  const id = 'm' + (++mutCount), parent = play(cur.dag, 'bass'), r = play(m.dag, 'bass');
+  const fromParent = r.fp && parent.fp ? dist(me(r.fp), me(parent.fp)) : null, heard = fromParent != null && fromParent >= SAME;
+  return Object.assign({ id, n: m.n || mutCount, op: m.lineage.ops[0], by: m.lineage.by, dag: m.dag, r, fromParent, heard, offered: r.ok && heard, near: r.fp ? nearest(r.fp) : null });
+}
+function doMutate() {
+  stop(); const t0 = performance.now();
+  const M = Compat.mutate(cur.dag, can, types, { seed, count: 6, from: cur.name });
+  mutants = M.map((m, i) => measure(Object.assign(m, { n: seed + '·' + (i + 1) }))); seed++;
+  document.getElementById('mutLab').innerHTML = 'seed ' + (seed - 1) + ' · ' + mutants.filter(m => m.offered).length + ' of ' + mutants.length + ' offered · each checked, built from its components, played and measured in ' + Math.round(performance.now() - t0) + ' ms · <b>⚄ again</b> for others';
+  drawMutants();
+}
+function wave(cv, r) {
+  const w = cv.width = cv.clientWidth * 2, h = cv.height = 84, g = cv.getContext('2d'); g.clearRect(0, 0, w, h); if (!r.mono) return;
+  const k = r.peak > 0 ? 0.95 / r.peak : 1, step = r.mono.length / w; g.fillStyle = '#00D4FF';
+  for (let x = 0; x < w; x++) { let lo = 1, hi = -1; for (let i = Math.floor(x * step); i < Math.floor((x + 1) * step); i++) { const v = r.mono[i] * k; if (v < lo) lo = v; if (v > hi) hi = v; } g.fillRect(x, h / 2 - hi * h / 2, 1, Math.max(1, (hi - lo) * h / 2)); }
+}
+function card(m) {
+  const d = document.createElement('div'); d.className = 'mut' + (m.offered ? '' : ' off'); d.dataset.mut = m.id;
+  const hit = hitNode(m.op), comps = inOrder(m.dag).map(n => '<span class="k' + (n.id === hit ? ' hit' : '') + '">' + n.component + '</span>').join('<span>→</span>');
+  const f = (x) => x == null ? '—' : x.toFixed(3);
+  d.innerHTML = '<div class="top"><span class="num">' + (String(m.n).startsWith('YOURS') ? m.n : 'MUTANT ' + m.n) + '</span><span class="by">' + (m.by === 'you' ? 'BY YOU' : '⚄ MUTATE') + '</span></div>' +
+    '<div class="what">' + say(m.op) + '</div><div class="chain">' + comps + '</div><canvas class="wave"></canvas>' +
+    '<div class="meas"><span>plays</span><b class="' + (m.r.ok ? 'yes' : 'no') + '">' + (m.r.ok ? 'yes · ' + m.r.rmsDb.toFixed(1) + ' dB' : 'no — ' + (m.r.why || []).join('; ')) + '</b>' +
+    '<span>heard as new</span><b class="' + (m.heard ? 'yes' : 'no') + '">' + (m.heard ? 'yes' : 'no') + ' · ' + f(m.fromParent) + ' from the tool</b>' +
+    '<span>nearest</span><b>' + (m.near ? m.near.nn.label + ' · ' + m.near.nn.preset + ' (' + f(m.near.d) + ', ' + m.near.verdict + ')' : '—') + '</b></div>' +
+    '<div class="row"><button class="tb" data-a="play">▶ PLAY</button><button class="tb" data-a="ab">A / B</button>' +
+    (m.offered ? '<button class="tb on" data-a="keep">KEEP</button>' : '') + '<button class="tb" data-a="throw">✕ THROW AWAY</button></div>';
+  d.querySelector('[data-a=play]').onclick = () => hear(m.dag, m.id);
+  d.querySelector('[data-a=ab]').onclick = () => hear(cur.dag, 'cur', () => setTimeout(() => hear(m.dag, m.id), 250));
+  const kb = d.querySelector('[data-a=keep]'); if (kb) kb.onclick = () => keep(m);
+  d.querySelector('[data-a=throw]').onclick = () => { if (playingId === m.id) stop(); mutants = mutants.filter(x => x !== m); drawMutants(); };
+  d.addEventListener('mouseenter', () => drawBoardPreview(m)); d.addEventListener('mouseleave', () => drawBoard(cur.dag));
+  requestAnimationFrame(() => wave(d.querySelector('canvas'), m.r));
+  return d;
+}
+let previewT = null;
+function drawBoardPreview(m) { clearTimeout(previewT); previewT = setTimeout(() => drawBoard(m.dag, hitNode(m.op)), 60); }
+function drawMutants() {
+  const grid = document.getElementById('grid'), offs = document.getElementById('offs'); grid.innerHTML = ''; offs.innerHTML = '';
+  const on = mutants.filter(m => m.offered), no = mutants.filter(m => !m.offered);
+  on.forEach(m => grid.appendChild(card(m)));
+  if (no.length) { const det = document.createElement('details'); det.className = 'offs';
+    det.innerHTML = '<summary>NOT OFFERED (' + no.length + ') — it does not play cleanly, or no one could hear the change</summary><div id="grid2" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:10px"></div>';
+    offs.appendChild(det); no.forEach(m => det.querySelector('#grid2').appendChild(card(m))); }
+}
+
+// ---- keep / mutate from ----
+function keep(m) {
+  const k = { id: 'k' + Date.now() + Math.floor(Math.random() * 1e3), name: cur.name + ' · ' + (m.op.op === 'swap' ? m.op.to : m.op.op === 'insert' ? '+ ' + m.op.component : m.op.op === 'remove' ? 'no ' + m.op.node : m.op.op === 'vary' ? m.op.node + ' ' + m.op.key + ' ' + m.op.value : m.op.from.split('.')[0] + ' → ' + m.op.to.split('.')[0]),
+    dag: m.dag, ops: cur.ops.concat([m.op]), from: cur.name, by: m.by, measured: { fromParent: m.fromParent, rmsDb: m.r.rmsDb, nearest: m.near && { tool: m.near.nn.label, preset: m.near.nn.preset, d: m.near.d, verdict: m.near.verdict } }, at: new Date().toISOString() };
+  kept.unshift(k); save(); mutants = mutants.filter(x => x !== m); drawMutants(); drawKept();
+}
+function drawKept() {
+  const L = document.getElementById('keptList'); L.innerHTML = '';
+  if (!kept.length) { L.innerHTML = '<div class="empty">nothing kept yet. KEEP a mutant you like; it shows here with how it was made (its lineage), and you can mutate from it.</div>'; }
+  kept.forEach(k => {
+    const d = document.createElement('div'); d.className = 'kp' + (cur.id === k.id ? ' cur' : '');
+    d.innerHTML = '<input aria-label="name" value="' + k.name.replace(/"/g, '&quot;') + '"><div class="ln">' + k.ops.map((o, i) => (i + 1) + '. ' + sayPlain(o)).join('<br>') + '</div>' +
+      '<div class="ln">' + inOrder(k.dag).map(n => n.component).join(' → ') + '</div>' +
+      '<div class="row"><button class="tb" data-a="play">▶</button><button class="tb on" data-a="from">⚄ MUTATE FROM THIS</button><button class="tb" data-a="del">✕</button></div>';
+    d.querySelector('input').onchange = (e) => { k.name = e.target.value || k.name; save(); if (cur.id === k.id) { cur.name = k.name; drawCur(); } };
+    d.querySelector('[data-a=play]').onclick = () => hear(k.dag, k.id);
+    d.querySelector('[data-a=from]').onclick = () => { stop(); cur = { id: k.id, name: k.name, dag: k.dag, ops: k.ops }; mutants = []; drawMutants(); drawCur(); drawKept(); doMutate(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+    d.querySelector('[data-a=del]').onclick = () => { kept = kept.filter(x => x !== k); save(); if (cur.id === k.id) { cur = { id: 'root', name: 'Saw voice', dag: ROOT_DAG, ops: [] }; drawCur(); } drawKept(); };
+    L.appendChild(d);
+  });
+}
+function drawCur() {
+  document.getElementById('curName').textContent = cur.name.toUpperCase();
+  const cr = document.getElementById('crumbs'); cr.innerHTML = '<span class="c' + (cur.ops.length ? '' : ' cur') + '">SAW VOICE</span>' + cur.ops.map((o, i) => '<span>›</span><span class="c' + (i === cur.ops.length - 1 ? ' cur' : '') + '">' + sayPlain(o).toUpperCase() + '</span>').join('');
+  if (cur.ops.length) { const b = document.createElement('button'); b.className = 'tb'; b.textContent = 'BACK TO THE START'; b.onclick = () => { stop(); cur = { id: 'root', name: 'Saw voice', dag: ROOT_DAG, ops: [] }; mutants = []; drawMutants(); drawCur(); drawKept(); }; cr.appendChild(b); }
+  drawBoard(cur.dag);
+}
+const phraseSel = document.getElementById('phrase'), playBtn = document.getElementById('playCur');
+function setPlayBtn() { playBtn.textContent = playingId === 'cur' ? '■ STOP' : '▶ PLAY THE TOOL'; playBtn.classList.toggle('on', playingId === 'cur'); }
+playBtn.onclick = () => hear(cur.dag, 'cur');
+phraseSel.onchange = () => stop();
+document.getElementById('mutate').onclick = doMutate;
+document.getElementById('foot').innerHTML = 'what can be mutated into today: <b>' + can.length + ' of ' + contracts.length + '</b> components (' + can.map(c => c.id).join(', ') + ') — the rest join as each gets its adapter.<br>' +
+  'a mutant is offered only if it passes the type check, builds, plays (finite, not silent, not pinned) and is heard to differ from the tool. "nearest" is advisory: your ear decides.<br>' +
+  'preview: kept tools stay in this browser. built, they go to Documents\\ERAVOS\\tools as tools you can open on the canvas.';
+drawCur(); drawKept(); drawMutants();
+window.__mutate = { doMutate, get mutants() { return mutants; }, keep, get kept() { return kept; } };
+})();
+</script>
+</body></html>
