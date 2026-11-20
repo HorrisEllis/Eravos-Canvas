@@ -44,6 +44,8 @@
       "saturator-tube@1.0.0",
       "saturator-tape@1.0.0",
       "bitcrusher@1.0.0",
+      "osc-noise@1.0.0",
+      "delay-line@1.0.0",
       "note-release@1.0.0"
     ],
     "elements": [
@@ -54,6 +56,8 @@
       "saturator-tube.element@1",
       "saturator-tape.element@1",
       "bitcrusher.element@1",
+      "osc-noise.element@1",
+      "delay-line.element@1",
       "note-release.element@1"
     ]
   },

@@ -21,14 +21,4 @@
 /* sockets and mutation (2026-11-20): a ⇄ chip on a gate that holds a socket; ⚄ MUTATE under the core */
 .fb-swap{margin-left:8px;padding:1px 8px;border-radius:999px;border:1px solid #00D4FF;background:#04070C;color:#00D4FF;font:500 10px 'DM Mono',monospace;letter-spacing:1px;cursor:pointer}
 .fb-swap:hover{background:#00D4FF;color:#04070C}
-.fb-mut{position:absolute;padding:12px 14px;border:1px dashed color-mix(in srgb,#00D4FF 55%,transparent);background:#04070C;border-radius:4px}
-.fb-mrow{display:flex;gap:8px;align-items:center}
-.fb-mut button{font:700 11px 'DM Mono',monospace;letter-spacing:1.4px;padding:8px 14px;border-radius:999px;cursor:pointer;border:1px solid #1c2530;background:#0b0f15;color:#D8F6FF}
-.fb-mut .fb-mgo{flex:1;padding:12px 18px;font-size:14px;letter-spacing:3px;border:0;color:#fff;background:linear-gradient(90deg,#8844ff,#ff6fa8);box-shadow:0 4px 18px rgba(255,111,168,.3),inset 0 1px 0 rgba(255,255,255,.3)}
-.fb-mut .fb-mgo:hover{box-shadow:0 6px 26px rgba(255,111,168,.55),inset 0 1px 0 rgba(255,255,255,.4)}
-.fb-mut .fb-mk:not(:disabled):hover{border-color:#3DDC97;color:#3DDC97}
-.fb-mut .fb-mt:not(:disabled):hover{border-color:#FF2266;color:#FF2266}
-.fb-mut button:disabled{opacity:.35;cursor:default}
-.fb-mline{margin-top:9px;font:500 11px 'DM Mono',monospace;line-height:1.5;color:#B8CFE0}
-.fb-mut.pending .fb-mline{color:#00D4FF}
-.fb-mtally{margin-top:4px;font:500 10px 'DM Mono',monospace;letter-spacing:1px;color:#4E6A80}
+.fb-mut{position:absolute}

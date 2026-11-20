@@ -158,7 +158,7 @@ registerProcessor('eravos-retro-dco', EravosRetroDCO);`;
       S.mod_in('rd.hook.mod_cutoff', 'cutoff'), S.mod_in('rd.hook.mod_pwm', 'pwm'), S.mod_in('rd.hook.mod_res', 'res'), S.mod_in('rd.hook.mod_drift', 'drift')],
     config: [
       e('voice', 'Voice', 'VOICE', 'poly', 'poly: a voice card per note · mono: one, every note retriggers · legato: one, glides over held keys · unison: one note, many voices'),
-      e('filter', 'Filter', 'VCF', 'svf 24', 'svf 24: the clean 24 dB low-pass · ladder: the transistor ladder, with Drive inside its loop'),
+      Object.assign(e('filter', 'Filter', 'VCF', 'svf 24', 'svf 24: the clean 24 dB low-pass · ladder: the transistor ladder, with Drive inside its loop'), { socket: 'filter', near: 'cutoff' }),   // 2026-11-20: a socket (filter-svf ⇄ filter-ladder): the Field board swaps it
       e('chorus', 'Chorus', 'FX', 'I', 'the Juno chorus: bucket brigade + two taps, I slow, II faster, I+II the fast shimmer'),
       { key: 'hold', type: 'boolean', default: false, label: 'Hold', group: 'VOICE', hint: 'keys you let go keep sounding until you play the next one' },
       n('saw', 'Saw', 'DCO', 0.7, 0, 1), n('pulse', 'Pulse', 'DCO', 0.5, 0, 1), n('width', 'Width', 'DCO', 0.35, 0.05, 0.5, 0.001), n('pwm', 'PWM', 'DCO', 0.3, 0, 1),

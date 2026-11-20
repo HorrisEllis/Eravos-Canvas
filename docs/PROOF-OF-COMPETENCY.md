@@ -71,6 +71,16 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-20 · Mutation everywhere: one shared mechanism for every tool, its parts and the Workshop's documents (3.201)
+- **His words (2026-11-20):** "need to be able to swap them out. then i want each tool to be able to be able to do that. then the workshop or field. like i want full mutation, like keep going"
+- **His call:** the ask; shown first, not merged.
+- **Built (by the AI coder, to his direction):** `tools/core/field/mutate.js` — one mutation (sockets swapped, settings nudged, learning from
+  keep and throw, never repeating, one undo step, domain guards) used by the Field board and the Workshop board; a board for any tool laid out
+  from its own window; two more Wobble Bass sockets; Retro DCO and Piano sockets.
+- **Proof:** `tests/p200` 2/2, `p199` 1/1; null render Wobble Bass 34/34, Retro DCO 12/12, Piano 11/11 against the code before; every Wobble part
+  measured playing; five tools exploded with every section found and no overlaps.
+- **Where to check:** `node tests/run.mjs P200`; `node docs/previews/workbench/any-tool-field.shots.mjs`; `docs/previews/workbench/field-*.png`, `workshop-mutate.png`.
+
 ### 2026-11-20 · Wobble Bass: shared components swapped into a live instrument, mutated, kept or thrown — the sound unchanged until he swaps (3.200)
 - **His words (2026-11-20):** "okay now i want to be able to mutate, and swap components for the wobble bass."
 - **His call:** the ask; shown first, not merged.

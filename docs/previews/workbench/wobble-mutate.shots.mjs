@@ -21,14 +21,14 @@ out.own = await p.evaluate(() => window.__level());
 const r = await p.evaluate(() => { const x = FieldBoard.explode(window.__wb, 'eravos.wobble-bass'); return { pieces: x.pieces, missing: x.missing }; }); console.log('explode', JSON.stringify(r));
 await p.waitForTimeout(600);
 const chips = await p.evaluate(() => [...document.querySelectorAll('.fb-swap')].map(c => c.closest('.fb-gate').dataset.piece + ':' + c.textContent));
-console.log('chips', chips, 'dock', await p.evaluate(() => !!document.querySelector('.fb-mut .fb-mgo')));
+console.log('chips', chips, 'dock', await p.evaluate(() => !!document.querySelector('.fb-mut .fm-go')));
 await p.evaluate(() => { const g = document.querySelector('.fb-mut'); g.scrollIntoView({ block: 'center' }); });
 await p.evaluate(() => { const m = document.querySelector('.fb-mut').getBoundingClientRect(); const v = CanvasWM.view; CanvasWM.view = { x: v.x - (m.left - 500), y: v.y - (m.top - 500), z: v.z }; CanvasWM.applyView(); });
 await p.waitForTimeout(300); await p.screenshot({ path: OUT('wobble-mutate-board.png') });
 // each part on its own, measured
-for (const [k, v] of [['partFilter', 'filter-svf'], ['partFilter', 'filter-ladder'], ['partDrive', 'saturator-tube'], ['partDrive', 'saturator-tape'], ['partDrive', 'bitcrusher']]) {
-  await p.evaluate(([k, v]) => { const h = OrganismFactory.handle(window.__wb); h.view.emit('config_change', { key: 'partFilter', value: 'own' }); h.view.emit('config_change', { key: 'partDrive', value: 'own' }); h.view.emit('config_change', { key: k, value: v }); }, [k, v]);
-  await p.waitForFunction(() => OrganismFactory.handle(window.__wb).ctx.parts && true); await p.evaluate(async (k) => OrganismFactory.handle(window.__wb).ctx.parts.ready(k === 'partFilter' ? 'filter' : 'drive'), k);
+for (const [k, v] of [['partFilter', 'filter-svf'], ['partFilter', 'filter-ladder'], ['partDrive', 'saturator-tube'], ['partDrive', 'saturator-tape'], ['partDrive', 'bitcrusher'], ['partNoise', 'osc-noise'], ['partInsert', 'delay-line'], ['partInsert', 'saturator-tube'], ['partInsert', 'bitcrusher']]) {
+  await p.evaluate(([k, v]) => { const h = OrganismFactory.handle(window.__wb); ['partFilter', 'partDrive', 'partNoise'].forEach(x => h.view.emit('config_change', { key: x, value: 'own' })); h.view.emit('config_change', { key: 'partInsert', value: 'none' }); h.view.emit('config_change', { key: 'noise', value: k === 'partNoise' ? 0.6 : 0 }); h.view.emit('config_change', { key: k, value: v }); }, [k, v]);
+  await p.waitForFunction(() => OrganismFactory.handle(window.__wb).ctx.parts && true); await p.evaluate(async (k) => OrganismFactory.handle(window.__wb).ctx.parts.ready({ partFilter: 'filter', partDrive: 'drive', partNoise: 'noise', partInsert: 'insert' }[k]), k);
   await p.waitForTimeout(200); out[v] = await p.evaluate(() => window.__level());
 }
 await p.evaluate(() => { const h = OrganismFactory.handle(window.__wb); h.view.emit('config_change', { key: 'partFilter', value: 'filter-ladder' }); h.view.emit('config_change', { key: 'partDrive', value: 'own' }); });
@@ -37,12 +37,12 @@ await p.keyboard.press('Escape').catch(() => {}); await p.evaluate(() => documen
 // mutate three times: throw, throw, keep
 const muts = [];
 for (let i = 0; i < 3; i++) {
-  await p.evaluate(() => document.querySelector('.fb-mgo').click()); await p.waitForTimeout(400);
-  await p.evaluate(async () => { const P = OrganismFactory.handle(window.__wb).ctx.parts; await P.ready('filter'); await P.ready('drive'); });
+  await p.evaluate(() => document.querySelector('.fm-go').click()); await p.waitForTimeout(400);
+  await p.evaluate(async () => { const P = OrganismFactory.handle(window.__wb).ctx.parts; for (const s of P.sockets) await P.ready(s); });
   const lv = await p.evaluate(() => window.__level());
-  muts.push({ line: await p.evaluate(() => document.querySelector('.fb-mline').textContent), level: lv });
+  muts.push({ line: await p.evaluate(() => document.querySelector('.fm-line').textContent), level: lv });
   if (i === 2) await p.screenshot({ path: OUT('wobble-mutate-mutated.png') });
-  await p.evaluate((i) => document.querySelector(i < 2 ? '.fb-mt' : '.fb-mk').click(), i); await p.waitForTimeout(200);
+  await p.evaluate((i) => document.querySelector(i < 2 ? '.fm-throw' : '.fm-keep').click(), i); await p.waitForTimeout(200);
 }
 console.log(JSON.stringify(out, null, 0)); muts.forEach(m => console.log('MUT', JSON.stringify(m)));
 console.log('learned', await p.evaluate(() => JSON.stringify(FieldBoard.learned('eravos.wobble-bass'))).then(s => s.slice(0, 400)));

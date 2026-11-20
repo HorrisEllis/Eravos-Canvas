@@ -276,3 +276,19 @@ acceptance (CG0): this spec, the map's numbers reproducible: grep the specs' dep
 #   screen); the rest of the canvas softens back; the camera glides; the tool's parts lift and fly to the board, nearest the core first; the core
 #   blooms; wires draw in; labels, header, legend come up. Esc or right-click: the reverse. Every motion a Web Animation (seekable, so a recording
 #   is exact); reduced motion → the end state at once. Rule kept: the look of the board is the board's; the motion is an addition, shown first.
+
+## ADDENDUM 2026-11-20 (6) — mutation everywhere, one mechanism (his words: "need to be able to swap them out. then i want each tool to be able to
+be able to do that. then the workshop or field. like i want full mutation, like keep going")
+- tools/core/field/mutate.js (window.FieldMutate, domain-free): a TARGET = { id, list() settings, get, set(patch) one undo step, hear? }. A mutation:
+  about half the sockets swapped (a part's own settings rolled fresh), then 1–5 other settings nudged (a quarter of their range, by ratio when wide;
+  an enum to another option, weighted). Learning per target: '@key' (moved in a kept one → more often) and 'key=value' (a kept / thrown choice).
+  Never the same full state twice (signature of every mutable setting). Guards: a domain keeps settings out (music: level, tempo, key, octave,
+  playing switches); a setting with mutate: false is never moved.
+- Every tool explodes on the canvas (board.js autoLayout): a tool with no board of its own is laid out from its window — every titled section
+  (outermost) and its keys, half each side of its core, in columns by their real size; moved gates kept. ⚄ MUTATE under every core.
+- A socket's ⇄ chip sits on the gate that holds the part it stands in for (near), else the socket itself, else the gate of its group.
+  Sockets today: Wobble Bass (filter, drive, noise, insert), Retro DCO (filter: svf 24 ⇄ ladder), Piano (body model).
+- The Workshop's BOARD: ⚄ MUTATE under the document's core — every field of every layer (not '@' fields, not mutate: false), one undo step,
+  heard through the kind's own ▶ HEAR; the dock kept across redraws.
+- Open: more sockets need parts moved out of tools' own code first (each proven by the null render); a mutation is not yet measured for loudness
+  before it is offered (the guards keep level out; a part's own trims keep it under full scale).

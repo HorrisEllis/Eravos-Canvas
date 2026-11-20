@@ -231,6 +231,17 @@
       { key: 'pdBits', type: 'number', default: 8, min: 2, max: 24, step: 1, label: 'Bits', group: 'PARTS', part: 'bitcrusher' },
       { key: 'pdRate', type: 'number', default: 12000, min: 600, max: 48000, step: 10, unit: 'Hz', label: 'Crush rate', group: 'PARTS', part: 'bitcrusher' },
       { key: 'pdMix', type: 'number', default: 1, min: 0, max: 1, step: 0.01, label: 'Part mix', group: 'PARTS', part: ['saturator-tube', 'saturator-tape', 'bitcrusher'] },
+      { key: 'partNoise', type: 'enum', options: ['own', 'osc-noise'], default: 'own', label: 'Noise part', group: 'PARTS', socket: 'noise', near: 'noise', hint: 'own = its looped white noise · osc-noise = every colour: pink, brown, velvet, crackle, band-limited, tilted (the Noise knob sets how much)' },
+      { key: 'pnColour', type: 'enum', options: ['white', 'pink', 'brown', 'velvet', 'crackle', 'band'], default: 'pink', label: 'Noise colour', group: 'PARTS', part: 'osc-noise' },
+      { key: 'pnDensity', type: 'number', default: 2000, min: 20, max: 20000, step: 10, unit: '/s', label: 'Noise density', group: 'PARTS', part: 'osc-noise', hint: 'velvet and crackle: impulses a second' },
+      { key: 'pnRate', type: 'number', default: 2000, min: 20, max: 20000, step: 10, unit: 'Hz', label: 'Noise band', group: 'PARTS', part: 'osc-noise', hint: 'band-limited: how fast it moves' },
+      { key: 'pnTilt', type: 'number', default: 0, min: -1, max: 1, step: 0.01, label: 'Noise tilt', group: 'PARTS', part: 'osc-noise' },
+      { key: 'partInsert', type: 'enum', options: ['none', 'delay-line', 'filter-svf', 'saturator-tube', 'saturator-tape', 'bitcrusher'], default: 'none', label: 'Insert part', group: 'PARTS', socket: 'insert', near: 'squash', hint: 'a component after the amp, before the clipper: none = straight through · delay-line = an echo on the beat' },
+      { key: 'piTime', type: 'enum', options: ['1/16', '1/8', '1/8.', '1/4', '1/4.', '1/2'], default: '1/8.', label: 'Echo time', group: 'PARTS', part: 'delay-line' },
+      { key: 'piFeedback', type: 'number', default: 0.35, min: 0, max: 0.9, step: 0.01, label: 'Echo feedback', group: 'PARTS', part: 'delay-line' },
+      { key: 'piDamp', type: 'number', default: 5000, min: 500, max: 16000, step: 10, unit: 'Hz', label: 'Echo damp', group: 'PARTS', part: 'delay-line' },
+      { key: 'piMix', type: 'number', default: 0.3, min: 0, max: 0.8, step: 0.01, label: 'Echo mix', group: 'PARTS', part: 'delay-line' },
+      { key: 'piMode', type: 'enum', options: ['tape', 'digital'], default: 'tape', label: 'Echo mode', group: 'PARTS', part: 'delay-line' },
     ],
     ui_hooks: ['shape_pts', 'wub_seq'],
     lib: { drawFn, cleanPts, parseCell, DIVS, SHAPES },   // shared with the window (same folder) so the drawing IS the sound
@@ -250,7 +261,7 @@
       // 2.1 noise layer (pre-filter, so it wobbles too)
       const nb = ac.createBuffer(1, ac.sampleRate, ac.sampleRate), nr = dsp.mulberry32(911), nd = nb.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = nr() * 2 - 1;
       const noiseSrc = ac.createBufferSource(); noiseSrc.buffer = nb; noiseSrc.loop = true; noiseSrc.start(); ctx.track(noiseSrc);
-      const noiseG = ac.createGain(); noiseG.gain.value = 0; noiseSrc.connect(noiseG); noiseG.connect(oscSum);
+      const noiseG = ac.createGain(); noiseG.gain.value = 0; const nOwn = ac.createGain(); nOwn.gain.value = 1; noiseSrc.connect(nOwn); nOwn.connect(noiseG); noiseG.connect(oscSum); ctx.track(nOwn);   // 4.3: nOwn = the NOISE socket's own part, at exactly 1
       [panA, panB].forEach(n => ctx.track(n));
       sub.connect(subG); sub.type = P.get('subWave') || 'sine';
       [saw, sq, sub, saw2].forEach(o => { o.frequency.value = 55; o.start(); ctx.track(o); });
@@ -365,7 +376,8 @@
       const outNode = ac.createGain(), clDry = ac.createGain(), clWet = ac.createGain(), clPre = ac.createGain(), clSh = ac.createWaveShaper(), clPost = ac.createGain();
       outNode.gain.value = 1; clDry.gain.value = 1; clWet.gain.value = 0;
       { const n = 2049, c = new Float32Array(n); for (let i = 0; i < n; i++) c[i] = Math.max(-1, Math.min(1, ((i / (n - 1)) * 2 - 1) * 4)); clSh.curve = c; }   // ±0.25 in → ±1 out: the knee at 1/4
-      ampOut.connect(clDry); clDry.connect(outNode); ampOut.connect(clPre); clPre.connect(clSh); clSh.connect(clPost); clPost.connect(clWet); clWet.connect(outNode);
+      const ownI = ac.createGain(), insBus = ac.createGain(); ownI.gain.value = 1; insBus.gain.value = 1; ampOut.connect(ownI); ownI.connect(insBus); ctx.track(ownI); ctx.track(insBus);   // 4.3 the INSERT socket (none = straight, at exactly 1)
+      insBus.connect(clDry); clDry.connect(outNode); insBus.connect(clPre); clPre.connect(clSh); clSh.connect(clPost); clPost.connect(clWet); clWet.connect(outNode);
       [outNode, clDry, clWet, clPre, clSh, clPost].forEach(n => ctx.track(n));
       function applyClip() {
         const on = !!P.get('clipOn'), c = Math.pow(10, P.get('ceiling') / 20), t = ac.currentTime;
@@ -396,38 +408,51 @@
       const depthG = ac.createGain(); uni.connect(depthG); depthG.connect(lp1.detune); depthG.connect(lp2.detune); depthG.connect(lp3.detune);
       const depthMod = ctx.modBus('depth', { min: 0, max: 7200 }); depthMod.connect(depthG.gain);
       const cutMod = ctx.modBus('cutoff', { min: -4800, max: 4800 }); cutMod.connect(lp1.detune); cutMod.connect(lp2.detune); cutMod.connect(lp3.detune);
-      // 4.3 PARTS: build a part when first chosen (its worklet is the component's tested kernel), crossfade to it, keep it for going back
-      const parts = { filter: {}, drive: {} }, pend = {};
+      // 4.3 PARTS: four sockets, one mechanism. A socket: where its signal comes from (none for a source), where it goes, the gain of the tool's own
+      // part (exactly 1 while it is chosen). A part is built when first chosen (its worklet is the component's tested kernel), crossfaded, kept.
+      const SOCK = {
+        filter: { key: 'partFilter', from: drvBus, to: postIn, own: ownF, filter: true },
+        drive: { key: 'partDrive', from: pre, to: drvBus, own: ownD },
+        noise: { key: 'partNoise', from: null, to: noiseG, own: nOwn },
+        insert: { key: 'partInsert', from: ampOut, to: insBus, own: ownI },
+      };
+      const parts = { filter: {}, drive: {}, noise: {}, insert: {} }, pend = {};
       const RES = () => Math.min(0.97, Math.max(0, (P.get('res') - 0.5) / 20));
-      const MAKE = { 'filter-svf': (a) => MusicParts.svf(a), 'filter-ladder': (a) => MusicParts.ladder(a), 'saturator-tube': (a) => MusicParts.saturatorTube(a), 'saturator-tape': (a) => MusicParts.saturatorTape(a), 'bitcrusher': (a) => MusicParts.bitcrusher(a) };
+      const MAKE = { 'filter-svf': (a) => MusicParts.svf(a), 'filter-ladder': (a) => MusicParts.ladder(a), 'saturator-tube': (a) => MusicParts.saturatorTube(a), 'saturator-tape': (a) => MusicParts.saturatorTape(a),
+        'bitcrusher': (a) => MusicParts.bitcrusher(a), 'osc-noise': (a) => MusicParts.noise(a), 'delay-line': (a) => MusicParts.delay(a) };
       function partNode(sock, id) {
-        if (parts[sock][id]) return Promise.resolve(parts[sock][id]); if (pend[id]) return pend[id];
+        const S = SOCK[sock], tag = sock + ':' + id; if (parts[sock][id]) return Promise.resolve(parts[sock][id]); if (pend[tag]) return pend[tag];
         const mk = MAKE[id]; if (!mk) return Promise.resolve(null);
-        return (pend[id] = Promise.resolve(mk(ac)).then(node => {
-          const g = ac.createGain(); g.gain.value = 0; node.connect(g); ctx.track(node); ctx.track(g);
-          if (sock === 'filter') { drvBus.connect(node); g.connect(postIn); const det = node.parameters.get('detune'); [depthG, fDet, cutMod].forEach(src => src.connect(det)); }
-          else { pre.connect(node); g.connect(drvBus); }
+        return (pend[tag] = Promise.resolve(mk(ac)).then(node => {
+          const g = ac.createGain(); g.gain.value = 0; node.connect(g); g.connect(S.to); ctx.track(node); ctx.track(g);
+          if (S.from) S.from.connect(node);
+          if (S.filter) { const det = node.parameters.get('detune'); [depthG, fDet, cutMod].forEach(src => src.connect(det)); }
           parts[sock][id] = { node, g }; setParts(); return parts[sock][id];
         }).catch(e => { ctx.fault('RUNTIME_003', 'wobble bass part ' + id + ': ' + e.message); return null; }));
       }
-      function setParts() {
-        const t = ac.currentTime, pv = (n, k, v) => { const prm = n.parameters.get(k); if (prm) prm.setTargetAtTime(v, t, 0.01); };
-        const fId = P.get('partFilter'), dId = P.get('partDrive');
-        Object.keys(parts.filter).forEach(id => { const x = parts.filter[id], n = x.node; x.g.gain.setTargetAtTime(id === fId ? 1 : 0, t, 0.006);
-          pv(n, 'frequency', P.get('cutoff')); pv(n, 'resonance', RES());
-          if (id === 'filter-svf') { n.parameters.get('mode').setValueAtTime(Math.max(0, MusicParts.SVF_MODES.indexOf(P.get('pfSvfMode'))), t); n.parameters.get('stages').setValueAtTime(P.get('pfStages'), t); }
-          else { n.parameters.get('mode').setValueAtTime(Math.max(0, ['lp24', 'lp12', 'bp12', 'hp12', 'hp24'].indexOf(P.get('pfLadMode'))), t); pv(n, 'drive', P.get('pfLadDrive')); pv(n, 'bass', P.get('pfBass')); } });
-        ownF.gain.setTargetAtTime(fId === 'own' || !parts.filter[fId] ? 1 : 0, t, 0.006);
-        Object.keys(parts.drive).forEach(id => { const x = parts.drive[id], n = x.node; x.g.gain.setTargetAtTime(id === dId ? 1 : 0, t, 0.006);
-          if (id === 'bitcrusher') { pv(n, 'bits', P.get('pdBits')); pv(n, 'rate', P.get('pdRate')); pv(n, 'mix', P.get('pdMix')); n.parameters.get('aa').setValueAtTime(1, t); }
-          else { const dr = P.get('pdDrive'); pv(n, 'drive', dr); pv(n, 'bias', P.get('pdBias')); pv(n, 'mix', P.get('pdMix')); pv(n, 'out', -Math.min(12, dr * 0.5));   // trimmed as the drive comes in: a hot part stays under full scale
-            if (id === 'saturator-tube') pv(n, 'tone', P.get('pdTone')); else pv(n, 'bump', P.get('pdBump')); } });
-        ownD.gain.setTargetAtTime(dId === 'own' || !parts.drive[dId] ? 1 : 0, t, 0.006);
+      const DIVSEC = (d) => MT.divisionSec(d, ctx.bpm);
+      function tune(id, n, t) {   // each part's own settings, from the tool's params
+        const pv = (k, v) => { const prm = n.parameters.get(k); if (prm) prm.setTargetAtTime(v, t, 0.01); }, at = (k, v) => { const prm = n.parameters.get(k); if (prm) prm.setValueAtTime(v, t); };
+        if (id === 'filter-svf') { pv('frequency', P.get('cutoff')); pv('resonance', RES()); at('mode', Math.max(0, MusicParts.SVF_MODES.indexOf(P.get('pfSvfMode')))); at('stages', P.get('pfStages')); }
+        else if (id === 'filter-ladder') { pv('frequency', P.get('cutoff')); pv('resonance', RES()); at('mode', Math.max(0, ['lp24', 'lp12', 'bp12', 'hp12', 'hp24'].indexOf(P.get('pfLadMode')))); pv('drive', P.get('pfLadDrive')); pv('bass', P.get('pfBass')); }
+        else if (id === 'bitcrusher') { pv('bits', P.get('pdBits')); pv('rate', P.get('pdRate')); pv('mix', P.get('pdMix')); at('aa', 1); }
+        else if (id === 'saturator-tube' || id === 'saturator-tape') { const dr = P.get('pdDrive'); pv('drive', dr); pv('bias', P.get('pdBias')); pv('mix', P.get('pdMix')); pv('out', -Math.min(12, dr * 0.5));   // trimmed as the drive comes in
+          if (id === 'saturator-tube') pv('tone', P.get('pdTone')); else pv('bump', P.get('pdBump')); }
+        else if (id === 'osc-noise') { at('colour', Math.max(0, ['white', 'pink', 'brown', 'velvet', 'crackle', 'band'].indexOf(P.get('pnColour')))); pv('density', P.get('pnDensity')); pv('rate', P.get('pnRate')); pv('tilt', P.get('pnTilt')); pv('width', 1); pv('level', 1); }
+        else if (id === 'delay-line') { at('sync', 0); at('mode', P.get('piMode') === 'digital' ? 1 : 0); pv('time', DIVSEC(P.get('piTime'))); pv('feedback', P.get('piFeedback')); pv('damp', P.get('piDamp')); pv('lowcut', 120); pv('mix', P.get('piMix')); pv('drive', 0); }
       }
-      function wantParts() { const f = P.get('partFilter'), d = P.get('partDrive'); if (f !== 'own') partNode('filter', f); if (d !== 'own') partNode('drive', d); setParts(); }
-      ['partFilter', 'partDrive', 'pfSvfMode', 'pfStages', 'pfLadMode', 'pfLadDrive', 'pfBass', 'pdDrive', 'pdBias', 'pdTone', 'pdBump', 'pdBits', 'pdRate', 'pdMix', 'cutoff', 'res'].forEach(k => P.onChange(k, wantParts));
-      if (P.get('partFilter') !== 'own' || P.get('partDrive') !== 'own') wantParts();
-      ctx.parts = { ready: (sock) => { const id = P.get(sock === 'filter' ? 'partFilter' : 'partDrive'); return id === 'own' ? Promise.resolve(true) : partNode(sock, id).then(Boolean); }, get built() { return { filter: Object.keys(parts.filter), drive: Object.keys(parts.drive) }; } };
+      function setParts() {
+        const t = ac.currentTime;
+        Object.keys(SOCK).forEach(sock => { const S = SOCK[sock], want = P.get(S.key);
+          Object.keys(parts[sock]).forEach(id => { const x = parts[sock][id]; x.g.gain.setTargetAtTime(id === want ? 1 : 0, t, 0.006); tune(id, x.node, t); });
+          S.own.gain.setTargetAtTime(parts[sock][want] ? 0 : 1, t, 0.006); });
+      }
+      function wantParts() { Object.keys(SOCK).forEach(sock => { const v = P.get(SOCK[sock].key); if (MAKE[v]) partNode(sock, v); }); setParts(); }
+      P.onChange('*', (v, prev, k) => { if (k === undefined || /^(part|pf|pd|pn|pi)[A-Z]|^(cutoff|res)$/.test(k)) wantParts(); });
+      ctx.onTick && ctx.onTick(() => { if (parts.insert['delay-line'] && P.get('partInsert') === 'delay-line') { const n = parts.insert['delay-line'].node, s2 = DIVSEC(P.get('piTime')); if (Math.abs(n.parameters.get('time').value - s2) > 1e-3) n.parameters.get('time').setTargetAtTime(s2, ac.currentTime, 0.02); } });
+      if (Object.keys(SOCK).some(sock => MAKE[P.get(SOCK[sock].key)])) wantParts();
+      ctx.parts = { sockets: Object.keys(SOCK), ready: (sock) => { const id = P.get(SOCK[sock].key); return MAKE[id] ? partNode(sock, id).then(Boolean) : Promise.resolve(true); },
+        get built() { const o = {}; Object.keys(parts).forEach(k => { o[k] = Object.keys(parts[k]); }); return o; } };
       // 2.1: tremolo + vibrato ride the same LFO
       const tremDepth = ac.createGain(), tremAl = ac.createDelay(0.05); tremDepth.gain.value = 0; tremAl.delayTime.value = FILT_LAT; uni.connect(tremDepth); tremDepth.connect(tremAl); tremAl.connect(trem.gain); ctx.track(tremAl);
       const vibG = ac.createGain(); vibG.gain.value = 0; lfoBus.connect(vibG); [saw, saw2, sq].forEach(o => vibG.connect(o.detune)); vibG.connect(pitchBus);
@@ -669,7 +694,7 @@
       });
       ctx.shapeAt = (x) => drawFn(cleanPts(P.get('shapePts')) || [[0, -1, 0], [0.5, 1, 0]])(((x % 1) + 1) % 1);
       ctx.stateExtra = () => ({ vowels: VOWELS, key: ctx.key, divs: DIVS, shapes: SHAPES });
-      ctx.internals = { ownF, ownD, drvBus, parts, amDry, amWet, amMono, amLo2, amHi2, amLim, ampOut, wt, combOut, cd1, msWet, finalOut, lp1, lp2, lp3, s12, s24, s36, lpOut, keyBus, envBus, velBus, lfo2, l2Pitch, l2Cut, l2Vol, l2Fm, ringVca, ringDepth, clWet, extra, outNode, bands, lfoBus, amp, uni, trem, vibG, noiseG, panA, panB, saw2, sub, drawDc, lfoLog, get lfo() { return lfo; }, get frozen() { return frozen; } };
+      ctx.internals = { ownF, ownD, nOwn, ownI, insBus, drvBus, parts, amDry, amWet, amMono, amLo2, amHi2, amLim, ampOut, wt, combOut, cd1, msWet, finalOut, lp1, lp2, lp3, s12, s24, s36, lpOut, keyBus, envBus, velBus, lfo2, l2Pitch, l2Cut, l2Vol, l2Fm, ringVca, ringDepth, clWet, extra, outNode, bands, lfoBus, amp, uni, trem, vibG, noiseG, panA, panB, saw2, sub, drawDc, lfoLog, get lfo() { return lfo; }, get frozen() { return frozen; } };
       return {};
     },
   });

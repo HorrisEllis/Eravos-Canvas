@@ -56,7 +56,8 @@
     const d = e.def, k = 1 - Math.exp(-dt / tau);
     let box = null;
     if (d.type === 'wash') box = [0, 0, global.innerWidth, global.innerHeight];
-    else if (d.anchor) { if (!d.anchor.isConnected) return null; const r = d.anchor.getBoundingClientRect(); if (!r.width || !r.height) return null; box = [r.left, r.top, r.width, r.height]; }
+    else if (d.anchor) { if (!d.anchor.isConnected || (d.anchor.closest && d.anchor.closest('.fb-away'))) return null;   // a window whose parts are out on a board: its glow goes with it
+      const r = d.anchor.getBoundingClientRect(); if (!r.width || !r.height) return null; box = [r.left, r.top, r.width, r.height]; }
     else if (d.rect) box = d.rect.slice();
     if (!box) return null;
     const tgt = { col: rgba(val(d.color, '#ffffff')), amt: clamp(+val(d.intensity, val(d.alpha, 0)) || 0, 0, 1) };
