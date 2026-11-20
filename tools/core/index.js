@@ -3,7 +3,7 @@
  * it names no domain, tool or topic (tests/boundary.test.js scans it). Element synthesis (elements/, ES1): a tool's face from its elements. Loaded first, always (domain.json "always"). No tools of its own yet. */
 (function () {
   var base = (window.ERAVOS_TOOLS || '') + 'core/';
-  var F = [['css', 'field/field.css'], ['js', 'field/field.js'], ['js', 'elements/elements.js'], ['js', 'field/motion.js'], ['css', 'field/board.css'], ['js', 'field/board.js']];   // + a tool exploded on the canvas (board.js, 2026-11-20)   // ES1: element synthesis (domain-free)
+  var F = [['css', 'field/field.css'], ['js', 'field/field.js'], ['js', 'elements/elements.js'], ['js', 'field/motion.js'], ['css', 'field/board.css'], ['js', 'field/board.js'], ['css', 'start/start.css'], ['js', 'start/start.js']];   // + the Start screens (start/, SS1 preview 2026-11-20; today's Start stays until his yes)   // + a tool exploded on the canvas (board.js, 2026-11-20)   // ES1: element synthesis (domain-free)
   for (var i = 0; i < F.length; i++) {
     var u = base + F[i][1], css = F[i][0] === 'css';
     if (window.Catalog) window.Catalog.load(u, css);

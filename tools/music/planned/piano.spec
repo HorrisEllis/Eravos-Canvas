@@ -65,5 +65,5 @@ dag:
   layer 0: env-adsr ✓ · filter-svf ✓ · karplus-string ✓ · lfo ✓ · modal-resonator ✓ · saturator-tube ✓ · stereo-tools ✓
   tool: eravos.piano ← modal-resonator + karplus-string + env-adsr + lfo + filter-svf + saturator-tube + stereo-tools
   build order: env-adsr ✓ → filter-svf ✓ → karplus-string ✓ → lfo ✓ → modal-resonator ✓ → saturator-tube ✓ → stereo-tools ✓ → piano
-  shared with: env-adsr 21 · filter-svf 41 · karplus-string 2 · lfo 29 · modal-resonator 5 · saturator-tube 3 · stereo-tools 18  (other tools on each)
+  shared with: env-adsr 21 · filter-svf 41 · karplus-string 2 · lfo 29 · modal-resonator 5 · saturator-tube 4 · stereo-tools 18  (other tools on each)
   signal_dag check: every node is one of its components ✓

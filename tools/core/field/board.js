@@ -9,7 +9,12 @@
  *                                more: [ … the same, without frame / to: placed under the board ] })
  *     take: { title } a card or group by its title · { keys: [...] } controls by their data-key · { sel } a selector — inside the tool's window
  *   FieldBoard.explode(instanceId, toolId) · FieldBoard.assemble(instanceId) · FieldBoard.isOpen(instanceId) · FieldBoard.has(toolId)
- * Moving a gate: drag its label (kept per tool on this device). Put back: right-click the board, or the window's menu. */
+ * Moving a gate: drag its label (kept per tool on this device). Put back: right-click the board, or the window's menu.
+ * SOCKETS AND MUTATION (2026-11-20, his: "okay now i want to be able to mutate, and swap components for the wobble bass."): a tool whose settings
+ * say which are sockets (config { socket: name, options: the parts that fit, near?: the key of the tool's own part it stands in for }) and which settings belong to a part (config { part: id | [ids] }) gets,
+ * on its board: a ⇄ chip on every gate that holds a socket (swap on the spot), and ⚄ MUTATE under its core — a new combination of parts and their
+ * settings, played at once; ✓ KEEP / ✗ THROW (throw = back to before). It learns from each keep and throw (what was kept comes up more often,
+ * what was thrown less) and never offers the same combination twice (kept per tool on this device). Each mutation or swap is one undo step. */
 (function (global) {
   'use strict';
   const boards = new Map(), open = new Map(), NS = 'http://www.w3.org/2000/svg';
@@ -74,6 +79,7 @@
       board.appendChild(g); gates.push({ p, g, lab, was, wasW: was && toWorld(was), i });
       drag(lab, g, p, toolId, instanceId);
     });
+    sockets(instanceId).forEach(sk => { const holds = (k) => k && gates.find(gg => gg.g.querySelector('[data-key="' + k + '"]')), x = holds(sk.near) || holds(sk.key); if (x) swapChip(instanceId, x, sk); });   // on the gate of the part it stands in for (near), else where the socket is
     // a live part can be taller than the picture on the board it replaces: a gate that would cover the one under it pushes that one down
     // (only the board's own places — a gate he moved stays where he put it)
     const placed = gates.filter(x => !user[x.p.id]).sort((a, b) => a.g.offsetTop - b.g.offsetTop);
@@ -102,6 +108,7 @@
     A(head, [{ opacity: 0, transform: 'translateY(-18px)' }, { opacity: 1, transform: 'none' }], { duration: T(800), delay: T(1750), easing: EASE.out });
     [legend, since].filter(Boolean).forEach(el => A(el, [{ opacity: 0 }, { opacity: 1 }], { duration: T(900), delay: T(2500), easing: 'ease-out' }));
     drawWires(st, T(1900));
+    mutateDock(instanceId, st, T);
     const view = fitView(board), cam = view ? glideTo(view, T(1300)) : Promise.resolve();
     board.addEventListener('contextmenu', (e) => { if (e.target.closest('.fb-inner')) return; e.preventDefault(); e.stopPropagation(); const CM = global.ContextMenu;
       if (CM && CM.show) CM.show(e.clientX, e.clientY, [{ label: '◱ Put it back together', hint: 'every part back into its window (Esc)', run: () => assemble(instanceId) },
@@ -154,14 +161,14 @@
     document.removeEventListener('keydown', st.onKey);
     const finish = () => {
       st.took.slice().reverse().forEach(({ e, ph, hidden, display }) => { if (ph.parentNode) { ph.parentNode.insertBefore(e, ph); ph.remove(); } e.hidden = hidden; e.style.display = display; });
-      st.board.remove(); st.win.classList.remove('fb-away'); open.delete(instanceId);
+      st.gates.forEach(x => { if (x.swap) x.swap.remove(); }); st.board.remove(); st.win.classList.remove('fb-away'); open.delete(instanceId);
       [st.anims.win].concat(st.anims.scene || []).forEach(a => { if (a) a.cancel(); });
       return true;
     };
     if (now) { const r = finish(); if (wm && wm.applyView) { wm.view = Object.assign({}, st.before); wm.applyView(); } st.leaving = Promise.resolve(r); return st.leaving; }
     st.board.getAnimations({ subtree: true }).filter(finite).forEach(a => a.finish());   // whatever is still landing, landed
     // the late things go first, then every part flies back into the window as it re-forms, the rest of the canvas returns, the camera glides home
-    const late = [].slice.call(st.svg.children).concat([st.core, st.head, st.legend, st.since], st.gates.map(x => x.lab)).filter(Boolean);
+    const late = [].slice.call(st.svg.children).concat([st.core, st.head, st.legend, st.since, st.dock], st.gates.map(x => x.lab)).filter(Boolean);
     late.forEach(el => A(el, [{ opacity: getComputedStyle(el).opacity }, { opacity: 0 }], { duration: T(320), easing: 'ease-in', fill: 'forwards' }));
     const z = (wm.view && wm.view.z) || 1;
     const flights = st.gates.map((x, n) => {
@@ -178,6 +185,79 @@
     st.leaving = Promise.all(flights.map(a => a.finished).concat([home, winIn, new Promise(r => setTimeout(r, T(1900)))])).then(finish, finish);
     return st.leaving;
   }
+  // ---- SOCKETS AND MUTATION (all from the tool's own settings: nothing here knows a part or a tool)
+  const rec = (id) => global.OrganismFactory && global.OrganismFactory.handle(id);
+  const cfg = (id) => { const r = rec(id); return (r && r.def && r.def.config) || []; };
+  const sockets = (id) => cfg(id).filter(c => c.socket && c.type === 'enum');
+  const varsOf = (id, part) => cfg(id).filter(c => c.part && [].concat(c.part).includes(part));
+  const val = (id, k) => { const r = rec(id); return r && r.ctx && r.ctx.params ? r.ctx.params.get(k) : undefined; };
+  function setMany(id, patch) {   // as if turned by hand, together: one undo step
+    const r = rec(id); if (!r || !r.view) return; Object.keys(patch).forEach(k => r.view.emit('config_change', { key: k, value: patch[k] }));
+  }
+  const learnKey = (toolId) => 'eravos.mutate.' + toolId;
+  const learned = (toolId) => { try { const o = JSON.parse(localStorage.getItem(learnKey(toolId)) || '{}'); return { w: o.w || {}, seen: o.seen || [], kept: o.kept || 0, thrown: o.thrown || 0 }; } catch (e) { return { w: {}, seen: [], kept: 0, thrown: 0 }; } };
+  const keepLearned = (toolId, L) => { try { L.seen = L.seen.slice(-400); localStorage.setItem(learnKey(toolId), JSON.stringify(L)); } catch (e) {} };
+  function pick(opts, w, k, rnd) {   // weighted by what was kept (up) and thrown (down)
+    const ws = opts.map(o => Math.exp(Math.max(-3, Math.min(3, (w[k + '=' + o] || 0) * 0.5)))), tot = ws.reduce((a, b) => a + b, 0); let r = rnd() * tot;
+    for (let i = 0; i < opts.length; i++) { r -= ws[i]; if (r <= 0) return opts[i]; } return opts[opts.length - 1];
+  }
+  function roll(c, rnd, w) {
+    if (c.type === 'enum') return pick(c.options, w, c.key, rnd);
+    if (c.type === 'boolean') return rnd() < 0.5;
+    const lo = +c.min, hi = +c.max, st = +c.step || 0, x = lo + (hi - lo) * rnd(); return st ? Math.round(Math.round((x - lo) / st) * st * 1e6) / 1e6 + lo : x;
+  }
+  function mutate(id, toolId, o) {   // → { patch, prev, sig, words } or null — never one already seen, never every socket on its own part
+    const sks = sockets(id); if (!sks.length) return null; const L = learned(toolId), rnd = (o && o.rnd) || Math.random;
+    for (let tries = 0; tries < 60; tries++) {
+      const patch = {}, words = [];
+      sks.forEach(sk => {
+        const cur = val(id, sk.key), part = rnd() < 0.8 ? pick(sk.options.filter(x => x !== sk.default), L.w, sk.key, rnd) : cur; patch[sk.key] = part;
+        const vs = varsOf(id, part); vs.forEach(c => { patch[c.key] = roll(c, rnd, L.w); });
+        words.push(sk.socket + ' → ' + part + (vs.length ? ' (' + vs.map(c => (c.label || c.key) + ' ' + (typeof patch[c.key] === 'number' ? +patch[c.key].toFixed(2) : patch[c.key]) + (c.unit ? ' ' + c.unit : '')).join(', ') + ')' : ''));
+      });
+      if (sks.every(sk => patch[sk.key] === sk.default)) continue;
+      const sig = Object.keys(patch).sort().map(k => k + '=' + (typeof patch[k] === 'number' ? +patch[k].toPrecision(2) : patch[k])).join('&');
+      if (L.seen.includes(sig)) continue;
+      const prev = {}; Object.keys(patch).forEach(k => { prev[k] = val(id, k); });
+      return { patch, prev, sig, words };
+    }
+    return null;
+  }
+  function judge(toolId, m, keep) {   // learn: the parts and choices of a kept one come up more often, a thrown one's less
+    const L = learned(toolId), d = keep ? 1 : -1;
+    Object.keys(m.patch).forEach(k => { const v = m.patch[k]; if (typeof v === 'string') L.w[k + '=' + v] = (L.w[k + '=' + v] || 0) + d; });
+    if (keep) L.kept++; else L.thrown++; keepLearned(toolId, L); return L;
+  }
+  function swapChip(id, x, sk) {
+    const chip = h('button', 'fb-swap'); chip.type = 'button'; chip.title = 'swap the part in the ' + sk.socket + ' socket';
+    const show = () => { chip.textContent = '⇄ ' + val(id, sk.key); }; show();
+    chip.addEventListener('pointerdown', (e) => e.stopPropagation());
+    chip.addEventListener('click', (e) => { e.stopPropagation(); const CM = global.ContextMenu, r = chip.getBoundingClientRect(), cur = val(id, sk.key);
+      const items = sk.options.map(op => ({ label: (op === cur ? '● ' : '○ ') + op, hint: op === sk.default ? 'its own part' : 'a shared component, in its place, live', run: () => { setMany(id, { [sk.key]: op }); audition(id); } }));
+      if (CM && CM.show) CM.show(r.left, r.bottom + 4, items, sk.label || sk.socket); });
+    x.lab.appendChild(chip); const R = rec(id); if (R && R.view && R.view.bind) R.view.bind(sk.key, () => setTimeout(show, 0)); x.swap = chip;
+  }
+  function audition(id) { const r = rec(id); if (r && r.ctx && r.ctx.audition) try { r.ctx.audition({ note: 45, velocity: 0.9, duration: 1.4 }); } catch (e) {} }
+  function mutateDock(id, st, T) {
+    if (!sockets(id).length) return;
+    const dock = h('div', 'fb-mut'), core = st.core, go = h('button', 'fb-mgo', '⚄ MUTATE'), keep = h('button', 'fb-mk', '✓ KEEP'), toss = h('button', 'fb-mt', '✗ THROW'), line = h('div', 'fb-mline'), tally = h('div', 'fb-mtally');
+    [go, keep, toss].forEach(b => { b.type = 'button'; b.addEventListener('pointerdown', (e) => e.stopPropagation()); });
+    dock.style.cssText = 'left:' + core.offsetLeft + 'px;top:' + (core.offsetTop + core.offsetHeight + 18) + 'px;width:' + Math.max(380, core.offsetWidth) + 'px';
+    const row = h('div', 'fb-mrow'); row.append(go, keep, toss); dock.append(row, line, tally); st.board.appendChild(dock); st.dock = dock;
+    const count = () => { const L = learned(st.toolId); tally.textContent = L.kept + ' kept · ' + L.thrown + ' thrown · ' + L.seen.length + ' tried — it learns from each, never the same twice'; };
+    const pending = (on) => { keep.disabled = toss.disabled = !on; dock.classList.toggle('pending', on); };
+    pending(false); count(); line.textContent = 'a new combination of parts and their settings, played at once';
+    go.addEventListener('click', () => {
+      if (st.mut) judge(st.toolId, st.mut, true);   // mutating again keeps the one before (it stays in the tool)
+      const m = mutate(id, st.toolId); if (!m) { line.textContent = 'every combination near here has been tried'; return; }
+      const L = learned(st.toolId); L.seen.push(m.sig); keepLearned(st.toolId, L);
+      st.mut = m; setMany(id, m.patch); audition(id); line.textContent = m.words.join(' · '); pending(true); count();
+      A(dock, [{ boxShadow: '0 0 0 0 rgba(0,212,255,0)' }, { boxShadow: '0 0 30px 2px rgba(0,212,255,.45)', offset: 0.3 }, { boxShadow: '0 0 0 0 rgba(0,212,255,0)' }], { duration: T(900), fill: 'none' });
+    });
+    keep.addEventListener('click', () => { if (!st.mut) return; judge(st.toolId, st.mut, true); st.mut = null; pending(false); line.textContent = 'kept — it is the tool now (save it as a preset to keep it by name)'; count(); });
+    toss.addEventListener('click', () => { if (!st.mut) return; judge(st.toolId, st.mut, false); setMany(id, st.mut.prev); st.mut = null; pending(false); audition(id); line.textContent = 'thrown — back to before; that combination comes up less'; count(); });
+    A(dock, [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: T(700), delay: T(2300), easing: EASE.out });
+  }
   // the window's menu offers it, for a tool that has a board
   function hook() {
     const CM = global.ContextMenu; if (!CM || !CM.contribute) return false;
@@ -187,5 +267,5 @@
     return true;
   }
   if (!hook()) document.addEventListener('DOMContentLoaded', hook);
-  global.FieldBoard = { define, has, explode, assemble, isOpen, boards };
+  global.FieldBoard = { define, has, explode, assemble, isOpen, boards, sockets, mutate, judge, learned };
 })(window);

@@ -148,6 +148,9 @@ OrganismFactory.reg('eravos.wobble-bass', function (view) {
   const group = (title, keys, extra) => h('div', { class: 'uk-group wb-group' }, [h('div', { class: 'uk-group-title', text: title }), h('div', { class: 'uk-row' }, (extra || []).concat(keys.map(k => knob(k).el)))]);
   [shape, mode, va, vb, sync, retrig, subOct, wubOn, wubLen, wubStep].forEach((c, i) => { c.el.dataset.key = ['lfoShape', 'filterMode', 'vowelA', 'vowelB', 'lfoSync', 'retrig', 'subOct', 'wubOn', 'wubLen', 'wubStep'][i]; });
   const RULES = [   // [control key, the switch it waits on, when it works, what to say when it does not]
+    // 4.3 PARTS: each part's own settings wait on that part being in its socket (from the engine's config: socket / part)
+    ...view.descriptor.config.filter(c => c.part).map(c => { const sock = view.descriptor.config.find(x => x.socket && x.options.some(o => [].concat(c.part).includes(o))), ids = [].concat(c.part);
+      return [c.key, sock.key, (v) => ids.includes(v), 'works with ' + ids.join(' or ') + ' in the ' + sock.socket + ' socket']; }),
     ['lfoHz', 'lfoSync', (v) => !v, 'Free rate works with Sync off'],
     ['vowelA', 'filterMode', (v) => v === 'formant', 'vowels work in the formant filter'], ['vowelB', 'filterMode', (v) => v === 'formant', 'vowels work in the formant filter'],
     ['formantShift', 'filterMode', (v) => v === 'formant', 'Formant works in the formant filter'],
@@ -205,6 +208,7 @@ OrganismFactory.reg('eravos.wobble-bass', function (view) {
     group('WAVETABLE — a third voice', ['wtMix', 'wtTable', 'wtPos']),
     group('AMP — the growl through an amp, sub kept clean', ['ampOn', 'character', 'ampDrive', 'ampSplit', 'wow', 'mudCut', 'presence', 'glue']),
     group('OUTPUT — mono low end, clipper', ['monoBelow', 'clipOn', 'ceiling']),
+    group('PARTS — swap in a shared component', ['partFilter', 'pfSvfMode', 'pfStages', 'pfLadMode', 'pfLadDrive', 'pfBass', 'partDrive', 'pdDrive', 'pdBias', 'pdTone', 'pdBump', 'pdBits', 'pdRate', 'pdMix']),
   ];
   const deepBox = h('div', { class: 'wb-deep', hidden: true }, deep.map(gEl => { Object.assign(gEl.style, { margin: '0 0 8px', breakInside: 'avoid' }); return gEl; }));
   const deepB = UI.Button({ label: 'More depth ▸', hint: 'slope, key tracking, a filter envelope, ADSR, ring mod, unison voices, a wavetable, a second LFO, mono low end, a clipper', onClick: () => { deepBox.hidden = !deepBox.hidden; deepB.set(deepBox.hidden ? 'More depth ▸' : 'More depth ▾'); } });
