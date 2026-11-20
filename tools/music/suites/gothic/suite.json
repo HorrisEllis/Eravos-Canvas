@@ -43,7 +43,7 @@
       "tool": "eravos.fx-echo",
       "role": "echo",
       "required": true,
-      "preset": "Odd · Cathedral Throw",
+      "preset": "Cathedral Throw",
       "why": "the long room the organ and the choir share"
     },
     {
@@ -57,7 +57,7 @@
       "tool": "eravos.groove-gen",
       "role": "stomp",
       "required": false,
-      "preset": "Odd · Organ Hall Stomp",
+      "preset": "Organ Hall Stomp",
       "why": "a slow stomp — add it for drums",
       "notes": false
     },
@@ -65,7 +65,7 @@
       "tool": "eravos.pads",
       "role": "drums",
       "required": false,
-      "preset": "Odd · Séance Trap",
+      "preset": "Séance Trap",
       "why": "the drums the stomp plays",
       "notes": false
     }
@@ -231,7 +231,7 @@
         "preset": "Dark Choir"
       },
       "eravos.fx-echo": {
-        "preset": "Odd · Cathedral Throw"
+        "preset": "Cathedral Throw"
       }
     },
     "Vampire Ballroom": {

@@ -410,9 +410,17 @@
     cv.addEventListener('dblclick', () => { const a = acts().find(x => x.open); if (a && !a.disabled) runAct(a); });   // W3h double-click opens what is selected (2D or 3D)
     cv.addEventListener('pointerup', endPointer); cv.addEventListener('pointercancel', endPointer);
     cv.addEventListener('wheel', (e) => { if (mode !== '3d') return; e.preventDefault(); cam.zoom = Math.max(0.3, Math.min(4, cam.zoom * (e.deltaY < 0 ? 1.1 : 1 / 1.1))); draw(); }, { passive: false });
-    function close() { if (!root.isConnected) return; root.remove(); doc.documentElement.classList.remove('ws-open'); global.removeEventListener('keydown', onKey, true); global.removeEventListener('resize', onResize); if (current === api) current = null; if (o.onClose) o.onClose(clone(d)); }
+    // 2026-11-20 (his words: "do that with the workshop as well. It's supposed to be the same thing"): the Workshop opens and closes with the
+    // Field's motion (tools/core/field/motion.js) — assembled out of what he pressed, the viewport blooming last; closing flies home into it.
+    // close() stays immediate for everything that calls it: the Workshop is closed and gone from .ws-app at once; a copy flies home (.ws-out).
+    const parts = [bar, opts, strip, tabs, vp, insp, lays, status]; let motion = null;
+    function close() { if (!root.isConnected || root.classList.contains('ws-out')) return;
+      const MO = global.FieldMotion; if (MO && motion && !MO.still()) { root.classList.replace('ws-app', 'ws-out'); root.removeAttribute('role'); MO.leaveApp(root, parts, { from: motion.from, sceneAnims: motion.sceneAnims }).then(() => root.remove()); }
+      else root.remove();
+      doc.documentElement.classList.remove('ws-open'); global.removeEventListener('keydown', onKey, true); global.removeEventListener('resize', onResize); if (current === api) current = null; if (o.onClose) o.onClose(clone(d)); }
     global.addEventListener('keydown', onKey, true); global.addEventListener('resize', onResize);
     doc.body.appendChild(root); doc.documentElement.classList.add('ws-open'); render(); global.requestAnimationFrame(draw);
+    if (global.FieldMotion) motion = global.FieldMotion.enterApp(root, parts, { core: vp, from: o.from });
     const api = { el: root, doc: () => clone(d), set: (k, v, label) => edit(k, v, label), select: (id) => { selected = id; render(); }, undo, redo, history: () => hist.map(h2 => h2.label), close, kind: K.id,
       get selected() { return selected; }, keys: () => keyList(), tools: () => TOOLS.map(t => t[0]),
       drag: (t, pts, o3) => { const r = cv.getBoundingClientRect(); const res = K.drag ? K.drag(d, t, pts, r.width, r.height, Object.assign({ selected, phase: 'end' }, o3 || {})) : null; if (res && res.key !== undefined) edit(res.key, res.value, res.label); return !!res; }, get hidden() { return Array.from(hidden); }, tool: (t) => { if (t) { tool = t; render(); } return tool; },

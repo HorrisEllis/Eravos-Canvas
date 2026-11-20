@@ -2,6 +2,50 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.198 The Workshop opens and closes like the Field — one motion, shared (2026-11-20)
+His words: "I like that. But do that with the workshop as well. It's supposed to be the same thing, but" (the message ends there — asked).
+- tools/core/field/motion.js (window.FieldMotion, domain-free): the motion moved out of board.js so the Field board and the Workshop share it
+  (never copied): the scene (the bar away, the canvas full screen, the rest softened back), the camera glide, origin() — where he last pressed —
+  and enterApp / leaveApp: a full-screen app assembled out of its origin, each panel flying out of it to its place, the core blooming last;
+  leaving, each flies home into it and the canvas comes back.
+- The Workshop (tools/core/field/field.js): opens out of what he pressed (a note in the roll, a button) — bar, options, tool strip, tabs, the
+  properties and layers panes, status fly out; the viewport blooms last. close() stays immediate for every caller (gone from .ws-app, onClose
+  heard); a copy (.ws-out, untouchable) flies home and is removed. No tool's code changed: every Workshop.open gets it.
+- Tests: the in-page harness turns motion off (window.ERAVOS_NO_MOTION — not the system's reduced motion, which the app's CSS reacts to), so
+  every test sees open / close at once as before; P197 turns it on and checks it (starts where pressed, lands, blooms, closes at once, the copy
+  goes). P150 P151 P154 P156–P162 P165–P171 P174 P175 P196 P197, Timeline 33/33, Pattern, Step, boundary 10/10 — all green.
+- Video: docs/previews/workbench/workshop-transition.mp4 (workshop-transition.video.mjs); the Field's video re-filmed after the refactor: unchanged.
+
+## 3.197 The Field opens and closes as one animated scene — shown first, as a video (2026-11-20)
+His words: "Okay field is full screen. What about animated transition for the dynamic canvas changing. Like opening the field dynamically
+changes the ui. Animated and beautiful."
+- tools/core/field/board.js: every motion a Web Animation (seekable; reduced motion → the end at once). Opening: the bar slides away and the
+  canvas takes the whole screen; every other window, the cables and the dock soften back (fade + blur); the camera glides to frame the board;
+  the tool's frame dissolves while its parts lift (rise + scale + shadow) and fly to their places, nearest the core first, settling as they land;
+  the core blooms; each wire draws itself into the core; labels, header and legend come up (~3.4 s). Closing (right-click, or Esc): the
+  same in reverse — wires and labels go, the parts fly home as the window re-forms, the canvas and the bar return, the camera glides back.
+- Found while filming, fixed: the board sat under the windows (the parts were hidden behind their own window for the first half second); each
+  part's start was measured after the parts before it had left (the window reflowed — the keyboard flew from the top); parts hidden behind More
+  depth started at the screen's corner (now they rise out of the window's foot, fading in); finish() on the face's endless CSS animations threw.
+- Video: docs/previews/workbench/field-transition.mp4 (node docs/previews/workbench/field-transition.video.mjs — each frame the animations
+  seeked to that moment, 30 fps); frames: field-transition-open.png, field-transition-close.png.
+- Proof: P196 1/1 (assemble now awaits the flight home); boundary 10/10; bare-canvas; validate; Wobble 49/49; P102; P119.
+
+## 3.196 A tool exploded on the canvas, live — Wobble Bass in the Field board, editable (2026-11-20)
+His words: "okay now let me edit and change the wobble base. also i feel it should be a canvas in itself. so i can scroll around"
+- tools/core/field/board.js (window.FieldBoard, domain-free): a tool's live window lifted apart onto the canvas itself — each part (a card by
+  its title, controls by their data-key, a selector) moved (not copied) into its gate frame, labelled, wired to the tool's core; the board's
+  header, core and legend; the whole tool first, then each gate flies from where its parts were in the window (FLIP). Everything stays live:
+  turn a knob, draw the shape, play the keys. Pan, zoom and scroll as everywhere on the canvas. Drag a gate by its label (kept per tool);
+  a live part taller than the board's picture pushes the gate under it down. Right-click the board or the window: put it back together.
+- Wobble Bass: wobble-bass.board.js (files.extra), GENERATED from the board file by docs/previews/workbench/build-field.mjs --data — the
+  22 pieces' places, labels, gates and wires are the board's own; below it, what it has grown since that board (FILTER+, GROWL+, ENVELOPE+,
+  LFO 2, WAVETABLE, AMP = amp-chain, OUTPUT), every part live.
+- Proof: tests/p196 1/1 (29 parts found, the same live controls moved, a control in a gate still sets the tool, put back where they were);
+  boundary 10/10, bare-canvas, validate, Wobble 49/49, P102, P63, P119, P16; screenshots docs/previews/workbench/field-live-*.png
+  (node docs/previews/workbench/field-live.shots.mjs).
+- Not yet: swapping Wobble Bass's components (its sound is still its own engine — the WD track, CG7); the colours are the app's theme (live parts).
+
 ## 3.194 WD1 — Wobble Bass broken down, part 1: the Amp chain is a component (2026-11-16)
 His words: "the tools need to be broken down as well into their respective components, like the ones that existed before started doing the mutation."
 - components/amp-chain: Wobble Bass 4.2's AMP stage moved out unchanged (same nodes, wires, values) with its contract (ports in / mod / out,

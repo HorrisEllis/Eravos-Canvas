@@ -139,3 +139,140 @@ acceptance (CG0): this spec, the map's numbers reproducible: grep the specs' dep
 #     different phrase (a lead to listen to); the harness gates the sound itself (no VCA component has a contract yet).
 #   - tests/mutants.test.mjs: 20 checks (CI).
 
+
+## ADDENDUM 2026-11-20 — CG4 preview; a whole tool, not endless mutation; learning, friction, regression; the real tools (nothing above is changed)
+# his words (2026-11-20, verbatim):
+#   "yes go ahead, show me the preview. i want to be able to start mutating new tools."
+#   "okay it isn't letting me select the second slot. i like the ui though, i want to edit, not just create from scratch.
+#    but also the preview, like taking a tool that exists, and swapping components. whats the browser for?"
+#   "the wobble bass, and the wubs, and retro. okay but it needs to synthesize into a full tool. not just mutate endlessly"
+#   "also should learn from each discard right? also. null render used for creating friction, and repitition. so tools dont just replicate
+#    over and over, also regression gate"
+# the preview (docs/previews/mutate/mutate.html, built by build.mjs from the real engine; shown, waiting for his yes):
+#   EDIT   the bench holds one tool (the start voice, a mutant opened to edit, a kept tool); a component's every setting, live; SWAP FOR / remove
+#          / reset; ＋ on a wire inserts what fits; undo / redo. Every edit is the engine's own op (check()) and one undo step.
+#   MUTATE a pool (18, up to three batches) → the gates → ranked by what he taught it → five + one wildcard (so it keeps exploring).
+#   LEARN  every verdict is data: keep +1 · open to edit +0.5 · throw away −1, on what the mutant was (op, part, how far it moved); the sum ranks
+#          the next pool; each card says why it was offered; FORGET clears it. (Open: the weights, the wildcard share — his ear decides.)
+#   FRICTION — the null as a repetition gate: each mutant's render, level-matched, subtracted from everything already seen (the tool, kept tools,
+#          thrown-away ones, mutants already shown, others in the pool); nulls deeper than −30 dB = a REPEAT, never offered. Found at once: a
+#          rewire that leaves a filter unfed is the same sound as removing it (−∞ dB).
+#   REGRESSION — a kept / synthesized tool stores its render (the bass line, 4 kHz, 16-bit); every time it is shown it is rendered again and
+#          nulled against it: deeper than −60 dB ✓, otherwise ⚠ REGRESSION (a component's change reached a tool he kept).
+#   SYNTHESIZE — the end, not more mutating: the bench becomes a whole tool — its face from its parts' elements (contract `element`: face
+#          controls first, in signal order, the rest behind More depth; the same rule as ES1, tools/core/elements), its keys, its tool file
+#          (needs.components + elements, config per node, faceKeys, the DAG, lineage, gates + the null baseline). Saved: kept + the file.
+#   the "browser": the preview is a web page only so it can be tried before it is built; nothing in mutation needs one.
+# phases (each its own PR, proved before the next):
+#   CG4a  the preview above                                                                                      (2026-11-20, shown)
+#   CG4b  in the app, on his yes: the Field gets the bench (edit, mutate, learn, the two gates); kept tools and verdicts in Documents\ERAVOS
+#   CG6   SYNTHESIZE for real: a kept tool → Documents\ERAVOS\tools\mine.<id>\ (tool.json + the DAG + lineage); its engine = the assembled DAG
+#         run inside ONE AudioWorklet (assemble.js is plain JS for that), every setting an AudioParam (axiom 4); its face = ElementSynthesis;
+#         it opens on the canvas, wires, takes notes from keys / MIDI / the Timeline like any tool. Gate: the worklet nulls against the offline
+#         render (the same engine), and the regression baseline is stored with it.
+#   CG7   the real tools on the bench, his order: Wobble Bass, the wubs, Retro DCO. A tool opens only when (1) every part it is made of is a
+#         component with an adapter, (2) its DAG is written as data, and (3) the DAG assembled nulls against the tool's own engine (the null
+#         render) — so a swap changes THE tool, not a copy that sounds near it. What each needs today:
+#           Wobble Bass  0 of 3 announced parts assemble (filter-formant, amp-chain, note-release) and most of its sound is still its own code —
+#                        the WD track first: WD2 the sub · WD3 the output stage · WD4 squash · WD5 LFO + wub seq · WD6 FM growl, each moved out
+#                        unchanged and proven by the null render (as WD1 amp-chain); then the adapters; then the DAG.
+#           the wubs     Wub Osc, Wub Sub (note-release), Wub Filter (filter-formant), Wub Rate (wave-table) — the same parts as Wobble Bass's
+#                        decomposition; they follow it.
+#           Retro DCO    5 of 11 assemble (osc-va, osc-sub, filter-svf, filter-ladder, env-adsr); adapters for osc-noise, unison-stack, lfo,
+#                        random-source, bbd-line, ensemble-core; voice allocation (logic, not a node); then the DAG and the null.
+
+## ADDENDUM 2026-11-20 (2) — a tool opens exploded; the editor for a tool's UI (nothing above is changed)
+# his words (2026-11-20, verbatim): "what if we have a editor for the tool ui. like want to be able to understand the tool. like modulator, lfo,
+#   like i built the tool but no way to manipulate the wave like the wobblebase, like not just knobs, but i assume that will be built, now show
+#   me opening the wobble bass exactly like the preview was originally"
+# built in the preview: a tool that cannot be assembled yet opens EXPLODED — Wobble Bass from the board of 2026-11-15 unchanged (its pieces,
+#   positions, wires, timing; the pieces cut from its own face): whole, then apart, wired to its core; a piece clicked says what it is, its
+#   ports and settings (from its contract), what could stand in for it (the full graph), and what it waits on (BUILT → moves out, null-proven;
+#   IN IT → an adapter; COMES OUT → a contract, then out; PLANNED → to build; OWN; PACK). Not editable or mutable until it can be assembled (CG7).
+# the editor for a tool's UI (open — a preview first, on his word): to UNDERSTAND a tool, each element shows what it does, not only knobs:
+#   - the wave: an oscillator's element draws its waveform (and a wavetable's frames); a shaper its transfer curve; drawn and dragged to edit
+#   - the filter: its response curve, cutoff and resonance dragged on it (as Wobble Bass's MOUTH is heard, seen)
+#   - the modulators: an LFO / env-msseg / step-mod element draws its shape over time, drawn by hand (Wobble Bass's SHAPE and WUB SEQ are the
+#     model), and where it goes: modulation drawn as wires from the modulator to the settings it moves, with depth on the wire
+#   - each such view is part of the component's element (contract `element`), so every tool holding the component gets it, and a synthesized
+#     tool's face has it (ES1 + CG6); layout of a face editable (move, resize, hide an element) — the UI-field constraint layout
+#     (specs/eravos.ui-field.spec) as the rule that keeps it consistent
+
+## ADDENDUM 2026-11-20 (3) — the Field is the board, exactly; engines for every combination; the UI mutates inside the design rules (nothing above is changed)
+# his words (2026-11-20, verbatim):
+#   "like they all needs a engine right? like could have unlimited combinations. but i want the ui to mutate also. like deterministic aspecs like
+#    that relate to the design philosopy, and reactive colors stay consistent across the tools, but should also be able to edit the ui, with
+#    different knobs, different styles of ui elements per component, also like blocks."
+#   "i don't see the ui i want. im not saying like the original, im saying that exactly. i already critisist the other one immensly. do not deviate"
+# RULE: the Field's UI is the board "Field · Wobble Bass broken apart" (docs/previews/workbench/Wobble-Broken.dc.html, 2026-11-15) EXACTLY —
+#   header (FIELD · tool · EXPLODED · primitive → component → tool → suite / toolbox → miniworld), each component's own UI element in its dashed
+#   gate frame with its label and status, wired into the CORE, the legend. Wobble-Field.html is that markup copied (not redrawn), entered from the
+#   whole tool blown apart into it. Nothing is restyled; anything added (a menu, a control, a panel) is shown to him first as an addition on it.
+#   The mutate page (docs/previews/mutate/) is NOT the Field's UI: kept only as the engine's test bench (CG2/CG3/gates in a browser).
+# ENGINES: every combination needs one, and none is written by hand — a combination's engine is its DAG assembled from its components' own
+#   tested kernels (assemble.js; in the app inside one AudioWorklet, CG6). Unlimited combinations, one mechanism; the gates (types, builds,
+#   plays, the null as friction, the regression gate) decide which are offered.
+# THE UI MUTATES TOO, in two layers:
+#   FIXED (deterministic, from the design philosophy — never mutated): docs/DESIGN-GUIDE.md's rules (S/C/K/W/N), black surfaces (only colours
+#     are coloured), the reactive colours one system across every tool (the Beat colour, the theme's accents), the kit's tokens and sizes,
+#     the gate frames and wires of the Field. tests/design-check.mjs holds a mutated UI to them like any tool (D1–D6 clean).
+#   FREE (mutated and edited, per component element): the knob style (the kit's knob, an arc, a fader, a step row, a drawn curve), the element's
+#     style variant (compact · full · graph — e.g. an LFO as a rate grid, a drawn shape, or a spectrum), and blocks — elements as blocks that move,
+#     group, resize, hide (the UI-field constraint layout keeps them consistent). Each variant belongs to the component's element (its contract),
+#     so every tool holding it can use it; a synthesized tool's face picks variants (by him, or mutated, and the same verdicts teach it).
+# next: shown on THIS board first — (1) right-click a piece › SWAP FOR / STYLE / MUTATE (the canvas's own menu, nothing on the board until asked);
+#   (2) a piece's style variants; (3) blocks. Wobble Bass's pieces become editable as the WD track makes them components (CG7).
+
+## ADDENDUM 2026-11-20 (4) — the Field page kept, extended: a nav menu, a big MUTATE, components swapped on the spot, any domain, UI elements
+## edited / uploaded / created, cores mixed with a stability warning, on disk, packs / mod schemas / templates made from it (nothing above is changed)
+# his words (2026-11-20, verbatim, with his screenshot of the Field page, Wobble Bass exploded): "yes, love it but then the rest of the ui, keep
+#   everything but add the navmenu. bit mutate button, edit components, i want this able to create any tool, for any sound. you swap them out on
+#   the spot. then i want to be able to upload, edit, change, and maybe create ui elements. that way we can test the image manipulation domain.
+#   like each component also has the hooks. agnostic. like other domain components will also be able to be added. not static, only the engine or
+#   the core right? maybe even mutate cores? like mix and max, as long as it mutates cleanly, maybe a prompt that warns if it could be unstable.
+#   these need to save on disk by the way just like the rest, also would need to be able to generate packs and mod schemas and templates, with it
+#   and for it potentially."
+# the page is KEPT (nothing removed or restyled); added:
+#   NAV MENU   FIELD (save / open the library on disk) · TOOL (new from a template, synthesize, export / import its file) · EDIT (undo / redo)
+#              · COMPONENTS (every component of every domain, by its contract: add it, swap on the spot; the ones with no adapter shown, not
+#              offered) · MUTATE (the tool, its UI, mix cores) · MAKE (a pack, a mod schema, a template) · VIEW (board / chain)
+#   MUTATE     the big button; MUTATE ▸ the UI (each element's style, seeded, inside the fixed design rules — ADDENDUM (3))
+#   THE BOARD  any assembled tool drawn as the board: each component in its gate frame, labelled (order · component · status), its live element
+#              inside, wired to the CORE; click a label → swap it there and then (heard at once); Wobble Bass opens as the exact board (rule).
+#   ELEMENTS   per component: its style (knobs · faders · compact), an uploaded image as its face (a skin), the image's adjustments — brightness,
+#              contrast, hue, saturation, blur, invert: the image-manipulation domain's first components, tried on UI elements (preview: done
+#              with the browser's own filters; as a domain, each becomes a component with a contract and hooks like any other)
+#   CORES      MUTATE ▸ mix cores: graft a kept tool into this one — in parallel (both into a new output) or in series (this one into the other's
+#              chain); every mix is checked for stability (not finite · pinned · DC · energy growing · a feedback loop) and a warning asks first
+#   DISK       everything kept (tools, verdicts, element skins, packs, templates) saves to disk: the preview downloads / opens one library file;
+#              in the app it is Documents\ERAVOS\field\ (tools in Documents\ERAVOS\tools\mine.<id>\, as CG6)
+#   MAKE       a PACK (eravos.pack/1, schemas/pack.schema.json): presets made by varying the tool, each gated (plays, heard, not a repeat by the
+#              null), ranked by what he taught it · a MOD SCHEMA: the tool's insert slots (Mods: descriptor.slots, one after each component) and
+#              its settings as a JSON schema (what a pack / a mod may set) · a TEMPLATE: the tool as a starting point (START FROM › templates;
+#              templates/tool-sound shape when written to disk)
+# agnostic: the graph, the checker, assemble and the Field are domain-free; a component of any domain joins by its contract (ports, variables,
+#   element) and its domain's adapter + types; the CORE is the only part a tool keeps as its own — everything around it is components.
+# LEARN (his words, 2026-11-20: "yes. like eravos is meant to be as fluid and dynamic as possible. this is high leverage as hell. think about
+#   using this for learning, one component at a time?"): TOOL › learn — a bare oscillator on the bench, then one component at a time: what
+#   fits after the output (the graph), each explained from its own contract (what it takes, gives, which roles it shapes, which controls to
+#   move first), heard without it and with it (A / B), then added; any domain's components teach themselves the same way.
+
+## ADDENDUM 2026-11-20 (5) — a tool exploded on the canvas, live (nothing above is changed)
+# his words (2026-11-20, verbatim): "why 10?" · "okay now let me edit and change the wobble base. also i feel it should be a canvas in itself.
+#   so i can scroll around"
+# built (3.196): tools/core/field/board.js — a tool's LIVE window lifted apart onto the canvas (its world: pan, zoom, scroll) as its board: the
+#   parts moved into gates, labelled, wired to the core, the whole tool first then blown apart; every part still plays and edits the tool (its
+#   own engine); gates move by their labels; put back together from the menu. A tool offers it with <tool>.board.js (its content); Wobble
+#   Bass's is generated from the board file (build-field.mjs --data). Editing its SOUND parts here is real now; SWAPPING them waits on CG7
+#   (its parts as components with adapters, its DAG as data, the null against its engine).
+# why 10 (answered): 10 components have adapters; 12 more sound parts need only an adapter each (filter-formant, amp-chain, bbd-line,
+#   ensemble-core, modal-resonator, karplus-string, osc-noise, osc-wavetable, lfo, random-source, tape-transport, oscillator-population);
+#   13 are logic (notes, patterns, harmony, curves, data) and need a note / data node; settings are not yet modulation inputs.
+
+## ADDENDUM 2026-11-20 (6) — the Field opens and closes as one animated scene (nothing above is changed)
+# his words (2026-11-20, verbatim): "Okay field is full screen. What about animated transition for the dynamic canvas changing. Like opening the
+#   field dynamically changes the ui. Animated and beautiful."
+# built (3.197), shown first as a video (docs/previews/workbench/field-transition.mp4): full screen (the bar slides away, the canvas takes the
+#   screen); the rest of the canvas softens back; the camera glides; the tool's parts lift and fly to the board, nearest the core first; the core
+#   blooms; wires draw in; labels, header, legend come up. Esc or right-click: the reverse. Every motion a Web Animation (seekable, so a recording
+#   is exact); reduced motion → the end state at once. Rule kept: the look of the board is the board's; the motion is an addition, shown first.

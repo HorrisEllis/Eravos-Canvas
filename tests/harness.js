@@ -1,6 +1,9 @@
 /* ERAVOS test harness — minimal describe/it with async, run in Chromium (tests/run.html) */
 (function (global) {
   'use strict';
+  // the Field's and the Workshop's motion (tools/core/field/motion.js) off in the in-page suite: tests see things open and close at once, as
+  // before; a test about the motion turns it back on itself (P197). Not the system's reduced-motion: the app's own CSS reacts to that.
+  global.ERAVOS_NO_MOTION = true;
   const suites = [];
   let cur = null;
   global.describe = function (name, fn) { const s = { name, tests: [], phase: global.__phase || '' }; suites.push(s); const prev = cur; cur = s; fn(); cur = prev; };

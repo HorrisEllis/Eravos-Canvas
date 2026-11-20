@@ -160,6 +160,22 @@
       "release": 0.12,
       "level": 0.85
      }
+    },
+    "Steppers Sub": {
+     "params": {
+      "shape": 0.05,
+      "phantom": 0.25,
+      "drive": 0.25,
+      "click": 0.1,
+      "drop": 0,
+      "octave": -2,
+      "attack": 0.012,
+      "sustain": 0.95,
+      "release": 0.25,
+      "tone": 600,
+      "glide": 0.04,
+      "level": 0.589
+     }
     }
    }
   }

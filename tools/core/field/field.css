@@ -4,12 +4,12 @@
 @font-face { font-family: 'WS Display'; src: url(fonts/bebas-neue-400.woff2) format('woff2'); font-display: swap; }
 @font-face { font-family: 'WS Mono'; src: url(fonts/dm-mono-400.woff2) format('woff2'); font-weight: 400; font-display: swap; }
 @font-face { font-family: 'WS Mono'; src: url(fonts/dm-mono-500.woff2) format('woff2'); font-weight: 500; font-display: swap; }
-.ws-app { --wv:#030508; --wp:#060a12; --wl:#16243a; --wl2:#1e3050; --wc:#00d4ff; --wg:#00ff88; --wm:#cc44ff; --wy:#ffcc00; --wt:#b8cfe0; --wt2:#5a7a96; --wt3:#2e4a60;
+.ws-app, .ws-out { --wv:#030508; --wp:#060a12; --wl:#16243a; --wl2:#1e3050; --wc:#00d4ff; --wg:#00ff88; --wm:#cc44ff; --wy:#ffcc00; --wt:#b8cfe0; --wt2:#5a7a96; --wt3:#2e4a60;
   --wmono:'WS Mono', ui-monospace, monospace; --wdisp:'WS Display', Impact, sans-serif;
   position: fixed; inset: 0; z-index: 299000;   /* over every window, bar and light layer; notices (toasts, 300000) stay above */ display: grid; grid-template-rows: 30px 36px 1fr 22px; grid-template-columns: 44px 1fr 300px;
   background: var(--wv); color: var(--wt); font: 400 10px/1.4 var(--wmono); letter-spacing: .08em; text-transform: uppercase; }
-.ws-app * { box-sizing: border-box; }
-.ws-app button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: inherit; }
+.ws-app *, .ws-out * { box-sizing: border-box; }
+.ws-app button, .ws-out button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: inherit; }
 .ws-bar { grid-column: 1 / 4; display: flex; align-items: center; gap: 16px; padding: 0 12px; border-bottom: 1px solid var(--wl); background: #04070c; }
 .ws-name { font: 400 15px var(--wdisp); letter-spacing: .4em; color: var(--wc); text-shadow: 0 0 20px rgba(0,212,255,.25); }
 .ws-sep { width: 1px; height: 16px; background: var(--wl2); }
@@ -125,3 +125,4 @@ html.ws-open .cm-item { font: inherit !important; text-transform: uppercase; let
 .ws-lockbar { display: block; width: 100%; margin: 4px 0 8px; padding: 5px 8px; background: rgba(255,204,0,.06) !important; border: 1px solid rgba(255,204,0,.35) !important; color: var(--wy) !important; font: 400 10px var(--wmono); letter-spacing: .12em; border-radius: 2px; cursor: pointer; text-align: left; }
 .ws-amount .ws-range { flex: 1 1 auto; accent-color: var(--wc); }
 .ws-lfoot .ws-del { margin-left: auto; }
+.ws-out { pointer-events: none; }   /* a closed Workshop flying home (FieldMotion.leaveApp): seen, not touched, not .ws-app */

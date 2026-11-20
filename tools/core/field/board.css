@@ -1,0 +1,20 @@
+/* ERAVOS core — field/board.css: a tool exploded on the canvas (board.js; every motion is a Web Animation there, none here). The board's own language: dark ground, each part in a dashed gate
+ * frame in its status colour, its label above, wired to the core. The parts inside are the tool's own live face, unchanged. */
+.fb-board{position:absolute;pointer-events:none;color:#D8F6FF;font-family:'DM Mono',monospace}
+.fb-board .fb-gate,.fb-board .fb-lab,.fb-board .fb-core{pointer-events:auto}
+.fb-wires{position:absolute;left:0;top:0;overflow:visible}
+.fb-head{position:absolute;left:0;top:0;right:0}
+.fb-head > div{position:relative!important}
+.fb-core{position:absolute;left:740px;top:560px;transform-origin:50% 50%}
+.fb-core > div{position:static!important;left:auto!important;top:auto!important}
+.fb-legend > div{position:absolute}
+.fb-since{position:absolute;font:500 10px 'DM Mono',monospace;letter-spacing:2px;color:#4E6A80;white-space:nowrap}
+.fb-gate{position:absolute;padding:6px;border:1px dashed color-mix(in srgb,var(--c) 55%,transparent);background:#04070C;
+  will-change:transform}
+.fb-gate.lifting{box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 30%,transparent);z-index:5}
+.fb-lab{position:absolute;left:0;top:-24px;font:500 10px 'DM Mono',monospace;letter-spacing:1px;white-space:nowrap;cursor:grab;user-select:none}
+.fb-lab span{opacity:.7}
+.fb-inner{display:block}
+.fb-inner.row{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+.fb-inner > .wb-card,.fb-inner > .uk-group{margin:0!important}
+.wm-win.fb-away{pointer-events:none}   /* it stays where it is, its frame dissolved (board.js animates it) */

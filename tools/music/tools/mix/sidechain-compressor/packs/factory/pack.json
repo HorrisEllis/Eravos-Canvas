@@ -124,6 +124,36 @@
       "release": 200,
       "curve": 0.7
      }
+    },
+    "Steppers Pump 1/4": {
+     "params": {
+      "mode": "duck",
+      "triggerMode": "tempo",
+      "division": "1/4",
+      "depth": 0.5,
+      "attack": 3,
+      "hold": 10,
+      "release": 220,
+      "curve": 0.5
+     },
+     "extra": {
+      "points": null
+     }
+    },
+    "Kick Breath": {
+     "params": {
+      "mode": "duck",
+      "triggerMode": "event",
+      "source": "kick",
+      "depth": 0.6,
+      "attack": 2,
+      "hold": 10,
+      "release": 160,
+      "curve": 0.6
+     },
+     "extra": {
+      "points": null
+     }
     }
    }
   }

@@ -42,6 +42,14 @@
       "length": 8,
       "octave": 1
      }
+    },
+    "Reggae One Drop": {
+     "params": {
+      "rhythm": "offbeats",
+      "energy": 0.5,
+      "length": 1,
+      "octave": 2
+     }
     }
    }
   }

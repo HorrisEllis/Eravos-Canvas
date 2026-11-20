@@ -1,0 +1,974 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Field Mutate</title>
+<!-- CG4 preview (specs/eravos.compat-graph.spec): the Field as an editor of a tool's components — edit every setting live, SWAP / INSERT /
+     REMOVE a component, undo; ⚄ MUTATE for one-step variations; open a mutant or a kept tool to keep editing it.
+     Built by docs/previews/mutate/build.mjs from the REAL code — tools/core/compat/{compat,assemble}.js, tools/music/compat/adapters.js,
+     every component's own kernel, the contracts, tools/music/types.json, tests/audio-measure.js, docs/novelty-baseline.json, the tools'
+     tool.json (what each is made of). Nothing here re-implements a sound or a rule: the page only lays them out. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap">
+<style>
+:root{--bg:#04070C;--panel:#060A12;--ink:#D8F6FF;--soft:#B8CFE0;--dim:#6E8BA3;--faint:#4E6A80;--line:#1B2A3A;--line2:#0F1A26;
+  --core:#FF2266;--on:#00D4FF;--osc:#39E5A0;--flt:#FF2266;--sat:#00D4FF;--dly:#CC44FF;--st:#9FB3C8;--env:#FFB84D;--ok:#39E5A0;--no:#FF5A6E}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'DM Mono','Segoe UI Symbol','Noto Sans Symbols 2','Apple Symbols',monospace;font-size:11px}
+button,select,input{font-family:inherit}
+#bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 16px;background:#04070CEE;border-bottom:1px solid var(--line2)}
+#bar .brand{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:var(--on)}
+#bar .sep{color:var(--faint)}
+.tb{border:1px solid var(--line);color:var(--dim);padding:5px 11px;font-size:10px;letter-spacing:2px;background:none;cursor:pointer;white-space:nowrap}
+.tb:hover{border-color:var(--dim);color:var(--ink)}
+.tb.on{border-color:var(--on);color:var(--on);background:#06202C}
+.tb.hot{border-color:var(--core);color:#fff;background:#3A0716}
+.tb.hot:hover{background:#550A20}
+.tb:disabled{opacity:.35;cursor:default}
+select.tb{background:var(--bg);color:var(--soft)}
+#crumbs{display:flex;gap:6px;flex-wrap:nowrap;overflow:hidden;min-width:0;flex:1 1 200px;white-space:nowrap;align-items:center;color:var(--dim);font-size:10px;letter-spacing:1px}
+#crumbs .c{color:var(--soft)} #crumbs .c.cur{color:var(--ink)}
+.spacer{flex:1}
+#bar .spacer{flex:0}
+main{display:grid;grid-template-columns:minmax(0,1fr) 300px;min-height:calc(100vh - 50px)}
+@media (max-width:900px){main{grid-template-columns:1fr}#side{border-left:0;border-top:1px solid var(--line2)}}
+section{padding:14px 16px}
+.lab{color:var(--faint);font-size:10px;letter-spacing:2px;text-transform:uppercase;line-height:1.6}
+.lab b{color:var(--soft);font-weight:500}
+h2{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:20px;letter-spacing:4px;margin:0 0 2px;color:var(--ink)}
+/* the bench */
+.benchHead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+#toolName{background:none;border:0;border-bottom:1px solid transparent;color:var(--ink);font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:4px;padding:0;min-width:140px;width:auto;max-width:100%}
+#toolName:hover,#toolName:focus{border-bottom-color:var(--line);outline:0}
+#edited{color:var(--env);font-size:10px;letter-spacing:2px}
+#boardWrap{overflow-x:auto;padding:8px 0 4px}
+#board{position:relative}
+#board > svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.node{position:absolute;width:184px;border:1px dashed var(--c);background:var(--panel);padding:8px 10px 9px;cursor:pointer;text-align:left;color:var(--ink)}
+.node:hover{box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 25%,transparent)}
+.node.sel{border-style:solid;box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 40%,transparent)}
+.node .tag{position:absolute;left:-1px;top:-19px;font-size:10px;letter-spacing:1px;color:var(--c);white-space:nowrap;pointer-events:none}
+.node .nm{font-size:12px;letter-spacing:1px;color:var(--ink);margin-bottom:5px}
+.node .v{display:flex;justify-content:space-between;gap:8px;color:var(--dim);font-size:10px;line-height:1.55}
+.node .v span:last-child{color:var(--soft)}
+.node .v.set span:last-child{color:var(--c)}
+.node .note{display:inline-block;margin-top:5px;font-size:9px;letter-spacing:1px;color:var(--env);border:1px solid #4A3A1A;padding:1px 5px}
+.node .idle{display:inline-block;margin-top:5px;font-size:9px;letter-spacing:1px;color:var(--no);border:1px solid #4A1A22;padding:1px 5px}
+.plus{position:absolute;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--dim);font-size:14px;line-height:18px;text-align:center;cursor:pointer;padding:0;z-index:2}
+.plus:hover,.plus.sel{border-color:var(--on);color:var(--on)}
+.out{position:absolute;width:84px;height:46px;border:2px solid var(--core);background:var(--panel);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
+/* the inspector */
+#insp{border:1px solid var(--line);background:var(--panel);padding:12px 14px;margin-top:6px}
+#insp .hd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+#insp .hd .t{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px}
+#insp .hd .s{color:var(--dim);font-size:10px;letter-spacing:1px}
+.vars{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px 18px}
+.var{display:flex;flex-direction:column;gap:3px}
+.var .k{display:flex;justify-content:space-between;color:var(--dim);font-size:10px;letter-spacing:1px}
+.var .k b{font-weight:400;color:var(--soft)}
+.var.set .k b{color:var(--c)}
+.var input[type=range]{width:100%;accent-color:var(--c)}
+.seg{display:flex;flex-wrap:wrap;gap:0}
+.seg button{border:1px solid var(--line);margin:0 -1px -1px 0;background:none;color:var(--dim);font-size:10px;padding:3px 7px;cursor:pointer}
+.seg button.on{background:var(--c);border-color:var(--c);color:#04070C}
+.acts{display:flex;flex-direction:column;gap:6px;margin-top:12px;border-top:1px solid var(--line2);padding-top:10px}
+.acts .row{align-items:center}
+.acts .w{color:var(--faint);font-size:10px;letter-spacing:2px;min-width:92px}
+.chip{border:1px solid var(--line);background:none;color:var(--soft);font-size:10px;padding:3px 8px;cursor:pointer}
+.chip:hover{border-color:var(--on);color:var(--on)}
+.why{color:var(--faint);font-size:10px}
+/* mutants */
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:10px}
+.mut{border:1px solid var(--line);background:var(--panel);padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+.mut.playing{border-color:var(--on)} .mut.off{opacity:.5}
+.mut .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.mut .num{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
+.mut .by{font-size:9px;letter-spacing:2px;color:var(--faint)}
+.mut .what{font-size:12px;line-height:1.45}
+.mut .what em,.ln em{font-style:normal;color:var(--core)}
+.chain{display:flex;flex-wrap:wrap;gap:3px;align-items:center;font-size:9px;color:var(--faint)}
+.chain span.k{border:1px solid var(--line);padding:1px 5px;color:var(--dim)}
+.chain span.k.hit{border-color:var(--core);color:#fff;background:#3A0716}
+canvas.wave{width:100%;height:42px;display:block;background:#03060A;border:1px solid var(--line2)}
+.meas{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:10px;color:var(--dim)}
+.meas b{font-weight:400;color:var(--soft)}
+.yes{color:var(--ok)!important}.no{color:var(--no)!important}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+details.offs{margin-top:12px;color:var(--faint)} details.offs summary{cursor:pointer;letter-spacing:2px;font-size:10px}
+/* side */
+#side{border-left:1px solid var(--line2);padding:14px 16px}
+.kp{border:1px dashed var(--line);padding:9px 10px;margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.kp.cur{border-color:var(--on);border-style:solid}
+.kp .nm{font-size:12px;letter-spacing:1px}
+.kp .ln{font-size:10px;color:var(--dim);line-height:1.5}
+.empty{color:var(--faint);font-size:10px;line-height:1.6;margin-top:10px}
+.tool{border:1px solid var(--line2);padding:8px 10px;margin-top:8px;display:flex;flex-direction:column;gap:4px}
+.tool .nm{display:flex;justify-content:space-between;gap:8px;font-size:11px}
+.tool .nm span:last-child{color:var(--dim);font-size:10px}
+.tool .bar{height:3px;background:var(--line2)} .tool .bar i{display:block;height:100%;background:var(--on)}
+.tool .ln{font-size:10px;color:var(--faint);line-height:1.5}
+.tool.ready{border-color:var(--on)}
+.foot{color:var(--faint);font-size:10px;line-height:1.7;margin-top:18px;border-top:1px solid var(--line2);padding-top:10px}
+.foot b{color:var(--soft);font-weight:400}
+/* the synthesized tool: a window like every ERAVOS tool — its face from its parts' elements, its keys */
+#synthWrap{position:fixed;inset:0;z-index:50;background:#020408E6;overflow:auto;padding:28px 16px}
+#synthBox{max-width:1080px;margin:0 auto;border:1px solid var(--line);border-top:2px solid var(--core);background:#05080F}
+.sbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 14px;border-bottom:1px solid var(--line2)}
+.sic{color:var(--core);font-size:14px} #sName{font-size:13px;letter-spacing:1px} .sv{color:var(--faint);font-size:10px}
+.sface{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;padding:14px}
+.el{border:1px solid var(--line2);background:var(--panel);padding:10px 12px 12px}
+.el .eh{display:flex;justify-content:space-between;font-size:10px;letter-spacing:2px;color:var(--c);margin-bottom:8px}
+.el .eh span:last-child{color:var(--faint);letter-spacing:1px}
+.knobs{display:flex;flex-wrap:wrap;gap:10px 12px}
+.knob{display:flex;flex-direction:column;align-items:center;min-width:58px;cursor:ns-resize;user-select:none;touch-action:none}
+.knob svg{display:block} .knob .kv{font-size:10px;color:var(--soft);margin-top:1px;white-space:nowrap} .knob .kl{font-size:9px;color:var(--dim);letter-spacing:1px}
+.el .seg{margin-top:4px}
+.more{grid-column:1/-1;color:var(--dim);font-size:10px;letter-spacing:2px;cursor:pointer;background:none;border:0;text-align:left;padding:2px 0}
+.skeys{position:relative;height:96px;margin:0 14px 12px;border:1px solid var(--line2);user-select:none;touch-action:none}
+.wk{position:absolute;top:0;bottom:0;background:#E8EEF3;border-right:1px solid #9AA5AF;cursor:pointer}
+.wk.on,.bk.on{background:var(--core)!important}
+.bk{position:absolute;top:0;height:58%;background:#0B0F16;border:1px solid #000;z-index:2;cursor:pointer}
+.wk i{position:absolute;bottom:4px;left:0;right:0;text-align:center;font-style:normal;font-size:8px;color:#556}
+.sfoot{padding:0 14px 14px;color:var(--faint);font-size:10px;line-height:1.7}
+.sfoot b{color:var(--soft);font-weight:400}
+#sFile{margin:0 14px 14px;padding:10px;background:#020408;border:1px solid var(--line2);color:var(--soft);font-size:10px;max-height:360px;overflow:auto;white-space:pre-wrap}
+.lrn{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:var(--dim);line-height:1.7}
+.lrn b{font-weight:400} .lrn b.p{color:var(--ok)} .lrn b.n{color:var(--no)}
+.reg{font-size:10px} .reg.ok{color:var(--ok)} .reg.bad{color:var(--no)}
+#xWrap{overflow:hidden;margin-top:8px;border:1px solid var(--line2)}
+#xStage{position:relative;width:1800px;height:1320px;transform-origin:0 0;background:#04070C}
+#xStage .pc{transition:left 2.8s cubic-bezier(.22,.8,.25,1),top 2.8s cubic-bezier(.22,.8,.25,1),border-color 1.2s ease}
+#xStage .apart,#xStage #surface{transition:opacity 1.4s ease}
+#xStage .whole .pc{border-color:transparent!important}
+#xStage .still,#xStage .still *{transition:none!important}
+#xStage .piece{position:absolute;padding:0;border:0;background:none;cursor:pointer;outline:1px dashed transparent;outline-offset:5px;
+  transition:left 2.8s cubic-bezier(.22,.8,.25,1),top 2.8s cubic-bezier(.22,.8,.25,1),outline-color 1.2s ease}
+#xStage .piece img{display:block}
+#xStage.still *{transition:none!important}
+#xStage .fade{transition:opacity 1.4s ease}
+#xStage .tag{position:absolute;left:-5px;top:-22px;white-space:nowrap;font:500 10px 'DM Mono',monospace;letter-spacing:1px}
+#xStage .wire{position:absolute;left:0;top:0;pointer-events:none}
+#xCore{position:absolute;left:700px;top:540px;width:300px;height:150px;box-sizing:border-box;background:#060A12;border:2px solid var(--core);display:flex;flex-direction:column;justify-content:center;gap:6px;padding:14px 18px}
+#xSurface{position:absolute;left:300px;top:120px;width:1100px;height:824px;display:block}
+.mark{display:inline-block;border:1px solid currentColor;padding:1px 6px;font-size:10px;letter-spacing:1px}
+.pl{display:grid;grid-template-columns:auto 1fr;gap:2px 14px;font-size:10px;color:var(--dim);margin-top:8px}
+.pl b{font-weight:400;color:var(--soft)}
+#nav{display:flex;gap:0}
+#nav button{background:none;border:0;color:var(--dim);font-size:10px;letter-spacing:2px;padding:6px 9px;cursor:pointer}
+#nav button:hover,#nav button.open{color:var(--ink);background:#0B1522}
+.tb.big{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;padding:6px 22px;border-width:2px}
+#menu{position:fixed;z-index:60;min-width:240px;max-width:340px;max-height:70vh;overflow:auto;background:#070C15;border:1px solid var(--line);box-shadow:0 10px 34px #000c;display:none;padding:5px 0}
+#menu .h{padding:6px 12px 4px;color:var(--faint);font-size:9px;letter-spacing:2px}
+#menu button{display:flex;justify-content:space-between;gap:12px;width:100%;text-align:left;border:0;background:none;color:var(--soft);padding:5px 12px;font-size:11px;cursor:pointer}
+#menu button:hover:not(:disabled){background:#0C1726;color:var(--ink)}
+#menu button:disabled{color:var(--faint);cursor:default}
+#menu button span:last-child{color:var(--faint);font-size:10px}
+#menu hr{border:0;border-top:1px solid var(--line2);margin:4px 0}
+#modalWrap{position:fixed;inset:0;z-index:70;background:#020408D0;display:flex;align-items:flex-start;justify-content:center;padding:60px 16px;overflow:auto}
+#modalWrap[hidden]{display:none}
+#modal{width:min(640px,100%);background:#05080F;border:1px solid var(--line);border-top:2px solid var(--core);padding:16px 18px}
+#modal h3{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:22px;letter-spacing:4px;margin:0 0 8px}
+#modal .warn{color:var(--env);font-size:11px;line-height:1.7}
+#modal ul{margin:8px 0;padding-left:18px;color:var(--soft);font-size:11px;line-height:1.7}
+#modal .acts2{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+#modal pre{background:#020408;border:1px solid var(--line2);padding:8px;max-height:260px;overflow:auto;font-size:10px;color:var(--soft);white-space:pre-wrap}
+/* the board, for any assembled tool: the Field's own language — gate frames, labels, live elements, wired to the core */
+.gate{position:absolute;border:1px dashed var(--c);background:#060A12;padding:10px 12px 10px}
+.gate.sel{border-style:solid;box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 35%,transparent)}
+.gate .glab{position:absolute;left:-1px;top:-20px;white-space:nowrap;font:500 10px 'DM Mono',monospace;letter-spacing:1px;color:var(--c);cursor:pointer;background:none;border:0;padding:0}
+.gate .glab:hover{text-decoration:underline}
+.gate .ghd{font-size:10px;letter-spacing:2px;color:var(--soft);margin-bottom:6px;display:flex;justify-content:space-between;gap:8px}
+.gate .skin{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.55;pointer-events:none}
+.gate .knobs{position:relative}
+.fad{display:flex;flex-direction:column;gap:2px;width:100%;font-size:9px;color:var(--dim)}
+.fad input{width:100%;accent-color:var(--c)}
+.cmp{display:flex;justify-content:space-between;width:100%;font-size:10px;color:var(--dim)} .cmp b{color:var(--c);font-weight:400}
+.fcore{position:absolute;box-sizing:border-box;background:#060A12;border:2px solid var(--core);display:flex;flex-direction:column;justify-content:center;gap:5px;padding:12px 16px}
+.fcore .t{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:5px;color:var(--ink);line-height:1}
+.fcore .s{color:var(--core);font-size:10px} .fcore .c2{color:#B8CFE0;font-size:10px;line-height:1.5}
+.learn{border:1px solid var(--env);background:#0E0B05;padding:10px 12px;margin-top:8px;font-size:11px;color:var(--soft);line-height:1.6}
+.learn b{color:var(--env);font-weight:400}
+#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#0B1522;border:1px solid var(--line);padding:7px 14px;color:var(--soft);font-size:11px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:40}
+</style></head><body>
+<div id="bar">
+  <span class="brand">FIELD</span>
+  <nav id="nav" aria-label="the Field's menu"></nav><span class="sep">·</span>
+  <div id="crumbs"></div>
+  <span class="spacer"></span>
+  <select class="tb" id="phrase" aria-label="what the tool plays">
+    <option value="bass">BASS LINE</option><option value="hold">ONE LONG NOTE</option><option value="high">TWO OCTAVES UP</option>
+  </select>
+  <button class="tb" id="playCur">▶ PLAY</button>
+  <button class="tb hot big" id="mutate">⚄ MUTATE</button>
+</div>
+<main>
+  <div>
+    <section>
+      <div class="benchHead">
+        <input id="toolName" aria-label="the tool's name" spellcheck="false">
+        <span id="edited"></span><span class="spacer"></span>
+        <span id="xBtns" style="display:none;gap:6px"><button class="tb" id="xEx">EXPLODE</button><button class="tb" id="xAs">ASSEMBLE</button><button class="tb" id="xBack">← BACK TO THE BENCH</button></span>
+        <button class="tb" id="undo">↶ UNDO</button><button class="tb" id="redo">↷ REDO</button>
+        <label class="tb" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="auto" checked style="margin:0">HEAR EACH EDIT</label>
+        <button class="tb on" id="save">KEEP AS A NEW TOOL</button>
+        <button class="tb hot" id="synth">◆ SYNTHESIZE INTO A TOOL</button>
+      </div>
+      <div class="lab" id="benchLab">the tool, exploded · <b>click a component</b> to edit it, swap it or remove it · <b>＋</b> on a wire to put a component there</div>
+      <div id="boardWrap"><div id="board"></div></div>
+      <div id="xWrap" style="display:none"><div id="xStage"></div></div>
+      <div id="learnBox"></div>
+      <div id="insp"></div>
+    </section>
+    <section style="padding-top:4px">
+      <h2>MUTANTS</h2>
+      <div class="lab" id="mutLab">press <b>⚄ MUTATE</b> — one-step variations of the tool on the bench, each checked, built, played and measured · <b>open</b> one to keep editing it</div>
+      <div id="grid"></div>
+      <div id="offs"></div>
+    </section>
+  </div>
+  <aside id="side">
+    <h2>KEPT</h2>
+    <div class="lab">your tools · <b>open</b> to edit · <b>⚄</b> to mutate from it</div>
+    <div id="keptList"></div>
+    <h2 style="margin-top:22px">LEARNED</h2>
+    <div class="lab">from what you keep, open and throw away · it ranks the mutants · one wildcard each time</div>
+    <div id="learned"></div>
+    <h2 style="margin-top:22px">START FROM</h2>
+    <div class="lab">a tool opens on the bench once every part of it can be assembled</div>
+    <div id="tools"></div>
+    <div class="foot" id="foot"></div>
+  </aside>
+</main>
+<div id="toast"></div>
+<div id="menu" role="menu"></div>
+<div id="modalWrap" hidden><div id="modal"></div></div>
+<input type="file" id="fileIn" hidden>
+<div id="synthWrap" hidden><div id="synthBox">
+  <div class="sbar"><span class="sic">◆</span><span id="sName"></span><span class="sv" id="sVer"></span><span class="spacer"></span>
+    <button class="tb" id="sJson">TOOL FILE</button><button class="tb on" id="sSave">⤓ SAVE THE TOOL</button><button class="tb" id="sClose">✕ BACK TO THE BENCH</button></div>
+  <div class="sface" id="sFace"></div>
+  <div class="skeys" id="sKeys"></div>
+  <div class="sfoot" id="sFoot"></div>
+  <pre id="sFile" hidden></pre>
+</div></div>
+
+<!--INLINE-->
+
+<script>
+(function () {
+'use strict';
+const D = window.__MUTATE_DATA, MP = window.MusicParts || {}, Compat = window.Compat, assemble = window.Assemble.assemble, AM = window.AudioMeasure;
+const domain = window.MusicAdapters(MP), types = D.types, contracts = D.contracts, C = {};
+contracts.forEach(c => { C[c.id] = c; });
+const can = contracts.filter(c => domain.adapters[c.id]);          // only parts that can be assembled today (as build/mutants.mjs)
+const G = Compat.graph(can, types);
+const SR = 48000, SECS = 2.8, SAME = 0.005;
+const PHRASES = {
+  bass: [55, 65.41, 73.42, 49].map((hz, i) => ({ t: 0.05 + i * 0.65, dur: 0.6, hz })),   // build/mutants.mjs PHRASE — the verdicts use this one
+  hold: [{ t: 0.05, dur: 2.6, hz: 55 }],
+  high: [55, 65.41, 73.42, 49].map((hz, i) => ({ t: 0.05 + i * 0.65, dur: 0.6, hz: hz * 4 }))
+};
+const NC = window.NoveltyCore, B = D.baseline, dist = NC.makeDist(NC.groupsFor(B.D));
+const me = (v) => ({ v, n: NC.norm(v, B.lo, B.hi) });
+const base = B.items.map(x => Object.assign({}, x, { n: NC.norm(x.v, B.lo, B.hi) }));
+const nearest = (v) => { let d = 9, nn = null; for (const x of base) { const e = dist(me(v), x); if (e < d) { d = e; nn = x; } } return { d, nn, verdict: d < B.twin ? 'TWIN' : d < B.close ? 'CLOSE' : 'novel' }; };
+const clone = (x) => JSON.parse(JSON.stringify(x));
+const ld = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? d : v; } catch (e) { return d; } };
+const st = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+const toast = (t) => { const e = document.getElementById('toast'); e.textContent = t; e.style.opacity = 1; clearTimeout(toast.t); toast.t = setTimeout(() => { e.style.opacity = 0; }, 2200); };
+
+// ---- render: the same harness as build/mutants.mjs play() ----
+const cache = new Map();
+function play(dag, phraseKey) {
+  const key = phraseKey + '|' + JSON.stringify(dag); if (cache.has(key)) return cache.get(key);
+  const notes = PHRASES[phraseKey], E = assemble(dag, contracts, domain, { sr: SR });
+  if (!E.ok) { const r = { ok: false, why: E.why }; cache.set(key, r); return r; }
+  const { L, R } = E.render(SECS, notes);
+  let g = 0; const up = 1 / (0.005 * SR), dn = 1 / (0.04 * SR);
+  for (let i = 0; i < L.length; i++) { const t = i / SR, on = notes.some(x => t >= x.t && t < x.t + x.dur); g = on ? Math.min(1, g + up) : Math.max(0, g - dn); L[i] *= g; R[i] *= g; }
+  let nan = 0, peak = 0, pinned = 0, q = 0;
+  for (let i = 0; i < L.length; i++) { const a = L[i], b = R[i]; if (!Number.isFinite(a) || !Number.isFinite(b)) { nan++; L[i] = 0; R[i] = 0; continue; } const m = Math.max(Math.abs(a), Math.abs(b)); if (m > peak) peak = m; if (m >= 0.999) pinned++; q += 0.5 * (a * a + b * b); }
+  const rmsDb = 20 * Math.log10(Math.sqrt(q / L.length) + 1e-12), mono = new Float32Array(L.length); for (let i = 0; i < L.length; i++) mono[i] = 0.5 * (L[i] + R[i]);
+  const why = []; if (nan) why.push(nan + ' samples not finite'); if (rmsDb < -50) why.push('silent (' + rmsDb.toFixed(1) + ' dB)'); if (pinned / L.length > 0.01) why.push('pinned ' + (100 * pinned / L.length).toFixed(1) + ' %');
+  const fp = !nan && rmsDb > -90 ? AM.fingerprint(mono, SR, 0.1, 2.7) : null;
+  const r = { ok: !why.length, why, peak, rmsDb, L, R, mono, fp: fp && fp.frames > 4 ? fp.v : null };
+  if (cache.size > 120) cache.delete(cache.keys().next().value); cache.set(key, r); return r;
+}
+
+// ---- audio out ----
+let AC = null, src = null, playingId = null;
+function stop() { if (src) { try { src.stop(); } catch (e) {} src = null; } playingId = null; document.querySelectorAll('.mut.playing').forEach(x => x.classList.remove('playing')); setPlayBtn(); }
+function hear(dag, id, then, restart) {
+  if (playingId === id && !then && !restart) { stop(); return; }
+  stop(); AC = AC || new (window.AudioContext || window.webkitAudioContext)({ sampleRate: SR }); if (AC.state === 'suspended') AC.resume();
+  const r = play(dag, phraseSel.value); if (!r.L) { toast('it does not build: ' + (r.why || []).join('; ')); return; }
+  const buf = AC.createBuffer(2, r.L.length, SR), k = r.peak > 0 ? 0.89 / r.peak : 1;   // every sound heard at the same level (as the WAVs)
+  const l = buf.getChannelData(0), rr = buf.getChannelData(1); for (let i = 0; i < r.L.length; i++) { l[i] = r.L[i] * k * 0.8; rr[i] = r.R[i] * k * 0.8; }
+  src = AC.createBufferSource(); src.buffer = buf; src.connect(AC.destination); playingId = id; const me = src;
+  src.onended = () => { if (src === me) { playingId = null; src = null; document.querySelectorAll('.mut.playing').forEach(x => x.classList.remove('playing')); setPlayBtn(); if (then) then(); } };
+  src.start(); const el = document.querySelector('[data-mut="' + id + '"]'); if (el) el.classList.add('playing'); setPlayBtn();
+}
+
+// ---- state: the tool on the bench, its history (undo / redo), what is selected ----
+const START = { id: 'saw', name: 'Saw voice', dag: D.parent, ops: [] };
+let bench = null, hist = [], fut = [], sel = null, seed = 1, mutants = [], kept = [], mutCount = 0;
+try { const s = JSON.parse(localStorage.getItem('eravos.field.mutate.kept') || '[]'); if (Array.isArray(s)) kept = s.filter(k => k && k.dag && k.dag.nodes); } catch (e) {}
+const save = () => { try { localStorage.setItem('eravos.field.mutate.kept', JSON.stringify(kept)); } catch (e) {} };
+function open(t) {     // put a tool on the bench to edit: the start tool, a mutant, or a kept one
+  learning = false; view = null;
+  stop(); bench = { keptId: t.keptId || null, name: t.name, dag: clone(t.dag), ops: clone(t.ops || []), savedAt: JSON.stringify(t.dag) };
+  hist = []; fut = []; sel = null; drawAll();
+}
+function apply(r, label) {     // every edit: through the engine's own op (checked), one undo step
+  if (!r || r.error) { toast(r ? r.error : 'that does not fit'); return false; }
+  hist.push({ dag: bench.dag, ops: bench.ops }); fut = []; if (hist.length > 200) hist.shift();
+  const last = bench.ops[bench.ops.length - 1], op = r.op;
+  const ops = (op.op === 'vary' && last && last.op === 'vary' && last.node === op.node && last.key === op.key) ? bench.ops.slice(0, -1).concat([op]) : bench.ops.concat([op]);
+  bench.dag = r.dag; bench.ops = ops; if (sel && !bench.dag.nodes.some(n => n.id === sel)) sel = null;
+  drawBench(); if (label) toast(label); hearSoon(); return true;
+}
+let hearT = null;
+function hearSoon() { if (!autoBox.checked) return; clearTimeout(hearT); hearT = setTimeout(() => hear(bench.dag, 'bench', null, true), 180); }
+function undo() { if (!hist.length) return; fut.push({ dag: bench.dag, ops: bench.ops }); const h = hist.pop(); bench.dag = h.dag; bench.ops = h.ops; if (sel && !bench.dag.nodes.some(n => n.id === sel)) sel = null; drawBench(); hearSoon(); }
+function redo() { if (!fut.length) return; hist.push({ dag: bench.dag, ops: bench.ops }); const h = fut.pop(); bench.dag = h.dag; bench.ops = h.ops; drawBench(); hearSoon(); }
+const isEdited = () => JSON.stringify(bench.dag) !== bench.savedAt;
+
+const kindCol = (cid) => /^osc-/.test(cid) ? 'var(--osc)' : /^filter-/.test(cid) ? 'var(--flt)' : /^saturator-|bitcrusher/.test(cid) ? 'var(--sat)' : /delay/.test(cid) ? 'var(--dly)' : /^env-/.test(cid) ? 'var(--env)' : 'var(--st)';
+const cssVar = (v) => getComputedStyle(document.documentElement).getPropertyValue(v.slice(4, -1)).trim() || '#9FB3C8';
+const fmtN = (x, v) => { if (typeof x !== 'number') return String(x); const a = Math.abs(x), s = a >= 1000 ? (x / 1000).toFixed(a >= 10000 ? 1 : 2) + 'k' : a >= 100 ? x.toFixed(0) : a >= 10 ? x.toFixed(1) : +x.toPrecision(3) + ''; return s + (v && v.unit ? ' ' + v.unit : ''); };
+const say = (op) => op.op === 'graft' ? 'mixed cores with <em>' + op.with + '</em> (' + op.how + ')' : op.op === 'swap' ? 'swap <em>' + op.from + '</em> → <em>' + op.to + '</em>' : op.op === 'insert' ? 'insert <em>' + op.component + '</em> between ' + op.between.join(' → ')
+  : op.op === 'vary' ? op.node + '.<em>' + op.key + '</em> → <em>' + (typeof op.value === 'number' ? fmtN(op.value) : op.value) + '</em>' : op.op === 'rewire' ? 'rewire ' + op.from + ': ' + op.was + ' → <em>' + op.to + '</em>' : 'remove <em>' + op.node + '</em>';
+const sayPlain = (op) => say(op).replace(/<\/?em>/g, '');
+const hitNode = (op) => op.op === 'graft' ? null : op.op === 'insert' ? op.node : op.op === 'rewire' ? op.to.split('.')[0] : op.node;
+const newId = (dag, base) => { const b = base.replace(/^(osc|filter|saturator|stereo|env|delay)-?/, '').slice(0, 5) || 'n'; let i = 2, id = b; while (dag.nodes.some(n => n.id === id)) id = b + i++; return id; };
+
+// ---- the board: the tool exploded, columns by depth ----
+const board = document.getElementById('board');
+function layout(dag) {
+  const depth = {}, ids = dag.nodes.map(n => n.id), inE = {}; ids.forEach(i => { depth[i] = 0; inE[i] = []; });
+  dag.edges.filter(e => !e.feedback).forEach(e => inE[e.to.split('.')[0]].push(e.from.split('.')[0]));
+  for (let k = 0; k < ids.length; k++) ids.forEach(i => inE[i].forEach(a => { depth[i] = Math.max(depth[i], depth[a] + 1); }));
+  const cols = {}; ids.forEach(i => { (cols[depth[i]] = cols[depth[i]] || []).push(i); });
+  const pos = {}, CW = 236, RH = 170; Object.keys(cols).forEach(c => cols[c].forEach((i, r) => { pos[i] = { x: 10 + c * CW, y: 30 + r * RH }; }));
+  return { pos, ncol: Object.keys(cols).length, nrow: Math.max(1, ...Object.values(cols).map(a => a.length)), CW, RH };
+}
+const inOrder = (dag) => { const L = layout(dag); return dag.nodes.slice().sort((a, b) => (L.pos[a.id].x - L.pos[b.id].x) || (L.pos[a.id].y - L.pos[b.id].y)); };
+let selEdge = null;
+function drawChain() {
+  const dag = bench.dag, Lt = layout(dag); board.innerHTML = '';
+  const W = 10 + Lt.ncol * Lt.CW + 110, H = 30 + Lt.nrow * Lt.RH - 20; board.style.width = W + 'px'; board.style.height = H + 'px';
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('width', W); svg.setAttribute('height', H); board.appendChild(svg);
+  const els = {};
+  dag.nodes.forEach(n => {
+    const c = C[n.component], col = kindCol(n.component), p = Lt.pos[n.id], b = document.createElement('button');
+    b.type = 'button'; b.className = 'node' + (sel === n.id ? ' sel' : ''); b.style.setProperty('--c', col); b.style.left = p.x + 'px'; b.style.top = p.y + 'px';
+    const vs = (c.variables || []).filter(v => v.type === 'number' || v.type === 'enum' || v.type === 'boolean');
+    const isSet = (v) => n.vars && n.vars[v.key] !== undefined && n.vars[v.key] !== v.default;
+    const show = vs.filter(isSet).concat(vs.filter(v => !isSet(v))).slice(0, 4);
+    const hears = (c.ports || []).filter(pt => pt.dir === 'in' && (pt.type === 'pitch' || pt.type === 'gate') && !dag.edges.some(e => e.to === n.id + '.' + pt.id));
+    const needsIn = (c.ports || []).some(pt => pt.dir === 'in' && pt.type === 'audio') && !dag.edges.some(e => e.to.split('.')[0] === n.id && C[n.component].ports.find(q => q.id === e.to.split('.')[1] && q.type === 'audio'));
+    b.innerHTML = '<span class="tag">' + n.component + ' · ' + (c.kind || '') + '</span><div class="nm">' + n.id.toUpperCase() + '</div>' +
+      show.map(v => { const x = n.vars && n.vars[v.key] !== undefined ? n.vars[v.key] : v.default; return '<div class="v' + (isSet(v) ? ' set' : '') + '"><span>' + v.key + '</span><span>' + (typeof x === 'number' ? fmtN(x, v) : String(x)) + '</span></div>'; }).join('') +
+      (hears.length ? '<span class="note">♪ HEARS THE NOTE</span>' : '') + (needsIn ? '<span class="idle">NOTHING IN · SILENT</span>' : '');
+    b.onclick = () => { sel = sel === n.id ? null : n.id; selEdge = null; drawBench(); };
+    board.appendChild(b); els[n.id] = b;
+  });
+  const out = document.createElement('div'); out.className = 'out'; out.textContent = 'OUT';
+  const [on] = (dag.outs[0] || '').split('.'), op = Lt.pos[on] || { x: 10, y: 30 }; out.style.left = (10 + Lt.ncol * Lt.CW) + 'px'; out.style.top = (op.y + 30) + 'px'; board.appendChild(out);
+  const R = (id) => { const e = els[id]; return { x: e.offsetLeft, y: e.offsetTop, w: e.offsetWidth, h: e.offsetHeight }; };
+  const edge = (x1, y1, x2, y2, col, dash) => { const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'), m = (x1 + x2) / 2;
+    p.setAttribute('d', `M${x1} ${y1} C ${m} ${y1}, ${m} ${y2}, ${x2} ${y2}`); p.setAttribute('fill', 'none'); p.setAttribute('stroke', col); p.setAttribute('stroke-width', '2'); p.setAttribute('stroke-opacity', '0.8'); if (dash) p.setAttribute('stroke-dasharray', '6 4'); svg.appendChild(p);
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); c.setAttribute('cx', x2); c.setAttribute('cy', y2); c.setAttribute('r', 3.5); c.setAttribute('fill', col); svg.appendChild(c); };
+  dag.edges.forEach((e, i) => { const a = e.from.split('.')[0], z = e.to.split('.')[0], A = R(a), Z = R(z), port = e.to.split('.')[1];
+    const x1 = A.x + A.w, y1 = A.y + A.h / 2, x2 = Z.x, y2 = Z.y + Z.h / 2 + (port === 'in' ? 0 : 14);
+    edge(x1, y1, x2, y2, cssVar(kindCol(dag.nodes.find(n => n.id === a).component)), !!e.feedback);
+    const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, over = Object.values(els).some(el => mx > el.offsetLeft - 12 && mx < el.offsetLeft + el.offsetWidth + 12 && my > el.offsetTop - 12 && my < el.offsetTop + el.offsetHeight + 12);
+    if (over) return;   // a wire that skips past a component: its ＋ would sit on that component
+    const pl = document.createElement('button'); pl.type = 'button'; pl.className = 'plus' + (selEdge === i ? ' sel' : ''); pl.textContent = '＋'; pl.title = 'put a component on this wire';
+    pl.style.left = ((x1 + x2) / 2 - 11) + 'px'; pl.style.top = ((y1 + y2) / 2 - 11) + 'px'; pl.onclick = () => { selEdge = selEdge === i ? null : i; sel = null; drawBench(); }; board.appendChild(pl); });
+  if (els[on]) { const A = R(on); edge(A.x + A.w, A.y + A.h / 2, out.offsetLeft, out.offsetTop + 23, '#FF2266'); }
+}
+
+let fieldView = 'board';
+let styles = ld('eravos.field.styles', {}), skins = ld('eravos.field.skins', {});   // per component: its element's style, its face image + the image's adjustments
+const saveLooks = () => { st('eravos.field.styles', styles); st('eravos.field.skins', skins); };
+function drawBoard() { if (fieldView === 'chain') return drawChain(); drawField(); }
+const STATUS = (cid) => domain.adapters[cid] ? '✓ built' : C[cid] ? '○ no adapter' : '○ planned';
+function elementInto(K, n, compact) {   // a component's live element: its face controls (contract `element`) in its chosen style
+  const c = C[n.component], col = kindCol(n.component), vs = (c.variables || []).filter(v => v.type === 'number' || v.type === 'enum' || v.type === 'boolean');
+  const face = ((((c.element || {}).controls) || []).filter(q => q.face).map(q => q.key)), keys = (face.length ? face : vs.slice(0, 3).map(v => v.key)), style = styles[n.component] || 'knobs';
+  K.style.setProperty('--c', col); K.style.display = 'flex'; K.style.flexWrap = 'wrap'; K.style.gap = style === 'knobs' ? '8px 10px' : '6px';
+  keys.forEach(k => { const v = vs.find(q => q.key === k); if (!v) return; const x = n.vars && n.vars[k] !== undefined ? n.vars[k] : v.default;
+    const set = (val) => apply(Compat.vary(bench.dag, n.id, k, val, can, types));
+    if (v.type === 'number' && style === 'knobs') K.appendChild(knob(v, x, set));
+    else if (v.type === 'number' && style === 'faders') { const sl = slider(v), w = document.createElement('div'); w.className = 'fad'; w.innerHTML = '<span>' + k + ' · <b style="color:var(--soft);font-weight:400">' + fmtN(x, v) + '</b></span><input type="range" min="0" max="1000" value="' + Math.round(sl.toS(x) * 1000) + '">';
+      const inp = w.querySelector('input'); inp.oninput = () => { w.querySelector('b').textContent = fmtN(sl.fromS(inp.value / 1000), v); }; inp.onchange = () => set(sl.fromS(inp.value / 1000)); K.appendChild(w); }
+    else if (v.type === 'number') { const w = document.createElement('div'); w.className = 'cmp'; w.innerHTML = '<span>' + k + '</span><b>' + fmtN(x, v) + '</b>'; K.appendChild(w); }
+    else { const w = document.createElement('div'); w.style.cssText = 'display:flex;flex-direction:column;gap:2px'; w.innerHTML = '<span style="font-size:9px;color:var(--dim);letter-spacing:1px">' + k + '</span><div class="seg"></div>';
+      (v.type === 'enum' ? v.options : [true, false]).forEach(o => { const b = document.createElement('button'); b.textContent = v.type === 'enum' ? o : (o ? 'on' : 'off'); if (o === x) b.className = 'on'; b.onclick = (e) => { e.stopPropagation(); set(o); }; w.querySelector('.seg').appendChild(b); }); K.appendChild(w); } });
+}
+function drawField() {
+  const dag = bench.dag, order = inOrder(dag), n = order.length; board.innerHTML = '';
+  const GW = 236, CW = 300, CH = 150, left = order.slice(0, Math.ceil(n / 2)), right = order.slice(Math.ceil(n / 2)), rowH = (k) => 190;
+  const H = Math.max(CH + 120, Math.max(left.length, right.length) * 190 + 40), W = GW * 2 + CW + 260; board.style.width = W + 'px'; board.style.height = H + 'px';
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('width', W); svg.setAttribute('height', H); board.appendChild(svg);
+  const cx = GW + 130, cy = Math.round(H / 2 - CH / 2), core = document.createElement('div'); core.className = 'fcore'; core.style.cssText = 'left:' + cx + 'px;top:' + cy + 'px;width:' + CW + 'px;height:' + CH + 'px';
+  core.innerHTML = '<span class="t">' + bench.name.toUpperCase().replace(/</g, '') + ' · CORE</span><span class="s">assembled from ' + n + ' components · ' + (bench.ops.length ? bench.ops.length + ' changes' : 'as made') + '</span><span class="c2">' + order.map(x => x.id).join(' → ') + ' → out</span>';
+  board.appendChild(core);
+  const place = (list, side) => list.forEach((nd, i) => {
+    const c = C[nd.component], col = kindCol(nd.component), g = document.createElement('div'), x = side ? cx + CW + 130 : 0, y = 30 + i * 190;
+    g.className = 'gate' + (sel === nd.id ? ' sel' : ''); g.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + GW + 'px;--c:' + col;
+    const sk = skins[nd.component];
+    g.innerHTML = (sk ? '<div class="skin" style="background-image:url(' + sk.src + ');filter:' + skinFilter(sk) + '"></div>' : '') +
+      '<button class="glab" title="swap it here">' + (order.indexOf(nd) + 1) + ' · ' + nd.component + ' · ' + (c.kind || '') + '  ' + STATUS(nd.component) + ' ▾</button>' +
+      '<div class="ghd"><span>' + nd.id.toUpperCase() + '</span><span style="color:var(--faint)">' + (styles[nd.component] || 'knobs') + '</span></div><div class="knobs"></div>';
+    elementInto(g.querySelector('.knobs'), nd);
+    g.onclick = (e) => { if (e.target.closest('.knob,.seg,.fad,.glab')) return; sel = sel === nd.id ? null : nd.id; selEdge = null; drawBench(); };
+    g.querySelector('.glab').onclick = (e) => { e.stopPropagation(); swapMenu(nd, e.currentTarget); };
+    board.appendChild(g);
+    requestAnimationFrame(() => { const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'), x1 = side ? x : x + GW, y1 = y + g.offsetHeight / 2, x2 = side ? cx + CW : cx, y2 = cy + 20 + (CH - 40) * ((i + 0.5) / list.length);
+      p.setAttribute('d', `M${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}`); p.setAttribute('fill', 'none'); p.setAttribute('stroke', cssVar(col)); p.setAttribute('stroke-opacity', '0.75'); p.setAttribute('stroke-width', '1.6');
+      if (!domain.adapters[nd.component]) p.setAttribute('stroke-dasharray', '6 4'); svg.appendChild(p);
+      [[x1, y1, 4, true], [x2, y2, 3, false]].forEach(([a, b, r, hollow]) => { const ci = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); ci.setAttribute('cx', a); ci.setAttribute('cy', b); ci.setAttribute('r', r);
+        ci.setAttribute('fill', hollow ? '#04070C' : cssVar(col)); if (hollow) { ci.setAttribute('stroke', cssVar(col)); ci.setAttribute('stroke-width', '1.6'); } svg.appendChild(ci); }); });
+  });
+  place(left, 0); place(right, 1);
+}
+const skinFilter = (sk) => 'brightness(' + (sk.b || 1) + ') contrast(' + (sk.c || 1) + ') hue-rotate(' + (sk.h || 0) + 'deg) saturate(' + (sk.s == null ? 1 : sk.s) + ') blur(' + (sk.bl || 0) + 'px) invert(' + (sk.i || 0) + ')';
+
+// ---- menus: one dropdown for the nav and for a piece's label ----
+const menuEl = document.getElementById('menu');
+function menu(anchor, items) {
+  menuEl.innerHTML = ''; items.forEach(it => { if (it === '-') { menuEl.appendChild(document.createElement('hr')); return; } if (it.h) { const h = document.createElement('div'); h.className = 'h'; h.textContent = it.h; menuEl.appendChild(h); return; }
+    const b = document.createElement('button'); b.innerHTML = '<span>' + it.t + '</span><span>' + (it.k || '') + '</span>'; b.disabled = !!it.off; if (it.off && it.why) b.title = it.why;
+    b.onclick = (e) => { e.stopPropagation(); closeMenu(); it.do(); }; menuEl.appendChild(b); });
+  const r = anchor.getBoundingClientRect(); menuEl.style.display = 'block'; menuEl.style.left = Math.max(4, Math.min(innerWidth - menuEl.offsetWidth - 4, r.left)) + 'px';
+  menuEl.style.top = Math.min(innerHeight - menuEl.offsetHeight - 4, r.bottom + 4) + 'px'; menu.anchor = anchor; anchor.classList.add('open');
+}
+function closeMenu() { menuEl.style.display = 'none'; if (menu.anchor) menu.anchor.classList.remove('open'); menu.anchor = null; }
+document.addEventListener('click', (e) => { if (menuEl.style.display === 'block' && !menuEl.contains(e.target) && e.target !== menu.anchor) closeMenu(); });
+function swapMenu(nd, anchor) {    // on the spot: swap it, insert after it, remove it, its style
+  const sibs = (G.standIns[nd.component] || []).map(x => ({ x, r: Compat.swap(bench.dag, nd.id, x, can, types) })).filter(o => !o.r.error), rm = Compat.remove(bench.dag, nd.id, can, types);
+  const outE = bench.dag.edges.findIndex(e => e.from.split('.')[0] === nd.id), ins = outE >= 0 ? can.map(c => ({ c, r: Compat.insert(bench.dag, outE, c.id, can, types, newId(bench.dag, c.id)) })).filter(o => !o.r.error) : [];
+  menu(anchor, [{ h: 'SWAP ' + nd.id.toUpperCase() + ' FOR' }].concat(sibs.length ? sibs.map(o => ({ t: o.x, k: 'swap', do: () => { apply(o.r, nd.id + ' is now ' + o.x); } })) : [{ t: 'nothing that fits its slot yet', off: true }],
+    ['-', { h: 'INSERT AFTER ' + nd.id.toUpperCase() }], ins.length ? ins.map(o => ({ t: o.c.id, k: '＋', do: () => { if (apply(o.r, 'inserted ' + o.c.id)) { sel = o.r.op.node; drawBench(); } } })) : [{ t: 'nothing fits after it', off: true }],
+    ['-', { h: 'ITS ELEMENT' }], ['knobs', 'faders', 'compact'].map(st2 => ({ t: 'style: ' + st2, k: (styles[nd.component] || 'knobs') === st2 ? '●' : '', do: () => { styles[nd.component] = st2; saveLooks(); drawBench(); } })),
+    [{ t: 'upload an image as its face…', do: () => uploadSkin(nd.component) }], skins[nd.component] ? [{ t: 'remove its image', do: () => { delete skins[nd.component]; saveLooks(); drawBench(); } }] : [],
+    ['-', { t: rm.error ? 'remove — ' + rm.error : 'remove ' + nd.id + ' (wire around it)', off: !!rm.error, do: () => apply(rm, 'removed ' + nd.id) }]));
+}
+// ---- element images: upload, then the image domain's first adjustments (preview: the browser's own filters) ----
+const fileIn = document.getElementById('fileIn');
+function pickFile(accept, then) { fileIn.accept = accept; fileIn.value = ''; fileIn.onchange = () => { const f = fileIn.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => then(rd.result, f); if (/image/.test(accept)) rd.readAsDataURL(f); else rd.readAsText(f); }; fileIn.click(); }
+function uploadSkin(cid) { pickFile('image/*', (src) => { shrink(src, (small) => { skins[cid] = { src: small, b: 1, c: 1, h: 0, s: 1, bl: 0, i: 0 }; saveLooks(); sel = (bench.dag.nodes.find(n => n.component === cid) || {}).id || sel; drawBench(); toast('image set as ' + cid + '\'s face'); }); }); }
+function shrink(src, then) { const im = new Image(); im.onload = () => { const k = Math.min(1, 480 / Math.max(im.width, im.height)), cv = document.createElement('canvas'); cv.width = Math.round(im.width * k); cv.height = Math.round(im.height * k); cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height); then(cv.toDataURL('image/jpeg', 0.85)); }; im.onerror = () => then(src); im.src = src; }
+
+// ---- modal: warnings, packs, schemas ----
+function modal(html, wire) { const W = document.getElementById('modalWrap'), M = document.getElementById('modal'); M.innerHTML = html; W.hidden = false; const close = () => { W.hidden = true; }; M.querySelectorAll('[data-close]').forEach(b => b.onclick = close); if (wire) wire(M, close); }
+function download(name, obj) { try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2)], { type: 'application/json' })); a.download = name; document.body.appendChild(a); a.click(); a.remove(); } catch (e) {} }
+
+// ---- STABILITY: what could make a core unstable, measured before it is accepted ----
+function stability(dag) {
+  const risks = [], E = assemble(dag, contracts, domain, { sr: SR }); if (!E.ok) return ['it does not build: ' + E.why.join('; ')];
+  const { L } = E.render(3, [{ t: 0.05, dur: 2.9, hz: 55 }]); let nan = 0, pin = 0, sum = 0; const blk = Math.floor(SR * 0.5), rms = [];
+  for (let i = 0; i < L.length; i++) { const v = L[i]; if (!Number.isFinite(v)) { nan++; continue; } if (Math.abs(v) >= 0.999) pin++; sum += v; }
+  for (let b = 0; b + blk <= L.length; b += blk) { let q = 0; for (let i = b; i < b + blk; i++) { const v = Number.isFinite(L[i]) ? L[i] : 0; q += v * v; } rms.push(Math.sqrt(q / blk)); }
+  if (nan) risks.push(nan + ' samples not finite (it blows up)');
+  if (pin / L.length > 0.01) risks.push('pinned at full scale ' + (100 * pin / L.length).toFixed(1) + ' % of the time');
+  if (Math.abs(sum / L.length) > 0.05) risks.push('DC offset ' + (sum / L.length).toFixed(3) + ' (the speaker pushed one way)');
+  if (rms.length > 3 && rms[rms.length - 1] > 2.8 * (rms[1] || 1e-9) && rms[rms.length - 1] > 0.05) risks.push('energy growing under a held note (' + (20 * Math.log10(rms[rms.length - 1] / (rms[1] || 1e-9))).toFixed(1) + ' dB) — a runaway');
+  if (dag.edges.some(e => e.feedback)) risks.push('a feedback loop — stable now, can run away when a setting moves');
+  return risks;
+}
+function guarded(r, label) {    // a mix of cores is checked first; a risk asks before it is applied
+  if (!r || r.error) { toast(r ? r.error : 'that does not fit'); return; }
+  const risks = stability(r.dag); if (!risks.length) { apply(r, label + ' — checked: stable'); return; }
+  modal('<h3>THIS COULD BE UNSTABLE</h3><div class="warn">' + label + ' builds and plays, but:</div><ul>' + risks.map(x => '<li>' + x + '</li>').join('') + '</ul><div class="why">keep it and listen with the level down, or cancel. undo takes it back either way.</div>' +
+    '<div class="acts2"><button class="tb" data-close>CANCEL</button><button class="tb hot" id="goAnyway">APPLY ANYWAY</button></div>', (M, close) => { M.querySelector('#goAnyway').onclick = () => { close(); apply(r, label + ' (warned)'); }; });
+}
+// ---- MIX CORES: graft another tool into this one, in parallel or in series ----
+function prefixed(dag, px) { const m = (ref) => px + ref; return { nodes: dag.nodes.map(n => Object.assign({}, n, { id: px + n.id })), edges: dag.edges.map(e => Object.assign({}, e, { from: m(e.from), to: m(e.to) })), outs: dag.outs.map(m) }; }
+function mixCores(other, how) {
+  const A = clone(bench.dag), Bd = prefixed(other.dag, 'b'), dag = { nodes: A.nodes.concat(Bd.nodes), edges: A.edges.concat(Bd.edges), outs: [] };
+  if (how === 'parallel') { const id = newId(dag, 'stereo-tools'); dag.nodes.push({ id, component: 'stereo-tools' }); dag.edges.push({ from: A.outs[0], to: id + '.in' }, { from: Bd.outs[0], to: id + '.in' }); dag.outs = [id + '.out']; }
+  else {   // series: this tool's sound into the other's chain, where its own source fed it (the other's sources leave)
+    const srcs = Bd.nodes.filter(n => !Bd.edges.some(e => e.to.split('.')[0] === n.id)).map(n => n.id), first = Bd.edges.filter(e => srcs.includes(e.from.split('.')[0]));
+    if (!first.length) return { error: other.name + ' has nothing after its source to feed' };
+    dag.nodes = dag.nodes.filter(n => !srcs.includes(n.id)); dag.edges = dag.edges.filter(e => !srcs.includes(e.from.split('.')[0])).concat(first.map(e => ({ from: A.outs[0], to: e.to }))); dag.outs = Bd.outs;
+  }
+  const ck = Compat.check(dag, can, types); return ck.ok ? { dag, op: { op: 'graft', with: other.name, how } } : { error: ck.why.join('; ') };
+}
+// ---- the library on disk: kept tools, verdicts, element looks, templates, packs ----
+let templates = ld('eravos.field.templates', []), packs = ld('eravos.field.packs', []);
+function library() { return { schema: 'eravos.field-library/1', at: new Date().toISOString(), kept, verdicts, styles, skins, templates, packs }; }
+function openLibrary(txt) { try { const L = JSON.parse(txt); if (L.schema !== 'eravos.field-library/1') throw new Error('not a Field library');
+  kept = L.kept || []; verdicts = L.verdicts || []; styles = L.styles || {}; skins = L.skins || {}; templates = L.templates || []; packs = L.packs || [];
+  save(); st('eravos.field.mutate.verdicts', verdicts); saveLooks(); st('eravos.field.templates', templates); st('eravos.field.packs', packs); drawAll(); toast('library opened: ' + kept.length + ' tools, ' + templates.length + ' templates, ' + packs.length + ' packs'); } catch (e) { toast('could not open it: ' + e.message); } }
+// ---- MAKE: a pack, a mod schema, a template ----
+const toolId = () => 'mine.' + slug(bench.name);
+function makePack() {
+  const w = weights(), seenR = [play(bench.dag, 'bass')], out = [];
+  for (let k = 0; out.length < 6 && k < 40; k++) {
+    let d = bench.dag; const ops = []; for (let j = 0; j < 3; j++) { const m = Compat.mutate(d, can, types, { seed: seed * 101 + k * 7 + j, count: 1, ops: ['vary'] })[0]; if (m) { d = m.dag; ops.push(m.lineage.ops[0]); } }
+    const r = play(d, 'bass'); if (!r.ok || !r.mono) continue; if (seenR.some(o => o.mono && nullDb(r.mono, o.mono) < NULL_REPEAT)) continue;
+    const score = ops.reduce((a, o) => a + feats({ op: o, dag: d }).reduce((b, f) => b + (w[f] || 0), 0), 0); seenR.push(r); out.push({ dag: d, ops, score });
+  }
+  out.sort((a, b) => b.score - a.score);
+  const params = (d) => { const p = {}; d.nodes.forEach(n => Object.keys(n.vars || {}).forEach(k => { p[n.id + '.' + k] = n.vars[k]; })); return p; };
+  const names = out.map((o, i) => bench.name + ' ' + String.fromCharCode(65 + i) + ' · ' + [...new Set(o.ops.map(op => op.key))].join(' · '));
+  const pack = { schema: 'eravos.pack/1', id: slug(bench.name) + '.field-' + Date.now().toString(36), version: '1.0.0', label: bench.name + ' — made in the Field', prefix: '', author: 'Field (mutate, gated)', tags: ['field', 'generated'], for: toolId(),
+    items: { [toolId()]: { presets: Object.fromEntries(out.map((o, i) => [names[i], { params: params(o.dag) }])) } } };
+  modal('<h3>A PACK FROM ' + bench.name.toUpperCase() + '</h3><div class="why">' + out.length + ' presets, each the tool with three settings varied, each played, heard, and not a repeat of another (the null) — ranked by what you taught it. eravos.pack/1, like every pack.</div><div id="pk"></div>' +
+    '<div class="acts2"><button class="tb" data-close>CLOSE</button><button class="tb on" id="pkSave">⤓ SAVE THE PACK</button></div>', (M, close) => {
+    const P = M.querySelector('#pk'); out.forEach((o, i) => { const r = document.createElement('div'); r.className = 'row'; r.style.cssText = 'align-items:center;margin-top:6px'; r.innerHTML = '<button class="tb">▶</button><button class="tb">✎ OPEN</button><span style="font-size:11px;color:var(--soft)"></span>';
+      r.querySelector('span').textContent = names[i]; r.children[0].onclick = () => hear(o.dag, 'pk' + i); r.children[1].onclick = () => { close(); open({ name: names[i], dag: o.dag, ops: bench.ops.concat(o.ops) }); bench.savedAt = ''; drawBench(); }; P.appendChild(r); });
+    M.querySelector('#pkSave').onclick = () => { packs.unshift(pack); st('eravos.field.packs', packs); download(pack.id + '.pack.json', pack); close(); toast('pack saved: ' + out.length + ' presets'); }; });
+}
+function modSchema() {
+  const order = inOrder(bench.dag), id = toolId();
+  const props = {}; order.forEach(n => (C[n.component].variables || []).forEach(v => { props[n.id + '.' + v.key] = v.type === 'number' ? { type: 'number', minimum: v.min, maximum: v.max, default: v.default, description: (v.role || '') + (v.unit ? ' · ' + v.unit : '') } : v.type === 'enum' ? { enum: v.options, default: v.default } : { type: 'boolean', default: v.default }; }));
+  return { schema: 'eravos.mod-schema/1 (draft)', tool: id,
+    slots: order.map(n => ({ id: 'after-' + n.id, label: 'after ' + n.id, wire_type: 'audio', accepts: { provides: 'audio' }, max: 4 })),
+    params: { $schema: 'https://json-schema.org/draft/2020-12/schema', title: 'what a pack or a mod may set on ' + bench.name, type: 'object', properties: props, additionalProperties: false },
+    note: 'Mods (canvas/runtime/mods.js): a slot hosts a chain of other tools; send → mods → return. One audio insert after each component.' };
+}
+function makeTemplate() { const t = { schema: 'eravos.field-template/1', name: bench.name, dag: clone(bench.dag), parts: inOrder(bench.dag).map(n => n.component), at: new Date().toISOString() }; templates.unshift(t); st('eravos.field.templates', templates); drawTools(); download(slug(bench.name) + '.template.json', t); toast('template made: ' + t.name + ' (START FROM › templates)'); }
+
+// ---- LEARN: build a tool one component at a time — each explained by its own contract, heard without it and with it ----
+const LEARN_ORDER = ['filter-svf', 'saturator-tube', 'env-adsr', 'filter-ladder', 'bitcrusher', 'saturator-tape', 'delay-line', 'stereo-tools', 'osc-sub'];
+let learning = false;
+function startLearning() { open({ name: 'My first tool', dag: { nodes: [{ id: 'osc', component: 'osc-va' }], edges: [], outs: ['osc.out'] }, ops: [] }); learning = true; sel = 'osc'; drawBench(); toast('learn: one component at a time'); }
+function nextFits() { const out = bench.dag.outs[0], [on] = out.split('.'), oc = C[(bench.dag.nodes.find(n => n.id === on) || {}).component];
+  return can.filter(c => c.id !== 'osc-va').map(c => { const id = newId(bench.dag, c.id), d = clone(bench.dag), inP = (c.ports || []).find(p => p.dir === 'in' && p.type === 'audio'), outP = (c.ports || []).find(p => p.dir === 'out' && p.type === 'audio');
+    if (!inP || !outP) return null; d.nodes.push({ id, component: c.id }); d.edges.push({ from: out, to: id + '.' + inP.id }); d.outs = [id + '.' + outP.id]; const ck = Compat.check(d, can, types); return ck.ok ? { c, r: { dag: d, op: { op: 'insert', component: c.id, node: id, between: [out, 'out'] } } } : null; })
+    .filter(Boolean).sort((a, b) => (LEARN_ORDER.indexOf(a.c.id) + 99) % 99 - (LEARN_ORDER.indexOf(b.c.id) + 99) % 99); }
+function explain(c) { const ins = c.ports.filter(p => p.dir === 'in').map(p => p.id + ' (' + p.type + ')'), outs = c.ports.filter(p => p.dir === 'out').map(p => p.id + ' (' + p.type + ')'), face = ((c.element || {}).controls || []).filter(q => q.face);
+  const roles = [...new Set((c.variables || []).map(v => v.role).filter(Boolean))];
+  return '<b>' + c.id + '</b> — ' + (/^[aeiou]/.test(c.kind || '') ? 'an ' : 'a ') + (c.kind || '') + ' part. it takes ' + (ins.join(', ') || 'nothing') + ' and gives ' + (outs.join(', ') || 'nothing') + '. it shapes ' + (roles.join(', ') || 'the sound') + '. move ' + (face.map(q => '<b>' + q.key + '</b>').join(', ') || 'its settings') + ' first.'; }
+function drawLearn() {
+  const L = document.getElementById('learnBox'); if (!L) return; if (!learning) { L.innerHTML = ''; return; }
+  const fits = nextFits(), last = bench.dag.nodes[bench.dag.nodes.length - 1];
+  L.innerHTML = '<div class="learn">LEARNING · step ' + bench.dag.nodes.length + ' — ' + explain(C[last.component]) + '<br>next, one at a time — what fits after <b>' + last.id + '</b>:<div class="row" style="margin-top:6px" id="lfits"></div><div id="lone" style="margin-top:6px"></div>' +
+    '<div class="row" style="margin-top:6px"><button class="tb" id="lstop">STOP LEARNING</button></div></div>';
+  const F = L.querySelector('#lfits'); fits.slice(0, 8).forEach(o => { const b = document.createElement('button'); b.className = 'chip'; b.textContent = '＋ ' + o.c.id; b.onclick = () => {
+    L.querySelector('#lone').innerHTML = '<div style="color:var(--soft)">' + explain(o.c) + '</div><div class="row" style="margin-top:6px"><button class="tb" id="lwo">▶ WITHOUT IT</button><button class="tb" id="lw">▶ WITH IT</button><button class="tb on" id="ladd">ADD IT</button></div>';
+    L.querySelector('#lwo').onclick = () => hear(bench.dag, 'lwo'); L.querySelector('#lw').onclick = () => hear(o.r.dag, 'lw'); L.querySelector('#ladd').onclick = () => { if (apply(o.r, 'added ' + o.c.id)) { sel = o.r.op.node; drawBench(); } }; }; F.appendChild(b); });
+  L.querySelector('#lstop').onclick = () => { learning = false; drawLearn(); };
+}
+
+// ---- the nav menu ----
+const NAV = {
+  FIELD: () => [{ t: 'save the library to disk', k: '⤓', do: () => { download('eravos-field-library.json', library()); toast('saved to disk: ' + kept.length + ' tools, ' + templates.length + ' templates, ' + packs.length + ' packs'); } },
+    { t: 'open a library from disk…', do: () => pickFile('application/json,.json', (txt) => openLibrary(txt)) }, '-', { h: 'IN THE APP: Documents\\ERAVOS\\field\\ (tools in …\\tools\\mine.<id>\\)' }],
+  TOOL: () => [{ t: 'learn: build one component at a time', k: '★', do: startLearning }, { t: 'start from the saw voice', do: () => open(START) }].concat(templates.length ? [{ h: 'TEMPLATES' }].concat(templates.slice(0, 8).map(t => ({ t: t.name, k: t.parts.length + ' parts', do: () => open({ name: t.name, dag: t.dag, ops: [] }) }))) : [],
+    ['-', { t: '◆ synthesize into a tool', do: () => openSynth() }, { t: 'export its tool file', k: '⤓', do: () => download(toolId() + '.tool.json', toolFile()) },
+      { t: 'import a tool file…', do: () => pickFile('application/json,.json', (txt) => { try { const f = JSON.parse(txt); if (!f.dag) throw 0; open({ name: f.label || 'imported', dag: f.dag, ops: (f.lineage || {}).ops || [] }); toast('opened ' + (f.label || 'the tool')); } catch (e) { toast('not a tool file'); } }) },
+      '-', { t: 'open Wobble Bass exploded', do: openExploded }]),
+  EDIT: () => [{ t: 'undo', k: 'Ctrl+Z', off: !hist.length, do: undo }, { t: 'redo', k: 'Ctrl+Y', off: !fut.length, do: redo }, { t: 'every setting back to its default', do: () => { const d = clone(bench.dag); d.nodes.forEach(n => { n.vars = {}; }); apply({ dag: d, op: { op: 'vary', node: '*', key: '*', value: 'defaults' } }, 'all settings reset'); } }],
+  COMPONENTS: () => { const by = {}; contracts.forEach(c => { (by[c.domain || 'music'] = by[c.domain || 'music'] || []).push(c); });
+    const tgt = sel ? bench.dag.edges.findIndex(e => e.from.split('.')[0] === sel) : bench.dag.edges.length - 1;
+    return [{ h: 'ADD — ' + (sel ? 'after ' + sel : 'before the output') + ' (select a component to choose where)' }].concat(...Object.keys(by).map(dm => [{ h: dm.toUpperCase() + ' · ' + by[dm].length + ' components' }].concat(by[dm].map(c => {
+      const ok = domain.adapters[c.id], r = ok && tgt >= 0 ? Compat.insert(bench.dag, tgt, c.id, can, types, newId(bench.dag, c.id)) : null;
+      return { t: c.id, k: !ok ? 'no adapter yet' : r && !r.error ? '＋ ' + c.kind : 'does not fit here', off: !ok || !r || !!r.error, do: () => { if (apply(r, 'added ' + c.id)) { sel = r.op.node; drawBench(); } } }; }))),
+      ['-', { h: 'OTHER DOMAINS: a domain\'s components join here by their contract (ports, variables, element) and its adapter' }]); },
+  MUTATE: () => [{ t: '⚄ mutate the tool', do: doMutate }, { t: '⚄ mutate its UI (each element\'s style)', do: () => { const opts = ['knobs', 'faders', 'compact']; let k = seed * 13; bench.dag.nodes.forEach(n => { styles[n.component] = opts[(k = (k * 1103515245 + 12345) % 2147483648) % 3]; }); seed++; saveLooks(); drawBench(); toast('the UI mutated — the design rules held (black surfaces, the reactive colours, the kit)'); } },
+    '-', { h: 'MIX CORES — graft another tool in (checked for stability first)' }].concat(...kept.concat(templates.map(t => ({ name: t.name, dag: t.dag }))).concat([START]).filter(k => JSON.stringify(k.dag) !== JSON.stringify(bench.dag)).slice(0, 8).map(k => [
+      { t: k.name + ' — in parallel', do: () => guarded(mixCores(k, 'parallel'), 'mixed with ' + k.name + ' in parallel') }, { t: k.name + ' — in series', do: () => guarded(mixCores(k, 'series'), 'mixed into ' + k.name + ' in series') }]),
+    ['-', { t: 'forget what it learned', do: () => { verdicts = []; st('eravos.field.mutate.verdicts', verdicts); drawLearned(); toast('forgotten'); } }]),
+  MAKE: () => [{ t: 'a pack from this tool', k: 'eravos.pack/1', do: makePack }, { t: 'a mod schema for it', k: 'slots + params', do: () => { const m = modSchema(); modal('<h3>MOD SCHEMA · ' + bench.name.toUpperCase() + '</h3><div class="why">' + m.slots.length + ' insert slots (one after each component) and ' + Object.keys(m.params.properties).length + ' settings a pack or a mod may set.</div><pre></pre><div class="acts2"><button class="tb" data-close>CLOSE</button><button class="tb on" id="msSave">⤓ SAVE</button></div>', (M, close) => { M.querySelector('pre').textContent = JSON.stringify(m, null, 2); M.querySelector('#msSave').onclick = () => { download(toolId() + '.mod-schema.json', m); close(); }; }); } },
+    { t: 'a template from it', k: 'START FROM', do: makeTemplate }],
+  VIEW: () => [{ t: 'the board (parts wired to the core)', k: fieldView === 'board' ? '●' : '', do: () => { fieldView = 'board'; drawBench(); } }, { t: 'the signal chain', k: fieldView === 'chain' ? '●' : '', do: () => { fieldView = 'chain'; drawBench(); } }, '-', { t: 'Wobble Bass, exploded', do: openExploded }]
+};
+Object.keys(NAV).forEach(k => { const b = document.createElement('button'); b.textContent = k; b.onclick = (e) => { e.stopPropagation(); if (menu.anchor === b) { closeMenu(); return; } closeMenu(); menu(b, NAV[k]()); }; document.getElementById('nav').appendChild(b); });
+
+// ---- the inspector: every setting of the selected component, and what it can become ----
+const insp = document.getElementById('insp');
+function slider(v) {   // a range control in the variable's own units; wide ranges (Hz, ms) move on a log scale
+  const lg = v.min > 0 && v.max / v.min >= 50, toS = (x) => lg ? Math.log(x / v.min) / Math.log(v.max / v.min) : (x - v.min) / (v.max - v.min),
+    fromS = (s) => { let x = lg ? v.min * Math.pow(v.max / v.min, s) : v.min + s * (v.max - v.min); if (v.integer) x = Math.round(x); else x = +x.toPrecision(4); return Math.min(v.max, Math.max(v.min, x)); };
+  return { toS, fromS };
+}
+function drawInsp() {
+  if (selEdge != null && bench.dag.edges[selEdge]) {
+    const e = bench.dag.edges[selEdge], opts = can.map(c => ({ c, r: Compat.insert(bench.dag, selEdge, c.id, can, types, newId(bench.dag, c.id)) })).filter(x => !x.r.error);
+    insp.innerHTML = '<div class="hd"><span class="t">THE WIRE ' + e.from.toUpperCase() + ' → ' + e.to.toUpperCase() + '</span><span class="s">put a component here — only what fits both ends is listed</span></div>' +
+      '<div class="row">' + (opts.length ? opts.map(x => '<button class="chip" data-ins="' + x.c.id + '">＋ ' + x.c.id + '</button>').join('') : '<span class="why">nothing that fits this wire can be assembled yet</span>') + '</div>';
+    insp.querySelectorAll('[data-ins]').forEach(b => b.onclick = () => { const x = opts.find(o => o.c.id === b.dataset.ins); selEdge = null; if (apply(x.r, 'inserted ' + x.c.id)) { sel = x.r.op.node; drawBench(); } });
+    return;
+  }
+  const n = sel && bench.dag.nodes.find(x => x.id === sel);
+  if (!n) { insp.innerHTML = '<div class="why" style="font-size:11px">click a component above to edit its settings, swap it for another, or remove it · <b style="color:var(--soft);font-weight:400">＋</b> on a wire puts a new component there · every edit is checked by the same rules a mutant is, and is one undo step</div>'; return; }
+  const c = C[n.component], col = kindCol(n.component); insp.style.setProperty('--c', col);
+  const vs = (c.variables || []).filter(v => v.type === 'number' || v.type === 'enum' || v.type === 'boolean');
+  let h = '<div class="hd"><span class="t" style="color:' + col + '">' + n.id.toUpperCase() + '</span><span class="s">' + n.component + ' · ' + (c.kind || '') + ' · ' + vs.length + ' settings</span></div><div class="vars">';
+  vs.forEach(v => {
+    const x = n.vars && n.vars[v.key] !== undefined ? n.vars[v.key] : v.default, set = n.vars && n.vars[v.key] !== undefined && n.vars[v.key] !== v.default;
+    h += '<div class="var' + (set ? ' set' : '') + '" style="--c:' + col + '" title="' + (v.about || '').replace(/"/g, '&quot;') + '"><div class="k"><span>' + v.key + (v.role ? ' · ' + v.role : '') + '</span><b>' + (typeof x === 'number' ? fmtN(x, v) : String(x)) + '</b></div>';
+    if (v.type === 'number') { const s = slider(v); h += '<input type="range" min="0" max="1000" step="1" value="' + Math.round(s.toS(x) * 1000) + '" data-k="' + v.key + '">'; }
+    else if (v.type === 'enum') h += '<div class="seg">' + v.options.map(o => '<button data-k="' + v.key + '" data-o="' + o + '" class="' + (o === x ? 'on' : '') + '">' + o + '</button>').join('') + '</div>';
+    else h += '<div class="seg"><button data-k="' + v.key + '" data-b="1" class="' + (x ? 'on' : '') + '">on</button><button data-k="' + v.key + '" data-b="0" class="' + (!x ? 'on' : '') + '">off</button></div>';
+    h += '</div>';
+  });
+  h += '</div>';
+  const sibs = (G.standIns[n.component] || []).map(s => ({ s, r: Compat.swap(bench.dag, n.id, s, can, types) })).filter(x => !x.r.error), rm = Compat.remove(bench.dag, n.id, can, types);
+  h += '<div class="acts"><div class="row"><span class="w">SWAP FOR</span>' + (sibs.length ? sibs.map(x => '<button class="chip" data-sw="' + x.s + '">' + x.s + '</button>').join('') : '<span class="why">nothing that fits this slot can be assembled yet</span>') + '</div>' +
+    '<div class="row"><span class="w">REMOVE</span>' + (rm.error ? '<span class="why">' + rm.error + '</span>' : '<button class="chip" data-rm="1">remove ' + n.id + ' — wire around it</button>') + '</div>' +
+    '<div class="row"><span class="w">RESET</span><button class="chip" data-reset="1">every setting of ' + n.id + ' back to its default</button></div>' +
+    '<div class="row"><span class="w">ELEMENT</span>' + ['knobs', 'faders', 'compact'].map(x => '<button class="chip" data-style="' + x + '"' + ((styles[n.component] || 'knobs') === x ? ' style="border-color:var(--on);color:var(--on)"' : '') + '>' + x + '</button>').join('') + '<button class="chip" data-up="1">upload an image as its face…</button></div>' +
+    (skins[n.component] ? '<div class="row"><span class="w">IMAGE</span>' + [['b', 'brightness', 0, 2, 1], ['c', 'contrast', 0, 2, 1], ['h', 'hue', -180, 180, 0], ['s', 'saturation', 0, 2, 1], ['bl', 'blur', 0, 8, 0], ['i', 'invert', 0, 1, 0]].map(a => '<label class="fad" style="width:120px"><span>' + a[1] + '</span><input type="range" data-img="' + a[0] + '" min="' + a[2] + '" max="' + a[3] + '" step="0.01" value="' + (skins[n.component][a[0]] == null ? a[4] : skins[n.component][a[0]]) + '"></label>').join('') + '<button class="chip" data-unskin="1">remove the image</button></div><div class="why" style="margin-left:98px">the image domain\'s first components, tried on a UI element (preview: the browser\'s own filters)</div>' : '') + '</div>';
+  insp.innerHTML = h;
+  const setVar = (k, val, live) => { const r = Compat.vary(bench.dag, n.id, k, val, can, types); if (live && r && !r.error) { apply(r); } else apply(r); };
+  insp.querySelectorAll('input[type=range][data-k]').forEach(inp => { const v = vs.find(q => q.key === inp.dataset.k), s = slider(v);
+    inp.oninput = () => { const x = s.fromS(inp.value / 1000); inp.previousSibling.querySelector('b').textContent = fmtN(x, v); };
+    inp.onchange = () => setVar(v.key, s.fromS(inp.value / 1000), true); });
+  insp.querySelectorAll('[data-o]').forEach(b => b.onclick = () => setVar(b.dataset.k, b.dataset.o));
+  insp.querySelectorAll('[data-b]').forEach(b => b.onclick = () => setVar(b.dataset.k, b.dataset.b === '1'));
+  insp.querySelectorAll('[data-sw]').forEach(b => b.onclick = () => { const x = sibs.find(o => o.s === b.dataset.sw); apply(x.r, n.id + ' is now ' + x.s); });
+  const rb = insp.querySelector('[data-rm]'); if (rb) rb.onclick = () => apply(rm, 'removed ' + n.id);
+  insp.querySelectorAll('[data-style]').forEach(b => b.onclick = () => { styles[n.component] = b.dataset.style; saveLooks(); drawBench(); });
+  const up = insp.querySelector('[data-up]'); if (up) up.onclick = () => uploadSkin(n.component);
+  insp.querySelectorAll('[data-img]').forEach(r => r.oninput = () => { skins[n.component][r.dataset.img] = +r.value; const sk = document.querySelector('.gate.sel .skin'); if (sk) sk.style.filter = skinFilter(skins[n.component]); }); insp.querySelectorAll('[data-img]').forEach(r => r.onchange = saveLooks);
+  const us = insp.querySelector('[data-unskin]'); if (us) us.onclick = () => { delete skins[n.component]; saveLooks(); drawBench(); };
+  insp.querySelector('[data-reset]').onclick = () => { const d = clone(bench.dag), m = d.nodes.find(x => x.id === n.id); m.vars = {}; const ck = Compat.check(d, can, types); apply(ck.ok ? { dag: d, op: { op: 'vary', node: n.id, key: '*', value: 'defaults' } } : { error: ck.why.join('; ') }, n.id + ' reset'); };
+}
+
+// ---- mutate ----
+// ---- the null: two renders, level-matched, subtracted. −∞ dB = the same sound; ~0 dB or above = nothing alike.
+// FRICTION: a mutant that nulls against anything already seen (the tool, a kept tool, a thrown one, another mutant) is a REPEAT, never offered.
+const NULL_REPEAT = -30;
+function nullDb(a, b) {
+  const n = Math.min(a.length, b.length); let ea = 0, eb = 0; for (let i = 0; i < n; i++) { ea += a[i] * a[i]; eb += b[i] * b[i]; }
+  if (!ea || !eb) return 0; const ka = 1 / Math.sqrt(ea), kb = 1 / Math.sqrt(eb); let r = 0; for (let i = 0; i < n; i++) { const d = a[i] * ka - b[i] * kb; r += d * d; }
+  return r > 0 ? 10 * Math.log10(r) : -Infinity;
+}
+const fmtDb = (x) => x === -Infinity ? '−∞ dB' : (x > 0 ? '+' : '') + x.toFixed(1) + ' dB';
+
+// ---- LEARN: every verdict is data. keep +1 · open to edit +0.5 · throw away −1, on what the mutant was (the op, the part, how far it moved).
+let verdicts = ld('eravos.field.mutate.verdicts', []);
+const compOf = (dag, id) => { const n = dag.nodes.find(x => x.id === id); return n ? n.component : id; };
+function feats(m) {
+  const o = m.op, part = o.op === 'swap' ? o.to : o.op === 'insert' ? o.component : o.op === 'vary' ? compOf(m.dag, o.node) + '.' + o.key : o.op === 'remove' ? compOf(m.parentDag || bench.dag, o.node) : compOf(m.dag, o.to.split('.')[0]);
+  const far = m.fromParent == null ? null : m.fromParent < 0.05 ? 'a little' : m.fromParent < 0.15 ? 'clearly' : 'a lot';
+  return ['op:' + o.op, 'part:' + part, far && 'moves:' + far].filter(Boolean);
+}
+function weights() { const w = {}; verdicts.forEach(v => v.f.forEach(f => { w[f] = (w[f] || 0) + v.v; })); return w; }
+function verdict(m, v) { verdicts.push({ at: new Date().toISOString(), f: feats(m), v, op: m.op, dag: v < 0 ? m.dag : undefined }); if (verdicts.length > 400) verdicts = verdicts.slice(-400); st('eravos.field.mutate.verdicts', verdicts); drawLearned(); }
+const featWords = (f) => f.replace('op:', '').replace('part:', '').replace('moves:', 'moves ');
+
+function measure(m) {
+  const id = 'm' + (++mutCount), parent = play(bench.dag, 'bass'), r = play(m.dag, 'bass');
+  const fromParent = r.fp && parent.fp ? dist(me(r.fp), me(parent.fp)) : null, heard = fromParent != null && fromParent >= SAME;
+  return { id, n: m.n, op: m.lineage.ops[0], dag: m.dag, parentDag: bench.dag, r, fromParent, heard, offered: r.ok && heard, why: !r.ok ? 'does not play: ' + (r.why || []).join('; ') : !heard ? 'no one could hear the change' : '',
+    near: r.fp ? nearest(r.fp) : null, from: { name: bench.name, ops: bench.ops } };
+}
+let seenMutants = [];
+function seenSet() {   // what a new mutant must not repeat: the tool, your kept tools, what you threw away, the mutants already shown
+  return [{ what: 'the tool on the bench', dag: bench.dag }].concat(kept.slice(0, 20).map(k => ({ what: 'kept: ' + k.name, dag: k.dag })),
+    verdicts.filter(v => v.v < 0 && v.dag).slice(-20).map(v => ({ what: 'thrown away: ' + sayPlain(v.op), dag: v.dag })), seenMutants.slice(-30));
+}
+function doMutate() {
+  stop(); const t0 = performance.now(), w = weights();
+  const seen = seenSet(), taken = [], pool = [];
+  for (let k = 0; k < 3 && pool.filter(m => m.offered).length < 6; k++) {   // the gates are friction: when few pass, make another batch (up to three)
+    const batch = Compat.mutate(bench.dag, can, types, { seed: seed + k * 1000, count: 18, from: bench.name }).filter(m => !pool.some(x => JSON.stringify(x.dag) === JSON.stringify(m.dag)))
+      .map((m, i) => measure(Object.assign(m, { n: seed + '·' + (pool.length + i + 1) })));
+    pool.push(...batch); gate(batch);
+  }
+  function gate(batch) { batch.forEach(m => {     // the null against everything seen: a repeat is friction, not a new tool
+    if (!m.offered || !m.r.mono) return;
+    let best = { db: Infinity, what: '' };
+    seen.concat(taken).forEach(x => { const o = x.r || play(x.dag, 'bass'); if (!o.mono) return; const db = nullDb(m.r.mono, o.mono); if (db < best.db) best = { db, what: x.what }; });
+    m.nullTo = best; if (best.db < NULL_REPEAT) { m.offered = false; m.why = 'repeats ' + best.what + ' (nulls to ' + fmtDb(best.db) + ')'; }
+    else taken.push({ what: 'mutant ' + m.n, dag: m.dag, r: m.r });
+    m.score = feats(m).reduce((a, f) => a + (w[f] || 0), 0);
+  }); }
+  const ok = pool.filter(m => m.offered).sort((a, b) => b.score - a.score), pick = ok.slice(0, 5), rest = ok.slice(5);
+  if (rest.length) { const wild = rest[Math.floor(rest.length * ((seed * 0.618) % 1))]; wild.wild = true; pick.push(wild); }   // one wildcard, so it keeps exploring
+  const ranked = rest.filter(m => !m.wild).length;
+  mutants = pick.concat(pool.filter(m => !m.offered)); seed++;
+  seenMutants = seenMutants.concat(pick.map(m => ({ what: 'mutant ' + m.n, dag: m.dag, r: m.r }))).slice(-60);
+  const nv = verdicts.length;
+  document.getElementById('mutLab').innerHTML = 'from <b>' + bench.name + '</b> · seed ' + (seed - 1) + ' · ' + pool.length + ' made, ' + pool.filter(m => !m.offered).length + ' failed a gate, ' + ranked + ' ranked lower' +
+    (nv ? ' by what you kept and threw away (' + nv + ' verdicts)' : '') + ' · ' + pick.length + ' offered · ' + Math.round(performance.now() - t0) + ' ms';
+  drawMutants(); document.getElementById('grid').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function wave(cv, r) {
+  const w = cv.width = Math.max(10, cv.clientWidth * 2), h = cv.height = 84, g = cv.getContext('2d'); g.clearRect(0, 0, w, h); if (!r.mono) return;
+  const k = r.peak > 0 ? 0.95 / r.peak : 1, step = r.mono.length / w; g.fillStyle = '#00D4FF';
+  for (let x = 0; x < w; x++) { let lo = 1, hi = -1; for (let i = Math.floor(x * step); i < Math.floor((x + 1) * step); i++) { const v = r.mono[i] * k; if (v < lo) lo = v; if (v > hi) hi = v; } g.fillRect(x, h / 2 - hi * h / 2, 1, Math.max(1, (hi - lo) * h / 2)); }
+}
+function nameFor(base, op) { return base + ' · ' + (op.op === 'swap' ? op.to : op.op === 'insert' ? '+ ' + op.component : op.op === 'remove' ? 'no ' + op.node : op.op === 'vary' ? op.node + ' ' + op.key : op.from.split('.')[0] + ' → ' + op.to.split('.')[0]); }
+function whyOffered(m) {
+  if (m.wild) return 'a wildcard — ranked low, offered so it keeps learning';
+  const w = weights(), fs = feats(m).filter(f => w[f]).sort((a, b) => Math.abs(w[b]) - Math.abs(w[a])).slice(0, 2);
+  return fs.length ? fs.map(f => (w[f] > 0 ? 'you kept ' : 'you threw away ') + featWords(f) + ' (' + (w[f] > 0 ? '+' : '') + w[f] + ')').join(' · ') : 'nothing learned about it yet';
+}
+function card(m) {
+  const d = document.createElement('div'); d.className = 'mut' + (m.offered ? '' : ' off'); d.dataset.mut = m.id;
+  const hit = hitNode(m.op), comps = inOrder(m.dag).map(n => '<span class="k' + (n.id === hit ? ' hit' : '') + '">' + n.component + '</span>').join('<span>→</span>'), f = (x) => x == null ? '—' : x.toFixed(3);
+  d.innerHTML = '<div class="top"><span class="num">MUTANT ' + m.n + '</span><span class="by">' + (m.wild ? '⚄ WILDCARD' : '⚄ MUTATE') + '</span></div>' +
+    '<div class="what">' + say(m.op) + '</div><div class="chain">' + comps + '</div><canvas class="wave"></canvas>' +
+    '<div class="meas"><span>plays</span><b class="' + (m.r.ok ? 'yes' : 'no') + '">' + (m.r.ok ? 'yes · ' + m.r.rmsDb.toFixed(1) + ' dB' : 'no — ' + (m.r.why || []).join('; ')) + '</b>' +
+    '<span>heard as new</span><b class="' + (m.heard ? 'yes' : 'no') + '">' + (m.heard ? 'yes' : 'no') + ' · ' + f(m.fromParent) + ' from ' + m.from.name + '</b>' +
+    '<span>null to seen</span><b class="' + (m.nullTo && m.nullTo.db < NULL_REPEAT ? 'no' : '') + '">' + (m.nullTo ? fmtDb(m.nullTo.db) + ' vs ' + m.nullTo.what : '—') + '</b>' +
+    '<span>nearest</span><b>' + (m.near ? m.near.nn.label + ' · ' + m.near.nn.preset + ' (' + f(m.near.d) + ', ' + m.near.verdict + ')' : '—') + '</b>' +
+    (m.offered ? '<span>why offered</span><b>' + whyOffered(m) + '</b>' : '<span>not offered</span><b class="no">' + m.why + '</b>') + '</div>' +
+    '<div class="row"><button class="tb" data-a="play">▶ PLAY</button><button class="tb" data-a="ab">A / B</button>' +
+    (m.offered ? '<button class="tb on" data-a="open">✎ OPEN TO EDIT</button><button class="tb" data-a="keep">KEEP</button>' : '') + '<button class="tb" data-a="throw">' + (m.offered ? '✕ THROW AWAY' : '✕') + '</button></div>';
+  d.querySelector('[data-a=play]').onclick = () => hear(m.dag, m.id);
+  d.querySelector('[data-a=ab]').onclick = () => hear(bench.dag, 'bench', () => setTimeout(() => hear(m.dag, m.id), 250));
+  const ob = d.querySelector('[data-a=open]'); if (ob) ob.onclick = () => { verdict(m, 0.5); open({ name: nameFor(m.from.name, m.op), dag: m.dag, ops: m.from.ops.concat([m.op]) }); bench.savedAt = ''; drawBench(); window.scrollTo({ top: 0, behavior: 'smooth' }); toast('mutant ' + m.n + ' is on the bench — edit it, then keep it'); };
+  const kb = d.querySelector('[data-a=keep]'); if (kb) kb.onclick = () => { verdict(m, 1); keepAs(nameFor(m.from.name, m.op), m.dag, m.from.ops.concat([m.op]), m); mutants = mutants.filter(x => x !== m); drawMutants(); };
+  d.querySelector('[data-a=throw]').onclick = () => { if (m.offered) verdict(m, -1); if (playingId === m.id) stop(); mutants = mutants.filter(x => x !== m); drawMutants(); };
+  requestAnimationFrame(() => wave(d.querySelector('canvas'), m.r));
+  return d;
+}
+function drawMutants() {
+  const grid = document.getElementById('grid'), offs = document.getElementById('offs'); grid.innerHTML = ''; offs.innerHTML = '';
+  const on = mutants.filter(m => m.offered), no = mutants.filter(m => !m.offered);
+  on.forEach(m => grid.appendChild(card(m)));
+  if (no.length) { const det = document.createElement('details'); det.className = 'offs';
+    det.innerHTML = '<summary>NOT OFFERED (' + no.length + ') — it does not play cleanly, no one could hear the change, or it nulls against something already seen</summary><div class="g2" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:10px"></div>';
+    offs.appendChild(det); no.forEach(m => det.querySelector('.g2').appendChild(card(m))); }
+}
+
+// ---- keep: a tool of your own (its DAG, its lineage, what was measured) ----
+function sig(r) { if (!r.mono) return null; const k = r.peak > 0 ? 1 / r.peak : 1, n = Math.floor(r.mono.length / 12), a = new Int16Array(n); for (let i = 0; i < n; i++) a[i] = Math.round(Math.max(-1, Math.min(1, r.mono[i * 12] * k)) * 32767);
+  let b = ''; const u = new Uint8Array(a.buffer); for (let i = 0; i < u.length; i += 8192) b += String.fromCharCode.apply(null, u.subarray(i, i + 8192)); return btoa(b); }
+function unsig(s) { const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); const a = new Int16Array(u.buffer), f = new Float32Array(a.length); for (let i = 0; i < a.length; i++) f[i] = a[i] / 32767; return f; }
+function regression(k) {   // the kept tool rendered now, nulled against its render when kept: the same parts and settings must make the same sound
+  if (!k.render) return null; const r = play(k.dag, 'bass'); if (!r.mono) return { db: 0, ok: false };
+  const now = unsig(sig(r)), then = unsig(k.render), db = nullDb(now, then); return { db, ok: db < -60 };
+}
+function keepAs(name, dag, ops, m) {
+  const r = play(dag, 'bass'), k = { id: 'k' + Date.now().toString(36) + Math.floor(Math.random() * 1e3), name, dag: clone(dag), ops: clone(ops), at: new Date().toISOString(),
+    render: sig(r), measured: { rmsDb: r.rmsDb, nearest: r.fp ? (() => { const n = nearest(r.fp); return { tool: n.nn.label, preset: n.nn.preset, d: +n.d.toFixed(3), verdict: n.verdict }; })() : null } };
+  kept.unshift(k); save(); drawKept(); toast('kept: ' + name); return k;
+}
+document.getElementById('save').onclick = () => {
+  if (bench.keptId && kept.some(k => k.id === bench.keptId)) { const k = kept.find(k => k.id === bench.keptId); k.dag = clone(bench.dag); k.ops = clone(bench.ops); k.name = bench.name; k.at = new Date().toISOString(); k.render = sig(play(k.dag, 'bass')); save(); bench.savedAt = JSON.stringify(bench.dag); drawKept(); drawBench(); toast('saved ' + k.name); return; }
+  const k = keepAs(bench.name, bench.dag, bench.ops); bench.keptId = k.id; bench.savedAt = JSON.stringify(bench.dag); drawBench();
+};
+function drawKept() {
+  const L = document.getElementById('keptList'); L.innerHTML = '';
+  if (!kept.length) L.innerHTML = '<div class="empty">nothing kept yet. edit the tool and press KEEP AS A NEW TOOL, or KEEP a mutant. kept tools show here with how they were made.</div>';
+  kept.forEach(k => {
+    const d = document.createElement('div'); d.className = 'kp' + (bench && bench.keptId === k.id ? ' cur' : '');
+    d.innerHTML = '<div class="nm"></div><div class="ln">' + (k.ops.length ? k.ops.slice(-6).map((o, i) => (k.ops.length - Math.min(6, k.ops.length) + i + 1) + '. ' + say(o)).join('<br>') : 'no changes') + '</div>' +
+      '<div class="ln">' + inOrder(k.dag).map(n => n.component).join(' → ') + '</div><div class="reg"></div>' +
+      '<div class="row"><button class="tb" data-a="play">▶</button><button class="tb on" data-a="open">✎ OPEN</button><button class="tb" data-a="from">⚄ MUTATE FROM IT</button><button class="tb" data-a="del" title="delete">✕</button></div>';
+    d.querySelector('.nm').textContent = k.name;
+    const rg = regression(k), re = d.querySelector('.reg'); if (rg) { re.className = 'reg ' + (rg.ok ? 'ok' : 'bad'); re.textContent = rg.ok ? '✓ regression gate: nulls against its render when kept (' + fmtDb(rg.db) + ')' : '⚠ REGRESSION: sounds different from when kept (null ' + fmtDb(rg.db) + ')'; }
+    d.querySelector('[data-a=play]').onclick = () => hear(k.dag, k.id);
+    d.querySelector('[data-a=open]').onclick = () => { open({ keptId: k.id, name: k.name, dag: k.dag, ops: k.ops }); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+    d.querySelector('[data-a=from]').onclick = () => { open({ keptId: k.id, name: k.name, dag: k.dag, ops: k.ops }); doMutate(); };
+    d.querySelector('[data-a=del]').onclick = () => { kept = kept.filter(x => x !== k); save(); if (bench.keptId === k.id) bench.keptId = null; drawKept(); drawBench(); };
+    L.appendChild(d);
+  });
+}
+
+function drawLearned() {
+  const L = document.getElementById('learned'); if (!L) return; const w = weights(), ks = Object.keys(w).filter(k => w[k]).sort((a, b) => w[b] - w[a]);
+  if (!ks.length) { L.innerHTML = '<div class="empty">nothing yet. each KEEP, OPEN and THROW AWAY teaches it what you go for.</div>'; return; }
+  const row = (k) => '<div class="lrn"><span>' + featWords(k) + '</span><b class="' + (w[k] > 0 ? 'p' : 'n') + '">' + (w[k] > 0 ? '+' : '') + w[k] + '</b></div>';
+  L.innerHTML = '<div class="empty" style="margin-top:6px">' + verdicts.length + ' verdicts</div>' + ks.slice(0, 5).map(row).join('') + (ks.length > 5 ? '<div class="lrn"><span>…</span></div>' + ks.slice(-3).filter(k => w[k] < 0 && ks.indexOf(k) >= 5).map(row).join('') : '') +
+    '<div class="row" style="margin-top:6px"><button class="tb" id="forget">FORGET WHAT IT LEARNED</button></div>';
+  document.getElementById('forget').onclick = () => { verdicts = []; st('eravos.field.mutate.verdicts', verdicts); drawLearned(); };
+}
+
+// ---- SYNTHESIZE: the bench becomes a whole tool — its face from its parts' elements (in signal order, the face controls first, the rest
+// behind More depth), its keys, its tool file (what it is made of, its DAG, its lineage, its render for the regression gate). The end, not more mutating.
+const slug = (t) => String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'tool';
+function toolFile() {
+  const order = inOrder(bench.dag), r = play(bench.dag, 'bass');
+  return { schema: 'eravos.tool/1 (draft — synthesized)', id: 'mine.' + slug(bench.name), label: bench.name, category: 'Mine', icon: '◆',
+    needs: { components: [...new Set(order.map(n => n.component + '@' + (C[n.component].version || '1.0.0')))], elements: [...new Set(order.map(n => n.component + '.element@1'))] },
+    config: order.flatMap(n => (C[n.component].variables || []).filter(v => v.type === 'number' || v.type === 'enum' || v.type === 'boolean').map(v => ({ key: n.id + '.' + v.key, element: n.component, node: n.id,
+      type: v.type, min: v.min, max: v.max, options: v.options, unit: v.unit, default: n.vars && n.vars[v.key] !== undefined ? n.vars[v.key] : v.default }))),
+    faceKeys: order.flatMap(n => (((C[n.component].element || {}).controls) || []).filter(c => c.face).map(c => n.id + '.' + c.key)),
+    dag: bench.dag, lineage: { from: 'Saw voice', ops: bench.ops, by: 'him + mutate', at: new Date().toISOString() },
+    gates: { render: 'bass line, 48 kHz', null_baseline: sig(r) ? '(stored: the regression gate nulls against it)' : null, rmsDb: +r.rmsDb.toFixed(2) } };
+}
+function knob(v, x, onSet) {
+  const s = slider(v), el = document.createElement('div'); el.className = 'knob'; el.title = (v.about || v.key) + ' · drag up / down · double-click: default';
+  let val = x; const draw = () => { const t = s.toS(val), a0 = 135, a1 = 135 + 270 * t, R = 17, P = (a) => [24 + R * Math.cos(a * Math.PI / 180), 24 + R * Math.sin(a * Math.PI / 180)], [x0, y0] = P(a0), [x1, y1] = P(a1), [xe, ye] = P(405);
+    el.innerHTML = '<svg width="48" height="44" viewBox="0 0 48 44"><path d="M' + x0 + ' ' + y0 + ' A' + R + ' ' + R + ' 0 1 1 ' + xe + ' ' + ye + '" fill="none" stroke="#1B2A3A" stroke-width="3.5" stroke-linecap="round"/>' +
+      (t > 0.002 ? '<path d="M' + x0 + ' ' + y0 + ' A' + R + ' ' + R + ' 0 ' + (270 * t > 180 ? 1 : 0) + ' 1 ' + x1 + ' ' + y1 + '" fill="none" stroke="var(--c)" stroke-width="3.5" stroke-linecap="round"/>' : '') +
+      '<circle cx="' + x1 + '" cy="' + y1 + '" r="2.6" fill="#D8F6FF"/></svg><span class="kv">' + fmtN(val, v) + '</span><span class="kl">' + v.key + '</span>'; };
+  draw(); let y = null, t0 = 0;
+  el.onpointerdown = (e) => { y = e.clientY; t0 = s.toS(val); el.setPointerCapture(e.pointerId); };
+  el.onpointermove = (e) => { if (y == null) return; val = s.fromS(Math.max(0, Math.min(1, t0 + (y - e.clientY) / 160))); draw(); };
+  el.onpointerup = () => { if (y == null) return; y = null; onSet(val); };
+  el.ondblclick = () => { val = v.default; draw(); onSet(val); };
+  return el;
+}
+let synthOpen = false;
+function drawSynth() {
+  if (!synthOpen) return;
+  const order = inOrder(bench.dag), face = document.getElementById('sFace'); face.innerHTML = '';
+  document.getElementById('sName').textContent = bench.name; document.getElementById('sVer').textContent = 'synthesized from ' + order.length + ' parts · ' + bench.ops.length + ' changes from Saw voice';
+  const more = [];
+  order.forEach(n => {
+    const c = C[n.component], col = kindCol(n.component), ctl = ((c.element || {}).controls) || [], vs = (c.variables || []).filter(v => v.type === 'number' || v.type === 'enum' || v.type === 'boolean');
+    const mk = (keys, title) => { const el = document.createElement('div'); el.className = 'el'; el.style.setProperty('--c', col);
+      el.innerHTML = '<div class="eh"><span>' + title + '</span><span>' + n.component + '</span></div><div class="knobs"></div>'; const K = el.querySelector('.knobs');
+      keys.forEach(k => { const v = vs.find(q => q.key === k); if (!v) return; const x = n.vars && n.vars[k] !== undefined ? n.vars[k] : v.default;
+        const set = (val) => { apply(Compat.vary(bench.dag, n.id, k, val, can, types)); drawSynth(); };
+        if (v.type === 'number') K.appendChild(knob(v, x, set));
+        else { const w = document.createElement('div'); w.style.cssText = 'display:flex;flex-direction:column;gap:3px'; w.innerHTML = '<span class="kl" style="font-size:9px;color:var(--dim);letter-spacing:1px">' + k + '</span><div class="seg"></div>';
+          (v.type === 'enum' ? v.options : [true, false]).forEach(o => { const b = document.createElement('button'); b.textContent = v.type === 'enum' ? o : (o ? 'on' : 'off'); if (o === x) b.className = 'on'; b.onclick = () => set(o); w.querySelector('.seg').appendChild(b); }); K.appendChild(w); } });
+      return el; };
+    const fk = ctl.filter(q => q.face).map(q => q.key), rest = vs.map(v => v.key).filter(k => !fk.includes(k));
+    face.appendChild(mk(fk.length ? fk : vs.slice(0, 3).map(v => v.key), n.id.toUpperCase() + ' · ' + n.component.replace(/-/g, ' ').toUpperCase()));
+    if (rest.length) more.push(mk(rest, n.id.toUpperCase() + ' · MORE'));
+  });
+  if (more.length) { const b = document.createElement('button'); b.className = 'more'; b.textContent = (synthMore ? '▾' : '▸') + ' MORE DEPTH (' + more.reduce((a, e) => a + e.querySelectorAll('.knob,.seg').length, 0) + ' more settings)';
+    b.onclick = () => { synthMore = !synthMore; drawSynth(); }; face.appendChild(b); if (synthMore) more.forEach(e => face.appendChild(e)); }
+  const f = toolFile(); document.getElementById('sFile').textContent = JSON.stringify(Object.assign({}, f, { gates: Object.assign({}, f.gates) }), null, 2);
+  const rg = (kept.find(k => k.id === bench.keptId) && regression(kept.find(k => k.id === bench.keptId))) || null;
+  document.getElementById('sFoot').innerHTML = 'face: <b>' + f.faceKeys.length + '</b> controls from the parts\' elements, ' + (f.config.length - f.faceKeys.length) + ' more behind More depth · made of <b>' + f.needs.components.join(', ') + '</b><br>' +
+    'gates: types fit ✓ · builds ✓ · plays ' + (play(bench.dag, 'bass').ok ? '✓' : '✗') + ' · null against your kept tools: ' + nullAgainstKept() + (rg ? ' · regression ' + (rg.ok ? '✓ ' + fmtDb(rg.db) : '⚠ ' + fmtDb(rg.db)) : '') + '<br>' +
+    'play the keys (or your computer keyboard: A W S E D F T G Y H U J K). built into ERAVOS, SAVE puts this tool in Documents\\ERAVOS\\tools\\' + f.id + ' — it opens on the canvas, wires like any tool, its knobs move while it plays.';
+}
+let synthMore = false;
+function nullAgainstKept() { const r = play(bench.dag, 'bass'); if (!r.mono) return '—'; let best = { db: Infinity, name: '' };
+  kept.filter(k => k.id !== bench.keptId).forEach(k => { const o = play(k.dag, 'bass'); if (o.mono) { const db = nullDb(r.mono, o.mono); if (db < best.db) best = { db, name: k.name }; } });
+  return best.name ? (best.db < NULL_REPEAT ? '⚠ the same as ' + best.name + ' (' + fmtDb(best.db) + ')' : '✓ nearest ' + best.name + ' ' + fmtDb(best.db)) : 'nothing kept to compare'; }
+// the keys: each press renders the note through the assembled tool, held until let go
+const noteCache = new Map(); let held = null;
+function renderNote(dag, hz) {
+  const key = hz + '|' + JSON.stringify(dag); if (noteCache.has(key)) return noteCache.get(key);
+  const E = assemble(dag, contracts, domain, { sr: SR }); if (!E.ok) return null; const { L, R } = E.render(3, [{ t: 0, dur: 3, hz }]);
+  let pk = 0; for (let i = 0; i < L.length; i++) { if (!Number.isFinite(L[i])) L[i] = 0; if (!Number.isFinite(R[i])) R[i] = 0; pk = Math.max(pk, Math.abs(L[i]), Math.abs(R[i])); }
+  const g = Math.min(1, 0.005 * SR); for (let i = 0; i < g; i++) { L[i] *= i / g; R[i] *= i / g; }
+  const o = { L, R, k: pk > 0 ? 0.7 / pk : 1 }; if (noteCache.size > 60) noteCache.delete(noteCache.keys().next().value); noteCache.set(key, o); return o;
+}
+function noteOn(hz, el) {
+  noteOff(); AC = AC || new (window.AudioContext || window.webkitAudioContext)({ sampleRate: SR }); if (AC.state === 'suspended') AC.resume();
+  const o = renderNote(bench.dag, hz); if (!o) return; const buf = AC.createBuffer(2, o.L.length, SR); buf.getChannelData(0).set(o.L); buf.getChannelData(1).set(o.R);
+  const sN = AC.createBufferSource(), gN = AC.createGain(); sN.buffer = buf; gN.gain.value = o.k; sN.connect(gN).connect(AC.destination); sN.start(); held = { sN, gN, el }; if (el) el.classList.add('on');
+}
+function noteOff() { if (!held) return; const { sN, gN, el } = held; const t = AC.currentTime; gN.gain.setValueAtTime(gN.gain.value, t); gN.gain.linearRampToValueAtTime(0, t + 0.06); sN.stop(t + 0.08); if (el) el.classList.remove('on'); held = null; }
+function drawKeys() {
+  const K = document.getElementById('sKeys'); K.innerHTML = ''; const names = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'], white = [], black = [];
+  for (let i = 0; i <= 24; i++) { const nm = names[i % 12], hz = 55 * Math.pow(2, i / 12); (nm.includes('#') ? black : white).push({ i, nm, hz, oct: 1 + Math.floor((i + 9) / 12) }); }
+  const W = 100 / white.length;
+  white.forEach((k, j) => { const e = document.createElement('div'); e.className = 'wk'; e.style.left = (j * W) + '%'; e.style.width = W + '%'; e.innerHTML = k.nm === 'A' || k.nm === 'C' ? '<i>' + k.nm + k.oct + '</i>' : ''; k.el = e; K.appendChild(e); });
+  black.forEach(k => { const j = white.filter(w => w.i < k.i).length; const e = document.createElement('div'); e.className = 'bk'; e.style.left = (j * W - W * 0.32) + '%'; e.style.width = (W * 0.64) + '%'; k.el = e; K.appendChild(e); });
+  white.concat(black).forEach(k => { k.el.onpointerdown = (e) => { e.preventDefault(); noteOn(k.hz, k.el); }; k.el.onpointerup = k.el.onpointerleave = () => { if (held && held.el === k.el) noteOff(); }; });
+  drawKeys.map = white.concat(black).sort((a, b) => a.i - b.i);
+}
+const KB = 'awsedftgyhujk';
+document.addEventListener('keydown', (e) => { if (!synthOpen || e.repeat || e.target.tagName === 'INPUT') return; const i = KB.indexOf(e.key.toLowerCase()); if (i >= 0 && drawKeys.map) { const k = drawKeys.map[i + 3]; if (k) noteOn(k.hz, k.el); } else if (e.key === 'Escape') closeSynth(); });
+document.addEventListener('keyup', (e) => { if (synthOpen && KB.indexOf(e.key.toLowerCase()) >= 0) noteOff(); });
+function openSynth() { stop(); synthOpen = true; document.getElementById('synthWrap').hidden = false; document.body.style.overflow = 'hidden'; drawKeys(); drawSynth(); }
+function closeSynth() { noteOff(); synthOpen = false; document.getElementById('synthWrap').hidden = true; document.body.style.overflow = ''; drawBench(); }
+document.getElementById('synth').onclick = openSynth; document.getElementById('sClose').onclick = closeSynth;
+document.getElementById('sJson').onclick = () => { const f = document.getElementById('sFile'); f.hidden = !f.hidden; };
+document.getElementById('sSave').onclick = () => {
+  const f = toolFile(); f.gates.null_baseline = sig(play(bench.dag, 'bass'));
+  if (!(bench.keptId && kept.some(k => k.id === bench.keptId))) { const k = keepAs(bench.name, bench.dag, bench.ops); bench.keptId = k.id; } else document.getElementById('save').click();
+  bench.savedAt = JSON.stringify(bench.dag);
+  try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(f, null, 2)], { type: 'application/json' })); a.download = f.id + '.tool.json'; document.body.appendChild(a); a.click(); a.remove(); } catch (e) {}
+  toast('saved: ' + f.id + ' (kept here, and its tool file downloaded)'); drawSynth();
+};
+
+// ---- a tool that cannot be assembled yet opens EXPLODED: the whole tool, then its pieces apart, wired to its core (the board of 2026-11-15,
+// unchanged). Click a piece: what it is, what it carries, what it could become, what it waits on. Editing it needs its parts as components.
+const XW = D.wobble, FULLG = Compat.graph(contracts, types);
+let view = null;
+function openExploded() { stop(); closeSynth && synthOpen && closeSynth(); view = { exploded: false, flip: {}, sel: null }; drawBench(); window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => { if (view && !view.exploded) { view.exploded = true; drawX(); } }, 900); }
+function closeExploded() { view = null; drawBench(); }
+let xEls = null;
+// the exact board (Wobble-Broken.dc.html, as Wobble-Field.html): its markup, not redrawn; the whole tool first, then blown apart into it
+function buildX() {
+  const S = document.getElementById('xStage'); S.innerHTML = XW.board; xEls = [].slice.call(S.querySelectorAll('.pc'));
+  xEls.forEach(img => { img.style.cursor = 'pointer'; img.onclick = (e) => { e.stopPropagation(); const id = img.dataset.png.replace('.png', '').replace('filter-vowels', 'filter-formant');
+    if (view.sel === id) view.flip[id] = !view.flip[id]; view.sel = id; drawX(); drawXInsp(); }; });
+}
+function fitX() { const W = document.getElementById('xWrap'), k = Math.min(1, (W.clientWidth || 1100) / 1800); document.getElementById('xStage').style.transform = 'scale(' + k + ')'; W.style.height = (1320 * k) + 'px'; }
+function drawX() {
+  const first = !xEls; if (first) buildX(); fitX(); const S = document.getElementById('xStage'), Bd = S.firstElementChild; if (first) Bd.classList.add('still');
+  const e = view.exploded, idOf = (img) => img.dataset.png.replace('.png', '').replace('filter-vowels', 'filter-formant'), out = (img) => e ? !view.flip[idOf(img)] : !!view.flip[idOf(img)];
+  Bd.classList.toggle('whole', !e);
+  xEls.forEach(img => { const o = out(img); img.style.left = (o ? img.dataset.x : img.dataset.hx) + 'px'; img.style.top = (o ? img.dataset.y : img.dataset.hy) + 'px'; img.style.transitionDelay = o && e ? img.dataset.delay + 's' : '0s';
+    img.style.boxShadow = view.sel === idOf(img) ? '0 0 0 3px #00D4FF88' : 'none'; });
+  [].forEach.call(Bd.querySelectorAll('.apart'), el => { el.style.opacity = e ? 1 : 0; el.style.transitionDelay = e ? '2.2s' : '0s'; });
+  const sf = Bd.querySelector('#surface'); if (sf) { sf.style.opacity = e ? 0 : 1; sf.style.transitionDelay = e ? '0.4s' : '0s'; }
+  document.getElementById('xEx').classList.toggle('on', e); document.getElementById('xAs').classList.toggle('on', !e);
+  if (first) { void Bd.offsetWidth; requestAnimationFrame(() => Bd.classList.remove('still')); }
+}
+const WAITS = { '✓ BUILT': 'the part exists as a component; Wobble Bass still does it inside its own engine — it moves out unchanged, proven by the null render, and then it can be edited and swapped here',
+  '● IN IT': 'already its own component inside Wobble Bass, null-proven — it needs an adapter to be assembled here',
+  '↗ COMES OUT': 'inside Wobble Bass now: its contract is to write, then it moves out (the WD track), proven by the null render',
+  '○ PLANNED': 'not built yet: the component and its contract are to write', 'OWN': 'Wobble Bass\'s own part — it stays in the tool (or becomes a component if another tool needs it)',
+  'PACK': 'data beside the tool, never in its engine — presets load into every component' };
+function drawXInsp() {
+  const p = view.sel && XW.pieces.find(x => x.id === view.sel);
+  if (!p) { insp.innerHTML = '<div class="why" style="font-size:11px;line-height:1.7">Wobble Bass, opened exploded: every element of its face lifted off and wired to its core, as on the board of 2026-11-15 (Wobble Bass 4.1.0 — since then its AMP stage moved out as the amp-chain component, WD1). ' +
+    '<b style="color:var(--soft);font-weight:400">Click a piece</b> to see what it is and what it waits on; click it again to snap it off or back in. It cannot be edited or mutated yet: '
+    + XW.pieces.filter(x => x.mark === '✓ BUILT' || x.mark === '● IN IT').length + ' of ' + XW.pieces.length + ' pieces are components, none can be assembled into Wobble Bass yet. The way there: WD2 the sub · WD3 the output stage · WD4 squash · WD5 LFO + wub seq · WD6 FM growl — each moved out unchanged and proven by the null render.</div>'; return; }
+  const c = C[p.comp], sib = c ? (FULLG.standIns[p.comp] || []) : [];
+  insp.style.setProperty('--c', p.col);
+  insp.innerHTML = '<div class="hd"><span class="t" style="color:' + p.col + '">' + p.comp.replace('own:', '').toUpperCase() + '</span><span class="s">' + p.sub + ' &nbsp; <span class="mark" style="color:' + p.col + '">' + p.mark + '</span></span></div>' +
+    '<div class="why" style="font-size:11px;color:var(--soft)">' + p.lines.join(' · ') + '</div>' +
+    '<div class="pl"><span>waits on</span><b>' + (WAITS[p.mark] || '') + '</b>' +
+    (c ? '<span>ports</span><b>' + c.ports.map(q => q.dir + ' ' + q.id + ' (' + q.type + ')').join(' · ') + '</b>' +
+      '<span>settings</span><b>' + (c.variables || []).map(v => v.key + (v.type === 'number' ? ' ' + fmtN(v.min) + '–' + fmtN(v.max, v) : v.type === 'enum' ? ' [' + v.options.length + ']' : '')).join(' · ') + '</b>' +
+      '<span>could swap for</span><b>' + (sib.length ? sib.join(' · ') : 'nothing that fits its slot yet') + '</b>' : '<span>component</span><b>' + (p.comp.startsWith('own:') ? 'none — Wobble Bass\'s own' : p.comp === 'packs' ? 'none — data' : 'no contract yet (' + p.comp + ')') + '</b>') + '</div>';
+}
+document.getElementById('xEx').onclick = () => { view.exploded = true; view.flip = {}; drawX(); };
+document.getElementById('xAs').onclick = () => { view.exploded = false; view.flip = {}; drawX(); };
+document.getElementById('xBack').onclick = closeExploded;
+addEventListener('resize', () => { if (view) fitX(); });
+
+// ---- start from: the real tools, and how much of each can be assembled today ----
+function drawTools() {
+  const T = document.getElementById('tools'); T.innerHTML = '';
+  const row = (name, have, all, missing, ready, onOpen, note) => { const d = document.createElement('div'); d.className = 'tool' + (ready ? ' ready' : '');
+    d.innerHTML = '<div class="nm"><span></span><span>' + have + ' of ' + all + ' parts ready</span></div><div class="bar"><i style="width:' + Math.round(100 * have / Math.max(1, all)) + '%"></i></div><div class="ln"></div>' + (ready ? '<div class="row"><button class="tb on">✎ OPEN ON THE BENCH</button></div>' : '');
+    d.querySelector('.nm span').textContent = name; d.querySelector('.ln').textContent = note || (missing.length ? 'needs: ' + missing.join(', ') : '');
+    if (ready) d.querySelector('button').onclick = onOpen; if (!ready && note === 'X') { d.querySelector('.ln').textContent = 'needs: ' + missing.join(', ') + ' — opens EXPLODED to understand it'; const r = document.createElement('div'); r.className = 'row'; r.innerHTML = '<button class="tb on">◎ OPEN EXPLODED</button>'; r.querySelector('button').onclick = openExploded; d.appendChild(r); d.classList.add('ready'); } T.appendChild(d); };
+  row(START.name, START.dag.nodes.length, START.dag.nodes.length, [], true, () => open(START), 'osc-va → filter-svf → saturator-tube → stereo-tools (the CG3 voice)');
+  D.tools.map(t => { const missing = t.components.filter(c => !domain.adapters[c] && c !== 'voice-allocator'); return Object.assign({ missing, have: t.components.length - missing.length }, t); })
+    .sort((a, b) => (b.have / b.components.length) - (a.have / a.components.length) || b.have - a.have)
+    .forEach(t => row(t.label, t.have, t.components.length, t.missing, false, null, t.id === 'eravos.wobble-bass' ? 'X' : null));
+}
+
+// ---- the bar, the bench ----
+const phraseSel = document.getElementById('phrase'), playBtn = document.getElementById('playCur'), autoBox = document.getElementById('auto'), nameIn = document.getElementById('toolName');
+function setPlayBtn() { playBtn.textContent = playingId === 'bench' ? '■ STOP' : '▶ PLAY'; playBtn.classList.toggle('on', playingId === 'bench'); }
+playBtn.onclick = () => hear(bench.dag, 'bench');
+phraseSel.onchange = () => stop();
+document.getElementById('mutate').onclick = doMutate;
+document.getElementById('undo').onclick = undo; document.getElementById('redo').onclick = redo;
+nameIn.oninput = () => { bench.name = nameIn.value || 'untitled'; nameIn.style.width = Math.max(140, nameIn.value.length * 15 + 20) + 'px'; drawCrumbs(); };
+document.addEventListener('keydown', (e) => { if (e.target.tagName === 'INPUT' && e.target.type !== 'range') return;
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
+  else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
+  else if (e.key === ' ' && e.target === document.body) { e.preventDefault(); hear(bench.dag, 'bench'); }
+  else if (e.key === 'Escape') { sel = null; selEdge = null; drawBench(); } });
+function drawCrumbs() {
+  const cr = document.getElementById('crumbs'), ops = bench.ops.slice(-3), skip = bench.ops.length - ops.length;
+  cr.innerHTML = '<span class="c">' + (bench.ops.length ? 'SAW VOICE' : bench.name.toUpperCase()) + '</span>' + (skip ? '<span>› … ' + skip + ' more</span>' : '') + ops.map((o, i) => { const t = sayPlain(o).toUpperCase(); return '<span>›</span><span class="c' + (i === ops.length - 1 ? ' cur' : '') + '" title="' + t + '">' + (t.length > 26 ? t.slice(0, 25) + '…' : t) + '</span>'; }).join('');
+}
+function drawBench() {
+  const X = !!view, show = (id, on) => { document.getElementById(id).style.display = on ? '' : 'none'; }; show('boardWrap', !X); show('xWrap', X); document.getElementById('xBtns').style.display = X ? 'flex' : 'none';
+  ['undo', 'redo', 'save', 'synth'].forEach(id => show(id, !X)); document.getElementById('auto').parentNode.style.display = X ? 'none' : 'flex';
+  const mb = document.getElementById('mutate'); mb.disabled = X; mb.title = X ? 'Wobble Bass can be mutated once its parts are components it is assembled from (the WD track)' : '';
+  if (X) { nameIn.value = 'Wobble Bass 4.1.0'; nameIn.readOnly = true; nameIn.style.width = '300px'; document.getElementById('edited').textContent = 'EXPLODED · TO UNDERSTAND IT';
+    document.getElementById('benchLab').innerHTML = 'the whole tool, then its pieces apart, wired to its core · <b>click a piece</b> to see what it is · again to snap it off or back in';
+    document.getElementById('crumbs').innerHTML = '<span class="c cur">WOBBLE BASS · EXPLODED</span>'; drawX(); drawXInsp(); drawKept(); return; }
+  nameIn.readOnly = false; document.getElementById('benchLab').innerHTML = 'the tool, exploded · <b>click a component</b> to edit it, swap it or remove it · <b>＋</b> on a wire to put a component there';
+  nameIn.value = bench.name; nameIn.style.width = Math.max(140, bench.name.length * 15 + 20) + 'px';
+  const ed = isEdited(); document.getElementById('edited').textContent = ed ? (bench.keptId ? '● CHANGED SINCE SAVED' : '● NOT KEPT YET') : (bench.keptId ? '✓ SAVED' : '');
+  const sv = document.getElementById('save'); sv.textContent = bench.keptId ? 'SAVE' : 'KEEP AS A NEW TOOL'; sv.disabled = bench.keptId ? !ed : false;
+  document.getElementById('undo').disabled = !hist.length; document.getElementById('redo').disabled = !fut.length;
+  drawCrumbs(); drawBoard(); drawInsp(); drawKept(); drawLearn();
+}
+function drawAll() { drawBench(); drawMutants(); drawTools(); drawLearned(); }
+document.getElementById('foot').innerHTML = 'parts that can be assembled today: <b>' + can.length + ' of ' + contracts.length + '</b> components — a tool opens here once every part it is made of can be; each part joins when its adapter is written (no sound re-made: the adapter calls the part\'s own tested kernel).<br>' +
+  'every edit and every mutant goes through the same checks: the types fit, it builds, it plays (finite, not silent, not pinned). "nearest" is advisory: your ear decides.<br>' +
+  'preview: kept tools stay in this page (this device). built into ERAVOS, they are tools in Documents\\ERAVOS\\tools that open on the canvas.';
+open(START); drawTools();
+if (/wobble/.test(location.hash)) openExploded();
+window.__mutate = { startLearning, nextFits, mixCores, stability, makePack, modSchema, makeTemplate, library, openLibrary, get styles() { return styles; }, get skins() { return skins; }, get templates() { return templates; }, openExploded, get view() { return view; }, openSynth, closeSynth, get verdicts() { return verdicts; }, nullDb, toolFile, doMutate, get mutants() { return mutants; }, get kept() { return kept; }, get bench() { return bench; }, apply, undo, redo, open };
+})();
+</script>
+</body></html>

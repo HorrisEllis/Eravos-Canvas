@@ -15,6 +15,9 @@
   ],
   "files": {
     "engine": "wobble-bass.engine.js",
+    "extra": [
+      "wobble-bass.board.js"
+    ],
     "ui": "wobble-bass.ui.js",
     "spec": "wobble-bass.spec",
     "preview": "preview.png",

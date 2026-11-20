@@ -35,7 +35,7 @@
       "tool": "eravos.fx-echo",
       "role": "echo",
       "required": false,
-      "preset": "Odd · Golden Echo",
+      "preset": "Golden Echo",
       "why": "a long golden echo"
     }
   ],
@@ -189,7 +189,7 @@
     },
     "Séance": {
       "eravos.ratio-lattice": {
-        "preset": "Odd · Séance Lattice"
+        "preset": "Séance Lattice"
       },
       "eravos.xen-synth": {
         "preset": "π Drone"
