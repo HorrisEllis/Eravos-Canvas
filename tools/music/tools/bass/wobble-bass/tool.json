@@ -39,6 +39,7 @@
     "components": [
       "filter-formant@1.0.0",
       "amp-chain@1.0.0",
+      "ensemble-core@1.0.0",
       "filter-svf@1.0.0",
       "filter-ladder@1.0.0",
       "saturator-tube@1.0.0",
@@ -51,6 +52,7 @@
     "elements": [
       "filter-formant.element@1",
       "amp-chain.element@1",
+      "ensemble-core.element@1",
       "filter-svf.element@1",
       "filter-ladder.element@1",
       "saturator-tube.element@1",

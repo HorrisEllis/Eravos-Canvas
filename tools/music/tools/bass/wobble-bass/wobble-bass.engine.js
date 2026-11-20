@@ -236,7 +236,9 @@
       { key: 'pnDensity', type: 'number', default: 2000, min: 20, max: 20000, step: 10, unit: '/s', label: 'Noise density', group: 'PARTS', part: 'osc-noise', hint: 'velvet and crackle: impulses a second' },
       { key: 'pnRate', type: 'number', default: 2000, min: 20, max: 20000, step: 10, unit: 'Hz', label: 'Noise band', group: 'PARTS', part: 'osc-noise', hint: 'band-limited: how fast it moves' },
       { key: 'pnTilt', type: 'number', default: 0, min: -1, max: 1, step: 0.01, label: 'Noise tilt', group: 'PARTS', part: 'osc-noise' },
-      { key: 'partInsert', type: 'enum', options: ['none', 'delay-line', 'filter-svf', 'saturator-tube', 'saturator-tape', 'bitcrusher'], default: 'none', label: 'Insert part', group: 'PARTS', socket: 'insert', near: 'squash', hint: 'a component after the amp, before the clipper: none = straight through · delay-line = an echo on the beat' },
+      { key: 'partInsert', type: 'enum', options: ['none', 'delay-line', 'filter-svf', 'saturator-tube', 'saturator-tape', 'bitcrusher', 'ensemble-core'], default: 'none', label: 'Insert part', group: 'PARTS', socket: 'insert', near: 'squash', hint: 'a component after the amp, before the clipper: none = straight through · delay-line = an echo on the beat' },
+      { key: 'peMode', type: 'enum', options: ['juno I', 'juno II', 'juno I+II', 'string machine', 'dimension'], default: 'juno I', label: 'Chorus', group: 'PARTS', part: 'ensemble-core', hint: 'the ensemble\'s machines (its own data): Juno I / II / I+II, a string machine, a dimension' },
+      { key: 'peMix', type: 'number', default: 0.5, min: 0, max: 1, step: 0.01, label: 'Chorus mix', group: 'PARTS', part: 'ensemble-core' },
       { key: 'piTime', type: 'enum', options: ['1/16', '1/8', '1/8.', '1/4', '1/4.', '1/2'], default: '1/8.', label: 'Echo time', group: 'PARTS', part: 'delay-line' },
       { key: 'piFeedback', type: 'number', default: 0.35, min: 0, max: 0.9, step: 0.01, label: 'Echo feedback', group: 'PARTS', part: 'delay-line' },
       { key: 'piDamp', type: 'number', default: 5000, min: 500, max: 16000, step: 10, unit: 'Hz', label: 'Echo damp', group: 'PARTS', part: 'delay-line' },
@@ -418,7 +420,7 @@
       };
       const parts = { filter: {}, drive: {}, noise: {}, insert: {} }, pend = {};
       const RES = () => Math.min(0.97, Math.max(0, (P.get('res') - 0.5) / 20));
-      const MAKE = { 'filter-svf': (a) => MusicParts.svf(a), 'filter-ladder': (a) => MusicParts.ladder(a), 'saturator-tube': (a) => MusicParts.saturatorTube(a), 'saturator-tape': (a) => MusicParts.saturatorTape(a),
+      const MAKE = { 'ensemble-core': (a) => MusicParts.ensemble(a), 'filter-svf': (a) => MusicParts.svf(a), 'filter-ladder': (a) => MusicParts.ladder(a), 'saturator-tube': (a) => MusicParts.saturatorTube(a), 'saturator-tape': (a) => MusicParts.saturatorTape(a),
         'bitcrusher': (a) => MusicParts.bitcrusher(a), 'osc-noise': (a) => MusicParts.noise(a), 'delay-line': (a) => MusicParts.delay(a) };
       function partNode(sock, id) {
         const S = SOCK[sock], tag = sock + ':' + id; if (parts[sock][id]) return Promise.resolve(parts[sock][id]); if (pend[tag]) return pend[tag];
@@ -439,6 +441,8 @@
         else if (id === 'saturator-tube' || id === 'saturator-tape') { const dr = P.get('pdDrive'); pv('drive', dr); pv('bias', P.get('pdBias')); pv('mix', P.get('pdMix')); pv('out', -Math.min(12, dr * 0.5));   // trimmed as the drive comes in
           if (id === 'saturator-tube') pv('tone', P.get('pdTone')); else pv('bump', P.get('pdBump')); }
         else if (id === 'osc-noise') { at('colour', Math.max(0, ['white', 'pink', 'brown', 'velvet', 'crackle', 'band'].indexOf(P.get('pnColour')))); pv('density', P.get('pnDensity')); pv('rate', P.get('pnRate')); pv('tilt', P.get('pnTilt')); pv('width', 1); pv('level', 1); }
+        else if (id === 'ensemble-core') { const m = (MusicParts.ENSEMBLE_MODES || {})[P.get('peMode')] || {}; ['taps', 'shape'].forEach(k => { if (m[k] !== undefined) at(k, m[k]); });
+          ['base', 'depth', 'rate', 'depth2', 'rate2', 'spread'].forEach(k => { if (m[k] !== undefined) pv(k, m[k]); }); if (m.depth2 === undefined) pv('depth2', 0); pv('mix', P.get('peMix')); }   // 2026-11-20: the Juno chorus (Retro DCO's part) in the insert
         else if (id === 'delay-line') { at('sync', 0); at('mode', P.get('piMode') === 'digital' ? 1 : 0); pv('time', DIVSEC(P.get('piTime'))); pv('feedback', P.get('piFeedback')); pv('damp', P.get('piDamp')); pv('lowcut', 120); pv('mix', P.get('piMix')); pv('drive', 0); }
       }
       function setParts() {
@@ -448,7 +452,7 @@
           S.own.gain.setTargetAtTime(parts[sock][want] ? 0 : 1, t, 0.006); });
       }
       function wantParts() { Object.keys(SOCK).forEach(sock => { const v = P.get(SOCK[sock].key); if (MAKE[v]) partNode(sock, v); }); setParts(); }
-      P.onChange('*', (v, prev, k) => { if (k === undefined || /^(part|pf|pd|pn|pi)[A-Z]|^(cutoff|res)$/.test(k)) wantParts(); });
+      P.onChange('*', (v, prev, k) => { if (k === undefined || /^(part|pf|pd|pn|pi|pe)[A-Z]|^(cutoff|res)$/.test(k)) wantParts(); });
       ctx.onTick && ctx.onTick(() => { if (parts.insert['delay-line'] && P.get('partInsert') === 'delay-line') { const n = parts.insert['delay-line'].node, s2 = DIVSEC(P.get('piTime')); if (Math.abs(n.parameters.get('time').value - s2) > 1e-3) n.parameters.get('time').setTargetAtTime(s2, ac.currentTime, 0.02); } });
       if (Object.keys(SOCK).some(sock => MAKE[P.get(SOCK[sock].key)])) wantParts();
       ctx.parts = { sockets: Object.keys(SOCK), ready: (sock) => { const id = P.get(SOCK[sock].key); return MAKE[id] ? partNode(sock, id).then(Boolean) : Promise.resolve(true); },

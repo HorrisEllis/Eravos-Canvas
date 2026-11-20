@@ -12,7 +12,7 @@
  * A mutation: some sockets swapped (each new part's own settings rolled fresh), a few other settings moved — near where they are, not anywhere
  * (a mutation, not a randomise). Learning: a kept mutation's choices (a part, an option) and the settings it moved weigh more next time; a thrown
  * one's less. Never the same state twice (its signature remembered). A domain can keep settings out (FieldMutate.guards: (setting, target) → false).
- *   FieldMutate.mutate(target, { rnd, moves }) → { patch, prev, sig, words } | null · .judge(target, m, keep) · .learned(id) · .forget(id)
+ *   FieldMutate.mutate(target, { rnd, moves, extra?(rnd) → { patch, words } (a part from another tool) }) → { patch, prev, sig, words } | null · .judge(target, m, keep) · .learned(id) · .forget(id)
  *   FieldMutate.dock(target, { onMutate, kit?, primary? }) → an element (kit: a tool window's UI kit — its buttons then): ⚄ MUTATE · ✓ KEEP · ✗ THROW, what changed, what it has learned
  *   FieldMutate.toolTarget(instanceId) → the target of a tool on the canvas (its settings; set = as if turned by hand) */
 (function (global) {
@@ -52,6 +52,8 @@
       swap.forEach(s => { const cur = t.get(s.key), others = s.options.filter(x => x !== cur); if (!others.length) return; const p = pick(others, (x) => W(L, s.key + '=' + x), rnd); patch[s.key] = p;
         const own = all.filter(c => c.part && [].concat(c.part).includes(p) && (!c.of || c.of === s.key)); own.forEach(c => { patch[c.key] = roll(c, rnd, L); });
         words.push((s.socket || s.label || s.key) + ' → ' + p + (own.length ? ' (' + own.map(c => (c.label || c.key) + ' ' + show(c, patch[c.key])).join(', ') + ')' : '')); });
+      // another tool's part (o.extra: the Field board, when another tool is exploded beside this one) — counted with the swaps
+      if (o.extra && rnd() < 0.6) { const x = o.extra(rnd); if (x && x.patch) { Object.keys(x.patch).forEach(k => { patch[k] = x.patch[k]; }); words.push(x.words); } }
       // the rest: a few settings moved, those that were kept before more often (a part's settings only while it is in its socket)
       const free = all.filter(c => !c.socket && !(c.key in patch) && (!c.part || (owner(c) && [].concat(c.part).includes(val(owner(c).key)))));
       const n = Math.min(free.length, o.moves || (swap.length ? 1 + Math.floor(rnd() * 3) : 2 + Math.floor(rnd() * 4))), moved = [];
@@ -85,7 +87,7 @@
     line.textContent = opt.hint || 'a new combination, played at once — keep it or throw it'; pending(false); count();
     go.addEventListener('click', () => {
       if (cur) judge(t, cur, true);   // mutating again keeps the one before (it stays)
-      const m = mutate(t); if (!m) { line.textContent = 'nothing left to try here'; return; }
+      const m = mutate(t, { extra: opt.extra }); if (!m) { line.textContent = 'nothing left to try here'; return; }
       cur = m; apply(t, m); line.textContent = m.words.join(' · '); pending(true); count(); if (opt.onMutate) opt.onMutate(m);
     });
     kp.addEventListener('click', () => { if (!cur) return; judge(t, cur, true); cur = null; pending(false); line.textContent = 'kept — it stays (save it as a preset to keep it by name)'; count(); });

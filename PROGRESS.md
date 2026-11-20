@@ -2,6 +2,22 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.204 Components swapped between tools blown up on the canvas (2026-11-20) — not merged
+His words: "Give Eravos the tools to swap tools components when they are blown up on the canvas. Like give me the ability to mutate or
+synthesize tools together." · "you click on the component' box and can pick a new one or one from another tool. then uses the ui element for the
+compoenent as a block"
+- First try rejected ("What the hell is that? … Didn't ask for it."): a COMBINE card + a builder window. Set aside in a git stash; its engine
+  parts kept (ensemble-core and osc-noise adapters; the settings→parts mapping became part-exchange.js).
+- tools/core/field/board.js: component boxes, no menus (his: "drag components, delete them, change them. not drop down menus") — each box's
+  component a tile: drag it onto another box (this tool or another blown-up tool; fits light up, the rest dim), ✕ deletes, the PARTS tray
+  holds new ones; what is in a box shows as its block (its own controls); boxes below move down; a wire draws across; one undo step; MUTATE
+  takes other tools' parts. The core names no music word (boundary 10/10: the tempo is the domain's to find).
+- tools/music/data/part-exchange.js: Wobble Bass (mouth, grit, noise, after the amp, wobble) and Retro DCO (VCF, chorus, noise, LFO) as parts.
+- Wobble Bass's insert takes the Juno chorus (ensemble-core, peMode / peMix); its default and every preset unchanged (null render 34/34;
+  Retro DCO 12/12).
+- On the canvas (docs/previews/workbench/swap-across.shots.mjs): Retro DCO's ladder (1.4k, reso .40, +6 dB) into Wobble Bass's mouth, its Juno II
+  chorus after Wobble Bass's amp, Wobble Bass's wobble into Retro DCO's LFO — each dragged; a crusher from the tray; Retro DCO's chorus ✕'d. P203 1/1.
+
 ## 3.203 The Wobble Builder, built (2026-11-20) — not merged
 His words: "yes build it." (to the preview, 3.202)
 - WB1 one engine: assemble.js streams (block / set / amount; render bit-identical to before), every adapter takes new settings in place (no

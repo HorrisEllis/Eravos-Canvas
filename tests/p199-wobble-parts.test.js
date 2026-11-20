@@ -19,8 +19,8 @@ describe('P199 Wobble Bass — swap a component in, mutate, keep or throw', () =
       h.view.emit('config_change', { key: 'partFilter', value: 'own' }); await TH.sleep(120); assert.ok(I.ownF.gain.value > 0.9, 'and back to its own');
       // the board: chips where the parts are, the dock under the core
       const r = FieldBoard.explode(a, 'eravos.wobble-bass'); assert.deepEqual(r.missing, [], 'every piece found');
-      const chips = [...document.querySelectorAll('.fb-swap')].map(c => c.closest('.fb-gate').dataset.piece).sort();
-      assert.ok(['filter-vowels', 'grit'].every(x => chips.includes(x)) && chips.length === 4, 'a ⇄ chip on the gate of each part a socket stands in for (filter, drive, noise, insert): ' + chips);
+      const chips = [...document.querySelectorAll('.fb-gate.fb-comp')].filter(g => g.querySelector('.fb-tile')).map(g => g.dataset.piece).sort();   // 2026-11-20: a tile in each component box (no ⇄ chips)
+      assert.ok(['filter-vowels', 'grit', 'noise', 'squash'].every(x => chips.includes(x)), 'a tile in the box of each part a socket stands in for (filter, drive, noise, insert): ' + chips);
       assert.ok(document.querySelector('.fb-mut .fm-go'), '⚄ MUTATE under the core');
       const hist = Kernel.history ? Kernel.history.state().undo : null;
       document.querySelector('.fm-go').click(); await TH.sleep(80);
@@ -36,7 +36,7 @@ describe('P199 Wobble Bass — swap a component in, mutate, keep or throw', () =
       document.querySelector('.fm-go').click(); await TH.sleep(80); document.querySelector('.fm-keep').click();
       L = FieldBoard.learned('eravos.wobble-bass'); assert.equal(L.kept, 1, 'it learned the keep'); assert.ok(Object.values(L.w).some(v => v > 0), 'the kept choices weigh more');
       if (hist != null) assert.ok(Kernel.history.state().undo > hist, 'mutations are undo steps');
-      await FieldBoard.assemble(a, { now: true }); assert.equal(document.querySelectorAll('.fb-swap').length, 0, 'put back: the chips go with the board');
+      await FieldBoard.assemble(a, { now: true }); assert.equal(document.querySelectorAll('.fb-tile').length, 0, 'put back: the tiles go with the board');
     } finally { if (FieldBoard.isOpen(a)) await FieldBoard.assemble(a, { now: true }); OrganismFactory.close ? OrganismFactory.close(a) : CanvasWM.close && CanvasWM.close(a); try { localStorage.removeItem('eravos.mutate.eravos.wobble-bass'); } catch (e) {} }
   });
 });
