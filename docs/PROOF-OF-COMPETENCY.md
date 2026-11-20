@@ -71,6 +71,16 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-20 · The Workshop's exploded board: one agnostic view for every kind of document (3.199)
+- **His words (2026-11-20):** "Love that. Now the exploded view. Of the notes. Agnostic" · "merge it."
+- **His call:** the idea and the rule (agnostic); merged on his word after the video.
+- **Built (by the AI coder, to his direction):** BOARD in the Workshop (`tools/core/field/field.js`): each layer a gate with its live fields
+  (the Workshop's own field editors: the same edit, one undo step), wired to the document as its core; its own pan / zoom; the layers fly out
+  of LAYERS into it with the shared motion. Nothing in it names a kind.
+- **Proof:** `tests/p198` 1/1 on a kind from no domain (gates, fields, core, wires, select, zoom); the notes: 13 gates, 27 live fields; every
+  Workshop suite, Timeline, Pattern, Step, boundary green; the 2D / 3D views before and after differ only by the new chip (pixel compared).
+- **Where to check:** `node tests/run.mjs P198`; `docs/previews/workbench/workshop-board.mp4`.
+
 ### 2026-11-20 · The Field: his board made live and editable on the canvas, opening as one animated scene; the Workshop given the same motion — release 0.2.26 (3.196–3.198)
 - **His words (2026-11-20):** "okay now let me edit and change the wobble base. also i feel it should be a canvas in itself. so i can scroll
   around" · "im saying that exactly. i already critisist the other one immensly. do not deviate" · "What about animated transition for the
