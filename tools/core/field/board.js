@@ -34,25 +34,10 @@
   // the bar slides away and the canvas takes the whole screen, every other window softens back, the camera glides to frame the board, the tool's
   // frame dissolves while its parts lift off it and fly to their places (nearest the core first, settling as they land), the core blooms, each
   // wire draws itself into it, the labels, header and legend come up. Put back: the same, in reverse. Reduced motion: the end state at once.
-  const reduced = () => !!(global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  const A = (el, kf, o) => (el && el.animate) ? el.animate(kf, Object.assign({ fill: 'both' }, o)) : null;
-  const finite = (a) => { try { return isFinite(a.effect.getComputedTiming().endTime); } catch (e) { return false; } };   // the live face may run endless CSS animations of its own
-  const EASE = { glide: 'cubic-bezier(.65,0,.35,1)', out: 'cubic-bezier(.16,1,.3,1)', land: 'cubic-bezier(.22,1.12,.36,1)', in: 'cubic-bezier(.55,0,.75,.1)', away: 'cubic-bezier(.6,0,.2,1)' };
-  function scene(win, on, k) {   // everything but the tool: the bar, the canvas edge, the other windows, the cables, the dock
-    const wm = WM(), out = [], T = (ms) => ms * k, bar = document.getElementById('topbar'), cv = wm.canvas;
-    if (bar) out.push(A(bar, [{ transform: 'none', opacity: 1 }, { transform: 'translateY(-100%)', opacity: 0 }], { duration: T(650), easing: EASE.away }));
-    if (cv && cv.id === 'canvas') { const top = getComputedStyle(cv).top; out.push(A(cv, [{ top }, { top: '0px' }], { duration: T(650), easing: EASE.away })); }
-    [].slice.call(wm.world.querySelectorAll('.wm-win')).filter(w => w !== win).concat([].slice.call(wm.world.querySelectorAll('svg.wires')), [document.getElementById('dock')]).filter(Boolean)
-      .forEach((el, i) => out.push(A(el, [{ opacity: 1, filter: 'blur(0px)' }, { opacity: 0, filter: 'blur(10px)' }], { duration: T(700), delay: T(Math.min(i, 8) * 25), easing: EASE.away })));
-    return out.filter(Boolean);
-  }
-  function glideTo(view, ms) {   // the camera moves as one smooth glide, then the view is the canvas's own again
-    const wm = WM(); if (!wm || !wm.world) return Promise.resolve();
-    const from = wm.world.style.transform || `translate(${wm.view.x}px, ${wm.view.y}px) scale(${wm.view.z})`, to = `translate(${view.x}px, ${view.y}px) scale(${view.z})`;
-    const a = A(wm.world, [{ transform: from }, { transform: to }], { duration: ms, easing: EASE.glide, fill: 'forwards' });
-    const done = () => { wm.view = { x: view.x, y: view.y, z: view.z }; wm.applyView(); if (a) a.cancel(); };
-    return a ? a.finished.then(done, done) : (done(), Promise.resolve());
-  }
+  // the motion is shared with the Workshop: tools/core/field/motion.js (window.FieldMotion), never copied
+  const M = () => global.FieldMotion, reduced = () => M().still(), A = (el, kf, o) => M().A(el, kf, o), finite = (a) => M().finite(a);
+  const EASE = new Proxy({}, { get: (t, k) => M().EASE[k] });
+  const scene = (win, on, k) => M().scene(win, k), glideTo = (view, ms) => M().glide(view, ms);
   function fitView(board) {   // the whole screen (the bar is going away) looks at the board
     const wm = WM(), cv = wm && wm.canvas; if (!cv) return null;
     const r = cv.getBoundingClientRect(), Wd = cv.id === 'canvas' ? global.innerWidth : r.width, Hd = cv.id === 'canvas' ? global.innerHeight : r.height; if (!Wd) return null;
@@ -187,10 +172,7 @@
         { duration: T(1050), delay: T(220 + (st.gates.length - n) * 18), easing: EASE.glide, fill: 'forwards' });
     }).filter(Boolean);
     if (st.anims.win) { st.anims.win.cancel(); st.anims.win = A(st.win, [{ opacity: 0, transform: 'scale(.985)', filter: 'blur(3px)' }, { opacity: 1, transform: 'scale(1)', filter: 'blur(0px)' }], { duration: T(520), delay: T(1050), easing: EASE.out, fill: 'forwards' }); }
-    st.anims.scene = (st.anims.scene || []).map(a => {   // the bar, the canvas edge and the other windows come back (seekable: a delay, not a timer)
-      const el = a.effect && a.effect.target, kf = a.effect ? a.effect.getKeyframes().reverse().map(f => { const o = Object.assign({}, f); delete o.offset; delete o.computedOffset; delete o.composite; return o; }) : null;
-      const t = a.effect ? a.effect.getTiming() : {}; a.cancel();
-      return el && kf ? A(el, kf, { duration: T(+t.duration || 650), delay: T(900), easing: EASE.out }) : null; }).filter(Boolean);
+    st.anims.scene = M().unscene(st.anims.scene, 1, 900);   // the bar, the canvas edge and the other windows come back
     const home = glideTo(st.before, T(1250));
     const winIn = st.anims.win ? st.anims.win.finished : Promise.resolve();
     st.leaving = Promise.all(flights.map(a => a.finished).concat([home, winIn, new Promise(r => setTimeout(r, T(1900)))])).then(finish, finish);

@@ -2,6 +2,20 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.198 The Workshop opens and closes like the Field — one motion, shared (2026-11-20)
+His words: "I like that. But do that with the workshop as well. It's supposed to be the same thing, but" (the message ends there — asked).
+- tools/core/field/motion.js (window.FieldMotion, domain-free): the motion moved out of board.js so the Field board and the Workshop share it
+  (never copied): the scene (the bar away, the canvas full screen, the rest softened back), the camera glide, origin() — where he last pressed —
+  and enterApp / leaveApp: a full-screen app assembled out of its origin, each panel flying out of it to its place, the core blooming last;
+  leaving, each flies home into it and the canvas comes back.
+- The Workshop (tools/core/field/field.js): opens out of what he pressed (a note in the roll, a button) — bar, options, tool strip, tabs, the
+  properties and layers panes, status fly out; the viewport blooms last. close() stays immediate for every caller (gone from .ws-app, onClose
+  heard); a copy (.ws-out, untouchable) flies home and is removed. No tool's code changed: every Workshop.open gets it.
+- Tests: the in-page harness turns motion off (window.ERAVOS_NO_MOTION — not the system's reduced motion, which the app's CSS reacts to), so
+  every test sees open / close at once as before; P197 turns it on and checks it (starts where pressed, lands, blooms, closes at once, the copy
+  goes). P150 P151 P154 P156–P162 P165–P171 P174 P175 P196 P197, Timeline 33/33, Pattern, Step, boundary 10/10 — all green.
+- Video: docs/previews/workbench/workshop-transition.mp4 (workshop-transition.video.mjs); the Field's video re-filmed after the refactor: unchanged.
+
 ## 3.197 The Field opens and closes as one animated scene — shown first, as a video (2026-11-20)
 His words: "Okay field is full screen. What about animated transition for the dynamic canvas changing. Like opening the field dynamically
 changes the ui. Animated and beautiful."

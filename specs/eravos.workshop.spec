@@ -359,3 +359,10 @@ W3h  AT HAND      ⤓ save to the note library · ▶ play it · ✕ close — a
 #     the library (where it fits lights), REWIRE, VARY its ranges, ⚄ MUTATE (a few mutants, each playable at once; keep → a new tool with its
 #     lineage). Every mutant offered has passed types, builds and plays; the novelty gate says new or not (advisory). CG4 — preview first.
 #   - decided 2026-11-13: not waiting for Emerge — built as data Emerge takes over (docs/eravos-v2-emerge-looking-glass.md ADDENDUM 2026-11-13).
+
+## ADDENDUM 2026-11-20 — the Workshop opens and closes like the Field (nothing above is changed)
+# his words (2026-11-20, verbatim): "I like that. But do that with the workshop as well. It's supposed to be the same thing, but" (ends there)
+# built (3.198): one motion for both (tools/core/field/motion.js, FieldMotion): the Workshop grows out of what he pressed — its panels fly out of
+#   it to their places, the viewport blooms last, the canvas behind softens and the bar goes; Esc / close flies it home and the canvas returns.
+#   close() is immediate for callers (a copy flies). Shown as a video first (docs/previews/workbench/workshop-transition.mp4). Open: what he
+#   meant after "but".
