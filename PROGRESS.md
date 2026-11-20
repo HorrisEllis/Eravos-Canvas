@@ -2,6 +2,20 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.202 The Wobble Builder — spec, its ground, the UI preview (2026-11-20) — shown first, not built
+His words: "I want to make like a wobble synthsize tool." → "A wobble builder" (his pick: a tool that synthesizes NEW wobble instruments).
+- Spec first (axiom 8): tools/music/planned/wobble-builder.spec — slots SOURCE · DRIVE · MOUTH · WOBBLE · FX · SUB · OUT, each a shared component;
+  D1–D6 (slots not a free graph, every edit heard, ONE assembled engine live, SYNTHESIZE writes a real tool, the twin refusal + regression gate,
+  guards); WB1 live engine → WB2 the window → WB3 SYNTHESIZE → WB4 the missing adapters.
+- The ground (built, tested — it changes no tool's sound): filter-svf / filter-ladder contracts gain a `detune` control in-port (a wobble rides
+  the kernel's own detune, sample by sample); the lfo adapter (restarted on each note); assemble edges carry an `amount`; FieldMutate's `of`
+  (a part's setting names its socket when two sockets take the same part). tests/wobble-builder.test.mjs 10 checks (the wobble at the LFO's
+  rate with either filter, none at depth 0, restarted per note, under full scale); compat 38; components all pass.
+- The UI preview (docs/previews/wobble-builder/, the Mutation Lab look he approved): the face (WOBBLE · MOUTH · VOICE · OUT), the chain as Field
+  gates with ⇄ on every slot, the inspector, the keys, the waveform with the brightness line ("wobbles at … Hz"), the shared ⚄ MUTATE dock,
+  MADE BY YOU, LEARNED, SLOTS (what is still to write, dashed). Measured: every part in every slot plays (peaks −0.9 … −8 dB); 8 of 8 mutations
+  play; SYNTHESIZE kept a novel one (nearest 0.391) and refused making it again ("your Gutter Mouth again (0.000)").
+
 ## 3.201 Mutation everywhere: every tool, every socket, the Workshop (2026-11-20) — shown first, not merged
 His words: "need to be able to swap them out. then i want each tool to be able to be able to do that. then the workshop or field. like i want full
 mutation, like keep going"

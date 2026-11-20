@@ -56,7 +56,8 @@
               const bridge = sp.type !== p.type ? domain.bridges[`${sp.type}→${p.type}`] : null;
               for (let c = 0; c < dst.length; c++) { const s = src[Math.min(c, src.length - 1)], d = dst[c];
                 if (src.length > 1 && dst.length === 1) { for (let j = 0; j < n; j++) d[j] += 0.5 * (src[0][j] + src[1][j]); continue; }
-                if (bridge) for (let j = 0; j < n; j++) d[j] += bridge(s[j], { hz: hz[j], gate: gate[j] }); else for (let j = 0; j < n; j++) d[j] += s[j]; }
+                const k = e.amount === undefined ? 1 : +e.amount;   // an edge may carry an amount (2026-11-20: how far a wobble moves a filter, in its unit)
+                if (bridge) for (let j = 0; j < n; j++) d[j] += k * bridge(s[j], { hz: hz[j], gate: gate[j] }); else for (let j = 0; j < n; j++) d[j] += k * s[j]; }
             }
           }
           nd.run.run(nd.ins, nd.outs, n, ctx);

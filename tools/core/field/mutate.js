@@ -6,6 +6,7 @@
  *   { id,                 what it learns under (a tool's id, a Workshop kind's id) — kept on this device
  *     list() → [setting]  { key, type: number | enum | boolean, min, max, step, options, label, unit, default,
  *                           socket?  (an enum whose options are parts: a swap), part? (belongs to that part: only while it is in its socket),
+ *                           of? (the key of its socket, when two sockets take the same part),
  *                           mutate?: false (never touched) }
  *     get(key), set(patch)   (the whole patch is ONE undo step) · hear?()  (play it, so the change is heard at once) }
  * A mutation: some sockets swapped (each new part's own settings rolled fresh), a few other settings moved — near where they are, not anywhere
@@ -43,13 +44,13 @@
     o = o || {}; const rnd = o.rnd || Math.random, L = learned(t.id), all = (t.list() || []).filter(c => usable(t, c));
     if (!all.length) return null;
     const sockets = all.filter(c => c.socket && c.type === 'enum');
-    const owner = (c) => sockets.find(s => [].concat(c.part).some(p => s.options.includes(p)));
+    const owner = (c) => sockets.find(s => c.of ? s.key === c.of : [].concat(c.part).some(p => s.options.includes(p)));   // of: the socket it belongs to, when two sockets take the same part
     for (let tries = 0; tries < 60; tries++) {
       const patch = {}, words = [], val = (k) => (k in patch ? patch[k] : t.get(k));
       // sockets: about half swap (at least one, most times), each new part's own settings fresh
       const swap = sockets.filter(() => rnd() < 0.5); if (sockets.length && !swap.length && rnd() < 0.7) swap.push(sockets[Math.floor(rnd() * sockets.length)]);
       swap.forEach(s => { const cur = t.get(s.key), others = s.options.filter(x => x !== cur); if (!others.length) return; const p = pick(others, (x) => W(L, s.key + '=' + x), rnd); patch[s.key] = p;
-        const own = all.filter(c => c.part && [].concat(c.part).includes(p)); own.forEach(c => { patch[c.key] = roll(c, rnd, L); });
+        const own = all.filter(c => c.part && [].concat(c.part).includes(p) && (!c.of || c.of === s.key)); own.forEach(c => { patch[c.key] = roll(c, rnd, L); });
         words.push((s.socket || s.label || s.key) + ' → ' + p + (own.length ? ' (' + own.map(c => (c.label || c.key) + ' ' + show(c, patch[c.key])).join(', ') + ')' : '')); });
       // the rest: a few settings moved, those that were kept before more often (a part's settings only while it is in its socket)
       const free = all.filter(c => !c.socket && !(c.key in patch) && (!c.part || (owner(c) && [].concat(c.part).includes(val(owner(c).key)))));

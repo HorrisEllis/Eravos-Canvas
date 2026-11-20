@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wobble Builder</title>
+<!-- The Wobble Builder's UI preview (tools/music/planned/wobble-builder.spec, 2026-11-20). His words: "I want to make like a wobble synthsize tool."
+     → "A wobble builder". A wobble as a chain of slots, each a shared component; swap any slot on the spot; ⚄ MUTATE / ✓ KEEP / ✗ THROW (the one
+     mutation every tool uses: tools/core/field/mutate.js); ◆ SYNTHESIZE INTO A TOOL (refused when it is a twin of anything in ERAVOS or made before).
+     The look is the Mutation Lab's he approved ("yes, love it"). Built by docs/previews/wobble-builder/build.mjs from the REAL code: every sound is
+     the components' own kernels through the assembler. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap">
+<style>
+:root{--bg:#04070C;--panel:#060A12;--ink:#D8F6FF;--soft:#B8CFE0;--dim:#6E8BA3;--faint:#4E6A80;--line:#1B2A3A;--line2:#0F1A26;
+  --core:#FF2266;--on:#00D4FF;--osc:#39E5A0;--flt:#FF2266;--sat:#00D4FF;--dly:#CC44FF;--st:#9FB3C8;--env:#FFB84D;--lfo:#FFCC00;--ok:#39E5A0;--no:#FF5A6E}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'DM Mono','Segoe UI Symbol','Noto Sans Symbols 2',monospace;font-size:11px}
+button,select,input{font-family:inherit}
+#bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 16px;background:#04070CEE;border-bottom:1px solid var(--line2)}
+#bar .brand{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:var(--on)}
+#crumbs{flex:1 1 200px;color:var(--dim);font-size:10px;letter-spacing:1px;white-space:nowrap;overflow:hidden}
+#crumbs b{color:var(--ink);font-weight:400}
+.tb{border:1px solid var(--line);color:var(--dim);padding:5px 11px;font-size:10px;letter-spacing:2px;background:none;cursor:pointer;white-space:nowrap}
+.tb:hover{border-color:var(--dim);color:var(--ink)} .tb.on{border-color:var(--on);color:var(--on);background:#06202C}
+.tb.hot{border-color:var(--core);color:#fff;background:#3A0716} .tb.hot:hover{background:#550A20} .tb:disabled{opacity:.35;cursor:default}
+.tb input{width:44px;background:none;border:0;color:var(--ink);font-size:10px}
+main{display:grid;grid-template-columns:minmax(0,1fr) 300px;min-height:calc(100vh - 50px)}
+@media (max-width:900px){main{grid-template-columns:1fr}#side{border-left:0;border-top:1px solid var(--line2)}}
+section{padding:14px 16px}
+.lab{color:var(--faint);font-size:10px;letter-spacing:2px;text-transform:uppercase;line-height:1.6} .lab b{color:var(--soft);font-weight:500}
+h2{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:20px;letter-spacing:4px;margin:0 0 2px;color:var(--ink)}
+.benchHead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#toolName{background:none;border:0;border-bottom:1px solid transparent;color:var(--ink);font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;padding:0;min-width:160px}
+#toolName:hover,#toolName:focus{border-bottom-color:var(--line);outline:0}
+#made{color:var(--env);font-size:10px;letter-spacing:2px}
+/* the face: what a wobble needs */
+#face{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin:12px 0 6px}
+.card{border:1px solid var(--line2);background:var(--panel);padding:10px 12px}
+.card .eh{display:flex;justify-content:space-between;font-size:10px;letter-spacing:2px;color:var(--c,var(--on));margin-bottom:8px} .card .eh span:last-child{color:var(--faint);letter-spacing:1px}
+.seg{display:flex;flex-wrap:wrap} .seg button{border:1px solid var(--line);margin:0 -1px -1px 0;background:none;color:var(--dim);font-size:10px;padding:4px 7px;cursor:pointer}
+.seg button.on{background:var(--c,var(--on));border-color:var(--c,var(--on));color:#04070C}
+.var{display:flex;flex-direction:column;gap:3px;margin-top:6px} .var .k{display:flex;justify-content:space-between;color:var(--dim);font-size:10px;letter-spacing:1px}
+.var .k b{font-weight:400;color:var(--c,var(--soft))} .var input[type=range]{width:100%;accent-color:var(--c,var(--on))}
+/* the chain */
+#boardWrap{overflow-x:auto;padding:30px 0 8px}
+#board{position:relative;height:300px;min-width:1000px}
+#board > svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.node{position:absolute;width:168px;border:1px dashed var(--c);background:var(--panel);padding:8px 10px 9px;cursor:pointer;text-align:left;color:var(--ink)}
+.node:hover{box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 25%,transparent)}
+.node.sel{border-style:solid;box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 40%,transparent)}
+.node.none{opacity:.55}
+.node .tag{position:absolute;left:-1px;top:-19px;font-size:10px;letter-spacing:1px;color:var(--c);white-space:nowrap}
+.node .nm{display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:1px;margin-bottom:5px}
+.node .sw{border:1px solid var(--c);color:var(--c);background:none;font-size:9px;padding:1px 6px;border-radius:999px;cursor:pointer}
+.node .sw:hover{background:var(--c);color:#04070C}
+.node .v{display:flex;justify-content:space-between;gap:8px;color:var(--dim);font-size:10px;line-height:1.55} .node .v span:last-child{color:var(--soft)}
+.out{position:absolute;width:84px;height:46px;border:2px solid var(--core);background:var(--panel);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
+/* the inspector */
+#insp{border:1px solid var(--line);background:var(--panel);padding:12px 14px;margin-top:4px}
+#insp .hd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+#insp .hd .t{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;color:var(--c)} #insp .hd .s{color:var(--dim);font-size:10px;letter-spacing:1px}
+.vars{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 18px}
+.acts{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:12px;border-top:1px solid var(--line2);padding-top:10px}
+.acts .w{color:var(--faint);font-size:10px;letter-spacing:2px;min-width:80px}
+.chip{border:1px solid var(--line);background:none;color:var(--soft);font-size:10px;padding:3px 8px;cursor:pointer} .chip:hover{border-color:var(--on);color:var(--on)}
+.chip.on{border-color:var(--c);color:var(--c)} .chip.later{opacity:.45;cursor:default;border-style:dashed}
+.why{color:var(--faint);font-size:10px;line-height:1.6}
+/* play */
+#play{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:12px;margin-top:12px;align-items:start}
+@media (max-width:1100px){#play{grid-template-columns:1fr}}
+#keys{position:relative;height:96px;user-select:none;border:1px solid var(--line2);background:#03060A}
+#keys .w{position:absolute;top:0;bottom:0;border-right:1px solid #0A1018;background:#C9D6E2;cursor:pointer} #keys .w:hover,#keys .w.on{background:#7FE6FF}
+#keys .b{position:absolute;top:0;height:58%;background:#0A1018;border:1px solid #000;z-index:2;cursor:pointer} #keys .b:hover,#keys .b.on{background:#00A3C4}
+#keys .w i{position:absolute;bottom:4px;left:3px;font-style:normal;font-size:9px;color:#4E6A80}
+canvas.wave{width:100%;height:96px;display:block;background:#03060A;border:1px solid var(--line2)}
+.meas{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:10px;color:var(--dim);margin-top:6px} .meas b{font-weight:400;color:var(--soft)}
+.yes{color:var(--ok)!important} .no{color:var(--no)!important}
+#mut{margin-top:14px;max-width:640px}
+/* side */
+#side{border-left:1px solid var(--line2);padding:14px 16px}
+.kp{border:1px dashed var(--line);padding:9px 10px;margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.kp .nm{font-size:12px;letter-spacing:1px;display:flex;justify-content:space-between} .kp .nm span{color:var(--faint);font-size:10px}
+.kp .ln{font-size:10px;color:var(--dim);line-height:1.5} .row{display:flex;gap:6px;flex-wrap:wrap}
+.empty{color:var(--faint);font-size:10px;line-height:1.6;margin-top:10px}
+.slot{border:1px solid var(--line2);padding:7px 9px;margin-top:6px;font-size:10px;line-height:1.6;color:var(--dim)} .slot b{color:var(--c);font-weight:400;letter-spacing:1px}
+.slot s{color:var(--faint);text-decoration:none;border-bottom:1px dashed var(--faint)}
+.foot{color:var(--faint);font-size:10px;line-height:1.7;margin-top:18px;border-top:1px solid var(--line2);padding-top:10px} .foot b{color:var(--soft);font-weight:400}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#0B1420;border:1px solid var(--on);color:var(--ink);padding:9px 16px;font-size:11px;letter-spacing:1px;opacity:0;transition:opacity .25s;z-index:99;pointer-events:none}
+/*DOCKCSS*/
+</style></head>
+<body>
+<div id="bar">
+  <span class="brand">FIELD</span><span id="crumbs">WOBBLE BUILDER › <b id="crName">Classic Wobble</b> · a wobble from shared parts — swap any slot, mutate, synthesize it into a tool</span>
+  <button class="tb" id="undo">↶ UNDO</button><button class="tb" id="redo">↷ REDO</button>
+  <label class="tb on" id="hearL"><input type="checkbox" id="hearEach" checked style="width:auto"> HEAR EACH EDIT</label>
+  <label class="tb">BPM <input id="bpm" type="number" min="60" max="200" value="140"></label>
+  <button class="tb" id="riff">▶ PLAY</button>
+  <button class="tb hot" id="mutBar">⚄ MUTATE</button>
+  <button class="tb hot" id="synth">◆ SYNTHESIZE INTO A TOOL</button>
+</div>
+<main>
+<section>
+  <div class="benchHead"><input id="toolName" value="Classic Wobble" spellcheck="false"><span id="made">NOT MADE YET</span></div>
+  <div class="lab">THE WOBBLE · each slot a shared component · click a slot to set it · <b>⇄</b> swaps it on the spot · the yellow wire is the wobble (its thickness = depth)</div>
+  <div id="face"></div>
+  <div id="boardWrap"><div id="board"></div></div>
+  <div id="insp"></div>
+  <div id="play">
+    <div><div class="lab">PLAY IT — every key its own note (the slots and the wobble rendered by their own kernels)</div><div id="keys"></div></div>
+    <div><div class="lab">WHAT YOU HEARD — the waveform · <span style="color:var(--lfo)">the brightness (the wobble)</span></div><canvas class="wave" id="wave"></canvas><div class="meas" id="meas"></div></div>
+  </div>
+  <div id="mut"></div>
+</section>
+<aside id="side">
+  <h2>MADE BY YOU</h2><div class="lab">SYNTHESIZED TOOLS · each opens on the canvas like any tool (built: Bass › Made by you)</div>
+  <div id="madeList"></div>
+  <h2 style="margin-top:22px">LEARNED</h2><div class="lab">FROM EACH KEEP AND THROW · THE SAME LEARNING AS EVERY TOOL'S ⚄ MUTATE</div>
+  <div id="learned"></div>
+  <h2 style="margin-top:22px">SLOTS</h2><div class="lab">WHAT FITS EACH · <s>dashed</s> = its adapter is still to write</div>
+  <div id="slots"></div>
+  <div class="foot">
+    <b>preview, shown first</b> (2026-11-20, not built): every sound here is the components' own kernels assembled (tools/core/compat/assemble.js),
+    a note rendered when you play it. <b>Built</b> (WB1, after your yes): the same assembled engine running live in one worklet, every knob moving
+    the sound while it plays. <b>SYNTHESIZE</b> here keeps the tool on this page (this device); built, it writes Documents\ERAVOS\tools\&lt;name&gt;
+    (tool.json, its spec with its DAG, its presets) and it opens on the canvas, explodes and mutates like any tool. A made tool is fingerprinted
+    against every sound in ERAVOS and every tool made before: <b>a twin is refused</b>, close is said, novel is kept.
+  </div>
+</aside>
+</main>
+<div id="toast"></div>
+<!--INLINE-->
+<script>
+(function () {
+'use strict';
+const D = window.__WB, MP = window.MusicParts, assemble = window.Assemble.assemble, domain = window.MusicAdapters(MP), contracts = D.contracts, AM = window.AudioMeasure, FM = window.FieldMutate;
+const SR = 48000, $ = (id) => document.getElementById(id), h = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+const ld = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? d : v; } catch (e) { return d; } };
+const st = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+const toast = (t) => { const e = $('toast'); e.textContent = t; e.style.opacity = 1; clearTimeout(toast.t); toast.t = setTimeout(() => { e.style.opacity = 0; }, 2600); };
+const clone = (x) => JSON.parse(JSON.stringify(x));
+
+// ---- the settings (data): the face, the slots (sockets), each part's own (part, of). The mutation and the UI both read this one list.
+const DIVS = ['1/1', '1/2', '1/4', '1/4t', '1/8', '1/8t', '1/16', '1/16t', '1/32'], BEATS = { '1/1': 4, '1/2': 2, '1/4': 1, '1/4t': 2 / 3, '1/8': 0.5, '1/8t': 1 / 3, '1/16': 0.25, '1/16t': 1 / 6, '1/32': 0.125, '1/8.': 0.75 };
+const n = (key, label, min, max, step, def, o) => Object.assign({ key, label, type: 'number', min, max, step, default: def }, o || {});
+const e = (key, label, options, def, o) => Object.assign({ key, label, type: 'enum', options, default: def }, o || {});
+const SET = [
+  e('rate', 'Rate', DIVS, '1/8', { face: 'WOBBLE' }), e('lfoShape', 'Shape', MP.LFO_SHAPES, 'sine', { face: 'WOBBLE' }), n('depth', 'Depth', 0, 5, 0.05, 2.5, { unit: 'oct', face: 'WOBBLE' }),
+  n('cutoff', 'Cutoff', 40, 3000, 1, 220, { unit: 'Hz', face: 'MOUTH' }), n('reso', 'Reso', 0, 0.95, 0.01, 0.55, { face: 'MOUTH' }),
+  e('wave', 'Wave', ['saw', 'pulse', 'square', 'triangle'], 'saw', { face: 'VOICE' }), n('pw', 'Width', 0.05, 0.95, 0.01, 0.5, { face: 'VOICE' }),
+  n('sub', 'Sub', 0, 1, 0.01, 0.55, { face: 'VOICE' }), e('subOct', 'Sub octave', [-1, -2], -1, { face: 'VOICE' }),
+  n('width', 'Width', 0, 1, 0.01, 0.8, { face: 'OUT' }), n('level', 'Level', 0, 1.2, 0.01, 0.8, { face: 'OUT', mutate: false }),
+  e('drive', 'Drive', ['none', 'saturator-tube', 'saturator-tape', 'bitcrusher'], 'saturator-tube', { socket: 'drive' }),
+  e('mouth', 'Mouth', ['filter-svf', 'filter-ladder'], 'filter-svf', { socket: 'mouth' }),
+  e('fx', 'FX', ['none', 'delay-line', 'saturator-tape', 'bitcrusher'], 'none', { socket: 'fx' }),
+  n('dTubeDrive', 'Drive', 0, 20, 0.5, 8, { unit: 'dB', part: 'saturator-tube', of: 'drive', v: 'drive' }), n('dTubeBias', 'Bias', 0, 1, 0.01, 0.3, { part: 'saturator-tube', of: 'drive', v: 'bias' }), n('dTubeTone', 'Tone', -1, 1, 0.01, 0, { part: 'saturator-tube', of: 'drive', v: 'tone' }),
+  n('dTapeDrive', 'Drive', 0, 20, 0.5, 8, { unit: 'dB', part: 'saturator-tape', of: 'drive', v: 'drive' }), n('dTapeBump', 'Bump', 0, 6, 0.1, 2, { unit: 'dB', part: 'saturator-tape', of: 'drive', v: 'bump' }), n('dTapeHf', 'Top', 3000, 20000, 10, 12000, { unit: 'Hz', part: 'saturator-tape', of: 'drive', v: 'hf' }),
+  n('dCrushBits', 'Bits', 3, 16, 1, 8, { part: 'bitcrusher', of: 'drive', v: 'bits' }), n('dCrushRate', 'Rate', 2000, 40000, 10, 12000, { unit: 'Hz', part: 'bitcrusher', of: 'drive', v: 'rate' }),
+  e('mSvfMode', 'Mode', ['lowpass', 'bandpass', 'notch', 'peak'], 'lowpass', { part: 'filter-svf', of: 'mouth', v: 'mode' }), n('mSvfStages', 'Poles ×2', 1, 3, 1, 2, { part: 'filter-svf', of: 'mouth', v: 'stages' }),
+  e('mLadMode', 'Tap', ['lowpass 24', 'lowpass 12', 'bandpass 12', 'highpass 12', 'highpass 24'], 'lowpass 24', { part: 'filter-ladder', of: 'mouth', v: 'mode' }),
+  n('mLadDrive', 'Drive', 0, 18, 0.5, 6, { unit: 'dB', part: 'filter-ladder', of: 'mouth', v: 'drive' }), n('mLadBass', 'Bass', 0, 1, 0.01, 0.5, { part: 'filter-ladder', of: 'mouth', v: 'bass' }),
+  e('fDelTime', 'Time', ['1/16', '1/8', '1/8.', '1/4'], '1/8.', { part: 'delay-line', of: 'fx' }), n('fDelFb', 'Feedback', 0, 0.8, 0.01, 0.35, { part: 'delay-line', of: 'fx', v: 'feedback' }), n('fDelMix', 'Mix', 0, 0.5, 0.01, 0.25, { part: 'delay-line', of: 'fx', v: 'mix' }),
+  n('fTapeDrive', 'Drive', 0, 12, 0.5, 4, { unit: 'dB', part: 'saturator-tape', of: 'fx', v: 'drive' }), n('fTapeHf', 'Top', 3000, 16000, 10, 9000, { unit: 'Hz', part: 'saturator-tape', of: 'fx', v: 'hf' }),
+  n('fCrushBits', 'Bits', 4, 16, 1, 10, { part: 'bitcrusher', of: 'fx', v: 'bits' }), n('fCrushRate', 'Rate', 4000, 40000, 10, 16000, { unit: 'Hz', part: 'bitcrusher', of: 'fx', v: 'rate' }),
+];
+const K = {}; SET.forEach(c => { K[c.key] = c; });
+const defaults = () => { const o = {}; SET.forEach(c => { o[c.key] = c.default; }); return o; };
+let S = Object.assign(defaults(), ld('eravos.wb.bench', {})), past = [], future = [], name = ld('eravos.wb.name', 'Classic Wobble');
+const COL = { WOBBLE: 'var(--lfo)', MOUTH: 'var(--flt)', VOICE: 'var(--osc)', OUT: 'var(--st)', drive: 'var(--sat)', mouth: 'var(--flt)', fx: 'var(--dly)' };
+const bpm = () => Math.max(60, Math.min(200, +$('bpm').value || 140));
+
+// ---- the DAG from the settings: what SYNTHESIZE writes, what the assembler plays
+function dag(s) {
+  const nodes = [{ id: 'osc', component: 'osc-va', vars: { shape: s.wave, width: s.pw } }, { id: 'sub', component: 'osc-sub', vars: { octave: s.subOct, shape: 'sine' } },
+    { id: 'lfo', component: 'lfo', vars: { rate: 1 / (BEATS[s.rate] * 60 / bpm()), shape: s.lfoShape } }], edges = [];
+  const vars = (part, of) => { const o = {}; SET.filter(c => c.part === part && c.of === of && c.v).forEach(c => { o[c.v] = s[c.key]; }); return o; };
+  let last = 'osc.out';
+  if (s.drive !== 'none') { const v = vars(s.drive, 'drive'); if (s.drive !== 'bitcrusher') v.out = -Math.min(12, (v.drive || 0) * 0.5 + 3); else v.aa = true; nodes.push({ id: 'drv', component: s.drive, vars: v }); edges.push({ from: last, to: 'drv.in' }); last = 'drv.out'; }
+  const mv = Object.assign({ frequency: s.cutoff, resonance: s.reso }, vars(s.mouth, 'mouth')); nodes.push({ id: 'flt', component: s.mouth, vars: mv });
+  edges.push({ from: last, to: 'flt.in' }, { from: 'lfo.out', to: 'flt.detune', amount: s.depth * 1200 }); last = 'flt.out';
+  if (s.fx !== 'none') { const v = vars(s.fx, 'fx'); if (s.fx === 'delay-line') Object.assign(v, { time: BEATS[s.fDelTime] * 60 / bpm(), sync: 0, damp: 5000, lowcut: 120 }); if (s.fx === 'saturator-tape') v.out = -Math.min(9, (v.drive || 0) * 0.5); if (s.fx === 'bitcrusher') v.aa = true;
+    nodes.push({ id: 'fx', component: s.fx, vars: v }); edges.push({ from: last, to: 'fx.in' }); last = 'fx.out'; }
+  nodes.push({ id: 'st', component: 'stereo-tools', vars: { width: s.width, hz: 120 } }); edges.push({ from: last, to: 'st.in', amount: 0.7 }, { from: 'sub.out', to: 'st.in', amount: s.sub * 0.6 });
+  return { nodes, edges, outs: ['st.out'] };
+}
+// ---- render: the assembled engine, a gate envelope, the level; the gates every made tool passes (finite, not silent, never pinned)
+function render(s, notes, secs) {
+  const E = assemble(dag(s), contracts, domain, { sr: SR }); if (!E.ok) return { ok: false, why: E.why };
+  const { L, R } = E.render(secs, notes); let g = 0; const up = 1 / (0.004 * SR), dn = 1 / (0.05 * SR), lv = s.level;
+  let nan = 0, peak = 0, pinned = 0, q = 0;
+  for (let i = 0; i < L.length; i++) { const t = i / SR, on = notes.some(x => t >= x.t && t < x.t + x.dur); g = on ? Math.min(1, g + up) : Math.max(0, g - dn); L[i] *= g * lv; R[i] *= g * lv;
+    const a = L[i], b = R[i]; if (!isFinite(a) || !isFinite(b)) { nan++; L[i] = R[i] = 0; continue; } const m = Math.max(Math.abs(a), Math.abs(b)); if (m > peak) peak = m; if (m >= 0.999) pinned++; q += 0.5 * (a * a + b * b); }
+  const rmsDb = 20 * Math.log10(Math.sqrt(q / L.length) + 1e-12), mono = new Float32Array(L.length); for (let i = 0; i < L.length; i++) mono[i] = 0.5 * (L[i] + R[i]);
+  const why = []; if (nan) why.push(nan + ' samples not finite'); if (rmsDb < -50) why.push('silent'); if (pinned / L.length > 0.005) why.push('pinned at full scale ' + (100 * pinned / L.length).toFixed(1) + ' %');
+  return { ok: !why.length, why, L, R, mono, peak, rmsDb, secs };
+}
+function brightness(mono, win) { const out = []; for (let s = 0; s + win < mono.length; s += win) { let a = 0, d = 0; for (let j = s + 1; j < s + win; j++) { a += mono[j] ** 2; d += (mono[j] - mono[j - 1]) ** 2; } out.push(a > 1e-9 ? Math.sqrt(d / a) : null); } return out; }
+const RIFF = () => { const b = 60 / bpm(); return [33, 33, 36, 31].map((m, i) => ({ t: 0.03 + i * 2 * b, dur: 2 * b - 0.06, hz: 440 * Math.pow(2, (m - 69) / 12) })); };
+
+// ---- audio out
+let AC = null, src = null, last = null;
+function hear(notes, secs) {
+  const r = render(S, notes, secs); last = r; drawWave(r); if (!r.L) return r;
+  AC = AC || new (window.AudioContext || window.webkitAudioContext)({ sampleRate: SR }); if (AC.state === 'suspended') AC.resume();
+  if (src) try { src.stop(); } catch (e2) {} const buf = AC.createBuffer(2, r.L.length, SR); buf.getChannelData(0).set(r.L); buf.getChannelData(1).set(r.R);
+  src = AC.createBufferSource(); src.buffer = buf; src.connect(AC.destination); src.start(); return r;
+}
+const note = (m) => hear([{ t: 0.02, dur: 4 * 60 / bpm() - 0.05, hz: 440 * Math.pow(2, (m - 69) / 12) }], 4 * 60 / bpm() + 0.25);
+let soon = null; const hearSoon = () => { if (!$('hearEach').checked) return; clearTimeout(soon); soon = setTimeout(() => note(33), 220); };
+
+// ---- edits: one undo step each; the mutation is the same one every tool uses (FieldMutate), on this page's settings
+function set(patch, quiet) { past.push(clone(S)); future = []; Object.assign(S, patch); st('eravos.wb.bench', S); draw(); if (!quiet) hearSoon(); }
+const target = { id: 'eravos.wobble-builder', list: () => SET, get: (k) => S[k], set: (p) => set(p, true), hear: () => note(33) };
+$('undo').onclick = () => { if (!past.length) return; future.push(clone(S)); S = past.pop(); st('eravos.wb.bench', S); draw(); hearSoon(); };
+$('redo').onclick = () => { if (!future.length) return; past.push(clone(S)); S = future.pop(); st('eravos.wb.bench', S); draw(); hearSoon(); };
+$('riff').onclick = () => { const r = RIFF(); hear(r, r[r.length - 1].t + r[r.length - 1].dur + 0.3); };
+$('bpm').onchange = () => { draw(); hearSoon(); };
+$('toolName').oninput = () => { name = $('toolName').value || 'Untitled'; st('eravos.wb.name', name); $('crName').textContent = name; };
+
+// ---- the face
+let sel = 'mouth';
+function control(c, col) {
+  const v = S[c.key], wrap = h('div', 'var'); wrap.style.setProperty('--c', col);
+  if (c.type === 'enum') { const k = h('div', 'k'); k.append(h('span', '', c.label)); wrap.append(k); const sg = h('div', 'seg'); sg.style.setProperty('--c', col);
+    c.options.forEach(o => { const b = h('button', String(o) === String(v) ? 'on' : '', String(o)); b.onclick = () => set({ [c.key]: o }); sg.append(b); }); wrap.append(sg); return wrap; }
+  const k = h('div', 'k'), b = h('b', '', fmt(c, v)); k.append(h('span', '', c.label), b); const r = h('input'); r.type = 'range'; r.min = c.min; r.max = c.max; r.step = c.step; r.value = v;
+  r.oninput = () => { b.textContent = fmt(c, +r.value); }; r.onchange = () => set({ [c.key]: +r.value }); wrap.append(k, r); return wrap;
+}
+const fmt = (c, v) => (typeof v === 'number' ? (Math.abs(v) >= 100 ? Math.round(v) : +v.toFixed(2)) : v) + (c.unit ? ' ' + c.unit : '');
+function drawFace() {
+  const f = $('face'); f.replaceChildren(); [['WOBBLE', 'the LFO into the mouth, on the beat'], ['MOUTH', 'where it opens'], ['VOICE', 'the saw and a clean sub'], ['OUT', 'width, level']].forEach(([g, why]) => {
+    const card = h('div', 'card'); card.style.setProperty('--c', COL[g]); const eh = h('div', 'eh'); eh.append(h('span', '', g), h('span', '', why)); card.append(eh);
+    SET.filter(c => c.face === g).forEach(c => card.append(control(c, COL[g]))); f.append(card); });
+}
+// ---- the chain (the Field's look: dashed gates, labels above, wires)
+const CHAIN = [{ id: 'source', x: 0, y: 120, tag: 'osc-va · the voice', c: 'var(--osc)' }, { id: 'drive', x: 220, y: 120, c: 'var(--sat)' }, { id: 'mouth', x: 440, y: 120, c: 'var(--flt)' },
+  { id: 'fx', x: 660, y: 120, c: 'var(--dly)' }, { id: 'wobble', x: 440, y: 0, tag: 'lfo · the wobble', c: 'var(--lfo)' }, { id: 'sub', x: 0, y: 236, tag: 'osc-sub · clean, under it all', c: 'var(--osc)' }];
+function lines(id) {
+  if (id === 'source') return [['wave', S.wave], ['width', fmt(K.pw, S.pw)]];
+  if (id === 'sub') return [['level', fmt(K.sub, S.sub)], ['octave', S.subOct]];
+  if (id === 'wobble') return [['rate', S.rate + ' at ' + bpm()], ['shape', S.lfoShape], ['depth', fmt(K.depth, S.depth)]];
+  const comp = S[id]; if (comp === 'none') return [['—', 'straight through']];
+  return (id === 'mouth' ? [['cutoff', fmt(K.cutoff, S.cutoff)], ['reso', fmt(K.reso, S.reso)]] : []).concat(SET.filter(c => c.part === comp && c.of === id).slice(0, 3).map(c => [c.label.toLowerCase(), fmt(c, S[c.key])]));
+}
+function drawBoard() {
+  const b = $('board'); b.replaceChildren(); const NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg'); svg.setAttribute('width', 1000); svg.setAttribute('height', 300); b.append(svg);
+  const W = 168, H = 86, wire = (x1, y1, x2, y2, col, w, dash) => { const p = document.createElementNS(NS, 'path'), m = (x1 + x2) / 2; p.setAttribute('d', `M${x1} ${y1} C ${m} ${y1}, ${m} ${y2}, ${x2} ${y2}`); p.setAttribute('fill', 'none'); p.setAttribute('stroke', col); p.setAttribute('stroke-width', w); if (dash) p.setAttribute('stroke-dasharray', '6 4'); svg.append(p); };
+  const vwire = (x, y1, y2, col, w) => { const p = document.createElementNS(NS, 'path'); p.setAttribute('d', `M${x} ${y1} L ${x} ${y2}`); p.setAttribute('stroke', col); p.setAttribute('stroke-width', w); svg.append(p); };
+  ['source', 'drive', 'mouth', 'fx'].forEach((id, i, a) => { const x = CHAIN[i].x; wire(x + W, 120 + H / 2, (i < 3 ? CHAIN[i + 1].x : 880), 120 + H / 2, '#39E5A0AA', 1.6); });
+  wire(W, 236 + H / 2, 880, 120 + H / 2 + 10, '#39E5A0', 1.4, true);
+  vwire(440 + W / 2, H, 120, '#FFCC00', Math.max(1, S.depth * 1.6));
+  CHAIN.forEach(sl => {
+    const comp = sl.id === 'source' ? 'osc-va' : sl.id === 'sub' ? 'osc-sub' : sl.id === 'wobble' ? 'lfo' : S[sl.id], d = h('div', 'node' + (sel === sl.id ? ' sel' : '') + (comp === 'none' ? ' none' : ''));
+    d.style.cssText = `left:${sl.x}px;top:${sl.y}px`; d.style.setProperty('--c', sl.c);
+    d.append(h('div', 'tag', sl.tag || (sl.id + ' · ' + comp)));
+    const nm = h('div', 'nm'); nm.append(h('span', '', sl.id.toUpperCase()));
+    if (K[sl.id] && K[sl.id].socket) { const sw = h('button', 'sw', '⇄ ' + comp); sw.title = 'swap the part in this slot'; sw.onclick = (ev) => { ev.stopPropagation(); swapMenu(sl.id, sw); }; nm.append(sw); }
+    d.append(nm); lines(sl.id).forEach(([k, v]) => { const r = h('div', 'v'); r.append(h('span', '', k), h('span', '', String(v))); d.append(r); });
+    d.onclick = () => { sel = sl.id; draw(); }; b.append(d);
+  });
+  const o = h('div', 'out', 'OUT'); o.style.cssText = 'left:880px;top:140px'; b.append(o);
+}
+function swapMenu(slot, anchor) {   // the options of the slot, right there
+  const c = K[slot]; document.querySelectorAll('.swapPop').forEach(x => x.remove()); const pop = h('div', 'swapPop'); const r = anchor.getBoundingClientRect();
+  pop.style.cssText = `position:fixed;left:${r.left}px;top:${r.bottom + 4}px;z-index:60;background:#060A12;border:1px solid var(--line);padding:4px;display:flex;flex-direction:column;gap:2px;min-width:170px`;
+  c.options.forEach(o => { const b = h('button', 'chip' + (o === S[slot] ? ' on' : ''), (o === S[slot] ? '● ' : '○ ') + o); b.style.setProperty('--c', COL[slot]); b.style.textAlign = 'left'; b.onclick = () => { pop.remove(); set({ [slot]: o }); }; pop.append(b); });
+  document.body.append(pop); setTimeout(() => document.addEventListener('click', () => pop.remove(), { once: true }), 0);
+}
+const LATER = { source: ['osc-wavetable', 'unison-stack'], mouth: ['filter-formant'], wobble: ['env-msseg (draw it)', 'step-mod (wub seq)'], fx: [] , drive: [], sub: [] };
+function drawInsp() {
+  const i = $('insp'), sl = CHAIN.find(x => x.id === sel), col = sl.c; i.replaceChildren(); i.style.setProperty('--c', col);
+  const comp = sel === 'source' ? 'osc-va' : sel === 'sub' ? 'osc-sub' : sel === 'wobble' ? 'lfo' : S[sel], hd = h('div', 'hd'); hd.append(h('span', 't', sel.toUpperCase() + ' · ' + comp), h('span', 's', comp === 'none' ? 'nothing in this slot — the sound goes straight through' : 'a shared component (tools/music/components/' + comp + ') — its own kernel'));
+  i.append(hd); const vs = h('div', 'vars');
+  const mine = sel === 'source' ? ['wave', 'pw'] : sel === 'sub' ? ['sub', 'subOct'] : sel === 'wobble' ? ['rate', 'lfoShape', 'depth'] : (sel === 'mouth' ? ['cutoff', 'reso'] : []).concat(SET.filter(c => c.part === comp && c.of === sel).map(c => c.key));
+  mine.forEach(k => vs.append(control(K[k], col))); i.append(vs);
+  const acts = h('div', 'acts'); acts.append(h('span', 'w', K[sel] && K[sel].socket ? 'SWAP FOR' : 'MORE PARTS'));
+  if (K[sel] && K[sel].socket) K[sel].options.forEach(o => { const b = h('button', 'chip' + (o === S[sel] ? ' on' : ''), o); b.onclick = () => set({ [sel]: o }); acts.append(b); });
+  (LATER[sel] || []).forEach(o => { const b = h('button', 'chip later', o); b.title = 'its adapter is still to write (WB4)'; acts.append(b); });
+  i.append(acts);
+  const why = { source: 'the voice: the note\'s pitch into osc-va. Wavetable and unison voices join when their adapters are written.', sub: 'a clean sine an octave or two down, joined at the end: it never goes through the drive or the mouth (why the low end stays centered).',
+    wobble: 'the LFO, restarted on each note, wired into the mouth\'s detune: Depth is how many octaves it moves the cutoff. Rate is on the beat.', drive: 'before the mouth: the drive gives the wobble something to bite.',
+    mouth: 'the filter the wobble moves. Cutoff is where it rests, the wobble opens it up from there.', fx: 'after the mouth: an echo on the beat, tape, or crush.' }[sel];
+  i.append(h('div', 'why', why));
+}
+// ---- the keys
+function drawKeys() {
+  const k = $('keys'); if (k.childElementCount) return; const lo = 24, hi = 48, whites = []; for (let m = lo; m <= hi; m++) if (![1, 3, 6, 8, 10].includes(m % 12)) whites.push(m);
+  const ww = 100 / whites.length; whites.forEach((m, i) => { const w = h('div', 'w'); w.style.cssText = `left:${i * ww}%;width:${ww}%`; if (m % 12 === 0) w.append(h('i', '', 'C' + (m / 12 - 1))); w.onpointerdown = () => { note(m); w.classList.add('on'); setTimeout(() => w.classList.remove('on'), 200); }; k.append(w); });
+  for (let m = lo; m <= hi; m++) if ([1, 3, 6, 8, 10].includes(m % 12)) { const i = whites.indexOf(m - 1), b = h('div', 'b'); b.style.cssText = `left:${(i + 1) * ww - ww * 0.3}%;width:${ww * 0.6}%`; b.onpointerdown = () => note(m); k.append(b); }
+}
+function drawWave(r) {
+  const cv = $('wave'), w = cv.width = Math.max(10, cv.clientWidth * 2), hh = cv.height = 192, g = cv.getContext('2d'); g.clearRect(0, 0, w, hh);
+  const m = $('meas'); m.replaceChildren(); const row = (k, v, c) => { m.append(h('span', '', k)); const b = h('b', c || '', v); m.append(b); };
+  if (!r.mono) { row('builds', 'no — ' + (r.why || []).join('; '), 'no'); return; }
+  const k = r.peak > 0 ? 0.92 / r.peak : 1, step = r.mono.length / w; g.fillStyle = '#00D4FF';
+  for (let x = 0; x < w; x++) { let lo = 1, hi = -1; for (let i = Math.floor(x * step); i < Math.floor((x + 1) * step); i++) { const v = r.mono[i] * k; if (v < lo) lo = v; if (v > hi) hi = v; } g.fillRect(x, hh / 2 - hi * hh / 2, 1, Math.max(1, (hi - lo) * hh / 2)); }
+  const bw = brightness(r.mono, 960), vals = bw.filter(x => x != null), mx = Math.max(...vals, 1e-9); g.strokeStyle = '#FFCC00'; g.lineWidth = 3; g.beginPath();
+  bw.forEach((v, i) => { if (v == null) return; const x = i / bw.length * w, y = hh - 8 - (v / mx) * (hh - 16); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke();
+  // how fast the brightness moves: rises through its middle a second (the wobble you hear)
+  let ups = 0, below = true; const mean = vals.reduce((a, b) => a + b, 0) / (vals.length || 1), band = (mx - Math.min(...vals)) * 0.15; vals.forEach(v => { if (below && v > mean + band) { ups++; below = false; } else if (!below && v < mean - band) below = true; });
+  row('plays', r.ok ? 'yes' : 'no — ' + r.why.join('; '), r.ok ? 'yes' : 'no'); row('peak', (20 * Math.log10(r.peak + 1e-12)).toFixed(1) + ' dBFS', r.peak >= 0.999 ? 'no' : '');
+  row('wobbles at', (ups / (vals.length * 960 / SR)).toFixed(2) + ' Hz (the rate: ' + (1 / (BEATS[S.rate] * 60 / bpm())).toFixed(2) + ' Hz)');
+}
+// ---- the mutation dock: the same one as the Field and the Workshop
+const dock = FM.dock(target, { hint: 'swaps slots (a new part\'s settings fresh) and moves a few settings near where they are — heard at once; keep it or throw it', onMutate: () => draw() });
+$('mut').append(dock); $('mutBar').onclick = () => dock.mutateNow();
+dock.addEventListener('click', () => setTimeout(() => { draw(); drawLearned(); }, 0));
+function drawLearned() {
+  const L = FM.learned(target.id), w = Object.entries(L.w).filter(([k, v]) => v && !k.startsWith('@')).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1])).slice(0, 10), el = $('learned'); el.replaceChildren();
+  if (!w.length) { el.append(h('div', 'empty', 'nothing yet — mutate, then keep or throw: what you keep comes up more, what you throw less; it never offers the same wobble twice.')); return; }
+  w.forEach(([k, v]) => { const r = h('div', 'slot'); r.style.setProperty('--c', v > 0 ? 'var(--ok)' : 'var(--no)'); r.append(h('b', '', (v > 0 ? '+' : '') + v + '  '), document.createTextNode(k.replace('=', ' → '))); el.append(r); });
+  el.append(h('div', 'why', L.kept + ' kept · ' + L.thrown + ' thrown · ' + L.seen.length + ' tried'));
+  const f = h('button', 'chip', 'FORGET WHAT IT LEARNED'); f.style.marginTop = '8px'; f.onclick = () => { FM.forget(target.id); drawLearned(); }; el.append(f);
+}
+function drawSlots() {
+  const el = $('slots'); el.replaceChildren();
+  [['source', 'osc-va'], ['drive', null], ['mouth', null], ['wobble', 'lfo → the mouth\'s detune'], ['fx', null], ['sub', 'osc-sub'], ['out', 'stereo-tools']].forEach(([id, fixed]) => {
+    const r = h('div', 'slot'); r.style.setProperty('--c', COL[id] || 'var(--osc)'); r.append(h('b', '', id.toUpperCase() + '  '));
+    r.append(document.createTextNode(fixed || K[id].options.join(' · '))); (LATER[id] || []).forEach(x => { r.append(document.createTextNode(' · ')); r.append(h('s', '', x)); }); el.append(r); });
+}
+// ---- SYNTHESIZE: the friction against repetition (his, 2026-11-17) — fingerprinted against every sound in ERAVOS and every tool made before
+const NC = window.NoveltyCore, B = D.baseline, dist = NC.makeDist(NC.groupsFor(B.D)), me = (v) => ({ v, n: NC.norm(v, B.lo, B.hi) });
+const base = B.items.map(x => Object.assign({}, x, { n: NC.norm(x.v, B.lo, B.hi) }));
+let made = ld('eravos.wb.made', []);
+function synthesize() {
+  const riff = RIFF(), secs = riff[riff.length - 1].t + riff[riff.length - 1].dur + 0.2, r = render(S, riff, secs); drawWave(r);
+  if (!r.ok) { toast('not made — it does not play cleanly: ' + r.why.join('; ')); return; }
+  const fp = AM.fingerprint(r.mono, SR, 0.1, secs - 0.1); if (!fp || fp.frames < 4) { toast('not made — too short to fingerprint'); return; }
+  let best = { d: 9, what: '' }; base.forEach(x => { const d = dist(me(fp.v), x); if (d < best.d) best = { d, what: x.label + ' · ' + x.preset }; });
+  made.forEach(t => { if (!t.fp) return; const d = dist(me(fp.v), me(t.fp)); if (d < best.d) best = { d, what: 'your ' + t.name }; });
+  const verdict = best.d < B.twin ? 'TWIN' : best.d < B.close ? 'CLOSE' : 'novel';
+  if (verdict === 'TWIN') { toast('not made — this is ' + best.what + ' again (' + best.d.toFixed(3) + '): change something that can be heard'); return; }
+  let nm = (name || 'Untitled').trim(); if (made.some(t => t.name === nm)) nm += ' ' + (made.filter(t => t.name.startsWith(nm)).length + 1);
+  made.unshift({ name: nm, at: new Date().toISOString(), settings: clone(S), dag: dag(S), bpm: bpm(), fp: fp.v.map(x => +x.toPrecision(5)), verdict, near: best.what, d: +best.d.toFixed(3) }); st('eravos.wb.made', made);
+  $('made').textContent = 'MADE · ' + nm.toUpperCase() + ' · ' + verdict + (verdict === 'CLOSE' ? ' (near ' + best.what + ')' : ''); toast('◆ ' + nm + ' synthesized — ' + verdict + ' (nearest: ' + best.what + ', ' + best.d.toFixed(3) + ')'); drawMade();
+}
+$('synth').onclick = synthesize;
+function drawMade() {
+  const el = $('madeList'); el.replaceChildren(); if (!made.length) { el.append(h('div', 'empty', 'nothing made yet. shape a wobble, then ◆ SYNTHESIZE INTO A TOOL. a twin of anything in ERAVOS — or of one you made — is refused.')); return; }
+  made.slice(0, 12).forEach((t, i) => { const k = h('div', 'kp'), nm = h('div', 'nm'); nm.append(h('b', '', t.name), h('span', '', t.verdict)); k.append(nm);
+    k.append(h('div', 'ln', t.dag.nodes.map(x => x.component).filter(x => x !== 'stereo-tools').join(' → ') + ' · ' + t.settings.rate + ' at ' + t.bpm));
+    k.append(h('div', 'ln', 'nearest: ' + t.near + ' (' + t.d + ')'));
+    const row = h('div', 'row'), pl = h('button', 'chip', '▶ PLAY'), op = h('button', 'chip', '✎ OPEN TO EDIT'), rm = h('button', 'chip', '✕');
+    pl.onclick = () => { const was = S; S = clone(t.settings); const r = RIFF(); hear(r, r[r.length - 1].t + r[r.length - 1].dur + 0.3); S = was; };
+    op.onclick = () => { set(clone(t.settings), true); name = t.name; $('toolName').value = name; $('crName').textContent = name; note(33); };
+    rm.onclick = () => { made.splice(i, 1); st('eravos.wb.made', made); drawMade(); }; row.append(pl, op, rm); k.append(row); el.append(k); });
+}
+function draw() { drawFace(); drawBoard(); drawInsp(); }
+$('toolName').value = name; $('crName').textContent = name;
+draw(); drawKeys(); drawLearned(); drawSlots(); drawMade(); drawWave(render(S, [{ t: 0.02, dur: 1.6, hz: 55 }], 1.8));
+window.__wb = { S: () => S, dag: () => dag(S), render: (notes, secs) => render(S, notes, secs), set, synthesize, made: () => made, dock };
+})();
+</script>
+</body></html>
