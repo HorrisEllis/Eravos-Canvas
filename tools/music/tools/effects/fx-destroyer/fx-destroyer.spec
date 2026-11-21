@@ -61,7 +61,7 @@ dag:
   layer 0: bitcrusher ✓ · waveshaper
   tool: eravos.fx-destroyer ← bitcrusher + waveshaper
   build order: bitcrusher ✓ → waveshaper → fx-destroyer
-  shared with: bitcrusher 5 · waveshaper 22  (other tools on each)
+  shared with: bitcrusher 4 · waveshaper 22  (other tools on each)
   in it now: —
   comes out of it: bitcrusher · waveshaper
   planned: —

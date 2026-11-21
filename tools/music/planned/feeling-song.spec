@@ -170,5 +170,5 @@ dag:
   layer 0: filter-formant ✓ · lfo ✓ · mod-tree ✓ · modal-resonator ✓ · osc-wavetable ✓ · pattern-store ✓ · pitch-path ✓ · random-source ✓ · ratio-set ✓ · reverb-fdn · scale-key ✓ · slew-lag · stereo-tools ✓
   tool: eravos.feeling-song ← ratio-set + pitch-path + modal-resonator + osc-wavetable + filter-formant + mod-tree + random-source + lfo + slew-lag + reverb-fdn + stereo-tools + pattern-store + scale-key
   build order: filter-formant ✓ → lfo ✓ → mod-tree ✓ → modal-resonator ✓ → osc-wavetable ✓ → pattern-store ✓ → pitch-path ✓ → random-source ✓ → ratio-set ✓ → reverb-fdn → scale-key ✓ → slew-lag → stereo-tools ✓ → feeling-song
-  shared with: filter-formant 8 · lfo 30 · mod-tree 1 · modal-resonator 5 · osc-wavetable 12 · pattern-store 25 · pitch-path 1 · random-source 8 · ratio-set 1 · reverb-fdn 12 · scale-key 15 · slew-lag 11 · stereo-tools 19  (other tools on each)
+  shared with: filter-formant 8 · lfo 29 · mod-tree 1 · modal-resonator 5 · osc-wavetable 12 · pattern-store 25 · pitch-path 1 · random-source 8 · ratio-set 1 · reverb-fdn 12 · scale-key 15 · slew-lag 11 · stereo-tools 18  (other tools on each)
   signal_dag check: every node is one of its components ✓

@@ -78,3 +78,17 @@ dag:
   planned: —
   signal_dag check: every node is one of its components ✓
   signal_dag check: components with no place in the flow yet: filter-ladder, saturator-tape, bitcrusher, delay-line
+
+# ---- ADDENDUM 2026-11-21 — the Wobble Builder removed; its engine is what SYNTHESIZING tools together makes. His words: (to "If you meant the Wobble
+#      Builder, say so and I'll hide it") "Don't hide it. What is it? And yes. I didn't ask for it." · "That's redundant." · "Do it. Then remove that
+#      tool. Dont hide it." (this spec moved here from tools/music/tools/bass/wobble-builder/wobble-builder.spec; everything above kept verbatim)
+removed: the tool eravos.wobble-builder (its window, packs, presets, its in-page tests) — not hidden: deleted (git history keeps it).
+kept, as tools/music/core/assembled-tool.js → window.AssembledTool: the model (settings → DAG), Voice (offline = live), the one AudioWorklet
+  ('eravos-assembled'), the regression + novelty gates, made tools (eravos.wb-<name>, kept by tools/music/data/made-tools.js, defined at start)
+  with a plain kit face (their parts as cards), now also running ensemble-core (the Juno chorus), osc-noise and env-adsr into the mouth.
+SYNTHESIZE TOGETHER, on the canvas (tools/core/field/board.js, domain-free): each blown-up tool's core carries a ◆ tile; drag it onto another
+  blown-up tool's core → exchange.synthesize (AssembledTool.synthesize): each part from the tool it is most itself in (tools/music/data/
+  tool-blend.js — Retro DCO's voice, mouth, chorus; Wobble Bass's wobble and drive), the gates (plays cleanly; a twin refused), named "<A> × <B>",
+  spawned beside them and opened blown up — its parts as tiles you drag like any tool's (tools/music/data/part-exchange.js knows its parts).
+proof: P203 2/2 (the drag, the parts, blown up, a twin refused) · P202 8/8 on a synthesized tool (live = offline, knob live, swap live, make + twin)
+  · tests/assembled-tool.test.mjs 32.

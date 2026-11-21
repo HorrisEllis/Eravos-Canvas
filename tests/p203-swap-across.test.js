@@ -46,4 +46,28 @@ describe('P203 swap components between tools on the canvas', () => {
       assert.ok(across > 0, 'MUTATE takes the other tool\'s parts too (' + across + ' of 12)');
     } finally { for (const x of [a, b]) { if (FieldBoard.isOpen(x)) await FieldBoard.assemble(x, { now: true }); OrganismFactory.close(x); } FieldMutate.forget('eravos.wobble-bass'); }
   });
+  it('SYNTHESIZE TOGETHER: drag one blown-up tool\'s ◆ onto another\'s core → one tool of its own, opened blown up, a twin refused', async () => {
+    host(); const keep = MadeTools.list(AssembledTool.MADE_KEY); MadeTools.save(AssembledTool.MADE_KEY, []);
+    const a = OrganismFactory.spawn('eravos.wobble-bass', { x: 20, y: 20 }), b = OrganismFactory.spawn('eravos.retro-dco', { x: 2000, y: 20 }); let made = null;
+    try {
+      await TH.sleep(400); const B = OrganismFactory.handle(b); [['chorus', 'II'], ['filter', 'ladder'], ['pulse', 0.9], ['saw', 0.2]].forEach(([k, v]) => B.view.emit('config_change', { key: k, value: v })); await TH.sleep(100);
+      FieldBoard.explode(a, 'eravos.wobble-bass'); FieldBoard.explode(b, 'eravos.retro-dco'); await TH.sleep(200); CanvasWM.view = { x: 10, y: 10, z: 0.2 }; CanvasWM.applyView(); await TH.sleep(50);
+      const tileA = document.querySelector('.fb-board[data-instance="' + a + '"] .fb-core .fb-fuse'), coreB = document.querySelector('.fb-board[data-instance="' + b + '"] .fb-core');
+      assert.ok(tileA && coreB, 'each blown-up tool\'s core carries a ◆ tile');
+      const p1 = tileA.getBoundingClientRect(), p2 = coreB.getBoundingClientRect(), o = { bubbles: true, button: 0, pointerId: 1 };
+      tileA.dispatchEvent(new PointerEvent('pointerdown', Object.assign({ clientX: p1.left + 6, clientY: p1.top + 5 }, o)));
+      document.dispatchEvent(new PointerEvent('pointermove', Object.assign({ clientX: p2.left + p2.width / 2, clientY: p2.top + 20 }, o)));
+      assert.ok(coreB.classList.contains('fb-over'), 'carried over the other tool\'s core: it lights');
+      const before = new Set(Kernel.registry.list().map(r => r.instance_id));
+      document.dispatchEvent(new PointerEvent('pointerup', Object.assign({ clientX: p2.left + 4, clientY: p2.top + 4 }, o)));
+      for (let i = 0; i < 60 && !made; i++) { await TH.sleep(100); made = Kernel.registry.list().find(r => !before.has(r.instance_id) && /^eravos\.wb-/.test(r.organism_id)); }
+      assert.ok(made, 'a new tool of its own is on the canvas'); assert.equal(made.organism_id, 'eravos.wb-wobble-bass-retro-dco', 'named after both: Wobble Bass × Retro DCO');
+      const M = OrganismFactory.handle(made.instance_id), P = M.ctx.params; await M.ctx.internals.ready;
+      assert.equal(P.get('wave'), 'pulse', 'its voice is Retro DCO\'s'); assert.equal(P.get('mouth'), 'filter-ladder', 'its mouth Retro DCO\'s'); assert.equal(P.get('fx'), 'ensemble-core', 'its chorus Retro DCO\'s');
+      assert.equal(P.get('drive'), 'saturator-tube', 'its drive Wobble Bass\'s'); assert.ok(M.ctx.internals.node(), 'and it plays (its engine built)');
+      await TH.sleep(900); assert.ok(FieldBoard.isOpen(made.instance_id), 'it opens blown up beside them');
+      assert.ok(document.querySelectorAll('.fb-board[data-instance="' + made.instance_id + '"] .fb-gate.fb-comp .fb-tile').length >= 4, 'its parts in component boxes, as tiles (drag them like any tool\'s)');
+      const again = await FieldBoard.synthesizeOnto(a, b); assert.ok(!again, 'the same two again: refused (a twin of the one just made)');
+    } finally { for (const x of [a, b, made && made.instance_id].filter(Boolean)) { if (FieldBoard.isOpen(x)) await FieldBoard.assemble(x, { now: true }); OrganismFactory.close(x); } MadeTools.save(AssembledTool.MADE_KEY, keep); }
+  });
 });

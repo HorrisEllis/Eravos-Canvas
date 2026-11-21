@@ -40,4 +40,4 @@ dag:
   layer 0: bitcrusher ✓ · clipper · eq-parametric · multiband-splitter · oversampler · rectifier · saturator-tape ✓ · saturator-tube ✓ · wavefolder · waveshaper
   tool: eravos.harmonic-weapon ← waveshaper + wavefolder + clipper + rectifier + bitcrusher + saturator-tube + saturator-tape + multiband-splitter + oversampler + eq-parametric
   build order: bitcrusher ✓ → clipper → eq-parametric → multiband-splitter → oversampler → rectifier → saturator-tape ✓ → saturator-tube ✓ → wavefolder → waveshaper → harmonic-weapon
-  shared with: bitcrusher 5 · clipper 9 · eq-parametric 13 · multiband-splitter 10 · oversampler 2 · rectifier 0 · saturator-tape 6 · saturator-tube 5 · wavefolder 1 · waveshaper 22  (other tools on each)
+  shared with: bitcrusher 4 · clipper 9 · eq-parametric 13 · multiband-splitter 10 · oversampler 2 · rectifier 0 · saturator-tape 5 · saturator-tube 4 · wavefolder 1 · waveshaper 22  (other tools on each)

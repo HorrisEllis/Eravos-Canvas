@@ -1,13 +1,13 @@
-/* ERAVOS tool — Wobble Builder 1.0.0 (tools/music/planned/wobble-builder.spec; WB1–WB3, 2026-11-20). His words: "I want to make like a wobble
- * synthsize tool." → "A wobble builder" → (the preview) "yes build it."
- * A wobble as a chain of SLOTS, each filled by a shared component (SOURCE osc-va · DRIVE · MOUTH · WOBBLE lfo → the mouth's detune · FX · SUB · OUT);
- * swap any slot on the spot, mutate / keep / throw (FieldMutate, the one every tool uses), ◆ SYNTHESIZE INTO A TOOL (a real tool of its own).
- * ONE engine, nothing re-implemented: the settings make a DAG (Model.dag), the DAG is assembled from the components' own kernels
+/* ERAVOS music core — assembled-tool.js → window.AssembledTool (2026-11-21; specs/eravos.assembled-tool.spec). His words (2026-11-21): "Do it. Then
+ * remove that tool. Dont hide it." — the Wobble Builder (3.202–3.203) is gone as a tool; its engine is what SYNTHESIZING tools together makes:
+ * drag one blown-up tool's ◆ onto another's core on the canvas (tools/core/field/board.js) → one tool of its own, each part from the tool it is
+ * most itself in (tools/music/data/tool-blend.js), checked (it plays cleanly; no twin of anything in ERAVOS or made before), opened blown up.
+ * ONE engine, nothing re-implemented: the settings make a DAG (dag), the DAG is assembled from the components' own kernels
  * (tools/core/compat/assemble.js + tools/music/compat/adapters.js) and runs in ONE AudioWorklet built from their text — the same code renders
- * offline (tests, the novelty gate) and live (what you hear). A knob reaches the sound in place (an adapter's set(): the kernel keeps its state,
- * no click); a slot swap builds the new chain and cross-fades to it (256 samples).
- *   window.WobbleBuilder → { SET, DIVS, BEATS, defaults(), dag(settings, bpm), shape(dag), Voice, source(MP), PARTS,
- *     made(), make(name, settings, bpm, MusicNovelty), judge(…), defineMade(rec), forget(id) }   (the model and Voice also require()-able) */
+ * offline (tests, the novelty gate) and live. A knob reaches the sound in place; a part swapped rebuilds the chain, cross-faded (256 samples).
+ *   window.AssembledTool → { SET, defaults(), dag(settings, bpm), shape(dag), Voice, source(MP, Assemble, MusicAdapters), descriptor(o),
+ *     made(), make(name, settings, bpm, MusicNovelty), judge(…), defineMade(rec), forget(id), synthesize(aInstance, bInstance) → Promise }
+ *   (the model and Voice also require()-able) */
 (function (root) {
   'use strict';
   // ---------------------------------------------------------------- the model: settings (data) → the DAG. The UI, the mutation and the engine read this one list.
@@ -20,13 +20,17 @@
     e('rate', 'Rate', 'WOBBLE', DIVS, '1/8', { hint: 'the wobble on the beat' }), e('lfoShape', 'Shape', 'WOBBLE', LFO_SHAPES, 'sine'),
     n('depth', 'Depth', 'WOBBLE', 0, 5, 0.05, 2.5, { unit: 'oct', hint: 'how many octaves the wobble opens the mouth' }),
     n('cutoff', 'Cutoff', 'MOUTH', 40, 3000, 1, 220, { unit: 'Hz', hint: 'where the mouth rests; the wobble opens it from here' }), n('reso', 'Reso', 'MOUTH', 0, 0.95, 0.01, 0.55),
+    n('envAmt', 'Env amount', 'MOUTH', 0, 4, 0.05, 0, { unit: 'oct', hint: 'a filter envelope on each note (env-adsr into the mouth): how far it opens it' }),
+    n('envDecay', 'Env decay', 'MOUTH', 0.01, 2, 0.01, 0.3, { unit: 's' }), n('envSustain', 'Env sustain', 'MOUTH', 0, 1, 0.01, 0.2),
     e('wave', 'Wave', 'VOICE', ['saw', 'pulse', 'square', 'triangle'], 'saw'), n('pw', 'Width', 'VOICE', 0.05, 0.95, 0.01, 0.5, { hint: 'the pulse width' }),
     n('sub', 'Sub', 'VOICE', 0, 1, 0.01, 0.55, { hint: 'a clean sine under it all: never through the drive or the mouth' }), e('subOct', 'Sub octave', 'VOICE', [-1, -2], -1),
-    n('glide', 'Glide', 'VOICE', 0, 0.5, 0.001, 0.02, { unit: 's' }), n('octave', 'Octave', 'VOICE', -2, 1, 1, -1, { mutate: false }),
+    n('glide', 'Glide', 'VOICE', 0, 0.5, 0.001, 0.02, { unit: 's' }),
+    n('noise', 'Noise', 'VOICE', 0, 1, 0.01, 0, { hint: 'a noise layer before the drive, so it wobbles too (osc-noise)' }),
+    e('noiseColour', 'Noise colour', 'VOICE', ['white', 'pink', 'brown', 'velvet', 'crackle', 'band-limited'], 'white'), n('octave', 'Octave', 'VOICE', -2, 1, 1, -1, { mutate: false }),
     n('width', 'Width', 'OUT', 0, 1, 0.01, 0.8, { hint: 'stereo width above 120 Hz' }), n('level', 'Level', 'OUT', 0, 1.2, 0.01, 0.8, { mutate: false }),
     e('drive', 'Drive part', 'PARTS', ['none', 'saturator-tube', 'saturator-tape', 'bitcrusher'], 'saturator-tube', { socket: 'drive', near: 'drive', hint: 'before the mouth: gives the wobble something to bite' }),
     e('mouth', 'Mouth part', 'PARTS', ['filter-svf', 'filter-ladder'], 'filter-svf', { socket: 'mouth', near: 'cutoff', hint: 'the filter the wobble moves' }),
-    e('fx', 'FX part', 'PARTS', ['none', 'delay-line', 'saturator-tape', 'bitcrusher'], 'none', { socket: 'fx', near: 'fx', hint: 'after the mouth' }),
+    e('fx', 'FX part', 'PARTS', ['none', 'delay-line', 'saturator-tape', 'bitcrusher', 'ensemble-core'], 'none', { socket: 'fx', near: 'fx', hint: 'after the mouth · ensemble-core = the Juno chorus (Retro DCO\'s)' }),
     n('dTubeDrive', 'Drive', 'DRIVE', 0, 20, 0.5, 8, { unit: 'dB', part: 'saturator-tube', of: 'drive', v: 'drive' }), n('dTubeBias', 'Bias', 'DRIVE', 0, 1, 0.01, 0.3, { part: 'saturator-tube', of: 'drive', v: 'bias' }),
     n('dTubeTone', 'Tone', 'DRIVE', -1, 1, 0.01, 0, { part: 'saturator-tube', of: 'drive', v: 'tone' }),
     n('dTapeDrive', 'Drive', 'DRIVE', 0, 20, 0.5, 8, { unit: 'dB', part: 'saturator-tape', of: 'drive', v: 'drive' }), n('dTapeBump', 'Bump', 'DRIVE', 0, 6, 0.1, 2, { unit: 'dB', part: 'saturator-tape', of: 'drive', v: 'bump' }),
@@ -38,9 +42,15 @@
     e('fDelTime', 'Echo time', 'FX', ['1/16', '1/8', '1/8.', '1/4'], '1/8.', { part: 'delay-line', of: 'fx' }), n('fDelFb', 'Feedback', 'FX', 0, 0.8, 0.01, 0.35, { part: 'delay-line', of: 'fx', v: 'feedback' }),
     n('fDelMix', 'Echo mix', 'FX', 0, 0.5, 0.01, 0.25, { part: 'delay-line', of: 'fx', v: 'mix' }),
     n('fTapeDrive', 'Tape drive', 'FX', 0, 12, 0.5, 4, { unit: 'dB', part: 'saturator-tape', of: 'fx', v: 'drive' }), n('fTapeHf', 'Tape top', 'FX', 3000, 16000, 10, 9000, { unit: 'Hz', part: 'saturator-tape', of: 'fx', v: 'hf' }),
+    e('fEnsMode', 'Chorus', 'FX', ['juno I', 'juno II', 'juno I+II', 'string machine', 'dimension'], 'juno I', { part: 'ensemble-core', of: 'fx' }),
+    n('fEnsMix', 'Chorus mix', 'FX', 0, 1, 0.01, 0.5, { part: 'ensemble-core', of: 'fx', v: 'mix' }),
     n('fCrushBits', 'Crush bits', 'FX', 4, 16, 1, 10, { part: 'bitcrusher', of: 'fx', v: 'bits' }), n('fCrushRate', 'Crush rate', 'FX', 4000, 40000, 10, 16000, { unit: 'Hz', part: 'bitcrusher', of: 'fx', v: 'rate' }),
   ];
   const K = {}; SET.forEach(c => { K[c.key] = c; });
+  // ensemble-core's machines are its own data (MusicParts.ENSEMBLE_MODES); kept here as read so the model runs without a page (tests)
+  const ENSEMBLE = { 'juno I': { taps: 2, base: 3.5, depth: 1.85, rate: 0.513, depth2: 0, shape: 1, spread: 1 }, 'juno II': { taps: 2, base: 3.5, depth: 1.85, rate: 0.863, depth2: 0, shape: 1, spread: 1 },
+    'juno I+II': { taps: 2, base: 3.2, depth: 0.25, rate: 9.75, depth2: 0, shape: 0, spread: 1 }, 'string machine': { taps: 3, base: 6, depth: 1.5, rate: 0.6, depth2: 0.25, rate2: 6, shape: 0, spread: 0.8 },
+    'dimension': { taps: 4, base: 8, depth: 0.6, rate: 0.25, depth2: 0, shape: 1, spread: 0.6 } };
   const defaults = () => { const o = {}; SET.forEach(c => { o[c.key] = c.default; }); return o; };
   const lfoHz = (s, bpm) => 1 / (BEATS[s.rate] * 60 / (bpm || 120));
   function dag(s, bpm) {   // the settings → the chain (what SYNTHESIZE writes, what the engine plays)
@@ -49,12 +59,16 @@
     const nodes = [{ id: 'osc', component: 'osc-va', vars: { shape: s.wave, width: s.pw } }, { id: 'sub', component: 'osc-sub', vars: { octave: s.subOct, shape: 'sine' } },
       { id: 'lfo', component: 'lfo', vars: { rate: lfoHz(s, bpm), shape: s.lfoShape } }], edges = [];
     let last = 'osc.out';
+    if (s.noise > 0) nodes.push({ id: 'nz', component: 'osc-noise', vars: { colour: s.noiseColour, level: 1, width: 1 } });
     if (s.drive !== 'none') { const v = vars(s.drive, 'drive'); if (s.drive !== 'bitcrusher') v.out = -Math.min(12, (v.drive || 0) * 0.5 + 3); else v.aa = true;   // a saturator trimmed as its drive comes in
-      nodes.push({ id: 'drv', component: s.drive, vars: v }); edges.push({ from: last, to: 'drv.in' }); last = 'drv.out'; }
+      nodes.push({ id: 'drv', component: s.drive, vars: v }); edges.push({ from: last, to: 'drv.in' }); if (s.noise > 0) edges.push({ from: 'nz.out', to: 'drv.in', amount: s.noise * 0.5 }); last = 'drv.out'; }
+    else if (s.noise > 0) edges.push({ from: 'nz.out', to: 'flt.in', amount: s.noise * 0.5 });
     nodes.push({ id: 'flt', component: s.mouth, vars: Object.assign({ frequency: s.cutoff, resonance: s.reso }, vars(s.mouth, 'mouth')) });
     edges.push({ from: last, to: 'flt.in' }, { from: 'lfo.out', to: 'flt.detune', amount: s.depth * 1200 }); last = 'flt.out';
+    if (s.envAmt > 0) { nodes.push({ id: 'env', component: 'env-adsr', vars: { attack: 0.003, decay: s.envDecay, sustain: s.envSustain, release: 0.15 } }); edges.push({ from: 'env.out', to: 'flt.detune', amount: s.envAmt * 1200 }); }
     if (s.fx !== 'none') { const v = vars(s.fx, 'fx'); if (s.fx === 'delay-line') Object.assign(v, { time: BEATS[s.fDelTime] * 60 / bpm, sync: 0, damp: 5000, lowcut: 120 });
       if (s.fx === 'saturator-tape') v.out = -Math.min(9, (v.drive || 0) * 0.5); if (s.fx === 'bitcrusher') v.aa = true;
+      if (s.fx === 'ensemble-core') Object.assign(v, ENSEMBLE[s.fEnsMode] || {}, { mix: s.fEnsMix, shape: (ENSEMBLE[s.fEnsMode] || {}).shape ? 'triangle' : 'sine' });
       nodes.push({ id: 'fx', component: s.fx, vars: v }); edges.push({ from: last, to: 'fx.in' }); last = 'fx.out'; }
     nodes.push({ id: 'st', component: 'stereo-tools', vars: { width: s.width, hz: 120 } }); edges.push({ from: last, to: 'st.in', amount: 0.7 }, { from: 'sub.out', to: 'st.in', amount: s.sub * 0.6 });
     return { nodes, edges, outs: ['st.out'] };
@@ -97,7 +111,7 @@
   // (named one by one, so the components map and the tool's DAG see which components it stands on)
   const kernels = (MP) => ({ SVF: MP.SVF, SVF_PARAMS: MP.SVF_PARAMS, Ladder: MP.Ladder, LADDER_PARAMS: MP.LADDER_PARAMS, TapeSat: MP.TapeSat, TAPESAT_PARAMS: MP.TAPESAT_PARAMS,
     TubeSat: MP.TubeSat, TUBESAT_PARAMS: MP.TUBESAT_PARAMS, Crusher: MP.Crusher, CRUSHER_PARAMS: MP.CRUSHER_PARAMS, Delay: MP.Delay, DELAY_PARAMS: MP.DELAY_PARAMS,
-    VA: MP.VA, Sub: MP.Sub, ADSR: MP.ADSR, MonoBelow: MP.MonoBelow, LFO: MP.LFO });
+    VA: MP.VA, Sub: MP.Sub, ADSR: MP.ADSR, MonoBelow: MP.MonoBelow, LFO: MP.LFO, Ensemble: MP.Ensemble, ENSEMBLE_PARAMS: MP.ENSEMBLE_PARAMS, Noise: MP.Noise, NOISE_PARAMS: MP.NOISE_PARAMS });
   const PARTS = Object.keys(kernels({}));
   function source(MP, Assemble, MusicAdapters) {
     const K = kernels(MP), mp = PARTS.filter(k => K[k] !== undefined).map(k => `MP.${k} = ${typeof K[k] === 'function' ? K[k].toString() : JSON.stringify(K[k])};`).join('\n');
@@ -112,23 +126,23 @@ class EravosWobbleBuilder extends AudioWorkletProcessor {
       else if (d.type === 'amount') d.list.forEach(x => this.v.amount(x.i, x.v)); }; }
   process(ins, outs, p) { const o = outs[0]; if (!o || !o.length) return true; this.v.process(o[0], o[1] || o[0], o[0].length, p.hz, p.gate, p.level[0], p.glide[0]); return true; }
 }
-registerProcessor('eravos-wobble-builder', EravosWobbleBuilder);`].join('\n');
+registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
   }
   // what a tool made by the builder carries (WB3): its settings and its DAG, saved; it runs on this same engine
   const MADE_KEY = 'wobble-builder';
-  const Model = { SET, K, DIVS, BEATS, LFO_SHAPES, defaults, dag, shape, lfoHz, Voice, PARTS, source, MADE_KEY, version: '1.0.0' };
+  const Model = { SET, K, ENSEMBLE, DIVS, BEATS, LFO_SHAPES, defaults, dag, shape, lfoHz, Voice, PARTS, source, MADE_KEY, version: '1.0.0' };
   if (typeof module === 'object' && module.exports) module.exports = Model;
   if (!root) return;
-  root.WobbleBuilder = Model;
+  root.AssembledTool = Model;
 
   // ---------------------------------------------------------------- the tool (and every tool it makes: the same engine, its settings as defaults)
   const S = root.OrganismSDK && root.OrganismSDK.STD;
   function descriptor(o) {
     o = o || {};
     return {
-      id: o.id || 'eravos.wobble-builder', domain: 'music', version: o.version || '1.0.0', label: o.label || 'Wobble Builder', icon: o.icon || '🧪', accent: o.accent || '#ffcc00', phase: 'P202',
-      category: 'Bass', blurb: o.blurb || 'Build a wobble from shared parts: pick each slot, wire the wobble into the mouth, mutate, keep or throw — then synthesize it into a tool of its own.',
-      size: o.made ? { w: 760, h: 760 } : { w: 980, h: 900 }, minSize: { w: 560, h: 560 },
+      id: o.id, domain: 'music', version: o.version || '1.0.0', label: o.label || 'Synthesized', icon: o.icon || '🧪', accent: o.accent || '#ffcc00', phase: 'P202',
+      category: 'Bass', blurb: o.blurb || 'A tool synthesized from others: its parts are shared components, assembled into one engine.',
+      size: { w: 760, h: 720 }, minSize: { w: 480, h: 480 },
       permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'], provides: ['capability.audio_out', 'capability.note_in', 'capability.bass_voice'],
       needs: { works_with: ['eravos.timeline', 'eravos.bass-gen', 'eravos.wobble-bass', 'eravos.fx-echo'] },
       hooks: [S.audio_out('wb.hook.audio_out'), S.note_in('wb.hook.note_in'), S.midi_in('wb.hook.midi_in'), S.transport_in('wb.hook.transport_in')],
@@ -143,14 +157,14 @@ registerProcessor('eravos-wobble-builder', EravosWobbleBuilder);`].join('\n');
     const settings = () => { const o = {}; SET.forEach(c => { o[c.key] = P.get(c.key); }); return o; };
     let node = null, cur = dag(settings(), ctx.bpm); const queue = [];
     const prm = (k) => node.parameters.get(k);
-    const ready = ctx.loadWorklet('eravos-wobble-builder', source(MP, root.Assemble, root.MusicAdapters)).then(() => {
+    const ready = ctx.loadWorklet('eravos-assembled', source(MP, root.Assemble, root.MusicAdapters)).then(() => {
       if (ctx.disposed) return null;
-      node = new AudioWorkletNode(ac, 'eravos-wobble-builder', { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2], processorOptions: { dag: cur, contracts: C.contracts } }); ctx.track(node);
-      node.onprocessorerror = (er) => ctx.fault('RUNTIME_003', 'wobble builder worklet stopped: ' + ((er && er.message) || 'processor error'));
-      node.port.onmessage = (m) => { const d = m.data || {};  if (d.type === 'fault') ctx.fault('RUNTIME_003', 'wobble builder: ' + d.why.join('; ')); if (d.type === 'rebuild') node.port.postMessage({ type: 'dag', dag: cur }); };
+      node = new AudioWorkletNode(ac, 'eravos-assembled', { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2], processorOptions: { dag: cur, contracts: C.contracts } }); ctx.track(node);
+      node.onprocessorerror = (er) => ctx.fault('RUNTIME_003', 'synthesized tool worklet stopped: ' + ((er && er.message) || 'processor error'));
+      node.port.onmessage = (m) => { const d = m.data || {};  if (d.type === 'fault') ctx.fault('RUNTIME_003', 'synthesized tool: ' + d.why.join('; ')); if (d.type === 'rebuild') node.port.postMessage({ type: 'dag', dag: cur }); };
       node.connect(out); prm('level').setValueAtTime(P.get('level'), 0); prm('glide').setValueAtTime(P.get('glide'), 0);
       queue.splice(0).forEach(f => f()); return node;
-    }).catch(er => { ctx.fault('RUNTIME_003', 'wobble builder worklet: ' + er.message); return null; });
+    }).catch(er => { ctx.fault('RUNTIME_003', 'synthesized tool worklet: ' + er.message); return null; });
     const when = (f) => { if (node) f(); else queue.push(f); };
     // a change: the same shape → each part's new settings in place, each edge's new amount; another shape (a slot swapped) → the new chain, cross-faded
     function update() {
@@ -181,7 +195,6 @@ registerProcessor('eravos-wobble-builder', EravosWobbleBuilder);`].join('\n');
     return {};
   }
   Model.descriptor = descriptor;
-  if (root.OrganismFactory) root.OrganismFactory.define(descriptor({ id: 'eravos.wobble-builder' }));
 
   // ---------------------------------------------------------------- WB3: SYNTHESIZE — a made tool is real: its own id, name, settings (its defaults and its
   // first preset), the DAG it was made as; it runs on this same engine (nothing copied), opens, plays, explodes and mutates like any tool.
@@ -194,7 +207,7 @@ registerProcessor('eravos-wobble-builder', EravosWobbleBuilder);`].join('\n');
   Model.defineMade = function (r) {   // → the made tool's id, defined (and its window, once the builder's UI is here)
     const F = root.OrganismFactory; if (!F) return null;
     if (!F.def || !F.def(r.id)) F.define(descriptor({ id: r.id, label: r.name, icon: '🧪', accent: r.accent || '#ffcc00', settings: r.settings, version: '1.0.0',
-      blurb: 'Made with the Wobble Builder (' + String(r.at || '').slice(0, 10) + '): ' + r.chain + '. ' + (r.verdict === 'novel' ? 'New to ERAVOS.' : 'Close to ' + r.near + '.'), made: { from: 'eravos.wobble-builder', at: r.at, dag: r.dag, verdict: r.verdict, near: r.near, d: r.d } }));
+      blurb: 'Synthesized ' + String(r.at || '').slice(0, 10) + (r.of ? ' from ' + r.of.join(' × ') : '') + ': ' + r.chain + '. ' + (r.verdict === 'novel' ? 'New to ERAVOS.' : 'Close to ' + r.near + '.'), made: { from: 'synthesized', of: r.of || [], at: r.at, dag: r.dag, verdict: r.verdict, near: r.near, d: r.d } }));
     if (Model.ui) F.reg(r.id, Model.ui); return r.id;
   };
   Model.forget = (id) => keep(ld().filter(r => r.id !== id));
@@ -218,11 +231,47 @@ registerProcessor('eravos-wobble-builder', EravosWobbleBuilder);`].join('\n');
     const verdict = best.d < B.twin ? 'TWIN' : best.d < B.close ? 'CLOSE' : 'novel';
     return { ok: verdict !== 'TWIN', why: verdict === 'TWIN' ? 'this is ' + best.what + ' again (' + best.d.toFixed(3) + ') — change something that can be heard' : '', verdict, near: best.what, d: +best.d.toFixed(3), fp: fp.v.map(x => +x.toPrecision(5)), dag: d, rmsDb };
   };
-  Model.make = function (name, settings, bpm, N) {   // → { ok, id, rec } or { ok: false, why }
+  Model.make = function (name, settings, bpm, N, of) {   // → { ok, id, rec } or { ok: false, why } · of: the tools it was synthesized from
     const j = Model.judge(settings, bpm, N); if (!j.ok) return j;
     const L = ld(); let nm = String(name || 'Made Wobble').trim() || 'Made Wobble', i = 2; const base = nm; while (L.some(r => r.name === nm) || (root.OrganismFactory && root.OrganismFactory.def(Model.idFor(nm)))) nm = base + ' ' + i++;
-    const rec = { id: Model.idFor(nm), name: nm, at: new Date().toISOString(), settings: JSON.parse(JSON.stringify(settings)), bpm, dag: j.dag, chain: Model.chainOf(j.dag), fp: j.fp, verdict: j.verdict, near: j.near, d: j.d };
+    const rec = { id: Model.idFor(nm), name: nm, of: of || [], at: new Date().toISOString(), settings: JSON.parse(JSON.stringify(settings)), bpm, dag: j.dag, chain: Model.chainOf(j.dag), fp: j.fp, verdict: j.verdict, near: j.near, d: j.d };
     L.unshift(rec); keep(L); Model.defineMade(rec); return { ok: true, id: rec.id, rec, verdict: j.verdict, near: j.near, d: j.d };
+  };
+  // ---------------------------------------------------------------- SYNTHESIZE TOGETHER: two tools blown up on the canvas → one of its own
+  // (the board calls this when one tool's ◆ is dropped on another's core). Each part from the tool it is most itself in (ToolBlend.pickFor);
+  // the same gates (it plays cleanly; no twin). Its name is theirs: "<A> × <B>".
+  function loadNovelty() {
+    if (root.MusicNovelty) return Promise.resolve(root.MusicNovelty);
+    return new Promise((res, rej) => { const s2 = root.document.createElement('script'); s2.src = (root.ERAVOS_TOOLS || '') + 'music/compat/novelty.js'; s2.onload = () => res(root.MusicNovelty); s2.onerror = () => rej(new Error('the novelty measure did not load')); root.document.head.appendChild(s2); });
+  }
+  Model.synthesize = async function (aInst, bInst) {
+    const F = root.OrganismFactory, TB = root.ToolBlend, A = F && F.handle(aInst), B = F && F.handle(bInst);
+    if (!A || !B || !TB || !TB.has(A.id) || !TB.has(B.id)) return { ok: false, why: 'these two have no parts the engine runs yet' };
+    let N; try { N = await loadNovelty(); } catch (er) { return { ok: false, why: er.message }; }
+    const bpm = (root.Kernel && root.Kernel.music && root.Kernel.music.bpm) || 120, a = { id: A.id, params: TB.paramsOf(aInst) }, b = { id: B.id, params: TB.paramsOf(bInst) };
+    const settings = TB.combine(a, b, TB.pickFor(A.id, B.id), bpm), names = [A.def.label, B.def.label];
+    return Model.make(names.join(' × '), settings, bpm, N, names);
+  };
+  if (root.PartExchange) root.PartExchange.synthesize = Model.synthesize;   // the board finds it on the exchange the music domain hands it
+
+  // ---------------------------------------------------------------- the face of a synthesized tool: the kit, its parts as cards (what is in each, its settings)
+  Model.ui = function (view) {
+    const UI = view.ui, h = UI.h, cfg = (k) => view.descriptor.config.find(c => c.key === k), st = (k) => view.state[k] !== undefined ? view.state[k] : cfg(k).default, made = view.descriptor.made || {};
+    const ctl = (k, o) => { const c = UI.paramControl(view, cfg(k), Object.assign({ size: 30 }, o || {})); c.el.dataset.key = k; return c; };
+    const row = (kids) => h('div', { class: 'uk-row', style: { flexWrap: 'wrap', gap: '8px', alignItems: 'flex-end' } }, kids);
+    const card = (title, kids) => h('div', { class: 'uk-group', style: { breakInside: 'avoid', margin: '0 0 8px' } }, [h('div', { class: 'uk-group-title', text: title })].concat(kids));
+    const part = (title, socket, always) => { const box = h('div'), draw = () => box.replaceChildren(row((always || []).map(k => ctl(k).el).concat(view.descriptor.config.filter(c => c.part && c.of === socket && [].concat(c.part).includes(st(socket))).map(c => ctl(c.key).el))));
+      draw(); view.bind(socket, () => setTimeout(draw, 0)); return card(title, [ctl(socket, { segMax: 5, noLabel: true }).el, box]); };
+    const kb = UI.Keyboard ? UI.Keyboard({ low: 33, high: 57, key: view.key, onDown: (n, v) => view.emit('audition', { note: n, velocity: v, duration: 30 }), onUp: (n) => view.emit('audition_off', { note: n }) }) : { el: h('div') };
+    view.root.append(h('div', { class: 'org-row', style: { justifyContent: 'space-between' } }, [UI.presetBar(view)]),
+      UI.hint('Synthesized' + (made.of && made.of.length ? ' from ' + made.of.join(' × ') : '') + ' · ' + (made.verdict === 'novel' ? 'new to ERAVOS' : 'close to ' + made.near) + ' · blow it up on the canvas to swap its parts'),
+      h('div', { style: { columnWidth: '300px', columnGap: '8px', marginTop: '6px' } }, [
+        card('WOBBLE', [row(['rate', 'lfoShape', 'depth'].map(k => ctl(k, k === 'rate' ? { segMax: 9 } : {}).el))]),
+        part('MOUTH', 'mouth', ['cutoff', 'reso', 'envAmt', 'envDecay', 'envSustain']),
+        part('DRIVE', 'drive'), part('FX', 'fx'),
+        card('VOICE', [row(['wave', 'pw', 'sub', 'subOct', 'noise', 'noiseColour', 'glide', 'octave'].map(k => ctl(k).el))]),
+        card('OUT', [row(['width', 'level'].map(k => ctl(k).el))])]),
+      h('div', { style: { height: '6px' } }), kb.el);
   };
   ld().forEach(r => { try { Model.defineMade(r); } catch (er) {} });   // every tool you made, at every start
 })(typeof window !== 'undefined' ? window : null);

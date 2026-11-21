@@ -112,7 +112,7 @@
     A(head, [{ opacity: 0, transform: 'translateY(-18px)' }, { opacity: 1, transform: 'none' }], { duration: T(800), delay: T(1750), easing: EASE.out });
     [legend, since].filter(Boolean).forEach(el => A(el, [{ opacity: 0 }, { opacity: 1 }], { duration: T(900), delay: T(2500), easing: 'ease-out' }));
     drawWires(st, T(1900));
-    mutateDock(instanceId, st, T); tray(instanceId, st, T);
+    mutateDock(instanceId, st, T); tray(instanceId, st, T); fuseTile(instanceId, st);
     const view = fitView(board), cam = view ? glideTo(view, T(1300)) : Promise.resolve();
     board.addEventListener('contextmenu', (e) => { if (e.target.closest('.fb-inner')) return; e.preventDefault(); e.stopPropagation(); const CM = global.ContextMenu;
       if (CM && CM.show) CM.show(e.clientX, e.clientY, [{ label: '◱ Put it back together', hint: 'every part back into its window (Esc)', run: () => assemble(instanceId) },
@@ -165,7 +165,7 @@
     document.removeEventListener('keydown', st.onKey);
     const finish = () => {
       st.took.slice().reverse().forEach(({ e, ph, hidden, display }) => { if (ph.parentNode) { ph.parentNode.insertBefore(e, ph); ph.remove(); } e.hidden = hidden; e.style.display = display; });
-      st.gates.forEach(x => { if (x.swap) x.swap.remove(); if (x.block) x.block.remove(); if (x.tile) x.tile.remove(); }); st.board.remove(); st.win.classList.remove('fb-away'); open.delete(instanceId);
+      st.gates.forEach(x => { if (x.swap) x.swap.remove(); if (x.block) x.block.remove(); if (x.tile) x.tile.remove(); }); if (st.fuse) st.fuse.remove(); st.board.remove(); st.win.classList.remove('fb-away'); open.delete(instanceId);
       [st.anims.win].concat(st.anims.scene || []).forEach(a => { if (a) a.cancel(); });
       return true;
     };
@@ -275,6 +275,35 @@
       setTimeout(() => { tile(o.inst, o.g); block(o.inst, o.g); }, 0); flash(o.g, src.from && src.from !== o.inst ? src.from : null, src.x); };
     move(e); document.addEventListener('pointermove', move, true); document.addEventListener('pointerup', up, true);
   }
+  // SYNTHESIZE TOGETHER (2026-11-21, his: "Do it."): the core carries a ◆ tile — drag it onto another blown-up tool's core and the two become one
+  // tool of its own (the domain's exchange.synthesize decides its parts and checks it), opened blown up beside them. Nothing here knows a tool.
+  function fuseTile(id, st) {
+    const r = rec(id); if (!r || !exchange || !exchange.synthesize || !exchange.has(r.id)) return;
+    const t = h('div', 'fb-tile fb-fuse', '⠿ ◆ drag onto another tool\'s core — synthesize them together'); t.title = 'two tools blown up on the canvas become one of their own';
+    t.addEventListener('pointerdown', (e) => { if (e.button !== 0) return; e.stopPropagation(); e.preventDefault(); carryCore(e, id); });
+    st.core.appendChild(t); st.fuse = t; settle(id);
+  }
+  function carryCore(e, id) {
+    const ghost = h('div', 'fb-ghost', '◆ ' + (rec(id).def.label || '')); document.body.appendChild(ghost);
+    const targets = [...open.entries()].filter(([inst]) => inst !== id && rec(inst) && exchange.has(rec(inst).id)).map(([inst, st]) => ({ inst, st }));
+    targets.forEach(t => t.st.core.classList.add('fb-can')); let over = null;
+    const move = (ev) => { ghost.style.left = (ev.clientX + 12) + 'px'; ghost.style.top = (ev.clientY + 10) + 'px'; ghost.style.display = 'none'; const el = document.elementFromPoint(ev.clientX, ev.clientY); ghost.style.display = '';
+      const c = el && el.closest('.fb-core'), hit = c && targets.find(t => t.st.core === c); if (over && over !== hit) over.st.core.classList.remove('fb-over'); over = hit || null; if (over) over.st.core.classList.add('fb-over'); };
+    const up = () => { document.removeEventListener('pointermove', move, true); document.removeEventListener('pointerup', up, true); ghost.remove(); targets.forEach(t => t.st.core.classList.remove('fb-can', 'fb-over'));
+      if (over) synthesizeOnto(id, over.inst, over.st); };
+    move(e); document.addEventListener('pointermove', move, true); document.addEventListener('pointerup', up, true);
+  }
+  function synthesizeOnto(aId, bId, bst) {
+    const say = (t2, kind) => { if (global.Shell && global.Shell.toast) global.Shell.toast(t2, kind || '', 3600); };
+    bst.core.classList.add('fb-busy'); say('◆ synthesizing ' + rec(aId).def.label + ' × ' + rec(bId).def.label + ' — measuring it against everything…');
+    return Promise.resolve(exchange.synthesize(aId, bId)).then((r) => {
+      bst.core.classList.remove('fb-busy'); if (!r || !r.ok) { say('not made — ' + ((r && r.why) || 'it did not build'), 'bad'); return null; }
+      const F = global.OrganismFactory, x = bst.board.offsetLeft + bst.board.offsetWidth + 120, y = bst.board.offsetTop, inst = F.spawn(r.id, { x, y });
+      say('◆ ' + r.rec.name + ' — a tool of its own (' + r.verdict + (r.near ? ', nearest ' + r.near : '') + ')', 'good');
+      if (inst) setTimeout(() => { if (!open.has(inst)) explode(inst, r.id); }, 700);
+      return { inst, id: r.id, rec: r.rec };
+    }, (er) => { bst.core.classList.remove('fb-busy'); say('not made — ' + er.message, 'bad'); return null; });
+  }
   // the PARTS tray: new components this tool's boxes take — drag one onto a box to change what is in it
   function tray(id, st, T) {
     const comps = []; sockets(id).forEach(sk => sk.options.filter(o => o !== sk.default && o !== 'none').forEach(o => { if (!comps.includes(o)) comps.push(o); }));
@@ -296,7 +325,7 @@
   }
   function settle(id) {   // a box that grew (its block) pushes the boxes under it down, so nothing covers anything; the wires follow
     const st = open.get(id); if (!st) return;
-    [st.dock, st.tray].filter(Boolean).forEach(o => { const ob = o.offsetTop + o.offsetHeight + 26;   // the dock and the tray are solid: a box under them moves below
+    [st.core, st.dock, st.tray].filter(Boolean).forEach(o => { const ob = o.offsetTop + o.offsetHeight + 26;   // the dock and the tray are solid: a box under them moves below
       st.gates.forEach(l => { if (l.g.offsetLeft < o.offsetLeft + o.offsetWidth && l.g.offsetLeft + l.g.offsetWidth > o.offsetLeft && l.g.offsetTop < ob && l.g.offsetTop + l.g.offsetHeight > o.offsetTop) l.g.style.top = ob + 'px'; }); });
     for (let pass = 0; pass < 4; pass++) { let movedAny = false; const gs = st.gates.slice().sort((a, b) => a.g.offsetTop - b.g.offsetTop);
       gs.forEach((u, i) => { const ub = u.g.offsetTop + u.g.offsetHeight + 26;
@@ -367,5 +396,5 @@
     return true;
   }
   if (!hook()) document.addEventListener('DOMContentLoaded', hook);
-  global.FieldBoard = { define, has, explode, assemble, isOpen, boards, sockets, setExchange, get exchange() { return exchange; }, learned: (toolId) => FM().learned(toolId), mutate: (id) => FM().mutate(FM().toolTarget(id)) };
+  global.FieldBoard = { define, has, explode, assemble, isOpen, boards, sockets, setExchange, synthesizeOnto: (a, b) => open.get(b) ? synthesizeOnto(a, b, open.get(b)) : Promise.resolve(null), get exchange() { return exchange; }, learned: (toolId) => FM().learned(toolId), mutate: (id) => FM().mutate(FM().toolTarget(id)) };
 })(window);

@@ -78,20 +78,45 @@
     },
   };
   const tempo = (bpm) => bpm || (root.Kernel && root.Kernel.music && root.Kernel.music.bpm) || 120;   // the canvas's tempo when the caller does not say
+  // a tool SYNTHESIZED on the canvas (tools/music/core/assembled-tool.js: ids eravos.wb-*): its settings are the assembled engine's
+  const ADIVS = ['1/1', '1/2', '1/4', '1/4t', '1/8', '1/8t', '1/16', '1/16t', '1/32'];
+  const MADE = { slots: [
+    { id: 'filter', label: 'the mouth', find: { near: ['cutoff', 'mouth'] }, kinds: ['filter'],
+      read: (P) => part('filter', P.mouth, P.mouth === 'filter-ladder' ? { cutoff: P.cutoff, reso: P.reso, mode: P.mLadMode, drive: P.mLadDrive, bass: P.mLadBass } : { cutoff: P.cutoff, reso: P.reso, mode: P.mSvfMode, stages: P.mSvfStages }),
+      take: (p) => Object.assign({ mouth: p.component, cutoff: clamp(p.s.cutoff, 40, 3000), reso: clamp(p.s.reso, 0, 0.95) }, p.component === 'filter-ladder' ? { mLadMode: LADDER.includes(p.s.mode) ? p.s.mode : 'lowpass 24', mLadDrive: clamp(p.s.drive, 0, 18), mLadBass: clamp(p.s.bass === undefined ? 0.5 : p.s.bass, 0, 1) }
+        : { mSvfMode: ['lowpass', 'bandpass', 'notch', 'peak'].includes(p.s.mode) ? p.s.mode : 'lowpass', mSvfStages: clamp(p.s.stages || 2, 1, 3) }) },
+    { id: 'drive', label: 'the drive', find: { near: ['drive'] }, kinds: ['drive'], clear: () => ({ drive: 'none' }), isClear: (P) => P.drive === 'none',
+      read: (P) => P.drive === 'none' ? null : part('drive', P.drive, P.drive === 'bitcrusher' ? { bits: P.dCrushBits, rate: P.dCrushRate } : P.drive === 'saturator-tape' ? { drive: P.dTapeDrive, bump: P.dTapeBump } : { drive: P.dTubeDrive, bias: P.dTubeBias, tone: P.dTubeTone }),
+      take: (p) => p.component === 'bitcrusher' ? { drive: 'bitcrusher', dCrushBits: clamp(p.s.bits || 8, 3, 16), dCrushRate: clamp(p.s.rate || 12000, 2000, 40000) }
+        : p.component === 'saturator-tape' ? { drive: 'saturator-tape', dTapeDrive: clamp(p.s.drive, 0, 20), dTapeBump: clamp(p.s.bump === undefined ? 2 : p.s.bump, 0, 6) }
+        : { drive: 'saturator-tube', dTubeDrive: clamp(p.s.drive, 0, 20), dTubeBias: clamp(p.s.bias === undefined ? 0.3 : p.s.bias, 0, 1), dTubeTone: clamp(p.s.tone, -1, 1) } },
+    { id: 'noise', label: 'the noise', find: { near: ['noise'] }, kinds: ['noise'], clear: () => ({ noise: 0 }), isClear: (P) => !(P.noise > 0),
+      read: (P) => part('noise', 'osc-noise', { colour: P.noiseColour, amount: P.noise }),
+      take: (p) => ({ noiseColour: p.s.colour || 'white', noise: p.s.amount > 0 ? clamp(p.s.amount, 0, 1) : 0.3 }) },
+    { id: 'fx', label: 'after the mouth', find: { near: ['fx'] }, kinds: ['fx'], clear: () => ({ fx: 'none' }), isClear: (P) => P.fx === 'none',
+      read: (P) => P.fx === 'ensemble-core' ? part('fx', 'ensemble-core', { mode: P.fEnsMode, mix: P.fEnsMix }) : P.fx === 'delay-line' ? part('fx', 'delay-line', { time: P.fDelTime, feedback: P.fDelFb, mix: P.fDelMix }) : P.fx === 'none' ? null : part('fx', P.fx, {}),
+      take: (p) => p.component === 'ensemble-core' ? { fx: 'ensemble-core', fEnsMode: p.s.mode || 'juno I', fEnsMix: clamp(p.s.mix === undefined ? 0.5 : p.s.mix, 0, 1) }
+        : p.component === 'delay-line' ? { fx: 'delay-line', fDelTime: ['1/16', '1/8', '1/8.', '1/4'].includes(p.s.time) ? p.s.time : '1/8.', fDelFb: clamp(p.s.feedback, 0, 0.8), fDelMix: clamp(p.s.mix, 0, 0.5) }
+        : ['saturator-tape', 'bitcrusher'].includes(p.component) ? { fx: p.component } : null },
+    { id: 'wobble', label: 'the wobble', find: { near: ['depth', 'rate'] }, kinds: ['wobble'], clear: () => ({ depth: 0 }), isClear: (P) => !(P.depth > 0),
+      read: (P, bpm) => part('wobble', 'lfo', { div: P.rate, hz: hzOfDiv(P.rate, bpm), shape: P.lfoShape, depth: P.depth }),
+      take: (p, P, bpm) => ({ rate: p.s.div && ADIVS.includes(p.s.div) ? p.s.div : divOfHz(p.s.div ? hzOfDiv(p.s.div, bpm) : p.s.hz, bpm, ADIVS), lfoShape: p.s.shape || 'sine', depth: clamp(p.s.depth, 0, 5) }) },
+  ] };
+  const profileOf = (id) => PROFILES[id] || (/^eravos\.wb-/.test(String(id)) ? MADE : null);
   const defaultsOf = (id) => { const d = root.OrganismFactory && root.OrganismFactory.def(id), o = {}; ((d && d.config) || []).forEach(c => { o[c.key] = c.default; }); return o; };
   function slots(toolId, params, bpm) {
-    const pr = PROFILES[toolId]; if (!pr) return [];
+    const pr = profileOf(toolId); if (!pr) return [];
     const P = Object.assign(defaultsOf(toolId), params || {});
     return pr.slots.map(sl => { let p = null; try { p = sl.read(P, tempo(bpm)); } catch (e) {} if (p) p.from = toolId; let own = false, isClear = true; try { own = sl.own ? !!sl.own(P) : false; isClear = sl.isClear ? !!sl.isClear(P) : true; } catch (e) {} return { id: sl.id, label: sl.label, find: sl.find, kinds: sl.kinds, part: p, own, clearable: !!sl.clear && !isClear }; });
   }
   function take(toolId, slotId, p, params, bpm) {
-    const sl = PROFILES[toolId] && PROFILES[toolId].slots.find(x => x.id === slotId); if (!sl || !p || !sl.kinds.includes(p.kind)) return null;
+    const sl = profileOf(toolId) && profileOf(toolId).slots.find(x => x.id === slotId); if (!sl || !p || !sl.kinds.includes(p.kind)) return null;
     let patch = null; try { patch = sl.take(p, Object.assign(defaultsOf(toolId), params || {}), tempo(bpm)); } catch (e) { patch = null; }
     if (patch) Object.keys(patch).forEach(k => { if (patch[k] === undefined || (typeof patch[k] === 'number' && !isFinite(patch[k]))) delete patch[k]; });
     return patch && Object.keys(patch).length ? patch : null;
   }
-  function clear(toolId, slotId) { const sl = PROFILES[toolId] && PROFILES[toolId].slots.find(x => x.id === slotId); return sl && sl.clear ? sl.clear() : null; }   // delete: back to its own part, or empty
-  const api = { has: (id) => !!PROFILES[id], slots, take, clear, label, kinds: ['filter', 'drive', 'noise', 'fx', 'wobble'] };
+  function clear(toolId, slotId) { const sl = profileOf(toolId) && profileOf(toolId).slots.find(x => x.id === slotId); return sl && sl.clear ? sl.clear() : null; }   // delete: back to its own part, or empty
+  const api = { has: (id) => !!profileOf(id), slots, take, clear, label, kinds: ['filter', 'drive', 'noise', 'fx', 'wobble'] };
   root.PartExchange = api;
   if (root.FieldBoard && root.FieldBoard.setExchange) root.FieldBoard.setExchange(api);
   if (typeof module === 'object' && module.exports) module.exports = api;

@@ -2,6 +2,18 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.205 Synthesize tools together on the canvas; the Wobble Builder removed (2026-11-21) — not merged
+His words: "Do it. Then remove that tool. Dont hide it." (after "That's redundant." of the Wobble Builder)
+- tools/core/field/board.js: each blown-up tool's core carries a ◆ tile — drag it onto another blown-up tool's core (it lights) → one tool of
+  its own, spawned beside them and opened blown up, its parts as tiles; the core counts as solid (boxes move clear of it).
+- tools/music/core/assembled-tool.js (moved from the Wobble Builder's engine): AssembledTool.synthesize — each part from the tool it is most
+  itself in (tools/music/data/tool-blend.js), the gates (plays cleanly; a twin refused), "<A> × <B>"; made tools' plain kit face; their parts
+  in part-exchange.js. The engine runs ensemble-core, osc-noise and the filter envelope.
+- Removed: the Wobble Builder tool (window, packs, its tests) — deleted, not hidden. Its spec → specs/eravos.assembled-tool.spec (kept whole).
+- On the canvas (docs/previews/workbench/synth-together.shots.mjs): Wobble Bass × Retro DCO — novel (nearest Xen Synth · Silver-Mean Membrane
+  0.469), tube → ladder → filter env → Juno II chorus, wobble into the ladder; opened blown up, 5 parts as tiles.
+- Tests: P203 2/2 · P202 8/8 (on a synthesized tool) · tests/assembled-tool.test.mjs 32 · boundary 10/10 · the suites green.
+
 ## 3.204 Components swapped between tools blown up on the canvas (2026-11-20) — not merged
 His words: "Give Eravos the tools to swap tools components when they are blown up on the canvas. Like give me the ability to mutate or
 synthesize tools together." · "you click on the component' box and can pick a new one or one from another tool. then uses the ui element for the
