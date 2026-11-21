@@ -1,3 +1,19 @@
+ERAVOS v0.2.29 (2026-11-21)
+
+Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.29.exe from the release.
+
+- An update can no longer leave ERAVOS half written. The Setup checks every large file on disk after installing it; if one did not go in
+  completely it says which, and the update runs it once more, then offers the Setup with its window to repair. (If an earlier update
+  broke ERAVOS: run ERAVOS-Setup-0.2.29.exe from this release by hand — your library is not touched.)
+- The Setup asks where your library goes — your projects, tools, packs and exports — after where the canvas goes. Documents\ERAVOS by
+  default, Browse… to change it. Updates never ask again or move it.
+- Synthesize tools together: blow up two tools on the canvas, drag one's ◆ onto the other's core — one tool of its own, opened blown up.
+  The Wobble Builder is gone (its engine makes these tools now).
+- Drag a part onto another box: it swaps with what is there when that fits back, otherwise it replaces it (inside one tool it moves).
+  The drag says which. Right-click a part: mutate only it, delete it, show it as a block or a tile. ⚄ Open in Mutation Lab (right-click
+  a tool, or a part).
+- The wires of a tool blown up on the canvas glow and flow, in your theme's colours (Dusk, Studio, Field, Midnight each their own).
+
 ERAVOS v0.2.28 (2026-11-21)
 
 Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.28.exe from the release.
