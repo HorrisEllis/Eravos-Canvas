@@ -2,6 +2,13 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.209 Wire colours belong to the theme (2026-11-21) — not merged
+His words: "I just want them to look consistent, and but also in relation to the themes as well, right?"
+- canvas/runtime/eravos.css: `--wire1` `--wire2` `--wire3` (from a part, the middle, into what it feeds) and `--wire-glow`, said by each theme:
+  Dusk its own sunset (violet → pink → peach), Studio cyan → violet → pink (the installer's), Field around its violet, Midnight its calm blue,
+  glowing less. The Field board's wires and their ends take them (tools/core/field/board.{js,css}) — one rule for every wire drawn.
+- `docs/previews/workbench/wires.shots.mjs` → wires-themes.png (the four themes). P196 P203 P204 boundary green.
+
 ## 3.208 The exploded board's wires in the installer's colours; the Setup asks where your library goes (2026-11-21) — not merged
 His words: "You make those, like, the wires, too, like, the ones, when you, like, the, when you blow up, when you explode the tools in the canvas" · "And everything else goes in the documents folder, but also it asks for where you want to install the where you want to set the location for the tools and shit." · "Like have it the default be the documents like documents /Eravos, and but then you know have like a browse button to change it." · on the installer preview: "It looks fucking significantly better."
 - tools/core/field/board.{js,css}: each wire a gradient cyan (at the part) → violet → pink (at the core), glowing, light flowing along it
