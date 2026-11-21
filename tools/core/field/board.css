@@ -41,3 +41,9 @@
 .fb-trayh{width:100%;font:500 10px 'DM Mono',monospace;letter-spacing:2px;color:#4E6A80}
 .fb-ttile{padding:4px 8px;border:1px solid #1B2A3A;color:#B8CFE0;font:500 10px 'DM Mono',monospace;letter-spacing:1px;cursor:grab;user-select:none}
 .fb-ttile:hover{border-color:#00D4FF;color:#00D4FF}
+.fb-tile.fb-fuse{--c:#FF6FA8;margin:10px 0 0;cursor:grab}
+.fb-core.fb-can{box-shadow:0 0 0 2px #FF6FA8AA}
+.fb-core.fb-over{box-shadow:0 0 0 3px #FF6FA8,0 0 40px #FF6FA8AA}
+.fb-core.fb-busy{animation:fb-busy 1s ease-in-out infinite alternate}
+@keyframes fb-busy{from{filter:brightness(1)}to{filter:brightness(1.4)}}
+@media (prefers-reduced-motion: reduce){.fb-core.fb-busy{animation:none}}

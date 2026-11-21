@@ -71,7 +71,7 @@ dag:
   layer 0: env-adsr ✓ · filter-svf ✓ · lfo ✓ · osc-va ✓ · osc-wavetable ✓ · oscillator-population ✓ · stereo-tools ✓
   tool: eravos.swarm-oscillator ← osc-va + osc-wavetable + oscillator-population + env-adsr + lfo + filter-svf + stereo-tools
   build order: env-adsr ✓ → filter-svf ✓ → lfo ✓ → osc-va ✓ → osc-wavetable ✓ → oscillator-population ✓ → stereo-tools ✓ → swarm-oscillator
-  shared with: env-adsr 22 · filter-svf 42 · lfo 30 · osc-va 27 · osc-wavetable 12 · oscillator-population 3 · stereo-tools 19  (other tools on each)
+  shared with: env-adsr 21 · filter-svf 41 · lfo 29 · osc-va 26 · osc-wavetable 12 · oscillator-population 3 · stereo-tools 18  (other tools on each)
   in it now: osc-va · osc-wavetable · oscillator-population · env-adsr · lfo · filter-svf · stereo-tools
   comes out of it: —
   planned: —

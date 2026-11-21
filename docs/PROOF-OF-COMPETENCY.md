@@ -71,6 +71,13 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-21 · Tools synthesized together on the canvas; parts swapped between tools by dragging (3.204–3.205)
+- **His words (2026-11-20 / 21):** "Give Eravos the tools to swap tools components when they are blown up on the canvas. Like give me the ability to mutate or synthesize tools together." · "drag components, delete them, change them. not drop down menus" · "Do it. Then remove that tool. Dont hide it."
+- **His call:** the concept ("that was the entire concept i wanted"); two attempts rejected on the way (a combine card and builder window; a click-menu) and the redundant tool removed.
+- **Built (by the AI coder, to his direction):** component boxes on a blown-up tool whose parts are dragged between tools with their settings, deleted, or changed from a tray; dragging one tool's ◆ onto another's core synthesizes them into a tool of its own (an assembled engine from the parts each is most itself in, behind regression and novelty gates), opened blown up.
+- **Proof:** P203 2/2 · P202 8/8 · tests/assembled-tool.test.mjs 32 · null render Wobble Bass 34/34, Retro DCO 12/12 against main (3.204) · boundary 10/10.
+- **Where to check:** `node tests/run.mjs P203`; `node docs/previews/workbench/synth-together.shots.mjs`; `docs/previews/workbench/swap-across-after.png`.
+
 ### 2026-11-20 · The Wobble Builder: a tool that makes tools, from shared parts, live, with a twin refused (3.202–3.203)
 - **His words (2026-11-20):** "I want to make like a wobble synthsize tool." · (his pick) "A wobble builder" · "yes build it."
 - **His call:** the idea and the choice of kind; the preview approved before the build.

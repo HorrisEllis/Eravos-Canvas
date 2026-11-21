@@ -1,18 +1,20 @@
-/* Wobble Builder (eravos.wobble-builder) — tests that travel with the tool (WB1–WB3, tools/music/tools/bass/wobble-builder/wobble-builder.spec).
+/* P202 — the engine of synthesized tools (tools/music/core/assembled-tool.js; was the Wobble Builder's, removed 2026-11-21 — his: "Do it. Then remove that tool.") (WB1–WB3, tools/music/tools/bass/wobble-builder/wobble-builder.spec).
  * The contract is shared (TH.toolContract). Then: live = offline (the worklet plays the very samples the offline Voice renders — the null render),
- * a knob and a slot swap reach the sound while it plays, and SYNTHESIZE makes a real tool (refusing a twin). Plain node: tests/wobble-builder.test.mjs. */
-TH.toolContract('eravos.wobble-builder');
+ * a knob and a slot swap reach the sound while it plays, and SYNTHESIZE makes a real tool (refusing a twin). Plain node: tests/assembled-tool.test.mjs. */
 
 window.__phase = 'P202';
-describe('Wobble Builder — live, swapped, synthesized', () => {
-  const WB = () => window.WobbleBuilder;
+// a synthesized tool to test the engine on (as SYNTHESIZE makes them: its settings, its own id)
+if (window.AssembledTool && !OrganismFactory.def('eravos.wb-p202')) AssembledTool.defineMade({ id: 'eravos.wb-p202', name: 'P202 Test', settings: AssembledTool.defaults(), at: '2026-11-21', chain: '', verdict: 'novel', near: '', d: 0, of: ['test'] });
+TH.toolContract('eravos.wb-p202');
+describe('P202 a synthesized tool — live = offline, knobs live, parts swapped live, SYNTHESIZE refuses a twin', () => {
+  const WB = () => window.AssembledTool;
   async function live(secs, setup, during, o) {   // the tool in an offline universe, its out to the speakers; setup(ctx) schedules notes; during: [[t, fn]]
-    const U = TH.universe(secs, { bpm: 140 }), a = TH.spawn(U, 'eravos.wobble-builder'), c = OrganismFactory.handle(a).ctx;
+    const U = TH.universe(secs, { bpm: 140 }), a = TH.spawn(U, 'eravos.wb-p202'), c = OrganismFactory.handle(a).ctx;
     await c.internals.ready; assert.ok(c.internals.node(), 'its worklet is running');
     U.K.audio.chain.out.gain.value = 0;
     if (o && o.engine) c.internals.node().connect(U.ctx.destination);   // the engine itself (the canvas's port adds its own 5 Hz DC block after it, as for every tool)
     else U.K.audio.ports(a).filter(x => x.kind === 'audio' && x.direction === 'out').forEach(x => x.node.connect(U.ctx.destination));
-    setup(c); (during || []).forEach(([t, fn]) => U.ctx.suspend(t).then(() => { fn(c); return new Promise(r => setTimeout(r, 30)); }).then(() => U.ctx.resume()));
+    setup(c); (during || []).forEach(([t, fn]) => U.ctx.suspend(t).then(() => { fn(c); return new Promise(r => setTimeout(r, 250)); }).then(() => U.ctx.resume()));
     return { buf: await TH.render(U), c };
   }
   const bright = (d, sr, a, b) => { let e = 0, f = 0; for (let i = Math.floor(a * sr) + 1; i < Math.floor(b * sr); i++) { e += d[i] * d[i]; f += (d[i] - d[i - 1]) ** 2; } return Math.sqrt(f / (e || 1e-12)); };
@@ -44,7 +46,7 @@ describe('Wobble Builder — live, swapped, synthesized', () => {
       const s = Object.assign(WB().defaults(), { mouth: 'filter-ladder', mLadMode: 'bandpass 12', rate: '1/8t', drive: 'saturator-tape', dTapeDrive: 14 });
       const r = WB().make('Test Gutter', s, 140, MusicNovelty);
       assert.ok(r.ok, 'made: ' + (r.why || '')); assert.equal(r.id, 'eravos.wb-test-gutter'); assert.ok(['novel', 'CLOSE'].includes(r.verdict), r.verdict + ' · nearest ' + r.near + ' (' + r.d + ')');
-      const def = OrganismFactory.def(r.id); assert.ok(def && def.made && def.made.from === 'eravos.wobble-builder', 'a tool of its own, that says where it came from');
+      const def = OrganismFactory.def(r.id); assert.ok(def && def.made && def.made.from === 'synthesized', 'a tool of its own, that says how it was made');
       assert.equal(def.config.find(c => c.key === 'mouth').default, 'filter-ladder', 'its settings are its own defaults');
       const U = TH.universe(0.2), inst = TH.spawn(U, r.id), mc = OrganismFactory.handle(inst).ctx; await mc.internals.ready;
       assert.equal(mc.params.get('dTapeDrive'), 14, 'it opens as it was made'); assert.ok(mc.internals.node(), 'it plays on the same engine');

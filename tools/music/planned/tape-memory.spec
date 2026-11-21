@@ -73,5 +73,5 @@ dag:
   layer 0: bitcrusher ✓ · delay-line ✓ · filter-svf ✓ · osc-noise ✓ · random-source ✓ · saturator-tape ✓ · tape-transport ✓
   tool: eravos.tape-memory ← saturator-tape + delay-line + filter-svf + osc-noise + bitcrusher + random-source + tape-transport
   build order: bitcrusher ✓ → delay-line ✓ → filter-svf ✓ → osc-noise ✓ → random-source ✓ → saturator-tape ✓ → tape-transport ✓ → tape-memory
-  shared with: bitcrusher 5 · delay-line 17 · filter-svf 42 · osc-noise 8 · random-source 8 · saturator-tape 6 · tape-transport 1  (other tools on each)
+  shared with: bitcrusher 4 · delay-line 16 · filter-svf 41 · osc-noise 8 · random-source 8 · saturator-tape 5 · tape-transport 1  (other tools on each)
   signal_dag check: every node is one of its components ✓

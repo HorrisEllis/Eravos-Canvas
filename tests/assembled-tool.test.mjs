@@ -1,4 +1,4 @@
-// node tests/wobble-builder.test.mjs — the Wobble Builder's ground (tools/music/planned/wobble-builder.spec, 2026-11-20): a wobble assembled from
+// node tests/assembled-tool.test.mjs — the engine of synthesized tools (tools/music/core/assembled-tool.js; specs/eravos.assembled-tool.spec): a wobble assembled from
 // shared parts only (osc-va → saturator-tube → filter-svf ← lfo, → stereo-tools) through the CG3 assembler and the music adapters. The LFO wired
 // into the filter's detune moves the sound's brightness at the LFO's rate; at depth 0 it does not move; the ladder in the mouth wobbles too;
 // the wobble restarts with each note (its gate rising); nothing goes over full scale.
@@ -33,13 +33,13 @@ for (const mouth of ['filter-svf', 'filter-ladder']) {
   const e = assemble(wobble({ rate: 3, depth: 2400 }), contracts, domain, { sr: SR }), o = e.render(1.6, [{ t: 0, dur: 0.7, hz: 60 }, { t: 0.8, dur: 0.7, hz: 60 }]);
   const b = brightness(o.L, 1600), a1 = b.slice(1, 9), a2 = b.slice(25, 33); let d = 0; for (let i = 0; i < a1.length; i++) d += Math.abs(a1[i] - a2[i]) / a1[i];
   ok(d / a1.length < 0.1, `each note restarts the wobble (difference ${(d / a1.length).toFixed(3)})`); }
-console.log(`wobble-builder ground: ${n} checks pass`);
+console.log(`assembled-tool ground: ${n} checks pass`);
 
 // ---- WB1 (2026-11-20): the tool's own model and Voice — the ONE function that plays offline (here) and in the worklet
 {
-  const WB = require(path.join(ROOT, 'tools/music/tools/bass/wobble-builder/wobble-builder.engine.js'));
+  const WB = require(path.join(ROOT, 'tools/music/core/assembled-tool.js'));
   const A = require(path.join(ROOT, 'tools/core/compat/assemble.js')), MA = MusicAdapters;
-  for (const c of ['saturator-tape', 'bitcrusher', 'delay-line']) Object.assign(MP, require(path.join(ROOT, `tools/music/components/${c}/${c}.js`)));
+  for (const c of ['saturator-tape', 'bitcrusher', 'delay-line', 'ensemble-core', 'osc-noise']) Object.assign(MP, require(path.join(ROOT, `tools/music/components/${c}/${c}.js`)));
   const s = WB.defaults(), d = WB.dag(s, 140), notes = [{ t: 0.02, dur: 0.8, hz: 55 }, { t: 0.9, dur: 0.6, hz: 73.42 }];
   // 1. the Voice = the assembled chain + the gate's envelope + the level (what the preview played), sample for sample
   const v = WB.Voice(A, MA, MP, contracts, SR).render(d, notes, 1.6, s.level, 0);
@@ -65,6 +65,22 @@ console.log(`wobble-builder ground: ${n} checks pass`);
     ok(at <= Math.max(before * 2, 0.2), `a slot swap cross-fades (largest step ${at.toFixed(3)} vs ${before.toFixed(3)} before)`); }
   // 5. the worklet's text is whole: it evaluates on its own (no page) and its processor class is there
   { const src = WB.source(MP, A, MA); let reg = null; new Function('AudioWorkletProcessor', 'registerProcessor', 'sampleRate', 'globalThis', src)(class {}, (n, c) => { reg = [n, c]; }, SR, {});
-    ok(reg && reg[0] === 'eravos-wobble-builder', 'the worklet source stands alone and registers its processor'); }
-  console.log(`wobble-builder tool: ${n} checks pass in all`);
+    ok(reg && reg[0] === 'eravos-assembled', 'the worklet source stands alone and registers its processor'); }
+  console.log(`assembled-tool engine: ${n} checks pass in all`);
+}
+
+// ---- SYNTHESIZE TOGETHER (2026-11-21): ToolBlend maps two tools' saved settings onto the engine's parts, each part from the tool it is most itself in
+{
+  global.window = global.window || globalThis; global.AssembledTool = require(path.join(ROOT, 'tools/music/core/assembled-tool.js'));
+  const TB = require(path.join(ROOT, 'tools/music/data/tool-blend.js')), AT = global.AssembledTool, A2 = require(path.join(ROOT, 'tools/core/compat/assemble.js'));
+  const wob = { id: 'eravos.wobble-bass', params: { div: '1/8t', lfoShape: 'square', depth: 3.2, drive: 0.6, sub: 0.7, cutoff: 260, res: 8, partDrive: 'own' } };
+  const dco = { id: 'eravos.retro-dco', params: { saw: 0.3, pulse: 0.9, width: 0.3, sub: 0.4, filter: 'ladder', drive: 6, cutoff: 1400, res: 0.4, envAmt: 0.6, fD: 0.25, fS: 0.1, chorus: 'II', chorusMix: 0.6, lfoRate: 0.5, lfoCutoff: 0 } };
+  const pick = TB.pickFor(wob.id, dco.id), s = TB.combine(wob, dco, pick, 140);
+  ok(pick.voice === 'b' && pick.mouth === 'b' && pick.fx === 'b' && pick.wobble === 'a' && pick.drive === 'a', 'each part from the tool it is most itself in: ' + JSON.stringify(pick));
+  ok(s.wave === 'pulse' && s.mouth === 'filter-ladder' && s.cutoff === 1400 && s.fx === 'ensemble-core' && s.fEnsMode === 'juno II', 'Retro DCO\'s voice, ladder, Juno II');
+  ok(s.rate === '1/8t' && s.lfoShape === 'square' && s.depth === 3.2 && s.drive === 'saturator-tube' && s.dTubeDrive === 12, 'Wobble Bass\'s wobble and drive');
+  const r = AT.Voice(A2, MusicAdapters, MP, contracts, SR).render(AT.dag(s, 140), [{ t: 0.02, dur: 0.8, hz: 55 }, { t: 0.9, dur: 0.6, hz: 73.42 }], 1.6, s.level, s.glide);
+  let pk = 0, bad = 0, dLR = 0; for (let i = 0; i < r.L.length; i++) { if (!isFinite(r.L[i])) bad++; pk = Math.max(pk, Math.abs(r.L[i]), Math.abs(r.R[i])); dLR += Math.abs(r.L[i] - r.R[i]); }
+  ok(r.ok && !bad && pk > 0.05 && pk < 1, `the synthesized sound plays, under full scale (peak ${pk.toFixed(3)})`); ok(dLR / r.L.length > 0.003, 'Retro DCO\'s chorus spreads it in stereo');
+  console.log(`assembled-tool synthesize: ${n} checks pass in all`);
 }
