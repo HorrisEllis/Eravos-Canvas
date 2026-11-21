@@ -147,10 +147,18 @@
       else { x1 = r.x; y1 = cy; vert = false; x2 = C.x + C.w; y2 = Math.max(C.y + 10, Math.min(C.y + C.h - 10, cy)); }
       if (to) { x2 = to.x; y2 = to.y; }   // the board's own point on the core, until a gate is moved
       const d = vert ? `M${x1} ${y1} C ${x1} ${(y1 + y2) / 2}, ${x2} ${(y1 + y2) / 2}, ${x2} ${y2}` : `M${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}`;
-      const pa = document.createElementNS(NS, 'path'); pa.setAttribute('d', d); pa.setAttribute('fill', 'none'); pa.setAttribute('stroke', p.col); pa.setAttribute('stroke-opacity', '0.75'); pa.setAttribute('stroke-width', '1.6');
-      if (p.dash) pa.setAttribute('stroke-dasharray', '6 4'); svg.appendChild(pa);
-      const a = document.createElementNS(NS, 'circle'); a.setAttribute('cx', x1); a.setAttribute('cy', y1); a.setAttribute('r', 4); a.setAttribute('fill', '#04070C'); a.setAttribute('stroke', p.col); a.setAttribute('stroke-width', '1.6'); svg.appendChild(a);
-      const b = document.createElementNS(NS, 'circle'); b.setAttribute('cx', x2); b.setAttribute('cy', y2); b.setAttribute('r', 3); b.setAttribute('fill', p.col); svg.appendChild(b);
+      // 2026-11-21 (his: "You make those, like, the wires, too … when you explode the tools in the canvas"): each wire is the installer's
+      // three colours — cyan at the part, violet, pink at the core — glowing, with light flowing along it into the core
+      const gid = 'fbw-' + (st.wid = (st.wid || 0) + 1), gr = document.createElementNS(NS, 'linearGradient');
+      [['gradientUnits', 'userSpaceOnUse'], ['x1', x1], ['y1', y1], ['x2', x2], ['y2', y2], ['id', gid]].forEach(([k2, v]) => gr.setAttribute(k2, v));
+      [['0', '--cyan', '#00d4ff'], ['0.5', '--violet', '#b066ff'], ['1', '--pink', '#ff2266']].forEach(([o, v, f]) => { const sp = document.createElementNS(NS, 'stop'); sp.setAttribute('offset', o); sp.setAttribute('style', 'stop-color:var(' + v + ',' + f + ')'); gr.appendChild(sp); });
+      let defs = svg.querySelector('defs'); if (!defs) { defs = document.createElementNS(NS, 'defs'); svg.insertBefore(defs, svg.firstChild); } defs.appendChild(gr);
+      const pa = document.createElementNS(NS, 'path'); pa.setAttribute('d', d); pa.setAttribute('fill', 'none'); pa.setAttribute('stroke', 'url(#' + gid + ')'); pa.setAttribute('stroke-opacity', '0.9'); pa.setAttribute('stroke-width', '2');
+      pa.setAttribute('class', 'fb-wire'); if (p.dash) pa.setAttribute('stroke-dasharray', '6 4'); svg.appendChild(pa);
+      const fl = document.createElementNS(NS, 'path'); fl.setAttribute('d', d); fl.setAttribute('fill', 'none'); fl.setAttribute('stroke', 'url(#' + gid + ')'); fl.setAttribute('stroke-width', '3.2');
+      fl.setAttribute('stroke-linecap', 'round'); fl.setAttribute('stroke-dasharray', '2 26'); fl.setAttribute('class', 'fb-flow'); fl.style.animationDelay = (-(k % 7) * 0.17) + 's'; svg.appendChild(fl);
+      const a = document.createElementNS(NS, 'circle'); a.setAttribute('cx', x1); a.setAttribute('cy', y1); a.setAttribute('r', 4); a.setAttribute('fill', '#000'); a.setAttribute('stroke', 'var(--cyan, #00d4ff)'); a.setAttribute('stroke-width', '1.6'); a.setAttribute('class', 'fb-end'); svg.appendChild(a);
+      const b = document.createElementNS(NS, 'circle'); b.setAttribute('cx', x2); b.setAttribute('cy', y2); b.setAttribute('r', 3.2); b.setAttribute('fill', 'var(--pink, #ff2266)'); b.setAttribute('class', 'fb-end'); svg.appendChild(b);
     });
   }
   function drag(lab, g, p, toolId, instanceId) {   // move a gate by its label; the wires follow; kept per tool

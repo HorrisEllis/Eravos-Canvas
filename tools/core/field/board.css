@@ -3,6 +3,12 @@
 .fb-board{position:absolute;pointer-events:none;color:#D8F6FF;font-family:'DM Mono',monospace}
 .fb-board .fb-gate,.fb-board .fb-lab,.fb-board .fb-core,.fb-board .fb-mut{pointer-events:auto}
 .fb-wires{position:absolute;left:0;top:0;overflow:visible}
+/* the wires (2026-11-21): the installer's three colours, glowing; light flows along each from its part into the core */
+.fb-wires .fb-wire{filter:drop-shadow(0 0 4px rgba(176,102,255,.55))}
+.fb-wires .fb-flow{filter:drop-shadow(0 0 6px rgba(255,34,102,.8));animation:fb-flow 1.2s linear infinite}
+.fb-wires .fb-end{filter:drop-shadow(0 0 5px rgba(255,34,102,.6))}
+@keyframes fb-flow{to{stroke-dashoffset:-28}}
+@media (prefers-reduced-motion:reduce){.fb-wires .fb-flow{animation:none}}
 .fb-head{position:absolute;left:0;top:0;right:0}
 .fb-head > div{position:relative!important}
 .fb-core{position:absolute;left:740px;top:560px;transform-origin:50% 50%}

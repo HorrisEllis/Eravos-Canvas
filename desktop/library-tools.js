@@ -64,4 +64,12 @@ function resolve(rel, libDir, bundleDir) {
   return null;
 }
 
-module.exports = { sync, resolve, walk, STATE };
+// 3.208 where the library is, as the Setup asked (his: "have it ask where you want to save … the default be the documents … a browse
+// button to change it"): %APPDATA%\ERAVOS\library.txt — UTF-16 with a BOM from the Setup (or UTF-8 by hand). An absolute path, or null.
+function chosen(file) {
+  let b; try { b = fs.readFileSync(file); } catch (e) { return null; }
+  let t = b[0] === 0xff && b[1] === 0xfe ? b.slice(2).toString('utf16le') : b[0] === 0xfe && b[1] === 0xff ? null : b.toString('utf8').replace(/^\uFEFF/, '');
+  if (!t) return null; t = t.replace(/\0+$/, '').trim(); if (!t || !(path.isAbsolute(t) || path.win32.isAbsolute(t))) return null;
+  return t;
+}
+module.exports = { sync, resolve, walk, STATE, chosen };

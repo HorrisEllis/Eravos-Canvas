@@ -28,5 +28,11 @@ ok(L.resolve('music/tools/b/b.engine.js', D, B) === path.join(D, 'music/tools/b/
 ok(L.resolve('music/only-in-app.js', D, B) === path.join(B, 'music/only-in-app.js'), 'the app folder answers what the library lacks');
 ok(L.resolve('../../secret', D, B) === null && L.resolve('music/.hidden', D, B) === null && L.resolve('nope.js', D, B) === null, 'nothing outside, no dot files, missing = null');
 ok(L.sync(D, D, {}).skipped, 'the library is never synced onto itself (portable mode)');
+// 3.208 the library folder the Setup asked for
+const lt = path.join(T, 'library.txt');
+fs.writeFileSync(lt, Buffer.concat([Buffer.from([0xff, 0xfe]), Buffer.from('D:\\Music\\ERAVOS', 'utf16le')])); ok(L.chosen(lt) === 'D:\\Music\\ERAVOS', 'the Setup\'s UTF-16 choice is read: ' + L.chosen(lt));
+fs.writeFileSync(lt, '\uFEFF/home/me/ERAVOS\n'); ok(L.chosen(lt) === '/home/me/ERAVOS', 'UTF-8 by hand too');
+fs.writeFileSync(lt, 'relative\\folder'); ok(L.chosen(lt) === null, 'a relative path is not taken');
+ok(L.chosen(path.join(T, 'nope.txt')) === null, 'no file: the default (Documents\\ERAVOS)');
 fs.rmSync(T, { recursive: true, force: true });
 console.log(`library-tools: ${pass}/${pass + fail} passed`); process.exit(fail ? 1 : 0);

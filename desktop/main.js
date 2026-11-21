@@ -25,6 +25,8 @@ function writable(dir) { try { fs.mkdirSync(dir, { recursive: true }); const t =
 function pickHome() {
   if (process.env.ERAVOS_LIBRARY) return path.resolve(process.env.ERAVOS_LIBRARY);
   if (fs.existsSync(path.join(APP_DIR, 'portable')) && writable(APP_DIR)) return APP_DIR;
+  // 3.208 the folder chosen in the Setup (default Documents\ERAVOS, Browse… to change it) — used only if it can be written
+  try { const c = require('./library-tools.js').chosen(path.join(app.getPath('appData'), 'ERAVOS', 'library.txt')); if (c && writable(c)) return path.resolve(c); } catch (e) {}
   return path.join(app.getPath('documents'), 'ERAVOS');
 }
 const HOME = pickHome();

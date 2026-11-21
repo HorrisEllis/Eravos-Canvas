@@ -2,6 +2,16 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.208 The exploded board's wires in the installer's colours; the Setup asks where your library goes (2026-11-21) — not merged
+His words: "You make those, like, the wires, too, like, the ones, when you, like, the, when you blow up, when you explode the tools in the canvas" · "And everything else goes in the documents folder, but also it asks for where you want to install the where you want to set the location for the tools and shit." · "Like have it the default be the documents like documents /Eravos, and but then you know have like a browse button to change it." · on the installer preview: "It looks fucking significantly better."
+- tools/core/field/board.{js,css}: each wire a gradient cyan (at the part) → violet → pink (at the core), glowing, light flowing along it
+  into the core (still with prefers-reduced-motion); the ends cyan and pink. `docs/previews/workbench/wires.shots.mjs` → wires-new.png.
+- packaging/windows/eravos.nsi: after the canvas's folder, a page "Your library" — Documents\ERAVOS by default (or the last choice), Browse…
+  (a folder of its own, ERAVOS, inside the one chosen); saved per user in %APPDATA%\ERAVOS\library.txt; a silent update never asks or
+  changes it; the finish page opens the chosen library. desktop/main.js pickHome reads it (library-tools.js chosen), used only if writable.
+- Preview colours (3.207 follow-up, his: "I want it to match … have a consistent color scheme"): one palette (cyan · violet · pink), one font.
+- desktop/test/library-tools.mjs 18/18 · makensis compiles · P196 P199 P200 P203 P204 boundary 10/10 · bare-canvas green.
+
 ## 3.207 An update can no longer leave ERAVOS half written; the installer's new look as a preview (2026-11-21) — not merged
 His words: "update broke my eravos. also can you make a much nicer installer and updater. like matching? animated and vibrant like the rest of eravos?"
 - What broke: the ERAVOS.exe he sent is 39,796,736 bytes; its own header says ~246 MB — the install stopped part way through writing it
