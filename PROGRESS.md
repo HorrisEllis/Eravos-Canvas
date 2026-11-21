@@ -2,6 +2,17 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.207 An update can no longer leave ERAVOS half written; the installer's new look as a preview (2026-11-21) — not merged
+His words: "update broke my eravos. also can you make a much nicer installer and updater. like matching? animated and vibrant like the rest of eravos?"
+- What broke: the ERAVOS.exe he sent is 39,796,736 bytes; its own header says ~246 MB — the install stopped part way through writing it
+  and nothing noticed (the release builds were all green; the file on his PC was cut short).
+- packaging/windows/install-check.mjs (run by make-exe.ps1): every file of 256 KB or more in the Setup, with its size → checks.nsh.
+  eravos.nsi: after writing, each one is checked on disk; a missing or short file → it says which, the version is NOT written, exit 3.
+- eravos-update.nsi: the version not in → it runs the Setup once more; still not → it says why and offers the Setup with its window (repair).
+- Both compile (makensis 3.09, with and without the list); the Windows end-to-end runs in the release workflow.
+- The look (his ask): `docs/previews/installer/installer.html` + stills — black, the palette's waves breathing, the wordmark flowing, a
+  glowing progress / ring, "checking every file" as a step. Not built: on his yes (NSIS custom pages, animated by frames).
+
 ## 3.206 A part dragged to another box swaps or replaces; right-click a part; Open in Mutation Lab (2026-11-21) — not merged
 His words: "i want to be able to drag one component from one part of a tool to another. like directly, with differnt ui options, more components. utilize right click, open in mutation lab, like, i want to drag components to one tool and have them either swap if compatible or remove the one its replacing."
 - tools/core/field/board.js: on a drop, what is in the box it lands on goes back into the box the part came from when it fits there (⇄ a swap,

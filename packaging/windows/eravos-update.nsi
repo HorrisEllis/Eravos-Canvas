@@ -156,7 +156,10 @@ Section "Update"
   !insertmacro Say "ERAVOS has closed"
 
   ; 3. Windows asks for permission here, in front of you; then the Setup installs silently into the same folder
-  !insertmacro Say "Asking Windows for permission to install ERAVOS $VERSION..."
+  StrCpy $R6 0
+  install:
+  IntOp $R6 $R6 + 1
+  !insertmacro Say "Asking Windows for permission to install ERAVOS $VERSION... (try $R6)"
   ClearErrors
   ExecShellWait "runas" "$SETUP" "/S /D=$DEST"
   ${If} ${Errors}
@@ -178,8 +181,19 @@ Section "Update"
     StrCpy $OK "true"
     StrCpy $MSG "ERAVOS $VERSION is installed"
   ${Else}
+    ; 3.207 the Setup now refuses to write its version when a file did not go in completely ("update broke my eravos."): try once more
+    ReadRegStr $R7 HKLM "Software\ERAVOS" "LastInstallError"
+    ${If} $R6 < 2
+      !insertmacro Say "The install did not finish ($R7) - trying once more"
+      Sleep 3000
+      Goto install
+    ${EndIf}
     StrCpy $OK "false"
-    StrCpy $MSG "the installer ran, but ERAVOS reports version $R5, not $VERSION"
+    StrCpy $MSG "the installer ran twice, but ERAVOS did not go in completely ($R7) - ERAVOS reports version $R5, not $VERSION"
+    ; the way back, at once: the Setup with its own window
+    MessageBox MB_YESNO|MB_ICONEXCLAMATION "ERAVOS $VERSION did not install completely.$\r$\n$\r$\n$R7$\r$\nRun the installer now, with its window, to repair it? Your library (Documents\ERAVOS) is not touched." /SD IDNO IDNO finish
+    ExecShell "runas" "$SETUP"
+    StrCpy $NOSTART "1"
   ${EndIf}
 
   finish:
