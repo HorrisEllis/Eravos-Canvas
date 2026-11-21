@@ -71,6 +71,15 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-21 · A part dragged to another box swaps or replaces it; right-click a part; Open in Mutation Lab (3.206)
+- **His words (2026-11-21):** "i want to be able to drag one component from one part of a tool to another. like directly, with differnt ui options, more components. utilize right click, open in mutation lab, like, i want to drag components to one tool and have them either swap if compatible or remove the one its replacing."
+- **His call:** swap when compatible, else replace; right-click; the Mutation Lab.
+- **Built (by the AI coder, to his direction):** drop semantics on the blown-up board (swap if what is there fits back, else replace; a move
+  inside one tool, one undo step), the drag saying which; a part's right-click (mutate only it, delete, block or tile view, the Lab); the window's
+  ⚄ Open in Mutation Lab.
+- **Proof:** tests/p204-part-swap.test.js 1/1 · P203 2/2 · P202 8/8 · boundary 10/10.
+- **Where to check:** `node tests/run.mjs P204`.
+
 ### 2026-11-21 · Tools synthesized together on the canvas; parts swapped between tools by dragging (3.204–3.205)
 - **His words (2026-11-20 / 21):** "Give Eravos the tools to swap tools components when they are blown up on the canvas. Like give me the ability to mutate or synthesize tools together." · "drag components, delete them, change them. not drop down menus" · "Do it. Then remove that tool. Dont hide it."
 - **His call:** the concept ("that was the entire concept i wanted"); two attempts rejected on the way (a combine card and builder window; a click-menu) and the redundant tool removed.

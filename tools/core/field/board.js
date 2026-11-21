@@ -115,6 +115,8 @@
     mutateDock(instanceId, st, T); tray(instanceId, st, T); fuseTile(instanceId, st);
     const view = fitView(board), cam = view ? glideTo(view, T(1300)) : Promise.resolve();
     board.addEventListener('contextmenu', (e) => { if (e.target.closest('.fb-inner')) return; e.preventDefault(); e.stopPropagation(); const CM = global.ContextMenu;
+      const cg = e.target.closest('.fb-gate.fb-comp'), cx = cg && st.gates.find(x => x.g === cg);
+      if (cx && CM && CM.show) return CM.show(e.clientX, e.clientY, partItems(instanceId, cx), partIn(instanceId, cx).label + ' · a part');
       if (CM && CM.show) CM.show(e.clientX, e.clientY, [{ label: '◱ Put it back together', hint: 'every part back into its window (Esc)', run: () => assemble(instanceId) },
         { label: '↺ Gates back to the board', hint: 'undo your moves of the gates', run: () => { keepMoved(toolId, {}); assemble(instanceId, { now: true }); explode(instanceId, toolId); } }], (L.title || 'the tool') + ' · exploded'); else assemble(instanceId); });
     st.onKey = (e) => { if (e.key === 'Escape' && !e.defaultPrevented && open.get(instanceId) === st && !st.leaving) assemble(instanceId); };
@@ -243,9 +245,9 @@
     if (!p.empty) grip.parentNode.onpointerdown = (e) => { if (e.button !== 0 || e.target.closest('.fb-del')) return; e.stopPropagation(); e.preventDefault(); carry(e, { from: id, x, part: p.part, comp: p.comp, label: p.label }); };
     else x.tile.onpointerdown = null;
   }
+  function clearPatch(id, x) { const r = rec(id), sk = x.socket, patch = x.slot && exchange ? exchange.clear(r.id, x.slot) : null; return patch || (sk ? { [sk.key]: sk.default } : null); }
   function remove(id, x) {
-    const r = rec(id), t = FM().toolTarget(id), sk = x.socket, patch = x.slot && exchange ? exchange.clear(r.id, x.slot) : null;
-    const pt = patch || (sk ? { [sk.key]: sk.default } : null); if (!pt) return;
+    const t = FM().toolTarget(id), pt = clearPatch(id, x); if (!pt) return;
     t.set(pt); x.origin = null; t.hear(); setTimeout(() => { tile(id, x); block(id, x); }, 0);
     A(x.g, [{ opacity: 1 }, { opacity: 0.55, offset: 0.3 }, { opacity: 1 }], { duration: 500, fill: 'none' });
   }
@@ -261,19 +263,33 @@
   function carry(e, src) {
     const ghost = h('div', 'fb-ghost', '⠿ ' + src.label); document.body.appendChild(ghost);
     const all = [...open.entries()].flatMap(([inst, st]) => st.gates.filter(g => g.g.classList.contains('fb-comp')).map(g => ({ inst, g })));
-    const ok = all.map(o => ({ o, patch: fits(src, o.inst, o.g) }));
+    // 2026-11-21 (his: "drag components to one tool and have them either swap if compatible or remove the one its replacing"): what is in the
+    // box it lands on goes back into the box it came from when it fits there (a SWAP); otherwise the one there is replaced — and inside one tool
+    // the part MOVES (the box it left is cleared: back to its own part, or empty). From another tool or the tray it is a copy.
+    const ok = all.map(o => { const patch = fits(src, o.inst, o.g); if (!patch) return { o, patch };
+      const tp = partIn(o.inst, o.g), back = src.x && rec(src.from) && !tp.empty && !tp.own ? fits({ from: o.inst, x: o.g, part: tp.part, comp: tp.comp, label: tp.label }, src.from, src.x) : null;
+      const verb = back ? '⇄ swaps with ' + tp.label : (tp.empty || tp.own ? '→ goes in' : '→ replaces ' + tp.label) + (src.x && src.from === o.inst ? ' (moved)' : '');
+      return { o, patch, back, tp, verb }; });
     ok.forEach(({ o, patch }) => o.g.g.classList.add(patch ? 'fb-can' : 'fb-cannot'));
     let over = null;
     const move = (ev) => { ghost.style.left = (ev.clientX + 12) + 'px'; ghost.style.top = (ev.clientY + 10) + 'px';
       ghost.style.display = 'none'; const el = document.elementFromPoint(ev.clientX, ev.clientY); ghost.style.display = '';
       const g = el && el.closest('.fb-gate.fb-comp'), hit = g && ok.find(k => k.o.g.g === g && k.patch);
-      if (over && over !== hit) over.o.g.g.classList.remove('fb-over'); over = hit || null; if (over) over.o.g.g.classList.add('fb-over'); };
+      if (over && over !== hit) over.o.g.g.classList.remove('fb-over'); over = hit || null; if (over) over.o.g.g.classList.add('fb-over');
+      ghost.textContent = '⠿ ' + src.label + (over ? '  ' + over.verb : ''); };
     const up = () => { document.removeEventListener('pointermove', move, true); document.removeEventListener('pointerup', up, true); ghost.remove();
       ok.forEach(({ o }) => o.g.g.classList.remove('fb-can', 'fb-cannot', 'fb-over'));
-      if (!over) return; const { o, patch } = over, t = FM().toolTarget(o.inst); t.set(patch);
-      o.g.origin = src.from && src.from !== o.inst && rec(src.from) ? { from: (rec(src.from).def.label || ''), part: src.label } : null; t.hear();
-      setTimeout(() => { tile(o.inst, o.g); block(o.inst, o.g); }, 0); flash(o.g, src.from && src.from !== o.inst ? src.from : null, src.x); };
+      if (!over) return; drop(src, over); };
     move(e); document.addEventListener('pointermove', move, true); document.addEventListener('pointerup', up, true);
+  }
+  function drop(src, hit) {
+    const { o, back } = hit, same = src.x && src.from === o.inst, t = FM().toolTarget(o.inst); let patch = hit.patch;
+    if (same) patch = Object.assign({}, back || clearPatch(src.from, src.x) || {}, patch);   // one tool: one step — the swap, or the move
+    else if (back && rec(src.from)) { const ts = FM().toolTarget(src.from); ts.set(back); setTimeout(() => { tile(src.from, src.x); block(src.from, src.x); }, 0); flash(src.x, o.inst, o.g); }
+    t.set(patch); if (same) { src.x.origin = null; setTimeout(() => { tile(src.from, src.x); block(src.from, src.x); }, 0); }
+    o.g.origin = src.from && src.from !== o.inst && rec(src.from) ? { from: (rec(src.from).def.label || ''), part: src.label } : null; t.hear();
+    setTimeout(() => { tile(o.inst, o.g); block(o.inst, o.g); }, 0); flash(o.g, src.from && src.from !== o.inst ? src.from : null, src.x);
+    return { swapped: !!back, moved: !!(same && !back) };
   }
   // SYNTHESIZE TOGETHER (2026-11-21, his: "Do it."): the core carries a ◆ tile — drag it onto another blown-up tool's core and the two become one
   // tool of its own (the domain's exchange.synthesize decides its parts and checks it), opened blown up beside them. Nothing here knows a tool.
@@ -314,9 +330,39 @@
     st.board.appendChild(box); st.tray = box; settle(id);
     A(box, [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: T(700), delay: T(2400), easing: EASE.out });
   }
+  // RIGHT-CLICK ON A PART (2026-11-21, his: "utilize right click, open in mutation lab"): delete it, mutate only it, how it shows (block or tile)
+  const views = (toolId) => { try { return JSON.parse(localStorage.getItem('eravos.fieldboard.view.' + toolId) || '{}') || {}; } catch (e) { return {}; } };
+  const keepView = (toolId, v) => { try { localStorage.setItem('eravos.fieldboard.view.' + toolId, JSON.stringify(v)); } catch (e) {} };
+  const viewOf = (id, x) => (views(rec(id).id)[x.p.id] || 'block');
+  function partTarget(id, x) {   // this one part as a mutation target: its socket and the settings that belong to its components
+    const t = FM().toolTarget(id), sk = x.socket; if (!t || !sk) return null;
+    return Object.assign({}, t, { list: () => t.list().filter(c => c.key === sk.key || (c.part && (!c.of || c.of === sk.key) && [].concat(c.part).some(q => sk.options.includes(q)))) });
+  }
+  function mutatePart(id, x) {
+    const t = partTarget(id, x), m = t && FM().mutate(t); const say = (w) => global.Shell && global.Shell.toast && global.Shell.toast(w, '', 3200);
+    if (!m) return say('nothing left to try in this part'), null;
+    FM().apply(t, m); setTimeout(() => { tile(id, x); block(id, x); }, 0); flash(x, null, null); say('⚄ ' + m.words.join(' · ') + ' — Ctrl+Z puts it back'); return m;
+  }
+  function partItems(id, x) {
+    const p = partIn(id, x), v = viewOf(id, x), out = [];
+    out.push({ label: '⇄ Drag its ⠿ onto another box', hint: 'a swap when what is there fits back here; otherwise it replaces it (inside this tool it moves)', run: () => {} });
+    if (x.socket) out.push({ label: '⚄ Mutate only this part', hint: 'another component here, its own settings fresh — the rest of the tool stays', run: () => mutatePart(id, x) });
+    if (p.clearable) out.push({ label: '✕ Delete it', hint: 'back to the tool\'s own part, or empty', run: () => remove(id, x) });
+    if (x.socket) out.push({ sep: true }, { label: (v === 'block' ? '● ' : '○ ') + 'Show as a block', hint: 'the component with its own controls in the box', run: () => setView(id, x, 'block') },
+      { label: (v === 'tile' ? '● ' : '○ ') + 'Show as a tile only', hint: 'just its name — the box stays small', run: () => setView(id, x, 'tile') });
+    out.push({ sep: true }, { label: '⚄ Open in Mutation Lab', hint: 'the whole tool: mutate, keep or throw, the parts tray', run: () => lab(id) });
+    return out;
+  }
+  function setView(id, x, v) { const toolId = rec(id).id, m = views(toolId); m[x.p.id] = v; keepView(toolId, m); block(id, x); settle(id); }
+  function lab(id) {   // the Mutation Lab of a tool = it exploded with its dock up front: the dock glows, the first MUTATE is a click away
+    const st = open.get(id); if (!st) { const r = rec(id); if (!r) return null; const res = explode(id, r.id); if (res && res.done) res.done.then(() => lab(id)); return res; }
+    if (st.dock) { st.dock.scrollIntoView && st.dock.scrollIntoView({ block: 'center', inline: 'center' }); A(st.dock, [{ boxShadow: '0 0 0 0 rgba(0,212,255,0)' }, { boxShadow: '0 0 34px 4px rgba(0,212,255,.55)', offset: 0.35 }, { boxShadow: '0 0 0 0 rgba(0,212,255,0)' }], { duration: 1400, fill: 'none' }); }
+    return { open: true };
+  }
   function block(id, x) {   // the component in the box, as its block: its own controls (the tool's settings that belong to that part)
     if (x.block) { x.block.remove(); x.block = null; }
     const r = rec(id), UI = global.UIKit, sk = x.socket; if (!r || !r.view || !UI || !sk) { if (x.origin) badge(x); return; }
+    if (viewOf(id, x) === 'tile') { if (x.origin) badge(x); return; }
     const comp = val(id, sk.key), own = cfg(id).filter(c => c.part && [].concat(c.part).includes(comp) && !c.socket); if (comp === sk.default || comp === 'none' || !own.length) { if (x.origin) badge(x); return; }
     const head = h('div', 'fb-bhead'); head.textContent = comp + (x.origin ? ' · from ' + x.origin.from : '');
     const row = h('div', 'fb-brow'); own.forEach(c => { const ctl = UI.paramControl(r.view, c, { size: 26 }); if (ctl) { ctl.el.dataset.key = c.key; row.appendChild(ctl.el); } });
@@ -392,9 +438,10 @@
     const CM = global.ContextMenu; if (!CM || !CM.contribute) return false;
     CM.contribute(({ rec }) => !rec || !WM() || !WM().windowOf(rec.instanceId) ? [] : [isOpen(rec.instanceId)
       ? { label: '◱ Put it back together', hint: 'every part back into its window', run: () => assemble(rec.instanceId) }
-      : { label: '✦ Explode on the canvas', hint: 'every part of it apart, wired to its core — all of it still live: play it, turn it, move the pieces', run: () => explode(rec.instanceId, rec.id) }]);
+      : { label: '✦ Explode on the canvas', hint: 'every part of it apart, wired to its core — all of it still live: play it, turn it, move the pieces', run: () => explode(rec.instanceId, rec.id) },
+      { label: '⚄ Open in Mutation Lab', hint: 'exploded, with MUTATE · KEEP · THROW up front — drag parts between boxes and tools', run: () => lab(rec.instanceId) }]);
     return true;
   }
   if (!hook()) document.addEventListener('DOMContentLoaded', hook);
-  global.FieldBoard = { define, has, explode, assemble, isOpen, boards, sockets, setExchange, synthesizeOnto: (a, b) => open.get(b) ? synthesizeOnto(a, b, open.get(b)) : Promise.resolve(null), get exchange() { return exchange; }, learned: (toolId) => FM().learned(toolId), mutate: (id) => FM().mutate(FM().toolTarget(id)) };
+  global.FieldBoard = { define, has, explode, lab, mutatePart, partItems, drop, partIn, gates: (id) => (open.get(id) || {}).gates || [], assemble, isOpen, boards, sockets, setExchange, synthesizeOnto: (a, b) => open.get(b) ? synthesizeOnto(a, b, open.get(b)) : Promise.resolve(null), get exchange() { return exchange; }, learned: (toolId) => FM().learned(toolId), mutate: (id) => FM().mutate(FM().toolTarget(id)) };
 })(window);

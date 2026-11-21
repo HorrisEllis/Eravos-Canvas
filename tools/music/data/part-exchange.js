@@ -49,7 +49,7 @@
           take: (p) => ({ partNoise: 'osc-noise', pnColour: ({ 'band-limited': 'band' })[p.s.colour] || p.s.colour || 'pink', pnTilt: clamp(p.s.tilt, -1, 1), noise: p.s.amount > 0 ? clamp(p.s.amount, 0, 1) : undefined }) },
         { id: 'insert', label: 'after the amp', find: { near: ['squash'] }, kinds: ['fx', 'drive'], clear: () => ({ partInsert: 'none' }), isClear: (P) => !P.partInsert || P.partInsert === 'none',
           read: (P) => P.partInsert === 'ensemble-core' ? part('fx', 'ensemble-core', { mode: P.peMode, mix: P.peMix }) : P.partInsert === 'delay-line' ? part('fx', 'delay-line', { time: P.piTime, feedback: P.piFeedback, mix: P.piMix })
-            : P.partInsert && P.partInsert !== 'none' ? part('fx', P.partInsert, { drive: P.pdDrive, bits: P.pdBits, rate: P.pdRate }) : null,
+            : P.partInsert && P.partInsert !== 'none' ? part(['saturator-tube', 'saturator-tape', 'bitcrusher'].includes(P.partInsert) ? 'drive' : 'fx', P.partInsert, { drive: P.pdDrive, bits: P.pdBits, rate: P.pdRate }) : null,
           take: (p) => p.component === 'ensemble-core' ? { partInsert: 'ensemble-core', peMode: p.s.mode || 'juno I', peMix: clamp(p.s.mix === undefined ? 0.5 : p.s.mix, 0, 1) }
             : p.component === 'delay-line' ? { partInsert: 'delay-line', piTime: ['1/16', '1/8', '1/8.', '1/4', '1/4.', '1/2'].includes(p.s.time) ? p.s.time : '1/8.', piFeedback: clamp(p.s.feedback, 0, 0.9), piMix: clamp(p.s.mix, 0, 0.8) }
             : ['saturator-tube', 'saturator-tape', 'bitcrusher', 'filter-svf'].includes(p.component) ? { partInsert: p.component, pdDrive: clamp(p.s.drive || 6, 0, 24), pdBits: clamp(p.s.bits || 8, 2, 24), pdRate: clamp(p.s.rate || 12000, 600, 48000) } : null },
