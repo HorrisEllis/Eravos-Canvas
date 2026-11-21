@@ -10,6 +10,7 @@ Unicode true
 SetCompressor /SOLID lzma
 !include "MUI2.nsh"
 !include "FileFunc.nsh"
+!include "LogicLib.nsh"
 
 !ifndef VERSION
   !define VERSION "0.0.0"
@@ -89,6 +90,33 @@ FunctionEnd
   Sleep 800
 !macroend
 
+; 3.207 after writing, every big file is checked on disk (his: "update broke my eravos." — an ERAVOS.exe cut off at 39.8 of 246 MB).
+; CHECKS = the list install-check.mjs writes at build time: a file missing or the wrong size = the install failed, and it says so.
+Var BAD
+!macro CheckFile REL SIZE
+  ClearErrors
+  FileOpen $R8 "$INSTDIR\${REL}" r
+  ${If} ${Errors}
+    StrCpy $BAD "$BAD${REL} (missing)$\r$\n"
+  ${Else}
+    FileSeek $R8 0 END $R9
+    FileClose $R8
+    ${If} $R9 != ${SIZE}
+      StrCpy $BAD "$BAD${REL} ($R9 of ${SIZE} bytes)$\r$\n"
+    ${EndIf}
+  ${EndIf}
+!macroend
+Function VerifyFiles
+  StrCpy $BAD ""
+  !ifdef CHECKS
+    !include "${CHECKS}"
+  !else
+    ; a hand build without the list: only that ERAVOS.exe is there
+    IfFileExists "$INSTDIR\ERAVOS.exe" +2
+      StrCpy $BAD "ERAVOS.exe (missing)$\r$\n"
+  !endif
+FunctionEnd
+
 Section "ERAVOS" SecApp
   SectionIn RO
   !insertmacro CloseEravos
@@ -101,7 +129,18 @@ Section "ERAVOS" SecApp
   RMDir /r "$INSTDIR\tests"
   RMDir /r "$INSTDIR\resources"
   RMDir /r "$INSTDIR\locales"
+  SetOverwrite on
   File /r "${SRC}\*.*"
+  Call VerifyFiles
+  ${If} $BAD != ""
+    DetailPrint "These files did not install completely:"
+    DetailPrint "$BAD"
+    WriteRegStr HKLM "Software\ERAVOS" "LastInstallError" "$BAD"
+    MessageBox MB_OK|MB_ICONSTOP "ERAVOS did not install completely - these files were not written in full:$\r$\n$\r$\n$BAD$\r$\nNothing of yours was touched (your library is Documents\ERAVOS). Close anything that may hold ERAVOS's files and run this Setup again." /SD IDOK
+    SetErrorLevel 3
+    Abort "ERAVOS did not install completely"
+  ${EndIf}
+  DeleteRegValue HKLM "Software\ERAVOS" "LastInstallError"
   WriteUninstaller "$INSTDIR\Uninstall ERAVOS.exe"
   WriteRegStr HKLM "Software\ERAVOS" "InstallDir" "$INSTDIR"
 
