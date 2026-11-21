@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.206 A part dragged to another box swaps or replaces; right-click a part; Open in Mutation Lab (2026-11-21) — not merged
+His words: "i want to be able to drag one component from one part of a tool to another. like directly, with differnt ui options, more components. utilize right click, open in mutation lab, like, i want to drag components to one tool and have them either swap if compatible or remove the one its replacing."
+- tools/core/field/board.js: on a drop, what is in the box it lands on goes back into the box the part came from when it fits there (⇄ a swap,
+  both tools when across tools); otherwise it replaces it, and inside one tool the part moves (the box it left is cleared: its own part, or
+  empty) — one undo step in one tool. The carried ghost says which ("⇄ swaps with …" · "→ replaces … (moved)" · "→ goes in").
+- Right-click on a part's box: ⚄ Mutate only this part (its socket and its components' settings; nothing else moves), ✕ Delete it, ○ Show as a
+  block / ○ Show as a tile only (kept per tool), ⚄ Open in Mutation Lab. The window's right-click gains ⚄ Open in Mutation Lab: the tool
+  blown up with MUTATE · KEEP · THROW lit up front (the Mutation Lab screen in Start stays a preview).
+- tools/music/data/part-exchange.js: a drive in Wobble Bass's after-the-amp box is read as a drive, so it swaps back into the grit.
+- Open: "more components" — more sockets in the engines (each new socket is engine work, its null render first).
+- tests/p204-part-swap.test.js 1/1 (swap through the real drag, replace + move, the menus, mutate only that part, tile view, the Lab);
+  P203 2/2, P202 8/8, P199, P200, P196, boundary 10/10, Wobble Bass 18/18.
+
 ## 3.205 Synthesize tools together on the canvas; the Wobble Builder removed (2026-11-21) — not merged
 His words: "Do it. Then remove that tool. Dont hide it." (after "That's redundant." of the Wobble Builder)
 - tools/core/field/board.js: each blown-up tool's core carries a ◆ tile — drag it onto another blown-up tool's core (it lights) → one tool of
