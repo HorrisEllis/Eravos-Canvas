@@ -1006,3 +1006,11 @@ html[data-gfx="low"] * { box-shadow: none !important; text-shadow: none !importa
 /* a menu item's key, right-aligned (context-menu.js: item.keys) */
 .cm-item:has(.cm-k) { display: flex; align-items: center; gap: 24px; }
 .cm-k { margin-left: auto; opacity: .5; font-size: .85em; letter-spacing: .04em; }
+
+/* 3.209 WIRE COLOURS BY THEME (his words, 2026-11-21: "I just want them to look consistent, and but also in relation to the themes as well"):
+   three stops a wire runs through — from a part, the middle, into what it feeds — and how much it glows. Every theme says its own;
+   anything that draws a wire takes them (the Field board's wires, the installer's look). Studio / the base: cyan · violet · pink. */
+:root { --wire1: var(--cyan, #00d4ff); --wire2: var(--violet, #b066ff); --wire3: var(--pink, #ff2266); --wire-glow: .6; }
+html[data-theme="dusk"] { --wire1: #b06bff; --wire2: #ff6fa8; --wire3: #ffb36b; --wire-glow: .65; }   /* its own sunset (themes.js swatch) */
+html[data-theme="field"] { --wire1: color-mix(in oklab, var(--acc) 55%, #00d4ff); --wire2: var(--acc); --wire3: color-mix(in oklab, var(--acc) 55%, #ff2266); --wire-glow: .6; }
+html[data-theme="midnight"] { --wire1: #5d74c4; --wire2: #8fa8ff; --wire3: #c9d2e3; --wire-glow: .3; }   /* calm graphite: its one accent, gently */

@@ -11,6 +11,7 @@ SetCompressor /SOLID lzma
 !include "MUI2.nsh"
 !include "FileFunc.nsh"
 !include "LogicLib.nsh"
+!include "nsDialogs.nsh"
 
 !ifndef VERSION
   !define VERSION "0.0.0"
@@ -43,17 +44,19 @@ VIAddVersionKey "LegalCopyright" "ERAVOS"
 !define MUI_ABORTWARNING
 !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
-!define MUI_WELCOMEPAGE_TEXT "This installs ERAVOS ${VERSION} on this PC.$\r$\n$\r$\nYour projects, exports, packs and tools are kept in your library, Documents\ERAVOS. Installing, updating or uninstalling never touches it.$\r$\n$\r$\nClose ERAVOS before you continue."
+!define MUI_WELCOMEPAGE_TEXT "This installs ERAVOS ${VERSION} on this PC.$\r$\n$\r$\nYour projects, exports, packs and tools are kept in your library - you choose where (Documents\ERAVOS by default). Installing, updating or uninstalling never touches it.$\r$\n$\r$\nClose ERAVOS before you continue."
 !define MUI_FINISHPAGE_RUN "$INSTDIR\ERAVOS.exe"
 !define MUI_FINISHPAGE_RUN_TEXT "Start ERAVOS"
 !define MUI_FINISHPAGE_RUN_NOTCHECKED
 !define MUI_FINISHPAGE_SHOWREADME ""
-!define MUI_FINISHPAGE_SHOWREADME_TEXT "Open my ERAVOS library (Documents\ERAVOS)"
+!define MUI_FINISHPAGE_SHOWREADME_TEXT "Open my ERAVOS library"
 !define MUI_FINISHPAGE_SHOWREADME_FUNCTION OpenLibrary
 !define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
 
 !insertmacro MUI_PAGE_WELCOME
+!define MUI_DIRECTORYPAGE_TEXT_TOP "Where the ERAVOS canvas goes - the program itself. Next you choose where your library goes (your projects, tools, packs and exports): it stays separate from the canvas."
 !insertmacro MUI_PAGE_DIRECTORY
+Page custom LibraryPage LibraryLeave
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
 !insertmacro MUI_UNPAGE_CONFIRM
@@ -69,11 +72,83 @@ Function un.onInit
   SetRegView 64
 FunctionEnd
 
+; 3.208 WHERE THE LIBRARY GOES (his words, 2026-11-21: "have it ask where you want to save. Like have it the default be the documents
+; like documents /Eravos, and but then you know have like a browse button to change it."). The canvas is installed here (Program Files);
+; everything else - projects, tools, packs, exports - lives in the library. The choice is per user: %APPDATA%\ERAVOS\library.txt (UTF-16),
+; which ERAVOS reads at start (desktop/main.js pickHome). A silent update never asks and never changes it.
+Var LIBDIR
+Var LIBFIELD
+Function LibraryPage
+  SetShellVarContext current
+  ${If} $LIBDIR == ""
+    StrCpy $LIBDIR "$DOCUMENTS\ERAVOS"
+    ClearErrors
+    FileOpen $0 "$APPDATA\ERAVOS\library.txt" r
+    ${IfNot} ${Errors}
+      FileReadUTF16LE $0 $1
+      FileClose $0
+      ${If} $1 != ""
+        StrCpy $LIBDIR $1
+      ${EndIf}
+    ${EndIf}
+  ${EndIf}
+  SetShellVarContext all
+  !insertmacro MUI_HEADER_TEXT "Your library" "Where your projects, tools, packs and exports are kept"
+  nsDialogs::Create 1018
+  Pop $0
+  ${NSD_CreateLabel} 0 0 100% 36u "ERAVOS keeps everything you make, and the tools it loads, in one folder of yours - separate from the canvas. Installing, updating or uninstalling never touches it.$\r$\n$\r$\nThe default is Documents\ERAVOS."
+  Pop $0
+  ${NSD_CreateGroupBox} 0 44u 100% 34u "Library folder"
+  Pop $0
+  ${NSD_CreateDirRequest} 8u 58u 74% 12u "$LIBDIR"
+  Pop $LIBFIELD
+  ${NSD_CreateBrowseButton} 79% 57u 19% 14u "Browse..."
+  Pop $0
+  ${NSD_OnClick} $0 LibraryBrowse
+  nsDialogs::Show
+FunctionEnd
+Function LibraryBrowse
+  ${NSD_GetText} $LIBFIELD $1
+  nsDialogs::SelectFolderDialog "Choose where your ERAVOS library goes" "$1"
+  Pop $1
+  ${If} $1 != "error"
+    StrCpy $2 $1 6 -6
+    ${If} $2 != "ERAVOS"
+      StrCpy $1 "$1\ERAVOS"   ; a folder of its own inside the one chosen
+    ${EndIf}
+    ${NSD_SetText} $LIBFIELD $1
+  ${EndIf}
+FunctionEnd
+Function LibraryLeave
+  ${NSD_GetText} $LIBFIELD $LIBDIR
+  ${If} $LIBDIR == ""
+    MessageBox MB_OK|MB_ICONEXCLAMATION "Choose a folder for your library."
+    Abort
+  ${EndIf}
+FunctionEnd
+Function SaveLibrary
+  ${If} $LIBDIR == ""
+    Return            ; silent (an update): the library stays where it is
+  ${EndIf}
+  SetShellVarContext current
+  CreateDirectory "$LIBDIR"
+  CreateDirectory "$APPDATA\ERAVOS"
+  FileOpen $0 "$APPDATA\ERAVOS\library.txt" w
+  ${If} $0 != ""
+    FileWriteUTF16LE /BOM $0 "$LIBDIR"
+    FileClose $0
+  ${EndIf}
+  SetShellVarContext all
+FunctionEnd
+
 ; the library is per user: the person running Setup (Documents)
 Function OpenLibrary
   SetShellVarContext current
-  CreateDirectory "$DOCUMENTS\ERAVOS"
-  ExecShell "open" "$DOCUMENTS\ERAVOS"
+  ${If} $LIBDIR == ""
+    StrCpy $LIBDIR "$DOCUMENTS\ERAVOS"
+  ${EndIf}
+  CreateDirectory "$LIBDIR"
+  ExecShell "open" "$LIBDIR"
   SetShellVarContext all
 FunctionEnd
 
@@ -141,6 +216,7 @@ Section "ERAVOS" SecApp
     Abort "ERAVOS did not install completely"
   ${EndIf}
   DeleteRegValue HKLM "Software\ERAVOS" "LastInstallError"
+  Call SaveLibrary
   WriteUninstaller "$INSTDIR\Uninstall ERAVOS.exe"
   WriteRegStr HKLM "Software\ERAVOS" "InstallDir" "$INSTDIR"
 
