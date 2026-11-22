@@ -5,6 +5,8 @@
  * Your work lives in the library, Documents\ERAVOS: projects/ exports/ packs/ tools/ drop/ .appdata/ (see pickHome).
  * The tools are served from the library's tools/ (store S3, library-tools.js); the app folder's copy fills it on start. */
 'use strict';
+// 3.210 started by the Setup with --eravos-setup: the Setup's own window (desktop/setup-window.js), nothing of the canvas
+if (process.argv.includes('--eravos-setup')) { require('./setup-window.js').run(); return; }
 const { app, BrowserWindow, protocol, net, session, shell, ipcMain, Menu, dialog } = require('electron');
 const path = require('path'), fs = require('fs'), { pathToFileURL } = require('url');
 

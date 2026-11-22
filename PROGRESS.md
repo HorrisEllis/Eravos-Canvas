@@ -2,6 +2,23 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.210 The Setup's own window — the look he approved, built (2026-11-22) — not merged
+His words (of the 0.2.29 Setup, a screenshot of the stock pages): "they aren't there. it is the old one." — the look had only been a preview.
+- packaging/windows/eravos.nsi: not silent → it unpacks the app into a stage folder (a few seconds, the progress dark), hides itself and starts
+  that ERAVOS.exe with --eravos-setup; result.ini says ok · dest · library · start; then the uninstaller, Settings > Apps, the shortcuts, and
+  ERAVOS started as you (explorer). Cancelled → nothing changed (exit 1); failed → it said why, the version not written (exit 3); the window
+  could not open → the plain way (copied from the stage). /S (silent) exactly as before — the release workflow's end-to-end test; /CLASSIC
+  the stock pages.
+- desktop/setup-window.js + setup.html (main.js hands over first with --eravos-setup): the approved look — the canvas's folder and your
+  library's (Documents\ERAVOS by default, the last choice remembered, Browse…, a folder of its own), Install, writing with the file and MB,
+  checking every file, ERAVOS x IS IN · Open my library · Close · Start ERAVOS. /UPDATE: the ring, no questions, ERAVOS Update.exe starts it.
+- desktop/setup-copy.js (plain node): plan, copy with progress (a held file retried), the app's own folders cleared only in ERAVOS's own
+  folder, every size checked on disk, the library choice, the answer as UTF-16 INI. `desktop/test/setup-copy.mjs` 12/12.
+- packaging/windows/eravos-update.nsi: no window of its own (SilentInstall); the Setup with /UPDATE (its ring); /NOSTART (the release
+  test) silent as before; the repair offer still shows.
+- Both scripts compile (makensis 3.09); shipped-files 6/6 (both builds copy setup-window.js, setup-copy.js, setup.html). NOT seen on Windows:
+  the first real run is the next Setup. `docs/previews/installer/setup-window.shots.mjs` → setup-window.png (the real page, demo mode).
+
 ## 3.209 Wire colours belong to the theme (2026-11-21) — not merged
 His words: "I just want them to look consistent, and but also in relation to the themes as well, right?"
 - canvas/runtime/eravos.css: `--wire1` `--wire2` `--wire3` (from a part, the middle, into what it feeds) and `--wire-glow`, said by each theme:
