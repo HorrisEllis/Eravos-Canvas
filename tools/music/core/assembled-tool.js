@@ -252,7 +252,24 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
     const settings = TB.combine(a, b, TB.pickFor(A.id, B.id), bpm), names = [A.def.label, B.def.label];
     return Model.make(names.join(' × '), settings, bpm, N, names);
   };
-  if (root.PartExchange) root.PartExchange.synthesize = Model.synthesize;   // the board finds it on the exchange the music domain hands it
+  // 3.211 the parts he picked (Ctrl+click on the board, any tools blown up) → one tool: each picked part takes its place in the engine,
+  // the rest comes from the tool most of them came from. list: [{ inst, slot }] (slot: the exchange's box id). Same gates, same naming.
+  Model.synthesizeParts = async function (list) {
+    const F = root.OrganismFactory, TB = root.ToolBlend; if (!F || !TB) return { ok: false, why: 'the engine is not loaded' };
+    const parts = (list || []).map(x => ({ x, h: F.handle(x.inst), to: TB.PART_SLOT[x.slot] })).filter(o => o.h);
+    const usable = parts.filter(o => o.to && TB.has(o.h.id)), left = parts.filter(o => !usable.includes(o));
+    if (!usable.length) return { ok: false, why: 'none of these parts runs in the engine yet' + (left.length ? ' (' + left.map(o => o.h.def.label + ' · ' + o.x.slot).join(', ') + ')' : '') };
+    let N; try { N = await loadNovelty(); } catch (er) { return { ok: false, why: er.message }; }
+    const bpm = (root.Kernel && root.Kernel.music && root.Kernel.music.bpm) || 120, src = (h) => ({ id: h.id, params: TB.paramsOf(h.instanceId) });
+    const count = new Map(); usable.forEach(o => count.set(o.h, (count.get(o.h) || 0) + 1));
+    const base = [...count.entries()].sort((a, b) => b[1] - a[1])[0][0], from = {};
+    usable.forEach(o => { from[o.to] = src(o.h); });
+    const settings = TB.combineFrom(from, src(base), bpm); if (!settings) return { ok: false, why: 'these parts could not be read' };
+    const names = [...new Set(usable.map(o => o.h.def.label))];
+    const r = await Model.make(names.length > 1 ? names.join(' × ') : names[0] + ' · parts', settings, bpm, N, names);
+    if (r) r.left = left.map(o => o.h.def.label + ' · ' + o.x.slot); return r;
+  };
+  if (root.PartExchange) { root.PartExchange.synthesize = Model.synthesize; root.PartExchange.synthesizeParts = Model.synthesizeParts; }   // the board finds it on the exchange the music domain hands it
 
   // ---------------------------------------------------------------- the face of a synthesized tool: the kit, its parts as cards (what is in each, its settings)
   Model.ui = function (view) {

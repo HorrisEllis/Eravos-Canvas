@@ -66,6 +66,15 @@
     pick = pick || pickFor(a.id, b.id); SLOTS.forEach(sl => Object.assign(out, (pick[sl] === 'b' ? sb : sa)[sl] || {}));
     return out;
   }
-  root.ToolBlend = { SLOTS, has: (id) => !!profileOf(id), slots, combine, pickFor, paramsOf, defaultsOf, behind: (id) => (profileOf(id) || {}).behind || [], nearestDiv };
+  // 3.211 parts picked by hand (his words, 2026-11-22: "holding control to select multiple parts at a time and right click with a synthesize
+  // into one tool"): each engine slot from the tool whose part was picked for it, the rest from the base tool (the one most parts came from)
+  //   combineFrom({ voice: { id, params }, wobble: …, … }, base, bpm) → settings
+  const PART_SLOT = { filter: 'mouth', drive: 'drive', noise: 'voice', insert: 'fx', chorus: 'fx', fx: 'fx', wobble: 'wobble' };
+  function combineFrom(from, base, bpm) {
+    const W = root.AssembledTool, out = W ? W.defaults() : {}, cache = new Map(), sl = (src) => { const k = src.id + '#' + JSON.stringify(src.params); if (!cache.has(k)) cache.set(k, slots(src.id, src.params, bpm)); return cache.get(k); };
+    for (const s of SLOTS) { const src = from[s] || base, got = src && sl(src); if (!got) return null; Object.assign(out, got[s] || {}); }
+    return out;
+  }
+  root.ToolBlend = { SLOTS, PART_SLOT, has: (id) => !!profileOf(id), slots, combine, combineFrom, pickFor, paramsOf, defaultsOf, behind: (id) => (profileOf(id) || {}).behind || [], nearestDiv };
   if (typeof module === 'object' && module.exports) module.exports = root.ToolBlend;
 })(typeof window !== 'undefined' ? window : globalThis);
