@@ -25,7 +25,9 @@ Name "ERAVOS Update"
 Caption "ERAVOS Update"
 OutFile "${OUT}"
 RequestExecutionLevel user          ; it asks for admin only for the Setup it runs (ExecShellWait runas)
-ShowInstDetails show
+; 3.210 it shows nothing of its own: the Setup's own window (the update ring, desktop/setup.html) is what you see. A failure still says
+; why (a message) and offers the installer to repair. /NOSTART (the release test) runs the Setup the plain, silent way.
+SilentInstall silent
 AutoCloseWindow true
 BrandingText "ERAVOS Update"
 InstallButtonText "Update"
@@ -161,7 +163,11 @@ Section "Update"
   IntOp $R6 $R6 + 1
   !insertmacro Say "Asking Windows for permission to install ERAVOS $VERSION... (try $R6)"
   ClearErrors
-  ExecShellWait "runas" "$SETUP" "/S /D=$DEST"
+  ${If} $NOSTART == "1"
+    ExecShellWait "runas" "$SETUP" "/S /D=$DEST"
+  ${Else}
+    ExecShellWait "runas" "$SETUP" "/UPDATE /D=$DEST"
+  ${EndIf}
   ${If} ${Errors}
     StrCpy $OK "false"
     StrCpy $MSG "Windows did not run the installer (the permission prompt was declined, or it could not start). ERAVOS is unchanged; the update is still ready."
@@ -191,7 +197,7 @@ Section "Update"
     StrCpy $OK "false"
     StrCpy $MSG "the installer ran twice, but ERAVOS did not go in completely ($R7) - ERAVOS reports version $R5, not $VERSION"
     ; the way back, at once: the Setup with its own window
-    MessageBox MB_YESNO|MB_ICONEXCLAMATION "ERAVOS $VERSION did not install completely.$\r$\n$\r$\n$R7$\r$\nRun the installer now, with its window, to repair it? Your library (Documents\ERAVOS) is not touched." /SD IDNO IDNO finish
+    MessageBox MB_YESNO|MB_ICONEXCLAMATION "ERAVOS $VERSION did not install completely.$\r$\n$\r$\n$R7$\r$\nRun the installer now, with its window, to repair it? Your library is not touched." IDNO finish
     ExecShell "runas" "$SETUP"
     StrCpy $NOSTART "1"
   ${EndIf}

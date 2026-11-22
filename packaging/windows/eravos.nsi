@@ -4,7 +4,12 @@
 ;   , your work is in the library, Documents\ERAVOS (projects, exports, packs, tools, drop) - Setup and Uninstall never touch it
 ;   , Start menu + desktop shortcuts, Settings > Apps entry with an uninstaller
 ;   , run again (or by the app's updater, silently with /S) to update in place
-; Unicode, LZMA, admin (Program Files). /S = silent.
+; Unicode, LZMA, admin (Program Files). /S = silent (the plain way, no window). /CLASSIC = the plain pages. /UPDATE = the update ring.
+; 3.210 ITS OWN WINDOW (his words, 2026-11-21, of the stock installer: "they aren't there. it is the old one."; the look approved: "It looks
+; fucking significantly better."): the Setup unpacks the app into a stage folder (its progress dark, a few seconds), then starts that
+; ERAVOS.exe with --eravos-setup — the Setup's own window (desktop/setup-window.js, setup.html): where the canvas goes, where your library
+; goes (Browse), writing, checking every file, done. It answers in result.ini; this script then writes the uninstaller, Settings > Apps and
+; the shortcuts. If that window cannot open, it installs the plain way. Silent (/S) installs exactly as before (the release test).
 
 Unicode true
 SetCompressor /SOLID lzma
@@ -23,6 +28,10 @@ SetCompressor /SOLID lzma
   !define OUT "..\..\dist\ERAVOS-Setup-${VERSION}.exe"
 !endif
 !define UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\ERAVOS"
+Var FANCY     ; 1 = its own window (not silent, not /CLASSIC)
+Var MODE      ; install | update
+Var STAGE     ; where the app is unpacked: the stage (its own window copies it) or $INSTDIR (the plain way)
+Var START     ; 1 = start ERAVOS when done (asked in its own window)
 
 Name "ERAVOS ${VERSION}"
 OutFile "${OUT}"
@@ -53,11 +62,15 @@ VIAddVersionKey "LegalCopyright" "ERAVOS"
 !define MUI_FINISHPAGE_SHOWREADME_FUNCTION OpenLibrary
 !define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
 
+!define MUI_PAGE_CUSTOMFUNCTION_PRE SkipIfFancy
 !insertmacro MUI_PAGE_WELCOME
+!define MUI_PAGE_CUSTOMFUNCTION_PRE SkipIfFancy
 !define MUI_DIRECTORYPAGE_TEXT_TOP "Where the ERAVOS canvas goes - the program itself. Next you choose where your library goes (your projects, tools, packs and exports): it stays separate from the canvas."
 !insertmacro MUI_PAGE_DIRECTORY
 Page custom LibraryPage LibraryLeave
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW InstShow
 !insertmacro MUI_PAGE_INSTFILES
+!define MUI_PAGE_CUSTOMFUNCTION_PRE SkipIfFancy
 !insertmacro MUI_PAGE_FINISH
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
@@ -66,6 +79,48 @@ Page custom LibraryPage LibraryLeave
 Function .onInit
   SetShellVarContext all
   SetRegView 64
+  InitPluginsDir
+  ${GetParameters} $R0
+  StrCpy $FANCY "1"
+  StrCpy $MODE "install"
+  StrCpy $START "0"
+  ClearErrors
+  ${GetOptions} $R0 "/UPDATE" $R1
+  ${IfNot} ${Errors}
+    StrCpy $MODE "update"
+  ${EndIf}
+  ClearErrors
+  ${GetOptions} $R0 "/CLASSIC" $R1
+  ${IfNot} ${Errors}
+    StrCpy $FANCY "0"
+  ${EndIf}
+  ${If} ${Silent}
+    StrCpy $FANCY "0"
+  ${EndIf}
+FunctionEnd
+Function SkipIfFancy
+  ${If} $FANCY == "1"
+    Abort
+  ${EndIf}
+FunctionEnd
+; while it unpacks (a few seconds): dark, no list, the progress in the palette
+Function InstShow
+  ${If} $FANCY == "1"
+    SetAutoClose true
+    !insertmacro MUI_HEADER_TEXT "ERAVOS ${VERSION}" "Unpacking - the Setup opens in a moment"
+    FindWindow $0 "#32770" "" $HWNDPARENT
+    SetCtlColors $0 "D6E4F0" "000000"
+    GetDlgItem $1 $0 1016
+    ShowWindow $1 ${SW_HIDE}
+    GetDlgItem $1 $0 1027
+    ShowWindow $1 ${SW_HIDE}
+    GetDlgItem $1 $0 1006
+    SetCtlColors $1 "7F93A8" "000000"
+    GetDlgItem $1 $0 1004
+    System::Call 'uxtheme::SetWindowTheme(p r1, w " ", w " ")'
+    SendMessage $1 0x0409 0 0x00B066FF
+    SendMessage $1 0x2001 0 0x000D0D0D
+  ${EndIf}
 FunctionEnd
 Function un.onInit
   SetShellVarContext all
@@ -79,6 +134,9 @@ FunctionEnd
 Var LIBDIR
 Var LIBFIELD
 Function LibraryPage
+  ${If} $FANCY == "1"
+    Abort
+  ${EndIf}
   SetShellVarContext current
   ${If} $LIBDIR == ""
     StrCpy $LIBDIR "$DOCUMENTS\ERAVOS"
@@ -158,10 +216,17 @@ FunctionEnd
   Pop $0
   Pop $1
   StrCpy $2 $1 10
-  StrCmp $2 "ERAVOS.exe" 0 +4
-    IfSilent +2
-    MessageBox MB_OKCANCEL|MB_ICONINFORMATION "ERAVOS is running. It will be closed (autosave keeps your song)." IDCANCEL +2
-    nsExec::Exec 'taskkill /IM ERAVOS.exe /F'
+  ${If} $2 == "ERAVOS.exe"
+    StrCpy $3 "go"
+    ${IfNot} ${Silent}
+    ${AndIf} $MODE != "update"
+      MessageBox MB_OKCANCEL|MB_ICONINFORMATION "ERAVOS is running. It will be closed (autosave keeps your song)." IDOK +2
+      StrCpy $3 "no"
+    ${EndIf}
+    ${If} $3 == "go"
+      nsExec::Exec 'taskkill /IM ERAVOS.exe /F'
+    ${EndIf}
+  ${EndIf}
   Sleep 800
 !macroend
 
@@ -192,20 +257,70 @@ Function VerifyFiles
   !endif
 FunctionEnd
 
+!macro ClearApp DIR
+  ; an update replaces the app's own folders completely (a tool removed upstream must not linger)
+  RMDir /r "${DIR}\canvas"
+  RMDir /r "${DIR}\tools"
+  RMDir /r "${DIR}\schemas"
+  RMDir /r "${DIR}\host"
+  RMDir /r "${DIR}\tests"
+  RMDir /r "${DIR}\resources"
+  RMDir /r "${DIR}\locales"
+!macroend
+
+; 3.210 its own window: the stage's ERAVOS.exe --eravos-setup; result.ini says what happened (ok · dest · library · start)
+Function RunOwnWindow
+  DetailPrint "Opening the ERAVOS Setup window"
+  Delete "$PLUGINSDIR\result.ini"
+  HideWindow
+  ClearErrors
+  ExecWait '"$STAGE\ERAVOS.exe" --eravos-setup --mode=$MODE "--dest=$INSTDIR" --version=${VERSION} "--result=$PLUGINSDIR\result.ini"' $R0
+  ${If} ${Errors}
+    StrCpy $R0 "-1"
+  ${EndIf}
+  ReadINIStr $R1 "$PLUGINSDIR\result.ini" "result" "ok"
+  ${If} $R1 == "1"
+    ReadINIStr $R2 "$PLUGINSDIR\result.ini" "result" "dest"
+    ${If} $R2 != ""
+      StrCpy $INSTDIR $R2
+    ${EndIf}
+    ReadINIStr $START "$PLUGINSDIR\result.ini" "result" "start"
+    Return
+  ${EndIf}
+  ${If} $R0 == "1"
+    SetErrorLevel 1             ; cancelled: nothing installed, nothing changed
+    Quit
+  ${EndIf}
+  ${If} $R0 == "3"
+    ReadINIStr $R3 "$PLUGINSDIR\result.ini" "result" "why"
+    WriteRegStr HKLM "Software\ERAVOS" "LastInstallError" "$R3"
+    SetErrorLevel 3             ; it said why in its window; the version is not written (ERAVOS Update.exe sees it)
+    Quit
+  ${EndIf}
+  ; the window could not open (exit $R0): the plain way, into $INSTDIR
+  BringToFront
+  DetailPrint "The Setup window did not open ($R0) - installing the plain way"
+  CreateDirectory "$INSTDIR"
+  !insertmacro ClearApp "$INSTDIR"
+  CopyFiles /SILENT "$STAGE\*.*" "$INSTDIR"
+FunctionEnd
+
 Section "ERAVOS" SecApp
   SectionIn RO
   !insertmacro CloseEravos
-  SetOutPath "$INSTDIR"
-  ; an update replaces the app's own folders completely (a tool removed upstream must not linger)
-  RMDir /r "$INSTDIR\canvas"
-  RMDir /r "$INSTDIR\tools"
-  RMDir /r "$INSTDIR\schemas"
-  RMDir /r "$INSTDIR\host"
-  RMDir /r "$INSTDIR\tests"
-  RMDir /r "$INSTDIR\resources"
-  RMDir /r "$INSTDIR\locales"
+  ${If} $FANCY == "1"
+    StrCpy $STAGE "$PLUGINSDIR\stage"
+  ${Else}
+    StrCpy $STAGE "$INSTDIR"
+    !insertmacro ClearApp "$INSTDIR"
+  ${EndIf}
+  SetOutPath "$STAGE"
   SetOverwrite on
   File /r "${SRC}\*.*"
+  ${If} $FANCY == "1"
+    Call RunOwnWindow
+  ${EndIf}
+  SetOutPath "$INSTDIR"
   Call VerifyFiles
   ${If} $BAD != ""
     DetailPrint "These files did not install completely:"
@@ -236,6 +351,13 @@ Section "ERAVOS" SecApp
   ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
   IntFmt $0 "0x%08X" $0
   WriteRegDWORD HKLM "${UNINST_KEY}" "EstimatedSize" "$0"
+  ${If} $FANCY == "1"
+    SetOutPath "$TEMP"
+    RMDir /r "$PLUGINSDIR\stage"
+    ${If} $START == "1"
+      Exec '"$WINDIR\explorer.exe" "$INSTDIR\ERAVOS.exe"'   ; as you, not as admin
+    ${EndIf}
+  ${EndIf}
 SectionEnd
 
 Section "Uninstall"
