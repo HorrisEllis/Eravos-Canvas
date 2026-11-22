@@ -59,7 +59,11 @@ describe('P205 the whole box: drag anywhere, Ctrl selects, synthesize the select
       assert.ok(/Wobble Bass/.test(r.rec.name) && /Retro DCO/.test(r.rec.name), 'named for both: ' + r.rec.name);
       assert.equal(FieldBoard.selected().length, 0, 'the selection is cleared once it is made');
       await TH.sleep(900); assert.ok(FieldBoard.isOpen(r.inst), 'the new tool opens blown up');
-      // 5. Esc clears a selection before it closes a board
+      // 5. Delete removes the selected parts (each box empty again, or back to its tool's own)
+      A.view.emit('config_change', { key: 'partInsert', value: 'delay-line' }); await TH.sleep(150); ctrl(box(a, /squash/));
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', bubbles: true })); await TH.sleep(200);
+      assert.equal(A.ctx.params.get('partInsert'), 'none', 'Delete removed the selected part'); assert.equal(FieldBoard.selected().length, 0, 'and cleared the selection');
+      // 6. Esc clears a selection before it closes a board
       ctrl(box(a, /noise/)); document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await TH.sleep(30);
       assert.equal(FieldBoard.selected().length, 0, 'Esc clears the selection'); assert.ok(FieldBoard.isOpen(a), 'and leaves the board open');
     } finally {

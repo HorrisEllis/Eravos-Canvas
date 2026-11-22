@@ -121,7 +121,8 @@
       if (cx && CM && CM.show) return CM.show(e.clientX, e.clientY, partItems(instanceId, cx), partIn(instanceId, cx).label + ' · a part');
       if (CM && CM.show) CM.show(e.clientX, e.clientY, [{ label: '◱ Put it back together', hint: 'every part back into its window (Esc)', run: () => assemble(instanceId) },
         { label: '↺ Gates back to the board', hint: 'undo your moves of the gates', run: () => { keepMoved(toolId, {}); assemble(instanceId, { now: true }); explode(instanceId, toolId); } }], (L.title || 'the tool') + ' · exploded'); else assemble(instanceId); });
-    st.onKey = (e) => { if (e.key !== 'Escape' || e.defaultPrevented) return; if (sel.size) { e.preventDefault(); clearSel(); return; } if (open.get(instanceId) === st && !st.leaving) assemble(instanceId); };
+    st.onKey = (e) => { if ((e.key === 'Delete' || e.key === 'Backspace') && sel.size && !(e.target && e.target.closest && e.target.closest('input,textarea,[contenteditable]'))) { e.preventDefault(); removeSel(); return; }
+      if (e.key !== 'Escape' || e.defaultPrevented) return; if (sel.size) { e.preventDefault(); clearSel(); return; } if (open.get(instanceId) === st && !st.leaving) assemble(instanceId); };
     board.addEventListener('pointerdown', (e) => { if (e.button === 0 && !e.ctrlKey && !e.metaKey && !e.target.closest('.fb-gate') && sel.size) clearSel(); });
     document.addEventListener('keydown', st.onKey);
     if (global.Shell && global.Shell.toast && k) setTimeout(() => { if (open.get(instanceId) === st) global.Shell.toast('Esc or right-click — put it back together'); }, 3400);
@@ -224,11 +225,15 @@
     };
     document.addEventListener('pointermove', move, true); document.addEventListener('pointerup', up, true);
   }
+  function removeSel() {   // 3.212 his: "also need to be able to remove the component" — Delete on a selection: each part out (empty, or the tool's own)
+    selected().filter(o => partIn(o.inst, o.x).clearable).forEach(o => remove(o.inst, o.x)); clearSel();
+  }
   function selItems() {
     const list = selected(), comps = list.filter(o => o.x.slot || o.x.socket), out = [];
     if (exchange && exchange.synthesizeParts && comps.some(o => o.x.slot)) out.push({ label: '◆ Synthesize these ' + comps.length + ' parts into one tool', hint: 'each part takes its place in one new tool; the rest from the tool most of them came from — checked: it plays, it is no twin', run: () => synthesizeSel() });
     if (comps.some(o => o.x.socket)) out.push({ label: '⚄ Mutate only these parts', hint: 'another component in each, its own settings fresh — nothing else moves', run: () => comps.filter(o => o.x.socket).forEach(o => mutatePart(o.inst, o.x)) });
-    out.push({ label: '✕ Clear the selection', hint: 'Esc', run: () => clearSel() });
+    if (comps.some(o => partIn(o.inst, o.x).clearable)) out.push({ label: '✕ Remove these parts', hint: 'Delete — each box empty again, or back to its tool\'s own part', run: () => removeSel() });
+    out.push({ label: 'Clear the selection', hint: 'Esc', run: () => clearSel() });
     return out;
   }
   function synthesizeSel() {
@@ -436,7 +441,7 @@
     const p = partIn(id, x), v = viewOf(id, x), out = [];
     out.push({ label: '⇄ Drag its ⠿ onto another box', hint: 'a swap when what is there fits back here; otherwise it replaces it (inside this tool it moves)', run: () => {} });
     if (x.socket) out.push({ label: '⚄ Mutate only this part', hint: 'another component here, its own settings fresh — the rest of the tool stays', run: () => mutatePart(id, x) });
-    if (p.clearable) out.push({ label: '✕ Delete it', hint: 'back to the tool\'s own part, or empty', run: () => remove(id, x) });
+    if (p.clearable) out.push({ label: '✕ Remove it', hint: 'back to the tool\'s own part, or empty (Delete on a selection)', run: () => remove(id, x) });
     if (x.socket) out.push({ sep: true }, { label: (v === 'block' ? '● ' : '○ ') + 'Show as a block', hint: 'the component with its own controls in the box', run: () => setView(id, x, 'block') },
       { label: (v === 'tile' ? '● ' : '○ ') + 'Show as a tile only', hint: 'just its name — the box stays small', run: () => setView(id, x, 'tile') });
     out.push({ sep: true }, { label: '⚄ Open in Mutation Lab', hint: 'the whole tool: mutate, keep or throw, the parts tray', run: () => lab(id) });

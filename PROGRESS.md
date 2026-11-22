@@ -2,6 +2,13 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.212 The Setup heals itself and logs; Delete removes parts; release 0.2.31 (2026-11-22)
+His words: "installer couldn't find eravos.exe." · "also need to be able to remove the component." · (of the 0.2.30 zip) "didn't let me synthesize or select with control and right click" — 3.211 was not merged yet.
+- packaging/windows/eravos.nsi: every step to %TEMP%\ERAVOS Setup.log (unpacked, the window's exit and answer, copied, checked); if
+  ERAVOS.exe is not in the folder after its window, the app is copied the plain way from the stage; the failure message names the log.
+- tools/core/field/board.js: Delete (or Backspace) removes the selected parts; right-click › ✕ Remove these parts / ✕ Remove it.
+- P205 1/1 (+ Delete), P204 P203 boundary green; makensis compiles. Release 0.2.31 carries 3.211 + 3.212.
+
 ## 3.211 The whole box: drag from anywhere, Ctrl selects, synthesize the selection into one tool (2026-11-22) — not merged
 His words: "i want to be able to drag any component from the tools, not grabbing a small area but anywhere on the ui of the component when exploded, drag then around. maybe holding control to select multiple parts at a time and right click with a synthesize into one tool? like i want the ability to combine retro dcs and wobble bass." · "I don't just want presets and changed values, i want to be able to make novel tools."
 - tools/core/field/board.{js,css} (domain-free): press anywhere on a box that is not a control (a knob, a slider, keys, a button, a field;

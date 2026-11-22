@@ -32,6 +32,18 @@ Var FANCY     ; 1 = its own window (not silent, not /CLASSIC)
 Var MODE      ; install | update
 Var STAGE     ; where the app is unpacked: the stage (its own window copies it) or $INSTDIR (the plain way)
 Var START     ; 1 = start ERAVOS when done (asked in its own window)
+Var LOGF      ; 3.212 %TEMP%\ERAVOS Setup.log: every step, so a failure on his PC can be read (his: "installer couldn't find eravos.exe")
+!macro Log TEXT
+  Push $9
+  FileOpen $9 "$LOGF" a
+  ${If} $9 != ""
+    FileSeek $9 0 END
+    FileWrite $9 "${TEXT}$\r$\n"
+    FileClose $9
+  ${EndIf}
+  Pop $9
+  DetailPrint "${TEXT}"
+!macroend
 
 Name "ERAVOS ${VERSION}"
 OutFile "${OUT}"
@@ -80,6 +92,8 @@ Function .onInit
   SetShellVarContext all
   SetRegView 64
   InitPluginsDir
+  StrCpy $LOGF "$TEMP\ERAVOS Setup.log"
+  Delete "$LOGF"
   ${GetParameters} $R0
   StrCpy $FANCY "1"
   StrCpy $MODE "install"
@@ -274,11 +288,16 @@ Function RunOwnWindow
   Delete "$PLUGINSDIR\result.ini"
   HideWindow
   ClearErrors
+  ${IfNot} ${FileExists} "$STAGE\ERAVOS.exe"
+    !insertmacro Log "the stage has no ERAVOS.exe ($STAGE) - an antivirus may have taken it"
+  ${EndIf}
   ExecWait '"$STAGE\ERAVOS.exe" --eravos-setup --mode=$MODE "--dest=$INSTDIR" --version=${VERSION} "--result=$PLUGINSDIR\result.ini"' $R0
   ${If} ${Errors}
     StrCpy $R0 "-1"
   ${EndIf}
   ReadINIStr $R1 "$PLUGINSDIR\result.ini" "result" "ok"
+  ReadINIStr $R2 "$PLUGINSDIR\result.ini" "result" "dest"
+  !insertmacro Log "the Setup window ended: exit $R0, ok=$R1, dest=$R2"
   ${If} $R1 == "1"
     ReadINIStr $R2 "$PLUGINSDIR\result.ini" "result" "dest"
     ${If} $R2 != ""
@@ -298,11 +317,15 @@ Function RunOwnWindow
     Quit
   ${EndIf}
   ; the window could not open (exit $R0): the plain way, into $INSTDIR
+  Call PlainCopy
+FunctionEnd
+Function PlainCopy
   BringToFront
   DetailPrint "The Setup window did not open ($R0) - installing the plain way"
   CreateDirectory "$INSTDIR"
   !insertmacro ClearApp "$INSTDIR"
   CopyFiles /SILENT "$STAGE\*.*" "$INSTDIR"
+  !insertmacro Log "copied the plain way from $STAGE into $INSTDIR"
 FunctionEnd
 
 Section "ERAVOS" SecApp
@@ -317,16 +340,23 @@ Section "ERAVOS" SecApp
   SetOutPath "$STAGE"
   SetOverwrite on
   File /r "${SRC}\*.*"
+  !insertmacro Log "ERAVOS ${VERSION} Setup: unpacked into $STAGE (mode $MODE, own window $FANCY), installing into $INSTDIR"
   ${If} $FANCY == "1"
     Call RunOwnWindow
+    ; whatever its window said: ERAVOS.exe must be in the folder now; if not, the app goes there the plain way (it heals itself)
+    ${IfNot} ${FileExists} "$INSTDIR\ERAVOS.exe"
+      !insertmacro Log "no ERAVOS.exe in $INSTDIR after the Setup window - copying the plain way"
+      Call PlainCopy
+    ${EndIf}
   ${EndIf}
   SetOutPath "$INSTDIR"
   Call VerifyFiles
+  !insertmacro Log "checked every file. Not in full: [$BAD]"
   ${If} $BAD != ""
     DetailPrint "These files did not install completely:"
     DetailPrint "$BAD"
     WriteRegStr HKLM "Software\ERAVOS" "LastInstallError" "$BAD"
-    MessageBox MB_OK|MB_ICONSTOP "ERAVOS did not install completely - these files were not written in full:$\r$\n$\r$\n$BAD$\r$\nNothing of yours was touched (your library is Documents\ERAVOS). Close anything that may hold ERAVOS's files and run this Setup again." /SD IDOK
+    MessageBox MB_OK|MB_ICONSTOP "ERAVOS did not install completely - these files were not written in full:$\r$\n$\r$\n$BAD$\r$\nNothing of yours was touched (your library is Documents\ERAVOS). Close anything that may hold ERAVOS's files and run this Setup again.$\r$\n$\r$\nWhat happened is in $LOGF." /SD IDOK
     SetErrorLevel 3
     Abort "ERAVOS did not install completely"
   ${EndIf}
