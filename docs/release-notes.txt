@@ -1,3 +1,12 @@
+ERAVOS v0.2.30 (2026-11-22)
+
+Install: ERAVOS-Setup-0.2.30.exe from the release (run it by hand once if an earlier update broke ERAVOS), or ERAVOS offers it by itself.
+
+- The Setup has its own window, in ERAVOS's look: where the canvas goes and where your library goes (Browse… for each; Documents\ERAVOS
+  by default), then it writes the app, checks every file, and offers Start ERAVOS and Open my library. If that window cannot open, it
+  installs the plain way.
+- Updates show the same look as a ring — no questions — and ERAVOS starts again by itself.
+
 ERAVOS v0.2.29 (2026-11-21)
 
 Install: ERAVOS offers it by itself (⚙ Settings › About & updates › Check for updates), or ERAVOS-Setup-0.2.29.exe from the release.
