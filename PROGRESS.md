@@ -2,6 +2,29 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.212 The Setup heals itself and logs; Delete removes parts; release 0.2.31 (2026-11-22)
+His words: "installer couldn't find eravos.exe." · "also need to be able to remove the component." · (of the 0.2.30 zip) "didn't let me synthesize or select with control and right click" — 3.211 was not merged yet.
+- packaging/windows/eravos.nsi: every step to %TEMP%\ERAVOS Setup.log (unpacked, the window's exit and answer, copied, checked); if
+  ERAVOS.exe is not in the folder after its window, the app is copied the plain way from the stage; the failure message names the log.
+- tools/core/field/board.js: Delete (or Backspace) removes the selected parts; right-click › ✕ Remove these parts / ✕ Remove it.
+- P205 1/1 (+ Delete), P204 P203 boundary green; makensis compiles. Release 0.2.31 carries 3.211 + 3.212.
+
+## 3.211 The whole box: drag from anywhere, Ctrl selects, synthesize the selection into one tool (2026-11-22) — not merged
+His words: "i want to be able to drag any component from the tools, not grabbing a small area but anywhere on the ui of the component when exploded, drag then around. maybe holding control to select multiple parts at a time and right click with a synthesize into one tool? like i want the ability to combine retro dcs and wobble bass." · "I don't just want presets and changed values, i want to be able to make novel tools."
+- tools/core/field/board.{js,css} (domain-free): press anywhere on a box that is not a control (a knob, a slider, keys, a button, a field;
+  Alt drags even from those) and drag — the box moves (all selected boxes with it), kept per tool; let go over another component box and its
+  part goes there (a swap when what is there fits back, else it replaces — as the tile), the drag says which, the box glides home. A press
+  that barely moves stays a click. Ctrl+click (anywhere on a box) selects across tools — a violet ring, a bar saying how many; Esc or a
+  click on the board clears it (before Esc closes the board). Right-click with a selection: ◆ Synthesize these N parts into one tool,
+  ⚄ Mutate only these parts, ✕ Clear.
+- tools/music/core/assembled-tool.js synthesizeParts + tools/music/data/tool-blend.js combineFrom: each picked part takes its place in the
+  engine (the mouth, the drive, the FX, the wobble, the voice by its noise), the rest from the tool most of them came from; the same gates
+  (plays cleanly, no twin); spawned beside and blown up. Parts the engine does not run yet are named, not lost silently.
+- tests/p205-whole-box.test.js 1/1 (body drag, a knob stays a knob, box-drop swap, Ctrl across tools, the menu, the made tool's mouth / FX /
+  wobble from the parts picked, Esc). P196 P199 P200 P202 P203 P204 green, boundary 10/10, bare-canvas green.
+- `docs/previews/workbench/whole-box.shots.mjs` → whole-box-select.png, whole-box-made.png ("Wobble Bass × Retro DCO": osc-va → filter-ladder
+  → env-adsr → ensemble-core, wobble into the ladder; novel).
+
 ## 3.210 The Setup's own window — the look he approved, built (2026-11-22) — not merged
 His words (of the 0.2.29 Setup, a screenshot of the stock pages): "they aren't there. it is the old one." — the look had only been a preview.
 - packaging/windows/eravos.nsi: not silent → it unpacks the app into a stage folder (a few seconds, the progress dark), hides itself and starts

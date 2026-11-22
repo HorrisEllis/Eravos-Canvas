@@ -31,7 +31,7 @@ describe('P204 drag a part to another box: swap or replace; right-click a part; 
       assert.ok(/replaces .*moved/.test(said2), 'it says it replaces it: ' + said2);
       assert.equal(P('partInsert'), 'bitcrusher', 'the bitcrusher replaced the delay line'); assert.equal(P('partDrive'), 'own', 'and the grit box it left is back to its own part');
       // right-click a part
-      const items = FieldBoard.partItems(a, ins).map(i => i.label || ''); ['Mutate only this part', 'Delete it', 'Show as a block', 'Show as a tile only', 'Open in Mutation Lab'].forEach(w => assert.ok(items.some(l => l.includes(w)), 'right-click on a part: ' + w));
+      const items = FieldBoard.partItems(a, ins).map(i => i.label || ''); ['Mutate only this part', 'Remove it', 'Show as a block', 'Show as a tile only', 'Open in Mutation Lab'].forEach(w => assert.ok(items.some(l => l.includes(w)), 'right-click on a part: ' + w));
       ins.g.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 200, clientY: 200 })); await TH.sleep(50);
       const cm = document.querySelector('.cm'); assert.ok(cm && /Mutate only this part/.test(cm.textContent), 'the menu opens on the box'); ContextMenu.close();
       const before = {}; A.def.config.forEach(c => { before[c.key] = P(c.key); });
