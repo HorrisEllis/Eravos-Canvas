@@ -2,6 +2,20 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.221 Everything logged: the session map, the specs' addenda and phases, the to-do ledger (2026-11-24)
+His words: "first one, beyond removing the undo and redo, and redundany options. also log all of this, don't lose anything, update the specs,
+phases. and add that to a to do ledger" (his answer: Options' actions INTO SETTINGS).
+- specs/eravos.2026-11-24-session.map.spec: all 22 of his messages today, verbatim, in order, each built / rule / open / answered.
+- specs/eravos.performance-plan.spec (NEW): what is true today (no GPU flags, ~3–4 cores used, one audio thread, 15 animation loops), his
+  PC, decisions D1–D5 (sound stays on the CPU; the GPU draws; priority follows the canvas, agnostic), phases PF0–PF8, RP1–RP3, AN1–AN3.
+- ADDENDA 2026-11-24 (originals kept): settings-buttons-dag (ST1–ST5: one Settings, Options in it, Undo / Redo buttons gone; sections from
+  the contracts) · bare-canvas (TB1–TB7: the toolbar) · start-screens (two steps built; the Start button out, "← Domains" in the catalog) ·
+  assembled-tool (3.216–3.217 built; ML1–ML6 the Mutation Lab / Workbench / Tool Builder).
+- docs/TODO-LEDGER.md (NEW): T-01 … T-31 (today) + O-01 … O-16 (every older open item from CLAUDE.md) + Done; CLAUDE.md: two rules (priority
+  follows the canvas; the to-do ledger), the Open section points to it, the Ledger gains 3.216–3.221.
+- docs/HIS-WORDS-MAP.md N-X115 … N-X124; docs/competence/register.jsonl: today's directions and ideas (quotes checked against the session map).
+- Nothing built: the toolbar (T-04 …) is next, shown first. Open questions T-08, T-09, T-10 wait for him.
+
 ## 3.220 Start in two steps; a borderless window; the 3D exploded note in the README; release 0.2.36 (2026-11-24)
 His words: "also the start from should only show after you pick music. like only show the domains at first." · "like this" (a screenshot of a
 note in 3D · EXPLODED) · "also borderless windows please?" · (of the Claude app's notification) "what is that?" — it was the Claude app, not ERAVOS.

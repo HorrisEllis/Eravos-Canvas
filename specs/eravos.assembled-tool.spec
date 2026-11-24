@@ -92,3 +92,23 @@ SYNTHESIZE TOGETHER, on the canvas (tools/core/field/board.js, domain-free): eac
   spawned beside them and opened blown up — its parts as tiles you drag like any tool's (tools/music/data/part-exchange.js knows its parts).
 proof: P203 2/2 (the drag, the parts, blown up, a twin refused) · P202 8/8 on a synthesized tool (live = offline, knob live, swap live, make + twin)
   · tests/assembled-tool.test.mjs 32.
+
+ADDENDUM 2026-11-24 (the original above kept verbatim)
+His words (verbatim; specs/eravos.2026-11-24-session.map.spec 7–9): "i want to be able to mutate the tools, synthesize two or more cores, and
+  make something completely new. like my goal is to add the capability to create a mix of the retro dcs and the wobble bass to make the retro
+  wobble or something." · "eravos makes it, not you. only add capability. always capability first." · "like this is meant to be dynamic and
+  fluid. also tools are isolated so if they cause instability they can be deleted."
+BUILT 3.216: component boxes framed whole; the hover card (tools/music/data/part-words.js, PartExchange.explain); right-click › REPLACE WITH.
+BUILT 3.217: a selected box is taken by what it is (ToolBlend.slotOfPiece — the oscillators are the VOICE); right-click a selection →
+  "◆ … the rest from <tool>" (synthesizeParts(list, { restFrom })); Model.render. P217: the test only picks; ERAVOS makes it.
+Phases (ML — the Mutation Lab, the Workbench, the Tool Builder; one engine, this one):
+  - ML1 more tools trade parts: part-exchange.js + tool-blend.js profiles for Supersaw, Swarm Oscillator, Retro Poly, Piano, Tape Memory
+    (those sharing the most components first); words for every component they hold (part-words.js).
+  - ML2 two or more CORES at once: drag several cores together / select several whole tools → one made tool (each slot from the tool picked
+    for it, the rest as he says).
+  - ML3 more slots in the engine (unison, the sub, envelopes, the formant mouth, the wub sequence …) so fewer picked parts are "left behind".
+  - ML4 THE MUTATION LAB: a shelf of every component and every core, drag onto a board, combine, mutate — spec + preview first.
+  - ML5 THE WORKBENCH / TOOL BUILDER: an empty board, parts from the shelf, then the face — which UI element each control is (knob, fader,
+    XY, keys, segmented …) and its theme — saved as a tool of its own (isolated: delete it whole). Spec + preview first.
+  - ML6 the made tool as its own zip (the store's isolated tool, specs/eravos.store.spec) so a misbehaving one is deleted whole.
+Tracked: docs/TODO-LEDGER.md T-25 … T-30.
