@@ -314,7 +314,7 @@
     sks.forEach(sk => { const x = holds(sk); if (x && !x.socket) x.socket = sk; });
     slots.forEach(sl => { const x = gateFor(gates, sl.find); if (x && !x.slot) x.slot = sl.id; });
     gates.filter(x => x.socket || x.slot).forEach(x => {
-      x.g.classList.add('fb-comp'); x.inst = id; tile(id, x); block(id, x);
+      x.g.classList.add('fb-comp'); x.inst = id; tile(id, x); block(id, x); hover(id, x);
       const R = rec(id); if (R && R.view && R.view.bind) [x.socket && x.socket.key].concat(cfg(id).filter(c => c.part).map(c => c.key)).filter(Boolean).forEach(k => R.view.bind(k, () => setTimeout(() => { tile(id, x); }, 0)));
     });
   }
@@ -440,12 +440,46 @@
   function partItems(id, x) {
     const p = partIn(id, x), v = viewOf(id, x), out = [];
     out.push({ label: '⇄ Drag its ⠿ onto another box', hint: 'a swap when what is there fits back here; otherwise it replaces it (inside this tool it moves)', run: () => {} });
+    const rep = replacements(id, x);
+    if (rep.length) out.push({ sep: true }, { section: 'REPLACE WITH' }, ...rep.map(r => ({ label: r.label, hint: r.hint, run: () => replace(id, x, r) })), { sep: true });
     if (x.socket) out.push({ label: '⚄ Mutate only this part', hint: 'another component here, its own settings fresh — the rest of the tool stays', run: () => mutatePart(id, x) });
     if (p.clearable) out.push({ label: '✕ Remove it', hint: 'back to the tool\'s own part, or empty (Delete on a selection)', run: () => remove(id, x) });
     if (x.socket) out.push({ sep: true }, { label: (v === 'block' ? '● ' : '○ ') + 'Show as a block', hint: 'the component with its own controls in the box', run: () => setView(id, x, 'block') },
       { label: (v === 'tile' ? '● ' : '○ ') + 'Show as a tile only', hint: 'just its name — the box stays small', run: () => setView(id, x, 'tile') });
     out.push({ sep: true }, { label: '⚄ Open in Mutation Lab', hint: 'the whole tool: mutate, keep or throw, the parts tray', run: () => lab(id) });
     return out;
+  }
+  // REPLACE WITH… (3.216, his: "also right click to replace"): every component this box takes — its own options, and what is in the boxes of
+  // the other tools blown up on the canvas — the same step as a drop (one undo step; from another tool a copy, its settings with it)
+  function replacements(id, x) {
+    const out = [], now = partIn(id, x), sk = x.socket, say = (c) => { const w = exchange && exchange.explain && exchange.explain(c); return w ? w.name : c; };
+    if (sk) sk.options.filter(o => o !== val(id, sk.key)).forEach(o => { const patch = fits({ comp: o, label: o }, id, x); if (patch) out.push({ label: '→ ' + say(o), hint: (exchange && exchange.explain && (exchange.explain(o) || {}).what) || o, src: { comp: o, label: o }, patch }); });
+    [...open.entries()].forEach(([inst, st]) => st.gates.filter(g => g !== x && g.g.classList.contains('fb-comp')).forEach(g => {
+      const tp = partIn(inst, g); if (tp.empty || (inst === id)) return;
+      const src = { from: inst, x: g, part: tp.part, comp: tp.comp, label: tp.label }, patch = fits(src, id, x); if (!patch) return;
+      const r = rec(inst), from = (r && r.def && r.def.label) || inst;
+      out.push({ label: '⇠ ' + tp.label + ' — from ' + from, hint: 'a copy of that part, its settings with it', src, patch }); }));
+    return out;
+  }
+  function replace(id, x, r) { const hit = { o: { inst: id, g: x }, patch: r.patch, back: null }; const src = Object.assign({}, r.src); if (src.from === undefined) delete src.x; return drop(src, hit); }
+  // THE HOVER CARD (3.216, his: "when you hover tells you what it is and the point of it and how it effects sound, in the simplest ways, so
+  // even a child could understand it"): the domain's words for the component in the box (exchange.explain), said where it sits
+  let card = null, cardT = 0;
+  function hideCard() { clearTimeout(cardT); if (card) { card.remove(); card = null; } }
+  function hover(id, x) {
+    if (x.hovered) return; x.hovered = true;
+    x.g.addEventListener('pointerenter', () => { clearTimeout(cardT); cardT = setTimeout(() => showCard(id, x), 450); });
+    x.g.addEventListener('pointerleave', hideCard); x.g.addEventListener('pointerdown', hideCard);
+  }
+  function showCard(id, x) {
+    hideCard(); if (!exchange || !exchange.explain || !x.g.isConnected) return;
+    const p = partIn(id, x), c = p.empty ? null : p.own && !p.part ? 'own' : (p.part && p.part.component) || p.comp, w = c && exchange.explain(c); if (!w) return;
+    const sl = x.slot && slotsOf(id).find(s2 => s2.id === x.slot), r = rec(id), where = (sl ? sl.label : (x.p.label && x.p.label.text) || '') + (r && r.def ? ' of ' + r.def.label : '');
+    card = h('div', 'fb-card'); card.style.setProperty('--c', x.p.col);
+    [['fb-cn', w.name + (p.own ? ' · its own' : '')], ['fb-cw', 'here: ' + where], ['fb-ct', w.what], ['fb-ct', w.point], ['fb-cs', '♪ ' + w.sound]].forEach(([k, t]) => card.appendChild(h('div', k, esc(t))));
+    document.body.appendChild(card);
+    const b = x.g.getBoundingClientRect(), W = global.innerWidth || 1200, H = global.innerHeight || 800;
+    card.style.left = Math.max(8, Math.min(b.right + 12, W - card.offsetWidth - 8)) + 'px'; card.style.top = Math.max(8, Math.min(b.top, H - card.offsetHeight - 8)) + 'px';
   }
   function setView(id, x, v) { const toolId = rec(id).id, m = views(toolId); m[x.p.id] = v; keepView(toolId, m); block(id, x); settle(id); }
   function lab(id) {   // the Mutation Lab of a tool = it exploded with its dock up front: the dock glows, the first MUTATE is a click away
@@ -537,5 +571,5 @@
     return true;
   }
   if (!hook()) document.addEventListener('DOMContentLoaded', hook);
-  global.FieldBoard = { define, has, explode, lab, select, clearSel, selected: () => selected().map(o => ({ inst: o.inst, piece: o.x.p.id, slot: o.x.slot })), synthesizeSel, selItems, mutatePart, partItems, drop, partIn, gates: (id) => (open.get(id) || {}).gates || [], assemble, isOpen, boards, sockets, setExchange, synthesizeOnto: (a, b) => open.get(b) ? synthesizeOnto(a, b, open.get(b)) : Promise.resolve(null), get exchange() { return exchange; }, learned: (toolId) => FM().learned(toolId), mutate: (id) => FM().mutate(FM().toolTarget(id)) };
+  global.FieldBoard = { define, has, explode, lab, select, clearSel, selected: () => selected().map(o => ({ inst: o.inst, piece: o.x.p.id, slot: o.x.slot })), synthesizeSel, selItems, mutatePart, partItems, replacements, replace, showCard, drop, partIn, gates: (id) => (open.get(id) || {}).gates || [], assemble, isOpen, boards, sockets, setExchange, synthesizeOnto: (a, b) => open.get(b) ? synthesizeOnto(a, b, open.get(b)) : Promise.resolve(null), get exchange() { return exchange; }, learned: (toolId) => FM().learned(toolId), mutate: (id) => FM().mutate(FM().toolTarget(id)) };
 })(window);

@@ -116,7 +116,7 @@
     return patch && Object.keys(patch).length ? patch : null;
   }
   function clear(toolId, slotId) { const sl = profileOf(toolId) && profileOf(toolId).slots.find(x => x.id === slotId); return sl && sl.clear ? sl.clear() : null; }   // delete: back to its own part, or empty
-  const api = { has: (id) => !!profileOf(id), slots, take, clear, label, kinds: ['filter', 'drive', 'noise', 'fx', 'wobble'] };
+  const api = { has: (id) => !!profileOf(id), slots, take, clear, label, explain: (c) => (root.PartWords ? root.PartWords.explain(c) : null), kinds: ['filter', 'drive', 'noise', 'fx', 'wobble'] };
   root.PartExchange = api;
   if (root.FieldBoard && root.FieldBoard.setExchange) root.FieldBoard.setExchange(api);
   if (typeof module === 'object' && module.exports) module.exports = api;
