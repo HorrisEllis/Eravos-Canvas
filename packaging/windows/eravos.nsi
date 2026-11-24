@@ -365,14 +365,36 @@ Function RunOwnWindow
   ; the window could not open (exit $R0), or could not write the app: the plain way, into $INSTDIR
   Call PlainCopy
 FunctionEnd
+; the new ERAVOS Update.exe: copied now, or - running (it started this Setup) - put in place at the next restart
+Function PutUpdater
+  ${IfNot} ${FileExists} "$STAGE\ERAVOS Update.exe"
+    Return
+  ${EndIf}
+  ClearErrors
+  CopyFiles /SILENT "$STAGE\ERAVOS Update.exe" "$INSTDIR"
+  ${If} ${Errors}
+    CopyFiles /SILENT "$STAGE\ERAVOS Update.exe" "$INSTDIR\ERAVOS Update.exe.new"
+    Rename /REBOOTOK "$INSTDIR\ERAVOS Update.exe.new" "$INSTDIR\ERAVOS Update.exe"
+    !insertmacro Log "ERAVOS Update.exe is running - the new one goes in at the next restart"
+  ${EndIf}
+FunctionEnd
 Function PlainCopy
   BringToFront
   DetailPrint "Installing the plain way (the Setup window ended with $R0)"
   CreateDirectory "$INSTDIR"
   !insertmacro ClearApp "$INSTDIR"
   !insertmacro FreeExe "$INSTDIR"
-  CopyFiles /SILENT "$STAGE\*.*" "$INSTDIR"
-  !insertmacro Log "copied the plain way from $STAGE into $INSTDIR"
+  ; 3.215 robocopy, not CopyFiles: CopyFiles gave up on the first held file (the running ERAVOS Update.exe) and left the folder without
+  ; ERAVOS.exe (his: "also broke my current version"); robocopy copies every file it can and retries a held one
+  nsExec::ExecToStack 'robocopy "$STAGE" "$INSTDIR" /E /R:3 /W:1 /NP /NFL /NDL /NJH /NJS /XF "ERAVOS Update.exe"'
+  Pop $R4
+  Pop $R5
+  !insertmacro Log "copied the plain way from $STAGE into $INSTDIR (robocopy $R4: below 8 = done)"
+  ${If} $R4 >= 8
+    CopyFiles /SILENT "$STAGE\*.*" "$INSTDIR"
+    !insertmacro Log "robocopy failed ($R4) - CopyFiles as well"
+  ${EndIf}
+  Call PutUpdater
 FunctionEnd
 
 Section "ERAVOS" SecApp
@@ -395,6 +417,8 @@ Section "ERAVOS" SecApp
     ${IfNot} ${FileExists} "$INSTDIR\ERAVOS.exe"
       !insertmacro Log "no ERAVOS.exe in $INSTDIR after the Setup window - copying the plain way"
       Call PlainCopy
+    ${Else}
+      Call PutUpdater           ; the window keeps a running ERAVOS Update.exe as it is: the new one goes in now, or at restart
     ${EndIf}
   ${EndIf}
   SetOutPath "$INSTDIR"

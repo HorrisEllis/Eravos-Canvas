@@ -71,6 +71,14 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-24 · Updating no longer breaks on the running ERAVOS Update.exe (3.215)
+- **His words (2026-11-24):** "trying to update it. fails to close eravos. also broke my current version." (with two screenshots)
+- **His call:** the screenshots — the cause read from them.
+- **Built (by the AI coder, to his direction):** the updater run from a copy; a held updater kept and replaced at restart; the fallback copy
+  by robocopy. States plainly that 3.214's fallback made his install worse.
+- **Proof:** desktop/test/setup-copy.mjs 15/15 (a locked updater simulated) · makensis compiles. Not yet seen on Windows.
+- **Where to check:** `node desktop/test/setup-copy.mjs`; `packaging/windows/eravos.nsi` PutUpdater / PlainCopy.
+
 ### 2026-11-24 · The Setup falls back to the 0.2.29 way when its window cannot write the app (3.214)
 - **His words (2026-11-24):** "so have actually done something right? it didnt have this problem pre 2.30."
 - **His call:** the regression dates from 0.2.30 — the Setup's own window.

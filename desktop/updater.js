@@ -121,8 +121,10 @@ function create(o) {
     let p;
     // 3.141 ERAVOS Update.exe (his: "why not make it another exe?"): an ordinary program, started as you, its own window; it asks
     // Windows for admin itself (in front) for the Setup it runs. Arguments as it reads them: /KEY="value" (quoted here, not by Node).
-    const exe = path.join(appDir, 'ERAVOS Update.exe');
+    let exe = path.join(appDir, 'ERAVOS Update.exe');
     if (st.setup && fs.existsSync(exe)) {
+      // 3.215 run a copy from the work folder: the one in the app folder stays free for the Setup to replace (his: "EBUSY … ERAVOS Update.exe")
+      try { const copy = path.join(work, 'ERAVOS Update.exe'); fs.copyFileSync(exe, copy); exe = copy; } catch (e) {}
       const a = [['SETUP', st.setup], ['DEST', appDir], ['VERSION', st.version], ['WORK', work], ['STARTED', started]].map(([k, v]) => `/${k}="${v}"`).join(' ') + (o.noStart ? ' /NOSTART' : '');   // noStart: the release check only
       try { p = spawn(exe, [a], { argv0: `"${exe}"`, detached: true, stdio: 'ignore', windowsVerbatimArguments: true, shell: false }); p.on('error', (e) => { try { fs.writeFileSync(failed, 'ERAVOS Update.exe: ' + e.message); } catch (er) {} }); p.unref(); }
       catch (e) { try { fs.writeFileSync(failed, 'ERAVOS Update.exe: ' + e.message); } catch (er) {} }
