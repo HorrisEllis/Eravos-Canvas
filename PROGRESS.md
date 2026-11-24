@@ -2,6 +2,11 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.219 The exploded note in the README; release 0.2.35 (2026-11-24)
+His words: "okay do the exploded note view for the screenshot also. marge and publish."
+- README.md: "Blow a note apart" — the Workshop's BOARD (3.199), docs/previews/workbench/workshop-board-note.png.
+- desktop/package.json 0.2.35; release notes (3.216–3.219).
+
 ## 3.218 The README, current, with pictures (2026-11-24)
 His words: "Also update the readme, with images if possible."
 - README.md: a new top — what ERAVOS is, get it (the Setup, the library, updates, repair), what you can do (play · blow apart · hover · replace ·

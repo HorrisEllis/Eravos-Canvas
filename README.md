@@ -57,6 +57,12 @@ Patterns as a structure (scale, chords, grid, range, density, contour) that note
 
 ![The Workshop: a pattern emerging into Retro DCO](docs/previews/workshop-built.png)
 
+### Blow a note apart
+In the Workshop, **BOARD** blows the open note apart the same way a tool is: every layer of it — its timing, pitch and velocity, chance and
+ratchet, its bend and oscillate curves, when and how it plays, its chord and speed — in a box of its own, live, wired to the note's core.
+
+![A note blown apart into its layers on the Workshop's board](docs/previews/workbench/workshop-board-note.png)
+
 ## How it is built — the rules
 
 - **Parts, not monoliths.** Components are shared parts any tool can use; packs are data beside a tool, never wired into it.

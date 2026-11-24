@@ -1,3 +1,14 @@
+ERAVOS v0.2.35 (2026-11-24)
+
+Install: ERAVOS-Setup-0.2.35.exe from the release, or ERAVOS offers it by itself.
+
+- Blown-up tools: each part is framed whole; rest the pointer on a part and it says, in the simplest words, what it is, what it is for and
+  what it does to the sound.
+- Right-click a part › REPLACE WITH: everything that fits there — its own choices and the parts in the other tools you have blown up.
+- Synthesize: the voice (the oscillators) is a part you can pick, and right-click › "◆ … the rest from <tool>" says where everything you did
+  not pick comes from — Retro DCO's voice with the rest of Wobble Bass, for one.
+- The README, current, with pictures.
+
 ERAVOS v0.2.34 (2026-11-24)
 
 Install: ERAVOS-Setup-0.2.34.exe from the release — run it yourself (double-click), it repairs a broken 0.2.33 update.
