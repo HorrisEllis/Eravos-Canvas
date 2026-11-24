@@ -161,7 +161,7 @@ async function install() {
     btn('Start ERAVOS', true, () => done({ ok: true, dest, library: lib, start: true }));
   } else {
     $('doneText').innerHTML = '<span style="color:var(--c3)">ERAVOS did not install completely.</span>';
-    $('bad').textContent = 'These files were not written in full:\n' + r.bad.join('\n') + '\n\nNothing of yours was touched. Close anything that may hold ERAVOS\'s files and run the Setup again.';
+    $('bad').textContent = 'These files were not written in full:\n' + r.bad.join('\n') + '\n\nNothing of yours was touched. Press Close: the Setup then puts ERAVOS in the plain way and checks every file again.';
     btn('Close', true, () => done({ ok: false, dest, library: lib, why: r.bad.slice(0, 3).join('; ') }));
   }
 }
@@ -175,7 +175,7 @@ async function update() {
   busy = false;
   if (r.ok) { set(1, 'DONE'); $('rCheck').innerHTML = '<span style="color:var(--text)">' + r.files + ' of ' + r.files + ' files in full</span>'; $('rOk').textContent = 'ERAVOS ' + (O.version || '') + ' IS IN — STARTING IT';
     setTimeout(() => done({ ok: true, dest: O.dest, start: false }), 1600); }
-  else { $('rWhat').textContent = 'NOT IN'; $('rCheck').textContent = r.bad.slice(0, 3).join(' · '); $('rOk').textContent = ''; $('rNote').textContent = 'The update tries once more, then offers the installer to repair it.';
+  else { $('rWhat').textContent = 'NOT IN'; $('rCheck').textContent = r.bad.slice(0, 3).join(' · '); $('rOk').textContent = ''; $('rNote').textContent = 'The Setup now puts it in the plain way and checks every file again.';
     setTimeout(() => done({ ok: false, dest: O.dest, why: r.bad.slice(0, 3).join('; ') }), 3000); }
 }
 

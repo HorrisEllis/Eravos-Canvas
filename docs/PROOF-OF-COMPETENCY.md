@@ -71,6 +71,14 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-24 · The Setup falls back to the 0.2.29 way when its window cannot write the app (3.214)
+- **His words (2026-11-24):** "so have actually done something right? it didnt have this problem pre 2.30."
+- **His call:** the regression dates from 0.2.30 — the Setup's own window.
+- **Built (by the AI coder, to his direction):** the Setup no longer stops when its window's copy fails; it writes the app itself (the
+  pre-0.2.30 way) and checks every file. The earlier fix (3.213) is stated as not his cause.
+- **Proof:** makensis compiles. Not yet seen on Windows.
+- **Where to check:** `packaging/windows/eravos.nsi` RunOwnWindow.
+
 ### 2026-11-24 · Fixed: "error writing ERAVOS.exe" on install / update (3.213)
 - **His words (2026-11-24):** "can you merge branches. figure out why it keeps telling me error writing eravos.exe"
 - **His call:** find it and fix it.
