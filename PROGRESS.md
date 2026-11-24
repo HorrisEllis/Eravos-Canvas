@@ -2,6 +2,22 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.217 Pick the voice; say where the rest comes from (2026-11-24) — not merged (shown first)
+His words: "my goal is to add the capability to create a mix of the retro dcs and the wobble bass to make the retro wobble or something … combine
+the sound of retro dcs with the rest of wobble bass." · "eravos makes it, not you. only add capability. always capability first."
+- The gap: synthesizing picked parts could not take the VOICE (the oscillator boxes are not swap slots), and the rest always came from the tool
+  most picks came from — "Retro DCO's voice, the rest from Wobble Bass" could not be said.
+- tools/music/data/tool-blend.js slotOfPiece: a box is taken by what it is when it is not a swap slot (osc-va / osc-sub / unison / dco → voice,
+  lfo → wobble, filter-svf / ladder → mouth, waveshaper / saturator → drive). assembled-tool.js synthesizeParts(list, { restFrom }): everything
+  not picked from the tool he names; Model.render (the judge's own render, to hear what was made).
+- tools/core/field/board.js (domain-free): right-click a selection → "◆ Synthesize …" and "◆ … the rest from <each tool blown up>"; every
+  selected box goes to the domain (it decides what it can take; what it cannot is named, as before); "1 part" said singular.
+- tests/p217-voice-and-rest.test.js 1/1 — the test only PICKS (Retro DCO's DCO, the rest from Wobble Bass); ERAVOS makes it: its voice is
+  Retro DCO's (wave, width), its wobble / mouth / drive Wobble Bass's, it plays (no broken sample, peak below clipping). P196 P199 P200 P202
+  P203 P204 P205 P216 boundary bare-canvas assembled-tool (32) green.
+- docs/previews/workbench/voice-rest.shots.mjs → voice-rest-menu.png, voice-rest-made.png, voice-rest.wav: made on the canvas through the menu —
+  "Retro DCO × Wobble Bass · osc-va → saturator-tube → filter-svf · wobble into filter-svf · novel (nearest Gothic Organ · Pedal Drone)".
+
 ## 3.216 The box is the component; hover words; right-click › Replace with (2026-11-24) — not merged (screenshots shown first)
 His words: "the purple box should surround the entire component ui. also right click to replace." · "maybe when you hover tells you what it is
 and the point of it and how it effects sound, in the simplest ways, so even a child could understand it." · "eravos makes it, not you. only add
