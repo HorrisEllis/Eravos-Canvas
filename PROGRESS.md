@@ -2,6 +2,16 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.223 ERAVOS's own engine — specced; written in Emerge (2026-11-24)
+His words: "that is still not great. what about the audio driver or engine that electron uses?" · "invent our own? specifically made more eravos?" · "dynamic, load balancing, signal to noise? wait for emerge"
+- specs/eravos.engine.spec (NEW): an engine, not a driver (D1); written in Emerge, waiting for E2 / E3 (D2, his call); its own process; tools
+  isolated; agnostic; live = offline. DYNAMIC (the graph swapped at a block, cross-faded; parameters as data; made tools assembled at once;
+  quality that steps down before a dropout) · LOAD BALANCING (the DAG as the schedule over a pool of MMCSS real-time threads, work stealing,
+  measured cost per node, critical path first, deadline watched) · SIGNAL TO NOISE (64-bit mix, FTZ / DAZ, headroom + true-peak, TPDF dither,
+  oversampling for what bends the wave, each contract's noise floor; and work only on what is heard). Phases EN0–EN6.
+- performance-plan ADDENDUM: PF7 moved to the engine. docs/TODO-LEDGER.md T-33 … T-38; session map 24–26; his-words N-X126 … N-X128;
+  the register. Nothing built. Open: EN1 now? · screen or sound?
+
 ## 3.222 Less lag: a forced layout removed; Settings › Performance; Auto (2026-11-24); release 0.2.37
 His words: "needs performance optimization. the cpu cores. its lagging with plenty of overhead. maybe custom settings, like cpu cores, animations, graphics acceloratoin. maybe invent a better driver"
 - Measured (docs: the probe below; 10 tools of a Song Engine song playing, 2-core test machine): main thread blocked ~46 % of every second
