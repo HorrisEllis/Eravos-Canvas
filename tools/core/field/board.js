@@ -117,7 +117,7 @@
     const view = fitView(board), cam = view ? glideTo(view, T(1300)) : Promise.resolve();
     board.addEventListener('contextmenu', (e) => { if (e.target.closest('.fb-inner')) return; e.preventDefault(); e.stopPropagation(); const CM = global.ContextMenu;
       const cg = e.target.closest('.fb-gate.fb-comp'), cx = cg && st.gates.find(x => x.g === cg);
-      if (sel.size && CM && CM.show) return CM.show(e.clientX, e.clientY, selItems().concat(cx ? [{ sep: true }].concat(partItems(instanceId, cx)) : []), sel.size + ' parts selected');
+      if (sel.size && CM && CM.show) return CM.show(e.clientX, e.clientY, selItems().concat(cx ? [{ sep: true }].concat(partItems(instanceId, cx)) : []), sel.size + (sel.size === 1 ? ' part selected' : ' parts selected'));
       if (cx && CM && CM.show) return CM.show(e.clientX, e.clientY, partItems(instanceId, cx), partIn(instanceId, cx).label + ' · a part');
       if (CM && CM.show) CM.show(e.clientX, e.clientY, [{ label: '◱ Put it back together', hint: 'every part back into its window (Esc)', run: () => assemble(instanceId) },
         { label: '↺ Gates back to the board', hint: 'undo your moves of the gates', run: () => { keepMoved(toolId, {}); assemble(instanceId, { now: true }); explode(instanceId, toolId); } }], (L.title || 'the tool') + ' · exploded'); else assemble(instanceId); });
@@ -188,7 +188,7 @@
   }
   function clearSel() { sel.forEach(o => o.x.g.classList.remove('fb-sel')); sel.clear(); count(); }
   function count() { const n = sel.size; document.querySelectorAll('.fb-board').forEach(b => { let t = b.querySelector('.fb-selbar'); if (!n) { if (t) t.remove(); return; }
-      if (!t) { t = h('div', 'fb-selbar'); b.appendChild(t); } t.textContent = n + ' selected · right-click to synthesize them into one tool · Esc clears'; }); }
+      if (!t) { t = h('div', 'fb-selbar'); b.appendChild(t); } t.textContent = n + ' selected · right-click to synthesize · Esc clears'; }); }
   function grab(x, instanceId, toolId) {
     x.g.addEventListener('pointerdown', (e) => {
       if (e.button !== 0) return;
@@ -230,18 +230,22 @@
   }
   function selItems() {
     const list = selected(), comps = list.filter(o => o.x.slot || o.x.socket), out = [];
-    if (exchange && exchange.synthesizeParts && comps.some(o => o.x.slot)) out.push({ label: '◆ Synthesize these ' + comps.length + ' parts into one tool', hint: 'each part takes its place in one new tool; the rest from the tool most of them came from — checked: it plays, it is no twin', run: () => synthesizeSel() });
+    if (exchange && exchange.synthesizeParts && list.length) {
+      out.push({ label: '◆ Synthesize ' + (list.length === 1 ? 'this part' : 'these ' + list.length + ' parts') + ' into one tool', hint: 'each part takes its place in one new tool; the rest from the tool most of them came from — checked: it plays, it is no twin', run: () => synthesizeSel() });
+      // 3.217 where the rest comes from is his to say: each tool blown up on the canvas (his: "combine the sound of retro dcs with the rest of wobble bass")
+      [...open.keys()].filter(i => rec(i) && exchange.has(rec(i).id)).forEach(i => out.push({ label: '◆ … the rest from ' + rec(i).def.label, hint: 'the parts you picked, and everything else from ' + rec(i).def.label, run: () => synthesizeSel({ restFrom: i }) }));
+    }
     if (comps.some(o => o.x.socket)) out.push({ label: '⚄ Mutate only these parts', hint: 'another component in each, its own settings fresh — nothing else moves', run: () => comps.filter(o => o.x.socket).forEach(o => mutatePart(o.inst, o.x)) });
     if (comps.some(o => partIn(o.inst, o.x).clearable)) out.push({ label: '✕ Remove these parts', hint: 'Delete — each box empty again, or back to its tool\'s own part', run: () => removeSel() });
     out.push({ label: 'Clear the selection', hint: 'Esc', run: () => clearSel() });
     return out;
   }
-  function synthesizeSel() {
+  function synthesizeSel(opts) {
     const say = (t2, kind) => { if (global.Shell && global.Shell.toast) global.Shell.toast(t2, kind || '', 4200); };
-    const list = selected().filter(o => o.x.slot), insts = [...new Set(list.map(o => o.inst))], last = open.get(insts[insts.length - 1]);
+    const list = selected(), insts = [...new Set(list.map(o => o.inst))], last = open.get(insts[insts.length - 1]);
     if (!list.length) return Promise.resolve(null);
-    list.forEach(o => o.x.g.classList.add('fb-busy')); say('◆ synthesizing ' + list.length + ' parts into one tool — measuring it against everything…');
-    return Promise.resolve(exchange.synthesizeParts(list.map(o => ({ inst: o.inst, slot: o.x.slot })))).then((r) => {
+    list.forEach(o => o.x.g.classList.add('fb-busy')); say('◆ synthesizing ' + list.length + (list.length === 1 ? ' part' : ' parts') + ' into one tool — measuring it against everything…');
+    return Promise.resolve(exchange.synthesizeParts(list.map(o => ({ inst: o.inst, slot: o.x.slot, piece: o.x.p.id, label: o.x.lab.textContent })), opts)).then((r) => {
       list.forEach(o => o.x.g.classList.remove('fb-busy')); if (!r || !r.ok) { say('not made — ' + ((r && r.why) || 'it did not build'), 'bad'); return null; }
       const F = global.OrganismFactory, b = last && last.board, x = b ? b.offsetLeft + b.offsetWidth + 120 : 40, y = b ? b.offsetTop : 40, inst = F.spawn(r.id, { x, y });
       say('◆ ' + r.rec.name + ' — a tool of its own (' + r.verdict + (r.near ? ', nearest ' + r.near : '') + ')' + (r.left && r.left.length ? ' · not in the engine yet: ' + r.left.join(', ') : ''), 'good');

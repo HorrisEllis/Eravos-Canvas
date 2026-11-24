@@ -1,20 +1,81 @@
 # ERAVOS
 
-A canvas of living instruments for making music — everything in key, everything on the beat.
+**A creative canvas to create creatively — and to connect with people.** Living instruments you play, take apart, swap the parts of,
+and synthesize into new tools of your own. Everything in key, everything on the beat, every sound made live (no recordings dressed up as
+instruments).
 
-## 3.48.3 — every pack kind, a tool's own panel on its page, mods for the Drum Machine, one Bass category
-- **Tool pages show everything a tool has.** **Its panel**: the tool's own controls, live, on its page (the Drum Machine's
-  pad editor, any tool's whole window). **Every pack kind**, not only presets: the Drum Machine lists all of its **kits**,
-  from every kit pack and your own ("Mine"), each with **Load kit**. A domain says how a kind loads (`ToolPage.addKind`).
-- **Drum Machine 3.1**: a mod slot after the whole kit. Put a Squash, Destroyer or Echo on every pad at once.
-- **Bass**: one category with Wobble Bass, Reese Bass, Sub Engine, Acid Synth, Bass Forge and Bass Gen. Wub Sub stays with
-  the wub tools it belongs to.
+![Wobble Bass on the ERAVOS canvas](docs/previews/workbench/field-live-whole.png)
 
-## 3.48.2 — accents follow the sound
-- Every sounding window's accent colour moves with its own sound: knob arcs, active buttons, toggles, sliders, the border
-  and its spectrum. As it gets louder it drifts toward the hue of the mix (violet and red for bass weight, teal for bright
-  tops) and brightens on each hit; when it goes quiet it returns to the tool's own colour. Knobs no longer pin a fixed colour
-  each. Tools inside another (mod cards, linked faces) keep their own colour. ⋯ Options › Reactive colours turns it off.
+## Get it (Windows)
+
+Download **`ERAVOS-Setup-<version>.exe`** from [Releases](https://github.com/HorrisEllis/Eravos-Canvas/releases) and run it. It asks where the
+canvas goes (Program Files by default) and where **your library** goes (`Documents\ERAVOS` by default) — everything you make lives in the library,
+and installing, updating or uninstalling never touches it. ERAVOS checks for updates by itself and puts them in with one click.
+
+![The ERAVOS Setup: where it goes, writing, done, and the update ring](docs/previews/installer/setup-window.png)
+
+If an update ever stops part way, run the newest Setup yourself (double-click it): it repairs the install. What happened is in
+`%TEMP%\ERAVOS Setup.log`.
+
+## What you can do
+
+### Play living instruments
+Wobble Bass, Retro DCO, Piano, Swarm Oscillator, Tape Memory and dozens more — each built live from shared parts (oscillators, filters,
+envelopes, drives, choruses), every knob reachable while it plays, every key its own note.
+
+![Retro DCO, playing](docs/previews/retro-dco-built-playing.png)
+
+### Blow a tool apart on the canvas
+Right-click a tool › **Explode on the canvas**: every part of it lifts out into its own box, still live, wired to the tool's core. Blow up two
+tools side by side and drag a part from one into the other — it swaps with what is there when it fits back, otherwise it replaces it.
+
+![Wobble Bass and Retro DCO blown up side by side; Retro DCO's ladder filter being dragged into Wobble Bass](docs/previews/workbench/swap-across-drag.png)
+
+### Hover to learn what a part does
+Rest the pointer on a part and it says, in the simplest words, what it is, what it is for, and what it does to the sound.
+
+![The hover card on Wobble Bass's wobble](docs/previews/workbench/hover-card.png)
+
+### Replace a part from a list
+Right-click a part › **REPLACE WITH**: everything that fits there — its own choices, and the parts in the other tools you have blown up
+(they come with their settings). One Ctrl+Z puts it back.
+
+![Right-click › Replace with](docs/previews/workbench/replace-menu.png)
+
+### Synthesize a new tool
+Ctrl+click parts across tools, then right-click › **◆ Synthesize** — and say where the rest comes from (**◆ … the rest from Wobble Bass**).
+ERAVOS builds one new tool of its own from your picks, checks it plays cleanly, measures it against everything ERAVOS already has (a twin is
+refused), and opens it blown up so you can keep going. Below: Retro DCO's voice with the rest of Wobble Bass.
+
+![Retro DCO's voice picked; right-click › the rest from Wobble Bass](docs/previews/workbench/voice-rest-menu.png)
+![What ERAVOS made: Retro DCO × Wobble Bass, blown up](docs/previews/workbench/voice-rest-made.png)
+
+A made tool is a tool of its own, apart from the rest: if one misbehaves, delete it and nothing else is touched.
+
+### Shape notes and patterns in the Workshop
+Patterns as a structure (scale, chords, grid, range, density, contour) that notes emerge from; any note shaped layer by layer, in 2D or 3D.
+
+![The Workshop: a pattern emerging into Retro DCO](docs/previews/workshop-built.png)
+
+## How it is built — the rules
+
+- **Parts, not monoliths.** Components are shared parts any tool can use; packs are data beside a tool, never wired into it.
+- **Capability first.** ERAVOS makes things from what you pick; the code only adds what ERAVOS can do.
+- **Dynamic and fluid; tools isolated.** Everything changes while it plays; anything made is its own tool and can be deleted whole.
+- **No toys.** Every instrument makes its sound live — no shipped recordings.
+- **Canvas and content apart.** `canvas/` is the host and names no tool; `tools/<domain>/` is the content.
+- **Nothing is lost.** Specs gain dated addenda; the originals stay. The full list is in [CLAUDE.md](CLAUDE.md); the log in [PROGRESS.md](PROGRESS.md).
+
+## Where it is going
+
+- **The Mutation Lab** — every component and core on one shelf, to combine two or more into something new.
+- **The Workbench / Tool Builder** — build a tool from scratch: pick its parts, then how each control looks (knob, fader, XY pad, keys…) and its theme.
+- **Connecting with people** — share as a link, remix with credit, play together, share packs.
+- **ERAVOS v2** — on Emerge and Looking Glass (a note for later: [docs/eravos-v2-emerge-looking-glass.md](docs/eravos-v2-emerge-looking-glass.md)).
+
+---
+
+# Reference
 
 ## Layout — the canvas and the tools are separate
 
@@ -37,7 +98,7 @@ A canvas of living instruments for making music — everything in key, everythin
 The canvas finds the tools through one setting: `canvas/scripts.js` sets `ERAVOS_TOOLS` (default `../tools/`) and loads
 `tools/index.js` last. Nothing in `canvas/` names a domain (tests/boundary.test.js enforces it).
 
-## Start
+## Start from a source checkout (developers)
 
 - **Windows:** double-click **Start ERAVOS**.
 - **macOS / Linux:** run `./start-eravos.sh`.
@@ -108,153 +169,6 @@ Techno, Trap, Synthwave (80s), Darkwave (80s), Witch House). Every press writes 
 drums, bass, chords, lead and the arrangement — on the Timeline, all in key. Click any clip to edit it in the piano roll.
 The song's name ends in its number: `SongEngine.write('synthwave', 4242)` builds that exact song again.
 
-## 3.48.1 — the MIDI button on a fresh install · the web build and ERAVOS.exe are the same
-- **Mods fixed**: Clip Maker was offered as a mod, and inside any tool it silenced the sound (it records clips; it doesn't
-  pass sound through). It is no longer offered. Every other mod in every slot was checked: 83 host × mod pairs, all
-  pass sound, and a test now checks every tool the ＋ mod picker offers.
-- **A tool's page opens when you click its name** (or icon) in the window title; dragging still moves the window. The
-  page button is a clean drawn icon (the 📘 emoji looked fragmented).
-- **Spectrum at rest**: the display under every instrument shows its frequency grid and "play a note" instead of an empty box.
-- **Fixed** "That needs a pack that isn't installed" when clicking **MIDI / Connect pads** on a fresh install, as on
-  ERAVOS.exe's first start. Any tool opened by name now installs itself first and then opens; this also covers Learn,
-  Sounds and the Song dock. Check it with `node tests/fresh-profile.mjs`.
-- **One server for both**: `node serve.js` now runs ERAVOS Glass, the same server ERAVOS.exe runs inside itself. The web
-  build gets the event stream and command door too, and the exe now serves `voice/` (her recordings) like the web build.
-  The only remaining differences are the desktop's own folders (drop, packs, projects, exports), which a browser cannot have.
-
-## 3.48 (P48.1) — a precise piano roll
-- **Notes land where you aim**: a ghost shows exactly where a click will land, and the toolbar reads the position
-  (bar.beat.tick) and the note. A click never slides: notes follow the cell and row under the pointer, so a small slide
-  inside the cell you clicked no longer moves the note a step or a semitone. Before, it did.
-- **Finer grids**: 1/32, 1/64, 1/8 · 1/16 · 1/32 triplets, and off. Hold **Alt** to place freely.
-- **Zoom**: taller rows (Rows, or Ctrl+Shift+wheel), smooth zoom (Ctrl+wheel keeps your spot), and fit clip.
-- **Ruler**: song bars and beats above the notes; click or drag it to move the playhead.
-- **Tools**: ✎ Draw · 🖌 **Paint** (drag = one note per grid cell, following the pointer) · ✂ Split · ⌫ Erase (drag
-  across notes), on keys 1–4.
-- **Stretch notes from either edge**; the edge is easier to grab on short notes. New notes take the length you last drew.
-- Notes now keep exact triplet timing in the song (1/192 step).
-- **Edit many**: ⬚ Select (5) or Shift-drag a box, Shift-click to add. Drag moves the lot, Ctrl+drag copies, and an edge
-  stretches them all. Ctrl+C/X/V (paste at the pointer), Ctrl+D duplicate, ← → nudge, ↑ ↓ transpose.
-  **Q** quantize (25–100 %), **H** humanize, **L** legato. Each edit is one undo step.
-- **Velocity lane** under the notes: drag to draw velocities, Ctrl-drag for a ramp.
-- **The note's knobs**: double-click a note for Start (snaps to the grid), Length, Pitch and Velocity knobs.
-  It's live and nothing to type. Right-click deletes.
-- **Step input** ⏎: type notes on Z S X D C V G B H N J M (Q 2 W 3 E R 5 T 6 Y 7 U an octave up). Space rests, Backspace steps back.
-
-## 3.47 — ERAVOS Glass + ERAVOS COS (from Nexus Clear Glass and COS, made for ERAVOS)
-- **ERAVOS COS** (`host/cos.js`): compartments **nest** like the project: the canvas › each **domain** (music, image, video,
-  agents, coding, dataflow) › each **tool**. Each earns its place through **birth gates**:
-  - **canvas**: no domain words in its skeleton.
-  - **domain**: its `domain.json` is whole, its loader matches its tools exactly, the build ships it, and it never reaches into another domain.
-  - **tool**: manifest, shape, sealed (reaches nothing outside its folder), presets checked against its real settings, spec, plus `--deep` for its own tests and the sound survey.
-
-  A parent passes only when everything inside it passes. `node host/eravos.mjs cos gate` checks the whole tree (69, all
-  passing); `cos archetype` generates the COS `eravos-canvas` archetype from this repo.
-- **ERAVOS Glass** (`host/glass.js`): the canvas served with a live **event stream** and one **command door**. Anything on your
-  machine can drive the open canvas, a script today and the Ollama DJ next: open tools, turn knobs, load presets, wire, load
-  suites, read the whole state back. All of it is undoable, like a person doing it.
-  `node host/eravos.mjs glass --open`, then e.g. `node host/eravos.mjs send canvas.spawn '{"tool":"eravos.wobble-bass"}'`.
-- **ERAVOS.exe** runs Glass inside the app (`eravos://app/glass/`, and `127.0.0.1:4748` for outside callers).
-
-## 3.46 — a whole page for every tool
-- **📘 on every window** (and "📘 Its page" in ＋ Add): its **suite**: load the lot in one click, or ＋ one by one. Also: every **mod**
-  that fits each slot, the tools it **plays with**, every **sound pack** (▶ hear, Load, pack on/off), **every control** (range, default,
-  ∿ = an input can move it) and its inputs and outputs.
-- Suites: Wobble Bass (The drop rig), Wub Osc (A whole wub), Morph Osc (Morph voice), Destroyer (Talking grit).
-- **Wobble Bass 3.6**: a **growl** mod slot. Its mods run on the wub only; the sub stays clean and in time.
-
-## 3.45 — Wobble Bass: everything on screen, fluid rates, the Bun Dem screech
-- **Fixed**: seven controls (FM, FM ratio, FM wub, Squash, Grit type, Square oct, Sub in phase) were missing from the window.
-  Now every control is there, grouped (Rate · Mouth · Growl · Pitch · Tone); a control that waits on a switch is dimmed and says why.
-- **Perform pad**: drag sideways to bend the wobble speed smoothly (×¼ … ×4), up and down to open the mouth; springs back on release.
-- **Rate glide**: rate changes swoop instead of jumping — wub-seq steps glide into each other. **Pitch wub** to 2400 c (an octave
-  scream; it stopped at 1 semitone). **Octave +2**. New inputs: **rate · FM · pitch** — wire an Envelope or LFO into them.
-- **Bun Dem presets**: Screech (the drop lead, octave up, FM, octave-wide bends), Talking Growl, Rate Ramp (glide).
-- **Matched to the track**: the drop measured (1/8-triplet movement at ~141 BPM, mono F#1 sub, scooped low-mids, a flat bright
-  top) and the Wobble Bass tuned against it by an offline search — "Bun Dem · Matched to the track (1/8t)" and "… + drop rhythm".
-
-## 3.44 — Songs by category · the Bun Dem growl
-- **Songs page by category**: 🔊 Dubstep & Wubs · ⚡ Drum & Bass · 🏠 House · 🌀 Techno & Trance · 🎛 Trap & Phonk · 🔥 Reggae &
-  Dub · 🌆 80s · 🖤 Dark · 🌙 Chill, then the collections 💜 For Her · 🥀 Lost Love · 🧪 Odd Couples. Counts on every chip,
-  headings in the grid, a search box (title, genre or tool), and the mood chips still narrow it down.
-- **Wobble Bass 3.4 — the growl**: **FM** (a sine bending the saws, in tune) and **FM wub** (the wobble opens the FM too, so
-  the growl talks with its harmonics, not just a filter) and **Squash** (3-band OTT-style; the sub stays clean). The
-  "Bun Dem Growl" preset now uses FM; new Bun Dem presets: FM Talker, Half-time Yoi 1/4t, Sub Growl (ratio ½).
-
-## 3.43 — small tools that combine · Links · Mods · Synthesis
-- **Links — tools grow when they meet.** Every window shows what it is wired to (⇠ feeds it · ⇢ it feeds). Click a chip and
-  that tool's main controls unfold inside this window; pairs that belong together (Wub Rate → Wub Filter, Morph Osc → Morph
-  Osc, Envelope → anything) unfold on their own when you wire them.
-- **Mods — any tool inside another.** Destroyer, Wub Osc, Wub Filter and Wub Sub have a 🧩 MODS rack: ＋ mod puts any effect
-  inside (Wub Filter inside the Destroyer, a Destroyer inside a Wub Osc …) — no extra window, one undo step, saved with it,
-  mods can hold mods. ⏻ bypass, ↑ ↓ reorder, ⤢ shows a mod's whole window.
-- **In and out freely**: ＋ mod also lists the windows already on your canvas — ⇲ moves one inside and joins its cables up
-  behind it; ⇱ on a mod pops it back out into its own window, wired straight after its host. A mod that delays its sound
-  (a Destroyer's oversampling) is waited for, so its host's Mix never comb-filters.
-- **Granular**: any sound into a cloud of grains — live from whatever is wired in (or the tool it sits inside as a mod), or from
-  a clip. Freeze, feedback shimmer, tempo-synced stutters, pitch spray in key, play it from notes; click the field to burst.
-- **Synthesis** (new category): **Morph Osc** — wavetable oscillator that morphs (analog / vocal / digital / organ tables),
-  with FM and Ring INPUTS: wire one Morph Osc into another's FM in and you have FM synthesis — the modulator follows the
-  notes by itself. **Envelope** — wire it into any knob on any tool; it moves on that tool's notes. **Partials** — additive:
-  draw 24 harmonics, evolve between two spectra, stretch them into bells (kept in tune).
-
-## 3.42 — Destroyer 2.0 · distortion that sits in a mix
-- **Same volume, new colour**: drive no longer adds up to +13 dB on quiet parts (1.x levelled itself at full scale) —
-  gain is matched across −6…−24 dBFS, so switching it on changes the tone, not the loudness.
-- **No more fizz**: its own curves with a smooth knee (hard, fold were brick walls) + **Auto tame** rolls off the top as
-  the drive goes up. New shapes **tape · fuzz · rectify**, and **Asym** for warm even harmonics.
-- **Bass that stays bass**: **Tight** cuts the mud before the shaper; **Low keep** leaves the sub clean under the grit.
-- **Crush that crunches instead of hissing**: **Alias** (0 clean lo-fi … 1 raw 8-bit fold-over), **Dither**, smooth
-  fractional downsample under modulation. 7 new presets (Fuzz Box, Wub Grit · sub stays clean, Drum Bus Crunch …).
-
-## 3.41 — Odd Couples · every tool measured · her voice on top
-- **Songs → 🧪 Odd Couples**: 72 songs in 12 genres made from tools that never meet — a cathedral organ over the riddim wub
-  rig, a 303 at a séance, golden-ratio bells on a dub sound system, a music box over tearout, a breathing drone under 174 drum &
-  bass … Every tool has a new **Odd Couples** pack (prefix "Odd ·"). Every song opens her voice rig: record her once in Clip
-  Maker — she plays in the break AND lands on the drop with the rest of the mix ducked under her.
-- **Drop Builder · Her voice on top** (VOCAL, default 9 dB): everything else dips under each word of her clip; she never does.
-- **Measured, not guessed** (specs/eravos.p42-tool-audio.spec): every tool × every preset rendered and measured — timing to the
-  sample, pitch to the cent, level, Stop all. Fixed: notes that played 2.7–18 ms late (Sub Engine, Organ with drive, Reese,
-  Embodiment, driven drum voices), echo repeats drifting off the beat, dry/wet comb filtering in Destroyer / Filter / Wub Filter,
-  presets peaking over full scale. `node tests/tool-audio.mjs [tool]` runs the survey.
-- **Songs page**: every card answers a click (39 didn't in the exe) and Write writes the card you picked. A song installs any
-  tool it needs and says which. **Settings panels**: scrolling no longer turns the knob that slides under the cursor.
-
-## 3.36 — the Sequencer drives every tool to the beat · "Give Your Head a Shake"
-- ＋ lane → automation lane: pick any tool and any knob, paint a value per step (⟋ = glide). Wobble rate, cutoff, DJ filter, reverb — on the beat.
-- Right-click a step: 🔒 lock a knob for that one hit · "Plays": every other pass, only in a fill, first pass only…
-- ✦ Fill (button, MIDI, Perform pad 8) · Evolve per lane (patterns grow from the 2nd pass, repeatably) · Humanize.
-- Preset "Song · Give Your Head a Shake": the whole song — intro, verse, build (her line at the end), pause, two drops, breakdown.
-- Lyrics → Rhythm → ⇢ Sequencer: paste your words; they become lanes + a "her voice" lane on every line (load her clip in a Sample Player).
-
-## 3.35.1 — ⏮ restart · your pads do more
-- ⏮ (top bar, Timeline, Home): back to the loop start, or bar 1 — keeps playing.
-- MIDI Map → What the pads do: Drums · Keys (16 notes in key) · Chords + drums · Split · Perform (⏮ ▶ ⏺ ⟲, markers, drop, tap, patterns A–H) · ✎ any pad.
-
-## 3.35 — the Timeline, easier
-- ⤢ fills the screen at true size whatever the canvas zoom (Esc back). Long songs at high zoom no longer go blank.
-- Drag the bar above the piano roll to resize it · exports are one ⤓ Export menu · wheel scrolls time · + / − zoom · F fit.
-
-## 3.34.2 — Bass Pack · 3.34.1 — Words → Song
-- Bass Pack: 8 genres (tearout, dubstep-og, riddim-war, drumstep, trapstep, bass-house, deathstep, tension-study); genre bar-writer hook `G.bar`; real builds, pause, lift.
-- Words → Song (RhythmExpand): lyrics' rhythm drives drums/bass/lead over a Song Engine genre. `SongEngine.generate(id, seed, X)` + `helpers`.
-- Merge fix: p22 golden hashes re-captured in-page (old set lacked organism sizes → layout drift; notes unchanged). Windows payload rebuilt (was 3.33).
-
-## 3.34 — nothing sticks, windows that expand, speed + settings per tool, the Mixer
-- Drags can no longer get stuck (the "open the dev console and it works again" bug): one guard ends every drag on release, a button-less move, Esc or switching windows.
-- ⤢ on every window and the bottom dock (fills the screen). Timeline: fills its window, lane height − / ＋, Ctrl+wheel zoom, Alt+wheel lane height, ⤢ Fit, ruler stays on top.
-- Speed per tool: every beat-driven tool has Speed (¼ … 4, or its own BPM) in ⚙ Settings.
-- ⚙ Settings on every tool: every parameter (searchable), presets, Reset, and Output (its mixer strip).
-- 🎛 Mixer (Mix): a strip per sound (fader, pan, M/S, meter, low cut, EQ, sends, output), ＋ Group / Reverb / Echo / Aux lines.
-- Coming next (mapped in specs/eravos.phase34-map.spec): Hard Tune, the Song editor, the UI rebuild pass, new EDM genres, import & map.
-
-## 3.33 — Drop Builder 3, Lyrics → Rhythm, Embodiment Lab, living surfaces
-
-Drop Builder: her voice panel first; every part of every section (tension, build, pause, drop) has its own editor and
-a ▶ hear button. Lyrics → Rhythm turns words into a beat or a melody line. Embodiment Lab: an irrational-ratio drone
-with a heartbeat pulse, a breath swell and body cues — feelings as presets (Lab mode). Pad Forge and Dub Station are
-redesigned; every tool's surface can follow its own sound (UI.alive). Timeline clicks land where you click at any zoom.
-
 ## Making new tools, packs, modes, domains (3.32)
 
 Read `specs/eravos.structure.spec`. In short: every tool is its own folder
@@ -265,32 +179,6 @@ that reference tools, packs are content only. Formats: `schemas/`. Starting poin
     node build/index-tools.mjs && node build/validate.mjs
 
 Where every current tool moves: `specs/eravos.structure.map.spec` (generated by `build/structure-map.mjs`).
-
-## 3.31 — your songs, your taste, goals
-
-**📖 Save to Songs** in the Song Recorder keeps the song (audio + the whole canvas) — Songs → **My songs** to listen or
-open it again. **Learn → EDM tour**: 22 kinds of EDM, write → hear → rate each; Songs → **For you** shows what you love.
-**Goals** at the top of Learn always show the next thing to do. The map of every future domain (image, video, UI,
-automation) is in `specs/eravos.domains.map.spec`, one spec per tool.
-
-## 3.30 — blank canvas, pads that just work, Sounds
-
-ERAVOS opens blank: **Start · Add · Options**. Everything else appears when you pick a mode or add a tool.
-Your pad controller plays the Drum Machine with no window open, and the pad you hit is the pad you see.
-**🎚 Sounds** (toolbar, Music Production): every preset by pack, drum **kit packs** to switch on/off, load and mix pad by
-pad, and **Capture → pad**: play any tool and its sound lands on a Drum Machine pad.
-On the exe, tools come from **tools/<domain>/** next to ERAVOS.exe — the same folders as this project.
-
-## Songbook and Learn (3.29) — pages of their own, off the canvas
-
-**📖 Songs** (toolbar, Music Production): finished songs in every genre — reggae (Bun Dem), dancehall, Hanging Tree
-desert goth, phonk, lo-fi, ambient and all the Song Engine genres. Each card says what to listen for, what the drop
-does and where her voice clips go. **▶ Write this song** builds it on the canvas; **🎲 Another like it** rolls a new one.
-
-**🧠 Learn**: short lessons on a map — predict first, then press; each lesson ends on a question the next one answers.
-The lesson runs in a small strip at the bottom-left. Finishing some lessons unlocks songs in the Songbook.
-
-Every drop now goes silent for half a beat before it hits (crash + kick on beat 1).
 
 ## Connecting tools
 
@@ -321,3 +209,196 @@ exe loads its tools from `tools/` exactly like the dev build. Your work is not i
 **Build ERAVOS.exe.bat** (repo root, Windows, no Node) → `dist/ERAVOS/ERAVOS.exe`, `dist/ERAVOS_<version>.zip` and, with
 [NSIS](https://nsis.sourceforge.io) installed (`winget install NSIS.NSIS`), the installer `dist/ERAVOS-Setup-<version>.exe`;
 `node desktop/build.mjs` does the same anywhere with Node. `dist/` is build output and is not committed.
+
+---
+
+## Release history
+
+The older notes, kept as they were written.
+
+### 3.48.3 — every pack kind, a tool's own panel on its page, mods for the Drum Machine, one Bass category
+- **Tool pages show everything a tool has.** **Its panel**: the tool's own controls, live, on its page (the Drum Machine's
+  pad editor, any tool's whole window). **Every pack kind**, not only presets: the Drum Machine lists all of its **kits**,
+  from every kit pack and your own ("Mine"), each with **Load kit**. A domain says how a kind loads (`ToolPage.addKind`).
+- **Drum Machine 3.1**: a mod slot after the whole kit. Put a Squash, Destroyer or Echo on every pad at once.
+- **Bass**: one category with Wobble Bass, Reese Bass, Sub Engine, Acid Synth, Bass Forge and Bass Gen. Wub Sub stays with
+  the wub tools it belongs to.
+
+### 3.48.2 — accents follow the sound
+- Every sounding window's accent colour moves with its own sound: knob arcs, active buttons, toggles, sliders, the border
+  and its spectrum. As it gets louder it drifts toward the hue of the mix (violet and red for bass weight, teal for bright
+  tops) and brightens on each hit; when it goes quiet it returns to the tool's own colour. Knobs no longer pin a fixed colour
+  each. Tools inside another (mod cards, linked faces) keep their own colour. ⋯ Options › Reactive colours turns it off.
+
+### 3.48.1 — the MIDI button on a fresh install · the web build and ERAVOS.exe are the same
+- **Mods fixed**: Clip Maker was offered as a mod, and inside any tool it silenced the sound (it records clips; it doesn't
+  pass sound through). It is no longer offered. Every other mod in every slot was checked: 83 host × mod pairs, all
+  pass sound, and a test now checks every tool the ＋ mod picker offers.
+- **A tool's page opens when you click its name** (or icon) in the window title; dragging still moves the window. The
+  page button is a clean drawn icon (the 📘 emoji looked fragmented).
+- **Spectrum at rest**: the display under every instrument shows its frequency grid and "play a note" instead of an empty box.
+- **Fixed** "That needs a pack that isn't installed" when clicking **MIDI / Connect pads** on a fresh install, as on
+  ERAVOS.exe's first start. Any tool opened by name now installs itself first and then opens; this also covers Learn,
+  Sounds and the Song dock. Check it with `node tests/fresh-profile.mjs`.
+- **One server for both**: `node serve.js` now runs ERAVOS Glass, the same server ERAVOS.exe runs inside itself. The web
+  build gets the event stream and command door too, and the exe now serves `voice/` (her recordings) like the web build.
+  The only remaining differences are the desktop's own folders (drop, packs, projects, exports), which a browser cannot have.
+
+### 3.48 (P48.1) — a precise piano roll
+- **Notes land where you aim**: a ghost shows exactly where a click will land, and the toolbar reads the position
+  (bar.beat.tick) and the note. A click never slides: notes follow the cell and row under the pointer, so a small slide
+  inside the cell you clicked no longer moves the note a step or a semitone. Before, it did.
+- **Finer grids**: 1/32, 1/64, 1/8 · 1/16 · 1/32 triplets, and off. Hold **Alt** to place freely.
+- **Zoom**: taller rows (Rows, or Ctrl+Shift+wheel), smooth zoom (Ctrl+wheel keeps your spot), and fit clip.
+- **Ruler**: song bars and beats above the notes; click or drag it to move the playhead.
+- **Tools**: ✎ Draw · 🖌 **Paint** (drag = one note per grid cell, following the pointer) · ✂ Split · ⌫ Erase (drag
+  across notes), on keys 1–4.
+- **Stretch notes from either edge**; the edge is easier to grab on short notes. New notes take the length you last drew.
+- Notes now keep exact triplet timing in the song (1/192 step).
+- **Edit many**: ⬚ Select (5) or Shift-drag a box, Shift-click to add. Drag moves the lot, Ctrl+drag copies, and an edge
+  stretches them all. Ctrl+C/X/V (paste at the pointer), Ctrl+D duplicate, ← → nudge, ↑ ↓ transpose.
+  **Q** quantize (25–100 %), **H** humanize, **L** legato. Each edit is one undo step.
+- **Velocity lane** under the notes: drag to draw velocities, Ctrl-drag for a ramp.
+- **The note's knobs**: double-click a note for Start (snaps to the grid), Length, Pitch and Velocity knobs.
+  It's live and nothing to type. Right-click deletes.
+- **Step input** ⏎: type notes on Z S X D C V G B H N J M (Q 2 W 3 E R 5 T 6 Y 7 U an octave up). Space rests, Backspace steps back.
+
+### 3.47 — ERAVOS Glass + ERAVOS COS (from Nexus Clear Glass and COS, made for ERAVOS)
+- **ERAVOS COS** (`host/cos.js`): compartments **nest** like the project: the canvas › each **domain** (music, image, video,
+  agents, coding, dataflow) › each **tool**. Each earns its place through **birth gates**:
+  - **canvas**: no domain words in its skeleton.
+  - **domain**: its `domain.json` is whole, its loader matches its tools exactly, the build ships it, and it never reaches into another domain.
+  - **tool**: manifest, shape, sealed (reaches nothing outside its folder), presets checked against its real settings, spec, plus `--deep` for its own tests and the sound survey.
+
+  A parent passes only when everything inside it passes. `node host/eravos.mjs cos gate` checks the whole tree (69, all
+  passing); `cos archetype` generates the COS `eravos-canvas` archetype from this repo.
+- **ERAVOS Glass** (`host/glass.js`): the canvas served with a live **event stream** and one **command door**. Anything on your
+  machine can drive the open canvas, a script today and the Ollama DJ next: open tools, turn knobs, load presets, wire, load
+  suites, read the whole state back. All of it is undoable, like a person doing it.
+  `node host/eravos.mjs glass --open`, then e.g. `node host/eravos.mjs send canvas.spawn '{"tool":"eravos.wobble-bass"}'`.
+- **ERAVOS.exe** runs Glass inside the app (`eravos://app/glass/`, and `127.0.0.1:4748` for outside callers).
+
+### 3.46 — a whole page for every tool
+- **📘 on every window** (and "📘 Its page" in ＋ Add): its **suite**: load the lot in one click, or ＋ one by one. Also: every **mod**
+  that fits each slot, the tools it **plays with**, every **sound pack** (▶ hear, Load, pack on/off), **every control** (range, default,
+  ∿ = an input can move it) and its inputs and outputs.
+- Suites: Wobble Bass (The drop rig), Wub Osc (A whole wub), Morph Osc (Morph voice), Destroyer (Talking grit).
+- **Wobble Bass 3.6**: a **growl** mod slot. Its mods run on the wub only; the sub stays clean and in time.
+
+### 3.45 — Wobble Bass: everything on screen, fluid rates, the Bun Dem screech
+- **Fixed**: seven controls (FM, FM ratio, FM wub, Squash, Grit type, Square oct, Sub in phase) were missing from the window.
+  Now every control is there, grouped (Rate · Mouth · Growl · Pitch · Tone); a control that waits on a switch is dimmed and says why.
+- **Perform pad**: drag sideways to bend the wobble speed smoothly (×¼ … ×4), up and down to open the mouth; springs back on release.
+- **Rate glide**: rate changes swoop instead of jumping — wub-seq steps glide into each other. **Pitch wub** to 2400 c (an octave
+  scream; it stopped at 1 semitone). **Octave +2**. New inputs: **rate · FM · pitch** — wire an Envelope or LFO into them.
+- **Bun Dem presets**: Screech (the drop lead, octave up, FM, octave-wide bends), Talking Growl, Rate Ramp (glide).
+- **Matched to the track**: the drop measured (1/8-triplet movement at ~141 BPM, mono F#1 sub, scooped low-mids, a flat bright
+  top) and the Wobble Bass tuned against it by an offline search — "Bun Dem · Matched to the track (1/8t)" and "… + drop rhythm".
+
+### 3.44 — Songs by category · the Bun Dem growl
+- **Songs page by category**: 🔊 Dubstep & Wubs · ⚡ Drum & Bass · 🏠 House · 🌀 Techno & Trance · 🎛 Trap & Phonk · 🔥 Reggae &
+  Dub · 🌆 80s · 🖤 Dark · 🌙 Chill, then the collections 💜 For Her · 🥀 Lost Love · 🧪 Odd Couples. Counts on every chip,
+  headings in the grid, a search box (title, genre or tool), and the mood chips still narrow it down.
+- **Wobble Bass 3.4 — the growl**: **FM** (a sine bending the saws, in tune) and **FM wub** (the wobble opens the FM too, so
+  the growl talks with its harmonics, not just a filter) and **Squash** (3-band OTT-style; the sub stays clean). The
+  "Bun Dem Growl" preset now uses FM; new Bun Dem presets: FM Talker, Half-time Yoi 1/4t, Sub Growl (ratio ½).
+
+### 3.43 — small tools that combine · Links · Mods · Synthesis
+- **Links — tools grow when they meet.** Every window shows what it is wired to (⇠ feeds it · ⇢ it feeds). Click a chip and
+  that tool's main controls unfold inside this window; pairs that belong together (Wub Rate → Wub Filter, Morph Osc → Morph
+  Osc, Envelope → anything) unfold on their own when you wire them.
+- **Mods — any tool inside another.** Destroyer, Wub Osc, Wub Filter and Wub Sub have a 🧩 MODS rack: ＋ mod puts any effect
+  inside (Wub Filter inside the Destroyer, a Destroyer inside a Wub Osc …) — no extra window, one undo step, saved with it,
+  mods can hold mods. ⏻ bypass, ↑ ↓ reorder, ⤢ shows a mod's whole window.
+- **In and out freely**: ＋ mod also lists the windows already on your canvas — ⇲ moves one inside and joins its cables up
+  behind it; ⇱ on a mod pops it back out into its own window, wired straight after its host. A mod that delays its sound
+  (a Destroyer's oversampling) is waited for, so its host's Mix never comb-filters.
+- **Granular**: any sound into a cloud of grains — live from whatever is wired in (or the tool it sits inside as a mod), or from
+  a clip. Freeze, feedback shimmer, tempo-synced stutters, pitch spray in key, play it from notes; click the field to burst.
+- **Synthesis** (new category): **Morph Osc** — wavetable oscillator that morphs (analog / vocal / digital / organ tables),
+  with FM and Ring INPUTS: wire one Morph Osc into another's FM in and you have FM synthesis — the modulator follows the
+  notes by itself. **Envelope** — wire it into any knob on any tool; it moves on that tool's notes. **Partials** — additive:
+  draw 24 harmonics, evolve between two spectra, stretch them into bells (kept in tune).
+
+### 3.42 — Destroyer 2.0 · distortion that sits in a mix
+- **Same volume, new colour**: drive no longer adds up to +13 dB on quiet parts (1.x levelled itself at full scale) —
+  gain is matched across −6…−24 dBFS, so switching it on changes the tone, not the loudness.
+- **No more fizz**: its own curves with a smooth knee (hard, fold were brick walls) + **Auto tame** rolls off the top as
+  the drive goes up. New shapes **tape · fuzz · rectify**, and **Asym** for warm even harmonics.
+- **Bass that stays bass**: **Tight** cuts the mud before the shaper; **Low keep** leaves the sub clean under the grit.
+- **Crush that crunches instead of hissing**: **Alias** (0 clean lo-fi … 1 raw 8-bit fold-over), **Dither**, smooth
+  fractional downsample under modulation. 7 new presets (Fuzz Box, Wub Grit · sub stays clean, Drum Bus Crunch …).
+
+### 3.41 — Odd Couples · every tool measured · her voice on top
+- **Songs → 🧪 Odd Couples**: 72 songs in 12 genres made from tools that never meet — a cathedral organ over the riddim wub
+  rig, a 303 at a séance, golden-ratio bells on a dub sound system, a music box over tearout, a breathing drone under 174 drum &
+  bass … Every tool has a new **Odd Couples** pack (prefix "Odd ·"). Every song opens her voice rig: record her once in Clip
+  Maker — she plays in the break AND lands on the drop with the rest of the mix ducked under her.
+- **Drop Builder · Her voice on top** (VOCAL, default 9 dB): everything else dips under each word of her clip; she never does.
+- **Measured, not guessed** (specs/eravos.p42-tool-audio.spec): every tool × every preset rendered and measured — timing to the
+  sample, pitch to the cent, level, Stop all. Fixed: notes that played 2.7–18 ms late (Sub Engine, Organ with drive, Reese,
+  Embodiment, driven drum voices), echo repeats drifting off the beat, dry/wet comb filtering in Destroyer / Filter / Wub Filter,
+  presets peaking over full scale. `node tests/tool-audio.mjs [tool]` runs the survey.
+- **Songs page**: every card answers a click (39 didn't in the exe) and Write writes the card you picked. A song installs any
+  tool it needs and says which. **Settings panels**: scrolling no longer turns the knob that slides under the cursor.
+
+### 3.36 — the Sequencer drives every tool to the beat · "Give Your Head a Shake"
+- ＋ lane → automation lane: pick any tool and any knob, paint a value per step (⟋ = glide). Wobble rate, cutoff, DJ filter, reverb — on the beat.
+- Right-click a step: 🔒 lock a knob for that one hit · "Plays": every other pass, only in a fill, first pass only…
+- ✦ Fill (button, MIDI, Perform pad 8) · Evolve per lane (patterns grow from the 2nd pass, repeatably) · Humanize.
+- Preset "Song · Give Your Head a Shake": the whole song — intro, verse, build (her line at the end), pause, two drops, breakdown.
+- Lyrics → Rhythm → ⇢ Sequencer: paste your words; they become lanes + a "her voice" lane on every line (load her clip in a Sample Player).
+
+### 3.35.1 — ⏮ restart · your pads do more
+- ⏮ (top bar, Timeline, Home): back to the loop start, or bar 1 — keeps playing.
+- MIDI Map → What the pads do: Drums · Keys (16 notes in key) · Chords + drums · Split · Perform (⏮ ▶ ⏺ ⟲, markers, drop, tap, patterns A–H) · ✎ any pad.
+
+### 3.35 — the Timeline, easier
+- ⤢ fills the screen at true size whatever the canvas zoom (Esc back). Long songs at high zoom no longer go blank.
+- Drag the bar above the piano roll to resize it · exports are one ⤓ Export menu · wheel scrolls time · + / − zoom · F fit.
+
+### 3.34.2 — Bass Pack · 3.34.1 — Words → Song
+- Bass Pack: 8 genres (tearout, dubstep-og, riddim-war, drumstep, trapstep, bass-house, deathstep, tension-study); genre bar-writer hook `G.bar`; real builds, pause, lift.
+- Words → Song (RhythmExpand): lyrics' rhythm drives drums/bass/lead over a Song Engine genre. `SongEngine.generate(id, seed, X)` + `helpers`.
+- Merge fix: p22 golden hashes re-captured in-page (old set lacked organism sizes → layout drift; notes unchanged). Windows payload rebuilt (was 3.33).
+
+### 3.34 — nothing sticks, windows that expand, speed + settings per tool, the Mixer
+- Drags can no longer get stuck (the "open the dev console and it works again" bug): one guard ends every drag on release, a button-less move, Esc or switching windows.
+- ⤢ on every window and the bottom dock (fills the screen). Timeline: fills its window, lane height − / ＋, Ctrl+wheel zoom, Alt+wheel lane height, ⤢ Fit, ruler stays on top.
+- Speed per tool: every beat-driven tool has Speed (¼ … 4, or its own BPM) in ⚙ Settings.
+- ⚙ Settings on every tool: every parameter (searchable), presets, Reset, and Output (its mixer strip).
+- 🎛 Mixer (Mix): a strip per sound (fader, pan, M/S, meter, low cut, EQ, sends, output), ＋ Group / Reverb / Echo / Aux lines.
+- Coming next (mapped in specs/eravos.phase34-map.spec): Hard Tune, the Song editor, the UI rebuild pass, new EDM genres, import & map.
+
+### 3.33 — Drop Builder 3, Lyrics → Rhythm, Embodiment Lab, living surfaces
+
+Drop Builder: her voice panel first; every part of every section (tension, build, pause, drop) has its own editor and
+a ▶ hear button. Lyrics → Rhythm turns words into a beat or a melody line. Embodiment Lab: an irrational-ratio drone
+with a heartbeat pulse, a breath swell and body cues — feelings as presets (Lab mode). Pad Forge and Dub Station are
+redesigned; every tool's surface can follow its own sound (UI.alive). Timeline clicks land where you click at any zoom.
+
+### 3.31 — your songs, your taste, goals
+
+**📖 Save to Songs** in the Song Recorder keeps the song (audio + the whole canvas) — Songs → **My songs** to listen or
+open it again. **Learn → EDM tour**: 22 kinds of EDM, write → hear → rate each; Songs → **For you** shows what you love.
+**Goals** at the top of Learn always show the next thing to do. The map of every future domain (image, video, UI,
+automation) is in `specs/eravos.domains.map.spec`, one spec per tool.
+
+### 3.30 — blank canvas, pads that just work, Sounds
+
+ERAVOS opens blank: **Start · Add · Options**. Everything else appears when you pick a mode or add a tool.
+Your pad controller plays the Drum Machine with no window open, and the pad you hit is the pad you see.
+**🎚 Sounds** (toolbar, Music Production): every preset by pack, drum **kit packs** to switch on/off, load and mix pad by
+pad, and **Capture → pad**: play any tool and its sound lands on a Drum Machine pad.
+On the exe, tools come from **tools/<domain>/** next to ERAVOS.exe — the same folders as this project.
+
+### Songbook and Learn (3.29) — pages of their own, off the canvas
+
+**📖 Songs** (toolbar, Music Production): finished songs in every genre — reggae (Bun Dem), dancehall, Hanging Tree
+desert goth, phonk, lo-fi, ambient and all the Song Engine genres. Each card says what to listen for, what the drop
+does and where her voice clips go. **▶ Write this song** builds it on the canvas; **🎲 Another like it** rolls a new one.
+
+**🧠 Learn**: short lessons on a map — predict first, then press; each lesson ends on a question the next one answers.
+The lesson runs in a small strip at the bottom-left. Finishing some lessons unlocks songs in the Songbook.
+
+Every drop now goes silent for half a beat before it hits (crash + kick on beat 1).

@@ -75,6 +75,10 @@
     for (const s of SLOTS) { const src = from[s] || base, got = src && sl(src); if (!got) return null; Object.assign(out, got[s] || {}); }
     return out;
   }
-  root.ToolBlend = { SLOTS, PART_SLOT, has: (id) => !!profileOf(id), slots, combine, combineFrom, pickFor, paramsOf, defaultsOf, behind: (id) => (profileOf(id) || {}).behind || [], nearestDiv };
+  // 3.217 a part picked by what it IS, when it is not a swap slot (his: "combine the sound of retro dcs with the rest of wobble bass"): the
+  // oscillator boxes are the VOICE, an lfo box the WOBBLE, a filter box the MOUTH — read from the box's own label (the component it names)
+  const PIECE_SLOT = [[/^(osc-va|osc-sub|osc-wavetable|osc-additive|unison|dco)\b/i, 'voice'], [/^lfo\b/i, 'wobble'], [/^filter-(svf|ladder)\b/i, 'mouth'], [/^(waveshaper|saturator)/i, 'drive']];
+  const slotOfPiece = (label) => { const t = String(label || '').trim(); const m = PIECE_SLOT.find(([re]) => re.test(t)); return m ? m[1] : null; };
+  root.ToolBlend = { SLOTS, PART_SLOT, slotOfPiece, has: (id) => !!profileOf(id), slots, combine, combineFrom, pickFor, paramsOf, defaultsOf, behind: (id) => (profileOf(id) || {}).behind || [], nearestDiv };
   if (typeof module === 'object' && module.exports) module.exports = root.ToolBlend;
 })(typeof window !== 'undefined' ? window : globalThis);

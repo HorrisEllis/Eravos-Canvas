@@ -71,6 +71,20 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-24 · Pick the voice; say where the rest comes from (3.217)
+- **His words (2026-11-24):** "combine the sound of retro dcs with the rest of wobble bass." · "eravos makes it, not you. only add capability. always capability first."
+- **His call:** capability, not a made tool.
+- **Built (by the AI coder, to his direction):** the voice pickable by what a box is; "the rest from <tool>" in the selection's right-click; the made tool's render exposed.
+- **Proof:** tests/p217-voice-and-rest.test.js 1/1 (the test only picks; ERAVOS makes it; its voice and the rest checked; plays, no clipping) · 10 Field suites green.
+- **Where to check:** `node tests/run.mjs P217`; `node docs/previews/workbench/voice-rest.shots.mjs` → voice-rest.wav.
+
+### 2026-11-24 · The box is the component; hover words; right-click › Replace with (3.216)
+- **His words (2026-11-24):** "the purple box should surround the entire component ui. also right click to replace." · "when you hover tells you what it is and the point of it and how it effects sound, in the simplest ways, so even a child could understand it."
+- **His call:** "Yes." (after the screenshots).
+- **Built (by the AI coder, to his direction):** the box framed whole; a hover card from the domain's words (part-words.js); REPLACE WITH from its options and the other tools' parts.
+- **Proof:** tests/p216-hover-replace.test.js 1/1 · P196–P205 green · boundary 10/10. Merged PR #214.
+- **Where to check:** `node tests/run.mjs P216`; docs/previews/workbench/hover-card.png, replace-menu.png.
+
 ### 2026-11-24 · Updating no longer breaks on the running ERAVOS Update.exe (3.215)
 - **His words (2026-11-24):** "trying to update it. fails to close eravos. also broke my current version." (with two screenshots)
 - **His call:** the screenshots — the cause read from them.

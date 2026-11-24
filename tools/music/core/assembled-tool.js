@@ -214,6 +214,8 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
   Model.chainOf = (d) => d.nodes.filter(x => !['lfo', 'sub', 'st'].includes(x.id)).map(x => x.component).join(' → ') + ' · wobble into ' + (d.nodes.find(x => x.id === 'flt') || {}).component;
   // the gates every made tool passes (D5, D6): it plays (finite, not silent, never pinned), and it is not a twin of anything in ERAVOS or made before
   const RIFF = (bpm) => { const b = 60 / bpm; return [33, 33, 36, 31].map((m, i) => ({ t: 0.03 + i * 2 * b, dur: 2 * b - 0.06, hz: 440 * Math.pow(2, (m - 69) / 12) })); };
+  // 3.217 what a made tool sounds like, offline (the same render the judge measures) → { ok, L, R, sr } — to hear what ERAVOS made
+  Model.render = function (settings, bpm) { const sr = 48000, notes = RIFF(bpm), secs = notes[3].t + notes[3].dur + 0.2; const r = Voice(root.Assemble, root.MusicAdapters, root.MusicParts, root.MusicContracts.contracts, sr).render(dag(settings, bpm), notes, secs, settings.level, settings.glide); return Object.assign({ sr }, r); };
   Model.judge = function (settings, bpm, N) {   // N: window.MusicNovelty (tools/music/compat/novelty.js)
     const sr = 48000, notes = RIFF(bpm), secs = notes[3].t + notes[3].dur + 0.2, d = dag(settings, bpm);
     const r = Voice(root.Assemble, root.MusicAdapters, root.MusicParts, root.MusicContracts.contracts, sr).render(d, notes, secs, settings.level, settings.glide);
@@ -254,18 +256,20 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
   };
   // 3.211 the parts he picked (Ctrl+click on the board, any tools blown up) → one tool: each picked part takes its place in the engine,
   // the rest comes from the tool most of them came from. list: [{ inst, slot }] (slot: the exchange's box id). Same gates, same naming.
-  Model.synthesizeParts = async function (list) {
+  // 3.217 opts.restFrom: the tool (instance) everything not picked comes from — his choice (the menu offers each tool blown up); without it,
+  // the tool most of the picked parts came from. A part is taken by its swap slot, else by what it is (TB.slotOfPiece: the voice, …).
+  Model.synthesizeParts = async function (list, opts) {
     const F = root.OrganismFactory, TB = root.ToolBlend; if (!F || !TB) return { ok: false, why: 'the engine is not loaded' };
-    const parts = (list || []).map(x => ({ x, h: F.handle(x.inst), to: TB.PART_SLOT[x.slot] })).filter(o => o.h);
+    const parts = (list || []).map(x => ({ x, h: F.handle(x.inst), to: TB.PART_SLOT[x.slot] || (TB.slotOfPiece && TB.slotOfPiece(x.label)) })).filter(o => o.h);
     const usable = parts.filter(o => o.to && TB.has(o.h.id)), left = parts.filter(o => !usable.includes(o));
     if (!usable.length) return { ok: false, why: 'none of these parts runs in the engine yet' + (left.length ? ' (' + left.map(o => o.h.def.label + ' · ' + o.x.slot).join(', ') + ')' : '') };
     let N; try { N = await loadNovelty(); } catch (er) { return { ok: false, why: er.message }; }
     const bpm = (root.Kernel && root.Kernel.music && root.Kernel.music.bpm) || 120, src = (h) => ({ id: h.id, params: TB.paramsOf(h.instanceId) });
     const count = new Map(); usable.forEach(o => count.set(o.h, (count.get(o.h) || 0) + 1));
-    const base = [...count.entries()].sort((a, b) => b[1] - a[1])[0][0], from = {};
+    const rest = opts && opts.restFrom && F.handle(opts.restFrom), base = rest && TB.has(rest.id) ? rest : [...count.entries()].sort((a, b) => b[1] - a[1])[0][0], from = {};
     usable.forEach(o => { from[o.to] = src(o.h); });
     const settings = TB.combineFrom(from, src(base), bpm); if (!settings) return { ok: false, why: 'these parts could not be read' };
-    const names = [...new Set(usable.map(o => o.h.def.label))];
+    const names = [...new Set(usable.map(o => o.h.def.label).concat(base.def.label))];
     const r = await Model.make(names.length > 1 ? names.join(' × ') : names[0] + ' · parts', settings, bpm, N, names);
     if (r) r.left = left.map(o => o.h.def.label + ' · ' + o.x.slot); return r;
   };
