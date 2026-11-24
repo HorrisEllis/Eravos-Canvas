@@ -2,6 +2,20 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.216 The box is the component; hover words; right-click › Replace with (2026-11-24) — not merged (screenshots shown first)
+His words: "the purple box should surround the entire component ui. also right click to replace." · "maybe when you hover tells you what it is
+and the point of it and how it effects sound, in the simplest ways, so even a child could understand it." · "eravos makes it, not you. only add
+capability. always capability first." · "like this is meant to be dynamic and fluid. also tools are isolated so if they cause instability they
+can be deleted."
+- tools/core/field/board.{js,css} (domain-free): a component box is framed whole in its colour, its tile the box's title strip (it was a box
+  of its own inside — the purple box he saw); the whole box lights on hover. Hover (0.45 s) → a card: what it is · what it is for · what it
+  does to the sound, and where it sits ("here: the wobble of Wobble Bass"). Right-click › REPLACE WITH: its own options and the parts in the
+  other blown-up tools that fit — the same step as a drop (one undo step; from another tool a copy, its settings with it).
+- tools/music/data/part-words.js (data beside the components): the words for each component the board swaps (14), one entry each so every
+  tool says the same; PartExchange.explain(component).
+- tests/p216-hover-replace.test.js 1/1; P196 P199 P200 P203 P204 P205 boundary 10/10 bare-canvas green.
+- Screenshots: docs/previews/workbench/hover-replace.shots.mjs → hover-card.png, replace-menu.png, replaced.png.
+
 ## 3.215 Updating no longer breaks on the running ERAVOS Update.exe (2026-11-24); release 0.2.34
 His words: "trying to update it. fails to close eravos. also broke my current version." — two screenshots: the update ring "NOT IN ·
 ERAVOS Update.exe: EBUSY: resource busy or locked, open 'C:\Program Files\ERAVOS\ERAVOS Update.exe'", then the 0.2.33 Setup: "ERAVOS did not

@@ -63,3 +63,16 @@
 @keyframes fb-busy{50%{box-shadow:0 0 34px color-mix(in srgb,var(--wire3,#ff2266) 60%,transparent)}}
 .fb-selbar{position:absolute;left:40px;top:4px;padding:5px 12px;border-radius:14px;font:600 11px/1.3 var(--font,sans-serif);letter-spacing:.06em;color:var(--text,#d6e4f0);
   background:#000;border:1px solid color-mix(in srgb,var(--wire2,#b066ff) 50%,transparent);box-shadow:0 0 18px color-mix(in srgb,var(--wire2,#b066ff) 30%,transparent);z-index:30;pointer-events:none}
+
+/* 3.216 the box IS the component (his: "the purple box should surround the entire component ui"): a component box is framed whole in its
+   colour; its tile is the box's title strip, not a box of its own; the whole box lights when the pointer is on it */
+.fb-gate.fb-comp{border:1px solid color-mix(in srgb,var(--c) 80%,transparent);box-shadow:0 0 14px color-mix(in srgb,var(--c) 18%,transparent)}
+.fb-gate.fb-comp:hover{border-color:var(--c);box-shadow:0 0 0 1px var(--c),0 0 24px color-mix(in srgb,var(--c) 40%,transparent)}
+.fb-gate.fb-comp > .fb-tile{border:0;border-bottom:1px solid color-mix(in srgb,var(--c) 45%,transparent);margin:-6px -6px 6px;padding:5px 8px;width:auto;max-width:none}
+/* the hover card: what it is, what it is for, what it does to the sound — in the simplest words (the domain's, PartExchange.explain) */
+.fb-card{position:fixed;z-index:3000001;pointer-events:none;width:280px;padding:10px 12px;background:#04070CF2;border:1px solid var(--c,#00D4FF);
+  box-shadow:0 12px 36px rgba(0,0,0,.65),0 0 20px color-mix(in srgb,var(--c,#00D4FF) 30%,transparent);font:500 12px/1.45 var(--font,sans-serif);color:#D8F6FF}
+.fb-card .fb-cn{font:600 12px 'DM Mono',monospace;letter-spacing:1px;color:var(--c,#00D4FF);text-transform:uppercase}
+.fb-card .fb-cw{font:500 10px 'DM Mono',monospace;letter-spacing:1px;color:#7F93A8;margin:2px 0 6px}
+.fb-card .fb-ct{margin-bottom:4px}
+.fb-card .fb-cs{margin-top:6px;padding-top:6px;border-top:1px solid #1B2A3A;color:#B8CFE0}

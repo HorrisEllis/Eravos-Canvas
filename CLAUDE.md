@@ -77,6 +77,13 @@ Each holds for every tool and every change. How each is kept is said with it. Th
   wired here as a suite), across domains — "a way to explore creatively … connecting things to things". Everything changes while it
   plays. Every thing he says is mapped in `docs/HIS-WORDS-MAP.md` (done / rule / open) — add to it every session.
 
+- **Capability first — ERAVOS makes it, not the coder** (his words, 2026-11-24: "eravos makes it, not you. only add capability. always
+  capability first."): never hand-build a result he describes (a "Retro Wobble" preset, a made tool); add the capability that lets ERAVOS
+  make it from what he picks, and prove the capability (a test where ERAVOS makes one), not a result.
+- **Dynamic and fluid; tools isolated** (his words, 2026-11-24: "like this is meant to be dynamic and fluid. also tools are isolated so if
+  they cause instability they can be deleted."): what is made on the canvas is a tool of its own, apart from the rest, and can be deleted
+  whole if it misbehaves; nothing made depends on being hand-wired into another tool.
+
 - **No toys** (his words, 2026-11-05: "It's not a toy replaying sounds … I want it to stay that way. No toys."). Every instrument makes
   its sound live — oscillators, filters, shapers, modulation — like Wobble Bass: no shipped recordings, no sample playback dressed up
   as an instrument, every preset is settings the engine rebuilds. Samplers work only on the user's own audio. Full depth, nothing
@@ -218,6 +225,12 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
   wired (`specs/eravos.ui-field.spec` ADDENDUM 2026-11-13), Bassline 2.0 (`bass-gen.spec` ADDENDUM). Not waiting for Emerge (v2 plan
   ADDENDUM 2026-11-13). Every component carries its own UI element; every tool announces its needs from its DAG and the canvas imports it from the zip
   (`specs/eravos.store.spec` ADDENDUM 2026-11-13, I1–I4). ERAVOS 2's name: "Synthesis" proposed, to confirm. Order: BC1 ✓ → CG1 ✓ (33 of 33) → CG2 ✓ (3.192: graph, checker, mutation ops) → CG3 ✓ (3.193: assembled, rendered, offered only if it plays and is heard) → the Field's swap / mutate UI (shown first) → Bassline 2.0. Map: `specs/eravos.2026-11-13-session.map.spec`.
+- **The Mutation Lab, the Workbench, the Tool Builder** (2026-11-24, his: "i want THE MUTATION explotion view on the canvas, to be able to
+  create new tools from current ones, then the workbench to be able to build from scratch from components and the broad selection of ui
+  elements, with different control types, and themes, like a tool builder … you open the mutation lab, and it has all the components, and
+  cores to play with"): one space, three ways in (an exploded tool · every component and core on a shelf · an empty board), one engine
+  (assembled-tool.js). Order: 3.216 hover words + Replace with + the box framed whole (shown first) → synthesis keeps one tool's voice and
+  another's motion by what he picks (capability; "Retro Wobble" is his to make) → the Lab's shelf → the Workbench / Tool Builder (spec + preview first).
 - **The store** (2026-11-13, specced; the Browse UI rejected — see Next): every tool a
   whole isolated zip, the canvas only through the interaction contract (`specs/eravos.store-browse.spec`; preview first, SB1); songs decomposed
   into rhythms and notes per tool (SD1 ✓ 3.180).
