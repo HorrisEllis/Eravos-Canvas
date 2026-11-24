@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.215 Updating no longer breaks on the running ERAVOS Update.exe (2026-11-24); release 0.2.34
+His words: "trying to update it. fails to close eravos. also broke my current version." — two screenshots: the update ring "NOT IN ·
+ERAVOS Update.exe: EBUSY: resource busy or locked, open 'C:\Program Files\ERAVOS\ERAVOS Update.exe'", then the 0.2.33 Setup: "ERAVOS did not
+install completely … ERAVOS.exe (missing), locales\en-US.pak (missing), …".
+- The cause, at last from his screen: ERAVOS Update.exe runs from the app folder and waits for the Setup; the Setup window's copy cannot
+  replace it (an NSIS exe holds itself: no rename either) → the window failed; then 3.214's fallback (CopyFiles) gave up at that same file
+  after the app folders had been cleared → ERAVOS.exe and the rest missing. 3.214 made it worse; this is the fix.
+- desktop/updater.js: ERAVOS Update.exe is copied into the work folder and run from there — the app folder's copy is never held.
+- desktop/setup-copy.js: a held ERAVOS Update.exe is kept (HELD_OK), never a failed install. eravos.nsi: PutUpdater copies the new one, or
+  (running) puts it in at the next restart (Rename /REBOOTOK); PlainCopy by robocopy (goes on past a held file), CopyFiles only if it fails.
+- desktop/test/setup-copy.mjs 15/15 (+1: a locked updater kept, the rest installs); updater, shipped-files green; makensis compiles.
+- His PC now: run ERAVOS-Setup-0.2.34.exe by hand (nothing of ERAVOS running) — it repairs the folder.
+
 ## 3.214 The Setup falls back to the 0.2.29 way when its window cannot write the app (2026-11-24); release 0.2.33
 His words: "its not running. eravos isn't even installed." · "windows defender is turned off." · "so have actually done something right? it
 didnt have this problem pre 2.30."

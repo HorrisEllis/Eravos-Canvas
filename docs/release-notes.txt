@@ -1,3 +1,11 @@
+ERAVOS v0.2.34 (2026-11-24)
+
+Install: ERAVOS-Setup-0.2.34.exe from the release — run it yourself (double-click), it repairs a broken 0.2.33 update.
+
+- Fixed: updating failed with "ERAVOS Update.exe: EBUSY: resource busy or locked" and could leave ERAVOS without ERAVOS.exe.
+  The updater ran from the ERAVOS folder, so the Setup could not replace it; the fallback copy then stopped at that one file.
+  Now the updater runs from a copy, a held updater is kept (the new one goes in at the next restart), and the fallback copies every file.
+
 ERAVOS v0.2.33 (2026-11-24)
 
 Install: ERAVOS-Setup-0.2.33.exe from the release, or ERAVOS offers it by itself.

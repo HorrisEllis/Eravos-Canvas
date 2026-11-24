@@ -34,5 +34,13 @@ const H = path.join(T, 'held'); put(H, 'ERAVOS.exe', 10); C.moveAside(path.join(
 const old = fs.readdirSync(H).filter(n => /^ERAVOS\.exe\.old-\d+$/.test(n));
 ok(!fs.existsSync(path.join(H, 'ERAVOS.exe')) && old.length === 1, 'a held ERAVOS.exe is moved aside: ' + fs.readdirSync(H));
 put(H, 'ERAVOS.exe', 10); C.prepare(H); ok(!fs.readdirSync(H).some(n => /\.old-/.test(n)), 'the next install sweeps the old copy away');
+// 3.215 a running ERAVOS Update.exe (EBUSY, cannot be renamed) is kept as it is - never a failed install
+const U = path.join(T, 'upd-stage'), UD = path.join(T, 'upd-dest'); put(U, 'ERAVOS.exe', 2000); put(U, 'ERAVOS Update.exe', 300); put(UD, 'ERAVOS Update.exe', 100);
+const realCreate = fs.createWriteStream, realRename = fs.renameSync;
+fs.createWriteStream = (f, o) => { if (/ERAVOS Update\.exe$/.test(f)) { const e = Object.assign(new Error('EBUSY: resource busy or locked, open \'' + f + '\''), { code: 'EBUSY' }); throw e; } return realCreate(f, o); };
+fs.renameSync = (a, b) => { if (/ERAVOS Update\.exe$/.test(a)) throw Object.assign(new Error('EBUSY'), { code: 'EBUSY' }); return realRename(a, b); };
+const ru = await C.install(U, UD, C.plan(U));
+fs.createWriteStream = realCreate; fs.renameSync = realRename;
+ok(ru.ok && ru.kept.includes('ERAVOS Update.exe') && fs.statSync(path.join(UD, 'ERAVOS.exe')).size === 2000, 'a running ERAVOS Update.exe is kept, the rest installs: ' + JSON.stringify(ru));
 fs.rmSync(T, { recursive: true, force: true });
 console.log(`setup-copy: ${pass}/${pass + fail} passed`); process.exit(fail ? 1 : 0);

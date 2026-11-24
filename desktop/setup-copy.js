@@ -12,6 +12,10 @@
 'use strict';
 const fs = require('fs'), path = require('path');
 const APP_DIRS = ['canvas', 'tools', 'schemas', 'host', 'tests', 'resources', 'locales'];   // the app's own folders (eravos.nsi clears the same)
+// 3.215 (his screenshot: "ERAVOS Update.exe: EBUSY: resource busy or locked"): during an update ERAVOS Update.exe is running - it started this
+// Setup and waits for it - and Windows will not let it be replaced, or even renamed. It is kept as it is (the Setup puts the new one in at
+// the next restart); it never fails the install.
+const HELD_OK = new Set(['ERAVOS Update.exe']);
 
 function plan(stage) {
   const files = []; let bytes = 0;
@@ -40,22 +44,22 @@ function copyOne(src, dst, onBytes) {
 }
 async function install(stage, dest, p, onProgress) {
   p = p || plan(stage); prepare(dest);
-  let done = 0, last = 0; const tell = (file, phase) => { if (onProgress) onProgress({ phase, file, done, total: p.bytes }); };
+  let done = 0, last = 0; const kept = []; const tell = (file, phase) => { if (onProgress) onProgress({ phase, file, done, total: p.bytes }); };
   for (const f of p.files) {
     let tries = 0;
     for (;;) {
       try { await copyOne(path.join(stage, f.rel), path.join(dest, f.rel), (n) => { done += n; if (done - last > (2 << 20)) { last = done; tell(f.rel, 'copy'); } }); break; }
-      catch (e) { if (++tries > 5) throw new Error(f.rel + ': ' + e.message);
+      catch (e) { if (++tries > 5) { if (HELD_OK.has(f.rel) && fs.existsSync(path.join(dest, f.rel))) { kept.push(f.rel); break; } throw new Error(f.rel + ': ' + e.message); }
         moveAside(path.join(dest, f.rel));   // 3.213 held (ERAVOS still running, a scanner): Windows lets it be renamed, never overwritten
         await new Promise(r => setTimeout(r, 400 * tries)); }
     }
     tell(f.rel, 'copy');
   }
   const bad = []; let n = 0;
-  for (const f of p.files) { let s = -1; try { s = fs.statSync(path.join(dest, f.rel)).size; } catch (e) {} if (s !== f.size) bad.push(f.rel + ' (' + (s < 0 ? 'missing' : s + ' of ' + f.size + ' bytes') + ')');
+  for (const f of p.files) { if (kept.includes(f.rel)) continue; let s = -1; try { s = fs.statSync(path.join(dest, f.rel)).size; } catch (e) {} if (s !== f.size) bad.push(f.rel + ' (' + (s < 0 ? 'missing' : s + ' of ' + f.size + ' bytes') + ')');
     if (++n % 50 === 0 && onProgress) onProgress({ phase: 'check', file: f.rel, done: n, total: p.files.length }); }
   if (onProgress) onProgress({ phase: 'check', file: '', done: p.files.length, total: p.files.length });
-  return { ok: !bad.length, bad, files: p.files.length };
+  return { ok: !bad.length, bad, kept, files: p.files.length };
 }
 const utf16 = (s) => Buffer.concat([Buffer.from([0xff, 0xfe]), Buffer.from(s, 'utf16le')]);
 function saveLibrary(appData, dir) { const d = path.join(appData, 'ERAVOS'); fs.mkdirSync(d, { recursive: true }); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(d, 'library.txt'), utf16(dir)); }
@@ -63,4 +67,4 @@ function writeResult(file, r) {
   const line = (k, v) => k + '=' + String(v == null ? '' : v).replace(/[\r\n]+/g, ' ');
   fs.writeFileSync(file, utf16(['[result]', line('ok', r.ok ? 1 : 0), line('dest', r.dest), line('library', r.library), line('start', r.start ? 1 : 0), line('why', r.why)].join('\r\n') + '\r\n'));
 }
-module.exports = { plan, folder, prepare, install, saveLibrary, writeResult, moveAside, APP_DIRS };
+module.exports = { plan, folder, prepare, install, saveLibrary, writeResult, moveAside, HELD_OK, APP_DIRS };
