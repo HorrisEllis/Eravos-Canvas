@@ -2,6 +2,18 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.213 Fixed: "error writing ERAVOS.exe" (2026-11-24); release 0.2.32
+His words: "can you merge branches. figure out why it keeps telling me error writing eravos.exe"
+- Merging: every branch on origin was already in main (0 commits ahead each) — nothing to merge.
+- The cause: packaging/windows/eravos.nsi (CloseEravos) and eravos-update.nsi (step 2) decided "ERAVOS is running" from the first 10
+  characters of `tasklist /FI "IMAGENAME eq ERAVOS.exe" /NH` — but that output starts with an empty line, so it never matched: a running
+  ERAVOS was never closed, the updater never waited, and the Setup's `File` (or the Setup window's copy) hit a locked ERAVOS.exe.
+- Fixed: `tasklist … | find /I "ERAVOS.exe"` — find's exit code decides; `taskkill /T /F` (its helpers too) and a wait until none is left
+  (≤ 15 s, killed again at 5 s); Cancel on the "ERAVOS is running" box now quits instead of carrying on into the error. FreeExe: the old
+  ERAVOS.exe deleted, or — still held — renamed to ERAVOS.exe.old-<ticks> (Windows allows renaming a running exe) and removed at restart.
+  desktop/setup-copy.js: a file that will not copy is moved aside before the retry; the next install sweeps `*.old-*`.
+- desktop/test/setup-copy.mjs 14/14 (+2); both .nsi compile (makensis 3.09). NOT run on Windows here: the next Setup is the real check.
+
 ## 3.212 The Setup heals itself and logs; Delete removes parts; release 0.2.31 (2026-11-22)
 His words: "installer couldn't find eravos.exe." · "also need to be able to remove the component." · (of the 0.2.30 zip) "didn't let me synthesize or select with control and right click" — 3.211 was not merged yet.
 - packaging/windows/eravos.nsi: every step to %TEMP%\ERAVOS Setup.log (unpacked, the window's exit and answer, copied, checked); if

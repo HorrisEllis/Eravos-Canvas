@@ -71,6 +71,15 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-24 · Fixed: "error writing ERAVOS.exe" on install / update (3.213)
+- **His words (2026-11-24):** "can you merge branches. figure out why it keeps telling me error writing eravos.exe"
+- **His call:** find it and fix it.
+- **Built (by the AI coder, to his direction):** the cause found in the scripts (a "is it running?" check that could never be true); the check
+  by `find`'s exit code, the close with its helpers and a wait, the old exe moved aside when still held — in the Setup, the updater and the
+  Setup window's copy.
+- **Proof:** desktop/test/setup-copy.mjs 14/14 · both NSIS scripts compile. Not yet seen on Windows.
+- **Where to check:** `node desktop/test/setup-copy.mjs`; `packaging/windows/eravos.nsi` CloseEravos / FreeExe.
+
 ### 2026-11-21 · A part dragged to another box swaps or replaces it; right-click a part; Open in Mutation Lab (3.206)
 - **His words (2026-11-21):** "i want to be able to drag one component from one part of a tool to another. like directly, with differnt ui options, more components. utilize right click, open in mutation lab, like, i want to drag components to one tool and have them either swap if compatible or remove the one its replacing."
 - **His call:** swap when compatible, else replace; right-click; the Mutation Lab.
