@@ -225,23 +225,64 @@ Function OpenLibrary
 FunctionEnd
 
 ; close a running ERAVOS (its files are in use) - ask first unless silent (the updater has already closed it)
+; 3.213 (his: "it keeps telling me error writing eravos.exe"): the old check read the first 10 characters of `tasklist /NH`, but that output
+; starts with an empty line - so a running ERAVOS was never seen, never closed, and Windows refused to overwrite its ERAVOS.exe.
+; Now: `find` says whether it runs (its exit code, not the text), every ERAVOS.exe process is ended (/T: its helpers too), and the Setup
+; waits until none is left (up to 15 s). Then, whatever still holds it, the old ERAVOS.exe is moved aside (Windows lets a running exe be
+; renamed, never overwritten) so the new one can be written; the old copy goes at the next restart.
 !macro CloseEravos
-  nsExec::ExecToStack 'tasklist /FI "IMAGENAME eq ERAVOS.exe" /NH'
+  nsExec::ExecToStack 'cmd.exe /c tasklist /FI "IMAGENAME eq ERAVOS.exe" /NH | find /I "ERAVOS.exe"'
   Pop $0
   Pop $1
-  StrCpy $2 $1 10
-  ${If} $2 == "ERAVOS.exe"
+  ${If} $0 == "0"
     StrCpy $3 "go"
     ${IfNot} ${Silent}
     ${AndIf} $MODE != "update"
       MessageBox MB_OKCANCEL|MB_ICONINFORMATION "ERAVOS is running. It will be closed (autosave keeps your song)." IDOK +2
       StrCpy $3 "no"
     ${EndIf}
-    ${If} $3 == "go"
-      nsExec::Exec 'taskkill /IM ERAVOS.exe /F'
+    ${If} $3 == "no"
+      Quit
+    ${EndIf}
+    !insertmacro Log "ERAVOS is running - closing it"
+    nsExec::Exec 'taskkill /IM ERAVOS.exe /T /F'
+    StrCpy $4 0
+    ${Do}
+      Sleep 500
+      nsExec::ExecToStack 'cmd.exe /c tasklist /FI "IMAGENAME eq ERAVOS.exe" /NH | find /I "ERAVOS.exe"'
+      Pop $0
+      Pop $1
+      ${If} $0 != "0"
+        ${Break}
+      ${EndIf}
+      IntOp $4 $4 + 1
+      ${If} $4 == 10
+        nsExec::Exec 'taskkill /IM ERAVOS.exe /T /F'
+      ${EndIf}
+    ${LoopUntil} $4 >= 30
+    !insertmacro Log "ERAVOS closed (waited $4 x 0.5 s)"
+  ${EndIf}
+  Sleep 500
+!macroend
+
+; the old ERAVOS.exe out of the way: deleted, or (still held by something) renamed aside and deleted at the next restart
+!macro FreeExe DIR
+  Delete "${DIR}\ERAVOS.exe.old-*"
+  ${If} ${FileExists} "${DIR}\ERAVOS.exe"
+    ClearErrors
+    Delete "${DIR}\ERAVOS.exe"
+    ${If} ${Errors}
+      System::Call 'kernel32::GetTickCount() i .r5'
+      ClearErrors
+      Rename "${DIR}\ERAVOS.exe" "${DIR}\ERAVOS.exe.old-$5"
+      ${If} ${Errors}
+        !insertmacro Log "ERAVOS.exe in ${DIR} is held and could not be moved aside"
+      ${Else}
+        Delete /REBOOTOK "${DIR}\ERAVOS.exe.old-$5"
+        !insertmacro Log "ERAVOS.exe in ${DIR} was held - moved aside to ERAVOS.exe.old-$5 (removed at the next restart)"
+      ${EndIf}
     ${EndIf}
   ${EndIf}
-  Sleep 800
 !macroend
 
 ; 3.207 after writing, every big file is checked on disk (his: "update broke my eravos." — an ERAVOS.exe cut off at 39.8 of 246 MB).
@@ -324,6 +365,7 @@ Function PlainCopy
   DetailPrint "The Setup window did not open ($R0) - installing the plain way"
   CreateDirectory "$INSTDIR"
   !insertmacro ClearApp "$INSTDIR"
+  !insertmacro FreeExe "$INSTDIR"
   CopyFiles /SILENT "$STAGE\*.*" "$INSTDIR"
   !insertmacro Log "copied the plain way from $STAGE into $INSTDIR"
 FunctionEnd
@@ -336,6 +378,7 @@ Section "ERAVOS" SecApp
   ${Else}
     StrCpy $STAGE "$INSTDIR"
     !insertmacro ClearApp "$INSTDIR"
+    !insertmacro FreeExe "$INSTDIR"
   ${EndIf}
   SetOutPath "$STAGE"
   SetOverwrite on

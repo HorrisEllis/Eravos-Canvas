@@ -1,3 +1,11 @@
+ERAVOS v0.2.32 (2026-11-24)
+
+Install: ERAVOS-Setup-0.2.32.exe from the release, or ERAVOS offers it by itself.
+
+- Fixed: "Error opening file for writing … ERAVOS.exe" when installing or updating while ERAVOS was open. The Setup never saw that ERAVOS
+  was running (so never closed it), and Windows will not overwrite a running program. Now the Setup and ERAVOS Update see it, close it
+  (and its helper processes), wait until it is gone, and if something still holds ERAVOS.exe they move it aside and write the new one.
+
 ERAVOS v0.2.31 (2026-11-22)
 
 Install: ERAVOS-Setup-0.2.31.exe from the release, or ERAVOS offers it by itself.

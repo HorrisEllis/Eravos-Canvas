@@ -25,9 +25,12 @@ function folder(chosen) { const c = String(chosen || '').replace(/[\\/]+$/, '');
 function prepare(dest) {
   fs.mkdirSync(dest, { recursive: true });
   const mine = fs.existsSync(path.join(dest, 'ERAVOS.exe')) || !fs.readdirSync(dest).length;
-  if (mine) APP_DIRS.forEach(d => fs.rmSync(path.join(dest, d), { recursive: true, force: true }));
+  if (mine) { APP_DIRS.forEach(d => fs.rmSync(path.join(dest, d), { recursive: true, force: true })); sweepOld(dest); }
   return mine;
 }
+// a file that cannot be overwritten is renamed aside (<name>.old-<time>); the next install sweeps those away
+function moveAside(f) { try { if (fs.existsSync(f)) fs.renameSync(f, f + '.old-' + Date.now()); } catch (e) {} }
+function sweepOld(dest) { try { for (const n of fs.readdirSync(dest)) if (/\.old-\d+$/.test(n)) try { fs.rmSync(path.join(dest, n), { force: true }); } catch (e) {} } catch (e) {} }
 function copyOne(src, dst, onBytes) {
   return new Promise((res, rej) => {
     fs.mkdirSync(path.dirname(dst), { recursive: true });
@@ -42,7 +45,9 @@ async function install(stage, dest, p, onProgress) {
     let tries = 0;
     for (;;) {
       try { await copyOne(path.join(stage, f.rel), path.join(dest, f.rel), (n) => { done += n; if (done - last > (2 << 20)) { last = done; tell(f.rel, 'copy'); } }); break; }
-      catch (e) { if (++tries > 5) throw new Error(f.rel + ': ' + e.message); await new Promise(r => setTimeout(r, 400 * tries)); }   // a file held a moment (a scanner): again
+      catch (e) { if (++tries > 5) throw new Error(f.rel + ': ' + e.message);
+        moveAside(path.join(dest, f.rel));   // 3.213 held (ERAVOS still running, a scanner): Windows lets it be renamed, never overwritten
+        await new Promise(r => setTimeout(r, 400 * tries)); }
     }
     tell(f.rel, 'copy');
   }
@@ -58,4 +63,4 @@ function writeResult(file, r) {
   const line = (k, v) => k + '=' + String(v == null ? '' : v).replace(/[\r\n]+/g, ' ');
   fs.writeFileSync(file, utf16(['[result]', line('ok', r.ok ? 1 : 0), line('dest', r.dest), line('library', r.library), line('start', r.start ? 1 : 0), line('why', r.why)].join('\r\n') + '\r\n'));
 }
-module.exports = { plan, folder, prepare, install, saveLibrary, writeResult, APP_DIRS };
+module.exports = { plan, folder, prepare, install, saveLibrary, writeResult, moveAside, APP_DIRS };

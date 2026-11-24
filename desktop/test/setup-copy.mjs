@@ -29,5 +29,10 @@ const RES = path.join(T, 'result.ini'); C.writeResult(RES, { ok: true, dest: D, 
 const txt = fs.readFileSync(RES); ok(txt[0] === 0xff && txt[1] === 0xfe && /\[result\]\r\nok=1\r\ndest=.*ERAVOS\r\nlibrary=.*\r\nstart=1/.test(txt.slice(2).toString('utf16le')), 'the answer: UTF-16 INI the Setup reads');
 // a folder that is not ERAVOS's: its folders are never cleared
 const O2 = path.join(T, 'shared'); put(O2, 'tools/theirs.txt', 3); put(O2, 'other.txt', 3); ok(C.prepare(O2) === false && fs.existsSync(path.join(O2, 'tools/theirs.txt')), 'someone else\'s folder: nothing cleared');
+// 3.213 a held ERAVOS.exe (still running) is moved aside, never left in the way; the next install sweeps the old copy
+const H = path.join(T, 'held'); put(H, 'ERAVOS.exe', 10); C.moveAside(path.join(H, 'ERAVOS.exe'));
+const old = fs.readdirSync(H).filter(n => /^ERAVOS\.exe\.old-\d+$/.test(n));
+ok(!fs.existsSync(path.join(H, 'ERAVOS.exe')) && old.length === 1, 'a held ERAVOS.exe is moved aside: ' + fs.readdirSync(H));
+put(H, 'ERAVOS.exe', 10); C.prepare(H); ok(!fs.readdirSync(H).some(n => /\.old-/.test(n)), 'the next install sweeps the old copy away');
 fs.rmSync(T, { recursive: true, force: true });
 console.log(`setup-copy: ${pass}/${pass + fail} passed`); process.exit(fail ? 1 : 0);

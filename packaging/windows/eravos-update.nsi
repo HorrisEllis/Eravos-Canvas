@@ -145,11 +145,11 @@ Section "Update"
   !insertmacro Say "Waiting for ERAVOS to close..."
   StrCpy $R1 0
   wait:
-    nsExec::ExecToStack 'tasklist /FI "IMAGENAME eq ERAVOS.exe" /NH'
+    ; 3.213 `find`'s exit code says whether it runs (tasklist /NH starts with an empty line: the first 10 characters never matched)
+    nsExec::ExecToStack 'cmd.exe /c tasklist /FI "IMAGENAME eq ERAVOS.exe" /NH | find /I "ERAVOS.exe"'
     Pop $R2
     Pop $R3
-    StrCpy $R4 $R3 10
-    StrCmp $R4 "ERAVOS.exe" 0 closed
+    StrCmp $R2 "0" 0 closed
     IntOp $R1 $R1 + 1
     IntCmp $R1 120 closed
     Sleep 500
