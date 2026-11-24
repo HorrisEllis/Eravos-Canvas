@@ -255,3 +255,4 @@ kept), or **open** (not done yet, and what is missing). Newest at the bottom. Ad
 | N-X106 | "this is meant to be like creative space to create creative tools to create creatively, infinitely possibility possibly." (2026-11-24) | **direction** | CLAUDE.md Open |
 | N-X107 | "like this is meant to be dynamic and fluid. also tools are isolated so if they cause instability they can be deleted." (2026-11-24) | **rule** | CLAUDE.md Rules that hold |
 | N-X108 | "eravos makes it, not you. only add capability. always capability first." (2026-11-24) | **rule** | CLAUDE.md Rules that hold: capability first |
+| N-X109 | "Also update the readme, with images if possible." (2026-11-24) | **done** | 3.218 README with pictures; also taken as the yes to merge 3.217 |

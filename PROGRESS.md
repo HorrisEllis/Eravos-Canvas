@@ -2,6 +2,12 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.218 The README, current, with pictures (2026-11-24)
+His words: "Also update the readme, with images if possible."
+- README.md: a new top — what ERAVOS is, get it (the Setup, the library, updates, repair), what you can do (play · blow apart · hover · replace ·
+  synthesize · the Workshop), each with its picture from docs/previews; the rules; where it is going. The reference sections follow unchanged;
+  every older version note kept word for word under Release history (checked: 0 of the old lines missing; every image path exists).
+
 ## 3.217 Pick the voice; say where the rest comes from (2026-11-24) — not merged (shown first)
 His words: "my goal is to add the capability to create a mix of the retro dcs and the wobble bass to make the retro wobble or something … combine
 the sound of retro dcs with the rest of wobble bass." · "eravos makes it, not you. only add capability. always capability first."
