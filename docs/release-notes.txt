@@ -1,3 +1,10 @@
+ERAVOS v0.2.33 (2026-11-24)
+
+Install: ERAVOS-Setup-0.2.33.exe from the release, or ERAVOS offers it by itself.
+
+- Fixed: the Setup stopping with "not written in full … ERAVOS.exe" on a fresh install (since 0.2.30). When the Setup's own window
+  cannot write the app, the Setup now puts it in the way 0.2.29 did, then checks every file again — instead of stopping.
+
 ERAVOS v0.2.32 (2026-11-24)
 
 Install: ERAVOS-Setup-0.2.32.exe from the release, or ERAVOS offers it by itself.

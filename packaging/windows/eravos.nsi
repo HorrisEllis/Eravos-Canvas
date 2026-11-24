@@ -351,18 +351,23 @@ Function RunOwnWindow
     SetErrorLevel 1             ; cancelled: nothing installed, nothing changed
     Quit
   ${EndIf}
+  ; 3.214 (his: "it didnt have this problem pre 2.30"): the window's own copy (new in 0.2.30, never run on Windows by a test) failed -
+  ; no longer the end: the app goes in the way 0.2.29 put it in (this Setup writes it), then every file is checked as before
   ${If} $R0 == "3"
     ReadINIStr $R3 "$PLUGINSDIR\result.ini" "result" "why"
-    WriteRegStr HKLM "Software\ERAVOS" "LastInstallError" "$R3"
-    SetErrorLevel 3             ; it said why in its window; the version is not written (ERAVOS Update.exe sees it)
-    Quit
+    ReadINIStr $R2 "$PLUGINSDIR\result.ini" "result" "dest"
+    ${If} $R2 != ""
+      StrCpy $INSTDIR $R2
+    ${EndIf}
+    ReadINIStr $LIBDIR "$PLUGINSDIR\result.ini" "result" "library"
+    !insertmacro Log "the Setup window could not write the app ($R3) - installing it the 0.2.29 way into $INSTDIR"
   ${EndIf}
-  ; the window could not open (exit $R0): the plain way, into $INSTDIR
+  ; the window could not open (exit $R0), or could not write the app: the plain way, into $INSTDIR
   Call PlainCopy
 FunctionEnd
 Function PlainCopy
   BringToFront
-  DetailPrint "The Setup window did not open ($R0) - installing the plain way"
+  DetailPrint "Installing the plain way (the Setup window ended with $R0)"
   CreateDirectory "$INSTDIR"
   !insertmacro ClearApp "$INSTDIR"
   !insertmacro FreeExe "$INSTDIR"

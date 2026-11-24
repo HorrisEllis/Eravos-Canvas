@@ -2,6 +2,18 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.214 The Setup falls back to the 0.2.29 way when its window cannot write the app (2026-11-24); release 0.2.33
+His words: "its not running. eravos isn't even installed." · "windows defender is turned off." · "so have actually done something right? it
+didnt have this problem pre 2.30."
+- Honest: 3.213 fixed a real bug (a running ERAVOS was never closed) but not his — ERAVOS was not installed or running.
+- His clue: from 0.2.30 (3.210) the app is copied by the Setup window's own code (desktop/setup-copy.js, in Electron), never run on Windows
+  by a test (the release test is silent = the plain way); before, the Setup itself wrote it (worked for him).
+- packaging/windows/eravos.nsi RunOwnWindow: the window's exit 3 (could not write) no longer quits — its dest and library are taken and the
+  app is copied the plain way (PlainCopy, from the stage), then VerifyFiles as before; a failure there still says so. desktop/setup.html:
+  the failure text says the Setup now puts it in the plain way.
+- makensis compiles. NOT run on Windows: his next Setup is the check. The cause inside the window's copy is still unknown (the log will say:
+  %TEMP%\ERAVOS Setup.log, "the Setup window could not write the app (...)").
+
 ## 3.213 Fixed: "error writing ERAVOS.exe" (2026-11-24); release 0.2.32
 His words: "can you merge branches. figure out why it keeps telling me error writing eravos.exe"
 - Merging: every branch on origin was already in main (0 commits ahead each) — nothing to merge.
