@@ -1,3 +1,13 @@
+ERAVOS v0.2.36 (2026-11-24)
+
+Install: ERAVOS-Setup-0.2.36.exe from the release, or ERAVOS offers it by itself.
+
+- Start in two steps: first only the domains (and your projects and autosave); pick one and its modes, songs and START FROM follow.
+  ← All domains goes back.
+- Borderless: no Windows title bar — the toolbar is the window's top. Drag the window by the toolbar's empty space (double-click maximises);
+  minimise / maximise / close stay at the right, in the toolbar's colours.
+- The README shows a note blown apart in 3D.
+
 ERAVOS v0.2.35 (2026-11-24)
 
 Install: ERAVOS-Setup-0.2.35.exe from the release, or ERAVOS offers it by itself.

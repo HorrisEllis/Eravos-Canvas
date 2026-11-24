@@ -145,11 +145,13 @@
 
   // ---------------- boot / recipe picker
   let bootOpen = null;
-  function bootScreen(first) {
+  // 3.220 (his words, 2026-11-24: "like only show the domains at first."): two steps —
+  // first only the domains (and your projects / autosave); a domain picked → its modes, its songs and START FROM. picked = the domain chosen here.
+  function bootScreen(first, picked) {
     if (bootOpen) bootOpen.close();
     const ov = h('div', { class: 'overlay' });
     const close = () => { ov.remove(); if (bootOpen && bootOpen.ov === ov) bootOpen = null; };
-    bootOpen = { ov, close, first };
+    bootOpen = { ov, close, first, picked };
     const start = async (id) => {
       S.activate(); close();
       // 3.124 Empty canvas = every tool starts blank (no preset); any other start brings tools with their presets
@@ -180,21 +182,23 @@
     // 3.37 domains first: one big card per installed domain (its first mode) — "what are you making?" — then any other
     // modes a domain offers (Lab…) as smaller cards. Domains arrive as packs; this lists whatever is installed.
     const catArt = (domainId) => { const d = window.Catalog && window.Catalog.domains().find(x => x.id === domainId); return d && d.art ? (window.ERAVOS_TOOLS || '') + d.art : null; };
-    const modeCard = (m, big) => { const art = m.art || (big ? catArt(m.domain) : null); return h('div', { class: 'card mode-card' + (big ? ' domain-card' : '') + (art ? ' has-art' : '') + (X.isActive(m.id) ? ' on' : ''), style: { '--acc': m.accent || '#00d4ff' }, onclick: () => { S.activate(); OrganismFactory.blankStart(false); X.enterMode(m.id); bootScreen(first); } }, [
+    const modeCard = (m, big) => { const art = m.art || (big ? catArt(m.domain) : null); return h('div', { class: 'card mode-card' + (big ? ' domain-card' : '') + (art ? ' has-art' : '') + (X.isActive(m.id) ? ' on' : ''), style: { '--acc': m.accent || '#00d4ff' }, onclick: () => { S.activate(); OrganismFactory.blankStart(false); X.enterMode(m.id); bootScreen(first, m.domain || m.id); } }, [
       pic(art), h('b', { text: (art ? '' : (m.icon || '◈') + ' ') + m.label + (X.isActive(m.id) ? '  ✓' : '') }), h('small', { text: m.blurb || '' })].filter(Boolean)); };
     const seenDomain = new Set(), primary = [], more = [];
     X.modes().forEach(m => { const d = m.domain || m.id; if (seenDomain.has(d)) more.push(m); else { seenDomain.add(d); primary.push(m); } });
-    const modeCards = primary.map(m => modeCard(m, true)), moreCards = more.map(m => modeCard(m, false));
+    const modeCards = primary.map(m => modeCard(m, true)), moreCards = more.filter(m => (m.domain || m.id) === picked).map(m => modeCard(m, false));
     // P38 catalog: domains offered but not installed — one click installs that domain's starter set (named on the card), then enters it
     const Cat = window.Catalog;
     if (Cat) Cat.domains().filter(d => !d.loaded && !d.toolless && !seenDomain.has(d.id)).forEach(d => modeCards.push(h('div', { class: 'card mode-card domain-card avail', style: { '--acc': '#7f93a8' }, title: 'installs ' + (d.starter.length ? d.starter.length + ' starter tools' : 'this domain') + ' — add more from ＋ Add any time', onclick: async () => {
       S.toast(`Installing ${d.label}…`, '', 2000); Cat.chooseDomain(d.id); OrganismFactory.blankStart(false); await Cat.install(d.starter, K); S.activate();
-      const m = X.modes().find(x => x.domain === d.id); if (m) X.enterMode(m.id); bootScreen(first);
+      const m = X.modes().find(x => x.domain === d.id); if (m) X.enterMode(m.id); bootScreen(first, d.id);
     } }, [pic(d.art ? (window.ERAVOS_TOOLS || '') + d.art : null), h('b', { text: (d.art ? '' : (d.icon || '◈') + ' ') + d.label }), h('small', { text: (d.summary || '') + ' · not installed — click to install ' + (d.starter.length ? d.starter.length + ' starter tool' + (d.starter.length > 1 ? 's' : '') : 'it') })].filter(Boolean))));
-    const box = h('div', { class: 'boot' }, [
-      h('h1', { text: 'ERAVOS' }),
-      h('p', { class: 'sub', text: X.active().length ? brand.tagline : 'A blank canvas. Pick what you are making — or start empty and add any tool from any domain; it turns on only what it needs.' }),
-      ...(modeCards.length ? [h('div', { class: 'boot-sec', text: 'WHAT ARE YOU MAKING?' }), h('div', { class: 'grid modes domains' }, modeCards)] : []),
+    const pickedMode = picked && X.modes().find(m => (m.domain || m.id) === picked);
+    const back = h('div', { class: 'row', style: { justifyContent: 'center', gap: '8px', margin: '4px 0 10px' } }, [
+      h('button', { class: 'tb-btn', title: 'back to every domain', onclick: () => bootScreen(first) }, ['← All domains']),
+      h('span', { class: 'sub', style: { margin: '0', alignSelf: 'center' }, text: pickedMode ? (pickedMode.label + (pickedMode.blurb ? ' — ' + pickedMode.blurb : '')) : '' })]);
+    const box = h('div', { class: 'boot' }, picked ? [
+      h('h1', { text: 'ERAVOS' }), back,
       ...(moreCards.length ? [h('div', { class: 'boot-sec', text: 'MORE MODES' }), h('div', { class: 'grid modes' }, moreCards)] : []),
       ...(featured.length ? [h('div', { class: 'hero-row' }, featured.map(r => h('div', { class: 'hero-card', role: 'button', tabindex: '0', onclick: () => start(r.id), onkeydown: (e) => { if (e.key === 'Enter') e.currentTarget.click(); } }, [heroPic(r), h('div', {}, [h('h2', { text: r.featured.title || r.label }), h('p', { text: r.featured.text || r.tagline || '' })]), h('span', { class: 'hero-go', text: 'Start ▸' })])))] : []),
       ...sectionEls,
@@ -204,6 +208,14 @@
         h('div', { class: 'card has-art', onclick: () => start(null) }, [pic('runtime/art/blank-canvas.svg'), h('b', { text: 'Empty canvas' }), h('small', { text: 'Agnostic — add tools yourself (＋ Add)' })]),
         h('div', { class: 'card has-art', onclick: () => { start(null); setTimeout(() => AddMenu.show(S, X), 30); } }, [pic('runtime/art/chest.svg'), h('b', { text: 'Browse every tool' }), h('small', { text: 'See what each one needs before you add it' })]),
       ])),
+      h('div', { class: 'row', id: 'autosaveRow' }),
+      h('p', { class: 'sub', style: { marginTop: '14px', fontSize: '11px' }, text: brand.tip }),
+    ] : [
+      h('h1', { text: 'ERAVOS' }),
+      h('p', { class: 'sub', text: 'What are you making? Pick a domain — its setups, songs and modes come next.' }),
+      ...(modeCards.length ? [h('div', { class: 'grid modes domains' }, modeCards)] : []),
+      ...(OrganismFactory.defined().length ? [] : [h('div', { class: 'hero-card', style: { cursor: 'default' } }, [h('div', { class: 'big', text: '⧉' }), h('div', {}, [h('h2', { text: 'This canvas has no tools yet' }), h('p', { text: 'Drop a pack (.zip) onto the canvas to add tools.' })])])]),
+      h('div', { class: 'row', style: { justifyContent: 'center', marginTop: '10px' } }, [h('button', { class: 'tb-btn', title: 'agnostic — add tools yourself (＋ Add); every tool starts blank', onclick: () => start(null) }, ['◻ Empty canvas'])]),
       h('div', { class: 'row', id: 'autosaveRow' }),
       h('p', { class: 'sub', style: { marginTop: '14px', fontSize: '11px' }, text: brand.tip }),
     ]);
@@ -237,7 +249,7 @@
     });
   }
   document.getElementById('startBtn').onclick = () => bootScreen(false);
-  K.bus.subscribe('workspace:backup-imported', (p) => { toast(`Brought in ${p.projects} project(s) and ${p.presets} preset(s). Find them under Start → PROJECTS.`, 'good', 6000); if (bootOpen) bootScreen(bootOpen.first); }, 'shell');
+  K.bus.subscribe('workspace:backup-imported', (p) => { toast(`Brought in ${p.projects} project(s) and ${p.presets} preset(s). Find them under Start → PROJECTS.`, 'good', 6000); if (bootOpen) bootScreen(bootOpen.first, bootOpen.picked); }, 'shell');
 
   // ---------------- undo / redo (P11.1, runtime/history.js — works for any organism a pack adds)
   const history = window.ShellHistory = History.create(K);
@@ -273,7 +285,7 @@
     e.preventDefault(); doHist(k === 'y' || e.shiftKey ? 'redo' : 'undo');
   });
   // packs can arrive while the start screen is open (a drop, or the Packs folder) → show what they added
-  let reboot = 0; K.bus.subscribe('kernel:pack-installed', () => { if (!bootOpen) return; clearTimeout(reboot); const f = bootOpen.first; reboot = setTimeout(() => { if (bootOpen) bootScreen(f); }, 120); }, 'shell');
+  let reboot = 0; K.bus.subscribe('kernel:pack-installed', () => { if (!bootOpen) return; clearTimeout(reboot); const f = bootOpen.first, pk = bootOpen.picked; reboot = setTimeout(() => { if (bootOpen) bootScreen(f, pk); }, 120); }, 'shell');
   // desktop: wait for the Packs folder to finish loading before offering recipes / autosave (both need the tools)
   // 3.30: the canvas opens BLANK — Start · Add · Options only. The start page opens when you press Start
   // (or by itself only when no tools are installed yet, to say how to add some). ?boot opens it as before.

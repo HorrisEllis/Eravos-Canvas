@@ -368,6 +368,11 @@ svg.wires path.wire.hot { stroke-width: 4.5; filter: drop-shadow(0 0 4px current
 /* 3.37 responsive top bar: the skeleton's own items never shrink; the domain slots shrink and scroll sideways (wheel),
    with edge fades — so ⋯ Options (Stop all, Fit, Clear) is always on screen however many units a domain adds */
 #topbar > * { flex-shrink: 0; }
+/* 3.220 borderless window (ERAVOS.exe): the toolbar is the window's top — drag it by its empty space (double-click maximises); every control in it
+   stays a control; it keeps clear of the window buttons Windows draws at its right (env() is 0 in a browser, so nothing moves there) */
+#topbar { -webkit-app-region: drag; padding-right: calc(12px + 100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw)); }
+#topbar > *, #topbar button, #topbar input, #topbar select, #topbar a, #topbar [role="button"] { -webkit-app-region: no-drag; }
+#topbar > .tb-spacer, #topbar > #logo { -webkit-app-region: drag; }
 #topbar > .tb-spacer { flex: 1 1 0; min-width: 0; }
 #topbar > #slot-bar, #topbar > #slot-bar-right { flex: 0 1 auto; min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; overscroll-behavior: contain; }
 #topbar > #slot-bar::-webkit-scrollbar, #topbar > #slot-bar-right::-webkit-scrollbar { display: none; }

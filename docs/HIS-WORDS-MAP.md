@@ -257,3 +257,7 @@ kept), or **open** (not done yet, and what is missing). Newest at the bottom. Ad
 | N-X108 | "eravos makes it, not you. only add capability. always capability first." (2026-11-24) | **rule** | CLAUDE.md Rules that hold: capability first |
 | N-X109 | "Also update the readme, with images if possible." (2026-11-24) | **done** | 3.218 README with pictures; also taken as the yes to merge 3.217 |
 | N-X110 | "okay do the exploded note view for the screenshot also. marge and publish." (2026-11-24) | **done** | 3.219: the exploded note in the README; release 0.2.35 |
+| N-X111 | "okay but did we choose to do the exploded view on the canvas for existing tools?" (2026-11-24) | **answered** | yes — 3.196 / 3.201: every tool explodes; only Wobble Bass, Retro DCO and made tools can swap parts (part-exchange.js) — open: profiles for the rest |
+| N-X112 | "what is that? also the start from should only show after you pick music. like only show the domains at first." (2026-11-24) | **done** | the pop-up was the Claude app's; 3.220 Start in two steps |
+| N-X113 | "like this" (2026-11-24, a screenshot: a note in 3D · EXPLODED) | **done** | 3.220 README picture |
+| N-X114 | "also borderless windows please?" (2026-11-24) | **done, unconfirmed on Windows** | 3.220 titleBarOverlay; the toolbar drags the window |
