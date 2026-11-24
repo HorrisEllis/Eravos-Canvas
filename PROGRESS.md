@@ -2,6 +2,17 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.220 Start in two steps; a borderless window; the 3D exploded note in the README; release 0.2.36 (2026-11-24)
+His words: "also the start from should only show after you pick music. like only show the domains at first." · "like this" (a screenshot of a
+note in 3D · EXPLODED) · "also borderless windows please?" · (of the Claude app's notification) "what is that?" — it was the Claude app, not ERAVOS.
+- canvas/index.html bootScreen(first, picked) (domain-free): first only the domain cards, Empty canvas, projects / autosave; a domain picked →
+  ← All domains, its own modes (MORE MODES), the featured songs, sections, START FROM. A pack arriving keeps the step.
+- desktop/main.js: on Windows titleBarStyle hidden + titleBarOverlay (#0a0e14, 52 px — the toolbar's); canvas/runtime/eravos.css #topbar is the
+  drag region (its controls not), kept clear of the window buttons by env(titlebar-area-*) (0 in a browser). NOT seen on Windows yet.
+- README: "Blow a note apart" — docs/previews/workbench/note-exploded-3d.png (note-exploded-3d.shots.mjs), as his screenshot.
+- tests/p16-ui.mjs: the two steps checked (both pass); its later "plug.click" failure is on main too (not this). boundary 10/10, bare-canvas,
+  design check no worse. Screenshots: docs/previews/start-two-steps.shots.mjs → start-1-domains.png, start-2-music.png.
+
 ## 3.219 The exploded note in the README; release 0.2.35 (2026-11-24)
 His words: "okay do the exploded note view for the screenshot also. marge and publish."
 - README.md: "Blow a note apart" — the Workshop's BOARD (3.199), docs/previews/workbench/workshop-board-note.png.

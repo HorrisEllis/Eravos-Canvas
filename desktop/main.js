@@ -202,6 +202,9 @@ app.whenReady().then(async () => {
   win = new BrowserWindow({
     width: st.width || 1600, height: st.height || 1000, x: st.x, y: st.y, minWidth: 900, minHeight: 600,
     backgroundColor: '#07090d', title: 'ERAVOS', autoHideMenuBar: true, show: false,
+    // 3.220 borderless (his words, 2026-11-24: "also borderless windows please?"): no Windows title bar — the toolbar is the window's top; the
+    // minimise / maximise / close buttons stay, drawn by Windows in the toolbar's colours at its right end (eravos.css #topbar keeps them clear)
+    ...(process.platform === 'win32' ? { titleBarStyle: 'hidden', titleBarOverlay: { color: '#0a0e14', symbolColor: '#d6e4f0', height: 52 } } : {}),
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, nodeIntegration: false, sandbox: true, backgroundThrottling: false, autoplayPolicy: 'no-user-gesture-required' },
   });
   if (st.maximized) win.maximize();

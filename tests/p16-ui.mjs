@@ -9,12 +9,15 @@ const p = await b.newPage({ viewport: { width: 1500, height: 1000 } }); const er
 const results = []; const check = (name, ok, info) => { results.push({ name, ok: !!ok, info }); console.log(`  ${ok ? '✓' : '✗'} ${name}${info ? '  — ' + info : ''}`); };
 await p.addInitScript(() => { window.ERAVOS_CATALOG_ALL = true; });   // P41 catalog: a fresh profile installs no tools — this script needs every one
 await p.goto('file://' + ROOT + '/canvas/index.html'); await p.waitForSelector('.overlay .boot', { timeout: 15000 });
+// 3.220 Start in two steps (his words, 2026-11-24: "only show the domains at first"): the domains alone first; Music picked → its modes and START FROM
+const first = await p.evaluate(() => ({ domains: Array.from(document.querySelectorAll('.overlay .domain-card b')).map(b => b.textContent.trim()), secs: Array.from(document.querySelectorAll('.overlay .boot-sec')).map(e => e.textContent) }));
+check('first only the domains (no START FROM, no modes yet)', first.domains.some(m => /Music Production/.test(m)) && !first.secs.includes('START FROM') && !first.secs.includes('MORE MODES'), first.domains.join(' | ') + ' · ' + first.secs.join(' | '));
 // enter Music Production from the start screen
 await p.evaluate(() => { const m = Array.from(document.querySelectorAll('.mode-card')).find(c => /Music Production/.test(c.textContent)); m && m.click(); });
 await p.waitForTimeout(300);
 const modes = await p.evaluate(() => Array.from(document.querySelectorAll('.mode-card b')).map(b => b.textContent.replace(/\s+✓$/, '').trim()));
-// 3.37: every installed domain has a card (Music, Image, Video, AI, Coding …) and Lab is one of Music's modes
-check('Music Production and Lab are on the start screen', modes.some(m => /Music Production/.test(m)) && modes.some(m => /Lab/.test(m)), modes.join(' | '));
+const secs = await p.evaluate(() => Array.from(document.querySelectorAll('.overlay .boot-sec')).map(e => e.textContent));
+check('Music picked: Lab (its mode) and START FROM show', modes.some(m => /Lab/.test(m)) && secs.includes('START FROM'), modes.join(' | ') + ' · ' + secs.join(' | '));
 await p.screenshot({ path: path.join(OUT, 'start-screen.png') });
 // 3.34: the Song Engine moved off the start screen into 📖 Songs — every genre must have a card there
 await p.evaluate(() => { const c = Array.from(document.querySelectorAll('.overlay .card')).find(x => /Empty canvas/.test(x.textContent)); c && c.click(); });
