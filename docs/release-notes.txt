@@ -1,3 +1,12 @@
+ERAVOS v0.2.37 (2026-11-24)
+
+Install: ERAVOS-Setup-0.2.37.exe from the release, or ERAVOS offers it by itself.
+
+- Less lag: the reactive colours forced the whole page to be laid out again for every window, every frame — gone (same look).
+- Settings › Performance: live numbers (frames a second, how busy the screen's thread is, your CPU threads), and your own settings —
+  Display rate, Reactive colours & glow (Full · Light · Off), Animations, Resolution, Blur & shadows, Graphics acceleration (on the next start).
+- Auto (the default): when the screen lags, the costly effects get lighter by themselves, and come back when there is room.
+
 ERAVOS v0.2.36 (2026-11-24)
 
 Install: ERAVOS-Setup-0.2.36.exe from the release, or ERAVOS offers it by itself.

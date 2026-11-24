@@ -112,6 +112,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-24 | **Less lag; Settings › Performance; Auto** (3.222, release 0.2.37): measured (main thread blocked ~46 %/s with 10 tools playing); a per-window forced layout in the reactive colours removed; custom settings + Auto (effects lighter while lagging); GPU switch | `canvas/runtime/performance.js`, `tools/music/core/sound-css.js`, `desktop/main.js` | measured before/after; P102 P106 P147 P110 green, boundary 10/10 |
 | 2026-11-24 | **The to-do ledger; the session mapped; specs and phases** (3.221): every word of the session verbatim, the performance plan (PF0–PF8, RP, AN), Settings from the contracts (ST), the toolbar (TB), the Mutation Lab / Workbench (ML) — `docs/TODO-LEDGER.md` | `specs/eravos.2026-11-24-session.map.spec`, `specs/eravos.performance-plan.spec`, `docs/TODO-LEDGER.md` | `node build/competence.mjs --check` |
 | 2026-11-24 | **Start in two steps; a borderless window; the 3D exploded note in the README** (3.220, release 0.2.36) | `canvas/index.html`, `desktop/main.js`, `canvas/runtime/eravos.css`, `README.md` | `tests/p16-ui.mjs` (the two steps), boundary 10/10 · PR #217 |
 | 2026-11-24 | **The README, current, with pictures** (3.218–3.219, release 0.2.35) | `README.md` | 0 old lines lost; every image exists · PR #215, #216 |

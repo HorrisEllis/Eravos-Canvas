@@ -15,7 +15,7 @@
 (function (global) {
   'use strict';
   const doc = global.document;
-  const still = () => !!(global.ERAVOS_NO_MOTION || (global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches));
+  const still = () => !!(global.ERAVOS_NO_MOTION || (global.document && global.document.documentElement.dataset.motion === 'off') || (global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches));   // 3.222 Settings › Performance › Animations: Off
   const A = (el, kf, o) => (el && el.animate) ? el.animate(kf, Object.assign({ fill: 'both' }, o)) : null;
   const finite = (a) => { try { return isFinite(a.effect.getComputedTiming().endTime); } catch (e) { return false; } };
   const EASE = { glide: 'cubic-bezier(.65,0,.35,1)', out: 'cubic-bezier(.16,1,.3,1)', land: 'cubic-bezier(.22,1.12,.36,1)', in: 'cubic-bezier(.55,0,.75,.1)', away: 'cubic-bezier(.6,0,.2,1)' };

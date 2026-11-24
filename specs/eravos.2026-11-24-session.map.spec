@@ -108,3 +108,11 @@
   > first one, beyond removing the undo and redo, and redundany options. also log all of this, don't lose anything, update the specs, phases. and add that to a to do ledger
   - DECIDED: Options' actions go INTO SETTINGS; the Undo / Redo buttons are removed (Ctrl+Z / Ctrl+Shift+Z stay); redundant options removed.
   - DONE 3.221: this map, the specs' addenda and phases, docs/TODO-LEDGER.md (the to-do ledger), the his-words map, the register.
+
+## 23 — verbatim:
+  > needs performance optimization. the cpu cores. its lagging with plenty of overhead. maybe custom settings, like cpu cores, animations, graphics acceloratoin. maybe invent a better driver
+  - MEASURED (10 tools playing): main thread blocked ~46 % of each second, ~32 fps, stalls to 150 ms; the reactive colours nearly all of it
+    (off: 60 fps, no long task). Inside them: one `offsetParent` read per window per frame forced the whole page's layout.
+  - BUILT 3.222: the forced layout removed (IntersectionObserver); Settings › Performance (live numbers; Display rate, Reactive colours &
+    glow, Animations, Resolution, Blur & shadows, Graphics acceleration on the next start); AUTO — "a better driver": the effects step down
+    while the screen lags and come back with room. CPU cores: shown; spreading background work over them is PF6 (next).

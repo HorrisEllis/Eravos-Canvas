@@ -60,6 +60,17 @@ const BUNDLE_TOOLS = path.join(APP_DIR, 'tools');
 const TOOLS_IN_LIBRARY = !!LIBTOOLS && (app.isPackaged || process.env.ERAVOS_LIBRARY_TOOLS === '1');
 if (TOOLS_IN_LIBRARY) { try { const r = LIBTOOLS.sync(BUNDLE_TOOLS, DIRS.tools, { version: app.getVersion() }); if (!r.skipped) console.log(`tools → ${DIRS.tools}: ${r.copied} copied, ${r.updated} updated, ${r.removed} removed, ${r.kept.length} of yours kept`); } catch (e) { console.error('tools into the library failed:', e.message); } }
 app.setPath('userData', DIRS.appdata);
+// 3.222 Settings › Performance › Graphics acceleration (his words, 2026-11-24: "maybe custom settings, like cpu cores, animations, graphics
+// acceloratoin"): read before the app is ready (Chromium decides at start); a change waits for the next start (Restart ERAVOS now)
+const GPU_PREFS = path.join(DIRS.appdata, 'graphics.json');
+let gpuSaved = true; try { gpuSaved = JSON.parse(fs.readFileSync(GPU_PREFS, 'utf8')).accel !== false; } catch (e) {}
+const GPU_AT_START = gpuSaved; if (!GPU_AT_START) app.disableHardwareAcceleration();
+ipcMain.handle('eravos:gpu', (e, set) => {
+  if (set && typeof set.accel === 'boolean') { gpuSaved = set.accel; try { fs.writeFileSync(GPU_PREFS, JSON.stringify({ accel: gpuSaved })); } catch (er) {} }
+  let st = null; try { st = app.getGPUFeatureStatus(); } catch (er) {}
+  return { accel: gpuSaved, pending: gpuSaved !== GPU_AT_START, status: st ? 'compositing ' + (st.gpu_compositing || '?') + ' · 2D canvas ' + (st['2d_canvas'] || '?') + ' · WebGL ' + (st.webgl || '?') : '' };
+});
+ipcMain.handle('eravos:relaunch', () => { app.relaunch(); app.exit(0); });
 
 // ---------------------------------------------------------------- one instance
 const PRIMARY = app.requestSingleInstanceLock();

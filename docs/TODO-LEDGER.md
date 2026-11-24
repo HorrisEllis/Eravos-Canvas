@@ -26,9 +26,9 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 
 | # | What | His words (2026-11-24) | State |
 |---|---|---|---|
-| T-13 | **PF0 measure**: Settings › Performance — GPU status, frame times, main-thread busy %, audio load, workers, memory; a saved report. Gate for the rest. | "like is it optimized?" | specced |
+| T-13 | **PF0 measure** (live numbers built in 3.222; the saved report still to do): Settings › Performance — GPU status, frame times, main-thread busy %, audio load, workers, memory; a saved report. Gate for the rest. | "like is it optimized?" | specced |
 | T-14 | **PF1 pause what is not seen + lazy load**: one shared frame scheduler (15 loops today); off-screen / covered / minimised windows draw nothing; a tool's face built on first sight. | "like lazy load" | specced |
-| T-15 | **PF2 Performance mode**: no transitions, no reactive colours / glow, slower meters; follows reduce-motion. Off by default. | "like disabling animations, transitions." | specced |
+| T-15 | **PF2 Performance mode** (3.222: the custom settings + Auto cover it; a one-switch mode still possible): no transitions, no reactive colours / glow, slower meters; follows reduce-motion. Off by default. | "like disabling animations, transitions." | specced |
 | T-16 | **PF3 simpler when zoomed out**: a tool becomes one cached picture (or name, colour, level) below a zoom level; live again zoomed in. | "like real pixelated when zooming out" | specced |
 | T-17 | **PF4 tools that grow as they are resized**: small = the essentials, wider = more, up to today's full face. Preview first. | "what about a simplified ui for tools. then they expand as you resize them?" | specced (waits a preview) |
 | T-18 | **PF5 displays on the GPU** (WebGL / OffscreenCanvas): spectra, scopes, meters, waveforms, wires. | "like is it using my graphics card? like offloading?" · "gpupu" | specced |
@@ -37,6 +37,7 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-21 | **PF8 safe Chromium switches** (GPU rasterization / zero-copy; never ignore-gpu-blocklist). | "at least until looking glass replaces electron." | specced |
 | T-22 | **RP1 resource needs in every tool's contract** (`needs.resources`, from its DAG; a CI check). | "what ever is on the canvas, is priority … it needs to remain agnostic." | specced |
 | T-23 | **RP2 priority follows the canvas**: the canvas sums the needs of what is on it (audio first for music, GPU / images for image tools, both when both); names no domain. | same | specced |
+| T-32 | **Lag fixed at its cause + Settings › Performance + Auto** (3.222): measured; the forced layout in the reactive colours removed; custom settings (display rate, effects, animations, resolution, blur, GPU on next start); Auto steps effects down while lagging. Shown first — waits his yes to merge. | "needs performance optimization. the cpu cores. its lagging with plenty of overhead. maybe custom settings, like cpu cores, animations, graphics acceloratoin. maybe invent a better driver" | built, shown first |
 | T-24 | **AN1–AN3 beautiful animations**: one motion language (FieldMotion) for windows, tools landing, wires, menus, Start's steps; transform + opacity only; **shown as a video first**. | "i want beautiful animations in eravos." | specced (waits a video) |
 
 ## The Mutation Lab, the Workbench, the Tool Builder · `specs/eravos.assembled-tool.spec` ADDENDUM 2026-11-24

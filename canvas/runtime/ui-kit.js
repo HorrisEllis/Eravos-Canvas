@@ -331,7 +331,7 @@
   // ---------------------------------------------------------------- canvases
   function Canvas(w, hgt, cls) {
     const c = h('canvas', { class: 'uk-canvas ' + (cls || ''), role: 'img', 'aria-label': 'live display' });
-    const dpr = doc.documentElement.dataset.gfx === 'low' ? 1 : Math.min(2, global.devicePixelRatio || 1);   // 3.121 Low: 1×
+    const dpr = doc.documentElement.dataset.gfx === 'low' || doc.documentElement.dataset.res === 'standard' ? 1 : Math.min(2, global.devicePixelRatio || 1);   // 3.121 Low: 1× · 3.222 Display resolution: Standard
     c.width = w * dpr; c.height = hgt * dpr; c.style.width = '100%'; c.style.height = hgt + 'px';
     c.dpr = dpr;
     const g = c.getContext('2d'); g.scale(dpr, dpr);
@@ -350,7 +350,7 @@
     // 3.121 Settings › Graphics: Balanced = at most 30 redraws a second, Low = 15 (read each frame, so a change applies at once)
     // 3.122 zoomed out the windows are small, so their displays need less: under 60 % zoom at most 24 redraws a second, under 35 % 8
     const zoomDt = () => { const z = global.CanvasWM && global.CanvasWM.view ? global.CanvasWM.view.z || 1 : 1; return z < 0.35 ? 1000 / 8 : z < 0.6 ? 1000 / 24 : 0; };
-    const gfxDt = () => { const g = doc.documentElement.dataset.gfx; return Math.max(g === 'low' ? 1000 / 15 : g === 'balanced' ? 1000 / 30 : 0, el.closest && el.closest('#world') ? zoomDt() : 0); };
+    const gfxDt = () => { const g = doc.documentElement.dataset.gfx, f = +doc.documentElement.dataset.fps || 0; return Math.max(g === 'low' ? 1000 / 15 : g === 'balanced' ? 1000 / 30 : 0, f && f < 60 ? 1000 / f : 0, el.closest && el.closest('#world') ? zoomDt() : 0); };   // 3.222 Settings › Performance › Display rate (data-fps)
     const baseDt = Math.max(fps ? 1000 / fps : 0, reduceMotion() ? 125 : 0);
     function frame(t) {
       if (!alive) return;

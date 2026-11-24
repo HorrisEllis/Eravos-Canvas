@@ -260,7 +260,12 @@
   let frameEma = 16.7, prevRaf = 0, load = 1;
   const budget = (ts) => { if (prevRaf) { const dt = Math.min(250, ts - prevRaf); frameEma += (dt - frameEma) * 0.06; } prevRaf = ts;
     const want = frameEma > 22 ? Math.min(4, frameEma / 16.7) : 1; load += (want - load) * (want > load ? 0.2 : 0.02); };
-  const WRITE_MS_NOW = () => WRITE_MS_BASE * (gfx() === 'low' ? 4 : gfx() === 'balanced' ? 2 : 1) * (load > 1.05 ? load : 1);
+  // 3.222 Settings › Performance › Reactive colours & glow (the canvas's data-fx — full | light | off; Auto picks light while the screen lags):
+  // Light = the same colours, read 10× a second and written ~3× less often; Off = at rest (the cheapest). Measured: with them off a playing
+  // song of 10 tools ran 60 fps with no long task; on, the main thread was blocked ~46 % of each second.
+  const fx = () => doc.documentElement.dataset.fx || 'full';
+  let fxRest = false;
+  const WRITE_MS_NOW = () => WRITE_MS_BASE * (gfx() === 'low' ? 4 : gfx() === 'balanced' ? 2 : 1) * (fx() === 'light' ? 3 : 1) * (load > 1.05 ? load : 1);
   let pageOff = false;   // 3.83 glass mode: the page palette is the glass layer's; the windows still answer
   const set = (k, v) => { if (!writing || pageOff || rootV[k] === v) return; rootV[k] = v; root.style.setProperty(k, v); };
   // 3.96 "All the colors are meant to be reactive … the button contents and their border": the accents are written in glass mode too.
@@ -294,10 +299,13 @@
     t = { an: a, buf: new Float32Array(a.fftSize), win, node: p.node }; taps.set(id, t); return t;
   }
   // 3.78 the skip between writes lives only inside the loop: a call from outside (liveAcc, restoreAcc, setMode) always writes
+  const winSeen = new WeakMap(), winIO = typeof IntersectionObserver !== 'undefined' ? new IntersectionObserver((es) => es.forEach(e => winSeen.set(e.target, e.isIntersecting)), { threshold: 0 }) : null;
+  const seen = (w) => { if (!winIO) return w.offsetParent !== null; if (!w._seenObs) { w._seenObs = true; winIO.observe(w); return true; } return winSeen.get(w) !== false; };
   function frame(ts) { try { frameBody(ts); } finally { writing = true; } }
   function frameBody(ts) {
     raf = global.requestAnimationFrame(frame); budget(ts);
-    if (doc.hidden || ts - last < 33) return;
+    if (doc.hidden || ts - last < (fx() === 'light' ? 100 : 33)) return;
+    if (fx() === 'off') { if (!fxRest) { fxRest = true; zero(); } return; } fxRest = false;
     // the app is Off: only windows with their own reactive setting (⚙ → Reactive colours) still answer — looked for once a second
     if (!on) { if (ts - ownScan > 1000) { ownScan = ts; ownAny = Array.from(doc.querySelectorAll('.wm-win')).some(w => { const x = settingsOf(w); return x.own && x.mode !== 'off'; }); } if (!ownAny) return; }
     last = ts; writing = ts - lastW >= WRITE_MS_NOW(); if (writing) lastW = ts;
@@ -328,7 +336,7 @@
     const kMix = q(clamp((level * 0.55 + pulse * 0.5) * amt * 1.25, 0, 1), 20);
     // 3.98 the Field theme: one turn (degrees, a plain number) and one light (0…1) for every colour at once — written in both ways of
     // drawing, so every accent on the page moves together ("changing to sync them all, and change with the sounds")
-    if (on) { setPal('--snd-hn', String(Math.round(shift))); setPal('--snd-lv', kMix.toFixed(2)); } if (on && ts - lastPal >= 100) { lastPal = ts; PALETTE.forEach(k => { if (base[k]) setPal(k, colourFor(base[k], kMix, G())); }); surfaces(kMix); }
+    if (on) { setPal('--snd-hn', String(Math.round(shift))); setPal('--snd-lv', kMix.toFixed(2)); } if (on && ts - lastPal >= (fx() === 'light' ? 400 : 100)) { lastPal = ts; PALETTE.forEach(k => { if (base[k]) setPal(k, colourFor(base[k], kMix, G())); }); surfaces(kMix); }
     if (G2 && on && gfx() !== 'low') glassMix(kMix); else if (G2 && gfx() === 'low') glassRest();   // 3.121 Low: no glow layer
     // a tool shown on its page (or a suite's page) lights with the mix
     if (on) doc.querySelectorAll('.tp-overlay').forEach(o => { o._rk = kMix; o._ro = G(); light(o, kMix, G()); accented(o, ts).forEach(el => light(el, kMix, G())); });
@@ -338,7 +346,11 @@
     // 3.73 "all of the accents … when sound plays — in the tools, the ui": a window that makes no sound of its own (a pattern tool,
     // the timeline, a modulator) follows the tools it plays (wired from it), or else the mix — so every window answers the sound
     const lvOf = new Map(), quiet = [];
-    Array.from(doc.querySelectorAll('.wm-win')).filter(w => !w.classList.contains('collapsed') && w.offsetParent !== null).forEach(w => {   // 3.78 every read first
+    // 3.222 which windows to light, WITHOUT reading layout: `offsetParent` here forced the whole page's style and layout to be worked out
+    // again, every frame, right after the colour variables were written — measured, it was nearly all of this loop's cost (the main
+    // thread blocked ~40 % of every second with a song playing). An IntersectionObserver says what is on screen without forcing anything;
+    // a window off screen (or hidden) is not lit until it comes into view — what you see looks the same.
+    Array.from(doc.querySelectorAll('.wm-win')).filter(w => !w.classList.contains('collapsed') && seen(w)).forEach(w => {   // 3.78 every read first
       const t = toolTap(w); if (!t || t.none) { quiet.push(w); return; }
       t.an.getFloatTimeDomainData(t.buf); let s = 0, pk = 0; for (let i = 0; i < t.buf.length; i++) { const x = t.buf[i]; s += x * x; const a = x < 0 ? -x : x; if (a > pk) pk = a; }
       // 3.73 a meter's envelope: the loudness or the peak (a drum hit is short — its peak is what you see), up fast, down slower

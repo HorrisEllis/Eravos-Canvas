@@ -23,6 +23,8 @@ contextBridge.exposeInMainWorld('eravosDesktop', {
   updateStatus: () => ipcRenderer.invoke('eravos:update-status'),
   updateChannel: (c) => ipcRenderer.invoke('eravos:update-channel', c),   // 3.148 get (no argument) or set 'stable' | 'beta'
   openUpdateLog: () => ipcRenderer.send('eravos:update-log'),
+  gpu: (set) => ipcRenderer.invoke('eravos:gpu', set || null),   // 3.222 graphics acceleration: get, or set { accel } (on the next start)
+  relaunch: () => ipcRenderer.invoke('eravos:relaunch'),
 });
 // ERAVOS Glass (host/glass.js) runs inside the app: tell the page before its scripts run (canvas/runtime/glass-link.js)
 { const g = ipcRenderer.sendSync('eravos:glass'); if (g) contextBridge.exposeInMainWorld('ERAVOS_GLASS', g); }
