@@ -88,3 +88,24 @@ host_files: add-menu.js app-settings.js black-surfaces.js canvas-prefs.js canvas
   - D4 (his call): suites.js and the reactive look (colour-field, glass-layer) — host or tools.
 open gaps: the Field's global name; whether tools/core is listed in the Start menu's domains (proposed: no — it is always there, like the canvas);
   how the store ships tools/core (with the canvas, or as the first zip).
+
+## ADDENDUM 2026-11-24 — the toolbar: only what the canvas needs, the rest from the tools (the original above kept verbatim)
+His words (2026-11-24, verbatim; the whole message: specs/eravos.2026-11-24-session.map.spec 21):
+  "okay well no options and settings. organize or tidy up, don't need both. sounds or rhythms, and songs. metronome loop region in the
+   canvas ui. need to clean up the noise. need to when choosing a domain. remove the start button from the corner and just have the add
+   button, with a back to domain, in the top left corner of the catalog."
+  and (22): "first one, beyond removing the undo and redo, and redundany options."
+Phases (TB — each a look change: shown to him before it merges):
+  - TB1 Options → into Settings; Undo / Redo buttons removed; redundant options removed (DECIDED — settings-buttons-dag ADDENDUM, ST1).
+  - TB2 Organize / Tidy up: one action, one button (DECIDED: "don't need both"). Recommended: keep "Organize" on the toolbar, drop
+    "Tidy up" from the menu (same CanvasWM.tidy). Open: which name — asked in the ledger, T-07.
+  - TB3 Sounds · Rhythms · Songs (and Learn — the music domain's "studio" unit): one entry instead of three. OPEN — recommended: one
+    Library button, one browser with tabs (Songs · Sounds · Rhythms · Learn). Asked, not answered yet: T-08.
+  - TB4 Metronome and loop region. OPEN — "metronome loop region in the canvas ui" read three ways (out of the agnostic toolbar into the
+    music transport · onto the canvas as a loop-region bar · into the Timeline only). Asked, not answered: T-09.
+  - TB5 "need to clean up the noise. need to when choosing a domain": the toolbar shows only what the canvas needs (Add, Settings, the
+    fault light) until a domain is chosen; a domain's units come with the tools that need them (Shell.X units, domain.js) — as today, but
+    nothing music-shaped before it. OPEN which of: only what the tools on the canvas need · the domain's set at once — asked: T-10.
+  - TB6 START BUTTON REMOVED (DECIDED): the toolbar's top-left is Add only. Start's first step (the domains) opens on launch as today.
+  - TB7 THE CATALOG (Add) GETS "← Domains" in its top-left corner (DECIDED): back to the domain screen (Start's first step, 3.220).
+Kept agnostic: none of this names a domain in canvas/ (tests/boundary.test.js); the domain contributes its units, as now.

@@ -47,3 +47,24 @@
 
 ## Order
   S1 buttons (small, his pick, now) → S3 the DAGs (needed by the components work and Looking Glass LG4) → S2 Settings (the page that shows them).
+
+## ADDENDUM 2026-11-24 — Settings is THE one menu; it grows from the tools' contracts (the original above kept verbatim)
+His words (2026-11-24, verbatim; the whole messages: specs/eravos.2026-11-24-session.map.spec 20–22):
+  "also the settings needs to be a real menu, that expands from the tools dag contract, like what is needed expands the options."
+  "okay well no options and settings."
+  Asked "Options and Settings: you don't need both. Where should Options' actions go (Stop all, Show ports, Fit all, Clear canvas)?" —
+  options Into Settings · Into right-click · Both — he answered: "first one, beyond removing the undo and redo, and redundany options."
+Decided:
+  - ST1 ONE BUTTON: ⚙ Settings. The ⋯ Options button and its drop-down are removed; their actions (Stop all — Shift+Esc stays, Show ports,
+    Fit all, Clear canvas) become a section of Settings (and stay on their keys). The Undo / Redo toolbar buttons are removed (Ctrl+Z,
+    Ctrl+Shift+Z / Ctrl+Y stay; HISTORY stays where it is shown). Redundant entries removed — Organize and Tidy up are the same action
+    (CanvasWM.tidy) on two buttons: one stays (see specs/eravos.bare-canvas.spec ADDENDUM 2026-11-24, TB2).
+  - ST2 A REAL MENU: the sections down the side, search across every option, each option saying what it does.
+  - ST3 SECTIONS FROM THE CONTRACTS (agnostic): a section appears because a tool on the canvas needs it — tool.json needs.resources
+    (specs/eravos.performance-plan.spec RP1): Audio (device, latency, buffer, sample rate) with 'audio-realtime'; MIDI with 'midi-in';
+    GPU / image memory / colour with 'draw-gpu' / 'image-memory'; Files with 'files'. Always there: Look, Performance, Library, Updates,
+    Canvas (the former Options' actions). Each option lists the tools that asked for it ("Latency — needed by Wobble Bass, Retro DCO"). The
+    last tool needing a section removed → the section hides; its values are kept for when it comes back.
+  - ST4 a tool's own ⚙ settings stay on the tool (tool-settings.js) and are reachable from its entry in Settings.
+  - ST5 a LOOK CHANGE → a preview he approves first (the rule), then built.
+Order: ST1 (with the toolbar clean-up, shown first) → RP1 (needs.resources) → ST3 → ST2. Tracked: docs/TODO-LEDGER.md T-04, T-05, T-12.

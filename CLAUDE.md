@@ -84,6 +84,14 @@ Each holds for every tool and every change. How each is kept is said with it. Th
   they cause instability they can be deleted."): what is made on the canvas is a tool of its own, apart from the rest, and can be deleted
   whole if it misbehaves; nothing made depends on being hand-wired into another tool.
 
+- **Priority follows what is on the canvas — agnostic** (his words, 2026-11-24: "what ever is on the canvas, is priority, like if its music,
+  its audio, if its image manipulation, its images and audio if there is more, like it needs to remain agnostic."): the canvas never names a
+  domain; each tool's contract declares the resources it uses, and the canvas gives priority from the sum of what is on it
+  (`specs/eravos.performance-plan.spec` D4, RP1–RP3). Settings grows from the same contracts.
+- **The to-do ledger** (his words, 2026-11-24: "also log all of this, don't lose anything, update the specs, phases. and add that to a to do
+  ledger"): `docs/TODO-LEDGER.md` is the one list of what is asked and not done — a line is never deleted, a finished one moves to Done.
+  Every session adds to it with his words, the spec and the phase.
+
 - **No toys** (his words, 2026-11-05: "It's not a toy replaying sounds … I want it to stay that way. No toys."). Every instrument makes
   its sound live — oscillators, filters, shapers, modulation — like Wobble Bass: no shipped recordings, no sample playback dressed up
   as an instrument, every preset is settings the engine rebuilds. Samplers work only on the user's own audio. Full depth, nothing
@@ -104,6 +112,11 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-24 | **The to-do ledger; the session mapped; specs and phases** (3.221): every word of the session verbatim, the performance plan (PF0–PF8, RP, AN), Settings from the contracts (ST), the toolbar (TB), the Mutation Lab / Workbench (ML) — `docs/TODO-LEDGER.md` | `specs/eravos.2026-11-24-session.map.spec`, `specs/eravos.performance-plan.spec`, `docs/TODO-LEDGER.md` | `node build/competence.mjs --check` |
+| 2026-11-24 | **Start in two steps; a borderless window; the 3D exploded note in the README** (3.220, release 0.2.36) | `canvas/index.html`, `desktop/main.js`, `canvas/runtime/eravos.css`, `README.md` | `tests/p16-ui.mjs` (the two steps), boundary 10/10 · PR #217 |
+| 2026-11-24 | **The README, current, with pictures** (3.218–3.219, release 0.2.35) | `README.md` | 0 old lines lost; every image exists · PR #215, #216 |
+| 2026-11-24 | **Pick the voice; "the rest from <tool>"** (3.217): ERAVOS makes Retro DCO × Wobble Bass from his picks | `tools/music/data/tool-blend.js`, `core/assembled-tool.js`, `tools/core/field/board.js` | `tests/p217` 1/1 · PR #215 |
+| 2026-11-24 | **The box is the component; hover words; right-click › Replace with** (3.216) | `tools/core/field/board.{js,css}`, `tools/music/data/part-words.js` | `tests/p216` 1/1 · PR #214 |
 | 2026-11-24 | **Updating no longer breaks on the running ERAVOS Update.exe** (3.215, release 0.2.34): from his screenshot (EBUSY) — the updater runs from a copy, a held one is kept and replaced at restart, the fallback copies by robocopy (3.214's CopyFiles left ERAVOS.exe out) | `desktop/updater.js`, `desktop/setup-copy.js`, `packaging/windows/eravos.nsi` | `desktop/test/setup-copy.mjs` 15/15; makensis compiles |
 | 2026-11-24 | **The Setup falls back to the 0.2.29 way** (3.214, release 0.2.33): when its own window (new in 0.2.30) cannot write the app, the Setup copies it itself and checks every file — not a stop | `packaging/windows/eravos.nsi`, `desktop/setup.html` | makensis compiles; not yet run on Windows |
 | 2026-11-24 | **Fixed: "error writing ERAVOS.exe"** (3.213, release 0.2.32): the Setup and the updater never saw a running ERAVOS (`tasklist /NH` starts with an empty line), so never closed it; now `find` decides, it is killed and waited for, and a still-held ERAVOS.exe is moved aside | `packaging/windows/eravos.nsi`, `eravos-update.nsi`, `desktop/setup-copy.js` | `desktop/test/setup-copy.mjs` 14/14; makensis compiles |
@@ -217,6 +230,9 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
   `docs/eco-graph.md` (which components the planned tools stand on, how many each reaches, what is ready to build).
 
 ## Open (asked, not done)
+
+**The whole list, with states and phases: `docs/TODO-LEDGER.md`** (2026-11-24). The items below are kept as they were written.
+
 
 - **The store** (2026-11-06): the canvas installs on the system, everything else (domains, tools, components, packs, suites) lives in Documents\ERAVOS as whole zips from a store, the graph says what each needs (UI elements included) — `specs/eravos.store.spec`, S0 written; decisions D1–D4 his.
 - **Novel, full depth, no noise** (2026-11-06): every preset, pad sound, unit and mod novel against ALL of ERAVOS (measured); every tool full depth in pitch · tone · wave · modulation · speed · tempo · rhythm (and what its kind has), each control earning its place; a Tuning & settings tab per tool. Order N1 (the report) → N2 Swarm made new → N3 settings tab → N4 per tool. `specs/eravos.music-ecosystem.spec` + `eravos.tool-depth.spec` ADDENDA 2026-11-06.

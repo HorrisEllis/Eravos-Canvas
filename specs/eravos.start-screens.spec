@@ -28,3 +28,12 @@
 # phases: SS0 this spec · SS1 the preview, built in core, opened by hand (StartScreen.open()), filmed · SS2 on his yes: the Start button opens it
 #   (today's bootScreen kept as a fallback until then) · SS3 genre demos for every genre the songbooks have (a setup per genre, its painting)
 # open: whether "any tool selected from the domains populates the catagories" means picking tools to build a canvas (a basket) — asked.
+
+# ADDENDUM 2026-11-24 (the original above kept verbatim)
+# His words: "also the start from should only show after you pick music. like only show the domains at first." · "remove the start button
+#   from the corner and just have the add button, with a back to domain, in the top left corner of the catalog."
+# BUILT 3.220 (0.2.36), in today's Start (canvas/index.html bootScreen, domain-free): two steps — the domains (with Empty canvas, projects,
+#   autosave) → a domain picked: ← All domains, its modes, its songs, START FROM. StartScreen (this spec's SS1, tools/core/start/) is still
+#   the preview; SS2 (it replacing bootScreen) waits for his yes, as before.
+# NEXT (specs/eravos.bare-canvas.spec ADDENDUM 2026-11-24): TB6 the Start button leaves the toolbar (the domains open on launch); TB7 the
+#   Add catalog carries "← Domains" top-left, back to the first step. Animations between the steps: specs/eravos.performance-plan.spec AN1.

@@ -71,6 +71,13 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-24 · Start in two steps; a borderless window; the README with pictures (3.218–3.220)
+- **His words (2026-11-24):** "Also update the readme, with images if possible." · "like only show the domains at first." · "also borderless windows please?"
+- **His call:** each asked directly; "marge and publish."
+- **Built (by the AI coder, to his direction):** the README's new top with pictures (nothing older lost); Start in two steps (domain-free); the window without its title bar.
+- **Proof:** README — 0 old lines missing, every image path exists · tests/p16-ui.mjs two new checks pass · boundary 10/10. Borderless: not yet seen on Windows. PR #215–#217, releases 0.2.35–0.2.36.
+- **Where to check:** `node docs/previews/start-two-steps.shots.mjs`; `desktop/main.js` titleBarOverlay.
+
 ### 2026-11-24 · Pick the voice; say where the rest comes from (3.217)
 - **His words (2026-11-24):** "combine the sound of retro dcs with the rest of wobble bass." · "eravos makes it, not you. only add capability. always capability first."
 - **His call:** capability, not a made tool.
