@@ -67,3 +67,8 @@
 ## Order
   PF0 → PF1 → PF2 → PF3 → (PF4 preview → his yes → PF4) → PF5 → PF6 → PF7; RP1 → RP2 → RP3 alongside PF1; AN1–AN3 after PF1 (a smooth
   canvas first, then motion on it). Tracked in docs/TODO-LEDGER.md (T-13 … T-24).
+
+## ADDENDUM 2026-11-24 (the original above kept verbatim)
+His words: "invent our own? specifically made more eravos?" · "dynamic, load balancing, signal to noise? wait for emerge". PF7 (faster sound per
+core, WebAssembly) is withdrawn from this plan: the sound's own engine is specs/eravos.engine.spec, written in Emerge (his call); what today's
+stack can do for the sound is its EN1. This plan keeps the screen's thread (PF0–PF6, PF8) and the animations (AN).

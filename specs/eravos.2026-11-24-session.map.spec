@@ -116,3 +116,18 @@
   - BUILT 3.222: the forced layout removed (IntersectionObserver); Settings › Performance (live numbers; Display rate, Reactive colours &
     glow, Animations, Resolution, Blur & shadows, Graphics acceleration on the next start); AUTO — "a better driver": the effects step down
     while the screen lags and come back with room. CPU cores: shown; spreading background work over them is PF6 (next).
+
+## 24 — verbatim:
+  > that is still not great. what about the audio driver or engine that electron uses?
+  - ANSWERED: Chromium's Web Audio — one real-time thread for every tool, WASAPI shared mode (~10 ms), no ASIO / exclusive / device / buffer
+    choice. Asked: is "still not great" the screen or the sound? (not answered yet)
+
+## 25 — verbatim:
+  > invent our own? specifically made more eravos?
+  - ANSWERED: an engine of ERAVOS's own (not a driver): the DAG as the schedule across cores, tools isolated, everything live, synthesis in
+    the engine, agnostic, live = offline, its own process.
+
+## 26 — verbatim:
+  > dynamic, load balancing, signal to noise? wait for emerge
+  - DECIDED: the native engine is written in Emerge and waits for it (E2 / E3). DYNAMIC, LOAD BALANCING and SIGNAL TO NOISE written into
+    specs/eravos.engine.spec (NEW, EN0–EN6); docs/TODO-LEDGER.md T-33 … T-38. Open: EN1 (today's stack) now?

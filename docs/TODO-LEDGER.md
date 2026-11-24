@@ -33,7 +33,7 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-17 | **PF4 tools that grow as they are resized**: small = the essentials, wider = more, up to today's full face. Preview first. | "what about a simplified ui for tools. then they expand as you resize them?" | specced (waits a preview) |
 | T-18 | **PF5 displays on the GPU** (WebGL / OffscreenCanvas): spectra, scopes, meters, waveforms, wires. | "like is it using my graphics card? like offloading?" · "gpupu" | specced |
 | T-19 | **PF6 a worker pool across the cores** for offline work (synthesizing + judging, mutation, bouncing, analysis). | "using all my cpu cores, ram?" | specced |
-| T-20 | **PF7 faster sound per core**: shared DSP kernels in WebAssembly + SIMD; proven by components.mjs + the null render. | "can we optimize the performance even more?" | specced |
+| T-20 | **PF7 faster sound per core** (moved to the engine, 2026-11-24: kernels in Emerge, EN3): shared DSP kernels in WebAssembly + SIMD; proven by components.mjs + the null render. | "can we optimize the performance even more?" | specced |
 | T-21 | **PF8 safe Chromium switches** (GPU rasterization / zero-copy; never ignore-gpu-blocklist). | "at least until looking glass replaces electron." | specced |
 | T-22 | **RP1 resource needs in every tool's contract** (`needs.resources`, from its DAG; a CI check). | "what ever is on the canvas, is priority … it needs to remain agnostic." | specced |
 | T-23 | **RP2 priority follows the canvas**: the canvas sums the needs of what is on it (audio first for music, GPU / images for image tools, both when both); names no domain. | same | specced |
@@ -50,6 +50,17 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-28 | **ML4 the Mutation Lab**: a shelf of every component and core; spec + preview first. | "you open the mutation lab, and it has all the components, and cores to play with." | specced (waits a preview) |
 | T-29 | **ML5 the Workbench / Tool Builder**: from scratch — parts, then each control's UI element and the theme; saved as a tool of its own. Spec + preview first. | "the workbench to be able to build from scratch from components and the broad selection of ui elements, with different control types, and themes, like a tool builder." | specced (waits a preview) |
 | T-30 | **ML6 a made tool as its own zip** (isolated: deleted whole if unstable). | "also tools are isolated so if they cause instability they can be deleted." | specced |
+
+## ERAVOS's own engine · `specs/eravos.engine.spec` (decided 2026-11-24: written in Emerge — "wait for emerge")
+
+| # | What | His words (2026-11-24) | State |
+|---|---|---|---|
+| T-33 | **EN1 today's stack** (no new language): the audio thread's load measured; silent tools sleep; voices / tails below the floor ended; denormal guards + headroom checked in every component; TPDF dither on export; latency / sample rate / output device settings. Null render proves no change. | "dynamic, load balancing, signal to noise? wait for emerge" | open (asked: now?) |
+| T-34 | **EN2 Emerge prerequisites**: E2 native_windows, E3 calling Windows (COM for WASAPI), threads, atomics, a lock-free queue, MMCSS — in HorrisEllis/Emerge (needs push access there). | "wait for emerge" | specced (blocked on access) |
+| T-35 | **EN3 kernels in Emerge**, each against its contract, bit-close to today's by the null render. | "invent our own? specifically made more eravos?" | specced |
+| T-36 | **EN4 the engine process in Emerge**: WASAPI exclusive / shared, ASIO; DYNAMIC (graph swapped at a block, cross-faded); LOAD BALANCING (the DAG scheduled over cores, work stealing, measured cost, critical path first); SIGNAL TO NOISE (64-bit mix, FTZ, headroom + true-peak, TPDF dither, oversampling; work only on what is heard); tools isolated; its own process; Web Audio the fallback. | "dynamic, load balancing, signal to noise?" | specced |
+| T-37 | **EN5 Settings › Audio** from the engine (driver, device, buffer, sample rate, cores, per-core load, per-tool cost). | "that is still not great. what about the audio driver or engine that electron uses?" | specced |
+| T-38 | **Which lags on his PC — the screen or the sound?** (decides what is cut next) | "that is still not great. what about the audio driver or engine that electron uses?" | open (asked) |
 
 ## Shipped, to confirm on his PC
 
