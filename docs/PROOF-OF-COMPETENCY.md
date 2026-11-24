@@ -71,6 +71,13 @@ The release (installer + portable build, built on GitHub's Windows runners): htt
 Each entry: **when** (merge time on `main`) · **his words** (the ask, dated) · **his call** · **built** (by the AI coder to his
 direction) · **proof** (what was measured or tested) · **check** (where a stranger looks).
 
+### 2026-11-24 · Less lag at its cause; Settings › Performance; Auto (3.222)
+- **His words (2026-11-24):** "needs performance optimization. the cpu cores. its lagging with plenty of overhead. maybe custom settings, like cpu cores, animations, graphics acceloratoin. maybe invent a better driver"
+- **His call:** custom settings; the lag fixed.
+- **Built (by the AI coder, to his direction):** measured the main thread per loop; found and removed a forced layout per window per frame; the Performance settings and an automatic governor; the GPU switch.
+- **Proof:** blocked time per second 460 → 173 ms (Auto), fps 32 → 49, on a 2-core test machine; tests listed in PROGRESS 3.222.
+- **Where to check:** `node docs/previews/settings-performance.shots.mjs`; `canvas/runtime/performance.js`.
+
 ### 2026-11-24 · Start in two steps; a borderless window; the README with pictures (3.218–3.220)
 - **His words (2026-11-24):** "Also update the readme, with images if possible." · "like only show the domains at first." · "also borderless windows please?"
 - **His call:** each asked directly; "marge and publish."

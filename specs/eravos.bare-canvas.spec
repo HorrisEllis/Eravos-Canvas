@@ -67,7 +67,7 @@ BC2 — wired (new UI: a preview shown to him before it is built): a Field windo
 #     (domain.json "always": true — the Catalog loads a domain marked always before any other, whatever is installed; the canvas reads the
 #     flag and names no domain); ERAVOS_DOMAINS lists core first; the boundary test scans tools/core as it scans the canvas.
 #   - the guard: tests/bare-canvas.test.mjs (plain node, in CI) — every canvas/runtime/*.js is on the line below; a new file fails until listed.
-host_files: add-menu.js app-settings.js black-surfaces.js canvas-prefs.js canvas-wm.js catalog.js colour-field.js content-packs.js context-menu.js dep-graph.js desktop-bridge.js erv.js expansion.js glass-layer.js glass-link.js history.js icons.gen.js icons.js links.js mods-rack.js mods.js organism-factory.js organism-sdk.js pack-editor.js plain-errors.js preview.js recipes.js suites.js themes.js tool-page.js tool-settings.js ui-kit.js updates.js wire-system.js workspace.js
+host_files: add-menu.js app-settings.js black-surfaces.js canvas-prefs.js canvas-wm.js catalog.js colour-field.js content-packs.js context-menu.js dep-graph.js desktop-bridge.js erv.js expansion.js glass-layer.js glass-link.js history.js icons.gen.js icons.js links.js mods-rack.js mods.js organism-factory.js organism-sdk.js pack-editor.js plain-errors.js preview.js recipes.js suites.js themes.js tool-page.js tool-settings.js ui-kit.js updates.js wire-system.js workspace.js performance.js
 #   (dep-graph, pack-editor, mods-rack are on the list until BC3 moves them; suites, colour-field, glass-layer until he decides — D4)
 
 ## the rule this adds (a guard, with BC1)
@@ -109,3 +109,9 @@ Phases (TB — each a look change: shown to him before it merges):
   - TB6 START BUTTON REMOVED (DECIDED): the toolbar's top-left is Add only. Start's first step (the domains) opens on launch as today.
   - TB7 THE CATALOG (Add) GETS "← Domains" in its top-left corner (DECIDED): back to the domain screen (Start's first step, 3.220).
 Kept agnostic: none of this names a domain in canvas/ (tests/boundary.test.js); the domain contributes its units, as now.
+
+## ADDENDUM 2026-11-24 (2) — performance.js joins the host (the original above kept verbatim)
+His words (2026-11-24): "needs performance optimization. the cpu cores. its lagging with plenty of overhead. maybe custom settings, like cpu
+  cores, animations, graphics acceloratoin. maybe invent a better driver". canvas/runtime/performance.js is the host's because it is about the
+  machine, not a domain: it measures the page (frames, main-thread busy), adapts what is drawn (Auto), holds the custom settings (display
+  rate, effects, animations, resolution, blur, graphics acceleration) as root data-attributes a domain may read, and names no domain.

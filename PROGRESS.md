@@ -2,6 +2,24 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.222 Less lag: a forced layout removed; Settings › Performance; Auto (2026-11-24); release 0.2.37
+His words: "needs performance optimization. the cpu cores. its lagging with plenty of overhead. maybe custom settings, like cpu cores, animations, graphics acceloratoin. maybe invent a better driver"
+- Measured (docs: the probe below; 10 tools of a Song Engine song playing, 2-core test machine): main thread blocked ~46 % of every second
+  (long tasks 405–460 ms/s), ~32 fps, stalls to 150 ms. By loop: the reactive colours (tools/music/core/sound-css.js) ~400 ms/s, displays
+  ~200, the glow layer ~150. Reactive colours off: 60 fps, 0 long tasks. Graphics Low still left them ~220 ms/s.
+- Inside the colour frame: `w.offsetParent` per window (to skip hidden ones) forced the page's style + layout right after the colour writes —
+  nearly all of the frame's cost. Now an IntersectionObserver (off-screen windows are not lit until seen; the look is the same). Full:
+  405 → 332 ms/s blocked, 34 → 43 fps, worst 117 → 83 ms. What remains is the browser restyling after each write (outside the code).
+- canvas/runtime/performance.js (NEW, the host's — listed in specs/eravos.bare-canvas.spec with why): measures (fps, long tasks), AUTO
+  levels 0–2 with hysteresis (2 s lagging → lighter; 6 s calm → back), the custom settings as <html> data-attributes (data-fps, data-fx,
+  data-motion, data-res, data-blur), Settings › Performance. Read by ui-kit's display loop (rate, resolution), the glow layer (resolution,
+  every 3rd frame on Light), FieldMotion and the colour field (motion), eravos.css (motion, blur), and the music domain's reactive colours
+  (Light: read 10×/s, written ~3× less, palette 2.5×/s; Off: at rest). Auto: Full 405 → Auto 173 ms/s blocked, 34 → 49 fps.
+- desktop/main.js + preload.js: graphics acceleration (graphics.json in the app data, read before the app is ready — app.disableHardwareAcceleration;
+  GPU status from app.getGPUFeatureStatus), Restart ERAVOS now.
+- Tests: P102 P106 P147 P103 P110 P83 P84 P77 P91 P58 P196 P197 green, boundary 10/10, bare-canvas (36 files). Screenshot:
+  docs/previews/settings-performance.shots.mjs → settings-performance.png. NOT seen on Windows: the GPU switch.
+
 ## 3.221 Everything logged: the session map, the specs' addenda and phases, the to-do ledger (2026-11-24)
 His words: "first one, beyond removing the undo and redo, and redundany options. also log all of this, don't lose anything, update the specs,
 phases. and add that to a to do ledger" (his answer: Options' actions INTO SETTINGS).

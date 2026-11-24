@@ -81,7 +81,7 @@
   let ema = 16.7, prevT = 0, skip = 0;
   function frame(t) {
     if (prevT) ema += (Math.min(250, t - prevT) - ema) * 0.06; prevT = t;
-    const every = ema > 33 ? 3 : ema > 22 ? 2 : 1;
+    const every = Math.max(ema > 33 ? 3 : ema > 22 ? 2 : 1, doc.documentElement.dataset.fx === 'light' ? 3 : 1);   // 3.222 effects Light: every 3rd frame
     if (every > 1 && (++skip % every)) { raf = global.requestAnimationFrame(frame); return; }
     raf = 0; const dt = lastT ? clamp(t - lastT, 1, 100) : 16; lastT = t; let any = false;
     LAYERS.forEach(L => {
@@ -93,7 +93,7 @@
     if (any) raf = global.requestAnimationFrame(frame); else lastT = 0;
   }
   function size(L) {
-    const dpr = doc.documentElement.dataset.gfx === 'low' ? 1 : Math.min(2, global.devicePixelRatio || 1), w = Math.max(1, Math.round(global.innerWidth * dpr)), h = Math.max(1, Math.round(global.innerHeight * dpr));
+    const dpr = doc.documentElement.dataset.gfx === 'low' || doc.documentElement.dataset.res === 'standard' ? 1 : Math.min(2, global.devicePixelRatio || 1), w = Math.max(1, Math.round(global.innerWidth * dpr)), h = Math.max(1, Math.round(global.innerHeight * dpr));
     if (L.el.width !== w || L.el.height !== h) { L.el.width = w; L.el.height = h; L.resized = true; } L.dpr = dpr;
   }
   // ---- WebGPU (WGSL: one instanced quad per element; a rounded box as a signed distance field — crisp at any scale)
