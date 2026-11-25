@@ -2,6 +2,21 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.224 Mutation and synthesis reach five more tools; EN1 specced in full (2026-11-25) — not merged (shown first)
+His words: "i love the mutation and synthesis. can you expand to the rest of eravos?" · of EN1: "just spec it"
+- tools/music/data/part-exchange.js: Supersaw (filter), Swarm Oscillator (tone = its filter), Retro Poly (VCF, chorus, noise), Piano (drive —
+  its tube; a crusher refused), Tape Memory (saturation; digital = a bitcrusher when under 16 bits / 48 kHz) — each box found by its card's
+  title on the tool's board; settings carried in shared terms (each tool's own resonance scale converted).
+- tools/music/data/tool-blend.js: the same five in the engine's slots (voice · mouth · drive · fx); a slot a tool has nothing for is left to
+  the engine's default; what the engine cannot run is named (Supersaw's unison, Swarm's population and life, the piano's own voice, the
+  tape's wow / hiss / stop). A box is the VOICE by what it is: also osc / swarm. PART_SLOT: crush → fx.
+- tests/p218-mutation-everywhere.test.js 1/1: the five show their part boxes; Wobble Bass's mouth into Retro Poly's VCF (cutoff carried); the
+  piano refuses a crusher; ERAVOS makes a tool from Swarm's swarm + the piano's tube + the tape's 8-bit digital, the rest from Wobble Bass —
+  it plays, no clipping. P196 P199 P200 P202 P203 P204 P205 P216 P217 boundary 10/10 assembled-tool 32 bare-canvas green.
+- Screenshot: docs/previews/workbench/everywhere.shots.mjs → everywhere.png (Retro Poly and Tape Memory blown up, their part tiles).
+- specs/eravos.engine.spec ADDENDUM 2026-11-25: EN1.1–EN1.6 in full (measure; sleep; end the inaudible; dither; latency / rate / device;
+  denormals + headroom checks), each with its proof and what carries into the engine. Nothing of EN1 built.
+
 ## 3.223 ERAVOS's own engine — specced; written in Emerge (2026-11-24)
 His words: "that is still not great. what about the audio driver or engine that electron uses?" · "invent our own? specifically made more eravos?" · "dynamic, load balancing, signal to noise? wait for emerge"
 - specs/eravos.engine.spec (NEW): an engine, not a driver (D1); written in Emerge, waiting for E2 / E3 (D2, his call); its own process; tools

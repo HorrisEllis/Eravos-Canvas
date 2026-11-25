@@ -51,6 +51,46 @@
       }),
       best: ['voice', 'mouth', 'fx'],
     },
+    // 3.224 the rest of ERAVOS: what each tool brings to a synthesized tool, in the engine's slots; a slot a tool has nothing for is left out
+    // (the engine's own default stays); what the engine cannot run yet is named (behind), never faked
+    'eravos.supersaw': {
+      behind: ['the unison stack (up to 9 detuned saws, spread)', 'chords', 'its amp envelope'],
+      slots: (P) => ({
+        voice: { wave: 'saw', pw: 0.5, sub: 0, octave: clamp(P.octave, -2, 1), glide: 0, noise: 0, noiseColour: 'white' },
+        mouth: { mouth: 'filter-svf', mSvfMode: 'lowpass', mSvfStages: 2, cutoff: clamp(P.cutoff, 40, 3000), reso: clamp(((+P.res || 0.8) - 0.5) / 20, 0, 0.95), envAmt: clamp(P.fEnv, 0, 4), envDecay: clamp(P.fD || 0.4, 0.01, 2), envSustain: clamp(P.fS, 0, 1) },
+      }),
+      best: ['voice'],
+    },
+    'eravos.swarm-oscillator': {
+      behind: ['the swarm itself (voices, coupling, pull, drift, cluster)', 'its life (restless, form glide, field FM)', 'the wavetable', 'its stereo field'],
+      slots: (P) => ({
+        voice: { wave: ({ saw: 'saw', pulse: 'pulse', tri: 'triangle' })[P.shape] || 'saw', pw: 0.5, sub: clamp(P.sub, 0, 1), octave: clamp(P.octave, -2, 1), glide: 0, noise: 0, noiseColour: 'white' },
+        mouth: { mouth: 'filter-svf', mSvfMode: 'lowpass', mSvfStages: 2, cutoff: clamp(P.cutoff, 40, 3000), reso: clamp((+P.res || 0) * 0.95, 0, 0.95), envAmt: clamp((+P.envAmt || 0) * 4, 0, 4), envDecay: clamp(P.decay || 0.4, 0.01, 2), envSustain: clamp(P.sustain, 0, 1) },
+      }),
+      best: ['voice'],
+    },
+    'eravos.retro-poly': {
+      behind: ['poly voices, unison and drift', 'PWM', 'the arp'],
+      slots: (P) => ({
+        voice: { wave: (+P.pulse || 0) > (+P.saw || 0) ? 'pulse' : 'saw', pw: clamp(P.width, 0.05, 0.95), sub: clamp(P.sub, 0, 1), subOct: -1, octave: clamp(P.octave, -2, 1), glide: clamp(P.glide, 0, 0.5), noise: clamp(P.noise, 0, 1), noiseColour: 'white' },
+        mouth: { mouth: 'filter-svf', mSvfMode: 'lowpass', mSvfStages: 2, cutoff: clamp(P.cutoff, 40, 3000), reso: clamp(((+P.res || 3) - 0.3) / 20, 0, 0.95), envAmt: clamp(Math.abs(+P.envAmt || 0) * 4, 0, 4), envDecay: clamp(P.fD || 0.35, 0.01, 2), envSustain: clamp(P.fS, 0, 1) },
+        fx: P.chorus && P.chorus !== 'off' ? { fx: 'ensemble-core', fEnsMode: 'juno ' + P.chorus, fEnsMix: 0.5 } : { fx: 'none' },
+      }),
+      best: ['voice', 'fx'],
+    },
+    'eravos.piano': {
+      behind: ['the piano\'s own voice (hammer, strings, body, tine, reed) — the engine has no modal or string voice yet', 'the pedal and sympathetic strings', 'the tremolo'],
+      slots: (P) => ({ drive: { drive: 'saturator-tube', dTubeDrive: clamp((+P.drive || 0) * 20, 0, 20), dTubeBias: 0.3, dTubeTone: 0 } }),
+      best: ['drive'],
+    },
+    'eravos.tape-memory': {
+      behind: ['wow and flutter', 'hiss, crackle and dropouts', 'the tape stop', 'generations of wear'],
+      slots: (P) => ({
+        drive: { drive: 'saturator-tape', dTapeDrive: clamp((+P.drive || 0) * 20, 0, 20), dTapeBump: 2 },
+        fx: ((+P.bits || 16) < 16 || (+P.rate || 48000) < 48000) ? { fx: 'bitcrusher', fCrushBits: clamp(P.bits, 4, 16), fCrushRate: clamp(P.rate, 4000, 40000) } : { fx: 'saturator-tape', fTapeDrive: clamp((+P.drive || 0) * 12, 0, 12) },
+      }),
+      best: ['drive', 'fx'],
+    },
   };
   const builderProfile = { behind: [], best: SLOTS, slots: (P) => { const W = root.AssembledTool, o = {}; if (!W) return o;
     const of = { voice: ['wave', 'pw', 'sub', 'subOct', 'octave', 'glide', 'noise', 'noiseColour'], wobble: ['rate', 'lfoShape', 'depth'], mouth: ['mouth', 'cutoff', 'reso', 'envAmt', 'envDecay', 'envSustain'], drive: ['drive'], fx: ['fx'] };
@@ -69,7 +109,7 @@
   // 3.211 parts picked by hand (his words, 2026-11-22: "holding control to select multiple parts at a time and right click with a synthesize
   // into one tool"): each engine slot from the tool whose part was picked for it, the rest from the base tool (the one most parts came from)
   //   combineFrom({ voice: { id, params }, wobble: …, … }, base, bpm) → settings
-  const PART_SLOT = { filter: 'mouth', drive: 'drive', noise: 'voice', insert: 'fx', chorus: 'fx', fx: 'fx', wobble: 'wobble' };
+  const PART_SLOT = { filter: 'mouth', drive: 'drive', noise: 'voice', insert: 'fx', chorus: 'fx', fx: 'fx', wobble: 'wobble', crush: 'fx' };
   function combineFrom(from, base, bpm) {
     const W = root.AssembledTool, out = W ? W.defaults() : {}, cache = new Map(), sl = (src) => { const k = src.id + '#' + JSON.stringify(src.params); if (!cache.has(k)) cache.set(k, slots(src.id, src.params, bpm)); return cache.get(k); };
     for (const s of SLOTS) { const src = from[s] || base, got = src && sl(src); if (!got) return null; Object.assign(out, got[s] || {}); }
@@ -77,7 +117,7 @@
   }
   // 3.217 a part picked by what it IS, when it is not a swap slot (his: "combine the sound of retro dcs with the rest of wobble bass"): the
   // oscillator boxes are the VOICE, an lfo box the WOBBLE, a filter box the MOUTH — read from the box's own label (the component it names)
-  const PIECE_SLOT = [[/^(osc-va|osc-sub|osc-wavetable|osc-additive|unison|dco)\b/i, 'voice'], [/^lfo\b/i, 'wobble'], [/^filter-(svf|ladder)\b/i, 'mouth'], [/^(waveshaper|saturator)/i, 'drive']];
+  const PIECE_SLOT = [[/^(osc-va|osc-sub|osc-wavetable|osc-additive|unison|dco|osc|swarm)\b/i, 'voice'], [/^lfo\b/i, 'wobble'], [/^filter-(svf|ladder)\b/i, 'mouth'], [/^(waveshaper|saturator)/i, 'drive']];
   const slotOfPiece = (label) => { const t = String(label || '').trim(); const m = PIECE_SLOT.find(([re]) => re.test(t)); return m ? m[1] : null; };
   root.ToolBlend = { SLOTS, PART_SLOT, slotOfPiece, has: (id) => !!profileOf(id), slots, combine, combineFrom, pickFor, paramsOf, defaultsOf, behind: (id) => (profileOf(id) || {}).behind || [], nearestDiv };
   if (typeof module === 'object' && module.exports) module.exports = root.ToolBlend;
