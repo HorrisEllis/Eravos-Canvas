@@ -144,7 +144,8 @@ NEXT (specced, in this order — each shown first where it is seen):
     rebuilds (no toys), measured by the novelty report (no TWIN of another preset) and levelled. Dubstep first, its baseline (his):
     "Make It Bun Dem" (Skrillex & Damian Marley, 2012) — studied as technique only, never its tune or a recording: docs/research/ (the
     reggae-dubstep half-time at 140, the talking growl from formant + FM, the vocal-chop-as-instrument, the build into a riser and the
-    drop's call-and-response bass). "trenke" — asked (which track).
+    drop's call-and-response bass). "trenke" — asked (which track); answered 2026-11-25 by his screenshot: the same record,
+    "Make It Bun Dem" (Skrillex & Damian Marley, the After Hours EP).
   - LEVERAGE: the next set from docs/eco-graph.md (slew-lag, mpe-expression, relationship-graph, reverb-fdn, waveshaper; Ensemble Organism) —
     each tool's UI shown first.
   - THE LAB: a made sound opened in the Lab — asked (the Lab mode's analysis / spectra, or the Mutation Lab, ML4).

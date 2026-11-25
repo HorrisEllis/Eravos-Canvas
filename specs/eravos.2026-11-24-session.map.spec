@@ -165,3 +165,10 @@
     (the Piano) so Wobble × Retro and Reese × Piano carry their voices; Retro Poly's poly / PWM; genre packs per tool (Lofi, Dubstep,
     Synthwave, EDM; technique only); the baseline "Make It Bun Dem" studied as technique; the next leverage set. docs/TODO-LEDGER.md T-39 … T-45.
   - OPEN (asked): "trenke by skrillex" — which track? · "opening them in the lab" — the Lab mode (analysis, spectra) or the Mutation Lab?
+
+## 33 — verbatim (2026-11-25; the AI coder's question pasted back, with his screenshot — Spotify, his Liked Songs, #1 "Make It Bun Dem",
+## Skrillex, Damian Marley, album "Make It Bun Dem After Hours EP", added Aug 22, 2026):
+  > "trenke" by Skrillex: which track do you mean?
+  - ANSWERED (his screenshot): the track is "Make It Bun Dem" (Skrillex & Damian Marley), the After Hours EP — the same record as his baseline.
+    The baseline study (T-43) is that one record, looked into deeply: technique only, never its tune or a recording.
+
