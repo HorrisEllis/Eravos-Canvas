@@ -59,6 +59,11 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-45 | **Open a made sound in the Lab** — the Lab mode or the Mutation Lab (ML4)? | "synthesis and mutation and the unqiue sounds and opening them in the lab" | open (asked) |
 | T-46 | **Font**: Settings › Look › Font (As it is · Grotesk · Grotesk only · Plain) built 3.227; today's stays until he picks one to be the default. | "okay, i hate the font." | waiting (his pick) |
 | T-47 | **The green everywhere else**: tools' own UIs still carry fixed greens inside them (each tool's code) — moved to the theme colour tool by tool. | "yes. almost all of it. make it colored. the themes, and the reactive color.s" | open |
+| T-48 | **D0 the gate generalised**: a domain hands render → works / why / fingerprint; the twin judgement and the reasons card for every domain; proven on generative pictures. | "Use this to find domains we can use this canvas for" | specced (specs/eravos.domains-from-the-toolkit.spec) |
+| T-49 | **D1 FRAMEWORK** (his toolkit as tools: ledger, gap finder, leverage scorer, hostile verifier) on one type table shared with MIND. | (same) | specced, waits his pick |
+| T-50 | **D2 SYSTEMS** (stocks, flows, feedback) on the assembled engine — a model you hear. | (same) | specced, waits his pick |
+| T-51 | **D3 CONNECTION** (two people on one canvas; consent as the gate) — the two-machine link first. | (same) | specced, waits his pick |
+| T-52 | **D4 WORDS** (lines, meter, rhyme) beside the dubstep tools. | (same) | specced |
 
 ## ERAVOS's own engine · `specs/eravos.engine.spec` (decided 2026-11-24: written in Emerge — "wait for emerge")
 

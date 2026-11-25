@@ -192,3 +192,9 @@
     Grotesk only · Plain), today's the default until he picks (catalog-fonts.png). P227 3/3.
   - OPEN: which font (his pick from catalog-fonts.png).
 
+## 37 — verbatim (2026-11-25, with his Innovation Toolkit pasted — his own document, personal, not copied into the repo):
+  > Use this to find domains we can use this canvas for
+  - MAPPED: specs/eravos.domains-from-the-toolkit.spec — the toolkit run on the canvas: its invariants (I1–I8), the constraint field (C1–C4),
+    the gaps (G1–G4), candidates scored with his weighting (the gate generalised · SYSTEMS · FRAMEWORK · CONNECTION · MIND · WORDS · pictures ·
+    play), hostile verification, a proposed order D0–D4. Nothing built. Open: which first; the names.
+

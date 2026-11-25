@@ -285,3 +285,4 @@ kept), or **open** (not done yet, and what is missing). Newest at the bottom. Ad
 | N-X136 | "no. domains are meant to be there. just consistent with the rest of ui," (2026-11-25) | **done** (shown first) | 3.226: the Modes page kept, each mode a tool card; catalog-modes.png |
 | N-X137 | "okay, i hate the font. also the green. also i want the thumbnails back. and i want those generated per tool, mutated tool, consistent style." (2026-11-25) | **built** (green, paintings) + **open** (font: his pick) | 3.227 · P227 · catalog-look-*.png, catalog-fonts.png |
 | N-X138 | "yes. almost all of it. make it colored. the themes, and the reactive color.s" (2026-11-25) | **built** | 3.227: --ok from the theme, moved by the Beat colour |
+| N-X139 | "Use this to find domains we can use this canvas for" (2026-11-25, with his Innovation Toolkit) | **mapped** + **open** (which first) | specs/eravos.domains-from-the-toolkit.spec · T-48 … T-52 |
