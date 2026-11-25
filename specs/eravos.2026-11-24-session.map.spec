@@ -131,3 +131,13 @@
   > dynamic, load balancing, signal to noise? wait for emerge
   - DECIDED: the native engine is written in Emerge and waits for it (E2 / E3). DYNAMIC, LOAD BALANCING and SIGNAL TO NOISE written into
     specs/eravos.engine.spec (NEW, EN0–EN6); docs/TODO-LEDGER.md T-33 … T-38. Open: EN1 (today's stack) now?
+
+## 27 — verbatim (2026-11-25):
+  > i love the mutation and synthesis. can you expand to the rest of eravos?
+  - BUILT 3.224 (shown first): Supersaw, Swarm Oscillator, Retro Poly, Piano and Tape Memory trade parts (part-exchange.js) and can be
+    synthesized (tool-blend.js); what the engine cannot run yet is named, never faked. P218. ML1 continues for the rest.
+
+## 28 — verbatim (2026-11-25; the first part quotes the AI coder's question, "just spec it" is his):
+  > 1. EN1, now? Part of this needs no new language and works in today's ERAVOS: measure the audio thread's load, let silent tools sleep, end tails nobody can hear, add dither to exports, and add latency, sample-rate and output-device settings. It would help now and carries straight over to the Emerge engine. just spec it
+  - SPECCED 3.224: specs/eravos.engine.spec ADDENDUM 2026-11-25 — EN1.1 measure · EN1.2 silent tools sleep · EN1.3 end what nobody hears ·
+    EN1.4 clean exports (dither) · EN1.5 latency / sample rate / output device · EN1.6 denormals + headroom in every component. Nothing built.

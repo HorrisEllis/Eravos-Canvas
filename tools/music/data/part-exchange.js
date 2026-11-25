@@ -76,6 +76,52 @@
             lfoCutoff: Math.round(clamp(p.s.depth * 1200, 0, 2400)), lfoDelay: 0 }) },
       ],
     },
+    // 3.224 the rest of ERAVOS (his words, 2026-11-25: "i love the mutation and synthesis. can you expand to the rest of eravos?") — each tool's
+    // parts in the same shared terms; a box found by its card's title on the tool's board; what a tool cannot take is refused, never faked
+    'eravos.supersaw': {
+      slots: [
+        { id: 'filter', label: 'the filter', find: { title: '^filter' }, kinds: ['filter'],
+          read: (P) => part('filter', 'filter-svf', { cutoff: P.cutoff, reso: clamp((P.res - 0.5) / 20, 0, 0.97), mode: 'lowpass', stages: 2 }),
+          take: (p) => ({ cutoff: clamp(p.s.cutoff, 200, 18000), res: +(0.5 + clamp(p.s.reso, 0, 0.97) * 20).toFixed(2) }) },
+      ],
+    },
+    'eravos.swarm-oscillator': {
+      slots: [
+        { id: 'filter', label: 'the tone', find: { title: '^tone' }, kinds: ['filter'],
+          read: (P) => part('filter', 'filter-svf', { cutoff: P.cutoff, reso: clamp(P.res, 0, 0.97), mode: 'lowpass', stages: 2 }),
+          take: (p) => ({ cutoff: clamp(p.s.cutoff, 40, 18000), res: clamp(p.s.reso, 0, 1) }) },
+      ],
+    },
+    'eravos.retro-poly': {
+      slots: [
+        { id: 'filter', label: 'the VCF', find: { title: '^vcf' }, kinds: ['filter'],
+          read: (P) => part('filter', 'filter-svf', { cutoff: P.cutoff, reso: clamp((P.res - 0.3) / 20, 0, 0.97), mode: 'lowpass', stages: 2 }),
+          take: (p) => ({ cutoff: clamp(p.s.cutoff, 60, 16000), res: +(0.3 + clamp(p.s.reso, 0, 0.97) * 20).toFixed(2) }) },
+        { id: 'chorus', label: 'the chorus', find: { title: '^fx' }, kinds: ['fx'], clear: () => ({ chorus: 'off' }), isClear: (P) => !P.chorus || P.chorus === 'off',
+          read: (P) => P.chorus && P.chorus !== 'off' ? part('fx', 'ensemble-core', { mode: 'juno ' + P.chorus, mix: 0.5 }) : null,
+          take: (p) => p.component === 'ensemble-core' ? { chorus: ({ 'juno I': 'I', 'juno II': 'II' })[p.s.mode] || 'I+II' } : null },
+        { id: 'noise', label: 'the noise', find: { title: '^dco' }, kinds: ['noise'], clear: () => ({ noise: 0 }), isClear: (P) => !(P.noise > 0),
+          read: (P) => part('noise', 'osc-noise', { colour: 'white', amount: P.noise, tilt: 0 }),
+          take: (p) => ({ noise: p.s.amount > 0 ? clamp(p.s.amount, 0, 1) : 0.3 }) },
+      ],
+    },
+    'eravos.piano': {
+      slots: [
+        { id: 'drive', label: 'the drive', find: { title: '^out' }, kinds: ['drive'], clear: () => ({ drive: 0 }), isClear: (P) => !(P.drive > 0),
+          read: (P) => part('drive', 'saturator-tube', { drive: +((+P.drive || 0) * 20).toFixed(1), bias: 0.3, tone: 0 }),
+          take: (p) => ['saturator-tube', 'saturator-tape'].includes(p.component) ? { drive: clamp((+p.s.drive || 0) / 20, 0, 1) } : null },   // its tube only: a crusher has no place in it
+      ],
+    },
+    'eravos.tape-memory': {
+      slots: [
+        { id: 'drive', label: 'the tape\'s saturation', find: { title: '^tone' }, kinds: ['drive'], clear: () => ({ drive: 0 }), isClear: (P) => !(P.drive > 0),
+          read: (P) => part('drive', 'saturator-tape', { drive: +((+P.drive || 0) * 20).toFixed(1), bump: 2 }),
+          take: (p) => ['saturator-tube', 'saturator-tape'].includes(p.component) ? { drive: clamp((+p.s.drive || 0) / 20, 0, 1) } : null },
+        { id: 'crush', label: 'the digital', find: { title: '^digital' }, kinds: ['drive'], clear: () => ({ bits: 16, rate: 48000 }), isClear: (P) => !((+P.bits || 16) < 16 || (+P.rate || 48000) < 48000),
+          read: (P) => ((+P.bits || 16) < 16 || (+P.rate || 48000) < 48000) ? part('drive', 'bitcrusher', { bits: +P.bits || 16, rate: +P.rate || 48000 }) : null,
+          take: (p) => p.component === 'bitcrusher' ? { bits: Math.round(clamp(p.s.bits || 8, 4, 16)), rate: clamp(p.s.rate || 12000, 4000, 48000) } : null },
+      ],
+    },
   };
   const tempo = (bpm) => bpm || (root.Kernel && root.Kernel.music && root.Kernel.music.bpm) || 120;   // the canvas's tempo when the caller does not say
   // a tool SYNTHESIZED on the canvas (tools/music/core/assembled-tool.js: ids eravos.wb-*): its settings are the assembled engine's

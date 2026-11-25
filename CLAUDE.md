@@ -112,6 +112,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-25 | **Mutation and synthesis reach five more tools** (3.224): Supersaw, Swarm, Retro Poly, Piano, Tape Memory trade parts and synthesize; EN1 specced in full | `tools/music/data/part-exchange.js`, `tool-blend.js`, `specs/eravos.engine.spec` | `tests/p218` 1/1; Field suites green |
 | 2026-11-24 | **ERAVOS's own engine, specced** (3.223): an engine not a driver, in Emerge (his call: "wait for emerge"); dynamic · load balancing · signal to noise; EN0–EN6 | `specs/eravos.engine.spec` | — (a spec) |
 | 2026-11-24 | **Less lag; Settings › Performance; Auto** (3.222, release 0.2.37): measured (main thread blocked ~46 %/s with 10 tools playing); a per-window forced layout in the reactive colours removed; custom settings + Auto (effects lighter while lagging); GPU switch | `canvas/runtime/performance.js`, `tools/music/core/sound-css.js`, `desktop/main.js` | measured before/after; P102 P106 P147 P110 green, boundary 10/10 |
 | 2026-11-24 | **The to-do ledger; the session mapped; specs and phases** (3.221): every word of the session verbatim, the performance plan (PF0–PF8, RP, AN), Settings from the contracts (ST), the toolbar (TB), the Mutation Lab / Workbench (ML) — `docs/TODO-LEDGER.md` | `specs/eravos.2026-11-24-session.map.spec`, `specs/eravos.performance-plan.spec`, `docs/TODO-LEDGER.md` | `node build/competence.mjs --check` |

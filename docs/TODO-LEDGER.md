@@ -44,7 +44,7 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 
 | # | What | His words (2026-11-24) | State |
 |---|---|---|---|
-| T-25 | **ML1 more tools trade parts**: profiles for Supersaw, Swarm Oscillator, Retro Poly, Piano, Tape Memory first; hover words for every part they hold. | "okay but did we choose to do the exploded view on the canvas for existing tools?" · "swap components better" | specced |
+| T-25 | **ML1 more tools trade parts** — 3.224 (2026-11-25, "i love the mutation and synthesis. can you expand to the rest of eravos?"): Supersaw, Swarm Oscillator, Retro Poly, Piano, Tape Memory DONE (P218, shown first); next: every other instrument and effect, by shared components. | "okay but did we choose to do the exploded view on the canvas for existing tools?" · "swap components better" | specced |
 | T-26 | **ML2 two or more cores at once** → one made tool. | "synthesize two or more cores, and make something completely new." | specced |
 | T-27 | **ML3 more slots in the engine** (unison, sub, envelopes, the formant mouth, the wub sequence …) so fewer parts are left behind. | "combine the sound of retro dcs with the rest of wobble bass." | specced |
 | T-28 | **ML4 the Mutation Lab**: a shelf of every component and core; spec + preview first. | "you open the mutation lab, and it has all the components, and cores to play with." | specced (waits a preview) |
@@ -55,7 +55,7 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 
 | # | What | His words (2026-11-24) | State |
 |---|---|---|---|
-| T-33 | **EN1 today's stack** (no new language): the audio thread's load measured; silent tools sleep; voices / tails below the floor ended; denormal guards + headroom checked in every component; TPDF dither on export; latency / sample rate / output device settings. Null render proves no change. | "dynamic, load balancing, signal to noise? wait for emerge" | open (asked: now?) |
+| T-33 | **EN1 today's stack** (specced in full 2026-11-25, "just spec it": EN1.1–EN1.6 in the engine spec's addendum) (no new language): the audio thread's load measured; silent tools sleep; voices / tails below the floor ended; denormal guards + headroom checked in every component; TPDF dither on export; latency / sample rate / output device settings. Null render proves no change. | "dynamic, load balancing, signal to noise? wait for emerge" | specced (his: "just spec it") |
 | T-34 | **EN2 Emerge prerequisites**: E2 native_windows, E3 calling Windows (COM for WASAPI), threads, atomics, a lock-free queue, MMCSS — in HorrisEllis/Emerge (needs push access there). | "wait for emerge" | specced (blocked on access) |
 | T-35 | **EN3 kernels in Emerge**, each against its contract, bit-close to today's by the null render. | "invent our own? specifically made more eravos?" | specced |
 | T-36 | **EN4 the engine process in Emerge**: WASAPI exclusive / shared, ASIO; DYNAMIC (graph swapped at a block, cross-faded); LOAD BALANCING (the DAG scheduled over cores, work stealing, measured cost, critical path first); SIGNAL TO NOISE (64-bit mix, FTZ, headroom + true-peak, TPDF dither, oversampling; work only on what is heard); tools isolated; its own process; Web Audio the fallback. | "dynamic, load balancing, signal to noise?" | specced |

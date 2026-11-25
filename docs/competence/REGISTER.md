@@ -6,7 +6,7 @@
 
 **How to read it.** Each entry is one contribution: the exact words (checked word for word against their source by `node build/competence.mjs --check`), when, who it came from, what kind of thing it was, how it developed, what came of it, and the evidence a stranger can check. **Confidence is three separate levels, never one score**: *proposed* (an idea) · *demonstrated* (built and tested here — built by the AI coder to his direction: the idea and the call are his, the code is not claimed as his) · *independently verified* (validated outside this project — none yet). **Append-only**: an entry is never edited; a correction is a new entry that amends it. Generated from `docs/competence/register.jsonl` — do not edit this page. The record before this register (merged work since 2026-10-15, with merge times): `docs/PROOF-OF-COMPETENCY.md`.
 
-**95 entries** · his: 87 (35 proposed · 52 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
+**96 entries** · his: 88 (35 proposed · 53 demonstrated · 0 independently verified) · the AI coder’s: 2 · outside: 1
 
 ## Ideas
 _what he originated, proposed or identified_
@@ -101,6 +101,7 @@ _decisions, the alternatives in front of him, and the way he set_
 | R-2026-11-24-91 | 2026-11-24 00:00:00 UTC | “first one, beyond removing the undo and redo, and redundany options.” | decision | His answer to where Options' actions go: into Settings; the Undo / Redo buttons and redundant options removed (session map 22). (The session kept no per-message times: its order is the session map's.) | Decided: ST1 / TB1; docs/TODO-LEDGER.md T-04 (to build, shown first). | `specs/eravos.settings-buttons-dag.map.spec` · `specs/eravos.bare-canvas.spec` | proposed |
 | R-2026-11-24-92 | 2026-11-24 00:00:00 UTC | “also log all of this, don't lose anything, update the specs, phases. and add that to a to do ledger” | direction | The session mapped verbatim; four specs given dated addenda with phases; a new performance plan; the to-do ledger holding every open item, today's and older (session map 22). (The session kept no per-message times: its order is the session map's.) | 3.221: docs/TODO-LEDGER.md, specs/eravos.2026-11-24-session.map.spec; the register check passes. | `docs/TODO-LEDGER.md` · `specs/eravos.2026-11-24-session.map.spec` · `specs/eravos.performance-plan.spec` | demonstrated |
 | R-2026-11-24-95 | 2026-11-24 00:00:00 UTC | “dynamic, load balancing, signal to noise? wait for emerge” | decision | He set the engine's three qualities (dynamic, load balancing, signal to noise) and chose Emerge for it, over writing it in Rust or C++ first. (The session kept no per-message times: its order is the session map's.) | Specced: specs/eravos.engine.spec D2 and its three sections; ledger T-33 … T-38. | `specs/eravos.engine.spec` · `docs/TODO-LEDGER.md` | proposed |
+| R-2026-11-25-96 | 2026-11-25 00:00:00 UTC | “i love the mutation and synthesis. can you expand to the rest of eravos?” | direction | Mutation and synthesis widened from two tools to seven: five more tools' parts described in the shared terms the board and the engine use; what cannot run is named. (No per-message times kept: the session map's order.) | 3.224: tests/p218-mutation-everywhere.test.js 1/1; the Field suites green. | `tools/music/data/part-exchange.js` · `tools/music/data/tool-blend.js` · `tests/p218-mutation-everywhere.test.js` | demonstrated |
 
 ## Competence
 _what is shown, at its own level — an idea, a built and tested idea, and outside validation are not the same thing_
@@ -143,7 +144,7 @@ _what is shown, at its own level — an idea, a built and tested idea, and outsi
 - R-2026-11-24-94 · 2026-11-24 00:00:00 UTC · idea — “invent our own? specifically made more eravos?” → Specced: specs/eravos.engine.spec (EN0). · evidence: `specs/eravos.engine.spec` · `docs/TODO-LEDGER.md`
 - R-2026-11-24-95 · 2026-11-24 00:00:00 UTC · decision — “dynamic, load balancing, signal to noise? wait for emerge” → Specced: specs/eravos.engine.spec D2 and its three sections; ledger T-33 … T-38. · evidence: `specs/eravos.engine.spec` · `docs/TODO-LEDGER.md`
 
-**demonstrated** (52)
+**demonstrated** (53)
 
 - R-2026-11-06-01 · 2026-11-06 06:28:35 UTC · idea — “Can you when picking empty canvas have every tool empty of presets?” → 3.124 built: OrganismFactory.blankStart — 27 tools that loaded a default preset now open plain on an empty canvas. · evidence: `tests/p116-blank-start.test.js (2/2)` · `commit faaccca (branch claude/empty-canvas-blank-tools (commit ids change if squash-merged; the merge is logged as its own entry))`
 - R-2026-11-06-03 · 2026-11-06 06:56:30 UTC · direction — “Ui preview. What’s the highest leverage?” → Swarm Oscillator ranked first (6 components to build, 14.5 other tools each); its UI previewed before any code. · evidence: `docs/eco-graph.md` · `docs/previews/swarm-oscillator-preview.png` · `tools/music/planned/swarm-oscillator.ui.md`
@@ -197,6 +198,7 @@ _what is shown, at its own level — an idea, a built and tested idea, and outsi
 - R-2026-11-24-87 · 2026-11-24 00:00:00 UTC · principle — “eravos makes it, not you. only add capability. always capability first.” → CLAUDE.md › Rules that hold; applied in 3.217 (P217 only picks). · evidence: `CLAUDE.md` · `tests/p217-voice-and-rest.test.js`
 - R-2026-11-24-92 · 2026-11-24 00:00:00 UTC · direction — “also log all of this, don't lose anything, update the specs, phases. and add that to a to do ledger” → 3.221: docs/TODO-LEDGER.md, specs/eravos.2026-11-24-session.map.spec; the register check passes. · evidence: `docs/TODO-LEDGER.md` · `specs/eravos.2026-11-24-session.map.spec` · `specs/eravos.performance-plan.spec`
 - R-2026-11-24-93 · 2026-11-24 00:00:00 UTC · observation — “needs performance optimization. the cpu cores. its lagging with plenty of overhead. maybe custom settings, like cpu cores, animations, graphics acceloratoin. maybe invent a better driver” → 3.222: blocked time 405 → 332 ms/s on Full, 173 ms/s on Auto (from 460); fps 32 → 49. P102 P106 P147 P110 green; boundary 10/10. · evidence: `canvas/runtime/performance.js` · `tools/music/core/sound-css.js` · `docs/previews/settings-performance.png`
+- R-2026-11-25-96 · 2026-11-25 00:00:00 UTC · direction — “i love the mutation and synthesis. can you expand to the rest of eravos?” → 3.224: tests/p218-mutation-everywhere.test.js 1/1; the Field suites green. · evidence: `tools/music/data/part-exchange.js` · `tools/music/data/tool-blend.js` · `tests/p218-mutation-everywhere.test.js`
 
 **independently verified** (0)
 
@@ -302,6 +304,7 @@ _whose each contribution is: his, the AI coder’s, or from outside_
 | R-2026-11-24-93 | 2026-11-24 00:00:00 UTC | user | James Brooks | observation |
 | R-2026-11-24-94 | 2026-11-24 00:00:00 UTC | user | James Brooks | idea |
 | R-2026-11-24-95 | 2026-11-24 00:00:00 UTC | user | James Brooks | decision |
+| R-2026-11-25-96 | 2026-11-25 00:00:00 UTC | user | James Brooks | direction |
 
 ## Outcomes
 _what came of each_
@@ -403,4 +406,5 @@ _what came of each_
 | R-2026-11-24-93 | 2026-11-24 00:00:00 UTC | “needs performance optimization. the cpu cores. its lagging with plenty of overhead. maybe custom settings, like cpu cores, animations, graphics acceloratoin. maybe invent a better driver” | observation | His observation (lag with CPU to spare) pointed at one thread, not the machine; measured: the reactive colours' per-window forced layout was most of the main thread's load. Removed; Settings › Performance with his custom settings and an automatic governor. (The session kept no per-message times: its order is the session map's.) | 3.222: blocked time 405 → 332 ms/s on Full, 173 ms/s on Auto (from 460); fps 32 → 49. P102 P106 P147 P110 green; boundary 10/10. | `canvas/runtime/performance.js` · `tools/music/core/sound-css.js` · `docs/previews/settings-performance.png` | demonstrated |
 | R-2026-11-24-94 | 2026-11-24 00:00:00 UTC | “invent our own? specifically made more eravos?” | idea | An engine of ERAVOS's own rather than Chromium's Web Audio: the tools' DAGs as the schedule across cores, tools isolated, live parameter and part changes, synthesis assembled in the engine, agnostic real-time work. (The session kept no per-message times: its order is the session map's.) | Specced: specs/eravos.engine.spec (EN0). | `specs/eravos.engine.spec` · `docs/TODO-LEDGER.md` | proposed |
 | R-2026-11-24-95 | 2026-11-24 00:00:00 UTC | “dynamic, load balancing, signal to noise? wait for emerge” | decision | He set the engine's three qualities (dynamic, load balancing, signal to noise) and chose Emerge for it, over writing it in Rust or C++ first. (The session kept no per-message times: its order is the session map's.) | Specced: specs/eravos.engine.spec D2 and its three sections; ledger T-33 … T-38. | `specs/eravos.engine.spec` · `docs/TODO-LEDGER.md` | proposed |
+| R-2026-11-25-96 | 2026-11-25 00:00:00 UTC | “i love the mutation and synthesis. can you expand to the rest of eravos?” | direction | Mutation and synthesis widened from two tools to seven: five more tools' parts described in the shared terms the board and the engine use; what cannot run is named. (No per-message times kept: the session map's order.) | 3.224: tests/p218-mutation-everywhere.test.js 1/1; the Field suites green. | `tools/music/data/part-exchange.js` · `tools/music/data/tool-blend.js` · `tests/p218-mutation-everywhere.test.js` | demonstrated |
 

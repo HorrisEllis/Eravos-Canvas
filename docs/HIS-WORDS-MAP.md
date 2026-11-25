@@ -275,3 +275,5 @@ kept), or **open** (not done yet, and what is missing). Newest at the bottom. Ad
 | N-X126 | "that is still not great. what about the audio driver or engine that electron uses?" (2026-11-24) | **answered** + **open** | Web Audio, one thread, WASAPI shared; asked: screen or sound? |
 | N-X127 | "invent our own? specifically made more eravos?" (2026-11-24) | **specced** | specs/eravos.engine.spec |
 | N-X128 | "dynamic, load balancing, signal to noise? wait for emerge" (2026-11-24) | **decided** (Emerge) + **specced** | specs/eravos.engine.spec D2; DYNAMIC · LOAD BALANCING · SIGNAL TO NOISE; EN0–EN6 · T-33 … T-38 |
+| N-X129 | "i love the mutation and synthesis. can you expand to the rest of eravos?" (2026-11-25) | **built, shown first** (part) | 3.224: five more tools trade parts and synthesize (P218); ML1 continues |
+| N-X130 | "just spec it" (2026-11-25, of EN1) | **specced** | specs/eravos.engine.spec ADDENDUM 2026-11-25, EN1.1–EN1.6 · T-33 |
