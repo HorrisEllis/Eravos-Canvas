@@ -124,6 +124,7 @@
     // 3.226 his words (2026-11-25): "domains are meant to be there. just consistent with the rest of ui" — each mode is a card like a tool's
     // (the picture frame, the glyph + name, its blurb, plain chips), the page heads like All tools, and what a mode turns on and shows is in
     // the detail on the right, as a tool's dependencies are; the button that enters it sits there, as Add to canvas does
+    const modeArt = (m) => { if (m.art) return m.art; if (m.agnostic) return global.ToolArt ? global.ToolArt.url({ id: 'stay-agnostic', label: 'Stay agnostic', accents: ['#7f93a8', '#00d4ff', '#b066ff'], sky: 'night' }) : null; const d = Cat && Cat.domains && Cat.domains().find(x => x.id === (m.domain || m.id)); return d && d.art ? (global.ERAVOS_TOOLS || '') + d.art : null; };
     const modeCard = (m) => ({ id: 'mode:' + m.id, icon: m.icon || '◈', accent: m.accent || '#00d4ff', label: m.label });
     function renderModes() {
       main.innerHTML = ''; cards = [];
@@ -133,7 +134,8 @@
       all.forEach(m => {
         const on = !m.agnostic && X.isActive(m.id), n = m.agnostic ? defs().length : defs().filter(d => m.categories.includes(d.category)).length, c = modeCard(m);
         const chips = [chip(n + ' tools', 'dim')]; if (!m.agnostic) chips.push(chip(m.categories.length + ' categories', 'dim')); if (on) chips.unshift(chip('active', 'built', 'this mode is on'));
-        const frame = h('div', { class: 'ap-card-pic fit' }, [h('div', { class: 'ap-art' }, [tileOf(c, 64, 'ap-art-tile')])]);
+        const art = modeArt(m), frame = h('div', { class: 'ap-card-pic' + (art ? ' painted' : ' fit') }, [h('div', { class: 'ap-art' }, [tileOf(c, 64, 'ap-art-tile')])]);   // 3.227 his "i want the thumbnails back": the mode's painting (Start's), as a tool card's
+        if (art) frame.appendChild(h('img', { class: 'ap-card-img', src: art, alt: '', loading: 'lazy', onerror: (e) => e.target.remove() }));
         const card = h('div', { class: 'ap-card' + (state.msel === (m.id || '*') ? ' sel' : ''), tabindex: '-1', style: { '--acc': c.accent }, 'data-mode': m.id || '*' }, [
           frame, h('div', { class: 'ap-card-tx' }, [h('b', {}, [h('span', { class: 'ap-card-glyph', html: IC(m.agnostic ? null : 'mode:' + m.id, '', c.icon) }), m.label]), h('small', { text: m.blurb || '' }), h('div', { class: 'ap-chiprow' }, chips)]),
         ]);
@@ -187,7 +189,7 @@
         // 3.44: the card leads with the tool's own display (thumb.png, 16:10) — the old 84×52 corner of the whole window showed
         // only a title bar. No picture → the icon on the tool's colour, same frame, so the grid stays even.
         // 3.88 a painting of what it does (art.svg) leads when the tool has one
-        const pic = meta && (meta.art || meta.thumb || meta.preview), frame = h('div', { class: 'ap-card-pic' + (meta && (meta.art || meta.thumb) ? '' : ' fit') + (meta && meta.art ? ' painted' : '') + (d._suite ? ' suite' : '') }, [cardArt(d)]);
+        const artOf = (meta && meta.art) || d.art, pic = artOf || (meta && (meta.thumb || meta.preview)), frame = h('div', { class: 'ap-card-pic' + (artOf || (meta && meta.thumb) ? '' : ' fit') + (artOf ? ' painted' : '') + (d._suite ? ' suite' : '') }, [cardArt(d)]);   // 3.227 a made tool carries its own painting (d.art)
         if (pic) frame.appendChild(h('img', { class: 'ap-card-img', src: pic, alt: '', loading: 'lazy', onerror: (e) => e.target.remove() }));
         const card = h('div', { class: 'ap-card' + (d._avail ? ' avail' : ''), tabindex: '-1', style: { '--acc': d.accent || '#00d4ff' }, 'data-id': d.id }, [
           frame,

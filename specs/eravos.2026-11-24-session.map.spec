@@ -178,3 +178,17 @@
     agnostic is a tool card (the picture frame with its icon, glyph + name, blurb, plain chips); a click selects it, the detail on the right
     shows what it turns on and shows (as a tool's dependencies) with Enter / Browse where Add to canvas sits. Screenshot catalog-modes.png.
 
+## 35 — verbatim (2026-11-25, of the catalog's Modes as tool cards):
+  > okay, i hate the font. also the green. also i want the thumbnails back. and i want those generated per tool, mutated tool, consistent style.
+  - ASKED (three questions: which font · what replaces the green · the paintings?) — he answered in 36.
+
+## 36 — verbatim (2026-11-25, his answer):
+  > yes. almost all of it. make it colored. the themes, and the reactive color.s
+  - READ AS: the paintings, yes; the green — almost all of it — coloured by the themes and the reactive colours.
+  - DONE 3.227: --ok (what is on / ready / done) is the theme's colour (Dusk #ff6fa8, Studio cyan, Field its accent, Midnight #8fa8ff) and the
+    Beat colour moves it; every canvas use of the fixed green moved to it. Paintings: the mode cards show Start's paintings; the 7 tools without
+    one painted (build/tool-art.py); a tool made on the canvas — synthesized or mutated — is painted at once in the same style
+    (tools/core/art/painter.js: one ribbon per tool it came from, in its colour). FONT: a choice in Settings › Look (As it is · Grotesk ·
+    Grotesk only · Plain), today's the default until he picks (catalog-fonts.png). P227 3/3.
+  - OPEN: which font (his pick from catalog-fonts.png).
+

@@ -112,6 +112,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-25 | **The catalog's look** (3.227): the green is the theme's colour (moved by the Beat colour); every tool, mode and made tool painted (made / mutated tools painted live in the same style); Font a choice in Settings › Look (his pick open) | `canvas/runtime/eravos.css`, `themes.js`, `tools/core/art/painter.js`, `assembled-tool.js` | `tests/p227` 3/3; `docs/previews/catalog-look-*.png`, `catalog-fonts.png` |
 | 2026-11-25 | **What a synthesis will make, and why not** (3.226): ◇ the plan (each place, from which tool, what it is, what stays behind) + ▶ hear before making; a refusal flashes the blamed parts red, the reason and its fixes beside them; the ＋ Add catalog's Modes as tool cards | `tools/core/field/board.js`, `tools/music/core/assembled-tool.js`, `canvas/runtime/add-menu.js` | `tests/p226` 2/2; `docs/previews/workbench/synthesis-why.png` |
 | 2026-11-25 | **Mutation and synthesis reach five more tools** (3.224): Supersaw, Swarm, Retro Poly, Piano, Tape Memory trade parts and synthesize; EN1 specced in full | `tools/music/data/part-exchange.js`, `tool-blend.js`, `specs/eravos.engine.spec` | `tests/p218` 1/1; Field suites green |
 | 2026-11-24 | **ERAVOS's own engine, specced** (3.223): an engine not a driver, in Emerge (his call: "wait for emerge"); dynamic · load balancing · signal to noise; EN0–EN6 | `specs/eravos.engine.spec` | — (a spec) |

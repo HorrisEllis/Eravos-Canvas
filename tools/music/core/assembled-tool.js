@@ -140,7 +140,7 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
   function descriptor(o) {
     o = o || {};
     return {
-      id: o.id, domain: 'music', version: o.version || '1.0.0', label: o.label || 'Synthesized', icon: o.icon || '🧪', accent: o.accent || '#ffcc00', phase: 'P202',
+      id: o.id, domain: 'music', version: o.version || '1.0.0', label: o.label || 'Synthesized', icon: o.icon || '🧪', accent: o.accent || '#ffcc00', phase: 'P202', art: o.art,
       category: 'Bass', blurb: o.blurb || 'A tool synthesized from others: its parts are shared components, assembled into one engine.',
       size: { w: 760, h: 720 }, minSize: { w: 480, h: 480 },
       permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'], provides: ['capability.audio_out', 'capability.note_in', 'capability.bass_voice'],
@@ -206,7 +206,10 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
   Model.idFor = (name) => 'eravos.wb-' + slug(name);
   Model.defineMade = function (r) {   // → the made tool's id, defined (and its window, once the builder's UI is here)
     const F = root.OrganismFactory; if (!F) return null;
-    if (!F.def || !F.def(r.id)) F.define(descriptor({ id: r.id, label: r.name, icon: '🧪', accent: r.accent || '#ffcc00', settings: r.settings, version: '1.0.0',
+    // 3.227 its painting, in the cards' style (tools/core/art/painter.js): one ribbon per tool it came from, in that tool's colour
+    const accents = r.accents || (r.of || []).map(l => { const d = (F.defined ? F.defined() : []).find(x => x.label === l); return d && d.accent; }).filter(Boolean);
+    const art = root.ToolArt ? root.ToolArt.url({ id: r.id, label: r.name, accents, mutated: (r.of || []).length <= 1 }) : undefined;
+    if (!F.def || !F.def(r.id)) F.define(descriptor({ id: r.id, label: r.name, icon: '🧪', accent: r.accent || accents[0] || '#ffcc00', settings: r.settings, version: '1.0.0', art,
       blurb: 'Synthesized ' + String(r.at || '').slice(0, 10) + (r.of ? ' from ' + r.of.join(' × ') : '') + ': ' + r.chain + '. ' + (r.verdict === 'novel' ? 'New to ERAVOS.' : 'Close to ' + r.near + '.'), made: { from: 'synthesized', of: r.of || [], at: r.at, dag: r.dag, verdict: r.verdict, near: r.near, d: r.d } }));
     if (Model.ui) F.reg(r.id, Model.ui); return r.id;
   };
@@ -236,7 +239,8 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
   Model.make = function (name, settings, bpm, N, of) {   // → { ok, id, rec } or { ok: false, why } · of: the tools it was synthesized from
     const j = Model.judge(settings, bpm, N); if (!j.ok) return j;
     const L = ld(); let nm = String(name || 'Made Wobble').trim() || 'Made Wobble', i = 2; const base = nm; while (L.some(r => r.name === nm) || (root.OrganismFactory && root.OrganismFactory.def(Model.idFor(nm)))) nm = base + ' ' + i++;
-    const rec = { id: Model.idFor(nm), name: nm, of: of || [], at: new Date().toISOString(), settings: JSON.parse(JSON.stringify(settings)), bpm, dag: j.dag, chain: Model.chainOf(j.dag), fp: j.fp, verdict: j.verdict, near: j.near, d: j.d };
+    const F0 = root.OrganismFactory, accents = (of || []).map(l => { const d = F0 && F0.defined ? F0.defined().find(x => x.label === l) : null; return d && d.accent; }).filter(Boolean);
+    const rec = { id: Model.idFor(nm), name: nm, of: of || [], accents, at: new Date().toISOString(), settings: JSON.parse(JSON.stringify(settings)), bpm, dag: j.dag, chain: Model.chainOf(j.dag), fp: j.fp, verdict: j.verdict, near: j.near, d: j.d };
     L.unshift(rec); keep(L); Model.defineMade(rec); return { ok: true, id: rec.id, rec, verdict: j.verdict, near: j.near, d: j.d };
   };
   // ---------------------------------------------------------------- SYNTHESIZE TOGETHER: two tools blown up on the canvas → one of its own

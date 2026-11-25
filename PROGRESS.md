@@ -2,6 +2,22 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.227 The catalog: the theme's colour for the green, paintings for every tool, mode and made tool; Font a choice (2026-11-25)
+His words: "okay, i hate the font. also the green. also i want the thumbnails back. and i want those generated per tool, mutated tool, consistent style." · "yes. almost all of it. make it colored. the themes, and the reactive color.s"
+- canvas/runtime/eravos.css: --ok (on / ready / done) = the theme's colour (Dusk #ff6fa8, Studio cyan, Field its accent, Midnight #8fa8ff),
+  the Beat colour moves it; every fixed green of the canvas moved to it (toolbar on, chips ready / active, the catalog's ✓ rows, toasts, drop
+  zones, wire-menu checks, the Field's green, the music core's MIDI / recorder states). Tools' own inner greens: T-47.
+- Paintings: the mode cards show Start's paintings (and Stay agnostic one); Step, Tape Memory, Feelings, Pattern, Piano, Retro DCO, Swarm
+  Oscillator painted (build/tool-art.py MOTIF entries; tool.json files.art; tools/catalog.js regenerated) — every tool has one now.
+  tools/core/art/painter.js (NEW, domain-free, window.ToolArt): the same style painted live; a made tool (assembled-tool.js) gets one the
+  moment it exists — one ribbon per tool it came from in that tool's colour, braided, meeting at a star (mutated: one ribbon + sparks);
+  seeded by its id. The card, the window's title bar (Dusk) and the tool page read a descriptor's own art.
+- Font: Settings › Look › FONT (themes.js FONTS: As it is · Grotesk · Grotesk only · Plain; data-font on <html>; the faces shipped in
+  canvas/runtime/fonts). Today's stays the default until his pick (T-46). board.css reads var(--mono).
+- Tests: tests/p227-catalog-look.test.js 3/3. P226 P110 P102 P103 P91 P77 P203 green, boundary 10/10, bare-canvas, validate.
+- Screenshots: docs/previews/catalog-look.shots.mjs → catalog-look-modes.png, catalog-look-made.png, catalog-fonts.png (rendered on Linux:
+  on Windows "As it is" shows Segoe UI and Consolas, as Inter / JetBrains Mono are not shipped).
+
 ## 3.226 What a synthesis will make, and why it was not made; the catalog's Modes as tool cards (2026-11-25)
 His words: "remove these from the tool catalog. tools when the can't synthesize, need to flash the reasons why. also expand the ability. its hard to tell what it will do when i synthesize. like the wobble and the retro could sound amazing. or the reese and the piano, …" (whole: specs/eravos.2026-11-24-session.map.spec 32; his screenshot: ＋ Add › Modes)
 - canvas/runtime/add-menu.js: first removed the Modes page; his correction ("no. domains are meant to be there. just consistent with the rest of ui,")

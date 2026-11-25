@@ -1,6 +1,6 @@
 /* ERAVOS core — field/board.css: a tool exploded on the canvas (board.js; every motion is a Web Animation there, none here). The board's own language: dark ground, each part in a dashed gate
  * frame in its status colour, its label above, wired to the core. The parts inside are the tool's own live face, unchanged. */
-.fb-board{position:absolute;pointer-events:none;color:#D8F6FF;font-family:'DM Mono',monospace}
+.fb-board{position:absolute;pointer-events:none;color:#D8F6FF;font-family:var(--mono)}
 .fb-board .fb-gate,.fb-board .fb-lab,.fb-board .fb-core,.fb-board .fb-mut{pointer-events:auto}
 .fb-wires{position:absolute;left:0;top:0;overflow:visible}
 /* the wires (2026-11-21): the theme's three wire colours (--wire1..3, eravos.css), glowing; light flows along each from its part into the core */
@@ -14,38 +14,38 @@
 .fb-core{position:absolute;left:740px;top:560px;transform-origin:50% 50%}
 .fb-core > div{position:static!important;left:auto!important;top:auto!important}
 .fb-legend > div{position:absolute}
-.fb-since{position:absolute;font:500 10px 'DM Mono',monospace;letter-spacing:2px;color:#4E6A80;white-space:nowrap}
+.fb-since{position:absolute;font:500 10px var(--mono);letter-spacing:2px;color:#4E6A80;white-space:nowrap}
 .fb-gate{position:absolute;padding:6px;border:1px dashed color-mix(in srgb,var(--c) 55%,transparent);background:#04070C;
   will-change:transform}
 .fb-gate.lifting{box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 30%,transparent);z-index:5}
-.fb-lab{position:absolute;left:0;top:-24px;font:500 10px 'DM Mono',monospace;letter-spacing:1px;white-space:nowrap;cursor:grab;user-select:none}
+.fb-lab{position:absolute;left:0;top:-24px;font:500 10px var(--mono);letter-spacing:1px;white-space:nowrap;cursor:grab;user-select:none}
 .fb-lab span{opacity:.7}
 .fb-inner{display:block}
 .fb-inner.row{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
 .fb-inner > .wb-card,.fb-inner > .uk-group{margin:0!important}
 .wm-win.fb-away{pointer-events:none}   /* it stays where it is, its frame dissolved (board.js animates it) */
 /* sockets and mutation (2026-11-20): a ⇄ chip on a gate that holds a socket; ⚄ MUTATE under the core */
-.fb-swap{margin-left:8px;padding:1px 8px;border-radius:999px;border:1px solid #00D4FF;background:#04070C;color:#00D4FF;font:500 10px 'DM Mono',monospace;letter-spacing:1px;cursor:pointer}
+.fb-swap{margin-left:8px;padding:1px 8px;border-radius:999px;border:1px solid #00D4FF;background:#04070C;color:#00D4FF;font:500 10px var(--mono);letter-spacing:1px;cursor:pointer}
 .fb-swap:hover{background:#00D4FF;color:#04070C}
 .fb-mut{position:absolute}
 /* component boxes (2026-11-20): a click on the box picks a new component or one from another tool; what is in it shows as its block */
 .fb-block{margin-top:8px;padding:6px 8px 8px;border-top:1px dashed color-mix(in srgb,var(--c) 55%,transparent);min-width:340px;max-width:460px;box-sizing:border-box}
-.fb-bhead{font:500 10px 'DM Mono',monospace;letter-spacing:1px;color:var(--c);margin-bottom:4px}
+.fb-bhead{font:500 10px var(--mono);letter-spacing:1px;color:var(--c);margin-bottom:4px}
 .fb-brow{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
 /* the tile: the component in a box — drag it, ✕ it (2026-11-20: "drag components, delete them, change them. not drop down menus") */
-.fb-tile{display:flex;align-items:center;gap:6px;margin:0 0 6px;padding:3px 6px;border:1px solid color-mix(in srgb,var(--c) 70%,transparent);background:#04070C;font:500 10px 'DM Mono',monospace;letter-spacing:1px;color:var(--c);cursor:grab;user-select:none;width:max-content;max-width:100%}
+.fb-tile{display:flex;align-items:center;gap:6px;margin:0 0 6px;padding:3px 6px;border:1px solid color-mix(in srgb,var(--c) 70%,transparent);background:#04070C;font:500 10px var(--mono);letter-spacing:1px;color:var(--c);cursor:grab;user-select:none;width:max-content;max-width:100%}
 .fb-tile.empty{border-style:dashed;opacity:.6;cursor:default}
 .fb-grip{opacity:.7}
 .fb-tname{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fb-del{margin-left:4px;padding:0 5px;border:0;background:none;color:var(--c);font:500 11px 'DM Mono',monospace;cursor:pointer;opacity:.7}
+.fb-del{margin-left:4px;padding:0 5px;border:0;background:none;color:var(--c);font:500 11px var(--mono);cursor:pointer;opacity:.7}
 .fb-del:hover{opacity:1;color:#FF5A6E}
-.fb-ghost{position:fixed;z-index:3000000;pointer-events:none;padding:4px 8px;border:1px solid #00D4FF;background:#04070CEE;color:#00D4FF;font:500 11px 'DM Mono',monospace;letter-spacing:1px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+.fb-ghost{position:fixed;z-index:3000000;pointer-events:none;padding:4px 8px;border:1px solid #00D4FF;background:#04070CEE;color:#00D4FF;font:500 11px var(--mono);letter-spacing:1px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
 .fb-gate.fb-can{box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 60%,transparent)}
 .fb-gate.fb-over{box-shadow:0 0 0 3px var(--c),0 0 28px color-mix(in srgb,var(--c) 60%,transparent)}
 .fb-gate.fb-cannot{opacity:.35}
 .fb-tray{position:absolute;padding:10px 12px;border:1px dashed color-mix(in srgb,#00D4FF 45%,transparent);background:#04070C;display:flex;flex-wrap:wrap;gap:6px;pointer-events:auto}
-.fb-trayh{width:100%;font:500 10px 'DM Mono',monospace;letter-spacing:2px;color:#4E6A80}
-.fb-ttile{padding:4px 8px;border:1px solid #1B2A3A;color:#B8CFE0;font:500 10px 'DM Mono',monospace;letter-spacing:1px;cursor:grab;user-select:none}
+.fb-trayh{width:100%;font:500 10px var(--mono);letter-spacing:2px;color:#4E6A80}
+.fb-ttile{padding:4px 8px;border:1px solid #1B2A3A;color:#B8CFE0;font:500 10px var(--mono);letter-spacing:1px;cursor:grab;user-select:none}
 .fb-ttile:hover{border-color:#00D4FF;color:#00D4FF}
 .fb-tile.fb-fuse{--c:#FF6FA8;margin:10px 0 0;cursor:grab}
 .fb-core.fb-can{box-shadow:0 0 0 2px #FF6FA8AA}
@@ -72,8 +72,8 @@
 /* the hover card: what it is, what it is for, what it does to the sound — in the simplest words (the domain's, PartExchange.explain) */
 .fb-card{position:fixed;z-index:3000001;pointer-events:none;width:280px;padding:10px 12px;background:#04070CF2;border:1px solid var(--c,#00D4FF);
   box-shadow:0 12px 36px rgba(0,0,0,.65),0 0 20px color-mix(in srgb,var(--c,#00D4FF) 30%,transparent);font:500 12px/1.45 var(--font,sans-serif);color:#D8F6FF}
-.fb-card .fb-cn{font:600 12px 'DM Mono',monospace;letter-spacing:1px;color:var(--c,#00D4FF);text-transform:uppercase}
-.fb-card .fb-cw{font:500 10px 'DM Mono',monospace;letter-spacing:1px;color:#7F93A8;margin:2px 0 6px}
+.fb-card .fb-cn{font:600 12px var(--mono);letter-spacing:1px;color:var(--c,#00D4FF);text-transform:uppercase}
+.fb-card .fb-cw{font:500 10px var(--mono);letter-spacing:1px;color:#7F93A8;margin:2px 0 6px}
 .fb-card .fb-ct{margin-bottom:4px}
 .fb-card .fb-cs{margin-top:6px;padding-top:6px;border-top:1px solid #1B2A3A;color:#B8CFE0}
 /* 3.226 what it will make, and why not: the card beside the parts; the parts to blame flash red and keep a red ring while it is up */
@@ -82,14 +82,14 @@
   box-shadow:0 12px 40px #000C;font:12px/1.45 var(--font,sans-serif);color:#D6E4F0}
 .fb-why.bad{border-color:#FF3355;box-shadow:0 0 0 1px #FF335540,0 12px 40px #000C,0 0 30px #FF335533}
 .fb-wtop{display:flex;align-items:flex-start;gap:8px}
-.fb-wtt{flex:1;font:600 12px 'DM Mono',monospace;letter-spacing:.5px;text-transform:uppercase;color:#00D4FF}
+.fb-wtt{flex:1;font:600 12px var(--mono);letter-spacing:.5px;text-transform:uppercase;color:#00D4FF}
 .fb-why.bad .fb-wtt{color:#FF5570}
 .fb-wx{background:none;border:0;color:#7F93A8;cursor:pointer;font-size:13px;padding:0 2px}.fb-wx:hover{color:#fff}
-.fb-wwhy{margin:6px 0 2px;color:#B8CFE0;font:500 11px 'DM Mono',monospace}
+.fb-wwhy{margin:6px 0 2px;color:#B8CFE0;font:500 11px var(--mono)}
 .fb-wsteps{margin:8px 0 4px;padding-left:18px}.fb-wsteps li{margin-bottom:4px}
 .fb-wplan{margin-top:8px;border-top:1px solid #1B2A3A;padding-top:6px}
 .fb-wrow{display:grid;grid-template-columns:62px 1fr;column-gap:8px;padding:3px 0;border-bottom:1px dashed #12202E}
-.fb-wrow b{grid-row:span 2;font:600 10px 'DM Mono',monospace;letter-spacing:1px;color:#7F93A8;padding-top:2px}
+.fb-wrow b{grid-row:span 2;font:600 10px var(--mono);letter-spacing:1px;color:#7F93A8;padding-top:2px}
 .fb-wrow.picked b{color:#B066FF}
 .fb-wfrom{font-weight:600}.fb-wwhat{color:#9FB4C8;font-size:11px}
 .fb-wleft{margin-top:6px;color:#FFB020;font-size:11px}

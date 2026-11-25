@@ -57,6 +57,8 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-43 | **The baseline: "Make It Bun Dem"** studied as technique (docs/research), then the dubstep tools and packs measured against it. "trenke" — which track? | "i want to make music that sounds like make it bun dem by skrillex, thats my baseline of reverse engineering. like i want the dubstep tools, synthwave tools, like look deeply into trenke by skrillex" | specced — answered 2026-11-25 (his screenshot): "trenke" is the same record, "Make It Bun Dem" (Skrillex & Damian Marley, After Hours EP) |
 | T-44 | **The next highest-leverage components and tools** (docs/eco-graph.md), each UI shown first. | "or what about making the next highest leverage components and tools." | specced |
 | T-45 | **Open a made sound in the Lab** — the Lab mode or the Mutation Lab (ML4)? | "synthesis and mutation and the unqiue sounds and opening them in the lab" | open (asked) |
+| T-46 | **Font**: Settings › Look › Font (As it is · Grotesk · Grotesk only · Plain) built 3.227; today's stays until he picks one to be the default. | "okay, i hate the font." | waiting (his pick) |
+| T-47 | **The green everywhere else**: tools' own UIs still carry fixed greens inside them (each tool's code) — moved to the theme colour tool by tool. | "yes. almost all of it. make it colored. the themes, and the reactive color.s" | open |
 
 ## ERAVOS's own engine · `specs/eravos.engine.spec` (decided 2026-11-24: written in Emerge — "wait for emerge")
 
