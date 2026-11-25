@@ -149,3 +149,19 @@
   > these shouldn't show in other domains. also remove the button that says empty canvas
   - FIXED 3.225: with a domain picked, Start shows only that domain's setups and songs (another domain switched on no longer leaks in);
     the Empty canvas button and card removed (Browse every tool starts the same way).
+
+## 31 — verbatim (2026-11-25; with a pasted progress report from another session of his — not his words — about an autosave rename and synthesis-failure feedback):
+  > find the other branch.
+  - ANSWERED: no branch on GitHub holds that work (every remote branch and open PR checked; no other session reachable) — it was not pushed.
+    The synthesis-failure feedback it described was then built here (32, 3.226); the autosave rename was not (it is not in any branch).
+
+## 32 — verbatim (2026-11-25, with a screenshot: ＋ Add › Modes — "Pick a mode — or stay agnostic", the four mode cards):
+  > remove these from the tool catalog. tools when the can't synthesize, need to flash the reasons why. also expand the ability. its hard to tell what it will do when i synthesize. like the wobble and the retro could sound amazing. or the reese and the piano, or what about making the next highest leverage components and tools. like also the retro poly. also the packs, for each tool, have like lofi, dubstep, synthwave, edm, dubstep, i want to make music that sounds like make it bun dem by skrillex, thats my baseline of reverse engineering. like i want the dubstep tools, synthwave tools, like look deeply into trenke by skrillex, like continue making eravos huge. synthesis and mutation and the unqiue sounds and opening them in the lab
+  - DONE 3.226: the catalog has no Modes page (it opens on All tools). Synthesis: ◇ What will it make? (each place, the tool it comes from,
+    what it is, what stays behind, ▶ Hear it, ◆ Make it); refused → the parts to blame flash and keep a red ring, the reason beside them
+    with steps and buttons that fix it (the VOICE / MOUTH from another tool, the rest from another, 6 dB quieter, open the mouth, tame it,
+    pick the boxes that fit, mutate then make). The plan shows while one core is carried over another. P226 2/2.
+  - SPECCED (specs/eravos.assembled-tool.spec ADDENDUM 2026-11-25): ML3a the engine's VOICE gains unison (Reese, Supersaw) and a string
+    (the Piano) so Wobble × Retro and Reese × Piano carry their voices; Retro Poly's poly / PWM; genre packs per tool (Lofi, Dubstep,
+    Synthwave, EDM; technique only); the baseline "Make It Bun Dem" studied as technique; the next leverage set. docs/TODO-LEDGER.md T-39 … T-45.
+  - OPEN (asked): "trenke by skrillex" — which track? · "opening them in the lab" — the Lab mode (analysis, spectra) or the Mutation Lab?

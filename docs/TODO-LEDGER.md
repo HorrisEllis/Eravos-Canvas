@@ -50,6 +50,13 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-28 | **ML4 the Mutation Lab**: a shelf of every component and core; spec + preview first. | "you open the mutation lab, and it has all the components, and cores to play with." | specced (waits a preview) |
 | T-29 | **ML5 the Workbench / Tool Builder**: from scratch — parts, then each control's UI element and the theme; saved as a tool of its own. Spec + preview first. | "the workbench to be able to build from scratch from components and the broad selection of ui elements, with different control types, and themes, like a tool builder." | specced (waits a preview) |
 | T-30 | **ML6 a made tool as its own zip** (isolated: deleted whole if unstable). | "also tools are isolated so if they cause instability they can be deleted." | specced |
+| T-39 | **What it will make, and why not** (3.226): ◇ the plan + ▶ hear before making; a refusal flashes the blamed parts red with the reason and fixes beside them. Shown first (screenshots). | "tools when the can't synthesize, need to flash the reasons why. also expand the ability. its hard to tell what it will do when i synthesize" | built, shown first |
+| T-40 | **ML3a the VOICE grows**: unison (Reese Bass, Supersaw) and string (the Piano) voices in the engine, so Wobble × Retro and Reese × Piano carry both voices. Composite node specced in the compat graph first. | "like the wobble and the retro could sound amazing. or the reese and the piano" | specced |
+| T-41 | **ML3b Retro Poly whole** in synthesis: poly voices, PWM, unison. | "like also the retro poly." | specced |
+| T-42 | **GP genre packs for every tool**: Lofi · Dubstep · Synthwave · EDM; novelty-measured, levelled, no toys. Dubstep first. | "also the packs, for each tool, have like lofi, dubstep, synthwave, edm, dubstep" | specced |
+| T-43 | **The baseline: "Make It Bun Dem"** studied as technique (docs/research), then the dubstep tools and packs measured against it. "trenke" — which track? | "i want to make music that sounds like make it bun dem by skrillex, thats my baseline of reverse engineering. like i want the dubstep tools, synthwave tools, like look deeply into trenke by skrillex" | specced + open (asked) |
+| T-44 | **The next highest-leverage components and tools** (docs/eco-graph.md), each UI shown first. | "or what about making the next highest leverage components and tools." | specced |
+| T-45 | **Open a made sound in the Lab** — the Lab mode or the Mutation Lab (ML4)? | "synthesis and mutation and the unqiue sounds and opening them in the lab" | open (asked) |
 
 ## ERAVOS's own engine · `specs/eravos.engine.spec` (decided 2026-11-24: written in Emerge — "wait for emerge")
 

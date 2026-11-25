@@ -1,7 +1,7 @@
 /* ERAVOS runtime — add-menu.js → window.AddMenu (spec eravos.shell-expansion § add menu)
  * ＋ Add opens a full popup, not a side panel:
- *   rail     — Modes · All tools · categories (active modes first, then everything a pack installed)
- *   main     — the modes page (agnostic canvas) or a grid of tool cards; search filters everything
+ *   rail     — All tools · categories (active modes first, then everything a pack installed); 3.226: no Modes page (domains are picked on Start)
+ *   main     — a grid of tool cards; search filters everything
  *   detail   — the selected tool's dependency list: mode, services, what it adds to the toolbar (✚ new / ✓ already
  *              there), inputs, outputs, works-with, presets — read from Expansion.deps(), the same list the specs print
  * 3.63 a click on a card opens that tool's page (a suite's: its suite page) — ← Back on the page returns here, as you left it.
@@ -17,9 +17,10 @@
     if (open) { open.close(); return null; }
     const UI = global.UIKit, h = UI.h, F = global.OrganismFactory;
     S.activate();
-    const state = { view: o.view || (X.agnostic() && X.modes().length ? 'modes' : 'all'), cat: o.cat || null, sel: o.sel || null, q: o.q || '' };
+    // 3.226 his words (2026-11-25, of the Modes page): "remove these from the tool catalog" — the catalog is tools only; domains are picked on Start
+    const state = { view: o.view === 'modes' ? 'all' : (o.view || 'all'), cat: o.cat || null, sel: o.sel || null, q: o.q || '' };
     const ov = h('div', { class: 'overlay addpop', role: 'dialog', 'aria-label': 'Add to canvas' });
-    const q = h('input', { class: 'ap-search', placeholder: 'Search tools, modes, what they do…', 'aria-label': 'Search' });
+    const q = h('input', { class: 'ap-search', placeholder: 'Search tools, what they do…', 'aria-label': 'Search' });
     const closeBtn = h('button', { class: 'ap-x', title: 'Close (Esc)', text: '×' });
     const modeChips = h('div', { class: 'ap-chips' });
     const rail = h('nav', { class: 'ap-rail' }), main = h('section', { class: 'ap-main' }), detail = h('aside', { class: 'ap-detail' });
@@ -107,7 +108,6 @@
     function renderRail() {
       rail.innerHTML = '';
       const item = (label, count, on, fn, cls, ic) => rail.appendChild(h('button', { class: 'ap-rail-item ' + (on ? 'on ' : '') + (cls || ''), onclick: fn }, [h('span', { class: 'ap-rail-l', html: IC(ic || null, label) }), count !== null ? h('small', { text: String(count) }) : null]));
-      if (X.modes().length) item('Modes', X.modes().length, state.view === 'modes' && !state.q, () => { state.view = 'modes'; state.q = ''; q.value = ''; render(); }, 'top', 'layers');
       item('All tools', defs().length, state.view === 'all' && !state.q, () => { state.view = 'all'; state.q = ''; q.value = ''; render(); }, 'top', 'square-stack');
       const cats = categories(); if (!cats.length) return;
       rail.appendChild(h('div', { class: 'ap-rail-sec', text: 'CATEGORIES' }));
@@ -118,35 +118,6 @@
       const act = X.modes().filter(m => X.isActive(m.id));
       if (!act.length) modeChips.appendChild(chip(X.built().length ? 'expanded by the tools you added' : 'agnostic canvas — nothing loaded yet', 'dim'));
       act.forEach(m => { const c = chip('', 'mode', 'active mode'); c.innerHTML = IC('mode:' + m.id, m.label, m.icon); modeChips.appendChild(c); });
-    }
-
-    // ---------------------------------------------------------------- modes page
-    function renderModes() {
-      main.innerHTML = '';
-      main.appendChild(h('div', { class: 'ap-lead' }, [h('h2', { text: 'Pick a mode — or stay agnostic' }), h('p', { text: 'The canvas starts empty and domain-free. A mode turns on the toolbar and tools it needs. Adding any single tool turns on only what that tool needs.' })]));
-      const grid = h('div', { class: 'ap-modes' });
-      X.modes().forEach(m => {
-        const on = X.isActive(m.id);
-        const tools = defs().filter(d => m.categories.includes(d.category)).length;
-        const unitsRow = h('div', { class: 'ap-chiprow' }, m.units.map(u => { const L = X.units().find(x => x.id === u); return chip((L ? L.label : u).trim(), L && L.built ? 'built' : 'new', L ? L.describes : ''); }));
-        grid.appendChild(h('div', { class: 'ap-mode ' + (on ? 'on' : ''), style: { '--acc': m.accent || '#00d4ff' } }, [
-          h('div', { class: 'ap-mode-top' }, [h('span', { class: 'ap-mode-ic', html: IC('mode:' + m.id, '', m.icon || '◈') }), h('div', {}, [h('b', { text: m.label }), h('small', { text: `${tools} tools · ${m.categories.length} categories` })])]),
-          h('p', { text: m.blurb || '' }),
-          h('div', { class: 'ap-sub', text: 'Turns on' }), unitsRow,
-          h('div', { class: 'ap-sub', text: 'Shows' }), h('div', { class: 'ap-chiprow' }, m.categories.map(c => chip(c, 'cat'))),
-          h('div', { class: 'ap-mode-act' }, [
-            on ? h('button', { class: 'tb-btn on', text: '✓ Active — browse its tools', onclick: () => { state.view = 'cat'; state.cat = m.categories[0]; render(); } })
-               : h('button', { class: 'tb-btn primary', text: 'Enter ' + m.label, onclick: () => { X.enterMode(m.id); state.view = 'cat'; state.cat = m.categories[0]; render(); } }),
-          ]),
-        ]));
-      });
-      grid.appendChild(h('div', { class: 'ap-mode ghost' }, [
-        h('div', { class: 'ap-mode-top' }, [h('span', { class: 'ap-mode-ic', text: '◻' }), h('div', {}, [h('b', { text: 'Stay agnostic' }), h('small', { text: `${defs().length} tools from every pack` })])]),
-        h('p', { text: 'Browse everything without switching anything on. Each tool lists what it needs; only that turns on when you add it.' }),
-        h('div', { class: 'ap-mode-act' }, [h('button', { class: 'tb-btn', text: 'Browse all tools', onclick: () => { state.view = 'all'; render(); } })]),
-      ]));
-      main.appendChild(grid);
-      if (!defs().length) main.appendChild(h('p', { class: 'ap-empty', text: 'No tools installed yet — drop a pack (.zip) onto the canvas.' }));
     }
 
     // ---------------------------------------------------------------- tool grid
@@ -193,7 +164,7 @@
     function renderDetail() {
       detail.innerHTML = '';
       const d = state.sel && (F.def(state.sel) || defs().find(x => x.id === state.sel));
-      if (!d || state.view === 'modes' && !state.q) {
+      if (!d) {
         detail.appendChild(h('div', { class: 'ap-d-empty' }, [h('b', { text: 'Dependencies, up front' }), h('p', { text: 'Every tool says what it needs before you add it: the mode it belongs to, the services it relies on, and exactly what will appear on the toolbar.' })]));
         return;
       }
@@ -228,14 +199,13 @@
 
     function render() {
       renderChips(); renderRail();
-      if (state.view === 'modes' && !state.q) { renderModes(); renderDetail(); }
-      else renderTools();
+      renderTools();
     }
     q.addEventListener('input', () => { state.q = q.value; render(); });
     function onKey(e) {
       if (!document.body.contains(ov)) return;
       if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); return; }
-      if (!cards.length || state.view === 'modes' && !state.q) return;
+      if (!cards.length) return;
       const i = Math.max(0, cards.findIndex(c => c.d.id === state.sel));
       const cols = Math.max(1, Math.round(main.querySelector('.ap-grid') ? main.querySelector('.ap-grid').clientWidth / 280 : 1));
       const go = (n) => { e.preventDefault(); select(cards[Math.max(0, Math.min(cards.length - 1, n))].d.id); };

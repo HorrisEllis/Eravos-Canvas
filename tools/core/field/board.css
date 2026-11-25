@@ -76,3 +76,24 @@
 .fb-card .fb-cw{font:500 10px 'DM Mono',monospace;letter-spacing:1px;color:#7F93A8;margin:2px 0 6px}
 .fb-card .fb-ct{margin-bottom:4px}
 .fb-card .fb-cs{margin-top:6px;padding-top:6px;border-top:1px solid #1B2A3A;color:#B8CFE0}
+/* 3.226 what it will make, and why not: the card beside the parts; the parts to blame flash red and keep a red ring while it is up */
+.fb-gate.fb-blame,.fb-core.fb-blame{outline:2px solid #FF3355;outline-offset:4px}
+.fb-why{position:fixed;z-index:3000002;width:360px;max-height:80vh;overflow:auto;padding:12px 14px;background:#04070CF5;border:1px solid #00D4FF;border-radius:10px;
+  box-shadow:0 12px 40px #000C;font:12px/1.45 var(--font,sans-serif);color:#D6E4F0}
+.fb-why.bad{border-color:#FF3355;box-shadow:0 0 0 1px #FF335540,0 12px 40px #000C,0 0 30px #FF335533}
+.fb-wtop{display:flex;align-items:flex-start;gap:8px}
+.fb-wtt{flex:1;font:600 12px 'DM Mono',monospace;letter-spacing:.5px;text-transform:uppercase;color:#00D4FF}
+.fb-why.bad .fb-wtt{color:#FF5570}
+.fb-wx{background:none;border:0;color:#7F93A8;cursor:pointer;font-size:13px;padding:0 2px}.fb-wx:hover{color:#fff}
+.fb-wwhy{margin:6px 0 2px;color:#B8CFE0;font:500 11px 'DM Mono',monospace}
+.fb-wsteps{margin:8px 0 4px;padding-left:18px}.fb-wsteps li{margin-bottom:4px}
+.fb-wplan{margin-top:8px;border-top:1px solid #1B2A3A;padding-top:6px}
+.fb-wrow{display:grid;grid-template-columns:62px 1fr;column-gap:8px;padding:3px 0;border-bottom:1px dashed #12202E}
+.fb-wrow b{grid-row:span 2;font:600 10px 'DM Mono',monospace;letter-spacing:1px;color:#7F93A8;padding-top:2px}
+.fb-wrow.picked b{color:#B066FF}
+.fb-wfrom{font-weight:600}.fb-wwhat{color:#9FB4C8;font-size:11px}
+.fb-wleft{margin-top:6px;color:#FFB020;font-size:11px}
+.fb-wbehind{margin-top:6px;color:#7F93A8;font-size:11px}.fb-wbehind summary{cursor:pointer}
+.fb-wbar{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.fb-wbtn{background:#0B141E;border:1px solid #2A3B4D;color:#D6E4F0;border-radius:7px;padding:5px 9px;font:600 11px var(--font,sans-serif);cursor:pointer}
+.fb-wbtn:hover{border-color:#00D4FF}.fb-wbtn.fix{border-color:#00D4FF80}.fb-why.bad .fb-wbtn.fix{border-color:#FF335580}

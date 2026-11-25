@@ -2,6 +2,22 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.226 What a synthesis will make, and why it was not made; the catalog without Modes (2026-11-25)
+His words: "remove these from the tool catalog. tools when the can't synthesize, need to flash the reasons why. also expand the ability. its hard to tell what it will do when i synthesize. like the wobble and the retro could sound amazing. or the reese and the piano, …" (whole: specs/eravos.2026-11-24-session.map.spec 32; his screenshot: ＋ Add › Modes)
+- canvas/runtime/add-menu.js: no Modes rail item, no "Pick a mode" page; it opens on All tools (domains are picked on Start).
+- tools/music/core/assembled-tool.js: one PLAN (planParts / planPair: each of VOICE · WOBBLE · MOUTH · DRIVE · FX — from which tool and part, what
+  it is; not taken; stays behind); previewParts / previewPair (the gates dry, nothing kept); hear (the gates' riff, offline, through the mix);
+  every refusal a REASON as data (kind, title, why, steps, blame, actions); fixes as opts (flip, restFrom, override a place, tweak quieter /
+  open / tame — the made tool's settings only) or runs; fits(part); a made tool is named from every tool it took from.
+- tools/core/field/board.js (domain-free) + board.css: ◇ What will it make? (right-click a selection); the card beside the parts; refused → the
+  blamed boxes / cores flash red ×3 and keep a red ring while it is up; its buttons do the fixes; ↻ Try again; ✕ / Esc. The plan shows while a
+  core is carried over another.
+- Tests: tests/p226-synthesis-why.test.js 2/2 (in tests/run.html). P196 P199 P200 P202 P203 P204 P205 P216 P217 P218 green, boundary 10/10,
+  bare-canvas, competence check. P63's one failure ("eravos.wb-p202" without an icon — P202's made tool left in the page) is on main too.
+- Screenshots: docs/previews/workbench/synthesis-why.shots.mjs → synthesis-plan.png, synthesis-why.png, catalog-no-modes.png.
+- Specced (assembled-tool ADDENDUM 2026-11-25): ML3a unison + string voices (Reese, Supersaw, Piano), ML3b Retro Poly, genre packs for every
+  tool, the "Make It Bun Dem" baseline, the next leverage set. T-39 … T-45. Asked: "trenke" (which track?) · "the lab" (which?).
+
 ## 3.225 Start: each domain only its own; no Empty canvas button (2026-11-25)
 His words: "these shouldn't show in other domains. also remove the button that says empty canvas" (his screenshot: Image Manipulation picked, the music setups under START FROM).
 - canvas/index.html bootScreen (domain-free): with a domain picked, a setup / song shows only if its modes belong to that domain — Music
