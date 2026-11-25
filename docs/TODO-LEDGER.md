@@ -68,7 +68,7 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 |---|---|---|---|
 | T-01 | **Borderless window** (0.2.36): no Windows title bar; drag by the toolbar; window buttons at its right. | "also borderless windows please?" (2026-11-24) | built, unconfirmed |
 | T-02 | **Updating in the app** (0.2.34): the updater runs from a copy; a held updater is kept. Confirm an in-app update goes through. | "trying to update it. fails to close eravos. also broke my current version." (2026-11-24) | built, unconfirmed |
-| T-03 | **Start in two steps** (0.2.36). | "like only show the domains at first." (2026-11-24) | built, unconfirmed |
+| T-03 | **Start in two steps** (0.2.36). | "like only show the domains at first." (2026-11-24) | CONFIRMED on his PC (2026-11-25 screenshot) — 3.225: a picked domain shows only its own setups; Empty canvas removed |
 | T-31 | **The new Start (StartScreen, SS2)** replacing today's Start: a preview since 2026-11-20. | "domain screen first, then animated transition into the next screen" (2026-11-20) | waiting (his yes) |
 
 ## Older open items (from CLAUDE.md › Open, carried here so this is the one list)
