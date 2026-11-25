@@ -11,7 +11,16 @@
   const VERSION = '1.0.0';
   const contributors = [];
   let K, timer = null, lastSaved = null, enabled = true, restoring = false, debounce = null, dirty = false, keptAt = null;
-  const HISTORY = 5, PROJ = 'project:';
+  const HISTORY = 10, PROJ = 'project:';
+  // 3.227 (his words, 2026-11-25: "can you fix the autosave?"). Measured: picking a domain pins its docked tool (along the bottom) at once; the
+  // autosave took that lone docked window for work and wrote it over the real autosave — and a relaunch within a minute replaced the history's
+  // copy too (10 tools → "Restore autosave … 1 tools"). Now: WORK = at least one tool that is not docked (a docked window is the
+  // canvas's frame — domain-free); nothing is written without work; each launch is kept apart, so a new launch never replaces the last
+  // one's final state; the Start screen offers the newest autosave that holds work.
+  const LAUNCH = Date.now();
+  const isWork = (o) => { const F = global.OrganismFactory, d = F && F.def ? F.def(o.id) : null; return !(d && d.dock); };
+  const workCount = (snap) => (snap && snap.organisms ? snap.organisms.filter(isWork).length : 0);
+  let current = null;   // 3.227 the project this canvas is (Ctrl+S keeps it there)
 
   function b64(ab) { const b = new Uint8Array(ab); let s = ''; const CH = 0x8000; for (let i = 0; i < b.length; i += CH) s += String.fromCharCode.apply(null, b.subarray(i, i + CH)); return btoa(s); }
   function unb64(s) { const bin = atob(s); const b = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i); return b.buffer; }
@@ -85,8 +94,8 @@
     if (!enabled || restoring) return;
     try {
       const snap = snapshot();
-      if (!snap.organisms.length) return;
-      const entry = { time: Date.now(), snap };
+      if (!workCount(snap)) return;   // 3.227 a docked window alone is not work: never written over a real autosave
+      const entry = { time: Date.now(), snap, launch: LAUNCH };
       // 3.37 (QA: with storage blocked this still announced "autosaved" while keeping nothing): a failed write is said once
       if (!(await global.OrganismSDK.IDB.put('autosave', 'latest', entry))) {
         if (!storageWarned) { storageWarned = true; K.fault('RUNTIME_003', { organism_id: 'workspace.autosave', message: 'This browser is blocking storage, so your work is not being kept automatically. Save a copy to a file to keep it.' }); }
@@ -95,7 +104,7 @@
       storageWarned = false;
       // rolling history: a bad state never overwrites the only good copy
       const hist = (await global.OrganismSDK.IDB.get('autosave', 'history')) || [];
-      if (!hist.length || entry.time - hist[0].time > 60000) { hist.unshift(entry); await global.OrganismSDK.IDB.put('autosave', 'history', hist.slice(0, HISTORY)); }
+      if (!hist.length || hist[0].launch !== LAUNCH || entry.time - hist[0].time > 60000) { hist.unshift(entry); await global.OrganismSDK.IDB.put('autosave', 'history', hist.slice(0, HISTORY)); }   // 3.227 a new launch: its own entry
       else { hist[0] = entry; await global.OrganismSDK.IDB.put('autosave', 'history', hist); }
       lastSaved = new Date();
       K.bus.publish('workspace:autosaved', { time: lastSaved.toISOString() });
@@ -127,6 +136,8 @@
   }
   async function latestAutosave() { const r = await global.OrganismSDK.IDB.get('autosave', 'latest'); return r || null; }
   async function autosaveHistory() { return (await global.OrganismSDK.IDB.get('autosave', 'history')) || []; }
+  // 3.227 the newest autosave that holds work (latest first, then the history) — what "Restore autosave" offers
+  async function bestAutosave() { const all = [await latestAutosave()].concat(await autosaveHistory()).filter(x => x && x.snap && workCount(x.snap) > 0); all.sort((a, b) => b.time - a.time); return all[0] || null; }
   function hasWork() { const F = global.OrganismFactory; return !!(K && K.registry && K.registry.list().some(r => !(r.descriptor && r.descriptor.system) && !(F && F.handle(r.instance_id) && F.handle(r.instance_id).service))); }
   function markKept() { dirty = false; keptAt = new Date(); (K || global.Kernel).bus.publish('workspace:kept', { time: keptAt.toISOString() }); }
 
@@ -140,9 +151,9 @@
       const snap = snapshot(); const ok = await IDBX().put('autosave', PROJ + name, { time: Date.now(), snap });
       if (!ok) { (K || global.Kernel).fault('RUNTIME_003', { message: `couldn’t save project ${name} — storage full or blocked` }); return false; }
       const idx = (await projIndex()).filter(p => p.name !== name); idx.push({ name, time: Date.now(), tools: snap.organisms.length });
-      await IDBX().put('autosave', 'projects', idx); markKept(); return true;
+      await IDBX().put('autosave', 'projects', idx); markKept(); current = name; return true;
     },
-    async load(name) { const r = await IDBX().get('autosave', PROJ + name); if (!r) { (K || global.Kernel).fault('MUTATION_001', { message: `project ${name} not found` }); return false; } const ok = await restore(r.snap); if (ok) markKept(); return ok; },
+    async load(name) { const r = await IDBX().get('autosave', PROJ + name); if (!r) { (K || global.Kernel).fault('MUTATION_001', { message: `project ${name} not found` }); return false; } const ok = await restore(r.snap); if (ok) { markKept(); current = name; } return ok; },
     async remove(name) { await IDBX().put('autosave', PROJ + name, null); await IDBX().put('autosave', 'projects', (await projIndex()).filter(p => p.name !== name)); return true; },
   };
   // ---- backup: everything this address has kept, in one file → open it at another address (file:// → localhost → exe)
@@ -173,7 +184,7 @@
   }
 
   global.Workspace = {
-    VERSION, snapshot, restore, boot, autosaveNow, latestAutosave, autosaveHistory, download, b64, unb64, projects, backup, importBackup, markKept,
+    VERSION, snapshot, restore, boot, autosaveNow, latestAutosave, autosaveHistory, bestAutosave, workCount, get current() { return current; }, set current(n) { current = n || null; }, download, b64, unb64, projects, backup, importBackup, markKept,
     get dirty() { return dirty; }, get keptAt() { return keptAt; },
     contribute(c) { if (c && c.id && !contributors.some(x => x.id === c.id)) contributors.push(c); },
     setAutosave(v) { enabled = !!v; }, get lastSaved() { return lastSaved; }, get autosaveEnabled() { return enabled; },
