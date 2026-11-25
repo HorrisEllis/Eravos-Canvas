@@ -2,6 +2,13 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.225 Start: each domain only its own; no Empty canvas button (2026-11-25)
+His words: "these shouldn't show in other domains. also remove the button that says empty canvas" (his screenshot: Image Manipulation picked, the music setups under START FROM).
+- canvas/index.html bootScreen (domain-free): with a domain picked, a setup / song shows only if its modes belong to that domain — Music
+  switched on no longer leaks into Image Manipulation; the Empty canvas button (step 1) and card (step 2) removed — Browse every tool starts
+  the same way. tests/p16-ui.mjs uses Browse; its two Start checks pass (its later plug.click failure is on main too). boundary 10/10.
+- docs/previews/start-two-steps.shots.mjs → start-3-image.png (Image Manipulation with Music on: only Browse every tool).
+
 ## 3.224 Mutation and synthesis reach five more tools; EN1 specced in full (2026-11-25) — not merged (shown first)
 His words: "i love the mutation and synthesis. can you expand to the rest of eravos?" · of EN1: "just spec it"
 - tools/music/data/part-exchange.js: Supersaw (filter), Swarm Oscillator (tone = its filter), Retro Poly (VCF, chorus, noise), Piano (drive —

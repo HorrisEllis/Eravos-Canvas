@@ -20,7 +20,8 @@ const secs = await p.evaluate(() => Array.from(document.querySelectorAll('.overl
 check('Music picked: Lab (its mode) and START FROM show', modes.some(m => /Lab/.test(m)) && secs.includes('START FROM'), modes.join(' | ') + ' · ' + secs.join(' | '));
 await p.screenshot({ path: path.join(OUT, 'start-screen.png') });
 // 3.34: the Song Engine moved off the start screen into 📖 Songs — every genre must have a card there
-await p.evaluate(() => { const c = Array.from(document.querySelectorAll('.overlay .card')).find(x => /Empty canvas/.test(x.textContent)); c && c.click(); });
+await p.evaluate(() => { const c = Array.from(document.querySelectorAll('.overlay .card')).find(x => /Browse every tool/.test(x.textContent)); c && c.click(); });   // 3.225: no Empty canvas button; Browse starts the same way
+await p.waitForTimeout(300); await p.keyboard.press('Escape');
 await p.waitForFunction(() => window.SongEngine && window.Songbook && document.getElementById('songbookBtn'), null, { timeout: 15000 }); await p.click('#songbookBtn'); await p.waitForSelector('.overlay.sbk');
 const cover = await p.evaluate(() => { const shown = new Set(window.Songbook.all().map(s => s.genre)); return window.SongEngine.genres().filter(g => !shown.has(g.id)).map(g => g.id); });
 check('📖 Songs has a card for every Song Engine genre', cover.length === 0, cover.length ? 'missing: ' + cover.join(', ') : 'every genre');

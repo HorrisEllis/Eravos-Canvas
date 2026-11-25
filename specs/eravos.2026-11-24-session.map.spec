@@ -141,3 +141,11 @@
   > 1. EN1, now? Part of this needs no new language and works in today's ERAVOS: measure the audio thread's load, let silent tools sleep, end tails nobody can hear, add dither to exports, and add latency, sample-rate and output-device settings. It would help now and carries straight over to the Emerge engine. just spec it
   - SPECCED 3.224: specs/eravos.engine.spec ADDENDUM 2026-11-25 — EN1.1 measure · EN1.2 silent tools sleep · EN1.3 end what nobody hears ·
     EN1.4 clean exports (dither) · EN1.5 latency / sample rate / output device · EN1.6 denormals + headroom in every component. Nothing built.
+
+## 29 — verbatim (2026-11-25): "yes merge." (with a screenshot: Start's first step on his PC — the domains only)
+  - DONE: PR #221 merged. CONFIRMED on his PC: Start's two steps (T-03).
+
+## 30 — verbatim (2026-11-25, with a screenshot: Image Manipulation picked, START FROM full of the music setups):
+  > these shouldn't show in other domains. also remove the button that says empty canvas
+  - FIXED 3.225: with a domain picked, Start shows only that domain's setups and songs (another domain switched on no longer leaks in);
+    the Empty canvas button and card removed (Browse every tool starts the same way).

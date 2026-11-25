@@ -11,5 +11,10 @@ await p.evaluate(() => { const c = [...document.querySelectorAll('.overlay .doma
 await p.waitForTimeout(1500);
 const two = await p.evaluate(() => [...document.querySelectorAll('.overlay .boot-sec')].map(e => e.textContent));
 await p.screenshot({ path: HERE + '/start-2-music.png' });
+// 3.225 back to the domains with Music still on, then Image Manipulation: only its own setups (his: "these shouldn't show in other domains")
+await p.evaluate(() => { const b = [...document.querySelectorAll('.overlay button')].find(x => /All domains/.test(x.textContent)); b && b.click(); }); await p.waitForTimeout(400);
+await p.evaluate(() => { const c = [...document.querySelectorAll('.overlay .domain-card')].find(e => /Image/i.test(e.textContent)); c && c.click(); }); await p.waitForTimeout(2500);
+const three = await p.evaluate(() => [...document.querySelectorAll('.overlay .card b')].map(e => e.textContent));
+await p.screenshot({ path: HERE + '/start-3-image.png' }); console.log('image domain cards:', JSON.stringify(three));
 console.log('step 1 sections:', JSON.stringify(one)); console.log('step 2 sections:', JSON.stringify(two)); console.log(errs.length ? 'errors: ' + errs.join(' | ') : 'no page errors');
 await b.close();

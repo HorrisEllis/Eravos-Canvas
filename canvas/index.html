@@ -155,6 +155,7 @@
     const start = async (id) => {
       S.activate(); close();
       // 3.124 Empty canvas = every tool starts blank (no preset); any other start brings tools with their presets
+      // (3.225: no "Empty canvas" button any more — his words, 2026-11-25: "also remove the button that says empty canvas"; Browse every tool starts this way)
       OrganismFactory.blankStart(!id);
       if (!id) toast('Empty canvas: every tool you add starts blank — no preset. Pick one from its presets any time.', '', 4000);
       if (id) {
@@ -165,7 +166,10 @@
     };
     // recipes belong to the modes their tools need; on an agnostic canvas none show until a mode is picked
     const activeDomains = new Set(X.active().map(id => (X.mode_(id) || {}).domain));
-    const visible = (r) => { const ms = X.recipeModes(r); return !ms.length || ms.some(m => X.isActive(m) || activeDomains.has((X.mode_(m) || {}).domain)); };
+    // 3.225 (his words, 2026-11-25: "these shouldn't show in other domains"): with a domain picked, only ITS setups and songs — not those of
+    // another domain that happens to be switched on; before a domain is picked, as before
+    const domainsOf = (r) => X.recipeModes(r).map(m => (X.mode_(m) || {}).domain || m);
+    const visible = (r) => { const ms = X.recipeModes(r); if (picked) return ms.length > 0 && domainsOf(r).includes(picked); return !ms.length || ms.some(m => X.isActive(m) || activeDomains.has((X.mode_(m) || {}).domain)); };
     const featured = Recipes.featured().filter(visible);
     // 3.81 a featured recipe may bring a picture (an SVG it ships as data); else its icon
     const heroPic = (r) => { if (typeof r.featured.art === 'string' && /^<svg[\s>]/.test(r.featured.art)) { const d = h('div', { class: 'big art' }); d.innerHTML = r.featured.art; return d; } return h('div', { class: 'big', text: r.featured.icon || r.icon || '✦' }); };
@@ -205,7 +209,6 @@
       ...(OrganismFactory.defined().length ? [] : [h('div', { class: 'hero-card', style: { cursor: 'default' } }, [h('div', { class: 'big', text: '⧉' }), h('div', {}, [h('h2', { text: 'This canvas has no tools yet' }), h('p', { text: window.ERAVOS_DESKTOP ? 'Drop a pack (.zip) onto the canvas, or put it in ERAVOS Library › Packs and it loads every start. 📁 Library opens the folder.' : 'Drop a pack (.zip) anywhere onto the canvas to add its tools.' })])])]),
       ...(setupCards.length || cards.length || X.active().length ? [h('div', { class: 'boot-sec', text: 'START FROM' })] : []),
       h('div', { class: 'grid' }, setupCards.concat(cards).concat([
-        h('div', { class: 'card has-art', onclick: () => start(null) }, [pic('runtime/art/blank-canvas.svg'), h('b', { text: 'Empty canvas' }), h('small', { text: 'Agnostic — add tools yourself (＋ Add)' })]),
         h('div', { class: 'card has-art', onclick: () => { start(null); setTimeout(() => AddMenu.show(S, X), 30); } }, [pic('runtime/art/chest.svg'), h('b', { text: 'Browse every tool' }), h('small', { text: 'See what each one needs before you add it' })]),
       ])),
       h('div', { class: 'row', id: 'autosaveRow' }),
@@ -215,7 +218,6 @@
       h('p', { class: 'sub', text: 'What are you making? Pick a domain — its setups, songs and modes come next.' }),
       ...(modeCards.length ? [h('div', { class: 'grid modes domains' }, modeCards)] : []),
       ...(OrganismFactory.defined().length ? [] : [h('div', { class: 'hero-card', style: { cursor: 'default' } }, [h('div', { class: 'big', text: '⧉' }), h('div', {}, [h('h2', { text: 'This canvas has no tools yet' }), h('p', { text: 'Drop a pack (.zip) onto the canvas to add tools.' })])])]),
-      h('div', { class: 'row', style: { justifyContent: 'center', marginTop: '10px' } }, [h('button', { class: 'tb-btn', title: 'agnostic — add tools yourself (＋ Add); every tool starts blank', onclick: () => start(null) }, ['◻ Empty canvas'])]),
       h('div', { class: 'row', id: 'autosaveRow' }),
       h('p', { class: 'sub', style: { marginTop: '14px', fontSize: '11px' }, text: brand.tip }),
     ]);
