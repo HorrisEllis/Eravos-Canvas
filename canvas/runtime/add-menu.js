@@ -21,16 +21,19 @@
     const ov = h('div', { class: 'overlay addpop', role: 'dialog', 'aria-label': 'Add to canvas' });
     const q = h('input', { class: 'ap-search', placeholder: 'Search tools, modes, what they do…', 'aria-label': 'Search' });
     const closeBtn = h('button', { class: 'ap-x', title: 'Close (Esc)', text: '×' });
+    // 3.226 ← Domains, top left of the catalog: back to the domain screen (the Start button left the toolbar)
+    const backBtn = h('button', { class: 'ap-back', type: 'button', title: 'back to the domain screen — pick another, your projects, autosave', text: '← Domains' });
     const modeChips = h('div', { class: 'ap-chips' });
     const rail = h('nav', { class: 'ap-rail' }), main = h('section', { class: 'ap-main' }), detail = h('aside', { class: 'ap-detail' });
     const foot = h('div', { class: 'ap-foot', text: 'Click a tool for its page · type to search · ↑↓ move · Enter adds · Space: its page · Esc closes' });
     const box = h('div', { class: 'ap-box' }, [
-      h('header', { class: 'ap-head' }, [h('div', { class: 'ap-title' }, [h('b', { text: '＋ Add to canvas' }), modeChips]), q, closeBtn]),
+      h('header', { class: 'ap-head' }, [backBtn, h('div', { class: 'ap-title' }, [h('b', { text: '＋ Add to canvas' }), modeChips]), q, closeBtn]),
       h('div', { class: 'ap-body' }, [rail, main, detail]), foot,
     ]);
     ov.appendChild(box);
     function close() { ov.remove(); document.removeEventListener('keydown', onKey, true); unsub(); unsubCat(); if (open && open.ov === ov) open = null; }
     closeBtn.onclick = close;
+    backBtn.onclick = () => { close(); if (global.ShellStart) global.ShellStart(); };
     ov.addEventListener('mousedown', (e) => { if (e.target === ov) close(); });
 
     // P38 catalog: installed tools (defined) + tools the catalog offers but this canvas has not installed (cards say so; adding installs)

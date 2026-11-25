@@ -18,7 +18,7 @@ describe('P218 mutation and synthesis across ERAVOS', () => {
       const crush = FieldBoard.gates(inst['eravos.tape-memory']).find(g => g.slot === 'crush'); assert.ok(crush, 'Tape Memory\'s digital (8 bits) is a part box');
       // a part across tools: Wobble Bass's mouth into Retro Poly's VCF (its settings with it)
       const rp = inst['eravos.retro-poly'], vcf = FieldBoard.gates(rp).find(g => g.slot === 'filter');
-      const from = FieldBoard.replacements(rp, vcf).find(r => /from Wobble Bass/.test(r.label)); assert.ok(from, 'Retro Poly\'s VCF is offered Wobble Bass\'s mouth');
+      const from = FieldBoard.replacements(rp, vcf).find(r => r.src && r.src.from === inst['eravos.wobble-bass']);   // its own Wobble Bass (an earlier test may leave one blown up) assert.ok(from, 'Retro Poly\'s VCF is offered Wobble Bass\'s mouth');
       FieldBoard.replace(rp, vcf, from); await TH.sleep(120);
       const wbCut = ToolBlend.slots('eravos.wobble-bass', ToolBlend.paramsOf(inst['eravos.wobble-bass']), 120).mouth.cutoff;
       assert.equal(Math.round(OrganismFactory.handle(rp).ctx.params.get('cutoff')), Math.round(wbCut), 'and takes its cutoff');

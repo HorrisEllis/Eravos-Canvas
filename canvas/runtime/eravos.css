@@ -225,6 +225,8 @@ svg.wires { position: absolute; pointer-events: none; overflow: visible; z-index
 .ap-search:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(0,212,255,.15); }
 .ap-x { width: 36px; height: 36px; border-radius: 9px; border: 1px solid var(--line2); background: var(--panel2); color: var(--text); font-size: 20px; cursor: pointer; }
 .ap-x:hover { border-color: var(--pink); color: var(--pink); }
+.ap-back { height: 36px; padding: 0 12px; border-radius: 9px; border: 1px solid var(--line2); background: var(--panel2); color: var(--text); font: inherit; font-size: 13px; cursor: pointer; white-space: nowrap; }   /* 3.226 ← Domains, the same as the catalog's close button */
+.ap-back:hover { border-color: var(--cyan); color: var(--cyan); }
 .ap-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 210px 1fr 360px; }
 .ap-rail { border-right: 1px solid var(--line); padding: 10px 8px; overflow: auto; display: flex; flex-direction: column; gap: 2px; background: var(--bg2); }
 .ap-rail-item { display: flex; justify-content: space-between; align-items: center; gap: 6px; text-align: left; padding: 7px 10px; border-radius: 8px; border: 0; background: transparent; color: var(--text); cursor: pointer; font-size: 12.5px; }

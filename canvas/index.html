@@ -14,7 +14,6 @@
 <body>
 <div id="topbar">
   <div id="logo" title="ERAVOS v0.1.0 — kernel 3.2">ERAVOS</div>
-  <button class="tb-btn primary" id="startBtn" data-ic="sparkles" title="Start from a recipe">Start</button>
   <button class="tb-btn" id="addBtn" data-ic="plus" title="Add a tool to the canvas — every tool lists what it needs">Add</button>
   <div id="slot-bar" class="tb-slot"></div>
   <div class="tb-spacer"></div>
@@ -250,7 +249,9 @@
       row.appendChild(h('button', { class: 'tb-btn', onclick: async () => { S.activate(); close(); await Workspace.restore(a.snap); setTimeout(() => CanvasWM.fitAll(), 80); } }, [`⟲ Restore autosave (${new Date(a.time).toLocaleString()}, ${a.snap.organisms.length} tools)`]));
     });
   }
-  document.getElementById('startBtn').onclick = () => bootScreen(false);
+  // 3.226 the Start button left the toolbar (his words, 2026-11-24: "remove the start button from the corner and just have the add button, with a
+  // back to domain, in the top left corner of the catalog."); the domain screen opens on launch, and from the catalog's ← Domains
+  window.ShellStart = () => bootScreen(false);
   K.bus.subscribe('workspace:backup-imported', (p) => { toast(`Brought in ${p.projects} project(s) and ${p.presets} preset(s). Find them under Start → PROJECTS.`, 'good', 6000); if (bootOpen) bootScreen(bootOpen.first, bootOpen.picked); }, 'shell');
 
   // ---------------- undo / redo (P11.1, runtime/history.js — works for any organism a pack adds)
