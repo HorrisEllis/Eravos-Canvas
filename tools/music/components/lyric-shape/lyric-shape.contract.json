@@ -1,0 +1,16 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "lyric-shape",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "logic",
+ "kernel": "MusicParts.LyricShape",
+ "ports": [
+  { "id": "in", "dir": "in", "type": "data", "rate": "event", "about": "lyrics (text; a blank line = a new stanza)" },
+  { "id": "out", "dir": "out", "type": "data", "rate": "event", "about": "per stanza: energy, opposites, refrain, its part (verse · chorus · build · drop · break), split, and why" }
+ ],
+ "variables": [
+  { "key": "contrast", "type": "number", "min": 0, "max": 1, "default": 1, "role": "depth", "about": "how hard neighbouring stanzas are pushed apart (0 = every stanza a verse)" }
+ ],
+ "element": { "version": 1, "controls": [ { "key": "contrast", "role": "depth", "face": true } ], "needs_ui": ["kit.knob"] }
+}

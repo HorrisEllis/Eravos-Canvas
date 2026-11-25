@@ -198,3 +198,10 @@
     the gaps (G1–G4), candidates scored with his weighting (the gate generalised · SYSTEMS · FRAMEWORK · CONNECTION · MIND · WORDS · pictures ·
     play), hostile verification, a proposed order D0–D4. Nothing built. Open: which first; the names.
 
+## 38 — verbatim (2026-11-25, with a zip — his poetry index, 24 pages — and a poem of his as the lyrics; both personal, kept with him, not here):
+  > continue making more tools for eravos. i want to make music with contrast. thats my rhytm;
+  > i want to learn how to make music from my lyrics. that is the point of the rhythm tool
+  - BUILT 3.228: the lyric-shape component (the shape of the words: energy, space, opposites, what comes back) → ♫ Make a song gives each
+    stanza the part its words are and turns a stanza with opposites line by line; Lyrics → Rhythm shows SHAPE (each stanza's part and why)
+    and "How words become music". P228 4/4. Next (T-53 … T-55): a tool that teaches it step by step on his own words; the vocal itself; the
+    poetry index as songs to start from.

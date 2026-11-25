@@ -46,3 +46,16 @@ dag:
   in it now: —
   comes out of it: —
   planned: —
+
+ADDENDUM 2026-11-25 (1.1.0; the original above kept verbatim)
+his words (verbatim): "continue making more tools for eravos. i want to make music with contrast. thats my rhytm;" · "i want to learn how to make music from my lyrics. that is the point of the rhythm tool" (with his poem as the lyrics, and his poetry index as a zip — both
+  kept with him, not in the repo)
+BUILT 3.228:
+  - SONG › Song shape: from the words (default) · every stanza a verse (as before) · Contrast 0…1. ♫ Make a song reads the words with the
+    lyric-shape component (tools/music/components/lyric-shape): each stanza becomes the part it already is — the loudest a DROP (everything,
+    the drums full), the quietest a BREAK (no drums, no bass: space), a stanza carrying a run of words that comes back a CHORUS, the stanza
+    before the drop a BUILD (the snare rolls up, a gap before the drop); a stanza holding opposites (light / dark, peaks / valleys …) turns
+    line by line: a dark line sung an octave down over one long low root and no groove, a light line an octave up over the full groove.
+  - SHAPE (the lesson): each stanza's part, its energy, and WHY in words; "How words become music" — five steps from syllable to song.
+  - RhythmExpand.generate(text, { shape: 'contrast', contrast }) · RhythmExpand.shape(text) — the API's default stays 'verses' (P21 unchanged).
+proof: tests/p228-words-contrast.test.js 4/4 · lyric-shape.test.mjs 17 · P20 47/47 · RhythmExpand 6/6 · Bass Pack 9/9 · boundary 10/10

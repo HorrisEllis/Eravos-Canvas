@@ -117,7 +117,7 @@
   function ctxHelpers() { window.LyricRhythm = { syllables, analyse, place, FLOWS }; }
 
   OrganismFactory.define({
-    id: 'eravos.lyric-rhythm', domain: 'music', version: '1.0.0', label: 'Lyrics → Rhythm', icon: '✎', accent: '#ff7eb6',
+    id: 'eravos.lyric-rhythm', domain: 'music', version: '1.1.0', label: 'Lyrics → Rhythm', icon: '✎', accent: '#ff7eb6',
     category: 'Voice & samples', blurb: 'Type the words — they become a rhythm (drums) or a melody line in key, on the beat. Send it to the Timeline.',
     size: { w: 620, h: 600 }, minSize: { w: 440, h: 420 },
     permissions: ['bus_publish', 'bus_subscribe', 'registry_read'],
@@ -138,6 +138,9 @@
       { key: 'target', type: 'string', default: 'auto', label: 'Plays', group: 'OUT', hidden: true },
       { key: 'level', type: 'number', default: 0.9, min: 0, max: 1, step: 0.01, label: 'Velocity', group: 'OUT' },
       { key: 'songGenre', type: 'enum', options: ['darkwave', 'synthwave', 'witch-house', 'house', 'techno', 'future-bass', 'melodic', 'dubstep', 'riddim', 'dnb', 'neuro', 'trap'], default: 'darkwave', label: 'Song style', group: 'SONG', hint: 'the kind of music your rhythm grows into (♫ Make a song)' },
+      // 3.228 (his words, 2026-11-25: "i want to make music with contrast. thats my rhytm"): the song's parts from the words' own shape
+      { key: 'songShape', type: 'enum', options: ['from the words', 'every stanza a verse'], default: 'from the words', label: 'Song shape', group: 'SONG', hint: 'from the words: each stanza becomes the part it already is — the loudest a drop, the quietest a break, a line that comes back a chorus, opposites turn line by line (see SHAPE)' },
+      { key: 'contrast', type: 'number', default: 1, min: 0, max: 1, step: 0.01, label: 'Contrast', group: 'SONG', hint: 'how far apart the parts are pushed: 0 = every stanza a verse, 1 = as far as the words go' },
     ],
     ui_hooks: ['syl_edit', 'reset_edits', 'preview', 'send_timeline', 'expand_song', 'send_sequencer'],
     presets: {},
@@ -198,7 +201,7 @@
         let bottom = 0; const WM = window.CanvasWM;
         if (WM && WM.rectOf) K.registry.list().forEach(r => { const q = WM.rectOf(r.instance_id); if (q && isFinite(q.y + q.h)) bottom = Math.max(bottom, q.y + q.h); });
         try {
-          window.RhythmExpand.write(text, { genre: P.get('songGenre'), flow: P.get('flow'), seed: P.get('vary') || 1, reuse: true, run: { clear: false, origin: { x: 40, y: bottom ? bottom + 80 : 40 } } });
+          window.RhythmExpand.write(text, { genre: P.get('songGenre'), flow: P.get('flow'), seed: P.get('vary') || 1, shape: P.get('songShape') === 'every stanza a verse' ? 'verses' : 'contrast', contrast: P.get('contrast'), reuse: true, run: { clear: false, origin: { x: 40, y: bottom ? bottom + 80 : 40 } } });
           ctx.emitUI('status', { info: 'Building your song below — press Space to hear it.' });
         } catch (e) { ctx.emitUI('status', { warn: e.message }); }
       });
@@ -249,8 +252,19 @@
         ctx.emitUI('status', { info: `Sent ${pl.notes.length} syllables to the Sequencer — ${bars} bars in slot${nSlots > 1 ? 's A–' + SL[nSlots - 1] + ' (song mode on)' : ' A'}${pl.steps > 512 ? ' · first 32 bars only' : ''}${rounded ? ' · ' + rounded + ' off-grid syllables rounded to 16ths' : ''}${voice ? '' : ' · add a Sample Player with her clip for the voice lane'}.` });
       });
       ['text', 'flow', 'bars', 'vary', 'mode', 'octave', 'range'].forEach(k => P.onChange(k, build));
+      ['songShape', 'contrast'].forEach(k => P.onChange(k, () => ctx.syncUI()));
       ctx.onKey && ctx.onKey(() => build());
-      ctx.stateExtra = () => { const pl = plan || build(); return { plan: { steps: pl.steps, notes: pl.notes.map(n => ({ text: n.text, word: n.word, s: n.s, l: n.l, stress: n.stress, last: n.last, line: n.line, key: keyOf(n), deg: n.deg })) }, target: target() }; };
+      ctx.stateExtra = () => { const pl = plan || build(); return { plan: { steps: pl.steps, notes: pl.notes.map(n => ({ text: n.text, word: n.word, s: n.s, l: n.l, stress: n.stress, last: n.last, line: n.line, key: keyOf(n), deg: n.deg })) }, target: target(), shape: shapeNow() }; };
+      // the words' shape for the SHAPE card: what each stanza becomes in ♫ Make a song, and why (the lesson)
+      let shapeKey = '', shapeVal = null;
+      function shapeNow() {
+        const RE = window.RhythmExpand, text = String(P.get('text') || ''), on = P.get('songShape') !== 'every stanza a verse', k = text + '|' + on + '|' + P.get('contrast');
+        if (k === shapeKey) return shapeVal; shapeKey = k;
+        try { const r = RE && RE.shape ? RE.shape(text, { contrast: on ? P.get('contrast') : 0 }) : null;
+          shapeVal = r && r.stanzas.length ? { on, lesson: r.lesson, stanzas: r.stanzas.map(s => ({ kind: s.kind, energy: s.energy, first: s.lines[0], lines: s.lines.length, pairs: s.pairs, refrain: s.refrain.slice(0, 1), split: s.split, why: s.why.filter(Boolean) })) } : null;
+        } catch (e) { shapeVal = null; }
+        return shapeVal;
+      }
       ctx.saveExtra = () => ({ edits });
       ctx.loadExtra = (x) => { edits = (x && x.edits) || {}; build(); };
       build();

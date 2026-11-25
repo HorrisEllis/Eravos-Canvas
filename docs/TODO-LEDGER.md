@@ -64,6 +64,9 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-50 | **D2 SYSTEMS** (stocks, flows, feedback) on the assembled engine — a model you hear. | (same) | specced, waits his pick |
 | T-51 | **D3 CONNECTION** (two people on one canvas; consent as the gate) — the two-machine link first. | (same) | specced, waits his pick |
 | T-52 | **D4 WORDS** (lines, meter, rhyme) beside the dubstep tools. | (same) | specced |
+| T-53 | **Learn it step by step on his own words**: Lyrics → Rhythm walks him through (1) syllables on the beat (2) a stanza's part (3) contrast (4) the melody (5) the song — each step heard, his choice kept, ERAVOS fills the rest. Preview first. | "i want to learn how to make music from my lyrics. that is the point of the rhythm tool" | open (next) |
+| T-54 | **His voice in it**: record the lyrics (Song Recorder) and lock the take to the syllables the tool placed (vocal-chop as instrument — the Make It Bun Dem technique). | "i want to make music with contrast. thats my rhytm" | open |
+| T-55 | **His poetry index as a shelf**: each poem → a song shape to start from, kept in Documents\ERAVOS (his, never shipped). | (the zip he sent, 2026-11-25) | open (asks him first) |
 
 ## ERAVOS's own engine · `specs/eravos.engine.spec` (decided 2026-11-24: written in Emerge — "wait for emerge")
 

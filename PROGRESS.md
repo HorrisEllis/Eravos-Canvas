@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.228 Music with contrast from the words; the SHAPE and the lesson (2026-11-25)
+His words: "continue making more tools for eravos. i want to make music with contrast. thats my rhytm;" · "i want to learn how to make music from my lyrics. that is the point of the rhythm tool" (his poem as the lyrics; his poetry index as a zip — kept with him, not in the repo)
+- tools/music/components/lyric-shape (NEW, contract, spec, 17 checks): per stanza density, space, stress, light / dark words, push, opposites,
+  runs that come back → energy and its part (verse · chorus · build · drop · break, split on opposites) with the reason in words; contrast
+  0 = every stanza a verse. Lines set apart one by one read as one stanza of spaced lines.
+- tools/music/data/rhythm-expand.js: shape 'contrast' — sections by the words' parts (a break has no drums or bass; the drop's drums full; the
+  build rolls up); a split stanza turns line by line (dark: an octave down, one long low root, no groove · light: an octave up, the full
+  groove). RhythmExpand.shape(text). The API's default stays as before (P21 unchanged).
+- Lyrics → Rhythm 1.1.0: SONG › Song shape (from the words · every stanza a verse) + Contrast; SHAPE card (each stanza's part, energy, why)
+  and "How words become music" (five steps).
+- Tests: tests/p228-words-contrast.test.js 4/4; P20 47/47, RhythmExpand 6/6, Bass Pack 9/9, P218, boundary 10/10, bare-canvas, component
+  contracts 36/36, tool needs, validate. Screenshot with his poem shown to him only (not kept in the repo: his words).
+
 ## 3.227 The catalog: the theme's colour for the green, paintings for every tool, mode and made tool; Font a choice (2026-11-25)
 His words: "okay, i hate the font. also the green. also i want the thumbnails back. and i want those generated per tool, mutated tool, consistent style." · "yes. almost all of it. make it colored. the themes, and the reactive color.s"
 - canvas/runtime/eravos.css: --ok (on / ready / done) = the theme's colour (Dusk #ff6fa8, Studio cyan, Field its accent, Midnight #8fa8ff),

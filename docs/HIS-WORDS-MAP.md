@@ -286,3 +286,5 @@ kept), or **open** (not done yet, and what is missing). Newest at the bottom. Ad
 | N-X137 | "okay, i hate the font. also the green. also i want the thumbnails back. and i want those generated per tool, mutated tool, consistent style." (2026-11-25) | **built** (green, paintings) + **open** (font: his pick) | 3.227 · P227 · catalog-look-*.png, catalog-fonts.png |
 | N-X138 | "yes. almost all of it. make it colored. the themes, and the reactive color.s" (2026-11-25) | **built** | 3.227: --ok from the theme, moved by the Beat colour |
 | N-X139 | "Use this to find domains we can use this canvas for" (2026-11-25, with his Innovation Toolkit) | **mapped** + **open** (which first) | specs/eravos.domains-from-the-toolkit.spec · T-48 … T-52 |
+| N-X140 | "continue making more tools for eravos. i want to make music with contrast. thats my rhytm;" (2026-11-25, his poem as the lyrics) | **built** (part) | 3.228 lyric-shape; ♫ Make a song with contrast; P228 |
+| N-X141 | "i want to learn how to make music from my lyrics. that is the point of the rhythm tool" (2026-11-25) | **built** (the SHAPE + the lesson) + **open** (step-by-step) | Lyrics → Rhythm 1.1.0 · T-53 |
