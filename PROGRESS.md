@@ -2,9 +2,12 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
-## 3.226 What a synthesis will make, and why it was not made; the catalog without Modes (2026-11-25)
+## 3.226 What a synthesis will make, and why it was not made; the catalog's Modes as tool cards (2026-11-25)
 His words: "remove these from the tool catalog. tools when the can't synthesize, need to flash the reasons why. also expand the ability. its hard to tell what it will do when i synthesize. like the wobble and the retro could sound amazing. or the reese and the piano, …" (whole: specs/eravos.2026-11-24-session.map.spec 32; his screenshot: ＋ Add › Modes)
-- canvas/runtime/add-menu.js: no Modes rail item, no "Pick a mode" page; it opens on All tools (domains are picked on Start).
+- canvas/runtime/add-menu.js: first removed the Modes page; his correction ("no. domains are meant to be there. just consistent with the rest of ui,")
+  put it back made like the rest of the catalog: "Modes" heads the page as "All tools" does, each mode (and Stay agnostic) is a tool card
+  (picture frame with its icon, glyph + name, blurb, plain chips: active · N tools · N categories), a click selects it, and the detail on the
+  right shows what it TURNS ON and SHOWS as a tool's dependencies, with Enter / Browse where Add to canvas sits; double-click enters.
 - tools/music/core/assembled-tool.js: one PLAN (planParts / planPair: each of VOICE · WOBBLE · MOUTH · DRIVE · FX — from which tool and part, what
   it is; not taken; stays behind); previewParts / previewPair (the gates dry, nothing kept); hear (the gates' riff, offline, through the mix);
   every refusal a REASON as data (kind, title, why, steps, blame, actions); fixes as opts (flip, restFrom, override a place, tweak quieter /
@@ -14,7 +17,7 @@ His words: "remove these from the tool catalog. tools when the can't synthesize,
   core is carried over another.
 - Tests: tests/p226-synthesis-why.test.js 2/2 (in tests/run.html). P196 P199 P200 P202 P203 P204 P205 P216 P217 P218 green, boundary 10/10,
   bare-canvas, competence check. P63's one failure ("eravos.wb-p202" without an icon — P202's made tool left in the page) is on main too.
-- Screenshots: docs/previews/workbench/synthesis-why.shots.mjs → synthesis-plan.png, synthesis-why.png, catalog-no-modes.png.
+- Screenshots: docs/previews/workbench/synthesis-why.shots.mjs → synthesis-plan.png, synthesis-why.png, catalog-modes.png.
 - Specced (assembled-tool ADDENDUM 2026-11-25): ML3a unison + string voices (Reese, Supersaw, Piano), ML3b Retro Poly, genre packs for every
   tool, the "Make It Bun Dem" baseline, the next leverage set. T-39 … T-45. Asked: "trenke" (which track?) · "the lab" (which?).
 

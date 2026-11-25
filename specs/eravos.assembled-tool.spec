@@ -130,7 +130,8 @@ BUILT 3.226 — WHAT IT WILL MAKE, AND WHY NOT:
     keeps a red ring while the card is up; the card sits beside them; its buttons do the fix: opts (flip · restFrom · override { slot: inst } ·
     tweak quieter / open / tame — applied to the made tool's settings only, never to a tool) or run (rest-from · slot-from · select-fit ·
     mutate-then-retry); ↻ Try again; ✕ / Esc closes. A twin made only from one tool says so and offers that tool's VOICE / MOUTH from another.
-  - The ＋ Add catalog has no Modes page (domains are picked on Start, 3.220–3.225); it opens on All tools.
+  - The ＋ Add catalog's Modes: first removed, then (his correction, map 34: "no. domains are meant to be there. just consistent with the rest of
+    ui,") kept and made like the rest: each mode a tool card, its TURNS ON / SHOWS in the detail on the right, Enter where Add to canvas is.
   proof: tests/p226-synthesis-why.test.js 2/2 (preview makes nothing; twin refused, blamed parts ringed, card beside them, fixed from the card;
     no-place parts named and the fitting ones picked; a tweak changes what is measured, never the tool; two-tool plan). P196–P218 green.
 NEXT (specced, in this order — each shown first where it is seen):

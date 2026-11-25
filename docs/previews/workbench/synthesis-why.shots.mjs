@@ -1,6 +1,6 @@
 // node docs/previews/workbench/synthesis-why.shots.mjs — 3.226: Wobble Bass and Retro DCO blown up; (1) ◇ What will it make? beside the picked
 // parts → synthesis-plan.png · (2) the same picks made twice: refused, the parts ringed red, the reason and its fixes → synthesis-why.png ·
-// (3) the ＋ Add catalog with no Modes page → catalog-no-modes.png
+// (3) the ＋ Add catalog's Modes as tool-like cards → catalog-modes.png
 import { chromium } from '../../../host/driver/glass.js'; import path from 'path'; import { fileURLToPath } from 'url';
 const HERE = path.dirname(fileURLToPath(import.meta.url)), ROOT = path.resolve(HERE, '../../..');
 const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1800, height: 1000 }, deviceScaleFactor: 2 });
@@ -19,6 +19,6 @@ await p.waitForTimeout(500); await p.screenshot({ path: HERE + '/synthesis-plan.
 await p.evaluate(async () => { FieldBoard.hideWhy(); window.__pick(); await FieldBoard.synthesizeSel(); document.querySelectorAll('.wm-win').forEach(w => { if (/Wobble Bass · parts/.test(w.textContent)) w.style.display = 'none'; });
   document.querySelectorAll('.fb-board').forEach((bd, i) => { if (i > 1) bd.style.display = 'none'; }); window.__pick(); await FieldBoard.synthesizeSel(); });
 await p.waitForTimeout(700); await p.screenshot({ path: HERE + '/synthesis-why.png' });
-await p.evaluate(() => { FieldBoard.hideWhy(); FieldBoard.clearSel(); AddMenu.show(Shell, Shell.X, {}); });
-await p.waitForTimeout(500); await p.screenshot({ path: HERE + '/catalog-no-modes.png' });
+await p.evaluate(() => { FieldBoard.hideWhy(); FieldBoard.clearSel(); AddMenu.show(Shell, Shell.X, { view: 'modes' }); });
+await p.waitForTimeout(500); await p.screenshot({ path: HERE + '/catalog-modes.png' });
 console.log(errs.length ? 'errors: ' + errs.join(' | ') : 'no page errors'); await b.close();

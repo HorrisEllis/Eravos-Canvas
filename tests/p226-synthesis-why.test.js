@@ -5,13 +5,19 @@
 window.__phase = 'P226';
 describe('P226 what it will make, and why not', () => {
   function host() { const h = document.getElementById('wmhost'); if (!CanvasWM.world) { CanvasWM.init(h, Kernel); WireSystem.init(Kernel); OrganismFactory.boot(Kernel); } Kernel.audio.boot(); }
-  it('the Add catalog opens on the tools, with no Modes page', async () => {
+  it('the Add catalog keeps its modes, as cards like the tools', async () => {
     if (!window.AddMenu || !AddMenu.show) return;   // the catalog is the host's; the test page may not load it
-    const S = window.Shell || { K: Kernel, activate() {}, toast() {} }, X = S.X || Expansion.create(S, Kernel); AddMenu.show(S, X, {}); await TH.sleep(150);
-    const ov = document.querySelector('.ap-rail') || document.body;
-    assert.ok(![...ov.querySelectorAll('.ap-rail-item')].some(b => /^Modes/.test(b.textContent.trim())), 'no Modes item in the rail');
-    assert.ok(!document.querySelector('.ap-modes'), 'no mode cards');
-    assert.ok(document.querySelector('.ap-card'), 'the tool cards are what it opens on'); if (AddMenu.close) AddMenu.close(); else document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await TH.sleep(50);
+    const S = window.Shell || { K: Kernel, activate() {}, toast() {} }, X = S.X || Expansion.create(S, Kernel); if (!X.modes().length) return;
+    AddMenu.show(S, X, { view: 'modes' }); await TH.sleep(150);
+    assert.ok([...document.querySelectorAll('.ap-rail-item')].some(b => /^Modes/.test(b.textContent.trim())), 'Modes is in the rail');
+    assert.ok(!document.querySelector('.ap-modes, .ap-mode'), 'no mode card of its own look');
+    const cs = [...document.querySelectorAll('.ap-grid .ap-card[data-mode]')]; assert.equal(cs.length, X.modes().length + 1, 'one tool-like card per mode, and Stay agnostic');
+    assert.ok(cs.every(c => c.querySelector('.ap-card-pic') && c.querySelector('.ap-card-tx b') && c.querySelector('.ap-chiprow')), 'each with the tool card\'s picture, name and chips');
+    assert.ok(/Modes/.test(document.querySelector('.ap-gridhead h2').textContent), 'the page heads like All tools');
+    cs[0].click(); await TH.sleep(30); assert.ok(cs[0].classList.contains('sel'), 'a click selects it, as a tool card');
+    const det = document.querySelector('.ap-d-head h3'); assert.ok(det && det.textContent === X.modes()[0].label, 'its detail on the right, as a tool\'s');
+    assert.ok([...document.querySelectorAll('.ap-addbtn')].some(b => /Enter|Browse/.test(b.textContent)), 'the button that enters it, where Add to canvas is');
+    AddMenu.close(); await TH.sleep(50);
   });
   it('previews, then refuses a twin with its reason beside the blamed parts, and fixes it from the card', async () => {
     host(); const keep = MadeTools.list(AssembledTool.MADE_KEY); MadeTools.save(AssembledTool.MADE_KEY, []); const made = [];

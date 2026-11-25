@@ -172,3 +172,9 @@
   - ANSWERED (his screenshot): the track is "Make It Bun Dem" (Skrillex & Damian Marley), the After Hours EP — the same record as his baseline.
     The baseline study (T-43) is that one record, looked into deeply: technique only, never its tune or a recording.
 
+## 34 — verbatim (2026-11-25, of 3.226's catalog without Modes):
+  > no. domains are meant to be there. just consistent with the rest of ui,
+  - CORRECTED 3.226: the Modes page is back, made like the rest of the catalog — "Modes" heads it as "All tools" does; each mode and Stay
+    agnostic is a tool card (the picture frame with its icon, glyph + name, blurb, plain chips); a click selects it, the detail on the right
+    shows what it turns on and shows (as a tool's dependencies) with Enter / Browse where Add to canvas sits. Screenshot catalog-modes.png.
+
