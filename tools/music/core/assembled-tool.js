@@ -140,7 +140,7 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
   function descriptor(o) {
     o = o || {};
     return {
-      id: o.id, domain: 'music', version: o.version || '1.0.0', label: o.label || 'Synthesized', icon: o.icon || '🧪', accent: o.accent || '#ffcc00', phase: 'P202',
+      id: o.id, domain: 'music', version: o.version || '1.0.0', label: o.label || 'Synthesized', icon: o.icon || '🧪', accent: o.accent || '#00d4ff', phase: 'P202', art: o.art,
       category: 'Bass', blurb: o.blurb || 'A tool synthesized from others: its parts are shared components, assembled into one engine.',
       size: { w: 760, h: 720 }, minSize: { w: 480, h: 480 },
       permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'], provides: ['capability.audio_out', 'capability.note_in', 'capability.bass_voice'],
@@ -206,10 +206,15 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
   Model.idFor = (name) => 'eravos.wb-' + slug(name);
   Model.defineMade = function (r) {   // → the made tool's id, defined (and its window, once the builder's UI is here)
     const F = root.OrganismFactory; if (!F) return null;
-    if (!F.def || !F.def(r.id)) F.define(descriptor({ id: r.id, label: r.name, icon: '🧪', accent: r.accent || '#ffcc00', settings: r.settings, version: '1.0.0',
-      blurb: 'Synthesized ' + String(r.at || '').slice(0, 10) + (r.of ? ' from ' + r.of.join(' × ') : '') + ': ' + r.chain + '. ' + (r.verdict === 'novel' ? 'New to ERAVOS.' : 'Close to ' + r.near + '.'), made: { from: 'synthesized', of: r.of || [], at: r.at, dag: r.dag, verdict: r.verdict, near: r.near, d: r.d } }));
+    // 3.227 its painting, in the cards' style (tools/core/art/painter.js): one ribbon per tool it came from, in that tool's colour
+    const accents = r.accents || (r.of || []).map(l => { const d = (F.defined ? F.defined() : []).find(x => x.label === l); return d && d.accent; }).filter(Boolean);
+    const art = root.ToolArt ? root.ToolArt.url({ id: r.id, label: r.name, accents, mutated: (r.of || []).length <= 1 }) : undefined;
+    if (!F.def || !F.def(r.id)) F.define(descriptor({ id: r.id, label: r.name, icon: '🧪', accent: blendOf(accents) || r.accent || '#00d4ff', settings: r.settings, version: '1.0.0', art,
+      blurb: (r.character ? r.character.name.replace(/^./, c => c.toUpperCase()) + ' — s' : 'S') + 'ynthesized ' + String(r.at || '').slice(0, 10) + (r.of ? ' from ' + r.of.join(' × ') : '') + ': ' + r.chain + '. ' + (r.verdict === 'novel' ? 'New to ERAVOS.' : 'Close to ' + r.near + '.'), made: { from: 'synthesized', of: r.of || [], at: r.at, dag: r.dag, verdict: r.verdict, near: r.near, d: r.d, character: r.character || null } }));
     if (Model.ui) F.reg(r.id, Model.ui); return r.id;
   };
+  // 3.230 (his: "the color keeps being yellow"): a made tool's colour is its parents' colours blended — never the old fixed yellow
+  function blendOf(L) { const c = (L || []).filter(x => /^#[0-9a-f]{6}$/i.test(x)); if (!c.length) return null; const v = [0, 2, 4].map(i => Math.round(c.reduce((a, x) => a + parseInt(x.slice(1 + i, 3 + i), 16), 0) / c.length)); return '#' + v.map(x => x.toString(16).padStart(2, '0')).join(''); }
   Model.forget = (id) => keep(ld().filter(r => r.id !== id));
   Model.chainOf = (d) => d.nodes.filter(x => !['lfo', 'sub', 'st'].includes(x.id)).map(x => x.component).join(' → ') + ' · wobble into ' + (d.nodes.find(x => x.id === 'flt') || {}).component;
   // the gates every made tool passes (D5, D6): it plays (finite, not silent, never pinned), and it is not a twin of anything in ERAVOS or made before
@@ -219,24 +224,25 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
   Model.judge = function (settings, bpm, N) {   // N: window.MusicNovelty (tools/music/compat/novelty.js)
     const sr = 48000, notes = RIFF(bpm), secs = notes[3].t + notes[3].dur + 0.2, d = dag(settings, bpm);
     const r = Voice(root.Assemble, root.MusicAdapters, root.MusicParts, root.MusicContracts.contracts, sr).render(d, notes, secs, settings.level, settings.glide);
-    if (!r.ok) return { ok: false, why: 'it does not build: ' + r.why.join('; ') };
+    if (!r.ok) return { ok: false, kind: 'build', why: 'it does not build: ' + r.why.join('; ') };
     let bad = 0, pinned = 0, q = 0; const mono = new Float32Array(r.L.length);
     for (let i = 0; i < r.L.length; i++) { const a = r.L[i], b = r.R[i]; if (!isFinite(a) || !isFinite(b)) bad++; if (Math.max(Math.abs(a), Math.abs(b)) >= 0.999) pinned++; q += 0.5 * (a * a + b * b); mono[i] = 0.5 * (a + b); }
     const rmsDb = 20 * Math.log10(Math.sqrt(q / r.L.length) + 1e-12);
-    if (bad) return { ok: false, why: bad + ' samples are not numbers' }; if (rmsDb < -50) return { ok: false, why: 'it is silent (' + rmsDb.toFixed(1) + ' dB)' };
-    if (pinned / r.L.length > 0.005) return { ok: false, why: 'it sits at full scale ' + (100 * pinned / r.L.length).toFixed(1) + ' % of the time (turn the level or the drive down)' };
-    const fp = N.measure.fingerprint(mono, sr, 0.1, secs - 0.1); if (!fp || fp.frames < 4) return { ok: false, why: 'too short to fingerprint' };
+    if (bad) return { ok: false, kind: 'nan', why: bad + ' samples are not numbers', bad }; if (rmsDb < -50) return { ok: false, kind: 'silent', why: 'it is silent (' + rmsDb.toFixed(1) + ' dB)', rmsDb };
+    if (pinned / r.L.length > 0.005) return { ok: false, kind: 'clips', why: 'it sits at full scale ' + (100 * pinned / r.L.length).toFixed(1) + ' % of the time (turn the level or the drive down)', pinned: +(100 * pinned / r.L.length).toFixed(1) };
+    const fp = N.measure.fingerprint(mono, sr, 0.1, secs - 0.1); if (!fp || fp.frames < 4) return { ok: false, kind: 'short', why: 'too short to fingerprint' };
     const B = N.baseline, C = N.core, dist = C.makeDist(C.groupsFor(B.D)), me = (v) => ({ v, n: C.norm(v, B.lo, B.hi) }), mine = me(fp.v);
     let best = { d: 9, what: '' };
     B.items.forEach(x => { const dd = dist(mine, me(x.v)); if (dd < best.d) best = { d: dd, what: x.label + ' · ' + x.preset }; });
     ld().forEach(t => { if (!t.fp) return; const dd = dist(mine, me(t.fp)); if (dd < best.d) best = { d: dd, what: 'your ' + t.name }; });
     const verdict = best.d < B.twin ? 'TWIN' : best.d < B.close ? 'CLOSE' : 'novel';
-    return { ok: verdict !== 'TWIN', why: verdict === 'TWIN' ? 'this is ' + best.what + ' again (' + best.d.toFixed(3) + ') — change something that can be heard' : '', verdict, near: best.what, d: +best.d.toFixed(3), fp: fp.v.map(x => +x.toPrecision(5)), dag: d, rmsDb };
+    return { ok: verdict !== 'TWIN', kind: verdict === 'TWIN' ? 'twin' : '', twin: B.twin, why: verdict === 'TWIN' ? 'this is ' + best.what + ' again (' + best.d.toFixed(3) + ') — change something that can be heard' : '', verdict, near: best.what, d: +best.d.toFixed(3), fp: fp.v.map(x => +x.toPrecision(5)), dag: d, rmsDb };
   };
   Model.make = function (name, settings, bpm, N, of) {   // → { ok, id, rec } or { ok: false, why } · of: the tools it was synthesized from
     const j = Model.judge(settings, bpm, N); if (!j.ok) return j;
     const L = ld(); let nm = String(name || 'Made Wobble').trim() || 'Made Wobble', i = 2; const base = nm; while (L.some(r => r.name === nm) || (root.OrganismFactory && root.OrganismFactory.def(Model.idFor(nm)))) nm = base + ' ' + i++;
-    const rec = { id: Model.idFor(nm), name: nm, of: of || [], at: new Date().toISOString(), settings: JSON.parse(JSON.stringify(settings)), bpm, dag: j.dag, chain: Model.chainOf(j.dag), fp: j.fp, verdict: j.verdict, near: j.near, d: j.d };
+    const F0 = root.OrganismFactory, accents = (of || []).map(l => { const d = F0 && F0.defined ? F0.defined().find(x => x.label === l) : null; return d && d.accent; }).filter(Boolean);
+    const rec = { id: Model.idFor(nm), name: nm, of: of || [], accents, character: (Model._char || null), at: new Date().toISOString(), settings: JSON.parse(JSON.stringify(settings)), bpm, dag: j.dag, chain: Model.chainOf(j.dag), fp: j.fp, verdict: j.verdict, near: j.near, d: j.d };
     L.unshift(rec); keep(L); Model.defineMade(rec); return { ok: true, id: rec.id, rec, verdict: j.verdict, near: j.near, d: j.d };
   };
   // ---------------------------------------------------------------- SYNTHESIZE TOGETHER: two tools blown up on the canvas → one of its own
@@ -246,34 +252,150 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
     if (root.MusicNovelty) return Promise.resolve(root.MusicNovelty);
     return new Promise((res, rej) => { const s2 = root.document.createElement('script'); s2.src = (root.ERAVOS_TOOLS || '') + 'music/compat/novelty.js'; s2.onload = () => res(root.MusicNovelty); s2.onerror = () => rej(new Error('the novelty measure did not load')); root.document.head.appendChild(s2); });
   }
-  Model.synthesize = async function (aInst, bInst) {
+  // ---------------------------------------------------------------- 3.226 THE PLAN, THE REASONS (his words, 2026-11-25: "tools when the can't synthesize,
+  // need to flash the reasons why. also expand the ability. its hard to tell what it will do when i synthesize"). One plan serves three things:
+  // what it WILL make (each slot: from which tool, which part, what it is), what stays behind, and — when the gates say no — WHY, as data the board
+  // shows beside the parts to blame: { kind, title, why, steps: [...], blame: [{ inst, piece }], actions: [{ label, hint, opts | run }] }.
+  const SLOT_NAME = { voice: 'VOICE', wobble: 'WOBBLE', mouth: 'MOUTH', drive: 'DRIVE', fx: 'FX' };
+  function describe(slot, s) {   // what a slot holds, in words, from the made tool's settings
+    const r = (x, d) => (+x).toFixed(d === undefined ? 0 : d);
+    if (slot === 'voice') return s.wave + (s.wave === 'pulse' ? ' ' + r(s.pw * 100) + ' %' : '') + (s.sub > 0.02 ? ' · sub ' + r(s.sub * 100) + ' %' : '') + (s.noise > 0.02 ? ' · ' + s.noiseColour + ' noise' : '') + ' · octave ' + s.octave;
+    if (slot === 'wobble') return s.rate + ' ' + s.lfoShape + ' · ' + r(s.depth, 1) + ' oct';
+    if (slot === 'mouth') return s.mouth + ' · ' + r(s.cutoff) + ' Hz · reso ' + r(s.reso, 2) + (s.envAmt > 0 ? ' · env ' + r(s.envAmt, 1) + ' oct' : '');
+    if (slot === 'drive') return s.drive === 'none' ? 'none' : s.drive + (s.drive === 'bitcrusher' ? ' · ' + s.dCrushBits + ' bits' : ' · ' + r(s.drive === 'saturator-tape' ? s.dTapeDrive : s.dTubeDrive, 1) + ' dB');
+    if (slot === 'fx') return s.fx === 'none' ? 'none' : s.fx + (s.fx === 'ensemble-core' ? ' · ' + s.fEnsMode : s.fx === 'delay-line' ? ' · ' + s.fDelTime : s.fx === 'bitcrusher' ? ' · ' + s.fCrushBits + ' bits' : '');
+    return '';
+  }
+  function tweak(settings, list) {   // a fix asked for on the card, applied to the settings before the gates (never to a tool)
+    const s = Object.assign({}, settings);
+    [].concat(list || []).forEach(t => {
+      if (t === 'quieter') { s.level = +(s.level * 0.5).toFixed(3); s.dTubeDrive = Math.max(0, s.dTubeDrive - 6); s.dTapeDrive = Math.max(0, s.dTapeDrive - 6); s.mLadDrive = Math.max(0, s.mLadDrive - 6); }
+      if (t === 'open') { s.cutoff = Math.min(3000, Math.max(600, s.cutoff * 3)); s.depth = Math.max(1, s.depth); if (s.mSvfMode === 'notch') s.mSvfMode = 'lowpass'; }
+      if (t === 'tame') { s.reso = Math.min(s.reso, 0.6); s.mLadDrive = Math.min(s.mLadDrive, 6); s.fDelFb = Math.min(s.fDelFb, 0.5); }
+    });
+    return s;
+  }
+  // which tool each slot comes from → the plan. src: { voice: { h, part? }, … } (h: a tool's handle; part: the box picked, if one was)
+  function planOf(srcs, bpm, opts) {
+    const TB = root.ToolBlend, from = {}; SLOTS_ORDER.forEach(sl => { from[sl] = { id: srcs[sl].h.id, params: TB.paramsOf(srcs[sl].h.instanceId) }; });
+    let settings = TB.combineFrom(from, from.voice, bpm); if (!settings) return null;
+    settings = tweak(settings, opts && opts.tweak);
+    const rows = SLOTS_ORDER.map(sl => { const own = TB.slots(srcs[sl].h.id, from[sl].params, bpm), has = own && own[sl] && Object.keys(own[sl]).length;
+      return { slot: sl, name: SLOT_NAME[sl], from: srcs[sl].h.def.label, inst: srcs[sl].h.instanceId, part: srcs[sl].part ? srcs[sl].part.label : null, picked: !!srcs[sl].part,
+        what: has ? describe(sl, settings) : describe(sl, settings) + ' (the engine\'s own — ' + srcs[sl].h.def.label + ' has no ' + sl + ')' }; });
+    const tools = [...new Map(SLOTS_ORDER.map(sl => [srcs[sl].h.id, srcs[sl].h])).values()];
+    const behind = []; tools.forEach(h => TB.behind(h.id).forEach(b => behind.push(h.def.label + ': ' + b)));
+    // 3.230 what it will sound like: each place's character from the tool it comes from (ToolBlend.sound) — "wobble synthwave"
+    const character = TB.sound ? TB.sound(SLOTS_ORDER.map(sl => ({ slot: sl, id: srcs[sl].h.id, label: srcs[sl].h.def.label, char: (srcs[sl].h.def.made || {}).character })), settings) : null;
+    rows.forEach(rw => { const ch = TB.character && (TB.character(srcs[rw.slot].h.id) || (srcs[rw.slot].h.def.made || {}).character); if (ch && ch[rw.slot]) rw.char = ch[rw.slot] + ' · ' + ch.style; });
+    return { rows, behind, settings, character, tools: tools.map(h => h.def.label), insts: tools.map(h => h.instanceId) };
+  }
+  const SLOTS_ORDER = ['voice', 'wobble', 'mouth', 'drive', 'fx'];
+  function reasonFor(j, plan, ctx) {   // ctx: { parts: [{ x, h, to }], base: handle, pair: bool }
+    const blameSlots = (sls) => (ctx.parts || []).filter(o => sls.includes(o.to)).map(o => ({ inst: o.x.inst, piece: o.x.piece }));
+    const allPicked = (ctx.parts || []).map(o => ({ inst: o.x.inst, piece: o.x.piece })), cores = (plan ? plan.insts : []).map(i => ({ inst: i }));
+    const row = (sl) => plan && plan.rows.find(r => r.slot === sl), blameOr = (b) => b.length ? b : ctx.pair ? cores : allPicked;
+    const tools = plan ? plan.tools : [];
+    if (j.kind === 'twin') {
+      const one = tools.length === 1, mine = /^your /.test(j.near || ''), allIn = !!(plan && plan.rows.every(r => r.picked));
+      return { kind: 'twin', title: 'It would be ' + j.near + ' again', why: j.why,
+        steps: [one && allIn ? 'Every place was picked from ' + tools[0] + ', so what it makes is ' + tools[0] + (mine ? ' — the one you made already.' : '.')
+              : one ? 'Every part came from ' + tools[0] + ' — the parts you picked and the rest — so what it makes is ' + tools[0] + '.'
+                    : mine ? 'You made this one already (' + j.near + '): what changed cannot be heard against it.'
+                    : 'Against ' + j.near + ' it measures ' + j.d + ' — under ' + j.twin + ' is the same sound to the ear.',
+          ctx.pair ? 'Swap which tool gives which part, or move a knob on either tool that changes the sound, then try again.'
+                   : allIn ? 'Taking “the rest” elsewhere changes nothing here: take its VOICE or MOUTH from another tool blown up on the canvas, or Ctrl+click a part from another tool into the selection.'
+                   : 'Take the rest from another tool blown up on the canvas, or Ctrl+click a part from another tool into the selection.',
+          'Or mutate the parts you picked first — each takes another component, fresh settings — and make it from that.'],
+        blame: blameOr(allPicked),
+        actions: (ctx.pair ? [{ label: '⇄ Swap which tool gives which part', hint: 'each slot from the other tool', opts: { flip: true } }]
+          : (allIn ? [] : [{ label: '◆ Take the rest from…', run: 'rest-from', exclude: ctx.base && ctx.base.instanceId }])
+            .concat([{ run: 'slot-from', slots: ['voice', 'mouth'].map(id => ({ id, name: SLOT_NAME[id] })), now: plan ? Object.fromEntries(plan.rows.map(r => [r.slot, r.inst])) : {} }])).concat([{ label: '⚄ Mutate these parts, then make it', run: 'mutate-then-retry' }]) };
+    }
+    if (j.kind === 'clips') { const d = row('drive'), b = blameSlots(['drive', 'fx', 'mouth']);
+      return { kind: 'clips', title: 'It would clip', why: j.why,
+        steps: ['It sits at full scale ' + j.pinned + ' % of the time — loud enough to break up into digital distortion.',
+          d && d.what !== 'none' ? 'The drive (' + d.what + ', from ' + d.from + ') and the level push it over.' : 'The level and the mouth\'s resonance push it over.',
+          'Turn the drive or the level down on the tool it came from, or let ERAVOS make it 6 dB quieter.'],
+        blame: blameOr(b), actions: [{ label: '− Make it 6 dB quieter', hint: 'half the level, 6 dB off the drive', opts: { tweak: 'quieter' } }] }; }
+    if (j.kind === 'silent') { const m = row('mouth');
+      return { kind: 'silent', title: 'It would be silent', why: j.why,
+        steps: [m ? 'The mouth (' + m.what + ', from ' + m.from + ') lets almost nothing through.' : 'Almost nothing comes out.',
+          'Open the filter on the tool it came from (its cutoff up), or let ERAVOS open the mouth.'],
+        blame: blameOr(blameSlots(['mouth', 'voice'])), actions: [{ label: '◠ Open the mouth and make it', hint: 'the cutoff up, the wobble at least an octave', opts: { tweak: 'open' } }] }; }
+    if (j.kind === 'nan') return { kind: 'nan', title: 'It would break', why: j.why,
+        steps: ['The chain runs away (' + j.bad + ' samples are not numbers) — a resonance or a feedback above what it can hold.', 'Turn the resonance or the echo feedback down, or let ERAVOS tame them.'],
+        blame: blameOr(blameSlots(['mouth', 'drive', 'fx'])), actions: [{ label: '◇ Tame it and make it', hint: 'resonance ≤ 0.6, ladder drive ≤ 6 dB, feedback ≤ 0.5', opts: { tweak: 'tame' } }] };
+    if (j.kind === 'build') return { kind: 'build', title: 'It would not build', why: j.why, steps: ['One of its parts cannot be assembled into the engine yet.', 'Pick a different part for that slot.'], blame: [], actions: [] };
+    return { kind: j.kind || 'other', title: 'Not made', why: j.why || 'it did not build', steps: [], blame: [], actions: [] };
+  }
+  async function gate(plan, ctx, name, of, opts) {   // the gates (judge) → made, or the reason; opts.dry: judge only (the preview)
+    let N; try { N = await loadNovelty(); } catch (er) { return { ok: false, why: er.message, reason: { kind: 'load', title: 'The measure did not load', why: er.message, steps: [], blame: [], actions: [] } }; }
+    const bpm = ctx.bpm; Model._char = plan.character ? { style: (plan.character.mix[0] || {}).style, name: plan.character.name, voice: plan.character.name, wobble: plan.character.name, mouth: plan.character.name, drive: plan.character.name, fx: plan.character.name } : null;
+    const j = opts && opts.dry ? Model.judge(plan.settings, bpm, N) : Model.make(name, plan.settings, bpm, N, of); Model._char = null;
+    if (!j.ok) return Object.assign({}, j, { ok: false, plan, reason: reasonFor(j, plan, ctx) });
+    return Object.assign(j, { plan });
+  }
+  const bpmNow = () => (root.Kernel && root.Kernel.music && root.Kernel.music.bpm) || 120;
+  function pairSrcs(aInst, bInst, opts) {
     const F = root.OrganismFactory, TB = root.ToolBlend, A = F && F.handle(aInst), B = F && F.handle(bInst);
-    if (!A || !B || !TB || !TB.has(A.id) || !TB.has(B.id)) return { ok: false, why: 'these two have no parts the engine runs yet' };
-    let N; try { N = await loadNovelty(); } catch (er) { return { ok: false, why: er.message }; }
-    const bpm = (root.Kernel && root.Kernel.music && root.Kernel.music.bpm) || 120, a = { id: A.id, params: TB.paramsOf(aInst) }, b = { id: B.id, params: TB.paramsOf(bInst) };
-    const settings = TB.combine(a, b, TB.pickFor(A.id, B.id), bpm), names = [A.def.label, B.def.label];
-    return Model.make(names.join(' × '), settings, bpm, N, names);
+    if (!A || !B || !TB || !TB.has(A.id) || !TB.has(B.id)) return { none: [A, B].filter(h => h && !(TB && TB.has(h.id))) };
+    const pick = TB.pickFor(A.id, B.id), srcs = {}; SLOTS_ORDER.forEach(sl => { let w = pick[sl]; if (opts && opts.flip) w = w === 'a' ? 'b' : 'a'; srcs[sl] = { h: w === 'b' ? B : A }; });
+    return { A, B, srcs };
+  }
+  Model.planPair = function (aInst, bInst, opts) { const p = pairSrcs(aInst, bInst, opts); return p.srcs ? planOf(p.srcs, bpmNow(), opts) : null; };
+  Model.synthesize = async function (aInst, bInst, opts) {
+    const p = pairSrcs(aInst, bInst, opts);
+    if (!p.srcs) return { ok: false, why: 'these two have no parts the engine runs yet', reason: { kind: 'none', title: 'Nothing here goes into the engine yet',
+      why: (p.none || []).map(h => h.def.label).join(', ') + ' has no parts the synthesis engine can run yet', steps: ['Synthesis runs a VOICE, WOBBLE, MOUTH, DRIVE and FX. ' + (p.none || []).map(h => h.def.label).join(', ') + ' does not map onto them yet.', 'Try one of the tools that do: Wobble Bass, Retro DCO, Retro Poly, Supersaw, Swarm Oscillator, Piano (its drive), Tape Memory, or a tool you made.'],
+      blame: (p.none || []).map(h => ({ inst: h.instanceId })), actions: [] } };
+    const plan = planOf(p.srcs, bpmNow(), opts); if (!plan) return { ok: false, why: 'these parts could not be read' };
+    const names = [p.A.def.label, p.B.def.label];
+    return gate(plan, { pair: true, bpm: bpmNow() }, names.join(' × '), names, opts);
   };
+  Model.previewPair = (a, b, opts) => Model.synthesize(a, b, Object.assign({}, opts, { dry: true }));
   // 3.211 the parts he picked (Ctrl+click on the board, any tools blown up) → one tool: each picked part takes its place in the engine,
-  // the rest comes from the tool most of them came from. list: [{ inst, slot }] (slot: the exchange's box id). Same gates, same naming.
-  // 3.217 opts.restFrom: the tool (instance) everything not picked comes from — his choice (the menu offers each tool blown up); without it,
-  // the tool most of the picked parts came from. A part is taken by its swap slot, else by what it is (TB.slotOfPiece: the voice, …).
-  Model.synthesizeParts = async function (list, opts) {
-    const F = root.OrganismFactory, TB = root.ToolBlend; if (!F || !TB) return { ok: false, why: 'the engine is not loaded' };
+  // the rest comes from the tool most of them came from. list: [{ inst, slot, piece, label }]. Same gates, same naming.
+  // 3.217 opts.restFrom: the tool (instance) everything not picked comes from — his choice. 3.226 opts.dry: the plan and the gates, nothing kept.
+  function partsCtx(list, opts) {
+    const F = root.OrganismFactory, TB = root.ToolBlend; if (!F || !TB) return { err: 'the engine is not loaded' };
     const parts = (list || []).map(x => ({ x, h: F.handle(x.inst), to: TB.PART_SLOT[x.slot] || (TB.slotOfPiece && TB.slotOfPiece(x.label)) })).filter(o => o.h);
     const usable = parts.filter(o => o.to && TB.has(o.h.id)), left = parts.filter(o => !usable.includes(o));
-    if (!usable.length) return { ok: false, why: 'none of these parts runs in the engine yet' + (left.length ? ' (' + left.map(o => o.h.def.label + ' · ' + o.x.slot).join(', ') + ')' : '') };
-    let N; try { N = await loadNovelty(); } catch (er) { return { ok: false, why: er.message }; }
-    const bpm = (root.Kernel && root.Kernel.music && root.Kernel.music.bpm) || 120, src = (h) => ({ id: h.id, params: TB.paramsOf(h.instanceId) });
+    if (!usable.length) return { parts, usable, left };
     const count = new Map(); usable.forEach(o => count.set(o.h, (count.get(o.h) || 0) + 1));
-    const rest = opts && opts.restFrom && F.handle(opts.restFrom), base = rest && TB.has(rest.id) ? rest : [...count.entries()].sort((a, b) => b[1] - a[1])[0][0], from = {};
-    usable.forEach(o => { from[o.to] = src(o.h); });
-    const settings = TB.combineFrom(from, src(base), bpm); if (!settings) return { ok: false, why: 'these parts could not be read' };
-    const names = [...new Set(usable.map(o => o.h.def.label).concat(base.def.label))];
-    const r = await Model.make(names.length > 1 ? names.join(' × ') : names[0] + ' · parts', settings, bpm, N, names);
-    if (r) r.left = left.map(o => o.h.def.label + ' · ' + o.x.slot); return r;
+    const rest = opts && opts.restFrom && F.handle(opts.restFrom), base = rest && TB.has(rest.id) ? rest : [...count.entries()].sort((a, b) => b[1] - a[1])[0][0];
+    const srcs = {}; SLOTS_ORDER.forEach(sl => { srcs[sl] = { h: base }; }); usable.forEach(o => { srcs[o.to] = { h: o.h, part: o.x }; });
+    Object.keys((opts && opts.override) || {}).forEach(sl => { const h = F.handle(opts.override[sl]); if (h && TB.has(h.id) && srcs[sl]) srcs[sl] = { h }; });   // 3.226 a place taken from another tool (a fix from the card)
+    return { parts, usable, left, base, srcs };
+  }
+  Model.fits = function (x) { const F = root.OrganismFactory, TB = root.ToolBlend, h = F && F.handle(x.inst); return !!(h && TB && TB.has(h.id) && (TB.PART_SLOT[x.slot] || (TB.slotOfPiece && TB.slotOfPiece(x.label)))); };
+  Model.planParts = function (list, opts) { const c = partsCtx(list, opts); if (c.err || !c.srcs) return null; const p = planOf(c.srcs, bpmNow(), opts); if (p) p.left = c.left.map(o => o.h.def.label + ' · ' + (o.x.label || o.x.slot)); return p; };
+  Model.synthesizeParts = async function (list, opts) {
+    const c = partsCtx(list, opts); if (c.err) return { ok: false, why: c.err };
+    if (!c.usable.length) { const names = c.left.map(o => o.h.def.label + ' · ' + String(o.x.label || o.x.slot || '').trim());
+      return { ok: false, why: 'none of these parts runs in the engine yet' + (names.length ? ' (' + names.join(', ') + ')' : ''), reason: { kind: 'none', title: 'None of these parts goes into the engine',
+        why: 'none of these parts runs in the engine yet', steps: ['Synthesis builds one tool from five places: a VOICE (an oscillator box), a WOBBLE (an LFO), a MOUTH (a filter box), a DRIVE (tube, tape or crusher) and an FX (echo, chorus, tape or crusher).',
+          names.join(', ') + (names.length === 1 ? ' has' : ' have') + ' no place in it yet.', 'Pick at least one box that has — “Pick the boxes that fit” selects them for you.'],
+        blame: c.left.map(o => ({ inst: o.x.inst, piece: o.x.piece })), actions: [{ label: '✓ Pick the boxes that fit', hint: 'select every box on these boards the engine can take', run: 'select-fit' }] } }; }
+    const plan = planOf(c.srcs, bpmNow(), opts); if (!plan) return { ok: false, why: 'these parts could not be read' };
+    plan.left = c.left.map(o => o.h.def.label + ' · ' + (o.x.label || o.x.slot));
+    const names = [...new Set(c.usable.map(o => o.h.def.label).concat(plan.tools))];
+    const r = await gate(plan, { parts: c.usable, base: c.base, bpm: bpmNow() }, names.length > 1 ? names.join(' × ') : names[0] + ' · parts', names, opts);
+    r.left = plan.left; return r;
   };
-  if (root.PartExchange) { root.PartExchange.synthesize = Model.synthesize; root.PartExchange.synthesizeParts = Model.synthesizeParts; }   // the board finds it on the exchange the music domain hands it
+  Model.previewParts = (list, opts) => Model.synthesizeParts(list, Object.assign({}, opts, { dry: true }));
+  // ▶ hear what it would make, before it is made: the gates' own render (the same riff), played once through the mix
+  let hearing = null;
+  Model.hear = function (settings) {
+    const A = root.Kernel && root.Kernel.audio; if (!A) return false; if (!A.booted && A.boot) A.boot(); const ctx = A.ctx, dst = (A.send && A.send()) || (ctx && ctx.destination); if (!ctx || !dst) return false;
+    if (hearing) { try { hearing.stop(); } catch (e) {} hearing = null; }
+    const r = Model.render(settings, bpmNow()); if (!r.ok) return false;
+    const buf = ctx.createBuffer(2, r.L.length, r.sr); buf.copyToChannel(r.L, 0); buf.copyToChannel(r.R, 1);
+    const src = ctx.createBufferSource(); src.buffer = buf; src.connect(dst); if (ctx.state === 'suspended' && ctx.resume) ctx.resume(); src.start(); hearing = src; src.onended = () => { if (hearing === src) hearing = null; };
+    return true;
+  };
+  Model.stopHearing = () => { if (hearing) { try { hearing.stop(); } catch (e) {} hearing = null; } };
+  if (root.PartExchange) Object.assign(root.PartExchange, { synthesize: Model.synthesize, synthesizeParts: Model.synthesizeParts, previewParts: Model.previewParts, previewPair: Model.previewPair, planPair: Model.planPair, planParts: Model.planParts, fits: Model.fits, hear: Model.hear, stopHearing: Model.stopHearing });   // the board finds it on the exchange the music domain hands it
 
   // ---------------------------------------------------------------- the face of a synthesized tool: the kit, its parts as cards (what is in each, its settings)
   Model.ui = function (view) {

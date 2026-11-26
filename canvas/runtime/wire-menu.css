@@ -7,5 +7,5 @@
 .wire-menu-item b { font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wire-menu-item .wm-port { color: var(--dim, #7f93a8); font: 11px var(--mono, monospace); }
 .wire-menu-item .wm-chk { width: 16px; text-align: center; color: var(--dim, #7f93a8); }
-.wire-menu-item.on .wm-chk { color: #00ff88; font-weight: 700; }
+.wire-menu-item.on .wm-chk { color: var(--ok, var(--cyan)); font-weight: 700; }
 .wire-menu-empty { color: var(--dim, #7f93a8); font: 12px var(--font, sans-serif); padding: 6px; max-width: 280px; }

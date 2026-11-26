@@ -231,6 +231,7 @@
   function selItems() {
     const list = selected(), comps = list.filter(o => o.x.slot || o.x.socket), out = [];
     if (exchange && exchange.synthesizeParts && list.length) {
+      if (exchange.previewParts) out.push({ label: '◇ What will it make?', hint: 'each place in the new tool, which tool it comes from, what stays behind — hear it, then make it', run: () => previewSel() });
       out.push({ label: '◆ Synthesize ' + (list.length === 1 ? 'this part' : 'these ' + list.length + ' parts') + ' into one tool', hint: 'each part takes its place in one new tool; the rest from the tool most of them came from — checked: it plays, it is no twin', run: () => synthesizeSel() });
       // 3.217 where the rest comes from is his to say: each tool blown up on the canvas (his: "combine the sound of retro dcs with the rest of wobble bass")
       [...open.keys()].filter(i => rec(i) && exchange.has(rec(i).id)).forEach(i => out.push({ label: '◆ … the rest from ' + rec(i).def.label, hint: 'the parts you picked, and everything else from ' + rec(i).def.label, run: () => synthesizeSel({ restFrom: i }) }));
@@ -245,8 +246,11 @@
     const list = selected(), insts = [...new Set(list.map(o => o.inst))], last = open.get(insts[insts.length - 1]);
     if (!list.length) return Promise.resolve(null);
     list.forEach(o => o.x.g.classList.add('fb-busy')); say('◆ synthesizing ' + list.length + (list.length === 1 ? ' part' : ' parts') + ' into one tool — measuring it against everything…');
-    return Promise.resolve(exchange.synthesizeParts(list.map(o => ({ inst: o.inst, slot: o.x.slot, piece: o.x.p.id, label: o.x.lab.textContent })), opts)).then((r) => {
-      list.forEach(o => o.x.g.classList.remove('fb-busy')); if (!r || !r.ok) { say('not made — ' + ((r && r.why) || 'it did not build'), 'bad'); return null; }
+    return Promise.resolve(exchange.synthesizeParts(selList(list), opts)).then((r) => {
+      list.forEach(o => o.x.g.classList.remove('fb-busy'));
+      if (!r || !r.ok) { say('not made — ' + ((r && r.why) || 'it did not build'), 'bad');   // 3.226 and the reason beside the parts to blame
+        showWhy(r, { anchor: list.map(o => o.x.g), insts, retry: (o2) => synthesizeSel(merge(opts, o2)), mutate: () => mutateThen(list, () => synthesizeSel(opts)) }); return null; }
+      hideWhy();
       const F = global.OrganismFactory, b = last && last.board, x = b ? b.offsetLeft + b.offsetWidth + 120 : 40, y = b ? b.offsetTop : 40, inst = F.spawn(r.id, { x, y });
       say('◆ ' + r.rec.name + ' — a tool of its own (' + r.verdict + (r.near ? ', nearest ' + r.near : '') + ')' + (r.left && r.left.length ? ' · not in the engine yet: ' + r.left.join(', ') : ''), 'good');
       clearSel(); if (inst) setTimeout(() => { if (!open.has(inst)) explode(inst, r.id); }, 700);
@@ -402,16 +406,21 @@
     const targets = [...open.entries()].filter(([inst]) => inst !== id && rec(inst) && exchange.has(rec(inst).id)).map(([inst, st]) => ({ inst, st }));
     targets.forEach(t => t.st.core.classList.add('fb-can')); let over = null;
     const move = (ev) => { ghost.style.left = (ev.clientX + 12) + 'px'; ghost.style.top = (ev.clientY + 10) + 'px'; ghost.style.display = 'none'; const el = document.elementFromPoint(ev.clientX, ev.clientY); ghost.style.display = '';
-      const c = el && el.closest('.fb-core'), hit = c && targets.find(t => t.st.core === c); if (over && over !== hit) over.st.core.classList.remove('fb-over'); over = hit || null; if (over) over.st.core.classList.add('fb-over'); };
+      const c = el && el.closest('.fb-core'), hit = c && targets.find(t => t.st.core === c); if (over && over !== hit) { over.st.core.classList.remove('fb-over'); hideWhy(); }
+      if (hit && hit !== over && exchange.planPair) { const p = exchange.planPair(id, hit.inst); if (p) showWhy({ ok: true, plan: p }, { anchor: [hit.st.core] }); }   // 3.226 what it will make, while it is over the core
+      over = hit || null; if (over) over.st.core.classList.add('fb-over'); };
     const up = () => { document.removeEventListener('pointermove', move, true); document.removeEventListener('pointerup', up, true); ghost.remove(); targets.forEach(t => t.st.core.classList.remove('fb-can', 'fb-over'));
-      if (over) synthesizeOnto(id, over.inst, over.st); };
+      if (over) synthesizeOnto(id, over.inst, over.st); else hideWhy(); };
     move(e); document.addEventListener('pointermove', move, true); document.addEventListener('pointerup', up, true);
   }
-  function synthesizeOnto(aId, bId, bst) {
+  function synthesizeOnto(aId, bId, bst, opts) {
     const say = (t2, kind) => { if (global.Shell && global.Shell.toast) global.Shell.toast(t2, kind || '', 3600); };
     bst.core.classList.add('fb-busy'); say('◆ synthesizing ' + rec(aId).def.label + ' × ' + rec(bId).def.label + ' — measuring it against everything…');
-    return Promise.resolve(exchange.synthesize(aId, bId)).then((r) => {
-      bst.core.classList.remove('fb-busy'); if (!r || !r.ok) { say('not made — ' + ((r && r.why) || 'it did not build'), 'bad'); return null; }
+    return Promise.resolve(exchange.synthesize(aId, bId, opts)).then((r) => {
+      bst.core.classList.remove('fb-busy');
+      if (!r || !r.ok) { say('not made — ' + ((r && r.why) || 'it did not build'), 'bad'); const ast = open.get(aId);
+        showWhy(r, { anchor: [bst.core].concat(ast ? [ast.core] : []), insts: [aId, bId], retry: (o2) => synthesizeOnto(aId, bId, bst, merge(opts, o2)) }); return null; }
+      hideWhy();
       const F = global.OrganismFactory, x = bst.board.offsetLeft + bst.board.offsetWidth + 120, y = bst.board.offsetTop, inst = F.spawn(r.id, { x, y });
       say('◆ ' + r.rec.name + ' — a tool of its own (' + r.verdict + (r.near ? ', nearest ' + r.near : '') + ')', 'good');
       if (inst) setTimeout(() => { if (!open.has(inst)) explode(inst, r.id); }, 700);
@@ -549,11 +558,20 @@
       pieces.push({ id: 'auto-' + i, take: { title: t }, x: 0, y: 0, w: 0, col: '', dash: false, label: { text: t.toLowerCase(), status: '' } }); });
     if (win.querySelector('.uk-keys')) pieces.push({ id: 'auto-keys', take: { sel: '.uk-keys' }, x: 0, y: 0, w: 0, col: '', label: { text: 'keys · every key its own note', status: '' } });
     const label = (r && r.def && r.def.label) || 'the tool', blurb = (r && r.def && (r.def.blurb || r.def.summary)) || '';
-    const BCOL = ['#00D4FF', '#3DDC97', '#CC44FF', '#FFCC00', '#FF2266', '#9FB3C8', '#00FF88', '#FF8A3D'];
+    // 3.230 (his words, 2026-11-26: "Also the color keeps being yellow."): an auto board's parts take the TOOL's own colour family — its accent
+    // turned a little round the wheel each way — never a fixed rainbow with a yellow in it
+    const acc = (r && r.def && /^#[0-9a-f]{6}$/i.test(r.def.accent || '') ? r.def.accent : '#00D4FF'), BCOL = [0, 28, -28, 56, -56, 14, -14, 42].map(d => hueTurn(acc, d));
     pieces.forEach((p, i) => { p.col = BCOL[i % BCOL.length]; });
     return { auto: true, title: label.toUpperCase(), size: [1600, 1000], pieces, more: [],
       header: '<div style="font:500 11px DM Mono,monospace;letter-spacing:2px;color:#4E6A80;white-space:nowrap"><b style="font:600 18px DM Mono,monospace;letter-spacing:6px;color:#00D4FF;margin-right:16px">FIELD</b>' + esc(label.toUpperCase()) + ' · EXPLODED · every part apart, live, wired to its core</div>',
       core: '<div style="width:300px;padding:16px 18px;border:2px solid ' + esc((r && r.def && r.def.accent) || '#FF2266') + ';background:#04070C"><div style="font:500 24px DM Mono,monospace;letter-spacing:4px;color:#EAF6FF">' + esc(label.toUpperCase()) + '</div><div style="font:500 13px DM Mono,monospace;letter-spacing:3px;color:#9FB3C8;margin:4px 0 8px">· CORE</div><div style="font:400 11px DM Mono,monospace;line-height:1.5;color:#B8CFE0">' + esc(blurb) + '</div></div>' };
+  }
+  function hueTurn(hex, deg) {   // the colour turned round the hue wheel by deg, its lightness and saturation kept
+    const n = parseInt(hex.slice(1), 16), r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+    let h = 0, sat = 0; if (d) { sat = d / (1 - Math.abs(2 * l - 1)); h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; }
+    h = ((h + deg) % 360 + 360) % 360; const c = (1 - Math.abs(2 * l - 1)) * sat, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2;
+    const [R, G, B] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+    return '#' + [R, G, B].map(v => Math.round((v + m) * 255).toString(16).padStart(2, '0')).join('').toUpperCase();
   }
   function placeAuto(st) {   // after the parts are in their gates (their real sizes): half each side of the core, in columns, in the window's order
     const gs = st.gates, GAP = 46, COLG = 80, maxH = 900, half = Math.ceil(gs.length / 2), sides = [gs.slice(0, half), gs.slice(half)];
@@ -575,5 +593,70 @@
     return true;
   }
   if (!hook()) document.addEventListener('DOMContentLoaded', hook);
-  global.FieldBoard = { define, has, explode, lab, select, clearSel, selected: () => selected().map(o => ({ inst: o.inst, piece: o.x.p.id, slot: o.x.slot })), synthesizeSel, selItems, mutatePart, partItems, replacements, replace, showCard, drop, partIn, gates: (id) => (open.get(id) || {}).gates || [], assemble, isOpen, boards, sockets, setExchange, synthesizeOnto: (a, b) => open.get(b) ? synthesizeOnto(a, b, open.get(b)) : Promise.resolve(null), get exchange() { return exchange; }, learned: (toolId) => FM().learned(toolId), mutate: (id) => FM().mutate(FM().toolTarget(id)) };
+  // ---- 3.226 WHAT IT WILL MAKE, AND WHY NOT (his words, 2026-11-25: "tools when the can't synthesize, need to flash the reasons why. also expand the
+  // ability. its hard to tell what it will do when i synthesize"). One card beside the parts: the plan (each place in the new tool: from which tool,
+  // what it is), what stays behind, ▶ hear it before it is made — and, when the gates say no, the reason: the parts to blame flash red and keep a red
+  // ring while the card is up; its steps say what to do and its buttons do it. Every word on it is the domain's (exchange.previewParts / previewPair,
+  // r.reason { kind, title, why, steps, blame: [{ inst, piece? }], actions: [{ label, hint, opts | run }] }); the card stays until ✕ or a try.
+  let why = null;
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && why) hideWhy(); });
+  function blamedEls(blame) {
+    return (blame || []).map(b => { const st = open.get(b.inst); if (!st) return null; if (!b.piece) return st.core; const x = st.gates.find(g => g.p.id === b.piece); return x ? x.g : null; }).filter(Boolean);
+  }
+  function hideWhy() { if (!why) return; why.el.remove(); why.blamed.forEach(el => el.classList.remove('fb-blame')); if (exchange && exchange.stopHearing) exchange.stopHearing(); why = null; }
+  function flashBlame(els) {
+    els.forEach(el => { el.classList.add('fb-blame'); if (!reduced()) A(el, [{ boxShadow: '0 0 0 0 rgba(255,51,85,0)' }, { boxShadow: '0 0 0 8px rgba(255,51,85,.65), 0 0 44px rgba(255,51,85,.7)', offset: 0.3 }, { boxShadow: '0 0 0 0 rgba(255,51,85,0)' }], { duration: 520, iterations: 3, fill: 'none' }); });
+  }
+  // r: the domain's answer (ok + plan, or reason + plan) · o: { anchor: [els], retry(opts), make(), preview: bool, opts }
+  function showWhy(r, o) {
+    hideWhy(); const reason = r && !r.ok ? r.reason || { title: 'Not made', why: (r && r.why) || 'it did not build', steps: [], blame: [], actions: [] } : null, plan = r && r.plan;
+    const el = h('div', 'fb-why' + (reason ? ' bad' : ' plan')); el.setAttribute('role', reason ? 'alert' : 'dialog');
+    const top = h('div', 'fb-wtop'); const ch = plan && plan.character;   // 3.230 what it will sound like (the domain's words): "wobble synthwave"
+    top.appendChild(h('div', 'fb-wtt', esc(reason ? '✕ ' + reason.title : '◇ ' + (ch ? 'It will sound like ' + ch.name : 'What it will make') + (r && r.verdict ? ' — ' + (r.verdict === 'novel' ? 'new to ERAVOS' : 'close to ' + r.near) : ''))));
+    const x = h('button', 'fb-wx', '✕'); x.title = 'close'; x.onclick = hideWhy; top.appendChild(x); el.appendChild(top);
+    if (reason && reason.why) el.appendChild(h('div', 'fb-wwhy', esc(reason.why)));
+    if (reason && reason.steps && reason.steps.length) { const ol = h('ol', 'fb-wsteps'); reason.steps.forEach(s => ol.appendChild(h('li', '', esc(s)))); el.appendChild(ol); }
+    if (ch && ch.mix && ch.mix.length) { const mx = h('div', 'fb-wmix'); ch.mix.forEach((m, k) => { const seg = h('span', 'fb-wseg', esc(m.style + ' ' + m.share + ' %')); seg.style.flex = String(Math.max(8, m.share)); seg.style.setProperty('--k', String(k)); mx.appendChild(seg); });
+      el.appendChild(mx); el.appendChild(h('div', 'fb-wsays', esc(ch.says))); }
+    if (plan && plan.rows) { const tb = h('div', 'fb-wplan'); plan.rows.forEach(rw => { const line = h('div', 'fb-wrow' + (rw.picked ? ' picked' : ''));
+        line.append(h('b', '', esc(rw.name)), h('span', 'fb-wfrom', esc(rw.from + (rw.part ? ' · ' + String(rw.part).trim() : ''))), h('span', 'fb-wwhat', esc(rw.what + (rw.char ? '  —  ' + rw.char : '')))); tb.appendChild(line); });
+      el.appendChild(tb);
+      if (plan.left && plan.left.length) el.appendChild(h('div', 'fb-wleft', esc('not taken (no place in the engine yet): ' + plan.left.join(', '))));
+      if (plan.behind && plan.behind.length) { const d = document.createElement('details'); d.className = 'fb-wbehind'; d.appendChild(h('summary', '', esc('stays behind · ' + plan.behind.length)));
+        plan.behind.forEach(b => d.appendChild(h('div', '', esc(b)))); el.appendChild(d); } }
+    const bar = h('div', 'fb-wbar'), btn = (label, hint, fn, cls) => { const b = h('button', 'fb-wbtn' + (cls ? ' ' + cls : ''), esc(label)); if (hint) b.title = hint; b.onclick = (e) => { e.stopPropagation(); fn(); }; bar.appendChild(b); return b; };
+    if (plan && plan.settings && exchange && exchange.hear) btn('▶ Hear it', 'what it would sound like — the riff the gates measure', () => exchange.hear(plan.settings));
+    (reason ? reason.actions || [] : []).forEach(a => {
+      if (a.run === 'rest-from') { [...open.keys()].filter(i => i !== a.exclude && rec(i) && exchange.has(rec(i).id)).forEach(i => btn('◆ The rest from ' + rec(i).def.label, 'the parts you picked, everything else from ' + rec(i).def.label, () => o.retry({ restFrom: i }), 'fix')); return; }
+      if (a.run === 'slot-from') { (a.slots || []).forEach(sl => [...open.keys()].filter(i => i !== (a.now || {})[sl.id] && rec(i) && exchange.has(rec(i).id)).forEach(i => btn('◆ The ' + sl.name + ' from ' + rec(i).def.label, 'that place from ' + rec(i).def.label + ', the rest as picked', () => o.retry({ override: { [sl.id]: i } }), 'fix'))); return; }
+      if (a.run === 'mutate-then-retry') { if (o.mutate) btn(a.label, a.hint || 'another component in each picked part, then make it', () => o.mutate(), 'fix'); return; }
+      if (a.run === 'select-fit') { btn(a.label, a.hint, () => { hideWhy(); selectFit(o.insts || []); }, 'fix'); return; }
+      if (a.opts) btn(a.label, a.hint, () => o.retry(a.opts), 'fix');
+    });
+    if (reason) btn('↻ Try again', 'after you changed something', () => o.retry({}));
+    else if (o.make) btn('◆ Make it', 'make it a tool of its own', () => { hideWhy(); o.make(); }, 'fix');
+    if (bar.children.length) el.appendChild(bar);
+    el.addEventListener('pointerdown', (e) => e.stopPropagation()); document.body.appendChild(el);
+    const blamed = reason ? blamedEls(reason.blame) : []; why = { el, blamed }; flashBlame(blamed);
+    const anchor = (blamed.length ? blamed : o.anchor || []).filter(e => e && e.isConnected), box = anchor.length ? union(anchor.map(e => e.getBoundingClientRect())) : null, W = global.innerWidth || 1200, H = global.innerHeight || 800;
+    const L = box ? (box.right + 16 + el.offsetWidth < W ? box.right + 16 : Math.max(8, box.left - 16 - el.offsetWidth)) : (W - el.offsetWidth) / 2;
+    el.style.left = Math.max(8, Math.min(L, W - el.offsetWidth - 8)) + 'px'; el.style.top = Math.max(8, Math.min(box ? box.top : 80, H - el.offsetHeight - 8)) + 'px';
+    if (!reduced()) A(el, [{ opacity: 0, transform: 'translateX(-8px)' }, { opacity: 1, transform: 'none' }], { duration: 220, easing: EASE.out });
+    return el;
+  }
+  function selectFit(insts) {
+    if (!exchange || !exchange.fits) return 0; let n = 0;
+    (insts.length ? insts : [...open.keys()]).forEach(i => { const st = open.get(i); if (!st) return; st.gates.forEach(x => { if (exchange.fits({ inst: i, slot: x.slot, piece: x.p.id, label: labOf(x) })) { select(i, x, true); n++; } }); });
+    if (global.Shell && global.Shell.toast) global.Shell.toast(n ? n + ' boxes picked — right-click to synthesize' : 'no box on these boards fits the engine yet', n ? 'good' : 'bad', 3200);
+    return n;
+  }
+  const labOf = (x) => x.lab ? String((x.lab.firstChild && x.lab.firstChild.nodeType === 3 ? x.lab.firstChild : x.lab).textContent).trim() : '';   // the box's name, not its status
+  const selList = (list) => list.map(o => ({ inst: o.inst, slot: o.x.slot, piece: o.x.p.id, label: labOf(o.x) }));
+  function previewSel(opts) {   // ◇ what it will make: the plan and the gates, nothing kept
+    const list = selected(); if (!list.length || !exchange || !exchange.previewParts) return Promise.resolve(null);
+    return Promise.resolve(exchange.previewParts(selList(list), opts)).then(r => { showWhy(r, { anchor: list.map(o => o.x.g), insts: [...new Set(list.map(o => o.inst))], retry: (o2) => previewSel(merge(opts, o2)), make: () => synthesizeSel(opts), mutate: () => mutateThen(list, () => previewSel(opts)) }); return r; });
+  }
+  const merge = (a, b) => { const o = Object.assign({}, a || {}, b || {}); if ((a && a.override) || (b && b.override)) o.override = Object.assign({}, a && a.override, b && b.override); if ((a && a.tweak) || (b && b.tweak)) o.tweak = [].concat((a && a.tweak) || [], (b && b.tweak) || []); return o; };
+  function mutateThen(list, then) { list.filter(o => o.x.socket).forEach(o => mutatePart(o.inst, o.x)); setTimeout(then, 250); }
+  global.FieldBoard = { previewSel, showWhy, hideWhy, selectFit, get why() { return why && { el: why.el, blamed: why.blamed }; }, define, has, explode, lab, select, clearSel, selected: () => selected().map(o => ({ inst: o.inst, piece: o.x.p.id, slot: o.x.slot })), synthesizeSel, selItems, mutatePart, partItems, replacements, replace, showCard, drop, partIn, gates: (id) => (open.get(id) || {}).gates || [], assemble, isOpen, boards, sockets, setExchange, synthesizeOnto: (a, b) => open.get(b) ? synthesizeOnto(a, b, open.get(b)) : Promise.resolve(null), get exchange() { return exchange; }, learned: (toolId) => FM().learned(toolId), mutate: (id) => FM().mutate(FM().toolTarget(id)) };
 })(window);

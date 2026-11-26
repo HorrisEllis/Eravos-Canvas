@@ -31,7 +31,21 @@ OrganismFactory.reg('eravos.lyric-rhythm', function (view) {
     const n = plan.notes.length, strong = plan.notes.filter(x => x.stress).length;
     status.textContent = n ? `${n} syllables · ${strong} strong · ${Math.ceil(plan.steps / 16)} bars` : 'Type some words above.';
   }
-  view.on('state_sync', (s) => { if (s.plan) { plan = s.plan; paint(); } tgt.textContent = s.target ? '→ ' + view.label(s.target) : '→ add a Drum Machine or synth to hear it'; });
+  // 3.228 SHAPE: what each stanza becomes when it grows into a song, and why — the lesson in how words become music
+  const shapeBox = h('div', { class: 'lyr-shape' }), KIND = { verse: 'VERSE', chorus: 'CHORUS', build: 'BUILD', drop: 'DROP', break: 'BREAK' };
+  let shapeSig = '';
+  function paintShape(sh) {
+    const sig = JSON.stringify(sh || null); if (sig === shapeSig) return; shapeSig = sig; shapeBox.innerHTML = '';
+    if (!sh) return;
+    shapeBox.appendChild(h('div', { class: 'lyr-shape-h' }, [h('b', { text: 'SHAPE' }), h('span', { text: sh.on ? 'what each stanza becomes in ♫ Make a song — and why' : 'every stanza a verse (Song shape)' })]));
+    sh.stanzas.forEach((st, i) => shapeBox.appendChild(h('div', { class: 'lyr-st k-' + st.kind + (st.split ? ' split' : '') }, [
+      h('span', { class: 'lyr-st-k', text: (KIND[st.kind] || st.kind) + (st.split ? ' ⇅' : '') }),
+      h('span', { class: 'lyr-st-e', title: 'energy ' + st.energy }, [h('i', { style: { width: Math.round(st.energy * 100) + '%' } })]),
+      h('div', { class: 'lyr-st-t' }, [h('b', { text: (i + 1) + '. ' + st.first + (st.lines > 1 ? ' …' : '') }), h('small', { text: st.why.join(' · ') })]),
+    ])));
+    const d = h('details', { class: 'lyr-lesson' }, [h('summary', { text: 'How words become music' })]); (sh.lesson || []).forEach((t, k) => d.appendChild(h('p', { text: (k + 1) + '. ' + t }))); shapeBox.appendChild(d);
+  }
+  view.on('state_sync', (s) => { if ('shape' in s) paintShape(s.shape); if (s.plan) { plan = s.plan; paint(); } tgt.textContent = s.target ? '→ ' + view.label(s.target) : '→ add a Drum Machine or synth to hear it'; });
   view.on('pos', (p) => { const b = Math.floor(p.step / 16); grid.querySelectorAll('.lyr-head').forEach((el, i) => { el.style.display = i === b ? 'block' : 'none'; if (i === b) el.style.left = ((p.step % 16) / 16 * 100) + '%'; }); });
   view.on('syl', (p) => { const c = grid.querySelector(`.lyr-syl[data-i="${p.i}"]`); if (c) { c.classList.remove('hit'); void c.offsetWidth; c.classList.add('hit'); } });
   view.on('status', (s) => { status.textContent = s.warn || s.info || ''; status.classList.toggle('warn', !!s.warn); });
@@ -41,10 +55,11 @@ OrganismFactory.reg('eravos.lyric-rhythm', function (view) {
       UI.Button({ label: '▶ Hear it', hint: 'play it once now', onClick: () => view.emit('preview', {}) }).el,
       UI.Button({ label: '⇢ Timeline', hint: 'put it on the Timeline as a clip you can edit', onClick: () => view.emit('send_timeline', {}) }).el,
       UI.Button({ label: '⇢ Sequencer', hint: 'your words as Sequencer lanes (4 bars per slot, chained) + a her-voice lane on every line start — then automate it', onClick: () => view.emit('send_sequencer', {}) }).el,
+      UI.Button({ label: '⇢ Patterns', hint: 'every stanza → four patterns in Patterns › Yours: the words, their mirror, their shadow (the rests become hits), the pendulum (out and back) — as drums or melody', onClick: () => view.emit('make_patterns', {}) }).el,
       UI.Button({ label: '↺', hint: 'undo your weight/nudge edits', onClick: () => view.emit('reset_edits', {}) }).el])]),
     ta, h('div', { class: 'org-row lyr-ctl' }, [seg('flow')]),
     h('div', { class: 'org-row lyr-ctl' }, [UI.Button({ label: '♫ Make a song', kind: 'primary', hint: 'grow this rhythm into a whole song, written below on the Timeline', onClick: () => view.emit('expand_song', {}) }).el, UI.paramControl(view, cfg('songGenre'), { segMax: 4 }).el]), h('div', { class: 'org-row lyr-ctl' }, [seg('mode'), tgt]),
-    grid, status,
+    grid, status, h('div', { class: 'org-row lyr-ctl' }, [UI.paramControl(view, cfg('songShape'), { segMax: 2 }).el, UI.paramControl(view, cfg('contrast'), { size: 30 }).el, UI.paramControl(view, cfg('depth'), { size: 30 }).el, UI.paramControl(view, cfg('dims'), { size: 30 }).el]), shapeBox,
     UI.paramPanel(view, ['bars', 'vary', 'octave', 'range', 'gate', 'level'], { flat: true, noTitles: true, size: 30 }),
     UI.hint('Words become rhythm: strong syllables land on the beat. Click a syllable to make it weak / strong / ACCENT, drag to move it. Wire ⇢ to any instrument, or it plays the first Drum Machine (drums) or synth (melody). Space plays it with the song.'));
   UI.alive(view, { events: ['syl'], port: null });

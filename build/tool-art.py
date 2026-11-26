@@ -166,6 +166,9 @@ MOTIF = {
  'eravos.contrast-analyser': (m_compass,'aurora'), 'eravos.midi-mapper': (m_lanterns,'night'), 'eravos.particle-field': (m_fireflies,'night'),
  'eravos.clip-maker': (m_jar,'night'), 'eravos.sample-player': (m_jar,'violet'), 'eravos.lyric-rhythm': (m_feather,'dawn'),
  'eravos.wub-filter': (m_curtain,'dusk'), 'eravos.wub-osc': (m_wobble,'night'), 'eravos.wub-rate': (m_moons,'violet'), 'eravos.wub-sub': (m_sub,'dusk'),
+ # 3.227 the tools built since (his words, 2026-11-25: "i want the thumbnails back. and i want those generated per tool, mutated tool, consistent style.")
+ 'eravos.agents.step': (m_lanterns,'aurora'), 'eravos.tape-memory': (m_tower,'violet'), 'eravos.feelings': (m_aura,'dusk'), 'eravos.pattern-field': (m_stairs,'aurora'),
+ 'eravos.piano': (m_triad,'night'), 'eravos.retro-dco': (m_synthwave,'violet'), 'eravos.swarm-oscillator': (m_cloud,'night'),
  'eravos.ratio-lattice': (m_crystal,'night'), 'eravos.recursive-spectra': (m_crystal,'aurora'), 'eravos.xen-synth': (m_crystal,'violet'),
 }
 WATER = {m_sub, m_ripples, m_breath, m_lighthouse, m_rivers, m_palms, m_river}

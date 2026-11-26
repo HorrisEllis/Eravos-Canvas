@@ -21,7 +21,8 @@
     "preview": "preview.png",
     "spec": "swarm-oscillator.spec",
     "tests": "swarm-oscillator.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

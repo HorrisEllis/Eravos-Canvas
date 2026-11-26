@@ -1,7 +1,7 @@
 {
   "schema": "eravos.tool/1",
   "id": "eravos.lyric-rhythm",
-  "version": "0.1.0",
+  "version": "1.2.0",
   "label": "Lyrics → Rhythm",
   "icon": "✎",
   "accent": "#ff7eb6",

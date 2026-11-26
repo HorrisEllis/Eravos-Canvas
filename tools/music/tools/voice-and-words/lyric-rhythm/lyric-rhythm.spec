@@ -46,3 +46,29 @@ dag:
   in it now: —
   comes out of it: —
   planned: —
+
+ADDENDUM 2026-11-25 (1.1.0; the original above kept verbatim)
+his words (verbatim): "continue making more tools for eravos. i want to make music with contrast. thats my rhytm;" · "i want to learn how to make music from my lyrics. that is the point of the rhythm tool" (with his poem as the lyrics, and his poetry index as a zip — both
+  kept with him, not in the repo)
+BUILT 3.228:
+  - SONG › Song shape: from the words (default) · every stanza a verse (as before) · Contrast 0…1. ♫ Make a song reads the words with the
+    lyric-shape component (tools/music/components/lyric-shape): each stanza becomes the part it already is — the loudest a DROP (everything,
+    the drums full), the quietest a BREAK (no drums, no bass: space), a stanza carrying a run of words that comes back a CHORUS, the stanza
+    before the drop a BUILD (the snare rolls up, a gap before the drop); a stanza holding opposites (light / dark, peaks / valleys …) turns
+    line by line: a dark line sung an octave down over one long low root and no groove, a light line an octave up over the full groove.
+  - SHAPE (the lesson): each stanza's part, its energy, and WHY in words; "How words become music" — five steps from syllable to song.
+  - RhythmExpand.generate(text, { shape: 'contrast', contrast }) · RhythmExpand.shape(text) — the API's default stays 'verses' (P21 unchanged).
+proof: tests/p228-words-contrast.test.js 4/4 · lyric-shape.test.mjs 17 · P20 47/47 · RhythmExpand 6/6 · Bass Pack 9/9 · boundary 10/10
+
+ADDENDUM 2026-11-25 (1.2.0; the originals above kept verbatim)
+his words (verbatim): "How does it sound? Like I want it deep as hell." · "More of my rhythm. Make patterns." — with his personal book of philosophy (kept with him, not in the repo);
+  from it, the law the patterns follow: "The amount of time the pendulum swings to the left is directly proportional to the amount of time in takes to swing to the right."
+BUILT 3.229:
+  - SONG › Depth 0…1 (0.7 here; the API's default 0 = as before): the lead down up to two octaves, the chords one, the bass held longer and
+    harder in the drop / chorus / build, the kick heavier, a boom on 1 of every drop and chorus bar.
+  - ⇢ Patterns: every stanza → four patterns in Patterns › Yours (drums or melody, as Plays as): its WORDS · their MIRROR (the bar played
+    back — the pendulum's return) · their SHADOW (the rests become the hits — negative space) · the PENDULUM (out, then back, as long each
+    way). Made by lyric-shape 1.1.0 patterns(); saved in one go (PF_LIB.saveNotes { later }).
+  - build/render-words.mjs: the song from any lyrics file rendered offline to a WAV and measured per section (loudness, peak, pinned, low end).
+proof: tests/p229-deep-and-patterns.test.js 2/2 · lyric-shape 23 checks · render-words on his poem: low end of the drop 32 % → 39 % (darkwave,
+  depth 0 → 1); witch-house is already loud with words (−6 dB RMS, the master limiter holds it: ≤ 0.14 % of samples at the ceiling).
