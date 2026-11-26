@@ -17,7 +17,7 @@
     if (open) { open.close(); return null; }
     const UI = global.UIKit, h = UI.h, F = global.OrganismFactory;
     S.activate();
-    const state = { view: o.view || (X.agnostic() && X.modes().length ? 'modes' : 'all'), cat: o.cat || null, sel: o.sel || null, q: o.q || '' };
+    const state = { view: o.view || (X.agnostic() && X.modes().length ? 'modes' : 'all'), cat: o.cat || null, sel: o.sel || null, q: o.q || '', msel: o.msel || (X.modes()[0] ? X.modes()[0].id : null) };
     const ov = h('div', { class: 'overlay addpop', role: 'dialog', 'aria-label': 'Add to canvas' });
     const q = h('input', { class: 'ap-search', placeholder: 'Search tools, modes, what they do…', 'aria-label': 'Search' });
     const closeBtn = h('button', { class: 'ap-x', title: 'Close (Esc)', text: '×' });
@@ -124,32 +124,48 @@
     }
 
     // ---------------------------------------------------------------- modes page
+    // 3.226 his words (2026-11-25): "domains are meant to be there. just consistent with the rest of ui" — each mode is a card like a tool's
+    // (the picture frame, the glyph + name, its blurb, plain chips), the page heads like All tools, and what a mode turns on and shows is in
+    // the detail on the right, as a tool's dependencies are; the button that enters it sits there, as Add to canvas does
+    const modeArt = (m) => { if (m.art) return m.art; if (m.agnostic) return global.ToolArt ? global.ToolArt.url({ id: 'stay-agnostic', label: 'Stay agnostic', accents: ['#7f93a8', '#00d4ff', '#b066ff'], sky: 'night' }) : null; const d = Cat && Cat.domains && Cat.domains().find(x => x.id === (m.domain || m.id)); return d && d.art ? (global.ERAVOS_TOOLS || '') + d.art : null; };
+    const modeCard = (m) => ({ id: 'mode:' + m.id, icon: m.icon || '◈', accent: m.accent || '#00d4ff', label: m.label });
     function renderModes() {
-      main.innerHTML = '';
-      main.appendChild(h('div', { class: 'ap-lead' }, [h('h2', { text: 'Pick a mode — or stay agnostic' }), h('p', { text: 'The canvas starts empty and domain-free. A mode turns on the toolbar and tools it needs. Adding any single tool turns on only what that tool needs.' })]));
-      const grid = h('div', { class: 'ap-modes' });
-      X.modes().forEach(m => {
-        const on = X.isActive(m.id);
-        const tools = defs().filter(d => m.categories.includes(d.category)).length;
-        const unitsRow = h('div', { class: 'ap-chiprow' }, m.units.map(u => { const L = X.units().find(x => x.id === u); return chip((L ? L.label : u).trim(), L && L.built ? 'built' : 'new', L ? L.describes : ''); }));
-        grid.appendChild(h('div', { class: 'ap-mode ' + (on ? 'on' : ''), style: { '--acc': m.accent || '#00d4ff' } }, [
-          h('div', { class: 'ap-mode-top' }, [h('span', { class: 'ap-mode-ic', html: IC('mode:' + m.id, '', m.icon || '◈') }), h('div', {}, [h('b', { text: m.label }), h('small', { text: `${tools} tools · ${m.categories.length} categories` })])]),
-          h('p', { text: m.blurb || '' }),
-          h('div', { class: 'ap-sub', text: 'Turns on' }), unitsRow,
-          h('div', { class: 'ap-sub', text: 'Shows' }), h('div', { class: 'ap-chiprow' }, m.categories.map(c => chip(c, 'cat'))),
-          h('div', { class: 'ap-mode-act' }, [
-            on ? h('button', { class: 'tb-btn on', text: '✓ Active — browse its tools', onclick: () => { state.view = 'cat'; state.cat = m.categories[0]; render(); } })
-               : h('button', { class: 'tb-btn primary', text: 'Enter ' + m.label, onclick: () => { X.enterMode(m.id); state.view = 'cat'; state.cat = m.categories[0]; render(); } }),
-          ]),
-        ]));
+      main.innerHTML = ''; cards = [];
+      const ms = X.modes(), all = ms.concat([{ id: '', label: 'Stay agnostic', icon: '◻', blurb: 'Browse everything without switching anything on. Each tool lists what it needs; only that turns on when you add it.', categories: [], units: [], agnostic: true }]);
+      main.appendChild(h('div', { class: 'ap-gridhead' }, [h('h2', { text: 'Modes' }), h('small', { text: ms.length + ' modes' })]));
+      const grid = h('div', { class: 'ap-grid' });
+      all.forEach(m => {
+        const on = !m.agnostic && X.isActive(m.id), n = m.agnostic ? defs().length : defs().filter(d => m.categories.includes(d.category)).length, c = modeCard(m);
+        const chips = [chip(n + ' tools', 'dim')]; if (!m.agnostic) chips.push(chip(m.categories.length + ' categories', 'dim')); if (on) chips.unshift(chip('active', 'built', 'this mode is on'));
+        const art = modeArt(m), frame = h('div', { class: 'ap-card-pic' + (art ? ' painted' : ' fit') }, [h('div', { class: 'ap-art' }, [tileOf(c, 64, 'ap-art-tile')])]);   // 3.227 his "i want the thumbnails back": the mode's painting (Start's), as a tool card's
+        if (art) frame.appendChild(h('img', { class: 'ap-card-img', src: art, alt: '', loading: 'lazy', onerror: (e) => e.target.remove() }));
+        const card = h('div', { class: 'ap-card' + (state.msel === (m.id || '*') ? ' sel' : ''), tabindex: '-1', style: { '--acc': c.accent }, 'data-mode': m.id || '*' }, [
+          frame, h('div', { class: 'ap-card-tx' }, [h('b', {}, [h('span', { class: 'ap-card-glyph', html: IC(m.agnostic ? null : 'mode:' + m.id, '', c.icon) }), m.label]), h('small', { text: m.blurb || '' }), h('div', { class: 'ap-chiprow' }, chips)]),
+        ]);
+        card.onclick = () => { state.msel = m.id || '*'; grid.querySelectorAll('.ap-card').forEach(x => x.classList.toggle('sel', x === card)); renderDetail(); };
+        card.ondblclick = () => enter(m);
+        grid.appendChild(card);
       });
-      grid.appendChild(h('div', { class: 'ap-mode ghost' }, [
-        h('div', { class: 'ap-mode-top' }, [h('span', { class: 'ap-mode-ic', text: '◻' }), h('div', {}, [h('b', { text: 'Stay agnostic' }), h('small', { text: `${defs().length} tools from every pack` })])]),
-        h('p', { text: 'Browse everything without switching anything on. Each tool lists what it needs; only that turns on when you add it.' }),
-        h('div', { class: 'ap-mode-act' }, [h('button', { class: 'tb-btn', text: 'Browse all tools', onclick: () => { state.view = 'all'; render(); } })]),
-      ]));
       main.appendChild(grid);
       if (!defs().length) main.appendChild(h('p', { class: 'ap-empty', text: 'No tools installed yet — drop a pack (.zip) onto the canvas.' }));
+    }
+    function enter(m) {
+      if (m.agnostic) { state.view = 'all'; render(); return; }
+      if (!X.isActive(m.id)) X.enterMode(m.id); state.view = 'cat'; state.cat = m.categories[0]; render();
+    }
+    function modeDetail(m) {   // the mode's dependencies, as a tool's are shown
+      const c = modeCard(m), on = !m.agnostic && X.isActive(m.id);
+      const sec = (t, kids) => kids && kids.length ? h('div', { class: 'ap-d-sec' }, [h('div', { class: 'ap-sub', text: t }), ...kids]) : null;
+      const row = (a, b, cls) => h('div', { class: 'ap-d-row ' + (cls || '') }, [h('span', { text: a }), b ? h('small', { text: b }) : null]);
+      detail.append(...[
+        h('div', { class: 'ap-d-head', style: { '--acc': c.accent } }, [tileOf(c, 48, 'ap-d-tile'), h('div', {}, [h('h3', { text: m.label }), h('small', { text: m.agnostic ? 'nothing switched on' : on ? 'active' : 'mode' })])]),
+        h('p', { class: 'ap-d-blurb', text: m.blurb || '' }),
+        h('button', { class: 'tb-btn primary ap-addbtn', html: IC(m.agnostic ? 'square-stack' : 'layers', m.agnostic ? 'Browse all tools' : on ? 'Browse its tools' : 'Enter ' + m.label), onclick: () => enter(m) }),
+      ]);
+      [
+        sec('TURNS ON', (m.units || []).map(u => { const L = X.units().find(x => x.id === u); return row(((L && L.built) ? '✓ ' : '✚ ') + (L ? L.label : u).trim(), L ? L.describes : '', L && L.built ? 'built' : 'new'); })),
+        sec('SHOWS', (m.categories || []).map(cat => row(cat, defs().filter(d => d.category === cat).length + ' tools'))),
+      ].forEach(x => { if (x) detail.appendChild(x); });
     }
 
     // ---------------------------------------------------------------- tool grid
@@ -176,7 +192,7 @@
         // 3.44: the card leads with the tool's own display (thumb.png, 16:10) — the old 84×52 corner of the whole window showed
         // only a title bar. No picture → the icon on the tool's colour, same frame, so the grid stays even.
         // 3.88 a painting of what it does (art.svg) leads when the tool has one
-        const pic = meta && (meta.art || meta.thumb || meta.preview), frame = h('div', { class: 'ap-card-pic' + (meta && (meta.art || meta.thumb) ? '' : ' fit') + (meta && meta.art ? ' painted' : '') + (d._suite ? ' suite' : '') }, [cardArt(d)]);
+        const artOf = (meta && meta.art) || d.art, pic = artOf || (meta && (meta.thumb || meta.preview)), frame = h('div', { class: 'ap-card-pic' + (artOf || (meta && meta.thumb) ? '' : ' fit') + (artOf ? ' painted' : '') + (d._suite ? ' suite' : '') }, [cardArt(d)]);   // 3.227 a made tool carries its own painting (d.art)
         if (pic) frame.appendChild(h('img', { class: 'ap-card-img', src: pic, alt: '', loading: 'lazy', onerror: (e) => e.target.remove() }));
         const card = h('div', { class: 'ap-card' + (d._avail ? ' avail' : ''), tabindex: '-1', style: { '--acc': d.accent || '#00d4ff' }, 'data-id': d.id }, [
           frame,
@@ -196,6 +212,7 @@
     function renderDetail() {
       detail.innerHTML = '';
       const d = state.sel && (F.def(state.sel) || defs().find(x => x.id === state.sel));
+      if (state.view === 'modes' && !state.q && state.msel) { const m = state.msel === '*' ? { id: '', label: 'Stay agnostic', icon: '◻', blurb: 'Browse everything without switching anything on. Each tool lists what it needs; only that turns on when you add it.', categories: [], units: [], agnostic: true } : X.modes().find(x => x.id === state.msel); if (m) { modeDetail(m); return; } }
       if (!d || state.view === 'modes' && !state.q) {
         detail.appendChild(h('div', { class: 'ap-d-empty' }, [h('b', { text: 'Dependencies, up front' }), h('p', { text: 'Every tool says what it needs before you add it: the mode it belongs to, the services it relies on, and exactly what will appear on the toolbar.' })]));
         return;

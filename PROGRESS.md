@@ -2,20 +2,107 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
-## 3.226–3.228 The Start button out, ← Domains; the autosave fixed, Ctrl+S; not made → flash + a card (2026-11-25) — shown first
+## 3.232–3.234 The Start button out, ← Domains; the autosave fixed, Ctrl+S (2026-11-25) — renumbered from 3.226–3.228 when merged with main (a parallel session had used them); 3.234 (not made → flash) withdrawn: main's 3.226 does it
 His words: "also told you to remove the add button once i pick a domain, up wheere it says add to canvas, add a back to domains screen," · "after that can you fix the autosave? also make control s a hotkey to save." · "okay i need it to like flash when it can't synthesize, not a toast with no direction" (and "also can you make all of the ui consistent? all of the canvas, and the themese." — open, T-39)
-- 3.226 canvas/index.html: the Start button removed from the toolbar (window.ShellStart opens the domain screen); canvas/runtime/add-menu.js:
+- 3.232 canvas/index.html: the Start button removed from the toolbar (window.ShellStart opens the domain screen); canvas/runtime/add-menu.js:
   "← Domains" top left of the catalog; eravos.css .ap-back (as the catalog's close button). docs/previews/catalog-back.shots.mjs.
-- 3.227 canvas/runtime/workspace.js: WORK = a tool that is not docked (domain-free); no autosave without work; each launch its own history
+- 3.233 canvas/runtime/workspace.js: WORK = a tool that is not docked (domain-free); no autosave without work; each launch its own history
   entry (10 kept); bestAutosave(); the open project remembered (current). canvas/index.html: Start offers the newest autosave with work and
   counts only work; Ctrl+S saves the project (name asked once), a new canvas or a restore forgets the project. tests/p227-autosave.mjs 6/6
   (reproduced first: 10 tools → a relaunch + a domain picked → "1 tools").
-- 3.228 tools/music/core/assembled-tool.js: a failure carries kind · title · fix · blame (twin — all parts from one tool or sounds like X;
+- (withdrawn, superseded by main's 3.226) tools/music/core/assembled-tool.js: a failure carries kind · title · fix · blame (twin — all parts from one tool or sounds like X;
   loud; silent; parts it cannot run) and restUseful; tools/core/field/board.js (domain-free): failCard — the blamed boxes (or the cores)
   flash red; a card beside them: why, what to do, buttons (the rest from another tool when it can change something · Mutate these parts ·
   Try again); Esc / ✕ / the next try closes it. tests/p228-not-made.test.js 2/2; docs/previews/workbench/not-made.shots.mjs.
 - Tests: P38 42/42, P21 27/27 (P218 fixed to pick its own Wobble Bass — it took one an earlier test left), P110, P120, P100, P19, runtime,
   P203 P205 P216 P217 P218 P228, assembled-tool 32, boundary 10/10, design check no worse. P17's 2 failures are on main too.
+## 3.231 A made tool is his: rename it, edit it fully in the Workshop, delete it (2026-11-26)
+His words: "also merge and push. need to be able to delete custom tools. rename them. open them in workshop and edit them fully." (merged first: PR #224, 3.226–3.230)
+- assembled-tool.js: Model.get / rename (made unique, kept, the def and every open window's title follow; the id stays so songs still find it) /
+  update (kept as its settings, its DAG and chain rebuilt, the def's defaults and every open window follow) / remove (its windows closed — a
+  blown-up one put back first —, its record gone, gone from ＋ Add) / edit (the Workshop).
+- the Workshop kind "music.made-tool": TOOL (its name) · VOICE · WOBBLE (a curve layer) · DRIVE · MOUTH · FX · OUT — every setting a field; a part
+  chosen brings its own fields (bitcrusher's bits, the ladder's drive …); the view draws the chain with the wobble opening the mouth; ▶ Hear;
+  every edit kept and heard at once; undo / history as every kind.
+- the made tool's face: ✎ Workshop · Rename (inline, Enter keeps) · ✕ Delete tool (twice to delete). canvas/runtime/organism-factory.js:
+  undefine(id) (domain-free: a tool leaves the list).
+- Tests: tests/p231-made-tools-yours.test.js 1/1. Screenshots: docs/previews/made-tool-workshop.shots.mjs → made-tool-face.png, made-tool-workshop.png.
+
+## 3.230 What mixes with what; no more yellow; dimensions; Voice Lab and UI elements specced (2026-11-26)
+His words: "No like more dimentions. Also Like I want a voice lab. T pain like auto tune. Creating voice. And wubs, wow. Like voice music like wubs, etc." · "I want to be able to change the ui elements to other styles, types, build components from combining two. Also the color keeps being yellow. I want to be able to tell what's mixing with what. Like I want to be able to mix the dco with the wobble bass and know it will make a wobble synthwave sound. You know? Expand the tools and engines maybe,"
+- tools/music/data/tool-blend.js: CHAR (each tool's style and what each of its places carries) + sound(rows) → { name ("wobble synthwave"),
+  mix (each style's share and which tool brings it), says }. The synthesis plan carries it (each place its character too); a made tool keeps
+  it (its words start with it; mixed again, it brings it).
+- tools/core/field/board.js (domain-free): the card says "It will sound like …", the mix in shares, and the sentence; also while one core is
+  carried over another. An auto board's parts take the tool's own colour family (hueTurn), never the fixed rainbow with a yellow.
+- assembled-tool.js: a made tool's colour = its parents' colours blended (old records too); the fallback no longer yellow.
+- rhythm-expand.js + Lyrics → Rhythm: Dimensions 0…1 (0.7 in the tool; API 0 = as before) — the lead layered an octave up then a third above
+  in the drops / choruses, a counter-line in the gaps the words leave (their shadow), more space (the master's reverb wider, longer).
+  build/render-words.mjs --dims.
+- Specs: specs/eravos.voice-lab.spec (TUNE · CREATE · WUB; VL1–VL4 components, VT1–VT3 tools, the Voice Lab setup) ·
+  specs/eravos.ui-elements-and-combining.spec (UE1–UE3, CB1–CB3, EX1–EX2). T-56 … T-61.
+- Tests: tests/p230-what-mixes.test.js 1/1 (Retro DCO × Wobble Bass = wobble synthwave; no yellow); P229 3/3 (dimensions).
+
+## 3.229 Deep as hell; patterns from the words (2026-11-25)
+His words: "How does it sound? Like I want it deep as hell." · "More of my rhythm. Make patterns." (with his personal book of philosophy — kept with him, not in the repo). From it, the rule the
+patterns keep: "The amount of time the pendulum swings to the left is directly proportional to the amount of time in takes to swing to the right."
+- data/rhythm-expand.js: depth 0…1 — the lead down up to two octaves, the chords one, the bass held longer and harder in the loud parts,
+  the kick heavier, a boom on 1 of every drop / chorus bar; intro / outro lowered too. 0 = as before (P21 unchanged).
+- lyric-shape 1.1.0: patterns(syllables) → words · mirror (retrograde: the pendulum's return) · shadow (the rests on the 8ths become hits:
+  negative space) · pendulum (out then back, as long each way); ≤ 4 bars.
+- Lyrics → Rhythm 1.2.0: SONG › Depth (0.7); ⇢ Patterns → each stanza's four patterns into Patterns › Yours (drums or melody). PF_LIB.saveNotes
+  takes { later } so a batch rebuilds the library once.
+- build/render-words.mjs (NEW): any lyrics file → the song rendered offline → WAV + per section loudness, peak, pinned %, low-end share.
+  His poem, measured: the drop's low end 32 % → 39 % with depth (darkwave); witch-house is loud with words already (−6 dB RMS, ≤ 0.14 % pinned).
+- Tests: tests/p229-deep-and-patterns.test.js 2/2; lyric-shape 23 checks; P228 P21 P22 P20 boundary.
+
+## 3.228 Music with contrast from the words; the SHAPE and the lesson (2026-11-25)
+His words: "continue making more tools for eravos. i want to make music with contrast. thats my rhytm;" · "i want to learn how to make music from my lyrics. that is the point of the rhythm tool" (his poem as the lyrics; his poetry index as a zip — kept with him, not in the repo)
+- tools/music/components/lyric-shape (NEW, contract, spec, 17 checks): per stanza density, space, stress, light / dark words, push, opposites,
+  runs that come back → energy and its part (verse · chorus · build · drop · break, split on opposites) with the reason in words; contrast
+  0 = every stanza a verse. Lines set apart one by one read as one stanza of spaced lines.
+- tools/music/data/rhythm-expand.js: shape 'contrast' — sections by the words' parts (a break has no drums or bass; the drop's drums full; the
+  build rolls up); a split stanza turns line by line (dark: an octave down, one long low root, no groove · light: an octave up, the full
+  groove). RhythmExpand.shape(text). The API's default stays as before (P21 unchanged).
+- Lyrics → Rhythm 1.1.0: SONG › Song shape (from the words · every stanza a verse) + Contrast; SHAPE card (each stanza's part, energy, why)
+  and "How words become music" (five steps).
+- Tests: tests/p228-words-contrast.test.js 4/4; P20 47/47, RhythmExpand 6/6, Bass Pack 9/9, P218, boundary 10/10, bare-canvas, component
+  contracts 36/36, tool needs, validate. Screenshot with his poem shown to him only (not kept in the repo: his words).
+
+## 3.227 The catalog: the theme's colour for the green, paintings for every tool, mode and made tool; Font a choice (2026-11-25)
+His words: "okay, i hate the font. also the green. also i want the thumbnails back. and i want those generated per tool, mutated tool, consistent style." · "yes. almost all of it. make it colored. the themes, and the reactive color.s"
+- canvas/runtime/eravos.css: --ok (on / ready / done) = the theme's colour (Dusk #ff6fa8, Studio cyan, Field its accent, Midnight #8fa8ff),
+  the Beat colour moves it; every fixed green of the canvas moved to it (toolbar on, chips ready / active, the catalog's ✓ rows, toasts, drop
+  zones, wire-menu checks, the Field's green, the music core's MIDI / recorder states). Tools' own inner greens: T-47.
+- Paintings: the mode cards show Start's paintings (and Stay agnostic one); Step, Tape Memory, Feelings, Pattern, Piano, Retro DCO, Swarm
+  Oscillator painted (build/tool-art.py MOTIF entries; tool.json files.art; tools/catalog.js regenerated) — every tool has one now.
+  tools/core/art/painter.js (NEW, domain-free, window.ToolArt): the same style painted live; a made tool (assembled-tool.js) gets one the
+  moment it exists — one ribbon per tool it came from in that tool's colour, braided, meeting at a star (mutated: one ribbon + sparks);
+  seeded by its id. The card, the window's title bar (Dusk) and the tool page read a descriptor's own art.
+- Font: Settings › Look › FONT (themes.js FONTS: As it is · Grotesk · Grotesk only · Plain; data-font on <html>; the faces shipped in
+  canvas/runtime/fonts). Today's stays the default until his pick (T-46). board.css reads var(--mono).
+- Tests: tests/p227-catalog-look.test.js 3/3. P226 P110 P102 P103 P91 P77 P203 green, boundary 10/10, bare-canvas, validate.
+- Screenshots: docs/previews/catalog-look.shots.mjs → catalog-look-modes.png, catalog-look-made.png, catalog-fonts.png (rendered on Linux:
+  on Windows "As it is" shows Segoe UI and Consolas, as Inter / JetBrains Mono are not shipped).
+
+## 3.226 What a synthesis will make, and why it was not made; the catalog's Modes as tool cards (2026-11-25)
+His words: "remove these from the tool catalog. tools when the can't synthesize, need to flash the reasons why. also expand the ability. its hard to tell what it will do when i synthesize. like the wobble and the retro could sound amazing. or the reese and the piano, …" (whole: specs/eravos.2026-11-24-session.map.spec 32; his screenshot: ＋ Add › Modes)
+- canvas/runtime/add-menu.js: first removed the Modes page; his correction ("no. domains are meant to be there. just consistent with the rest of ui,")
+  put it back made like the rest of the catalog: "Modes" heads the page as "All tools" does, each mode (and Stay agnostic) is a tool card
+  (picture frame with its icon, glyph + name, blurb, plain chips: active · N tools · N categories), a click selects it, and the detail on the
+  right shows what it TURNS ON and SHOWS as a tool's dependencies, with Enter / Browse where Add to canvas sits; double-click enters.
+- tools/music/core/assembled-tool.js: one PLAN (planParts / planPair: each of VOICE · WOBBLE · MOUTH · DRIVE · FX — from which tool and part, what
+  it is; not taken; stays behind); previewParts / previewPair (the gates dry, nothing kept); hear (the gates' riff, offline, through the mix);
+  every refusal a REASON as data (kind, title, why, steps, blame, actions); fixes as opts (flip, restFrom, override a place, tweak quieter /
+  open / tame — the made tool's settings only) or runs; fits(part); a made tool is named from every tool it took from.
+- tools/core/field/board.js (domain-free) + board.css: ◇ What will it make? (right-click a selection); the card beside the parts; refused → the
+  blamed boxes / cores flash red ×3 and keep a red ring while it is up; its buttons do the fixes; ↻ Try again; ✕ / Esc. The plan shows while a
+  core is carried over another.
+- Tests: tests/p226-synthesis-why.test.js 2/2 (in tests/run.html). P196 P199 P200 P202 P203 P204 P205 P216 P217 P218 green, boundary 10/10,
+  bare-canvas, competence check. P63's one failure ("eravos.wb-p202" without an icon — P202's made tool left in the page) is on main too.
+- Screenshots: docs/previews/workbench/synthesis-why.shots.mjs → synthesis-plan.png, synthesis-why.png, catalog-modes.png.
+- Specced (assembled-tool ADDENDUM 2026-11-25): ML3a unison + string voices (Reese, Supersaw, Piano), ML3b Retro Poly, genre packs for every
+  tool, the "Make It Bun Dem" baseline, the next leverage set. T-39 … T-45. Asked: "trenke" (which track?) · "the lab" (which?).
 
 ## 3.225 Start: each domain only its own; no Empty canvas button (2026-11-25)
 His words: "these shouldn't show in other domains. also remove the button that says empty canvas" (his screenshot: Image Manipulation picked, the music setups under START FROM).

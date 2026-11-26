@@ -150,23 +150,102 @@
   - FIXED 3.225: with a domain picked, Start shows only that domain's setups and songs (another domain switched on no longer leaks in);
     the Empty canvas button and card removed (Browse every tool starts the same way).
 
+## 31 — verbatim (2026-11-25; with a pasted progress report from another session of his — not his words — about an autosave rename and synthesis-failure feedback):
+  > find the other branch.
+  - ANSWERED: no branch on GitHub holds that work (every remote branch and open PR checked; no other session reachable) — it was not pushed.
+    The synthesis-failure feedback it described was then built here (32, 3.226); the autosave rename was not (it is not in any branch).
+
+## 32 — verbatim (2026-11-25, with a screenshot: ＋ Add › Modes — "Pick a mode — or stay agnostic", the four mode cards):
+  > remove these from the tool catalog. tools when the can't synthesize, need to flash the reasons why. also expand the ability. its hard to tell what it will do when i synthesize. like the wobble and the retro could sound amazing. or the reese and the piano, or what about making the next highest leverage components and tools. like also the retro poly. also the packs, for each tool, have like lofi, dubstep, synthwave, edm, dubstep, i want to make music that sounds like make it bun dem by skrillex, thats my baseline of reverse engineering. like i want the dubstep tools, synthwave tools, like look deeply into trenke by skrillex, like continue making eravos huge. synthesis and mutation and the unqiue sounds and opening them in the lab
+  - DONE 3.226: the catalog has no Modes page (it opens on All tools). Synthesis: ◇ What will it make? (each place, the tool it comes from,
+    what it is, what stays behind, ▶ Hear it, ◆ Make it); refused → the parts to blame flash and keep a red ring, the reason beside them
+    with steps and buttons that fix it (the VOICE / MOUTH from another tool, the rest from another, 6 dB quieter, open the mouth, tame it,
+    pick the boxes that fit, mutate then make). The plan shows while one core is carried over another. P226 2/2.
+  - SPECCED (specs/eravos.assembled-tool.spec ADDENDUM 2026-11-25): ML3a the engine's VOICE gains unison (Reese, Supersaw) and a string
+    (the Piano) so Wobble × Retro and Reese × Piano carry their voices; Retro Poly's poly / PWM; genre packs per tool (Lofi, Dubstep,
+    Synthwave, EDM; technique only); the baseline "Make It Bun Dem" studied as technique; the next leverage set. docs/TODO-LEDGER.md T-39 … T-45.
+  - OPEN (asked): "trenke by skrillex" — which track? · "opening them in the lab" — the Lab mode (analysis, spectra) or the Mutation Lab?
+
+## 33 — verbatim (2026-11-25; the AI coder's question pasted back, with his screenshot — Spotify, his Liked Songs, #1 "Make It Bun Dem",
+## Skrillex, Damian Marley, album "Make It Bun Dem After Hours EP", added Aug 22, 2026):
+  > "trenke" by Skrillex: which track do you mean?
+  - ANSWERED (his screenshot): the track is "Make It Bun Dem" (Skrillex & Damian Marley), the After Hours EP — the same record as his baseline.
+    The baseline study (T-43) is that one record, looked into deeply: technique only, never its tune or a recording.
+
+## 34 — verbatim (2026-11-25, of 3.226's catalog without Modes):
+  > no. domains are meant to be there. just consistent with the rest of ui,
+  - CORRECTED 3.226: the Modes page is back, made like the rest of the catalog — "Modes" heads it as "All tools" does; each mode and Stay
+    agnostic is a tool card (the picture frame with its icon, glyph + name, blurb, plain chips); a click selects it, the detail on the right
+    shows what it turns on and shows (as a tool's dependencies) with Enter / Browse where Add to canvas sits. Screenshot catalog-modes.png.
+
+## 35 — verbatim (2026-11-25, of the catalog's Modes as tool cards):
+  > okay, i hate the font. also the green. also i want the thumbnails back. and i want those generated per tool, mutated tool, consistent style.
+  - ASKED (three questions: which font · what replaces the green · the paintings?) — he answered in 36.
+
+## 36 — verbatim (2026-11-25, his answer):
+  > yes. almost all of it. make it colored. the themes, and the reactive color.s
+  - READ AS: the paintings, yes; the green — almost all of it — coloured by the themes and the reactive colours.
+  - DONE 3.227: --ok (what is on / ready / done) is the theme's colour (Dusk #ff6fa8, Studio cyan, Field its accent, Midnight #8fa8ff) and the
+    Beat colour moves it; every canvas use of the fixed green moved to it. Paintings: the mode cards show Start's paintings; the 7 tools without
+    one painted (build/tool-art.py); a tool made on the canvas — synthesized or mutated — is painted at once in the same style
+    (tools/core/art/painter.js: one ribbon per tool it came from, in its colour). FONT: a choice in Settings › Look (As it is · Grotesk ·
+    Grotesk only · Plain), today's the default until he picks (catalog-fonts.png). P227 3/3.
+  - OPEN: which font (his pick from catalog-fonts.png).
+
+## 37 — verbatim (2026-11-25, with his Innovation Toolkit pasted — his own document, personal, not copied into the repo):
+  > Use this to find domains we can use this canvas for
+  - MAPPED: specs/eravos.domains-from-the-toolkit.spec — the toolkit run on the canvas: its invariants (I1–I8), the constraint field (C1–C4),
+    the gaps (G1–G4), candidates scored with his weighting (the gate generalised · SYSTEMS · FRAMEWORK · CONNECTION · MIND · WORDS · pictures ·
+    play), hostile verification, a proposed order D0–D4. Nothing built. Open: which first; the names.
+
+## 38 — verbatim (2026-11-25, with a zip — his poetry index, 24 pages — and a poem of his as the lyrics; both personal, kept with him, not here):
+  > continue making more tools for eravos. i want to make music with contrast. thats my rhytm;
+  > i want to learn how to make music from my lyrics. that is the point of the rhythm tool
+  - BUILT 3.228: the lyric-shape component (the shape of the words: energy, space, opposites, what comes back) → ♫ Make a song gives each
+    stanza the part its words are and turns a stanza with opposites line by line; Lyrics → Rhythm shows SHAPE (each stanza's part and why)
+    and "How words become music". P228 4/4. Next (T-53 … T-55): a tool that teaches it step by step on his own words; the vocal itself; the
+    poetry index as songs to start from.
+
+## 39 — verbatim (2026-11-25, with his personal book of philosophy — kept with him, not here):
+  > How does it sound? Like I want it deep as hell.
+  > More of my rhythm. Make patterns.
+  - BUILT 3.229: Depth (Lyrics → Rhythm › SONG; build/render-words.mjs renders and measures it: his poem's song as WAVs, given to him);
+    ⇢ Patterns (each stanza: words · mirror · shadow · pendulum) — the pendulum from his own book: "The amount of time the pendulum swings to the left is directly proportional to the amount of time in takes to swing to the right."
+
+## 40 — verbatim (2026-11-26):
+  > No like more dimentions. Also Like I want a voice lab. T pain like auto tune. Creating voice. And wubs, wow. Like voice music like wubs, etc.
+  - BUILT 3.230: Dimensions (layers in the loud parts, a counter-line in the words' gaps, more space) beside Depth. SPECCED: specs/eravos.voice-lab.spec
+    (TUNE · CREATE · WUB; components pitch-tracker, pitch-shifter, vocal-tract, letter-to-sound). Open: which door first.
+
+## 41 — verbatim (2026-11-26):
+  > I want to be able to change the ui elements to other styles, types, build components from combining two. Also the color keeps being yellow. I want to be able to tell what's mixing with what. Like I want to be able to mix the dco with the wobble bass and know it will make a wobble synthwave sound. You know? Expand the tools and engines maybe,
+  - BUILT 3.230: the yellow gone (a made tool's colour = its parents' blended; an auto board's parts in the tool's own colour family);
+    what mixes with what: every synthesis plan says what it will sound like ("wobble synthwave") and which tool brings which character
+    (ToolBlend.CHAR / sound). SPECCED: specs/eravos.ui-elements-and-combining.spec (UE type / style, CB combine two components, EX engines).
+
+## 42 — verbatim (2026-11-26, of "the composite node" in the coder's answer on what is highest leverage):
+  > What the highest leverage?
+  > didn't i name it in the spec?
+  - ANSWERED: yes — SNAP, his (specs/eravos.workbench.spec ADDENDUM 2026-11-15 (3): "it would also be cool to 'snap off' components and snap components together."); the spec now says so (ADDENDUM (2)).
+  > also merge and push. need to be able to delete custom tools. rename them. open them in workshop and edit them fully.
+  - DONE: the branch merged (PR). BUILDING 3.231: a made tool deleted, renamed, opened in the Workshop and edited fully.
 ## 31 — verbatim (2026-11-25, with a screenshot of the catalog "Add to canvas" in Image Manipulation):
   > also told you to remove the add button once i pick a domain, up wheere it says add to canvas, add a back to domains screen,
   > also can you make all of the ui consistent? all of the canvas, and the themese.
-  - BUILT 3.226 (TB6 + TB7, decided 2026-11-24 and not built until now — said plainly): the Start button left the toolbar (Add stays); the
+  - BUILT 3.232 (TB6 + TB7, decided 2026-11-24 and not built until now — said plainly): the Start button left the toolbar (Add stays); the
     catalog's top left carries "← Domains" (back to the domain screen). Read as: the Start button goes, not Add (his 2026-11-24 words).
   - OPEN: the whole UI consistent — the canvas and the themes (an audit + a preview first; the 2026-11-05 "the UI stays as it is" holds
-    until he approves a preview). docs/TODO-LEDGER.md T-39. Also OPEN (noticed): the catalog lists every domain's tools in Image Manipulation.
+    until he approves a preview). docs/TODO-LEDGER.md T-63. Also OPEN (noticed): the catalog lists every domain's tools in Image Manipulation.
 
 ## 32 — verbatim (2026-11-25):
   > after that can you fix the autosave? also make control s a hotkey to save.
-  - BUILT 3.227: measured — picking a domain pins its docked window at once and the autosave wrote that lone window over the real one (and a
+  - BUILT 3.233: measured — picking a domain pins its docked window at once and the autosave wrote that lone window over the real one (and a
     relaunch within a minute replaced the history's copy: 10 tools → "1 tools"). Now: no autosave without work (a tool that is not docked);
     each launch keeps its own history entry; Start offers the newest autosave that holds work. Ctrl+S saves the project (its name asked the
     first time); Ctrl+Shift+S still saves an .erv. tests/p227-autosave.mjs 6/6.
 
 ## 33 — verbatim (2026-11-25, with a screenshot: two toasts — "synthesizing 22 parts…" and "not made — this is your Wobble Bass · parts again"):
   > okay i need it to like flash when it can't synthesize, not a toast with no direction
-  - BUILT 3.228: not made → the parts it is about flash red where they are; a card beside them says why and what to do, with buttons that do
+  - BUILT 3.234 — WITHDRAWN: the same was already on main from a parallel session (its 3.226 "the plan, the reasons", richer); main's kept, this one removed: not made → the parts it is about flash red where they are; a card beside them says why and what to do, with buttons that do
     it (the rest from another tool — only when that can change something; Mutate these parts; Try again); stays until closed or the next try.
     tests/p228-not-made.test.js 2/2.

@@ -14,12 +14,12 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 |---|---|---|---|
 | T-04 | **Options into Settings** (ST1 / TB1): the ⋯ Options button and drop-down go; Stop all, Show ports, Fit all, Clear canvas become a section of ⚙ Settings (their keys stay). **Undo / Redo buttons removed** (Ctrl+Z / Ctrl+Shift+Z stay). Redundant options removed. Preview first. | "okay well no options and settings." · "first one, beyond removing the undo and redo, and redundany options." | decided |
 | T-05 | **Settings a real menu** (ST2): sections down the side, search across every option. Preview first. | "also the settings needs to be a real menu" | decided |
-| T-06 | **The Start button leaves the toolbar** (BUILT 3.226, 2026-11-25 — shown first) (TB6): top-left is Add only; the domains still open on launch. | "remove the start button from the corner and just have the add button" | decided |
+| T-06 | **The Start button leaves the toolbar** (BUILT 3.232, 2026-11-25 — shown first) (TB6): top-left is Add only; the domains still open on launch. | "remove the start button from the corner and just have the add button" | decided |
 | T-07 | **Organize / Tidy up: one** (TB2), the same action today. Recommended: keep **Organize** on the toolbar. | "organize or tidy up, don't need both." | decided (which name: recommended Organize) |
 | T-08 | **Sounds · Rhythms · Songs (· Learn): one entry** (TB3). Recommended: one **Library** button, one browser with tabs. Other readings: keep Songs only; all into Add. | "sounds or rhythms, and songs." | open |
 | T-09 | **Metronome and loop region** (TB4). Readings: out of the agnostic toolbar into the music transport (recommended) · onto the canvas as a loop-region bar · the Timeline only. | "metronome loop region in the canvas ui." | open |
 | T-10 | **The toolbar's noise when choosing a domain** (TB5): before a domain, only Add · Settings · the fault light; after, recommended: only what the tools on the canvas need (not the domain's whole set). | "need to clean up the noise. need to when choosing a domain." | open |
-| T-11 | **The catalog (Add) gets "← Domains" in its top-left corner** (BUILT 3.226, 2026-11-25 — shown first) (TB7): back to the domain screen. | "with a back to domain, in the top left corner of the catalog." | decided |
+| T-11 | **The catalog (Add) gets "← Domains" in its top-left corner** (BUILT 3.232, 2026-11-25 — shown first) (TB7): back to the domain screen. | "with a back to domain, in the top left corner of the catalog." | decided |
 | T-12 | **Settings' sections grow from the tools' DAG contracts** (ST3), agnostic: Audio with real-time audio, MIDI with MIDI in, GPU / image memory with image tools; each option names the tools that asked; hides when none needs it, values kept. | "that expands from the tools dag contract, like what is needed expands the options." | specced |
 
 ## Performance and animations · `specs/eravos.performance-plan.spec` (his PC: Ryzen 7 3700X · GTX 1650 · 16 GB)
@@ -50,6 +50,30 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-28 | **ML4 the Mutation Lab**: a shelf of every component and core; spec + preview first. | "you open the mutation lab, and it has all the components, and cores to play with." | specced (waits a preview) |
 | T-29 | **ML5 the Workbench / Tool Builder**: from scratch — parts, then each control's UI element and the theme; saved as a tool of its own. Spec + preview first. | "the workbench to be able to build from scratch from components and the broad selection of ui elements, with different control types, and themes, like a tool builder." | specced (waits a preview) |
 | T-30 | **ML6 a made tool as its own zip** (isolated: deleted whole if unstable). | "also tools are isolated so if they cause instability they can be deleted." | specced |
+| T-39 | **What it will make, and why not** (3.226): ◇ the plan + ▶ hear before making; a refusal flashes the blamed parts red with the reason and fixes beside them. Shown first (screenshots). | "tools when the can't synthesize, need to flash the reasons why. also expand the ability. its hard to tell what it will do when i synthesize" | built, shown first |
+| T-40 | **ML3a the VOICE grows**: unison (Reese Bass, Supersaw) and string (the Piano) voices in the engine, so Wobble × Retro and Reese × Piano carry both voices. Composite node specced in the compat graph first. | "like the wobble and the retro could sound amazing. or the reese and the piano" | specced |
+| T-41 | **ML3b Retro Poly whole** in synthesis: poly voices, PWM, unison. | "like also the retro poly." | specced |
+| T-42 | **GP genre packs for every tool**: Lofi · Dubstep · Synthwave · EDM; novelty-measured, levelled, no toys. Dubstep first. | "also the packs, for each tool, have like lofi, dubstep, synthwave, edm, dubstep" | specced |
+| T-43 | **The baseline: "Make It Bun Dem"** studied as technique (docs/research), then the dubstep tools and packs measured against it. "trenke" — which track? | "i want to make music that sounds like make it bun dem by skrillex, thats my baseline of reverse engineering. like i want the dubstep tools, synthwave tools, like look deeply into trenke by skrillex" | specced — answered 2026-11-25 (his screenshot): "trenke" is the same record, "Make It Bun Dem" (Skrillex & Damian Marley, After Hours EP) |
+| T-44 | **The next highest-leverage components and tools** (docs/eco-graph.md), each UI shown first. | "or what about making the next highest leverage components and tools." | specced |
+| T-45 | **Open a made sound in the Lab** — the Lab mode or the Mutation Lab (ML4)? | "synthesis and mutation and the unqiue sounds and opening them in the lab" | open (asked) |
+| T-46 | **Font**: Settings › Look › Font (As it is · Grotesk · Grotesk only · Plain) built 3.227; today's stays until he picks one to be the default. | "okay, i hate the font." | waiting (his pick) |
+| T-47 | **The green everywhere else**: tools' own UIs still carry fixed greens inside them (each tool's code) — moved to the theme colour tool by tool. | "yes. almost all of it. make it colored. the themes, and the reactive color.s" | open |
+| T-48 | **D0 the gate generalised**: a domain hands render → works / why / fingerprint; the twin judgement and the reasons card for every domain; proven on generative pictures. | "Use this to find domains we can use this canvas for" | specced (specs/eravos.domains-from-the-toolkit.spec) |
+| T-49 | **D1 FRAMEWORK** (his toolkit as tools: ledger, gap finder, leverage scorer, hostile verifier) on one type table shared with MIND. | (same) | specced, waits his pick |
+| T-50 | **D2 SYSTEMS** (stocks, flows, feedback) on the assembled engine — a model you hear. | (same) | specced, waits his pick |
+| T-51 | **D3 CONNECTION** (two people on one canvas; consent as the gate) — the two-machine link first. | (same) | specced, waits his pick |
+| T-52 | **D4 WORDS** (lines, meter, rhyme) beside the dubstep tools. | (same) | specced |
+| T-53 | **Learn it step by step on his own words**: Lyrics → Rhythm walks him through (1) syllables on the beat (2) a stanza's part (3) contrast (4) the melody (5) the song — each step heard, his choice kept, ERAVOS fills the rest. Preview first. | "i want to learn how to make music from my lyrics. that is the point of the rhythm tool" | open (next) |
+| T-54 | **His voice in it**: record the lyrics (Song Recorder) and lock the take to the syllables the tool placed (vocal-chop as instrument — the Make It Bun Dem technique). | "i want to make music with contrast. thats my rhytm" | open |
+| T-55 | **His poetry index as a shelf**: each poem → a song shape to start from, kept in Documents\ERAVOS (his, never shipped). | (the zip he sent, 2026-11-25) | open (asks him first) |
+| T-56 | **Voice Lab › TUNE**: pitch-tracker + pitch-shifter, the hard tune at 0 ms (voice-tune.spec). UI shown first. | "T pain like auto tune." | specced (specs/eravos.voice-lab.spec) |
+| T-57 | **Voice Lab › CREATE**: a voice made from nothing (vocal-tract + letter-to-sound) singing his lyrics from Lyrics → Rhythm. | "Creating voice." | specced |
+| T-58 | **Voice Lab › WUB**: the voice's mouth opens the Wobble Bass (talkbox / vocoder), or the wobble opens the voice. | "And wubs, wow. Like voice music like wubs, etc." | specced |
+| T-59 | **UE: any control shown as another element, any element in another style** (right-click › Show as; Settings › Look › Elements, shown first). | "I want to be able to change the ui elements to other styles, types" | specced (specs/eravos.ui-elements-and-combining.spec) |
+| T-60 | **CB: combine two components into one part** (on the board; its own contract; gated; mixable everywhere). Needs the composite node. | "build components from combining two." | specced |
+| T-61 | **EX: the engines grow** (VOICE: unison · string · wavetable; MOUTH: formant; SPACE and SUB places) and every tool speaks the character table. | "Expand the tools and engines maybe," | specced |
+| T-62 | **A made tool is his: rename · edit fully in the Workshop · delete** — built 3.231 (P231). Next: the same on a tool's page and in ＋ Add. | "also merge and push. need to be able to delete custom tools. rename them. open them in workshop and edit them fully." | built |
 
 ## ERAVOS's own engine · `specs/eravos.engine.spec` (decided 2026-11-24: written in Emerge — "wait for emerge")
 
@@ -62,15 +86,15 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-37 | **EN5 Settings › Audio** from the engine (driver, device, buffer, sample rate, cores, per-core load, per-tool cost). | "that is still not great. what about the audio driver or engine that electron uses?" | specced |
 | T-38 | **Which lags on his PC — the screen or the sound?** (decides what is cut next) | "that is still not great. what about the audio driver or engine that electron uses?" | open (asked) |
 
-## Asked 2026-11-25
+## Asked 2026-11-25 (this branch; renumbered when merged with main)
 
 | # | What | His words (2026-11-25) | State |
 |---|---|---|---|
-| T-39 | **The whole UI consistent — the canvas and the themes**: one audit of every canvas surface (toolbar, Start, catalog, Settings, tool pages, menus, cards, the Field, toasts) in every theme; what differs listed; a preview of the consistent version shown first (the 2026-11-05 "the UI stays as it is" holds until he approves). | "also can you make all of the ui consistent? all of the canvas, and the themese." | open |
-| T-40 | **The catalog in a domain lists every domain's tools** (Image Manipulation showed Genre instruments, Sound Forge …) — only its own? (asked) | (from his screenshot) | open (asked) |
-| T-41 | **Autosave fixed; Ctrl+S saves** (3.227). | "after that can you fix the autosave? also make control s a hotkey to save." | built — confirm on his PC |
-| T-42 | **Not made: flash + a card with why and what to do** (3.228). | "okay i need it to like flash when it can't synthesize, not a toast with no direction" | built, shown first |
-| T-43 | **The tip line in a domain** (Image Manipulation showed a music tip — "voice clips", ".mid") — the domain's own tip. | (noticed 2026-11-25) | open (asked) |
+| T-63 | **The whole UI consistent — the canvas and the themes**: one audit of every canvas surface (toolbar, Start, catalog, Settings, tool pages, menus, cards, the Field, toasts) in every theme; what differs listed; a preview of the consistent version shown first (the 2026-11-05 "the UI stays as it is" holds until he approves). | "also can you make all of the ui consistent? all of the canvas, and the themese." | open |
+| T-64 | **The catalog in a domain lists every domain's tools** (Image Manipulation showed Genre instruments, Sound Forge …) — only its own? (asked) | (from his screenshot) | open (asked) |
+| T-65 | **Autosave fixed; Ctrl+S saves** (3.233). | "after that can you fix the autosave? also make control s a hotkey to save." | built — confirm on his PC |
+| T-66 | **Not made: flash + a card with why and what to do** — withdrawn: main's 3.226 (what it will make, and why not; T-39 above) does it. | "okay i need it to like flash when it can't synthesize, not a toast with no direction" | superseded |
+| T-67 | **The tip line in a domain** (Image Manipulation showed a music tip — "voice clips", ".mid") — the domain's own tip. | (noticed 2026-11-25) | open (asked) |
 
 ## Shipped, to confirm on his PC
 

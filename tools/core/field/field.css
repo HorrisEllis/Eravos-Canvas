@@ -4,7 +4,7 @@
 @font-face { font-family: 'WS Display'; src: url(fonts/bebas-neue-400.woff2) format('woff2'); font-display: swap; }
 @font-face { font-family: 'WS Mono'; src: url(fonts/dm-mono-400.woff2) format('woff2'); font-weight: 400; font-display: swap; }
 @font-face { font-family: 'WS Mono'; src: url(fonts/dm-mono-500.woff2) format('woff2'); font-weight: 500; font-display: swap; }
-.ws-app, .ws-out { --wv:#030508; --wp:#060a12; --wl:#16243a; --wl2:#1e3050; --wc:#00d4ff; --wg:#00ff88; --wm:#cc44ff; --wy:#ffcc00; --wt:#b8cfe0; --wt2:#5a7a96; --wt3:#2e4a60;
+.ws-app, .ws-out { --wv:#030508; --wp:#060a12; --wl:#16243a; --wl2:#1e3050; --wc:#00d4ff; --wg:var(--ok,#00d4ff); --wm:#cc44ff; --wy:#ffcc00; --wt:#b8cfe0; --wt2:#5a7a96; --wt3:#2e4a60;
   --wmono:'WS Mono', ui-monospace, monospace; --wdisp:'WS Display', Impact, sans-serif;
   position: fixed; inset: 0; z-index: 299000;   /* over every window, bar and light layer; notices (toasts, 300000) stay above */ display: grid; grid-template-rows: 30px 36px 1fr 22px; grid-template-columns: 44px 1fr 300px;
   background: var(--wv); color: var(--wt); font: 400 10px/1.4 var(--wmono); letter-spacing: .08em; text-transform: uppercase; }

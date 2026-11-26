@@ -219,7 +219,7 @@
     const body = h('div', { class: 'wm-body' });
     const grip = h('div', { class: 'wm-grip' });
     const win = h('div', { class: 'wm-win', role: 'group', 'aria-label': d.label, 'data-instance': rec.instanceId, 'data-organism': d.id, style: { left: pos.x + 'px', top: pos.y + 'px', width: w + 'px', height: hgt + 'px', '--acc': d.accent || '#00d4ff' } }, [header, body, h('div', { class: 'wm-dusk', 'aria-hidden': 'true' }), grip]);
-    { const m = global.Catalog && global.Catalog.meta && global.Catalog.meta(d.id); if (m && m.art) { let u = m.art; try { u = new URL(m.art, doc.baseURI).href; } catch (e) {} win.style.setProperty('--art', 'url("' + u + '")'); } }   // 3.91 its painting (the Dusk theme's title bar) · 3.114 an absolute URL: a relative one in a custom property resolves against the stylesheet that uses it (canvas/runtime/), not the page — every window asked for /canvas/tools/…/art.svg (404)
+    { const m = global.Catalog && global.Catalog.meta && global.Catalog.meta(d.id), a0 = (m && m.art) || d.art; if (a0) { let u = a0; if (!/^data:/.test(a0)) try { u = new URL(a0, doc.baseURI).href; } catch (e) {} win.style.setProperty('--art', 'url("' + u + '")'); } }   // 3.91 its painting (the Dusk theme's title bar) · 3.114 an absolute URL: a relative one in a custom property resolves against the stylesheet that uses it (canvas/runtime/), not the page — every window asked for /canvas/tools/…/art.svg (404)
     win.classList.add('wm-new'); global.setTimeout(() => win.classList.remove('wm-new'), 320);   // 3.73 fluid: it grows into place
     win.style.zIndex = ++zTop;
     world.appendChild(win);

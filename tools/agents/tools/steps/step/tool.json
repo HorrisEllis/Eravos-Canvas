@@ -22,7 +22,8 @@
     "preview": "preview.png",
     "spec": "step.spec",
     "tests": "step.test.js",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [],

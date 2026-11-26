@@ -37,6 +37,23 @@
     { id: 'brushed', label: 'Brushed', blurb: 'Brushed metal: fine horizontal lines and a soft sheen, like a hardware face plate.' },
     { id: 'carbon', label: 'Carbon', blurb: 'A tight carbon-fibre weave in the panels, with a soft sheen.' },
   ];
+  // 3.227 FONT (his words, 2026-11-25: "okay, i hate the font"): a choice beside the theme, today's the default until he picks (his rule:
+  // "always show me or add more themes before change"). Each sets the two faces every page reads (--font, --mono) on <html data-font>.
+  const FONTS = [
+    { id: 'theme', label: 'As it is', blurb: 'Inter (or the system’s sans) for text, a monospace for the small labels and counts.' },
+    { id: 'grotesk', label: 'Grotesk', blurb: 'Space Grotesk for text, DM Mono for the small labels and counts.' },
+    { id: 'grotesk-all', label: 'Grotesk only', blurb: 'Space Grotesk everywhere — no monospace, numbers kept even.' },
+    { id: 'plain', label: 'Plain', blurb: 'The system’s own sans everywhere (Segoe UI on Windows) — no monospace, numbers kept even.' },
+  ];
+  const FKEY = 'eravos.font';
+  function getFont() { const v = root && root.dataset.font; return FONTS.some(f => f.id === v) ? v : 'theme'; }
+  function setFont(id) {
+    if (!FONTS.some(f => f.id === id) || !root) return false;
+    if (id === 'theme') delete root.dataset.font; else root.dataset.font = id;
+    try { global.localStorage.setItem(FKEY, id); } catch (e) {}
+    listeners.forEach(fn => { try { fn(get()); } catch (e) {} }); return true;
+  }
+  if (root && !root.dataset.font) { let v = null; try { v = global.localStorage.getItem(FKEY); } catch (e) {} if (v && v !== 'theme' && FONTS.some(f => f.id === v)) root.dataset.font = v; }
   const MKEY = 'eravos.material';
   // the grain tile: neutral noise made once in code (white at a few percent, so it only lightens the black a touch)
   (function grainTile() {
@@ -108,16 +125,24 @@
         h('span', { class: 'thm-mat', 'data-material-demo': m.id }), h('b', { text: m.label + (on ? '  ✓' : '') }), h('small', { text: m.blurb })]);
       c.onclick = () => { setMaterial(m.id); paintM(); }; mcards.appendChild(c); }); };
     paintM();
+    const fcards = h('div', { class: 'thm-btns thm-fonts' });
+    const paintF = () => { fcards.innerHTML = ''; FONTS.forEach(f => {
+      const on = getFont() === f.id, c = h('button', { class: 'thm-bcard' + (on ? ' on' : ''), type: 'button', 'aria-pressed': on ? 'true' : 'false', title: f.blurb }, [
+        h('span', { class: 'thm-fdemo', 'data-font-demo': f.id }, [h('span', { class: 'thm-fd1', text: 'Add to canvas' }), h('span', { class: 'thm-fd2', text: '12 tools · 3 categories' })]),
+        h('b', { text: f.label + (on ? '  ✓' : '') }), h('small', { text: f.blurb })]);
+      c.onclick = () => { setFont(f.id); paintF(); }; fcards.appendChild(c); }); };
+    paintF();
     const react = h('button', { class: 'thm-link', type: 'button', text: 'Reactive colours — how every colour answers the sound →', onclick: () => { if (global.AppSettings && global.AppSettings.isOpen) { global.AppSettings.open('reactive'); return; } if (onClose) onClose(); const b = doc.getElementById('reactBtn'); if (b) b.click(); } });
     return h('div', { class: 'thm-panel', role: 'dialog', 'aria-label': 'Themes' }, [
       h('div', { class: 'thm-headr' }, [h('b', { text: 'THEMES' }), h('span', { text: 'the whole look in one choice — remembered on this computer' }), h('button', { class: 'thm-x', type: 'button', text: '×', 'aria-label': 'close', onclick: () => onClose && onClose() })]),
       cards, h('div', { class: 'thm-sub' }, [h('b', { text: 'BUTTONS' }), h('span', { text: 'with any theme' })]), bcards,
-      h('div', { class: 'thm-sub' }, [h('b', { text: 'MATERIAL' }), h('span', { text: 'a texture on the black, with any theme' })]), mcards, react]);
+      h('div', { class: 'thm-sub' }, [h('b', { text: 'MATERIAL' }), h('span', { text: 'a texture on the black, with any theme' })]), mcards,
+      h('div', { class: 'thm-sub' }, [h('b', { text: 'FONT' }), h('span', { text: 'with any theme' })]), fcards, react]);
   }
   // 3.110 the look is a section of ⚙ Settings (it was an entry in the ⋯ Options dropdown, opening a popover)
   function entry() {
     if (!global.AppSettings) return false;
-    global.AppSettings.addSection({ id: 'look', label: 'Look', order: 10, sub: 'The whole look in one choice: a theme, a button style and a material, with any theme.', make: (close) => panel(close) });
+    global.AppSettings.addSection({ id: 'look', label: 'Look', order: 10, sub: 'The whole look in one choice: a theme, a button style, a material and a font, with any theme.', make: (close) => panel(close) });
     return true;
   }
   const h0 = (tag, cls) => { const e = doc.createElement(tag); e.className = cls; return e; };
@@ -125,5 +150,6 @@
   if (doc) { if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', boot); else boot(); }
   global.Themes = { list: () => LIST.map(t => Object.assign({}, t)), get, set, onChange(fn) { listeners.push(fn); }, panel, DEFAULT,
     buttons: () => BUTTONS.map(b => Object.assign({}, b)), getButtons, setButtons,
-    materials: () => MATERIALS.map(m => Object.assign({}, m)), getMaterial, setMaterial };
+    materials: () => MATERIALS.map(m => Object.assign({}, m)), getMaterial, setMaterial,
+    fonts: () => FONTS.map(f => Object.assign({}, f)), getFont, setFont };
 })(typeof window !== 'undefined' ? window : globalThis);

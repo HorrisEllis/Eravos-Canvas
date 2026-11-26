@@ -206,7 +206,7 @@
     pick.value = st.target || ''; pick.addEventListener('change', () => { st.target = pick.value || null; repaint(); });
     const suite = d.suite && (d.suite.members || []).length ? d.suite : null;
     // 3.88 its painting (art.svg, from the catalogue) in place of the icon tile, when it has one
-    const meta = global.Catalog && global.Catalog.meta && global.Catalog.meta(d.id), art = meta && meta.art;
+    const meta = global.Catalog && global.Catalog.meta && global.Catalog.meta(d.id), art = (meta && meta.art) || d.art;   // 3.227 a made tool's own painting
     page.appendChild(h('header', { class: 'tp-head' + (art ? ' has-art' : '') }, [
       art ? h('img', { class: 'tp-art', src: art, alt: '', draggable: 'false' }) : tileOf(d, 56, d.icon || '◻'),
       h('div', { class: 'tp-ht' }, [h('h2', { text: d.label }), h('div', { class: 'tp-meta', text: [d.category, 'v' + d.version].filter(Boolean).join(' · ') }), h('p', { text: d.blurb || '' })]),
