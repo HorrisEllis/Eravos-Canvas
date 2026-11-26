@@ -31,7 +31,7 @@ describe('P226 what it will make, and why not', () => {
       pick(); const n0 = MadeTools.list(AssembledTool.MADE_KEY).length, pv = await FieldBoard.previewSel();
       assert.ok(pv && pv.plan && pv.plan.rows.length === 5, 'the plan has its five places'); assert.ok(pv.plan.rows.every(r => r.from && r.what), 'each says where it comes from and what it is');
       assert.equal(MadeTools.list(AssembledTool.MADE_KEY).length, n0, 'a preview makes nothing');
-      const card = document.querySelector('.fb-why'); assert.ok(card && /What it will make/i.test(card.textContent), 'the card says what it will make');
+      const card = document.querySelector('.fb-why'); assert.ok(card && /What it will make|sound like/i.test(card.textContent), 'the card says what it will make');
       assert.ok([...card.querySelectorAll('.fb-wbtn')].some(x => /Hear/.test(x.textContent)), 'with ▶ Hear it: ' + card.querySelector('.fb-wbar').textContent + ' | ' + Object.keys(FieldBoard.exchange).join(',') + ' | ' + Object.keys(pv).join(',')); assert.ok(FieldBoard.exchange.hear(pv.plan.settings), 'and it plays');
       assert.ok([...card.querySelectorAll('.fb-wrow b')].map(x => x.textContent).join(' ') === 'VOICE WOBBLE MOUTH DRIVE FX', 'in the engine\'s order');
       FieldBoard.hideWhy();

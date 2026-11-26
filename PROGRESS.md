@@ -2,6 +2,21 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.230 What mixes with what; no more yellow; dimensions; Voice Lab and UI elements specced (2026-11-26)
+His words: "No like more dimentions. Also Like I want a voice lab. T pain like auto tune. Creating voice. And wubs, wow. Like voice music like wubs, etc." · "I want to be able to change the ui elements to other styles, types, build components from combining two. Also the color keeps being yellow. I want to be able to tell what's mixing with what. Like I want to be able to mix the dco with the wobble bass and know it will make a wobble synthwave sound. You know? Expand the tools and engines maybe,"
+- tools/music/data/tool-blend.js: CHAR (each tool's style and what each of its places carries) + sound(rows) → { name ("wobble synthwave"),
+  mix (each style's share and which tool brings it), says }. The synthesis plan carries it (each place its character too); a made tool keeps
+  it (its words start with it; mixed again, it brings it).
+- tools/core/field/board.js (domain-free): the card says "It will sound like …", the mix in shares, and the sentence; also while one core is
+  carried over another. An auto board's parts take the tool's own colour family (hueTurn), never the fixed rainbow with a yellow.
+- assembled-tool.js: a made tool's colour = its parents' colours blended (old records too); the fallback no longer yellow.
+- rhythm-expand.js + Lyrics → Rhythm: Dimensions 0…1 (0.7 in the tool; API 0 = as before) — the lead layered an octave up then a third above
+  in the drops / choruses, a counter-line in the gaps the words leave (their shadow), more space (the master's reverb wider, longer).
+  build/render-words.mjs --dims.
+- Specs: specs/eravos.voice-lab.spec (TUNE · CREATE · WUB; VL1–VL4 components, VT1–VT3 tools, the Voice Lab setup) ·
+  specs/eravos.ui-elements-and-combining.spec (UE1–UE3, CB1–CB3, EX1–EX2). T-56 … T-61.
+- Tests: tests/p230-what-mixes.test.js 1/1 (Retro DCO × Wobble Bass = wobble synthwave; no yellow); P229 3/3 (dimensions).
+
 ## 3.229 Deep as hell; patterns from the words (2026-11-25)
 His words: "How does it sound? Like I want it deep as hell." · "More of my rhythm. Make patterns." (with his personal book of philosophy — kept with him, not in the repo). From it, the rule the
 patterns keep: "The amount of time the pendulum swings to the left is directly proportional to the amount of time in takes to swing to the right."

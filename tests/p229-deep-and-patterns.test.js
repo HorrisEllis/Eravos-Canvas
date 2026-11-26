@@ -14,6 +14,14 @@ describe('P229 deep, and patterns from the words', () => {
     const len = (cs) => all(cs, '@bass').reduce((x, n) => x + n.l, 0); assert.ok(len(b) > len(a), 'the bass held longer: ' + len(b) + ' > ' + len(a));
     const kick = (cs) => mean(all(cs, '@drums').filter(n => n.n === 36).map(n => n.v)); assert.ok(kick(b) > kick(a), 'a heavier kick');
   });
+  it('dimensions (3.230, his "No like more dimentions."): layers in the loud parts, a counter-line in the gaps, more space — 0 is as before', () => {
+    const a = clips({ dims: 0 }), b = clips({ dims: 1 }); assert.equal(JSON.stringify(a), JSON.stringify(clips({})), 'dims 0 = as before');
+    const lead = (cs, re) => cs.filter(c => c.target === '@lead' && re.test(c.name)).flatMap(c => c.notes);
+    assert.ok(lead(b, /drop|chorus/).length >= 2 * lead(a, /drop|chorus/).length, 'the loud parts layered: ' + lead(b, /drop|chorus/).length + ' vs ' + lead(a, /drop|chorus/).length);
+    assert.ok(lead(b, /verse|break/).length > lead(a, /verse|break/).length, 'a counter-line in the quieter parts');
+    const m = (o) => (RhythmExpand.generate(TEXT, Object.assign({ genre: 'darkwave', seed: 2, shape: 'contrast' }, o)).find(s => s.op === 'configure' && s.target === 'master') || {}).params || {};
+    assert.ok(m({ dims: 1 }).reverbMix > m({}).reverbMix, 'more space');
+  });
   it('⇢ Patterns: every stanza → words, mirror, shadow and pendulum in the rhythm library (Yours)', async () => {
     const h = document.getElementById('wmhost'); if (!CanvasWM.world) { CanvasWM.init(h, Kernel); WireSystem.init(Kernel); OrganismFactory.boot(Kernel); }
     const LIB = MusicParts.PF_LIB, before = LIB.readSaved().length, id = OrganismFactory.spawn('eravos.lyric-rhythm', { x: 20, y: 20 });

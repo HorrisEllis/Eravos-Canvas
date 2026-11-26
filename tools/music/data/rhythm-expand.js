@@ -10,7 +10,7 @@
  *   · CHORDS, instruments, presets, effects and the master are the genre's own (Song Engine) — an intro and an outro frame it
  * Same words + genre + seed + flow → the same song. It is a Song Engine song with the words' rhythm in it: the engine's
  * output is untouched (RhythmExpand uses its optional generate(…, X) hook and helpers).
- *   RhythmExpand.write(text, { genre:'darkwave', seed, flow:'spoken', per:4, shape:'verses'|'contrast', contrast:0…1, depth:0…1 })  → the song on the canvas
+ *   RhythmExpand.write(text, { genre:'darkwave', seed, flow:'spoken', per:4, shape:'verses'|'contrast', contrast:0…1, depth:0…1, dims:0…1 })  → the song on the canvas
  *   RhythmExpand.shape(text, { contrast })  → the words' shape (lyric-shape): each stanza's part and why — 3.228
  *   RhythmExpand.generate(text, opts)                                            → the recipe steps (no canvas) */
 (function () {
@@ -67,6 +67,10 @@
     // the chords down (up to two octaves / one), the bass held longer and harder in the loud parts, the kick heavier, a half-time boom on
     // beat 1 of every drop bar. 0 = as before.
     const D = Math.max(0, Math.min(1, +o.depth || 0)), down = Math.round(D * 2), cdown = D >= 0.34 ? 1 : 0;
+    // 3.230 DIMENSIONS 0…1 (his words, 2026-11-26: "No like more dimentions."): deep as in MORE, not only lower — LAYERS (the lead doubled an
+    // octave up in the loud parts, then a harmony a third above it), a COUNTER-LINE in the gaps the words leave (their shadow, high and soft),
+    // and SPACE (the master's reverb wider and longer). 0 = as before.
+    const DIM = Math.max(0, Math.min(1, +o.dims || 0)), LS = window.MusicParts && window.MusicParts.LyricShape;
     const X = {
       name: o.name || ('Words · ' + secs[0].lines[0].slice(0, 28)),
       form,
@@ -100,13 +104,21 @@
         }
         if (c.role === 'lead') {
           const oct = (c.P.octave || 5) - down + (dark ? -1 : light ? 1 : 0);   // a dark line sung an octave down, a light one an octave up (depth: all lower)
-          return here.filter(n => n.stress || n.last).map(n => N(n.s, Math.max(1, Math.min(4, n.l)), MT().degreeToMidi(c.deg + (n.off || 0), oct, c.key.root, c.key.scale), n.stress === 2 ? 1 : 0.85));
+          const sung = here.filter(n => n.stress || n.last), mid = (dg, o2) => MT().degreeToMidi(dg, o2, c.key.root, c.key.scale), loud = ['drop', 'chorus'].includes(w.kind);
+          const out = sung.map(n => N(n.s, Math.max(1, Math.min(4, n.l)), mid(c.deg + (n.off || 0), oct), n.stress === 2 ? 1 : 0.85));
+          if (DIM >= 0.3 && loud) sung.forEach(n => out.push(N(n.s, Math.max(1, Math.min(4, n.l)), mid(c.deg + (n.off || 0), oct + 1), 0.45)));   // layer: an octave up, softer
+          if (DIM >= 0.6 && loud) sung.forEach(n => out.push(N(n.s, Math.max(1, Math.min(4, n.l)), mid(c.deg + (n.off || 0) + 2, oct), 0.5)));   // layer: a third above
+          if (DIM >= 0.5 && !loud && LS) { const pt = LS.patterns(here.map(n => ({ s: n.s, l: n.l, stress: n.stress })), { bars: 1 });   // the counter-line: in the words' gaps
+            if (pt) pt.shadow.forEach((g, k) => out.push(N(g.s, 1.5, mid(c.deg + [4, 2, 5, 3][k % 4], oct + 1), 0.35 + 0.15 * g.stress))); }
+          return out;
         }
         if (c.role === 'chords' && D) return H.chordBar(c.sec.chordStyle || c.P.style, c.deg, c.key, c.P.voicing, (c.P.octave || 4) - cdown);
         return null;                                               // chords: the genre's own
       },
     };
     const steps = S.generate(G.id, seed, X);
+    if (DIM > 0) steps.forEach(st => { if (st.op === 'configure' && st.target === 'master' && st.params) st.params = Object.assign({}, st.params, {   // space: wider, longer
+      reverbMix: Math.min(0.6, (+st.params.reverbMix || 0.2) + 0.2 * DIM), size: Math.min(6, (+st.params.size || 2.2) * (1 + 0.6 * DIM)) }); });
     // onto a canvas that already has a Session / Timeline (the button path): add to those, don't mount a second pair
     if (o.reuse) steps.forEach(s => { if (s.op === 'mount' && (s.organism === 'eravos.session' || s.organism === 'eravos.timeline')) s.reuse = true; });
     return steps;

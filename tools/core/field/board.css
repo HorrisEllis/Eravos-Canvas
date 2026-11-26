@@ -97,3 +97,8 @@
 .fb-wbar{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .fb-wbtn{background:#0B141E;border:1px solid #2A3B4D;color:#D6E4F0;border-radius:7px;padding:5px 9px;font:600 11px var(--font,sans-serif);cursor:pointer}
 .fb-wbtn:hover{border-color:#00D4FF}.fb-wbtn.fix{border-color:#00D4FF80}.fb-why.bad .fb-wbtn.fix{border-color:#FF335580}
+/* 3.230 what it will sound like: the mix of characters, each its share, in the theme's colours */
+.fb-wmix{display:flex;gap:2px;margin-top:8px;height:18px;border-radius:5px;overflow:hidden}
+.fb-wseg{display:flex;align-items:center;justify-content:center;font:600 10px var(--mono);color:#04070C;white-space:nowrap;overflow:hidden;
+  background:color-mix(in oklab,var(--ok,#00D4FF) calc(100% - var(--k) * 35%),var(--violet,#B066FF))}
+.fb-wsays{margin-top:5px;color:#B8CFE0;font-size:11.5px}

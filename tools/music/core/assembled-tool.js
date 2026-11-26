@@ -140,7 +140,7 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
   function descriptor(o) {
     o = o || {};
     return {
-      id: o.id, domain: 'music', version: o.version || '1.0.0', label: o.label || 'Synthesized', icon: o.icon || '🧪', accent: o.accent || '#ffcc00', phase: 'P202', art: o.art,
+      id: o.id, domain: 'music', version: o.version || '1.0.0', label: o.label || 'Synthesized', icon: o.icon || '🧪', accent: o.accent || '#00d4ff', phase: 'P202', art: o.art,
       category: 'Bass', blurb: o.blurb || 'A tool synthesized from others: its parts are shared components, assembled into one engine.',
       size: { w: 760, h: 720 }, minSize: { w: 480, h: 480 },
       permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'], provides: ['capability.audio_out', 'capability.note_in', 'capability.bass_voice'],
@@ -209,10 +209,12 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
     // 3.227 its painting, in the cards' style (tools/core/art/painter.js): one ribbon per tool it came from, in that tool's colour
     const accents = r.accents || (r.of || []).map(l => { const d = (F.defined ? F.defined() : []).find(x => x.label === l); return d && d.accent; }).filter(Boolean);
     const art = root.ToolArt ? root.ToolArt.url({ id: r.id, label: r.name, accents, mutated: (r.of || []).length <= 1 }) : undefined;
-    if (!F.def || !F.def(r.id)) F.define(descriptor({ id: r.id, label: r.name, icon: '🧪', accent: r.accent || accents[0] || '#ffcc00', settings: r.settings, version: '1.0.0', art,
-      blurb: 'Synthesized ' + String(r.at || '').slice(0, 10) + (r.of ? ' from ' + r.of.join(' × ') : '') + ': ' + r.chain + '. ' + (r.verdict === 'novel' ? 'New to ERAVOS.' : 'Close to ' + r.near + '.'), made: { from: 'synthesized', of: r.of || [], at: r.at, dag: r.dag, verdict: r.verdict, near: r.near, d: r.d } }));
+    if (!F.def || !F.def(r.id)) F.define(descriptor({ id: r.id, label: r.name, icon: '🧪', accent: blendOf(accents) || r.accent || '#00d4ff', settings: r.settings, version: '1.0.0', art,
+      blurb: (r.character ? r.character.name.replace(/^./, c => c.toUpperCase()) + ' — s' : 'S') + 'ynthesized ' + String(r.at || '').slice(0, 10) + (r.of ? ' from ' + r.of.join(' × ') : '') + ': ' + r.chain + '. ' + (r.verdict === 'novel' ? 'New to ERAVOS.' : 'Close to ' + r.near + '.'), made: { from: 'synthesized', of: r.of || [], at: r.at, dag: r.dag, verdict: r.verdict, near: r.near, d: r.d, character: r.character || null } }));
     if (Model.ui) F.reg(r.id, Model.ui); return r.id;
   };
+  // 3.230 (his: "the color keeps being yellow"): a made tool's colour is its parents' colours blended — never the old fixed yellow
+  function blendOf(L) { const c = (L || []).filter(x => /^#[0-9a-f]{6}$/i.test(x)); if (!c.length) return null; const v = [0, 2, 4].map(i => Math.round(c.reduce((a, x) => a + parseInt(x.slice(1 + i, 3 + i), 16), 0) / c.length)); return '#' + v.map(x => x.toString(16).padStart(2, '0')).join(''); }
   Model.forget = (id) => keep(ld().filter(r => r.id !== id));
   Model.chainOf = (d) => d.nodes.filter(x => !['lfo', 'sub', 'st'].includes(x.id)).map(x => x.component).join(' → ') + ' · wobble into ' + (d.nodes.find(x => x.id === 'flt') || {}).component;
   // the gates every made tool passes (D5, D6): it plays (finite, not silent, never pinned), and it is not a twin of anything in ERAVOS or made before
@@ -240,7 +242,7 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
     const j = Model.judge(settings, bpm, N); if (!j.ok) return j;
     const L = ld(); let nm = String(name || 'Made Wobble').trim() || 'Made Wobble', i = 2; const base = nm; while (L.some(r => r.name === nm) || (root.OrganismFactory && root.OrganismFactory.def(Model.idFor(nm)))) nm = base + ' ' + i++;
     const F0 = root.OrganismFactory, accents = (of || []).map(l => { const d = F0 && F0.defined ? F0.defined().find(x => x.label === l) : null; return d && d.accent; }).filter(Boolean);
-    const rec = { id: Model.idFor(nm), name: nm, of: of || [], accents, at: new Date().toISOString(), settings: JSON.parse(JSON.stringify(settings)), bpm, dag: j.dag, chain: Model.chainOf(j.dag), fp: j.fp, verdict: j.verdict, near: j.near, d: j.d };
+    const rec = { id: Model.idFor(nm), name: nm, of: of || [], accents, character: (Model._char || null), at: new Date().toISOString(), settings: JSON.parse(JSON.stringify(settings)), bpm, dag: j.dag, chain: Model.chainOf(j.dag), fp: j.fp, verdict: j.verdict, near: j.near, d: j.d };
     L.unshift(rec); keep(L); Model.defineMade(rec); return { ok: true, id: rec.id, rec, verdict: j.verdict, near: j.near, d: j.d };
   };
   // ---------------------------------------------------------------- SYNTHESIZE TOGETHER: two tools blown up on the canvas → one of its own
@@ -283,7 +285,10 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
         what: has ? describe(sl, settings) : describe(sl, settings) + ' (the engine\'s own — ' + srcs[sl].h.def.label + ' has no ' + sl + ')' }; });
     const tools = [...new Map(SLOTS_ORDER.map(sl => [srcs[sl].h.id, srcs[sl].h])).values()];
     const behind = []; tools.forEach(h => TB.behind(h.id).forEach(b => behind.push(h.def.label + ': ' + b)));
-    return { rows, behind, settings, tools: tools.map(h => h.def.label), insts: tools.map(h => h.instanceId) };
+    // 3.230 what it will sound like: each place's character from the tool it comes from (ToolBlend.sound) — "wobble synthwave"
+    const character = TB.sound ? TB.sound(SLOTS_ORDER.map(sl => ({ slot: sl, id: srcs[sl].h.id, label: srcs[sl].h.def.label, char: (srcs[sl].h.def.made || {}).character })), settings) : null;
+    rows.forEach(rw => { const ch = TB.character && (TB.character(srcs[rw.slot].h.id) || (srcs[rw.slot].h.def.made || {}).character); if (ch && ch[rw.slot]) rw.char = ch[rw.slot] + ' · ' + ch.style; });
+    return { rows, behind, settings, character, tools: tools.map(h => h.def.label), insts: tools.map(h => h.instanceId) };
   }
   const SLOTS_ORDER = ['voice', 'wobble', 'mouth', 'drive', 'fx'];
   function reasonFor(j, plan, ctx) {   // ctx: { parts: [{ x, h, to }], base: handle, pair: bool }
@@ -326,7 +331,8 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
   }
   async function gate(plan, ctx, name, of, opts) {   // the gates (judge) → made, or the reason; opts.dry: judge only (the preview)
     let N; try { N = await loadNovelty(); } catch (er) { return { ok: false, why: er.message, reason: { kind: 'load', title: 'The measure did not load', why: er.message, steps: [], blame: [], actions: [] } }; }
-    const bpm = ctx.bpm, j = opts && opts.dry ? Model.judge(plan.settings, bpm, N) : Model.make(name, plan.settings, bpm, N, of);
+    const bpm = ctx.bpm; Model._char = plan.character ? { style: (plan.character.mix[0] || {}).style, name: plan.character.name, voice: plan.character.name, wobble: plan.character.name, mouth: plan.character.name, drive: plan.character.name, fx: plan.character.name } : null;
+    const j = opts && opts.dry ? Model.judge(plan.settings, bpm, N) : Model.make(name, plan.settings, bpm, N, of); Model._char = null;
     if (!j.ok) return Object.assign({}, j, { ok: false, plan, reason: reasonFor(j, plan, ctx) });
     return Object.assign(j, { plan });
   }

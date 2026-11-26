@@ -67,6 +67,12 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-53 | **Learn it step by step on his own words**: Lyrics → Rhythm walks him through (1) syllables on the beat (2) a stanza's part (3) contrast (4) the melody (5) the song — each step heard, his choice kept, ERAVOS fills the rest. Preview first. | "i want to learn how to make music from my lyrics. that is the point of the rhythm tool" | open (next) |
 | T-54 | **His voice in it**: record the lyrics (Song Recorder) and lock the take to the syllables the tool placed (vocal-chop as instrument — the Make It Bun Dem technique). | "i want to make music with contrast. thats my rhytm" | open |
 | T-55 | **His poetry index as a shelf**: each poem → a song shape to start from, kept in Documents\ERAVOS (his, never shipped). | (the zip he sent, 2026-11-25) | open (asks him first) |
+| T-56 | **Voice Lab › TUNE**: pitch-tracker + pitch-shifter, the hard tune at 0 ms (voice-tune.spec). UI shown first. | "T pain like auto tune." | specced (specs/eravos.voice-lab.spec) |
+| T-57 | **Voice Lab › CREATE**: a voice made from nothing (vocal-tract + letter-to-sound) singing his lyrics from Lyrics → Rhythm. | "Creating voice." | specced |
+| T-58 | **Voice Lab › WUB**: the voice's mouth opens the Wobble Bass (talkbox / vocoder), or the wobble opens the voice. | "And wubs, wow. Like voice music like wubs, etc." | specced |
+| T-59 | **UE: any control shown as another element, any element in another style** (right-click › Show as; Settings › Look › Elements, shown first). | "I want to be able to change the ui elements to other styles, types" | specced (specs/eravos.ui-elements-and-combining.spec) |
+| T-60 | **CB: combine two components into one part** (on the board; its own contract; gated; mixable everywhere). Needs the composite node. | "build components from combining two." | specced |
+| T-61 | **EX: the engines grow** (VOICE: unison · string · wavetable; MOUTH: formant; SPACE and SUB places) and every tool speaks the character table. | "Expand the tools and engines maybe," | specced |
 
 ## ERAVOS's own engine · `specs/eravos.engine.spec` (decided 2026-11-24: written in Emerge — "wait for emerge")
 

@@ -558,11 +558,20 @@
       pieces.push({ id: 'auto-' + i, take: { title: t }, x: 0, y: 0, w: 0, col: '', dash: false, label: { text: t.toLowerCase(), status: '' } }); });
     if (win.querySelector('.uk-keys')) pieces.push({ id: 'auto-keys', take: { sel: '.uk-keys' }, x: 0, y: 0, w: 0, col: '', label: { text: 'keys · every key its own note', status: '' } });
     const label = (r && r.def && r.def.label) || 'the tool', blurb = (r && r.def && (r.def.blurb || r.def.summary)) || '';
-    const BCOL = ['#00D4FF', '#3DDC97', '#CC44FF', '#FFCC00', '#FF2266', '#9FB3C8', '#00FF88', '#FF8A3D'];
+    // 3.230 (his words, 2026-11-26: "Also the color keeps being yellow."): an auto board's parts take the TOOL's own colour family — its accent
+    // turned a little round the wheel each way — never a fixed rainbow with a yellow in it
+    const acc = (r && r.def && /^#[0-9a-f]{6}$/i.test(r.def.accent || '') ? r.def.accent : '#00D4FF'), BCOL = [0, 28, -28, 56, -56, 14, -14, 42].map(d => hueTurn(acc, d));
     pieces.forEach((p, i) => { p.col = BCOL[i % BCOL.length]; });
     return { auto: true, title: label.toUpperCase(), size: [1600, 1000], pieces, more: [],
       header: '<div style="font:500 11px DM Mono,monospace;letter-spacing:2px;color:#4E6A80;white-space:nowrap"><b style="font:600 18px DM Mono,monospace;letter-spacing:6px;color:#00D4FF;margin-right:16px">FIELD</b>' + esc(label.toUpperCase()) + ' · EXPLODED · every part apart, live, wired to its core</div>',
       core: '<div style="width:300px;padding:16px 18px;border:2px solid ' + esc((r && r.def && r.def.accent) || '#FF2266') + ';background:#04070C"><div style="font:500 24px DM Mono,monospace;letter-spacing:4px;color:#EAF6FF">' + esc(label.toUpperCase()) + '</div><div style="font:500 13px DM Mono,monospace;letter-spacing:3px;color:#9FB3C8;margin:4px 0 8px">· CORE</div><div style="font:400 11px DM Mono,monospace;line-height:1.5;color:#B8CFE0">' + esc(blurb) + '</div></div>' };
+  }
+  function hueTurn(hex, deg) {   // the colour turned round the hue wheel by deg, its lightness and saturation kept
+    const n = parseInt(hex.slice(1), 16), r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+    let h = 0, sat = 0; if (d) { sat = d / (1 - Math.abs(2 * l - 1)); h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; }
+    h = ((h + deg) % 360 + 360) % 360; const c = (1 - Math.abs(2 * l - 1)) * sat, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2;
+    const [R, G, B] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+    return '#' + [R, G, B].map(v => Math.round((v + m) * 255).toString(16).padStart(2, '0')).join('').toUpperCase();
   }
   function placeAuto(st) {   // after the parts are in their gates (their real sizes): half each side of the core, in columns, in the window's order
     const gs = st.gates, GAP = 46, COLG = 80, maxH = 900, half = Math.ceil(gs.length / 2), sides = [gs.slice(0, half), gs.slice(half)];
@@ -602,12 +611,15 @@
   function showWhy(r, o) {
     hideWhy(); const reason = r && !r.ok ? r.reason || { title: 'Not made', why: (r && r.why) || 'it did not build', steps: [], blame: [], actions: [] } : null, plan = r && r.plan;
     const el = h('div', 'fb-why' + (reason ? ' bad' : ' plan')); el.setAttribute('role', reason ? 'alert' : 'dialog');
-    const top = h('div', 'fb-wtop'); top.appendChild(h('div', 'fb-wtt', esc(reason ? '✕ ' + reason.title : '◇ What it will make' + (r && r.verdict ? ' — ' + (r.verdict === 'novel' ? 'new to ERAVOS' : 'close to ' + r.near) : ''))));
+    const top = h('div', 'fb-wtop'); const ch = plan && plan.character;   // 3.230 what it will sound like (the domain's words): "wobble synthwave"
+    top.appendChild(h('div', 'fb-wtt', esc(reason ? '✕ ' + reason.title : '◇ ' + (ch ? 'It will sound like ' + ch.name : 'What it will make') + (r && r.verdict ? ' — ' + (r.verdict === 'novel' ? 'new to ERAVOS' : 'close to ' + r.near) : ''))));
     const x = h('button', 'fb-wx', '✕'); x.title = 'close'; x.onclick = hideWhy; top.appendChild(x); el.appendChild(top);
     if (reason && reason.why) el.appendChild(h('div', 'fb-wwhy', esc(reason.why)));
     if (reason && reason.steps && reason.steps.length) { const ol = h('ol', 'fb-wsteps'); reason.steps.forEach(s => ol.appendChild(h('li', '', esc(s)))); el.appendChild(ol); }
+    if (ch && ch.mix && ch.mix.length) { const mx = h('div', 'fb-wmix'); ch.mix.forEach((m, k) => { const seg = h('span', 'fb-wseg', esc(m.style + ' ' + m.share + ' %')); seg.style.flex = String(Math.max(8, m.share)); seg.style.setProperty('--k', String(k)); mx.appendChild(seg); });
+      el.appendChild(mx); el.appendChild(h('div', 'fb-wsays', esc(ch.says))); }
     if (plan && plan.rows) { const tb = h('div', 'fb-wplan'); plan.rows.forEach(rw => { const line = h('div', 'fb-wrow' + (rw.picked ? ' picked' : ''));
-        line.append(h('b', '', esc(rw.name)), h('span', 'fb-wfrom', esc(rw.from + (rw.part ? ' · ' + String(rw.part).trim() : ''))), h('span', 'fb-wwhat', esc(rw.what))); tb.appendChild(line); });
+        line.append(h('b', '', esc(rw.name)), h('span', 'fb-wfrom', esc(rw.from + (rw.part ? ' · ' + String(rw.part).trim() : ''))), h('span', 'fb-wwhat', esc(rw.what + (rw.char ? '  —  ' + rw.char : '')))); tb.appendChild(line); });
       el.appendChild(tb);
       if (plan.left && plan.left.length) el.appendChild(h('div', 'fb-wleft', esc('not taken (no place in the engine yet): ' + plan.left.join(', '))));
       if (plan.behind && plan.behind.length) { const d = document.createElement('details'); d.className = 'fb-wbehind'; d.appendChild(h('summary', '', esc('stays behind · ' + plan.behind.length)));

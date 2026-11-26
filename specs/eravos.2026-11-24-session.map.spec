@@ -211,3 +211,14 @@
   > More of my rhythm. Make patterns.
   - BUILT 3.229: Depth (Lyrics → Rhythm › SONG; build/render-words.mjs renders and measures it: his poem's song as WAVs, given to him);
     ⇢ Patterns (each stanza: words · mirror · shadow · pendulum) — the pendulum from his own book: "The amount of time the pendulum swings to the left is directly proportional to the amount of time in takes to swing to the right."
+
+## 40 — verbatim (2026-11-26):
+  > No like more dimentions. Also Like I want a voice lab. T pain like auto tune. Creating voice. And wubs, wow. Like voice music like wubs, etc.
+  - BUILT 3.230: Dimensions (layers in the loud parts, a counter-line in the words' gaps, more space) beside Depth. SPECCED: specs/eravos.voice-lab.spec
+    (TUNE · CREATE · WUB; components pitch-tracker, pitch-shifter, vocal-tract, letter-to-sound). Open: which door first.
+
+## 41 — verbatim (2026-11-26):
+  > I want to be able to change the ui elements to other styles, types, build components from combining two. Also the color keeps being yellow. I want to be able to tell what's mixing with what. Like I want to be able to mix the dco with the wobble bass and know it will make a wobble synthwave sound. You know? Expand the tools and engines maybe,
+  - BUILT 3.230: the yellow gone (a made tool's colour = its parents' blended; an auto board's parts in the tool's own colour family);
+    what mixes with what: every synthesis plan says what it will sound like ("wobble synthwave") and which tool brings which character
+    (ToolBlend.CHAR / sound). SPECCED: specs/eravos.ui-elements-and-combining.spec (UE type / style, CB combine two components, EX engines).

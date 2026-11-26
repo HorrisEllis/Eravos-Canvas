@@ -142,6 +142,7 @@
       { key: 'songShape', type: 'enum', options: ['from the words', 'every stanza a verse'], default: 'from the words', label: 'Song shape', group: 'SONG', hint: 'from the words: each stanza becomes the part it already is — the loudest a drop, the quietest a break, a line that comes back a chorus, opposites turn line by line (see SHAPE)' },
       // 3.229 (his words, 2026-11-25: "How does it sound? Like I want it deep as hell."): how low the song sits
       { key: 'depth', type: 'number', default: 0.7, min: 0, max: 1, step: 0.01, label: 'Depth', group: 'SONG', hint: 'how deep the song sits: the lead and chords lower, the bass held longer in the loud parts, a heavier kick, a boom on 1 in the drop (0 = as before)' },
+      { key: 'dims', type: 'number', default: 0.7, min: 0, max: 1, step: 0.01, label: 'Dimensions', group: 'SONG', hint: 'more of it, not only lower: layers on the lead in the loud parts (an octave up, then a harmony), a counter-line in the gaps the words leave, and more space (0 = as before)' },
       { key: 'contrast', type: 'number', default: 1, min: 0, max: 1, step: 0.01, label: 'Contrast', group: 'SONG', hint: 'how far apart the parts are pushed: 0 = every stanza a verse, 1 = as far as the words go' },
     ],
     ui_hooks: ['syl_edit', 'reset_edits', 'preview', 'send_timeline', 'expand_song', 'send_sequencer', 'make_patterns'],
@@ -203,7 +204,7 @@
         let bottom = 0; const WM = window.CanvasWM;
         if (WM && WM.rectOf) K.registry.list().forEach(r => { const q = WM.rectOf(r.instance_id); if (q && isFinite(q.y + q.h)) bottom = Math.max(bottom, q.y + q.h); });
         try {
-          window.RhythmExpand.write(text, { genre: P.get('songGenre'), flow: P.get('flow'), seed: P.get('vary') || 1, shape: P.get('songShape') === 'every stanza a verse' ? 'verses' : 'contrast', contrast: P.get('contrast'), depth: P.get('depth'), reuse: true, run: { clear: false, origin: { x: 40, y: bottom ? bottom + 80 : 40 } } });
+          window.RhythmExpand.write(text, { genre: P.get('songGenre'), flow: P.get('flow'), seed: P.get('vary') || 1, shape: P.get('songShape') === 'every stanza a verse' ? 'verses' : 'contrast', contrast: P.get('contrast'), depth: P.get('depth'), dims: P.get('dims'), reuse: true, run: { clear: false, origin: { x: 40, y: bottom ? bottom + 80 : 40 } } });
           ctx.emitUI('status', { info: 'Building your song below — press Space to hear it.' });
         } catch (e) { ctx.emitUI('status', { warn: e.message }); }
       });
