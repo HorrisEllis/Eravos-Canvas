@@ -56,4 +56,18 @@ ok(L.whoAt(cl, 3) === 'I' && L.whoAt(cl, 7) === 'you', 'a word finds its speaker
 ok(L.clausesOf('even the painful moments', 'I')[0].who === 'I', 'a clause with no speaker carries the one before');
 const dl = L.read('I wanted all of you. You wanted fairytales.\nI wanted closeness, you wanted distance.'); ok(dl.stanzas[0].dialogue, 'a dialogue stanza');
 ok(dl.stanzas[0].why.some(w => /off the beat/.test(w)), 'and it says why');
+// 1.3.0 invariants: what stays the same (invented lines)
+const POEM2 = 'I gave you the morning light.\nYou gave me the night.\nI held the open sky.\nYou held the dark.\n\nI found the fire in the cold.\nYou found the cold in the fire.\nI sang the high notes, low and bright.\nYou sang them low.\n\nI carried the sun through the dark.\nYou carried the moon.\nI was the day you could not hold.\nYou were the night.';
+const iv = L.invariants(POEM2); const key = (k) => iv.invariants.find(c => c.key === k);
+ok(iv.by === 'stanza' && iv.units === 3, 'three stanzas read: ' + iv.units);
+ok(key('dialogue') && key('dialogue').holds === 1, 'I and you in every stanza');
+ok(key('parallel') && key('parallel').holds === 1, 'the same frame said twice, the speaker swapped, in every stanza');
+ok(key('opposites') && key('opposites').holds === 1, 'light and dark together, every stanza');
+ok(key('shape') && key('shape').value === 4, 'four lines each: the form is square');
+ok(iv.invariants.every(c => c.keep && c.what && c.where), 'each says what it is, where it holds and what the music keeps');
+ok(L.invariants('One line only.\nAnd another.').invariants.length === 0, 'one stanza proves nothing stays the same');
+const pieces = L.invariants([POEM2, 'I ran to you.\nYou walked away.\n\nI called the light.\nYou kept the dark.', 'the rain on the glass\nthe glass in the rain'], { hold: 0.6 });
+ok(pieces.by === 'piece' && pieces.units === 3, 'several texts: piece by piece');
+ok(pieces.invariants.some(c => c.key === 'opposites') && pieces.all.find(c => c.key === 'dialogue').holds === 0.67, 'across pieces: opposites hold, I / you in two of three (the third has neither)');
+ok(Array.isArray(pieces.variants), 'and what changes');
 console.log(`✓ lyric-shape: ${n} checks`);

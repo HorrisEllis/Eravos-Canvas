@@ -150,6 +150,14 @@
     const two = mix.filter(m => m.share >= 20).slice(0, 2).map(m => m.style), key = two.slice().sort().join('+'), name = two.length > 1 ? (NAMES[key] || two.join(' × ')) : mix[0].style;
     return { name, mix, says: mix.map(m => m.from.join(' and ') + ' (' + m.style + ')').join(' + ') + ' → ' + name };
   }
-  root.ToolBlend = { SLOTS, PART_SLOT, slotOfPiece, CHAR, sound, character: (id) => CHAR[id] || null, has: (id) => !!profileOf(id), slots, combine, combineFrom, pickFor, paramsOf, defaultsOf, behind: (id) => (profileOf(id) || {}).behind || [], nearestDiv };
+  // 3.238 a style as a source (his words, 2026-11-26: "imagine being able to synthesize anything into a dubstep tool"): for each place, the tool
+  // that carries that style there (its CHAR names the place) and the engine can read — the parts he picked keep theirs, the rest come from it.
+  // styles() → the styles some tool carries · styleSource(style, slot) → a tool id or null (best place first, then any place it names)
+  const styles = () => [...new Set(Object.keys(CHAR).filter(id => profileOf(id) && F() && F().def(id)).map(id => CHAR[id].style))];
+  function styleSource(style, slot) {
+    const ids = Object.keys(CHAR).filter(id => CHAR[id].style === style && CHAR[id][slot] && profileOf(id) && F() && F().def(id));
+    return ids.find(id => (profileOf(id).best || []).includes(slot)) || ids[0] || null;
+  }
+  root.ToolBlend = { styles, styleSource, SLOTS, PART_SLOT, slotOfPiece, CHAR, sound, character: (id) => CHAR[id] || null, has: (id) => !!profileOf(id), slots, combine, combineFrom, pickFor, paramsOf, defaultsOf, behind: (id) => (profileOf(id) || {}).behind || [], nearestDiv };
   if (typeof module === 'object' && module.exports) module.exports = root.ToolBlend;
 })(typeof window !== 'undefined' ? window : globalThis);

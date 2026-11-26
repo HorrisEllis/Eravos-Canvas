@@ -38,17 +38,18 @@
   };
   const FEELINGS = Object.keys(FEEL);
   OrganismFactory.define({
-    id: 'eravos.feelings', domain: 'music', version: '0.2.0', label: 'Feelings', icon: '◇', accent: '#7fb8ff',
+    id: 'eravos.feelings', domain: 'music', version: '0.3.0', label: 'Feelings', icon: '◇', accent: '#7fb8ff',
     category: 'Xenharmonic', blurb: 'One feeling fills the pad — drag to play it: love, anger, sadness.',
-    size: { w: 900, h: 820 }, minSize: { w: 420, h: 420 },
+    size: { w: 900, h: 560 }, minSize: { w: 420, h: 420 },   // 0.3.0: was 820 tall — on a laptop the bottom of the pad (less of the feeling) sat under the Song Recorder, out of reach; resize for more range
     permissions: ['audio_out', 'bus_publish', 'bus_subscribe'],
     hooks: [S.audio_out('feel.hook.audio_out'), S.note_in('feel.hook.note_in'), S.transport_in('feel.hook.transport_in')],
     config: [
       { key: 'feeling', type: 'enum', options: FEELINGS, default: 'love', label: 'Feeling', group: 'FEELING', element: 'own:feeling' },
       { key: 'x', type: 'number', default: 0.5, min: 0, max: 1, step: 0.001, label: 'Across', group: 'PAD', hint: 'left → right on the pad: the feeling’s own colour', element: 'own:pad' },
       { key: 'y', type: 'number', default: 0.5, min: 0, max: 1, step: 0.001, label: 'Up', group: 'PAD', hint: 'bottom → top on the pad: more of the feeling (louder, brighter, higher)', element: 'own:pad' },
+      { key: 'across', type: 'enum', options: ['colour', 'spectrum'], default: 'colour', label: 'Across', group: 'PAD', hint: 'colour: left → right is the feeling’s own colour · spectrum: left → right crosses every harmonic set, fused (the harmonic series) to apart (bells, bars, irrational stacks) — ordered by how far each sits from whole-number harmonics', element: 'ratio-set' },
       { key: 'speed', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Speed', group: 'PAD', hint: 'how fast the drag moves: a little brighter and louder', element: 'own:pad' },
-      { key: 'harmonics', type: 'enum', options: ['auto', 'harmonic', 'φ golden', '√2', '√3', 'π/2', 'e/2', '2^(1/φ)', 'golden stack', 'φ series', 'primes', 'stretched string', 'membrane'], default: 'auto', label: 'Harmonics', group: 'SOUND', hint: 'auto = the feeling’s own (Love harmonic, Anger √2, Sadness φ) — or any irrational set', element: 'ratio-set' },
+      { key: 'harmonics', type: 'enum', options: ['auto', 'harmonic', 'φ golden', '√2', '√3', 'π/2', 'e/2', '2^(1/φ)', 'golden stack', 'φ series', 'primes', 'stretched string', 'membrane', 'odd harmonics', 'free bar', 'clamped bar', 'church bell', 'bonang', '2.1 stretch', 'tritave'], default: 'auto', label: 'Harmonics', group: 'SOUND', hint: 'auto = the feeling’s own (Love harmonic, Anger √2, Sadness φ) — or any irrational set', element: 'ratio-set' },
       { key: 'root', type: 'integer', default: 0, min: -12, max: 12, label: 'Pitch', group: 'SOUND', hint: 'semitones from the feeling’s own register', element: 'own:feeling' },
       { key: 'hold', type: 'boolean', default: false, label: 'Hold', group: 'SOUND', hint: 'keep sounding when you let go (and when x / y are automated)', element: 'own:pad' },
       { key: 'level', type: 'number', default: 0.8, min: 0, max: 1, step: 0.01, label: 'Level', group: 'SOUND', element: 'own:feeling' },
@@ -90,10 +91,13 @@
       // ---------------------------------------------------------------- the feeling at the dot → every param
       const feel = () => FEEL[P.get('feeling')] || FEEL.love;
       const setName = () => { const h = P.get('harmonics'); return h === 'auto' ? feel().set : h; };
-      let touching = false, noteHeld = 0, noteSemis = null;
+      let touching = false, noteHeld = 0, noteSemis = null, spectrumNow = null;
       function apply(tau) {
-        const t = ac.currentTime, f = feel(), x = P.get('x'), y = P.get('y'), sp = P.get('speed'), c = f.at(x, y), T = tau == null ? 0.04 : tau;
-        const base = hz(f.root + P.get('root') + (noteSemis == null ? 0 : noteSemis) + c.semis), rs = R() ? R().ratios(setName(), N) : Array.from({ length: N }, (_, i) => [i + 1, 1 / (i + 1)]);
+        const t = ac.currentTime, f = feel(), x = P.get('x'), y = P.get('y'), sp = P.get('speed'), spec = P.get('across') === 'spectrum' && R() && R().morph, c = f.at(spec ? 0.5 : x, y), T = tau == null ? 0.04 : tau;
+        const base = hz(f.root + P.get('root') + (noteSemis == null ? 0 : noteSemis) + c.semis);
+        // 0.3.0 across = the spectrum: the dot's x crosses every set, fused → apart, gliding between neighbours (ratio-set 1.1.0 morph)
+        const mo = spec ? R().morph(x, N, base) : null; spectrumNow = mo ? { name: mo.name, from: mo.from, to: mo.to, t: +mo.t.toFixed(3) } : null; if (mo && ctx.emitUI) ctx.emitUI('spectrum', spectrumNow);
+        const rs = mo ? mo.ratios : R() ? R().ratios(setName(), N) : Array.from({ length: N }, (_, i) => [i + 1, 1 / (i + 1)]);
         let tot = 0; parts.forEach((p, i) => { tot += c.amps[i] * rs[i][1]; }); const norm = 0.28 / Math.max(0.4, tot);
         parts.forEach((p, i) => { const fr = Math.min(ac.sampleRate * 0.45, base * rs[i][0]), a = c.amps[i] * rs[i][1] * norm * (fr < ac.sampleRate * 0.44 ? 1 : 0);
           p.pair.forEach((o, k) => { o.frequency.setTargetAtTime(fr, t, T); o.detune.setTargetAtTime((k ? 1 : -1) * c.celeste * 0.5, t, T); });
@@ -121,11 +125,11 @@
         ctx.atAudioTime(t + dur, () => { noteHeld = Math.max(0, noteHeld - 1); if (!noteHeld) { refresh(); } }); });
       ctx.audition = (p) => { ctx.touch(true); ctx.timeout(() => ctx.touch(false), 900); };
       ctx.onSilence((p) => { touching = false; noteHeld = 0; sound(false, p && p.time, 'hard'); });
-      ['x', 'y', 'speed', 'root', 'level', 'harmonics'].forEach(k => P.onChange(k, () => apply()));
+      ['x', 'y', 'speed', 'root', 'level', 'harmonics', 'across'].forEach(k => P.onChange(k, () => apply()));
       P.onChange('feeling', () => apply(0.25)); P.onChange('hold', () => refresh());
       ctx.latency = dsp.osLatency(ac, '4x') + dsp.osLatency(ac, '2x') + 0.008;
       apply(0.001); refresh();
-      ctx.internals = { gate, level, roughOsc, roughDepth, growl, parts, FEEL, apply, get sounding() { return shouldSound(); } };
+      ctx.internals = { gate, level, roughOsc, roughDepth, growl, parts, FEEL, apply, get sounding() { return shouldSound(); }, get spectrum() { return spectrumNow; } };
       return {};
     },
   });

@@ -17,6 +17,9 @@ OrganismFactory.reg('eravos.feelings', function (view) {
   cv.addEventListener('pointermove', e => { if (!drag) return; at(e); send(); });
   const up = () => { if (!drag) return; drag = false; speed = 0; view.emit('config_change', { key: 'speed', value: 0 }); view.emit('touch', { on: false }); };
   cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up); cv.addEventListener('lostpointercapture', up);
+  // 0.3.0 across = the spectrum: where the dot is, named (from → to), and every set's place along the bottom — only in that mode
+  let spec = null; view.on('spectrum', (m) => { spec = m; });
+  const SP = () => (window.MusicParts && window.MusicParts.RATIOS && window.MusicParts.RATIOS.spectrum) ? window.MusicParts.RATIOS.spectrum() : [];
   view.bind('x', (v) => { if (!drag) px = v; }); view.bind('y', (v) => { if (!drag) py = 1 - v; });
   UI.loop(cv, () => {
     const g = cv.g; cv.fit();
@@ -30,9 +33,13 @@ OrganismFactory.reg('eravos.feelings', function (view) {
     g.font = '600 44px ui-monospace, monospace'; g.textAlign = 'center'; g.fillStyle = 'rgba(235,240,250,.07)'; g.fillText(WORD[P('feeling')] || '', W / 2, H / 2 + 15); g.textAlign = 'left';
     if (drag) { trail.push({ x: px, y: py }); if (trail.length > 120) trail.shift(); } else if (trail.length) trail.shift();
     trail.forEach((p, i) => { if (!i) return; const q = trail[i - 1]; g.strokeStyle = `rgba(127,184,255,${0.6 * i / trail.length})`; g.lineWidth = 2; g.beginPath(); g.moveTo(q.x * W, q.y * H); g.lineTo(p.x * W, p.y * H); g.stroke(); });
+    if (P('across') === 'spectrum') { const L = SP(); g.font = '10px ui-monospace, monospace'; g.textAlign = 'center';
+      L.forEach((e, i) => { const tx = L.length > 1 ? i / (L.length - 1) * W : W / 2; g.fillStyle = 'rgba(235,240,250,.18)'; g.fillRect(tx - 0.5, 4, 1, 6); });
+      if (spec) { g.font = '600 13px ui-monospace, monospace'; g.fillStyle = 'rgba(235,240,250,.7)'; g.fillText(spec.t < 0.08 || spec.t > 0.92 ? spec.name : spec.from + '  →  ' + spec.to, W / 2, 26); }
+      g.textAlign = 'left'; }
     const x = px * W, y = py * H; g.fillStyle = `rgba(127,184,255,${drag ? 0.24 : 0.14})`; g.beginPath(); g.arc(x, y, drag ? 26 : 22, 0, 6.283); g.fill();
     g.fillStyle = '#7fb8ff'; g.beginPath(); g.arc(x, y, 7, 0, 6.283); g.fill();
   }, 30);
   view.root.style.display = 'flex'; view.root.style.flexDirection = 'column';
-  view.root.append(h('div', { class: 'org-row' }, [UI.paramControl(view, cfg('feeling'), { segMax: 6, noLabel: true }).el]), cv);
+  view.root.append(h('div', { class: 'org-row' }, [UI.paramControl(view, cfg('feeling'), { segMax: 6, noLabel: true }).el, UI.paramControl(view, cfg('across'), { segMax: 4 }).el]), cv);
 });
