@@ -59,9 +59,30 @@
       bus.publish('transport:tick', { step16: s, time: t, bar, beat, sixteenth, stepDur: stepDur(), bpm: T.bpm });
     }
 
+    // 3.235 the look-ahead follows the screen's thread (his words, 2026-11-26: "the bassline keeps lagging"). Measured: with Bassline + Sub
+    // playing, the clock's wake (every 25 ms) sometimes reached the page 100–200 ms late, behind drawing — notes then arrived after their
+    // time and sounded late (up to 63 ms in a 16 s run, 214 ms at start). Notes are booked ahead on the audio clock; when a wake comes late,
+    // the next ones book further ahead (up to 0.35 s) so the next stall cannot make them late; after 4 s calm it eases back to 0.1 s.
+    // What is heard is the same — each note at its own time; only how early it is booked moves.
+    const LOOK0 = 0.1, LOOKMAX = 0.35;
+    let wokeAt = 0, raisedAt = 0;
+    T.timing = { late: 0, lookahead: LOOK0 };
+    function adapt(now) {
+      if (!clock) return LOOK0;
+      const gap = wokeAt ? now - wokeAt : 0; wokeAt = now;
+      if (gap > clock.interval * 2) {   // a stall: book at least the stall (and a margin) ahead from now on
+        const want = Math.min(LOOKMAX, gap + 0.04);
+        if (want > clock.lookahead) { clock.lookahead = want; raisedAt = now; }
+      } else if (now - raisedAt > 4 && clock.lookahead > LOOK0) clock.lookahead = Math.max(LOOK0, clock.lookahead - 0.002);
+      T.timing.lookahead = clock.lookahead;
+      return clock.lookahead;
+    }
+
     function schedule() {
-      if (!T.playing || !ac) return;
-      const horizon = ac.currentTime + (clock ? clock.lookahead : 0.1);
+      if (!T.playing || !ac) { wokeAt = 0; return; }
+      const now = ac.currentTime, ahead = adapt(now);
+      if (nextTime < now) T.timing.late++;   // a step whose time has already passed (counted, for the measure)
+      const horizon = now + ahead;
       while (nextTime < horizon) {
         if (countInSteps > 0) {
           if (countInSteps % 4 === 0) click(nextTime, countInSteps === 16);

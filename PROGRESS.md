@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.235 The bassline no longer lags: notes booked ahead after a stall; the displays draw less (2026-11-26)
+His words: "Also the bassline keeps lagging." (the whole message: specs/eravos.2026-11-24-session.map.spec 34)
+- Measured with Bassline → Deep Sub playing (the probe: notes' booking time against the audio clock; every display loop timed).
+- tools/music/core/master-transport.js: the look-ahead adapts — a clock wake later than 2 intervals raises it to the stall + 40 ms (≤ 0.35 s),
+  4 s calm eases it back to 0.1 s; T.timing { late, lookahead }. Before: 3 of 19 notes late (to 63 ms; 214 ms at start) · after: 0 of 19
+  (1 of 19 with Chords wired, 27 ms, after a > 0.35 s stall of the headless browser).
+- canvas/runtime/ui-kit.js: Canvas.fit() asks for its size at most twice a second (it forced a layout every frame for every display).
+- tools/music/tools/bass/bass-gen/bass-gen.ui.js: the map redraws only when a note, the step, its width or accent changes; one gradient per picture.
+- tools/music/core/ui-music.js Spectrum: the grid a cached picture; which bin each pixel reads worked out once per width; the sunset's two
+  gradients made once and slid (read in a translated space, the path kept); nothing redrawn while silent and unchanged. The same picture
+  (before / after screenshots compared).
+- Tests: Bassline 26/26, bass-gen 4/4, chord-gen 4/4, sub-engine 12/12, P22 21/21, P163 33/33, P11 92/92, P58 18/18, P112 13/13, P147 1/1,
+  boundary 10/10, design check no worse. Timeline 88/89 (the wheel test, failing on main before — CLAUDE.md › Open).
 ## 3.232–3.234 The Start button out, ← Domains; the autosave fixed, Ctrl+S (2026-11-25) — renumbered from 3.226–3.228 when merged with main (a parallel session had used them); 3.234 (not made → flash) withdrawn: main's 3.226 does it
 His words: "also told you to remove the add button once i pick a domain, up wheere it says add to canvas, add a back to domains screen," · "after that can you fix the autosave? also make control s a hotkey to save." · "okay i need it to like flash when it can't synthesize, not a toast with no direction" (and "also can you make all of the ui consistent? all of the canvas, and the themese." — open, T-39)
 - 3.232 canvas/index.html: the Start button removed from the toolbar (window.ShellStart opens the domain screen); canvas/runtime/add-menu.js:

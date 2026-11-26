@@ -249,3 +249,18 @@
   - BUILT 3.234 — WITHDRAWN: the same was already on main from a parallel session (its 3.226 "the plan, the reasons", richer); main's kept, this one removed: not made → the parts it is about flash red where they are; a card beside them says why and what to do, with buttons that do
     it (the rest from another tool — only when that can change something; Mutate these parts; Try again); stays until closed or the next try.
     tests/p228-not-made.test.js 2/2.
+
+## 34 — verbatim (2026-11-26):
+  > Look at main. Can you make the patterns deep as possible? Like per note editing, curves, like each feature at full variaty. Also the bassline keeps lagging. I like the chords and bassline. Can you make them easier to adjust? Like maybe a way to record macros of the keys. Like tap the start button, then you click the piano keys, and have it play the tool with it. Automation? Also wobble bass is still not full what I want it to be. Like I contrast. The pendulum swing, highes and lows. Oscillatory. Like I want it to be cleaner. I love the synthwave ones. A lot of the wobble bass presets aren't great.
+  - LOOKED AT MAIN: nothing new beyond what this branch already merged (PR #226, sweet-sagan).
+  - BUILT 3.235 "the bassline keeps lagging" — measured (Bassline → Deep Sub playing): two causes.
+    (1) TIMING: the clock's wake (every 25 ms) sometimes reached the page 100–200 ms late, behind drawing; notes were booked after their
+        time and sounded late (3 of 19 notes late in a 16 s run, up to 63 ms; 214 ms at the start). Now the transport books further ahead
+        after a stall (up to 0.35 s; back to 0.1 s after 4 s calm): 0 of 19 late without Chords, 1 of 19 with (27 ms, a > 0.35 s stall).
+    (2) DRAWING: the display fitting asked the page for its size every frame (a forced layout) — now at most twice a second; the Bassline's
+        map redraws only when a note or the step changes; the spectrum's grid is one cached picture, its sunset gradients made once and slid.
+        The same picture (before / after screenshots). Long tasks 0 ms/s.
+  - OPEN, specced next (spec + a preview first): T-68 patterns as deep as possible · T-69 Chords and Bassline easier to adjust · T-70 a key
+    macro recorder (tap record, click the keys, the tool plays them) and its automation · T-71 Wobble Bass: contrast, a pendulum swing between
+    highs and lows, oscillatory, cleaner · T-72 Wobble Bass presets measured against the synthwave ones he loves, the weak ones replaced.
+

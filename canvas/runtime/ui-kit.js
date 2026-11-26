@@ -336,7 +336,10 @@
     c.dpr = dpr;
     const g = c.getContext('2d'); g.scale(dpr, dpr);
     c.g = g; c.W = w; c.H = hgt;
-    c.fit = function () { const r = c.getBoundingClientRect(); if (r.width > 4 && Math.abs(r.width - c.W) > 1) { c.W = r.width; c.width = r.width * dpr; g.setTransform(dpr, 0, 0, dpr, 0, 0); } return c; };
+    // 3.235 measured at most twice a second (his words, 2026-11-26: "the bassline keeps lagging"): asking the browser for the size each frame
+    // forced the page's layout to be worked out again, every frame, for every display that fits itself — a zoom or a resize still lands in ½ s
+    c.fit = function () { const n = global.performance ? global.performance.now() : Date.now(); if (c._fitAt && n - c._fitAt < 500) return c; c._fitAt = n;
+      const r = c.getBoundingClientRect(); if (r.width > 4 && Math.abs(r.width - c.W) > 1) { c.W = r.width; c.width = r.width * dpr; g.setTransform(dpr, 0, 0, dpr, 0, 0); c._v = (c._v || 0) + 1; } return c; };
     return c;
   }
   // loop that stops when root disconnected (R7 util)

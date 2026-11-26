@@ -95,6 +95,12 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-65 | **Autosave fixed; Ctrl+S saves** (3.233). | "after that can you fix the autosave? also make control s a hotkey to save." | built — confirm on his PC |
 | T-66 | **Not made: flash + a card with why and what to do** — withdrawn: main's 3.226 (what it will make, and why not; T-39 above) does it. | "okay i need it to like flash when it can't synthesize, not a toast with no direction" | superseded |
 | T-67 | **The tip line in a domain** (Image Manipulation showed a music tip — "voice clips", ".mid") — the domain's own tip. | (noticed 2026-11-25) | open (asked) |
+| T-68 | **Patterns as deep as possible**: per-note editing, curves, every feature at full variety, for every tool (O-07). Spec + a preview first. | "Can you make the patterns deep as possible? Like per note editing, curves, like each feature at full variaty." (2026-11-26) | open — spec next |
+| T-69 | **Chords and Bassline easier to adjust** (he likes them). | "I like the chords and bassline. Can you make them easier to adjust?" (2026-11-26) | open — spec + preview |
+| T-70 | **A key macro recorder**: tap record, click the piano keys, the tool plays them (and they become automation / a pattern). | "Like maybe a way to record macros of the keys. Like tap the start button, then you click the piano keys, and have it play the tool with it. Automation?" (2026-11-26) | open — spec + preview |
+| T-71 | **Wobble Bass: contrast** — a pendulum swing between highs and lows, oscillatory, cleaner. Capability first (what lets ERAVOS make it), measured. | "Also wobble bass is still not full what I want it to be. Like I contrast. The pendulum swing, highes and lows. Oscillatory. Like I want it to be cleaner." (2026-11-26) | open — spec |
+| T-72 | **Wobble Bass presets**: measured against the synthwave ones he loves; the weak ones named and remade as settings (no toys). | "I love the synthwave ones. A lot of the wobble bass presets aren't great." (2026-11-26) | open — measure first |
+| T-73 | **The bassline lagging** (3.235): notes booked further ahead after a stall; displays draw less (the same picture). | "Also the bassline keeps lagging." (2026-11-26) | built — confirm on his PC |
 
 ## Shipped, to confirm on his PC
 
