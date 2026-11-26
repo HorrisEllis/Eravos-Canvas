@@ -2,6 +2,18 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.231 A made tool is his: rename it, edit it fully in the Workshop, delete it (2026-11-26)
+His words: "also merge and push. need to be able to delete custom tools. rename them. open them in workshop and edit them fully." (merged first: PR #224, 3.226–3.230)
+- assembled-tool.js: Model.get / rename (made unique, kept, the def and every open window's title follow; the id stays so songs still find it) /
+  update (kept as its settings, its DAG and chain rebuilt, the def's defaults and every open window follow) / remove (its windows closed — a
+  blown-up one put back first —, its record gone, gone from ＋ Add) / edit (the Workshop).
+- the Workshop kind "music.made-tool": TOOL (its name) · VOICE · WOBBLE (a curve layer) · DRIVE · MOUTH · FX · OUT — every setting a field; a part
+  chosen brings its own fields (bitcrusher's bits, the ladder's drive …); the view draws the chain with the wobble opening the mouth; ▶ Hear;
+  every edit kept and heard at once; undo / history as every kind.
+- the made tool's face: ✎ Workshop · Rename (inline, Enter keeps) · ✕ Delete tool (twice to delete). canvas/runtime/organism-factory.js:
+  undefine(id) (domain-free: a tool leaves the list).
+- Tests: tests/p231-made-tools-yours.test.js 1/1. Screenshots: docs/previews/made-tool-workshop.shots.mjs → made-tool-face.png, made-tool-workshop.png.
+
 ## 3.230 What mixes with what; no more yellow; dimensions; Voice Lab and UI elements specced (2026-11-26)
 His words: "No like more dimentions. Also Like I want a voice lab. T pain like auto tune. Creating voice. And wubs, wow. Like voice music like wubs, etc." · "I want to be able to change the ui elements to other styles, types, build components from combining two. Also the color keeps being yellow. I want to be able to tell what's mixing with what. Like I want to be able to mix the dco with the wobble bass and know it will make a wobble synthwave sound. You know? Expand the tools and engines maybe,"
 - tools/music/data/tool-blend.js: CHAR (each tool's style and what each of its places carries) + sound(rows) → { name ("wobble synthwave"),
