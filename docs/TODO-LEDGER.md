@@ -14,12 +14,12 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 |---|---|---|---|
 | T-04 | **Options into Settings** (ST1 / TB1): the ⋯ Options button and drop-down go; Stop all, Show ports, Fit all, Clear canvas become a section of ⚙ Settings (their keys stay). **Undo / Redo buttons removed** (Ctrl+Z / Ctrl+Shift+Z stay). Redundant options removed. Preview first. | "okay well no options and settings." · "first one, beyond removing the undo and redo, and redundany options." | decided |
 | T-05 | **Settings a real menu** (ST2): sections down the side, search across every option. Preview first. | "also the settings needs to be a real menu" | decided |
-| T-06 | **The Start button leaves the toolbar** (TB6): top-left is Add only; the domains still open on launch. | "remove the start button from the corner and just have the add button" | decided |
+| T-06 | **The Start button leaves the toolbar** (BUILT 3.236, 2026-11-25 — shown first) (TB6): top-left is Add only; the domains still open on launch. | "remove the start button from the corner and just have the add button" | decided |
 | T-07 | **Organize / Tidy up: one** (TB2), the same action today. Recommended: keep **Organize** on the toolbar. | "organize or tidy up, don't need both." | decided (which name: recommended Organize) |
 | T-08 | **Sounds · Rhythms · Songs (· Learn): one entry** (TB3). Recommended: one **Library** button, one browser with tabs. Other readings: keep Songs only; all into Add. | "sounds or rhythms, and songs." | open |
 | T-09 | **Metronome and loop region** (TB4). Readings: out of the agnostic toolbar into the music transport (recommended) · onto the canvas as a loop-region bar · the Timeline only. | "metronome loop region in the canvas ui." | open |
 | T-10 | **The toolbar's noise when choosing a domain** (TB5): before a domain, only Add · Settings · the fault light; after, recommended: only what the tools on the canvas need (not the domain's whole set). | "need to clean up the noise. need to when choosing a domain." | open |
-| T-11 | **The catalog (Add) gets "← Domains" in its top-left corner** (TB7): back to the domain screen. | "with a back to domain, in the top left corner of the catalog." | decided |
+| T-11 | **The catalog (Add) gets "← Domains" in its top-left corner** (BUILT 3.236, 2026-11-25 — shown first) (TB7): back to the domain screen. | "with a back to domain, in the top left corner of the catalog." | decided |
 | T-12 | **Settings' sections grow from the tools' DAG contracts** (ST3), agnostic: Audio with real-time audio, MIDI with MIDI in, GPU / image memory with image tools; each option names the tools that asked; hides when none needs it, values kept. | "that expands from the tools dag contract, like what is needed expands the options." | specced |
 
 ## Performance and animations · `specs/eravos.performance-plan.spec` (his PC: Ryzen 7 3700X · GTX 1650 · 16 GB)
@@ -88,6 +88,22 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-36 | **EN4 the engine process in Emerge**: WASAPI exclusive / shared, ASIO; DYNAMIC (graph swapped at a block, cross-faded); LOAD BALANCING (the DAG scheduled over cores, work stealing, measured cost, critical path first); SIGNAL TO NOISE (64-bit mix, FTZ, headroom + true-peak, TPDF dither, oversampling; work only on what is heard); tools isolated; its own process; Web Audio the fallback. | "dynamic, load balancing, signal to noise?" | specced |
 | T-37 | **EN5 Settings › Audio** from the engine (driver, device, buffer, sample rate, cores, per-core load, per-tool cost). | "that is still not great. what about the audio driver or engine that electron uses?" | specced |
 | T-38 | **Which lags on his PC — the screen or the sound?** (decides what is cut next) | "that is still not great. what about the audio driver or engine that electron uses?" | open (asked) |
+
+## Asked 2026-11-25 (this branch; renumbered when merged with main)
+
+| # | What | His words (2026-11-25) | State |
+|---|---|---|---|
+| T-83 | **The whole UI consistent — the canvas and the themes**: one audit of every canvas surface (toolbar, Start, catalog, Settings, tool pages, menus, cards, the Field, toasts) in every theme; what differs listed; a preview of the consistent version shown first (the 2026-11-05 "the UI stays as it is" holds until he approves). | "also can you make all of the ui consistent? all of the canvas, and the themese." | open |
+| T-84 | **The catalog in a domain lists every domain's tools** (Image Manipulation showed Genre instruments, Sound Forge …) — only its own? (asked) | (from his screenshot) | open (asked) |
+| T-85 | **Autosave fixed; Ctrl+S saves** (3.237). | "after that can you fix the autosave? also make control s a hotkey to save." | built — confirm on his PC |
+| T-86 | **Not made: flash + a card with why and what to do** — withdrawn: main's 3.226 (what it will make, and why not; T-39 above) does it. | "okay i need it to like flash when it can't synthesize, not a toast with no direction" | superseded |
+| T-87 | **The tip line in a domain** (Image Manipulation showed a music tip — "voice clips", ".mid") — the domain's own tip. | (noticed 2026-11-25) | open (asked) |
+| T-88 | **Patterns as deep as possible**: per-note editing, curves, every feature at full variety, for every tool (O-07). Spec + a preview first. | "Can you make the patterns deep as possible? Like per note editing, curves, like each feature at full variaty." (2026-11-26) | open — spec next |
+| T-89 | **Chords and Bassline easier to adjust** (he likes them). | "I like the chords and bassline. Can you make them easier to adjust?" (2026-11-26) | open — spec + preview |
+| T-90 | **A key macro recorder**: tap record, click the piano keys, the tool plays them (and they become automation / a pattern). | "Like maybe a way to record macros of the keys. Like tap the start button, then you click the piano keys, and have it play the tool with it. Automation?" (2026-11-26) | open — spec + preview |
+| T-91 | **Wobble Bass: contrast** — a pendulum swing between highs and lows, oscillatory, cleaner. Capability first (what lets ERAVOS make it), measured. | "Also wobble bass is still not full what I want it to be. Like I contrast. The pendulum swing, highes and lows. Oscillatory. Like I want it to be cleaner." (2026-11-26) | open — spec |
+| T-92 | **Wobble Bass presets**: measured against the synthwave ones he loves; the weak ones named and remade as settings (no toys). | "I love the synthwave ones. A lot of the wobble bass presets aren't great." (2026-11-26) | open — measure first |
+| T-93 | **The bassline lagging** (3.235): notes booked further ahead after a stall; displays draw less (the same picture). | "Also the bassline keeps lagging." (2026-11-26) | built — confirm on his PC |
 
 ## Shipped, to confirm on his PC
 
