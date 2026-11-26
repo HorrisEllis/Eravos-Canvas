@@ -1,3 +1,23 @@
+ERAVOS v0.2.38 (2026-11-26)
+
+Install: ERAVOS-Setup-0.2.38.exe from the release, or ERAVOS offers it by itself.
+
+- Synthesis you can read: right-click picked parts › What will it make? shows each place in the new tool, which tool it comes from, what
+  stays behind, and what it will sound like ("Retro DCO × Wobble Bass → wobble synthwave") — ▶ Hear it before you make it. The same
+  shows while you drag one tool over another.
+- When ERAVOS won't make it, the parts to blame flash red and a card beside them says why, with buttons that fix it (take the voice from
+  another tool, make it quieter, open the filter, tame it …).
+- Your made tools: Rename, ✎ Workshop (every part a layer, every setting editable, kept and heard at once) and ✕ Delete tool.
+- No more yellow: a made tool takes its parents' colours; the green that said "on / ready" is now your theme's colour and moves with
+  the Beat colour.
+- Every tool, mode and made tool has its painting; made tools are painted the moment they exist.
+- Settings › Look › Font: four choices (today's stays until you pick).
+- Lyrics → Rhythm: ♫ Make a song now follows your words' shape — the loudest stanza a drop, the quietest a break, a line that comes
+  back a chorus, opposites (light / dark) turning line by line. SHAPE shows each stanza's part and why, and "How words become music".
+  New: Depth (deeper), Dimensions (layers, a counter-line in the gaps, more space), Contrast, and ⇢ Patterns (each stanza as words,
+  mirror, shadow and pendulum in Patterns › Yours).
+- ＋ Add keeps its Modes, drawn as tool cards.
+
 ERAVOS v0.2.37 (2026-11-24)
 
 Install: ERAVOS-Setup-0.2.37.exe from the release, or ERAVOS offers it by itself.
