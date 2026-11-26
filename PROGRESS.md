@@ -8,7 +8,7 @@ His words: "also told you to remove the add button once i pick a domain, up whee
   "← Domains" top left of the catalog; eravos.css .ap-back (as the catalog's close button). docs/previews/catalog-back.shots.mjs.
 - 3.233 canvas/runtime/workspace.js: WORK = a tool that is not docked (domain-free); no autosave without work; each launch its own history
   entry (10 kept); bestAutosave(); the open project remembered (current). canvas/index.html: Start offers the newest autosave with work and
-  counts only work; Ctrl+S saves the project (name asked once), a new canvas or a restore forgets the project. tests/p227-autosave.mjs 6/6
+  counts only work; Ctrl+S saves the project (name asked once), a new canvas or a restore forgets the project. tests/p233-autosave.mjs 6/6
   (reproduced first: 10 tools → a relaunch + a domain picked → "1 tools").
 - (withdrawn, superseded by main's 3.226) tools/music/core/assembled-tool.js: a failure carries kind · title · fix · blame (twin — all parts from one tool or sounds like X;
   loud; silent; parts it cannot run) and restUseful; tools/core/field/board.js (domain-free): failCard — the blamed boxes (or the cores)

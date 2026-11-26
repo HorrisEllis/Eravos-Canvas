@@ -242,7 +242,7 @@
   - BUILT 3.233: measured — picking a domain pins its docked window at once and the autosave wrote that lone window over the real one (and a
     relaunch within a minute replaced the history's copy: 10 tools → "1 tools"). Now: no autosave without work (a tool that is not docked);
     each launch keeps its own history entry; Start offers the newest autosave that holds work. Ctrl+S saves the project (its name asked the
-    first time); Ctrl+Shift+S still saves an .erv. tests/p227-autosave.mjs 6/6.
+    first time); Ctrl+Shift+S still saves an .erv. tests/p233-autosave.mjs 6/6.
 
 ## 33 — verbatim (2026-11-25, with a screenshot: two toasts — "synthesizing 22 parts…" and "not made — this is your Wobble Bass · parts again"):
   > okay i need it to like flash when it can't synthesize, not a toast with no direction

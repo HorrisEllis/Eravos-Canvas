@@ -1,4 +1,4 @@
-// node tests/p227-autosave.mjs — 3.227 (his words, 2026-11-25: "can you fix the autosave? also make control s a hotkey to save.")
+// node tests/p233-autosave.mjs — 3.227 (his words, 2026-11-25: "can you fix the autosave? also make control s a hotkey to save.")
 // 1. a session's work (a song of 10 tools) autosaved; a FRESH launch, a domain picked (its docked window pinned at once) — the autosave and its
 //    history still hold the 10, and Start's "Restore autosave" offers them (before: 1 docked window was written over both)
 // 2. Ctrl+S: the first time asks the name and saves the project; again keeps it there without asking; a new canvas asks again
@@ -27,4 +27,4 @@ check('Ctrl+S asks the name the first time and saves the project', asked === 1 &
 await ctrlS(); await p2.waitForTimeout(600);
 check('Ctrl+S again keeps it there without asking', asked === 1);
 await p2.evaluate(async () => { await Workspace.projects.remove('P227 song'); });
-console.log(`p227 autosave + Ctrl+S: ${pass}/${pass + fail} passed`); await b.close(); process.exit(fail ? 1 : 0);
+console.log(`p233 autosave + Ctrl+S: ${pass}/${pass + fail} passed`); await b.close(); process.exit(fail ? 1 : 0);
