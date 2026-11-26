@@ -143,6 +143,11 @@
       // 3.229 (his words, 2026-11-25: "How does it sound? Like I want it deep as hell."): how low the song sits
       { key: 'depth', type: 'number', default: 0.7, min: 0, max: 1, step: 0.01, label: 'Depth', group: 'SONG', hint: 'how deep the song sits: the lead and chords lower, the bass held longer in the loud parts, a heavier kick, a boom on 1 in the drop (0 = as before)' },
       { key: 'dims', type: 'number', default: 0.7, min: 0, max: 1, step: 0.01, label: 'Dimensions', group: 'SONG', hint: 'more of it, not only lower: layers on the lead in the loud parts (an octave up, then a harmony), a counter-line in the gaps the words leave, and more space (0 = as before)' },
+      // 3.232 (his words, 2026-11-26: "Can you add contrasting rhythm or a bunch with tension?"): where I and you answer each other
+      { key: 'tension', type: 'number', default: 0.6, min: 0, max: 1, step: 0.01, label: 'Tension', group: 'SONG', hint: 'where I and you answer each other: the answer falls off the beat (three against four under it, the bass and lead left unresolved) and the last line lands home (0 = as before)' },
+      // 3.233 (his words, 2026-11-26: "Make sure you use the per note editing, curves … Really push Eravos … The piano doesn't get enough love.")
+      { key: 'expr', type: 'number', default: 1, min: 0, max: 1, step: 0.01, label: 'Expression', group: 'SONG', hint: 'every note shaped by its word: knob curves, bends, chords, chance, ratchets, humanize — an accent opens and scoops in, a question rises, a statement falls, the answer talks, the arrival dives (0 = as before)' },
+      { key: 'piano', type: 'boolean', default: true, label: 'Piano', group: 'SONG', hint: 'a Piano part on any style: it opens the song alone, climbs through the chord in the breaks, plays soft dyads under the verses, octaves on the hits, and closes with one rolled chord' },
       { key: 'contrast', type: 'number', default: 1, min: 0, max: 1, step: 0.01, label: 'Contrast', group: 'SONG', hint: 'how far apart the parts are pushed: 0 = every stanza a verse, 1 = as far as the words go' },
     ],
     ui_hooks: ['syl_edit', 'reset_edits', 'preview', 'send_timeline', 'expand_song', 'send_sequencer', 'make_patterns'],
@@ -204,7 +209,7 @@
         let bottom = 0; const WM = window.CanvasWM;
         if (WM && WM.rectOf) K.registry.list().forEach(r => { const q = WM.rectOf(r.instance_id); if (q && isFinite(q.y + q.h)) bottom = Math.max(bottom, q.y + q.h); });
         try {
-          window.RhythmExpand.write(text, { genre: P.get('songGenre'), flow: P.get('flow'), seed: P.get('vary') || 1, shape: P.get('songShape') === 'every stanza a verse' ? 'verses' : 'contrast', contrast: P.get('contrast'), depth: P.get('depth'), dims: P.get('dims'), reuse: true, run: { clear: false, origin: { x: 40, y: bottom ? bottom + 80 : 40 } } });
+          window.RhythmExpand.write(text, { genre: P.get('songGenre'), flow: P.get('flow'), seed: P.get('vary') || 1, shape: P.get('songShape') === 'every stanza a verse' ? 'verses' : 'contrast', contrast: P.get('contrast'), depth: P.get('depth'), dims: P.get('dims'), tension: P.get('tension'), expr: P.get('expr'), piano: !!P.get('piano'), reuse: true, run: { clear: false, origin: { x: 40, y: bottom ? bottom + 80 : 40 } } });
           ctx.emitUI('status', { info: 'Building your song below — press Space to hear it.' });
         } catch (e) { ctx.emitUI('status', { warn: e.message }); }
       });
@@ -264,16 +269,26 @@
         const text = String(P.get('text') || '').trim(); if (!text) return ctx.emitUI('status', { warn: 'Type or paste some words first.' });
         if (!RE || !LS || !LIB || !mt) return ctx.emitUI('status', { warn: 'The pattern library is not loaded.' });
         const drums = P.get('mode') === 'drums', k = ctx.key, DEG = [1, 3, 5, 3, 6, 5, 4, 2], oct = P.get('octave');
-        const toNotes = (list) => { let di = 0, deg = 1; return list.map(n => {
-          const v = Math.round(P.get('level') * (n.stress === 2 ? 1 : n.stress ? 0.85 : 0.55) * 100) / 100;
-          if (drums) return { s: n.s, l: 1, n: 36 + (n.stress ? (Math.floor(n.s / 4) % 2 ? 1 : 0) : 3), v };
-          if (n.stress) deg = DEG[di++ % DEG.length]; return { s: n.s, l: Math.max(0.5, n.l * P.get('gate')), n: mt.degreeToMidi(deg, oct, k.root, k.scale), v }; }); };
+        // 3.232 DEEP patterns (his: "Did you create extremely deep patterns?"): every note carries how it plays, from the word it came from —
+        // an ACCENT ratchets (3 hits, speeding up), a weak syllable is a ghost (plays 70 % of passes, humanized), a line end in the melody
+        // doubles an octave up, the answer in a call-and-response lags (microtiming), the pendulum's return plays every other pass
+        const deep = (n, o, kind, k2) => { const x = {};
+          if (n.stress === 2) { o.rt = 3; x.rs = 'accel'; }
+          else if (!n.stress) { o.pr = 0.7; x.hv = 0.1; x.ht = 8; }
+          if (n.tense) o.mt = 0.25;
+          if (!drums && n.last) { x.iv = [12]; x.strum = 30; }
+          if (kind === 'pendulum' && k2 >= 0.5) x.cond = { every: 2, at: 1 };
+          if (Object.keys(x).length) o.x = x; return o; };
+        const toNotes = (list, kind, L) => { let di = 0, deg = 1; return list.map(n => {
+          const v = Math.round(P.get('level') * (n.stress === 2 ? 1 : n.stress ? 0.85 : 0.55) * 100) / 100, half = L ? n.s / L : 0;
+          if (drums) return deep(n, { s: n.s, l: 1, n: 36 + (n.stress ? (Math.floor(n.s / 4) % 2 ? 1 : 0) : 3), v }, kind, half);
+          if (n.stress) deg = DEG[di++ % DEG.length]; return deep(n, { s: n.s, l: Math.max(0.5, n.l * P.get('gate')), n: mt.degreeToMidi(deg, oct, k.root, k.scale), v }, kind, half); }); };
         let made = 0; const names = [];
-        RE.sections(text, { flow: P.get('flow'), seed: P.get('vary') || 1, shape: 'contrast', contrast: P.get('contrast') }).forEach((sec, i) => {
+        RE.sections(text, { flow: P.get('flow'), seed: P.get('vary') || 1, shape: 'contrast', contrast: P.get('contrast'), tension: P.get('tension') }).forEach((sec, i) => {
           const pt = LS.patterns(sec.notes, { bars: 4 }); if (!pt) return;
           const base = (i + 1) + '. ' + sec.lines[0].replace(/[^A-Za-z0-9'’ ]/g, '').trim().split(/\s+/).slice(0, 4).join(' ').toLowerCase();
           [['words', pt.words], ['mirror', pt.mirror], ['shadow', pt.shadow], ['pendulum', pt.pendulum.notes]].forEach(([kind, list]) => {
-            if (!list.length) return; const nm = LIB.saveNotes(base + ' · ' + kind, toNotes(list), { drums, tool: drums ? 'eravos.pads' : null, later: true }); names.push(nm); made++; });
+            if (!list.length) return; const nm = LIB.saveNotes(base + ' · ' + kind, toNotes(list.map(n => Object.assign({}, n, { last: (sec.notes.find(q => Math.abs(q.s - n.s) < 1e-6) || {}).last, tense: (sec.notes.find(q => Math.abs(q.s - n.s) < 1e-6) || {}).tense })), kind, (kind === 'pendulum' ? pt.pendulum.bars : pt.bars) * 16), { drums, tool: drums ? 'eravos.pads' : null, later: true }); names.push(nm); made++; });
         });
         if (made && window.PatternLibrary) window.PatternLibrary.rebuild();
         ctx.emitUI('status', made ? { info: `Made ${made} patterns from your words (${drums ? 'drums' : 'melody'}) — Patterns › Yours: each stanza as the words, its mirror, its shadow and the pendulum.` } : { warn: 'No rhythm to make patterns from.' });
@@ -287,7 +302,7 @@
         const RE = window.RhythmExpand, text = String(P.get('text') || ''), on = P.get('songShape') !== 'every stanza a verse', k = text + '|' + on + '|' + P.get('contrast');
         if (k === shapeKey) return shapeVal; shapeKey = k;
         try { const r = RE && RE.shape ? RE.shape(text, { contrast: on ? P.get('contrast') : 0 }) : null;
-          shapeVal = r && r.stanzas.length ? { on, lesson: r.lesson, stanzas: r.stanzas.map(s => ({ kind: s.kind, energy: s.energy, first: s.lines[0], lines: s.lines.length, pairs: s.pairs, refrain: s.refrain.slice(0, 1), split: s.split, why: s.why.filter(Boolean) })) } : null;
+          shapeVal = r && r.stanzas.length ? { on, lesson: r.lesson, stanzas: r.stanzas.map(s => ({ kind: s.kind, energy: s.energy, first: s.lines[0], lines: s.lines.length, pairs: s.pairs, refrain: s.refrain.slice(0, 1), split: s.split, dialogue: s.dialogue, why: s.why.filter(Boolean) })) } : null;
         } catch (e) { shapeVal = null; }
         return shapeVal;
       }

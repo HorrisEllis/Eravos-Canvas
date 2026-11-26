@@ -2,6 +2,75 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.234 The piano without its rumble (2026-11-26)
+His words: "But make some sound beautiful. The piano doesn't get enough love."
+- Measured first (an offline render of each factory preset, a middle-C dyad): Felt Lullaby put 42 % of its energy under 30 Hz and a third more
+  between 30 and 120 Hz; Concert Grand 12 %, Upright Jazz 14 % under 30 Hz. The words-song's piano intro was 75 % under 30 Hz — a boom you feel,
+  not a piano. The cause: the soft hammer's long raised-cosine pulse goes straight through the string loop, carrying everything under the note.
+- piano.engine.js: each voice is high-passed under its own note (two poles at half the fundamental, never under 20 Hz) — the note keeps its
+  fundamental, the mud under it goes; the whole piano then passes a 28 Hz high-pass (4 poles). Under 30 Hz is now 1–2 % on every preset; Felt
+  Lullaby's 30–120 Hz 32 % → 4 %.
+- The loudness the rumble took with it (−2.1 … −3.3 dB per model, measured on a three-note chord) given back per model (LIFT): every model's level
+  within 0.05 dB of before.
+- rhythm-expand: the piano opening a words-song alone plays at 0.5–0.7 (was 0.32–0.44 — soft, and the rumble hid how soft); the outro's rolled chord 0.7.
+- Guard: P182 "no rumble under the notes" — every factory preset under 30 Hz < 4 %, 30–120 Hz < 12 %. Fails on the old code (Felt Lullaby 49.3 %).
+- Proof: P182 7/7, piano 51/51, P163 33/33. The null render's piano baseline (per machine, gitignored) changes on purpose — re-record it.
+
+## 3.233 Every note shaped by its word; the Piano in every words-song (2026-11-26)
+His words: "I contrast as you might have notives" · "Also Make sure you use the per note editing, curves, way too much variance to waste in nexus. Like multidimentional. Really push Eravos. Like all of the tools. But make some sound beautiful. The piano doesn't get enough love."
+- rhythm-expand: expr 0…1 — LEAD: a question's last note rises (+2), a statement falls (−1), an accent scoops in (−2 → 0) and opens, a light
+  line swells, a dark line plucks closed, the answer talks, weak syllables humanized · BASS: the arrival dives an octave with its filter, the
+  answer talks, drops / choruses growl or open · DRUMS: accents roll (a clap, 3 hits accelerating, growing), weak hats are ghosts (chance,
+  humanize) · CHORDS (with depth): swell in a dialogue, open in a break. Curves are the Song Engine's own moves (helpers.moveCurves, knobsFor —
+  now exported). 0 = as before.
+- the PIANO (o.piano): a Piano part added to any genre without touching it (SongEngine.generateWith(G, …)); its preset by mood (Felt Lullaby,
+  Concert Grand, Tine Phaser …); the intro is the piano alone (a slow climb through the chord), the breaks climb through the chord syllable by
+  syllable with a rolled chord at each line end, soft dyads under verses / choruses, low octaves on the drop's hits, one rolled chord held at the end.
+- Lyrics → Rhythm: SONG › Expression (1) · Piano (on). build/render-words.mjs --expr --piano.
+- Tests: P233 2/2 (in tests/p232-tension-and-words.test.js); P228 P229 P232 RhythmExpand Bass Pack P20 green.
+
+## 3.232 Tension from who speaks; his words imported; deep patterns; Song Import specced (2026-11-26)
+His words: "Can you add contrasting rhythm or a bunch with tension?" · "I want to be able to import a song and have Eravos open it with the needed tools to replicate it. Hard? That could be a good test. Did you create extremely deep patterns?" · "I am a good writer.  It would be cool to be able to import my words.  Can we have voices for the lyrics? On top of my own? Like I want to be able to make any genre of music using Eravos." (two poems of his given as the lyrics — kept with him, not in the repo)
+- lyric-shape 1.2.0: clausesOf(line) — each line cut at . ; ! ? (and at a comma before "I" / "you") into clauses with who speaks (I · you · we,
+  or carried); a stanza where I and you answer each other is a DIALOGUE, and says so.
+- rhythm-expand: tension 0…1 — in a dialogue stanza the "you" is pushed off the beat (a 16th · a dotted 16th · half a beat), three against four
+  under it, the bass on the 4th and the lead a step off (unresolved), the last line not pushed and its first strong syllable the ARRIVAL
+  (a crash and a kick). 0 = as before.
+- Lyrics → Rhythm 1.2.0+: Tension (0.6); SHAPE marks a dialogue ⇄; ⇣ Import words + Your words (tools/music/data/words-shelf.js: .txt, .md,
+  a Notion export .zip — its heading the title, the Notion id gone, marks removed, an index of links skipped, stanza breaks kept; on this
+  computer only); ⇢ Patterns made DEEP: accents ratchet (3, speeding up), weak syllables are ghosts (70 %, humanized), the answer lags
+  (+¼ step), melody line ends doubled an octave up, the pendulum's return every other pass. PF_LIB.saveNotes { later }.
+- build/render-words.mjs --tension.
+- Specs: specs/eravos.song-import.spec (SI0–SI6) · voice-lab ADDENDUM (2): CREATE first, on top of his own voice. T-63, T-64.
+- Tests: tests/p232-tension-and-words.test.js 3/3; lyric-shape 29 checks; P228 P229 P20 RhythmExpand Bass Pack Pattern Library boundary green.
+
+## 3.235 The bassline no longer lags: notes booked ahead after a stall; the displays draw less (2026-11-26)
+His words: "Also the bassline keeps lagging." (the whole message: specs/eravos.2026-11-24-session.map.spec 34)
+- Measured with Bassline → Deep Sub playing (the probe: notes' booking time against the audio clock; every display loop timed).
+- tools/music/core/master-transport.js: the look-ahead adapts — a clock wake later than 2 intervals raises it to the stall + 40 ms (≤ 0.35 s),
+  4 s calm eases it back to 0.1 s; T.timing { late, lookahead }. Before: 3 of 19 notes late (to 63 ms; 214 ms at start) · after: 0 of 19
+  (1 of 19 with Chords wired, 27 ms, after a > 0.35 s stall of the headless browser).
+- canvas/runtime/ui-kit.js: Canvas.fit() asks for its size at most twice a second (it forced a layout every frame for every display).
+- tools/music/tools/bass/bass-gen/bass-gen.ui.js: the map redraws only when a note, the step, its width or accent changes; one gradient per picture.
+- tools/music/core/ui-music.js Spectrum: the grid a cached picture; which bin each pixel reads worked out once per width; the sunset's two
+  gradients made once and slid (read in a translated space, the path kept); nothing redrawn while silent and unchanged. The same picture
+  (before / after screenshots compared).
+- Tests: Bassline 26/26, bass-gen 4/4, chord-gen 4/4, sub-engine 12/12, P22 21/21, P163 33/33, P11 92/92, P58 18/18, P112 13/13, P147 1/1,
+  boundary 10/10, design check no worse. Timeline 88/89 (the wheel test, failing on main before — CLAUDE.md › Open).
+## 3.236–3.237 The Start button out, ← Domains; the autosave fixed, Ctrl+S (2026-11-25) — renumbered from 3.226–3.228 when merged with main (a parallel session had used them); 3.234 (not made → flash) withdrawn: main's 3.226 does it
+His words: "also told you to remove the add button once i pick a domain, up wheere it says add to canvas, add a back to domains screen," · "after that can you fix the autosave? also make control s a hotkey to save." · "okay i need it to like flash when it can't synthesize, not a toast with no direction" (and "also can you make all of the ui consistent? all of the canvas, and the themese." — open, T-39)
+- 3.236 canvas/index.html: the Start button removed from the toolbar (window.ShellStart opens the domain screen); canvas/runtime/add-menu.js:
+  "← Domains" top left of the catalog; eravos.css .ap-back (as the catalog's close button). docs/previews/catalog-back.shots.mjs.
+- 3.237 canvas/runtime/workspace.js: WORK = a tool that is not docked (domain-free); no autosave without work; each launch its own history
+  entry (10 kept); bestAutosave(); the open project remembered (current). canvas/index.html: Start offers the newest autosave with work and
+  counts only work; Ctrl+S saves the project (name asked once), a new canvas or a restore forgets the project. tests/p237-autosave.mjs 6/6
+  (reproduced first: 10 tools → a relaunch + a domain picked → "1 tools").
+- (withdrawn, superseded by main's 3.226) tools/music/core/assembled-tool.js: a failure carries kind · title · fix · blame (twin — all parts from one tool or sounds like X;
+  loud; silent; parts it cannot run) and restUseful; tools/core/field/board.js (domain-free): failCard — the blamed boxes (or the cores)
+  flash red; a card beside them: why, what to do, buttons (the rest from another tool when it can change something · Mutate these parts ·
+  Try again); Esc / ✕ / the next try closes it. tests/p228-not-made.test.js 2/2; docs/previews/workbench/not-made.shots.mjs.
+- Tests: P38 42/42, P21 27/27 (P218 fixed to pick its own Wobble Bass — it took one an earlier test left), P110, P120, P100, P19, runtime,
+  P203 P205 P216 P217 P218 P228, assembled-tool 32, boundary 10/10, design check no worse. P17's 2 failures are on main too.
 ## 3.231 A made tool is his: rename it, edit it fully in the Workshop, delete it (2026-11-26)
 His words: "also merge and push. need to be able to delete custom tools. rename them. open them in workshop and edit them fully." (merged first: PR #224, 3.226–3.230)
 - assembled-tool.js: Model.get / rename (made unique, kept, the def and every open window's title follow; the id stays so songs still find it) /

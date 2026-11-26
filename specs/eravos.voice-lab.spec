@@ -36,3 +36,11 @@
 ## open (his)
   - which door first: TUNE (his own voice), CREATE (a made voice), or WUB?
   - the made voice: one voice, or a choice of characters (deep, airy, child, choir)?
+
+ADDENDUM 2026-11-26 (2) — the order, his (the original above kept verbatim)
+his words (verbatim): "I am a good writer.  It would be cool to be able to import my words.  Can we have voices for the lyrics? On top of my own?
+  Like I want to be able to make any genre of music using Eravos."
+  → CREATE first (a voice made from nothing singing his lyrics — the words come in through Lyrics → Rhythm's ⇣ Import words, 3.232), sung ON
+  TOP of his own recorded voice (Song Recorder) — then TUNE (his voice in key), then WUB. VL3 vocal-tract + VL4 letter-to-sound lead; the voice
+  follows the song's genre (a choice of characters: deep, airy, choir, robot / hard-tuned).
+

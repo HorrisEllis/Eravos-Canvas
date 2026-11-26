@@ -29,7 +29,8 @@ const SET = ${JSON.stringify(SET)}, SLOTS = ${SLOTS};
 const TINE = { r: [1, 2, 3, 4, 5], g: [1, 0.4, 0.18, 0.08, 0.04], d: [1, 0.7, 0.5, 0.4, 0.3] }, BEAM = { r: [6.267, 17.547], g: [0.5, 0.15], d: [0.9, 0.35] };
 const REED = { r: [1, 2, 3, 4, 5, 6, 7, 8], g: [1, 0.55, 0.7, 0.3, 0.4, 0.15, 0.22, 0.1], d: [1, 0.8, 0.7, 0.6, 0.5, 0.45, 0.4, 0.35] };
 const STRINGS = [0, 0, 1, 2, 3, 3];   // felt 1 · upright 2 · honky 3 · grand 3
-const GAIN = [0.0126 * 0.8 * 0.7, 0.0125 * 0.8 * 0.7, 63 * 0.55 * 0.7, 22 * 0.6 * 0.7, 21 * 0.6 * 0.7, 17.8 * 0.65 * 0.7];   // × 0.7: the default Level, now applied after (Level / 0.7)
+const LIFT = [1.27, 1.27, 1.47, 1.31, 1.32, 1.31];   // 3.234: the loudness the rumble took with it, measured per model (a three-note chord: −2.1 · −2.1 · −3.3 · −2.3 · −2.4 · −2.3 dB), given back
+const GAIN = [0.0126 * 0.8 * 0.7, 0.0125 * 0.8 * 0.7, 63 * 0.55 * 0.7, 22 * 0.6 * 0.7, 21 * 0.6 * 0.7, 17.8 * 0.65 * 0.7].map((g, i) => g * LIFT[i]);   // × 0.7: the default Level, now applied after (Level / 0.7)
 const BODY = [0.04, 0.04, 0.09, 0.12, 0.12, 0.13];   // how much of the sound rings the body, per model — measured: at Resonance 0.5 the body adds about half the dry level   // per model, measured (a three-note chord at the default level: RMS ≈ 0.1, peaks < 0.6) — the test holds every model within 6 dB
 class EravosPiano extends AudioWorkletProcessor {
   static get parameterDescriptors() { return ${JSON.stringify(DESC)}; }
@@ -39,7 +40,7 @@ class EravosPiano extends AudioWorkletProcessor {
     this.slots = [];
     for (let i = 0; i < SLOTS; i++) { const svf = SVF(); svf.setRate(sr);
       this.slots.push({ i, trig: 0, gate: 0, note: 60, vel: 0.8, v: 0.8, f0: 261.6, amp: ADSR(), modal: Modal(), str: [KString(), KString(), KString()], ns: 0, svf, sleep: true,
-        hPos: 1e9, hLen: 64, hAmp: 0, thump: 0, peak: 0, age: 0, gl: 0.7, gr: 0.7, mf: new Float64Array(8), mt: new Float64Array(8), mg: new Float64Array(8), M: new Float32Array(B), F: new Float32Array(B) }); }
+        hPos: 1e9, hLen: 64, hAmp: 0, thump: 0, ha: 0.99, hx1: 0, hy1: 0, hx2: 0, hy2: 0, peak: 0, age: 0, gl: 0.7, gr: 0.7, mf: new Float64Array(8), mt: new Float64Array(8), mg: new Float64Array(8), M: new Float32Array(B), F: new Float32Array(B) }); }
     this.lfo = LFO(); this.body = Modal(); this.sym = []; for (let k = 0; k < 12; k++) this.sym.push(KString());
     this.tube = TubeSat(); this.tube.setRate(sr); this.seed = 22222;
     this.mono = new Float32Array(B); this.symOut = new Float32Array(B); this.lastPedal = -1; this.pedalBurst = 0; this.post = 0; this.lvl = new Float32Array(SLOTS);
@@ -85,7 +86,9 @@ class EravosPiano extends AudioWorkletProcessor {
   start(sl, note, vel) {
     const s = this.s; sl.note = note; sl.vel = vel; sl.v = Math.pow(Math.max(0.01, vel), 0.5 + s.velCurve); sl.f0 = 440 * Math.pow(2, (note - 69) / 12);
     const hard = Math.max(0, Math.min(1, s.hardness * 0.7 + sl.v * 0.3)) * ((s.model | 0) === 2 ? 0.5 : 1);
-    sl.hLen = Math.max(8, Math.round(this.sr * (0.0045 - 0.0035 * hard))); sl.hPos = 0; sl.hAmp = sl.v; sl.age = 0; sl.peak = 1;
+    sl.hLen = Math.max(8, Math.round(this.sr * (0.0045 - 0.0035 * hard))); sl.hPos = 0;
+    // 3.234: the soft hammer's long pulse carried a boom far under the note (a third of a felt middle C between 30 and 120 Hz) — the note keeps its fundamental, the mud under it goes
+    sl.ha = Math.exp(-2 * Math.PI * Math.max(20, sl.f0 * 0.5) / this.sr); if (sl.sleep) { sl.hx1 = 0; sl.hy1 = 0; sl.hx2 = 0; sl.hy2 = 0; } sl.hAmp = sl.v; sl.age = 0; sl.peak = 1;
     if (sl.sleep) { sl.modal.reset(); for (const k of sl.str) k.reset(); sl.svf.reset(); }
     sl.sleep = false; this.voice(sl); sl.amp.gate(true); sl.gate = 1;
   }
@@ -109,6 +112,7 @@ class EravosPiano extends AudioWorkletProcessor {
         let y = 0;
         if (sl.ns) { for (let k = 0; k < sl.ns; k++) y += sl.str[k].tick(x * 0.5); y /= Math.sqrt(sl.ns); } else y = sl.modal.tick(x * 30);
         if (sl.thump > 1e-5) { y += this.rnd() * sl.thump; sl.thump *= 0.996; }
+        { const a = sl.ha, y1 = a * (sl.hy1 + y - sl.hx1); sl.hx1 = y; sl.hy1 = y1; const y2 = a * (sl.hy2 + y1 - sl.hx2); sl.hx2 = y1; sl.hy2 = y2; y = y2; }
         sl.M[j] = y; sl.F[j] = cut; sl.age++;
       }
       this.PS.frequency = sl.F; sl.svf.process([sl.M], [sl.M], B, this.PS);
@@ -174,6 +178,9 @@ registerProcessor('eravos-piano', EravosPiano);`;
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params;
       const out = ac.createGain(); ctx.track(out); ctx.port('out', { kind: 'audio', direction: 'out', node: out, label: 'piano' });
+      // 3.234: the strings and hammer left energy below hearing (up to 42 % of Felt Lullaby under 30 Hz) — a rumble that only shook the mix; cut it
+      const sub = ac.createBiquadFilter(); sub.type = 'highpass'; sub.frequency.value = 28; sub.Q.value = 0.707; ctx.track(sub);
+      const sub2 = ac.createBiquadFilter(); sub2.type = 'highpass'; sub2.frequency.value = 28; sub2.Q.value = 0.707; ctx.track(sub2); sub.connect(sub2); sub2.connect(out);
       const mods = { bright: ctx.modBus('brightness', { min: -1, max: 1 }), trem: ctx.modBus('tremolo', { min: -1, max: 1 }) };
       let node = null; const queue = [];
       const BEATS = { '1/4': 1, '1/8': 0.5, '1/8 t': 1 / 3, '1/16': 0.25 };
@@ -186,7 +193,7 @@ registerProcessor('eravos-piano', EravosPiano);`;
         if (ctx.disposed) return null;
         node = new AudioWorkletNode(ac, 'eravos-piano', { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2], processorOptions: { values: values() } }); ctx.track(node);
         node.onprocessorerror = (er) => ctx.fault('RUNTIME_003', 'piano worklet stopped: ' + ((er && er.message) || 'processor error'));
-        node.connect(out); mods.bright.connect(prm('brightMod')); mods.trem.connect(prm('tremMod')); if (ctx.bendInto) ctx.bendInto(prm('bend'));
+        node.connect(sub); mods.bright.connect(prm('brightMod')); mods.trem.connect(prm('tremMod')); if (ctx.bendInto) ctx.bendInto(prm('bend'));
         node.port.onmessage = (m) => { if (m.data && m.data.type === 'keys') { keys = m.data; ctx.emitUI('keys', keys); } };
         SET.forEach(k => prm(k).setValueAtTime(valueOf(k), 0)); queue.splice(0).forEach(f => f()); return node;
       }).catch(er => { ctx.fault('RUNTIME_003', 'piano worklet: ' + er.message); return null; });

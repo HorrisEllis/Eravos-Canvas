@@ -442,7 +442,9 @@
   window.SongEngine = {
     styles: { bass: ['half', 'stutter', 'roll', 'offbeat', 'pulse8', 'acid', '808', 'drone', 'onedrop', 'dembow', 'psy', 'gallop'], chords: ['stab', 'future', 'arp', 'pluck', 'skank', 'bubble', 'pulse', 'sustain'] },
     addGenre, genres: () => Array.from(genres.values()), generate: (id, seed, X) => genres.has(id) ? generate(genres.get(id), seed, X) : null,
-    helpers: { rng, pick, drumBar, bassBar, chordBar, leadBar, PAD },   // 3.34.1: what RhythmExpand builds on
+    // 3.233 a genre given whole (a known genre with a part added — the words' song's Piano), written without registering it anywhere
+    generateWith: (G, seed, X) => generate(G, seed, X),
+    helpers: { rng, pick, drumBar, bassBar, chordBar, leadBar, PAD, moveCurves, knobsFor },   // 3.34.1: what RhythmExpand builds on
     // same song again: SongEngine.write('synthwave', 4242)
     // o.shift = { semis, tempo } writes the same song higher / lower, faster / slower (Songs → Key · Tempo)
     write(id, seed, o) { const rec = R.get('eravos.recipe.engine.' + id); if (!rec) return null; o = Object.assign({}, o); rec._pinned = seed || 1; rec._shift = o.shift || null; delete o.shift; return R.run(rec.id, Object.assign({ clear: true, origin: { x: 30, y: 20 } }, o)); },

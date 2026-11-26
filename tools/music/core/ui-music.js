@@ -57,33 +57,59 @@
     o = o || {};
     const c = Canvas(o.width || 260, o.height || 80, 'uk-spectrum');
     let bins = new Float32Array(an ? an.frequencyBinCount : 1024);
+    // 3.235 the same picture, less work each frame (his words, 2026-11-26: "the bassline keeps lagging" — measured: this display ~168 ms of every
+    // second): the grid and its labels drawn once into a picture and copied; which bin each pixel reads worked out once per width; the sunset's
+    // two gradients made once and slid by moving the space they are read in (the path stays put) — not rebuilt with nine stops every frame;
+    // and nothing redrawn while it stays silent and nothing about it changed.
+    let bg = null, bgKey = '', map = null, mapKey = '', grad = null, gradKey = '', quiet = '';
     c.stop = loop(c, () => {
       if (c.fit) c.fit();   // draw at the size it is shown (stretched pixels blur the labels)
       const win = c._win || (c._win = c.closest && c.closest('.wm-win')), col = (win && win.dataset.accLive) || o.color || '#00d4ff';   // 3.48.2 the accent follows the sound
       const g = c.g, W = c.W, H = c.H;
-      g.clearRect(0, 0, W, H); g.fillStyle = '#080b10'; g.fillRect(0, 0, W, H);
-      // 3.48.1 the display at rest is still a display: a frequency grid (100 · 1k · 10k) and dB lines, never a blank box
+      const thm = global.document && global.document.documentElement.dataset.theme, plain = thm && thm !== 'dusk';
       const xf = (f) => Math.log(f / 20) / Math.log(1000) * W;
-      g.fillStyle = '#121a25'; [50, 200, 500, 2000, 5000].forEach(f => g.fillRect(Math.round(xf(f)), 0, 1, H));
-      g.fillStyle = '#1c2838'; [100, 1000, 10000].forEach(f => g.fillRect(Math.round(xf(f)), 0, 1, H)); [0.25, 0.5, 0.75].forEach(t => g.fillRect(0, Math.round(H * t), W, 1));
-      if (H >= 40) { g.fillStyle = '#4d6178'; g.font = '9px monospace'; [[100, '100'], [1000, '1k'], [10000, '10k']].forEach(([f, t]) => g.fillText(t, xf(f) + 3, H - 4)); }
-      if (!an) return;
-      if (bins.length !== an.frequencyBinCount) bins = new Float32Array(an.frequencyBinCount);
-      an.getFloatFrequencyData(bins);
-      const sr = an.context.sampleRate, ny = sr / 2;
-      let loud = 0;
-      g.beginPath(); g.moveTo(0, H);
-      for (let x = 0; x < W; x++) {
-        const f = 20 * Math.pow(1000, x / W); const b = Math.min(bins.length - 1, Math.round(f / ny * bins.length));
-        const db = bins[b]; const v = Math.max(0, Math.min(1, (db + 100) / 90)), y = H - v * H; if (v > loud) loud = v;
-        g.lineTo(x, y);
+      let ys = null, loud = 0;
+      if (an) {
+        if (bins.length !== an.frequencyBinCount) bins = new Float32Array(an.frequencyBinCount);
+        an.getFloatFrequencyData(bins);
+        const ny = an.context.sampleRate / 2, mk = W + '|' + bins.length + '|' + ny;
+        if (mk !== mapKey) { mapKey = mk; const n = Math.max(0, Math.ceil(W)); map = new Int32Array(n); for (let x = 0; x < n; x++) { const f = 20 * Math.pow(1000, x / W); map[x] = Math.min(bins.length - 1, Math.round(f / ny * bins.length)); } }
+        ys = new Float32Array(map.length);
+        for (let x = 0; x < map.length; x++) { const v = Math.max(0, Math.min(1, (bins[map[x]] + 100) / 90)); ys[x] = H - v * H; if (v > loud) loud = v; }
       }
+      // silent, and the size, colour and theme as they were drawn → the picture on screen is already right
+      const qk = (ys && loud < 0.02) || !an ? W + '|' + H + '|' + c.width + '|' + col + '|' + thm + '|' + !!an : '';
+      if (qk && qk === quiet && !o.overlay) return;
+      quiet = qk;
+      g.clearRect(0, 0, W, H);
+      // 3.48.1 the display at rest is still a display: a frequency grid (100 · 1k · 10k) and dB lines, never a blank box
+      const bk = W + '|' + H + '|' + c.width + '|' + c.height;
+      if (bk !== bgKey || !bg) {
+        bgKey = bk; bg = global.document.createElement('canvas'); bg.width = c.width; bg.height = c.height;
+        const b = bg.getContext('2d'), d = c.width / W; b.scale(d, d);
+        b.fillStyle = '#080b10'; b.fillRect(0, 0, W, H);
+        b.fillStyle = '#121a25'; [50, 200, 500, 2000, 5000].forEach(f => b.fillRect(Math.round(xf(f)), 0, 1, H));
+        b.fillStyle = '#1c2838'; [100, 1000, 10000].forEach(f => b.fillRect(Math.round(xf(f)), 0, 1, H)); [0.25, 0.5, 0.75].forEach(t => b.fillRect(0, Math.round(H * t), W, 1));
+        if (H >= 40) { b.fillStyle = '#4d6178'; b.font = '9px monospace'; [[100, '100'], [1000, '1k'], [10000, '10k']].forEach(([f, t]) => b.fillText(t, xf(f) + 3, H - 4)); }
+      }
+      g.drawImage(bg, 0, 0, W, H);
+      if (!an) return;
+      g.beginPath(); g.moveTo(0, H);
+      for (let x = 0; x < ys.length; x++) g.lineTo(x, ys[x]);
       g.lineTo(W, H); g.closePath();
       // 3.87 the spectrum in a slowly moving sunset: its own colour → rose → amber → violet → its own colour again
-      const thm = global.document && global.document.documentElement.dataset.theme, plain = thm && thm !== 'dusk';
-      const hx = /^#[0-9a-f]{6}$/i.test(col) ? col : '#00d4ff', ph = (performance.now() / 12000) % 1, gr = g.createLinearGradient(-ph * W, 0, (2 - ph) * W, 0), gf = g.createLinearGradient(-ph * W, 0, (2 - ph) * W, 0);
-      [[0, hx], [0.12, '#ff6fa8'], [0.25, '#ffb36b'], [0.37, '#b06bff'], [0.5, hx], [0.62, '#ff6fa8'], [0.75, '#ffb36b'], [0.87, '#b06bff'], [1, hx]].forEach(([o, c]) => { gr.addColorStop(o, c); gf.addColorStop(o, c + '50'); });
-      if (plain) { g.fillStyle = hx + '55'; g.fill(); g.strokeStyle = hx; g.stroke(); } else { g.fillStyle = gf; g.fill(); g.strokeStyle = gr; g.lineWidth = 1.4; g.stroke(); g.lineWidth = 1; }
+      const hx = /^#[0-9a-f]{6}$/i.test(col) ? col : '#00d4ff', ph = (performance.now() / 12000) % 1;
+      if (plain) { g.fillStyle = hx + '55'; g.fill(); g.strokeStyle = hx; g.stroke(); }
+      else {
+        const gk = W + '|' + hx;
+        if (gk !== gradKey) {
+          gradKey = gk; const gr = g.createLinearGradient(0, 0, 2 * W, 0), gf = g.createLinearGradient(0, 0, 2 * W, 0);
+          [[0, hx], [0.12, '#ff6fa8'], [0.25, '#ffb36b'], [0.37, '#b06bff'], [0.5, hx], [0.62, '#ff6fa8'], [0.75, '#ffb36b'], [0.87, '#b06bff'], [1, hx]].forEach(([o, c]) => { gr.addColorStop(o, c); gf.addColorStop(o, c + '50'); });
+          grad = [gr, gf];
+        }
+        // the path was laid down in the display's own space; the gradient is read in the space at the time of filling — slid by −ph·W, as before
+        g.save(); g.translate(-ph * W, 0); g.fillStyle = grad[1]; g.fill(); g.strokeStyle = grad[0]; g.lineWidth = 1.4; g.stroke(); g.restore();
+      }
       if (loud < 0.02) { g.fillStyle = col + '55'; g.fillRect(0, H - 1.5, W, 1.5); if (H >= 40) { g.fillStyle = '#4d6178'; g.font = '10px sans-serif'; g.textAlign = 'right'; g.fillText('play a note to see its spectrum', W - 8, 14); g.textAlign = 'left'; } }
       if (o.overlay) o.overlay(g, W, H);
     }, 30);

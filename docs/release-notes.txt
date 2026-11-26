@@ -1,3 +1,19 @@
+ERAVOS v0.2.39 (2026-11-26)
+
+Install: ERAVOS-Setup-0.2.39.exe from the release, or ERAVOS offers it by itself.
+
+- Lyrics → Rhythm: TENSION — who speaks shapes the rhythm: the "you" lines answer off the beat, three against four, unresolved until the
+  last line comes home. ⇣ Import words: your .txt / .md files or a whole Notion export (.zip) — kept on this computer only.
+- The words' song shapes every note by its word: a question rises, a statement falls, accents scoop and open, the answer talks; drums roll on
+  the accents, ghost hats; the bass dives on the arrival. Patterns made from your words carry all of it.
+- A Piano part on any style: it opens the song alone, climbs through the breaks, soft dyads under the verses, octaves on the hits, one rolled
+  chord at the end.
+- The Piano without its rumble: every preset carried energy you could feel but not hear (Felt Lullaby 42 % under 30 Hz) — gone, each model
+  as loud as before. Clearer in every mix.
+- Autosave keeps your work across launches; Ctrl+S saves the project.
+- The Start button leaves the toolbar; the catalog has ← Domains in its corner.
+- The bassline no longer lags after a stall; the displays draw the same for less.
+
 ERAVOS v0.2.38 (2026-11-26)
 
 Install: ERAVOS-Setup-0.2.38.exe from the release, or ERAVOS offers it by itself.
