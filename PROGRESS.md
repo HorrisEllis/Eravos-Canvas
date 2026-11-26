@@ -2,6 +2,20 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.234 The piano without its rumble (2026-11-26)
+His words: "But make some sound beautiful. The piano doesn't get enough love."
+- Measured first (an offline render of each factory preset, a middle-C dyad): Felt Lullaby put 42 % of its energy under 30 Hz and a third more
+  between 30 and 120 Hz; Concert Grand 12 %, Upright Jazz 14 % under 30 Hz. The words-song's piano intro was 75 % under 30 Hz — a boom you feel,
+  not a piano. The cause: the soft hammer's long raised-cosine pulse goes straight through the string loop, carrying everything under the note.
+- piano.engine.js: each voice is high-passed under its own note (two poles at half the fundamental, never under 20 Hz) — the note keeps its
+  fundamental, the mud under it goes; the whole piano then passes a 28 Hz high-pass (4 poles). Under 30 Hz is now 1–2 % on every preset; Felt
+  Lullaby's 30–120 Hz 32 % → 4 %.
+- The loudness the rumble took with it (−2.1 … −3.3 dB per model, measured on a three-note chord) given back per model (LIFT): every model's level
+  within 0.05 dB of before.
+- rhythm-expand: the piano opening a words-song alone plays at 0.5–0.7 (was 0.32–0.44 — soft, and the rumble hid how soft); the outro's rolled chord 0.7.
+- Guard: P182 "no rumble under the notes" — every factory preset under 30 Hz < 4 %, 30–120 Hz < 12 %. Fails on the old code (Felt Lullaby 49.3 %).
+- Proof: P182 7/7, piano 51/51, P163 33/33. The null render's piano baseline (per machine, gitignored) changes on purpose — re-record it.
+
 ## 3.233 Every note shaped by its word; the Piano in every words-song (2026-11-26)
 His words: "I contrast as you might have notives" · "Also Make sure you use the per note editing, curves, way too much variance to waste in nexus. Like multidimentional. Really push Eravos. Like all of the tools. But make some sound beautiful. The piano doesn't get enough love."
 - rhythm-expand: expr 0…1 — LEAD: a question's last note rises (+2), a statement falls (−1), an accent scoops in (−2 → 0) and opens, a light

@@ -101,8 +101,8 @@
         const w = c.sec.words;
         if (!w) {                                                   // intro / outro: the genre's own bar (lower with depth)
           if (c.role === 'keys') {   // the piano alone at the start: a slow climb through the chord; at the end one rolled chord, held
-            if (c.kind === 'outro') return c.b === 0 ? [Object.assign(N(0, 32, MT().degreeToMidi(c.deg, (c.P.octave || 4) - 1, c.key.root, c.key.scale), 0.6), { x: { iv: ivOf(c.deg, [4, 7, 9, 11], c.key), strum: 90, dir: 'up' } })] : [];
-            return [0, 2, 4, 7, 9, 7, 4, 2].map((d, i) => human(N(i * 2, 6, MT().degreeToMidi(c.deg + d, c.P.octave || 4, c.key.root, c.key.scale), 0.32 + 0.06 * (i % 3)), 1.2));
+            if (c.kind === 'outro') return c.b === 0 ? [Object.assign(N(0, 32, MT().degreeToMidi(c.deg, (c.P.octave || 4) - 1, c.key.root, c.key.scale), 0.7), { x: { iv: ivOf(c.deg, [4, 7, 9, 11], c.key), strum: 90, dir: 'up' } })] : [];
+            return [0, 2, 4, 7, 9, 7, 4, 2].map((d, i) => human(N(i * 2, 6, MT().degreeToMidi(c.deg + d, c.P.octave || 4, c.key.root, c.key.scale), 0.5 + 0.08 * (i % 3) + (i === 0 ? 0.1 : 0)), 1.2));   // 3.234: heard alone, not under the mix (it was 0.32–0.44: soft, and the rumble hid how soft)
           }
           if (!D) return null;
           if (c.role === 'chords') return H.chordBar(c.sec.chordStyle || c.P.style, c.deg, c.key, c.P.voicing, (c.P.octave || 4) - cdown);

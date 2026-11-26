@@ -37,6 +37,15 @@ describe('Piano — modelled live: tine, reed, felt, upright, honky, grand', () 
     for (const name of names) { const p = Object.assign({ drive: 0, trem: 0, sympathetic: 0, resonance: 0, keyOff: 0 }, (pr[name] && pr[name].params) || pr[name]);
       const r = await play(p, phrase.map(([n, t, d]) => [n, t, d, 0.85]), 3.2); const pk = peak(r.L); assert.lt(pk, 1, name + ': peak ' + pk.toFixed(3)); assert.gt(rms(r.L, S(r, 0.2), S(r, 2.5)), 0.01, name + ' sounds'); }
   });
+  it('no rumble under the notes: every factory preset, a middle-C dyad — under 30 Hz < 4 %, 30–120 Hz < 12 % of what it plays (3.234)', async () => {
+    // his "The piano doesn't get enough love." (2026-11-26): measured before 3.234, Felt Lullaby put 42 % of its energy under 30 Hz and a third between 30 and 120
+    const pr = OrganismFactory.def('eravos.piano').presets || {};
+    const band = (d, sr, f0, f1) => { let s = 0; const n = 8192, a = Math.floor(0.12 * sr); for (let f = f0; f < f1; f += 2) { const g = goertzel(d, a, n, f, sr); s += g * g; } return s; };
+    for (const name of Object.keys(pr)) { const p = Object.assign({}, (pr[name] && pr[name].params) || pr[name]);
+      const r = await play(p, [[60, 0.1, 1.2, 0.6], [64, 0.1, 1.2, 0.5]], 1.6);
+      const lo = band(r.L, r.sr, 2, 30), mid = band(r.L, r.sr, 30, 120), all = lo + mid + band(r.L, r.sr, 120, 2000);
+      assert.lt(lo / all, 0.04, name + ': under 30 Hz ' + (100 * lo / all).toFixed(1) + ' %'); assert.lt(mid / all, 0.12, name + ': 30–120 Hz ' + (100 * mid / all).toFixed(1) + ' %'); }
+  });
   it('pitch: A3 plays 220 Hz — the tine and the grand', async () => {
     for (const model of ['tine', 'grand']) {
       const r = await play({ model, brightness: 0.1, hardness: 0.2, inharm: 0, detune: 0, width: 0 }, [[57, 0.02, 1.5, 0.7]], 1.6);

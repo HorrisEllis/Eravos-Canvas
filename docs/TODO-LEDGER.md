@@ -131,3 +131,4 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | D-06 | The README, current, with pictures (3.218); the exploded note in it (3.219, 0.2.35) | PR #215, #216 |
 | D-07 | Start in two steps; borderless window; the 3D exploded note (3.220, 0.2.36) | PR #217 · p16-ui (the two steps) |
 | D-08 | This ledger, the 2026-11-24 session map, the specs' addenda and phases (3.221) | `specs/eravos.2026-11-24-session.map.spec`, `specs/eravos.performance-plan.spec` |
+| D-09 | The piano without its rumble (3.234): "The piano doesn't get enough love." — energy under hearing cut (each voice under its note, the piano at 28 Hz), loudness given back per model | `piano.engine.js` · P182 7/7 (guard fails on the old code) |

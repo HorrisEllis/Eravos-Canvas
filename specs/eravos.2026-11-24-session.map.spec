@@ -247,3 +247,6 @@
     one note, chance, ratchets, humanize) and the PIANO (a Piano part on any style: it opens alone, climbs through the breaks, soft dyads under
     the verses, octaves on the hits, one rolled chord at the end). Lyrics → Rhythm › Expression · Piano. Heard: his two poems rendered (to him).
   - RULE (his): contrast is his way ("I contrast as you might have notives") — every words-song capability keeps contrast first.
+  - BUILT 3.234 (the same words, "The piano doesn't get enough love."): measured, the piano carried a rumble under hearing (Felt Lullaby 42 %
+    under 30 Hz) — cut under each note and at 28 Hz, every model's loudness given back; the words-song piano intro played out (0.5–0.7). A
+    guard in P182 holds it.
