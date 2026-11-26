@@ -222,3 +222,10 @@
   - BUILT 3.230: the yellow gone (a made tool's colour = its parents' blended; an auto board's parts in the tool's own colour family);
     what mixes with what: every synthesis plan says what it will sound like ("wobble synthwave") and which tool brings which character
     (ToolBlend.CHAR / sound). SPECCED: specs/eravos.ui-elements-and-combining.spec (UE type / style, CB combine two components, EX engines).
+
+## 42 — verbatim (2026-11-26, of "the composite node" in the coder's answer on what is highest leverage):
+  > What the highest leverage?
+  > didn't i name it in the spec?
+  - ANSWERED: yes — SNAP, his (specs/eravos.workbench.spec ADDENDUM 2026-11-15 (3): "it would also be cool to 'snap off' components and snap components together."); the spec now says so (ADDENDUM (2)).
+  > also merge and push. need to be able to delete custom tools. rename them. open them in workshop and edit them fully.
+  - DONE: the branch merged (PR). BUILDING 3.231: a made tool deleted, renamed, opened in the Workshop and edited fully.

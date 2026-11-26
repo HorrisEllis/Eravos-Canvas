@@ -29,3 +29,10 @@
 
 ## order (proposed): CB1–CB2 with the composite node (it also unlocks EX1) → UE1 (right-click › Show as) → UE2 (styles, shown first) → EX1 → EX2
 ## open (his): which first — change elements (UE) or combine components (CB)?
+
+ADDENDUM 2026-11-26 (2) — its name is his (the original above kept verbatim)
+his words (verbatim): "didn't i name it in the spec?" — yes: specs/eravos.workbench.spec ADDENDUM 2026-11-15 (3), his words (06:12): "it would also be cool to 'snap off' components and snap components together."
+  and the levels (ADDENDUM (2), 05:36): "primitives are the smallest piece of a component, then component the smallest piece of the tool, then
+  tool of the suite or toolbox maybe? then of the miniworld?". So CB is SNAP: snap components together (a component made of components —
+  or of primitives, WB8), snap them off again. What this spec called "the composite node" is the engine side of SNAP. CB1–CB3 read as
+  SNAP1–SNAP3 from here on; nothing else changes.
