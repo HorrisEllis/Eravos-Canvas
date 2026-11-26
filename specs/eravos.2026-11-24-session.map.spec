@@ -205,3 +205,9 @@
     stanza the part its words are and turns a stanza with opposites line by line; Lyrics → Rhythm shows SHAPE (each stanza's part and why)
     and "How words become music". P228 4/4. Next (T-53 … T-55): a tool that teaches it step by step on his own words; the vocal itself; the
     poetry index as songs to start from.
+
+## 39 — verbatim (2026-11-25, with his personal book of philosophy — kept with him, not here):
+  > How does it sound? Like I want it deep as hell.
+  > More of my rhythm. Make patterns.
+  - BUILT 3.229: Depth (Lyrics → Rhythm › SONG; build/render-words.mjs renders and measures it: his poem's song as WAVs, given to him);
+    ⇢ Patterns (each stanza: words · mirror · shadow · pendulum) — the pendulum from his own book: "The amount of time the pendulum swings to the left is directly proportional to the amount of time in takes to swing to the right."

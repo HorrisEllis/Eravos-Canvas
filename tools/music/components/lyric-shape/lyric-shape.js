@@ -1,4 +1,4 @@
-/* eravos.component.lyric-shape 1.0.0 — the shape of the words: where they push, where they rest, where they turn (3.228, 2026-11-25).
+/* eravos.component.lyric-shape 1.1.0 — the shape of the words: where they push, where they rest, where they turn (3.228, 2026-11-25).
  * His words (2026-11-25): "continue making more tools for eravos. i want to make music with contrast. thats my rhytm" · "i want to learn how
  * to make music from my lyrics. that is the point of the rhythm tool"
  * NEW code. It reads any lyrics (a blank line = a new stanza) and says, for each stanza, what its words already do — so the music can do it
@@ -14,6 +14,7 @@
  * more opposites (its lines take turns: dark lines low and bare, light lines high and full). `contrast` 0…1: how hard neighbours are
  * pushed apart (0 = every stanza a verse, as before). Every choice comes with its reason in plain words (`why`).
  *   MusicParts.LyricShape.read(text, { contrast, syllables(line) → [{ stress }] }) → { stanzas: [...], arc: [kinds], lesson: [steps] }
+ *   MusicParts.LyricShape.patterns(placedSyllables, { bars }) → { bars, words, mirror, shadow, pendulum: { bars, notes } } (1.1.0)
  * The word lists are data here and small on purpose (static earns its place): they only steer, they never decide alone. A component
  * imports no tool: the syllable counter is passed in (Lyrics → Rhythm's), with a plain vowel-group counter when it is not. */
 (function (root) {
@@ -91,7 +92,27 @@
       'Opposites in one stanza (light and dark, peaks and valleys) can be heard: the music turns with the words, line by line.'];
     return { stanzas, arc: stanzas.map(s => s.kind), lesson, contrast };
   }
-  const api = { read, stanzasOf, plainSyllables, PAIRS, LIGHT, DARK, PUSH, version: '1.0.0' };
+  // ---------------------------------------------------------------- 1.1.0 PATTERNS from the words' rhythm (3.229; his words, 2026-11-25: "More of
+  // my rhythm. Make patterns." — and his own law, the same day: "The amount of time the pendulum swings to the left is directly proportional to
+  // the amount of time in takes to swing to the right."). From one stanza's placed syllables ([{ s, l, stress }] in 16ths), four rhythms:
+  //   words     as the words fall                         mirror    the same bar played back, right to left (the pendulum's return)
+  //   shadow    the rests become the hits (negative space: what the words leave out, on the 8ths)
+  //   pendulum  the words, then their mirror — as long out as back
+  // each ≤ `bars` bars (default 4), whole bars; stress kept (a mirrored strong syllable stays strong; a shadow hit on a beat is strong).
+  function patterns(notes, o) {
+    o = o || {}; const maxBars = Math.max(1, Math.min(8, o.bars || 4)), src = (notes || []).filter(n => isFinite(n.s) && n.s >= 0).map(n => ({ s: +n.s, l: Math.max(0.25, +n.l || 1), stress: n.stress | 0 }));
+    if (!src.length) return null;
+    const end = Math.max(...src.map(n => n.s + n.l)), bars = Math.max(1, Math.min(maxBars, Math.ceil(end / 16))), L = bars * 16, inL = src.filter(n => n.s < L);
+    const r3 = (x) => Math.round(x * 1000) / 1000;
+    const words = inL.map(n => ({ s: r3(n.s), l: r3(Math.min(n.l, L - n.s)), stress: n.stress }));
+    const mirror = words.map(n => ({ s: r3(Math.max(0, L - n.s - n.l)), l: n.l, stress: n.stress })).sort((a, b) => a.s - b.s);
+    const busy = new Array(L).fill(false); words.forEach(n => { for (let k = Math.floor(n.s); k < Math.min(L, Math.ceil(n.s + n.l)); k++) busy[k] = true; });
+    const shadow = []; for (let k = 0; k < L; k += 2) if (!busy[k] && !busy[k + 1]) shadow.push({ s: k, l: 2, stress: k % 4 === 0 ? 1 : 0 });
+    const half = Math.max(1, Math.floor(bars / 2)), H = half * 16, w2 = words.filter(n => n.s < H), pendulum = w2.map(n => ({ s: n.s, l: Math.min(n.l, H - n.s), stress: n.stress }))
+      .concat(w2.map(n => ({ s: r3(2 * H - n.s - Math.min(n.l, H - n.s)), l: Math.min(n.l, H - n.s), stress: n.stress }))).sort((a, b) => a.s - b.s);
+    return { bars, words, mirror, shadow, pendulum: { bars: half * 2, notes: pendulum } };
+  }
+  const api = { read, patterns, stanzasOf, plainSyllables, PAIRS, LIGHT, DARK, PUSH, version: '1.1.0' };
   root.MusicParts = root.MusicParts || {};
   root.MusicParts.LyricShape = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

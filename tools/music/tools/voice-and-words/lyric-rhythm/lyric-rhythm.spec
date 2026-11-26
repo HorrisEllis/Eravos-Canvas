@@ -59,3 +59,16 @@ BUILT 3.228:
   - SHAPE (the lesson): each stanza's part, its energy, and WHY in words; "How words become music" — five steps from syllable to song.
   - RhythmExpand.generate(text, { shape: 'contrast', contrast }) · RhythmExpand.shape(text) — the API's default stays 'verses' (P21 unchanged).
 proof: tests/p228-words-contrast.test.js 4/4 · lyric-shape.test.mjs 17 · P20 47/47 · RhythmExpand 6/6 · Bass Pack 9/9 · boundary 10/10
+
+ADDENDUM 2026-11-25 (1.2.0; the originals above kept verbatim)
+his words (verbatim): "How does it sound? Like I want it deep as hell." · "More of my rhythm. Make patterns." — with his personal book of philosophy (kept with him, not in the repo);
+  from it, the law the patterns follow: "The amount of time the pendulum swings to the left is directly proportional to the amount of time in takes to swing to the right."
+BUILT 3.229:
+  - SONG › Depth 0…1 (0.7 here; the API's default 0 = as before): the lead down up to two octaves, the chords one, the bass held longer and
+    harder in the drop / chorus / build, the kick heavier, a boom on 1 of every drop and chorus bar.
+  - ⇢ Patterns: every stanza → four patterns in Patterns › Yours (drums or melody, as Plays as): its WORDS · their MIRROR (the bar played
+    back — the pendulum's return) · their SHADOW (the rests become the hits — negative space) · the PENDULUM (out, then back, as long each
+    way). Made by lyric-shape 1.1.0 patterns(); saved in one go (PF_LIB.saveNotes { later }).
+  - build/render-words.mjs: the song from any lyrics file rendered offline to a WAV and measured per section (loudness, peak, pinned, low end).
+proof: tests/p229-deep-and-patterns.test.js 2/2 · lyric-shape 23 checks · render-words on his poem: low end of the drop 32 % → 39 % (darkwave,
+  depth 0 → 1); witch-house is already loud with words (−6 dB RMS, the master limiter holds it: ≤ 0.14 % of samples at the ceiling).

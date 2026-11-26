@@ -39,7 +39,7 @@
     o = o || {}; const K = global.Kernel, root = K && K.music && K.music.key ? +K.music.key.root || 0 : 0, a = readSaved(), nm = name || ('Pattern ' + (a.filter(q => q.notes).length + 1));
     const bars = Math.max(1, Math.min(8, Math.ceil(Math.max(1, ...notes.map(n => n.s + n.l)) / 16)));
     a.push({ name: nm, drums: !!o.drums, tool: o.tool || null, bars, at: Date.now(), notes: notes.map(n => Object.assign(o.drums ? { s: n.s, l: n.l, n: n.n, v: n.v } : { s: n.s, l: n.l, r: n.n - root, v: n.v }, keep(n))) });
-    writeSaved(a); ensureSource(); if (global.PatternLibrary) global.PatternLibrary.rebuild(); return nm;
+    writeSaved(a); ensureSource(); if (global.PatternLibrary && !o.later) global.PatternLibrary.rebuild(); return nm;   // o.later: many at once, the caller rebuilds once (3.229)
   }
   function saveShape(d, name) {
     const P = {}; Object.keys(d).forEach(k => { if (k[0] !== '_') P[k] = d[k]; }); const a = readSaved(), nm = name || ('Shape ' + (a.length + 1));

@@ -40,4 +40,13 @@ let calls = 0; L.read(POEM, { syllables: (l) => { calls++; return L.plainSyllabl
 // edges
 ok(L.read('').stanzas.length === 0 && L.read('   \n\n ').arc.length === 0, 'no words, no shape');
 const one = L.read('just one line here'); ok(one.stanzas.length === 1 && one.arc.length === 1, 'one line, one stanza');
+// 1.1.0 patterns: words · mirror · shadow · pendulum
+const P = L.patterns([{ s: 0, l: 2, stress: 1 }, { s: 2, l: 1, stress: 0 }, { s: 4, l: 2, stress: 1 }, { s: 8, l: 4, stress: 1 }]);
+ok(P.bars === 1 && P.words.length === 4, 'one bar of words');
+ok(P.mirror.map(x => x.s).join() === '4,10,13,14' && P.mirror.filter(x => x.stress).length === 3, 'mirror: the bar played back, stress kept: ' + P.mirror.map(x => x.s));
+ok(P.shadow.map(x => x.s).join() === '6,12,14' && P.shadow.find(x => x.s === 12).stress === 1, 'shadow: the rests on the 8ths become hits: ' + P.shadow.map(x => x.s));
+const P2 = L.patterns([{ s: 0, l: 2, stress: 1 }, { s: 6, l: 2, stress: 0 }, { s: 20, l: 2, stress: 1 }]);
+ok(P2.bars === 2 && P2.pendulum.bars === 2 && P2.pendulum.notes.map(x => x.s).join() === '0,6,24,30', 'pendulum: as long out as back: ' + P2.pendulum.notes.map(x => x.s));
+ok(L.patterns([]) === null, 'no syllables, no patterns');
+ok(L.patterns(Array.from({ length: 40 }, (_, i) => ({ s: i * 4, l: 2, stress: 1 }))).bars === 4, 'at most 4 bars');
 console.log(`✓ lyric-shape: ${n} checks`);

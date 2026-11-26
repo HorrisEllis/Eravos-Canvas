@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.229 Deep as hell; patterns from the words (2026-11-25)
+His words: "How does it sound? Like I want it deep as hell." · "More of my rhythm. Make patterns." (with his personal book of philosophy — kept with him, not in the repo). From it, the rule the
+patterns keep: "The amount of time the pendulum swings to the left is directly proportional to the amount of time in takes to swing to the right."
+- data/rhythm-expand.js: depth 0…1 — the lead down up to two octaves, the chords one, the bass held longer and harder in the loud parts,
+  the kick heavier, a boom on 1 of every drop / chorus bar; intro / outro lowered too. 0 = as before (P21 unchanged).
+- lyric-shape 1.1.0: patterns(syllables) → words · mirror (retrograde: the pendulum's return) · shadow (the rests on the 8ths become hits:
+  negative space) · pendulum (out then back, as long each way); ≤ 4 bars.
+- Lyrics → Rhythm 1.2.0: SONG › Depth (0.7); ⇢ Patterns → each stanza's four patterns into Patterns › Yours (drums or melody). PF_LIB.saveNotes
+  takes { later } so a batch rebuilds the library once.
+- build/render-words.mjs (NEW): any lyrics file → the song rendered offline → WAV + per section loudness, peak, pinned %, low-end share.
+  His poem, measured: the drop's low end 32 % → 39 % with depth (darkwave); witch-house is loud with words already (−6 dB RMS, ≤ 0.14 % pinned).
+- Tests: tests/p229-deep-and-patterns.test.js 2/2; lyric-shape 23 checks; P228 P21 P22 P20 boundary.
+
 ## 3.228 Music with contrast from the words; the SHAPE and the lesson (2026-11-25)
 His words: "continue making more tools for eravos. i want to make music with contrast. thats my rhytm;" · "i want to learn how to make music from my lyrics. that is the point of the rhythm tool" (his poem as the lyrics; his poetry index as a zip — kept with him, not in the repo)
 - tools/music/components/lyric-shape (NEW, contract, spec, 17 checks): per stanza density, space, stress, light / dark words, push, opposites,

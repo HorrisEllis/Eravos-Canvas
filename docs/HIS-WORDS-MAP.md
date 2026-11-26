@@ -288,3 +288,6 @@ kept), or **open** (not done yet, and what is missing). Newest at the bottom. Ad
 | N-X139 | "Use this to find domains we can use this canvas for" (2026-11-25, with his Innovation Toolkit) | **mapped** + **open** (which first) | specs/eravos.domains-from-the-toolkit.spec · T-48 … T-52 |
 | N-X140 | "continue making more tools for eravos. i want to make music with contrast. thats my rhytm;" (2026-11-25, his poem as the lyrics) | **built** (part) | 3.228 lyric-shape; ♫ Make a song with contrast; P228 |
 | N-X141 | "i want to learn how to make music from my lyrics. that is the point of the rhythm tool" (2026-11-25) | **built** (the SHAPE + the lesson) + **open** (step-by-step) | Lyrics → Rhythm 1.1.0 · T-53 |
+| N-X142 | "How does it sound? Like I want it deep as hell." (2026-11-25) | **built** + **his ear decides** | 3.229 Depth; WAVs of his poem rendered and measured (build/render-words.mjs) |
+| N-X143 | "More of my rhythm. Make patterns." (2026-11-25) | **built** | 3.229 ⇢ Patterns: words · mirror · shadow · pendulum per stanza |
+| N-X144 | "The amount of time the pendulum swings to the left is directly proportional to the amount of time in takes to swing to the right." (2026-11-25, his book of philosophy) | **rule** (for the patterns) | lyric-shape 1.1.0 patterns(): the pendulum — as long out as back |

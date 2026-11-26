@@ -55,10 +55,11 @@ OrganismFactory.reg('eravos.lyric-rhythm', function (view) {
       UI.Button({ label: '▶ Hear it', hint: 'play it once now', onClick: () => view.emit('preview', {}) }).el,
       UI.Button({ label: '⇢ Timeline', hint: 'put it on the Timeline as a clip you can edit', onClick: () => view.emit('send_timeline', {}) }).el,
       UI.Button({ label: '⇢ Sequencer', hint: 'your words as Sequencer lanes (4 bars per slot, chained) + a her-voice lane on every line start — then automate it', onClick: () => view.emit('send_sequencer', {}) }).el,
+      UI.Button({ label: '⇢ Patterns', hint: 'every stanza → four patterns in Patterns › Yours: the words, their mirror, their shadow (the rests become hits), the pendulum (out and back) — as drums or melody', onClick: () => view.emit('make_patterns', {}) }).el,
       UI.Button({ label: '↺', hint: 'undo your weight/nudge edits', onClick: () => view.emit('reset_edits', {}) }).el])]),
     ta, h('div', { class: 'org-row lyr-ctl' }, [seg('flow')]),
     h('div', { class: 'org-row lyr-ctl' }, [UI.Button({ label: '♫ Make a song', kind: 'primary', hint: 'grow this rhythm into a whole song, written below on the Timeline', onClick: () => view.emit('expand_song', {}) }).el, UI.paramControl(view, cfg('songGenre'), { segMax: 4 }).el]), h('div', { class: 'org-row lyr-ctl' }, [seg('mode'), tgt]),
-    grid, status, h('div', { class: 'org-row lyr-ctl' }, [UI.paramControl(view, cfg('songShape'), { segMax: 2 }).el, UI.paramControl(view, cfg('contrast'), { size: 30 }).el]), shapeBox,
+    grid, status, h('div', { class: 'org-row lyr-ctl' }, [UI.paramControl(view, cfg('songShape'), { segMax: 2 }).el, UI.paramControl(view, cfg('contrast'), { size: 30 }).el, UI.paramControl(view, cfg('depth'), { size: 30 }).el]), shapeBox,
     UI.paramPanel(view, ['bars', 'vary', 'octave', 'range', 'gate', 'level'], { flat: true, noTitles: true, size: 30 }),
     UI.hint('Words become rhythm: strong syllables land on the beat. Click a syllable to make it weak / strong / ACCENT, drag to move it. Wire ⇢ to any instrument, or it plays the first Drum Machine (drums) or synth (melody). Space plays it with the song.'));
   UI.alive(view, { events: ['syl'], port: null });
