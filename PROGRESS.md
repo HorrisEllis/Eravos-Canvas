@@ -2,6 +2,33 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.235 The bassline no longer lags: notes booked ahead after a stall; the displays draw less (2026-11-26)
+His words: "Also the bassline keeps lagging." (the whole message: specs/eravos.2026-11-24-session.map.spec 34)
+- Measured with Bassline → Deep Sub playing (the probe: notes' booking time against the audio clock; every display loop timed).
+- tools/music/core/master-transport.js: the look-ahead adapts — a clock wake later than 2 intervals raises it to the stall + 40 ms (≤ 0.35 s),
+  4 s calm eases it back to 0.1 s; T.timing { late, lookahead }. Before: 3 of 19 notes late (to 63 ms; 214 ms at start) · after: 0 of 19
+  (1 of 19 with Chords wired, 27 ms, after a > 0.35 s stall of the headless browser).
+- canvas/runtime/ui-kit.js: Canvas.fit() asks for its size at most twice a second (it forced a layout every frame for every display).
+- tools/music/tools/bass/bass-gen/bass-gen.ui.js: the map redraws only when a note, the step, its width or accent changes; one gradient per picture.
+- tools/music/core/ui-music.js Spectrum: the grid a cached picture; which bin each pixel reads worked out once per width; the sunset's two
+  gradients made once and slid (read in a translated space, the path kept); nothing redrawn while silent and unchanged. The same picture
+  (before / after screenshots compared).
+- Tests: Bassline 26/26, bass-gen 4/4, chord-gen 4/4, sub-engine 12/12, P22 21/21, P163 33/33, P11 92/92, P58 18/18, P112 13/13, P147 1/1,
+  boundary 10/10, design check no worse. Timeline 88/89 (the wheel test, failing on main before — CLAUDE.md › Open).
+## 3.232–3.234 The Start button out, ← Domains; the autosave fixed, Ctrl+S (2026-11-25) — renumbered from 3.226–3.228 when merged with main (a parallel session had used them); 3.234 (not made → flash) withdrawn: main's 3.226 does it
+His words: "also told you to remove the add button once i pick a domain, up wheere it says add to canvas, add a back to domains screen," · "after that can you fix the autosave? also make control s a hotkey to save." · "okay i need it to like flash when it can't synthesize, not a toast with no direction" (and "also can you make all of the ui consistent? all of the canvas, and the themese." — open, T-39)
+- 3.232 canvas/index.html: the Start button removed from the toolbar (window.ShellStart opens the domain screen); canvas/runtime/add-menu.js:
+  "← Domains" top left of the catalog; eravos.css .ap-back (as the catalog's close button). docs/previews/catalog-back.shots.mjs.
+- 3.233 canvas/runtime/workspace.js: WORK = a tool that is not docked (domain-free); no autosave without work; each launch its own history
+  entry (10 kept); bestAutosave(); the open project remembered (current). canvas/index.html: Start offers the newest autosave with work and
+  counts only work; Ctrl+S saves the project (name asked once), a new canvas or a restore forgets the project. tests/p233-autosave.mjs 6/6
+  (reproduced first: 10 tools → a relaunch + a domain picked → "1 tools").
+- (withdrawn, superseded by main's 3.226) tools/music/core/assembled-tool.js: a failure carries kind · title · fix · blame (twin — all parts from one tool or sounds like X;
+  loud; silent; parts it cannot run) and restUseful; tools/core/field/board.js (domain-free): failCard — the blamed boxes (or the cores)
+  flash red; a card beside them: why, what to do, buttons (the rest from another tool when it can change something · Mutate these parts ·
+  Try again); Esc / ✕ / the next try closes it. tests/p228-not-made.test.js 2/2; docs/previews/workbench/not-made.shots.mjs.
+- Tests: P38 42/42, P21 27/27 (P218 fixed to pick its own Wobble Bass — it took one an earlier test left), P110, P120, P100, P19, runtime,
+  P203 P205 P216 P217 P218 P228, assembled-tool 32, boundary 10/10, design check no worse. P17's 2 failures are on main too.
 ## 3.231 A made tool is his: rename it, edit it fully in the Workshop, delete it (2026-11-26)
 His words: "also merge and push. need to be able to delete custom tools. rename them. open them in workshop and edit them fully." (merged first: PR #224, 3.226–3.230)
 - assembled-tool.js: Model.get / rename (made unique, kept, the def and every open window's title follow; the id stays so songs still find it) /

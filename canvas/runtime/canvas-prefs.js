@@ -27,7 +27,7 @@
   root.dataset.gfx = gfxGet();
 
   const KEYS = [
-    ['Canvas', [['Space', 'play / stop'], ['Ctrl + Z · Ctrl + Shift + Z', 'undo · redo'], ['Shift + Esc', 'stop everything'], ['Ctrl + ,', 'Settings'], ['Alt while dragging', 'place a window freely (no snapping)'], ['Wheel · Ctrl + wheel', 'scroll · zoom the canvas'], ['Right-click', 'a menu for what is under the pointer']]],
+    ['Canvas', [['Space', 'play / stop'], ['Ctrl + Z · Ctrl + Shift + Z', 'undo · redo'], ['Ctrl + S', 'save the project (its name asked the first time) · Ctrl + Shift + S saves an .erv file'], ['Shift + Esc', 'stop everything'], ['Ctrl + ,', 'Settings'], ['Alt while dragging', 'place a window freely (no snapping)'], ['Wheel · Ctrl + wheel', 'scroll · zoom the canvas'], ['Right-click', 'a menu for what is under the pointer']]],
   ];
   const addKeys = (group, rows) => { if (!group || !Array.isArray(rows)) return; const g = KEYS.find(k => k[0] === group); if (g) g[1].push(...rows); else KEYS.push([group, rows.slice()]); };
   function graphics() {

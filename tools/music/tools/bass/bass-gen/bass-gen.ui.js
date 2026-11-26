@@ -19,14 +19,18 @@ OrganismFactory.reg('eravos.bass-gen', function (view) {
   const notes = new Array(32).fill(null); let cursor = -1;
   const now = h('div', { class: 'bl-now', text: '—' }), src = h('div', { class: 'bl-src', text: '' });
   const cv = UI.Canvas(560, 150); cv.classList.add('gg-map');
+  // 3.235 drawn only when something changed — a note, the cursor's step, the size, the colour (measured: this map alone took ~270 ms of every
+  // second at 30 redraws a second; the picture is the same, ~8 redraws a second at 120 BPM)
+  let ver = 0, drawn = '';
   UI.loop(cv, () => {
-    const g = cv.g, W = cv.fit().W, H = cv.H, cw = W / 32, A = acc(cv); g.clearRect(0, 0, W, H);
+    const W0 = cv.fit().W, A0 = acc(cv), key = ver + '|' + W0 + '|' + A0 + '|' + (cv._v || 0); if (key === drawn) return; drawn = key;
+    const g = cv.g, W = W0, H = cv.H, cw = W / 32, A = A0; g.clearRect(0, 0, W, H);
     for (let s = 0; s < 32; s++) { g.fillStyle = s % 4 === 0 ? '#121a24' : '#0c121a'; g.fillRect(s * cw + 1, 1, cw - 2, H - 2); }
     g.fillStyle = '#1c2836'; g.fillRect(W / 2 - 0.5, 0, 1, H);
     const on = notes.filter(Boolean); if (on.length) {
       let lo = Math.min(...on.map(n => n.note)), hi = Math.max(...on.map(n => n.note)); if (hi - lo < 12) { const m = (hi + lo) / 2; lo = m - 6; hi = m + 6; }
       const y = (n) => 10 + (1 - (n - lo) / (hi - lo)) * (H - 26), nh = 9;
-      let prev = null;
+      let prev = null; const fillD = UI.dusk ? UI.dusk(g, 0, W, A) : A;   // 3.235 one gradient per picture (the same for every note)
       for (let s = 0; s < 32; s++) {
         const n = notes[s]; if (!n) continue;
         let nx = s + 1; while (nx < 32 && !notes[nx]) nx++;   // a note is drawn until the next one starts
@@ -37,7 +41,7 @@ OrganismFactory.reg('eravos.bass-gen', function (view) {
         }
         g.globalAlpha = 0.3 + 0.7 * n.vel; g.shadowColor = A; g.shadowBlur = n.ghost ? 0 : 8 * n.vel;
         if (n.ghost) { g.strokeStyle = A; g.lineWidth = 1; g.strokeRect(x, yy, w, nh); }
-        else { g.fillStyle = (UI.dusk ? UI.dusk(g, 0, W, A) : A); g.fillRect(x, yy, w, nh); }
+        else { g.fillStyle = fillD; g.fillRect(x, yy, w, nh); }
         g.shadowBlur = 0; g.globalAlpha = 0.85; g.fillStyle = '#e8eef6'; g.font = '600 8.5px monospace';
         if (!n.ghost && w > 18) g.fillText(n.name, x + 2, yy - 2);
         g.globalAlpha = 1; prev = { x, w, y: yy };
@@ -45,8 +49,8 @@ OrganismFactory.reg('eravos.bass-gen', function (view) {
     }
     if (cursor >= 0) { const x = cursor * cw; g.fillStyle = 'rgba(255,255,255,.06)'; g.fillRect(x, 0, cw, H); g.fillStyle = A; g.shadowColor = A; g.shadowBlur = 8; g.fillRect(x, 0, 2, H); g.shadowBlur = 0; }
   }, 30);
-  view.on('bass_note', (n) => UI.atTime(view.ac, n.time, () => { notes[n.step] = n; now.textContent = n.name; }));
-  view.on('bass_step', (x) => UI.atTime(view.ac, x.time, () => { cursor = x.step; notes[(x.step + 1) % 32] = null; }));
+  view.on('bass_note', (n) => UI.atTime(view.ac, n.time, () => { notes[n.step] = n; now.textContent = n.name; ver++; }));
+  view.on('bass_step', (x) => UI.atTime(view.ac, x.time, () => { cursor = x.step; notes[(x.step + 1) % 32] = null; ver++; }));
   view.on('state_sync', (s) => { if (!s) return; if (s.note) now.textContent = s.note.name; if (s.following !== undefined) src.textContent = (s.following ? 'ON THE KICK OF THE WIRED GROOVE' : 'ON ITS OWN RHYTHM') + ' · ' + (s.chordFrom ? 'CHORDS FROM THE WIRED CHORDS' : 'ITS OWN CHORDS'); if (s.params && s.params.steps) paintSteps(s.params.steps); });
 
   // ---- the window

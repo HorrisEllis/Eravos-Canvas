@@ -229,3 +229,38 @@
   - ANSWERED: yes — SNAP, his (specs/eravos.workbench.spec ADDENDUM 2026-11-15 (3): "it would also be cool to 'snap off' components and snap components together."); the spec now says so (ADDENDUM (2)).
   > also merge and push. need to be able to delete custom tools. rename them. open them in workshop and edit them fully.
   - DONE: the branch merged (PR). BUILDING 3.231: a made tool deleted, renamed, opened in the Workshop and edited fully.
+## 31 — verbatim (2026-11-25, with a screenshot of the catalog "Add to canvas" in Image Manipulation):
+  > also told you to remove the add button once i pick a domain, up wheere it says add to canvas, add a back to domains screen,
+  > also can you make all of the ui consistent? all of the canvas, and the themese.
+  - BUILT 3.232 (TB6 + TB7, decided 2026-11-24 and not built until now — said plainly): the Start button left the toolbar (Add stays); the
+    catalog's top left carries "← Domains" (back to the domain screen). Read as: the Start button goes, not Add (his 2026-11-24 words).
+  - OPEN: the whole UI consistent — the canvas and the themes (an audit + a preview first; the 2026-11-05 "the UI stays as it is" holds
+    until he approves a preview). docs/TODO-LEDGER.md T-63. Also OPEN (noticed): the catalog lists every domain's tools in Image Manipulation.
+
+## 32 — verbatim (2026-11-25):
+  > after that can you fix the autosave? also make control s a hotkey to save.
+  - BUILT 3.233: measured — picking a domain pins its docked window at once and the autosave wrote that lone window over the real one (and a
+    relaunch within a minute replaced the history's copy: 10 tools → "1 tools"). Now: no autosave without work (a tool that is not docked);
+    each launch keeps its own history entry; Start offers the newest autosave that holds work. Ctrl+S saves the project (its name asked the
+    first time); Ctrl+Shift+S still saves an .erv. tests/p233-autosave.mjs 6/6.
+
+## 33 — verbatim (2026-11-25, with a screenshot: two toasts — "synthesizing 22 parts…" and "not made — this is your Wobble Bass · parts again"):
+  > okay i need it to like flash when it can't synthesize, not a toast with no direction
+  - BUILT 3.234 — WITHDRAWN: the same was already on main from a parallel session (its 3.226 "the plan, the reasons", richer); main's kept, this one removed: not made → the parts it is about flash red where they are; a card beside them says why and what to do, with buttons that do
+    it (the rest from another tool — only when that can change something; Mutate these parts; Try again); stays until closed or the next try.
+    tests/p228-not-made.test.js 2/2.
+
+## 34 — verbatim (2026-11-26):
+  > Look at main. Can you make the patterns deep as possible? Like per note editing, curves, like each feature at full variaty. Also the bassline keeps lagging. I like the chords and bassline. Can you make them easier to adjust? Like maybe a way to record macros of the keys. Like tap the start button, then you click the piano keys, and have it play the tool with it. Automation? Also wobble bass is still not full what I want it to be. Like I contrast. The pendulum swing, highes and lows. Oscillatory. Like I want it to be cleaner. I love the synthwave ones. A lot of the wobble bass presets aren't great.
+  - LOOKED AT MAIN: nothing new beyond what this branch already merged (PR #226, sweet-sagan).
+  - BUILT 3.235 "the bassline keeps lagging" — measured (Bassline → Deep Sub playing): two causes.
+    (1) TIMING: the clock's wake (every 25 ms) sometimes reached the page 100–200 ms late, behind drawing; notes were booked after their
+        time and sounded late (3 of 19 notes late in a 16 s run, up to 63 ms; 214 ms at the start). Now the transport books further ahead
+        after a stall (up to 0.35 s; back to 0.1 s after 4 s calm): 0 of 19 late without Chords, 1 of 19 with (27 ms, a > 0.35 s stall).
+    (2) DRAWING: the display fitting asked the page for its size every frame (a forced layout) — now at most twice a second; the Bassline's
+        map redraws only when a note or the step changes; the spectrum's grid is one cached picture, its sunset gradients made once and slid.
+        The same picture (before / after screenshots). Long tasks 0 ms/s.
+  - OPEN, specced next (spec + a preview first): T-68 patterns as deep as possible · T-69 Chords and Bassline easier to adjust · T-70 a key
+    macro recorder (tap record, click the keys, the tool plays them) and its automation · T-71 Wobble Bass: contrast, a pendulum swing between
+    highs and lows, oscillatory, cleaner · T-72 Wobble Bass presets measured against the synthwave ones he loves, the weak ones replaced.
+

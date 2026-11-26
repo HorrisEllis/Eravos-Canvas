@@ -54,6 +54,13 @@
     listeners.forEach(fn => { try { fn(get()); } catch (e) {} }); return true;
   }
   if (root && !root.dataset.font) { let v = null; try { v = global.localStorage.getItem(FKEY); } catch (e) {} if (v && v !== 'theme' && FONTS.some(f => f.id === v)) root.dataset.font = v; }
+  // 3.236 colours (his words, 2026-11-26: "I hate the mix of colors in the ui."): Mixed = as it is (each tool its own colour); One = every
+  // accent the theme's one colour (red kept for record / delete). A choice beside the theme, today's look the default until he says.
+  const HUES = [{ id: 'mixed', label: 'Mixed', blurb: 'As it is — each tool and button its own colour.' }, { id: 'one', label: 'One colour', blurb: 'Everything in the theme’s one colour; red only for record and delete.' }];
+  const HKEY = 'eravos.hue';
+  function getHue() { return root && root.dataset.hue === 'one' ? 'one' : 'mixed'; }
+  function setHue(id) { if (!root || !HUES.some(x => x.id === id)) return false; if (id === 'one') root.dataset.hue = 'one'; else delete root.dataset.hue; try { global.localStorage.setItem(HKEY, id); } catch (e) {} listeners.forEach(fn => { try { fn(get()); } catch (e) {} }); return true; }
+  if (root) { let v = null; try { v = global.localStorage.getItem(HKEY); } catch (e) {} if (v === 'one') root.dataset.hue = 'one'; }
   const MKEY = 'eravos.material';
   // the grain tile: neutral noise made once in code (white at a few percent, so it only lightens the black a touch)
   (function grainTile() {
@@ -132,12 +139,16 @@
         h('b', { text: f.label + (on ? '  ✓' : '') }), h('small', { text: f.blurb })]);
       c.onclick = () => { setFont(f.id); paintF(); }; fcards.appendChild(c); }); };
     paintF();
+    const hcards = h('div', { class: 'thm-btns' });
+    const paintH = () => { hcards.innerHTML = ''; HUES.forEach(x => { const on = getHue() === x.id, c = h('button', { class: 'thm-bcard' + (on ? ' on' : ''), type: 'button', 'aria-pressed': on ? 'true' : 'false', title: x.blurb }, [h('b', { text: x.label + (on ? '  ✓' : '') }), h('small', { text: x.blurb })]); c.onclick = () => { setHue(x.id); paintH(); }; hcards.appendChild(c); }); };
+    paintH();
     const react = h('button', { class: 'thm-link', type: 'button', text: 'Reactive colours — how every colour answers the sound →', onclick: () => { if (global.AppSettings && global.AppSettings.isOpen) { global.AppSettings.open('reactive'); return; } if (onClose) onClose(); const b = doc.getElementById('reactBtn'); if (b) b.click(); } });
     return h('div', { class: 'thm-panel', role: 'dialog', 'aria-label': 'Themes' }, [
       h('div', { class: 'thm-headr' }, [h('b', { text: 'THEMES' }), h('span', { text: 'the whole look in one choice — remembered on this computer' }), h('button', { class: 'thm-x', type: 'button', text: '×', 'aria-label': 'close', onclick: () => onClose && onClose() })]),
       cards, h('div', { class: 'thm-sub' }, [h('b', { text: 'BUTTONS' }), h('span', { text: 'with any theme' })]), bcards,
       h('div', { class: 'thm-sub' }, [h('b', { text: 'MATERIAL' }), h('span', { text: 'a texture on the black, with any theme' })]), mcards,
-      h('div', { class: 'thm-sub' }, [h('b', { text: 'FONT' }), h('span', { text: 'with any theme' })]), fcards, react]);
+      h('div', { class: 'thm-sub' }, [h('b', { text: 'FONT' }), h('span', { text: 'with any theme' })]), fcards,
+      h('div', { class: 'thm-sub' }, [h('b', { text: 'COLOURS' }), h('span', { text: 'with any theme' })]), hcards, react]);
   }
   // 3.110 the look is a section of ⚙ Settings (it was an entry in the ⋯ Options dropdown, opening a popover)
   function entry() {
@@ -151,5 +162,5 @@
   global.Themes = { list: () => LIST.map(t => Object.assign({}, t)), get, set, onChange(fn) { listeners.push(fn); }, panel, DEFAULT,
     buttons: () => BUTTONS.map(b => Object.assign({}, b)), getButtons, setButtons,
     materials: () => MATERIALS.map(m => Object.assign({}, m)), getMaterial, setMaterial,
-    fonts: () => FONTS.map(f => Object.assign({}, f)), getFont, setFont };
+    fonts: () => FONTS.map(f => Object.assign({}, f)), getFont, setFont, getHue, setHue };
 })(typeof window !== 'undefined' ? window : globalThis);
