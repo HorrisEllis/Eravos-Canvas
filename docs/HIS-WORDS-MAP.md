@@ -279,3 +279,7 @@ kept), or **open** (not done yet, and what is missing). Newest at the bottom. Ad
 | N-X130 | "just spec it" (2026-11-25, of EN1) | **specced** | specs/eravos.engine.spec ADDENDUM 2026-11-25, EN1.1–EN1.6 · T-33 |
 | N-X131 | "yes merge." (2026-11-25) | **done** | PR #221; Start two steps confirmed on his PC |
 | N-X132 | "these shouldn't show in other domains. also remove the button that says empty canvas" (2026-11-25) | **done** | 3.225 canvas/index.html bootScreen |
+| N-X133 | "also told you to remove the add button once i pick a domain, up wheere it says add to canvas, add a back to domains screen," (2026-11-25) | **built, shown first** | 3.226: Start button out of the toolbar; the catalog's ← Domains |
+| N-X134 | "also can you make all of the ui consistent? all of the canvas, and the themese." (2026-11-25) | **open** | T-39: audit the canvas + themes, a preview first |
+| N-X135 | "after that can you fix the autosave? also make control s a hotkey to save." (2026-11-25) | **built** | 3.227: the autosave keeps work across launches; Ctrl+S saves the project |
+| N-X136 | "okay i need it to like flash when it can't synthesize, not a toast with no direction" (2026-11-25) | **built, shown first** | 3.228: the parts flash; a card beside them with why, what to do, and buttons |

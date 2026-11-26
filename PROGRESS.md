@@ -2,6 +2,21 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.226–3.228 The Start button out, ← Domains; the autosave fixed, Ctrl+S; not made → flash + a card (2026-11-25) — shown first
+His words: "also told you to remove the add button once i pick a domain, up wheere it says add to canvas, add a back to domains screen," · "after that can you fix the autosave? also make control s a hotkey to save." · "okay i need it to like flash when it can't synthesize, not a toast with no direction" (and "also can you make all of the ui consistent? all of the canvas, and the themese." — open, T-39)
+- 3.226 canvas/index.html: the Start button removed from the toolbar (window.ShellStart opens the domain screen); canvas/runtime/add-menu.js:
+  "← Domains" top left of the catalog; eravos.css .ap-back (as the catalog's close button). docs/previews/catalog-back.shots.mjs.
+- 3.227 canvas/runtime/workspace.js: WORK = a tool that is not docked (domain-free); no autosave without work; each launch its own history
+  entry (10 kept); bestAutosave(); the open project remembered (current). canvas/index.html: Start offers the newest autosave with work and
+  counts only work; Ctrl+S saves the project (name asked once), a new canvas or a restore forgets the project. tests/p227-autosave.mjs 6/6
+  (reproduced first: 10 tools → a relaunch + a domain picked → "1 tools").
+- 3.228 tools/music/core/assembled-tool.js: a failure carries kind · title · fix · blame (twin — all parts from one tool or sounds like X;
+  loud; silent; parts it cannot run) and restUseful; tools/core/field/board.js (domain-free): failCard — the blamed boxes (or the cores)
+  flash red; a card beside them: why, what to do, buttons (the rest from another tool when it can change something · Mutate these parts ·
+  Try again); Esc / ✕ / the next try closes it. tests/p228-not-made.test.js 2/2; docs/previews/workbench/not-made.shots.mjs.
+- Tests: P38 42/42, P21 27/27 (P218 fixed to pick its own Wobble Bass — it took one an earlier test left), P110, P120, P100, P19, runtime,
+  P203 P205 P216 P217 P218 P228, assembled-tool 32, boundary 10/10, design check no worse. P17's 2 failures are on main too.
+
 ## 3.225 Start: each domain only its own; no Empty canvas button (2026-11-25)
 His words: "these shouldn't show in other domains. also remove the button that says empty canvas" (his screenshot: Image Manipulation picked, the music setups under START FROM).
 - canvas/index.html bootScreen (domain-free): with a domain picked, a setup / song shows only if its modes belong to that domain — Music

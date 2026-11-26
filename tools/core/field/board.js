@@ -246,12 +246,44 @@
     if (!list.length) return Promise.resolve(null);
     list.forEach(o => o.x.g.classList.add('fb-busy')); say('◆ synthesizing ' + list.length + (list.length === 1 ? ' part' : ' parts') + ' into one tool — measuring it against everything…');
     return Promise.resolve(exchange.synthesizeParts(list.map(o => ({ inst: o.inst, slot: o.x.slot, piece: o.x.p.id, label: o.x.lab.textContent })), opts)).then((r) => {
-      list.forEach(o => o.x.g.classList.remove('fb-busy')); if (!r || !r.ok) { say('not made — ' + ((r && r.why) || 'it did not build'), 'bad'); return null; }
-      const F = global.OrganismFactory, b = last && last.board, x = b ? b.offsetLeft + b.offsetWidth + 120 : 40, y = b ? b.offsetTop : 40, inst = F.spawn(r.id, { x, y });
+      list.forEach(o => o.x.g.classList.remove('fb-busy')); if (!r || !r.ok) { failCard(r, list, opts); return null; }
+      hideFail(); const F = global.OrganismFactory, b = last && last.board, x = b ? b.offsetLeft + b.offsetWidth + 120 : 40, y = b ? b.offsetTop : 40, inst = F.spawn(r.id, { x, y });
       say('◆ ' + r.rec.name + ' — a tool of its own (' + r.verdict + (r.near ? ', nearest ' + r.near : '') + ')' + (r.left && r.left.length ? ' · not in the engine yet: ' + r.left.join(', ') : ''), 'good');
       clearSel(); if (inst) setTimeout(() => { if (!open.has(inst)) explode(inst, r.id); }, 700);
       return { inst, id: r.id, rec: r.rec };
-    }, (er) => { list.forEach(o => o.x.g.classList.remove('fb-busy')); say('not made — ' + er.message, 'bad'); return null; });
+    }, (er) => { list.forEach(o => o.x.g.classList.remove('fb-busy')); failCard({ title: er.message }, list, opts); return null; });
+  }
+  // 3.228 NOT MADE, said where it happened (his words, 2026-11-25: "i need it to like flash when it can't synthesize, not a toast with no
+  // direction"): the parts it is about flash red; beside them a card says why and what to do, with the moves that fix it as buttons — the rest
+  // from another tool blown up, mutate these parts, try again. It stays until closed (✕ / Esc) or the next try. The words are the domain's.
+  let failEl = null;
+  function hideFail() { if (failEl) { failEl.remove(); failEl = null; } }
+  function flashFail(els) { els.forEach(el => { el.classList.remove('fb-fail'); void el.offsetWidth; el.classList.add('fb-fail'); setTimeout(() => el.classList.remove('fb-fail'), 2600); }); }
+  function failCard(r, list, opts, anchorEls) {
+    r = r || {}; hideFail();
+    list = list || [];   // the whole-tool drag has no picked parts: its cores are the anchors
+    const blamed = (r.blame && r.blame.length ? list.filter(o => r.blame.some(b => b.inst === o.inst && (b.piece ? b.piece === o.x.p.id : b.slot === o.x.slot))) : list).map(o => o.x.g);
+    const els = anchorEls || (blamed.length ? blamed : list.map(o => o.x.g)); flashFail(els);
+    const card = h('div', 'fb-failcard'); card.setAttribute('role', 'alert');
+    const x = h('button', 'fb-fx', '✕'); x.type = 'button'; x.title = 'close (Esc)'; x.onclick = hideFail;
+    card.append(x, h('div', 'fb-ft', esc('◆ Not made — ' + (r.title || r.why || 'it did not build'))));
+    (r.fix || []).forEach(t => card.appendChild(h('div', 'fb-fl', '→ ' + esc(t))));
+    const acts = h('div', 'fb-fa');
+    if (list && list.length && !anchorEls) {
+      const mine = new Set(list.map(o => o.inst));
+      if (r.restUseful !== false) [...open.keys()].filter(i => rec(i) && exchange.has(rec(i).id) && (!opts || i !== opts.restFrom) && !(mine.size === 1 && mine.has(i))).forEach(i => {   // only when it can change something
+        const b = h('button', 'fb-fbtn', esc('◆ The rest from ' + rec(i).def.label)); b.type = 'button'; b.onclick = () => { hideFail(); synthesizeSel({ restFrom: i }); }; acts.appendChild(b); });
+      if (list.some(o => o.x.socket)) { const b = h('button', 'fb-fbtn', '⚄ Mutate these parts'); b.type = 'button'; b.onclick = () => { hideFail(); list.filter(o => o.x.socket).forEach(o => mutatePart(o.inst, o.x)); }; acts.appendChild(b); }
+      const again = h('button', 'fb-fbtn', '↻ Try again'); again.type = 'button'; again.onclick = () => { hideFail(); synthesizeSel(opts); }; acts.appendChild(again);
+    }
+    if (acts.children.length) card.appendChild(acts);
+    document.body.appendChild(card); failEl = card;
+    const rs = els.map(e => e.getBoundingClientRect()).filter(q => q.width), W = global.innerWidth || 1200, H = global.innerHeight || 800;
+    const R = rs.length ? { l: Math.min(...rs.map(q => q.left)), t: Math.min(...rs.map(q => q.top)), r: Math.max(...rs.map(q => q.right)) } : { l: W / 2, t: H / 3, r: W / 2 };
+    const left = R.r + 16 + card.offsetWidth < W ? R.r + 16 : Math.max(8, R.l - 16 - card.offsetWidth);
+    card.style.left = Math.max(8, Math.min(left, W - card.offsetWidth - 8)) + 'px'; card.style.top = Math.max(8, Math.min(R.t, H - card.offsetHeight - 8)) + 'px';
+    const onKey = (e) => { if (e.key === 'Escape' && failEl === card) { e.stopPropagation(); hideFail(); document.removeEventListener('keydown', onKey, true); } }; document.addEventListener('keydown', onKey, true);
+    return card;
   }
   function assemble(instanceId, o) {   // → a promise: true once every part is back in its window
     const st = open.get(instanceId); if (!st) return Promise.resolve(false);
@@ -411,12 +443,13 @@
     const say = (t2, kind) => { if (global.Shell && global.Shell.toast) global.Shell.toast(t2, kind || '', 3600); };
     bst.core.classList.add('fb-busy'); say('◆ synthesizing ' + rec(aId).def.label + ' × ' + rec(bId).def.label + ' — measuring it against everything…');
     return Promise.resolve(exchange.synthesize(aId, bId)).then((r) => {
-      bst.core.classList.remove('fb-busy'); if (!r || !r.ok) { say('not made — ' + ((r && r.why) || 'it did not build'), 'bad'); return null; }
+      bst.core.classList.remove('fb-busy'); if (!r || !r.ok) { const a = open.get(aId); failCard(r, null, null, [bst.core].concat(a ? [a.core] : [])); return null; }
+      hideFail();
       const F = global.OrganismFactory, x = bst.board.offsetLeft + bst.board.offsetWidth + 120, y = bst.board.offsetTop, inst = F.spawn(r.id, { x, y });
       say('◆ ' + r.rec.name + ' — a tool of its own (' + r.verdict + (r.near ? ', nearest ' + r.near : '') + ')', 'good');
       if (inst) setTimeout(() => { if (!open.has(inst)) explode(inst, r.id); }, 700);
       return { inst, id: r.id, rec: r.rec };
-    }, (er) => { bst.core.classList.remove('fb-busy'); say('not made — ' + er.message, 'bad'); return null; });
+    }, (er) => { bst.core.classList.remove('fb-busy'); failCard({ title: er.message }, null, null, [bst.core]); return null; });
   }
   // the PARTS tray: new components this tool's boxes take — drag one onto a box to change what is in it
   function tray(id, st, T) {
@@ -575,5 +608,5 @@
     return true;
   }
   if (!hook()) document.addEventListener('DOMContentLoaded', hook);
-  global.FieldBoard = { define, has, explode, lab, select, clearSel, selected: () => selected().map(o => ({ inst: o.inst, piece: o.x.p.id, slot: o.x.slot })), synthesizeSel, selItems, mutatePart, partItems, replacements, replace, showCard, drop, partIn, gates: (id) => (open.get(id) || {}).gates || [], assemble, isOpen, boards, sockets, setExchange, synthesizeOnto: (a, b) => open.get(b) ? synthesizeOnto(a, b, open.get(b)) : Promise.resolve(null), get exchange() { return exchange; }, learned: (toolId) => FM().learned(toolId), mutate: (id) => FM().mutate(FM().toolTarget(id)) };
+  global.FieldBoard = { define, has, explode, lab, select, clearSel, selected: () => selected().map(o => ({ inst: o.inst, piece: o.x.p.id, slot: o.x.slot })), synthesizeSel, selItems, mutatePart, partItems, replacements, replace, showCard, failCard, hideFail, drop, partIn, gates: (id) => (open.get(id) || {}).gates || [], assemble, isOpen, boards, sockets, setExchange, synthesizeOnto: (a, b) => open.get(b) ? synthesizeOnto(a, b, open.get(b)) : Promise.resolve(null), get exchange() { return exchange; }, learned: (toolId) => FM().learned(toolId), mutate: (id) => FM().mutate(FM().toolTarget(id)) };
 })(window);

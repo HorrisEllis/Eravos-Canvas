@@ -76,3 +76,16 @@
 .fb-card .fb-cw{font:500 10px 'DM Mono',monospace;letter-spacing:1px;color:#7F93A8;margin:2px 0 6px}
 .fb-card .fb-ct{margin-bottom:4px}
 .fb-card .fb-cs{margin-top:6px;padding-top:6px;border-top:1px solid #1B2A3A;color:#B8CFE0}
+
+/* 3.228 not made: the parts it is about flash red where they are; the card beside them says why and what to do */
+.fb-gate.fb-fail, .fb-core.fb-fail { animation: fb-fail .42s ease-in-out 3; box-shadow: 0 0 0 2px #FF3B5C, 0 0 34px rgba(255,59,92,.65) !important; }
+@keyframes fb-fail { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+@media (prefers-reduced-motion: reduce) { .fb-gate.fb-fail, .fb-core.fb-fail { animation: none; } }
+.fb-failcard { position: fixed; z-index: 3000002; width: 340px; padding: 12px 14px 12px; background: #0A0206F2; border: 1px solid #FF3B5C;
+  box-shadow: 0 14px 40px rgba(0,0,0,.7), 0 0 26px rgba(255,59,92,.35); font: 500 12px/1.45 var(--font, sans-serif); color: #F3D8DE; }
+.fb-failcard .fb-ft { font: 600 12px/1.4 'DM Mono', monospace; color: #FF6B83; margin: 0 22px 8px 0; }
+.fb-failcard .fb-fl { margin: 3px 0; }
+.fb-failcard .fb-fa { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.fb-failcard .fb-fbtn { padding: 4px 10px; border: 1px solid #FF3B5C; background: #000; color: #FFC2CD; font: 500 11px 'DM Mono', monospace; cursor: pointer; }
+.fb-failcard .fb-fbtn:hover { background: #FF3B5C; color: #000; }
+.fb-failcard .fb-fx { position: absolute; top: 6px; right: 8px; border: 0; background: none; color: #FF6B83; font-size: 13px; cursor: pointer; }

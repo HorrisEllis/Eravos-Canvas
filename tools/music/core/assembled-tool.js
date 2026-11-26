@@ -219,19 +219,19 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
   Model.judge = function (settings, bpm, N) {   // N: window.MusicNovelty (tools/music/compat/novelty.js)
     const sr = 48000, notes = RIFF(bpm), secs = notes[3].t + notes[3].dur + 0.2, d = dag(settings, bpm);
     const r = Voice(root.Assemble, root.MusicAdapters, root.MusicParts, root.MusicContracts.contracts, sr).render(d, notes, secs, settings.level, settings.glide);
-    if (!r.ok) return { ok: false, why: 'it does not build: ' + r.why.join('; ') };
+    if (!r.ok) return { ok: false, kind: 'build', why: 'it does not build: ' + r.why.join('; ') };
     let bad = 0, pinned = 0, q = 0; const mono = new Float32Array(r.L.length);
     for (let i = 0; i < r.L.length; i++) { const a = r.L[i], b = r.R[i]; if (!isFinite(a) || !isFinite(b)) bad++; if (Math.max(Math.abs(a), Math.abs(b)) >= 0.999) pinned++; q += 0.5 * (a * a + b * b); mono[i] = 0.5 * (a + b); }
     const rmsDb = 20 * Math.log10(Math.sqrt(q / r.L.length) + 1e-12);
-    if (bad) return { ok: false, why: bad + ' samples are not numbers' }; if (rmsDb < -50) return { ok: false, why: 'it is silent (' + rmsDb.toFixed(1) + ' dB)' };
-    if (pinned / r.L.length > 0.005) return { ok: false, why: 'it sits at full scale ' + (100 * pinned / r.L.length).toFixed(1) + ' % of the time (turn the level or the drive down)' };
+    if (bad) return { ok: false, kind: 'broken', why: bad + ' samples are not numbers' }; if (rmsDb < -50) return { ok: false, kind: 'silent', why: 'it is silent (' + rmsDb.toFixed(1) + ' dB)' };
+    if (pinned / r.L.length > 0.005) return { ok: false, kind: 'loud', why: 'it sits at full scale ' + (100 * pinned / r.L.length).toFixed(1) + ' % of the time (turn the level or the drive down)' };
     const fp = N.measure.fingerprint(mono, sr, 0.1, secs - 0.1); if (!fp || fp.frames < 4) return { ok: false, why: 'too short to fingerprint' };
     const B = N.baseline, C = N.core, dist = C.makeDist(C.groupsFor(B.D)), me = (v) => ({ v, n: C.norm(v, B.lo, B.hi) }), mine = me(fp.v);
     let best = { d: 9, what: '' };
     B.items.forEach(x => { const dd = dist(mine, me(x.v)); if (dd < best.d) best = { d: dd, what: x.label + ' · ' + x.preset }; });
     ld().forEach(t => { if (!t.fp) return; const dd = dist(mine, me(t.fp)); if (dd < best.d) best = { d: dd, what: 'your ' + t.name }; });
     const verdict = best.d < B.twin ? 'TWIN' : best.d < B.close ? 'CLOSE' : 'novel';
-    return { ok: verdict !== 'TWIN', why: verdict === 'TWIN' ? 'this is ' + best.what + ' again (' + best.d.toFixed(3) + ') — change something that can be heard' : '', verdict, near: best.what, d: +best.d.toFixed(3), fp: fp.v.map(x => +x.toPrecision(5)), dag: d, rmsDb };
+    return { ok: verdict !== 'TWIN', kind: verdict === 'TWIN' ? 'twin' : '', why: verdict === 'TWIN' ? 'this is ' + best.what + ' again (' + best.d.toFixed(3) + ') — change something that can be heard' : '', verdict, near: best.what, d: +best.d.toFixed(3), fp: fp.v.map(x => +x.toPrecision(5)), dag: d, rmsDb };
   };
   Model.make = function (name, settings, bpm, N, of) {   // → { ok, id, rec } or { ok: false, why } · of: the tools it was synthesized from
     const j = Model.judge(settings, bpm, N); if (!j.ok) return j;
@@ -252,7 +252,11 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
     let N; try { N = await loadNovelty(); } catch (er) { return { ok: false, why: er.message }; }
     const bpm = (root.Kernel && root.Kernel.music && root.Kernel.music.bpm) || 120, a = { id: A.id, params: TB.paramsOf(aInst) }, b = { id: B.id, params: TB.paramsOf(bInst) };
     const settings = TB.combine(a, b, TB.pickFor(A.id, B.id), bpm), names = [A.def.label, B.def.label];
-    return Model.make(names.join(' × '), settings, bpm, N, names);
+    const r = await Model.make(names.join(' × '), settings, bpm, N, names);
+    if (r && !r.ok) Object.assign(r, r.kind === 'twin' ? { title: 'it sounds like ' + r.near + ' already', fix: ['Change a part on either tool first (right-click it › Replace with…, or ⚄ MUTATE)', 'or pick parts by hand: Ctrl+click them, then right-click › Synthesize'] }
+      : r.kind === 'loud' ? { title: 'too loud — it hits the ceiling', fix: ['Turn the drive or level down on one of them, then try again'] }
+      : r.kind === 'silent' ? { title: 'it makes no sound', fix: ['One of them needs a voice and an open filter'] } : { title: r.why || 'it did not build', fix: ['Try two other tools'] });
+    return r;
   };
   // 3.211 the parts he picked (Ctrl+click on the board, any tools blown up) → one tool: each picked part takes its place in the engine,
   // the rest comes from the tool most of them came from. list: [{ inst, slot }] (slot: the exchange's box id). Same gates, same naming.
@@ -262,7 +266,13 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
     const F = root.OrganismFactory, TB = root.ToolBlend; if (!F || !TB) return { ok: false, why: 'the engine is not loaded' };
     const parts = (list || []).map(x => ({ x, h: F.handle(x.inst), to: TB.PART_SLOT[x.slot] || (TB.slotOfPiece && TB.slotOfPiece(x.label)) })).filter(o => o.h);
     const usable = parts.filter(o => o.to && TB.has(o.h.id)), left = parts.filter(o => !usable.includes(o));
-    if (!usable.length) return { ok: false, why: 'none of these parts runs in the engine yet' + (left.length ? ' (' + left.map(o => o.h.def.label + ' · ' + o.x.slot).join(', ') + ')' : '') };
+    // 3.228 a failure says WHY and WHAT TO DO, and which parts it is about (his words, 2026-11-25: "i need it to like flash when it can't
+    // synthesize, not a toast with no direction"): { kind, title, fix: [plain lines], blame: [{ inst, slot, piece }] } — the board flashes the
+    // blamed boxes and shows the card beside them
+    const who = (o) => ({ inst: o.x.inst, slot: o.x.slot, piece: o.x.piece });
+    const PICKABLE = 'a filter, a drive, noise, a chorus or echo, a wobble (LFO), or an oscillator box (the voice)';
+    if (!usable.length) return { ok: false, kind: 'unusable', title: 'these parts can\'t be synthesized yet', why: 'none of these parts runs in the engine yet' + (left.length ? ' (' + left.map(o => o.h.def.label + ' · ' + (o.x.slot || o.x.label || '').trim()) .join(', ') + ')' : ''),
+      fix: ['Pick ' + PICKABLE + ' — those carry over into a new tool.', 'The boxes flashing are the ones the engine cannot run yet.'], blame: parts.map(who) };
     let N; try { N = await loadNovelty(); } catch (er) { return { ok: false, why: er.message }; }
     const bpm = (root.Kernel && root.Kernel.music && root.Kernel.music.bpm) || 120, src = (h) => ({ id: h.id, params: TB.paramsOf(h.instanceId) });
     const count = new Map(); usable.forEach(o => count.set(o.h, (count.get(o.h) || 0) + 1));
@@ -271,7 +281,23 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
     const settings = TB.combineFrom(from, src(base), bpm); if (!settings) return { ok: false, why: 'these parts could not be read' };
     const names = [...new Set(usable.map(o => o.h.def.label).concat(base.def.label))];
     const r = await Model.make(names.length > 1 ? names.join(' × ') : names[0] + ' · parts', settings, bpm, N, names);
-    if (r) r.left = left.map(o => o.h.def.label + ' · ' + o.x.slot); return r;
+    if (r) r.left = left.map(o => o.h.def.label + ' · ' + o.x.slot);
+    if (r && !r.ok) {   // 3.228 why, and what to do
+      const tools = [...new Set(usable.map(o => o.h).concat(base))], one = tools.length === 1, full = new Set(usable.map(o => o.to)).size >= TB.SLOTS.length;
+      r.restUseful = !full;   // every slot picked: "the rest from" another tool would change nothing — not offered
+      if (r.kind === 'twin') Object.assign(r, one
+        ? { title: 'every part came from ' + base.def.label + ' — so it is ' + base.def.label + ' again', blame: usable.map(who),
+            fix: full ? ['You picked a part for every slot, all from ' + base.def.label + ' — un-pick one (Ctrl+click it) and Ctrl+click that part on ANOTHER tool', 'or change one of these parts first: right-click it › Replace with…, or ⚄ Mutate only this part']
+              : ['Ctrl+click a part on ANOTHER tool you have blown up, then synthesize again', 'or take the rest from another tool (a button below)', 'or change one of these parts first: right-click it › Replace with…, or ⚄ Mutate only this part'] }
+        : { title: 'it sounds like ' + r.near + ' already', blame: usable.map(who),
+            fix: ['Change something you can hear: a different filter, drive or voice (right-click a part › Replace with…)', 'or ⚄ Mutate these parts, then synthesize again'].concat(full ? ['or un-pick a part and take it from another tool'] : ['or take the rest from another tool']) });
+      else if (r.kind === 'loud') Object.assign(r, { title: 'too loud — it hits the ceiling', blame: usable.filter(o => o.to === 'drive' || o.to === 'voice').map(who),
+        fix: ['Turn the drive or the level down in the flashing parts', 'or pick a gentler drive (right-click › Replace with…)'] });
+      else if (r.kind === 'silent') Object.assign(r, { title: 'it makes no sound', blame: usable.map(who),
+        fix: ['Pick a voice: Ctrl+click an oscillator box (osc, DCO, swarm)', 'or open the filter up — its cutoff may be shut'] });
+      else Object.assign(r, { title: r.why || 'it did not build', blame: usable.map(who), fix: ['Try other parts, or fewer at once'] });
+    }
+    return r;
   };
   if (root.PartExchange) { root.PartExchange.synthesize = Model.synthesize; root.PartExchange.synthesizeParts = Model.synthesizeParts; }   // the board finds it on the exchange the music domain hands it
 
