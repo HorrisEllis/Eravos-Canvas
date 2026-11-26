@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.233 Every note shaped by its word; the Piano in every words-song (2026-11-26)
+His words: "I contrast as you might have notives" · "Also Make sure you use the per note editing, curves, way too much variance to waste in nexus. Like multidimentional. Really push Eravos. Like all of the tools. But make some sound beautiful. The piano doesn't get enough love."
+- rhythm-expand: expr 0…1 — LEAD: a question's last note rises (+2), a statement falls (−1), an accent scoops in (−2 → 0) and opens, a light
+  line swells, a dark line plucks closed, the answer talks, weak syllables humanized · BASS: the arrival dives an octave with its filter, the
+  answer talks, drops / choruses growl or open · DRUMS: accents roll (a clap, 3 hits accelerating, growing), weak hats are ghosts (chance,
+  humanize) · CHORDS (with depth): swell in a dialogue, open in a break. Curves are the Song Engine's own moves (helpers.moveCurves, knobsFor —
+  now exported). 0 = as before.
+- the PIANO (o.piano): a Piano part added to any genre without touching it (SongEngine.generateWith(G, …)); its preset by mood (Felt Lullaby,
+  Concert Grand, Tine Phaser …); the intro is the piano alone (a slow climb through the chord), the breaks climb through the chord syllable by
+  syllable with a rolled chord at each line end, soft dyads under verses / choruses, low octaves on the drop's hits, one rolled chord held at the end.
+- Lyrics → Rhythm: SONG › Expression (1) · Piano (on). build/render-words.mjs --expr --piano.
+- Tests: P233 2/2 (in tests/p232-tension-and-words.test.js); P228 P229 P232 RhythmExpand Bass Pack P20 green.
+
 ## 3.232 Tension from who speaks; his words imported; deep patterns; Song Import specced (2026-11-26)
 His words: "Can you add contrasting rhythm or a bunch with tension?" · "I want to be able to import a song and have Eravos open it with the needed tools to replicate it. Hard? That could be a good test. Did you create extremely deep patterns?" · "I am a good writer.  It would be cool to be able to import my words.  Can we have voices for the lyrics? On top of my own? Like I want to be able to make any genre of music using Eravos." (two poems of his given as the lyrics — kept with him, not in the repo)
 - lyric-shape 1.2.0: clausesOf(line) — each line cut at . ; ! ? (and at a comma before "I" / "you") into clauses with who speaks (I · you · we,

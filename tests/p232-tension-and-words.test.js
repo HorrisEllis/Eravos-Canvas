@@ -37,3 +37,25 @@ describe('P232 tension, your words, deeper patterns', () => {
     } finally { const a = LIB.readSaved(); if (a.length > before) { localStorage.setItem(LIB.SAVED, JSON.stringify(a.slice(0, before))); PatternLibrary.rebuild(); } OrganismFactory.close(id); }
   });
 });
+/* P233 — every note shaped by its word; the Piano (3.233). His words, 2026-11-26: "Make sure you use the per note editing, curves, way too much
+ * variance to waste … Like multidimentional. Really push Eravos. Like all of the tools. But make some sound beautiful. The piano doesn't get enough love." */
+describe('P233 expression and the piano', () => {
+  const TEXT = 'hold on\n\nI gave you EVERY night I had, every hour I could carry. You gave me the morning after and the silence.\nI wanted the storm and the calm and the whole sky. You wanted the weather to choose for you.\nIn the end we stood in the rain together?';
+  const gen = (o) => RhythmExpand.generate(TEXT, Object.assign({ genre: 'darkwave', seed: 3, shape: 'contrast', tension: 1 }, o));
+  const clips = (st) => st.filter(s => s.topic === 'clip_add').map(s => s.payload);
+  it('expression: notes carry their own curves, bends, chords, chance, ratchets and humanize — 0 is as before', () => {
+    const a = clips(gen({ expr: 1 })), lead = a.filter(c => c.target === '@lead').flatMap(c => c.notes), bass = a.filter(c => c.target === '@bass').flatMap(c => c.notes), drums = a.filter(c => c.target === '@drums').flatMap(c => c.notes);
+    assert.ok(lead.some(n => n.b && n.b.to === 2), 'a question rises at its end'); assert.ok(lead.some(n => n.b && n.b.from === -2), 'an accent scoops in');
+    assert.ok(lead.filter(n => n.c).length >= lead.length * 0.6, 'most lead notes carry their own knob curves: ' + lead.filter(n => n.c).length + '/' + lead.length);
+    assert.ok(bass.some(n => n.b && n.b.to === -12) || bass.some(n => n.c), 'the bass shaped (the arrival dives)'); assert.ok(drums.some(n => n.rt === 3) && drums.some(n => n.pr && n.pr < 1), 'accents roll, ghosts come and go');
+    assert.ok(lead.some(n => n.x && n.x.ht), 'humanized'); assert.equal(JSON.stringify(gen({ expr: 0 })), JSON.stringify(gen({})), 'expression 0 = as before');
+  });
+  it('the Piano: opens the song alone, climbs through the break, closes with one rolled chord — on any style', () => {
+    const st = gen({ expr: 1, piano: true }), cs = clips(st), pianoLane = st.find(s => s.op === 'mount' && s.organism === 'eravos.piano'); assert.ok(pianoLane, 'a Piano on the canvas');
+    const p = cs.filter(c => c.target === '@piano'), intro = p.find(c => /intro/.test(c.name)), out = p.find(c => /outro/.test(c.name)), brk = p.find(c => /break/.test(c.name));
+    assert.ok(intro && cs.filter(c => /· intro/.test(c.name)).every(c => c.target === '@piano'), 'the intro is the piano alone');
+    assert.ok(out && out.notes.some(n => n.x && n.x.iv && n.x.iv.length >= 3 && n.x.strum), 'the outro: one rolled chord'); assert.ok(brk && brk.notes.length >= 2, 'it plays the break');
+    ['dubstep', 'synthwave', 'house'].forEach(g => assert.ok(clips(RhythmExpand.generate(TEXT, { genre: g, seed: 1, shape: 'contrast', piano: true })).some(c => c.target === '@piano'), 'on ' + g));
+    assert.ok(!SongEngine.genres().some(g => g.parts.piano && g.id === 'darkwave'), 'the genre itself is untouched');
+  });
+});

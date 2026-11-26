@@ -239,3 +239,11 @@
     (ratchets on accents, ghosts on weak syllables, the answer lagging, line ends doubled, the pendulum's return every other pass).
   - ANSWERED: deep patterns — before 3.232, no (rhythm and pitch only); now each note carries how it plays.
   - SPECCED: specs/eravos.song-import.spec (SI0 MIDI … SI6 stems; honest scope) · specs/eravos.voice-lab.spec ADDENDUM (2): CREATE first, on top of his own voice.
+
+## 44 — verbatim (2026-11-26):
+  > I contrast as you might have notives
+  > Also Make sure you use the per note editing, curves, way too much variance to waste in nexus. Like multidimentional. Really push Eravos. Like all of the tools. But make some sound beautiful. The piano doesn't get enough love.
+  - BUILT 3.233: EXPRESSION (every note of the words' song shaped by its word — knob curves from the Song Engine's moves, bends, chords from
+    one note, chance, ratchets, humanize) and the PIANO (a Piano part on any style: it opens alone, climbs through the breaks, soft dyads under
+    the verses, octaves on the hits, one rolled chord at the end). Lyrics → Rhythm › Expression · Piano. Heard: his two poems rendered (to him).
+  - RULE (his): contrast is his way ("I contrast as you might have notives") — every words-song capability keeps contrast first.

@@ -145,6 +145,9 @@
       { key: 'dims', type: 'number', default: 0.7, min: 0, max: 1, step: 0.01, label: 'Dimensions', group: 'SONG', hint: 'more of it, not only lower: layers on the lead in the loud parts (an octave up, then a harmony), a counter-line in the gaps the words leave, and more space (0 = as before)' },
       // 3.232 (his words, 2026-11-26: "Can you add contrasting rhythm or a bunch with tension?"): where I and you answer each other
       { key: 'tension', type: 'number', default: 0.6, min: 0, max: 1, step: 0.01, label: 'Tension', group: 'SONG', hint: 'where I and you answer each other: the answer falls off the beat (three against four under it, the bass and lead left unresolved) and the last line lands home (0 = as before)' },
+      // 3.233 (his words, 2026-11-26: "Make sure you use the per note editing, curves … Really push Eravos … The piano doesn't get enough love.")
+      { key: 'expr', type: 'number', default: 1, min: 0, max: 1, step: 0.01, label: 'Expression', group: 'SONG', hint: 'every note shaped by its word: knob curves, bends, chords, chance, ratchets, humanize — an accent opens and scoops in, a question rises, a statement falls, the answer talks, the arrival dives (0 = as before)' },
+      { key: 'piano', type: 'boolean', default: true, label: 'Piano', group: 'SONG', hint: 'a Piano part on any style: it opens the song alone, climbs through the chord in the breaks, plays soft dyads under the verses, octaves on the hits, and closes with one rolled chord' },
       { key: 'contrast', type: 'number', default: 1, min: 0, max: 1, step: 0.01, label: 'Contrast', group: 'SONG', hint: 'how far apart the parts are pushed: 0 = every stanza a verse, 1 = as far as the words go' },
     ],
     ui_hooks: ['syl_edit', 'reset_edits', 'preview', 'send_timeline', 'expand_song', 'send_sequencer', 'make_patterns'],
@@ -206,7 +209,7 @@
         let bottom = 0; const WM = window.CanvasWM;
         if (WM && WM.rectOf) K.registry.list().forEach(r => { const q = WM.rectOf(r.instance_id); if (q && isFinite(q.y + q.h)) bottom = Math.max(bottom, q.y + q.h); });
         try {
-          window.RhythmExpand.write(text, { genre: P.get('songGenre'), flow: P.get('flow'), seed: P.get('vary') || 1, shape: P.get('songShape') === 'every stanza a verse' ? 'verses' : 'contrast', contrast: P.get('contrast'), depth: P.get('depth'), dims: P.get('dims'), tension: P.get('tension'), reuse: true, run: { clear: false, origin: { x: 40, y: bottom ? bottom + 80 : 40 } } });
+          window.RhythmExpand.write(text, { genre: P.get('songGenre'), flow: P.get('flow'), seed: P.get('vary') || 1, shape: P.get('songShape') === 'every stanza a verse' ? 'verses' : 'contrast', contrast: P.get('contrast'), depth: P.get('depth'), dims: P.get('dims'), tension: P.get('tension'), expr: P.get('expr'), piano: !!P.get('piano'), reuse: true, run: { clear: false, origin: { x: 40, y: bottom ? bottom + 80 : 40 } } });
           ctx.emitUI('status', { info: 'Building your song below — press Space to hear it.' });
         } catch (e) { ctx.emitUI('status', { warn: e.message }); }
       });

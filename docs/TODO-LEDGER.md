@@ -76,6 +76,7 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-62 | **A made tool is his: rename · edit fully in the Workshop · delete** — built 3.231 (P231). Next: the same on a tool's page and in ＋ Add. | "also merge and push. need to be able to delete custom tools. rename them. open them in workshop and edit them fully." | built |
 | T-63 | **Song Import** SI0 MIDI → SI1 tempo / key / sections → SI2 drums → SI3 lines → SI4 chords → SI5 the tools + the closeness gate → SI6 stems. | "I want to be able to import a song and have Eravos open it with the needed tools to replicate it. Hard? That could be a good test." | specced (specs/eravos.song-import.spec) |
 | T-64 | **Voices for his lyrics, on top of his own** — Voice Lab CREATE first (vocal-tract + letter-to-sound), characters per genre. | "Can we have voices for the lyrics? On top of my own?" | specced (voice-lab ADDENDUM (2)) |
+| T-65 | **All of the tools in the words' song**: beyond the Piano — the LFO / XY Pad / Automation lanes driving knobs over the stanzas, Tape Memory on the breaks, the Arp under choruses, Feelings for the stanza's valence (each a capability ERAVOS uses from the words' shape). | "Like all of the tools." | open (next) |
 
 ## ERAVOS's own engine · `specs/eravos.engine.spec` (decided 2026-11-24: written in Emerge — "wait for emerge")
 
