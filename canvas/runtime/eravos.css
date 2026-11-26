@@ -1042,3 +1042,10 @@ html[data-font] body { font-family: var(--font); }
 .thm-fdemo[data-font-demo="grotesk"] .thm-fd1, .thm-fdemo[data-font-demo="grotesk-all"] .thm-fd1, .thm-fdemo[data-font-demo="grotesk-all"] .thm-fd2 { font-family: 'ERV Grotesk', sans-serif; }
 .thm-fdemo[data-font-demo="grotesk"] .thm-fd2 { font-family: 'ERV Mono', monospace; }
 .thm-fdemo[data-font-demo="plain"] .thm-fd1, .thm-fdemo[data-font-demo="plain"] .thm-fd2 { font-family: system-ui, 'Segoe UI', sans-serif; }
+
+/* 3.236 Settings › Look › Colours › One colour: every accent the theme's own (html's --acc), whatever a window, a button or the reactive
+   colours set; red keeps its meaning (record, delete). Off by default — today's look. */
+html[data-hue="one"] { --one: var(--acc); --cyan: var(--one); --green: var(--one); --pink: var(--one); --violet: var(--one); --amber: var(--one); --ok: var(--one); }
+html[data-hue="one"] body, html[data-hue="one"] body * { --acc: var(--one) !important; --facc: var(--one) !important; --cyan: var(--one); --green: var(--one); --pink: var(--one); --violet: var(--one); --amber: var(--one); --beat-col: var(--one) !important; }
+html[data-hue="one"] .wm-win { border-color: color-mix(in srgb, var(--one) 45%, var(--line2)) !important; }
+html[data-hue="one"] .wm-win.focused { border-color: var(--one) !important; }
