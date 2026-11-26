@@ -147,7 +147,7 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
       needs: { works_with: ['eravos.timeline', 'eravos.bass-gen', 'eravos.wobble-bass', 'eravos.fx-echo'] },
       hooks: [S.audio_out('wb.hook.audio_out'), S.note_in('wb.hook.note_in'), S.midi_in('wb.hook.midi_in'), S.transport_in('wb.hook.transport_in')],
       config: SET.map(c => Object.assign({}, c, o.settings && o.settings[c.key] !== undefined ? { default: o.settings[c.key] } : {})),
-      made: o.made || null,
+      made: o.made || null, ui_hooks: ['edit_workshop', 'rename_tool', 'delete_tool'],
       engine,
     };
   }
@@ -191,6 +191,11 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
     ctx.auditionOff = (p) => noteOff(p.note || 45);
     ctx.allNotesOff = () => { held.length = 0; off(); };
     ctx.onDispose(() => { if (node) node.port.onmessage = null; });
+    // 3.231 its own face asks: open it in the Workshop · rename it · delete it (the tool, every window of it)
+    const tid = ctx.descriptor && ctx.descriptor.id;
+    ctx.onUI('edit_workshop', null, () => { try { Model.edit(tid); } catch (er) { ctx.fault('RUNTIME_003', 'workshop: ' + er.message); } });
+    ctx.onUI('rename_tool', { type: 'object' }, (p) => { const nm = Model.rename(tid, p && p.name); if (nm) ctx.emitUI('renamed', { name: nm }); });
+    ctx.onUI('delete_tool', null, () => { setTimeout(() => Model.remove(tid), 0); });
     ctx.internals = { ready, node: () => node, dag: () => cur, settings, noteOn, noteOff };
     return {};
   }
@@ -397,6 +402,75 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
   Model.stopHearing = () => { if (hearing) { try { hearing.stop(); } catch (e) {} hearing = null; } };
   if (root.PartExchange) Object.assign(root.PartExchange, { synthesize: Model.synthesize, synthesizeParts: Model.synthesizeParts, previewParts: Model.previewParts, previewPair: Model.previewPair, planPair: Model.planPair, planParts: Model.planParts, fits: Model.fits, hear: Model.hear, stopHearing: Model.stopHearing });   // the board finds it on the exchange the music domain hands it
 
+  // ---------------------------------------------------------------- 3.231 A MADE TOOL IS HIS TO KEEP, NAME, CHANGE OR THROW AWAY (his words, 2026-11-26:
+  // "need to be able to delete custom tools. rename them. open them in workshop and edit them fully."). Every change is kept with the tool
+  // (its record, across restarts) and reaches every window of it at once; its id stays, so songs that use it still find it.
+  const instancesOf = (id) => { const K = root.Kernel; return K && K.registry ? K.registry.byOrganism(id).map(r => r.instance_id) : []; };
+  Model.get = (id) => ld().find(r => r.id === id) || null;
+  Model.rename = function (id, name) {   // → the name it now has (made unique), or null
+    const L = ld(), r = L.find(x => x.id === id); let nm = String(name || '').trim().slice(0, 60); if (!r || !nm) return null;
+    const base = nm; let i = 2; while (L.some(x => x !== r && x.name === nm)) nm = base + ' ' + i++;
+    r.name = nm; keep(L); const F = root.OrganismFactory, d = F && F.def(id); if (d) d.label = nm;
+    instancesOf(id).forEach(inst => { const w = root.CanvasWM && root.CanvasWM.windowOf && root.CanvasWM.windowOf(inst), t = w && w.querySelector('.wm-title'); if (t) t.textContent = nm; });
+    return nm;
+  };
+  Model.update = function (id, settings) {   // → true: kept as the tool's own settings, and every open window of it follows
+    const L = ld(), r = L.find(x => x.id === id); if (!r || !settings) return false;
+    const clean = {}; SET.forEach(c => { if (settings[c.key] !== undefined) clean[c.key] = settings[c.key]; });
+    const before = Object.assign({}, r.settings); r.settings = Object.assign({}, r.settings, clean); r.dag = dag(r.settings, r.bpm || 120); r.chain = Model.chainOf(r.dag); keep(L);
+    const F = root.OrganismFactory, d = F && F.def(id); if (d) d.config.forEach(c => { if (r.settings[c.key] !== undefined) c.default = r.settings[c.key]; });
+    const K = root.Kernel; instancesOf(id).forEach(inst => Object.keys(clean).forEach(k => { if (clean[k] !== before[k]) K.bus.publish('ui:config_change:' + inst, { key: k, value: clean[k] }); }));
+    return true;
+  };
+  Model.remove = function (id) {   // → true: its windows closed, its record gone, gone from ＋ Add (it can be made again)
+    if (!Model.get(id)) return false; const F = root.OrganismFactory;
+    instancesOf(id).forEach(inst => { try { if (root.FieldBoard && root.FieldBoard.isOpen(inst)) root.FieldBoard.assemble(inst, { now: true }); F.close(inst); } catch (e) {} });
+    Model.forget(id); if (F && F.undefine) F.undefine(id); return true;
+  };
+  // the WORKSHOP: the made tool as a document — every place a layer, every setting a field; the parts are choices that bring their own
+  const PLACES = [['tool', 'TOOL', []], ['voice', 'VOICE', ['wave', 'pw', 'sub', 'subOct', 'glide', 'noise', 'noiseColour', 'octave']], ['wobble', 'WOBBLE', ['rate', 'lfoShape', 'depth']],
+    ['drive', 'DRIVE', ['drive']], ['mouth', 'MOUTH', ['mouth', 'cutoff', 'reso', 'envAmt', 'envDecay', 'envSustain']], ['fx', 'FX', ['fx']], ['out', 'OUT', ['width', 'level']]];
+  const fieldOf = (c) => c.type === 'enum' ? { key: c.key, label: c.label, type: 'enum', options: c.options.map(String) } : { key: c.key, label: c.label, type: 'number', min: c.min, max: c.max, step: c.step, unit: c.unit };
+  const KIND = {
+    id: 'music.made-tool', label: 'Made tool',
+    title: (d) => d.name,
+    layers(d) {
+      return PLACES.map(([id, label, keys]) => {
+        let fields = keys.map(k => fieldOf(K[k]));
+        if (['drive', 'mouth', 'fx'].includes(id)) fields = fields.concat(SET.filter(c => c.part && c.of === id && c.part === d.settings[id]).map(fieldOf));
+        if (id === 'tool') fields = [{ key: 'name', label: 'Name', type: 'text' }];
+        const comp = id === 'drive' || id === 'mouth' || id === 'fx' ? ' · ' + d.settings[id] : id === 'voice' ? ' · osc-va ' + d.settings.wave : id === 'wobble' ? ' · lfo ' + d.settings.rate : '';
+        return { id, label: label + comp, group: id === 'tool' ? 'TOOL' : 'CHAIN', type: id === 'wobble' ? 'curve' : 'value', fields };
+      });
+    },
+    get: (d, key) => key === 'name' ? d.name : d.settings[key],
+    set(d, key, v) { const o = JSON.parse(JSON.stringify(d)); if (key === 'name') o.name = String(v); else { const c = K[key]; o.settings[key] = c && c.type === 'number' ? +v : (c && c.type === 'enum' && typeof c.default === 'number' ? +v : v); } return o; },
+    status: (d) => [['chain', Model.chainOf(dag(d.settings, 120))], ['made from', (d.of || []).join(' × ') || '—']],
+    draw(g, W, H, d, o) {   // the chain, left to right, the wobble above opening the mouth; the selected place lit
+      g.fillStyle = '#05070b'; g.fillRect(0, 0, W, H);
+      const order = [['voice', 'VOICE'], ['drive', 'DRIVE'], ['mouth', 'MOUTH'], ['fx', 'FX'], ['out', 'OUT']], bw = Math.min(170, (W - 60) / 5 - 16), y = H * 0.55, acc = d.accent || '#00d4ff';
+      const sub = { voice: d.settings.wave, drive: d.settings.drive, mouth: d.settings.mouth + ' ' + Math.round(d.settings.cutoff) + ' Hz', fx: d.settings.fx, out: 'width ' + d.settings.width };
+      order.forEach(([id, lab], i) => { const x = 30 + i * (bw + 16), on = o && o.selected === id;
+        g.strokeStyle = on ? '#fff' : acc; g.lineWidth = on ? 2.5 : 1.2; g.strokeRect(x, y - 30, bw, 60); g.fillStyle = on ? acc : '#d6e4f0'; g.font = '600 12px sans-serif'; g.fillText(lab, x + 10, y - 8);
+        g.fillStyle = '#7f93a8'; g.font = '11px sans-serif'; g.fillText(String(sub[id]).slice(0, 24), x + 10, y + 12);
+        if (i < order.length - 1) { g.strokeStyle = '#3a4b5e'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(x + bw, y); g.lineTo(x + bw + 16, y); g.stroke(); } });
+      const mx = 30 + 2 * (bw + 16) + bw / 2, on = o && o.selected === 'wobble'; g.strokeStyle = on ? '#fff' : acc; g.lineWidth = on ? 2.5 : 1.5; g.beginPath();
+      const depth = Math.min(1, d.settings.depth / 5), A = 30 * depth + 4; for (let k = 0; k <= 160; k++) { const t = k / 160, ph = t * 4 * Math.PI, sh = d.settings.lfoShape;
+        const v = sh === 'square' ? Math.sign(Math.sin(ph)) : sh === 'triangle' ? (2 / Math.PI) * Math.asin(Math.sin(ph)) : /saw up/.test(sh) ? ((t * 2) % 1) * 2 - 1 : /saw down/.test(sh) ? 1 - ((t * 2) % 1) * 2 : Math.sin(ph);
+        const X = mx - 80 + t * 160, Y = y - 110 - v * A; if (k) g.lineTo(X, Y); else g.moveTo(X, Y); } g.stroke();
+      g.fillStyle = '#7f93a8'; g.font = '11px sans-serif'; g.fillText('WOBBLE · ' + d.settings.rate + ' ' + d.settings.lfoShape + ' · ' + (+d.settings.depth).toFixed(1) + ' oct', mx - 80, y - 150);
+      g.strokeStyle = '#3a4b5e'; g.setLineDash([4, 4]); g.beginPath(); g.moveTo(mx, y - 75); g.lineTo(mx, y - 31); g.stroke(); g.setLineDash([]);
+    },
+    actions: (d) => [{ label: '▶ Hear', hint: 'what it sounds like now — the riff its gates measure', strip: true, run: (doc) => { Model.hear(doc.settings); return 'playing ' + doc.name; } }],
+  };
+  Model.KIND = KIND;
+  Model.edit = function (id) {   // open the made tool in the Workshop; every edit is kept and heard at once
+    const W = root.Workshop, r = Model.get(id); if (!W || !r) return null;
+    if (!W.kinds || !W.kinds().some(k => (k.id || k) === KIND.id)) { const a = W.addKind(KIND); if (!a.ok) throw new Error(a.problems.join('; ')); }
+    const F = root.OrganismFactory, d0 = { id, name: r.name, of: r.of || [], accent: (F && F.def(id) || {}).accent, settings: Object.assign(defaults(), r.settings) };
+    const live = (d) => { if (d.name !== Model.get(id).name) Model.rename(id, d.name); Model.update(id, d.settings); };
+    return W.open(KIND.id, d0, { title: r.name, onChange: live, onApply: live });
+  };
   // ---------------------------------------------------------------- the face of a synthesized tool: the kit, its parts as cards (what is in each, its settings)
   Model.ui = function (view) {
     const UI = view.ui, h = UI.h, cfg = (k) => view.descriptor.config.find(c => c.key === k), st = (k) => view.state[k] !== undefined ? view.state[k] : cfg(k).default, made = view.descriptor.made || {};
@@ -406,7 +480,18 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
     const part = (title, socket, always) => { const box = h('div'), draw = () => box.replaceChildren(row((always || []).map(k => ctl(k).el).concat(view.descriptor.config.filter(c => c.part && c.of === socket && [].concat(c.part).includes(st(socket))).map(c => ctl(c.key).el))));
       draw(); view.bind(socket, () => setTimeout(draw, 0)); return card(title, [ctl(socket, { segMax: 5, noLabel: true }).el, box]); };
     const kb = UI.Keyboard ? UI.Keyboard({ low: 33, high: 57, key: view.key, onDown: (n, v) => view.emit('audition', { note: n, velocity: v, duration: 30 }), onUp: (n) => view.emit('audition_off', { note: n }) }) : { el: h('div') };
-    view.root.append(h('div', { class: 'org-row', style: { justifyContent: 'space-between' } }, [UI.presetBar(view)]),
+    // 3.231 his: keep it, name it, change it fully in the Workshop, or throw it away (two clicks: the second deletes)
+    const nameIn = h('input', { class: 'uk-input', value: view.descriptor.label, title: 'its name — Enter keeps it', style: { width: '180px', display: 'none' } });
+    ['pointerdown', 'keydown', 'wheel'].forEach(t => nameIn.addEventListener(t, e => e.stopPropagation()));
+    const doRename = () => { const v = nameIn.value.trim(); nameIn.style.display = 'none'; if (v) view.emit('rename_tool', { name: v }); };
+    nameIn.addEventListener('keydown', (e) => { if (e.key === 'Enter') doRename(); if (e.key === 'Escape') nameIn.style.display = 'none'; }); nameIn.addEventListener('blur', doRename);
+    view.on('renamed', (p) => { nameIn.value = p.name; });
+    let armed = 0; const del = UI.Button({ label: '✕ Delete tool', hint: 'delete this made tool — every window of it closes; click twice', onClick: () => {
+      if (Date.now() - armed < 4000) { view.emit('delete_tool', {}); return; } armed = Date.now(); del.el.textContent = '✕ Click again to delete'; setTimeout(() => { del.el.textContent = '✕ Delete tool'; }, 4000); } });
+    const manage = h('div', { class: 'org-row', style: { gap: '6px', margin: 0 } }, [
+      UI.Button({ label: '✎ Workshop', hint: 'open it in the Workshop: every place a layer, every setting a field — edits are kept and heard at once', onClick: () => view.emit('edit_workshop', {}) }).el,
+      UI.Button({ label: 'Rename', hint: 'give it a name of its own', onClick: () => { nameIn.style.display = ''; nameIn.focus(); nameIn.select(); } }).el, nameIn, del.el]);
+    view.root.append(h('div', { class: 'org-row', style: { justifyContent: 'space-between' } }, [UI.presetBar(view), manage]),
       UI.hint('Synthesized' + (made.of && made.of.length ? ' from ' + made.of.join(' × ') : '') + ' · ' + (made.verdict === 'novel' ? 'new to ERAVOS' : 'close to ' + made.near) + ' · blow it up on the canvas to swap its parts'),
       h('div', { style: { columnWidth: '300px', columnGap: '8px', marginTop: '6px' } }, [
         card('WOBBLE', [row(['rate', 'lfoShape', 'depth'].map(k => ctl(k, k === 'rate' ? { segMax: 9 } : {}).el))]),

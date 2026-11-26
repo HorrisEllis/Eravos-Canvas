@@ -36,6 +36,9 @@
     return desc;
   }
   function reg(id, uiFn) { uis.set(id, uiFn); }
+  // 3.231 a tool can leave the canvas's list (a tool made on the canvas, deleted — his words, 2026-11-26: "need to be able to delete custom
+  // tools"); its open windows are the caller's to close first
+  function undefine(id) { if (!defs.has(id)) return false; defs.delete(id); uis.delete(id); listeners.forEach(fn => fn('undefine', id)); return true; }
   function shortId(id) {
     const base = id.replace(/^eravos\./, '');
     counters[base] = (counters[base] || 0) + 1;
@@ -190,7 +193,7 @@
     onBeforeSpawn(fn) { beforeSpawnHooks.push(fn); return () => { const i = beforeSpawnHooks.indexOf(fn); if (i >= 0) beforeSpawnHooks.splice(i, 1); }; },
     allowObserve(prefixes) { (prefixes || []).forEach(p => { if (!observable.includes(p)) observable.push(p); }); },
     close: (id, reason) => unmountOnce(id, reason || 'closed'),
-    handle: (id) => handles.get(id) || null,
+    handle: (id) => handles.get(id) || null, undefine,
     handles: () => Array.from(handles.values()),
     defined: () => Array.from(defs.values()),
     def: (id) => defs.get(id) || null,
