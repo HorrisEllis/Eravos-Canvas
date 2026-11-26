@@ -2,6 +2,21 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.232 Tension from who speaks; his words imported; deep patterns; Song Import specced (2026-11-26)
+His words: "Can you add contrasting rhythm or a bunch with tension?" · "I want to be able to import a song and have Eravos open it with the needed tools to replicate it. Hard? That could be a good test. Did you create extremely deep patterns?" · "I am a good writer.  It would be cool to be able to import my words.  Can we have voices for the lyrics? On top of my own? Like I want to be able to make any genre of music using Eravos." (two poems of his given as the lyrics — kept with him, not in the repo)
+- lyric-shape 1.2.0: clausesOf(line) — each line cut at . ; ! ? (and at a comma before "I" / "you") into clauses with who speaks (I · you · we,
+  or carried); a stanza where I and you answer each other is a DIALOGUE, and says so.
+- rhythm-expand: tension 0…1 — in a dialogue stanza the "you" is pushed off the beat (a 16th · a dotted 16th · half a beat), three against four
+  under it, the bass on the 4th and the lead a step off (unresolved), the last line not pushed and its first strong syllable the ARRIVAL
+  (a crash and a kick). 0 = as before.
+- Lyrics → Rhythm 1.2.0+: Tension (0.6); SHAPE marks a dialogue ⇄; ⇣ Import words + Your words (tools/music/data/words-shelf.js: .txt, .md,
+  a Notion export .zip — its heading the title, the Notion id gone, marks removed, an index of links skipped, stanza breaks kept; on this
+  computer only); ⇢ Patterns made DEEP: accents ratchet (3, speeding up), weak syllables are ghosts (70 %, humanized), the answer lags
+  (+¼ step), melody line ends doubled an octave up, the pendulum's return every other pass. PF_LIB.saveNotes { later }.
+- build/render-words.mjs --tension.
+- Specs: specs/eravos.song-import.spec (SI0–SI6) · voice-lab ADDENDUM (2): CREATE first, on top of his own voice. T-63, T-64.
+- Tests: tests/p232-tension-and-words.test.js 3/3; lyric-shape 29 checks; P228 P229 P20 RhythmExpand Bass Pack Pattern Library boundary green.
+
 ## 3.231 A made tool is his: rename it, edit it fully in the Workshop, delete it (2026-11-26)
 His words: "also merge and push. need to be able to delete custom tools. rename them. open them in workshop and edit them fully." (merged first: PR #224, 3.226–3.230)
 - assembled-tool.js: Model.get / rename (made unique, kept, the def and every open window's title follow; the id stays so songs still find it) /

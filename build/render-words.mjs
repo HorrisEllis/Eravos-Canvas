@@ -11,7 +11,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2), pos = args.filter(a => !a.startsWith('--')), opt = (k, d) => { const a = args.find(x => x.startsWith('--' + k + '=')); return a ? a.slice(k.length + 3) : d; };
 if (pos.length < 2) { console.error('usage: render-words.mjs <lyrics.txt> <out.wav> [--genre=] [--depth=] [--contrast=] [--shape=] [--flow=] [--seed=] [--bars=]'); process.exit(1); }
 const text = fs.readFileSync(pos[0], 'utf8'), out = pos[1];
-const o = { genre: opt('genre', 'darkwave'), depth: +opt('depth', 0.7), contrast: +opt('contrast', 1), dims: +opt('dims', 0.7), shape: opt('shape', 'contrast'), flow: opt('flow', 'spoken'), seed: +opt('seed', 1), bars: +opt('bars', 0) };
+const o = { genre: opt('genre', 'darkwave'), depth: +opt('depth', 0.7), contrast: +opt('contrast', 1), dims: +opt('dims', 0.7), tension: +opt('tension', 0.6), shape: opt('shape', 'contrast'), flow: opt('flow', 'spoken'), seed: +opt('seed', 1), bars: +opt('bars', 0) };
 const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required', '--js-flags=--max-old-space-size=4096'] });
 const p = await b.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
 await p.addInitScript(() => { window.ERAVOS_CATALOG_ALL = true; });

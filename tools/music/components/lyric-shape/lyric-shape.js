@@ -1,4 +1,4 @@
-/* eravos.component.lyric-shape 1.1.0 — the shape of the words: where they push, where they rest, where they turn (3.228, 2026-11-25).
+/* eravos.component.lyric-shape 1.2.0 — the shape of the words: where they push, where they rest, where they turn (3.228, 2026-11-25).
  * His words (2026-11-25): "continue making more tools for eravos. i want to make music with contrast. thats my rhytm" · "i want to learn how
  * to make music from my lyrics. that is the point of the rhythm tool"
  * NEW code. It reads any lyrics (a blank line = a new stanza) and says, for each stanza, what its words already do — so the music can do it
@@ -39,6 +39,25 @@
   const stemIn = (text, s) => s.includes(' ') ? text.includes(s) : (' ' + text + ' ').match(new RegExp('[^a-z]' + s + '[a-z]*[^a-z]'));
   function plainSyllables(line) { return words(line).flatMap(w => { const n = Math.max(1, (w.replace(/e$/, '').match(/[aeiouy]+/g) || []).length); return Array.from({ length: n }, (_, i) => ({ stress: i === 0 && !SMALL.has(w) ? 1 : 0 })); }); }
   const clamp = (x) => Math.max(0, Math.min(1, x));
+  // 1.2.0 WHO SPEAKS (his words, 2026-11-26: "Can you add contrasting rhythm or a bunch with tension?" — with "I loved you with all of me. You loved
+  // the thought of me."): each line cut into clauses at . ; ! ? — a clause is "I" (I, I'm, me, my …), "you" (you, your …), "we", or carries
+  // the one before it. Word indices are counted as Lyrics → Rhythm counts them (! and ? are not words), so a syllable finds its clause.
+  const WHO = { i: 'I', "i'm": 'I', im: 'I', "i've": 'I', ive: 'I', "i'd": 'I', "i'll": 'I', me: 'I', my: 'I', mine: 'I', myself: 'I',
+    you: 'you', "you're": 'you', youre: 'you', "you've": 'you', "you'd": 'you', "you'll": 'you', your: 'you', yours: 'you', yourself: 'you', we: 'we', us: 'we', our: 'we' };
+  const SUBJ = new Set(['i', "i'm", 'im', "i've", "i'd", "i'll", 'you', "you're", "you've", "you'd", "you'll", 'we']);
+  function clausesOf(line, carry) {
+    const out = []; let wi = 0, who = carry || null, start = true, soft = false;
+    (String(line).match(/[A-Za-z0-9'’]+|[.;!?]+|,/g) || []).forEach(t => {
+      if (/^[.;!?]+$/.test(t)) { start = true; return; }
+      if (t === ',') { soft = true; return; }   // after a comma, "I …" / "you …" starts a clause too ("I wanted closeness, you wanted the distance")
+      const w = t.toLowerCase().replace(/’/g, "'");
+      if (soft && !start && SUBJ.has(w) && WHO[w] !== who) start = true; soft = false;
+      if (start) { if (WHO[w]) who = WHO[w]; out.push({ start: wi, who: who || 'none' }); start = false; }
+      wi++;
+    });
+    return out.length ? out : [{ start: 0, who: carry || 'none' }];
+  }
+  const whoAt = (clauses, wi) => { let w = clauses[0].who; clauses.forEach(c => { if (wi >= c.start) w = c.who; }); return w; };
 
   function stanzasOf(text) {
     let g = String(text || '').replace(/\r/g, '').split(/\n\s*\n/).map(b => b.split('\n').map(l => l.trim()).filter(Boolean)).filter(b => b.length);
@@ -62,10 +81,12 @@
       const light = has(ws, LIGHT), dark = has(ws, DARK), push = has(ws, PUSH) + (lines.join(' ').match(/!/g) || []).length + lines.filter(l => /\b[A-Z]{2,}\b/.test(l)).length;
       const pairs = PAIRS.filter(([a, b]) => stemIn(text1, a) && stemIn(text1, b)).map(([a, b]) => a + ' / ' + b);
       const lineVal = lines.map(l => { const w = words(l); return has(w, LIGHT) - has(w, DARK); });
+      let carry = null; const clauses = lines.map(l => { const c = clausesOf(l, carry); carry = c[c.length - 1].who; return c; });
+      const whos = new Set(clauses.flat().map(c => c.who)), dialogue = whos.has('I') && whos.has('you');
       const density = n / lines.length, short = lines.spaced ? Math.max(0.75, per.filter(s => s.length <= 4).length / lines.length) : per.filter(s => s.length <= 4).length / lines.length;
       return { i, lines: lines.slice(), spaced: !!lines.spaced, syllables: n, density: +density.toFixed(2), short: +short.toFixed(2), stress: n ? +(strong / n).toFixed(2) : 0,
         valence: +((light - dark) / (light + dark + 1)).toFixed(2), intensity: push, pairs: [...new Set(pairs)], lineValence: lineVal,
-        refrain: refs[i].sort((a, b) => b.split(' ').length - a.split(' ').length).slice(0, 3), questions: lines.filter(l => /\?\s*$/.test(l)).length };
+        clauses, dialogue, refrain: refs[i].sort((a, b) => b.split(' ').length - a.split(' ').length).slice(0, 3), questions: lines.filter(l => /\?\s*$/.test(l)).length };
     });
     if (!stanzas.length) return { stanzas: [], arc: [], lesson: [] };
     // energy 0…1, scaled across this poem (a quiet poem still has its loudest stanza)
@@ -84,12 +105,14 @@
       const di = stanzas.indexOf(loud); if (loud.kind === 'drop' && di > 0 && stanzas[di - 1].kind === 'verse') { stanzas[di - 1].kind = 'build'; stanzas[di - 1].why.push('it comes just before the loudest stanza — the drums roll up into it, everything stops half a beat before'); }
       stanzas.forEach(s => { if (s.pairs.length >= (contrast >= 0.5 ? 1 : 2) && s.lines.length > 1) { s.split = true; s.why.push('opposites inside it (' + s.pairs.slice(0, 3).join(', ') + ') — its lines take turns: the dark ones low and bare, the light ones high and full'); } });
     }
+    if (contrast > 0) stanzas.forEach(s => { if (s.dialogue) s.why.push('I and you answer each other — the "you" falls off the beat (tension), the last line lands back on it (release)'); });
     stanzas.forEach(s => { if (!s.why.length) s.why.push(s.kind === 'verse' ? 'it tells the story (energy ' + s.energy + ') — drums, bass and chords under the words' : ''); });
     const lesson = ['Every syllable is a step: a strong one lands on the beat (a kick on 1 and 3, a snare on 2 and 4), a weak one fills between (a hat).',
       'Every stanza is a part of the song. How many syllables a line has is its speed; short lines leave space — and space is part of the music.',
       'Contrast is the rhythm of a song: a quiet stanza next to a loud one makes both stronger. The loudest becomes the drop, the quietest a break.',
       'A line that comes back is what the song is about: it becomes the chorus, and you will want to hear it more than once.',
-      'Opposites in one stanza (light and dark, peaks and valleys) can be heard: the music turns with the words, line by line.'];
+      'Opposites in one stanza (light and dark, peaks and valleys) can be heard: the music turns with the words, line by line.',
+      'Tension is a beat that does not land where you expect: when "I" speaks the words sit on the beat; when "you" answers they fall just off it, and the last line brings them home.'];
     return { stanzas, arc: stanzas.map(s => s.kind), lesson, contrast };
   }
   // ---------------------------------------------------------------- 1.1.0 PATTERNS from the words' rhythm (3.229; his words, 2026-11-25: "More of
@@ -112,7 +135,7 @@
       .concat(w2.map(n => ({ s: r3(2 * H - n.s - Math.min(n.l, H - n.s)), l: Math.min(n.l, H - n.s), stress: n.stress }))).sort((a, b) => a.s - b.s);
     return { bars, words, mirror, shadow, pendulum: { bars: half * 2, notes: pendulum } };
   }
-  const api = { read, patterns, stanzasOf, plainSyllables, PAIRS, LIGHT, DARK, PUSH, version: '1.1.0' };
+  const api = { read, patterns, clausesOf, whoAt, stanzasOf, plainSyllables, PAIRS, LIGHT, DARK, PUSH, version: '1.2.0' };
   root.MusicParts = root.MusicParts || {};
   root.MusicParts.LyricShape = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

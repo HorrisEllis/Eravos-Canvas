@@ -229,3 +229,13 @@
   - ANSWERED: yes — SNAP, his (specs/eravos.workbench.spec ADDENDUM 2026-11-15 (3): "it would also be cool to 'snap off' components and snap components together."); the spec now says so (ADDENDUM (2)).
   > also merge and push. need to be able to delete custom tools. rename them. open them in workshop and edit them fully.
   - DONE: the branch merged (PR). BUILDING 3.231: a made tool deleted, renamed, opened in the Workshop and edited fully.
+
+## 43 — verbatim (2026-11-26, with two poems of his as the lyrics — kept with him, not here):
+  > Can you add contrasting rhythm or a bunch with tension?
+  > I want to be able to import a song and have Eravos open it with the needed tools to replicate it. Hard? That could be a good test. Did you create extremely deep patterns?
+  > I am a good writer.  It would be cool to be able to import my words.  Can we have voices for the lyrics? On top of my own? Like I want to be able to make any genre of music using Eravos.
+  - BUILT 3.232: TENSION (who speaks: I / you per clause; the answer off the beat, three against four under it, bass and lead unresolved, the
+    last line home with an arrival; Lyrics → Rhythm › Tension) · ⇣ Import words (.txt / .md / a Notion .zip; Your words) · DEEP patterns
+    (ratchets on accents, ghosts on weak syllables, the answer lagging, line ends doubled, the pendulum's return every other pass).
+  - ANSWERED: deep patterns — before 3.232, no (rhythm and pitch only); now each note carries how it plays.
+  - SPECCED: specs/eravos.song-import.spec (SI0 MIDI … SI6 stems; honest scope) · specs/eravos.voice-lab.spec ADDENDUM (2): CREATE first, on top of his own voice.

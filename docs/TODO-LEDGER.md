@@ -74,6 +74,8 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-60 | **CB: combine two components into one part** (on the board; its own contract; gated; mixable everywhere). Needs the composite node. | "build components from combining two." | specced |
 | T-61 | **EX: the engines grow** (VOICE: unison · string · wavetable; MOUTH: formant; SPACE and SUB places) and every tool speaks the character table. | "Expand the tools and engines maybe," | specced |
 | T-62 | **A made tool is his: rename · edit fully in the Workshop · delete** — built 3.231 (P231). Next: the same on a tool's page and in ＋ Add. | "also merge and push. need to be able to delete custom tools. rename them. open them in workshop and edit them fully." | built |
+| T-63 | **Song Import** SI0 MIDI → SI1 tempo / key / sections → SI2 drums → SI3 lines → SI4 chords → SI5 the tools + the closeness gate → SI6 stems. | "I want to be able to import a song and have Eravos open it with the needed tools to replicate it. Hard? That could be a good test." | specced (specs/eravos.song-import.spec) |
+| T-64 | **Voices for his lyrics, on top of his own** — Voice Lab CREATE first (vocal-tract + letter-to-sound), characters per genre. | "Can we have voices for the lyrics? On top of my own?" | specced (voice-lab ADDENDUM (2)) |
 
 ## ERAVOS's own engine · `specs/eravos.engine.spec` (decided 2026-11-24: written in Emerge — "wait for emerge")
 

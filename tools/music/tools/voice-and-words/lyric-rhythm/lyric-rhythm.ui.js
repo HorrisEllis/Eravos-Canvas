@@ -8,7 +8,21 @@ OrganismFactory.reg('eravos.lyric-rhythm', function (view) {
   ta.addEventListener('input', () => { clearTimeout(tmr); tmr = setTimeout(() => view.set('text', ta.value), 250); });
   ['pointerdown', 'keydown', 'wheel'].forEach(t => ta.addEventListener(t, e => e.stopPropagation()));
   view.bind('text', (v) => { if (document.activeElement !== ta && ta.value !== v) ta.value = v || ''; });
+  // 3.232 YOUR WORDS (his words, 2026-11-26: "I am a good writer. It would be cool to be able to import my words."): import .txt / .md / a
+  // Notion export (.zip) — or drop them on the words — into a shelf of his pieces (WordsShelf, kept on this computer); pick one to play it
+  const WS = () => window.WordsShelf, pickW = h('select', { class: 'uk-select lyr-pick', title: 'your words — pick a piece to play it' });
+  const fileIn = h('input', { type: 'file', multiple: true, accept: '.txt,.md,.markdown,.zip,text/plain,text/markdown', style: { display: 'none' } });
+  function paintPick(sel) { if (!WS()) return; const L = WS().list(); pickW.innerHTML = ''; pickW.appendChild(h('option', { value: '', text: L.length ? 'Your words (' + L.length + ')…' : 'Your words — import some' }));
+    L.forEach(r => pickW.appendChild(h('option', { value: r.id, text: r.title }))); pickW.value = sel || ''; }
+  pickW.addEventListener('change', () => { const r = WS() && WS().get(pickW.value); if (r) { ta.value = r.text; view.set('text', r.text); } });
+  async function bring(files) { if (!WS() || !files || !files.length) return; const res = await WS().importFiles(files);
+    paintPick(res.added.length ? (WS().list()[0] || {}).id : ''); if (res.added.length) { const r = WS().list()[0]; ta.value = r.text; view.set('text', r.text); }
+    status.textContent = res.added.length ? 'Imported ' + res.added.length + ' piece' + (res.added.length > 1 ? 's' : '') + ' — pick any from Your words.' + (res.skipped.length ? ' (' + res.skipped.length + ' not words: skipped)' : '') : 'Nothing to import there (' + res.skipped.length + ' skipped).'; }
+  fileIn.addEventListener('change', () => { bring(fileIn.files); fileIn.value = ''; });
+  ta.addEventListener('dragover', (e) => { if (e.dataTransfer && [...e.dataTransfer.types].includes('Files')) { e.preventDefault(); e.stopPropagation(); } });
+  ta.addEventListener('drop', (e) => { if (e.dataTransfer && e.dataTransfer.files.length) { e.preventDefault(); e.stopPropagation(); bring(e.dataTransfer.files); } });
   const grid = h('div', { class: 'lyr-grid' }), status = h('div', { class: 'lyr-status' });
+  setTimeout(() => paintPick(), 0);
   const tgt = h('span', { class: 'lyr-tgt' });
   function paint() {
     grid.innerHTML = ''; const bars = Math.max(1, Math.ceil(plan.steps / 16));
@@ -39,7 +53,7 @@ OrganismFactory.reg('eravos.lyric-rhythm', function (view) {
     if (!sh) return;
     shapeBox.appendChild(h('div', { class: 'lyr-shape-h' }, [h('b', { text: 'SHAPE' }), h('span', { text: sh.on ? 'what each stanza becomes in ♫ Make a song — and why' : 'every stanza a verse (Song shape)' })]));
     sh.stanzas.forEach((st, i) => shapeBox.appendChild(h('div', { class: 'lyr-st k-' + st.kind + (st.split ? ' split' : '') }, [
-      h('span', { class: 'lyr-st-k', text: (KIND[st.kind] || st.kind) + (st.split ? ' ⇅' : '') }),
+      h('span', { class: 'lyr-st-k', text: (KIND[st.kind] || st.kind) + (st.split ? ' ⇅' : '') + (st.dialogue ? ' ⇄' : '') }),
       h('span', { class: 'lyr-st-e', title: 'energy ' + st.energy }, [h('i', { style: { width: Math.round(st.energy * 100) + '%' } })]),
       h('div', { class: 'lyr-st-t' }, [h('b', { text: (i + 1) + '. ' + st.first + (st.lines > 1 ? ' …' : '') }), h('small', { text: st.why.join(' · ') })]),
     ])));
@@ -57,9 +71,10 @@ OrganismFactory.reg('eravos.lyric-rhythm', function (view) {
       UI.Button({ label: '⇢ Sequencer', hint: 'your words as Sequencer lanes (4 bars per slot, chained) + a her-voice lane on every line start — then automate it', onClick: () => view.emit('send_sequencer', {}) }).el,
       UI.Button({ label: '⇢ Patterns', hint: 'every stanza → four patterns in Patterns › Yours: the words, their mirror, their shadow (the rests become hits), the pendulum (out and back) — as drums or melody', onClick: () => view.emit('make_patterns', {}) }).el,
       UI.Button({ label: '↺', hint: 'undo your weight/nudge edits', onClick: () => view.emit('reset_edits', {}) }).el])]),
+    h('div', { class: 'org-row lyr-ctl' }, [pickW, UI.Button({ label: '⇣ Import words', hint: 'your writing: .txt, .md, or a Notion export (.zip) — or drop files on the words', onClick: () => fileIn.click() }).el, fileIn]),
     ta, h('div', { class: 'org-row lyr-ctl' }, [seg('flow')]),
     h('div', { class: 'org-row lyr-ctl' }, [UI.Button({ label: '♫ Make a song', kind: 'primary', hint: 'grow this rhythm into a whole song, written below on the Timeline', onClick: () => view.emit('expand_song', {}) }).el, UI.paramControl(view, cfg('songGenre'), { segMax: 4 }).el]), h('div', { class: 'org-row lyr-ctl' }, [seg('mode'), tgt]),
-    grid, status, h('div', { class: 'org-row lyr-ctl' }, [UI.paramControl(view, cfg('songShape'), { segMax: 2 }).el, UI.paramControl(view, cfg('contrast'), { size: 30 }).el, UI.paramControl(view, cfg('depth'), { size: 30 }).el, UI.paramControl(view, cfg('dims'), { size: 30 }).el]), shapeBox,
+    grid, status, h('div', { class: 'org-row lyr-ctl' }, [UI.paramControl(view, cfg('songShape'), { segMax: 2 }).el, UI.paramControl(view, cfg('contrast'), { size: 30 }).el, UI.paramControl(view, cfg('depth'), { size: 30 }).el, UI.paramControl(view, cfg('dims'), { size: 30 }).el, UI.paramControl(view, cfg('tension'), { size: 30 }).el]), shapeBox,
     UI.paramPanel(view, ['bars', 'vary', 'octave', 'range', 'gate', 'level'], { flat: true, noTitles: true, size: 30 }),
     UI.hint('Words become rhythm: strong syllables land on the beat. Click a syllable to make it weak / strong / ACCENT, drag to move it. Wire ⇢ to any instrument, or it plays the first Drum Machine (drums) or synth (melody). Space plays it with the song.'));
   UI.alive(view, { events: ['syl'], port: null });

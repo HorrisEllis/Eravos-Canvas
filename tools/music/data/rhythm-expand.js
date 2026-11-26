@@ -10,7 +10,7 @@
  *   · CHORDS, instruments, presets, effects and the master are the genre's own (Song Engine) — an intro and an outro frame it
  * Same words + genre + seed + flow → the same song. It is a Song Engine song with the words' rhythm in it: the engine's
  * output is untouched (RhythmExpand uses its optional generate(…, X) hook and helpers).
- *   RhythmExpand.write(text, { genre:'darkwave', seed, flow:'spoken', per:4, shape:'verses'|'contrast', contrast:0…1, depth:0…1, dims:0…1 })  → the song on the canvas
+ *   RhythmExpand.write(text, { genre:'darkwave', seed, flow:'spoken', per:4, shape:'verses'|'contrast', contrast:0…1, depth:0…1, dims:0…1, tension:0…1 })  → the song on the canvas
  *   RhythmExpand.shape(text, { contrast })  → the words' shape (lyric-shape): each stanza's part and why — 3.228
  *   RhythmExpand.generate(text, opts)                                            → the recipe steps (no canvas) */
 (function () {
@@ -44,7 +44,15 @@
         else if (n.stress) { seen[n.line] = seen[n.line] || 0; n.off = [0, 2, 4, 7, 4, 2][seen[n.line]++ % 6]; }
       });
       const st = shape ? shape.stanzas[i] : null;
-      return Object.assign({ lines, notes: pl.notes, steps: pl.steps, bars: Math.max(2, 2 * Math.ceil(pl.steps / 32)) }, st ? { kind: st.kind, split: st.split, lineValence: st.lineValence, energy: st.energy, why: st.why } : {});
+      // 3.232 TENSION (his words, 2026-11-26: "Can you add contrasting rhythm or a bunch with tension?"): in a stanza where I and you answer
+      // each other, the "you" is pushed off the beat (a 16th at 0.33, a dotted 16th at 0.66, half a beat at 1); the last line is not pushed —
+      // it lands, and the first strong syllable of it is the arrival. 0 = as before.
+      const T = Math.max(0, Math.min(1, +o.tension || 0)), S2 = window.MusicParts && window.MusicParts.LyricShape;
+      if (st && st.dialogue && T > 0 && S2) { const last = Math.max(...pl.notes.map(n => n.line)), push = T < 0.5 ? 1 : T < 0.85 ? 1.5 : 2;
+        pl.notes.forEach(n => { if (n.line === last) { n.home = true; return; } if (S2.whoAt(st.clauses[n.line], n.wi) === 'you') { n.s += push; n.tense = true; } });
+        const arr = pl.notes.find(n => n.home && n.stress); if (arr) arr.arrival = true;
+        pl.steps = Math.max(pl.steps, Math.ceil(Math.max(...pl.notes.map(n => n.s + n.l)) / 16) * 16); }
+      return Object.assign({ lines, notes: pl.notes, steps: pl.steps, tension: !!(st && st.dialogue && +o.tension > 0), bars: Math.max(2, 2 * Math.ceil(pl.steps / 32)) }, st ? { kind: st.kind, split: st.split, lineValence: st.lineValence, energy: st.energy, why: st.why } : {});
     });
   }
 
@@ -54,7 +62,7 @@
     if (!S || !H || !L) throw new Error('Song Engine and Lyrics → Rhythm must both be loaded');
     const G = S.genres().find(g => g.id === (o.genre || 'darkwave')); if (!G) throw new Error('unknown genre: ' + o.genre);
     const flow = L.FLOWS.includes(o.flow) ? o.flow : 'spoken', seed = (o.seed | 0) || 1;
-    const secs = sections(text, { flow, seed, per: o.per, shape: o.shape, contrast: o.contrast }); if (!secs.length) throw new Error('no words to build a song from');
+    const secs = sections(text, { flow, seed, per: o.per, shape: o.shape, contrast: o.contrast, tension: o.tension }); if (!secs.length) throw new Error('no words to build a song from');
     const words = (lines) => lines[0].replace(/[^A-Za-z0-9'’ ]/g, '').trim().split(/\s+/).slice(0, 4).join(' ').toLowerCase();
     // 3.34.2: a genre whose parts are not called bass / chords / lead (the Bass Pack) names the parts that sing the words: G.wordsPlay = { verse: [...], frame: [...] }
     const WP = G.wordsPlay || {}, vplay = WP.verse || ['drums', 'bass', 'chords', 'lead'], fplay = WP.frame || ['chords', 'drums'];
@@ -85,10 +93,13 @@
         const lo = c.b * 16, here = w.notes.filter(n => n.s >= lo && n.s < lo + 16).map(n => Object.assign({}, n, { s: n.s - lo }));
         // 3.228 contrast: a split stanza turns with its lines — a dark line low and bare, a light line high and full
         const lv = w.split && here.length ? (w.lineValence[here[0].line] || 0) : 0, dark = lv < 0, light = lv > 0;
+        const TN = Math.max(0, Math.min(1, +o.tension || 0)), tense = w.tension && here.some(n => n.tense);   // 3.232 the answer off the beat
         if (c.role === 'drums') {
-          const k = w.kind || 'verse', mode = dark ? 'none' : k === 'build' ? 'build' : (k === 'chorus' || k === 'drop' || light) ? 'main' : 'light', lift = k === 'drop' ? 0.85 : k === 'chorus' || light ? 0.75 : 0.5;
+          const k = w.kind || 'verse', mode = dark ? 'none' : (tense && TN >= 0.7) ? 'light' : k === 'build' ? 'build' : (k === 'chorus' || k === 'drop' || light) ? 'main' : 'light', lift = k === 'drop' ? 0.85 : k === 'chorus' || light ? 0.75 : 0.5;
           const out = H.drumBar(G, c.r, mode, c.b, c.sec.bars, 0.5).map(x => Object.assign(x, { v: x.v * lift * (x.n === 36 + PAD.kick ? 1 + 0.25 * D : 1) }));
-          if (D >= 0.5 && (k === 'drop' || k === 'chorus') && !dark) out.push(N(0, 2, 36 + PAD.kick, 1));   // the boom on 1   // the groove: quiet under a verse, full in a chorus / drop, none under a dark line
+          if (D >= 0.5 && (k === 'drop' || k === 'chorus') && !dark) out.push(N(0, 2, 36 + PAD.kick, 1));   // the boom on 1
+          if (tense && TN >= 0.5) [0, 16 / 3, 32 / 3].forEach(x => out.push(N(+x.toFixed(3), 0.5, 36 + PAD.hat, 0.5)));   // three against four under the answer
+          here.filter(n => n.arrival).forEach(n => { out.push(N(n.s, 4, 36 + PAD.crash, 0.9)); out.push(N(n.s, 1, 36 + PAD.kick, 1)); });   // the arrival   // the groove: quiet under a verse, full in a chorus / drop, none under a dark line
           here.forEach(n => {
             if (n.stress) { out.push(N(n.s, 1, 36 + (Math.floor(n.s / 4) % 2 ? PAD.snare : PAD.kick), n.stress === 2 ? 1 : 0.9)); if (n.stress === 2) out.push(N(n.s, 1, 36 + PAD.clap, 0.85)); }
             else if (!dark) out.push(N(n.s, 0.5, 36 + (n.last ? PAD.perc : PAD.hat), n.last ? 0.6 : 0.45));
@@ -100,12 +111,12 @@
           if (dark) return [N(0, 16, MT().degreeToMidi(c.deg, 1, c.key.root, c.key.scale), 0.8)];   // a dark line: one long low root
           if (!strong.length) return H.bassBar(c.sec.bassStyle || c.P.style, c.deg, c.key, c.r, c.b);
           const loud = D > 0 && ['drop', 'chorus', 'build'].includes(w.kind), hold = loud ? 6 + Math.round(10 * D) : 6;   // depth: the loud parts hold the low end
-          return strong.map((n, i) => N(n.s, Math.max(1, Math.min(hold, (strong[i + 1] ? strong[i + 1].s : 16) - n.s)), MT().degreeToMidi(c.deg + (n.last ? 4 : 0), 1, c.key.root, c.key.scale), Math.min(1, (n.stress === 2 ? 1 : 0.9) * (1 + 0.15 * D))));
+          return strong.map((n, i) => N(n.s, Math.max(1, Math.min(hold, (strong[i + 1] ? strong[i + 1].s : 16) - n.s)), MT().degreeToMidi(c.deg + (n.tense ? 3 : n.last ? 4 : 0), 1, c.key.root, c.key.scale), Math.min(1, (n.stress === 2 ? 1 : 0.9) * (1 + 0.15 * D))));
         }
         if (c.role === 'lead') {
           const oct = (c.P.octave || 5) - down + (dark ? -1 : light ? 1 : 0);   // a dark line sung an octave down, a light one an octave up (depth: all lower)
           const sung = here.filter(n => n.stress || n.last), mid = (dg, o2) => MT().degreeToMidi(dg, o2, c.key.root, c.key.scale), loud = ['drop', 'chorus'].includes(w.kind);
-          const out = sung.map(n => N(n.s, Math.max(1, Math.min(4, n.l)), mid(c.deg + (n.off || 0), oct), n.stress === 2 ? 1 : 0.85));
+          const out = sung.map(n => N(n.s, Math.max(1, Math.min(4, n.l)), mid(c.deg + (n.off || 0) + (n.tense ? 1 : 0), oct), n.stress === 2 ? 1 : 0.85));   // the answer a step off, unresolved
           if (DIM >= 0.3 && loud) sung.forEach(n => out.push(N(n.s, Math.max(1, Math.min(4, n.l)), mid(c.deg + (n.off || 0), oct + 1), 0.45)));   // layer: an octave up, softer
           if (DIM >= 0.6 && loud) sung.forEach(n => out.push(N(n.s, Math.max(1, Math.min(4, n.l)), mid(c.deg + (n.off || 0) + 2, oct), 0.5)));   // layer: a third above
           if (DIM >= 0.5 && !loud && LS) { const pt = LS.patterns(here.map(n => ({ s: n.s, l: n.l, stress: n.stress })), { bars: 1 });   // the counter-line: in the words' gaps

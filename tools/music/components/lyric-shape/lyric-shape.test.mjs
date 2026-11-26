@@ -49,4 +49,11 @@ const P2 = L.patterns([{ s: 0, l: 2, stress: 1 }, { s: 6, l: 2, stress: 0 }, { s
 ok(P2.bars === 2 && P2.pendulum.bars === 2 && P2.pendulum.notes.map(x => x.s).join() === '0,6,24,30', 'pendulum: as long out as back: ' + P2.pendulum.notes.map(x => x.s));
 ok(L.patterns([]) === null, 'no syllables, no patterns');
 ok(L.patterns(Array.from({ length: 40 }, (_, i) => ({ s: i * 4, l: 2, stress: 1 }))).bars === 4, 'at most 4 bars');
+// 1.2.0 who speaks: call and answer
+const cl = L.clausesOf('I loved you with all of me. You loved the thought of me.'); ok(cl.length === 2 && cl[0].who === 'I' && cl[1].who === 'you' && cl[1].start === 7, 'two clauses, I then you: ' + JSON.stringify(cl));
+const cm = L.clausesOf('I wanted closeness, you wanted the distance'); ok(cm.length === 2 && cm[1].who === 'you' && cm[1].start === 3, 'a comma, then you: ' + JSON.stringify(cm));
+ok(L.whoAt(cl, 3) === 'I' && L.whoAt(cl, 7) === 'you', 'a word finds its speaker');
+ok(L.clausesOf('even the painful moments', 'I')[0].who === 'I', 'a clause with no speaker carries the one before');
+const dl = L.read('I wanted all of you. You wanted fairytales.\nI wanted closeness, you wanted distance.'); ok(dl.stanzas[0].dialogue, 'a dialogue stanza');
+ok(dl.stanzas[0].why.some(w => /off the beat/.test(w)), 'and it says why');
 console.log(`✓ lyric-shape: ${n} checks`);
