@@ -67,3 +67,15 @@
   - the preview: yes, or what changes? (the look is his: "always show me or add more themes before change")
   - Contrast Space as a tool of its own, or only the elements on the tools that already exist (Swarm, Wobble Bass, Sidechain)?
   - which first: CS1 (ripple in Hz) + CS2 (pendulum) reach Wobble Bass's contrast (T-91) soonest — proposed first.
+
+ADDENDUM 2026-11-27 (2) — not one monolith (the original above kept verbatim)
+his words (verbatim): "Okay but not one monolith. Against the design philosophy" · "needs an engine probably. look at the other tools. tool suite,
+  each tool, then each component for each tool. look at the rest." · "like skrillex right?"
+WITHDRAWN: Contrast Space as ONE tool holding seven elements (axioms 1–3). Instead, a SETUP "Contrast" (like Lofi) of whole tools, each its own
+engine, each built from components:
+  Ripple (new: unison-stack Hz · osc-va · osc-sub · saturator-tube · env-adsr · stereo-tools) · Collision (new effect: multiband-splitter ·
+  masking-analyzer · ducker) · Spatial Organism (planned) · LFO (built) + the pendulum shape · Tension Field (planned) · Swarm (built) + the
+  Emergence card · Groove / Pads (built) · Lyrics → Rhythm + Voice Lab (the voice, made). Wavelength: a display on any pitch control.
+PREVIEW (in progress): docs/previews/contrast-elements.* — seven separate windows wired with ordinary wires (the wires register; the cards
+  do not draw yet: a fault in mounting, being found). tools/music/planned/contrast-space.spec is superseded by this addendum.
+NEXT: Ripple bottom up — unison-stack Hz (test) → the tool's engine → pictures shown before it merges (asked: "Shall I go ahead?").
