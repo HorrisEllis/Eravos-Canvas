@@ -126,6 +126,11 @@ async function measureTool(id) {
         if (out.kind === 'instrument' || out.kind === 'sampler') chord.forEach(n => U.K.bus.publish('note:trigger', { target: inst, note: n, velocity: 0.9, time: 0.1, duration: 2.7 }));   // still held when Stop all lands
         if (chord.length > 1) { r.chord = true; expectHz = 0; }   // a triad has no single pitch to check
         if (out.kind === 'effect') { const o = U.ctx.createOscillator(), g = U.ctx.createGain(); o.type = 'sawtooth'; o.frequency.value = 110; g.gain.value = 0.5; o.connect(g); g.connect(inPort(U, inst).node); o.start(0.1); o.stop(1.3); expectHz = 0; if (plays) U.K.bus.publish('note:trigger', { target: inst, note: 60, velocity: 0.9, time: 0.1, duration: 1.2 }); }   // an effect that takes notes (Granular keys) is measured with one held
+        // 3.240 an effect that only acts when its KEY is hit (it declares survey.key, e.g. Collision) is measured with a kick on every beat in the key —
+        // with nothing in its key it passes the sound through by design, and would only be measured as a wire. Tools that declare nothing: unchanged.
+        const sv = (OrganismFactory.def(id) || {}).survey, keyP = sv && sv.key && U.K.audio.ports(inst).find(p => p.kind === 'audio' && p.direction === 'in' && p !== inPort(U, inst));
+        if (out.kind === 'effect' && keyP) for (let t = 0.1; t < 1.3; t += 0.5) { const o = U.ctx.createOscillator(), g = U.ctx.createGain(); o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(45, t + 0.12);
+          g.gain.setValueAtTime(0.9, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.18); o.connect(g); g.connect(keyP.node); o.start(t); o.stop(t + 0.2); }
         U.T.bpm = bpm; U.T.renderTicks(0, Math.floor(secs * bpm / 15), 0);   // the transport runs: arps, gates and synced LFOs move as they do in a song
         stopAt(U, 2.0);   // Stop all (hard), pressed when the clock reaches 2.0 s
         const buf = await TH.render(U), mono = mixDown(buf); levels(r, buf, mono, 0.3, 1.2);

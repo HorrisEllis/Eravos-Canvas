@@ -79,3 +79,13 @@ engine, each built from components:
 PREVIEW (in progress): docs/previews/contrast-elements.* — seven separate windows wired with ordinary wires (the wires register; the cards
   do not draw yet: a fault in mounting, being found). tools/music/planned/contrast-space.spec is superseded by this addendum.
 NEXT: Ripple bottom up — unison-stack Hz (test) → the tool's engine → pictures shown before it merges (asked: "Shall I go ahead?").
+
+ADDENDUM 2026-11-27 (3) — built (the originals above kept verbatim)
+his words (verbatim): "yes build them use the null renderer to make sure its novel in relation to the rest of eravos" · "Continue."
+BUILT 3.239 Ripple (tools/music/tools/bass/ripple) on unison-stack 1.1 (Hz) + saturator-tube; the LFO tool's Pendulum on lfo 1.1 — CS1, CS2 done.
+BUILT 3.240 Collision (tools/music/tools/effects/band-collision) on multiband-splitter, envelope-follower, masking-analyzer (all new) — CS3 done
+  (the per-band duck keyed by audio; the ducker component as specced — a triggered shape extracted from Sidechain — stays open).
+MEASURED: null render of the tools whose components changed (Retro DCO, Swarm, Piano: unchanged); novelty gate on every new preset (Ripple 8/8
+  novel; Collision 4 novel · 2 close (Channel, different role) · 0 twin — keyed effects measured with a kick in their key, survey.key).
+NEXT (the setup's other tools): Spatial Organism (CS4: panner + early-reflections, built from their specs) → Tension Field (CS5: tension-meter)
+  → Swarm's Emergence card (CS6) → the Contrast setup (Start › SETUPS, the tools wired) → the voice (CS7, Voice Lab).

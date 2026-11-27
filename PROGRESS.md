@@ -2,6 +2,33 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.240 Collision: where two sounds fight for one band, one steps back (2026-11-27)
+His words: "yes build them use the null renderer to make sure its novel in relation to the rest of eravos" · "Continue."
+- Components (NEW, each proving its numbers in node): multiband-splitter 1.0.0 (LR4 2/3 bands; −6.02 dB at the crossover, sums flat ±0.05 dB
+  30 Hz–15 kHz, −24.6 / −48.2 dB at one / two octaves; 21 checks) · envelope-follower 1.0.0 (attack to 63 % in 10 ms ±0.5, release + hold,
+  0…1 on a dB range, RMS of a sine −3 dB; 8 checks) · masking-analyzer 1.0.0 (per third-octave, how much two spectra collide; 7 checks).
+  Contracts 39 of 39 true to their code.
+- tools/music/tools/effects/band-collision (label Collision; the id is band-collision because "collision" is an ordinary word in the canvas
+  kernel and the boundary guard forbids a tool's name there): one worklet from the Splitter and Follower kernel text — the low band ducks by
+  Low duck on the KEY (a kick), the mid by Mid duck, Low mono, the duck out as a modulation; the view lights where the sound and the key
+  collide (masking-analyzer). 6 factory presets.
+- tests/tool-audio.mjs: a tool may declare survey.key — it is then measured with a kick on every beat in its key (Collision passes the sound
+  through with nothing in its key, by design, and was measured as a wire: 4 TWIN). Tools that declare nothing: unchanged.
+- Novelty gate (advisory): 4 novel · 2 close (Channel presets: a different role — overlap, usually fine) · 0 twin — docs/novelty-gate-collision.md.
+- Tests: contract 4/4, P240 4/4 (the split sums flat at 40 / 110 / 2000 Hz ±0.1 dB; the low ducks −12 dB ±2 on a kick and comes back; the mid
+  stays; Low mono), boundary 10/10, no-toys, design check 61/78 (no tool worse), 200 manifests valid. Picture: docs/previews/collision-window.png.
+
+## 3.239 Ripple: the rumble as a tool of its own; unison-stack 1.1 (Hz), lfo 1.1 (pendulum), the LFO tool's Pendulum (2026-11-27)
+His words: "yes build them use the null renderer to make sure its novel in relation to the rest of eravos"
+- unison-stack 1.1.0: detune in HERTZ (offsetHz: the outer two voices Hz apart — the swell rate the same on every note); 0 = 1.0.0 exactly;
+  the beat period measured within 1 %. lfo 1.1.0: the pendulum (lean > 0 lingers high, < 0 low; 0 = the sine exactly; time never runs back).
+- Null render (the components changed under three tools): Retro DCO 12/12, Swarm 14/14, Piano 11/11 unchanged (−60 dB).
+- tools/music/tools/bass/ripple: a clean sub (never driven, mono) under a grind of 2–7 voices Beat Hz apart through saturator-tube, a filter
+  envelope, Dive (each note falls into its pitch), the ripple out (|cos πBt|); 8 presets. LFO tool 2.1.0: Pendulum + Lean.
+- Novelty gate: 8 of 8 presets novel against 418 ERAVOS sounds (three were CLOSE to Reese Bass / Deep Sub and were remade) — docs/novelty-gate-ripple.md.
+- Tests: contract 4/4, P239 6/6 (the swell at Beat Hz on two notes, the sub untouched by Drive −60 dB, Drive grinds, Dive lands), P130, P163
+  34/34, boundary, no-toys, design check 60/77. Pictures: docs/previews/ripple-window.png, ripple-window-depth.png.
+
 ## 3.238 Contrast: the methods of a record, seven UI elements for components, Contrast Space specced (2026-11-27)
 His words: "look at the song rumble by skrillex. the frequencies how the collide. look deeply into the methods. the way it creates ripples and tension. i want to be able to create what that song does. voice, sounds, all of it. like the contrast is where its at. like i want a bunch of spacial tools and ui elements for components. tension, oscillations. wavelengths, emergence."
 - Research (techniques only): docs/research/rumble-techniques.md — beating (two notes Δ Hz apart swell Δ times a second; < 7 Hz a swell, above a

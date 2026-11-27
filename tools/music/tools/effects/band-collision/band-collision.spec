@@ -1,0 +1,26 @@
+# spec_id: eravos.band-collision · version 1.0.0 · status built (3.240, 2026-11-27) · template eravos.tool/1
+# his words (2026-11-27): "the frequencies how the collide" · "Okay but not one monolith" · "tool suite, each tool, then each component for each
+#   tool" · "yes build them use the null renderer to make sure its novel in relation to the rest of eravos"
+# direction: specs/eravos.contrast-space.spec ADDENDUM 2026-11-27 (2) — one tool of the Contrast setup; research docs/research/rumble-techniques.md (methods 3, 4)
+identity:
+  id: eravos.band-collision ; label: Collision ; domain: music ; family: effects ; icon: ⨯ ; accent: "#ff5a3c"
+  lineage: sidechain ducking, multiband dynamics, the sub kept mono — the low end shared in time between kick and bass (technique only)
+  novelty: the duck is PER BAND and keyed by real audio (not a scheduled curve, as Sidechain); the collision is SHOWN (masking per third-octave)
+assembles (components, tools/music/components/<id>/ — never re-implemented here):
+  multiband-splitter · envelope-follower · masking-analyzer
+signal_dag:
+  in → multiband-splitter
+  envelope-follower → multiband-splitter
+  multiband-splitter → out
+  masking-analyzer → out
+engine: one AudioWorklet (the components' kernel text): in (stereo) → Splitter per channel at Split (LR4) → low × 10^(−Low duck·e/20) (folded to
+  mono when Low mono) + mid × 10^(−Mid duck·e/20) → STD.fx (mix, in / out gain, bypass); e = Follower(key) 0…1 (attack, hold, release, the floor
+  it hears from). Out 2 (mod): e when Low duck > 0. The view: AnalyserNodes on in and key → masking-analyzer → lit bands.
+ports: in (audio) · key (audio) · out (audio) · mod in: mix, split · mod out: duck
+params: split · lowDuck · midDuck · attack · hold · release · floor · lowMono · lowGain · midGain · mix · inGain · outGain · bypass
+packs: factory — Kick Takes the Floor · Hard Gap · Breathing Low · Whole Bass Steps Back · Mid Only · Wide Low, Tight Kick
+acceptance (band-collision.test.js, P240):
+  - nothing in the key, ducks 0, Low mono off: the output equals the input in level at 40 Hz, 110 Hz and 2 kHz (± 0.1 dB) — the split sums flat
+  - a kick in the key: the low band falls by Low duck (± 1 dB) while it sounds; the mid stays (Mid duck 0); back within Release × 3
+  - Low mono: a low tone panned hard left comes out in both channels; a high tone stays left
+  - the duck goes out as a modulation 0…1 · novelty (build/novelty-gate.mjs) advisory, every preset · the components' node tests

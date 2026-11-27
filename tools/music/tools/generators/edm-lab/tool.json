@@ -51,6 +51,7 @@
   "works_with": [
     "eravos.acid-synth",
     "eravos.arp",
+    "eravos.band-collision",
     "eravos.bass-forge",
     "eravos.breath",
     "eravos.channel",

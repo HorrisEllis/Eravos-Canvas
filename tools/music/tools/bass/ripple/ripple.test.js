@@ -2,7 +2,7 @@
  * range, save → load is exact, closing leaves nothing behind, Stop all is obeyed. Then its own (ripple.spec acceptance), measured offline:
  * the swell runs at Beat Hz on any note · the sub never passes the tube · Dive falls into the note · the grind grinds with Drive. */
 TH.toolContract('eravos.ripple');
-window.__phase = 'P239';
+window.__rippleWas = window.__phase; window.__phase = 'P239';
 describe('Ripple — a clean sub under a grind that swells at Beat Hz', () => {
   const BASE = { voices: 2, beat: 1.6, detune: 0, width: 0, sub: 0, grind: 1, drive: 0, cutoff: 12000, fEnv: 0, res: 0.7, dive: 0, aA: 0.002, aD: 0.01, aS: 1, aR: 0.05, octave: 0, level: 0.7, wave: 'sine', midOct: '0' };
   async function play(params, notes, sec) {
@@ -50,3 +50,4 @@ describe('Ripple — a clean sub under a grind that swells at Beat Hz', () => {
     const def = OrganismFactory.def('eravos.ripple'); assert.ok(JSON.stringify(def.hooks).includes('ripple.hook.ripple_out'), 'declares the ripple out');
   });
 });
+window.__phase = window.__rippleWas;   // the next file's tests keep their own phase
