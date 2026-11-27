@@ -65,7 +65,10 @@ registerProcessor('eravos-hits', EravosHits);`;
         if (ctx.disposed) return;
         node = new AudioWorkletNode(ac, 'eravos-hits', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [1], channelCount: 2, channelCountMode: 'explicit', parameterData: Object.fromEntries(SET.map(k => [k, valueOf(k)])) });
         ctx.track(node); node.onprocessorerror = (er) => ctx.fault('RUNTIME_003', 'hits worklet stopped: ' + ((er && er.message) || 'processor error'));
-        inp.connect(node); node.connect(out); SET.forEach(k => node.parameters.get(k).setValueAtTime(valueOf(k), 0));
+        inp.connect(node); node.connect(out);
+        // a silent sink keeps the worklet running when nothing is wired to its output — Web Audio only runs what reaches the speakers, and the
+        // notes it sends do not (found 3.254: with only Notes wired, nothing was heard)
+        const sink = ac.createGain(); sink.gain.value = 0; node.connect(sink); sink.connect(ac.destination); ctx.track(sink); SET.forEach(k => node.parameters.get(k).setValueAtTime(valueOf(k), 0));
         // each hit: a note on every wired instrument, booked at the hit's own time (never in the past)
         node.port.onmessage = (m) => { const h = m.data; if (!h || typeof h.t !== 'number') return; count++; ctx.hits.push(h.t); if (ctx.hits.length > 256) ctx.hits.shift();
           const vel = P.get('velFollow') ? Math.max(0.1, Math.min(1, P.get('level') * (0.4 + 0.6 * Math.min(1, h.v * 1.6)))) : P.get('level'), t = Math.max(h.t, ac.currentTime);
