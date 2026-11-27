@@ -46,17 +46,17 @@ registerProcessor('eravos-collision', EravosCollision);`;
     size: { w: 600, h: 560 }, minSize: { w: 440, h: 380 },
     permissions: ['audio_out', 'audio_in', 'bus_publish', 'bus_subscribe'],
     provides: ['capability.audio_out', 'capability.fx', 'capability.mod_out'],
-    hooks: SDK.fxHooks([Object.assign(S.audio_in('col.hook.key_in', 'key', true), { intent: 'KEY: the sound that takes the low end (wire a kick into it)', label: 'key' }),
-      S.mod_in('col.hook.mod_split', 'split'), Object.assign(S.mod_out('col.hook.duck_out', 'duck'), { label: 'the duck' })]),
+    hooks: SDK.fxHooks([Object.assign(S.audio_in('col.hook.key_in', 'key', true), { intent: 'KEY: the sound that takes the low end (wire a kick into it)', label: 'Key' }),
+      S.mod_in('col.hook.mod_split', 'split'), Object.assign(S.mod_out('col.hook.duck_out', 'duck'), { label: 'The duck' })]),
     config: [
-      { key: 'split', type: 'number', default: 130, min: 30, max: 600, step: 1, unit: 'Hz', label: 'Split', group: 'SPLIT', element: 'multiband-splitter', hint: 'under it is the LOW band (the sub), over it the MID' },
-      { key: 'lowDuck', type: 'number', default: 20, min: 0, max: 36, step: 0.1, unit: 'dB', label: 'Low duck', group: 'DUCK', hint: 'how far the low band steps back when the key hits' },
+      { key: 'split', type: 'number', default: 130, min: 30, max: 600, step: 1, unit: 'Hz', label: 'Split', group: 'SPLIT', element: 'multiband-splitter', hint: 'Under it is the LOW band (the sub), over it the MID' },
+      { key: 'lowDuck', type: 'number', default: 20, min: 0, max: 36, step: 0.1, unit: 'dB', label: 'Low duck', group: 'DUCK', hint: 'How far the low band steps back when the key hits' },
       { key: 'midDuck', type: 'number', default: 0, min: 0, max: 24, step: 0.1, unit: 'dB', label: 'Mid duck', group: 'DUCK' },
       { key: 'attack', type: 'number', default: 0.5, min: 0.1, max: 50, step: 0.1, unit: 'ms', label: 'Attack', group: 'KEY', element: 'envelope-follower' },
       { key: 'hold', type: 'number', default: 70, min: 0, max: 300, step: 1, unit: 'ms', label: 'Hold', group: 'KEY', element: 'envelope-follower' },
       { key: 'release', type: 'number', default: 180, min: 5, max: 1500, step: 1, unit: 'ms', label: 'Release', group: 'KEY', element: 'envelope-follower' },
-      { key: 'floor', type: 'number', default: -48, min: -90, max: -12, step: 1, unit: 'dB', label: 'Hears from', group: 'KEY', element: 'envelope-follower', hint: 'the key under this is silence to it' },
-      { key: 'lowMono', type: 'boolean', default: true, label: 'Low mono', group: 'SPLIT', hint: 'the low band folded to the centre' },
+      { key: 'floor', type: 'number', default: -48, min: -90, max: -12, step: 1, unit: 'dB', label: 'Hears from', group: 'KEY', element: 'envelope-follower', hint: 'The key under this is silence to it' },
+      { key: 'lowMono', type: 'boolean', default: true, label: 'Low mono', group: 'SPLIT', hint: 'The low band folded to the centre' },
       { key: 'lowGain', type: 'number', default: 0, min: -24, max: 12, step: 0.1, unit: 'dB', label: 'Low', group: 'BANDS' },
       { key: 'midGain', type: 'number', default: 0, min: -24, max: 12, step: 0.1, unit: 'dB', label: 'Mid', group: 'BANDS' },
     ].concat(SDK.STD_FX_CONFIG),
@@ -65,8 +65,8 @@ registerProcessor('eravos-collision', EravosCollision);`;
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, fx = SDK.fxShell(ctx);
       const keyIn = ac.createGain(); keyIn.channelCount = 2; keyIn.channelCountMode = 'explicit'; ctx.track(keyIn);
-      ctx.port('key', { kind: 'audio', direction: 'in', node: keyIn, label: 'key' });
-      const duckBus = ac.createGain(); ctx.track(duckBus); ctx.port('duck', { kind: 'mod', direction: 'out', node: duckBus, label: 'the duck' });
+      ctx.port('key', { kind: 'audio', direction: 'in', node: keyIn, label: 'Key' });
+      const duckBus = ac.createGain(); ctx.track(duckBus); ctx.port('duck', { kind: 'mod', direction: 'out', node: duckBus, label: 'The duck' });
       const splitMod = ctx.modBus('split', { min: -200, max: 200 });
       // the view's ears: the sound in, the key — the masking-analyzer reads them (never the audio thread)
       const anIn = ac.createAnalyser(), anKey = ac.createAnalyser(); [anIn, anKey].forEach(a => { a.fftSize = 4096; a.smoothingTimeConstant = 0.7; ctx.track(a); });

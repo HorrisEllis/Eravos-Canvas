@@ -11,7 +11,7 @@ describe('Spatial Organism — a point around you, moved, in a room', () => {
     Object.entries(Object.assign({}, REST, params)).forEach(([k, v]) => c.params.set(k, v)); await c.ready;
     const ports = K.audio.ports(a), inN = ports.find(x => x.kind === 'audio' && x.direction === 'in').node, outN = ports.find(x => x.kind === 'audio' && x.direction === 'out').node;
     K.audio.chain.out.gain.value = 0; outN.connect(ctx.destination);
-    let whereBuf = null; if (taps) { const w = ports.find(x => x.label === 'where it is' || x.id === 'where' || x.port_id === 'where'); const m = ctx.createChannelMerger(2); w.node.connect(m, 0, 0); m.connect(ctx.destination); whereBuf = true; }
+    let whereBuf = null; if (taps) { const w = ports.find(x => x.label.toLowerCase() === 'where it is' || x.id === 'where' || x.port_id === 'where'); const m = ctx.createChannelMerger(2); w.node.connect(m, 0, 0); m.connect(ctx.destination); whereBuf = true; }
     src(ctx, inN, sr); const b = await ctx.startRendering(); return { L: b.getChannelData(0), R: b.getChannelData(1), sr };
   }
   const tone = (hz, panL, panR, from, to) => (ctx, node) => { const o = ctx.createOscillator(); o.frequency.value = hz; const m = ctx.createChannelMerger(2), gl = ctx.createGain(), gr = ctx.createGain();

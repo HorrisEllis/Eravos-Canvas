@@ -26,19 +26,19 @@
     config: [
       { key: 'wave', type: 'enum', options: Object.keys(WAVES), default: 'saw', label: 'Wave', group: 'GRIND' },
       { key: 'voices', type: 'integer', default: 3, min: 2, max: 7, label: 'Voices', group: 'RIPPLE', element: 'unison-stack' },
-      { key: 'beat', type: 'number', default: 1.6, min: 0, max: 12, step: 0.01, unit: 'Hz', label: 'Beat', group: 'RIPPLE', element: 'unison-stack', hint: 'how many times a second the voices swell together; under 7 Hz a swell, above it a growl' },
-      { key: 'detune', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Detune', group: 'RIPPLE', element: 'unison-stack', hint: 'cents on top (they scale with the note; Beat does not)' },
+      { key: 'beat', type: 'number', default: 1.6, min: 0, max: 12, step: 0.01, unit: 'Hz', label: 'Beat', group: 'RIPPLE', element: 'unison-stack', hint: 'How many times a second the voices swell together; under 7 Hz a swell, above it a growl' },
+      { key: 'detune', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Detune', group: 'RIPPLE', element: 'unison-stack', hint: 'Cents on top (they scale with the note; Beat does not)' },
       { key: 'width', type: 'number', default: 0.6, min: 0, max: 1, step: 0.01, label: 'Width', group: 'RIPPLE', element: 'unison-stack' },
       { key: 'midOct', type: 'enum', options: ['0', '+1', '+2'], default: '+1', label: 'Grind octave', group: 'GRIND' },
       { key: 'drive', type: 'number', default: 14, min: 0, max: 24, step: 0.1, unit: 'dB', label: 'Drive', group: 'GRIND', element: 'saturator-tube' },
-      { key: 'bias', type: 'number', default: 0.4, min: 0, max: 1, step: 0.01, label: 'Bias', group: 'GRIND', element: 'saturator-tube', hint: 'asymmetry: even harmonics' },
-      { key: 'grind', type: 'number', default: 0.7, min: 0, max: 1, step: 0.01, label: 'Grind', group: 'GRIND', hint: 'the grind’s level against the sub' },
-      { key: 'sub', type: 'number', default: 0.8, min: 0, max: 1, step: 0.01, label: 'Sub', group: 'SUB', hint: 'a clean sine on the note: never driven, always mono' },
+      { key: 'bias', type: 'number', default: 0.4, min: 0, max: 1, step: 0.01, label: 'Bias', group: 'GRIND', element: 'saturator-tube', hint: 'Asymmetry: even harmonics' },
+      { key: 'grind', type: 'number', default: 0.7, min: 0, max: 1, step: 0.01, label: 'Grind', group: 'GRIND', hint: 'The grind’s level against the sub' },
+      { key: 'sub', type: 'number', default: 0.8, min: 0, max: 1, step: 0.01, label: 'Sub', group: 'SUB', hint: 'A clean sine on the note: never driven, always mono' },
       { key: 'cutoff', type: 'number', default: 1400, min: 80, max: 12000, step: 1, unit: 'Hz', label: 'Cutoff', group: 'FILTER' },
       { key: 'res', type: 'number', default: 2, min: 0.5, max: 14, step: 0.1, label: 'Reso', group: 'FILTER' },
       { key: 'fEnv', type: 'number', default: 1.5, min: 0, max: 4, step: 0.01, unit: 'oct', label: 'Env amt', group: 'FILTER' },
       { key: 'fDec', type: 'number', default: 0.35, min: 0.02, max: 3, step: 0.01, unit: 's', label: 'Env dec', group: 'FILTER' },
-      { key: 'dive', type: 'number', default: 0, min: 0, max: 24, step: 0.1, unit: 'st', label: 'Dive', group: 'DIVE', hint: 'each note falls this far into its pitch' },
+      { key: 'dive', type: 'number', default: 0, min: 0, max: 24, step: 0.1, unit: 'st', label: 'Dive', group: 'DIVE', hint: 'Each note falls this far into its pitch' },
       { key: 'diveTime', type: 'number', default: 0.12, min: 0.01, max: 1.5, step: 0.01, unit: 's', label: 'Dive time', group: 'DIVE' },
       { key: 'aA', type: 'number', default: 0.004, min: 0.001, max: 2, step: 0.001, unit: 's', label: 'Attack', group: 'AMP' },
       { key: 'aD', type: 'number', default: 0.3, min: 0.01, max: 4, step: 0.01, unit: 's', label: 'Decay', group: 'AMP' },
@@ -53,7 +53,7 @@
       const ac = ctx.ac, P = ctx.params, MT = window.MusicTheory, US = MP.UnisonStack();
       const lvl = ac.createGain(); lvl.gain.value = P.get('level') * 0.5; const hr = ctx.dsp.headroom(ac), out = ac.createGain();
       lvl.connect(hr.input); hr.output.connect(out); hr.nodes.forEach(n => ctx.track(n)); ctx.track(lvl);
-      ctx.port('out', { kind: 'audio', direction: 'out', node: out, label: 'ripple' });
+      ctx.port('out', { kind: 'audio', direction: 'out', node: out, label: 'Ripple' });
       // the grind's bus → the tube (one, after the voices: their sums and differences are made here) → level; the sub goes round it
       const grindBus = ac.createGain(), grindLvl = ac.createGain(), subBus = ac.createGain(); grindLvl.gain.value = P.get('grind'); subBus.gain.value = P.get('sub');
       grindBus.connect(lvl); grindLvl.connect(grindBus); subBus.connect(lvl); [grindBus, grindLvl, subBus].forEach(n => ctx.track(n));
@@ -68,7 +68,7 @@
       const beatMod = ctx.modBus('beat', { min: -6, max: 6 }), cutMod = ctx.modBus('cutoff', { min: -4800, max: 4800 }), driveMod = ctx.modBus('drive', { min: -12, max: 12 });
       // out: the ripple itself — |cos(π·Beat·t)| = |sin| of an oscillator at Beat/2, through an absolute-value curve
       const rOsc = ac.createOscillator(); rOsc.frequency.value = P.get('beat') / 2; const abs = ac.createWaveShaper(); const cv = new Float32Array(1025); for (let i = 0; i < 1025; i++) cv[i] = Math.abs(i / 512 - 1); abs.curve = cv;
-      rOsc.connect(abs); rOsc.start(); ctx.track(rOsc); ctx.track(abs); ctx.port('ripple', { kind: 'mod', direction: 'out', node: abs, label: 'ripple' });
+      rOsc.connect(abs); rOsc.start(); ctx.track(rOsc); ctx.track(abs); ctx.port('ripple', { kind: 'mod', direction: 'out', node: abs, label: 'Ripple' });
       const layout = () => US.layout(P.get('voices'), P.get('detune'), 2, P.get('width'), 0.5, 2, 7, P.get('beat'));
       const voices = [];
       function makeVoice(note, vel, t, dur) {

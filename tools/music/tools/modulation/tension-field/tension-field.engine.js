@@ -49,14 +49,14 @@ registerProcessor('eravos-tension', EravosTension);`;
     size: { w: 600, h: 600 }, minSize: { w: 440, h: 400 },
     permissions: ['audio_in', 'audio_out', 'bus_publish', 'bus_subscribe'],
     provides: ['capability.mod_out'],
-    hooks: [Object.assign(S.audio_in('tf.hook.audio_in', 'in', true), { intent: 'the sound whose tension is heard (any tool, or the whole mix)' }), S.transport_in('tf.hook.transport_in'),
-      Object.assign(S.mod_in('tf.hook.mod_release', 'releaseIn'), { primary: true, intent: 'pushed past half, it lets go' }),
-      Object.assign(S.mod_out('tf.hook.tension', 'tension'), { label: 'tension' }), Object.assign(S.mod_out('tf.hook.release', 'release'), { label: 'release' }),
-      Object.assign(S.mod_out('tf.hook.loudness', 'loudness'), { label: 'loudness' }), Object.assign(S.mod_out('tf.hook.brightness', 'brightness'), { label: 'brightness' }),
-      Object.assign(S.mod_out('tf.hook.density', 'density'), { label: 'density' }), Object.assign(S.mod_out('tf.hook.motion', 'motion'), { label: 'motion' })],
+    hooks: [Object.assign(S.audio_in('tf.hook.audio_in', 'in', true), { intent: 'The sound whose tension is heard (any tool, or the whole mix)' }), S.transport_in('tf.hook.transport_in'),
+      Object.assign(S.mod_in('tf.hook.mod_release', 'releaseIn'), { primary: true, intent: 'Pushed past half, it lets go' }),
+      Object.assign(S.mod_out('tf.hook.tension', 'tension'), { label: 'Tension' }), Object.assign(S.mod_out('tf.hook.release', 'release'), { label: 'Release' }),
+      Object.assign(S.mod_out('tf.hook.loudness', 'loudness'), { label: 'Loudness' }), Object.assign(S.mod_out('tf.hook.brightness', 'brightness'), { label: 'Brightness' }),
+      Object.assign(S.mod_out('tf.hook.density', 'density'), { label: 'Density' }), Object.assign(S.mod_out('tf.hook.motion', 'motion'), { label: 'Motion' })],
     config: [
       { key: 'mode', type: 'enum', options: MODES, default: 'both', label: 'Mode', group: 'MODE', hint: 'Measure: heard · Target: the build · Both: the higher of the two' },
-      { key: 'hold', type: 'number', default: 8, min: 1, max: 64, step: 1, unit: 'bars', label: 'Hold', group: 'BUILD', element: 'energy-curve', hint: 'the build reaches Peak on the last bar of the hold' },
+      { key: 'hold', type: 'number', default: 8, min: 1, max: 64, step: 1, unit: 'bars', label: 'Hold', group: 'BUILD', element: 'energy-curve', hint: 'The build reaches Peak on the last bar of the hold' },
       { key: 'shape', type: 'number', default: 0.6, min: 0, max: 1, step: 0.01, label: 'Shape', group: 'BUILD', element: 'energy-curve', hint: '0 a straight climb · 1 it waits, then rushes' },
       { key: 'release', type: 'number', default: 0.2, min: 0.01, max: 8, step: 0.01, unit: 's', label: 'Release', group: 'BUILD', element: 'energy-curve' },
       { key: 'floor', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Floor', group: 'BUILD', element: 'energy-curve' },
@@ -72,7 +72,7 @@ registerProcessor('eravos-tension', EravosTension);`;
     defaultPreset: 'Pre-Drop',
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, bar = () => 240 / (ctx.bpm || 120);
-      const inp = ac.createGain(); inp.channelCount = 2; inp.channelCountMode = 'explicit'; ctx.track(inp); ctx.port('in', { kind: 'audio', direction: 'in', node: inp, label: 'in' });
+      const inp = ac.createGain(); inp.channelCount = 2; inp.channelCountMode = 'explicit'; ctx.track(inp); ctx.port('in', { kind: 'audio', direction: 'in', node: inp, label: 'In' });
       const relMod = ctx.modBus('releaseIn', { min: 0, max: 1 });
       const buses = OUTS.map(k => { const g = ac.createGain(); ctx.track(g); ctx.port(k, { kind: 'mod', direction: 'out', node: g, label: k }); return g; });
       const valueOf = (k) => k === 'mode' ? MODES.indexOf(P.get('mode')) : k === 'holdS' ? P.get('hold') * bar() : k === 'releaseS' ? P.get('release') : k === 'restS' ? P.get('rest') * bar() : k === 'loop' ? (P.get('loop') ? 1 : 0) : P.get(k);

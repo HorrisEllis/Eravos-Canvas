@@ -8,7 +8,7 @@ describe('Tension Field — heard, built, released', () => {
     const K = Kernel.create({ ctx, quiet: true, syncIR: true }); const T = MasterTransport.create(K, { offline: true, bpm: 120 }); T.boot();
     const a = OrganismFactory.spawn('eravos.tension-field', { K, headless: true }), c = OrganismFactory.handle(a).ctx;
     Object.entries(params).forEach(([k, v]) => c.params.set(k, v)); await c.ready;
-    const ports = K.audio.ports(a), inN = ports.find(x => x.kind === 'audio' && x.direction === 'in').node, out = (k) => ports.find(x => x.kind === 'mod' && x.label === k).node;
+    const ports = K.audio.ports(a), inN = ports.find(x => x.kind === 'audio' && x.direction === 'in').node, out = (k) => ports.find(x => x.kind === 'mod' && x.label.toLowerCase() === k).node;
     K.audio.chain.out.gain.value = 0; const m = ctx.createChannelMerger(6); ['tension', 'release', 'loudness', 'brightness', 'density', 'motion'].forEach((k, i) => out(k).connect(m, 0, i)); m.connect(ctx.destination);
     if (src) src(ctx, inN); if (during) during(c, ctx, K);
     const b = await ctx.startRendering(); const ch = (i) => b.getChannelData(i); return { tension: ch(0), release: ch(1), loud: ch(2), sr, at: (d, t) => d[Math.floor(t * sr)] };

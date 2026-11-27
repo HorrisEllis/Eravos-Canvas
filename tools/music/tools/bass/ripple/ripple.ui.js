@@ -18,7 +18,7 @@ OrganismFactory.reg('eravos.ripple', function (view) {
     if (n === 2) { g.strokeStyle = ACC; g.setLineDash([3, 3]); g.beginPath(); for (let x = 0; x < W; x++) { const y = mid + 10 - 24 * Math.abs(Math.cos(Math.PI * b * sh(x))); x ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); g.setLineDash([]); }
     const hz = MT.hz(lastNote + 12 * S('octave')), lam = 343 / hz;
     label(g, `RIPPLE · ${n} voices · ${b.toFixed(2)} swells / s`, 6, 12, '#e8e8ea');
-    label(g, b < 0.05 ? 'no ripple: one clean wave' : b < 7 ? 'a swell: the floor breathes' : 'roughness: a growl', 6, H - 6, b < 7 ? DIM : ACC);
+    label(g, b < 0.05 ? 'No ripple: one clean wave' : b < 7 ? 'A swell: the floor breathes' : 'Roughness: a growl', 6, H - 6, b < 7 ? DIM : ACC);
     label(g, `WAVELENGTH · ${MT.noteName ? MT.noteName(lastNote + 12 * S('octave')) : ''} ${hz.toFixed(1)} Hz · one wave ${lam.toFixed(2)} m`, W - 300, 12, ACC2);
   }, 30);
   const an = view.tap('out', 4096);
@@ -32,7 +32,7 @@ OrganismFactory.reg('eravos.ripple', function (view) {
   const face = h('div', { class: 'uk-panel' }, [card('RIPPLE', ['voices', 'beat', 'width']), card('GRIND', ['drive', 'grind']), card('SUB', ['sub']), card('FILTER', ['cutoff', 'fEnv']), card('DIVE', ['dive', 'diveTime'])]);
   const deep = h('div', { class: 'uk-panel' }, [card('RIPPLE+', ['detune']), card('GRIND+', ['wave', 'midOct', 'bias']), card('FILTER+', ['res', 'fDec']), card('AMP', ['aA', 'aD', 'aS', 'aR']), card('OUT', ['octave', 'level'])]);
   deep.style.display = 'none';
-  const more = UI.Button({ label: 'More depth ▸', hint: 'detune in cents, the grind’s wave, octave and bias, resonance, the filter’s decay, the amp envelope, octave and level', onClick: () => { const show = deep.style.display === 'none'; deep.style.display = show ? '' : 'none'; more.el.textContent = show ? 'More depth ▾' : 'More depth ▸'; } });
+  const more = UI.Button({ label: 'More depth ▸', hint: 'Detune in cents, the grind’s wave, octave and bias, resonance, the filter’s decay, the amp envelope, octave and level', onClick: () => { const show = deep.style.display === 'none'; deep.style.display = show ? '' : 'none'; more.el.textContent = show ? 'More depth ▾' : 'More depth ▸'; } });
   view.root.append(h('div', { class: 'org-row', style: { justifyContent: 'space-between' } }, [UI.presetBar(view)]), cv, spec.el || spec, kb.el, face, h('div', { class: 'org-row' }, [more.el]), deep,
     UI.hint('A clean sub on the note, and above it a grind of voices a few hertz apart: they swell together Beat times a second on every note. Drive turns their sums and differences into new partials. The ripple goes out (violet) to move any other knob.'));
 });

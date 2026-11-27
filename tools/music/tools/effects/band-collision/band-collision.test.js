@@ -11,7 +11,7 @@ describe('Collision — the low end steps back when the key hits', () => {
     await c.ready;
     const port = (id) => K.audio.ports(a).find(x => x.id === id || x.name === id || x.label === id || (x.port && x.port === id));
     const ins = K.audio.ports(a).filter(x => x.kind === 'audio' && x.direction === 'in'), outP = K.audio.ports(a).find(x => x.kind === 'audio' && x.direction === 'out');
-    const inNode = ins.find(x => x.label === 'in').node, keyNode = ins.find(x => x.label === 'key').node;
+    const inNode = ins.find(x => x.label.toLowerCase() === 'in').node, keyNode = ins.find(x => x.label.toLowerCase() === 'key').node;
     K.audio.chain.out.gain.value = 0; outP.node.connect(ctx.destination);
     src(ctx, inNode, sr); if (key) key(ctx, keyNode, sr);
     const b = await ctx.startRendering(); return { L: b.getChannelData(0), R: b.getChannelData(1), sr };

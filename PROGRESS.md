@@ -2,6 +2,14 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.248 No lowercase on the four new tools (2026-11-27)
+His words: "als ostop with the lowercase."
+- Ripple, Collision, Spatial Organism, Tension Field: every hover hint, port name, port intent and readout drawn on their displays starts with
+  a capital ("The sound", "A swell: the floor breathes", "Collide 43 %", "You", "Room 20 m · 12 echoes", "Tension", "Where it is").
+- Their tests find ports by name without regard to case. Ripple 4/4 + P239 6/6, Collision 4/4 + P240 4/4, Spatial Organism 4/4 + P241 4/4,
+  Tension Field 4/4 + P243 3/3, P242 3/3, boundary 10/10. Pictures: docs/previews/{ripple,collision,spatial-organism,tension-field}-window.png.
+- Open (his): the rest of ERAVOS has lowercase hints and port names too — the same everywhere?
+
 ## 3.247 Drawn icons and paintings for the four new tools; release 0.2.41 (2026-11-27)
 His words: "als ostop with the lowercase. and cheap icons." · "actually continue with the tensino field then release first. then what i juts said"
 - tools/music/icons.json: Ripple waves · Collision merge · Spatial Organism orbit · Tension Field trending-up (Lucide, like every tool);
