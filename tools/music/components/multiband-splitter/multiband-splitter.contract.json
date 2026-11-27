@@ -1,0 +1,88 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "multiband-splitter",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "audio",
+ "kernel": "MusicParts.Splitter",
+ "ports": [
+  {
+   "id": "in",
+   "dir": "in",
+   "type": "audio",
+   "rate": "audio"
+  },
+  {
+   "id": "low",
+   "dir": "out",
+   "type": "audio",
+   "rate": "audio"
+  },
+  {
+   "id": "mid",
+   "dir": "out",
+   "type": "audio",
+   "rate": "audio"
+  },
+  {
+   "id": "high",
+   "dir": "out",
+   "type": "audio",
+   "rate": "audio"
+  }
+ ],
+ "variables": [
+  {
+   "key": "bands",
+   "type": "enum",
+   "options": [
+    2,
+    3
+   ],
+   "default": 2,
+   "role": "mode"
+  },
+  {
+   "key": "f1",
+   "type": "number",
+   "min": 20,
+   "max": 20000,
+   "default": 120,
+   "role": "tone",
+   "unit": "Hz"
+  },
+  {
+   "key": "f2",
+   "type": "number",
+   "min": 20,
+   "max": 20000,
+   "default": 2000,
+   "role": "tone",
+   "unit": "Hz"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "bands",
+    "role": "mode",
+    "face": true
+   },
+   {
+    "key": "f1",
+    "role": "tone",
+    "face": true
+   },
+   {
+    "key": "f2",
+    "role": "tone",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.knob",
+   "kit.segmented"
+  ]
+ }
+}

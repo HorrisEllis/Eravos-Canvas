@@ -170,6 +170,8 @@ MOTIF = {
  'eravos.agents.step': (m_lanterns,'aurora'), 'eravos.tape-memory': (m_tower,'violet'), 'eravos.feelings': (m_aura,'dusk'), 'eravos.pattern-field': (m_stairs,'aurora'),
  'eravos.piano': (m_triad,'night'), 'eravos.retro-dco': (m_synthwave,'violet'), 'eravos.swarm-oscillator': (m_cloud,'night'),
  'eravos.ratio-lattice': (m_crystal,'night'), 'eravos.recursive-spectra': (m_crystal,'aurora'), 'eravos.xen-synth': (m_crystal,'violet'),
+ # 3.247 the Contrast tools (his words, 2026-11-27: "als ostop with the lowercase. and cheap icons.")
+ 'eravos.ripple': (m_ripples,'dusk'), 'eravos.band-collision': (m_rivers,'sunset'), 'eravos.spatial-organism': (m_lighthouse,'night'), 'eravos.tension-field': (m_drop,'violet'),
 }
 WATER = {m_sub, m_ripples, m_breath, m_lighthouse, m_rivers, m_palms, m_river}
 def paint(tid, label, accent):

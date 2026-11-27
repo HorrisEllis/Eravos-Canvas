@@ -36,6 +36,12 @@
                         "minimum": 0,
                         "maximum": 1
                       },
+                      "across": {
+                        "enum": [
+                          "colour",
+                          "spectrum"
+                        ]
+                      },
                       "speed": {
                         "type": "number",
                         "minimum": 0,
@@ -55,7 +61,14 @@
                           "φ series",
                           "primes",
                           "stretched string",
-                          "membrane"
+                          "membrane",
+                          "odd harmonics",
+                          "free bar",
+                          "clamped bar",
+                          "church bell",
+                          "bonang",
+                          "2.1 stretch",
+                          "tritave"
                         ]
                       },
                       "root": {

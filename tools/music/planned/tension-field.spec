@@ -40,3 +40,5 @@ dag:
   tool: eravos.tension-field ← tension-meter + energy-curve + spectral-features + onset-detector + chord-recognizer + relationship-graph
   build order: chord-recognizer → energy-curve → onset-detector → relationship-graph → spectral-features → tension-meter → tension-field
   shared with: chord-recognizer 1 · energy-curve 8 · onset-detector 12 · relationship-graph 12 · spectral-features 14 · tension-meter 5  (other tools on each)
+
+ADDENDUM 2026-11-27 — BUILT 1.0.0 (3.246): tools/music/tools/modulation/tension-field (its own spec there); this planned spec kept as written.

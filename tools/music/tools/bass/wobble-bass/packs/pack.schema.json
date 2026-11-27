@@ -596,8 +596,23 @@
                           "filter-svf",
                           "saturator-tube",
                           "saturator-tape",
-                          "bitcrusher"
+                          "bitcrusher",
+                          "ensemble-core"
                         ]
+                      },
+                      "peMode": {
+                        "enum": [
+                          "juno I",
+                          "juno II",
+                          "juno I+II",
+                          "string machine",
+                          "dimension"
+                        ]
+                      },
+                      "peMix": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
                       },
                       "piTime": {
                         "enum": [

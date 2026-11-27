@@ -156,13 +156,18 @@
     dragging.lit = lit;
     if (!lit && global.Shell && !dragging.quiet) global.Shell.toast(`Nothing on the canvas ${reverse ? 'can feed' : 'can take'} “${shortName(hook)}” yet — add something with a matching ${reverse ? 'output' : 'input'} (＋ Add).`, 'bad');
   }
-  // a release over a window body (not exactly on a dot) connects to that window's first lit port
+  // a release over a window body (not exactly on a dot) connects to that window's MAIN lit port: one its tool marks primary, else the first
+  // lit one that is not marked secondary (a shared mix / trim input), else the first (3.245: a modulator dropped on an effect landed on its Mix —
+  // the wire drew, the sound never moved)
   function targetAt(x, y) {
     const el = doc.elementFromPoint(x, y); if (!el || !el.closest) return null;
     const dot = el.closest('.port-dot.glow'); if (dot) return dot;
     const win = el.closest('.wm-win'); if (!win) return null;
-    return win.querySelector(`.rail.${dragging.reverse ? 'right' : 'left'} .port-dot.glow`);
+    return mainTarget(win, dragging.reverse);
   }
+  // the same choice, for a test: which lit port a drop on this window body would take (the window's dots must already be lit)
+  function mainTarget(win, reverse) { const lit = Array.from(win.querySelectorAll(`.rail.${reverse ? 'right' : 'left'} .port-dot.glow`)); if (!lit.length) return null;
+    const rec = K.registry.get(lit[0].dataset.instance), hk = (d) => (rec && rec.hooks.get(d.dataset.hook)) || {}; return lit.find(d => hk(d).primary) || lit.find(d => !hk(d).secondary) || lit[0]; }
   function cancelDrag() {
     if (!dragging) return; if (dragging.done) dragging.done(); dragging = null; doc.body.classList.remove('wiring');
     world.querySelectorAll('.port-dot.glow').forEach(x => x.classList.remove('glow'));
@@ -246,6 +251,6 @@
     // arrow keys move between items (menu pattern)
     el.addEventListener('keydown', (e) => { if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return; e.preventDefault(); const items = Array.from(el.querySelectorAll('.wire-menu-item')), i = items.indexOf(doc.activeElement); const j = (i + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length; if (items[j]) items[j].focus(); });
   }
-  Object.assign(WS, { init, buildRails, redraw: schedule, compatible, wireable, openMenu, targetsFor });
+  Object.assign(WS, { init, buildRails, redraw: schedule, compatible, wireable, openMenu, targetsFor, mainTarget });
   global.WireSystem = WS;
 })(typeof window !== 'undefined' ? window : globalThis);

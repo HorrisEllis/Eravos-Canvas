@@ -1,0 +1,86 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "band-collision.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "effects"
+ ],
+ "for": "eravos.band-collision",
+ "items": {
+  "eravos.band-collision": {
+   "presets": {
+    "Kick Takes the Floor": {
+     "params": {
+      "split": 130,
+      "lowDuck": 20,
+      "midDuck": 0,
+      "attack": 0.5,
+      "hold": 70,
+      "release": 180,
+      "lowMono": true
+     }
+    },
+    "Hard Gap": {
+     "params": {
+      "split": 140,
+      "lowDuck": 30,
+      "midDuck": 0,
+      "attack": 0.3,
+      "hold": 60,
+      "release": 90,
+      "lowMono": true
+     }
+    },
+    "Breathing Low": {
+     "params": {
+      "split": 180,
+      "lowDuck": 22,
+      "midDuck": 3,
+      "attack": 2,
+      "hold": 0,
+      "release": 300,
+      "lowMono": true
+     }
+    },
+    "Whole Bass Steps Back": {
+     "params": {
+      "split": 200,
+      "lowDuck": 14,
+      "midDuck": 6,
+      "attack": 1,
+      "hold": 20,
+      "release": 220,
+      "lowMono": true
+     }
+    },
+    "Mid Only": {
+     "params": {
+      "split": 160,
+      "lowDuck": 0,
+      "midDuck": 14,
+      "attack": 2,
+      "hold": 10,
+      "release": 150,
+      "lowMono": false
+     }
+    },
+    "Wide Low, Tight Kick": {
+     "params": {
+      "split": 125,
+      "lowDuck": 24,
+      "midDuck": 4,
+      "attack": 0.5,
+      "hold": 25,
+      "release": 100,
+      "lowMono": false,
+      "lowGain": -1.5
+     }
+    }
+   }
+  }
+ }
+}

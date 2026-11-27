@@ -1,0 +1,65 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "masking-analyzer",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "analysis",
+ "kernel": "MusicParts.masking",
+ "ports": [
+  {
+   "id": "a",
+   "dir": "in",
+   "type": "data",
+   "rate": "block"
+  },
+  {
+   "id": "b",
+   "dir": "in",
+   "type": "data",
+   "rate": "block"
+  },
+  {
+   "id": "collide",
+   "dir": "out",
+   "type": "data",
+   "rate": "block"
+  }
+ ],
+ "variables": [
+  {
+   "key": "perOctave",
+   "type": "number",
+   "min": 1,
+   "max": 6,
+   "default": 3,
+   "role": "tone"
+  },
+  {
+   "key": "floor",
+   "type": "number",
+   "min": -120,
+   "max": -20,
+   "default": -70,
+   "role": "level",
+   "unit": "dB"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "perOctave",
+    "role": "tone",
+    "face": false
+   },
+   {
+    "key": "floor",
+    "role": "level",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.knob"
+  ]
+ }
+}

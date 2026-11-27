@@ -1,0 +1,113 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "early-reflections",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "audio",
+ "kernel": "MusicParts.Reflections",
+ "ports": [
+  {
+   "id": "in",
+   "dir": "in",
+   "type": "audio",
+   "rate": "audio"
+  },
+  {
+   "id": "out",
+   "dir": "out",
+   "type": "audio",
+   "channels": 2,
+   "rate": "audio"
+  }
+ ],
+ "variables": [
+  {
+   "key": "size",
+   "type": "number",
+   "min": 2,
+   "max": 60,
+   "default": 12,
+   "role": "space",
+   "unit": "m"
+  },
+  {
+   "key": "predelay",
+   "type": "number",
+   "min": 0,
+   "max": 100,
+   "default": 8,
+   "role": "time",
+   "unit": "ms"
+  },
+  {
+   "key": "absorption",
+   "type": "number",
+   "min": 0,
+   "max": 0.95,
+   "default": 0.35,
+   "role": "tone"
+  },
+  {
+   "key": "damping",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0.4,
+   "role": "tone"
+  },
+  {
+   "key": "spread",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0.8,
+   "role": "width"
+  },
+  {
+   "key": "level",
+   "type": "number",
+   "min": 0,
+   "max": 1,
+   "default": 0.5,
+   "role": "level"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "size",
+    "role": "space",
+    "face": true
+   },
+   {
+    "key": "predelay",
+    "role": "time",
+    "face": true
+   },
+   {
+    "key": "absorption",
+    "role": "tone",
+    "face": false
+   },
+   {
+    "key": "damping",
+    "role": "tone",
+    "face": false
+   },
+   {
+    "key": "spread",
+    "role": "width",
+    "face": false
+   },
+   {
+    "key": "level",
+    "role": "level",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.knob"
+  ]
+ }
+}

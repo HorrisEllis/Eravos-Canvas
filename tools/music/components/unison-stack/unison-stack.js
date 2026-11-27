@@ -1,4 +1,4 @@
-/* eravos.component.unison-stack 1.0.0 — 1–16 voices of any source (11 planned tools stand on it, docs/eco-graph.md). NEW code
+/* eravos.component.unison-stack 1.1.0 — 1–16 voices of any source (11 planned tools stand on it, docs/eco-graph.md). NEW code
  * (2026-11-06); the layout is Supersaw's own (supersaw.engine.js makeVoice), so moving Supersaw onto it is a later step that can
  * null-render: same detune law, same blend, same level, same equal-power pan.
  *
@@ -10,15 +10,18 @@
  *   spread   0…1 stereo width: pan θ = (x·spread + 1)·π/4, L = cos θ, R = sin θ (equal power, StereoPannerNode's law)
  *   blend    0…1 centre against sides: the centre voice 1 − 0.4·blend, the others blend (Supersaw's mix) — all ÷ √n
  *   phase    0 free (each voice keeps running) · 1 reset (all start at 0) · 2 seeded random (the same seed, the same start)
- *   MusicParts.UnisonStack() → { layout(n, detune, curve, spread, blend, phaseMode, seed) → count, cents, pan, gain, gainL,
- *                               gainR, phase (Float64Array(16) each, preallocated), curveAt(curve, x) }
+ *   hz       1.1.0 (2026-11-27, Contrast: "the way it creates ripples"): 0…∞ Hz between the two outermost voices, the rest linear
+ *            between them: offsetHz[i] = x·hz/2. Cents scale with the note; hertz do not — two voices hz apart swell hz times a second
+ *            on EVERY note (beating). 0 (or left out) = 1.0.0 exactly (offsetHz all 0, every other array unchanged).
+ *   MusicParts.UnisonStack() → { layout(n, detune, curve, spread, blend, phaseMode, seed, hz) → count, cents, offsetHz, pan, gain,
+ *                               gainL, gainR, phase (Float64Array(16) each, preallocated), curveAt(curve, x) }
  * Allocation-free after it is made, self-contained (the text can be stringified into worklets). A component imports no tool. */
 (function (root) {
   'use strict';
   function UnisonStack() {
     const MAX = 16;
     const cents = new Float64Array(MAX), pan = new Float64Array(MAX), gain = new Float64Array(MAX), gainL = new Float64Array(MAX),
-      gainR = new Float64Array(MAX), phase = new Float64Array(MAX), pos = new Float64Array(MAX);
+      gainR = new Float64Array(MAX), phase = new Float64Array(MAX), pos = new Float64Array(MAX), offsetHz = new Float64Array(MAX);
     function curveAt(curve, x) {
       if (curve === 0) return x;
       if (curve === 1) { const a = x < 0 ? -x : x, v = (Math.pow(2, 3 * a) - 1) / 7; return x < 0 ? -v : v; }
@@ -30,19 +33,19 @@
       t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     }
-    const out = { count: 1, cents, pan, gain, gainL, gainR, phase, pos, curveAt, layout, MAX };
-    function layout(n, detune, curve, spread, blend, phaseMode, seed) {
+    const out = { count: 1, cents, offsetHz, pan, gain, gainL, gainR, phase, pos, curveAt, layout, MAX };
+    function layout(n, detune, curve, spread, blend, phaseMode, seed, hz) {
       n = Math.max(1, Math.min(MAX, Math.round(n || 1)));
       const det = Math.max(0, Math.min(1, detune || 0)) * 100, sp = Math.max(0, Math.min(1, spread || 0)), mix = Math.max(0, Math.min(1, blend === undefined ? 0.5 : blend));
-      const c = Math.max(0, Math.min(2, Math.round(curve === undefined ? 2 : curve))), root2 = Math.sqrt(n);
+      const c = Math.max(0, Math.min(2, Math.round(curve === undefined ? 2 : curve))), root2 = Math.sqrt(n), hzW = Math.max(0, +hz || 0);
       for (let i = 0; i < n; i++) {
         const x = n === 1 ? 0 : (i / (n - 1)) * 2 - 1, centre = n === 1 || Math.abs(x) < 1e-6;
-        pos[i] = x; cents[i] = curveAt(c, x) * det;
+        pos[i] = x; cents[i] = curveAt(c, x) * det; offsetHz[i] = x * hzW / 2;
         const th = (x * sp + 1) * Math.PI / 4; pan[i] = x * sp;
         gain[i] = (centre ? 1 - mix * 0.4 : mix) / root2; gainL[i] = gain[i] * Math.cos(th); gainR[i] = gain[i] * Math.sin(th);
         phase[i] = phaseMode === 2 ? hash(seed || 0, i) : phaseMode === 1 ? 0 : -1;   // −1 = free: leave the voice where it is
       }
-      for (let i = n; i < MAX; i++) { pos[i] = 0; cents[i] = 0; pan[i] = 0; gain[i] = 0; gainL[i] = 0; gainR[i] = 0; phase[i] = 0; }
+      for (let i = n; i < MAX; i++) { offsetHz[i] = 0; pos[i] = 0; cents[i] = 0; pan[i] = 0; gain[i] = 0; gainL[i] = 0; gainR[i] = 0; phase[i] = 0; }
       out.count = n; return out;
     }
     return out;

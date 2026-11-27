@@ -1,0 +1,91 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "tension-field.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "modulation"
+ ],
+ "for": "eravos.tension-field",
+ "items": {
+  "eravos.tension-field": {
+   "presets": {
+    "Slow Burn": {
+     "params": {
+      "mode": "target",
+      "hold": 32,
+      "shape": 0.3,
+      "release": 1.5,
+      "loop": true
+     }
+    },
+    "Rising Pressure": {
+     "params": {
+      "mode": "both",
+      "hold": 16,
+      "shape": 0.5,
+      "release": 0.4,
+      "wLoud": 0.3,
+      "wBright": 1,
+      "wDense": 1,
+      "wMotion": 0.3
+     }
+    },
+    "Suspended Resolution": {
+     "params": {
+      "mode": "target",
+      "hold": 8,
+      "shape": 0.1,
+      "release": 3,
+      "floor": 0.4,
+      "peak": 0.85
+     }
+    },
+    "Dissonance Bloom": {
+     "params": {
+      "mode": "both",
+      "hold": 8,
+      "shape": 0.4,
+      "release": 0.8,
+      "wLoud": 0.2,
+      "wBright": 1,
+      "wDense": 0.2,
+      "wMotion": 1
+     }
+    },
+    "Pre-Drop": {
+     "params": {
+      "mode": "both",
+      "hold": 8,
+      "shape": 0.6,
+      "release": 0.2,
+      "loop": true
+     }
+    },
+    "Psychological Horror": {
+     "params": {
+      "mode": "measure",
+      "wLoud": 0,
+      "wBright": 0.4,
+      "wDense": 0.2,
+      "wMotion": 1,
+      "release": 2
+     }
+    },
+    "Release Cascade": {
+     "params": {
+      "mode": "target",
+      "hold": 4,
+      "shape": 0.8,
+      "release": 2.5,
+      "loop": true,
+      "rest": 1
+     }
+    }
+   }
+  }
+ }
+}
