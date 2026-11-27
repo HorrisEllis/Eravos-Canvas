@@ -25,7 +25,7 @@
     links: [{ with: 'eravos.wub-rate', dir: 'in', face: ['stepLen', 'shape', 'smooth', 'depth', 'polarity'], hint: 'the rhythm opening this mouth' },
             { with: 'eravos.wub-osc', dir: 'in', face: ['wave', 'octave', 'index', 'voices', 'spread'], hint: 'the tone going in' }],
     hooks: SDK.fxHooks([
-      Object.assign(S.mod_in('wubf.hook.mod_wub', 'wub'), { intent: 'how far the mouth is open: 0 closed → 1 open (wire Wub Rate here)' }),
+      Object.assign(S.mod_in('wubf.hook.mod_wub', 'wub'), { primary: true, intent: 'how far the mouth is open: 0 closed → 1 open (wire Wub Rate here)' }),
       S.mod_in('wubf.hook.mod_cutoff', 'cutoff'),
       S.mod_in('wubf.hook.mod_res', 'res'),
     ]),

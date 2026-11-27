@@ -228,7 +228,7 @@ registerProcessor('eravos-pitch', EravosPitch);`;
     return [
       Object.assign(MUSIC_STD.audio_in('fx.hook.audio_in', 'in'), { intent: 'signal to process' }),
       MUSIC_STD.audio_out('fx.hook.audio_out', 'out'),
-      MUSIC_STD.mod_in('fx.hook.mod_mix', 'mix'),
+      Object.assign(MUSIC_STD.mod_in('fx.hook.mod_mix', 'mix'), { secondary: true }),   // 3.242 a dropped wire goes to the effect's own input, not its Mix
     ].concat(extra || []);
   }
   function fxShell(ctx, o) {
