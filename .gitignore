@@ -17,3 +17,4 @@ tests/null-baseline/
 # ERAVOS host (host/): COS state + snapshots, the Glass ledger — your machine only
 /.eravos/
 docs/previews/*.wav
+docs/previews/examples/

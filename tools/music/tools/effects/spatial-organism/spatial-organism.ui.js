@@ -24,15 +24,15 @@ OrganismFactory.reg('eravos.spatial-organism', function (view) {
       ER.taps().forEach(t => { const [x, y] = pos(t.pan, Math.min(1, d + t.t * 4)); g.fillStyle = `rgba(255,90,60,${Math.min(0.8, t.g * 2.5 * S('room'))})`; g.beginPath(); g.arc(x, y, 3, 0, TAU); g.fill(); }); }
     g.fillStyle = ACC; g.beginPath(); g.arc(sx, sy, 7, 0, TAU); g.fill();
     g.fillStyle = '#e8e8ea'; g.beginPath(); g.arc(cx, cy, 4, 0, TAU); g.fill();
-    g.font = '10px ui-monospace, monospace'; g.fillStyle = DIM; g.fillText('you', cx - 9, cy + 16);
-    g.fillStyle = '#e8e8ea'; g.fillText(`SPACE · ${a < -0.05 ? 'left ' + Math.round(-a * 90) + '°' : a > 0.05 ? 'right ' + Math.round(a * 90) + '°' : 'ahead'} · ${(0.5 + d * 3.5).toFixed(1)} m away${S('ears') > 0 ? ' · ears ' + Math.round(S('ears') * 100) + ' %' : ''}`, 6, 12);
-    g.fillStyle = ACC2; g.fillText(S('room') > 0 ? `room ${S('size').toFixed(0)} m · 12 echoes` : 'no room', W - 150, 12);
-    g.fillStyle = DIM; g.fillText(S('shape') === 'pendulum' ? `swings ${S('orbit').toFixed(2)} / s, lingers ${S('lean') > 0.05 ? 'right' : S('lean') < -0.05 ? 'left' : 'nowhere'}` : `orbits ${S('orbit').toFixed(2)} / s`, 6, 26);
+    g.font = '10px ui-monospace, monospace'; g.fillStyle = DIM; g.fillText('You', cx - 9, cy + 16);
+    g.fillStyle = '#e8e8ea'; g.fillText(`SPACE · ${a < -0.05 ? 'Left ' + Math.round(-a * 90) + '°' : a > 0.05 ? 'Right ' + Math.round(a * 90) + '°' : 'Ahead'} · ${(0.5 + d * 3.5).toFixed(1)} m away${S('ears') > 0 ? ' · ears ' + Math.round(S('ears') * 100) + ' %' : ''}`, 6, 12);
+    g.fillStyle = ACC2; g.fillText(S('room') > 0 ? `Room ${S('size').toFixed(0)} m · 12 echoes` : 'No room', W - 150, 12);
+    g.fillStyle = DIM; g.fillText(S('shape') === 'pendulum' ? `Swings ${S('orbit').toFixed(2)} / s, lingers ${S('lean') > 0.05 ? 'Right' : S('lean') < -0.05 ? 'Left' : 'Nowhere'}` : `Orbits ${S('orbit').toFixed(2)} / s`, 6, 26);
   }, 30);
   const face = h('div', { class: 'uk-panel' }, [card('PLACE', ['angle', 'distance', 'ears']), card('MOTION', ['shape', 'orbit', 'orbitDepth', 'lean']), card('ROOM', ['room', 'size'])]);
   const deep = h('div', { class: 'uk-panel' }, [card('MOTION+', ['orbitDist']), card('ROOM+', ['predelay', 'absorption', 'damping', 'spread']), card('OUT', ['width', 'bassMono', 'mix'])]);
   deep.style.display = 'none';
-  const more = UI.Button({ label: 'More depth ▸', hint: 'how far the swing carries it away, the room’s pre-delay, absorption, damping and spread, the input’s own width, bass mono, the mix', onClick: () => { const show = deep.style.display === 'none'; deep.style.display = show ? '' : 'none'; more.el.textContent = show ? 'More depth ▾' : 'More depth ▸'; } });
+  const more = UI.Button({ label: 'More depth ▸', hint: 'How far the swing carries it away, the room’s pre-delay, absorption, damping and spread, the input’s own width, bass mono, the mix', onClick: () => { const show = deep.style.display === 'none'; deep.style.display = show ? '' : 'none'; more.el.textContent = show ? 'More depth ▾' : 'More depth ▸'; } });
   view.root.append(h('div', { class: 'org-row', style: { justifyContent: 'space-between' } }, [UI.presetBar(view)]), cv, face, h('div', { class: 'org-row' }, [more.el]), deep,
     UI.hint('Wire any sound through: it becomes a point around you. Near is loud, bright and now; far is quiet, dark and late. The swing moves it (the pendulum lingers on one side); the room answers with its first echoes. Where it is goes out (violet) to move anything else.'));
 });

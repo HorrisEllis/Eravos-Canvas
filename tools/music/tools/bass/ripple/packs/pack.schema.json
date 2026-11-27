@@ -86,7 +86,7 @@
                       },
                       "fEnv": {
                         "type": "number",
-                        "minimum": 0,
+                        "minimum": -4,
                         "maximum": 4
                       },
                       "fDec": {
@@ -96,13 +96,23 @@
                       },
                       "dive": {
                         "type": "number",
-                        "minimum": 0,
+                        "minimum": -24,
                         "maximum": 24
                       },
                       "diveTime": {
                         "type": "number",
                         "minimum": 0.01,
-                        "maximum": 1.5
+                        "maximum": 4
+                      },
+                      "collideFrom": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 80
+                      },
+                      "collideTime": {
+                        "type": "number",
+                        "minimum": 0.01,
+                        "maximum": 8
                       },
                       "aA": {
                         "type": "number",

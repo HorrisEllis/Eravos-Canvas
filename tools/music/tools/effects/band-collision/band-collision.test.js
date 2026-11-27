@@ -11,7 +11,7 @@ describe('Collision — the low end steps back when the key hits', () => {
     await c.ready;
     const port = (id) => K.audio.ports(a).find(x => x.id === id || x.name === id || x.label === id || (x.port && x.port === id));
     const ins = K.audio.ports(a).filter(x => x.kind === 'audio' && x.direction === 'in'), outP = K.audio.ports(a).find(x => x.kind === 'audio' && x.direction === 'out');
-    const inNode = ins.find(x => x.label === 'in').node, keyNode = ins.find(x => x.label === 'key').node;
+    const inNode = ins.find(x => x.label.toLowerCase() === 'in').node, keyNode = ins.find(x => x.label.toLowerCase() === 'key').node;
     K.audio.chain.out.gain.value = 0; outP.node.connect(ctx.destination);
     src(ctx, inNode, sr); if (key) key(ctx, keyNode, sr);
     const b = await ctx.startRendering(); return { L: b.getChannelData(0), R: b.getChannelData(1), sr };
@@ -40,6 +40,11 @@ describe('Collision — the low end steps back when the key hits', () => {
   });
   it('the duck goes out as a modulation signal any tool can take', () => {
     assert.ok(JSON.stringify(OrganismFactory.def('eravos.band-collision').hooks).includes('col.hook.duck_out'), 'declares the duck out');
+  });
+  it('a sound wired into the key is only listened to: it still plays where it played (a tap)', () => {
+    const U = TH.universe(0.2), src = TH.spawn(U, 'eravos.ripple'), me = TH.spawn(U, 'eravos.band-collision');
+    assert.ok(U.K.audio.isOnMaster(src, 'out'), 'the source is heard before'); const w = U.K.wires.register({ src: { instanceId: src, hookId: 'ripple.hook.audio_out' }, dst: { instanceId: me, hookId: 'col.hook.key_in' } });
+    assert.ok(w.ok, 'wired'); assert.ok(U.K.audio.isOnMaster(src, 'out'), 'and still heard after it is wired in');
   });
 });
 window.__phase = window.__collisionWas;   // the next file's tests keep their own phase

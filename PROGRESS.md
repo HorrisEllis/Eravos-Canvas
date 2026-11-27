@@ -2,6 +2,55 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Release 0.2.42 (2026-11-27)
+His words: "Push and release." — 3.248–3.252 (no lowercase on the new tools, the pitch-tracker, Ripple 1.1, the taps, Follow).
+
+## 3.252 Follow: one tool's loudness moves another tool's knob — the first connector (2026-11-27)
+His words: "Also tools to connect to tools."
+- tools/music/tools/modulation/level-follow (label Follow; the id level-follow because "follow" is an ordinary word in the canvas kernel):
+  any sound in (a tap: it still plays where it played; its input is the main one, so a drop lands on it) → envelope-follower (Attack, Hold,
+  Release, Hears from) → Amount, Invert (a duck), Offset → Level out (violet), into any knob. The window names what it follows and what it
+  moves. 6 presets (Bass Opens · Kick Ducks · Slow Swell · Every Hit · Voice Breath · Gentle Duck); drawn icon and painting.
+- tests P244 4/4 (up while a sound plays, down after on a dB scale; Invert / Amount / Offset; it only listens; wired into Ripple's cutoff a
+  loud input brightens it > 3×), contract 4/4, boundary 10/10, design check 64/81 (no tool worse), 206 manifests, tool needs 25.
+- Next connectors: Hits (a sound's hits as triggers) and Pitch → Notes (a sound's pitch as notes: the voice playing tools).
+
+## 3.251 A sound wired into Collision's key or Tension Field is only listened to (2026-11-27)
+- Found while building the connector tools: those two inputs were not taps, so wiring a kick into Collision's key (or a mix into Tension
+  Field) took that sound off the master — the kick went silent everywhere else. Both are taps now (only listened to).
+- tests P240 5/5 and P243 4/4: a Ripple wired in is still heard after it is wired (both fail on the old ports).
+
+## 3.250 Ripple 1.1: a tone that loads in, collides and ripples (2026-11-27)
+His words: "Okay. They all sound similar. Can you get the rumble sound? Like it's a high pitch tone that loads in, collides and ripples . Also tools to connect to tools."
+- The capability, not a preset (2026-11-24, "eravos makes it, not you"): Dive below 0 = Rise (the note climbs in from under its pitch) ·
+  Env amt below 0 = the filter starts dark and opens in · Collide from (0–80 Hz) + Collide time: the voices start far apart (a clash) and
+  slide to Beat (a ripple). At their defaults nothing changes.
+- Proof the presets did not move: each of the 8 rendered by the old engine and the new — new vs old −70 dB or lower (the engine's own
+  render-to-render noise is −67 … −81 dB; the null render passes under −60).
+- Found: Ripple's two renders of one preset differ by −67 … −81 dB (the null render calls them unstable, it asks −90). Its starting levels
+  are now on the audio clock and a change before the clock moves is set exactly, which made more of them repeat exactly; the cause of the
+  rest is not found yet (open).
+- tests P239 10/10 (+ Rise: an octave under, landed within 10 cents; Collide: > 6 clashes in 0.3 s, then a ripple every 1.00 s at Beat 1;
+  the filter opening in: the highs grow > 4×). Examples (not in the repository — no recordings shipped): a high tone that rises from ~486 Hz
+  to 880 Hz in a second, clashes 13 times in 0.4 s and slows to a ripple; saw, square and over a low bass with a kick.
+
+## 3.249 The Voice Lab begins: the pitch-tracker (VL1) (2026-11-27)
+His words: "Voice tools. Like recording. Making sound like the tools? Full editing and modulation. Full t pain auto tune. Synthesized voice. Everything needed for remixing, EDM; dubstep."
+- specs/eravos.voice-lab.spec ADDENDUM 2026-11-27: RECORD, VOICE → TOOLS, EDIT, MODULATE, REMIX join TUNE · CREATE · WUB; the order VL1 →
+  VL3 / VL4 (CREATE, his order of 2026-11-26) → VL2 → VT1 Tune → VT2 Voice → voice → tools → VT3 → the remix set.
+- tools/music/components/pitch-tracker 1.0.0 (NEW): YIN, the octave guard, parabolic interpolation, confidence, voiced, gate; frame 2048 /
+  hop 256. Measured: sines 82–988 Hz within 0.2 cents; sung vowels AH / OO / EE within ±3 cents and > 95 % voiced; a 2nd harmonic twice the
+  fundamental still reads the fundamental; noise, silence, under −50 dBFS unvoiced; a glide followed within 15 cents. 17 checks; contracts 44/44.
+- Nothing he sees yet: the Tune tool's face is shown to him before it is built.
+
+## 3.248 No lowercase on the four new tools (2026-11-27)
+His words: "als ostop with the lowercase."
+- Ripple, Collision, Spatial Organism, Tension Field: every hover hint, port name, port intent and readout drawn on their displays starts with
+  a capital ("The sound", "A swell: the floor breathes", "Collide 43 %", "You", "Room 20 m · 12 echoes", "Tension", "Where it is").
+- Their tests find ports by name without regard to case. Ripple 4/4 + P239 6/6, Collision 4/4 + P240 4/4, Spatial Organism 4/4 + P241 4/4,
+  Tension Field 4/4 + P243 3/3, P242 3/3, boundary 10/10. Pictures: docs/previews/{ripple,collision,spatial-organism,tension-field}-window.png.
+- Open (his): the rest of ERAVOS has lowercase hints and port names too — the same everywhere?
+
 ## 3.247 Drawn icons and paintings for the four new tools; release 0.2.41 (2026-11-27)
 His words: "als ostop with the lowercase. and cheap icons." · "actually continue with the tensino field then release first. then what i juts said"
 - tools/music/icons.json: Ripple waves · Collision merge · Spatial Organism orbit · Tension Field trending-up (Lucide, like every tool);

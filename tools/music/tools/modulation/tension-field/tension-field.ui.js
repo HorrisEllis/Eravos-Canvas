@@ -23,12 +23,12 @@ OrganismFactory.reg('eravos.tension-field', function (view) {
     g.fillStyle = ACC; g.fillText(`Tension ${Math.round(row.tension * 100)} %`, W - 110, 12);
     g.fillStyle = DIM; g.fillText(S('mode') === 'measure' ? 'Heard from what is wired in' : S('mode') === 'target' ? `Build: Peak by bar ${S('hold')}` : `Heard, never below the build (bar ${S('hold')})`, 6, 24);
   }, 30);
-  let building = false; const go = UI.Button({ label: '⇡ Build', kind: 'primary', hint: 'start the build now (it also starts when the transport plays)', onClick: () => { view.emit(building ? 'release_now' : 'build_now', {}); } });
-  const label = () => { go.el.textContent = building ? '⇣ Release' : '⇡ Build'; go.el.title = building ? 'let the tension go now' : 'start the build now (it also starts when the transport plays)'; };
+  let building = false; const go = UI.Button({ label: '⇡ Build', kind: 'primary', hint: 'Start the build now (it also starts when the transport plays)', onClick: () => { view.emit(building ? 'release_now' : 'build_now', {}); } });
+  const label = () => { go.el.textContent = building ? '⇣ Release' : '⇡ Build'; go.el.title = building ? 'Let the tension go now' : 'Start the build now (it also starts when the transport plays)'; };
   view.on('build', () => { building = true; label(); }); view.on('release', () => { building = false; label(); });
   const face = h('div', { class: 'uk-panel' }, [card('Mode', ['mode']), card('Build', ['hold', 'shape', 'release', 'loop']), card('Hear', ['wLoud', 'wBright', 'wDense', 'wMotion'])]);
   const deep = h('div', { class: 'uk-panel' }, [card('Build+', ['floor', 'peak', 'rest'])]); deep.style.display = 'none';
-  const more = UI.Button({ label: 'More depth ▸', hint: 'where the build starts and ends, and the rest between builds', onClick: () => { const show = deep.style.display === 'none'; deep.style.display = show ? '' : 'none'; more.el.textContent = show ? 'More depth ▾' : 'More depth ▸'; } });
+  const more = UI.Button({ label: 'More depth ▸', hint: 'Where the build starts and ends, and the rest between builds', onClick: () => { const show = deep.style.display === 'none'; deep.style.display = show ? '' : 'none'; more.el.textContent = show ? 'More depth ▾' : 'More depth ▸'; } });
   view.root.append(h('div', { class: 'org-row', style: { justifyContent: 'space-between' } }, [UI.presetBar(view), go.el]), cv, face, h('div', { class: 'org-row' }, [more.el]), deep,
     UI.hint('Wire a sound (or the whole mix) in to hear its tension: Loudness, Brightness, Density, Motion. Or let it build: from Play, it climbs to Peak by the last bar of the Hold and lets go. Each one goes out (violet) to move any knob: wire Tension into a filter, Release into anything that should drop.'));
 });

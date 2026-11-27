@@ -1,7 +1,7 @@
 {
   "schema": "eravos.tool/1",
   "id": "eravos.ripple",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "label": "Ripple",
   "icon": "≈",
   "accent": "#ff5a3c",
@@ -98,6 +98,7 @@
     "eravos.granular",
     "eravos.groove-gen",
     "eravos.harmonic-analyzer",
+    "eravos.level-follow",
     "eravos.lfo",
     "eravos.macro-automation",
     "eravos.master-fx",

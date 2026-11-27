@@ -1,4 +1,4 @@
-/* eravos.ripple 1.0.0 — Ripple: the rumble (spec: ripple.spec · the direction: specs/eravos.contrast-space.spec ADDENDUM 2026-11-27 (2))
+/* eravos.ripple 1.1.0 — Ripple: the rumble (spec: ripple.spec · the direction: specs/eravos.contrast-space.spec ADDENDUM 2026-11-27 (2))
  * His words (2026-11-27): "the frequencies how the collide … the way it creates ripples and tension" · "yes build them use the null renderer to
  * make sure its novel in relation to the rest of eravos".
  *
@@ -15,7 +15,7 @@
   const S = OrganismSDK.STD, MP = window.MusicParts;
   const WAVES = { saw: 'sawtooth', square: 'square', triangle: 'triangle', sine: 'sine' }, MAXV = 6;
   OrganismFactory.define({
-    id: 'eravos.ripple', preview: 'bass', domain: 'music', version: '1.0.0', label: 'Ripple', icon: '≈', accent: '#ff5a3c',
+    id: 'eravos.ripple', preview: 'bass', domain: 'music', version: '1.1.0', label: 'Ripple', icon: '≈', accent: '#ff5a3c',
     category: 'Bass', blurb: 'The rumble: a clean sub under a driven grind whose voices are a few hertz apart, so the floor swells. Dive into each note.',
     size: { w: 620, h: 620 }, minSize: { w: 460, h: 380 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
@@ -26,20 +26,22 @@
     config: [
       { key: 'wave', type: 'enum', options: Object.keys(WAVES), default: 'saw', label: 'Wave', group: 'GRIND' },
       { key: 'voices', type: 'integer', default: 3, min: 2, max: 7, label: 'Voices', group: 'RIPPLE', element: 'unison-stack' },
-      { key: 'beat', type: 'number', default: 1.6, min: 0, max: 12, step: 0.01, unit: 'Hz', label: 'Beat', group: 'RIPPLE', element: 'unison-stack', hint: 'how many times a second the voices swell together; under 7 Hz a swell, above it a growl' },
-      { key: 'detune', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Detune', group: 'RIPPLE', element: 'unison-stack', hint: 'cents on top (they scale with the note; Beat does not)' },
+      { key: 'beat', type: 'number', default: 1.6, min: 0, max: 12, step: 0.01, unit: 'Hz', label: 'Beat', group: 'RIPPLE', element: 'unison-stack', hint: 'How many times a second the voices swell together; under 7 Hz a swell, above it a growl' },
+      { key: 'detune', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Detune', group: 'RIPPLE', element: 'unison-stack', hint: 'Cents on top (they scale with the note; Beat does not)' },
       { key: 'width', type: 'number', default: 0.6, min: 0, max: 1, step: 0.01, label: 'Width', group: 'RIPPLE', element: 'unison-stack' },
       { key: 'midOct', type: 'enum', options: ['0', '+1', '+2'], default: '+1', label: 'Grind octave', group: 'GRIND' },
       { key: 'drive', type: 'number', default: 14, min: 0, max: 24, step: 0.1, unit: 'dB', label: 'Drive', group: 'GRIND', element: 'saturator-tube' },
-      { key: 'bias', type: 'number', default: 0.4, min: 0, max: 1, step: 0.01, label: 'Bias', group: 'GRIND', element: 'saturator-tube', hint: 'asymmetry: even harmonics' },
-      { key: 'grind', type: 'number', default: 0.7, min: 0, max: 1, step: 0.01, label: 'Grind', group: 'GRIND', hint: 'the grind’s level against the sub' },
-      { key: 'sub', type: 'number', default: 0.8, min: 0, max: 1, step: 0.01, label: 'Sub', group: 'SUB', hint: 'a clean sine on the note: never driven, always mono' },
+      { key: 'bias', type: 'number', default: 0.4, min: 0, max: 1, step: 0.01, label: 'Bias', group: 'GRIND', element: 'saturator-tube', hint: 'Asymmetry: even harmonics' },
+      { key: 'grind', type: 'number', default: 0.7, min: 0, max: 1, step: 0.01, label: 'Grind', group: 'GRIND', hint: 'The grind’s level against the sub' },
+      { key: 'sub', type: 'number', default: 0.8, min: 0, max: 1, step: 0.01, label: 'Sub', group: 'SUB', hint: 'A clean sine on the note: never driven, always mono' },
       { key: 'cutoff', type: 'number', default: 1400, min: 80, max: 12000, step: 1, unit: 'Hz', label: 'Cutoff', group: 'FILTER' },
       { key: 'res', type: 'number', default: 2, min: 0.5, max: 14, step: 0.1, label: 'Reso', group: 'FILTER' },
-      { key: 'fEnv', type: 'number', default: 1.5, min: 0, max: 4, step: 0.01, unit: 'oct', label: 'Env amt', group: 'FILTER' },
+      { key: 'fEnv', type: 'number', default: 1.5, min: -4, max: 4, step: 0.01, unit: 'oct', label: 'Env amt', group: 'FILTER', hint: 'Above 0 each note starts bright and closes; below 0 it starts dark and opens in' },
       { key: 'fDec', type: 'number', default: 0.35, min: 0.02, max: 3, step: 0.01, unit: 's', label: 'Env dec', group: 'FILTER' },
-      { key: 'dive', type: 'number', default: 0, min: 0, max: 24, step: 0.1, unit: 'st', label: 'Dive', group: 'DIVE', hint: 'each note falls this far into its pitch' },
-      { key: 'diveTime', type: 'number', default: 0.12, min: 0.01, max: 1.5, step: 0.01, unit: 's', label: 'Dive time', group: 'DIVE' },
+      { key: 'dive', type: 'number', default: 0, min: -24, max: 24, step: 0.1, unit: 'st', label: 'Dive', group: 'DIVE', hint: 'Above 0 each note falls this far into its pitch; below 0 it rises in from under it' },
+      { key: 'diveTime', type: 'number', default: 0.12, min: 0.01, max: 4, step: 0.01, unit: 's', label: 'Dive time', group: 'DIVE' },
+      { key: 'collideFrom', type: 'number', default: 0, min: 0, max: 80, step: 0.1, unit: 'Hz', label: 'Collide from', group: 'COLLIDE', element: 'unison-stack', hint: 'Each note starts with its voices this far apart (a clash) and slides to Beat (a ripple); 0 = off' },
+      { key: 'collideTime', type: 'number', default: 0.6, min: 0.01, max: 8, step: 0.01, unit: 's', label: 'Collide time', group: 'COLLIDE', hint: 'How long the clash takes to slow into the ripple' },
       { key: 'aA', type: 'number', default: 0.004, min: 0.001, max: 2, step: 0.001, unit: 's', label: 'Attack', group: 'AMP' },
       { key: 'aD', type: 'number', default: 0.3, min: 0.01, max: 4, step: 0.01, unit: 's', label: 'Decay', group: 'AMP' },
       { key: 'aS', type: 'number', default: 0.85, min: 0, max: 1, step: 0.01, label: 'Sustain', group: 'AMP' },
@@ -53,10 +55,12 @@
       const ac = ctx.ac, P = ctx.params, MT = window.MusicTheory, US = MP.UnisonStack();
       const lvl = ac.createGain(); lvl.gain.value = P.get('level') * 0.5; const hr = ctx.dsp.headroom(ac), out = ac.createGain();
       lvl.connect(hr.input); hr.output.connect(out); hr.nodes.forEach(n => ctx.track(n)); ctx.track(lvl);
-      ctx.port('out', { kind: 'audio', direction: 'out', node: out, label: 'ripple' });
+      ctx.port('out', { kind: 'audio', direction: 'out', node: out, label: 'Ripple' });
       // the grind's bus → the tube (one, after the voices: their sums and differences are made here) → level; the sub goes round it
       const grindBus = ac.createGain(), grindLvl = ac.createGain(), subBus = ac.createGain(); grindLvl.gain.value = P.get('grind'); subBus.gain.value = P.get('sub');
       grindBus.connect(lvl); grindLvl.connect(grindBus); subBus.connect(lvl); [grindBus, grindLvl, subBus].forEach(n => ctx.track(n));
+      // the starting levels scheduled on the audio clock (not only .value): an offline render then repeats to the sample (the null render)
+      lvl.gain.setValueAtTime(P.get('level') * 0.5, 0); grindLvl.gain.setValueAtTime(P.get('grind'), 0); subBus.gain.setValueAtTime(P.get('sub'), 0);
       let tube = null;
       ctx.ready = ctx.loadWorklet('eravos-saturator-tube', MP.TUBESAT_WORKLET).then(() => {
         if (ctx.disposed) return;
@@ -68,7 +72,7 @@
       const beatMod = ctx.modBus('beat', { min: -6, max: 6 }), cutMod = ctx.modBus('cutoff', { min: -4800, max: 4800 }), driveMod = ctx.modBus('drive', { min: -12, max: 12 });
       // out: the ripple itself — |cos(π·Beat·t)| = |sin| of an oscillator at Beat/2, through an absolute-value curve
       const rOsc = ac.createOscillator(); rOsc.frequency.value = P.get('beat') / 2; const abs = ac.createWaveShaper(); const cv = new Float32Array(1025); for (let i = 0; i < 1025; i++) cv[i] = Math.abs(i / 512 - 1); abs.curve = cv;
-      rOsc.connect(abs); rOsc.start(); ctx.track(rOsc); ctx.track(abs); ctx.port('ripple', { kind: 'mod', direction: 'out', node: abs, label: 'ripple' });
+      rOsc.connect(abs); rOsc.start(); ctx.track(rOsc); ctx.track(abs); ctx.port('ripple', { kind: 'mod', direction: 'out', node: abs, label: 'Ripple' });
       const layout = () => US.layout(P.get('voices'), P.get('detune'), 2, P.get('width'), 0.5, 2, 7, P.get('beat'));
       const voices = [];
       function makeVoice(note, vel, t, dur) {
@@ -77,6 +81,8 @@
         const wBeat = ctx.modWired('beat'), oscs = [];
         for (let i = 0; i < n; i++) {
           const o = ac.createOscillator(); o.type = WAVES[P.get('wave')]; o.frequency.value = fm + L.offsetHz[i];
+          // 3.250 Collide: the voices start Collide-from Hz apart (outer two) and slide to Beat — a clash slowing into a ripple; 0 = as before
+          const cf = P.get('collideFrom'); if (cf > 0) { o.frequency.setValueAtTime(fm + L.pos[i] * cf / 2, t); o.frequency.linearRampToValueAtTime(fm + L.offsetHz[i], t + P.get('collideTime')); }
           o.detune.setValueAtTime(L.cents[i] + dive, t); if (dive) o.detune.linearRampToValueAtTime(L.cents[i], t + dT);
           let bm = null; if (wBeat) { bm = ac.createGain(); bm.gain.value = L.pos[i] / 2; beatMod.connect(bm); bm.connect(o.frequency); }
           const gL = ac.createGain(), gR = ac.createGain(); gL.gain.value = L.gainL[i]; gR.gain.value = L.gainR[i];
@@ -119,7 +125,10 @@
       ctx.onUI('key_down', { type: 'object', required: ['note'] }, (p) => noteOn(p.note, p.velocity || 0.85, ac.currentTime));
       ctx.onUI('key_up', { type: 'object', required: ['note'] }, (p) => noteOff(p.note));
       // ---- every control, live (sounding notes follow)
-      const now = () => ac.currentTime, glide = (prm, val) => prm.setTargetAtTime(val, now(), 0.012);
+      const now = () => ac.currentTime;
+      // a change glides while it plays; before the clock has moved (an offline render being set up) it is set exactly — a glide that starts at
+      // time 0 starts from whatever value the audio thread last reported, so two renders of one preset could differ (−70 dB)
+      const glide = (prm, val) => { if (ac.currentTime === 0) { prm.cancelScheduledValues(0); prm.setValueAtTime(val, 0); } else prm.setTargetAtTime(val, now(), 0.012); };
       const relayout = () => { const L = layout(); voices.forEach(v => v.oscs.forEach(x => { if (x.i >= L.count) return; glide(x.o.frequency, v.fm + L.offsetHz[x.i]); glide(x.o.detune, L.cents[x.i]); glide(x.gL.gain, L.gainL[x.i]); glide(x.gR.gain, L.gainR[x.i]); })); };
       ['beat', 'detune', 'width'].forEach(k => P.onChange(k, relayout));
       P.onChange('beat', (b) => glide(rOsc.frequency, b / 2));

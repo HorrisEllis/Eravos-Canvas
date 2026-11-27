@@ -21,15 +21,15 @@ OrganismFactory.reg('eravos.band-collision', function (view) {
     duckTap.getFloatTimeDomainData(db); let e = 0; for (const v of db) e = Math.max(e, v);
     const dLow = S('lowDuck') * e; g.fillStyle = ACC; g.fillRect(6, base + 6, Math.max(0, (sx - 6) * Math.min(1, dLow / 36)), 4);
     [30, 50, 100, 200, 500, 1000, 5000].forEach(hz => { g.fillStyle = DIM; g.font = '10px ui-monospace, monospace'; g.fillText(hz >= 1000 ? hz / 1000 + 'k' : '' + hz, x(hz) - 6, H - 1); });
-    g.font = '10px ui-monospace, monospace'; g.fillStyle = '#e8e8ea'; g.fillText('the sound', 6, 12); g.fillStyle = ACC2; g.fillText('the key', 74, 12);
-    g.fillStyle = ACC; g.fillText(last ? `collide ${(last.total * 100).toFixed(0)} %` : 'collide —', 128, 12);
+    g.font = '10px ui-monospace, monospace'; g.fillStyle = '#e8e8ea'; g.fillText('The sound', 6, 12); g.fillStyle = ACC2; g.fillText('The key', 74, 12);
+    g.fillStyle = ACC; g.fillText(last ? `Collide ${(last.total * 100).toFixed(0)} %` : 'Collide —', 128, 12);
     g.fillStyle = DIM; g.fillText(`LOW < ${S('split')} Hz ducks ${dLow.toFixed(1)} dB now`, W - 230, 12);
-    g.fillText(last && last.total > 0.02 ? 'lit: both loud in the same band' : 'wire a kick into the key (blue dot) to see where they meet', 6, 24);
+    g.fillText(last && last.total > 0.02 ? 'Lit: both loud in the same band' : 'Wire a kick into the key (blue dot) to see where they meet', 6, 24);
   }, 30);
   const face = h('div', { class: 'uk-panel' }, [card('SPLIT', ['split', 'lowMono']), card('DUCK', ['lowDuck', 'midDuck']), card('KEY', ['attack', 'hold', 'release'])]);
   const deep = h('div', { class: 'uk-panel' }, [card('KEY+', ['floor']), card('BANDS', ['lowGain', 'midGain']), card('OUT', ['mix'])]);
   deep.style.display = 'none';
-  const more = UI.Button({ label: 'More depth ▸', hint: 'what the key hears from, each band’s level, the mix', onClick: () => { const show = deep.style.display === 'none'; deep.style.display = show ? '' : 'none'; more.el.textContent = show ? 'More depth ▾' : 'More depth ▸'; } });
+  const more = UI.Button({ label: 'More depth ▸', hint: 'What the key hears from, each band’s level, the mix', onClick: () => { const show = deep.style.display === 'none'; deep.style.display = show ? '' : 'none'; more.el.textContent = show ? 'More depth ▾' : 'More depth ▸'; } });
   view.root.append(h('div', { class: 'org-row', style: { justifyContent: 'space-between' } }, [UI.presetBar(view)]), cv, face, h('div', { class: 'org-row' }, [more.el]), deep,
     UI.hint('Two sounds in one band fight for it. Wire the bass through, a kick into the key: on every kick the low band steps back (Low duck), the mid if you want (Mid duck). The duck goes out (violet) to move anything else at the same moment.'));
 });

@@ -8,7 +8,7 @@ describe('Tension Field — heard, built, released', () => {
     const K = Kernel.create({ ctx, quiet: true, syncIR: true }); const T = MasterTransport.create(K, { offline: true, bpm: 120 }); T.boot();
     const a = OrganismFactory.spawn('eravos.tension-field', { K, headless: true }), c = OrganismFactory.handle(a).ctx;
     Object.entries(params).forEach(([k, v]) => c.params.set(k, v)); await c.ready;
-    const ports = K.audio.ports(a), inN = ports.find(x => x.kind === 'audio' && x.direction === 'in').node, out = (k) => ports.find(x => x.kind === 'mod' && x.label === k).node;
+    const ports = K.audio.ports(a), inN = ports.find(x => x.kind === 'audio' && x.direction === 'in').node, out = (k) => ports.find(x => x.kind === 'mod' && x.label.toLowerCase() === k).node;
     K.audio.chain.out.gain.value = 0; const m = ctx.createChannelMerger(6); ['tension', 'release', 'loudness', 'brightness', 'density', 'motion'].forEach((k, i) => out(k).connect(m, 0, i)); m.connect(ctx.destination);
     if (src) src(ctx, inN); if (during) during(c, ctx, K);
     const b = await ctx.startRendering(); const ch = (i) => b.getChannelData(i); return { tension: ch(0), release: ch(1), loud: ch(2), sr, at: (d, t) => d[Math.floor(t * sr)] };
@@ -30,6 +30,11 @@ describe('Tension Field — heard, built, released', () => {
     assert.near(r.at(r.tension, 1.98), 0.248, 0.02, 'a quarter of the way at 2 s (4 bars = 8 s)'); assert.lt(r.at(r.tension, 2.3), 0.05, 'let go: ' + r.at(r.tension, 2.3).toFixed(3));
     const b = await run({ mode: 'both', hold: 1, shape: 0, loop: false, wBright: 0, wDense: 0, wMotion: 0 }, tone(0.02), 1.5, (c) => c.startBuild(0.0001));
     assert.gt(b.at(b.tension, 1.0), 0.49, 'both: at least the build (½ at 1 s)');
+  });
+  it('a sound wired into its input is only listened to: it still plays where it played (a tap)', () => {
+    const U = TH.universe(0.2), src = TH.spawn(U, 'eravos.ripple'), me = TH.spawn(U, 'eravos.tension-field');
+    assert.ok(U.K.audio.isOnMaster(src, 'out'), 'the source is heard before'); const w = U.K.wires.register({ src: { instanceId: src, hookId: 'ripple.hook.audio_out' }, dst: { instanceId: me, hookId: 'tf.hook.audio_in' } });
+    assert.ok(w.ok, 'wired'); assert.ok(U.K.audio.isOnMaster(src, 'out'), 'and still heard after it is wired in');
   });
 });
 window.__phase = window.__tensionWas;

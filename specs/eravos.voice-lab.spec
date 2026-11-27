@@ -44,3 +44,15 @@ his words (verbatim): "I am a good writer.  It would be cool to be able to impor
   TOP of his own recorded voice (Song Recorder) — then TUNE (his voice in key), then WUB. VL3 vocal-tract + VL4 letter-to-sound lead; the voice
   follows the song's genre (a choice of characters: deep, airy, choir, robot / hard-tuned).
 
+
+ADDENDUM 2026-11-27 — everything a voice needs (the originals above kept verbatim)
+his words (verbatim, answering how his lyrics should reach the tools): "Voice tools. Like recording. Making sound like the tools? Full editing and modulation. Full t pain auto tune. Synthesized voice. Everything needed for remixing, EDM; dubstep."
+  · the same day: "Still feel like i want to make music with this. using my lyrics. i love the piano its beautiful look at it."
+WHAT IT ADDS to the three doors (TUNE · CREATE · WUB): RECORD (his voice in, takes kept, comped) · VOICE → TOOLS (his voice playing any
+  instrument: the pitch and loudness he sings drive Piano, Ripple, Wobble Bass … — "making sound like the tools") · EDIT (every take as notes
+  and curves: pitch, timing, formant, level per syllable, on the Timeline's roll) · MODULATE (every voice control a modulation destination;
+  the voice's own pitch / loudness / vowel as signals out) · REMIX (chop, stutter, pitch-drop, reverse, vocal-chop leads — EDM / dubstep).
+ORDER (bottom up, each component proving its numbers, each new tool's face shown to him first):
+  VL1 pitch-tracker (every door stands on it: TUNE, VOICE → TOOLS, EDIT) → VL3 vocal-tract + VL4 letter-to-sound (CREATE, his order of
+  2026-11-26) → VL2 pitch-shifter (TUNE's correction, formants kept) → VT1 Tune (record + hard tune) → VT2 Voice (sings his lyrics over his
+  own) → voice → tools → VT3 Talk / Wub → the remix set (chop · stutter · drop · reverse · vocal chops).

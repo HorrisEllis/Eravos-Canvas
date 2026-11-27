@@ -52,29 +52,29 @@ registerProcessor('eravos-spatial', EravosSpatial);`;
     size: { w: 600, h: 600 }, minSize: { w: 440, h: 400 },
     permissions: ['audio_out', 'audio_in', 'bus_publish', 'bus_subscribe'],
     provides: ['capability.audio_out', 'capability.fx', 'capability.mod_out'],
-    hooks: SDK.fxHooks([S.mod_in('sp.hook.mod_angle', 'angle'), S.mod_in('sp.hook.mod_distance', 'distance'), Object.assign(S.mod_out('sp.hook.where_out', 'where'), { label: 'where it is' })]),
+    hooks: SDK.fxHooks([S.mod_in('sp.hook.mod_angle', 'angle'), S.mod_in('sp.hook.mod_distance', 'distance'), Object.assign(S.mod_out('sp.hook.where_out', 'where'), { label: 'Where it is' })]),
     config: [
       { key: 'angle', type: 'number', default: 0, min: -1, max: 1, step: 0.01, label: 'Angle', group: 'PLACE', element: 'panner', hint: '−1 left · 0 ahead · 1 right' },
-      { key: 'distance', type: 'number', default: 0.2, min: 0, max: 1, step: 0.01, label: 'Distance', group: 'PLACE', element: 'panner', hint: 'quieter, darker and later the further it is' },
-      { key: 'ears', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Ears', group: 'PLACE', element: 'panner', hint: 'binaural: the far ear hears it later and darker (headphones)' },
+      { key: 'distance', type: 'number', default: 0.2, min: 0, max: 1, step: 0.01, label: 'Distance', group: 'PLACE', element: 'panner', hint: 'Quieter, darker and later the further it is' },
+      { key: 'ears', type: 'number', default: 0, min: 0, max: 1, step: 0.01, label: 'Ears', group: 'PLACE', element: 'panner', hint: 'Binaural: the far ear hears it later and darker (headphones)' },
       { key: 'orbit', type: 'number', default: 0.25, min: 0.02, max: 6, step: 0.01, unit: 'Hz', label: 'Orbit', group: 'MOTION', element: 'lfo' },
       { key: 'shape', type: 'enum', options: SHAPES, default: 'pendulum', label: 'Swing', group: 'MOTION', element: 'lfo' },
       { key: 'orbitDepth', type: 'number', default: 0.6, min: 0, max: 1, step: 0.01, label: 'Swing width', group: 'MOTION', element: 'lfo' },
-      { key: 'lean', type: 'number', default: 0, min: -1, max: 1, step: 0.01, label: 'Lean', group: 'MOTION', element: 'lfo', hint: 'pendulum: lingers right (> 0) or left (< 0)' },
-      { key: 'orbitDist', type: 'number', default: 0.2, min: 0, max: 1, step: 0.01, label: 'Swing away', group: 'MOTION', hint: 'how far the swing carries it away from you' },
+      { key: 'lean', type: 'number', default: 0, min: -1, max: 1, step: 0.01, label: 'Lean', group: 'MOTION', element: 'lfo', hint: 'Pendulum: lingers right (> 0) or left (< 0)' },
+      { key: 'orbitDist', type: 'number', default: 0.2, min: 0, max: 1, step: 0.01, label: 'Swing away', group: 'MOTION', hint: 'How far the swing carries it away from you' },
       { key: 'room', type: 'number', default: 0.35, min: 0, max: 1, step: 0.01, label: 'Room', group: 'ROOM', element: 'early-reflections' },
       { key: 'size', type: 'number', default: 12, min: 2, max: 60, step: 0.1, unit: 'm', label: 'Size', group: 'ROOM', element: 'early-reflections' },
       { key: 'predelay', type: 'number', default: 8, min: 0, max: 100, step: 0.1, unit: 'ms', label: 'Pre-delay', group: 'ROOM', element: 'early-reflections' },
       { key: 'absorption', type: 'number', default: 0.35, min: 0, max: 0.95, step: 0.01, label: 'Absorb', group: 'ROOM', element: 'early-reflections' },
       { key: 'damping', type: 'number', default: 0.4, min: 0, max: 1, step: 0.01, label: 'Damping', group: 'ROOM', element: 'early-reflections' },
       { key: 'spread', type: 'number', default: 0.8, min: 0, max: 1, step: 0.01, label: 'Spread', group: 'ROOM', element: 'early-reflections' },
-      { key: 'width', type: 'number', default: 1, min: 0, max: 2, step: 0.01, label: 'Width', group: 'OUT', element: 'stereo-tools', hint: 'the input’s own stereo (its side)' },
+      { key: 'width', type: 'number', default: 1, min: 0, max: 2, step: 0.01, label: 'Width', group: 'OUT', element: 'stereo-tools', hint: 'The input’s own stereo (its side)' },
       { key: 'bassMono', type: 'number', default: 120, min: 0, max: 400, step: 1, unit: 'Hz', label: 'Bass mono', group: 'OUT', element: 'stereo-tools' },
     ].concat(SDK.STD_FX_CONFIG),
     defaultPreset: 'Moving Orbit',
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, fx = SDK.fxShell(ctx);
-      const whereBus = ac.createGain(); ctx.track(whereBus); ctx.port('where', { kind: 'mod', direction: 'out', node: whereBus, label: 'where it is' });
+      const whereBus = ac.createGain(); ctx.track(whereBus); ctx.port('where', { kind: 'mod', direction: 'out', node: whereBus, label: 'Where it is' });
       const angleMod = ctx.modBus('angle', { min: -1, max: 1 }), distMod = ctx.modBus('distance', { min: -1, max: 1 });
       const valueOf = (k) => k === 'shape' ? LFO_SHAPE[P.get('shape')] : P.get(k);
       let node = null; const pass = ac.createGain(); fx.wetIn.connect(pass); pass.connect(fx.wetOut); ctx.track(pass);
