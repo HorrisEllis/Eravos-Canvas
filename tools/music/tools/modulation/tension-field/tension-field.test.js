@@ -31,5 +31,10 @@ describe('Tension Field — heard, built, released', () => {
     const b = await run({ mode: 'both', hold: 1, shape: 0, loop: false, wBright: 0, wDense: 0, wMotion: 0 }, tone(0.02), 1.5, (c) => c.startBuild(0.0001));
     assert.gt(b.at(b.tension, 1.0), 0.49, 'both: at least the build (½ at 1 s)');
   });
+  it('a sound wired into its input is only listened to: it still plays where it played (a tap)', () => {
+    const U = TH.universe(0.2), src = TH.spawn(U, 'eravos.ripple'), me = TH.spawn(U, 'eravos.tension-field');
+    assert.ok(U.K.audio.isOnMaster(src, 'out'), 'the source is heard before'); const w = U.K.wires.register({ src: { instanceId: src, hookId: 'ripple.hook.audio_out' }, dst: { instanceId: me, hookId: 'tf.hook.audio_in' } });
+    assert.ok(w.ok, 'wired'); assert.ok(U.K.audio.isOnMaster(src, 'out'), 'and still heard after it is wired in');
+  });
 });
 window.__phase = window.__tensionWas;

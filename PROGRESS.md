@@ -2,6 +2,11 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.251 A sound wired into Collision's key or Tension Field is only listened to (2026-11-27)
+- Found while building the connector tools: those two inputs were not taps, so wiring a kick into Collision's key (or a mix into Tension
+  Field) took that sound off the master — the kick went silent everywhere else. Both are taps now (only listened to).
+- tests P240 5/5 and P243 4/4: a Ripple wired in is still heard after it is wired (both fail on the old ports).
+
 ## 3.250 Ripple 1.1: a tone that loads in, collides and ripples (2026-11-27)
 His words: "Okay. They all sound similar. Can you get the rumble sound? Like it's a high pitch tone that loads in, collides and ripples . Also tools to connect to tools."
 - The capability, not a preset (2026-11-24, "eravos makes it, not you"): Dive below 0 = Rise (the note climbs in from under its pitch) ·

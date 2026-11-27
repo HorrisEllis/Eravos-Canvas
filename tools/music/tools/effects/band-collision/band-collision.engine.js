@@ -65,7 +65,7 @@ registerProcessor('eravos-collision', EravosCollision);`;
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, fx = SDK.fxShell(ctx);
       const keyIn = ac.createGain(); keyIn.channelCount = 2; keyIn.channelCountMode = 'explicit'; ctx.track(keyIn);
-      ctx.port('key', { kind: 'audio', direction: 'in', node: keyIn, label: 'Key' });
+      ctx.port('key', { kind: 'audio', direction: 'in', node: keyIn, tap: true, label: 'Key' });   // a tap: the kick wired here still plays where it played
       const duckBus = ac.createGain(); ctx.track(duckBus); ctx.port('duck', { kind: 'mod', direction: 'out', node: duckBus, label: 'The duck' });
       const splitMod = ctx.modBus('split', { min: -200, max: 200 });
       // the view's ears: the sound in, the key — the masking-analyzer reads them (never the audio thread)

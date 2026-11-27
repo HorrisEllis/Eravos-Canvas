@@ -72,7 +72,7 @@ registerProcessor('eravos-tension', EravosTension);`;
     defaultPreset: 'Pre-Drop',
     engine(ctx) {
       const ac = ctx.ac, P = ctx.params, bar = () => 240 / (ctx.bpm || 120);
-      const inp = ac.createGain(); inp.channelCount = 2; inp.channelCountMode = 'explicit'; ctx.track(inp); ctx.port('in', { kind: 'audio', direction: 'in', node: inp, label: 'In' });
+      const inp = ac.createGain(); inp.channelCount = 2; inp.channelCountMode = 'explicit'; ctx.track(inp); ctx.port('in', { kind: 'audio', direction: 'in', node: inp, tap: true, label: 'In' });   // a tap: what is heard here still plays where it played
       const relMod = ctx.modBus('releaseIn', { min: 0, max: 1 });
       const buses = OUTS.map(k => { const g = ac.createGain(); ctx.track(g); ctx.port(k, { kind: 'mod', direction: 'out', node: g, label: k }); return g; });
       const valueOf = (k) => k === 'mode' ? MODES.indexOf(P.get('mode')) : k === 'holdS' ? P.get('hold') * bar() : k === 'releaseS' ? P.get('release') : k === 'restS' ? P.get('rest') * bar() : k === 'loop' ? (P.get('loop') ? 1 : 0) : P.get(k);
