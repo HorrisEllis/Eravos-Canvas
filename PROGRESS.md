@@ -2,6 +2,14 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.253 Hits: one tool's hits play another tool — the second connector (2026-11-27)
+His words: "Also tools to connect to tools."
+- tools/music/tools/modulation/hits: any sound in (a tap, the main input) → two envelope-followers (fast and slow; a hit is the fast one
+  over the slow one by Sensitivity, above Hears from, Gap after the last) → a note (Note, Length, velocity from the hit) on every tool wired
+  to Notes, booked at the hit's own time (the worklet marks it to the sample), and a Pulse (violet) for any knob. 6 presets; icon and painting.
+- tests P245 4/4: 8 kicks → 8 hits each within 3 ms; a steady tone → no more than its start; Gap stops a double hit; Notes into Ripple → 3
+  notes booked at their hits; it only listens. Contract 4/4, boundary 10/10, 208 manifests, tool needs 26.
+
 ## Release 0.2.42 (2026-11-27)
 His words: "Push and release." — 3.248–3.252 (no lowercase on the new tools, the pitch-tracker, Ripple 1.1, the taps, Follow).
 

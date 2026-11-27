@@ -1,7 +1,7 @@
 {
   "_": "Which drawn icon each music tool, suite and category shows (names from the Lucide set). build/icons.mjs turns this into core/icons.gen.js.",
   "tools": {
-    "eravos.ripple": "waves", "eravos.band-collision": "merge", "eravos.spatial-organism": "orbit", "eravos.tension-field": "trending-up", "eravos.level-follow": "activity",
+    "eravos.ripple": "waves", "eravos.band-collision": "merge", "eravos.spatial-organism": "orbit", "eravos.tension-field": "trending-up", "eravos.level-follow": "activity", "eravos.hits": "zap",
     "eravos.harmonic-analyzer": "radar", "eravos.bass-drop-builder": "arrow-big-down-dash", "eravos.song-recorder": "disc-3", "eravos.timeline": "chart-gantt",
     "eravos.pads": "drum", "eravos.sequencer": "grid-3x3", "eravos.fx-destroyer": "flame", "eravos.fx-dynamics": "gauge",
     "eravos.fx-echo": "cassette-tape", "eravos.fx-eq": "chart-spline", "eravos.fx-filter": "funnel", "eravos.fx-glitch": "shuffle",

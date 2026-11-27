@@ -1,0 +1,85 @@
+{
+ "schema": "eravos.pack/1",
+ "id": "hits.factory",
+ "version": "1.0.0",
+ "label": "Factory",
+ "prefix": "",
+ "author": "James Brooks",
+ "tags": [
+  "factory",
+  "modulation"
+ ],
+ "for": "eravos.hits",
+ "items": {
+  "eravos.hits": {
+   "presets": {
+    "Kick Plays Bass": {
+     "params": {
+      "sense": 6,
+      "floor": -42,
+      "gap": 80,
+      "note": 33,
+      "length": 0.25,
+      "velFollow": true,
+      "level": 0.85
+     }
+    },
+    "Snare Stabs": {
+     "params": {
+      "sense": 8,
+      "floor": -36,
+      "gap": 60,
+      "note": 60,
+      "length": 0.12,
+      "velFollow": true,
+      "level": 0.8
+     }
+    },
+    "Every Transient": {
+     "params": {
+      "sense": 3,
+      "floor": -48,
+      "gap": 30,
+      "note": 48,
+      "length": 0.08,
+      "velFollow": true,
+      "level": 0.7
+     }
+    },
+    "Only The Big Ones": {
+     "params": {
+      "sense": 14,
+      "floor": -24,
+      "gap": 150,
+      "note": 36,
+      "length": 0.3,
+      "velFollow": false,
+      "level": 1
+     }
+    },
+    "Ghost Notes": {
+     "params": {
+      "sense": 4,
+      "floor": -54,
+      "gap": 40,
+      "note": 72,
+      "length": 0.05,
+      "velFollow": true,
+      "level": 0.4
+     }
+    },
+    "Slow Pulse": {
+     "params": {
+      "sense": 6,
+      "floor": -42,
+      "gap": 250,
+      "note": 45,
+      "length": 1.2,
+      "velFollow": true,
+      "level": 0.8
+     }
+    }
+   }
+  }
+ }
+}

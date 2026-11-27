@@ -62,6 +62,7 @@
     "eravos.fx-box",
     "eravos.fx-dynamics",
     "eravos.granular",
+    "eravos.hits",
     "eravos.level-follow",
     "eravos.lfo",
     "eravos.macro-automation",
