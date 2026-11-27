@@ -1,3 +1,14 @@
+ERAVOS v0.2.40 (2026-11-27)
+
+Install: ERAVOS-Setup-0.2.40.exe from the release, or ERAVOS offers it by itself.
+
+- Synthesize into a style: blow up any tool, pick its parts, right-click › ◆ … into dubstep (or synthwave, trance, ambient, lofi) — every
+  place you did not pick comes from what carries that style, even when that tool is not on the canvas.
+- Feelings › Across › Spectrum (a new choice; Colour stays the default): drag left to right through 19 harmonic spectra — the harmonic series,
+  stretched strings, bars, a church bell, a gamelan kettle, up to the irrational stacks (φ, √2, π/2, e/2), each from a published measurement;
+  the pad names where you are.
+- Feelings fits your screen: the window was taller than a laptop, so the bottom of the pad sat under the Song Recorder.
+
 ERAVOS v0.2.39 (2026-11-26)
 
 Install: ERAVOS-Setup-0.2.39.exe from the release, or ERAVOS offers it by itself.

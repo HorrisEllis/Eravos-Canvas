@@ -84,4 +84,18 @@ describe('Feelings — one feeling fills the pad; drag to play it', () => {
       let low = 0; for (let f = 20; f <= 150; f += 5) low += goertzel(r.L, a, n, f, r.sr) ** 2; let all = 0; for (let f = 20; f <= 8000; f += 5) all += goertzel(r.L, a, n, f, r.sr) ** 2;
       assert.lt(low / all, 0.5, feeling + ': ' + (100 * low / all).toFixed(0) + ' % under 150 Hz'); }
   });
+  it('across = the spectrum (0.3.0): left is the harmonic series, right the irrational stacks, every set between — it glides, it sounds, under 0.72', async () => {
+    // his words, 2026-11-26: "Different harmonic and irrational frequencies … Like the full spectrum. Like moving across the screen."
+    const R = MusicParts.RATIOS, L = R.spectrum(); let seen = [];
+    for (const x of [0, 0.5, 1]) {
+      let cc = null; const r = await play({ feeling: 'love', across: 'spectrum', x, y: 0.6, hold: true }, 1.2, (c) => { cc = c; });
+      const sp = cc.internals.spectrum, ps = cc.internals.parts.map(p => p.pair[0].frequency.value), got = ps[1] / ps[0], want = R.morph(x, 6).ratios[1][0] / R.morph(x, 6).ratios[0][0];
+      assert.ok(sp && sp.name, 'it says where it is: ' + JSON.stringify(sp)); seen.push(sp.name);
+      assert.ok(Math.abs(Math.log(got / want)) < 0.02, 'x ' + x + ': its partials are that set\'s (' + got.toFixed(3) + ' vs ' + want.toFixed(3) + ')');
+      assert.gt(rms(r.L, S(r, 0.6), S(r, 1.1)), 0.003, 'x ' + x + ' sounds'); assert.lt(peak(r.L), 0.72 + 1e-3, 'never over 0.72');
+    }
+    assert.equal(seen[0], L[0].name, 'left: fused (' + seen[0] + ')'); assert.equal(seen[2], L[L.length - 1].name, 'right: the most apart (' + seen[2] + ')');
+    const r0 = await play({ feeling: 'love', across: 'colour', x: 0.5, y: 0.6, harmonics: 'harmonic', hold: true }, 0.4), c = (await (async () => { let k; await play({ feeling: 'love', x: 0.5, y: 0.6, hold: true }, 0.3, (c2) => { k = c2; }); return k; })());
+    assert.equal(c.internals.spectrum, null, 'colour (the default) is as before: no spectrum'); assert.gt(rms(r0.L, 0, r0.L.length), 0.001, 'and it still sounds');
+  });
 });

@@ -2,6 +2,20 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.238–3.240 Into a style; invariants of his words; Feelings across the spectrum (2026-11-26)
+His words: "Like imagine being able to synthesize anything into a dubstep tool." · "Also what about the structure of my words? Like invariants?" ·
+"Different harmonic and irrational frequencies, look at all domains, theories, research all music with any validtity or integrity or epistemic backing. Like the full spectrum. Like moving across the screen."
+- 3.238 INTO A STYLE: ToolBlend.styles() / styleSource(style, slot); synthesizeParts(list, { into }) — every place not picked from the tool that
+  carries that style there, read from its defaults (it need not be on the canvas); the board offers "◆ … into <style>". P238 1/1.
+- 3.239 INVARIANTS: lyric-shape 1.3.0 invariants(text | texts, { by, hold }) — dialogue, parallel frames, opposites, meter, shape, anaphora,
+  resolve, rise / fall, questions; each with where it holds and what the music keeps; the variants. 39 checks (invented lines). On his 21 poems
+  (scratchpad only): light and dark together 71 %, steady ~15-syllable lines 67 %. Not yet used by the song.
+- 3.240 FEELINGS 0.3.0: ratio-set 1.1.0 — seven measured / derived spectra (odd harmonics, free / clamped bar, church bell, bonang, 2.1 stretch,
+  tritave; sources named), dissonance (Plomp & Levelt / Sethares), inharmonicity, spectrum() ordered fused → apart, morph(x); Feelings Across:
+  colour (default, as before) | spectrum (the pad names where the dot is). Fixed: the window was 820 tall — the pad's bottom sat under the Song
+  Recorder; 560 now. Feelings 15/15, ratio-set 57 checks. Previews docs/previews/feelings-*.png (shown to him before merge).
+- Open: component speed checks (saw 101.9 ns, 32 voices 9.56 µs) failed once under load — re-run unfinished.
+
 ## 3.234 The piano without its rumble (2026-11-26)
 His words: "But make some sound beautiful. The piano doesn't get enough love."
 - Measured first (an offline render of each factory preset, a middle-C dyad): Felt Lullaby put 42 % of its energy under 30 Hz and a third more
