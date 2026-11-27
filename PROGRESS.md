@@ -2,6 +2,30 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Release 0.2.43 (2026-11-27)
+His words: "yes merge i meant and release." — 3.253 Hits, 3.254 Pitch → Notes (and the silent sink that keeps them running).
+
+## 3.254 Pitch → Notes: one tool's pitch plays another tool — the third connector; Hits kept running (2026-11-27)
+His words: "Also tools to connect to tools." · "Voice tools. … Making sound like the tools?"
+- tools/music/tools/modulation/pitch-notes (label Pitch → Notes): a single line in (a tap) → the pitch-tracker → when a note holds for Settle,
+  it plays on every tool wired to Notes: In key (snapped into the song's key), Octave, Length fitted to the beat (1/16 … 1 bar), Velocity from
+  the level; booked at the time its first reading began. Pitch out (violet): the line, continuously. 6 presets; icon and painting. The first
+  step of the Voice Lab's voice → tools. Open: a note held as long as it is sung; more than one line at once.
+- Found and fixed: Web Audio runs only what reaches the speakers — with only Notes wired (nothing on the Pulse / Pitch output), Hits and
+  Pitch → Notes heard nothing. A silent sink keeps them running. Hits' test now leaves the Pulse unwired, as on the canvas (fails on the old
+  engine: 0 of 3 notes). Not shipped: Hits came after 0.2.42.
+- The two tests wait for the worklet's messages to stop arriving (up to 1 s) instead of a fixed 60 ms (one flaky run seen, then 4 of 4 green).
+- tests P246 4/4 (A3 · C4 · E4 · silence · A4 → those 4 notes, each within 80 ms of its start; a C# snapped into the key; Octave −1; a sung
+  vowel read right; it only listens), P245 4/4, contracts, boundary 10/10, design check, 210 manifests, tool needs 27.
+
+## 3.253 Hits: one tool's hits play another tool — the second connector (2026-11-27)
+His words: "Also tools to connect to tools."
+- tools/music/tools/modulation/hits: any sound in (a tap, the main input) → two envelope-followers (fast and slow; a hit is the fast one
+  over the slow one by Sensitivity, above Hears from, Gap after the last) → a note (Note, Length, velocity from the hit) on every tool wired
+  to Notes, booked at the hit's own time (the worklet marks it to the sample), and a Pulse (violet) for any knob. 6 presets; icon and painting.
+- tests P245 4/4: 8 kicks → 8 hits each within 3 ms; a steady tone → no more than its start; Gap stops a double hit; Notes into Ripple → 3
+  notes booked at their hits; it only listens. Contract 4/4, boundary 10/10, 208 manifests, tool needs 26.
+
 ## Release 0.2.42 (2026-11-27)
 His words: "Push and release." — 3.248–3.252 (no lowercase on the new tools, the pitch-tracker, Ripple 1.1, the taps, Follow).
 

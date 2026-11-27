@@ -1,3 +1,13 @@
+ERAVOS v0.2.43 (2026-11-27)
+
+Install: ERAVOS-Setup-0.2.43.exe from the release, or ERAVOS offers it by itself.
+
+- Two more tools that connect tools (Modulation). The sound you wire in keeps playing where it was; they only listen.
+  - Hits: every hit in a sound plays a note on another tool, as hard as the hit — a kick in, a bass out: every kick plays the bass.
+    Each hit also comes out as a Pulse for any knob.
+  - Pitch → Notes: the pitch of a voice or a lead plays notes on another tool — snapped into the key, Octave to move it, each note fitted to
+    the beat. A lead in, the Piano out. Its Pitch output follows the line for any knob.
+
 ERAVOS v0.2.42 (2026-11-27)
 
 Install: ERAVOS-Setup-0.2.42.exe from the release, or ERAVOS offers it by itself.
