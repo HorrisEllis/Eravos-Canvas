@@ -2,6 +2,15 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.249 The Voice Lab begins: the pitch-tracker (VL1) (2026-11-27)
+His words: "Voice tools. Like recording. Making sound like the tools? Full editing and modulation. Full t pain auto tune. Synthesized voice. Everything needed for remixing, EDM; dubstep."
+- specs/eravos.voice-lab.spec ADDENDUM 2026-11-27: RECORD, VOICE → TOOLS, EDIT, MODULATE, REMIX join TUNE · CREATE · WUB; the order VL1 →
+  VL3 / VL4 (CREATE, his order of 2026-11-26) → VL2 → VT1 Tune → VT2 Voice → voice → tools → VT3 → the remix set.
+- tools/music/components/pitch-tracker 1.0.0 (NEW): YIN, the octave guard, parabolic interpolation, confidence, voiced, gate; frame 2048 /
+  hop 256. Measured: sines 82–988 Hz within 0.2 cents; sung vowels AH / OO / EE within ±3 cents and > 95 % voiced; a 2nd harmonic twice the
+  fundamental still reads the fundamental; noise, silence, under −50 dBFS unvoiced; a glide followed within 15 cents. 17 checks; contracts 44/44.
+- Nothing he sees yet: the Tune tool's face is shown to him before it is built.
+
 ## 3.248 No lowercase on the four new tools (2026-11-27)
 His words: "als ostop with the lowercase."
 - Ripple, Collision, Spatial Organism, Tension Field: every hover hint, port name, port intent and readout drawn on their displays starts with
