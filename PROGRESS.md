@@ -2,6 +2,20 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.250 Ripple 1.1: a tone that loads in, collides and ripples (2026-11-27)
+His words: "Okay. They all sound similar. Can you get the rumble sound? Like it's a high pitch tone that loads in, collides and ripples . Also tools to connect to tools."
+- The capability, not a preset (2026-11-24, "eravos makes it, not you"): Dive below 0 = Rise (the note climbs in from under its pitch) ·
+  Env amt below 0 = the filter starts dark and opens in · Collide from (0–80 Hz) + Collide time: the voices start far apart (a clash) and
+  slide to Beat (a ripple). At their defaults nothing changes.
+- Proof the presets did not move: each of the 8 rendered by the old engine and the new — new vs old −70 dB or lower (the engine's own
+  render-to-render noise is −67 … −81 dB; the null render passes under −60).
+- Found: Ripple's two renders of one preset differ by −67 … −81 dB (the null render calls them unstable, it asks −90). Its starting levels
+  are now on the audio clock and a change before the clock moves is set exactly, which made more of them repeat exactly; the cause of the
+  rest is not found yet (open).
+- tests P239 10/10 (+ Rise: an octave under, landed within 10 cents; Collide: > 6 clashes in 0.3 s, then a ripple every 1.00 s at Beat 1;
+  the filter opening in: the highs grow > 4×). Examples (not in the repository — no recordings shipped): a high tone that rises from ~486 Hz
+  to 880 Hz in a second, clashes 13 times in 0.4 s and slows to a ripple; saw, square and over a low bass with a kick.
+
 ## 3.249 The Voice Lab begins: the pitch-tracker (VL1) (2026-11-27)
 His words: "Voice tools. Like recording. Making sound like the tools? Full editing and modulation. Full t pain auto tune. Synthesized voice. Everything needed for remixing, EDM; dubstep."
 - specs/eravos.voice-lab.spec ADDENDUM 2026-11-27: RECORD, VOICE → TOOLS, EDIT, MODULATE, REMIX join TUNE · CREATE · WUB; the order VL1 →

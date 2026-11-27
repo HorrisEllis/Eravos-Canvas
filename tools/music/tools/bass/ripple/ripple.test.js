@@ -46,6 +46,27 @@ describe('Ripple — a clean sub under a grind that swells at Beat Hz', () => {
     const r = await play({ sub: 1, grind: 0, dive: 12, diveTime: 0.4 }, [[45, 0.02, 1.4]], 1.5), f0 = pitch(r.L, S(r, 0.03), S(r, 0.09), r.sr), f1 = pitch(r.L, S(r, 0.7), S(r, 1.3), r.sr);
     assert.gt(f0, 220 * 0.85, 'A2 (110 Hz) starts an octave up: ' + f0.toFixed(1) + ' Hz'); assert.lt(Math.abs(1200 * Math.log2(f1 / 110)), 10, 'landed ' + f1.toFixed(2) + ' Hz (110)');
   });
+  // 3.250 his words (2026-11-27): "Can you get the rumble sound? Like it's a high pitch tone that loads in, collides and ripples."
+  it('Rise: Dive −12 starts a note an octave under and lands on it', async () => {
+    const r = await play({ sub: 1, grind: 0, dive: -12, diveTime: 0.4 }, [[45, 0.02, 1.4]], 1.5), f0 = pitch(r.L, S(r, 0.03), S(r, 0.09), r.sr), f1 = pitch(r.L, S(r, 0.7), S(r, 1.3), r.sr);
+    assert.lt(f0, 110 * 0.6, 'A2 (110 Hz) starts an octave under: ' + f0.toFixed(1) + ' Hz'); assert.lt(Math.abs(1200 * Math.log2(f1 / 110)), 10, 'landed ' + f1.toFixed(2) + ' Hz');
+  });
+  it('Collide: voices 40 Hz apart slide to Beat 1 Hz — a fast clash at the start, a slow ripple after Collide time', async () => {
+    const r = await play({ beat: 1, collideFrom: 40, collideTime: 1.2, octave: 2 }, [[57, 0.02, 3.6]], 3.8);
+    // the clash: count the dips of the loudness (2 ms windows) in 0.1–0.4 s; the ripple: the spacing of the dips after 1.4 s
+    const env = (a, b, w) => { const o = []; for (let i = S(r, a); i + w < S(r, b); i += w) o.push(rms(r.L, i, i + w)); return o; };
+    const dips = (e) => { const top = Math.max(...e); let n = 0, inD = false; e.forEach(x => { if (x < top * 0.3) { if (!inD) n++; inD = true; } else inD = false; }); return n; };
+    const early = dips(env(0.1, 0.4, Math.floor(r.sr * 0.002))), late = swellPeriod(r, 1.4, 3.6);
+    assert.gt(early, 6, 'the clash: ' + early + ' dips in 0.3 s (voices ~35 Hz apart)'); assert.lt(Math.abs(late - 1), 0.08, 'the ripple: every ' + late.toFixed(3) + ' s (Beat 1 Hz)');
+  });
+  it('Env amt below 0: a note starts dark and opens in (its highs grow)', async () => {
+    const hi = (r, a, b) => { let h = 0, all = 0, y = 0; for (let i = S(r, a); i < S(r, b); i++) { const x = r.L[i]; const d = x - y; y = x; h += d * d; all += x * x; } return h / all; };
+    const r = await play({ sub: 0, fEnv: -3, fDec: 0.8, cutoff: 4000, drive: 0, wave: 'saw', voices: 2 }, [[45, 0.02, 2.4]], 2.5), a = hi(r, 0.03, 0.09), b = hi(r, 1.8, 2.3);
+    assert.gt(b, a * 4, `highs at the start ${a.toExponential(2)} → after ${b.toExponential(2)}`);
+  });
+  it('the new settings at their defaults leave every note as it was (Collide from 0)', () => {
+    const d = OrganismFactory.def('eravos.ripple'), c = (k) => d.config.find(x => x.key === k); assert.equal(c('collideFrom').default, 0); assert.ok(c('dive').min < 0 && c('fEnv').min < 0, 'Rise and opening filter are in reach');
+  });
   it('the ripple goes out as a modulation signal any tool can take', () => {
     const def = OrganismFactory.def('eravos.ripple'); assert.ok(JSON.stringify(def.hooks).includes('ripple.hook.ripple_out'), 'declares the ripple out');
   });

@@ -118,6 +118,8 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-101 | **Make music from his lyrics, with the Piano** he loves (Lyrics → Rhythm's song). | "Still feel like i want to make music with this. using my lyrics. i love the piano its beautiful look at it." | open |
 | T-102 | **The wub tools route** (3.245). | "like the wub tools wire but don't route." | **built** — confirm on his PC |
 | T-103 | **The Voice Lab, all of it**: record · hard tune (T-Pain) · a synthesized voice · his voice playing the tools · full editing and modulation · remix (EDM, dubstep). | "Voice tools. Like recording. Making sound like the tools? Full editing and modulation. Full t pain auto tune. Synthesized voice. Everything needed for remixing, EDM; dubstep." | VL1 pitch-tracker **built** 3.249; next VL3 vocal-tract + VL4 letter-to-sound, then VL2, then the Tune tool (its face shown first) |
+| T-104 | **Tools to connect to tools**: connectors made from what exists — a sound's loudness as a signal (envelope-follower), a sound's pitch as notes (pitch-tracker), a sound's hits as triggers. | "Also tools to connect to tools." | open — next |
+| T-105 | **Ripple renders repeat to −70 dB, not −90** (the null render asks −90): the cause not found. | (found 3.250) | open |
 | T-98 | **The voice**: a made character (deep, dry, close, level) on Voice Lab's CREATE, or his own voice through the same chain (CS7) — never a copied person. | "voice, sounds, all of it." | open — after Voice Lab VL3 |
 
 ## Shipped, to confirm on his PC
