@@ -2,6 +2,20 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.238 Contrast: the methods of a record, seven UI elements for components, Contrast Space specced (2026-11-27)
+His words: "look at the song rumble by skrillex. the frequencies how the collide. look deeply into the methods. the way it creates ripples and tension. i want to be able to create what that song does. voice, sounds, all of it. like the contrast is where its at. like i want a bunch of spacial tools and ui elements for components. tension, oscillations. wavelengths, emergence."
+- Research (techniques only): docs/research/rumble-techniques.md — beating (two notes Δ Hz apart swell Δ times a second; < 7 Hz a swell, above a
+  growl), intermodulation under drive, sub vs mid as two parts, the low end shared in time, pitch dives, kick rolls, negative space, the voice
+  as rhythm, space by band and distance, tension held and released; what is known (sourced), heard, uncertain (tempo and key not confirmed).
+- Preview (silent, in the real canvas with the kit): docs/previews/contrast-space.preview.js → contrast-space-preview.png, contrast-space-moved.png
+  (`node docs/previews/contrast-space.shots.mjs`, no faults). Seven elements, each a component's: RIPPLE (unison-stack, Hz), WAVELENGTH
+  (λ = 343 / f in a room), COLLISION (masking-analyzer + ducker), SPACE (panner + stereo-tools + early-reflections), PENDULUM (lfo), TENSION
+  (tension-meter + energy-curve, ⇣ RELEASE), EMERGENCE (oscillator-population, the Kuramoto agreement r as a signal).
+- Specs: specs/eravos.contrast-space.spec (CS0–CS9, graph; decisions D1–D3; open his), tools/music/planned/contrast-space.spec (DAG generated;
+  its block written by `node build/spec-dag.mjs` for this file only. Found: a full run of spec-dag drops anything written BELOW its generated
+  block (lyric-rhythm.spec's two addenda of 2026-11-25), so its other changes were not kept; the fix is queued), the session map, HIS-WORDS-MAP N-X162, TODO T-94 … T-98, R-2026-11-27-119.
+- Nothing sounds yet; capability first — no "Rumble" preset or song is hand-built.
+
 ## 3.234 The piano without its rumble (2026-11-26)
 His words: "But make some sound beautiful. The piano doesn't get enough love."
 - Measured first (an offline render of each factory preset, a middle-C dyad): Felt Lullaby put 42 % of its energy under 30 Hz and a third more

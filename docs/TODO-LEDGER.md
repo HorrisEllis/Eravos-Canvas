@@ -105,6 +105,16 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-92 | **Wobble Bass presets**: measured against the synthwave ones he loves; the weak ones named and remade as settings (no toys). | "I love the synthwave ones. A lot of the wobble bass presets aren't great." (2026-11-26) | open — measure first |
 | T-93 | **The bassline lagging** (3.235): notes booked further ahead after a stall; displays draw less (the same picture). | "Also the bassline keeps lagging." (2026-11-26) | built — confirm on his PC |
 
+## Asked 2026-11-27 · `specs/eravos.contrast-space.spec`
+
+| # | What | His words (2026-11-27) | State |
+|---|---|---|---|
+| T-94 | **The preview of the seven component UI elements** (RIPPLE · WAVELENGTH · COLLISION · SPACE · PENDULUM · TENSION · EMERGENCE) on Contrast Space — his yes or changes. | "i want a bunch of spacial tools and ui elements for components. tension, oscillations. wavelengths, emergence." | preview shown (3.238) — waiting (his yes) |
+| T-95 | **Ripples**: detune in Hz on unison-stack and oscillator-population (CS1); the pendulum LFO shape (CS2) — also Wobble Bass's contrast (T-91). | "the way it creates ripples and tension" | open — proposed first |
+| T-96 | **Collisions and space**: masking-analyzer, per-band ducker, panner, early-reflections built (CS3, CS4); Contrast Space the tool (CS9). | "the frequencies how the collide" | open |
+| T-97 | **Tension and emergence** as signals: tension-meter (CS5), agreement (sync) out of oscillator-population + relationship-graph (CS6); silence and release in the song engine (CS8). | "tension, oscillations. wavelengths, emergence." | open |
+| T-98 | **The voice**: a made character (deep, dry, close, level) on Voice Lab's CREATE, or his own voice through the same chain (CS7) — never a copied person. | "voice, sounds, all of it." | open — after Voice Lab VL3 |
+
 ## Shipped, to confirm on his PC
 
 | # | What | His words | State |
