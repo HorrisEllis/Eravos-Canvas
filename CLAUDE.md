@@ -112,6 +112,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-27 | **Release 0.2.41**; drawn icons and paintings for the four new tools (3.247) | `tools/music/icons.json`, `build/tool-art.py`, `desktop/package.json`, `docs/release-notes.txt` | full suite 1721/1734 before (the 13: 3 mine, fixed; 10 fail on main too) · P63 P227 P41 |
 | 2026-11-27 | **Tension Field** (3.246): tension heard from any sound (loudness, brightness, density, motion), built to a peak by a bar and released (end of the hold, ⇣ Release, or any signal); six outputs to map; tension-meter + energy-curve (new) | `tools/music/tools/modulation/tension-field/`, `components/{tension-meter,energy-curve}/` | P243 3/3, contract 4/4, components 10 + 11 |
 | 2026-11-27 | **The wub tools route** (3.245): a wire dropped on a window took the effect's Mix; now the tool's main input (primary), Mix secondary | `canvas/runtime/wire-system.js`, `sdk-music.js` fxHooks, `wub-filter.engine.js` | `tests/p242` 3/3 (fails on the old code) |
 | 2026-11-27 | **Spatial Organism** (3.244): any sound placed by angle and distance (level, air, arrival; ears for headphones), an orbit that swings or lingers (the pendulum), a room's first echoes, drawn from above; panner + early-reflections (new) | `tools/music/tools/effects/spatial-organism/`, `components/{panner,early-reflections}/` | P241 4/4, contract 4/4, components 12 + 7; novelty 5 novel · 2 close · 1 twin |

@@ -21,7 +21,8 @@
     "spec": "spatial-organism.spec",
     "tests": "spatial-organism.test.js",
     "preview": "preview.png",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [

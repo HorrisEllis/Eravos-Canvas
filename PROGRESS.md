@@ -2,6 +2,17 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.247 Drawn icons and paintings for the four new tools; release 0.2.41 (2026-11-27)
+His words: "als ostop with the lowercase. and cheap icons." · "actually continue with the tensino field then release first. then what i juts said"
+- tools/music/icons.json: Ripple waves · Collision merge · Spatial Organism orbit · Tension Field trending-up (Lucide, like every tool);
+  build/icons.mjs run on Lucide 1.82 — it draws fold / unfold / sunset differently from the set in use, so those three were kept exactly as
+  they were (only additions: merge, trending-up).
+- build/tool-art.py: their card paintings in the same style — Ripple a stone's ripples on a lake at dusk, Collision streams meeting at sunset,
+  Spatial Organism a lighthouse at night, Tension Field a cliff and a waterfall (the build and the drop); art.svg in each folder.
+- The full suite before the release: 1721/1734. Mine (P63 icons, P227 paintings, P41 thumbnails) fixed here; the other ten fail on main as
+  well (checked on a clean copy of main): P23 (wheel), P63 (eravos.wb-p202), P172, P84, P82 ×2, P70, P74, P73, P76.
+- Release 0.2.41: desktop/package.json, docs/release-notes.txt.
+
 (3.241–3.246 were written as 3.238–3.243 on their branch and renumbered when merged with main: a parallel session had used 3.238–3.240.)
 
 ## 3.246 Tension Field: tension heard, built to a bar and released (2026-11-27)

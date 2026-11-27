@@ -21,7 +21,8 @@
     "spec": "tension-field.spec",
     "tests": "tension-field.test.js",
     "preview": "preview.png",
-    "thumb": "thumb.png"
+    "thumb": "thumb.png",
+    "art": "art.svg"
   },
   "needs": {
     "units": [
