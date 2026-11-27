@@ -1,5 +1,5 @@
 // node docs/previews/contrast-examples.render.mjs — listenable examples of the four Contrast tools, rendered offline by ERAVOS itself
-// (his ask, 2026-11-27: "Give me some examples of the new tools.") → docs/previews/examples/*.wav
+// (his ask, 2026-11-27: "Give me some examples of the new tools.") → docs/previews/examples/*.wav (git-ignored: no recordings are shipped — tests/no-toys.mjs)
 //   1 ripple-<preset>.wav        Ripple's presets, each the same bass line (140 BPM)
 //   2 collision-before-after.wav a bass and a kick: 4 bars as they are, then 4 bars through Collision keyed by the kick
 //   3 spatial-<preset>.wav       a Piano phrase through Spatial Organism (headphones)
