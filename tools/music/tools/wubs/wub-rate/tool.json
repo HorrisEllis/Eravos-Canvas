@@ -86,6 +86,7 @@
     "eravos.granular",
     "eravos.groove-gen",
     "eravos.harmonic-analyzer",
+    "eravos.level-follow",
     "eravos.lfo",
     "eravos.macro-automation",
     "eravos.master-fx",

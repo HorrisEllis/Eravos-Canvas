@@ -2,6 +2,16 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.252 Follow: one tool's loudness moves another tool's knob — the first connector (2026-11-27)
+His words: "Also tools to connect to tools."
+- tools/music/tools/modulation/level-follow (label Follow; the id level-follow because "follow" is an ordinary word in the canvas kernel):
+  any sound in (a tap: it still plays where it played; its input is the main one, so a drop lands on it) → envelope-follower (Attack, Hold,
+  Release, Hears from) → Amount, Invert (a duck), Offset → Level out (violet), into any knob. The window names what it follows and what it
+  moves. 6 presets (Bass Opens · Kick Ducks · Slow Swell · Every Hit · Voice Breath · Gentle Duck); drawn icon and painting.
+- tests P244 4/4 (up while a sound plays, down after on a dB scale; Invert / Amount / Offset; it only listens; wired into Ripple's cutoff a
+  loud input brightens it > 3×), contract 4/4, boundary 10/10, design check 64/81 (no tool worse), 206 manifests, tool needs 25.
+- Next connectors: Hits (a sound's hits as triggers) and Pitch → Notes (a sound's pitch as notes: the voice playing tools).
+
 ## 3.251 A sound wired into Collision's key or Tension Field is only listened to (2026-11-27)
 - Found while building the connector tools: those two inputs were not taps, so wiring a kick into Collision's key (or a mix into Tension
   Field) took that sound off the master — the kick went silent everywhere else. Both are taps now (only listened to).
