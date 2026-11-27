@@ -40,3 +40,5 @@ dag:
   tool: eravos.spatial-organism ← panner + stereo-tools + early-reflections + delay-line + lfo + phase-correlation
   build order: delay-line ✓ → early-reflections → lfo ✓ → panner → phase-correlation → stereo-tools ✓ → spatial-organism
   shared with: delay-line 16 · early-reflections 3 · lfo 29 · panner 0 · phase-correlation 8 · stereo-tools 18  (other tools on each)
+
+ADDENDUM 2026-11-27 — BUILT 1.0.0 (3.241): tools/music/tools/effects/spatial-organism (its own spec there); this planned spec kept as written.

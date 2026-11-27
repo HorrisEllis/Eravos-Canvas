@@ -1,0 +1,138 @@
+{
+  "schema": "eravos.tool/1",
+  "id": "eravos.spatial-organism",
+  "version": "1.0.0",
+  "label": "Spatial Organism",
+  "icon": "◎",
+  "accent": "#5ac8ff",
+  "domain": "music",
+  "category": "effects",
+  "summary": "Any sound placed around you and moved: angle, distance, a room that answers, an orbit that swings or lingers. Ears for headphones.",
+  "tags": [
+    "effects",
+    "space",
+    "stereo",
+    "binaural",
+    "contrast"
+  ],
+  "files": {
+    "engine": "spatial-organism.engine.js",
+    "ui": "spatial-organism.ui.js",
+    "spec": "spatial-organism.spec",
+    "tests": "spatial-organism.test.js",
+    "preview": "preview.png",
+    "thumb": "thumb.png"
+  },
+  "needs": {
+    "units": [
+      "music.engine"
+    ],
+    "tools": [],
+    "permissions": [
+      "audio_out",
+      "audio_in",
+      "bus_publish",
+      "bus_subscribe"
+    ],
+    "components": [
+      "panner@1.0.0",
+      "early-reflections@1.0.0",
+      "lfo@1.1.0",
+      "stereo-tools@1.0.0"
+    ],
+    "elements": [
+      "panner.element@1",
+      "early-reflections.element@1",
+      "lfo.element@1",
+      "stereo-tools.element@1"
+    ]
+  },
+  "packs": {
+    "accepts": [
+      "presets"
+    ],
+    "shipped": [
+      "factory"
+    ]
+  },
+  "status": "built",
+  "conflicts": [],
+  "field": {
+    "first": [
+      "angle",
+      "distance",
+      "orbit",
+      "orbitDepth",
+      "room"
+    ],
+    "say": "where it is, how it moves and the room"
+  },
+  "works_with": [
+    "eravos.acid-synth",
+    "eravos.arp",
+    "eravos.band-collision",
+    "eravos.bass-drop-builder",
+    "eravos.bass-forge",
+    "eravos.bass-gen",
+    "eravos.breath",
+    "eravos.channel",
+    "eravos.chord-gen",
+    "eravos.clip-maker",
+    "eravos.contrast-analyser",
+    "eravos.coven",
+    "eravos.curve-synth",
+    "eravos.drum-forge",
+    "eravos.dub-station",
+    "eravos.edm-lab",
+    "eravos.embodiment-lab",
+    "eravos.feelings",
+    "eravos.fx-box",
+    "eravos.fx-destroyer",
+    "eravos.fx-dynamics",
+    "eravos.fx-echo",
+    "eravos.fx-eq",
+    "eravos.fx-filter",
+    "eravos.fx-glitch",
+    "eravos.fx-haunt",
+    "eravos.fx-moddelay",
+    "eravos.fx-phaser",
+    "eravos.fx-pitch",
+    "eravos.fx-squash",
+    "eravos.granular",
+    "eravos.groove-gen",
+    "eravos.harmonic-analyzer",
+    "eravos.lfo",
+    "eravos.macro-automation",
+    "eravos.master-fx",
+    "eravos.organ",
+    "eravos.pad-forge",
+    "eravos.pads",
+    "eravos.particle-field",
+    "eravos.piano",
+    "eravos.ratio-lattice",
+    "eravos.recursive-spectra",
+    "eravos.reese-bass",
+    "eravos.retro-dco",
+    "eravos.retro-poly",
+    "eravos.ripple",
+    "eravos.sample-player",
+    "eravos.sidechain-compressor",
+    "eravos.song-recorder",
+    "eravos.sub-engine",
+    "eravos.suite-hub",
+    "eravos.supersaw",
+    "eravos.swarm-oscillator",
+    "eravos.syn-env",
+    "eravos.syn-osc",
+    "eravos.syn-partials",
+    "eravos.tape-memory",
+    "eravos.timeline",
+    "eravos.wobble-bass",
+    "eravos.wub-filter",
+    "eravos.wub-osc",
+    "eravos.wub-rate",
+    "eravos.wub-sub",
+    "eravos.xen-synth",
+    "eravos.xy-pad"
+  ]
+}

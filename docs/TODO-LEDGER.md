@@ -111,7 +111,7 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 |---|---|---|---|
 | T-94 | **The preview of the seven component UI elements** (RIPPLE · WAVELENGTH · COLLISION · SPACE · PENDULUM · TENSION · EMERGENCE) on Contrast Space — his yes or changes. | "i want a bunch of spacial tools and ui elements for components. tension, oscillations. wavelengths, emergence." | preview shown (3.238) — waiting (his yes) |
 | T-95 | **Ripples**: detune in Hz on unison-stack and oscillator-population (CS1); the pendulum LFO shape (CS2) — also Wobble Bass's contrast (T-91). | "the way it creates ripples and tension" | **built** 3.239 (Ripple; LFO Pendulum) — confirm by ear |
-| T-96 | **Collisions and space**: masking-analyzer, per-band ducker, panner, early-reflections built (CS3, CS4); Contrast Space the tool (CS9). | "the frequencies how the collide" | collisions **built** 3.240 (Collision); space open (Spatial Organism); CS9 withdrawn (a setup instead) |
+| T-96 | **Collisions and space**: masking-analyzer, per-band ducker, panner, early-reflections built (CS3, CS4); Contrast Space the tool (CS9). | "the frequencies how the collide" | collisions **built** 3.240 (Collision); space **built** 3.241 (Spatial Organism); CS9 withdrawn (a setup instead) |
 | T-97 | **Tension and emergence** as signals: tension-meter (CS5), agreement (sync) out of oscillator-population + relationship-graph (CS6); silence and release in the song engine (CS8). | "tension, oscillations. wavelengths, emergence." | open |
 | T-98 | **The voice**: a made character (deep, dry, close, level) on Voice Lab's CREATE, or his own voice through the same chain (CS7) — never a copied person. | "voice, sounds, all of it." | open — after Voice Lab VL3 |
 

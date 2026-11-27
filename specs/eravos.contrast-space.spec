@@ -89,3 +89,6 @@ MEASURED: null render of the tools whose components changed (Retro DCO, Swarm, P
   novel; Collision 4 novel · 2 close (Channel, different role) · 0 twin — keyed effects measured with a kick in their key, survey.key).
 NEXT (the setup's other tools): Spatial Organism (CS4: panner + early-reflections, built from their specs) → Tension Field (CS5: tension-meter)
   → Swarm's Emergence card (CS6) → the Contrast setup (Start › SETUPS, the tools wired) → the voice (CS7, Voice Lab).
+BUILT 3.241 Spatial Organism (tools/music/tools/effects/spatial-organism) on panner + early-reflections (new), lfo, stereo-tools — CS4 done.
+  Novelty 5 novel · 2 close · 1 twin (Narrow Pressure, by design near-transparent; the survey is mono). Next: Tension Field (CS5) → Swarm's
+  Emergence card (CS6) → the Contrast setup → the voice (CS7).

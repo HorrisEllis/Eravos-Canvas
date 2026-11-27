@@ -2,6 +2,20 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.241 Spatial Organism: any sound placed around you, moved, in a room (2026-11-27)
+His words: "i want a bunch of spacial tools and ui elements for components" · "yes build them use the null renderer to make sure its novel in relation to the rest of eravos"
+- Components (NEW, node-tested): panner 1.0.0 (equal power; distance −18 dB at 1, 12 ms later, the air; ears: the far ear 0.66 ms later and
+  shadowed — 6 kHz lost, 200 Hz kept; 12 checks) · early-reflections 1.0.0 (12 shoebox echoes: first at pre-delay + 0.27·size/343 to a sample,
+  absorption per bounce, damping, spread; 7 checks). Contracts 41/41.
+- tools/music/tools/effects/spatial-organism (planned since the ecosystem spec; built): one worklet from panner, early-reflections, lfo (the
+  pendulum included) and stereo-tools' MonoBelow — angle, distance, ears, an orbit that swings or lingers, swing away, the room, the input's
+  own width, bass mono; "where it is" out. The SPACE element: from above, the sound where it is now (from its own output), its reach, its trail,
+  the room's echoes where they come from. 8 presets (the planned seven + Lingering Right).
+- Novelty gate: 5 novel · 2 close · 1 twin (Narrow Pressure — centred, close and tight is near-transparent to the survey's mono saw; the survey
+  hears distance and room, not placement) — docs/novelty-gate-spatial-organism.md. Open: a stereo fingerprint in the survey.
+- Tests: contract 4/4, P241 4/4 (rest = an equal-power centre ±0.1 dB, side untouched; angle 1 silences the left; distance 1 −18 dB ±1.2; the
+  pendulum leaning right sounds right > 60 % of the time; the room after the sound; bass mono), boundary 10/10, design check 62/79 (no tool worse).
+
 ## 3.240 Collision: where two sounds fight for one band, one steps back (2026-11-27)
 His words: "yes build them use the null renderer to make sure its novel in relation to the rest of eravos" · "Continue."
 - Components (NEW, each proving its numbers in node): multiband-splitter 1.0.0 (LR4 2/3 bands; −6.02 dB at the crossover, sums flat ±0.05 dB
