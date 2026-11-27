@@ -117,6 +117,7 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-100 | **No cheap icons**: the new tools' glyph icons (≈ ⨯ ◎ T) replaced by real drawn icons like the rest. | "and cheap icons." | **built** 3.247 (drawn icons + paintings) — are there other icons he means? |
 | T-101 | **Make music from his lyrics, with the Piano** he loves (Lyrics → Rhythm's song). | "Still feel like i want to make music with this. using my lyrics. i love the piano its beautiful look at it." | open |
 | T-102 | **The wub tools route** (3.245). | "like the wub tools wire but don't route." | **built** — confirm on his PC |
+| T-103 | **The Voice Lab, all of it**: record · hard tune (T-Pain) · a synthesized voice · his voice playing the tools · full editing and modulation · remix (EDM, dubstep). | "Voice tools. Like recording. Making sound like the tools? Full editing and modulation. Full t pain auto tune. Synthesized voice. Everything needed for remixing, EDM; dubstep." | open — VL1 pitch-tracker first (`specs/eravos.voice-lab.spec` ADDENDUM 2026-11-27) |
 | T-98 | **The voice**: a made character (deep, dry, close, level) on Voice Lab's CREATE, or his own voice through the same chain (CS7) — never a copied person. | "voice, sounds, all of it." | open — after Voice Lab VL3 |
 
 ## Shipped, to confirm on his PC
