@@ -1,3 +1,16 @@
+ERAVOS v0.2.42 (2026-11-27)
+
+Install: ERAVOS-Setup-0.2.42.exe from the release, or ERAVOS offers it by itself.
+
+- Ripple can make a high tone that loads in, collides and ripples: Dive below 0 makes a note climb in from under its pitch, Env amt below 0
+  makes the filter start dark and open in, and Collide from / Collide time start the voices far apart (a clash) and slide them together
+  (a slow ripple). Every preset sounds as it did.
+- Follow (Modulation), the first tool to connect tools: wire any sound in and its loudness moves any knob — a bass opens a filter, a kick
+  ducks a pad (Invert). The sound keeps playing where it was.
+- Fixed: a kick wired into Collision's key, or a sound wired into Tension Field, went silent everywhere else. They only listen now.
+- No lowercase on the four new tools: hints, port names and readouts start with a capital.
+- The Voice Lab begins underneath: a pitch tracker that hears what note a voice sings (nothing to see yet).
+
 ERAVOS v0.2.41 (2026-11-27)
 
 Install: ERAVOS-Setup-0.2.41.exe from the release, or ERAVOS offers it by itself.

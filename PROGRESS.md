@@ -2,6 +2,9 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Release 0.2.42 (2026-11-27)
+His words: "Push and release." — 3.248–3.252 (no lowercase on the new tools, the pitch-tracker, Ripple 1.1, the taps, Follow).
+
 ## 3.252 Follow: one tool's loudness moves another tool's knob — the first connector (2026-11-27)
 His words: "Also tools to connect to tools."
 - tools/music/tools/modulation/level-follow (label Follow; the id level-follow because "follow" is an ordinary word in the canvas kernel):
