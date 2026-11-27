@@ -39,7 +39,7 @@
       "karplus-string@1.0.0",
       "filter-svf@1.0.0",
       "env-adsr@1.0.0",
-      "lfo@1.0.0",
+      "lfo@1.1.0",
       "stereo-tools@1.0.0",
       "saturator-tube@1.0.0",
       "voice-allocator@1.0.0"

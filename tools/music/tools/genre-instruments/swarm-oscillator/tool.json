@@ -40,7 +40,7 @@
       "osc-wavetable@1.0.0",
       "oscillator-population@1.1.0",
       "env-adsr@1.0.0",
-      "lfo@1.0.0",
+      "lfo@1.1.0",
       "filter-svf@1.0.0",
       "stereo-tools@1.0.0"
     ],

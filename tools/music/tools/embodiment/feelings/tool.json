@@ -34,7 +34,7 @@
       "bus_subscribe"
     ],
     "components": [
-      "ratio-set@1.0.0"
+      "ratio-set@1.1.0"
     ],
     "elements": [
       "ratio-set.element@1"
