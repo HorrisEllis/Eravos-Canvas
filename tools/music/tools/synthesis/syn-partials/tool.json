@@ -106,6 +106,7 @@
     "eravos.syn-env",
     "eravos.syn-osc",
     "eravos.tape-memory",
+    "eravos.tension-field",
     "eravos.timeline",
     "eravos.wobble-bass",
     "eravos.wub-filter",

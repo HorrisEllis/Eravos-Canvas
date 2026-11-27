@@ -2,6 +2,27 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.243 Tension Field: tension heard, built to a bar and released (2026-11-27)
+His words: "actually continue with the tensino field then release first. then what i juts said"
+- Components (NEW, node-tested): tension-meter 1.0.0 (loudness −6 dB → 0.875; brightness finds a sine's frequency ±1 %; 6 hits/s → 0.75;
+  a sweep of one octave a second → 0.38; 10 checks) · energy-curve 1.0.0 (linear / waits-then-rushes builds, releases at the hold's end or
+  when told — 99 % gone at Release — loops with rest, deterministic; 11 checks). Contracts 43/43.
+- tools/music/tools/modulation/tension-field (planned; built): Measure (heard from what is wired in) · Target (from Play, Peak by the last
+  bar of Hold, then it lets go) · Both (never below the build); ⇡ Build / ⇣ Release, a release input (primary) any signal can push; six
+  outputs — Tension, Release (1 → 0 at the moment it lets go), Loudness, Brightness, Density, Motion (map any kind to any knob). The TENSION
+  element draws the heard kinds stacked, the result over them, the release marks. The planned seven presets.
+- Tests: contract 4/4, P243 3/3 (louder heard as more; half way at 1 s of a 2 s hold, the peak by 2 s, Release fires then; let go early from a
+  quarter; Both never below the build), boundary 10/10, design check 63/80 (no tool worse). A modulator: no audio out, so the audio survey and
+  the novelty gate do not apply — it is measured by its outputs.
+
+## 3.242 A dropped wire takes the main input: the wub tools route (2026-11-27)
+His words: "also some of the tools wont connect and route audio. like the wub tools wire but don't route."
+- Measured: Wub Rate (or any modulator) dropped on Wub Filter's window landed on its Mix — the shared effect input listed first. The wire drew;
+  the filter never moved. A drop on any effect did the same.
+- canvas/runtime/wire-system.js: a drop on a window body takes the input its tool marks primary, else the first not marked secondary
+  (WireSystem.mainTarget); a drop exactly on a dot still takes that dot. The shared effect Mix is secondary; Wub Filter's Wub input primary.
+- tests/p242 3/3 — fails on the old code (Mix chosen for Wub Filter and for Filter); boundary 10/10, P112 13/13, the wub suites 35/35.
+
 ## 3.241 Spatial Organism: any sound placed around you, moved, in a room (2026-11-27)
 His words: "i want a bunch of spacial tools and ui elements for components" · "yes build them use the null renderer to make sure its novel in relation to the rest of eravos"
 - Components (NEW, node-tested): panner 1.0.0 (equal power; distance −18 dB at 1, 12 ms later, the air; ears: the far ear 0.66 ms later and

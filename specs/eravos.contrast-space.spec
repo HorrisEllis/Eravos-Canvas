@@ -92,3 +92,4 @@ NEXT (the setup's other tools): Spatial Organism (CS4: panner + early-reflection
 BUILT 3.241 Spatial Organism (tools/music/tools/effects/spatial-organism) on panner + early-reflections (new), lfo, stereo-tools — CS4 done.
   Novelty 5 novel · 2 close · 1 twin (Narrow Pressure, by design near-transparent; the survey is mono). Next: Tension Field (CS5) → Swarm's
   Emergence card (CS6) → the Contrast setup → the voice (CS7).
+BUILT 3.243 Tension Field (tools/music/tools/modulation/tension-field) on tension-meter + energy-curve (new) — CS5 done. Next (his order, 2026-11-27): the release, then the lowercase text, the icons, his lyrics with the piano.
