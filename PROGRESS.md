@@ -2,6 +2,9 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## Release 0.2.43 (2026-11-27)
+His words: "yes merge i meant and release." — 3.253 Hits, 3.254 Pitch → Notes (and the silent sink that keeps them running).
+
 ## 3.254 Pitch → Notes: one tool's pitch plays another tool — the third connector; Hits kept running (2026-11-27)
 His words: "Also tools to connect to tools." · "Voice tools. … Making sound like the tools?"
 - tools/music/tools/modulation/pitch-notes (label Pitch → Notes): a single line in (a tap) → the pitch-tracker → when a note holds for Settle,
