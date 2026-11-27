@@ -19,3 +19,13 @@ for (let s = 0; s < 7; s++) { const y = take({ shape: s, rate: 3 }, 4), u = take
 // ---- phase: starts where it is told
 { const y = take({ shape: 2, rate: 1, phase: 0.5 }, 0.01); ok(Math.abs(y[0]) < 1e-9, 'saw from phase 0.5 starts at 0'); }
 console.log(`✓ lfo: ${n} checks`);
+// ---- 1.1.0 pendulum (shape 7): lean 0 is the sine exactly; lean > 0 lingers high, < 0 low; always within −1…1; never stops
+{ const { pendulumAt } = createRequire(import.meta.url)('./lfo.js');
+  const s = take({ shape: 0, rate: 2 }, 2), p0 = take({ shape: 7, rate: 2 }, 2); ok(s.every((v, i) => Math.abs(v - p0[i]) < 1e-12), 'pendulum lean 0 = sine exactly');
+  const hiFrac = (lean) => { const y = take({ shape: 7, rate: 2, lean }, 5); return y.filter(v => v > 0).length / y.length; };
+  const up = hiFrac(0.8), dn = hiFrac(-0.8), mid = hiFrac(0);
+  ok(up > 0.6 && dn < 0.4 && Math.abs(mid - 0.5) < 0.01, `pendulum dwell: lean .8 → ${(up * 100).toFixed(1)} % high, −.8 → ${(dn * 100).toFixed(1)} %, 0 → ${(mid * 100).toFixed(1)} %`);
+  for (const lean of [-1, -0.5, 0.5, 1]) { const y = take({ shape: 7, rate: 3, lean }, 3); ok(Math.min(...y) >= -1 - 1e-12 && Math.max(...y) <= 1 + 1e-12, `pendulum lean ${lean}: within −1…1`);
+    let back = 0; for (let k = 1; k < 1000; k++) { const a = k / 1000, b0 = 0.6 * lean, w = (x) => x + b0 * (Math.cos(2 * Math.PI * x) - 1) / (2 * Math.PI); if (w(a) < w((k - 1) / 1000)) back++; } ok(back === 0, `pendulum lean ${lean}: time never runs back`); }
+  ok(Math.abs(pendulumAt(0.25, 0) - 1) < 1e-12, 'pendulumAt exported, same law');
+  console.log(`✓ lfo 1.1.0 pendulum: ${n} checks in all`); }

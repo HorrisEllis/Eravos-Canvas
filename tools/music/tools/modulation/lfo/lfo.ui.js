@@ -39,9 +39,9 @@ OrganismFactory.reg('eravos.lfo', function (view) {
   view.observe('kernel:wire-registered', refreshTargets); view.observe('kernel:wire-removed', refreshTargets); refreshTargets();
   view.root.append(
     h('div', { class: 'org-row', style: { justifyContent: 'space-between' } }, [UI.presetBar(view), UI.paramControl(view, cfg('polarity')).el]),
-    UI.paramControl(view, cfg('shape'), { segMax: 8 }).el, cv, ed,
+    UI.paramControl(view, cfg('shape'), { segMax: 9 }).el, cv, ed,
     h('div', { class: 'org-row', style: { marginTop: '6px', flexWrap: 'wrap', gap: '6px' } }, [syncT.el, div.el, rate.el]),
-    UI.paramPanel(view, ['depth', 'offset', 'phase', 'retrigger', 'fade'], { flat: true, noTitles: true, size: 30 }),
+    UI.paramPanel(view, ['depth', 'offset', 'phase', 'lean', 'retrigger', 'fade'], { flat: true, noTitles: true, size: 30 }),
     targets,
   );
 });

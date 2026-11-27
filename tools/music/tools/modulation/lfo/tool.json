@@ -1,7 +1,7 @@
 {
   "schema": "eravos.tool/1",
   "id": "eravos.lfo",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "label": "LFO",
   "icon": "〰",
   "accent": "#aa44ff",
@@ -92,6 +92,7 @@
     "eravos.reese-bass",
     "eravos.retro-dco",
     "eravos.retro-poly",
+    "eravos.ripple",
     "eravos.sample-player",
     "eravos.sidechain-compressor",
     "eravos.song-recorder",

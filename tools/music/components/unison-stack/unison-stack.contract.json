@@ -1,7 +1,7 @@
 {
  "schema": "eravos.component-contract/1",
  "id": "unison-stack",
- "version": "1.0.0",
+ "version": "1.1.0",
  "domain": "music",
  "kind": "logic",
  "kernel": "MusicParts.UnisonStack",
@@ -83,6 +83,15 @@
    "default": 1,
    "role": "seed",
    "integer": true
+  },
+  {
+   "key": "hz",
+   "type": "number",
+   "min": 0,
+   "max": 24,
+   "default": 0,
+   "role": "pitch",
+   "unit": "Hz"
   }
  ],
  "element": {
@@ -122,6 +131,11 @@
     "key": "seed",
     "role": "seed",
     "face": false
+   },
+   {
+    "key": "hz",
+    "role": "pitch",
+    "face": true
    }
   ],
   "needs_ui": [

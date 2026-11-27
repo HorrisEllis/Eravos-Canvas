@@ -87,6 +87,40 @@
                           "trap"
                         ]
                       },
+                      "songShape": {
+                        "enum": [
+                          "from the words",
+                          "every stanza a verse"
+                        ]
+                      },
+                      "depth": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "dims": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "tension": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "expr": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "piano": {
+                        "type": "boolean"
+                      },
+                      "contrast": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
                       "_react": {},
                       "tempoX": {
                         "enum": [

@@ -49,3 +49,17 @@ ok(U.layout(0, 1, 2, 1, 1, 0, 0).count === 1 && U.layout(40, 1, 2, 1, 1, 0, 0).c
 // ---- no allocation per layout (the same arrays every call)
 { const a = U.layout(5, 1, 2, 1, 1, 0, 0).cents, b = U.layout(9, 0.2, 0, 0.1, 0.3, 2, 9).cents; ok(a === b, 'layout reuses its arrays'); }
 console.log(`unison-stack: ${n} checks pass`);
+// ---- 1.1.0 hz: the outer two voices exactly hz apart, the rest linear between; 0 / left out = 1.0.0 exactly
+{ const { UnisonStack: U2 } = createRequire(import.meta.url)('./unison-stack.js');
+  const a = U2(), b = U2(); let m = 0; const chk = (c, msg) => { m++; if (!c) { console.error('FAIL: ' + msg); process.exit(1); } };
+  for (const nv of [1, 2, 3, 7, 16]) { const A = a.layout(nv, 0.4, 2, 0.7, 0.5, 2, 9), snap = ['cents', 'pan', 'gain', 'gainL', 'gainR', 'phase'].map(k => Array.from(A[k]).join());
+    const B = b.layout(nv, 0.4, 2, 0.7, 0.5, 2, 9, 0); chk(['cents', 'pan', 'gain', 'gainL', 'gainR', 'phase'].every((k, i) => Array.from(B[k]).join() === snap[i]) && Array.from(B.offsetHz).every(v => v === 0), `hz 0 = 1.0.0 (${nv} voices)`); }
+  const L = a.layout(2, 0, 2, 0.5, 0.5, 1, 0, 1.6); chk(Math.abs((L.offsetHz[1] - L.offsetHz[0]) - 1.6) < 1e-12, 'two voices 1.6 Hz apart');
+  const L7 = a.layout(7, 0, 2, 0.5, 0.5, 1, 0, 6); chk(Math.abs(L7.offsetHz[6] - L7.offsetHz[0] - 6) < 1e-12 && Math.abs(L7.offsetHz[3]) < 1e-12 && Math.abs(L7.offsetHz[1] - L7.offsetHz[0] - 1) < 1e-12, '7 voices: 6 Hz outer, centre 0, 1 Hz steps');
+  // beating, measured: two sines 49 and 50.6 Hz summed — the envelope's period is 1/1.6 s (±1 %)
+  const SR = 8000, N = SR * 5, y = new Float64Array(N); const L2 = a.layout(2, 0, 2, 0, 0.5, 1, 0, 1.6);
+  for (let i = 0; i < N; i++) y[i] = Math.sin(2 * Math.PI * (49.8 + L2.offsetHz[0]) * i / SR) + Math.sin(2 * Math.PI * (49.8 + L2.offsetHz[1]) * i / SR);
+  const win = Math.round(SR / 49.8), env = []; for (let i = 0; i + win < N; i += win) { let mx = 0; for (let j = 0; j < win; j++) mx = Math.max(mx, Math.abs(y[i + j])); env.push(mx); }
+  const mins = []; for (let i = 1; i < env.length - 1; i++) if (env[i] < env[i - 1] && env[i] <= env[i + 1] && env[i] < 0.5) mins.push(i * win / SR);
+  const per = (mins[mins.length - 1] - mins[0]) / (mins.length - 1); chk(Math.abs(per - 1 / 1.6) / (1 / 1.6) < 0.01, `beat period ${per.toFixed(4)} s vs ${(1 / 1.6).toFixed(4)} s`);
+  console.log(`✓ unison-stack 1.1.0 hz: ${m} checks`); }

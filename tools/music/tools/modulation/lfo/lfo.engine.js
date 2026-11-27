@@ -6,8 +6,10 @@
   'use strict';
   const S = OrganismSDK.STD;
   const DIVS = ['4/1', '2/1', '1/1', '1/2', '1/4', '1/4t', '1/8', '1/8t', '1/16', '1/32'];
-  function shapeFn(shape, custom) {
+  function shapeFn(shape, custom, lean) {
     switch (shape) {
+      // 3.239 the pendulum (components/lfo 1.1.0): a swing that lingers high (lean > 0) or low (lean < 0); lean 0 is the sine
+      case 'pendulum': return (p) => MusicParts.LFO_PENDULUM(p, lean || 0);
       case 'sine': return (p) => Math.sin(2 * Math.PI * p);
       case 'triangle': return (p) => p < 0.25 ? 4 * p : p < 0.75 ? 2 - 4 * p : 4 * p - 4;
       case 'square': return (p) => p < 0.5 ? 1 : -1;
@@ -20,14 +22,15 @@
   // the drawn cycle → PeriodicWave + DC: the shared part (components/wave-table); this tool keeps its own 33 harmonics and degrees
   function makeWave(ac, fn, phaseDeg) { return MusicParts.periodicWave(ac, fn, { phase: (phaseDeg || 0) / 360, harmonics: 33 }); }
   OrganismFactory.define({
-    id: 'eravos.lfo', domain: 'music', version: '2.0.0', label: 'LFO', icon: '〰', accent: '#aa44ff', phase: 'P5',
+    id: 'eravos.lfo', domain: 'music', version: '2.1.0', label: 'LFO', icon: '〰', accent: '#aa44ff', phase: 'P5',
     category: 'Modulation', blurb: 'Makes any knob move in time with the beat — drag its violet dot onto a violet input.',
     size: { w: 480, h: 520 }, minSize: { w: 340, h: 300 },
     permissions: ['audio_out', 'bus_publish', 'bus_subscribe', 'registry_read'],
     provides: ['capability.lfo'],
     hooks: [S.mod_out('lfo.hook.mod_out', 'out'), S.transport_in('lfo.hook.transport_in'), S.mod_in('lfo.hook.mod_depth', 'depth')],
     config: [
-      { key: 'shape', type: 'enum', options: ['sine', 'triangle', 'square', 'saw', 'ramp', 'sh', 'smooth', 'custom'], default: 'sine', label: 'Shape', group: 'SHAPE' },
+      { key: 'shape', type: 'enum', options: ['sine', 'triangle', 'square', 'saw', 'ramp', 'sh', 'smooth', 'custom', 'pendulum'], default: 'sine', label: 'Shape', group: 'SHAPE' },
+      { key: 'lean', type: 'number', default: 0, min: -1, max: 1, step: 0.01, label: 'Lean', group: 'SHAPE', hint: 'Pendulum: > 0 lingers high, < 0 lingers low' },
       { key: 'sync', type: 'boolean', default: true, label: 'Sync', group: 'RATE' },
       { key: 'div', type: 'enum', options: DIVS, default: '1/4', label: 'Division', group: 'RATE' },
       { key: 'rate', type: 'number', default: 2, min: 0.01, max: 40, step: 0.01, unit: 'Hz', label: 'Rate', group: 'RATE' },
@@ -62,8 +65,8 @@
         off.offset.setTargetAtTime(P.get('offset') + c * d + dc * d * k, t, 0.005);
       }
       function wave() {
-        const key = P.get('shape') + ':' + P.get('phase') + ':' + (P.get('shape') === 'custom' ? P.get('custom').join(',') : '');
-        if (!waveCache[key]) waveCache[key] = makeWave(ac, shapeFn(P.get('shape'), P.get('custom')), P.get('phase'));
+        const key = P.get('shape') + ':' + P.get('phase') + ':' + (P.get('shape') === 'custom' ? P.get('custom').join(',') : '') + (P.get('shape') === 'pendulum' ? ':' + P.get('lean') : '');
+        if (!waveCache[key]) waveCache[key] = makeWave(ac, shapeFn(P.get('shape'), P.get('custom'), P.get('lean')), P.get('phase'));
         return waveCache[key];
       }
       function restart(t) {
@@ -77,7 +80,7 @@
       }
       ctx.restart = restart;
       restart(ac.currentTime); applyLevels();
-      ['shape', 'phase', 'custom'].forEach(k => P.onChange(k, () => { restart(ac.currentTime); applyLevels(); ctx.syncUI(); }));
+      ['shape', 'phase', 'custom', 'lean'].forEach(k => P.onChange(k, () => { restart(ac.currentTime); applyLevels(); ctx.syncUI(); }));
       ['depth', 'offset', 'polarity'].forEach(k => P.onChange(k, () => applyLevels()));
       ['sync', 'div', 'rate'].forEach(k => P.onChange(k, () => { if (osc) { osc.frequency.cancelScheduledValues(ac.currentTime); osc.frequency.value = freq(); } }));
       let bpmPending = false; ctx.onBpm(() => { bpmPending = true; });
@@ -112,7 +115,7 @@
         }
       }, 25);
       ctx.onUI('custom_shape', { type: 'object', required: ['points'] }, (p) => { if (!Array.isArray(p.points) || p.points.length !== 16) return ctx.fault('RUNTIME_002', 'custom_shape needs 16 points'); P.set('custom', p.points.map(v => Math.max(-1, Math.min(1, +v || 0)))); P.set('shape', 'custom'); });
-      ctx.shapeAt = (p) => shapeFn(P.get('shape'), P.get('custom'))(((p + P.get('phase') / 360) % 1 + 1) % 1);
+      ctx.shapeAt = (p) => shapeFn(P.get('shape'), P.get('custom'), P.get('lean'))(((p + P.get('phase') / 360) % 1 + 1) % 1);
       ctx.freq = freq;
       ctx.stateExtra = () => ({ freq: freq() });
       return {};
