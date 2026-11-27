@@ -282,7 +282,7 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
   }
   // which tool each slot comes from → the plan. src: { voice: { h, part? }, … } (h: a tool's handle; part: the box picked, if one was)
   function planOf(srcs, bpm, opts) {
-    const TB = root.ToolBlend, from = {}; SLOTS_ORDER.forEach(sl => { from[sl] = { id: srcs[sl].h.id, params: TB.paramsOf(srcs[sl].h.instanceId) }; });
+    const TB = root.ToolBlend, from = {}; SLOTS_ORDER.forEach(sl => { from[sl] = { id: srcs[sl].h.id, params: srcs[sl].h.virtual ? srcs[sl].h.params : TB.paramsOf(srcs[sl].h.instanceId) }; });
     let settings = TB.combineFrom(from, from.voice, bpm); if (!settings) return null;
     settings = tweak(settings, opts && opts.tweak);
     const rows = SLOTS_ORDER.map(sl => { const own = TB.slots(srcs[sl].h.id, from[sl].params, bpm), has = own && own[sl] && Object.keys(own[sl]).length;
@@ -293,7 +293,7 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
     // 3.230 what it will sound like: each place's character from the tool it comes from (ToolBlend.sound) — "wobble synthwave"
     const character = TB.sound ? TB.sound(SLOTS_ORDER.map(sl => ({ slot: sl, id: srcs[sl].h.id, label: srcs[sl].h.def.label, char: (srcs[sl].h.def.made || {}).character })), settings) : null;
     rows.forEach(rw => { const ch = TB.character && (TB.character(srcs[rw.slot].h.id) || (srcs[rw.slot].h.def.made || {}).character); if (ch && ch[rw.slot]) rw.char = ch[rw.slot] + ' · ' + ch.style; });
-    return { rows, behind, settings, character, tools: tools.map(h => h.def.label), insts: tools.map(h => h.instanceId) };
+    return { rows, behind, settings, character, into: (opts && opts.into) || null, tools: tools.map(h => h.def.label), insts: tools.map(h => h.instanceId).filter(Boolean) };
   }
   const SLOTS_ORDER = ['voice', 'wobble', 'mouth', 'drive', 'fx'];
   function reasonFor(j, plan, ctx) {   // ctx: { parts: [{ x, h, to }], base: handle, pair: bool }
@@ -370,6 +370,12 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
     const count = new Map(); usable.forEach(o => count.set(o.h, (count.get(o.h) || 0) + 1));
     const rest = opts && opts.restFrom && F.handle(opts.restFrom), base = rest && TB.has(rest.id) ? rest : [...count.entries()].sort((a, b) => b[1] - a[1])[0][0];
     const srcs = {}; SLOTS_ORDER.forEach(sl => { srcs[sl] = { h: base }; }); usable.forEach(o => { srcs[o.to] = { h: o.h, part: o.x }; });
+    // 3.238 opts.into: a style — every place not picked comes from the tool that carries that style there (on the canvas or not: read from its
+    // own defaults, nothing spawned); a place that style has no tool for stays with the base
+    if (opts && opts.into && TB.styleSource) { const picked = new Set(usable.map(o => o.to));
+      SLOTS_ORDER.forEach(sl => { if (picked.has(sl)) return; const id = TB.styleSource(opts.into, sl); if (!id) return;
+        const live = [...count.keys()].find(h => h.id === id) || (rest && rest.id === id ? rest : null);
+        srcs[sl] = { h: live || { id, instanceId: null, virtual: true, def: F.def(id), params: TB.defaultsOf(id) }, style: opts.into }; }); }
     Object.keys((opts && opts.override) || {}).forEach(sl => { const h = F.handle(opts.override[sl]); if (h && TB.has(h.id) && srcs[sl]) srcs[sl] = { h }; });   // 3.226 a place taken from another tool (a fix from the card)
     return { parts, usable, left, base, srcs };
   }
@@ -400,7 +406,8 @@ registerProcessor('eravos-assembled', EravosWobbleBuilder);`].join('\n');
     return true;
   };
   Model.stopHearing = () => { if (hearing) { try { hearing.stop(); } catch (e) {} hearing = null; } };
-  if (root.PartExchange) Object.assign(root.PartExchange, { synthesize: Model.synthesize, synthesizeParts: Model.synthesizeParts, previewParts: Model.previewParts, previewPair: Model.previewPair, planPair: Model.planPair, planParts: Model.planParts, fits: Model.fits, hear: Model.hear, stopHearing: Model.stopHearing });   // the board finds it on the exchange the music domain hands it
+  Model.styles = () => (root.ToolBlend && root.ToolBlend.styles ? root.ToolBlend.styles() : []);
+  if (root.PartExchange) Object.assign(root.PartExchange, { styles: Model.styles, synthesize: Model.synthesize, synthesizeParts: Model.synthesizeParts, previewParts: Model.previewParts, previewPair: Model.previewPair, planPair: Model.planPair, planParts: Model.planParts, fits: Model.fits, hear: Model.hear, stopHearing: Model.stopHearing });   // the board finds it on the exchange the music domain hands it
 
   // ---------------------------------------------------------------- 3.231 A MADE TOOL IS HIS TO KEEP, NAME, CHANGE OR THROW AWAY (his words, 2026-11-26:
   // "need to be able to delete custom tools. rename them. open them in workshop and edit them fully."). Every change is kept with the tool

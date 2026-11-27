@@ -1,4 +1,4 @@
-# spec_id: eravos.tension-field · version 1.0.0 · status built (3.243, 2026-11-27) · template eravos.tool/1
+# spec_id: eravos.tension-field · version 1.0.0 · status built (3.246, 2026-11-27) · template eravos.tool/1
 # planned as tools/music/planned/tension-field.spec (its modes measure · map · target and its seven packs kept); built for the Contrast setup
 # his words (2026-11-27): "the way it creates ripples and tension" · "tension, oscillations. wavelengths, emergence." · "actually continue with
 #   the tensino field then release first."

@@ -1,4 +1,4 @@
-# spec_id: eravos.band-collision · version 1.0.0 · status built (3.240, 2026-11-27) · template eravos.tool/1
+# spec_id: eravos.band-collision · version 1.0.0 · status built (3.243, 2026-11-27) · template eravos.tool/1
 # his words (2026-11-27): "the frequencies how the collide" · "Okay but not one monolith" · "tool suite, each tool, then each component for each
 #   tool" · "yes build them use the null renderer to make sure its novel in relation to the rest of eravos"
 # direction: specs/eravos.contrast-space.spec ADDENDUM 2026-11-27 (2) — one tool of the Contrast setup; research docs/research/rumble-techniques.md (methods 3, 4)

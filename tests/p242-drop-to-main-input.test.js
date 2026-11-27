@@ -1,4 +1,4 @@
-/* P242 · a wire dropped on a window lands on the input that moves its sound (3.242) — his words (2026-11-27): "also some of the tools wont connect
+/* P242 · a wire dropped on a window lands on the input that moves its sound (3.245) — his words (2026-11-27): "also some of the tools wont connect
  * and route audio. like the wub tools wire but don't route." Measured before: Wub Rate (or any LFO) dropped on Wub Filter's window went to its
  * Mix (the shared effect input listed first) — the wire drew, the filter never moved. Now a tool marks its main input (primary) and the shared
  * Mix is secondary; a drop takes the main one. A drop exactly on a dot still takes that dot. */

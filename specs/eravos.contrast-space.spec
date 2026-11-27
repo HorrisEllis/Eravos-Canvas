@@ -37,7 +37,7 @@
   One tool, isolated, deletable whole (2026-11-24). Holds only components; nothing in it names another tool.
 
 ## phases (depends_on in [ ]; each new component proves its own numbers in a node test first; the UI is shown before it merges)
-  CS0  [ ]          this spec, the research, the preview, his words mapped ................................................ DONE 3.238
+  CS0  [ ]          this spec, the research, the preview, his words mapped ................................................ DONE 3.241
   CS1  [CS0]        unison-stack + oscillator-population: detune in Hz (a "Hz" unit beside cents; 0 Hz = today, bit-identical) — test: two
                     voices at 49 / 50.6 Hz, the envelope's period measured 1/1.6 s ± 1 %
   CS2  [CS0]        lfo: the "pendulum" shape (a swing with gravity: slower at the ends, faster through the middle; Lean = an asymmetry) —
@@ -82,14 +82,14 @@ NEXT: Ripple bottom up — unison-stack Hz (test) → the tool's engine → pict
 
 ADDENDUM 2026-11-27 (3) — built (the originals above kept verbatim)
 his words (verbatim): "yes build them use the null renderer to make sure its novel in relation to the rest of eravos" · "Continue."
-BUILT 3.239 Ripple (tools/music/tools/bass/ripple) on unison-stack 1.1 (Hz) + saturator-tube; the LFO tool's Pendulum on lfo 1.1 — CS1, CS2 done.
-BUILT 3.240 Collision (tools/music/tools/effects/band-collision) on multiband-splitter, envelope-follower, masking-analyzer (all new) — CS3 done
+BUILT 3.242 Ripple (tools/music/tools/bass/ripple) on unison-stack 1.1 (Hz) + saturator-tube; the LFO tool's Pendulum on lfo 1.1 — CS1, CS2 done.
+BUILT 3.243 Collision (tools/music/tools/effects/band-collision) on multiband-splitter, envelope-follower, masking-analyzer (all new) — CS3 done
   (the per-band duck keyed by audio; the ducker component as specced — a triggered shape extracted from Sidechain — stays open).
 MEASURED: null render of the tools whose components changed (Retro DCO, Swarm, Piano: unchanged); novelty gate on every new preset (Ripple 8/8
   novel; Collision 4 novel · 2 close (Channel, different role) · 0 twin — keyed effects measured with a kick in their key, survey.key).
 NEXT (the setup's other tools): Spatial Organism (CS4: panner + early-reflections, built from their specs) → Tension Field (CS5: tension-meter)
   → Swarm's Emergence card (CS6) → the Contrast setup (Start › SETUPS, the tools wired) → the voice (CS7, Voice Lab).
-BUILT 3.241 Spatial Organism (tools/music/tools/effects/spatial-organism) on panner + early-reflections (new), lfo, stereo-tools — CS4 done.
+BUILT 3.244 Spatial Organism (tools/music/tools/effects/spatial-organism) on panner + early-reflections (new), lfo, stereo-tools — CS4 done.
   Novelty 5 novel · 2 close · 1 twin (Narrow Pressure, by design near-transparent; the survey is mono). Next: Tension Field (CS5) → Swarm's
   Emergence card (CS6) → the Contrast setup → the voice (CS7).
-BUILT 3.243 Tension Field (tools/music/tools/modulation/tension-field) on tension-meter + energy-curve (new) — CS5 done. Next (his order, 2026-11-27): the release, then the lowercase text, the icons, his lyrics with the piano.
+BUILT 3.246 Tension Field (tools/music/tools/modulation/tension-field) on tension-meter + energy-curve (new) — CS5 done. Next (his order, 2026-11-27): the release, then the lowercase text, the icons, his lyrics with the piano.

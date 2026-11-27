@@ -235,6 +235,8 @@
       out.push({ label: '◆ Synthesize ' + (list.length === 1 ? 'this part' : 'these ' + list.length + ' parts') + ' into one tool', hint: 'each part takes its place in one new tool; the rest from the tool most of them came from — checked: it plays, it is no twin', run: () => synthesizeSel() });
       // 3.217 where the rest comes from is his to say: each tool blown up on the canvas (his: "combine the sound of retro dcs with the rest of wobble bass")
       [...open.keys()].filter(i => rec(i) && exchange.has(rec(i).id)).forEach(i => out.push({ label: '◆ … the rest from ' + rec(i).def.label, hint: 'the parts you picked, and everything else from ' + rec(i).def.label, run: () => synthesizeSel({ restFrom: i }) }));
+      // 3.238 into a style: the parts he picked, everything else from the tools that carry that style (the styles are the exchange's words)
+      if (exchange.styles) exchange.styles().forEach(st => out.push({ label: '◆ … into ' + st, hint: 'the parts you picked, and every other place from what carries ' + st + ' — the tools need not be on the canvas', run: () => synthesizeSel({ into: st }) }));
     }
     if (comps.some(o => o.x.socket)) out.push({ label: '⚄ Mutate only these parts', hint: 'another component in each, its own settings fresh — nothing else moves', run: () => comps.filter(o => o.x.socket).forEach(o => mutatePart(o.inst, o.x)) });
     if (comps.some(o => partIn(o.inst, o.x).clearable)) out.push({ label: '✕ Remove these parts', hint: 'Delete — each box empty again, or back to its tool\'s own part', run: () => removeSel() });

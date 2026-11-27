@@ -7,7 +7,7 @@
   - ANSWERED: docs/research/rumble-techniques.md — the record's methods (beating, intermodulation, sub vs mid, the low end shared in time,
     pitch dives, kick rolls, negative space, the voice as rhythm, space by band, tension held and released), known / heard / uncertain kept
     apart, techniques only, the voice a made character (not a person's).
-  - PREVIEW (shown first, silent) 3.238: seven UI elements for components — RIPPLE, WAVELENGTH, COLLISION, SPACE, PENDULUM, TENSION,
+  - PREVIEW (shown first, silent) 3.241: seven UI elements for components — RIPPLE, WAVELENGTH, COLLISION, SPACE, PENDULUM, TENSION,
     EMERGENCE — on a proposed spatial tool, Contrast Space. docs/previews/contrast-space-preview.png, contrast-space-moved.png.
   - SPECCED: specs/eravos.contrast-space.spec (CS0–CS9, a graph) · tools/music/planned/contrast-space.spec (its DAG generated).
   - OPEN (his): the preview yes / changes · Contrast Space a tool of its own, or the elements only on existing tools · CS1 + CS2 first?

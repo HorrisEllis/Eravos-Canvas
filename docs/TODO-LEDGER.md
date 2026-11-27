@@ -109,14 +109,14 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 
 | # | What | His words (2026-11-27) | State |
 |---|---|---|---|
-| T-94 | **The preview of the seven component UI elements** (RIPPLE · WAVELENGTH · COLLISION · SPACE · PENDULUM · TENSION · EMERGENCE) on Contrast Space — his yes or changes. | "i want a bunch of spacial tools and ui elements for components. tension, oscillations. wavelengths, emergence." | preview shown (3.238) — waiting (his yes) |
-| T-95 | **Ripples**: detune in Hz on unison-stack and oscillator-population (CS1); the pendulum LFO shape (CS2) — also Wobble Bass's contrast (T-91). | "the way it creates ripples and tension" | **built** 3.239 (Ripple; LFO Pendulum) — confirm by ear |
-| T-96 | **Collisions and space**: masking-analyzer, per-band ducker, panner, early-reflections built (CS3, CS4); Contrast Space the tool (CS9). | "the frequencies how the collide" | collisions **built** 3.240 (Collision); space **built** 3.241 (Spatial Organism); CS9 withdrawn (a setup instead) |
-| T-97 | **Tension and emergence** as signals: tension-meter (CS5), agreement (sync) out of oscillator-population + relationship-graph (CS6); silence and release in the song engine (CS8). | "tension, oscillations. wavelengths, emergence." | tension **built** 3.243 (Tension Field); emergence, CS8 open |
+| T-94 | **The preview of the seven component UI elements** (RIPPLE · WAVELENGTH · COLLISION · SPACE · PENDULUM · TENSION · EMERGENCE) on Contrast Space — his yes or changes. | "i want a bunch of spacial tools and ui elements for components. tension, oscillations. wavelengths, emergence." | preview shown (3.241) — waiting (his yes) |
+| T-95 | **Ripples**: detune in Hz on unison-stack and oscillator-population (CS1); the pendulum LFO shape (CS2) — also Wobble Bass's contrast (T-91). | "the way it creates ripples and tension" | **built** 3.242 (Ripple; LFO Pendulum) — confirm by ear |
+| T-96 | **Collisions and space**: masking-analyzer, per-band ducker, panner, early-reflections built (CS3, CS4); Contrast Space the tool (CS9). | "the frequencies how the collide" | collisions **built** 3.243 (Collision); space **built** 3.244 (Spatial Organism); CS9 withdrawn (a setup instead) |
+| T-97 | **Tension and emergence** as signals: tension-meter (CS5), agreement (sync) out of oscillator-population + relationship-graph (CS6); silence and release in the song engine (CS8). | "tension, oscillations. wavelengths, emergence." | tension **built** 3.246 (Tension Field); emergence, CS8 open |
 | T-99 | **No lowercase**: every label, hint, readout and summary starts with a capital (sentence case) — the new tools first, then all. | "als ostop with the lowercase." | open (after the release) |
 | T-100 | **No cheap icons**: the new tools' glyph icons (≈ ⨯ ◎ T) replaced by real drawn icons like the rest. | "and cheap icons." | open (after the release) |
 | T-101 | **Make music from his lyrics, with the Piano** he loves (Lyrics → Rhythm's song). | "Still feel like i want to make music with this. using my lyrics. i love the piano its beautiful look at it." | open |
-| T-102 | **The wub tools route** (3.242). | "like the wub tools wire but don't route." | **built** — confirm on his PC |
+| T-102 | **The wub tools route** (3.245). | "like the wub tools wire but don't route." | **built** — confirm on his PC |
 | T-98 | **The voice**: a made character (deep, dry, close, level) on Voice Lab's CREATE, or his own voice through the same chain (CS7) — never a copied person. | "voice, sounds, all of it." | open — after Voice Lab VL3 |
 
 ## Shipped, to confirm on his PC

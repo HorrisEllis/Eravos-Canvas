@@ -1,4 +1,4 @@
-# spec_id: eravos.spatial-organism · version 1.0.0 · status built (3.241, 2026-11-27) · template eravos.tool/1
+# spec_id: eravos.spatial-organism · version 1.0.0 · status built (3.244, 2026-11-27) · template eravos.tool/1
 # planned as tools/music/planned/spatial-organism.spec (its assembles, adds, modes and packs kept); built for the Contrast setup
 # his words (2026-11-27): "i want a bunch of spacial tools and ui elements for components" · "Okay but not one monolith" · "tool suite, each
 #   tool, then each component for each tool" · "yes build them use the null renderer to make sure its novel in relation to the rest of eravos"

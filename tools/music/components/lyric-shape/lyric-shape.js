@@ -1,4 +1,4 @@
-/* eravos.component.lyric-shape 1.2.0 — the shape of the words: where they push, where they rest, where they turn (3.228, 2026-11-25).
+/* eravos.component.lyric-shape 1.3.0 — the shape of the words: where they push, where they rest, where they turn (3.228, 2026-11-25).
  * His words (2026-11-25): "continue making more tools for eravos. i want to make music with contrast. thats my rhytm" · "i want to learn how
  * to make music from my lyrics. that is the point of the rhythm tool"
  * NEW code. It reads any lyrics (a blank line = a new stanza) and says, for each stanza, what its words already do — so the music can do it
@@ -15,6 +15,7 @@
  * pushed apart (0 = every stanza a verse, as before). Every choice comes with its reason in plain words (`why`).
  *   MusicParts.LyricShape.read(text, { contrast, syllables(line) → [{ stress }] }) → { stanzas: [...], arc: [kinds], lesson: [steps] }
  *   MusicParts.LyricShape.patterns(placedSyllables, { bars }) → { bars, words, mirror, shadow, pendulum: { bars, notes } } (1.1.0)
+ *   MusicParts.LyricShape.invariants(text | [texts], { by, hold }) → what stays the same in every stanza / piece, and what changes (1.3.0)
  * The word lists are data here and small on purpose (static earns its place): they only steer, they never decide alone. A component
  * imports no tool: the syllable counter is passed in (Lyrics → Rhythm's), with a plain vowel-group counter when it is not. */
 (function (root) {
@@ -135,7 +136,62 @@
       .concat(w2.map(n => ({ s: r3(2 * H - n.s - Math.min(n.l, H - n.s)), l: Math.min(n.l, H - n.s), stress: n.stress }))).sort((a, b) => a.s - b.s);
     return { bars, words, mirror, shadow, pendulum: { bars: half * 2, notes: pendulum } };
   }
-  const api = { read, patterns, clausesOf, whoAt, stanzasOf, plainSyllables, PAIRS, LIGHT, DARK, PUSH, version: '1.2.0' };
+  // ---------------------------------------------------------------- 1.3.0 INVARIANTS (3.239; his words, 2026-11-26: "Also what about the structure
+  // of my words? Like invariants?"). What stays the same — in every stanza of a piece, or in every piece of his — and what changes. Each
+  // invariant is a property measured on every unit (a stanza, or a whole piece when several are given), kept when it holds in ≥ `hold` of them
+  // (default 0.75), with how strongly (its share) and what the music can KEEP because of it; the properties that change most are the variants:
+  // what the music can CHANGE. Nothing is judged: the structure he writes in, measured.
+  //   LyricShape.invariants(textOrTexts, { by: 'stanza'|'piece', hold, syllables }) → { units, invariants: [{ key, what, holds, value, keep }], variants: [...] }
+  const SUBJECTS = { I: 'I', you: 'you', we: 'we' };
+  function frameOf(clauseWords) { return clauseWords.map(w => WHO[w] ? '·' : w).filter(w => !SMALL.has(w) || w === '·'); }
+  function parallel(lines) {   // two clauses, different speakers, the same frame: "I loved you with all of me. You loved the thought of me."
+    const cl = []; let carry = null;
+    lines.forEach(l => { const ws = words(l), c = clausesOf(l, carry); carry = c[c.length - 1].who; c.forEach((x, k) => cl.push({ who: x.who, ws: ws.slice(x.start, k + 1 < c.length ? c[k + 1].start : ws.length) })); });
+    let n = 0; for (let i = 1; i < cl.length; i++) { const a = cl[i - 1], b = cl[i]; if (a.who === b.who || a.who === 'none' || b.who === 'none') continue;
+      const fa = new Set(frameOf(a.ws)), fb = frameOf(b.ws), shared = fb.filter(w => w !== '·' && fa.has(w)).length; if (shared >= 1 && a.ws[0] !== b.ws[0]) n++; }
+    return n;
+  }
+  function unitFeatures(lines, syl) {
+    const per = lines.map(l => (syl(l) || []).length), mean = per.reduce((a, b) => a + b, 0) / (per.length || 1);
+    const sd = Math.sqrt(per.reduce((a, b) => a + (b - mean) * (b - mean), 0) / (per.length || 1)), ws = words(lines.join(' ')), t1 = ' ' + ws.join(' ') + ' ';
+    let carry = null; const whos = new Set(); lines.forEach(l => { const c = clausesOf(l, carry); carry = c[c.length - 1].who; c.forEach(x => whos.add(x.who)); });
+    const first = lines.map(l => words(l)[0]).filter(Boolean), top = first.reduce((m, w) => (m[w] = (m[w] || 0) + 1, m), {}), lead = Object.keys(top).sort((a, b) => top[b] - top[a])[0];
+    const lv = lines.map(l => { const w = words(l); return has(w, LIGHT) - has(w, DARK); }), half = Math.ceil(lv.length / 2);
+    const startV = lv.slice(0, half).reduce((a, b) => a + b, 0), endV = lv.slice(half).reduce((a, b) => a + b, 0);
+    return { lines: lines.length, perLine: +mean.toFixed(1), steady: mean ? sd / mean : 1, dialogue: whos.has('I') && whos.has('you'), speaker: whos.has('I') ? 'I' : whos.has('you') ? 'you' : whos.has('we') ? 'we' : 'none',
+      opposites: PAIRS.filter(([a, b]) => stemIn(t1, a) && stemIn(t1, b)).length, parallel: parallel(lines), anaphora: lead && first.length > 1 ? top[lead] / first.length : 0, lead,
+      shortEnd: per.length > 1 && per[per.length - 1] < mean * 0.8, turn: endV - startV, questions: lines.filter(l => /\?\s*$/.test(l)).length, both: has(ws, LIGHT) > 0 && has(ws, DARK) > 0 };
+  }
+  function invariants(input, o) {
+    o = o || {}; const syl = typeof o.syllables === 'function' ? o.syllables : plainSyllables, hold = o.hold === undefined ? 0.75 : +o.hold;
+    const texts = Array.isArray(input) ? input : [input], by = o.by || (texts.length > 1 ? 'piece' : 'stanza');
+    const units = by === 'piece' ? texts.map(t => stanzasOf(t).flat()) : stanzasOf(texts.join('\n\n'));
+    const F = units.filter(u => u.length).map(u => unitFeatures(u, syl)), n = F.length; if (!n) return { units: 0, invariants: [], variants: [] };
+    const share = (fn) => F.filter(fn).length / n, U = by === 'piece' ? 'piece' : 'stanza', every = (x) => x >= 0.999 ? 'every ' + U : Math.round(x * 100) + ' % of the ' + U + 's';
+    const vals = (k) => F.map(f => f[k]), avg = (k) => vals(k).reduce((a, b) => a + b, 0) / n;
+    const cv = (k) => { const m = avg(k), v = vals(k); return m ? Math.sqrt(v.reduce((a, b) => a + (b - m) * (b - m), 0) / n) / m : 0; };
+    const C = [
+      { key: 'dialogue', holds: share(f => f.dialogue), what: 'I and you, both', keep: 'call and answer in every part: "I" on the beat, "you" off it' },
+      { key: 'parallel', holds: share(f => f.parallel > 0), what: 'one frame said twice, the speaker swapped ("I loved … / You loved …")', keep: 'one motif played twice — the same rhythm, the answer in another register' },
+      { key: 'opposites', holds: share(f => f.opposites > 0 || f.both), what: 'light and dark together', keep: 'the turn inside every part: dark lines low and bare, light lines high and full' },
+      { key: 'speaker', holds: Math.max(...['I', 'you', 'we'].map(w => share(f => f.speaker === w))), value: ['I', 'you', 'we'].sort((a, b) => share(f => f.speaker === b) - share(f => f.speaker === a))[0], what: 'the same voice speaks first', keep: 'one lead voice through the song' },
+      { key: 'meter', holds: share(f => f.steady < 0.35), value: +avg('perLine').toFixed(1), what: 'lines of a steady length (about ' + avg('perLine').toFixed(0) + ' syllables)', keep: 'one bar per line, one groove under all of it' },
+      { key: 'shape', holds: cv('lines') < 0.2 ? 1 - cv('lines') : 0, value: Math.round(avg('lines')), what: 'the same number of lines (about ' + Math.round(avg('lines')) + ')', keep: 'every part the same length — the form is square' },
+      { key: 'anaphora', holds: share(f => f.anaphora >= 0.5), what: 'lines that start the same way', keep: 'the same pickup into every line' },
+      { key: 'resolve', holds: share(f => f.shortEnd), what: 'a shorter last line', keep: 'every part closes early: the last bar leaves space' },
+      { key: 'rise', holds: share(f => f.turn > 0), what: 'it ends lighter than it starts', keep: 'every part climbs: dark low at the start, the light at the top at the end' },
+      { key: 'fall', holds: share(f => f.turn < 0), what: 'it ends darker than it starts', keep: 'every part sinks: it starts open and ends low' },
+      { key: 'questions', holds: share(f => f.questions > 0), what: 'a question', keep: 'a phrase left open (it rises, unresolved) in every part' },
+    ].map(c => Object.assign(c, { holds: +c.holds.toFixed(2), where: every(c.holds) }));
+    const invariantsL = n < 2 ? [] : C.filter(c => c.holds >= hold).sort((a, b) => b.holds - a.holds);   // one unit proves nothing stays the same
+    const variants = [{ key: 'length', amount: +cv('perLine').toFixed(2), what: 'how long the lines are', change: 'the speed: more syllables a line, busier drums' },
+      { key: 'lines', amount: +cv('lines').toFixed(2), what: 'how many lines', change: 'how long each part is' },
+      { key: 'opposites', amount: +cv('opposites').toFixed(2), what: 'how many opposites', change: 'how hard the part turns' },
+      { key: 'turn', amount: +(Math.sqrt(vals('turn').reduce((a, b) => a + b * b, 0) / n)).toFixed(2), what: 'which way it turns', change: 'up or down, part by part' }]
+      .filter(v => v.amount >= 0.3 && !invariantsL.some(c => c.key === v.key)).sort((a, b) => b.amount - a.amount);
+    return { by, units: n, invariants: invariantsL, all: C, variants, features: F };
+  }
+  const api = { read, patterns, invariants, clausesOf, whoAt, stanzasOf, plainSyllables, PAIRS, LIGHT, DARK, PUSH, version: '1.3.0' };
   root.MusicParts = root.MusicParts || {};
   root.MusicParts.LyricShape = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

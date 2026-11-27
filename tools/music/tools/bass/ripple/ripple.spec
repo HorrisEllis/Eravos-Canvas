@@ -1,4 +1,4 @@
-# spec_id: eravos.ripple · version 1.0.0 · status built (3.239, 2026-11-27) · template eravos.tool/1
+# spec_id: eravos.ripple · version 1.0.0 · status built (3.242, 2026-11-27) · template eravos.tool/1
 # his words (2026-11-27): "the frequencies how the collide … the way it creates ripples and tension" · "Okay but not one monolith" · "needs an
 #   engine probably. look at the other tools. tool suite, each tool, then each component for each tool." · "yes build them use the null renderer
 #   to make sure its novel in relation to the rest of eravos"

@@ -157,7 +157,7 @@
     if (!lit && global.Shell && !dragging.quiet) global.Shell.toast(`Nothing on the canvas ${reverse ? 'can feed' : 'can take'} “${shortName(hook)}” yet — add something with a matching ${reverse ? 'output' : 'input'} (＋ Add).`, 'bad');
   }
   // a release over a window body (not exactly on a dot) connects to that window's MAIN lit port: one its tool marks primary, else the first
-  // lit one that is not marked secondary (a shared mix / trim input), else the first (3.242: a modulator dropped on an effect landed on its Mix —
+  // lit one that is not marked secondary (a shared mix / trim input), else the first (3.245: a modulator dropped on an effect landed on its Mix —
   // the wire drew, the sound never moved)
   function targetAt(x, y) {
     const el = doc.elementFromPoint(x, y); if (!el || !el.closest) return null;

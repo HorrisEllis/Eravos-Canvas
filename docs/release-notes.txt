@@ -1,3 +1,31 @@
+ERAVOS v0.2.41 (2026-11-27)
+
+Install: ERAVOS-Setup-0.2.41.exe from the release, or ERAVOS offers it by itself.
+
+- Four new tools for contrast, each its own tool with its own engine (Effects, Bass, Modulation):
+  - Ripple (Bass): a clean sub under a driven grind whose voices sit a few hertz apart, so the low end swells the same on every note. Dive
+    makes each note fall into its pitch. The swell goes out to move any other knob.
+  - Collision (Effects): wire a bass through it and a kick into its key — on every kick the low end steps back, the mid too if you want.
+    It shows, lit, where the two sounds fight for the same band.
+  - Spatial Organism (Effects): any sound placed around you by angle and distance (near is loud, bright and now; far is quiet, dark and
+    late), an orbit that swings or lingers on one side, a room that answers, Ears for headphones.
+  - Tension Field (Modulation): hears tension in any sound (loudness, brightness, density, motion), or builds it to a peak by a bar and
+    lets it go — at the end, on Release, or when anything pushes it. Every kind goes out to move any knob.
+- The LFO has a Pendulum shape: a swing that can linger high or low.
+- Wiring fixed: a wire dropped on a window now reaches the input that moves its sound. Wub Rate on Wub Filter reaches its Wub (it went to
+  the Mix, so the wub never moved), and any modulator dropped on an effect no longer lands on its Mix.
+
+ERAVOS v0.2.40 (2026-11-27)
+
+Install: ERAVOS-Setup-0.2.40.exe from the release, or ERAVOS offers it by itself.
+
+- Synthesize into a style: blow up any tool, pick its parts, right-click › ◆ … into dubstep (or synthwave, trance, ambient, lofi) — every
+  place you did not pick comes from what carries that style, even when that tool is not on the canvas.
+- Feelings › Across › Spectrum (a new choice; Colour stays the default): drag left to right through 19 harmonic spectra — the harmonic series,
+  stretched strings, bars, a church bell, a gamelan kettle, up to the irrational stacks (φ, √2, π/2, e/2), each from a published measurement;
+  the pad names where you are.
+- Feelings fits your screen: the window was taller than a laptop, so the bottom of the pad sat under the Song Recorder.
+
 ERAVOS v0.2.39 (2026-11-26)
 
 Install: ERAVOS-Setup-0.2.39.exe from the release, or ERAVOS offers it by itself.

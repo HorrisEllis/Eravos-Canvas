@@ -1,4 +1,4 @@
-// node docs/previews/collision.shots.mjs — Spatial Organism.s window in the real canvas (3.240): a saw through it, swinging (live).
+// node docs/previews/collision.shots.mjs — Spatial Organism.s window in the real canvas (3.243): a saw through it, swinging (live).
 import { chromium } from '../../host/driver/glass.js'; import path from 'path'; import { fileURLToPath } from 'url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'), OUT = ROOT + '/docs/previews';
 const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1000, height: 900 }, deviceScaleFactor: 2 });

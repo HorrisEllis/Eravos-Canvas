@@ -2,7 +2,9 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
-## 3.243 Tension Field: tension heard, built to a bar and released (2026-11-27)
+(3.241–3.246 were written as 3.238–3.243 on their branch and renumbered when merged with main: a parallel session had used 3.238–3.240.)
+
+## 3.246 Tension Field: tension heard, built to a bar and released (2026-11-27)
 His words: "actually continue with the tensino field then release first. then what i juts said"
 - Components (NEW, node-tested): tension-meter 1.0.0 (loudness −6 dB → 0.875; brightness finds a sine's frequency ±1 %; 6 hits/s → 0.75;
   a sweep of one octave a second → 0.38; 10 checks) · energy-curve 1.0.0 (linear / waits-then-rushes builds, releases at the hold's end or
@@ -15,7 +17,7 @@ His words: "actually continue with the tensino field then release first. then wh
   quarter; Both never below the build), boundary 10/10, design check 63/80 (no tool worse). A modulator: no audio out, so the audio survey and
   the novelty gate do not apply — it is measured by its outputs.
 
-## 3.242 A dropped wire takes the main input: the wub tools route (2026-11-27)
+## 3.245 A dropped wire takes the main input: the wub tools route (2026-11-27)
 His words: "also some of the tools wont connect and route audio. like the wub tools wire but don't route."
 - Measured: Wub Rate (or any modulator) dropped on Wub Filter's window landed on its Mix — the shared effect input listed first. The wire drew;
   the filter never moved. A drop on any effect did the same.
@@ -23,7 +25,7 @@ His words: "also some of the tools wont connect and route audio. like the wub to
   (WireSystem.mainTarget); a drop exactly on a dot still takes that dot. The shared effect Mix is secondary; Wub Filter's Wub input primary.
 - tests/p242 3/3 — fails on the old code (Mix chosen for Wub Filter and for Filter); boundary 10/10, P112 13/13, the wub suites 35/35.
 
-## 3.241 Spatial Organism: any sound placed around you, moved, in a room (2026-11-27)
+## 3.244 Spatial Organism: any sound placed around you, moved, in a room (2026-11-27)
 His words: "i want a bunch of spacial tools and ui elements for components" · "yes build them use the null renderer to make sure its novel in relation to the rest of eravos"
 - Components (NEW, node-tested): panner 1.0.0 (equal power; distance −18 dB at 1, 12 ms later, the air; ears: the far ear 0.66 ms later and
   shadowed — 6 kHz lost, 200 Hz kept; 12 checks) · early-reflections 1.0.0 (12 shoebox echoes: first at pre-delay + 0.27·size/343 to a sample,
@@ -37,7 +39,7 @@ His words: "i want a bunch of spacial tools and ui elements for components" · "
 - Tests: contract 4/4, P241 4/4 (rest = an equal-power centre ±0.1 dB, side untouched; angle 1 silences the left; distance 1 −18 dB ±1.2; the
   pendulum leaning right sounds right > 60 % of the time; the room after the sound; bass mono), boundary 10/10, design check 62/79 (no tool worse).
 
-## 3.240 Collision: where two sounds fight for one band, one steps back (2026-11-27)
+## 3.243 Collision: where two sounds fight for one band, one steps back (2026-11-27)
 His words: "yes build them use the null renderer to make sure its novel in relation to the rest of eravos" · "Continue."
 - Components (NEW, each proving its numbers in node): multiband-splitter 1.0.0 (LR4 2/3 bands; −6.02 dB at the crossover, sums flat ±0.05 dB
   30 Hz–15 kHz, −24.6 / −48.2 dB at one / two octaves; 21 checks) · envelope-follower 1.0.0 (attack to 63 % in 10 ms ±0.5, release + hold,
@@ -53,7 +55,7 @@ His words: "yes build them use the null renderer to make sure its novel in relat
 - Tests: contract 4/4, P240 4/4 (the split sums flat at 40 / 110 / 2000 Hz ±0.1 dB; the low ducks −12 dB ±2 on a kick and comes back; the mid
   stays; Low mono), boundary 10/10, no-toys, design check 61/78 (no tool worse), 200 manifests valid. Picture: docs/previews/collision-window.png.
 
-## 3.239 Ripple: the rumble as a tool of its own; unison-stack 1.1 (Hz), lfo 1.1 (pendulum), the LFO tool's Pendulum (2026-11-27)
+## 3.242 Ripple: the rumble as a tool of its own; unison-stack 1.1 (Hz), lfo 1.1 (pendulum), the LFO tool's Pendulum (2026-11-27)
 His words: "yes build them use the null renderer to make sure its novel in relation to the rest of eravos"
 - unison-stack 1.1.0: detune in HERTZ (offsetHz: the outer two voices Hz apart — the swell rate the same on every note); 0 = 1.0.0 exactly;
   the beat period measured within 1 %. lfo 1.1.0: the pendulum (lean > 0 lingers high, < 0 low; 0 = the sine exactly; time never runs back).
@@ -64,7 +66,7 @@ His words: "yes build them use the null renderer to make sure its novel in relat
 - Tests: contract 4/4, P239 6/6 (the swell at Beat Hz on two notes, the sub untouched by Drive −60 dB, Drive grinds, Dive lands), P130, P163
   34/34, boundary, no-toys, design check 60/77. Pictures: docs/previews/ripple-window.png, ripple-window-depth.png.
 
-## 3.238 Contrast: the methods of a record, seven UI elements for components, Contrast Space specced (2026-11-27)
+## 3.241 Contrast: the methods of a record, seven UI elements for components, Contrast Space specced (2026-11-27)
 His words: "look at the song rumble by skrillex. the frequencies how the collide. look deeply into the methods. the way it creates ripples and tension. i want to be able to create what that song does. voice, sounds, all of it. like the contrast is where its at. like i want a bunch of spacial tools and ui elements for components. tension, oscillations. wavelengths, emergence."
 - Research (techniques only): docs/research/rumble-techniques.md — beating (two notes Δ Hz apart swell Δ times a second; < 7 Hz a swell, above a
   growl), intermodulation under drive, sub vs mid as two parts, the low end shared in time, pitch dives, kick rolls, negative space, the voice
@@ -77,6 +79,19 @@ His words: "look at the song rumble by skrillex. the frequencies how the collide
   its block written by `node build/spec-dag.mjs` for this file only. Found: a full run of spec-dag drops anything written BELOW its generated
   block (lyric-rhythm.spec's two addenda of 2026-11-25), so its other changes were not kept; the fix is queued), the session map, HIS-WORDS-MAP N-X162, TODO T-94 … T-98, R-2026-11-27-119.
 - Nothing sounds yet; capability first — no "Rumble" preset or song is hand-built.
+## 3.238–3.240 Into a style; invariants of his words; Feelings across the spectrum (2026-11-26)
+His words: "Like imagine being able to synthesize anything into a dubstep tool." · "Also what about the structure of my words? Like invariants?" ·
+"Different harmonic and irrational frequencies, look at all domains, theories, research all music with any validtity or integrity or epistemic backing. Like the full spectrum. Like moving across the screen."
+- 3.238 INTO A STYLE: ToolBlend.styles() / styleSource(style, slot); synthesizeParts(list, { into }) — every place not picked from the tool that
+  carries that style there, read from its defaults (it need not be on the canvas); the board offers "◆ … into <style>". P238 1/1.
+- 3.239 INVARIANTS: lyric-shape 1.3.0 invariants(text | texts, { by, hold }) — dialogue, parallel frames, opposites, meter, shape, anaphora,
+  resolve, rise / fall, questions; each with where it holds and what the music keeps; the variants. 39 checks (invented lines). On his 21 poems
+  (scratchpad only): light and dark together 71 %, steady ~15-syllable lines 67 %. Not yet used by the song.
+- 3.240 FEELINGS 0.3.0: ratio-set 1.1.0 — seven measured / derived spectra (odd harmonics, free / clamped bar, church bell, bonang, 2.1 stretch,
+  tritave; sources named), dissonance (Plomp & Levelt / Sethares), inharmonicity, spectrum() ordered fused → apart, morph(x); Feelings Across:
+  colour (default, as before) | spectrum (the pad names where the dot is). Fixed: the window was 820 tall — the pad's bottom sat under the Song
+  Recorder; 560 now. Feelings 15/15, ratio-set 57 checks. Previews docs/previews/feelings-*.png (shown to him before merge).
+- Open: component speed checks (saw 101.9 ns, 32 voices 9.56 µs) failed once under load — re-run unfinished.
 
 ## 3.234 The piano without its rumble (2026-11-26)
 His words: "But make some sound beautiful. The piano doesn't get enough love."

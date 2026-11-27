@@ -8,7 +8,7 @@
   const DIVS = ['4/1', '2/1', '1/1', '1/2', '1/4', '1/4t', '1/8', '1/8t', '1/16', '1/32'];
   function shapeFn(shape, custom, lean) {
     switch (shape) {
-      // 3.239 the pendulum (components/lfo 1.1.0): a swing that lingers high (lean > 0) or low (lean < 0); lean 0 is the sine
+      // 3.242 the pendulum (components/lfo 1.1.0): a swing that lingers high (lean > 0) or low (lean < 0); lean 0 is the sine
       case 'pendulum': return (p) => MusicParts.LFO_PENDULUM(p, lean || 0);
       case 'sine': return (p) => Math.sin(2 * Math.PI * p);
       case 'triangle': return (p) => p < 0.25 ? 4 * p : p < 0.75 ? 2 - 4 * p : 4 * p - 4;
