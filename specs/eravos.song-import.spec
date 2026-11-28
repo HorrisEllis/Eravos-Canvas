@@ -25,3 +25,14 @@
   SI6 stems (hardest, last): source-separator → his voice apart from the band (to sing over, or to chop) — his own audio only.
 ## open (his)
   - start with SI0 (MIDI: quick, exact) or SI1 (his audio: the real test)?
+
+## ADDENDUM 2026-11-28 — his words again, and the open answered
+# his words (2026-11-28, verbatim): "Okay this is backwards. The screech is a sound that comes in during the song. Do every layer. Can we make
+#   the canvas import a song and open the relevant tools to make it?"
+# The open (SI0 MIDI or SI1 audio first) is answered by what he asked: a song he hears (Rumble), so audio — SI1 first; SI0 stays next to it.
+# What exists today (checked): pitch-tracker (code, 17 checks). beat-tracker, key-detector, onset-detector, structure-segmenter, chord-recognizer,
+#   source-separator, transient-slicer, spectral-features: specs only. Intake already opens a dropped audio file in the Sample Player and a .mid
+#   in a Sequencer (tools/music/domain.js) — import arrives the same way (drop a song), and asks before it opens anything.
+# The layers (3.258) are the test's truth: a song made in ERAVOS whose every layer, tempo (140) and key (A) are known — SI1–SI5 must find them.
+# Order (bottom up, each proven before the next): onset-detector → beat-tracker → key-detector (SI1) → SI2 drums by band → SI3 the lines →
+#   SI5 the nearest tools (the novelty fingerprint) and the canvas opened wired → the gate card. The import UI is shown to him before it is built.

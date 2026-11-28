@@ -2,6 +2,18 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.258 Every layer, the screech coming in during the song; Song Import begins with audio (2026-11-28)
+His words: "Okay this is backwards. The screech is a sound that comes in during the song. Do every layer. Can we make the canvas import a song
+and open the relevant tools to make it?"
+- Every layer of the breakdown he pasted, from existing tools (docs/previews/rumble-layers.render.mjs; WAVs git-ignored), 12 bars at 140 in A:
+  hats fade in through Filter (1–2) → 1 the pulsing bass (Ripple: sine, FM ×1.5, short, Beat 7, Collide — fighting itself) (3–) → the drop
+  (5–8): 2 mid-bass (a copy of the pulse → EQ at 375 Hz) · 3 growl (Ripple triangle, triangle Mod ×3, FM amount rising each bar) · drums
+  two-step → 4 the screech comes in on bar 9, tightening (U3), the growl out, kick only → 11–12 the screech chopped, a breakbeat. 6 the voice:
+  his own (nothing recorded is shipped); a gap left on bar 8.
+- Measured: pulse 81 % under 150 Hz; mid-bass 0 % under 150, its most in 250–500 Hz; the screech from bar 9 at the pulse's level
+  (−19 / −16 dB vs −17; at first it came in 10 dB under — raised, as a Mixer fader would). Hats still soft in the intro (−47 dB) — his ear.
+- Song Import: SI1 (audio) first, spec ADDENDUM; these layers are the import test's known truth.
+
 ## 3.257 Ripple 1.3: Dive curve; his pick U3; layer 1, the pulsing bass (2026-11-28)
 His words: "It's like the wavelength goes in an upward curve and then wobbles once it reaches the peak." · then, of U1–U3: "The third one
 is the best. Honestly, I think that might be it. I think it's just the sound in the background. I think it's the wobble. … I like glitchy,
