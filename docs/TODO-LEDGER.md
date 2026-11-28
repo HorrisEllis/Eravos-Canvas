@@ -123,6 +123,7 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-106 | **The squeak, judged by him**: S0–S4 (Ripple 1.2 MOD, the recipe he pasted) — which is closest, and what is still wrong. | "Like a screech. I think it is a a voice." | renders sent 2026-11-28 — **his ear** |
 | T-107 | **One big Contrast instrument** that breaks off into tools, then components (asked; his yes / no). | "Maybe it should have been one big tool that you can break off into smaller tools, then into components." | **open — his call** |
 | T-108 | **The wobble that tightens**: which reading is his, T1–T4; then the capability (e.g. an LFO Rate that rises over a time, one knob, not a hand-made preset). | "The frequency gets tighter as it drags on for about 3 seconds. … The wavelength narrows not the volume." | renders sent 2026-11-28 — **his ear** |
+| T-109 | **The wobble becomes a rhythm** — the Rumble study (R0–R2) judged by him; then what is missing, as capability: (a) a Level / gate input on Ripple, so Wub Rate can chop the sub and the grind as well as a filter; (b) the study saved as a Setup he can open and change. Nothing added before his ear. | (N-X179) | renders sent 2026-11-28 — **his ear** |
 | T-98 | **The voice**: a made character (deep, dry, close, level) on Voice Lab's CREATE, or his own voice through the same chain (CS7) — never a copied person. | "voice, sounds, all of it." | open — after Voice Lab VL3 |
 
 ## Shipped, to confirm on his PC

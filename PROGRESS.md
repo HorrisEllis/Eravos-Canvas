@@ -2,6 +2,19 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.256 The wobble becomes a rhythm: an inventory and a study from existing tools, nothing new (2026-11-28)
+From the direction he pasted (another assistant's words): inspect what exists before adding parameters; "The wobble becomes a rhythm."
+- What does it, already: **Wub Rate** (steps of rates on the beat — 1/4 → 1/8 → 1/8t → 1/16 → 1/32 is the tightening; off = a gap; hold;
+  Restart every step = retriggering; shape saw-down = an attack every cycle, so a fast wobble turns to stabs; Depth stays where it is set;
+  Rate bend / Rate glide / a Rate input for a smooth speed-up) · **Glitch** (repeats on the grid, Chaos 0 = only where fired — controlled,
+  not random) · **Ripple** (the sub alone; a ~370 Hz square layer with a short envelope as stabs; the squeak with MOD; Collide slow → fast)
+  · **Pads** (two-step, then a breakbeat) · Wub Osc's Level / an Automation lane for the build in loudness.
+- The study (docs/previews/rumble-study.render.mjs; WAVs git-ignored): measured on the growl alone — bars 1–4 2.3 · 4.7 · 9.7 · 18.7
+  wobbles a second, brightness depth ±474 · 478 · 460 Hz (held), level −27 → −19 dB (the build); the gap −34.5 dB; Glitch fired on bars 6, 8.
+- Found in my render script (not a tool): it took a tool's first audio out, which on Wub Osc is its slot's send (before Level) — the level
+  build vanished. Ports marked internal are skipped now; Ripple and Spatial Organism have no slots, so 3.255's renders and preset check stand.
+- Missing (asked, not built): Ripple has no Level / gate input for Wub Rate to chop it; the study is not yet a Setup he can open (T-109).
+
 ## 3.255 Ripple 1.2: Mod, a square two octaves up bending each voice (FM) — the squeak recipe (2026-11-28)
 From the text he pasted (another assistant's, not his words): "A sawtooth oscillator. Modulation from a square wave two octaves higher.
 Low-pass filter modulation. Soft distortion. Two-voice unison and reverb. An automated pitch envelope." Before it, his: "Two frequencies
