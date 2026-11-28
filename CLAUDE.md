@@ -112,6 +112,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-28 | **Ripple 1.3: Dive curve** (3.257): the rise bent (his "an upward curve"; 0 = as before); his pick U3; layer 1 (the pulsing bass) rendered | `tools/music/tools/bass/ripple/` | P239 13/13; presets vs 1.1.0 worst −68.4 dB |
 | 2026-11-28 | **Ripple 1.2: Mod** (3.255): a square two octaves up bending each voice (FM index, ratio, wave; 0 = as before) — the squeak recipe he pasted; five renders for his ear | `tools/music/tools/bass/ripple/` | P239 12/12; presets vs 1.1.0 worst −69.7 dB |
 | 2026-11-27 | **Release 0.2.41**; drawn icons and paintings for the four new tools (3.247) | `tools/music/icons.json`, `build/tool-art.py`, `desktop/package.json`, `docs/release-notes.txt` | full suite 1721/1734 before (the 13: 3 mine, fixed; 10 fail on main too) · P63 P227 P41 |
 | 2026-11-27 | **Tension Field** (3.246): tension heard from any sound (loudness, brightness, density, motion), built to a peak by a bar and released (end of the hold, ⇣ Release, or any signal); six outputs to map; tension-meter + energy-curve (new) | `tools/music/tools/modulation/tension-field/`, `components/{tension-meter,energy-curve}/` | P243 3/3, contract 4/4, components 10 + 11 |

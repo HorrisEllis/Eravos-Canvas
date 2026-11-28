@@ -2,6 +2,18 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.257 Ripple 1.3: Dive curve; his pick U3; layer 1, the pulsing bass (2026-11-28)
+His words: "It's like the wavelength goes in an upward curve and then wobbles once it reaches the peak." · then, of U1–U3: "The third one
+is the best. Honestly, I think that might be it. I think it's just the sound in the background. I think it's the wobble. … I like glitchy,
+and oscillatory. Like it's fighting itself."
+- Dive curve (DIVE card): the rise bent (0 = as before). P239 13/13; presets unchanged (worst −68.4 dB).
+- His pick, U3: the screech (Ripple saw · square Mod ×4 · drive · rising an octave) on Wub Rate's steps 1/4 → 1/32 on the beat, louder as
+  it tightens, then chopped by 1/8 steps, square shape, Restart every step.
+- From the breakdown he pasted (another assistant's; "a reconstructed arrangement, not verified original stems"), layer 1 — the main
+  pulsing bass: sine · short envelope · FM · pitch and low-pass moving · saturation — made with Ripple (Wave sine, Mod ×2 sine, Dive 5 in
+  0.04 s, Env amt 2.5, Drive 12, Attack 2 ms / Decay 0.16 s / Sustain 0). "Fighting itself": the same with Beat 7 Hz, Collide from 25 Hz and
+  Mod ×1.5 — 14 notes heard as 25 pulses (17 when plain). Renders L1–L4 for his ear (scratchpad; no-toys).
+
 ## 3.256 The wobble becomes a rhythm: an inventory and a study from existing tools, nothing new (2026-11-28)
 From the direction he pasted (another assistant's words): inspect what exists before adding parameters; "The wobble becomes a rhythm."
 - What does it, already: **Wub Rate** (steps of rates on the beat — 1/4 → 1/8 → 1/8t → 1/16 → 1/32 is the tightening; off = a gap; hold;

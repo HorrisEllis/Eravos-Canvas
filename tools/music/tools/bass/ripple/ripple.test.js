@@ -79,6 +79,13 @@ describe('Ripple — a clean sub under a grind that swells at Beat Hz', () => {
     const d = OrganismFactory.def('eravos.ripple'), c = (k) => d.config.find(x => x.key === k); assert.equal(c('modAmt').default, 0); assert.equal(c('modRatio').default, 4);
     Object.entries(d.presets).forEach(([n, pr]) => assert.ok(!((pr.params || pr).modAmt), n + ' has no Mod'));
   });
+  // 3.257 his words (2026-11-28): "It's like the wavelength goes in an upward curve and then wobbles once it reaches the peak."
+  it('Dive curve: a rise curved slow-then-fast is still low halfway (a straight one is halfway up); both land on the note', async () => {
+    const base = { sub: 1, grind: 0, dive: -12, diveTime: 1.2 }, lin = await play(Object.assign({ diveCurve: 0 }, base), [[45, 0.02, 2]], 2.1), cur = await play(Object.assign({ diveCurve: 1 }, base), [[45, 0.02, 2]], 2.1);
+    const mid = (r) => pitch(r.L, S(r, 0.55), S(r, 0.68), r.sr), end = (r) => pitch(r.L, S(r, 1.5), S(r, 2.0), r.sr), st = (f) => 1200 * Math.log2(f / 110);
+    assert.lt(Math.abs(st(mid(lin)) + 600), 120, 'straight: about half way (' + st(mid(lin)).toFixed(0) + ' cents)'); assert.lt(st(mid(cur)), -900, 'curved: still low (' + st(mid(cur)).toFixed(0) + ' cents)');
+    assert.lt(Math.abs(st(end(cur))), 10, 'curved lands on A2'); assert.lt(Math.abs(st(end(lin))), 10, 'straight lands on A2');
+  });
   it('the ripple goes out as a modulation signal any tool can take', () => {
     const def = OrganismFactory.def('eravos.ripple'); assert.ok(JSON.stringify(def.hooks).includes('ripple.hook.ripple_out'), 'declares the ripple out');
   });

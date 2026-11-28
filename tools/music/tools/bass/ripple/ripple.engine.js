@@ -1,4 +1,4 @@
-/* eravos.ripple 1.2.0 — Ripple: the rumble (spec: ripple.spec · the direction: specs/eravos.contrast-space.spec ADDENDUM 2026-11-27 (2))
+/* eravos.ripple 1.3.0 — Ripple: the rumble (spec: ripple.spec · the direction: specs/eravos.contrast-space.spec ADDENDUM 2026-11-27 (2))
  * His words (2026-11-27): "the frequencies how the collide … the way it creates ripples and tension" · "yes build them use the null renderer to
  * make sure its novel in relation to the rest of eravos".
  *
@@ -15,7 +15,7 @@
   const S = OrganismSDK.STD, MP = window.MusicParts;
   const WAVES = { saw: 'sawtooth', square: 'square', triangle: 'triangle', sine: 'sine' }, MAXV = 6;
   OrganismFactory.define({
-    id: 'eravos.ripple', preview: 'bass', domain: 'music', version: '1.2.0', label: 'Ripple', icon: '≈', accent: '#ff5a3c',
+    id: 'eravos.ripple', preview: 'bass', domain: 'music', version: '1.3.0', label: 'Ripple', icon: '≈', accent: '#ff5a3c',
     category: 'Bass', blurb: 'The rumble: a clean sub under a driven grind whose voices are a few hertz apart, so the floor swells. Dive into each note.',
     size: { w: 620, h: 620 }, minSize: { w: 460, h: 380 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
@@ -40,6 +40,9 @@
       { key: 'fDec', type: 'number', default: 0.35, min: 0.02, max: 3, step: 0.01, unit: 's', label: 'Env dec', group: 'FILTER' },
       { key: 'dive', type: 'number', default: 0, min: -24, max: 24, step: 0.1, unit: 'st', label: 'Dive', group: 'DIVE', hint: 'Above 0 each note falls this far into its pitch; below 0 it rises in from under it' },
       { key: 'diveTime', type: 'number', default: 0.12, min: 0.01, max: 4, step: 0.01, unit: 's', label: 'Dive time', group: 'DIVE' },
+      // 3.257 his words (2026-11-28): "It's like the wavelength goes in an upward curve and then wobbles once it reaches the peak." — the dive's path
+      // bent: 0 = a straight glide (as before, the same automation), above 0 slow then fast (it curves up into the note), below 0 fast then easing in
+      { key: 'diveCurve', type: 'number', default: 0, min: -1, max: 1, step: 0.01, label: 'Dive curve', group: 'DIVE', hint: '0 = a straight glide · above 0 = slow, then sweeping up into the note · below 0 = fast, then easing into it' },
       { key: 'collideFrom', type: 'number', default: 0, min: 0, max: 80, step: 0.1, unit: 'Hz', label: 'Collide from', group: 'COLLIDE', element: 'unison-stack', hint: 'Each note starts with its voices this far apart (a clash) and slides to Beat (a ripple); 0 = off' },
       { key: 'collideTime', type: 'number', default: 0.6, min: 0.01, max: 8, step: 0.01, unit: 's', label: 'Collide time', group: 'COLLIDE', hint: 'How long the clash takes to slow into the ripple' },
       // 3.255 the recipe he pasted (2026-11-28, not his words): "Modulation from a square wave two octaves higher" — a modulator per voice (FM): it bends each voice's
@@ -83,24 +86,28 @@
       const voices = [];
       function makeVoice(note, vel, t, dur) {
         const f = MT.hz(note + 12 * P.get('octave')), fm = f * Math.pow(2, +P.get('midOct')), L = layout(), n = L.count, dive = P.get('dive') * 100, dT = P.get('diveTime');
+        // the dive: a straight glide (0, exactly as before), or along a curve (Dive curve) — the curve's first value is the start, so no event sits under it
+        const dc = P.get('diveCurve'), divePath = (prm, from, to) => { if (!dive || !dc) { prm.setValueAtTime(from, t); if (dive) prm.linearRampToValueAtTime(to, t + dT); return; }
+          const N = 96, e = 1 + 3 * Math.abs(dc), c = new Float32Array(N); for (let k = 0; k < N; k++) { const x = k / (N - 1), y = dc > 0 ? Math.pow(x, e) : 1 - Math.pow(1 - x, e); c[k] = from + (to - from) * y; }
+          prm.setValueCurveAtTime(c, t, dT); };
         const sumL = ac.createGain(), sumR = ac.createGain(), sum = ac.createChannelMerger(2); sumL.connect(sum, 0, 0); sumR.connect(sum, 0, 1);
         const wBeat = ctx.modWired('beat'), oscs = [];
         for (let i = 0; i < n; i++) {
           const o = ac.createOscillator(); o.type = WAVES[P.get('wave')]; o.frequency.value = fm + L.offsetHz[i];
           // 3.250 Collide: the voices start Collide-from Hz apart (outer two) and slide to Beat — a clash slowing into a ripple; 0 = as before
           const cf = P.get('collideFrom'); if (cf > 0) { o.frequency.setValueAtTime(fm + L.pos[i] * cf / 2, t); o.frequency.linearRampToValueAtTime(fm + L.offsetHz[i], t + P.get('collideTime')); }
-          o.detune.setValueAtTime(L.cents[i] + dive, t); if (dive) o.detune.linearRampToValueAtTime(L.cents[i], t + dT);
+          divePath(o.detune, L.cents[i] + dive, L.cents[i]);
           let bm = null; if (wBeat) { bm = ac.createGain(); bm.gain.value = L.pos[i] / 2; beatMod.connect(bm); bm.connect(o.frequency); }
           const gL = ac.createGain(), gR = ac.createGain(); gL.gain.value = L.gainL[i]; gR.gain.value = L.gainR[i];
           // the modulator (FM): only made when Mod amount is above 0 at the note's start, so a note without it is built exactly as before
           let mo = null, mg = null; const ma = P.get('modAmt'); if (ma > 0) { mo = ac.createOscillator(); mo.type = WAVES[P.get('modWave')]; mo.frequency.value = (fm + L.offsetHz[i]) * P.get('modRatio');
-            mo.detune.setValueAtTime(L.cents[i] + dive, t); if (dive) mo.detune.linearRampToValueAtTime(L.cents[i], t + dT);   // it rises / dives with its voice, so the ratio holds
+            divePath(mo.detune, L.cents[i] + dive, L.cents[i]);   // it rises / dives with its voice, so the ratio holds
             mg = ac.createGain(); mg.gain.value = ma * fm * P.get('modRatio'); mo.connect(mg); mg.connect(o.frequency); mo.start(t); }
           o.connect(gL); o.connect(gR); gL.connect(sumL); gR.connect(sumR); o.start(t, L.phase[i] / Math.max(1, fm)); oscs.push({ o, bm, gL, gR, i, mo, mg });
         }
         const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = P.get('res'); if (ctx.modWired('cutoff')) cutMod.connect(lp.detune);
         const amp = ac.createGain(), sAmp = ac.createGain(), so = ac.createOscillator(); amp.gain.value = 0; sAmp.gain.value = 0;
-        so.type = 'sine'; so.frequency.value = f; so.detune.setValueAtTime(dive, t); if (dive) so.detune.linearRampToValueAtTime(0, t + dT); so.connect(sAmp); sAmp.connect(subBus); so.start(t);
+        so.type = 'sine'; so.frequency.value = f; divePath(so.detune, dive, 0); so.connect(sAmp); sAmp.connect(subBus); so.start(t);
         sum.connect(lp); lp.connect(amp); amp.connect(grindLvl);
         const A = P.get('aA'), D = P.get('aD'), Sus = P.get('aS'), peak = 0.35 + 0.65 * vel;
         [amp, sAmp].forEach(g => { g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + A); g.gain.linearRampToValueAtTime(peak * Sus, t + A + D); });
@@ -138,7 +145,9 @@
       const now = () => ac.currentTime;
       // a change glides while it plays; before the clock has moved (an offline render being set up) it is set exactly — a glide that starts at
       // time 0 starts from whatever value the audio thread last reported, so two renders of one preset could differ (−70 dB)
-      const glide = (prm, val) => { if (ac.currentTime === 0) { prm.cancelScheduledValues(0); prm.setValueAtTime(val, 0); } else prm.setTargetAtTime(val, now(), 0.012); };
+      const glide = (prm, val) => { if (ac.currentTime === 0) { prm.cancelScheduledValues(0); prm.setValueAtTime(val, 0); return; }
+        // a knob moved during a curved dive: the curve cannot be glided over, so the knob takes over from where the curve is (3.257)
+        try { prm.setTargetAtTime(val, now(), 0.012); } catch (e) { const t0 = now(), v0 = prm.value; prm.cancelScheduledValues(t0); prm.setValueAtTime(v0, t0); prm.setTargetAtTime(val, t0, 0.012); } };
       const relayout = () => { const L = layout(); voices.forEach(v => v.oscs.forEach(x => { if (x.i >= L.count) return; glide(x.o.frequency, v.fm + L.offsetHz[x.i]); glide(x.o.detune, L.cents[x.i]); glide(x.gL.gain, L.gainL[x.i]); glide(x.gR.gain, L.gainR[x.i]); })); };
       ['beat', 'detune', 'width'].forEach(k => P.onChange(k, relayout));
       P.onChange('beat', (b) => glide(rOsc.frequency, b / 2));
