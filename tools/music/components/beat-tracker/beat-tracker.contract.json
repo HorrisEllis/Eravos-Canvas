@@ -1,0 +1,78 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "beat-tracker",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "analysis",
+ "kernel": "MusicParts.BeatTracker",
+ "ports": [
+  {
+   "id": "env",
+   "dir": "in",
+   "type": "control",
+   "rate": "block"
+  },
+  {
+   "id": "tempo",
+   "dir": "out",
+   "type": "data"
+  },
+  {
+   "id": "beats",
+   "dir": "out",
+   "type": "trigger"
+  }
+ ],
+ "variables": [
+  {
+   "key": "min",
+   "type": "number",
+   "min": 40,
+   "max": 120,
+   "default": 60,
+   "role": "rate",
+   "unit": "BPM"
+  },
+  {
+   "key": "max",
+   "type": "number",
+   "min": 120,
+   "max": 300,
+   "default": 200,
+   "role": "rate",
+   "unit": "BPM"
+  },
+  {
+   "key": "prefer",
+   "type": "number",
+   "min": 60,
+   "max": 200,
+   "default": 120,
+   "role": "rate",
+   "unit": "BPM"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "min",
+    "role": "rate",
+    "face": true
+   },
+   {
+    "key": "max",
+    "role": "rate",
+    "face": true
+   },
+   {
+    "key": "prefer",
+    "role": "rate",
+    "face": false
+   }
+  ],
+  "needs_ui": [
+   "kit.knob"
+  ]
+ }
+}

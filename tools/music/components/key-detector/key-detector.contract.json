@@ -1,0 +1,59 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "key-detector",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "analysis",
+ "kernel": "MusicParts.KeyDetector",
+ "ports": [
+  {
+   "id": "in",
+   "dir": "in",
+   "type": "audio",
+   "rate": "audio"
+  },
+  {
+   "id": "key",
+   "dir": "out",
+   "type": "harmony"
+  }
+ ],
+ "variables": [
+  {
+   "key": "low",
+   "type": "number",
+   "min": 20,
+   "max": 500,
+   "default": 55,
+   "role": "pitch",
+   "unit": "Hz"
+  },
+  {
+   "key": "high",
+   "type": "number",
+   "min": 500,
+   "max": 8000,
+   "default": 2000,
+   "role": "pitch",
+   "unit": "Hz"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "low",
+    "role": "pitch",
+    "face": true
+   },
+   {
+    "key": "high",
+    "role": "pitch",
+    "face": true
+   }
+  ],
+  "needs_ui": [
+   "kit.knob"
+  ]
+ }
+}

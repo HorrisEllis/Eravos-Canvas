@@ -2,6 +2,21 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.259 Song Import SI1: the song's tempo, beat and key, heard from the recording (2026-11-28)
+His words: "Can we make the canvas import a song and open the relevant tools to make it?"
+- Four components, NEW code, each proving its own numbers (node tests/components.mjs): spectral-features (FFT frames, band energy, flux,
+  centroid — 8 checks) · onset-detector (spectral flux by band, low · mid · high · all; the envelopes — 14) · beat-tracker (tempo, the octave
+  from the kicks and snares never the hats, the beat on the kicks, the downbeat, the other octave — 19: 87 · 120 · 128 · 140 · 174 BPM each
+  within 0.5 and on the kick) · key-detector (chroma → Krumhansl–Kessler, 24 keys — 11: C · A minor · F# minor · E♭ · G). Contracts 48 of 48.
+- On the layers song of 3.258 (truth 140 BPM, A, first beat 0.1 s): **140.02 BPM, A minor**, in 0.7 s. Drums alone: first beat 0.101 s, bar
+  0.101 s (exact). The full mix: the beat half a beat late (0.315 s) — its bass is syncopated and its 375 Hz copy fills the mid band, so
+  neither the kicks nor the snares stand out on the beat. Kept open, not hidden: the import screen will let him move the bar line by half a
+  beat (one click), and the gate (SI5) measures it.
+- Found on the way, fixed, each with a test: a kick's tail counted twice (floor 0.4 → 1, Gap 50 → 60 ms); hats on the off-beats pulled the
+  beat half a beat late (the beat now goes where the kicks and snares are strongest); 87 read as 174 and 128 as 64 (the envelope square-rooted;
+  the octave from the drums).
+- Next: SI2 the drums by band → a pattern; SI3 the lines; SI5 the tools opened, wired; the import screen shown to him first.
+
 ## 3.258 Every layer, the screech coming in during the song; Song Import begins with audio (2026-11-28)
 His words: "Okay this is backwards. The screech is a sound that comes in during the song. Do every layer. Can we make the canvas import a song
 and open the relevant tools to make it?"

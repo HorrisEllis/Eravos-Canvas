@@ -112,6 +112,7 @@ Newest first. One line per piece; the detail is in `PROGRESS.md` and the commit.
 
 | Date | Work | Where | Proof |
 |---|---|---|---|
+| 2026-11-28 | **Song Import SI1** (3.259): tempo, beat and key from a recording — spectral-features, onset-detector, beat-tracker, key-detector (new); every layer of the breakdown rendered with the screech coming in (3.258) | `tools/music/components/{spectral-features,onset-detector,beat-tracker,key-detector}/`, `docs/previews/rumble-layers.render.mjs` | 8 + 14 + 19 + 11 checks; the layers song → 140.02 BPM, A minor |
 | 2026-11-28 | **Ripple 1.3: Dive curve** (3.257): the rise bent (his "an upward curve"; 0 = as before); his pick U3; layer 1 (the pulsing bass) rendered | `tools/music/tools/bass/ripple/` | P239 13/13; presets vs 1.1.0 worst −68.4 dB |
 | 2026-11-28 | **Ripple 1.2: Mod** (3.255): a square two octaves up bending each voice (FM index, ratio, wave; 0 = as before) — the squeak recipe he pasted; five renders for his ear | `tools/music/tools/bass/ripple/` | P239 12/12; presets vs 1.1.0 worst −69.7 dB |
 | 2026-11-27 | **Release 0.2.41**; drawn icons and paintings for the four new tools (3.247) | `tools/music/icons.json`, `build/tool-art.py`, `desktop/package.json`, `docs/release-notes.txt` | full suite 1721/1734 before (the 13: 3 mine, fixed; 10 fail on main too) · P63 P227 P41 |

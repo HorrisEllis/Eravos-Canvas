@@ -1,0 +1,73 @@
+{
+ "schema": "eravos.component-contract/1",
+ "id": "spectral-features",
+ "version": "1.0.0",
+ "domain": "music",
+ "kind": "analysis",
+ "kernel": "MusicParts.SpectralFrames",
+ "ports": [
+  {
+   "id": "in",
+   "dir": "in",
+   "type": "audio",
+   "rate": "audio"
+  },
+  {
+   "id": "spectrum",
+   "dir": "out",
+   "type": "data",
+   "rate": "block"
+  },
+  {
+   "id": "flux",
+   "dir": "out",
+   "type": "control",
+   "rate": "block"
+  },
+  {
+   "id": "centroid",
+   "dir": "out",
+   "type": "control",
+   "unit": "Hz",
+   "rate": "block"
+  }
+ ],
+ "variables": [
+  {
+   "key": "size",
+   "type": "number",
+   "min": 512,
+   "max": 8192,
+   "default": 2048,
+   "role": "time",
+   "unit": "samples"
+  },
+  {
+   "key": "hop",
+   "type": "number",
+   "min": 32,
+   "max": 8192,
+   "default": 512,
+   "role": "time",
+   "unit": "samples"
+  }
+ ],
+ "element": {
+  "version": 1,
+  "controls": [
+   {
+    "key": "size",
+    "role": "time",
+    "face": true
+   },
+   {
+    "key": "hop",
+    "role": "time",
+    "face": false
+   }
+  ],
+  "needs_ui": [
+   "kit.knob"
+  ]
+ }
+}

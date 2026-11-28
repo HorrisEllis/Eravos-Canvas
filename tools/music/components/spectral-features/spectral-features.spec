@@ -13,3 +13,7 @@ acceptance:
   - its numbers proved on its own (frequency response, ranges, timing) in <id>.test.js
   - every tool that assembles it still nulls after any change to it
   - cpu measured and recorded in eravos.performance.spec
+
+# ADDENDUM 2026-11-28 — built (1.0.0, 3.259): the FFT frames, band energy, flux, centroid
+#   his words (2026-11-28): "Can we make the canvas import a song and open the relevant tools to make it?" — Song Import SI1 (specs/eravos.song-import.spec)
+#   code spectral-features.js · contract spectral-features.contract.json · its numbers proved in spectral-features.test.mjs (node tests/components.mjs)
