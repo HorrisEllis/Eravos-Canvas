@@ -67,6 +67,18 @@ describe('Ripple — a clean sub under a grind that swells at Beat Hz', () => {
   it('the new settings at their defaults leave every note as it was (Collide from 0)', () => {
     const d = OrganismFactory.def('eravos.ripple'), c = (k) => d.config.find(x => x.key === k); assert.equal(c('collideFrom').default, 0); assert.ok(c('dive').min < 0 && c('fEnv').min < 0, 'Rise and opening filter are in reach');
   });
+  // 3.255 the recipe he pasted (2026-11-28): "Modulation from a square wave two octaves higher" — Mod (FM) on each voice
+  it('Mod: a modulator two octaves up (ratio 4) puts sidebands on the note (f ± 4f: 3f and 5f); Mod amount 0 puts none', async () => {
+    const amp = (r, hz, a, b) => { let re = 0, im = 0; for (let i = S(r, a); i < S(r, b); i++) { const w = 2 * Math.PI * hz * i / r.sr; re += r.L[i] * Math.cos(w); im += r.L[i] * Math.sin(w); } return Math.hypot(re, im); };
+    const base = { wave: 'sine', voices: 2, beat: 0, detune: 0, width: 0, sub: 0, grind: 1, drive: 0, cutoff: 12000, res: 0.5, fEnv: 0, octave: 0, midOct: '+1', modRatio: 4, modWave: 'sine' };
+    const off = await play(Object.assign({}, base, { modAmt: 0 }), [[45, 0.02, 1.2]], 1.3), on = await play(Object.assign({}, base, { modAmt: 1 }), [[45, 0.02, 1.2]], 1.3), f = 220;
+    const r5 = (r) => amp(r, 5 * f, 0.3, 1.0) / amp(r, f, 0.3, 1.0), r3 = (r) => amp(r, 3 * f, 0.3, 1.0) / amp(r, f, 0.3, 1.0);
+    assert.lt(r5(off), 0.01, 'off: nothing at 5f (' + r5(off).toFixed(4) + ')'); assert.gt(r5(on), 0.2, 'on: a sideband at 5f (' + r5(on).toFixed(3) + ' of the note)'); assert.gt(r3(on), 0.2, 'on: a sideband at 3f (' + r3(on).toFixed(3) + ')');
+  });
+  it('Mod amount is 0 by default, so every note and preset plays as before', () => {
+    const d = OrganismFactory.def('eravos.ripple'), c = (k) => d.config.find(x => x.key === k); assert.equal(c('modAmt').default, 0); assert.equal(c('modRatio').default, 4);
+    Object.entries(d.presets).forEach(([n, pr]) => assert.ok(!((pr.params || pr).modAmt), n + ' has no Mod'));
+  });
   it('the ripple goes out as a modulation signal any tool can take', () => {
     const def = OrganismFactory.def('eravos.ripple'); assert.ok(JSON.stringify(def.hooks).includes('ripple.hook.ripple_out'), 'declares the ripple out');
   });

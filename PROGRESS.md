@@ -2,6 +2,20 @@
 
 Where things stand, so work can be picked up in any session. Newest first.
 
+## 3.255 Ripple 1.2: Mod, a square two octaves up bending each voice (FM) — the squeak recipe (2026-11-28)
+From the text he pasted (another assistant's, not his words): "A sawtooth oscillator. Modulation from a square wave two octaves higher.
+Low-pass filter modulation. Soft distortion. Two-voice unison and reverb. An automated pitch envelope." Before it, his: "Two frequencies
+percussing into each other and then rippling." · "It's a slow wobble in. High pitched." · "it wobbles a bit hard and it's rapid. Like a
+screech. I think it is a a voice."
+- Ripple had every part of the recipe but the modulator. Added MOD: Mod amount (the FM index; 0 = off, the default, and a note is built
+  exactly as before), Mod ratio (4 = two octaves up), Mod wave (square · sine · saw · triangle); one modulator per voice, following its
+  voice's Dive; live while a note sounds. First defined as a bend in the note's frequency: at 0.6 that was an index of 0.15, hardly heard
+  (the 3rd–8th harmonics moved < 3 dB) — redefined as the index, now the 3rd harmonic leads and the upper ones lift 10–20 dB (measured).
+- Five renders for his ear (scratchpad, not committed — no-toys): S0 the recipe without the square (to compare) · S1 the recipe · S2 a harder
+  screech · S3 one held note rising in slowly · S4 a sine modulator, softer. Ripple → Spatial Organism (Room), an LFO on Cutoff.
+- tests P239 12/12 (+2: sidebands at 3f and 5f with Mod 1, none with 0; Mod 0 by default and in every preset), the tool contract 4/4; every
+  preset against 1.1.0 worst −69.7 dB (gate −60; the rest is T-105); boundary 10/10, design check no worse, 210 manifests, tool needs 27.
+
 ## Release 0.2.43 (2026-11-27)
 His words: "yes merge i meant and release." — 3.253 Hits, 3.254 Pitch → Notes (and the silent sink that keeps them running).
 

@@ -29,7 +29,7 @@ OrganismFactory.reg('eravos.ripple', function (view) {
   const cfg = (k) => view.descriptor.config.find(c => c.key === k);
   const ctl = (k) => { const c = UI.paramControl(view, cfg(k), { size: 30, segMax: 4 }); c.el.dataset.key = k; return c.el; };
   const card = (title, keys) => h('div', { class: 'uk-group' }, [h('div', { class: 'uk-group-title', text: title }), h('div', { class: 'uk-row' }, keys.map(ctl))]);
-  const face = h('div', { class: 'uk-panel' }, [card('RIPPLE', ['voices', 'beat', 'width']), card('GRIND', ['drive', 'grind']), card('SUB', ['sub']), card('FILTER', ['cutoff', 'fEnv']), card('DIVE', ['dive', 'diveTime']), card('COLLIDE', ['collideFrom', 'collideTime'])]);
+  const face = h('div', { class: 'uk-panel' }, [card('RIPPLE', ['voices', 'beat', 'width']), card('GRIND', ['drive', 'grind']), card('SUB', ['sub']), card('FILTER', ['cutoff', 'fEnv']), card('DIVE', ['dive', 'diveTime']), card('COLLIDE', ['collideFrom', 'collideTime']), card('MOD', ['modAmt', 'modRatio', 'modWave'])]);
   const deep = h('div', { class: 'uk-panel' }, [card('RIPPLE+', ['detune']), card('GRIND+', ['wave', 'midOct', 'bias']), card('FILTER+', ['res', 'fDec']), card('AMP', ['aA', 'aD', 'aS', 'aR']), card('OUT', ['octave', 'level'])]);
   deep.style.display = 'none';
   const more = UI.Button({ label: 'More depth ▸', hint: 'Detune in cents, the grind’s wave, octave and bias, resonance, the filter’s decay, the amp envelope, octave and level', onClick: () => { const show = deep.style.display === 'none'; deep.style.display = show ? '' : 'none'; more.el.textContent = show ? 'More depth ▾' : 'More depth ▸'; } });

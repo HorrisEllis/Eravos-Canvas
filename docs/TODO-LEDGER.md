@@ -120,6 +120,8 @@ it moves to **Done**, and says where and the proof. His words in full, with what
 | T-103 | **The Voice Lab, all of it**: record · hard tune (T-Pain) · a synthesized voice · his voice playing the tools · full editing and modulation · remix (EDM, dubstep). | "Voice tools. Like recording. Making sound like the tools? Full editing and modulation. Full t pain auto tune. Synthesized voice. Everything needed for remixing, EDM; dubstep." | VL1 pitch-tracker **built** 3.249; next VL3 vocal-tract + VL4 letter-to-sound, then VL2, then the Tune tool (its face shown first) |
 | T-104 | **Tools to connect to tools**: connectors made from what exists — a sound's loudness as a signal (envelope-follower), a sound's pitch as notes (pitch-tracker), a sound's hits as triggers. | "Also tools to connect to tools." | Follow 3.252, Hits 3.253, Pitch → Notes 3.254 — **built** (to release) |
 | T-105 | **Ripple renders repeat to −70 dB, not −90** (the null render asks −90): the cause not found. | (found 3.250) | open |
+| T-106 | **The squeak, judged by him**: S0–S4 (Ripple 1.2 MOD, the recipe he pasted) — which is closest, and what is still wrong. | "Like a screech. I think it is a a voice." | renders sent 2026-11-28 — **his ear** |
+| T-107 | **One big Contrast instrument** that breaks off into tools, then components (asked; his yes / no). | "Maybe it should have been one big tool that you can break off into smaller tools, then into components." | **open — his call** |
 | T-98 | **The voice**: a made character (deep, dry, close, level) on Voice Lab's CREATE, or his own voice through the same chain (CS7) — never a copied person. | "voice, sounds, all of it." | open — after Voice Lab VL3 |
 
 ## Shipped, to confirm on his PC

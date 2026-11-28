@@ -1,4 +1,4 @@
-/* eravos.ripple 1.1.0 — Ripple: the rumble (spec: ripple.spec · the direction: specs/eravos.contrast-space.spec ADDENDUM 2026-11-27 (2))
+/* eravos.ripple 1.2.0 — Ripple: the rumble (spec: ripple.spec · the direction: specs/eravos.contrast-space.spec ADDENDUM 2026-11-27 (2))
  * His words (2026-11-27): "the frequencies how the collide … the way it creates ripples and tension" · "yes build them use the null renderer to
  * make sure its novel in relation to the rest of eravos".
  *
@@ -15,7 +15,7 @@
   const S = OrganismSDK.STD, MP = window.MusicParts;
   const WAVES = { saw: 'sawtooth', square: 'square', triangle: 'triangle', sine: 'sine' }, MAXV = 6;
   OrganismFactory.define({
-    id: 'eravos.ripple', preview: 'bass', domain: 'music', version: '1.1.0', label: 'Ripple', icon: '≈', accent: '#ff5a3c',
+    id: 'eravos.ripple', preview: 'bass', domain: 'music', version: '1.2.0', label: 'Ripple', icon: '≈', accent: '#ff5a3c',
     category: 'Bass', blurb: 'The rumble: a clean sub under a driven grind whose voices are a few hertz apart, so the floor swells. Dive into each note.',
     size: { w: 620, h: 620 }, minSize: { w: 460, h: 380 },
     permissions: ['audio_out', 'midi_in', 'bus_publish', 'bus_subscribe'],
@@ -42,6 +42,12 @@
       { key: 'diveTime', type: 'number', default: 0.12, min: 0.01, max: 4, step: 0.01, unit: 's', label: 'Dive time', group: 'DIVE' },
       { key: 'collideFrom', type: 'number', default: 0, min: 0, max: 80, step: 0.1, unit: 'Hz', label: 'Collide from', group: 'COLLIDE', element: 'unison-stack', hint: 'Each note starts with its voices this far apart (a clash) and slides to Beat (a ripple); 0 = off' },
       { key: 'collideTime', type: 'number', default: 0.6, min: 0.01, max: 8, step: 0.01, unit: 's', label: 'Collide time', group: 'COLLIDE', hint: 'How long the clash takes to slow into the ripple' },
+      // 3.255 the recipe he pasted (2026-11-28, not his words): "Modulation from a square wave two octaves higher" — a modulator per voice (FM): it bends each voice's
+      // frequency at Mod ratio × the voice's frequency (4 = two octaves up); Mod amount is the FM index (the bend = amount × the modulator's
+      // frequency). Mod amount 0 = as before.
+      { key: 'modAmt', type: 'number', default: 0, min: 0, max: 4, step: 0.01, label: 'Mod amount', group: 'MOD', hint: 'How far the modulator bends each voice (the FM index): 0 = off, 1 = a bend as wide as the modulator\u2019s own pitch, higher = more screech' },
+      { key: 'modRatio', type: 'number', default: 4, min: 0.25, max: 8, step: 0.01, label: 'Mod ratio', group: 'MOD', hint: 'The modulator\u2019s pitch against the note: 2 = an octave up, 4 = two octaves up, 0.5 = an octave down' },
+      { key: 'modWave', type: 'enum', options: ['square', 'sine', 'saw', 'triangle'], default: 'square', label: 'Mod wave', group: 'MOD' },
       { key: 'aA', type: 'number', default: 0.004, min: 0.001, max: 2, step: 0.001, unit: 's', label: 'Attack', group: 'AMP' },
       { key: 'aD', type: 'number', default: 0.3, min: 0.01, max: 4, step: 0.01, unit: 's', label: 'Decay', group: 'AMP' },
       { key: 'aS', type: 'number', default: 0.85, min: 0, max: 1, step: 0.01, label: 'Sustain', group: 'AMP' },
@@ -86,7 +92,11 @@
           o.detune.setValueAtTime(L.cents[i] + dive, t); if (dive) o.detune.linearRampToValueAtTime(L.cents[i], t + dT);
           let bm = null; if (wBeat) { bm = ac.createGain(); bm.gain.value = L.pos[i] / 2; beatMod.connect(bm); bm.connect(o.frequency); }
           const gL = ac.createGain(), gR = ac.createGain(); gL.gain.value = L.gainL[i]; gR.gain.value = L.gainR[i];
-          o.connect(gL); o.connect(gR); gL.connect(sumL); gR.connect(sumR); o.start(t, L.phase[i] / Math.max(1, fm)); oscs.push({ o, bm, gL, gR, i });
+          // the modulator (FM): only made when Mod amount is above 0 at the note's start, so a note without it is built exactly as before
+          let mo = null, mg = null; const ma = P.get('modAmt'); if (ma > 0) { mo = ac.createOscillator(); mo.type = WAVES[P.get('modWave')]; mo.frequency.value = (fm + L.offsetHz[i]) * P.get('modRatio');
+            mo.detune.setValueAtTime(L.cents[i] + dive, t); if (dive) mo.detune.linearRampToValueAtTime(L.cents[i], t + dT);   // it rises / dives with its voice, so the ratio holds
+            mg = ac.createGain(); mg.gain.value = ma * fm * P.get('modRatio'); mo.connect(mg); mg.connect(o.frequency); mo.start(t); }
+          o.connect(gL); o.connect(gR); gL.connect(sumL); gR.connect(sumR); o.start(t, L.phase[i] / Math.max(1, fm)); oscs.push({ o, bm, gL, gR, i, mo, mg });
         }
         const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = P.get('res'); if (ctx.modWired('cutoff')) cutMod.connect(lp.detune);
         const amp = ac.createGain(), sAmp = ac.createGain(), so = ac.createOscillator(); amp.gain.value = 0; sAmp.gain.value = 0;
@@ -102,17 +112,17 @@
       function release(v, t) {
         if (v.released) return; v.released = true; v.relT = t; const R = P.get('aR');
         [v.amp, v.sAmp].forEach(g => { if (g.gain.cancelAndHoldAtTime) g.gain.cancelAndHoldAtTime(t); else g.gain.cancelScheduledValues(t); g.gain.setTargetAtTime(0, t, R / 4); });
-        v.end = t + R * 1.6 + 0.05; v.oscs.forEach(x => { try { x.o.stop(v.end); } catch (e) {} }); try { v.so.stop(v.end); } catch (e) {}
+        v.end = t + R * 1.6 + 0.05; v.oscs.forEach(x => { try { x.o.stop(v.end); if (x.mo) x.mo.stop(v.end); } catch (e) {} }); try { v.so.stop(v.end); } catch (e) {}
         ctx.atAudioTime(v.end + 0.1, () => cleanup(v));
       }
       function cleanup(v) {
         const i = voices.indexOf(v); if (i >= 0) voices.splice(i, 1);
-        v.oscs.forEach(x => { try { if (x.bm) beatMod.disconnect(x.bm); x.o.disconnect(); } catch (e) {} });
+        v.oscs.forEach(x => { try { if (x.bm) beatMod.disconnect(x.bm); x.o.disconnect(); if (x.mo) { x.mo.disconnect(); x.mg.disconnect(); } } catch (e) {} });
         try { v.so.disconnect(); v.amp.disconnect(); v.sAmp.disconnect(); } catch (e) {} try { cutMod.disconnect(v.lp.detune); } catch (e) {}
         ctx.emitUI('voices', { active: voices.filter(x => !x.released).map(x => x.note) });
       }
       function kill(v, t) { [v.amp, v.sAmp].forEach(g => { g.gain.cancelScheduledValues(t); g.gain.setTargetAtTime(0, t, 0.004); }); v.released = true; v.end = t + 0.03;
-        v.oscs.forEach(x => { try { x.o.stop(t + 0.03); } catch (e) {} }); try { v.so.stop(t + 0.03); } catch (e) {} ctx.atAudioTime(t + 0.1, () => cleanup(v)); }
+        v.oscs.forEach(x => { try { x.o.stop(t + 0.03); if (x.mo) x.mo.stop(t + 0.03); } catch (e) {} }); try { v.so.stop(t + 0.03); } catch (e) {} ctx.atAudioTime(t + 0.1, () => cleanup(v)); }
       function noteOn(note, vel, t, dur) {
         t = Math.max(t, ac.currentTime);
         const live = voices.filter(v => v.end > t); if (live.length >= MAXV) { const rel = live.filter(v => v.released).sort((a, b) => a.relT - b.relT), victim = rel[0] || live.sort((a, b) => a.start - b.start)[0]; kill(victim, t); }
@@ -141,6 +151,9 @@
       P.onChange('cutoff', (c) => voices.forEach(v => v.lp.detune.setTargetAtTime(1200 * Math.log2(Math.max(1, c) / v.c0), now(), 0.012)));
       P.onChange('aS', (sv) => voices.forEach(v => { if (v.released || now() < v.start + P.get('aA') + P.get('aD')) return; [v.amp, v.sAmp].forEach(g => { g.gain.cancelScheduledValues(now()); glide(g.gain, sv); }); }));
       P.onChange('midOct', (o) => voices.forEach(v => { v.fm = v.f * Math.pow(2, +o); })); P.onChange('midOct', relayout);
+      P.onChange('modAmt', (a) => voices.forEach(v => v.oscs.forEach(x => { if (x.mg) glide(x.mg.gain, a * v.fm * P.get('modRatio')); })));
+      P.onChange('modRatio', (r) => { const L = layout(); voices.forEach(v => v.oscs.forEach(x => { if (x.mo) { glide(x.mo.frequency, (v.fm + L.offsetHz[x.i]) * r); glide(x.mg.gain, P.get('modAmt') * v.fm * r); } })); });
+      P.onChange('modWave', (w) => voices.forEach(v => v.oscs.forEach(x => { if (x.mo) x.mo.type = WAVES[w]; })));
       ctx.onKey(() => ctx.syncUI());
       ctx.audition = (p) => noteOn(p.note || 45, 0.85, ac.currentTime, 0.9);
       return { unmount() { voices.slice().forEach(v => kill(v, ac.currentTime)); } };

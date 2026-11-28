@@ -319,3 +319,8 @@ kept), or **open** (not done yet, and what is missing). Newest at the bottom. Ad
 | N-X170 | "Okay. They all sound similar. Can you get the rumble sound? Like it's a high pitch tone that loads in, collides and ripples . Also tools to connect to tools." (2026-11-27) | **built** (the sound) · **open** (connector tools) | 3.250 Ripple 1.1: Rise, the filter opening in, Collide from / time; connector tools next (T-104) |
 | N-X171 | "Push and release." (2026-11-27) | **done** | release 0.2.42 |
 | N-X172 | "consolidate and merge." · "yes merge i meant and release." (2026-11-27) | **done** | release 0.2.43 |
+| N-X173 | "okay now can you replicate rumble? in samles for that noise for me so i can judge?" (session of 2026-11-27/28) | **done** (renders sent) · his ear decides | Rumble studies A–H, Percuss P1–P3 |
+| N-X174 | "Two frequencies percussing into each other and then rippling." · "Maybe it should have been one big tool that you can break off into smaller tools, then into components." (session of 2026-11-27/28) | **open** — the one Contrast instrument asked, no answer yet | `specs/eravos.contrast-space.spec` |
+| N-X175 | "It's a slow wobble in. High pitched." (session of 2026-11-27/28) | **done** (renders W1–W4) | — |
+| N-X176 | "The last set was closer but it doesn't even out it wobbles a bit hard and it's rapid. Like a screech. I think it is a a voice." (session of 2026-11-27/28) | **open** — renders V1–V3 sent; Voice Lab VL3 (a made voice) offered | `specs/eravos.voice-lab.spec` |
+| N-X177 | The squeak recipe he pasted (another assistant's words, 2026-11-28): "Modulation from a square wave two octaves higher …" | **built** (the capability) · his ear decides the sound | 3.255 Ripple 1.2 MOD; renders S0–S4 |
